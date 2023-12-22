@@ -109,37 +109,6 @@
         <!-- Tax engine -->
         <service id="thelia.taxEngine" alias="Thelia\TaxEngine\TaxEngine"/>
 
-        <!--  The assets manager -->
-        <service id="assetic.asset.manager" alias="Thelia\Core\Template\Assets\AsseticAssetManager" public="true"/>
-
-        <!-- The asset filters -->
-        <service id="Thelia\Core\Template\Assets\Filter\LessDotPhpFilter">
-            <tag name="thelia.asset.filter" key="less" />
-            <tag name="kernel.event_subscriber"/>
-            <argument>%kernel.environment%</argument>
-        </service>
-        <service id="less.assetic.filter" alias="Thelia\Core\Template\Assets\Filter\LessDotPhpFilter"/>
-
-        <service id="Assetic\Filter\ScssphpFilter">
-            <tag name="thelia.asset.filter" key="scss"  />
-        </service>
-        <service id="scss.assetic.filter" alias="Assetic\Filter\ScssphpFilter"/>
-
-        <service id="Assetic\Filter\PhpCssEmbedFilter">
-            <tag name="thelia.asset.filter" key="cssembed" />
-        </service>
-        <service id="cssembed.assetic.filter" alias="Assetic\Filter\PhpCssEmbedFilter"/>
-
-        <service id="Assetic\Filter\CssRewriteFilter">
-            <tag name="thelia.asset.filter" key="cssrewrite"/>
-        </service>
-        <service id="cssrewrite.assetic.filter" alias="Assetic\Filter\CssRewriteFilter"/>
-
-        <service id="Assetic\Filter\CssImportFilter">
-            <tag name="thelia.asset.filter" key="cssimport"/>
-        </service>
-        <service id="cssimport.assetic.filter" alias="Assetic\Filter\CssImportFilter"/>
-
         <!--
         A ControllerResolver that supports "a:b:c", "service:method" and class::method" notations,
         thus allowing the definition of controllers as service (see http://symfony.com/fr/doc/current/cookbook/controller/service.html)

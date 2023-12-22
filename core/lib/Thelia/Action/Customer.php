@@ -250,7 +250,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::CUSTOMER_CREATEACCOUNT => ['create', 128],

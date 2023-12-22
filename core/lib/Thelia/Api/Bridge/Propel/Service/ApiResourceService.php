@@ -26,7 +26,6 @@ use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\CompositeIdentifiers;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Event\ModelToResourceEvent;
-use Thelia\Api\Resource\ItemFileResourceInterface;
 use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Api\Resource\ResourceAddonInterface;
 use Thelia\Api\Resource\TranslatableResourceInterface;
@@ -109,7 +108,7 @@ class ApiResourceService
                 }
 
                 $targetClass = $relationAttribute->getArguments()['targetResource'];
-                if ($targetClass === $parentReflector?->getName() && $property->getType()->getName() !== "array") {
+                if ($targetClass === $parentReflector?->getName() && $property->getType()->getName() !== 'array') {
                     $apiResource->$resourceSetter(
                         $this->modelToResource(
                             resourceClass: $parentReflector->getName(),
@@ -294,9 +293,9 @@ class ApiResourceService
                     $value = $data->$method();
                 }
 
-                if (is_object($value) && method_exists($value, 'getPropelModel')) {
+                if (\is_object($value) && method_exists($value, 'getPropelModel')) {
                     if (!$setterForced) {
-                        $propelSetter = $propelSetter.'Id';
+                        $propelSetter .= 'Id';
                     }
 
                     $valuePropelModel = $value->getPropelModel();
@@ -305,40 +304,41 @@ class ApiResourceService
                     }
 
                     // If value is still not transformed
-                    if (is_object($value) && method_exists($value, 'getId')) {
+                    if (\is_object($value) && method_exists($value, 'getId')) {
                         $value = $value->getId();
                     }
                 }
 
                 if (\is_array($value)) {
-                        $value = new Collection(
-                            array_map(
-                                function ($value, $index) use ($context, $property) {
-                                    try {
-                                        return $this->resourceToModel($value, $context);
-                                    } catch (ValidationException $exception) {
-                                        $constrainViolationList = new ConstraintViolationList(
-                                            array_map(
-                                                function (ConstraintViolation $violation) use ($property, $index) {
-                                                    $newViolation = new \ReflectionClass($violation);
-                                                    $newViolation->getProperty('propertyPath')->setValue(
-                                                        $violation,
-                                                        $property->getName().'['.$index.'].'.$violation->getPropertyPath()
-                                                    );
-                                                    return $violation;
-                                                },
-                                                iterator_to_array($exception->getConstraintViolationList())
-                                            ),
-                                        );
-                                        throw new ValidationException(
-                                            $constrainViolationList
-                                        );
-                                    }
-                                },
-                                $value,
-                                array_keys($value)
-                            )
-                        );
+                    $value = new Collection(
+                        array_map(
+                            function ($value, $index) use ($context, $property) {
+                                try {
+                                    return $this->resourceToModel($value, $context);
+                                } catch (ValidationException $exception) {
+                                    $constrainViolationList = new ConstraintViolationList(
+                                        array_map(
+                                            function (ConstraintViolation $violation) use ($property, $index) {
+                                                $newViolation = new \ReflectionClass($violation);
+                                                $newViolation->getProperty('propertyPath')->setValue(
+                                                    $violation,
+                                                    $property->getName().'['.$index.'].'.$violation->getPropertyPath()
+                                                );
+
+                                                return $violation;
+                                            },
+                                            iterator_to_array($exception->getConstraintViolationList())
+                                        ),
+                                    );
+                                    throw new ValidationException(
+                                        $constrainViolationList
+                                    );
+                                }
+                            },
+                            $value,
+                            array_keys($value)
+                        )
+                    );
                 }
 
                 $propelModel->$propelSetter($value);
@@ -372,33 +372,34 @@ class ApiResourceService
         return $propelModel;
     }
 
-    public function getResourceCompositeIdentifierValues(\ReflectionClass $reflector,string $param) : array
+    public function getResourceCompositeIdentifierValues(\ReflectionClass $reflector, string $param): array
     {
         $compositeIdentifiersAttribute = $reflector->getAttributes(CompositeIdentifiers::class);
 
-        if (empty($compositeIdentifiersAttribute)){
+        if (empty($compositeIdentifiersAttribute)) {
             return [];
         }
 
-        if (isset($compositeIdentifiersAttribute[0]) && isset($compositeIdentifiersAttribute[0]->getArguments()[0])){
+        if (isset($compositeIdentifiersAttribute[0]) && isset($compositeIdentifiersAttribute[0]->getArguments()[0])) {
             return $compositeIdentifiersAttribute[0]->getArguments()[0];
         }
 
-        if (isset($compositeIdentifiersAttribute[0]) && isset($compositeIdentifiersAttribute[0]->getArguments()[$param])){
+        if (isset($compositeIdentifiersAttribute[0]) && isset($compositeIdentifiersAttribute[0]->getArguments()[$param])) {
             return $compositeIdentifiersAttribute[0]->getArguments()[$param];
         }
 
         return [];
     }
 
-    public function getColumnValues(\ReflectionClass $reflector,array $columns) : array
+    public function getColumnValues(\ReflectionClass $reflector, array $columns): array
     {
         $columnValues = [];
-        foreach ($columns as $column){
-            if (isset($reflector->getProperty($column)->getAttributes(Column::class)[0])){
+        foreach ($columns as $column) {
+            if (isset($reflector->getProperty($column)->getAttributes(Column::class)[0])) {
                 $columnValues[$column] = $reflector->getProperty($column)->getAttributes(Column::class)[0]->getArguments();
             }
         }
+
         return $columnValues;
     }
 }

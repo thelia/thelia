@@ -406,7 +406,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::COUPON_CREATE => ['create', 128],

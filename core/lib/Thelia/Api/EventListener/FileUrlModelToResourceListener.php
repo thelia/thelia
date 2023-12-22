@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -15,9 +25,10 @@ class FileUrlModelToResourceListener implements EventSubscriberInterface
 {
     public function __construct(
         private EventDispatcherInterface $eventDispatcher
-    ){}
+    ) {
+    }
 
-    public function addFileUrl(ModelToResourceEvent $modelToResourceEvent)
+    public function addFileUrl(ModelToResourceEvent $modelToResourceEvent): void
     {
         /** @var ItemFileResourceInterface $resource */
         $resource = $modelToResourceEvent->getResource();
@@ -47,16 +58,15 @@ class FileUrlModelToResourceListener implements EventSubscriberInterface
         $event->setCacheSubdirectory($resource::getItemType());
         $this->eventDispatcher->dispatch($event, $eventName);
 
-
-        $urlGetter = $documentType === "image" ?  "getFileUrl" : "getDocumentUrl";
+        $urlGetter = $documentType === 'image' ? 'getFileUrl' : 'getDocumentUrl';
         $resource->setFileUrl($event->$urlGetter());
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ModelToResourceEvent::AFTER_TRANSFORM => [
-                ['addFileUrl', 0]
+                ['addFileUrl', 0],
             ],
         ];
     }

@@ -1,7 +1,16 @@
 <?php
 
-namespace Thelia\Api\Resource;
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
+namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
@@ -10,6 +19,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\OpenApi\Model\Operation;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -38,17 +48,17 @@ use Thelia\Model\Map\CategoryDocumentTableMap;
         new Get(
             uriTemplate: '/admin/category_documents/{id}/file',
             controller: BinaryFileController::class,
-            openapiContext: [
-                'responses' => [
+            openapi: new Operation(
+                responses: [
                     '200' => [
-                        'description' => 'The binary file'
-                    ]
+                        'description' => 'The binary file',
+                    ],
                 ]
-            ]
+            )
         ),
         new Put(
             uriTemplate: '/admin/category_documents/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_WRITE,self::GROUP_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_WRITE, self::GROUP_WRITE_UPDATE]]
         ),
         new Delete(
             uriTemplate: '/admin/category_documents/{id}'
@@ -76,7 +86,7 @@ class CategoryDocument extends AbstractTranslatableResource implements ItemFileR
     #[ApiProperty(
         openapiContext: [
             'type' => 'string',
-            'format' => 'binary'
+            'format' => 'binary',
         ]
     )]
     public UploadedFile $fileToUpload;
@@ -107,9 +117,10 @@ class CategoryDocument extends AbstractTranslatableResource implements ItemFileR
         return $this->id;
     }
 
-    public function setId(?int $id): CategoryDocument
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -118,9 +129,10 @@ class CategoryDocument extends AbstractTranslatableResource implements ItemFileR
         return $this->category;
     }
 
-    public function setCategory(Category $category): CategoryDocument
+    public function setCategory(Category $category): self
     {
         $this->category = $category;
+
         return $this;
     }
 
@@ -129,9 +141,10 @@ class CategoryDocument extends AbstractTranslatableResource implements ItemFileR
         return $this->fileToUpload;
     }
 
-    public function setFileToUpload(UploadedFile $fileToUpload): CategoryDocument
+    public function setFileToUpload(UploadedFile $fileToUpload): self
     {
         $this->fileToUpload = $fileToUpload;
+
         return $this;
     }
 
@@ -140,9 +153,10 @@ class CategoryDocument extends AbstractTranslatableResource implements ItemFileR
         return $this->visible;
     }
 
-    public function setVisible(bool $visible): CategoryDocument
+    public function setVisible(bool $visible): self
     {
         $this->visible = $visible;
+
         return $this;
     }
 
@@ -151,9 +165,10 @@ class CategoryDocument extends AbstractTranslatableResource implements ItemFileR
         return $this->position;
     }
 
-    public function setPosition(?int $position): CategoryDocument
+    public function setPosition(?int $position): self
     {
         $this->position = $position;
+
         return $this;
     }
 
@@ -162,9 +177,10 @@ class CategoryDocument extends AbstractTranslatableResource implements ItemFileR
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): CategoryDocument
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
@@ -173,9 +189,10 @@ class CategoryDocument extends AbstractTranslatableResource implements ItemFileR
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): CategoryDocument
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
@@ -184,9 +201,10 @@ class CategoryDocument extends AbstractTranslatableResource implements ItemFileR
         return $this->file;
     }
 
-    public function setFile(string $file): CategoryDocument
+    public function setFile(string $file): self
     {
         $this->file = $file;
+
         return $this;
     }
 
@@ -195,20 +213,21 @@ class CategoryDocument extends AbstractTranslatableResource implements ItemFileR
         return $this->fileUrl;
     }
 
-    public function setFileUrl(?string $fileUrl): CategoryDocument
+    public function setFileUrl(?string $fileUrl): self
     {
         $this->fileUrl = $fileUrl;
+
         return $this;
     }
 
     public static function getItemType(): string
     {
-        return "category";
+        return 'category';
     }
 
     public static function getFileType(): string
     {
-        return "document";
+        return 'document';
     }
 
     public function getItemId(): string

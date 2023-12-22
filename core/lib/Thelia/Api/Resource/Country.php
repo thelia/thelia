@@ -42,7 +42,7 @@ use Thelia\Model\Map\CountryTableMap;
                 'isoalpha3' => new Link(
                     fromProperty: 'isoalpha3',
                     fromClass: Country::class
-                )
+                ),
             ],
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]],
         ),
@@ -57,7 +57,7 @@ use Thelia\Model\Map\CountryTableMap;
         'id' => new Link(
             fromClass: Country::class,
             identifiers: ['id']
-        )
+        ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]

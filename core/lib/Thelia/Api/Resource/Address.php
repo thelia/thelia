@@ -370,7 +370,7 @@ class Address implements PropelResourceInterface
         return new AddressTableMap();
     }
 
-    #[Callback(groups: [Address::GROUP_WRITE, Customer::GROUP_WRITE])]
+    #[Callback(groups: [self::GROUP_WRITE, Customer::GROUP_WRITE])]
     public function verifyZipcode(ExecutionContextInterface $context): void
     {
         $resource = $context->getRoot();
@@ -383,7 +383,7 @@ class Address implements PropelResourceInterface
                         $context->addViolation(
                             Translator::getInstance()->trans(
                                 'This zip code should respect the following format : %format.',
-                                ['%format' => $country->getZipCodeFormat()],null,'en_US'
+                                ['%format' => $country->getZipCodeFormat()], null, 'en_US'
                             )
                         );
                     }
@@ -392,7 +392,7 @@ class Address implements PropelResourceInterface
         }
     }
 
-    #[Callback(groups: [Address::GROUP_WRITE, Customer::GROUP_WRITE])]
+    #[Callback(groups: [self::GROUP_WRITE, Customer::GROUP_WRITE])]
     public function verifyState(ExecutionContextInterface $context): void
     {
         $resource = $context->getRoot();
@@ -403,14 +403,14 @@ class Address implements PropelResourceInterface
                     if ($state->getCountryId() !== $country->getId()) {
                         $context->addViolation(
                             Translator::getInstance()->trans(
-                                "This state doesn't belong to this country.",[],null,'en_US'
+                                "This state doesn't belong to this country.", [], null, 'en_US'
                             )
                         );
                     }
                 } else {
                     $context->addViolation(
                         Translator::getInstance()->trans(
-                            'You should select a state for this country.',[],null,'en_US'
+                            'You should select a state for this country.', [], null, 'en_US'
                         )
                     );
                 }

@@ -23,7 +23,6 @@ use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
-use Thelia\Model\Event\CustomerEvent;
 use Thelia\Model\Map\StateTableMap;
 
 #[ApiResource(
@@ -48,7 +47,7 @@ use Thelia\Model\Map\StateTableMap;
                 'stateIso' => new Link(
                     fromProperty: 'isocode',
                     fromClass: State::class
-                )
+                ),
             ],
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]],
             name: 'state_by_iso',
@@ -64,7 +63,7 @@ use Thelia\Model\Map\StateTableMap;
         'id' => new Link(
             fromClass: Country::class,
             identifiers: ['id']
-        )
+        ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]

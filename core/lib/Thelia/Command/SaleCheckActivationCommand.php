@@ -31,7 +31,7 @@ class SaleCheckActivationCommand extends ContainerAwareCommand
             ->setDescription('check the activation and deactivation dates of sales, and perform the required action depending on the current date.');
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
             $this->getDispatcher()->dispatch(

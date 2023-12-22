@@ -308,9 +308,6 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         return $this->password;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function checkPassword($password)
     {
         return password_verify($password, $this->password);

@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Bridge\Propel\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -12,7 +22,8 @@ class BaseItemProviderListener implements EventSubscriberInterface
         private readonly ApiResourceService $apiResourceService,
     ) {
     }
-    public function baseProvider(ItemProviderQueryEvent $event)
+
+    public function baseProvider(ItemProviderQueryEvent $event): void
     {
         $query = $event->getQuery();
 
@@ -20,27 +31,27 @@ class BaseItemProviderListener implements EventSubscriberInterface
 
         $compositeIdentifiers = $this->apiResourceService->getResourceCompositeIdentifierValues(reflector: $reflector, param: 'keys');
 
-        $columnValues = $this->apiResourceService->getColumnValues(reflector: $reflector,columns: $compositeIdentifiers);
+        $columnValues = $this->apiResourceService->getColumnValues(reflector: $reflector, columns: $compositeIdentifiers);
 
         foreach ($event->getUriVariables() as $field => $value) {
             $filterMethod = null;
-            $filterName = $columnValues[$field]["propelQueryFilter"] ?? null;
-            if ($filterName && method_exists($query, $filterName)){
-                $filterMethod = $columnValues[$field]["propelQueryFilter"];
+            $filterName = $columnValues[$field]['propelQueryFilter'] ?? null;
+            if ($filterName && method_exists($query, $filterName)) {
+                $filterMethod = $columnValues[$field]['propelQueryFilter'];
                 $value = $event->getUriVariables()[$field];
             }
 
-            $filterName = "filterBy".ucfirst($field)."Id";
+            $filterName = 'filterBy'.ucfirst($field).'Id';
             if (null === $filterMethod && method_exists($query, $filterName)) {
                 $filterMethod = $filterName;
             }
 
-            $filterName = "filterBy".ucfirst($field);
+            $filterName = 'filterBy'.ucfirst($field);
             if (null === $filterMethod && method_exists($query, $filterName)) {
                 $filterMethod = $filterName;
             }
 
-            if ($filterMethod !== null){
+            if ($filterMethod !== null) {
                 $query->$filterMethod($value);
             }
         }
@@ -50,7 +61,7 @@ class BaseItemProviderListener implements EventSubscriberInterface
     {
         return [
             ItemProviderQueryEvent::class => [
-                ['baseProvider', 128]
+                ['baseProvider', 128],
             ],
         ];
     }

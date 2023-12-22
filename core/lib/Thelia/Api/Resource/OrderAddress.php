@@ -53,7 +53,7 @@ class OrderAddress implements PropelResourceInterface
     public const GROUP_READ_SINGLE = 'order_address:read:single';
     public const GROUP_WRITE = 'order_address:write';
 
-    #[Groups([self::GROUP_READ,Order::GROUP_WRITE, Order::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, Order::GROUP_WRITE, Order::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ, Order::GROUP_READ_SINGLE])]
@@ -87,15 +87,15 @@ class OrderAddress implements PropelResourceInterface
     public ?string $company;
 
     #[Relation(targetResource: CustomerTitle::class)]
-    #[Groups(groups: [self::GROUP_READ,self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
+    #[Groups(groups: [self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public CustomerTitle $customerTitle;
 
     #[Relation(targetResource: Country::class)]
-    #[Groups(groups: [self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_READ_SINGLE])]
+    #[Groups(groups: [self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public Country $country;
 
     #[Relation(targetResource: State::class)]
-    #[Groups(groups: [self::GROUP_READ,self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
+    #[Groups(groups: [self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public ?State $state = null;
 
     #[Groups([self::GROUP_READ])]
