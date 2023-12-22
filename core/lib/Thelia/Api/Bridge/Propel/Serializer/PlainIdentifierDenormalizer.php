@@ -30,7 +30,7 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
     ) {
     }
 
-    public function supportsDenormalization(mixed $data, string $type, string $format = null)
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         if (!\is_array($data) || !\in_array($format, ['json', 'jsonld'], true) || !class_exists($type)) {
             return false;
@@ -44,7 +44,7 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
         return false;
     }
 
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = [])
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
     {
         if (!\is_array($data)) {
             $data = [$data];
@@ -129,5 +129,12 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
                     );
             }
         );
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            "*" => false
+        ];
     }
 }

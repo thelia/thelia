@@ -55,7 +55,7 @@ class CacheClear extends ContainerAwareCommand
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $cacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
 

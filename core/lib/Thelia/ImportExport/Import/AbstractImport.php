@@ -12,6 +12,7 @@
 
 namespace Thelia\ImportExport\Import;
 
+use ReturnTypeWillChange;
 use Symfony\Component\HttpFoundation\File\File;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Lang;
@@ -48,12 +49,12 @@ abstract class AbstractImport implements \Iterator
      */
     protected $importedRows = 0;
 
-    public function current()
+    #[ReturnTypeWillChange] public function current(): mixed
     {
         return current($this->data);
     }
 
-    public function key()
+    #[ReturnTypeWillChange] public function key(): int|null|string
     {
         return key($this->data);
     }

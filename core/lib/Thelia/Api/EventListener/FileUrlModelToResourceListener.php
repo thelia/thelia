@@ -52,7 +52,7 @@ class FileUrlModelToResourceListener implements EventSubscriberInterface
         $resource->setFileUrl($event->$urlGetter());
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ModelToResourceEvent::AFTER_TRANSFORM => [

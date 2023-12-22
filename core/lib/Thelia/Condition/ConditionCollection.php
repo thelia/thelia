@@ -15,6 +15,7 @@ namespace Thelia\Condition;
 use ArrayAccess;
 use Countable;
 use Iterator;
+use ReturnTypeWillChange;
 use Thelia\Condition\Implementation\ConditionInterface;
 
 /**
@@ -35,7 +36,7 @@ class ConditionCollection implements \Iterator, \Countable, \ArrayAccess
      *
      * @return mixed can return any type
      */
-    public function current()
+    #[ReturnTypeWillChange] public function current()
     {
         $var = current($this->conditions);
 
@@ -60,14 +61,11 @@ class ConditionCollection implements \Iterator, \Countable, \ArrayAccess
      * Return the key of the current element.
      *
      * @see http://php.net/manual/en/iterator.key.php
-     *
-     * @return mixed scalar on success, or null on failure
+     * @return mixed
      */
-    public function key()
+    #[ReturnTypeWillChange] public function key(): mixed
     {
-        $var = key($this->conditions);
-
-        return $var;
+        return key($this->conditions);
     }
 
     /**
@@ -141,7 +139,7 @@ class ConditionCollection implements \Iterator, \Countable, \ArrayAccess
      *
      * @return mixed can return all value types
      */
-    public function offsetGet($offset)
+    #[ReturnTypeWillChange] public function offsetGet($offset)
     {
         return $this->conditions[$offset] ?? null;
     }

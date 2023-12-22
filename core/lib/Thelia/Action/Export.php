@@ -40,7 +40,7 @@ class Export extends BaseAction implements EventSubscriberInterface
         $this->handler = $exportHandler;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::EXPORT_CHANGE_POSITION => [

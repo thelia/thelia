@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\OpenApi\Model\Operation;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -49,13 +50,13 @@ use Thelia\Model\Map\ContentImageTableMap;
         new Get(
             uriTemplate: '/admin/content_images/{id}/file',
             controller: BinaryFileController::class,
-            openapiContext: [
-                'responses' => [
+            openapi: new Operation(
+                responses: [
                     '200' => [
                         'description' => 'The binary file'
                     ]
                 ]
-            ]
+            )
         ),
         new Put(
             uriTemplate: '/admin/content_images/{id}',

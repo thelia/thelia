@@ -103,7 +103,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
         $event->setDocumentUrl(URL::getInstance()->absoluteUrl($documentUrl, null, URL::PATH_TO_FILE, $this->cdnBaseUrl));
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::DOCUMENT_PROCESS => ['processDocument', 128],
