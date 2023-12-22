@@ -86,7 +86,7 @@ class State extends BaseAction implements EventSubscriberInterface
         $event->setState($state);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::STATE_CREATE => ['create', 128],

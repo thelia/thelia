@@ -40,6 +40,7 @@ class FragmentBag implements \Iterator
      *
      * @return mixed can return any type
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return $this->fragments[$this->position];
@@ -66,6 +67,7 @@ class FragmentBag implements \Iterator
      *
      * @return mixed scalar on success, or null on failure
      */
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return $this->position;
@@ -109,12 +111,12 @@ class FragmentBag implements \Iterator
         $this->fragments = [];
     }
 
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return \count($this->fragments) == 0;
     }
 
-    public function getCount()
+    public function getCount(): int
     {
         return \count($this->fragments);
     }
@@ -137,7 +139,7 @@ class FragmentBag implements \Iterator
      *
      * @api
      */
-    public function keys()
+    public function keys(): array
     {
         return array_keys($this->fragments);
     }

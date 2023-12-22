@@ -1,6 +1,6 @@
 services:
   mariadb:
-    image: mariadb:10.3
+    image: mariadb:11.2
     container_name: docker-thelia-mariadb
     working_dir: /application
     volumes:

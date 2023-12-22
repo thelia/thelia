@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\OpenApi\Model\Operation;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -47,17 +48,17 @@ use Thelia\Model\Map\FolderDocumentTableMap;
         new Get(
             uriTemplate: '/admin/folder_documents/{id}/file',
             controller: BinaryFileController::class,
-            openapiContext: [
-                'responses' => [
+            openapi: new Operation(
+                responses: [
                     '200' => [
-                        'description' => 'The binary file'
-                    ]
+                        'description' => 'The binary file',
+                    ],
                 ]
-            ]
+            )
         ),
         new Put(
             uriTemplate: '/admin/folder_documents/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_WRITE,self::GROUP_WRITE_UPDATE]],
+            denormalizationContext: ['groups' => [self::GROUP_WRITE, self::GROUP_WRITE_UPDATE]],
         ),
         new Delete(
             uriTemplate: '/admin/folder_documents/{id}'
@@ -75,7 +76,6 @@ class FolderDocument extends AbstractTranslatableResource implements ItemFileRes
     public const GROUP_WRITE_FILE = 'folder_document:write_file';
     public const GROUP_WRITE_UPDATE = 'folder_document:write_update';
 
-
     #[Groups([self::GROUP_READ])]
     public ?int $id = null;
 
@@ -87,7 +87,7 @@ class FolderDocument extends AbstractTranslatableResource implements ItemFileRes
     #[ApiProperty(
         openapiContext: [
             'type' => 'string',
-            'format' => 'binary'
+            'format' => 'binary',
         ]
     )]
     public UploadedFile $fileToUpload;
@@ -118,21 +118,22 @@ class FolderDocument extends AbstractTranslatableResource implements ItemFileRes
         return $this->id;
     }
 
-    public function setId(?int $id): FolderDocument
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
-
 
     public function getFileToUpload(): UploadedFile
     {
         return $this->fileToUpload;
     }
 
-    public function setFileToUpload(UploadedFile $fileToUpload): FolderDocument
+    public function setFileToUpload(UploadedFile $fileToUpload): self
     {
         $this->fileToUpload = $fileToUpload;
+
         return $this;
     }
 
@@ -141,9 +142,10 @@ class FolderDocument extends AbstractTranslatableResource implements ItemFileRes
         return $this->visible;
     }
 
-    public function setVisible(bool $visible): FolderDocument
+    public function setVisible(bool $visible): self
     {
         $this->visible = $visible;
+
         return $this;
     }
 
@@ -152,9 +154,10 @@ class FolderDocument extends AbstractTranslatableResource implements ItemFileRes
         return $this->position;
     }
 
-    public function setPosition(?int $position): FolderDocument
+    public function setPosition(?int $position): self
     {
         $this->position = $position;
+
         return $this;
     }
 
@@ -163,9 +166,10 @@ class FolderDocument extends AbstractTranslatableResource implements ItemFileRes
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): FolderDocument
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
@@ -174,9 +178,10 @@ class FolderDocument extends AbstractTranslatableResource implements ItemFileRes
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): FolderDocument
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
@@ -185,9 +190,10 @@ class FolderDocument extends AbstractTranslatableResource implements ItemFileRes
         return $this->file;
     }
 
-    public function setFile(string $file): FolderDocument
+    public function setFile(string $file): self
     {
         $this->file = $file;
+
         return $this;
     }
 
@@ -196,9 +202,10 @@ class FolderDocument extends AbstractTranslatableResource implements ItemFileRes
         return $this->fileUrl;
     }
 
-    public function setFileUrl(?string $fileUrl): FolderDocument
+    public function setFileUrl(?string $fileUrl): self
     {
         $this->fileUrl = $fileUrl;
+
         return $this;
     }
 
@@ -207,12 +214,12 @@ class FolderDocument extends AbstractTranslatableResource implements ItemFileRes
         return $this->folder;
     }
 
-    public function setFolder(Folder $folder): FolderDocument
+    public function setFolder(Folder $folder): self
     {
         $this->folder = $folder;
+
         return $this;
     }
-
 
     public static function getPropelRelatedTableMap(): ?TableMap
     {
@@ -226,12 +233,12 @@ class FolderDocument extends AbstractTranslatableResource implements ItemFileRes
 
     public static function getItemType(): string
     {
-        return "folder";
+        return 'folder';
     }
 
     public static function getFileType(): string
     {
-        return "document";
+        return 'document';
     }
 
     public function getItemId(): string

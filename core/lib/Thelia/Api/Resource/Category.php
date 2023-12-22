@@ -56,7 +56,7 @@ class Category extends AbstractTranslatableResource
         Product::GROUP_WRITE,
         ProductCategory::GROUP_READ,
         CategoryImage::GROUP_READ_SINGLE,
-        CategoryDocument::GROUP_READ_SINGLE
+        CategoryDocument::GROUP_READ_SINGLE,
     ])]
     public ?int $id = null;
 

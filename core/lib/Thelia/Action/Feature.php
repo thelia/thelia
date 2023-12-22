@@ -122,7 +122,7 @@ class Feature extends BaseAction implements EventSubscriberInterface
         FeatureTemplateQuery::create()->filterByFeature($event->getFeature())->delete();
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::FEATURE_CREATE => ['create', 128],

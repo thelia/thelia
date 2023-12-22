@@ -14,16 +14,13 @@ namespace Thelia\Api\Bridge\Propel\Routing;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Util\ClassInfoTrait;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
-use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingExceptionInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Thelia\Api\Bridge\Propel\Attribute\CompositeIdentifiers;
-use Thelia\Api\Resource\Country;
 use Thelia\Log\Tlog;
 
 #[AsDecorator(decorates: 'api_platform.symfony.iri_converter')]
@@ -39,16 +36,16 @@ class IriConverter implements IriConverterInterface
     ) {
     }
 
-    public function getResourceFromIri(string $iri, array $context = [], ?Operation $operation = null): object
+    public function getResourceFromIri(string $iri, array $context = [], Operation $operation = null): object
     {
         return $this->decorated->getResourceFromIri($iri, $context, $operation);
     }
 
-    public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = []): ?string
+    public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = []): ?string
     {
         $resourceClass = $resource;
-        if (is_object($resource)) {
-            $resourceClass = get_class($resource);
+        if (\is_object($resource)) {
+            $resourceClass = $resource::class;
         }
 
         $reflector = new \ReflectionClass($resourceClass);
@@ -59,7 +56,7 @@ class IriConverter implements IriConverterInterface
             $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(null, false, true);
         }
 
-        if (is_object($resource) && !empty($compositeIdentifiers) && null !== $operation) {
+        if (\is_object($resource) && !empty($compositeIdentifiers) && null !== $operation) {
             try {
                 $identifiers = array_reduce(
                     $compositeIdentifiers[0]->getArguments()[0],
@@ -80,7 +77,8 @@ class IriConverter implements IriConverterInterface
         try {
             return $this->decorated->getIriFromResource($resource, $referenceType, $operation, $context);
         } catch (\Exception $e) {
-            Tlog::getInstance()->warning("Iri convert failure : ".$e->getMessage());
+            Tlog::getInstance()->warning('Iri convert failure : '.$e->getMessage());
+
             return 'undefined_iri';
         }
     }
