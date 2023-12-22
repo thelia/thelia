@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiProperty;
@@ -9,6 +19,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\OpenApi\Model\Operation;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -37,17 +48,17 @@ use Thelia\Model\Map\BrandDocumentTableMap;
         new Get(
             uriTemplate: '/admin/brand_documents/{id}/file',
             controller: BinaryFileController::class,
-            openapiContext: [
-                'responses' => [
+            openapi: new Operation(
+                responses: [
                     '200' => [
-                        'description' => 'The binary file'
-                    ]
+                        'description' => 'The binary file',
+                    ],
                 ]
-            ]
+            )
         ),
         new Put(
             uriTemplate: '/admin/brand_documents/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_WRITE,self::GROUP_WRITE_UPDATE]],
+            denormalizationContext: ['groups' => [self::GROUP_WRITE, self::GROUP_WRITE_UPDATE]],
         ),
         new Delete(
             uriTemplate: '/admin/brand_documents/{id}'
@@ -64,7 +75,6 @@ class BrandDocument extends AbstractTranslatableResource implements ItemFileReso
     public const GROUP_WRITE_FILE = 'brand_document:write_file';
     public const GROUP_WRITE_UPDATE = 'brand_document:write_update';
 
-
     #[Groups([self::GROUP_READ])]
     public ?int $id = null;
 
@@ -76,7 +86,7 @@ class BrandDocument extends AbstractTranslatableResource implements ItemFileReso
     #[ApiProperty(
         openapiContext: [
             'type' => 'string',
-            'format' => 'binary'
+            'format' => 'binary',
         ]
     )]
     public UploadedFile $fileToUpload;
@@ -107,9 +117,10 @@ class BrandDocument extends AbstractTranslatableResource implements ItemFileReso
         return $this->id;
     }
 
-    public function setId(?int $id): BrandDocument
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -118,9 +129,10 @@ class BrandDocument extends AbstractTranslatableResource implements ItemFileReso
         return $this->brand;
     }
 
-    public function setBrand(Brand $brand): BrandDocument
+    public function setBrand(Brand $brand): self
     {
         $this->brand = $brand;
+
         return $this;
     }
 
@@ -129,9 +141,10 @@ class BrandDocument extends AbstractTranslatableResource implements ItemFileReso
         return $this->fileToUpload;
     }
 
-    public function setFileToUpload(UploadedFile $fileToUpload): BrandDocument
+    public function setFileToUpload(UploadedFile $fileToUpload): self
     {
         $this->fileToUpload = $fileToUpload;
+
         return $this;
     }
 
@@ -140,9 +153,10 @@ class BrandDocument extends AbstractTranslatableResource implements ItemFileReso
         return $this->visible;
     }
 
-    public function setVisible(bool $visible): BrandDocument
+    public function setVisible(bool $visible): self
     {
         $this->visible = $visible;
+
         return $this;
     }
 
@@ -151,9 +165,10 @@ class BrandDocument extends AbstractTranslatableResource implements ItemFileReso
         return $this->position;
     }
 
-    public function setPosition(?int $position): BrandDocument
+    public function setPosition(?int $position): self
     {
         $this->position = $position;
+
         return $this;
     }
 
@@ -162,9 +177,10 @@ class BrandDocument extends AbstractTranslatableResource implements ItemFileReso
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): BrandDocument
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
@@ -173,9 +189,10 @@ class BrandDocument extends AbstractTranslatableResource implements ItemFileReso
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): BrandDocument
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
@@ -184,9 +201,10 @@ class BrandDocument extends AbstractTranslatableResource implements ItemFileReso
         return $this->file;
     }
 
-    public function setFile(string $file): BrandDocument
+    public function setFile(string $file): self
     {
         $this->file = $file;
+
         return $this;
     }
 
@@ -195,9 +213,10 @@ class BrandDocument extends AbstractTranslatableResource implements ItemFileReso
         return $this->fileUrl;
     }
 
-    public function setFileUrl(?string $fileUrl): BrandDocument
+    public function setFileUrl(?string $fileUrl): self
     {
         $this->fileUrl = $fileUrl;
+
         return $this;
     }
 
@@ -213,12 +232,12 @@ class BrandDocument extends AbstractTranslatableResource implements ItemFileReso
 
     public static function getItemType(): string
     {
-        return "brand";
+        return 'brand';
     }
 
     public static function getFileType(): string
     {
-        return "document";
+        return 'document';
     }
 
     public function getItemId(): string

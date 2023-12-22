@@ -1,7 +1,16 @@
 <?php
 
-namespace Thelia\Api\Resource;
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
+namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
@@ -10,6 +19,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\OpenApi\Model\Operation;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -38,17 +48,17 @@ use Thelia\Model\Map\ModuleImageTableMap;
         new Get(
             uriTemplate: '/admin/module_images/{id}/file',
             controller: BinaryFileController::class,
-            openapiContext: [
-                'responses' => [
+            openapi: new Operation(
+                responses: [
                     '200' => [
-                        'description' => 'The binary file'
-                    ]
+                        'description' => 'The binary file',
+                    ],
                 ]
-            ]
+            )
         ),
         new Put(
             uriTemplate: '/admin/module_images/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_WRITE,self::GROUP_WRITE_UPDATE]],
+            denormalizationContext: ['groups' => [self::GROUP_WRITE, self::GROUP_WRITE_UPDATE]],
         ),
         new Delete(
             uriTemplate: '/admin/module_images/{id}'
@@ -66,7 +76,6 @@ class ModuleImage extends AbstractTranslatableResource implements ItemFileResour
     public const GROUP_WRITE_FILE = 'module_image:write_file';
     public const GROUP_WRITE_UPDATE = 'module_image:write_update';
 
-
     #[Groups([self::GROUP_READ])]
     public ?int $id = null;
 
@@ -78,7 +87,7 @@ class ModuleImage extends AbstractTranslatableResource implements ItemFileResour
     #[ApiProperty(
         openapiContext: [
             'type' => 'string',
-            'format' => 'binary'
+            'format' => 'binary',
         ]
     )]
     public UploadedFile $fileToUpload;
@@ -109,9 +118,10 @@ class ModuleImage extends AbstractTranslatableResource implements ItemFileResour
         return $this->id;
     }
 
-    public function setId(?int $id): ModuleImage
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -120,9 +130,10 @@ class ModuleImage extends AbstractTranslatableResource implements ItemFileResour
         return $this->module;
     }
 
-    public function setModule(Module $module): ModuleImage
+    public function setModule(Module $module): self
     {
         $this->module = $module;
+
         return $this;
     }
 
@@ -131,9 +142,10 @@ class ModuleImage extends AbstractTranslatableResource implements ItemFileResour
         return $this->fileToUpload;
     }
 
-    public function setFileToUpload(UploadedFile $fileToUpload): ModuleImage
+    public function setFileToUpload(UploadedFile $fileToUpload): self
     {
         $this->fileToUpload = $fileToUpload;
+
         return $this;
     }
 
@@ -142,9 +154,10 @@ class ModuleImage extends AbstractTranslatableResource implements ItemFileResour
         return $this->visible;
     }
 
-    public function setVisible(bool $visible): ModuleImage
+    public function setVisible(bool $visible): self
     {
         $this->visible = $visible;
+
         return $this;
     }
 
@@ -153,9 +166,10 @@ class ModuleImage extends AbstractTranslatableResource implements ItemFileResour
         return $this->position;
     }
 
-    public function setPosition(?int $position): ModuleImage
+    public function setPosition(?int $position): self
     {
         $this->position = $position;
+
         return $this;
     }
 
@@ -164,9 +178,10 @@ class ModuleImage extends AbstractTranslatableResource implements ItemFileResour
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): ModuleImage
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
@@ -175,9 +190,10 @@ class ModuleImage extends AbstractTranslatableResource implements ItemFileResour
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): ModuleImage
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
@@ -186,9 +202,10 @@ class ModuleImage extends AbstractTranslatableResource implements ItemFileResour
         return $this->file;
     }
 
-    public function setFile(string $file): ModuleImage
+    public function setFile(string $file): self
     {
         $this->file = $file;
+
         return $this;
     }
 
@@ -197,9 +214,10 @@ class ModuleImage extends AbstractTranslatableResource implements ItemFileResour
         return $this->fileUrl;
     }
 
-    public function setFileUrl(?string $fileUrl): ModuleImage
+    public function setFileUrl(?string $fileUrl): self
     {
         $this->fileUrl = $fileUrl;
+
         return $this;
     }
 
@@ -215,12 +233,12 @@ class ModuleImage extends AbstractTranslatableResource implements ItemFileResour
 
     public static function getItemType(): string
     {
-        return "module";
+        return 'module';
     }
 
     public static function getFileType(): string
     {
-        return "image";
+        return 'image';
     }
 
     public function getItemId(): string

@@ -21,22 +21,22 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
 class PropelExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface
 {
-    public function isReadable(string $class, string $property, array $context = [])
+    public function isReadable(string $class, string $property, array $context = []): null
     {
         return null;
     }
 
-    public function isWritable(string $class, string $property, array $context = [])
+    public function isWritable(string $class, string $property, array $context = []): null
     {
         return null;
     }
 
-    public function getProperties(string $class, array $context = [])
+    public function getProperties(string $class, array $context = []): null
     {
         return null;
     }
 
-    public function getTypes(string $class, string $property, array $context = [])
+    public function getTypes(string $class, string $property, array $context = []): ?array
     {
         /** @var \Reflector $reflector */
         $reflector = new \ReflectionClass($class);

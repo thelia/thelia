@@ -360,7 +360,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
         $dispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::TRANSLATION_GET_STRINGS => ['getTranslatableStrings', 128],

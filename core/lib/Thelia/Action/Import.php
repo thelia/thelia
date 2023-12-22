@@ -40,7 +40,7 @@ class Import extends BaseAction implements EventSubscriberInterface
         $this->handler = $importHandler;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::IMPORT_CHANGE_POSITION => [

@@ -37,7 +37,7 @@ class ModuleListCommand extends ContainerAwareCommand
     /**
      * @return int|void|null
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $helper = new Table($output);
         $helper->addRows($this->getModulesData());

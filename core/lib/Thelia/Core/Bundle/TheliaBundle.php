@@ -21,7 +21,6 @@ use Thelia\Core\DependencyInjection\Compiler\CurrencyConverterProviderPass;
 use Thelia\Core\DependencyInjection\Compiler\FallbackParserPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterApiResourceAddonPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
-use Thelia\Core\DependencyInjection\Compiler\RegisterAssetFilterPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterCommandPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterCouponConditionPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterCouponPass;
@@ -62,7 +61,6 @@ class TheliaBundle extends Bundle
             ->addCompilerPass(new RegisterCouponPass())
             ->addCompilerPass(new RegisterCouponConditionPass())
             ->addCompilerPass(new RegisterArchiverPass())
-            ->addCompilerPass(new RegisterAssetFilterPass())
             ->addCompilerPass(new RegisterSerializerPass())
             ->addCompilerPass(new RegisterFormExtensionPass())
             ->addCompilerPass(new CurrencyConverterProviderPass())

@@ -134,7 +134,7 @@ class Brand extends BaseAction implements EventSubscriberInterface
         throw new NotFoundHttpException();
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::BRAND_CREATE => ['create', 128],

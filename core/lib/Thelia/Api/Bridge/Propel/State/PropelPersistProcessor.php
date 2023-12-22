@@ -24,7 +24,6 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Service\ApiResourceService;
 use Thelia\Api\Resource\ResourceAddonInterface;
 use Thelia\Config\DatabaseConfiguration;
-use Thelia\Model\ProductPriceQuery;
 
 class PropelPersistProcessor implements ProcessorInterface
 {
@@ -43,7 +42,7 @@ class PropelPersistProcessor implements ProcessorInterface
         $connection->beginTransaction();
 
         try {
-            $this->beforeSave($data, $operation,$propelModel);
+            $this->beforeSave($data, $operation, $propelModel);
             $propelModel->save();
 
             $jsonData = json_decode($this->requestStack->getCurrentRequest()->getContent(), true);
@@ -76,7 +75,7 @@ class PropelPersistProcessor implements ProcessorInterface
         $postOperation = $context['operation'] ?? null;
         if (null !== $postOperation) {
             $data = $this->apiResourceService->modelToResource(
-                resourceClass: \get_class($data),
+                resourceClass: $data::class,
                 propelModel: $propelModel,
                 context: $postOperation->getNormalizationContext(),
                 withAddon: false
@@ -89,8 +88,9 @@ class PropelPersistProcessor implements ProcessorInterface
         return $data;
     }
 
-    private function beforeSave(mixed $data, Operation $operation, &$propelModel){
-        if (get_class($operation) !== Put::class){
+    private function beforeSave(mixed $data, Operation $operation, &$propelModel): void
+    {
+        if ($operation::class !== Put::class) {
             return;
         }
 
@@ -98,24 +98,24 @@ class PropelPersistProcessor implements ProcessorInterface
 
         foreach ($reflector->getProperties() as $property) {
             $propelGetter = 'get'.ucfirst($property->getName());
-            //todo add propel getter
+            // todo add propel getter
             foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
                 if (isset($relationAttribute->getArguments()['targetResource'])) {
                     $reflectorChild = new \ReflectionClass($relationAttribute->getArguments()['targetResource']);
                     $compositeIdentifiers = $this->apiResourceService->getResourceCompositeIdentifierValues(reflector: $reflectorChild, param: 'keys');
 
-                    if ($compositeIdentifiers === [] || !$propelModel->$propelGetter() instanceof Collection){
+                    if ($compositeIdentifiers === [] || !$propelModel->$propelGetter() instanceof Collection) {
                         continue;
                     }
 
-                    foreach ($propelModel->$propelGetter()->getData() as $item){
+                    foreach ($propelModel->$propelGetter()->getData() as $item) {
                         /** @var ModelCriteria $queryClass */
-                        $queryClass = get_class($item).'Query';
+                        $queryClass = $item::class.'Query';
 
                         /** @var ModelCriteria $query */
                         $query = $queryClass::create();
 
-                        foreach ($compositeIdentifiers as $compositeIdentifier){
+                        foreach ($compositeIdentifiers as $compositeIdentifier) {
                             $filter = 'filterBy'.ucfirst($compositeIdentifier).'Id';
                             $getter = 'get'.ucfirst($compositeIdentifier).'Id';
                             if (!method_exists($item, $getter) || !method_exists($query, $filter)) {
@@ -124,7 +124,7 @@ class PropelPersistProcessor implements ProcessorInterface
                             $id = $item->$getter();
                             $query->$filter($id);
                         }
-                        if ($query->findOne() !== null){
+                        if ($query->findOne() !== null) {
                             $item->setNew(false);
                         }
                     }
@@ -133,5 +133,3 @@ class PropelPersistProcessor implements ProcessorInterface
         }
     }
 }
-
-
