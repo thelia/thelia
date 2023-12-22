@@ -12,8 +12,6 @@
 
 namespace Thelia\Core\Template\Assets;
 
-use Assetic\Filter\FilterInterface;
-
 interface AssetManagerInterface
 {
     /**
@@ -48,18 +46,24 @@ interface AssetManagerInterface
      *
      * @return string the URL to the generated asset file
      */
-    public function processAsset($assetSource, $assetDirectoryBase, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey, $outputUrl, $assetType, $filters, $debug);
+    public function processAsset(
+        string $assetSource,
+        string $assetDirectoryBase,
+        string $webAssetsDirectoryBase,
+        string $webAssetsTemplate,
+        string $webAssetsKey,
+        string $outputUrl,
+        string $assetType,
+        array|string $filters,
+        bool $debug): string;
 
     /**
      * @return bool true if the AssetManager was started in debug mode
      */
-    public function isDebugMode();
+    public function isDebugMode(): bool;
 
     /**
      * Register an asset filter.
-     *
-     * @param string          $filterIdentifier
-     * @param FilterInterface $filter
      */
-    public function registerAssetFilter($filterIdentifier, $filter);
+    public function registerAssetFilter(string $filterIdentifier, mixed $filter);
 }

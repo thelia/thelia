@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiProperty;
@@ -9,6 +19,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\OpenApi\Model\Operation;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -37,17 +48,17 @@ use Thelia\Model\Map\ProductDocumentTableMap;
         new Get(
             uriTemplate: '/admin/product_documents/{id}/file',
             controller: BinaryFileController::class,
-            openapiContext: [
-                'responses' => [
+            openapi: new Operation(
+                responses: [
                     '200' => [
-                        'description' => 'The binary file'
-                    ]
+                        'description' => 'The binary file',
+                    ],
                 ]
-            ]
+            )
         ),
         new Put(
             uriTemplate: '/admin/product_documents/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_WRITE,self::GROUP_WRITE_UPDATE]],
+            denormalizationContext: ['groups' => [self::GROUP_WRITE, self::GROUP_WRITE_UPDATE]],
         ),
         new Delete(
             uriTemplate: '/admin/product_documents/{id}'
@@ -75,7 +86,7 @@ class ProductDocument extends AbstractTranslatableResource implements ItemFileRe
     #[ApiProperty(
         openapiContext: [
             'type' => 'string',
-            'format' => 'binary'
+            'format' => 'binary',
         ]
     )]
     public UploadedFile $fileToUpload;
@@ -106,9 +117,10 @@ class ProductDocument extends AbstractTranslatableResource implements ItemFileRe
         return $this->id;
     }
 
-    public function setId(?int $id): ProductDocument
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -117,9 +129,10 @@ class ProductDocument extends AbstractTranslatableResource implements ItemFileRe
         return $this->product;
     }
 
-    public function setProduct(Product $product): ProductDocument
+    public function setProduct(Product $product): self
     {
         $this->product = $product;
+
         return $this;
     }
 
@@ -128,9 +141,10 @@ class ProductDocument extends AbstractTranslatableResource implements ItemFileRe
         return $this->fileToUpload;
     }
 
-    public function setFileToUpload(UploadedFile $fileToUpload): ProductDocument
+    public function setFileToUpload(UploadedFile $fileToUpload): self
     {
         $this->fileToUpload = $fileToUpload;
+
         return $this;
     }
 
@@ -139,9 +153,10 @@ class ProductDocument extends AbstractTranslatableResource implements ItemFileRe
         return $this->visible;
     }
 
-    public function setVisible(bool $visible): ProductDocument
+    public function setVisible(bool $visible): self
     {
         $this->visible = $visible;
+
         return $this;
     }
 
@@ -150,9 +165,10 @@ class ProductDocument extends AbstractTranslatableResource implements ItemFileRe
         return $this->position;
     }
 
-    public function setPosition(?int $position): ProductDocument
+    public function setPosition(?int $position): self
     {
         $this->position = $position;
+
         return $this;
     }
 
@@ -161,9 +177,10 @@ class ProductDocument extends AbstractTranslatableResource implements ItemFileRe
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): ProductDocument
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
@@ -172,9 +189,10 @@ class ProductDocument extends AbstractTranslatableResource implements ItemFileRe
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): ProductDocument
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
@@ -183,9 +201,10 @@ class ProductDocument extends AbstractTranslatableResource implements ItemFileRe
         return $this->file;
     }
 
-    public function setFile(string $file): ProductDocument
+    public function setFile(string $file): self
     {
         $this->file = $file;
+
         return $this;
     }
 
@@ -194,9 +213,10 @@ class ProductDocument extends AbstractTranslatableResource implements ItemFileRe
         return $this->fileUrl;
     }
 
-    public function setFileUrl(?string $fileUrl): ProductDocument
+    public function setFileUrl(?string $fileUrl): self
     {
         $this->fileUrl = $fileUrl;
+
         return $this;
     }
 
@@ -212,12 +232,12 @@ class ProductDocument extends AbstractTranslatableResource implements ItemFileRe
 
     public static function getItemType(): string
     {
-        return "product";
+        return 'product';
     }
 
     public static function getFileType(): string
     {
-        return "document";
+        return 'document';
     }
 
     public function getItemId(): string

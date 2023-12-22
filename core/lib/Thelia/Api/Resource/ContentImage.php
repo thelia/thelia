@@ -19,13 +19,12 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\OpenApi\Model\Operation;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints\File;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Controller\Admin\BinaryFileController;
-use Thelia\Api\Controller\Admin\ContentImageController;
 use Thelia\Api\Controller\Admin\PostItemFileController;
 use Thelia\Model\Map\ContentImageTableMap;
 
@@ -49,17 +48,17 @@ use Thelia\Model\Map\ContentImageTableMap;
         new Get(
             uriTemplate: '/admin/content_images/{id}/file',
             controller: BinaryFileController::class,
-            openapiContext: [
-                'responses' => [
+            openapi: new Operation(
+                responses: [
                     '200' => [
-                        'description' => 'The binary file'
-                    ]
+                        'description' => 'The binary file',
+                    ],
                 ]
-            ]
+            )
         ),
         new Put(
             uriTemplate: '/admin/content_images/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_WRITE,self::GROUP_WRITE_UPDATE]],
+            denormalizationContext: ['groups' => [self::GROUP_WRITE, self::GROUP_WRITE_UPDATE]],
         ),
         new Delete(
             uriTemplate: '/admin/content_images/{id}'
@@ -87,7 +86,7 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
     #[ApiProperty(
         openapiContext: [
             'type' => 'string',
-            'format' => 'binary'
+            'format' => 'binary',
         ]
     )]
     public UploadedFile $fileToUpload;
@@ -118,9 +117,10 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
         return $this->id;
     }
 
-    public function setId(?int $id): ContentImage
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -129,9 +129,10 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
         return $this->content;
     }
 
-    public function setContent(Content $content): ContentImage
+    public function setContent(Content $content): self
     {
         $this->content = $content;
+
         return $this;
     }
 
@@ -140,9 +141,10 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
         return $this->fileToUpload;
     }
 
-    public function setFileToUpload(UploadedFile $fileToUpload): ContentImage
+    public function setFileToUpload(UploadedFile $fileToUpload): self
     {
         $this->fileToUpload = $fileToUpload;
+
         return $this;
     }
 
@@ -151,9 +153,10 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
         return $this->visible;
     }
 
-    public function setVisible(bool $visible): ContentImage
+    public function setVisible(bool $visible): self
     {
         $this->visible = $visible;
+
         return $this;
     }
 
@@ -162,9 +165,10 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
         return $this->position;
     }
 
-    public function setPosition(?int $position): ContentImage
+    public function setPosition(?int $position): self
     {
         $this->position = $position;
+
         return $this;
     }
 
@@ -173,9 +177,10 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): ContentImage
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
@@ -184,9 +189,10 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): ContentImage
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
@@ -195,9 +201,10 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
         return $this->file;
     }
 
-    public function setFile(string $file): ContentImage
+    public function setFile(string $file): self
     {
         $this->file = $file;
+
         return $this;
     }
 
@@ -206,12 +213,12 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
         return $this->fileUrl;
     }
 
-    public function setFileUrl(?string $fileUrl): ContentImage
+    public function setFileUrl(?string $fileUrl): self
     {
         $this->fileUrl = $fileUrl;
+
         return $this;
     }
-
 
     public static function getPropelRelatedTableMap(): ?TableMap
     {
@@ -225,12 +232,12 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
 
     public static function getItemType(): string
     {
-        return "content";
+        return 'content';
     }
 
     public static function getFileType(): string
     {
-       return "image";
+        return 'image';
     }
 
     public function getItemId(): string

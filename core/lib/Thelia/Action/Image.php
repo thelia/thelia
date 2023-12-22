@@ -489,7 +489,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         return $image;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::IMAGE_PROCESS => ['processImage', 128],

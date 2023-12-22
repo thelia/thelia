@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -12,12 +22,11 @@ class BinaryFileController
 {
     public function __invoke(
         Request $request
-    )
-    {
+    ) {
         $resource = $request->get('data');
 
         if (!$resource instanceof ItemFileResourceInterface) {
-            throw new \Exception("Resource must implements ItemFileResourceInterface to use the BinaryFileController");
+            throw new \Exception('Resource must implements ItemFileResourceInterface to use the BinaryFileController');
         }
 
         $propelModel = $resource->getPropelModel();

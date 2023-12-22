@@ -163,7 +163,7 @@ class File extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::FILE_CLONE => ['cloneFile', 128],
