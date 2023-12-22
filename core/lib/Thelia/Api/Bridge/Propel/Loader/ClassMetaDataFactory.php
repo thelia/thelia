@@ -12,7 +12,7 @@
 
 namespace Thelia\Api\Bridge\Propel\Loader;
 
-use ApiPlatform\Util\ClassInfoTrait;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;

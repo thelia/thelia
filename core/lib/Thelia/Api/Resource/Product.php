@@ -321,7 +321,7 @@ class Product extends AbstractTranslatableResource
         return ProductI18n::class;
     }
 
-    #[Callback(groups: [Product::GROUP_WRITE])]
+    #[Callback(groups: [self::GROUP_WRITE])]
     public function checkDuplicateRef(ExecutionContextInterface $context): void
     {
         $resource = $context->getRoot();
@@ -331,48 +331,48 @@ class Product extends AbstractTranslatableResource
             $context->addViolation(
                 Translator::getInstance()->trans(
                     'A product with reference %ref already exists. Please choose another reference.',
-                    ['%ref' => $resource->ref],null,'en_US'
+                    ['%ref' => $resource->ref], null, 'en_US'
                 )
             );
         }
     }
 
-    #[Callback(groups: [Product::GROUP_WRITE])]
-    public function checkTitleAndLocaleNotBlank(ExecutionContextInterface $context) :void
+    #[Callback(groups: [self::GROUP_WRITE])]
+    public function checkTitleAndLocaleNotBlank(ExecutionContextInterface $context): void
     {
         $resource = $context->getRoot();
         $titleAndLocaleCount = 0;
         /** @var I18nCollection $i18nData */
         $i18nData = $resource->getI18ns();
-        foreach ($i18nData->i18ns as $i18n){
-            if ($i18n->getTitle() !== null && !empty($i18n->getTitle())){
-                $titleAndLocaleCount++;
+        foreach ($i18nData->i18ns as $i18n) {
+            if ($i18n->getTitle() !== null && !empty($i18n->getTitle())) {
+                ++$titleAndLocaleCount;
             }
         }
-        if ($titleAndLocaleCount === 0){
+        if ($titleAndLocaleCount === 0) {
             $context->addViolation(
                 Translator::getInstance()->trans(
                     'The title and locale must be defined at least once.',
-                    [],null,'en_US'
+                    [], null, 'en_US'
                 )
             );
         }
     }
 
-    #[Callback(groups: [Product::GROUP_WRITE])]
-    public function checkDefaultCategoryNotBlank(ExecutionContextInterface $context) :void
+    #[Callback(groups: [self::GROUP_WRITE])]
+    public function checkDefaultCategoryNotBlank(ExecutionContextInterface $context): void
     {
         $resource = $context->getRoot();
         $defaultCategory = [];
         /** @var ProductCategory $productCategory */
-        foreach ($resource->getProductCategories() as $productCategory){
+        foreach ($resource->getProductCategories() as $productCategory) {
             $defaultCategory[] = $productCategory->getDefaultCategory();
         }
-        if (!in_array(true,$defaultCategory)){
+        if (!\in_array(true, $defaultCategory)) {
             $context->addViolation(
                 Translator::getInstance()->trans(
                     'There is no default category defined.',
-                    [],null,'en_US'
+                    [], null, 'en_US'
                 )
             );
         }

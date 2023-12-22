@@ -222,6 +222,7 @@ class Order implements PropelResourceInterface
         /** @var \Thelia\Model\Order $orderPropelModel */
         $orderPropelModel = $this->getPropelModel();
         $itemsAmount = $orderPropelModel->getTotalAmount($itemsTax, false, false);
+
         return $itemsAmount - $itemsTax;
     }
 
@@ -231,6 +232,7 @@ class Order implements PropelResourceInterface
         $totalTaxedAmount = $this->getTotalAmount();
         $postage = $this->getPostage();
         $discount = $this->getDiscount();
+
         return $totalTaxedAmount - $postage + $discount;
     }
 
@@ -239,6 +241,7 @@ class Order implements PropelResourceInterface
     {
         /** @var \Thelia\Model\Order $orderPropelModel */
         $orderPropelModel = $this->getPropelModel();
+
         return $orderPropelModel->getDiscount();
     }
 
@@ -247,6 +250,7 @@ class Order implements PropelResourceInterface
     {
         $totalTaxedAmount = $this->getTotalAmount();
         $postage = $this->getPostage();
+
         return $totalTaxedAmount - $postage;
     }
 
@@ -255,6 +259,7 @@ class Order implements PropelResourceInterface
     {
         /** @var \Thelia\Model\Order $orderPropelModel */
         $orderPropelModel = $this->getPropelModel();
+
         return $orderPropelModel->getPostage();
     }
 
@@ -263,7 +268,6 @@ class Order implements PropelResourceInterface
         $this->orderCoupons = [];
         $this->orderProducts = [];
     }
-
 
     public function getId(): ?int
     {

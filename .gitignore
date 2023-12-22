@@ -126,3 +126,17 @@ tests/cypress/downloads
 /.php-cs-fixer.php
 /.php-cs-fixer.cache
 ###< friendsofphp/php-cs-fixer ###
+
+###> phpstan/phpstan ###
+phpstan.neon
+###< phpstan/phpstan ###
+
+/web/bundles/apiplatform/
+/public/bundles/apiplatform/
+/.env
+/.env.test
+/webpack.config.js
+/package.json
+/assets
+/compose.override.yaml
+/phpstan.dist.neon

@@ -41,7 +41,7 @@ class ReloadDatabaseCommand extends BaseModuleGenerate
             );
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         if (false === $input->getOption('force')) {
             $helper = $this->getHelper('question');

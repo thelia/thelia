@@ -679,7 +679,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->setTax($tax);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::ORDER_SET_DELIVERY_ADDRESS => ['setDeliveryAddress', 128],

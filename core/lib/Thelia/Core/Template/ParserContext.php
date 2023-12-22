@@ -281,8 +281,7 @@ class ParserContext implements \IteratorAggregate
 
         if (
             !$request->hasSession(true)
-             ||
-            !$request->getSession()->isStarted()
+            || !$request->getSession()->isStarted()
         ) {
             return $this;
         }

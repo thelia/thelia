@@ -12,10 +12,6 @@
 
 namespace Thelia\Core\Template\Assets;
 
-use Assetic\AssetManager;
-use Assetic\AssetWriter;
-use Assetic\Factory\AssetFactory;
-use Assetic\FilterManager;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
@@ -25,7 +21,7 @@ use Thelia\Model\ConfigQuery;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class AsseticAssetManager implements AssetManagerInterface
+class AssetManager implements AssetManagerInterface
 {
     protected $debugMode;
 
@@ -129,7 +125,7 @@ class AsseticAssetManager implements AssetManagerInterface
      *
      * @return string the full path of the destination directory
      */
-    protected function getDestinationDirectory($webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey)
+    protected function getDestinationDirectory($webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey): string
     {
         // Compute the absolute path of the output directory
         return $webAssetsDirectoryBase.DS.$webAssetsTemplate.DS.$webAssetsKey;
@@ -187,124 +183,59 @@ class AsseticAssetManager implements AssetManagerInterface
     }
 
     /**
-     * Decode the filters names, and initialize the Assetic FilterManager.
-     *
-     * @param FilterManager $filterManager the Assetic filter manager
-     * @param string|array  $filters       a comma separated list of filter names
-     *
-     * @throws \InvalidArgumentException if a wrong filter is passed
-     *
-     * @return array an array of filter names
-     */
-    protected function decodeAsseticFilters(FilterManager $filterManager, $filters)
-    {
-        if (!empty($filters)) {
-            $filter_list = \is_array($filters) ? $filters : explode(',', $filters);
-
-            foreach ($filter_list as $filter_name) {
-                $filter_name = trim($filter_name);
-
-                foreach ($this->assetFilters as $filterIdentifier => $filterInstance) {
-                    if ($filterIdentifier == $filter_name) {
-                        $filterManager->set($filterIdentifier, $filterInstance);
-
-                        // No, goto is not evil.
-                        goto filterFound;
-                    }
-                }
-
-                throw new \InvalidArgumentException("Unsupported Assetic filter: '$filter_name'");
-                break;
-                filterFound:
-            }
-        } else {
-            $filter_list = [];
-        }
-
-        return $filter_list;
-    }
-
-    /**
      * Generates assets from $asset_path in $output_path, using $filters.
      *
-     * @param string $webAssetsDirectoryBase the full path to the asset file (or file collection, e.g. *.less)
-     * @param string $webAssetsTemplate      the full disk path to the base assets output directory in the web space
-     * @param string $outputUrl              the URL to the base assets output directory in the web space
-     * @param string $assetType              the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
-     * @param array  $filters                a list of filters, as defined below (see switch($filter_name) ...)
-     * @param bool   $debug                  true / false
-     *
-     * @return string the URL to the generated asset file
+     * @throws \Exception
      */
-    public function processAsset($assetSource, $assetDirectoryBase, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey, $outputUrl, $assetType, $filters, $debug)
-    {
+    public function processAsset(
+        string $assetSource,
+        string $assetDirectoryBase,
+        string $webAssetsDirectoryBase,
+        string $webAssetsTemplate,
+        string $webAssetsKey,
+        string $outputUrl,
+        string $assetType,
+        array|string $filters,
+        bool $debug
+    ): string {
         Tlog::getInstance()->addDebug(
             "Processing asset: assetSource=$assetSource, assetDirectoryBase=$assetDirectoryBase, webAssetsDirectoryBase=$webAssetsDirectoryBase, webAssetsTemplate=$webAssetsTemplate, webAssetsKey=$webAssetsKey, outputUrl=$outputUrl"
         );
 
         $assetName = basename($assetSource);
-        $inputDirectory = realpath(\dirname($assetSource));
-
         $assetFileDirectoryInAssetDirectory = trim(str_replace([$assetDirectoryBase, $assetName], '', $assetSource), DS);
-
-        $am = new AssetManager();
-        $fm = new FilterManager();
-
-        // Get the filter list
-        $filterList = $this->decodeAsseticFilters($fm, $filters);
-
-        // Factory setup
-        $factory = new AssetFactory($inputDirectory);
-
-        $factory->setAssetManager($am);
-        $factory->setFilterManager($fm);
-
-        $factory->setDefaultOutput('*'.(!empty($assetType) ? '.' : '').$assetType);
-
-        $factory->setDebug($debug);
-
-        $asset = $factory->createAsset($assetName, $filterList);
-
         $outputDirectory = $this->getDestinationDirectory($webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey);
-
-        // Get the URL part from the relative path
         $outputRelativeWebPath = $webAssetsTemplate.DS.$webAssetsKey;
-
-        $assetTargetFilename = $asset->getTargetPath();
-
-        /*
-         * This is the final name of the generated asset
-         * We preserve file structure intending to keep - for example - relative css links working
-         */
-        $assetDestinationPath = $outputDirectory.DS.$assetFileDirectoryInAssetDirectory.DS.$assetTargetFilename;
+        $assetDestinationPath = $outputDirectory.DS.$assetFileDirectoryInAssetDirectory.DS.$assetName;
 
         Tlog::getInstance()->addDebug("Asset destination full path: $assetDestinationPath");
 
-        // We generate an asset only if it does not exists, or if the asset processing is forced in development mode
         if (!file_exists($assetDestinationPath) || ($this->debugMode && ConfigQuery::read('process_assets', true))) {
-            $writer = new AssetWriter($outputDirectory.DS.$assetFileDirectoryInAssetDirectory);
-
-            Tlog::getInstance()->addDebug("Writing asset to $outputDirectory".DS."$assetFileDirectoryInAssetDirectory");
-
-            $writer->writeAsset($asset);
+            Tlog::getInstance()->addDebug("Writing asset to $assetDestinationPath");
+            (new Filesystem())->copy($assetSource, $assetDestinationPath, true);
         }
 
-        // Normalize path to generate a valid URL
-        if (DS != '/') {
-            $outputRelativeWebPath = str_replace(DS, '/', $outputRelativeWebPath);
-            $assetFileDirectoryInAssetDirectory = str_replace(DS, '/', $assetFileDirectoryInAssetDirectory);
-            $assetTargetFilename = str_replace(DS, '/', $assetTargetFilename);
-        }
+        $outputRelativeWebPath = $this->normalizePath($outputRelativeWebPath);
+        $assetFileDirectoryInAssetDirectory = $this->normalizePath($assetFileDirectoryInAssetDirectory);
+        $assetName = $this->normalizePath($assetName);
 
-        return rtrim($outputUrl, '/').'/'.trim($outputRelativeWebPath, '/').'/'.trim($assetFileDirectoryInAssetDirectory, '/').'/'.ltrim($assetTargetFilename, '/');
+        return rtrim($outputUrl, '/')
+            .'/'.trim($outputRelativeWebPath, '/')
+            .'/'.trim($assetFileDirectoryInAssetDirectory, '/')
+            .'/'.ltrim($assetName, '/');
     }
 
-    public function isDebugMode()
+    private function normalizePath(string $path): string
+    {
+        return DS !== '/' ? str_replace(DS, '/', $path) : $path;
+    }
+
+    public function isDebugMode(): bool
     {
         return $this->debugMode;
     }
 
-    public function registerAssetFilter($filterIdentifier, $filter): void
+    public function registerAssetFilter(string $filterIdentifier, mixed $filter): void
     {
         $this->assetFilters[$filterIdentifier] = $filter;
     }

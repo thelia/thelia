@@ -73,7 +73,7 @@ class ConfigCommand extends ContainerAwareCommand
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $command = $input->getArgument('COMMAND');
 
