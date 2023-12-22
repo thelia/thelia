@@ -62,7 +62,6 @@ class TheliaBundle extends Bundle
             ->addCompilerPass(new RegisterCouponPass())
             ->addCompilerPass(new RegisterCouponConditionPass())
             ->addCompilerPass(new RegisterArchiverPass())
-            ->addCompilerPass(new RegisterAssetFilterPass())
             ->addCompilerPass(new RegisterSerializerPass())
             ->addCompilerPass(new RegisterFormExtensionPass())
             ->addCompilerPass(new CurrencyConverterProviderPass())
