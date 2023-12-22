@@ -105,7 +105,7 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
         );
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::NEWSLETTER_SUBSCRIBE => ['subscribe', 128],

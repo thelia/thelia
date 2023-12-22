@@ -97,7 +97,7 @@ class CustomerTitle extends BaseAction implements EventSubscriberInterface
         $event->setCustomerTitle($customerTitle);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::CUSTOMER_TITLE_CREATE => ['create'],

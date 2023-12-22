@@ -23,7 +23,6 @@ use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Email;
-use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
@@ -79,7 +78,7 @@ class Customer implements PropelResourceInterface
     public const GROUP_READ_SINGLE = 'customer:read:single';
     public const GROUP_WRITE = 'customer:write';
 
-    #[Groups([self::GROUP_READ, Address::GROUP_READ_SINGLE, Order::GROUP_READ, Cart::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, Address::GROUP_READ_SINGLE, Order::GROUP_READ, Cart::GROUP_READ_SINGLE, Order::GROUP_WRITE])]
     public ?int $id = null;
 
     #[Relation(targetResource: CustomerTitle::class)]
@@ -417,23 +416,22 @@ class Customer implements PropelResourceInterface
         return new CustomerTableMap();
     }
 
-
-    #[Callback(groups: [Customer::GROUP_WRITE])]
+    #[Callback(groups: [self::GROUP_WRITE])]
     public function verifyPasswordLength(ExecutionContextInterface $context): void
     {
         $resource = $context->getRoot();
-        if (isset($resource->password) && strlen($resource->password) < ConfigQuery::read('password.length', 4)) {
-            $context->addViolation(Translator::getInstance()->trans('The password size is too small.',[],null,'en_US'));
+        if (isset($resource->password) && \strlen($resource->password) < ConfigQuery::read('password.length', 4)) {
+            $context->addViolation(Translator::getInstance()->trans('The password size is too small.', [], null, 'en_US'));
         }
     }
 
-    #[Callback(groups: [Customer::GROUP_WRITE])]
+    #[Callback(groups: [self::GROUP_WRITE])]
     public function verifyExistingEmail(ExecutionContextInterface $context): void
     {
         $resource = $context->getRoot();
         $customer = CustomerQuery::getCustomerByEmail($resource->email);
         if ($customer && $customer->getId() !== $this->getId()) {
-            $context->addViolation(Translator::getInstance()->trans('This email already exists.',[],null,'en_US'));
+            $context->addViolation(Translator::getInstance()->trans('This email already exists.', [], null, 'en_US'));
         }
     }
 }

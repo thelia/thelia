@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Bridge\Propel\Service;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -15,13 +25,13 @@ class ItemFileResourceService
     public function __construct(
         private RequestStack $requestStack,
         private EventDispatcherInterface $eventDispatcher
-    ){}
+    ) {
+    }
 
     public function createItemFile(
         int $parentId,
         FileModelInterface $fileModel
-    ): void
-    {
+    ): void {
         $request = $this->requestStack->getCurrentRequest();
 
         /** @var UploadedFile $file */
@@ -32,7 +42,7 @@ class ItemFileResourceService
         }
 
         $fileModel->setParentId($parentId)
-            ->setVisible(filter_var($request->get('visible'), FILTER_VALIDATE_BOOLEAN))
+            ->setVisible(filter_var($request->get('visible'), \FILTER_VALIDATE_BOOLEAN))
             ->setPosition($request->get('position'));
 
         $i18ns = json_decode($request->get('i18ns'), true);

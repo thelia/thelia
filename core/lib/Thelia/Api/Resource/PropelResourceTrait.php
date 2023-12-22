@@ -26,14 +26,14 @@ trait PropelResourceTrait
 
     public function __get(string $property)
     {
-        if (array_key_exists($property, $this->resourceAddons)) {
+        if (\array_key_exists($property, $this->resourceAddons)) {
             return $this->getResourceAddon($property);
         }
 
         throw new NoSuchPropertyException(sprintf('Can\'t get a way to read the property "%s" in class "%s".', $property, $this::class));
     }
 
-    public function setPropelModel(?ActiveRecordInterface $propelModel = null): PropelResourceInterface
+    public function setPropelModel(ActiveRecordInterface $propelModel = null): PropelResourceInterface
     {
         $this->propelModel = $propelModel;
 

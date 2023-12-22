@@ -15,7 +15,6 @@ namespace Thelia\Api\Bridge\Propel\State;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use ApiPlatform\State\UriVariablesResolverTrait;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\Event\ItemProviderQueryEvent;

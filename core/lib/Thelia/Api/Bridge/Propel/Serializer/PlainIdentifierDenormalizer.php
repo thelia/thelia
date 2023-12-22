@@ -30,7 +30,7 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
     ) {
     }
 
-    public function supportsDenormalization(mixed $data, string $type, string $format = null)
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         if (!\is_array($data) || !\in_array($format, ['json', 'jsonld'], true) || !class_exists($type)) {
             return false;
@@ -44,7 +44,7 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
         return false;
     }
 
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = [])
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
     {
         if (!\is_array($data)) {
             $data = [$data];
@@ -113,15 +113,13 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
             function (\ReflectionProperty $property) use ($data) {
                 return null !== $property->getType()
                     && isset($data[$property->getName()])
-                    &&
-                    (
+                    && (
                         (
                             \is_array($data[$property->getName()])
                             && array_filter($data[$property->getName()], fn ($value) => (\is_string($value) || \is_int($value)) && !str_contains($value, '/'))
                             && Collection::class === $property->getType()->getName()
                         )
-                        ||
-                        (
+                        || (
                             (\is_string($data[$property->getName()]) || \is_int($data[$property->getName()]))
                             && !str_contains($data[$property->getName()], '/')
                             && $this->resourceClassResolver->isResourceClass($property->getType()->getName())
@@ -129,5 +127,12 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
                     );
             }
         );
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            '*' => false,
+        ];
     }
 }

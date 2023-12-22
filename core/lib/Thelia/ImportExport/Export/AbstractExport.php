@@ -106,6 +106,7 @@ abstract class AbstractExport implements \Iterator
      *
      * @return array|false|mixed|string
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         if ($this->dataIsJSONFile) {
@@ -138,6 +139,7 @@ abstract class AbstractExport implements \Iterator
      *
      * @return bool|float|int|string|null
      */
+    #[\ReturnTypeWillChange]
     public function key()
     {
         if ($this->dataIsJSONFile) {

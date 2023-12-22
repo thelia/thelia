@@ -38,7 +38,7 @@ class LoopListCommand extends ContainerAwareCommand
     /**
      * @return int|void|null
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $loops = $this->theliaLoop->getLoopList();
         ksort($loops);

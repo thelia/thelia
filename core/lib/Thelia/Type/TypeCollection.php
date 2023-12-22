@@ -55,6 +55,7 @@ class TypeCollection implements \Iterator
      *
      * @return \Thelia\Type\TypeInterface
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return $this->types[$this->position];
@@ -81,6 +82,7 @@ class TypeCollection implements \Iterator
      *
      * @return mixed scalar on success, or null on failure
      */
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return $this->position;

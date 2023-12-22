@@ -32,7 +32,7 @@ class ModuleRefreshCommand extends ContainerAwareCommand
             ->setDescription('Refresh modules list');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
             $moduleManagement = new ModuleManagement($this->getContainer());

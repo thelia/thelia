@@ -118,7 +118,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
         AttributeTemplateQuery::create()->filterByAttribute($event->getAttribute())->delete();
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::ATTRIBUTE_CREATE => ['create', 128],
