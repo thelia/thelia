@@ -143,7 +143,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
                 $targetReflector = new \ReflectionClass($targetClass);
 
-                $isNullable = $property->getType()->allowsNull() || $property->getType()->getName() === "array";
+                $isNullable = $property->getType()->allowsNull() || $property->getType()->getName() === 'array';
                 $isLeftJoin = false !== $wasLeftJoin || true === $isNullable;
                 $joinFunctionName = 'use'.ucfirst($targetReflector->getShortName()).'Query';
 
@@ -223,8 +223,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         Operation $operation,
         \ReflectionClass $reflector,
         string $baseJoinAlias
-    )
-    {
+    ): void {
         $normalizationContextGroups = $operation->getNormalizationContext()['groups'] ?? [];
         $i18nAttributeGroups = $reflector->getProperty('i18ns')->getAttributes(Groups::class);
 
@@ -232,7 +231,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             return;
         }
 
-        $i18nGroups = $i18nAttributeGroups[0]->getArguments()['groups'] ?? $i18nAttributeGroups[0]->getArguments()[0] ?? null;;
+        $i18nGroups = $i18nAttributeGroups[0]->getArguments()['groups'] ?? $i18nAttributeGroups[0]->getArguments()[0] ?? null;
 
         // Don't join i18n table if i18ns property is not in current groups
         if (empty(array_intersect($normalizationContextGroups, $i18nGroups))) {

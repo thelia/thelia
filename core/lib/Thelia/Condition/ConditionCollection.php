@@ -35,6 +35,7 @@ class ConditionCollection implements \Iterator, \Countable, \ArrayAccess
      *
      * @return mixed can return any type
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         $var = current($this->conditions);
@@ -60,14 +61,11 @@ class ConditionCollection implements \Iterator, \Countable, \ArrayAccess
      * Return the key of the current element.
      *
      * @see http://php.net/manual/en/iterator.key.php
-     *
-     * @return mixed scalar on success, or null on failure
      */
-    public function key()
+    #[\ReturnTypeWillChange]
+    public function key(): mixed
     {
-        $var = key($this->conditions);
-
-        return $var;
+        return key($this->conditions);
     }
 
     /**
@@ -141,6 +139,7 @@ class ConditionCollection implements \Iterator, \Countable, \ArrayAccess
      *
      * @return mixed can return all value types
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->conditions[$offset] ?? null;
