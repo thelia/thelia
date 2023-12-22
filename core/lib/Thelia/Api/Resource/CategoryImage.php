@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiProperty;
@@ -41,14 +51,14 @@ use Thelia\Model\Map\CategoryImageTableMap;
             openapi: new Operation(
                 responses: [
                     '200' => [
-                        'description' => 'The binary file'
-                    ]
+                        'description' => 'The binary file',
+                    ],
                 ]
             )
         ),
         new Put(
             uriTemplate: '/admin/category_images/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_WRITE,self::GROUP_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_WRITE, self::GROUP_WRITE_UPDATE]]
         ),
         new Delete(
             uriTemplate: '/admin/category_images/{id}'
@@ -76,7 +86,7 @@ class CategoryImage extends AbstractTranslatableResource implements ItemFileReso
     #[ApiProperty(
         openapiContext: [
             'type' => 'string',
-            'format' => 'binary'
+            'format' => 'binary',
         ]
     )]
     public UploadedFile $fileToUpload;
@@ -107,9 +117,10 @@ class CategoryImage extends AbstractTranslatableResource implements ItemFileReso
         return $this->id;
     }
 
-    public function setId(?int $id): CategoryImage
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -118,9 +129,10 @@ class CategoryImage extends AbstractTranslatableResource implements ItemFileReso
         return $this->category;
     }
 
-    public function setCategory(Category $category): CategoryImage
+    public function setCategory(Category $category): self
     {
         $this->category = $category;
+
         return $this;
     }
 
@@ -129,9 +141,10 @@ class CategoryImage extends AbstractTranslatableResource implements ItemFileReso
         return $this->fileToUpload;
     }
 
-    public function setFileToUpload(UploadedFile $fileToUpload): CategoryImage
+    public function setFileToUpload(UploadedFile $fileToUpload): self
     {
         $this->fileToUpload = $fileToUpload;
+
         return $this;
     }
 
@@ -140,9 +153,10 @@ class CategoryImage extends AbstractTranslatableResource implements ItemFileReso
         return $this->visible;
     }
 
-    public function setVisible(bool $visible): CategoryImage
+    public function setVisible(bool $visible): self
     {
         $this->visible = $visible;
+
         return $this;
     }
 
@@ -151,9 +165,10 @@ class CategoryImage extends AbstractTranslatableResource implements ItemFileReso
         return $this->position;
     }
 
-    public function setPosition(?int $position): CategoryImage
+    public function setPosition(?int $position): self
     {
         $this->position = $position;
+
         return $this;
     }
 
@@ -162,9 +177,10 @@ class CategoryImage extends AbstractTranslatableResource implements ItemFileReso
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): CategoryImage
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
@@ -173,9 +189,10 @@ class CategoryImage extends AbstractTranslatableResource implements ItemFileReso
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): CategoryImage
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
@@ -184,9 +201,10 @@ class CategoryImage extends AbstractTranslatableResource implements ItemFileReso
         return $this->file;
     }
 
-    public function setFile(string $file): CategoryImage
+    public function setFile(string $file): self
     {
         $this->file = $file;
+
         return $this;
     }
 
@@ -195,12 +213,12 @@ class CategoryImage extends AbstractTranslatableResource implements ItemFileReso
         return $this->fileUrl;
     }
 
-    public function setFileUrl(?string $fileUrl): CategoryImage
+    public function setFileUrl(?string $fileUrl): self
     {
         $this->fileUrl = $fileUrl;
+
         return $this;
     }
-
 
     public static function getPropelRelatedTableMap(): ?TableMap
     {
@@ -214,12 +232,12 @@ class CategoryImage extends AbstractTranslatableResource implements ItemFileReso
 
     public static function getItemType(): string
     {
-        return "category";
+        return 'category';
     }
 
     public static function getFileType(): string
     {
-        return "image";
+        return 'image';
     }
 
     public function getItemId(): string

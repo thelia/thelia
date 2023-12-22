@@ -13,7 +13,6 @@
 namespace Thelia\Core\Hook;
 
 use Iterator;
-use ReturnTypeWillChange;
 
 /**
  * Class FragmentBag.
@@ -41,7 +40,8 @@ class FragmentBag implements \Iterator
      *
      * @return mixed can return any type
      */
-    #[ReturnTypeWillChange] public function current()
+    #[\ReturnTypeWillChange]
+    public function current()
     {
         return $this->fragments[$this->position];
     }
@@ -67,7 +67,8 @@ class FragmentBag implements \Iterator
      *
      * @return mixed scalar on success, or null on failure
      */
-    #[ReturnTypeWillChange] public function key()
+    #[\ReturnTypeWillChange]
+    public function key()
     {
         return $this->position;
     }

@@ -51,14 +51,14 @@ use Thelia\Model\Map\ContentDocumentTableMap;
             openapi: new Operation(
                 responses: [
                     '200' => [
-                        'description' => 'The binary file'
-                    ]
+                        'description' => 'The binary file',
+                    ],
                 ]
             )
         ),
         new Put(
             uriTemplate: '/admin/content_documents/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_WRITE,self::GROUP_WRITE_UPDATE]],
+            denormalizationContext: ['groups' => [self::GROUP_WRITE, self::GROUP_WRITE_UPDATE]],
         ),
         new Delete(
             uriTemplate: '/admin/content_documents/{id}'
@@ -75,7 +75,6 @@ class ContentDocument extends AbstractTranslatableResource implements ItemFileRe
     public const GROUP_WRITE_FILE = 'content_document:write_file';
     public const GROUP_WRITE_UPDATE = 'content_document:write_update';
 
-
     #[Groups([self::GROUP_READ])]
     public ?int $id = null;
 
@@ -87,7 +86,7 @@ class ContentDocument extends AbstractTranslatableResource implements ItemFileRe
     #[ApiProperty(
         openapiContext: [
             'type' => 'string',
-            'format' => 'binary'
+            'format' => 'binary',
         ]
     )]
     public UploadedFile $fileToUpload;
@@ -142,9 +141,10 @@ class ContentDocument extends AbstractTranslatableResource implements ItemFileRe
         return $this->fileToUpload;
     }
 
-    public function setFileToUpload(UploadedFile $fileToUpload): ContentDocument
+    public function setFileToUpload(UploadedFile $fileToUpload): self
     {
         $this->fileToUpload = $fileToUpload;
+
         return $this;
     }
 
@@ -211,9 +211,10 @@ class ContentDocument extends AbstractTranslatableResource implements ItemFileRe
         return $this->file;
     }
 
-    public function setFile(string $file): ContentDocument
+    public function setFile(string $file): self
     {
         $this->file = $file;
+
         return $this;
     }
 
@@ -222,20 +223,21 @@ class ContentDocument extends AbstractTranslatableResource implements ItemFileRe
         return $this->fileUrl;
     }
 
-    public function setFileUrl(?string $fileUrl): ContentDocument
+    public function setFileUrl(?string $fileUrl): self
     {
         $this->fileUrl = $fileUrl;
+
         return $this;
     }
 
     public static function getItemType(): string
     {
-        return "content";
+        return 'content';
     }
 
     public static function getFileType(): string
     {
-        return "document";
+        return 'document';
     }
 
     public function getItemId(): string

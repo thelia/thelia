@@ -12,7 +12,6 @@
 
 namespace Thelia\TaxEngine;
 
-use ReturnTypeWillChange;
 use Thelia\Model\OrderProductTax;
 
 /**
@@ -58,7 +57,8 @@ class OrderProductTaxCollection implements \Iterator
      *
      * @return OrderProductTax
      */
-    #[ReturnTypeWillChange] public function current()
+    #[\ReturnTypeWillChange]
+    public function current()
     {
         return $this->taxes[$this->position];
     }
@@ -84,7 +84,8 @@ class OrderProductTaxCollection implements \Iterator
      *
      * @return mixed scalar on success, or null on failure
      */
-    #[ReturnTypeWillChange] public function key()
+    #[\ReturnTypeWillChange]
+    public function key()
     {
         return $this->position;
     }

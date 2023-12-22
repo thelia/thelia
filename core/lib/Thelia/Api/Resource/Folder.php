@@ -53,7 +53,7 @@ class Folder extends AbstractTranslatableResource
     #[Groups([self::GROUP_READ,
         ContentFolder::GROUP_READ,
         FolderImage::GROUP_READ_SINGLE,
-        FolderDocument::GROUP_READ_SINGLE
+        FolderDocument::GROUP_READ_SINGLE,
     ])]
     public ?int $id = null;
 

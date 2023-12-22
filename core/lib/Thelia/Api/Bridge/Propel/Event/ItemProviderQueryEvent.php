@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Bridge\Propel\Event;
 
 use ApiPlatform\Metadata\Operation;
@@ -14,8 +24,7 @@ class ItemProviderQueryEvent extends Event
         private array $uriVariables = [],
         private array $context = [],
         private ?string $resourceClass = null
-    )
-    {
+    ) {
     }
 
     public function getQuery(): ModelCriteria
@@ -23,9 +32,10 @@ class ItemProviderQueryEvent extends Event
         return $this->query;
     }
 
-    public function setQuery(ModelCriteria $query): ItemProviderQueryEvent
+    public function setQuery(ModelCriteria $query): self
     {
         $this->query = $query;
+
         return $this;
     }
 
@@ -34,9 +44,10 @@ class ItemProviderQueryEvent extends Event
         return $this->operation;
     }
 
-    public function setOperation(Operation $operation): ItemProviderQueryEvent
+    public function setOperation(Operation $operation): self
     {
         $this->operation = $operation;
+
         return $this;
     }
 
@@ -45,9 +56,10 @@ class ItemProviderQueryEvent extends Event
         return $this->uriVariables;
     }
 
-    public function setUriVariables(array $uriVariables): ItemProviderQueryEvent
+    public function setUriVariables(array $uriVariables): self
     {
         $this->uriVariables = $uriVariables;
+
         return $this;
     }
 
@@ -56,9 +68,10 @@ class ItemProviderQueryEvent extends Event
         return $this->context;
     }
 
-    public function setContext(array $context): ItemProviderQueryEvent
+    public function setContext(array $context): self
     {
         $this->context = $context;
+
         return $this;
     }
 
@@ -67,9 +80,10 @@ class ItemProviderQueryEvent extends Event
         return $this->resourceClass;
     }
 
-    public function setResourceClass(?string $resourceClass): ItemProviderQueryEvent
+    public function setResourceClass(?string $resourceClass): self
     {
         $this->resourceClass = $resourceClass;
+
         return $this;
     }
 }

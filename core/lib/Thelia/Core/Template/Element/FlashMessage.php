@@ -12,8 +12,6 @@
 
 namespace Thelia\Core\Template\Element;
 
-use ReturnTypeWillChange;
-
 /**
  * Class FlashMessage.
  *
@@ -65,7 +63,8 @@ class FlashMessage implements \Iterator
      *
      * @return mixed can return any type
      */
-    #[ReturnTypeWillChange] public function current()
+    #[\ReturnTypeWillChange]
+    public function current()
     {
         return $this->collection[$this->position];
     }
@@ -91,7 +90,8 @@ class FlashMessage implements \Iterator
      *
      * @return mixed scalar on success, or null on failure
      */
-    #[ReturnTypeWillChange] public function key()
+    #[\ReturnTypeWillChange]
+    public function key()
     {
         return $this->position;
     }

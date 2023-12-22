@@ -14,6 +14,7 @@ namespace Thelia\Core\Template\Assets;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Log\Tlog;
+use Thelia\Model\ConfigQuery;
 
 /**
  * This class is a simple helper for generating assets using Assetic.
@@ -124,7 +125,7 @@ class AssetManager implements AssetManagerInterface
      *
      * @return string the full path of the destination directory
      */
-    protected function getDestinationDirectory($webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey)
+    protected function getDestinationDirectory($webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey): string
     {
         // Compute the absolute path of the output directory
         return $webAssetsDirectoryBase.DS.$webAssetsTemplate.DS.$webAssetsKey;
@@ -202,25 +203,31 @@ class AssetManager implements AssetManagerInterface
         );
 
         $assetName = basename($assetSource);
-        $destinationPath = $webAssetsDirectoryBase.'/'.$assetName;
+        $assetFileDirectoryInAssetDirectory = trim(str_replace([$assetDirectoryBase, $assetName], '', $assetSource), DS);
+        $outputDirectory = $this->getDestinationDirectory($webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey);
+        $outputRelativeWebPath = $webAssetsTemplate.DS.$webAssetsKey;
+        $assetDestinationPath = $outputDirectory.DS.$assetFileDirectoryInAssetDirectory.DS.$assetName;
 
-        // Vérifiez si le fichier source existe
-        if (!file_exists($assetSource)) {
-            throw new \Exception("Source file $assetSource doesn't exists.");
+        Tlog::getInstance()->addDebug("Asset destination full path: $assetDestinationPath");
+
+        if (!file_exists($assetDestinationPath) || ($this->debugMode && ConfigQuery::read('process_assets', true))) {
+            Tlog::getInstance()->addDebug("Writing asset to $assetDestinationPath");
+            (new Filesystem())->copy($assetSource, $assetDestinationPath, true);
         }
 
-        // Copie le fichier de la source vers la destination
-        if (!copy($assetSource, $destinationPath)) {
-            throw new \Exception("Can't copy asset from $assetSource to $destinationPath.");
-        }
+        $outputRelativeWebPath = $this->normalizePath($outputRelativeWebPath);
+        $assetFileDirectoryInAssetDirectory = $this->normalizePath($assetFileDirectoryInAssetDirectory);
+        $assetName = $this->normalizePath($assetName);
 
-        // Construit l'URL de l'asset copié
-        $assetUrl = $outputUrl.'/'.$assetName;
+        return rtrim($outputUrl, '/')
+            .'/'.trim($outputRelativeWebPath, '/')
+            .'/'.trim($assetFileDirectoryInAssetDirectory, '/')
+            .'/'.ltrim($assetName, '/');
+    }
 
-        Tlog::getInstance()->addDebug("Asset copied to $destinationPath, URL: $assetUrl");
-
-        // Retourne l'URL de l'asset
-        return $assetUrl;
+    private function normalizePath(string $path): string
+    {
+        return DS !== '/' ? str_replace(DS, '/', $path) : $path;
     }
 
     public function isDebugMode(): bool

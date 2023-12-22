@@ -54,7 +54,7 @@ class I18nDenormalizer extends AbstractItemNormalizer
     public function getSupportedTypes(?string $format): array
     {
         return [
-            I18n::class => false
+            I18n::class => false,
         ];
     }
 }
