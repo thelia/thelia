@@ -33,7 +33,7 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
         ),
         new Get(
             uriTemplate: '/admin/product_sale_elements/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/product_sale_elements/{id}'
@@ -42,57 +42,57 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
             uriTemplate: '/admin/product_sale_elements/{id}'
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
 class ProductSaleElements implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
-    public const GROUP_READ = 'product_sale_elements:read';
-    public const GROUP_READ_SINGLE = 'product_sale_elements:read:single';
-    public const GROUP_WRITE = 'product_sale_elements:write';
+    public const GROUP_ADMIN_READ = 'admin:product_sale_elements:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:product_sale_elements:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:product_sale_elements:write';
 
-    #[Groups([self::GROUP_READ, CartItem::GROUP_READ, ProductPrice::GROUP_READ, Product::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, CartItem::GROUP_ADMIN_READ, ProductPrice::GROUP_ADMIN_READ, Product::GROUP_ADMIN_READ_SINGLE])]
     public ?int $id = null;
 
     #[Relation(targetResource: Product::class)]
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
     public Product $product;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Product::GROUP_READ_SINGLE, Product::GROUP_WRITE, CartItem::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_READ_SINGLE, Product::GROUP_ADMIN_WRITE, CartItem::GROUP_ADMIN_READ])]
     public string $ref;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Product::GROUP_READ_SINGLE, Product::GROUP_WRITE, CartItem::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_READ_SINGLE, Product::GROUP_ADMIN_WRITE, CartItem::GROUP_ADMIN_READ])]
     public int $quantity;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Product::GROUP_READ_SINGLE, Product::GROUP_WRITE, CartItem::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_READ_SINGLE, Product::GROUP_ADMIN_WRITE, CartItem::GROUP_ADMIN_READ])]
     public ?bool $promo;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Product::GROUP_READ_SINGLE, Product::GROUP_WRITE, CartItem::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_READ_SINGLE, Product::GROUP_ADMIN_WRITE, CartItem::GROUP_ADMIN_READ])]
     public ?bool $newness;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Product::GROUP_READ_SINGLE, Product::GROUP_WRITE, CartItem::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_READ_SINGLE, Product::GROUP_ADMIN_WRITE, CartItem::GROUP_ADMIN_READ])]
     public ?float $weight;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Product::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_READ_SINGLE])]
     public ?bool $isDefault;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Product::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_READ_SINGLE])]
     public ?string $eanCode;
 
     #[Relation(targetResource: ProductPrice::class)]
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE, Product::GROUP_READ_SINGLE, Product::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_READ_SINGLE, Product::GROUP_ADMIN_WRITE])]
     public array $productPrices;
 
     #[Relation(targetResource: AttributeCombination::class)]
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_READ_SINGLE])]
     public array $attributeCombinations;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt;
 
     public function __construct()

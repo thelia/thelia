@@ -23,52 +23,52 @@ use Thelia\Model\Map\FeatureProductTableMap;
     operations: [
         new Get(
             uriTemplate: '/admin/feature_products/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Get(
             uriTemplate: '/admin/feature_products/{product}/features/{feature}/feature_avs/{featureAv}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
 class FeatureProduct implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
-    public const GROUP_READ = 'feature_product:read';
-    public const GROUP_READ_SINGLE = 'feature_product:read:single';
-    public const GROUP_WRITE = 'feature_product:write';
+    public const GROUP_ADMIN_READ = 'admin:feature_product:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:feature_product:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:feature_product:write';
 
-    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, Product::GROUP_ADMIN_READ_SINGLE])]
     public ?int $id = null;
 
     #[Relation(targetResource: Product::class)]
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
     public Product $product;
 
     #[Relation(targetResource: Feature::class)]
-    #[Groups([self::GROUP_READ_SINGLE, Product::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, Product::GROUP_ADMIN_READ_SINGLE])]
     public Feature $feature;
 
     #[Relation(targetResource: FeatureAv::class)]
-    #[Groups([self::GROUP_READ_SINGLE, Product::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, Product::GROUP_ADMIN_READ_SINGLE])]
     public FeatureAv $featureAv;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_READ_SINGLE])]
     public string $free_text_value;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_READ_SINGLE])]
     public ?bool $is_free_text = false;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?int $position;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt;
 
     public function getId(): ?int

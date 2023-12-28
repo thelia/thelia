@@ -34,7 +34,7 @@ use Thelia\Model\Map\CountryTableMap;
         ),
         new Get(
             uriTemplate: '/admin/countries/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]],
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Get(
             uriTemplate: '/admin/countries/iso/{isoalpha3}',
@@ -44,7 +44,7 @@ use Thelia\Model\Map\CountryTableMap;
                     fromClass: Country::class
                 ),
             ],
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]],
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
             uriTemplate: '/admin/countries/{id}'
@@ -59,62 +59,62 @@ use Thelia\Model\Map\CountryTableMap;
             identifiers: ['id']
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
 class Country extends AbstractTranslatableResource
 {
-    public const GROUP_READ = 'country:read';
-    public const GROUP_READ_SINGLE = 'country:read:single';
-    public const GROUP_WRITE = 'country:write';
+    public const GROUP_ADMIN_READ = 'admin:country:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:country:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:country:write';
 
     #[Groups([
-        self::GROUP_READ,
-        Order::GROUP_READ_SINGLE,
-        Customer::GROUP_READ_SINGLE,
-        Address::GROUP_READ,
-        State::GROUP_READ_SINGLE,
-        State::GROUP_READ,
-        TaxRuleCountry::GROUP_READ,
-        OrderAddress::GROUP_WRITE,
+        self::GROUP_ADMIN_READ,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Customer::GROUP_ADMIN_READ_SINGLE,
+        Address::GROUP_ADMIN_READ,
+        State::GROUP_ADMIN_READ_SINGLE,
+        State::GROUP_ADMIN_READ,
+        TaxRuleCountry::GROUP_ADMIN_READ,
+        OrderAddress::GROUP_ADMIN_WRITE,
     ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public bool $visible;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE])]
     public string $isocode;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE])]
     public ?string $isoalpha2;
 
     #[ApiProperty(identifier: true)]
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE])]
     public ?string $isoalpha3;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?bool $hasStates;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?bool $needZipCode;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?string $zipCodeFormat;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?bool $byDefault;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?bool $shopCountry;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int

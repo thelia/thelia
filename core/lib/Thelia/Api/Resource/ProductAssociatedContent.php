@@ -23,38 +23,38 @@ use Thelia\Model\Map\ProductAssociatedContentTableMap;
     operations: [
         new Get(
             uriTemplate: '/admin/product_associated_contents/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
 class ProductAssociatedContent implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
-    public const GROUP_READ = 'product_associated_content:read';
-    public const GROUP_READ_SINGLE = 'product_associated_content:read:single';
-    public const GROUP_WRITE = 'product_associated_content:write';
+    public const GROUP_ADMIN_READ = 'admin:product_associated_content:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:product_associated_content:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:product_associated_content:write';
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?int $id = null;
 
     #[Relation(targetResource: Product::class)]
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public Product $product;
 
     #[Relation(targetResource: Content::class)]
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public Content $content;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?int $position = null;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt;
 
     public function getId(): ?int

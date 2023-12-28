@@ -32,7 +32,7 @@ use Thelia\Model\Map\TaxTableMap;
         ),
         new Get(
             uriTemplate: '/admin/taxes/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/taxes/{id}'
@@ -41,31 +41,31 @@ use Thelia\Model\Map\TaxTableMap;
             uriTemplate: '/admin/taxes/{id}'
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
 class Tax extends AbstractTranslatableResource
 {
-    public const GROUP_READ = 'tax:read';
-    public const GROUP_READ_SINGLE = 'tax:read:single';
-    public const GROUP_WRITE = 'tax:write';
+    public const GROUP_ADMIN_READ = 'admin:tax:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:tax:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:tax:write';
 
-    #[Groups([self::GROUP_READ, TaxRuleCountry::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, TaxRuleCountry::GROUP_ADMIN_READ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public string $type;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public string $serializedRequirements;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int

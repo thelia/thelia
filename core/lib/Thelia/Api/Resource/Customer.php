@@ -44,7 +44,7 @@ use Thelia\Model\Map\CustomerTableMap;
         ),
         new Get(
             uriTemplate: '/admin/customers/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/customers/{id}'
@@ -53,8 +53,8 @@ use Thelia\Model\Map\CustomerTableMap;
             uriTemplate: '/admin/customers/{id}'
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -74,48 +74,48 @@ class Customer implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
-    public const GROUP_READ = 'customer:read';
-    public const GROUP_READ_SINGLE = 'customer:read:single';
-    public const GROUP_WRITE = 'customer:write';
+    public const GROUP_ADMIN_READ = 'admin:customer:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:customer:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:customer:write';
 
-    #[Groups([self::GROUP_READ, Address::GROUP_READ_SINGLE, Order::GROUP_READ, Cart::GROUP_READ_SINGLE, Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, Address::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_READ, Cart::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_WRITE])]
     public ?int $id = null;
 
     #[Relation(targetResource: CustomerTitle::class)]
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE, Address::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, Address::GROUP_ADMIN_READ_SINGLE])]
     #[Column(propelSetter: 'setTitleId')]
     public CustomerTitle $customerTitle;
 
     #[Relation(targetResource: Lang::class, relationAlias: 'LangModel')]
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
     public ?Lang $lang;
 
-    #[Groups([self::GROUP_READ, Address::GROUP_READ_SINGLE, Order::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, Address::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_READ])]
     public ?string $ref;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Address::GROUP_READ_SINGLE, Order::GROUP_READ, Order::GROUP_READ_SINGLE, Cart::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Address::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, Cart::GROUP_ADMIN_READ_SINGLE])]
     public string $firstname;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ, Order::GROUP_READ_SINGLE, Cart::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, Cart::GROUP_ADMIN_READ_SINGLE])]
     public string $lastname;
 
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE, Order::GROUP_READ, Order::GROUP_READ_SINGLE])]
-    #[NotBlank(groups: [self::GROUP_WRITE])]
-    #[Email(groups: [self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
+    #[Email(groups: [self::GROUP_ADMIN_WRITE])]
     public ?string $email;
 
-    #[Groups([self::GROUP_WRITE])]
-    #[NotBlank(groups: [self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_WRITE])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
     public ?string $password;
 
     public ?string $algo;
 
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
     public ?bool $reseller;
 
     public ?string $sponsor;
 
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
     public ?float $discount;
 
     public ?string $rememberMeToken;
@@ -126,10 +126,10 @@ class Customer implements PropelResourceInterface
 
     public ?string $confirmationToken;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
     public ?\DateTime $updatedAt;
 
     public ?int $version;
@@ -139,7 +139,7 @@ class Customer implements PropelResourceInterface
     public ?string $versionCreatedBy;
 
     #[Relation(targetResource: Address::class)]
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
     public array $addresses;
 
     public function __construct()
@@ -416,7 +416,7 @@ class Customer implements PropelResourceInterface
         return new CustomerTableMap();
     }
 
-    #[Callback(groups: [self::GROUP_WRITE])]
+    #[Callback(groups: [self::GROUP_ADMIN_WRITE])]
     public function verifyPasswordLength(ExecutionContextInterface $context): void
     {
         $resource = $context->getRoot();
@@ -425,7 +425,7 @@ class Customer implements PropelResourceInterface
         }
     }
 
-    #[Callback(groups: [self::GROUP_WRITE])]
+    #[Callback(groups: [self::GROUP_ADMIN_WRITE])]
     public function verifyExistingEmail(ExecutionContextInterface $context): void
     {
         $resource = $context->getRoot();

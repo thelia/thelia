@@ -33,7 +33,7 @@ use Thelia\Model\Map\ContentTableMap;
         ),
         new Get(
             uriTemplate: '/admin/contents/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/contents/{id}'
@@ -42,35 +42,35 @@ use Thelia\Model\Map\ContentTableMap;
             uriTemplate: '/admin/contents/{id}'
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
 class Content extends AbstractTranslatableResource
 {
-    public const GROUP_READ = 'content:read';
-    public const GROUP_READ_SINGLE = 'content:read:single';
-    public const GROUP_WRITE = 'content:write';
+    public const GROUP_ADMIN_READ = 'admin:content:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:content:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:content:write';
 
-    #[Groups([self::GROUP_READ, ContentFolder::GROUP_READ, ContentImage::GROUP_READ_SINGLE, ContentDocument::GROUP_READ_SINGLE, ProductAssociatedContent::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, ContentFolder::GROUP_ADMIN_READ, ContentImage::GROUP_ADMIN_READ_SINGLE, ContentDocument::GROUP_ADMIN_READ_SINGLE, ProductAssociatedContent::GROUP_ADMIN_READ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public bool $visible;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?int $position;
 
     #[Relation(targetResource: ContentFolder::class)]
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
     public array $contentFolders;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
 
     public function __construct()

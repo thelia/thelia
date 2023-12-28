@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class ModuleConfigI18n extends I18n
 {
-    #[Groups([ModuleConfig::GROUP_READ, ModuleConfig::GROUP_WRITE])]
+    #[Groups([ModuleConfig::GROUP_ADMIN_READ, ModuleConfig::GROUP_ADMIN_WRITE])]
     protected ?string $value;
 
     public function getValue(): ?string

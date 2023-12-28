@@ -32,7 +32,7 @@ use Thelia\Model\Map\FolderTableMap;
         ),
         new Get(
             uriTemplate: '/admin/folders/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/folders/{id}'
@@ -41,38 +41,38 @@ use Thelia\Model\Map\FolderTableMap;
             uriTemplate: '/admin/folders/{id}'
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
 class Folder extends AbstractTranslatableResource
 {
-    public const GROUP_READ = 'folder:read';
-    public const GROUP_READ_SINGLE = 'folder:read:single';
-    public const GROUP_WRITE = 'folder:write';
+    public const GROUP_ADMIN_READ = 'admin:folder:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:folder:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:folder:write';
 
-    #[Groups([self::GROUP_READ,
-        ContentFolder::GROUP_READ,
-        FolderImage::GROUP_READ_SINGLE,
-        FolderDocument::GROUP_READ_SINGLE,
+    #[Groups([self::GROUP_ADMIN_READ,
+        ContentFolder::GROUP_ADMIN_READ,
+        FolderImage::GROUP_ADMIN_READ_SINGLE,
+        FolderDocument::GROUP_ADMIN_READ_SINGLE,
     ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public bool $parent;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public bool $visible;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?int $position;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int

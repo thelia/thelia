@@ -37,10 +37,11 @@ class PropelPersistProcessor implements ProcessorInterface
     {
         $resourceAddons = [];
         $propelModel = $this->apiResourceService->resourceToModel($data, $context);
-
+        if (isset($uriVariables['id'])) {
+            $propelModel->setId($uriVariables['id']);
+        }
         $connection = Propel::getWriteConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME);
         $connection->beginTransaction();
-
         try {
             $this->beforeSave($data, $operation, $propelModel);
             $propelModel->save();
@@ -91,14 +92,16 @@ class PropelPersistProcessor implements ProcessorInterface
     private function beforeSave(mixed $data, Operation $operation, &$propelModel): void
     {
         if ($operation::class !== Put::class) {
+            $propelModel->setNew(true);
+
             return;
         }
-
+        $propelModel->setNew(false);
         $reflector = new \ReflectionClass($data);
 
         foreach ($reflector->getProperties() as $property) {
             $propelGetter = 'get'.ucfirst($property->getName());
-            // todo add propel getter
+
             foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
                 if (isset($relationAttribute->getArguments()['targetResource'])) {
                     $reflectorChild = new \ReflectionClass($relationAttribute->getArguments()['targetResource']);

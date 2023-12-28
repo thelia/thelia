@@ -41,10 +41,9 @@ class PropelRemoveProcessor implements ProcessorInterface
                     $addon->doDelete($propelModel, $data);
                 }
             }
-
             $propelModel->delete();
             if (!$propelModel->isDeleted()) {
-                throw new \Exception('This item cannot be deleted');
+                throw new \Exception('This item cannot be deleted, possibly because it is the default one.');
             }
 
             $connection->commit();
