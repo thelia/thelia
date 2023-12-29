@@ -17,9 +17,11 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Api\Bridge\Propel\Event\CRUDRessourceEvent;
 use Thelia\Api\Bridge\Propel\Event\ItemProviderQueryEvent;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\PropelResourceInterface;
+use Thelia\Core\Event\TheliaEvents;
 
 readonly class PropelItemProvider implements ProviderInterface
 {
@@ -66,10 +68,13 @@ readonly class PropelItemProvider implements ProviderInterface
             return null;
         }
 
-        return $this->apiResourcePropelTransformerService->modelToResource(
+        $resource = $this->apiResourcePropelTransformerService->modelToResource(
             resourceClass: $resourceClass,
             propelModel: $propelModel,
             context: $context
         );
+        $this->eventDispatcher->dispatch(new CRUDRessourceEvent($propelModel, $resource), TheliaEvents::API_READ_ITEM);
+
+        return $resource;
     }
 }

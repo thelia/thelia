@@ -17,49 +17,58 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\State\ProcessorInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Propel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Event\CRUDRessourceEvent;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
+use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Api\Resource\ResourceAddonInterface;
 use Thelia\Config\DatabaseConfiguration;
+use Thelia\Core\Event\TheliaEvents;
 
-class PropelPersistProcessor implements ProcessorInterface
+readonly class PropelPersistProcessor implements ProcessorInterface
 {
     public function __construct(
-        private readonly ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
-        private readonly RequestStack $requestStack
+        private ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
+        private RequestStack $requestStack,
+        private EventDispatcherInterface $eventDispatcher
     ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-        $resourceAddons = [];
         $propelModel = $this->apiResourcePropelTransformerService->resourceToModel($data, $context);
+        $isCreation = true;
         if (isset($uriVariables['id'])) {
+            $isCreation = false;
             $propelModel->setId($uriVariables['id']);
         }
         $connection = Propel::getWriteConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME);
         $connection->beginTransaction();
         try {
+            $event = new CRUDRessourceEvent($propelModel, $data);
+            $this->eventDispatcher->dispatch(
+                $event,
+                $isCreation ? TheliaEvents::API_BEFORE_CREATE : TheliaEvents::API_BEFORE_UPDATE
+            );
+            $propelModel = $event->getModel();
+            $data = $event->getResource();
             $this->beforeSave($data, $operation, $propelModel);
             $propelModel->save();
 
-            $jsonData = json_decode($this->requestStack->getCurrentRequest()->getContent(), true);
-            $resourceAddonDefinitions = $this->apiResourcePropelTransformerService->getResourceAddonDefinitions($data::class);
-            foreach ($resourceAddonDefinitions as $addonShortName => $addonClass) {
-                if (!isset($jsonData[$addonShortName])) {
-                    $resourceAddons[$addonShortName] = null;
-                    continue;
-                }
+            $resourceAddons = $this->manageResourceAddons($propelModel, $data);
 
-                if (is_subclass_of($addonClass, ResourceAddonInterface::class)) {
-                    $addon = (new $addonClass())->buildFromArray($jsonData[$addonShortName], $data);
-                    $addon->doSave($propelModel, $data);
-                    $resourceAddons[$addonShortName] = $addon;
-                }
-            }
+            $event = new CRUDRessourceEvent($propelModel, $data);
+            $this->eventDispatcher->dispatch(
+                $event,
+                $isCreation ? TheliaEvents::API_AFTER_CREATE : TheliaEvents::API_AFTER_UPDATE
+            );
+            $propelModel = $event->getModel();
+            $data = $event->getResource();
 
             $connection->commit();
 
@@ -134,5 +143,28 @@ class PropelPersistProcessor implements ProcessorInterface
                 }
             }
         }
+    }
+
+    private function manageResourceAddons(
+        ActiveRecordInterface $propelModel,
+        PropelResourceInterface $data
+    ): array {
+        $resourceAddons = [];
+        $jsonData = json_decode($this->requestStack->getCurrentRequest()?->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $resourceAddonDefinitions = $this->apiResourcePropelTransformerService->getResourceAddonDefinitions($data::class);
+        foreach ($resourceAddonDefinitions as $addonShortName => $addonClass) {
+            if (!isset($jsonData[$addonShortName])) {
+                $resourceAddons[$addonShortName] = null;
+                continue;
+            }
+
+            if (is_subclass_of($addonClass, ResourceAddonInterface::class)) {
+                $addon = (new $addonClass())->buildFromArray($jsonData[$addonShortName], $data);
+                $addon->doSave($propelModel, $data);
+                $resourceAddons[$addonShortName] = $addon;
+            }
+        }
+
+        return $resourceAddons;
     }
 }

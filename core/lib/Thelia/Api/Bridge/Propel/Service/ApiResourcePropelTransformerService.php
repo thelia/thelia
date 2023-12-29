@@ -186,7 +186,8 @@ readonly class ApiResourcePropelTransformerService
             if (!$property->isInitialized($data)) {
                 continue;
             }
-            $propelSetter = $this->determinePropelSetter($property, $setterForced);
+            $setterForced = false;
+            $propelSetter = $this->determinePropelSetterName($property, $setterForced);
 
             if (method_exists($propelModel, $propelSetter)) {
                 $value = $this->getPropertyValue($data, $property);
@@ -198,11 +199,10 @@ readonly class ApiResourcePropelTransformerService
         }
     }
 
-    private function determinePropelSetter(
+    private function determinePropelSetterName(
         \ReflectionProperty $property,
         bool &$setterForced = false
     ): string {
-        $setterForced = false;
         $propelSetter = 'set'.ucfirst($property->getName());
 
         foreach ($property->getAttributes(Column::class) as $columnAttribute) {
@@ -216,6 +216,21 @@ readonly class ApiResourcePropelTransformerService
         }
 
         return $propelSetter;
+    }
+
+    private function determinePropelGetterName(
+        \ReflectionProperty $property,
+        string $attributeClass,
+        string $argumentKey,
+        string $defaultGetter
+    ): string {
+        foreach ($property->getAttributes($attributeClass) as $attribute) {
+            if (isset($attribute->getArguments()[$argumentKey])) {
+                return 'get'.ucfirst($attribute->getArguments()[$argumentKey]);
+            }
+        }
+
+        return $defaultGetter;
     }
 
     private function getPropertyValue(PropelResourceInterface $data, \ReflectionProperty $property): mixed
@@ -313,8 +328,8 @@ readonly class ApiResourcePropelTransformerService
     ): void {
         foreach ($reflector->getProperties() as $property) {
             $defaultGetter = 'get'.ucfirst($property->getName());
-            $propelGetter = $this->getPropelGetterName($property, Column::class, 'propelFieldName', $defaultGetter);
-            $propelGetter = $this->getPropelGetterName($property, Relation::class, 'relationAlias', $propelGetter);
+            $propelGetter = $this->determinePropelGetterName($property, Column::class, 'propelFieldName', $defaultGetter);
+            $propelGetter = $this->determinePropelGetterName($property, Relation::class, 'relationAlias', $propelGetter);
 
             if (!method_exists($propelModel, $propelGetter)) {
                 continue;
@@ -384,21 +399,6 @@ readonly class ApiResourcePropelTransformerService
                 }
             }
         }
-    }
-
-    private function getPropelGetterName(
-        \ReflectionProperty $property,
-        string $attributeClass,
-        string $argumentKey,
-        string $defaultGetter): string
-    {
-        foreach ($property->getAttributes($attributeClass) as $attribute) {
-            if (isset($attribute->getArguments()[$argumentKey])) {
-                return 'get'.ucfirst($attribute->getArguments()[$argumentKey]);
-            }
-        }
-
-        return $defaultGetter;
     }
 
     private function manageCollectionAttribute(

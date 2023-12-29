@@ -16,16 +16,20 @@ use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Api\Bridge\Propel\Event\CRUDRessourceEvent;
 use Thelia\Api\Bridge\Propel\Extension\QueryResultCollectionExtensionInterface;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\PropelResourceInterface;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\LangQuery;
 
-class PropelCollectionProvider implements ProviderInterface
+readonly class PropelCollectionProvider implements ProviderInterface
 {
     public function __construct(
-        readonly private ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
-        private iterable $propelCollectionExtensions = []
+        private ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
+        private EventDispatcherInterface $eventDispatcher,
+        private iterable $propelCollectionExtensions = [],
     ) {
     }
 
@@ -38,7 +42,7 @@ class PropelCollectionProvider implements ProviderInterface
         }
 
         /** @var ModelCriteria $queryClass */
-        $queryClass = $resourceClass::getPropelRelatedTableMap()->getClassName().'Query';
+        $queryClass = $resourceClass::getPropelRelatedTableMap()?->getClassName().'Query';
 
         /** @var ModelCriteria $query */
         $query = $queryClass::create();
@@ -66,7 +70,7 @@ class PropelCollectionProvider implements ProviderInterface
 
         $langs = LangQuery::create()->filterByActive(1)->find();
 
-        return array_map(
+        $resources = array_map(
             function ($propelModel) use ($resourceClass, $context, $langs) {
                 return $this->apiResourcePropelTransformerService->modelToResource(
                     resourceClass: $resourceClass,
@@ -77,5 +81,8 @@ class PropelCollectionProvider implements ProviderInterface
             },
             iterator_to_array($results)
         );
+        $this->eventDispatcher->dispatch(new CRUDRessourceEvent($results->toArray(), $resources), TheliaEvents::API_READ_COLLECTION);
+
+        return $resources;
     }
 }

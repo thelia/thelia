@@ -95,7 +95,7 @@ class Brand extends AbstractTranslatableResource
     #[Groups([
         self::GROUP_ADMIN_READ,
         self::GROUP_FRONT_READ,
-        self::GROUP_ADMIN_WRITE
+        self::GROUP_ADMIN_WRITE,
     ])]
     public I18nCollection $i18ns;
 

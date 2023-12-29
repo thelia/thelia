@@ -101,7 +101,6 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
     public const GROUP_FRONT_READ = 'front:content_image:read';
     public const GROUP_FRONT_READ_SINGLE = 'front:content_image:read:single';
 
-
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?int $id = null;
 
