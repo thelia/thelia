@@ -19,8 +19,8 @@ use Thelia\Api\Resource\PropelResourceInterface;
 class CRUDRessourceEvent extends Event
 {
     public function __construct(
-        private readonly ActiveRecordInterface|array $model,
-        private readonly PropelResourceInterface|array $resource,
+        private ActiveRecordInterface|array $model,
+        private PropelResourceInterface|array $resource,
     ) {
     }
 
@@ -32,5 +32,19 @@ class CRUDRessourceEvent extends Event
     public function getResource(): PropelResourceInterface|array
     {
         return $this->resource;
+    }
+
+    public function setModel(ActiveRecordInterface|array $model): self
+    {
+        $this->model = $model;
+
+        return $this;
+    }
+
+    public function setResource(array|PropelResourceInterface $resource): self
+    {
+        $this->resource = $resource;
+
+        return $this;
     }
 }
