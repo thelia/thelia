@@ -16,25 +16,25 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class ContentI18n extends I18n
 {
-    #[Groups([Content::GROUP_READ, Content::GROUP_WRITE])]
+    #[Groups([Content::GROUP_ADMIN_READ, Content::GROUP_FRONT_READ, Content::GROUP_ADMIN_WRITE])]
     protected ?string $title;
 
-    #[Groups([Content::GROUP_READ, Content::GROUP_WRITE])]
+    #[Groups([Content::GROUP_ADMIN_READ, Content::GROUP_FRONT_READ, Content::GROUP_ADMIN_WRITE])]
     protected ?string $description;
 
-    #[Groups([Content::GROUP_READ, Content::GROUP_WRITE])]
+    #[Groups([Content::GROUP_ADMIN_READ, Content::GROUP_FRONT_READ, Content::GROUP_ADMIN_WRITE])]
     protected ?string $chapo;
 
-    #[Groups([Content::GROUP_READ, Content::GROUP_WRITE])]
+    #[Groups([Content::GROUP_ADMIN_READ, Content::GROUP_FRONT_READ, Content::GROUP_ADMIN_WRITE])]
     protected ?string $postscriptum;
 
-    #[Groups([Content::GROUP_READ, Content::GROUP_WRITE])]
+    #[Groups([Content::GROUP_ADMIN_READ, Content::GROUP_FRONT_READ, Content::GROUP_ADMIN_WRITE])]
     protected ?string $metaTitle;
 
-    #[Groups([Content::GROUP_READ, Content::GROUP_WRITE])]
+    #[Groups([Content::GROUP_ADMIN_READ, Content::GROUP_FRONT_READ, Content::GROUP_ADMIN_WRITE])]
     protected ?string $metaDescription;
 
-    #[Groups([Content::GROUP_READ, Content::GROUP_WRITE])]
+    #[Groups([Content::GROUP_ADMIN_READ, Content::GROUP_FRONT_READ, Content::GROUP_ADMIN_WRITE])]
     protected ?string $metaKeywords;
 
     public function getTitle(): ?string

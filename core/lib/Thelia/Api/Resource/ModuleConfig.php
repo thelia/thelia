@@ -33,7 +33,7 @@ use Thelia\Model\Map\ModuleConfigTableMap;
         ),
         new Get(
             uriTemplate: '/admin/module_configs/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/module_configs/{id}'
@@ -42,32 +42,32 @@ use Thelia\Model\Map\ModuleConfigTableMap;
             uriTemplate: '/admin/module_configs/{id}'
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
 class ModuleConfig extends AbstractTranslatableResource
 {
-    public const GROUP_READ = 'module_config:read';
-    public const GROUP_READ_SINGLE = 'module_config:read:single';
-    public const GROUP_WRITE = 'module_config:write';
+    public const GROUP_ADMIN_READ = 'admin:module_config:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:module_config:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:module_config:write';
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?int $id = null;
 
     #[Relation(targetResource: Module::class)]
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public Module $module;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public string $name;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int

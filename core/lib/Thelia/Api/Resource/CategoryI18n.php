@@ -16,25 +16,43 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class CategoryI18n extends I18n
 {
-    #[Groups([Category::GROUP_READ, Category::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
+    #[Groups([
+        Category::GROUP_ADMIN_READ,
+        Category::GROUP_FRONT_READ,
+        Category::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+    ])]
     protected ?string $title;
 
-    #[Groups([Category::GROUP_READ, Category::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
+    #[Groups([
+        Category::GROUP_ADMIN_READ,
+        Category::GROUP_FRONT_READ,
+        Category::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+    ])]
     protected ?string $chapo;
 
-    #[Groups([Category::GROUP_READ, Category::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
+    #[Groups([
+        Category::GROUP_ADMIN_READ,
+        Category::GROUP_FRONT_READ,
+        Category::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+    ])]
     protected ?string $description;
 
-    #[Groups([Category::GROUP_READ, Category::GROUP_WRITE])]
+    #[Groups([Category::GROUP_ADMIN_READ, Category::GROUP_FRONT_READ, Category::GROUP_ADMIN_WRITE])]
     protected ?string $postscriptum;
 
-    #[Groups([Category::GROUP_READ, Category::GROUP_WRITE])]
+    #[Groups([Category::GROUP_ADMIN_READ, Category::GROUP_FRONT_READ, Category::GROUP_ADMIN_WRITE])]
     protected ?string $metaTitle;
 
-    #[Groups([Category::GROUP_READ, Category::GROUP_WRITE])]
+    #[Groups([Category::GROUP_ADMIN_READ, Category::GROUP_FRONT_READ, Category::GROUP_ADMIN_WRITE])]
     protected ?string $metaDescription;
 
-    #[Groups([Category::GROUP_READ, Category::GROUP_WRITE])]
+    #[Groups([Category::GROUP_ADMIN_READ, Category::GROUP_FRONT_READ, Category::GROUP_ADMIN_WRITE])]
     protected ?string $metaKeywords;
 
     public function getTitle(): ?string

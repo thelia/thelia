@@ -34,7 +34,7 @@ use Thelia\Model\Map\OrderStatusTableMap;
         ),
         new Get(
             uriTemplate: '/admin/order_statutes/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Get(
             uriTemplate: '/admin/order_statutes/code/{code}',
@@ -44,7 +44,7 @@ use Thelia\Model\Map\OrderStatusTableMap;
                     fromClass: self::class
                 ),
             ],
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/order_statutes/{id}'
@@ -59,38 +59,38 @@ use Thelia\Model\Map\OrderStatusTableMap;
             identifiers: ['id']
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
 class OrderStatus extends AbstractTranslatableResource
 {
-    public const GROUP_READ = 'order_status:read';
-    public const GROUP_READ_SINGLE = 'order_status:read:single';
-    public const GROUP_WRITE = 'order_status:write';
+    public const GROUP_ADMIN_READ = 'admin:order_status:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:order_status:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:order_status:write';
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
     public ?int $id = null;
 
     #[ApiProperty(identifier: true)]
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ])]
     public string $code;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ])]
     public ?string $color = '#c3c3c3';
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?int $position;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?bool $protectedStatus = false;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int

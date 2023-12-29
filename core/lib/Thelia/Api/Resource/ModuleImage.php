@@ -34,8 +34,8 @@ use Thelia\Model\Map\ModuleImageTableMap;
             uriTemplate: '/admin/module_images',
             inputFormats: ['multipart' => ['multipart/form-data']],
             controller: PostItemFileController::class,
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]],
-            denormalizationContext: ['groups' => [self::GROUP_WRITE, self::GROUP_WRITE_FILE]],
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_FILE]],
             deserialize: false
         ),
         new GetCollection(
@@ -43,7 +43,7 @@ use Thelia\Model\Map\ModuleImageTableMap;
         ),
         new Get(
             uriTemplate: '/admin/module_images/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Get(
             uriTemplate: '/admin/module_images/{id}/file',
@@ -58,32 +58,32 @@ use Thelia\Model\Map\ModuleImageTableMap;
         ),
         new Put(
             uriTemplate: '/admin/module_images/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_WRITE, self::GROUP_WRITE_UPDATE]],
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
         ),
         new Delete(
             uriTemplate: '/admin/module_images/{id}'
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
 class ModuleImage extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
-    public const GROUP_READ = 'module_image:read';
-    public const GROUP_READ_SINGLE = 'module_image:read:single';
-    public const GROUP_WRITE = 'module_image:write';
+    public const GROUP_ADMIN_READ = 'admin:module_image:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:module_image:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:module_image:write';
 
-    public const GROUP_WRITE_FILE = 'module_image:write_file';
-    public const GROUP_WRITE_UPDATE = 'module_image:write_update';
+    public const GROUP_ADMIN_WRITE_FILE = 'admin:module_image:write_file';
+    public const GROUP_ADMIN_WRITE_UPDATE = 'admin:module_image:write_update';
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?int $id = null;
 
     #[Relation(targetResource: Module::class)]
-    #[Groups([self::GROUP_WRITE_FILE, self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_WRITE_FILE, self::GROUP_ADMIN_READ])]
     public Module $module;
 
-    #[Groups([self::GROUP_WRITE_FILE])]
+    #[Groups([self::GROUP_ADMIN_WRITE_FILE])]
     #[ApiProperty(
         openapiContext: [
             'type' => 'string',
@@ -92,25 +92,25 @@ class ModuleImage extends AbstractTranslatableResource implements ItemFileResour
     )]
     public UploadedFile $fileToUpload;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public bool $visible;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE_UPDATE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE_UPDATE])]
     public ?int $position;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
 
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
     public string $file;
 
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
     public ?string $fileUrl;
 
     public function getId(): ?int
