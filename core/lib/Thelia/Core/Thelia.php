@@ -668,12 +668,12 @@ class Thelia extends Kernel
 
         $extensionConfigs['security'][0]['firewalls'] = array_merge(
             [
-                'login' => [
-                    'pattern' => '^/api/login',
+                'frontLogin' => [
+                    'pattern' => '^/api/front/login',
                     'stateless' => true,
                     'provider' => 'customer_provider',
                     'json_login' => [
-                        'check_path' => '/api/login',
+                        'check_path' => '/api/front/login',
                         'success_handler' => 'lexik_jwt_authentication.handler.authentication_success',
                         'failure_handler' => 'lexik_jwt_authentication.handler.authentication_failure',
                     ],
@@ -688,12 +688,6 @@ class Thelia extends Kernel
                         'failure_handler' => 'lexik_jwt_authentication.handler.authentication_failure',
                     ],
                 ],
-//                'adminApi' => [
-//                    'pattern' => '^/api/admin',
-//                    'stateless' => true,
-//                    'jwt' => [],
-//                    'provider' => 'admin_provider'
-//                ],
                 'api' => [
                     'pattern' => '^/api',
                     'stateless' => true,
@@ -706,9 +700,11 @@ class Thelia extends Kernel
 
         $extensionConfigs['security'][0]['access_control'] = array_merge(
             [
-                ['path' => '^/api/login', 'roles' => 'PUBLIC_ACCESS'],
+                ['path' => '^/api/front/login', 'roles' => 'PUBLIC_ACCESS'],
+                ['path' => '^/api/admin/login', 'roles' => 'PUBLIC_ACCESS'],
                 ['path' => '^/api/docs', 'roles' => 'PUBLIC_ACCESS'],
-//                ['path' => '^/api/admin', 'roles' => 'ROLE_ADMIN']
+                ['path' => '^/api/admin', 'roles' => 'ROLE_ADMIN'],
+                ['path' => '^/api/front/account', 'roles' => 'ROLE_CUSTOMER'],
             ],
             $extensionConfigs['security'][0]['access_control'] ?? []
         );

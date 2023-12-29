@@ -32,7 +32,7 @@ use Thelia\Model\Map\ModuleTableMap;
         ),
         new Get(
             uriTemplate: '/admin/modules/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/modules/{id}'
@@ -41,59 +41,59 @@ use Thelia\Model\Map\ModuleTableMap;
             uriTemplate: '/admin/modules/{id}'
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
 class Module extends AbstractTranslatableResource
 {
-    public const GROUP_READ = 'module:read';
-    public const GROUP_READ_SINGLE = 'module:read:single';
-    public const GROUP_WRITE = 'module:write';
+    public const GROUP_ADMIN_READ = 'admin:module:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:module:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:module:write';
 
-    #[Groups([self::GROUP_READ,
-        ModuleConfig::GROUP_READ,
-        ModuleConfig::GROUP_WRITE,
-        Order::GROUP_READ_SINGLE,
-        Order::GROUP_READ,
-        Order::GROUP_WRITE,
-        ModuleImage::GROUP_READ_SINGLE,
+    #[Groups([self::GROUP_ADMIN_READ,
+        ModuleConfig::GROUP_ADMIN_READ,
+        ModuleConfig::GROUP_ADMIN_WRITE,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_ADMIN_READ,
+        Order::GROUP_ADMIN_WRITE,
+        ModuleImage::GROUP_ADMIN_READ_SINGLE,
     ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE])]
     public string $code;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE])]
     public string $category;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE])]
     public string $type;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE])]
     public string $version;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE])]
     public ?bool $activate;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE])]
     public ?string $fullNamespace;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE])]
     public ?bool $hidden;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE])]
     public ?int $position;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE])]
     public ?bool $mandatory;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int

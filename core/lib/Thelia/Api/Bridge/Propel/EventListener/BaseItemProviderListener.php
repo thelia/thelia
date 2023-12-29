@@ -14,12 +14,12 @@ namespace Thelia\Api\Bridge\Propel\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Api\Bridge\Propel\Event\ItemProviderQueryEvent;
-use Thelia\Api\Bridge\Propel\Service\ApiResourceService;
+use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 
 class BaseItemProviderListener implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly ApiResourceService $apiResourceService,
+        private readonly ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
     ) {
     }
 
@@ -29,9 +29,9 @@ class BaseItemProviderListener implements EventSubscriberInterface
 
         $reflector = new \ReflectionClass($event->getResourceClass());
 
-        $compositeIdentifiers = $this->apiResourceService->getResourceCompositeIdentifierValues(reflector: $reflector, param: 'keys');
+        $compositeIdentifiers = $this->apiResourcePropelTransformerService->getResourceCompositeIdentifierValues(reflector: $reflector, param: 'keys');
 
-        $columnValues = $this->apiResourceService->getColumnValues(reflector: $reflector, columns: $compositeIdentifiers);
+        $columnValues = $this->apiResourcePropelTransformerService->getColumnValues(reflector: $reflector, columns: $compositeIdentifiers);
 
         foreach ($event->getUriVariables() as $field => $value) {
             $filterMethod = null;

@@ -16,16 +16,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class FolderDocumentI18n extends I18n
 {
-    #[Groups([FolderDocument::GROUP_READ, FolderDocument::GROUP_WRITE])]
+    #[Groups([FolderDocument::GROUP_ADMIN_READ, FolderDocument::GROUP_ADMIN_WRITE])]
     protected ?string $title;
 
-    #[Groups([FolderDocument::GROUP_READ, FolderDocument::GROUP_WRITE])]
+    #[Groups([FolderDocument::GROUP_ADMIN_READ, FolderDocument::GROUP_ADMIN_WRITE])]
     protected ?string $description;
 
-    #[Groups([FolderDocument::GROUP_READ, FolderDocument::GROUP_WRITE])]
+    #[Groups([FolderDocument::GROUP_ADMIN_READ, FolderDocument::GROUP_ADMIN_WRITE])]
     protected ?string $chapo;
 
-    #[Groups([FolderDocument::GROUP_READ, FolderDocument::GROUP_WRITE])]
+    #[Groups([FolderDocument::GROUP_ADMIN_READ, FolderDocument::GROUP_ADMIN_WRITE])]
     protected ?string $postscriptum;
 
     public function getTitle(): ?string
