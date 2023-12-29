@@ -25,44 +25,87 @@ use Thelia\Model\Map\ProductPriceTableMap;
     operations: [
         new Get(
             uriTemplate: '/admin/product_prices/{productSaleElements}/currencies/{currency}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]],
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
+)]
+#[ApiResource(
+    operations: [
+        new Get(
+            uriTemplate: '/front/product_prices/{productSaleElements}/currencies/{currency}',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
 #[CompositeIdentifiers(['productSaleElements', 'currency'])]
 class ProductPrice implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
-    public const GROUP_READ = 'product_price:read';
-    public const GROUP_READ_SINGLE = 'product_price:read:single';
-    public const GROUP_WRITE = 'product_price:write';
+    public const GROUP_ADMIN_READ = 'admin:product_price:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:product_price:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:product_price:write';
+
+    public const GROUP_FRONT_READ = 'front:product_price:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:product_price:read:single';
 
     #[Relation(targetResource: ProductSaleElements::class)]
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ProductSaleElements $productSaleElements;
 
     #[Relation(targetResource: Currency::class)]
-    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE, Product::GROUP_WRITE])]
-    #[NotBlank(groups: [Product::GROUP_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+        ProductSaleElements::GROUP_ADMIN_READ_SINGLE,
+        ProductSaleElements::GROUP_FRONT_READ_SINGLE,
+        ProductSaleElements::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_WRITE,
+    ])]
+    #[NotBlank(groups: [Product::GROUP_ADMIN_WRITE])]
     public Currency $currency;
 
-    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE, Product::GROUP_WRITE])]
-    #[NotBlank(groups: [Product::GROUP_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+        ProductSaleElements::GROUP_ADMIN_READ_SINGLE,
+        ProductSaleElements::GROUP_FRONT_READ_SINGLE,
+        ProductSaleElements::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_WRITE,
+    ])]
+    #[NotBlank(groups: [Product::GROUP_ADMIN_WRITE])]
     public float $price;
 
-    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE, Product::GROUP_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+        ProductSaleElements::GROUP_ADMIN_READ_SINGLE,
+        ProductSaleElements::GROUP_FRONT_READ_SINGLE,
+        ProductSaleElements::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_WRITE,
+    ])]
     public float $promoPrice;
 
-    #[Groups([self::GROUP_READ, Product::GROUP_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        Product::GROUP_ADMIN_WRITE,
+    ])]
     public ?bool $fromDefaultCurrency = true;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $updatedAt;
 
     public function getProductSaleElements(): ProductSaleElements

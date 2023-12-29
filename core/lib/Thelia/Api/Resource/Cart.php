@@ -33,7 +33,7 @@ use Thelia\Model\Map\CartTableMap;
         ),
         new Get(
             uriTemplate: '/admin/carts/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/carts/{id}'
@@ -42,50 +42,79 @@ use Thelia\Model\Map\CartTableMap;
             uriTemplate: '/admin/carts/{id}'
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+)]
+#[ApiResource(
+    operations: [
+        new Post(
+            uriTemplate: '/front/carts'
+        ),
+        new GetCollection(
+            uriTemplate: '/front/carts'
+        ),
+        new Get(
+            uriTemplate: '/front/carts/{id}',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
+            security: 'is_granted("ROLE_CUSTOMER") and object.customer.getId() == user.getId()'
+        ),
+        new Put(
+            uriTemplate: '/front/carts/{id}',
+            security: 'is_granted("ROLE_CUSTOMER") and object.customer.getId() == user.getId()'
+        ),
+        new Delete(
+            uriTemplate: '/front/carts/{id}',
+            security: 'is_granted("ROLE_CUSTOMER") and object.customer.getId() == user.getId()'
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_FRONT_WRITE]]
 )]
 class Cart implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
-    public const GROUP_READ = 'cart:read';
-    public const GROUP_READ_SINGLE = 'cart:read:single';
-    public const GROUP_WRITE = 'cart:write';
+    public const GROUP_ADMIN_READ = 'admin:cart:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:cart:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:cart:write';
 
-    #[Groups([self::GROUP_READ, CartItem::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    public const GROUP_FRONT_READ = 'front:cart:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:cart:read:single';
+    public const GROUP_FRONT_WRITE = 'front:cart:write';
+
+    #[Groups([self::GROUP_ADMIN_READ, CartItem::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
     public ?string $token;
 
     #[Relation(targetResource: Customer::class)]
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
     public ?Customer $customer;
 
     #[Relation(targetResource: Address::class, relationAlias: 'AddressRelatedByAddressDeliveryId')]
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?Address $addressDelivery;
 
     #[Relation(targetResource: Address::class, relationAlias: 'AddressRelatedByAddressInvoiceId')]
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?Address $addressInvoice;
 
     #[Relation(targetResource: Currency::class)]
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?Currency $currency;
 
     #[Relation(targetResource: CartItem::class, )]
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?array $cartItems;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
     public ?float $discount;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     public ?\DateTime $updatedAt;
 
     public function __construct()
