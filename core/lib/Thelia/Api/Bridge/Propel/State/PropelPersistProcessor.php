@@ -21,14 +21,14 @@ use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Propel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
-use Thelia\Api\Bridge\Propel\Service\ApiResourceService;
+use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\ResourceAddonInterface;
 use Thelia\Config\DatabaseConfiguration;
 
 class PropelPersistProcessor implements ProcessorInterface
 {
     public function __construct(
-        private readonly ApiResourceService $apiResourceService,
+        private readonly ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
         private readonly RequestStack $requestStack
     ) {
     }
@@ -36,7 +36,7 @@ class PropelPersistProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
         $resourceAddons = [];
-        $propelModel = $this->apiResourceService->resourceToModel($data, $context);
+        $propelModel = $this->apiResourcePropelTransformerService->resourceToModel($data, $context);
         if (isset($uriVariables['id'])) {
             $propelModel->setId($uriVariables['id']);
         }
@@ -47,7 +47,7 @@ class PropelPersistProcessor implements ProcessorInterface
             $propelModel->save();
 
             $jsonData = json_decode($this->requestStack->getCurrentRequest()->getContent(), true);
-            $resourceAddonDefinitions = $this->apiResourceService->getResourceAddonDefinitions($data::class);
+            $resourceAddonDefinitions = $this->apiResourcePropelTransformerService->getResourceAddonDefinitions($data::class);
             foreach ($resourceAddonDefinitions as $addonShortName => $addonClass) {
                 if (!isset($jsonData[$addonShortName])) {
                     $resourceAddons[$addonShortName] = null;
@@ -75,7 +75,7 @@ class PropelPersistProcessor implements ProcessorInterface
         /** @var Post $postOperation */
         $postOperation = $context['operation'] ?? null;
         if (null !== $postOperation) {
-            $data = $this->apiResourceService->modelToResource(
+            $data = $this->apiResourcePropelTransformerService->modelToResource(
                 resourceClass: $data::class,
                 propelModel: $propelModel,
                 context: $postOperation->getNormalizationContext(),
@@ -105,7 +105,7 @@ class PropelPersistProcessor implements ProcessorInterface
             foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
                 if (isset($relationAttribute->getArguments()['targetResource'])) {
                     $reflectorChild = new \ReflectionClass($relationAttribute->getArguments()['targetResource']);
-                    $compositeIdentifiers = $this->apiResourceService->getResourceCompositeIdentifierValues(reflector: $reflectorChild, param: 'keys');
+                    $compositeIdentifiers = $this->apiResourcePropelTransformerService->getResourceCompositeIdentifierValues(reflector: $reflectorChild, param: 'keys');
 
                     if ($compositeIdentifiers === [] || !$propelModel->$propelGetter() instanceof Collection) {
                         continue;

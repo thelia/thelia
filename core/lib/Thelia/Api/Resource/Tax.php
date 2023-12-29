@@ -44,28 +44,48 @@ use Thelia\Model\Map\TaxTableMap;
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
     denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            uriTemplate: '/front/taxes'
+        ),
+        new Get(
+            uriTemplate: '/front/taxes/{id}',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]]
+)]
 class Tax extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:tax:read';
     public const GROUP_ADMIN_READ_SINGLE = 'admin:tax:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:tax:write';
 
-    #[Groups([self::GROUP_ADMIN_READ, TaxRuleCountry::GROUP_ADMIN_READ])]
+    public const GROUP_FRONT_READ = 'front:tax:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:tax:read:single';
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        TaxRuleCountry::GROUP_ADMIN_READ,
+        TaxRuleCountry::GROUP_FRONT_READ,
+    ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public string $type;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public string $serializedRequirements;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int

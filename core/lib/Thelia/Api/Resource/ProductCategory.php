@@ -30,6 +30,15 @@ use Thelia\Model\Map\ProductCategoryTableMap;
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
     denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
+#[ApiResource(
+    operations: [
+        new Get(
+            uriTemplate: '/front/product_categories/{product}/categories/{category}',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
+)]
 #[CompositeIdentifiers(['category', 'product'])]
 class ProductCategory implements PropelResourceInterface
 {
@@ -39,24 +48,33 @@ class ProductCategory implements PropelResourceInterface
     public const GROUP_ADMIN_READ_SINGLE = 'admin:product_categories:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:product_categories:write';
 
+    public const GROUP_FRONT_READ = 'front:product_categories:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:product_categories:read:single';
+
     #[Relation(targetResource: Category::class)]
-    #[Groups([self::GROUP_ADMIN_READ, Product::GROUP_ADMIN_READ_SINGLE, Product::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_ADMIN_WRITE,
+    ])]
     public Category $category;
 
     #[Relation(targetResource: Product::class)]
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public Product $product;
 
-    #[Groups([self::GROUP_ADMIN_READ, Product::GROUP_ADMIN_READ_SINGLE, Product::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Product::GROUP_FRONT_READ_SINGLE, Product::GROUP_ADMIN_READ_SINGLE, Product::GROUP_ADMIN_WRITE])]
     public ?bool $defaultCategory = false;
 
-    #[Groups([self::GROUP_ADMIN_READ, Product::GROUP_ADMIN_READ_SINGLE, Product::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Product::GROUP_FRONT_READ_SINGLE, Product::GROUP_ADMIN_READ_SINGLE, Product::GROUP_ADMIN_WRITE])]
     public int $position;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $updatedAt;
 
     public function getCategory(): Category

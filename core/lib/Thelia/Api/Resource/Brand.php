@@ -79,13 +79,24 @@ class Brand extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public bool $visible;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Product::GROUP_ADMIN_READ, Product::GROUP_ADMIN_READ_SINGLE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        Product::GROUP_ADMIN_READ,
+        Product::GROUP_FRONT_READ,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+    ])]
     public ?int $position = null;
 
     #[ApiProperty(
         types: 'object'
     )]
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        self::GROUP_ADMIN_WRITE
+    ])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int

@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
-use Thelia\Api\Bridge\Propel\Service\ApiResourceService;
+use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 
 #[AsDecorator(decorates: 'api_platform.serializer.mapping.class_metadata_factory')]
 class ClassMetaDataFactory implements ClassMetadataFactoryInterface
@@ -28,14 +28,14 @@ class ClassMetaDataFactory implements ClassMetadataFactoryInterface
     public function __construct(
         #[AutowireDecorated]
         private ClassMetadataFactoryInterface $inner,
-        private ApiResourceService $apiResourceService
+        private ApiResourcePropelTransformerService $apiResourcePropelTransformerService
     ) {
     }
 
     public function getMetadataFor($value): ClassMetadataInterface
     {
         $metadata = $this->inner->getMetadataFor(\is_object($value) ? $this->getObjectClass($value) : $this->getRealClassName($value));
-        $resourceAddons = $this->apiResourceService->getResourceAddonDefinitions($metadata->getName());
+        $resourceAddons = $this->apiResourcePropelTransformerService->getResourceAddonDefinitions($metadata->getName());
 
         if (empty($resourceAddons)) {
             return $metadata;

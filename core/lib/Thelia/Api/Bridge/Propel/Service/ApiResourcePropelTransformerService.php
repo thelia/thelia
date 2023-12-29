@@ -12,7 +12,6 @@
 
 namespace Thelia\Api\Bridge\Propel\Service;
 
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Validator\ValidatorInterface;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
@@ -30,12 +29,12 @@ use Thelia\Api\Resource\ResourceAddonInterface;
 use Thelia\Api\Resource\TranslatableResourceInterface;
 use Thelia\Model\LangQuery;
 
-class ApiResourceService
+readonly class ApiResourcePropelTransformerService
 {
     public function __construct(
-        private readonly array $apiResourceAddons,
-        private readonly ValidatorInterface $validator,
-        private readonly EventDispatcherInterface $eventDispatcher,
+        private array $apiResourceAddons,
+        private ValidatorInterface $validator,
+        private EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -62,9 +61,7 @@ class ApiResourceService
             $langs = LangQuery::create()->filterByActive(1)->find();
         }
 
-        if (null === $baseModel) {
-            $baseModel = $propelModel;
-        }
+        $baseModel = $baseModel ?? $propelModel;
 
         $modelToResourceEvent = new ModelToResourceEvent($baseModel, $parentModel);
         $this->eventDispatcher->dispatch($modelToResourceEvent, ModelToResourceEvent::BEFORE_TRANSFORM);
@@ -72,55 +69,19 @@ class ApiResourceService
 
         /** @var PropelResourceInterface $apiResource */
         $apiResource = new $resourceClass();
-
         $reflector = new \ReflectionClass($resourceClass);
 
-        foreach ($reflector->getProperties() as $property) {
-            $defaultGetter = 'get'.ucfirst($property->getName());
-            $propelGetter = $this->getPropelGetterName($property, Column::class, 'propelFieldName', $defaultGetter);
-            $propelGetter = $this->getPropelGetterName($property, Relation::class, 'relationAlias', $propelGetter);
-
-            if (!method_exists($propelModel, $propelGetter)) {
-                continue;
-            }
-
-            $resourceSetter = 'set'.ucfirst($property->getName());
-            if (!method_exists($apiResource, $resourceSetter)) {
-                continue;
-            }
-
-            $value = $propelModel->$propelGetter();
-
-            foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
-                if (!$withRelation || $value === null) {
-                    continue 2;
-                }
-
-                $targetClass = $relationAttribute->getArguments()['targetResource'];
-                if ($targetClass === $parentReflector?->getName() && $property->getType()->getName() !== 'array') {
-                    $apiResource->$resourceSetter(
-                        $this->modelToResource(
-                            resourceClass: $parentReflector?->getName(),
-                            propelModel: $parentModel,
-                            context: $context,
-                            withRelation: false,
-                            withAddon: $withAddon
-                        )
-                    );
-                    continue 2;
-                }
-                $this->manageCollectionAttribute(
-                    value: $value,
-                    targetClass: $targetClass,
-                    reflector: $reflector,
-                    propelModel: $propelModel,
-                    baseModel: $baseModel,
-                    context: $context,
-                    withAddon: $withAddon
-                );
-            }
-            $apiResource->$resourceSetter($value);
-        }
+        $this->processPropertiesRessource(
+            apiResource: $apiResource,
+            reflector: $reflector,
+            parentReflector: $parentReflector,
+            propelModel: $propelModel,
+            parentModel: $parentModel,
+            baseModel: $baseModel,
+            context: $context,
+            withRelation: $withRelation,
+            withAddon: $withAddon
+        );
 
         if (is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
             $this->manageTranslatableResource(
@@ -157,11 +118,13 @@ class ApiResourceService
     public function resourceToModel(PropelResourceInterface $data, array $context = []): ActiveRecordInterface
     {
         $operation = $context['operation'] ?? null;
-        $this->validateOperation($data, $operation);
+        if ($operation) {
+            $this->validator->validate($data, $operation->getDenormalizationContext());
+        }
 
         $propelModel = $this->initializePropelModel($data);
 
-        $this->processProperties($data, $propelModel, $context);
+        $this->processPropertiesModel($data, $propelModel, $context);
         $this->processTranslations($data, $propelModel);
 
         return $propelModel;
@@ -175,17 +138,20 @@ class ApiResourceService
             return [];
         }
 
-        if (isset($compositeIdentifiersAttribute[0]) && isset($compositeIdentifiersAttribute[0]->getArguments()[0])) {
+        if (isset($compositeIdentifiersAttribute[0], $compositeIdentifiersAttribute[0]->getArguments()[0])) {
             return $compositeIdentifiersAttribute[0]->getArguments()[0];
         }
 
-        if (isset($compositeIdentifiersAttribute[0]) && isset($compositeIdentifiersAttribute[0]->getArguments()[$param])) {
+        if (isset($compositeIdentifiersAttribute[0], $compositeIdentifiersAttribute[0]->getArguments()[$param])) {
             return $compositeIdentifiersAttribute[0]->getArguments()[$param];
         }
 
         return [];
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function getColumnValues(\ReflectionClass $reflector, array $columns): array
     {
         $columnValues = [];
@@ -196,13 +162,6 @@ class ApiResourceService
         }
 
         return $columnValues;
-    }
-
-    private function validateOperation(PropelResourceInterface $data, ?Operation $operation): void
-    {
-        if ($operation) {
-            $this->validator->validate($data, $operation->getDenormalizationContext());
-        }
     }
 
     private function initializePropelModel(PropelResourceInterface $data): ActiveRecordInterface
@@ -217,7 +176,7 @@ class ApiResourceService
         return $propelModel;
     }
 
-    private function processProperties(
+    private function processPropertiesModel(
         PropelResourceInterface $data,
         ActiveRecordInterface $propelModel,
         array $context
@@ -227,84 +186,176 @@ class ApiResourceService
             if (!$property->isInitialized($data)) {
                 continue;
             }
-
-            $setterForced = false;
-            $propelSetter = 'set'.ucfirst($property->getName());
-
-            foreach ($property->getAttributes(Column::class) as $columnAttribute) {
-                if (isset($columnAttribute->getArguments()['propelFieldName'])) {
-                    $propelSetter = 'set'.ucfirst($columnAttribute->getArguments()['propelFieldName']);
-                }
-                if (isset($columnAttribute->getArguments()['propelSetter'])) {
-                    $setterForced = true;
-                    $propelSetter = $columnAttribute->getArguments()['propelSetter'];
-                }
-            }
+            $propelSetter = $this->determinePropelSetter($property, $setterForced);
 
             if (method_exists($propelModel, $propelSetter)) {
-                $possibleGetters = [
-                    'get'.ucfirst($property->getName()),
-                    'is'.ucfirst($property->getName()),
-                ];
-
-                $availableMethods = array_filter(array_intersect($possibleGetters, get_class_methods($data)));
-
-                $value = null;
-                while (!empty($availableMethods) && $value === null) {
-                    $method = array_pop($availableMethods);
-                    $value = $data->$method();
-                }
-
-                if (\is_object($value) && method_exists($value, 'getPropelModel')) {
-                    if (!$setterForced) {
-                        $propelSetter .= 'Id';
-                    }
-
-                    $valuePropelModel = $value->getPropelModel();
-                    if (null !== $valuePropelModel && method_exists($valuePropelModel, 'getId')) {
-                        $value = $valuePropelModel->getId();
-                    }
-
-                    // If value is still not transformed
-                    if (\is_object($value) && method_exists($value, 'getId')) {
-                        $value = $value->getId();
-                    }
-                }
-
-                if (\is_array($value)) {
-                    $value = new Collection(
-                        array_map(
-                            function ($value, $index) use ($context, $property) {
-                                try {
-                                    return $this->resourceToModel($value, $context);
-                                } catch (ValidationException $exception) {
-                                    $constrainViolationList = new ConstraintViolationList(
-                                        array_map(
-                                            static function (ConstraintViolation $violation) use ($property, $index) {
-                                                $newViolation = new \ReflectionClass($violation);
-                                                $newViolation->getProperty('propertyPath')->setValue(
-                                                    $violation,
-                                                    $property->getName().'['.$index.'].'.$violation->getPropertyPath()
-                                                );
-
-                                                return $violation;
-                                            },
-                                            iterator_to_array($exception->getConstraintViolationList())
-                                        ),
-                                    );
-                                    throw new ValidationException(
-                                        $constrainViolationList
-                                    );
-                                }
-                            },
-                            $value,
-                            array_keys($value)
-                        )
-                    );
-                }
+                $value = $this->getPropertyValue($data, $property);
+                $value = $this->getRelationValue($value, $propelSetter, $setterForced);
+                $value = $this->getArrayValue($value, $context, $property);
 
                 $propelModel->$propelSetter($value);
             }
+        }
+    }
+
+    private function determinePropelSetter(
+        \ReflectionProperty $property,
+        bool &$setterForced = false
+    ): string {
+        $setterForced = false;
+        $propelSetter = 'set'.ucfirst($property->getName());
+
+        foreach ($property->getAttributes(Column::class) as $columnAttribute) {
+            if (isset($columnAttribute->getArguments()['propelFieldName'])) {
+                $propelSetter = 'set'.ucfirst($columnAttribute->getArguments()['propelFieldName']);
+            }
+            if (isset($columnAttribute->getArguments()['propelSetter'])) {
+                $setterForced = true;
+                $propelSetter = $columnAttribute->getArguments()['propelSetter'];
+            }
+        }
+
+        return $propelSetter;
+    }
+
+    private function getPropertyValue(PropelResourceInterface $data, \ReflectionProperty $property): mixed
+    {
+        $possibleGetters = [
+            'get'.ucfirst($property->getName()),
+            'is'.ucfirst($property->getName()),
+        ];
+
+        $availableMethods = array_filter(array_intersect($possibleGetters, get_class_methods($data)));
+
+        $value = null;
+        while (!empty($availableMethods) && $value === null) {
+            $method = array_pop($availableMethods);
+            $value = $data->$method();
+        }
+
+        return $value;
+    }
+
+    private function getRelationValue(
+        mixed $value,
+        string &$propelSetter,
+        bool $setterForced
+    ): mixed {
+        if (\is_object($value) && method_exists($value, 'getPropelModel')) {
+            if (!$setterForced) {
+                $propelSetter .= 'Id';
+            }
+
+            $valuePropelModel = $value->getPropelModel();
+            if (null !== $valuePropelModel && method_exists($valuePropelModel, 'getId')) {
+                $value = $valuePropelModel->getId();
+            }
+
+            // If value is still not transformed
+            if (\is_object($value) && method_exists($value, 'getId')) {
+                $value = $value->getId();
+            }
+        }
+
+        return $value;
+    }
+
+    private function getArrayValue(
+        mixed $value,
+        array $context,
+        \ReflectionProperty $property
+    ): mixed {
+        if (\is_array($value)) {
+            $value = new Collection(
+                array_map(
+                    function ($value, $index) use ($context, $property) {
+                        try {
+                            return $this->resourceToModel($value, $context);
+                        } catch (ValidationException $exception) {
+                            $constrainViolationList = new ConstraintViolationList(
+                                array_map(
+                                    static function (ConstraintViolation $violation) use ($property, $index) {
+                                        $newViolation = new \ReflectionClass($violation);
+                                        $newViolation->getProperty('propertyPath')->setValue(
+                                            $violation,
+                                            $property->getName().'['.$index.'].'.$violation->getPropertyPath()
+                                        );
+
+                                        return $violation;
+                                    },
+                                    iterator_to_array($exception->getConstraintViolationList())
+                                ),
+                            );
+                            throw new ValidationException(
+                                $constrainViolationList
+                            );
+                        }
+                    },
+                    $value,
+                    array_keys($value)
+                )
+            );
+        }
+
+        return $value;
+    }
+
+    private function processPropertiesRessource(
+        PropelResourceInterface $apiResource,
+        \ReflectionClass $reflector,
+        ?\ReflectionClass $parentReflector,
+        ActiveRecordInterface $propelModel,
+        ?ActiveRecordInterface $parentModel,
+        ActiveRecordInterface $baseModel,
+        array $context,
+        bool $withRelation,
+        bool $withAddon,
+    ): void {
+        foreach ($reflector->getProperties() as $property) {
+            $defaultGetter = 'get'.ucfirst($property->getName());
+            $propelGetter = $this->getPropelGetterName($property, Column::class, 'propelFieldName', $defaultGetter);
+            $propelGetter = $this->getPropelGetterName($property, Relation::class, 'relationAlias', $propelGetter);
+
+            if (!method_exists($propelModel, $propelGetter)) {
+                continue;
+            }
+
+            $resourceSetter = 'set'.ucfirst($property->getName());
+            if (!method_exists($apiResource, $resourceSetter)) {
+                continue;
+            }
+
+            $value = $propelModel->$propelGetter();
+
+            foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
+                if (!$withRelation || $value === null) {
+                    continue 2;
+                }
+
+                $targetClass = $relationAttribute->getArguments()['targetResource'];
+                if ($targetClass === $parentReflector?->getName() && $property->getType()?->getName() !== 'array') {
+                    $apiResource->$resourceSetter(
+                        $this->modelToResource(
+                            resourceClass: $parentReflector?->getName(),
+                            propelModel: $parentModel,
+                            context: $context,
+                            withRelation: false,
+                            withAddon: $withAddon
+                        )
+                    );
+                    continue 2;
+                }
+                $this->manageCollectionAttribute(
+                    value: $value,
+                    targetClass: $targetClass,
+                    reflector: $reflector,
+                    propelModel: $propelModel,
+                    baseModel: $baseModel,
+                    context: $context,
+                    withAddon: $withAddon
+                );
+            }
+            $apiResource->$resourceSetter($value);
         }
     }
 
@@ -314,7 +365,7 @@ class ApiResourceService
             foreach ($data->getI18ns() as $locale => $i18n) {
                 $i18nGetters = array_filter(
                     array_map(
-                        function (\ReflectionProperty $reflectionProperty) use ($i18n) {
+                        static function (\ReflectionProperty $reflectionProperty) use ($i18n) {
                             return $reflectionProperty->isInitialized($i18n) ? 'get'.ucfirst($reflectionProperty->getName()) : null;
                         },
                         (new \ReflectionClass($i18n))->getProperties()
@@ -405,7 +456,7 @@ class ApiResourceService
             $i18nResource = new ($resourceClass::getI18nResourceClass());
 
             $i18nFields = array_map(
-                function (\ReflectionProperty $reflectionProperty) {
+                static function (\ReflectionProperty $reflectionProperty) {
                     return $reflectionProperty;
                 },
                 (new \ReflectionClass($i18nResource))->getProperties()

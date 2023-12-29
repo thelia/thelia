@@ -47,10 +47,10 @@ use Thelia\Model\Map\CategoryTableMap;
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/admin/categories'
+            uriTemplate: '/front/categories'
         ),
         new Get(
-            uriTemplate: '/admin/categories/{id}',
+            uriTemplate: '/front/categories/{id}',
             normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
         ),
     ],
@@ -67,7 +67,9 @@ class Category extends AbstractTranslatableResource
 
     #[Groups([
         self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
         Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
         Product::GROUP_ADMIN_WRITE,
         ProductCategory::GROUP_ADMIN_READ,
         CategoryImage::GROUP_ADMIN_READ_SINGLE,
@@ -75,25 +77,25 @@ class Category extends AbstractTranslatableResource
     ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public int $parent;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public bool $visible;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public ?int $position;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public ?int $defaultTemplateId;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int

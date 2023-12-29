@@ -44,28 +44,53 @@ use Thelia\Model\Map\FeatureTableMap;
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
     denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            uriTemplate: '/front/features'
+        ),
+        new Get(
+            uriTemplate: '/front/features/{id}',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]]
+)]
 class Feature extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:feature:read';
     public const GROUP_ADMIN_READ_SINGLE = 'admin:feature:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:feature:write';
 
-    #[Groups([self::GROUP_ADMIN_READ, FeatureAv::GROUP_ADMIN_READ, FeatureAv::GROUP_ADMIN_WRITE, FeatureProduct::GROUP_ADMIN_READ, Product::GROUP_ADMIN_READ_SINGLE])]
+    public const GROUP_FRONT_READ = 'front:feature:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:feature:read:single';
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        FeatureAv::GROUP_ADMIN_READ,
+        FeatureAv::GROUP_FRONT_READ,
+        FeatureAv::GROUP_ADMIN_WRITE,
+        FeatureProduct::GROUP_ADMIN_READ,
+        FeatureProduct::GROUP_FRONT_READ,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+    ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public bool $visible;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public ?int $position = null;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_READ_SINGLE, Product::GROUP_FRONT_READ_SINGLE])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int

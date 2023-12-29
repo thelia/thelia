@@ -29,6 +29,14 @@ use Thelia\Model\Map\ContentFolderTableMap;
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
     denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
+#[ApiResource(
+    operations: [
+        new Get(
+            uriTemplate: '/front/content_folders/{content}/folders/{folder}'
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
+)]
 #[CompositeIdentifiers(['content', 'folder'])]
 class ContentFolder implements PropelResourceInterface
 {
@@ -38,24 +46,27 @@ class ContentFolder implements PropelResourceInterface
     public const GROUP_ADMIN_READ_SINGLE = 'admin:content_folder:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:content_folder:write';
 
+    public const GROUP_FRONT_READ = 'front:content_folder:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:content_folder:read:single';
+
     #[Relation(targetResource: Content::class)]
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public Content $content;
 
     #[Relation(targetResource: Folder::class)]
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public Folder $folder;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public bool $defaultFolder = false;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?int $position;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $updatedAt;
 
     public function getContent(): Content

@@ -67,6 +67,29 @@ use Thelia\Model\Map\CategoryDocumentTableMap;
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
     denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            uriTemplate: '/front/category_documents'
+        ),
+        new Get(
+            uriTemplate: '/front/category_documents/{id}',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+        ),
+        new Get(
+            uriTemplate: '/front/category_documents/{id}/file',
+            controller: BinaryFileController::class,
+            openapi: new Operation(
+                responses: [
+                    '200' => [
+                        'description' => 'The binary file',
+                    ],
+                ]
+            )
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+)]
 class CategoryDocument extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     public const GROUP_ADMIN_READ = 'admin:category_document:read';
@@ -74,6 +97,9 @@ class CategoryDocument extends AbstractTranslatableResource implements ItemFileR
     public const GROUP_ADMIN_WRITE = 'admin:category_document:write';
     public const GROUP_ADMIN_WRITE_FILE = 'admin:category_document:write_file';
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:category_document:write_update';
+
+    public const GROUP_FRONT_READ = 'front:category_document:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:category_document:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ])]
     public ?int $id = null;

@@ -44,25 +44,48 @@ use Thelia\Model\Map\TaxRuleTableMap;
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
     denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            uriTemplate: '/front/tax_rules'
+        ),
+        new Get(
+            uriTemplate: '/front/tax_rules/{id}',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
+)]
 class TaxRule extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:tax_rule:read';
     public const GROUP_ADMIN_READ_SINGLE = 'admin:tax_rule:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:tax_rule:write';
 
-    #[Groups([self::GROUP_ADMIN_READ, TaxRuleCountry::GROUP_ADMIN_READ, Product::GROUP_ADMIN_READ, Product::GROUP_ADMIN_WRITE])]
+    public const GROUP_FRONT_READ = 'front:tax_rule:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:tax_rule:read:single';
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        TaxRuleCountry::GROUP_ADMIN_READ,
+        TaxRuleCountry::GROUP_FRONT_READ,
+        Product::GROUP_ADMIN_READ,
+        Product::GROUP_FRONT_READ,
+        Product::GROUP_ADMIN_WRITE,
+    ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public ?bool $isDefault = false;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int

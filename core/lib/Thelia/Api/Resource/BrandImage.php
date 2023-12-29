@@ -67,6 +67,29 @@ use Thelia\Model\Map\BrandImageTableMap;
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
     denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            uriTemplate: '/admin/brand_images'
+        ),
+        new Get(
+            uriTemplate: '/admin/brand_images/{id}',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+        ),
+        new Get(
+            uriTemplate: '/admin/brand_images/{id}/file',
+            controller: BinaryFileController::class,
+            openapi: new Operation(
+                responses: [
+                    '200' => [
+                        'description' => 'The binary file',
+                    ],
+                ]
+            )
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
+)]
 class BrandImage extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     public const GROUP_ADMIN_READ = 'admin:brand_image:read';
@@ -75,11 +98,14 @@ class BrandImage extends AbstractTranslatableResource implements ItemFileResourc
     public const GROUP_ADMIN_WRITE_FILE = 'admin:brand_image:write_file';
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:brand_image:write_update';
 
+    public const GROUP_FRONT_READ = 'front:brand_image:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:brand_image:read:single';
+
     #[Groups([self::GROUP_ADMIN_READ])]
     public ?int $id = null;
 
     #[Relation(targetResource: Brand::class)]
-    #[Groups([self::GROUP_ADMIN_WRITE_FILE, self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_WRITE_FILE, self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public Brand $brand;
 
     #[Groups([self::GROUP_ADMIN_WRITE_FILE])]
@@ -91,24 +117,25 @@ class BrandImage extends AbstractTranslatableResource implements ItemFileResourc
     )]
     public UploadedFile $fileToUpload;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public bool $visible;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE_UPDATE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE_UPDATE])]
     public ?int $position;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
 
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     public string $file;
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
+
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     public ?string $fileUrl;
 
     public function getId(): ?int

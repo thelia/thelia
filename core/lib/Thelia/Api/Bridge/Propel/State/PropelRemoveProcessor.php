@@ -15,14 +15,14 @@ namespace Thelia\Api\Bridge\Propel\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use Propel\Runtime\Propel;
-use Thelia\Api\Bridge\Propel\Service\ApiResourceService;
+use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\ResourceAddonInterface;
 use Thelia\Config\DatabaseConfiguration;
 
 class PropelRemoveProcessor implements ProcessorInterface
 {
     public function __construct(
-        private readonly ApiResourceService $apiResourceService,
+        private readonly ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
     ) {
     }
 
@@ -34,7 +34,7 @@ class PropelRemoveProcessor implements ProcessorInterface
         try {
             $propelModel = $data->getPropelModel();
 
-            $resourceAddonDefinitions = $this->apiResourceService->getResourceAddonDefinitions($data::class);
+            $resourceAddonDefinitions = $this->apiResourcePropelTransformerService->getResourceAddonDefinitions($data::class);
             foreach ($resourceAddonDefinitions as $addonClass) {
                 if (is_subclass_of($addonClass, ResourceAddonInterface::class)) {
                     $addon = (new $addonClass());
