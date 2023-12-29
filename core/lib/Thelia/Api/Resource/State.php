@@ -35,7 +35,7 @@ use Thelia\Model\Map\StateTableMap;
         ),
         new Get(
             uriTemplate: '/admin/states/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Get(
             uriTemplate: '/admin/states/iso/{countryIso3}/{stateIso}',
@@ -49,7 +49,7 @@ use Thelia\Model\Map\StateTableMap;
                     fromClass: State::class
                 ),
             ],
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]],
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
             name: 'state_by_iso',
         ),
         new Put(
@@ -65,42 +65,42 @@ use Thelia\Model\Map\StateTableMap;
             identifiers: ['id']
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
 class State extends AbstractTranslatableResource
 {
-    public const GROUP_READ = 'state:read';
-    public const GROUP_READ_SINGLE = 'state:read:single';
-    public const GROUP_WRITE = 'state:write';
+    public const GROUP_ADMIN_READ = 'admin:state:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:state:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:state:write';
 
     #[Groups([
-        self::GROUP_READ,
-        Customer::GROUP_READ_SINGLE,
-        Address::GROUP_READ,
-        TaxRuleCountry::GROUP_READ,
-        OrderAddress::GROUP_WRITE,
+        self::GROUP_ADMIN_READ,
+        Customer::GROUP_ADMIN_READ_SINGLE,
+        Address::GROUP_ADMIN_READ,
+        TaxRuleCountry::GROUP_ADMIN_READ,
+        OrderAddress::GROUP_ADMIN_WRITE,
     ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderAddress::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, OrderAddress::GROUP_ADMIN_READ])]
     public bool $visible;
 
     #[ApiProperty(identifier: true)]
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderAddress::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, OrderAddress::GROUP_ADMIN_READ])]
     public ?string $isocode;
 
     #[Relation(targetResource: Country::class)]
-    #[Groups(groups: [self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
+    #[Groups(groups: [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE])]
     public Country $country;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int

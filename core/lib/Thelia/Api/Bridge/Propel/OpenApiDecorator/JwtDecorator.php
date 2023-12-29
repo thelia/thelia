@@ -64,7 +64,7 @@ class JwtDecorator implements OpenApiFactoryInterface
             'bearerFormat' => 'JWT',
         ]);
 
-        $openApi->getPaths()->addPath('/api/login', $this->getLoginPathItem('api'));
+        $openApi->getPaths()->addPath('/api/front/login', $this->getLoginPathItem('front'));
         $openApi->getPaths()->addPath('/api/admin/login', $this->getLoginPathItem('admin'));
 
         return $openApi;
@@ -75,8 +75,8 @@ class JwtDecorator implements OpenApiFactoryInterface
         return new PathItem(
             ref: 'JWT '.$type.' Token',
             post: new Operation(
-                operationId: 'postCredentialsItem',
-                tags: ['Token'],
+                operationId: 'postCredentialsItem'.$type,
+                tags: ['Token '.$type],
                 responses: [
                     '200' => [
                         'description' => 'Get JWT token for '.$type.' routes',

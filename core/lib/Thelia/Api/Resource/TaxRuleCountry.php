@@ -25,43 +25,54 @@ use Thelia\Model\Map\TaxRuleTableMap;
             uriTemplate: '/admin/tax_rules_country/{id}'
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+)]
+#[ApiResource(
+    operations: [
+        new Get(
+            uriTemplate: '/front/tax_rules_country/{id}'
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
 class TaxRuleCountry implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
-    public const GROUP_READ = 'tax_rule_country:read';
-    public const GROUP_READ_SINGLE = 'tax_rule_country:read:single';
-    public const GROUP_WRITE = 'tax_rule_country:write';
+    public const GROUP_ADMIN_READ = 'admin:tax_rule_country:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:tax_rule_country:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:tax_rule_country:write';
 
-    #[Groups([self::GROUP_READ])]
+    public const GROUP_FRONT_READ = 'front:tax_rule_country:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:tax_rule_country:read:single';
+
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?int $id = null;
 
     #[Relation(targetResource: TaxRule::class)]
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?TaxRule $taxRule;
 
     #[Relation(targetResource: Country::class)]
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?Country $country;
 
     #[Relation(targetResource: State::class)]
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?State $state;
 
     #[Relation(targetResource: Tax::class)]
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?Tax $tax;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?int $position;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $updatedAt;
 
     public function getId(): ?int

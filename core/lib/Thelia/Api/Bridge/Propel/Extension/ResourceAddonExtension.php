@@ -14,12 +14,12 @@ namespace Thelia\Api\Bridge\Propel\Extension;
 
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Thelia\Api\Bridge\Propel\Service\ApiResourceService;
+use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 
 final class ResourceAddonExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
     public function __construct(
-        private readonly ApiResourceService $apiResourceService
+        private readonly ApiResourcePropelTransformerService $apiResourcePropelTransformerService
     ) {
     }
 
@@ -35,7 +35,7 @@ final class ResourceAddonExtension implements QueryCollectionExtensionInterface,
 
     public function apply(ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
     {
-        foreach ($this->apiResourceService->getResourceAddonDefinitions($resourceClass) as $extendClass) {
+        foreach ($this->apiResourcePropelTransformerService->getResourceAddonDefinitions($resourceClass) as $extendClass) {
             \call_user_func($extendClass.'::extendQuery', $query, $operation, $context);
         }
     }

@@ -16,16 +16,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class ModuleI18n extends I18n
 {
-    #[Groups([Module::GROUP_READ_SINGLE, Module::GROUP_WRITE, Module::GROUP_READ, Order::GROUP_READ_SINGLE, Order::GROUP_WRITE])]
+    #[Groups([Module::GROUP_ADMIN_READ_SINGLE, Module::GROUP_ADMIN_WRITE, Module::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_WRITE])]
     protected ?string $title;
 
-    #[Groups([Module::GROUP_READ_SINGLE, Module::GROUP_WRITE])]
+    #[Groups([Module::GROUP_ADMIN_READ_SINGLE, Module::GROUP_ADMIN_WRITE])]
     protected ?string $description;
 
-    #[Groups([Module::GROUP_READ_SINGLE, Module::GROUP_WRITE])]
+    #[Groups([Module::GROUP_ADMIN_READ_SINGLE, Module::GROUP_ADMIN_WRITE])]
     protected ?string $chapo;
 
-    #[Groups([Module::GROUP_READ_SINGLE, Module::GROUP_WRITE])]
+    #[Groups([Module::GROUP_ADMIN_READ_SINGLE, Module::GROUP_ADMIN_WRITE])]
     protected ?string $postscriptum;
 
     public function getTitle(): ?string

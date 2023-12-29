@@ -16,16 +16,32 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class BrandImageI18n extends I18n
 {
-    #[Groups([BrandImage::GROUP_READ, BrandImage::GROUP_WRITE])]
+    #[Groups([
+        BrandImage::GROUP_ADMIN_READ,
+        BrandImage::GROUP_FRONT_READ,
+        BrandImage::GROUP_ADMIN_WRITE,
+    ])]
     protected ?string $title;
 
-    #[Groups([BrandImage::GROUP_READ, BrandImage::GROUP_WRITE])]
+    #[Groups([
+        BrandImage::GROUP_ADMIN_READ,
+        BrandImage::GROUP_FRONT_READ,
+        BrandImage::GROUP_ADMIN_WRITE,
+    ])]
     protected ?string $description;
 
-    #[Groups([BrandImage::GROUP_READ, BrandImage::GROUP_WRITE])]
+    #[Groups([
+        BrandImage::GROUP_ADMIN_READ,
+        BrandImage::GROUP_FRONT_READ,
+        BrandImage::GROUP_ADMIN_WRITE,
+    ])]
     protected ?string $chapo;
 
-    #[Groups([BrandImage::GROUP_READ, BrandImage::GROUP_WRITE])]
+    #[Groups([
+        BrandImage::GROUP_ADMIN_READ,
+        BrandImage::GROUP_FRONT_READ,
+        BrandImage::GROUP_ADMIN_WRITE,
+    ])]
     protected ?string $postscriptum;
 
     public function getTitle(): ?string

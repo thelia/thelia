@@ -32,7 +32,7 @@ use Thelia\Model\Map\CategoryTableMap;
         ),
         new Get(
             uriTemplate: '/admin/categories/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/categories/{id}'
@@ -41,44 +41,61 @@ use Thelia\Model\Map\CategoryTableMap;
             uriTemplate: '/admin/categories/{id}'
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+)]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            uriTemplate: '/front/categories'
+        ),
+        new Get(
+            uriTemplate: '/front/categories/{id}',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
 class Category extends AbstractTranslatableResource
 {
-    public const GROUP_READ = 'category:read';
-    public const GROUP_READ_SINGLE = 'category:read:single';
-    public const GROUP_WRITE = 'category:write';
+    public const GROUP_ADMIN_READ = 'admin:category:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:category:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:category:write';
+
+    public const GROUP_FRONT_READ = 'front:category:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:category:read:single';
 
     #[Groups([
-        self::GROUP_READ,
-        Product::GROUP_READ_SINGLE,
-        Product::GROUP_WRITE,
-        ProductCategory::GROUP_READ,
-        CategoryImage::GROUP_READ_SINGLE,
-        CategoryDocument::GROUP_READ_SINGLE,
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_ADMIN_WRITE,
+        ProductCategory::GROUP_ADMIN_READ,
+        CategoryImage::GROUP_ADMIN_READ_SINGLE,
+        CategoryDocument::GROUP_ADMIN_READ_SINGLE,
     ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public int $parent;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public bool $visible;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public ?int $position;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public ?int $defaultTemplateId;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int

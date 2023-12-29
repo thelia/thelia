@@ -33,7 +33,7 @@ use Thelia\Model\Map\BrandTableMap;
         ),
         new Get(
             uriTemplate: '/admin/brands/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/brands/{id}'
@@ -42,34 +42,61 @@ use Thelia\Model\Map\BrandTableMap;
             uriTemplate: '/admin/brands/{id}'
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+)]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            uriTemplate: '/front/brands'
+        ),
+        new Get(
+            uriTemplate: '/front/brands/{id}',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]]
 )]
 class Brand extends AbstractTranslatableResource
 {
-    public const GROUP_READ = 'brand:read';
-    public const GROUP_READ_SINGLE = 'brand:read:single';
-    public const GROUP_WRITE = 'brand:write';
+    public const GROUP_ADMIN_READ = 'admin:brand:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:brand:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:brand:write';
 
-    #[Groups([self::GROUP_READ,
-        Product::GROUP_READ_SINGLE,
-        Product::GROUP_READ,
-        Product::GROUP_WRITE,
-        BrandImage::GROUP_READ_SINGLE,
-        BrandDocument::GROUP_READ_SINGLE,
+    public const GROUP_FRONT_READ = 'front:brand:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:brand:read:single';
+
+    #[Groups([self::GROUP_ADMIN_READ,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_ADMIN_READ,
+        Product::GROUP_ADMIN_WRITE,
+        BrandImage::GROUP_ADMIN_READ_SINGLE,
+        BrandDocument::GROUP_ADMIN_READ_SINGLE,
+        self::GROUP_FRONT_READ,
     ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public bool $visible;
 
-    #[Groups([self::GROUP_READ, Product::GROUP_READ, Product::GROUP_READ_SINGLE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        Product::GROUP_ADMIN_READ,
+        Product::GROUP_FRONT_READ,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+    ])]
     public ?int $position = null;
 
     #[ApiProperty(
         types: 'object'
     )]
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        self::GROUP_ADMIN_WRITE,
+    ])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int

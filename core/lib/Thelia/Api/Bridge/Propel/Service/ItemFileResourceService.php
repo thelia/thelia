@@ -20,7 +20,7 @@ use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Files\FileModelInterface;
 
-class ItemFileResourceService
+readonly class ItemFileResourceService
 {
     public function __construct(
         private RequestStack $requestStack,
@@ -33,7 +33,9 @@ class ItemFileResourceService
         FileModelInterface $fileModel
     ): void {
         $request = $this->requestStack->getCurrentRequest();
-
+        if (null === $request) {
+            return;
+        }
         /** @var UploadedFile $file */
         $file = $request->files->get('fileToUpload');
 
