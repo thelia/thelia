@@ -33,7 +33,7 @@ use Thelia\Model\Map\FeatureAvTableMap;
         ),
         new Get(
             uriTemplate: '/admin/feature_avs/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/feature_avs/{id}'
@@ -42,32 +42,60 @@ use Thelia\Model\Map\FeatureAvTableMap;
             uriTemplate: '/admin/feature_avs/{id}'
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+)]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            uriTemplate: '/front/feature_avs'
+        ),
+        new Get(
+            uriTemplate: '/front/feature_avs/{id}',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
 class FeatureAv extends AbstractTranslatableResource
 {
-    public const GROUP_READ = 'feature_av:read';
-    public const GROUP_READ_SINGLE = 'feature_av:read:single';
-    public const GROUP_WRITE = 'feature_av:write';
+    public const GROUP_ADMIN_READ = 'admin:feature_av:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:feature_av:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:feature_av:write';
 
-    #[Groups([self::GROUP_READ, FeatureProduct::GROUP_READ, Product::GROUP_READ_SINGLE])]
+    public const GROUP_FRONT_READ = 'front:feature_av:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:feature_av:read:single';
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        FeatureProduct::GROUP_ADMIN_READ,
+        FeatureProduct::GROUP_FRONT_READ,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+    ])]
     public ?int $id = null;
 
     #[Relation(targetResource: Feature::class)]
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public Feature $feature;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public ?int $position;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        self::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+    ])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int
