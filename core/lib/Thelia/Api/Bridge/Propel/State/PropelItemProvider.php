@@ -18,15 +18,15 @@ use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\Event\ItemProviderQueryEvent;
-use Thelia\Api\Bridge\Propel\Service\ApiResourceService;
+use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\PropelResourceInterface;
 
-class PropelItemProvider implements ProviderInterface
+readonly class PropelItemProvider implements ProviderInterface
 {
     public function __construct(
-        readonly private ApiResourceService $apiResourceService,
-        readonly private iterable $propelItemExtensions = [],
-        readonly private EventDispatcherInterface $eventDispatcher
+        private ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
+        private iterable $propelItemExtensions = [],
+        private EventDispatcherInterface $eventDispatcher
     ) {
     }
 
@@ -66,7 +66,7 @@ class PropelItemProvider implements ProviderInterface
             return null;
         }
 
-        return $this->apiResourceService->modelToResource(
+        return $this->apiResourcePropelTransformerService->modelToResource(
             resourceClass: $resourceClass,
             propelModel: $propelModel,
             context: $context

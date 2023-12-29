@@ -24,40 +24,70 @@ use Thelia\Model\Map\AttributeCombinationTableMap;
     operations: [
         new Get(
             uriTemplate: '/admin/attribute_combinations/{productSaleElements}/attribute_av/{attributeAv}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]],
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
+)]
+#[ApiResource(
+    operations: [
+        new Get(
+            uriTemplate: '/front/attribute_combinations/{productSaleElements}/attribute_av/{attributeAv}',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
 #[CompositeIdentifiers(['productSaleElements', 'attributeAv'])]
 class AttributeCombination implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
-    public const GROUP_READ = 'attribute_combination:read';
-    public const GROUP_READ_SINGLE = 'attribute_combination:read:single';
-    public const GROUP_WRITE = 'attribute_combination:write';
+    public const GROUP_ADMIN_READ = 'admin:attribute_combination:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:attribute_combination:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:attribute_combination:write';
+
+    public const GROUP_FRONT_READ = 'front:attribute_combination:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:attribute_combination:read:single';
 
     #[Relation(targetResource: ProductSaleElements::class)]
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     public ProductSaleElements $productSaleElements;
 
     #[Relation(targetResource: Attribute::class)]
-    #[Groups([self::GROUP_READ_SINGLE, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ_SINGLE,
+        self::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+        ProductSaleElements::GROUP_ADMIN_WRITE,
+    ])]
     public Attribute $attribute;
 
     #[Relation(targetResource: AttributeAv::class)]
-    #[Groups([self::GROUP_READ_SINGLE, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE, ProductSaleElements::GROUP_READ_SINGLE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ_SINGLE,
+        self::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+        ProductSaleElements::GROUP_ADMIN_WRITE,
+        ProductSaleElements::GROUP_ADMIN_READ_SINGLE,
+        ProductSaleElements::GROUP_FRONT_READ_SINGLE,
+    ])]
     public AttributeAv $attributeAv;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        self::GROUP_ADMIN_WRITE,
+    ])]
     public ?int $position;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $updatedAt;
 
     public function getProductSaleElements(): ProductSaleElements

@@ -32,7 +32,7 @@ use Thelia\Model\Map\CustomerTitleTableMap;
         ),
         new Get(
             uriTemplate: '/admin/customer_titles/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/customer_titles/{id}'
@@ -41,39 +41,39 @@ use Thelia\Model\Map\CustomerTitleTableMap;
             uriTemplate: '/admin/customer_titles/{id}'
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
 class CustomerTitle extends AbstractTranslatableResource
 {
-    public const GROUP_READ = 'customer_title:read';
-    public const GROUP_READ_SINGLE = 'customer_title:read:single';
-    public const GROUP_WRITE = 'customer_title:write';
+    public const GROUP_ADMIN_READ = 'admin:customer_title:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:customer_title:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:customer_title:write';
 
     #[Groups([
-        self::GROUP_READ,
-        Customer::GROUP_READ_SINGLE,
-        Address::GROUP_READ,
-        OrderAddress::GROUP_READ_SINGLE,
-        State::GROUP_READ_SINGLE,
-        Order::GROUP_READ_SINGLE,
-        OrderAddress::GROUP_WRITE,
+        self::GROUP_ADMIN_READ,
+        Customer::GROUP_ADMIN_READ_SINGLE,
+        Address::GROUP_ADMIN_READ,
+        OrderAddress::GROUP_ADMIN_READ_SINGLE,
+        State::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        OrderAddress::GROUP_ADMIN_WRITE,
     ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public string $position;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public int $byDefault;
 
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int

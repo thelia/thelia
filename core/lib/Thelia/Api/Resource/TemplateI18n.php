@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class TemplateI18n extends I18n
 {
-    #[Groups([Template::GROUP_READ, Template::GROUP_WRITE])]
+    #[Groups([Template::GROUP_ADMIN_READ, Template::GROUP_ADMIN_WRITE])]
     protected ?string $name;
 
     public function getName(): ?string

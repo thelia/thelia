@@ -34,14 +34,14 @@ use Thelia\Model\Map\AddressTableMap;
     operations: [
         new Post(
             uriTemplate: '/admin/addresses',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new GetCollection(
             uriTemplate: '/admin/addresses'
         ),
         new Get(
             uriTemplate: '/admin/addresses/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/addresses/{id}'
@@ -50,8 +50,34 @@ use Thelia\Model\Map\AddressTableMap;
             uriTemplate: '/admin/addresses/{id}'
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ, CustomerTitle::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, CustomerTitle::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+)]
+#[ApiResource(
+    operations: [
+        new Post(
+            uriTemplate: '/front/account/addresses',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+        ),
+        new GetCollection(
+            uriTemplate: '/front/account/addresses'
+        ),
+        new Get(
+            uriTemplate: '/front/account/addresses/{id}',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
+            security: 'object.customer.getId() == user.getId()'
+        ),
+        new Put(
+            uriTemplate: '/front/account/addresses/{id}',
+            security: 'object.customer.getId() == user.getId()'
+        ),
+        new Delete(
+            uriTemplate: '/front/account/addresses/{id}',
+            security: 'object.customer.getId() == user.getId()'
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_FRONT_WRITE]]
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -64,76 +90,93 @@ class Address implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
-    public const GROUP_READ = 'address:read';
-    public const GROUP_READ_SINGLE = 'address:read:single';
-    public const GROUP_WRITE = 'address:write';
+    public const GROUP_ADMIN_READ = 'admin:address:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:address:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:address:write';
 
-    #[Groups([self::GROUP_READ, Customer::GROUP_READ_SINGLE, Cart::GROUP_READ_SINGLE])]
+    public const GROUP_FRONT_READ = 'front:address:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:address:read:single';
+    public const GROUP_FRONT_WRITE = 'front:address:write';
+
+    public const GROUP_ADMIN_COMBINED = [
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        Customer::GROUP_ADMIN_READ_SINGLE,
+        Customer::GROUP_ADMIN_WRITE,
+    ];
+
+    public const GROUP_FRONT_COMBINED = [
+        self::GROUP_FRONT_READ,
+        self::GROUP_FRONT_READ_SINGLE,
+        self::GROUP_FRONT_WRITE,
+    ];
+
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Customer::GROUP_ADMIN_READ_SINGLE, Cart::GROUP_ADMIN_READ_SINGLE])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
-    #[NotBlank(groups: [self::GROUP_WRITE, Customer::GROUP_WRITE])]
+    #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_WRITE])]
     public string $label;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE, Cart::GROUP_READ_SINGLE])]
-    #[NotBlank(groups: [self::GROUP_WRITE, Customer::GROUP_WRITE])]
+    #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED, Cart::GROUP_ADMIN_READ_SINGLE, Cart::GROUP_FRONT_READ_SINGLE])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_WRITE])]
     public string $firstname;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE, Cart::GROUP_READ_SINGLE])]
-    #[NotBlank(groups: [self::GROUP_WRITE, Customer::GROUP_WRITE])]
+    #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED, Cart::GROUP_ADMIN_READ_SINGLE, Cart::GROUP_FRONT_READ_SINGLE])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_WRITE])]
     public string $lastname;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
-    #[NotBlank(groups: [self::GROUP_WRITE, Customer::GROUP_WRITE])]
+    #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_WRITE])]
     public string $address1;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
     public string $address2;
 
-    #[Groups([self::GROUP_WRITE, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
     public string $address3;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
-    #[NotBlank(groups: [self::GROUP_WRITE, Customer::GROUP_WRITE])]
+    #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_WRITE])]
     public string $zipcode;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
     public ?string $company;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
     public ?string $cellphone;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
     public ?string $phone;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
-    #[NotBlank(groups: [self::GROUP_WRITE, Customer::GROUP_WRITE])]
+    #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_WRITE])]
     public ?string $city;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
     public ?bool $isDefault;
 
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     public ?\DateTime $updatedAt;
 
     #[Relation(targetResource: Country::class)]
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
-    #[NotBlank(groups: [self::GROUP_WRITE, Customer::GROUP_WRITE])]
+    #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_WRITE])]
     public Country $country;
 
     #[Relation(targetResource: State::class)]
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
     public ?State $state;
 
     #[Relation(targetResource: Customer::class)]
-    #[Groups(groups: [self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
+    #[Groups(groups: [self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_WRITE])]
     public Customer $customer;
 
     #[Relation(targetResource: CustomerTitle::class)]
-    #[Groups(groups: [self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_WRITE])]
+    #[Groups(groups: [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
     #[Column(propelSetter: 'setTitleId')]
     public CustomerTitle $customerTitle;
 
@@ -370,7 +413,7 @@ class Address implements PropelResourceInterface
         return new AddressTableMap();
     }
 
-    #[Callback(groups: [self::GROUP_WRITE, Customer::GROUP_WRITE])]
+    #[Callback(groups: [self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_WRITE])]
     public function verifyZipcode(ExecutionContextInterface $context): void
     {
         $resource = $context->getRoot();
@@ -392,7 +435,7 @@ class Address implements PropelResourceInterface
         }
     }
 
-    #[Callback(groups: [self::GROUP_WRITE, Customer::GROUP_WRITE])]
+    #[Callback(groups: [self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_WRITE])]
     public function verifyState(ExecutionContextInterface $context): void
     {
         $resource = $context->getRoot();
