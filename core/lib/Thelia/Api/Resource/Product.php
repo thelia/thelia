@@ -43,7 +43,7 @@ use Thelia\Model\ProductQuery;
         ),
         new Get(
             uriTemplate: '/admin/products/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/products/{id}'
@@ -52,8 +52,20 @@ use Thelia\Model\ProductQuery;
             uriTemplate: '/admin/products/{id}'
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+)]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            uriTemplate: '/front/products'
+        ),
+        new Get(
+            uriTemplate: '/front/products/{id}',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]]
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -80,71 +92,75 @@ use Thelia\Model\ProductQuery;
 )]
 class Product extends AbstractTranslatableResource
 {
-    public const GROUP_READ = 'product:read';
-    public const GROUP_READ_SINGLE = 'product:read:single';
-    public const GROUP_WRITE = 'product:write';
+    public const GROUP_ADMIN_READ = 'admin:product:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:product:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:product:write';
+
+    public const GROUP_FRONT_READ = 'front:product:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:product:read:single';
 
     #[Groups(
         [
-            self::GROUP_READ,
-            ProductCategory::GROUP_READ,
-            OrderProduct::GROUP_READ,
-            ProductAssociatedContent::GROUP_READ,
-            FeatureProduct::GROUP_READ_SINGLE,
-            ProductSaleElements::GROUP_READ,
-            ProductSaleElements::GROUP_WRITE,
-            ProductImage::GROUP_READ_SINGLE,
-            ProductDocument::GROUP_READ_SINGLE,
+            self::GROUP_ADMIN_READ,
+            self::GROUP_FRONT_READ,
+            ProductCategory::GROUP_ADMIN_READ,
+            OrderProduct::GROUP_ADMIN_READ,
+            ProductAssociatedContent::GROUP_ADMIN_READ,
+            FeatureProduct::GROUP_ADMIN_READ_SINGLE,
+            ProductSaleElements::GROUP_ADMIN_READ,
+            ProductSaleElements::GROUP_ADMIN_WRITE,
+            ProductImage::GROUP_ADMIN_READ_SINGLE,
+            ProductDocument::GROUP_ADMIN_READ_SINGLE,
         ]
     )]
     public ?int $id = null;
 
     #[Relation(targetResource: TaxRule::class)]
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
-    #[NotBlank(groups: [self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
     public TaxRule $taxRule;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    #[NotBlank(groups: [self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
     public string $ref;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public bool $visible;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public ?int $position;
 
     #[Relation(targetResource: Template::class)]
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
     public ?Template $template;
 
     #[Relation(targetResource: Brand::class)]
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     public ?Brand $brand;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public bool $virtual = false;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     public ?\DateTime $updatedAt;
 
     #[Relation(targetResource: ProductCategory::class)]
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     public array $productCategories;
 
     #[Column(propelFieldName: 'productSaleElementss')]
     #[Relation(targetResource: ProductSaleElements::class)]
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     public array $productSaleElements;
 
     #[Relation(targetResource: FeatureProduct::class)]
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     public array $featureProducts;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public I18nCollection $i18ns;
 
     public function __construct()
@@ -321,7 +337,7 @@ class Product extends AbstractTranslatableResource
         return ProductI18n::class;
     }
 
-    #[Callback(groups: [self::GROUP_WRITE])]
+    #[Callback(groups: [self::GROUP_ADMIN_WRITE])]
     public function checkDuplicateRef(ExecutionContextInterface $context): void
     {
         $resource = $context->getRoot();
@@ -337,7 +353,7 @@ class Product extends AbstractTranslatableResource
         }
     }
 
-    #[Callback(groups: [self::GROUP_WRITE])]
+    #[Callback(groups: [self::GROUP_ADMIN_WRITE])]
     public function checkTitleAndLocaleNotBlank(ExecutionContextInterface $context): void
     {
         $resource = $context->getRoot();
@@ -359,7 +375,7 @@ class Product extends AbstractTranslatableResource
         }
     }
 
-    #[Callback(groups: [self::GROUP_WRITE])]
+    #[Callback(groups: [self::GROUP_ADMIN_WRITE])]
     public function checkDefaultCategoryNotBlank(ExecutionContextInterface $context): void
     {
         $resource = $context->getRoot();

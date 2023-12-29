@@ -16,10 +16,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class TaxRuleI18n extends I18n
 {
-    #[Groups([TaxRule::GROUP_READ, TaxRule::GROUP_WRITE])]
+    #[Groups([TaxRule::GROUP_ADMIN_READ, TaxRule::GROUP_FRONT_READ, TaxRule::GROUP_ADMIN_WRITE])]
     protected ?string $title;
 
-    #[Groups([TaxRule::GROUP_READ, TaxRule::GROUP_WRITE])]
+    #[Groups([TaxRule::GROUP_ADMIN_READ, TaxRule::GROUP_FRONT_READ, TaxRule::GROUP_ADMIN_WRITE])]
     protected ?string $description;
 
     public function getTitle(): ?string

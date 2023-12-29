@@ -121,10 +121,12 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 continue;
             }
 
-            $propertyGroups = $groupAttributes->getArguments()['groups'] ?? $groupAttributes->getArguments()[0] ?? null;
+            if (isset($context['groups'])) {
+                $propertyGroups = $groupAttributes->getArguments()['groups'] ?? $groupAttributes->getArguments()[0] ?? null;
 
-            if (!$isInFilters && empty(array_intersect($propertyGroups, $context['groups']))) {
-                continue;
+                if (!$isInFilters && empty(array_intersect($propertyGroups, $context['groups']))) {
+                    continue;
+                }
             }
 
             foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
@@ -176,10 +178,12 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                         continue;
                     }
 
-                    $propertyGroups = $groupAttributes->getArguments()['groups'] ?? $groupAttributes->getArguments()[0] ?? null;
+                    if (isset($context['groups'])) {
+                        $propertyGroups = $groupAttributes->getArguments()['groups'] ?? $groupAttributes->getArguments()[0] ?? null;
 
-                    if (empty(array_intersect($propertyGroups, $context['groups']))) {
-                        continue;
+                        if (empty(array_intersect($propertyGroups, $context['groups']))) {
+                            continue;
+                        }
                     }
 
                     if (!empty($targetProperty->getAttributes(Relation::class))) {

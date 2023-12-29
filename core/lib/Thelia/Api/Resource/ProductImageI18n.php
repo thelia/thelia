@@ -16,16 +16,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class ProductImageI18n extends I18n
 {
-    #[Groups([ProductImage::GROUP_READ, ProductImage::GROUP_WRITE])]
+    #[Groups([ProductImage::GROUP_ADMIN_READ, ProductImage::GROUP_FRONT_READ, ProductImage::GROUP_ADMIN_WRITE])]
     protected ?string $title;
 
-    #[Groups([ProductImage::GROUP_READ, ProductImage::GROUP_WRITE])]
+    #[Groups([ProductImage::GROUP_ADMIN_READ, ProductImage::GROUP_FRONT_READ, ProductImage::GROUP_ADMIN_WRITE])]
     protected ?string $description;
 
-    #[Groups([ProductImage::GROUP_READ, ProductImage::GROUP_WRITE])]
+    #[Groups([ProductImage::GROUP_ADMIN_READ, ProductImage::GROUP_FRONT_READ, ProductImage::GROUP_ADMIN_WRITE])]
     protected ?string $chapo;
 
-    #[Groups([ProductImage::GROUP_READ, ProductImage::GROUP_WRITE])]
+    #[Groups([ProductImage::GROUP_ADMIN_READ, ProductImage::GROUP_FRONT_READ, ProductImage::GROUP_ADMIN_WRITE])]
     protected ?string $postscriptum;
 
     public function getTitle(): ?string

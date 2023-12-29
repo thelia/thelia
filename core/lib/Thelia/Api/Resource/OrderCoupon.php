@@ -30,7 +30,7 @@ use Thelia\Model\Map\OrderCouponTableMap;
         ),
         new Get(
             uriTemplate: '/admin/order_coupons/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/order_coupons/{id}'
@@ -39,75 +39,75 @@ use Thelia\Model\Map\OrderCouponTableMap;
             uriTemplate: '/admin/order_coupons/{id}'
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
 class OrderCoupon implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
-    public const GROUP_READ = 'order_coupon:read';
-    public const GROUP_READ_SINGLE = 'order_coupon:read:single';
-    public const GROUP_WRITE = 'order_coupon:write';
+    public const GROUP_ADMIN_READ = 'admin:order_coupon:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:order_coupon:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:order_coupon:write';
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ])]
     public ?int $id = null;
 
     #[Relation(targetResource: Order::class)]
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?Order $order;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_WRITE])]
-    #[NotBlank(groups: [Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
+    #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public ?string $code;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_WRITE])]
-    #[NotBlank(groups: [Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
+    #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public ?string $type;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ,  Order::GROUP_WRITE])]
-    #[NotBlank(groups: [Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ,  Order::GROUP_ADMIN_WRITE])]
+    #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public ?float $amount;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
     public ?string $title;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?string $shortDescription;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?string $description;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ])]
     public ?\DateTime $startDate;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_WRITE])]
-    #[NotBlank(groups: [Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
+    #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public ?\DateTime $expirationDate;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
     public ?bool $isCumulative;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
     public ?bool $isRemovingPostage;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
     public ?bool $isAvailableOnSpecialOffers;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_WRITE])]
-    #[NotBlank(groups: [Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
+    #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public ?string $serializedConditions;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
     public ?bool $perCustomerUsageCount;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
     public ?bool $usageCanceled;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt;
 
     public function getId(): ?int
