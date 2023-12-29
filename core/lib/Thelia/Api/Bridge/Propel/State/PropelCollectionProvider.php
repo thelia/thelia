@@ -17,15 +17,15 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Api\Bridge\Propel\Extension\QueryResultCollectionExtensionInterface;
-use Thelia\Api\Bridge\Propel\Service\ApiResourceService;
+use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Model\LangQuery;
 
-class PropelCollectionProvider implements ProviderInterface
+readonly class PropelCollectionProvider implements ProviderInterface
 {
     public function __construct(
-        readonly private ApiResourceService $apiResourceService,
-        private iterable $propelCollectionExtensions = []
+        private ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
+        private iterable $propelCollectionExtensions = [],
     ) {
     }
 
@@ -38,7 +38,7 @@ class PropelCollectionProvider implements ProviderInterface
         }
 
         /** @var ModelCriteria $queryClass */
-        $queryClass = $resourceClass::getPropelRelatedTableMap()->getClassName().'Query';
+        $queryClass = $resourceClass::getPropelRelatedTableMap()?->getClassName().'Query';
 
         /** @var ModelCriteria $query */
         $query = $queryClass::create();
@@ -68,7 +68,7 @@ class PropelCollectionProvider implements ProviderInterface
 
         return array_map(
             function ($propelModel) use ($resourceClass, $context, $langs) {
-                return $this->apiResourceService->modelToResource(
+                return $this->apiResourcePropelTransformerService->modelToResource(
                     resourceClass: $resourceClass,
                     propelModel: $propelModel,
                     context: $context,

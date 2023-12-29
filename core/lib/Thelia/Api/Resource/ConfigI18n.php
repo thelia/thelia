@@ -16,16 +16,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class ConfigI18n extends I18n
 {
-    #[Groups([Config::GROUP_READ, Config::GROUP_WRITE])]
+    #[Groups([Config::GROUP_ADMIN_READ, Config::GROUP_ADMIN_WRITE])]
     protected ?string $title;
 
-    #[Groups([Config::GROUP_READ, Config::GROUP_WRITE])]
+    #[Groups([Config::GROUP_ADMIN_READ, Config::GROUP_ADMIN_WRITE])]
     protected ?string $description;
 
-    #[Groups([Config::GROUP_READ, Config::GROUP_WRITE])]
+    #[Groups([Config::GROUP_ADMIN_READ, Config::GROUP_ADMIN_WRITE])]
     protected ?string $chapo;
 
-    #[Groups([Config::GROUP_READ, Config::GROUP_WRITE])]
+    #[Groups([Config::GROUP_ADMIN_READ, Config::GROUP_ADMIN_WRITE])]
     protected ?string $postscriptum;
 
     public function getTitle(): ?string

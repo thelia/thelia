@@ -33,7 +33,7 @@ use Thelia\Model\Map\AttributeAvTableMap;
         ),
         new Get(
             uriTemplate: '/admin/attribute_avs/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/attribute_avs/{id}'
@@ -42,32 +42,62 @@ use Thelia\Model\Map\AttributeAvTableMap;
             uriTemplate: '/admin/attribute_avs/{id}'
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+)]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            uriTemplate: '/front/attribute_avs'
+        ),
+        new Get(
+            uriTemplate: '/front/attribute_avs/{id}',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]]
 )]
 class AttributeAv extends AbstractTranslatableResource
 {
-    public const GROUP_READ = 'attribute_av:read';
-    public const GROUP_READ_SINGLE = 'attribute_av:read:single';
-    public const GROUP_WRITE = 'attribute_av:write';
+    public const GROUP_ADMIN_READ = 'admin:attribute_av:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:attribute_av:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:attribute_av:write';
 
-    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_READ_SINGLE, AttributeCombination::GROUP_WRITE])]
+    public const GROUP_FRONT_READ = 'front:attribute_av:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:attribute_av:read:single';
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+        ProductSaleElements::GROUP_ADMIN_READ_SINGLE,
+        AttributeCombination::GROUP_ADMIN_WRITE,
+    ])]
     public ?int $id = null;
 
     #[Relation(targetResource: Attribute::class)]
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public Attribute $attribute;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public ?int $position;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_READ_SINGLE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        self::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+        ProductSaleElements::GROUP_ADMIN_READ_SINGLE,
+        ProductSaleElements::GROUP_FRONT_READ_SINGLE,
+    ])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int

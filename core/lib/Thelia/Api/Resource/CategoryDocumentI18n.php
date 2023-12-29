@@ -16,16 +16,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class CategoryDocumentI18n extends I18n
 {
-    #[Groups([CategoryDocument::GROUP_READ, CategoryDocument::GROUP_WRITE])]
+    #[Groups([CategoryDocument::GROUP_ADMIN_READ, CategoryDocument::GROUP_FRONT_READ, CategoryDocument::GROUP_ADMIN_WRITE])]
     protected ?string $title;
 
-    #[Groups([CategoryDocument::GROUP_READ, CategoryDocument::GROUP_WRITE])]
+    #[Groups([CategoryDocument::GROUP_ADMIN_READ, CategoryDocument::GROUP_FRONT_READ, CategoryDocument::GROUP_ADMIN_WRITE])]
     protected ?string $description;
 
-    #[Groups([CategoryDocument::GROUP_READ, CategoryDocument::GROUP_WRITE])]
+    #[Groups([CategoryDocument::GROUP_ADMIN_READ, CategoryDocument::GROUP_FRONT_READ, CategoryDocument::GROUP_ADMIN_WRITE])]
     protected ?string $chapo;
 
-    #[Groups([CategoryDocument::GROUP_READ, CategoryDocument::GROUP_WRITE])]
+    #[Groups([CategoryDocument::GROUP_ADMIN_READ, CategoryDocument::GROUP_FRONT_READ, CategoryDocument::GROUP_ADMIN_WRITE])]
     protected ?string $postscriptum;
 
     public function getTitle(): ?string
