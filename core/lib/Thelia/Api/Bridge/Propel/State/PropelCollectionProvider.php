@@ -16,19 +16,15 @@ use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Thelia\Api\Bridge\Propel\Event\CRUDRessourceEvent;
 use Thelia\Api\Bridge\Propel\Extension\QueryResultCollectionExtensionInterface;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\PropelResourceInterface;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\LangQuery;
 
 readonly class PropelCollectionProvider implements ProviderInterface
 {
     public function __construct(
         private ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
-        private EventDispatcherInterface $eventDispatcher,
         private iterable $propelCollectionExtensions = [],
     ) {
     }
@@ -70,7 +66,7 @@ readonly class PropelCollectionProvider implements ProviderInterface
 
         $langs = LangQuery::create()->filterByActive(1)->find();
 
-        $resources = array_map(
+        return array_map(
             function ($propelModel) use ($resourceClass, $context, $langs) {
                 return $this->apiResourcePropelTransformerService->modelToResource(
                     resourceClass: $resourceClass,
@@ -81,8 +77,5 @@ readonly class PropelCollectionProvider implements ProviderInterface
             },
             iterator_to_array($results)
         );
-        $this->eventDispatcher->dispatch(new CRUDRessourceEvent($results->toArray(), $resources), TheliaEvents::API_READ_COLLECTION);
-
-        return $resources;
     }
 }

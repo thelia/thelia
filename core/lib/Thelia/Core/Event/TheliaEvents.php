@@ -711,15 +711,4 @@ final class TheliaEvents
 
     public const ORDER_STATUS_UPDATE_POSITION = 'action.updateOrderStatusPosition';
     // -- END ORDER STATUS EVENTS -----------------------------------------------
-
-    // -- API CRUD EVENTS -----------------------------------------------
-    public const API_READ_COLLECTION = 'api.read.collection';
-    public const API_READ_ITEM = 'api.read.item';
-    public const API_BEFORE_CREATE = 'api.before.create';
-    public const API_AFTER_CREATE = 'api.after.create';
-    public const API_BEFORE_UPDATE = 'api.before.update';
-    public const API_AFTER_UPDATE = 'api.after.update';
-    public const API_BEFORE_DELETE = 'api.before.delete';
-    public const API_AFTER_DELETE = 'api.after.delete';
-    // -- END API CRUD EVENTS -----------------------------------------------
 }

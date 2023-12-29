@@ -15,18 +15,14 @@ namespace Thelia\Api\Bridge\Propel\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use Propel\Runtime\Propel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Thelia\Api\Bridge\Propel\Event\CRUDRessourceEvent;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\ResourceAddonInterface;
 use Thelia\Config\DatabaseConfiguration;
-use Thelia\Core\Event\TheliaEvents;
 
 readonly class PropelRemoveProcessor implements ProcessorInterface
 {
     public function __construct(
         private ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
-        private EventDispatcherInterface $eventDispatcher
     ) {
     }
 
@@ -37,7 +33,6 @@ readonly class PropelRemoveProcessor implements ProcessorInterface
 
         try {
             $propelModel = $data->getPropelModel();
-            $this->eventDispatcher->dispatch(new CRUDRessourceEvent($propelModel, $data), TheliaEvents::API_BEFORE_DELETE);
             $resourceAddonDefinitions = $this->apiResourcePropelTransformerService->getResourceAddonDefinitions($data::class);
             foreach ($resourceAddonDefinitions as $addonClass) {
                 if (is_subclass_of($addonClass, ResourceAddonInterface::class)) {
@@ -47,7 +42,6 @@ readonly class PropelRemoveProcessor implements ProcessorInterface
             }
 
             $propelModel->delete();
-            $this->eventDispatcher->dispatch(new CRUDRessourceEvent($propelModel, $data), TheliaEvents::API_AFTER_DELETE);
             if (!$propelModel->isDeleted()) {
                 throw new \Exception('This item cannot be deleted, possibly because it is the default one.');
             }

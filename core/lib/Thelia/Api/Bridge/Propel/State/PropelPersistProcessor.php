@@ -20,55 +20,34 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Propel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
-use Thelia\Api\Bridge\Propel\Event\CRUDRessourceEvent;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Api\Resource\ResourceAddonInterface;
 use Thelia\Config\DatabaseConfiguration;
-use Thelia\Core\Event\TheliaEvents;
 
 readonly class PropelPersistProcessor implements ProcessorInterface
 {
     public function __construct(
         private ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
         private RequestStack $requestStack,
-        private EventDispatcherInterface $eventDispatcher
     ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
         $propelModel = $this->apiResourcePropelTransformerService->resourceToModel($data, $context);
-        $isCreation = true;
         if (isset($uriVariables['id'])) {
-            $isCreation = false;
             $propelModel->setId($uriVariables['id']);
         }
         $connection = Propel::getWriteConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME);
         $connection->beginTransaction();
         try {
-            $event = new CRUDRessourceEvent($propelModel, $data);
-            $this->eventDispatcher->dispatch(
-                $event,
-                $isCreation ? TheliaEvents::API_BEFORE_CREATE : TheliaEvents::API_BEFORE_UPDATE
-            );
-            $propelModel = $event->getModel();
-            $data = $event->getResource();
             $this->beforeSave($data, $operation, $propelModel);
             $propelModel->save();
 
             $resourceAddons = $this->manageResourceAddons($propelModel, $data);
-
-            $event = new CRUDRessourceEvent($propelModel, $data);
-            $this->eventDispatcher->dispatch(
-                $event,
-                $isCreation ? TheliaEvents::API_AFTER_CREATE : TheliaEvents::API_AFTER_UPDATE
-            );
-            $propelModel = $event->getModel();
-            $data = $event->getResource();
 
             $connection->commit();
 
