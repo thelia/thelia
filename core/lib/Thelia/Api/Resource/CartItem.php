@@ -33,7 +33,7 @@ use Thelia\Model\Map\CartItemTableMap;
         ),
         new Get(
             uriTemplate: '/admin/cart_items/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/cart_items/{id}'
@@ -42,54 +42,80 @@ use Thelia\Model\Map\CartItemTableMap;
             uriTemplate: '/admin/cart_items/{id}'
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+)]
+#[ApiResource(
+    operations: [
+        new Post(
+            uriTemplate: '/front/cart_items'
+        ),
+        new GetCollection(
+            uriTemplate: '/front/cart_items'
+        ),
+        new Get(
+            uriTemplate: '/front/cart_items/{id}',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+        ),
+        new Put(
+            uriTemplate: '/front/cart_items/{id}'
+        ),
+        new Delete(
+            uriTemplate: '/front/cart_items/{id}'
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_FRONT_WRITE]]
 )]
 class CartItem implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
-    public const GROUP_READ = 'cart_item:read';
-    public const GROUP_READ_SINGLE = 'cart_item:read:single';
-    public const GROUP_WRITE = 'cart_item:write';
+    public const GROUP_ADMIN_READ = 'admin:cart_item:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:cart_item:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:cart_item:write';
 
-    #[Groups([self::GROUP_READ, Cart::GROUP_READ])]
+    public const GROUP_FRONT_READ = 'front:cart_item:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:cart_item:read:single';
+    public const GROUP_FRONT_WRITE = 'front:cart_item:write';
+
+    #[Groups([self::GROUP_ADMIN_READ, Cart::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Cart::GROUP_FRONT_READ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, Cart::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, Cart::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Cart::GROUP_FRONT_READ])]
     public ?int $quantity;
 
     #[Relation(targetResource: Product::class)]
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public Product $product;
 
     #[Relation(targetResource: Cart::class)]
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public Cart $cart;
 
     #[Relation(targetResource: ProductSaleElements::class)]
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ProductSaleElements $productSaleElements;
 
-    #[Groups([self::GROUP_READ, Cart::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, Cart::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Cart::GROUP_FRONT_READ])]
     public ?float $price;
 
-    #[Groups([self::GROUP_READ, Cart::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, Cart::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Cart::GROUP_FRONT_READ])]
     public ?float $promo_price;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $priceEndOfLife;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?int $promo;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int

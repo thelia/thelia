@@ -32,7 +32,7 @@ use Thelia\Model\Map\CurrencyTableMap;
         ),
         new Get(
             uriTemplate: '/admin/currencies/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/currencies/{id}'
@@ -41,56 +41,84 @@ use Thelia\Model\Map\CurrencyTableMap;
             uriTemplate: '/admin/currencies/{id}'
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+)]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            uriTemplate: '/front/currencies'
+        ),
+        new Get(
+            uriTemplate: '/front/currencies/{id}',
+        ),
+    ]
 )]
 class Currency extends AbstractTranslatableResource
 {
-    public const GROUP_READ = 'currency:read';
-    public const GROUP_READ_SINGLE = 'currency:read:single';
-    public const GROUP_WRITE = 'currency:write';
+    public const GROUP_ADMIN_READ = 'admin:currency:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:currency:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:currency:write';
 
     #[Groups([
-        self::GROUP_READ,
-        Order::GROUP_READ,
-        Cart::GROUP_READ_SINGLE,
-        ProductSaleElements::GROUP_READ_SINGLE,
-        ProductPrice::GROUP_READ,
-        Product::GROUP_READ_SINGLE,
-        Product::GROUP_WRITE,
-        ProductSaleElements::GROUP_WRITE,
-        Order::GROUP_WRITE,
+        self::GROUP_ADMIN_READ,
+        Order::GROUP_ADMIN_READ,
+        Cart::GROUP_ADMIN_READ_SINGLE,
+        Cart::GROUP_FRONT_READ_SINGLE,
+        ProductSaleElements::GROUP_ADMIN_READ_SINGLE,
+        ProductPrice::GROUP_ADMIN_READ,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_ADMIN_WRITE,
+        ProductSaleElements::GROUP_ADMIN_WRITE,
+        Order::GROUP_ADMIN_WRITE,
     ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE, ProductSaleElements::GROUP_READ_SINGLE, Cart::GROUP_READ_SINGLE, Product::GROUP_READ_SINGLE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        ProductSaleElements::GROUP_ADMIN_READ_SINGLE,
+        Cart::GROUP_ADMIN_READ_SINGLE,
+        Cart::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+    ])]
     public ?string $code;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE, Cart::GROUP_READ_SINGLE, Product::GROUP_READ_SINGLE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Cart::GROUP_ADMIN_READ_SINGLE,
+        Cart::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+    ])]
     public ?string $symbol;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?string $format;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?float $rate;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?int $position;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?bool $visible;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?bool $byDefault;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int

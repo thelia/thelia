@@ -16,16 +16,34 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class AttributeI18n extends I18n
 {
-    #[Groups([Attribute::GROUP_READ, Attribute::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
+    #[Groups([
+        Attribute::GROUP_ADMIN_READ,
+        Attribute::GROUP_FRONT_READ,
+        Attribute::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+    ])]
     protected ?string $title;
 
-    #[Groups([Attribute::GROUP_READ, Attribute::GROUP_WRITE])]
+    #[Groups([
+        Attribute::GROUP_ADMIN_READ,
+        Attribute::GROUP_FRONT_READ,
+        Attribute::GROUP_ADMIN_WRITE,
+    ])]
     protected ?string $description;
 
-    #[Groups([Attribute::GROUP_READ, Attribute::GROUP_WRITE])]
+    #[Groups([
+        Attribute::GROUP_ADMIN_READ,
+        Attribute::GROUP_FRONT_READ,
+        Attribute::GROUP_ADMIN_WRITE,
+    ])]
     protected ?string $chapo;
 
-    #[Groups([Attribute::GROUP_READ, Attribute::GROUP_WRITE])]
+    #[Groups([
+        Attribute::GROUP_ADMIN_READ,
+        Attribute::GROUP_FRONT_READ,
+        Attribute::GROUP_ADMIN_WRITE,
+    ])]
     protected ?string $postscriptum;
 
     public function getTitle(): ?string
