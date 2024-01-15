@@ -1130,7 +1130,8 @@ INSERT INTO `country` (`id`, `visible`, `isocode`, `isoalpha2`, `isoalpha3`, `by
 (269, 1, '344', 'HK', 'HKG', 0, 0, '0', '0', '', NOW(), NOW()),
 (270, 1, '652', 'BL', 'BLM', 0, 0, '0', '0', '', NOW(), NOW()),
 (271, 1, '663', 'MF', 'MAF', 0, 0, '0', '0', '', NOW(), NOW()),
-(272, 1, '260', 'TF', 'ATF', 0, 0, '0', '0', '', NOW(), NOW());
+(272, 1, '260', 'TF', 'ATF', 0, 0, '0', '0', '', NOW(), NOW()),
+(273, 1, '158', 'TW', 'TWN', 0, 0, '0', '0', '', NOW(), NOW());
 
 INSERT INTO `state` (`id`, `visible`, `isocode`, `country_id`, `created_at`, `updated_at`) VALUES
 (1, 1, 'AL', '196', NOW(), NOW()),
@@ -1648,6 +1649,7 @@ INSERT INTO `country_area` (`country_id`, `area_id`, `created_at`, `updated_at`)
 (270, 5, NOW(), NOW()),
 (271, 5, NOW(), NOW()),
 (272, 6, NOW(), NOW()),
+(273, 4, NOW(), NOW()),
 (1, 9, NOW(), NOW()),
 (2, 10, NOW(), NOW()),
 (3, 13, NOW(), NOW()),
@@ -8397,6 +8399,7 @@ INSERT INTO `country_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `po
     (270, 'de_DE', 'Saint-Barthélemy', NULL, NULL, NULL),
     (271, 'de_DE', 'Saint-Martin (franz. Teil)', NULL, NULL, NULL),
     (272, 'de_DE', 'Französische Süd- und Antarktisgebiete', NULL, NULL, NULL),
+    (273, 'de_DE', 'Taiwan', NULL, NULL, NULL);
     (1, 'en_US', 'Afghanistan', NULL, NULL, NULL),
     (2, 'en_US', 'South Africa', NULL, NULL, NULL),
     (3, 'en_US', 'Albania', NULL, NULL, NULL),
@@ -8602,6 +8605,7 @@ INSERT INTO `country_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `po
     (270, 'en_US', 'Saint Barthélemy', NULL, NULL, NULL),
     (271, 'en_US', 'Saint Martin (French part)', NULL, NULL, NULL),
     (272, 'en_US', 'French Southern Territories', NULL, NULL, NULL),
+    (273, 'en_US', 'Taiwan', NULL, NULL, NULL),
     (1, 'es_ES', 'Afganistán', NULL, NULL, NULL),
     (2, 'es_ES', 'Sudáfrica', NULL, NULL, NULL),
     (3, 'es_ES', 'Albania', NULL, NULL, NULL),
@@ -8807,6 +8811,7 @@ INSERT INTO `country_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `po
     (270, 'es_ES', 'San Bartolomé', NULL, NULL, NULL),
     (271, 'es_ES', 'San Martín (parte francesa)', NULL, NULL, NULL),
     (272, 'es_ES', 'Tierras Australes y Antárticas Francesas', NULL, NULL, NULL),
+    (273, 'es_ES', 'Taiwán', NULL, NULL, NULL),
     (1, 'fr_FR', 'Afghanistan', NULL, NULL, NULL),
     (2, 'fr_FR', 'Afrique du Sud', NULL, NULL, NULL),
     (3, 'fr_FR', 'Albanie', NULL, NULL, NULL),
@@ -9012,6 +9017,7 @@ INSERT INTO `country_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `po
     (270, 'fr_FR', 'Saint-Barthélemy', NULL, NULL, NULL),
     (271, 'fr_FR', 'Saint-Martin (Antilles françaises)', NULL, NULL, NULL),
     (272, 'fr_FR', 'Terres australes et antarctiques françaises', NULL, NULL, NULL),
+    (273, 'fr_FR', 'Taïwan', NULL, NULL, NULL),
     (1, 'it_IT', NULL, NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -9217,6 +9223,7 @@ INSERT INTO `country_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `po
     (270, 'it_IT', 'Saint-Barthélemy', NULL, NULL, NULL),
     (271, 'it_IT', 'Saint-Martin', NULL, NULL, NULL),
     (272, 'it_IT', 'Terre australi e antartiche francesi', NULL, NULL, NULL),
+    (273, 'it_IT', 'Taiwan', NULL, NULL, NULL),
     (1, 'ru_RU', 'Афганистан', NULL, NULL, NULL),
     (2, 'ru_RU', 'Южная Африка', NULL, NULL, NULL),
     (3, 'ru_RU', 'Албания', NULL, NULL, NULL),
@@ -9421,7 +9428,8 @@ INSERT INTO `country_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `po
     (269, 'ru_RU', 'Гонконг', NULL, NULL, NULL),
     (270, 'ru_RU', 'Сен-Бартельми', NULL, NULL, NULL),
     (271, 'ru_RU', 'Сен-Мартен (французская часть)', NULL, NULL, NULL),
-    (272, 'ru_RU', 'Французские Южные Территории', NULL, NULL, NULL)
+    (272, 'ru_RU', 'Французские Южные Территории', NULL, NULL, NULL),
+    (273, 'ru_RU', 'Тайвань', NULL, NULL, NULL)
 ;
 
 INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
