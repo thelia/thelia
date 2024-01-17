@@ -15,7 +15,6 @@
       "@react-components/*": ["./components/React/*"],
       "@mixed-components/*": ["./components/mixed/*"],
       "@js/*": ["./assets/js/*"],
-      "@redux/*": ["./assets/js/redux/*"],
       "@utils/*": ["./assets/js/utils/*"],
       "@css/*": ["./assets/css/*"],
       "@images/*": ["./assets/images/*"],
@@ -45,7 +44,6 @@
     "./**/*.ts",
     "./components/**/*.tsx",
     "./components/**/*.ts",
-    "assets/js/utils/zoom.js"
   ],
   "exclude": ["node_modules/**/*", "dist"]
 }
