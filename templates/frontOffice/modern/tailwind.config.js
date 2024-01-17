@@ -5,7 +5,7 @@ module.exports = {
     './**/*.html',
     './**/*.tpl',
     './components/**/*.css',
-    '!(node_modules)/**/*.js'
+    '!(node_modules)/**/*.{js,tsx,ts}'
   ],
   theme: {
     extend: {

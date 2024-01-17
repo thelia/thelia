@@ -63,12 +63,15 @@
   },
   "dependencies": {
     "@openstudio/thelia-api-utils": "0.5.2",
-    "@reduxjs/toolkit": "^1.6.0",
     "@symfony/webpack-encore": "^4.1.0",
+    "@types/lodash": "^4.14.197",
+    "@types/react-dom": "^18.2.7",
+    "@types/react-modal": "^3.16.0",
     "axios": "^1.1.3",
     "eslint-config-react-app": "^7.0.1",
     "infinite-scroll": "^4.0.1",
     "leaflet": "^1.7.1",
+    "lodash": "^4.17.21",
     "lodash-es": "^4.17.20",
     "mmenu-light": "^3.0.8",
     "react": "^18.2.0",
@@ -79,7 +82,7 @@
     "react-modal": "^3.14.3",
     "react-phone-number-input": "^3.1.27",
     "react-query": "^3.21.1",
-    "react-redux": "^8.0.2",
-    "react-use": "^17.2.4"
+    "react-use": "^17.2.4",
+    "ts-loader": "^9.4.4"
   }
 }
