@@ -175,7 +175,7 @@ INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 (@max_id+1, 'es_ES', 'Integración del motor de plantillas Smarty', NULL,  NULL,  NULL),
 (@max_id+2, 'es_ES', 'Controlador de producto virtual', 'Compruebe si un módulo de entrega de producto virtual está habilitado si es virtual por lo menos un producto',  NULL,  NULL),
 (@max_id+1, 'fr_FR', 'Intégration du moteur de template Smarty', NULL,  NULL,  NULL),
-(@max_id+2, 'fr_FR', 'Contôle de produit virtuel', 'Vérifie qu\'un module de livraison pour produit virtuel soit activé si des produits virtuels existent',  NULL,  NULL)
+(@max_id+2, 'fr_FR', 'Contrôle de produit virtuel', 'Vérifie qu\'un module de livraison pour produit virtuel soit activé si des produits virtuels existent',  NULL,  NULL)
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;

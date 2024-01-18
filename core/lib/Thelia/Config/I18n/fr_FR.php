@@ -513,7 +513,7 @@ return [
     'State title' => 'Nom de l\'état',
     'Stock' => 'Stock',
     'Store Business Identification Number (SIRET, etc).' => 'Identifiant de la boutique (SIRET, etc)',
-    'Store Information' => 'Information boutique',
+    'Store Information' => 'Informations boutique',
     'Store configuration failed.' => 'Erreur de configuration du magasin.',
     'Store description' => 'Description du magasin',
     'Store email address' => 'Adresse e-mail du magasin',
