@@ -866,7 +866,7 @@ return [
     'Password changed' => 'Mot de passe modifié',
     'Payment information' => 'Informations de paiement',
     'Payment module' => 'Module de paiement',
-    'Payment modules' => 'Modules de payment',
+    'Payment modules' => 'Modules de paiement',
     'Percent Discount' => 'Pourcentage de remise',
     'Period' => 'Période',
     'Phone' => 'Téléphone',
