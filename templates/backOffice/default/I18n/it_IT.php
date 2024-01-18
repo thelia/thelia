@@ -361,7 +361,7 @@ return [
     'Discount' => 'Sconto',
     'Discount amount' => 'Quantità sconto',
     'Discount percentage' => 'Percentuale di sconto',
-    'Discover all our modules on <a href=\'http://thelia.net/modules\' target=\'_blank\'>Thelia Modules</a> !' => 'Scoprite tutti i nostri moduli <a href=\'http://thelia.net/modules\'>Thelia Modules</a> !',
+    'Discover all our modules on <a href=\'https://github.com/thelia-modules\' target=\'_blank\'>Thelia Modules</a> !' => 'Scoprite tutti i nostri moduli <a href=\'https://github.com/thelia-modules\'>Thelia Modules</a> !',
     'Do not use a product template' => 'Non utilizzare un template di prodotto',
     'Do this export' => 'Fai questa esportazione',
     'Do this import' => 'Fai questa importazione',

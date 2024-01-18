@@ -363,7 +363,7 @@ return [
     'Discount' => 'تخفیف',
     'Discount amount' => 'مبلغ تخفیف',
     'Discount percentage' => 'درصد تخفیف',
-    'Discover all our modules on <a href=\'http://thelia.net/modules\' target=\'_blank\'>Thelia Modules</a> !' => 'تمامی ماژول‌ها را می‌توانید در <a href=\'http://thelia.net/modules\' target=\'_blank\'>اینجا</a> پیدا کنید!',
+    'Discover all our modules on <a href=\'https://github.com/thelia-modules\' target=\'_blank\'>Thelia Modules</a> !' => 'تمامی ماژول‌ها را می‌توانید در <a href=\'https://github.com/thelia-modules\' target=\'_blank\'>اینجا</a> پیدا کنید!',
     'Do not use a product template' => 'از قالب محصول استفاده نکن',
     'Do this export' => 'عمل برون ریزی را انجام بده',
     'Do this import' => 'عمل درون ریزی را انجام بده',

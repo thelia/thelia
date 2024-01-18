@@ -90,7 +90,7 @@
 <footer class="footer">
         <p class="text-center">&copy; Thelia <time datetime="{'Y-m-d'|date}">{'Y'|date}</time>
             - <a href="http://www.openstudio.fr/" target="_blank">{intl l='Made with 💙 by OpenStudio'}</a>
-            - <a href="http://thelia.net/forum" target="_blank">{intl l='Need help ?'}</a>
+            - <a href="https://forum.thelia.net/" target="_blank">{intl l='Need help ?'}</a>
         </p>
 
         {hook name="main.in-footer" location="in_footer" }
