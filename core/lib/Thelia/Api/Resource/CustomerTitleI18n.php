@@ -16,10 +16,25 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class CustomerTitleI18n extends I18n
 {
-    #[Groups([CustomerTitle::GROUP_ADMIN_READ, Customer::GROUP_ADMIN_READ_SINGLE, CustomerTitle::GROUP_ADMIN_READ_SINGLE, CustomerTitle::GROUP_ADMIN_WRITE, Address::GROUP_ADMIN_READ])]
+    #[Groups([
+        CustomerTitle::GROUP_ADMIN_READ,
+        Customer::GROUP_ADMIN_READ_SINGLE,
+        CustomerTitle::GROUP_ADMIN_READ_SINGLE,
+        CustomerTitle::GROUP_ADMIN_WRITE,
+        Address::GROUP_ADMIN_READ,
+        CustomerTitle::GROUP_FRONT_READ,
+        Customer::GROUP_FRONT_READ_SINGLE,
+    ])]
     protected ?string $short;
 
-    #[Groups([CustomerTitle::GROUP_ADMIN_READ, Customer::GROUP_ADMIN_READ_SINGLE, CustomerTitle::GROUP_ADMIN_READ_SINGLE, CustomerTitle::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        CustomerTitle::GROUP_ADMIN_READ,
+        Customer::GROUP_ADMIN_READ_SINGLE,
+        CustomerTitle::GROUP_ADMIN_READ_SINGLE,
+        CustomerTitle::GROUP_ADMIN_WRITE,
+        CustomerTitle::GROUP_FRONT_READ,
+        Customer::GROUP_FRONT_READ_SINGLE,
+    ])]
     protected ?string $long;
 
     public function getShort(): ?string

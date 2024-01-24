@@ -12,6 +12,7 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -24,6 +25,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Type;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\OrderProductTableMap;
 
 #[ApiResource(
@@ -45,6 +47,33 @@ use Thelia\Model\Map\OrderProductTableMap;
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
     denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            uriTemplate: '/front/account/order_products',
+            extraProperties: ['usesForCustomer' => ['order']],
+        ),
+        new Get(
+            uriTemplate: '/front/account/order_products/{id}',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
+            security: 'object.order.customer.getId() == user.getId()'
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
+)]
+#[ApiFilter(
+    filterClass: SearchFilter::class,
+    properties: [
+        'productSaleElementsId' => 'exact',
+        'productSaleElementsRef' => 'exact',
+        'productRef' => 'exact',
+        'order.id' =>
+        [
+            'strategy' => 'exact',
+            'fieldPath' => 'order_product.order_id',
+        ],
+    ]
+)]
 class OrderProduct implements PropelResourceInterface
 {
     use PropelResourceTrait;
@@ -53,91 +82,186 @@ class OrderProduct implements PropelResourceInterface
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order_product:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:order_product:write';
 
-    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ])]
+    public const GROUP_FRONT_READ = 'front:order_product:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:order_product:read:single';
+
+    #[Groups([self::GROUP_ADMIN_READ,
+        Order::GROUP_ADMIN_READ,
+        Order::GROUP_FRONT_READ_SINGLE,
+        self::GROUP_FRONT_READ,
+    ])]
     public ?int $id = null;
 
     #[Relation(targetResource: Order::class)]
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE,self::GROUP_FRONT_READ])]
     public Order $order;
+    private $orderId;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ
+    ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public string $productRef;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ_SINGLE
+    ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public string $productSaleElementsRef;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ_SINGLE
+    ])]
     public ?int $productSaleElementsId;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        self::GROUP_FRONT_READ_SINGLE
+    ])]
     public ?string $title;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ_SINGLE
+    ])]
     public ?string $chapo;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ_SINGLE
+    ])]
     public ?string $description;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
     public ?string $postscriptum;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ
+    ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public int $quantity;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ
+    ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public float $price;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ
+    ])]
     public ?float $promoPrice;
 
-    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE,self::GROUP_FRONT_READ])]
     public ?float $unitTaxedPrice;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ_SINGLE
+    ])]
     #[Type(type: 'bool', groups: [Order::GROUP_ADMIN_WRITE])]
     #[NotNull(groups: [Order::GROUP_ADMIN_WRITE])]
     public bool $wasNew;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ_SINGLE
+    ])]
     #[Type(type: 'bool', groups: [Order::GROUP_ADMIN_WRITE])]
     #[NotNull(groups: [Order::GROUP_ADMIN_WRITE])]
     public bool $wasInPromo;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ_SINGLE
+    ])]
     public ?string $weight;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ_SINGLE
+    ])]
     public ?string $eanCode;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        Order::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ_SINGLE
+    ])]
     public ?string $taxRuleTitle;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
     public ?string $taxRuleDescription;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
     public ?int $parent;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
     #[Type(type: 'bool', groups: [Order::GROUP_ADMIN_WRITE])]
     #[NotNull(groups: [Order::GROUP_ADMIN_WRITE])]
     public bool $virtual;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        Order::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ_SINGLE
+    ])]
     public ?bool $virtualDocument;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ,self::GROUP_FRONT_READ_SINGLE])]
     public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt;
 
     #[Relation(targetResource: OrderProductTax::class)]
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ_SINGLE
+    ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public array $orderProductTaxes;
 
