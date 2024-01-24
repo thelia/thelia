@@ -53,7 +53,7 @@ class OrderAddress implements PropelResourceInterface
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order_address:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:order_address:write';
 
-    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE])]
