@@ -22,7 +22,7 @@
         "symfony/routing": "6.4.*",
         "symfony/filesystem": "6.4.*",
         "symfony/yaml": "6.4.*",
-        "symfony/translation": "6.4.*",
+        "symfony/translation": "6.4.x-dev",
         "symfony-cmf/routing": "3.0.*",
         "symfony/validator": "6.4.*",
         "symfony/options-resolver": "6.4.*",
