@@ -53,6 +53,19 @@ use Thelia\Model\Map\OrderTableMap;
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
     denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            uriTemplate: '/front/account/orders',
+        ),
+        new Get(
+            uriTemplate: '/front/account/orders/{id}',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
+            security: 'object.customer.getId() == user.getId()'
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
+)]
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
@@ -90,119 +103,127 @@ class Order implements PropelResourceInterface
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:order:write';
 
-    #[Groups([self::GROUP_ADMIN_READ, OrderCoupon::GROUP_ADMIN_READ_SINGLE, OrderProduct::GROUP_ADMIN_READ_SINGLE])]
+    public const GROUP_FRONT_READ = 'front:order:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:order:read:single';
+
+    #[Groups([self::GROUP_ADMIN_READ,
+        OrderCoupon::GROUP_ADMIN_READ_SINGLE,
+        OrderProduct::GROUP_ADMIN_READ_SINGLE,
+        self::GROUP_FRONT_READ,
+        OrderProduct::GROUP_FRONT_READ
+    ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ,self::GROUP_FRONT_READ])]
     public ?string $ref;
 
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
     public ?\DateTime $invoiceDate;
 
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
     #[NotNull]
     public float $currencyRate;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ,self::GROUP_FRONT_READ])]
     public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
     public ?float $discount;
 
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
     public float $postage;
 
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
     public float $postageTax;
 
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
     public ?string $postageTaxRuleTitle;
 
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
     public ?string $transactionRef;
 
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
     public ?string $deliveryRef;
 
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
     public ?string $invoiceRef;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ,self::GROUP_FRONT_READ])]
     public ?float $totalAmount;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ,self::GROUP_FRONT_READ])]
     public ?float $totalAmountWithoutTaxes;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ,self::GROUP_FRONT_READ_SINGLE])]
     public ?float $totalAmountWithTaxBeforeDiscount;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ,self::GROUP_FRONT_READ_SINGLE])]
     public ?float $amountDiscountWithTaxes;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ,self::GROUP_FRONT_READ_SINGLE])]
     public ?float $totalAmountWithTaxesAfterDiscount;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ,self::GROUP_FRONT_READ_SINGLE])]
     public ?float $totalShippingWithTaxes;
 
     #[Relation(targetResource: OrderProduct::class)]
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
     public array $orderProducts;
 
     #[Relation(targetResource: OrderCoupon::class)]
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
     public array $orderCoupons;
 
     #[Relation(targetResource: OrderAddress::class, relationAlias: 'OrderAddressRelatedByInvoiceOrderAddressId')]
     #[Column(propelSetter: 'setInvoiceOrderAddressId')]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
     public OrderAddress $invoiceOrderAddress;
 
     #[Relation(targetResource: OrderAddress::class, relationAlias: 'OrderAddressRelatedByDeliveryOrderAddressId')]
     #[Column(propelSetter: 'setDeliveryOrderAddressId')]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
     public OrderAddress $deliveryOrderAddress;
 
     #[Relation(targetResource: Module::class, relationAlias: 'ModuleRelatedByPaymentModuleId')]
     #[Column(propelSetter: 'setPaymentModuleId')]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
     public Module $paymentModule;
 
     #[Relation(targetResource: Module::class, relationAlias: 'ModuleRelatedByDeliveryModuleId')]
     #[Column(propelSetter: 'setDeliveryModuleId')]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
     public Module $deliveryModule;
 
     #[Relation(targetResource: OrderStatus::class)]
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
     #[Column(propelSetter: 'setStatusId')]
     public OrderStatus $orderStatus;
 
     #[Relation(targetResource: Customer::class)]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
     public Customer $customer;
 
     #[Relation(targetResource: Currency::class)]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
     public Currency $currency;
 
     #[Relation(targetResource: Lang::class)]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
     public Lang $lang;
 
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]

@@ -50,7 +50,7 @@ class OrderCoupon implements PropelResourceInterface
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order_coupon:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:order_coupon:write';
 
-    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, Order::GROUP_FRONT_READ_SINGLE])]
     public ?int $id = null;
 
     #[Relation(targetResource: Order::class)]
