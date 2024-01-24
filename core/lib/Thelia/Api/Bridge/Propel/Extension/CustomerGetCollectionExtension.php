@@ -37,9 +37,25 @@ final class CustomerGetCollectionExtension implements QueryCollectionExtensionIn
             return;
         }
         $patterns = $this->accessMap->getPatterns($this->requestStack->getCurrentRequest());
-        if (!isset($patterns[0][0]) || $patterns[0][0] !== 'ROLE_CUSTOMER' || !method_exists($query, 'filterByCustomer')) {
+
+        if (!isset($patterns[0][0]) || $patterns[0][0] !== 'ROLE_CUSTOMER') {
             return;
         }
-        $query->filterByCustomer($user);
+
+        if (isset($operation->getExtraProperties()['usesForCustomer'])){
+            foreach ($operation->getExtraProperties()['usesForCustomer'] as $joinTable){
+                $use = 'use'.ucwords(strtolower($joinTable)).'Query';
+                $query = $query->$use();
+            }
+            $query->filterByCustomer($user);
+            $endUse = 'endUse';
+            foreach ($operation->getExtraProperties()['usesForCustomer'] as $joinTable){
+                $query = $query->$endUse();
+            }
+            return;
+        }
+        if (method_exists($query, 'filterByCustomer')){
+            $query->filterByCustomer($user);
+        }
     }
 }
