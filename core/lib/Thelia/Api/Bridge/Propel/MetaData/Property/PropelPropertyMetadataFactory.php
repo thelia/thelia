@@ -20,7 +20,7 @@ use Symfony\Component\PropertyInfo\Type;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\TranslatableResourceInterface;
 
-#[AsDecorator(decorates: 'api_platform.metadata.property.metadata_factory')]
+#[AsDecorator(decorates: 'api_platform.metadata.property.metadata_factory.serializer')]
 class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
     public function __construct(
