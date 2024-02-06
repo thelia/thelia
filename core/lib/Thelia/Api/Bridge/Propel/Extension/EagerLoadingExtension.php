@@ -256,7 +256,8 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             (new \ReflectionClass($i18nResource))->getProperties()
         );
 
-        $joinMethodName = 'join'.$reflector->getShortName().'I18n';
+        $tableName = $resourceClass::getPropelRelatedTableMap()->getPhpName();
+        $joinMethodName = 'join'.$tableName.'I18n';
         foreach ($langs as $lang) {
             $joinAlias = trim($baseJoinAlias.'lang_'.$lang->getLocale(), '_');
             $query->$joinMethodName($joinAlias);
