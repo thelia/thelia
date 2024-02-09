@@ -3078,7 +3078,8 @@ INSERT INTO `country_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `po
     (269, '{$locale}', {intl l='Hong Kong' locale=$locale}, NULL, NULL, NULL),
     (270, '{$locale}', {intl l='Saint Barthélemy' locale=$locale}, NULL, NULL, NULL),
     (271, '{$locale}', {intl l='Saint Martin (French part)' locale=$locale}, NULL, NULL, NULL),
-    (272, '{$locale}', {intl l='French Southern Territories' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
+    (272, '{$locale}', {intl l='French Southern Territories' locale=$locale}, NULL, NULL, NULL),
+    (273, '{$locale}', {intl l='Taïwan' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;
