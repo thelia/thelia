@@ -1,0 +1,49 @@
+{
+  "compilerOptions": {
+    "lib": ["ESNext", "dom", "dom.iterable"],
+    "jsx": "react-jsx",
+    "removeComments": true,
+    "target": "ES2022",
+    "outDir": "dist",
+
+    // Module resolution
+    "baseUrl": "./", // Lets you set a base directory to resolve non-absolute module names.
+    "esModuleInterop": true, // fixes some issues TS originally had with the ES6 spec where TypeScript treats CommonJS/AMD/UMD modules similar to ES6 module
+    "moduleResolution": "node", // Pretty much always node for modern JS. Other option is "classic"
+    "paths": {
+      "@components/*": ["./components/*"],
+      "@react-components/*": ["./components/React/*"],
+      "@mixed-components/*": ["./components/mixed/*"],
+      "@js/*": ["./assets/js/*"],
+      "@utils/*": ["./assets/js/utils/*"],
+      "@css/*": ["./assets/css/*"],
+      "@images/*": ["./assets/images/*"],
+      "@icons/*": ["./assets/svg-icons/*"],
+      "@fonts/*": ["./assets/fonts/*"],
+      "@favicons/*": ["./assets/favicons/*"],
+      "@standalone/*": ["./assets/js/standalone/*"]
+    }, // A series of entries which re-map imports to lookup locations relative to the baseUrl
+
+    // Source Map
+    "sourceMap": true, // enables the use of source maps for debuggers and error reporting etc
+    "sourceRoot": "/", // Specify the location where a debugger should locate TypeScript files instead of relative source locations.
+
+    // Strict Checks
+    "alwaysStrict": true, // Ensures that your files are parsed in the ECMAScript strict mode, and emit “use strict” for each source file.
+    "allowUnreachableCode": false, // pick up dead code paths
+    "noImplicitAny": true, // In some cases where no type annotations are present, TypeScript will fall back to a type of any for a variable when it cannot infer the type.
+    "strictNullChecks": true, // When strictNullChecks is true, null and undefined have their own distinct types and you’ll get a type error if you try to use them where a concrete value is expected.
+
+    // Linter Checks
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true, // accessing index must always check for undefined
+    "allowJs": true,
+    "noUnusedLocals": false
+  },
+  "include": [
+    "./**/*.ts",
+    "./components/**/*.tsx",
+    "./components/**/*.ts",
+  ],
+  "exclude": ["node_modules/**/*", "dist"]
+}

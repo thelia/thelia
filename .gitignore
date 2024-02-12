@@ -7,6 +7,7 @@
 composer.lock
 symfony.lock
 phpunit.xml
+config
 ###< symfony/framework-bundle ###
 
 ###> thelia/thelia ###
@@ -116,3 +117,7 @@ tests/cypress/downloads
 /.php-cs-fixer.php
 /.php-cs-fixer.cache
 ###< friendsofphp/php-cs-fixer ###
+
+###> phpstan/phpstan ###
+phpstan.neon
+###< phpstan/phpstan ###
