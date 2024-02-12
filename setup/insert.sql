@@ -8399,7 +8399,7 @@ INSERT INTO `country_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `po
     (270, 'de_DE', 'Saint-Barthélemy', NULL, NULL, NULL),
     (271, 'de_DE', 'Saint-Martin (franz. Teil)', NULL, NULL, NULL),
     (272, 'de_DE', 'Französische Süd- und Antarktisgebiete', NULL, NULL, NULL),
-    (273, 'de_DE', 'Taiwan', NULL, NULL, NULL);
+    (273, 'de_DE', 'Taiwan', NULL, NULL, NULL),
     (1, 'en_US', 'Afghanistan', NULL, NULL, NULL),
     (2, 'en_US', 'South Africa', NULL, NULL, NULL),
     (3, 'en_US', 'Albania', NULL, NULL, NULL),
