@@ -1142,7 +1142,8 @@ INSERT INTO `country` (`id`, `visible`, `isocode`, `isoalpha2`, `isoalpha3`, `by
 (269, 1, '344', 'HK', 'HKG', 0, 0, '0', '0', '', NOW(), NOW()),
 (270, 1, '652', 'BL', 'BLM', 0, 0, '0', '0', '', NOW(), NOW()),
 (271, 1, '663', 'MF', 'MAF', 0, 0, '0', '0', '', NOW(), NOW()),
-(272, 1, '260', 'TF', 'ATF', 0, 0, '0', '0', '', NOW(), NOW());
+(272, 1, '260', 'TF', 'ATF', 0, 0, '0', '0', '', NOW(), NOW()),
+(273, 1, '158', 'TW', 'TWN', 0, 0, '0', '0', '', NOW(), NOW());
 
 INSERT INTO `state` (`id`, `visible`, `isocode`, `country_id`, `created_at`, `updated_at`) VALUES
 (1, 1, 'AL', '196', NOW(), NOW()),
