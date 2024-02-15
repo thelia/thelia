@@ -60,4 +60,12 @@ abstract class ActionEvent extends Event
             }
         }
     }
+
+    public function resetStopPropagation(): void
+    {
+        $reflection = new \ReflectionClass(Event::class);
+        $property = $reflection->getProperty('propagationStopped');
+        $property->setAccessible(true);
+        $property->setValue($this, false);
+    }
 }
