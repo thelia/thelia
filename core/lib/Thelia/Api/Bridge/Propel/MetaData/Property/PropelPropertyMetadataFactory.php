@@ -33,6 +33,22 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
     public function create(string $resourceClass, string $property, array $options = []): ApiProperty
     {
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
+
+        if (class_exists($resourceClass) && property_exists($resourceClass, $property)) {
+            $reflection = new \ReflectionProperty($resourceClass, $property);
+            if (null !== $reflection->getType()) {
+                $propertyClass = $reflection->getType()->getName();
+                if (class_exists($propertyClass) && \in_array('BackedEnum', class_implements($reflection->getType()->getName()))) {
+                    $values = array_column($propertyClass::cases(), 'value');
+                    $propertyMetadata = $propertyMetadata->withOpenapiContext([
+                        'type' => 'string',
+                        'enum' => $values,
+                        'example' => $values[0],
+                    ]);
+                }
+            }
+        }
+
         $resourceAddonDefinitions = $this->apiResourcePropelTransformerService->getResourceAddonDefinitions($resourceClass);
 
         if (!empty($resourceAddonDefinitions) && isset($resourceAddonDefinitions[$property])) {
