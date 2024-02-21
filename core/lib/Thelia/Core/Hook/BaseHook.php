@@ -239,7 +239,7 @@ abstract class BaseHook implements BaseHookInterface
 
         if ('' !== $url) {
             $tags = [];
-            $tags[] = '<script type="text/javascript" ';
+            $tags[] = '<script';
             $tags[] = ' src="'.$url.'" ';
             foreach ($attributes as $name => $val) {
                 if (\is_string($name) && !\in_array($name, ['src', 'type'])) {
