@@ -91,8 +91,8 @@
         "phpstan/phpstan": "1.8.2",
         "phpstan/extension-installer": "1.1.0",
         "symfony/css-selector": "6.4.*",
-        "symfony/var-dumper": "6.4.*",
-        "friendsofphp/php-cs-fixer": "3.41.*"
+        "friendsofphp/php-cs-fixer": "3.41.*",
+        "symfony/debug-bundle": "6.4.*"
     },
     "scripts": {
         "cs-diff": [
