@@ -467,7 +467,7 @@ readonly class ApiResourcePropelTransformerService
             /** @var \ReflectionProperty $i18nField */
             foreach ($i18nFields as $i18nField) {
                 $i18nFieldName = $i18nField->getName();
-                $groupAttributes = $i18nField->getAttributes(Groups::class)[0] ?? null;
+                $groupAttributes = $i18nField->getAttributes(Groups::class, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null;
 
                 if (null === $groupAttributes) {
                     continue;
