@@ -64,7 +64,7 @@ class ControllerResolver extends ContainerControllerResolver
                 );
             }
 
-           // Todo remove in 2.7
+            // Todo remove in 2.7
             if (is_subclass_of($controllerinstance, ControllerInterface::class)) {
                 $controllerinstance->setContainer($this->container);
             }
