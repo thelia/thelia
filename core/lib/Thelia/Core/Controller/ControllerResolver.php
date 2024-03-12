@@ -64,8 +64,8 @@ class ControllerResolver extends ContainerControllerResolver
                 );
             }
 
-            // To remove in 2.6
-            if (method_exists($controllerinstance, 'setContainer')) {
+           // Todo remove in 2.7
+            if (is_subclass_of($controllerinstance, ControllerInterface::class)) {
                 $controllerinstance->setContainer($this->container);
             }
         }
