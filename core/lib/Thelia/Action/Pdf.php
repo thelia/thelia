@@ -44,7 +44,7 @@ class Pdf extends BaseAction implements EventSubscriberInterface
         $event->setPdf($html2pdf->output('output.pdf', 'S'));
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::GENERATE_PDF => ['generatePdf', 128],

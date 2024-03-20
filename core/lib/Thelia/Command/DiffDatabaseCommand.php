@@ -34,7 +34,7 @@ class DiffDatabaseCommand extends ContainerAwareCommand
             ->setDescription('Generate SQL to update the database(s) structure to the global Propel schema');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var FormatterHelper $formatter */
         $formatter = $this->getHelper('formatter');

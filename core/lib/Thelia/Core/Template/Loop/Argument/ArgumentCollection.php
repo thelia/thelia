@@ -119,6 +119,7 @@ class ArgumentCollection implements \Iterator
      *
      * @return Argument
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return current($this->arguments);
@@ -145,6 +146,7 @@ class ArgumentCollection implements \Iterator
      *
      * @return mixed scalar on success, or null on failure
      */
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return key($this->arguments);

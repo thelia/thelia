@@ -1,0 +1,15 @@
+api_platform:
+    show_webby: false
+    mapping:
+        paths: [
+
+        ]
+    swagger:
+        versions: [3]
+        swagger_ui_extra_configuration:
+            docExpansion: none
+            filter: true
+        api_keys:
+            JWT:
+                name: Authorization
+                type: header

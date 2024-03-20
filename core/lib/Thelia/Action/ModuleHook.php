@@ -229,7 +229,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
         $this->dispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::MODULE_HOOK_CREATE => ['createModuleHook', 128],

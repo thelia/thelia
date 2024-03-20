@@ -24,10 +24,8 @@ trait ImplementationClassTrait
 {
     /**
      * Gets the full path to the file for the current class.
-     *
-     * @return string
      */
-    public function getClassFilePath()
+    public function getClassFilePath(): string
     {
         $path = rtrim((new Filesystem())->makePathRelative(
             THELIA_CACHE_DIR.$_SERVER['APP_ENV'].DS.'propel'.DS.'model'.DS

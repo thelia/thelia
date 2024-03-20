@@ -32,6 +32,9 @@ class IntToCombinedStringsListType extends BaseType
 
     public function isValid($values)
     {
+        if (null === $values) {
+            return false;
+        }
         // Explode expession parts, ignoring escaped characters, (\, and \:)
         foreach (preg_split('#(?<!\\\),#', $values) as $intToCombinedStrings) {
             $parts = preg_split('#(?<!\\\):#', $intToCombinedStrings);

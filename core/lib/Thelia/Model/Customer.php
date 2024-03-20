@@ -16,7 +16,8 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
-use Thelia\Core\Security\Role\Role;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface as SecurityUserInterface;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Base\Customer as BaseCustomer;
@@ -30,7 +31,7 @@ use Thelia\Model\Map\CustomerTableMap;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  */
-class Customer extends BaseCustomer implements UserInterface
+class Customer extends BaseCustomer implements UserInterface, SecurityUserInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @param int    $titleId          customer title id (from customer_title table)
@@ -302,6 +303,11 @@ class Customer extends BaseCustomer implements UserInterface
         return $this->getEmail();
     }
 
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
     public function checkPassword($password)
     {
         return password_verify($password, $this->password);
@@ -313,9 +319,9 @@ class Customer extends BaseCustomer implements UserInterface
         $this->resetModified();
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
-        return [new Role('CUSTOMER')];
+        return ['ROLE_CUSTOMER', 'CUSTOMER'];
     }
 
     public function getToken()
@@ -369,5 +375,10 @@ class Customer extends BaseCustomer implements UserInterface
         }
 
         return true;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->getEmail();
     }
 }
