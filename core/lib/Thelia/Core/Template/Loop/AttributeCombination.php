@@ -141,7 +141,7 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
                 ->joinProduct()
             ->endUse()
             ->useAttributeQuery()
-                ->joinAttributeTemplate(AttributeTemplateTableMap::TABLE_NAME)
+                ->leftJoinAttributeTemplate(AttributeTemplateTableMap::TABLE_NAME)
                 ->addJoinCondition(
                     AttributeTemplateTableMap::TABLE_NAME,
                     AttributeTemplateTableMap::COL_TEMPLATE_ID.Criteria::EQUAL.ProductTableMap::COL_TEMPLATE_ID
