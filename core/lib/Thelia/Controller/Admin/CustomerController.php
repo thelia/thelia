@@ -123,6 +123,8 @@ class CustomerController extends AbstractCrudController
         ];
 
         if ($address !== null) {
+            $data['address_firstname'] = $address->getFirstname();
+            $data['address_lastname'] = $address->getLastname();
             $data['company'] = $address->getCompany();
             $data['address1'] = $address->getAddress1();
             $data['address2'] = $address->getAddress2();

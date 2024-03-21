@@ -92,6 +92,20 @@ class CustomerUpdateForm extends BaseForm
                     'help' => Translator::getInstance()->trans('Leave blank to keep current customer password'),
                 ],
             ])
+            ->add('address_firstname', TextType::class, [
+                'label' => Translator::getInstance()->trans('First Name'),
+                'label_attr' => [
+                    'for' => 'address_firstname',
+                ],
+                'required' => true,
+            ])
+            ->add('address_lastname', TextType::class, [
+                'label' => Translator::getInstance()->trans('Last Name'),
+                'label_attr' => [
+                    'for' => 'address_lastname',
+                ],
+                'required' => true,
+            ])
             ->add('address1', TextType::class, [
                 'constraints' => [
                     new Constraints\NotBlank(),
