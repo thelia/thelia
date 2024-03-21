@@ -363,7 +363,7 @@ return [
     'Discount' => 'İndirim',
     'Discount amount' => 'İndirim Tutarı',
     'Discount percentage' => 'İndirim Yüzdesi',
-    'Discover all our modules on <a href=\'http://thelia.net/modules\' target=\'_blank\'>Thelia Modules</a> !' => '<a href=\'http://thelia.net/modules\' target=\'_blank\'> Thelia</a> modülleri tüm modülleri keşfedin!',
+    'Discover all our modules on <a href=\'https://github.com/thelia-modules\' target=\'_blank\'>Thelia Modules</a> !' => '<a href=\'https://github.com/thelia-modules\' target=\'_blank\'> Thelia</a> modülleri tüm modülleri keşfedin!',
     'Do not use a product template' => 'Bir ürün şablonunu kullan',
     'Do this export' => 'Bu ihracatı yapmak',
     'Do this import' => 'Bu alımı yapmak',

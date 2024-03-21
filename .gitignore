@@ -95,6 +95,13 @@ setup/audit/greenit.yaml
 /phpunit.xml
 .phpunit.result.cache
 ###< phpunit/phpunit ###
+.lando.yml
+local/setup
+webpack.config.js
+assets
+.env
+.env.test
+package.json
 
 ###> symfony/phpunit-bridge ###
 .phpunit

@@ -2721,7 +2721,7 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
   (1175, 'fr_FR', 'Variables - JavaScript', '', ''),
   (1176, 'fr_FR', 'Commande - liste produit', '', ''),
   (1177, 'fr_FR', 'Commande - Modification de JavaScript', '', ''),
-  (1178, 'fr_FR', 'Information boutique - JavaScript', '', ''),
+  (1178, 'fr_FR', 'Informations boutique - JavaScript', '', ''),
   (1179, 'fr_FR', 'Traductions - JavaScript', '', ''),
   (1180, 'fr_FR', 'Dossiers - en haut', '', ''),
   (1181, 'fr_FR', 'Dossiers - légende', '', ''),

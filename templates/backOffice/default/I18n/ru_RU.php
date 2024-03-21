@@ -380,7 +380,7 @@ return [
     'Discount' => 'Скидка',
     'Discount amount' => 'Фиксированная скидка',
     'Discount percentage' => 'Процент скидки',
-    'Discover all our modules on <a href=\'http://thelia.net/modules\' target=\'_blank\'>Thelia Modules</a> !' => 'Посмотреть все наши модули на <a href=\'http://thelia.net/modules\' target=\'_blank\'>Thelia Modules</a> !',
+    'Discover all our modules on <a href=\'https://github.com/thelia-modules\' target=\'_blank\'>Thelia Modules</a> !' => 'Посмотреть все наши модули на <a href=\'https://github.com/thelia-modules\' target=\'_blank\'>Thelia Modules</a> !',
     'Do not use a product template' => 'Не использовать шаблон товара',
     'Do this export' => 'Сделать этот экспорт',
     'Do this import' => 'Сделать импорт',

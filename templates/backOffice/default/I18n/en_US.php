@@ -389,7 +389,7 @@ return [
     'Discount percentage' => 'Discount percentage',
     'Discount tax' => 'Discount tax',
     'Discount with taxes' => 'Discount with taxes',
-    'Discover all our modules on <a href=\'http://thelia.net/modules\' target=\'_blank\'>Thelia Modules</a> !' => 'Discover all our modules on <a href=\'http://thelia.net/modules\' target=\'_blank\'>Thelia Modules</a> !',
+    'Discover all our modules on <a href=\'https://github.com/thelia-modules\' target=\'_blank\'>Thelia Modules</a> !' => 'Discover all our modules on <a href=\'https://github.com/thelia-modules\' target=\'_blank\'>Thelia Modules</a> !',
     'Display protected modules ?' => 'Display protected modules ?',
     'Do not use a product template' => 'Do not use a product template',
     'Do this export' => 'Do this export',
