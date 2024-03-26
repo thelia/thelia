@@ -53,7 +53,7 @@ trait CatalogBreadcrumbTrait
                     if (\in_array($currentId, $ids)) {
                         throw new \LogicException(
                             sprintf(
-                                'Circular reference detected in folder ID=%d hierarchy (folder ID=%d appears more than one times in path)',
+                                'Circular reference detected in category ID=%d hierarchy (category ID=%d appears more than one times in path)',
                                 $categoryId,
                                 $currentId
                             )
