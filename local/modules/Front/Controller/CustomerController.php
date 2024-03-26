@@ -180,7 +180,7 @@ class CustomerController extends BaseFrontController
                 }
 
                 if (ConfigQuery::isCustomerEmailConfirmationEnable() && !$newCustomer->getEnable()) {
-                    $response = $this->generateRedirectFromRoute('customer.login.view');
+                    $response = $this->generateRedirectFromRoute('customer.login.view', ['confirmation_sent' => 1]);
                 } else {
                     $this->processLogin($eventDispatcher, $customerCreateEvent->getCustomer());
 
