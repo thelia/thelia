@@ -13,7 +13,7 @@ CREATE TABLE `category`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `parent` INTEGER DEFAULT 0 NOT NULL,
-    `visible` TINYINT NOT NULL,
+    `visible` TINYINT DEFAULT 0  NOT NULL,
     `position` INTEGER NOT NULL,
     `default_template_id` INTEGER,
     `created_at` DATETIME,
@@ -619,7 +619,7 @@ CREATE TABLE `folder`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `parent` INTEGER DEFAULT 0 NOT NULL,
-    `visible` TINYINT,
+    `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -638,7 +638,7 @@ DROP TABLE IF EXISTS `content`;
 CREATE TABLE `content`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `visible` TINYINT,
+    `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -1885,7 +1885,7 @@ DROP TABLE IF EXISTS `brand`;
 CREATE TABLE `brand`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `visible` TINYINT,
+    `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER,
     `logo_image_id` INTEGER,
     `created_at` DATETIME,
