@@ -110,32 +110,30 @@ class FileManager
      */
     public function copyUploadedFile(FileModelInterface $model, UploadedFile $uploadedFile)
     {
-        $newUploadedFile = null;
+        $fileSystem = new Filesystem();
 
-        if ($uploadedFile !== null) {
-            $fileSystem = new Filesystem();
+        $directory = $model->getUploadDir();
 
-            $directory = $model->getUploadDir();
+        if (!$fileSystem->exists($directory)) {
+            $fileSystem->mkdir($directory);
+        }
 
-            if (!$fileSystem->exists($directory)) {
-                $fileSystem->mkdir($directory);
-            }
+        $fileName = $this->renameFile($model->getId(), $uploadedFile);
+        $filePath = $directory.DS.$fileName;
 
-            $fileName = $this->renameFile($model->getId(), $uploadedFile);
+        $fileSystem->rename($uploadedFile->getPathname(), $filePath);
+        $fileSystem->chmod($filePath, 0660);
+        $newUploadedFile = new UploadedFile($filePath, $fileName);
+        $model->setFile($fileName);
 
-            $fileSystem->rename($uploadedFile->getPathname(), $directory.DS.$fileName);
-            $newUploadedFile = new UploadedFile($directory.DS.$fileName, $fileName);
-            $model->setFile($fileName);
-
-            if (!$model->save()) {
-                throw new ImageException(
-                    sprintf(
-                        'Failed to update model after copy of uploaded file %s to %s',
-                        $uploadedFile,
-                        $model->getFile()
-                    )
-                );
-            }
+        if (!$model->save()) {
+            throw new ImageException(
+                sprintf(
+                    'Failed to update model after copy of uploaded file %s to %s',
+                    $uploadedFile,
+                    $model->getFile()
+                )
+            );
         }
 
         return $newUploadedFile;
