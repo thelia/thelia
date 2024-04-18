@@ -1820,7 +1820,10 @@ class ProductController extends AbstractSeoCrudController
      */
     protected function createLoopInstance(EventDispatcherInterface $eventDispatcher, $loopClass)
     {
-        return new $loopClass(
+        /** @var Image|Document $instance */
+        $instance = new $loopClass();
+
+        $instance->init(
             $this->container,
             $this->container->get('request_stack'),
             $eventDispatcher,
@@ -1829,6 +1832,8 @@ class ProductController extends AbstractSeoCrudController
             $this->container->getParameter('Thelia.parser.loops'),
             $this->container->getParameter('kernel.environment')
         );
+
+        return $instance;
     }
 
     protected function arrayHasEntries(array $data, array $entries)
