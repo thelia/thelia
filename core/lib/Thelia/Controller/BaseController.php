@@ -307,6 +307,7 @@ abstract class BaseController implements ControllerInterface
 
         try {
             $pdfEvent = new PdfEvent($html);
+            $pdfEvent->setTemplateName($fileName);
             $pdfEvent->setFilename($order->getRef());
 			
             $eventDispatcher->dispatch($pdfEvent, TheliaEvents::GENERATE_PDF);
