@@ -32,6 +32,7 @@ class PdfEvent extends ActionEvent
     protected $fontName;
     protected $fileName;
     protected $templateName;
+    protected $object;
 
     /**
      * @param string $content     html content to transform into pdf
@@ -44,6 +45,7 @@ class PdfEvent extends ActionEvent
      * @param string $fontName    Default font name
      * @param string $fileName    Default file name
      * @param string $templateName    Default template name
+     * @param string $object    Default object
      */
     public function __construct(
         $content,
@@ -55,7 +57,8 @@ class PdfEvent extends ActionEvent
         array $marges = [0, 0, 0, 0],
         $fontName = 'freesans',
         $fileName = null,
-        $templateName = null
+        $templateName = null,
+        $object = null
     ) {
         $this->content = $content;
         $this->orientation = $orientation;
@@ -67,6 +70,7 @@ class PdfEvent extends ActionEvent
         $this->fontName = $fontName;
         $this->fileName = $fileName;
         $this->templateName = $templateName;
+        $this->object = $object;
     }
 
     /**
@@ -253,7 +257,7 @@ class PdfEvent extends ActionEvent
     }
 
     /**
-     * @param string $templateName
+     * @param string $object
      *
      * @return $this
      */
