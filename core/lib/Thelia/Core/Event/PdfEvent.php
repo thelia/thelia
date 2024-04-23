@@ -31,6 +31,7 @@ class PdfEvent extends ActionEvent
     protected $marges;
     protected $fontName;
     protected $fileName;
+    protected $templateName;
 
     /**
      * @param string $content     html content to transform into pdf
@@ -42,6 +43,7 @@ class PdfEvent extends ActionEvent
      * @param array  $marges      Default marges (left, top, right, bottom)
      * @param string $fontName    Default font name
      * @param string $fontName    Default file name
+     * @param string $templateName    Default template name
      */
     public function __construct(
         $content,
@@ -52,7 +54,8 @@ class PdfEvent extends ActionEvent
         $encoding = 'UTF-8',
         array $marges = [0, 0, 0, 0],
         $fontName = 'freesans',
-        $filename = 'filename'
+        $filename = 'filename',
+        $templateName = 'templatename'
     ) {
         $this->content = $content;
         $this->orientation = $orientation;
@@ -63,6 +66,7 @@ class PdfEvent extends ActionEvent
         $this->marges = $marges;
         $this->fontName = $fontName;
         $this->fileName = $fileName;
+        $this->templateName = $templateName;
     }
 
     /**
@@ -222,6 +226,23 @@ class PdfEvent extends ActionEvent
     public function setFileName($fileName)
     {
         $this->fileName = $fileName;
+
+        return $this;
+    }
+
+	public function getTemplateName()
+    {
+        return $this->templateName;
+    }
+
+    /**
+     * @param string $templateName
+     *
+     * @return $this
+     */
+    public function setTemplateName($templateName)
+    {
+        $this->templateName = $templateName;
 
         return $this;
     }
