@@ -35,17 +35,17 @@ class PdfEvent extends ActionEvent
     protected $object;
 
     /**
-     * @param string $content     html content to transform into pdf
-     * @param string $orientation page orientation, same as TCPDF
-     * @param string $format      The format used for pages, same as TCPDF
-     * @param string $lang        Lang : fr, en, it...
-     * @param bool   $unicode     TRUE means that the input text is unicode (default = true)
-     * @param string $encoding    charset encoding; default is UTF-8
-     * @param array  $marges      Default marges (left, top, right, bottom)
-     * @param string $fontName    Default font name
-     * @param string $fileName    Default file name
-     * @param string $templateName    Default template name
-     * @param string $object    Default object
+     * @param string $content      html content to transform into pdf
+     * @param string $orientation  page orientation, same as TCPDF
+     * @param string $format       The format used for pages, same as TCPDF
+     * @param string $lang         Lang : fr, en, it...
+     * @param bool   $unicode      TRUE means that the input text is unicode (default = true)
+     * @param string $encoding     charset encoding; default is UTF-8
+     * @param array  $marges       Default marges (left, top, right, bottom)
+     * @param string $fontName     Default font name
+     * @param string $fileName     Default file name
+     * @param string $templateName Default template name
+     * @param string $object       Default object
      */
     public function __construct(
         $content,
@@ -217,7 +217,7 @@ class PdfEvent extends ActionEvent
         return $this;
     }
 
-	public function getFileName()
+    public function getFileName()
     {
         return $this->fileName;
     }
@@ -234,7 +234,7 @@ class PdfEvent extends ActionEvent
         return $this;
     }
 
-	public function getTemplateName()
+    public function getTemplateName()
     {
         return $this->templateName;
     }
@@ -251,7 +251,7 @@ class PdfEvent extends ActionEvent
         return $this;
     }
 
-	public function getObject()
+    public function getObject()
     {
         return $this->object;
     }
