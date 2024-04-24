@@ -102,7 +102,7 @@ abstract class BaseController implements ControllerInterface
                 'Content-type' => 'application/pdf',
                 'Content-Disposition' => sprintf(
                     '%s; filename=%s.pdf',
-                    (bool) $browser === false ? 'attachment' : 'inline',
+                    false === (bool) $browser ? 'attachment' : 'inline',
                     $fileName
                 ),
             ]
@@ -256,9 +256,9 @@ abstract class BaseController implements ControllerInterface
      * @param BaseForm $aBaseForm      the form
      * @param string   $expectedMethod the expected method, POST or GET, or null for any of them
      *
-     * @throws FormValidationException is the form contains error, or the method is not the right one
-     *
      * @return \Symfony\Component\Form\Form Form the symfony form object
+     *
+     * @throws FormValidationException is the form contains error, or the method is not the right one
      */
     protected function validateForm(BaseForm $aBaseForm, $expectedMethod = null)
     {
@@ -308,9 +308,9 @@ abstract class BaseController implements ControllerInterface
         try {
             $pdfEvent = new PdfEvent($html);
 
-			$pdfEvent->setTemplateName($fileName);
-			$pdfEvent->setFilename($order->getRef());
-			$pdfEvent->setObject($order);
+            $pdfEvent->setTemplateName($fileName);
+            $pdfEvent->setFilename($order->getRef());
+            $pdfEvent->setObject($order);
 
             $eventDispatcher->dispatch($pdfEvent, TheliaEvents::GENERATE_PDF);
 
@@ -327,17 +327,11 @@ abstract class BaseController implements ControllerInterface
             );
         }
 
-        throw new TheliaProcessException(
-            $this->getTranslator()->trans(
-                "We're sorry, this PDF invoice is not available at the moment."
-            )
-        );
+        throw new TheliaProcessException($this->getTranslator()->trans("We're sorry, this PDF invoice is not available at the moment."));
     }
 
     /**
      * Search success url in a form if present, in the query string otherwise.
-     *
-     * @param BaseForm $form
      *
      * @return mixed|string|null
      */
@@ -348,8 +342,6 @@ abstract class BaseController implements ControllerInterface
 
     /**
      * Search error url in a form if present, in the query string otherwise.
-     *
-     * @param BaseForm $form
      *
      * @return mixed|string|null
      */
@@ -370,7 +362,7 @@ abstract class BaseController implements ControllerInterface
     {
         $url = null;
 
-        if ($form != null) {
+        if (null != $form) {
             $url = $form->getFormDefinedUrl($parameterName);
         } else {
             $url = $this->container->get('request_stack')->getCurrentRequest()->get($parameterName);
@@ -415,8 +407,6 @@ abstract class BaseController implements ControllerInterface
     /**
      * create an instance of RedirectReponse if a success url is present, return null otherwise.
      *
-     * @param BaseForm $form
-     *
      * @return \Symfony\Component\HttpFoundation\Response|null
      */
     protected function generateSuccessRedirect(BaseForm $form = null)
@@ -430,8 +420,6 @@ abstract class BaseController implements ControllerInterface
 
     /**
      * create an instance of RedirectReponse if a success url is present, return null otherwise.
-     *
-     * @param BaseForm $form
      *
      * @return \Symfony\Component\HttpFoundation\Response|null
      */
@@ -469,13 +457,13 @@ abstract class BaseController implements ControllerInterface
      * @param mixed  $parameters    An array of parameters
      * @param int    $referenceType The type of reference to be generated (one of the constants)
      *
+     * @return string The generated URL
+     *
      * @throws RouteNotFoundException              If the named route doesn't exist
      * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
      * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
      *                                             it does not match the requirement
      * @throws \InvalidArgumentException           When the router doesn't exist
-     *
-     * @return string The generated URL
      *
      * @see \Thelia\Controller\BaseController::getRouteFromRouter()
      */
@@ -497,13 +485,13 @@ abstract class BaseController implements ControllerInterface
      * @param mixed  $parameters    An array of parameters
      * @param int    $referenceType The type of reference to be generated (one of the constants)
      *
+     * @return string The generated URL
+     *
      * @throws RouteNotFoundException              If the named route doesn't exist
      * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
      * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
      *                                             it does not match the requirement
      * @throws \InvalidArgumentException           When the router doesn't exist
-     *
-     * @return string The generated URL
      */
     protected function getRouteFromRouter(
         $routerName,
@@ -514,7 +502,7 @@ abstract class BaseController implements ControllerInterface
         /** @var Router $router */
         $router = $this->getRouter($routerName);
 
-        if ($router == null) {
+        if (null == $router) {
             throw new \InvalidArgumentException(sprintf("Router '%s' does not exists.", $routerName));
         }
 
@@ -532,9 +520,9 @@ abstract class BaseController implements ControllerInterface
     /**
      * Return a 404 error.
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     *
      * @return \Thelia\Core\HttpFoundation\Response
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function pageNotFound()
     {
