@@ -267,6 +267,7 @@
         </service>
         <service id="thelia.cache" alias="Symfony\Component\Cache\Adapter\AdapterInterface" public="true"/>
 
+
         <service id="Symfony\WebpackEncoreBundle\Asset\TagRenderer" alias="webpack_encore.tag_renderer" public="true"/>
         <service id="Symfony\WebpackEncoreBundle\Asset\EntrypointLookupInterface" alias="webpack_encore.entrypoint_lookup_collection" public="true"/>
 
