@@ -58,13 +58,13 @@ class DefaultController extends BaseFrontController
             if ($request->attributes->get('_rewritten', false) === false) {
                 /* Does the query GET parameters match a rewritten URL ? */
                 $rewrittenUrl = URL::getInstance()->retrieveCurrent($request);
-
                 if ($rewrittenUrl->rewrittenUrl !== null) {
                     /* 301 redirection to rewritten URL */
                     throw new RedirectException($rewrittenUrl->rewrittenUrl, 301);
                 }
             }
         }
+
     }
 
     public function emptyRoute()
