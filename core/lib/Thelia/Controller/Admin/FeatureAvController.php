@@ -35,7 +35,7 @@ class FeatureAvController extends AbstractCrudController
         parent::__construct(
             'featureav',
             'manual',
-            'order',
+            'featureav_order',
             AdminResources::FEATURE,
             TheliaEvents::FEATURE_AV_CREATE,
             TheliaEvents::FEATURE_AV_UPDATE,
@@ -148,7 +148,7 @@ class FeatureAvController extends AbstractCrudController
     {
         return [
             'feature_id' => $this->getRequest()->get('feature_id'),
-            'order' => $this->getCurrentListOrder(),
+            'featureav_order' => $this->getCurrentListOrder(),
         ];
     }
 
