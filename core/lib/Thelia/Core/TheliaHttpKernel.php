@@ -70,7 +70,6 @@ class TheliaHttpKernel extends HttpKernel
         $this->container->get('request.context')->fromRequest($request);
 
         $response = parent::handle($request, $type, $catch);
-
         return $response;
     }
 }
