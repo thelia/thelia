@@ -19,7 +19,7 @@ use Thelia\Tools\URL;
 
 trait CatalogBreadcrumbTrait
 {
-    public function getBaseBreadcrumb(Router $router, $categoryId)
+    public function getBaseBreadcrumb(Router $router, $categoryId, $locale)
     {
         $translator = Translator::getInstance();
         $catalogUrl = $router->generate('admin.catalog', [], Router::ABSOLUTE_URL);
@@ -42,7 +42,7 @@ trait CatalogBreadcrumbTrait
             if ($category != null) {
                 $results[] = [
                     'ID' => $category->getId(),
-                    'TITLE' => $category->getTitle(),
+                    'TITLE' => $category->setLocale($locale)->getTitle(),
                     'URL' => $category->getUrl(),
                 ];
 
@@ -81,7 +81,7 @@ trait CatalogBreadcrumbTrait
         /** @var \Thelia\Model\Product $product */
         $product = $this->getProduct();
 
-        $breadcrumb = $this->getBaseBreadcrumb($router, $product->getDefaultCategoryId());
+        $breadcrumb = $this->getBaseBreadcrumb($router, $product->getDefaultCategoryId(), $locale);
 
         $product->setLocale($locale);
 
@@ -103,7 +103,7 @@ trait CatalogBreadcrumbTrait
 
         /** @var \Thelia\Model\Category $category */
         $category = $this->getCategory();
-        $breadcrumb = $this->getBaseBreadcrumb($router, $this->getParentId());
+        $breadcrumb = $this->getBaseBreadcrumb($router, $this->getParentId(), $locale);
 
         $category->setLocale($locale);
 
