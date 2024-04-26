@@ -14,10 +14,12 @@ namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 use Thelia\Controller\BaseController;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
+use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Form\BaseForm;
@@ -41,6 +43,9 @@ class BaseAdminController extends BaseController
      * methods of this class.
      */
     protected $currentRouter = 'router.admin';
+
+    #[Required]
+    public ParserResolver $parserResolver;
 
     /**
      * This method process the rendering of view called from an admin page.
@@ -211,7 +216,7 @@ class BaseAdminController extends BaseController
      */
     protected function getParser($template = null)
     {
-        $parser = $this->container->get('thelia.parser');
+        $parser = $this->parserResolver->getParser($template);
 
         // Define the template that should be used
         $parser->setTemplateDefinition(
@@ -364,8 +369,10 @@ class BaseAdminController extends BaseController
      */
     protected function renderRaw($templateName, $args = [], $templateDir = null)
     {
+        $parser = $this->getParser($templateDir.'/'.$templateName);
+
         // Add the template standard extension
-        $templateName .= '.html';
+        $templateName .= '.' . $parser->getFileExtension();
 
         // Find the current edit language ID
         $edition_language = $this->getCurrentEditionLang();
@@ -388,7 +395,7 @@ class BaseAdminController extends BaseController
 
         // Render the template.
         try {
-            $content = $this->getParser($templateDir)->render($templateName, $args);
+            $content = $parser->render($templateName, $args);
         } catch (AuthenticationException $ex) {
             // User is not authenticated, and templates requires authentication -> redirect to login page
             // We user login_tpl as a path, not a template.

@@ -13,9 +13,11 @@
 namespace Thelia\Controller\Front;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 use Thelia\Controller\BaseController;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
+use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Model\AddressQuery;
@@ -26,6 +28,9 @@ class BaseFrontController extends BaseController
     public const CONTROLLER_TYPE = 'front';
 
     protected $currentRouter = 'router.front';
+
+    #[Required]
+    public ParserResolver $parserResolver;
 
     public function checkAuth(): void
     {
@@ -78,7 +83,7 @@ class BaseFrontController extends BaseController
      */
     protected function getParser($template = null)
     {
-        $parser = $this->container->get('thelia.parser');
+        $parser = $this->parserResolver->getParser($template);
 
         // Define the template that should be used
         $parser->setTemplateDefinition(
@@ -114,12 +119,7 @@ class BaseFrontController extends BaseController
      */
     protected function renderRaw($templateName, $args = [], $templateDir = null)
     {
-        // Add the template standard extension
-        $templateName .= '.html';
-
         // Render the template.
-        $data = $this->getParser($templateDir)->render($templateName, $args);
-
-        return $data;
+        return $this->getParser($templateName)->render($templateName, $args);
     }
 }

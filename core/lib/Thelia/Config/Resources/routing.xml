@@ -15,7 +15,7 @@
 
     <services>
         <service id="Thelia\Core\EventListener\ViewListener">
-            <argument type="service" id="thelia.parser"/>
+            <argument type="service" id="thelia.parser.resolver"/>
             <argument type="service" id="thelia.template_helper"/>
             <argument type="service" id="request_stack"/>
             <argument type="service" id="event_dispatcher"/>
@@ -27,7 +27,7 @@
         <service id="controller.default" class="Thelia\Controller\DefaultController" public="true"/>
 
         <service id="thelia.admin.base_controller" class="Thelia\Admin\Controller\BaseAdminController">
-       		<argument type="service" id="thelia.parser"/>
+       		<argument type="service" id="thelia.parser.resolver"/>
         </service>
 
 
