@@ -545,7 +545,6 @@ class SmartyParser extends \Smarty implements ParserInterface
         $templates = $this->getTemplateDir();
 
         $found = true;
-
         /* @noinspection PhpUnusedLocalVariableInspection */
         foreach ($templates as $key => $value) {
             $absolutePath = rtrim(realpath(\dirname($value.$fileName)), '/');
@@ -554,7 +553,6 @@ class SmartyParser extends \Smarty implements ParserInterface
                 $found = false;
             }
         }
-
         return $found;
     }
 
@@ -647,5 +645,15 @@ class SmartyParser extends \Smarty implements ParserInterface
     public function getTemplateHelper()
     {
         return $this->templateHelper;
+    }
+
+    public function supportTemplateRender($templateName): bool
+    {
+        return $this->checkTemplate($templateName);
+    }
+
+    public function getFileExtension(): string
+    {
+        return 'html';
     }
 }

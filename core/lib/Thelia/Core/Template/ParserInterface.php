@@ -12,9 +12,11 @@
 
 namespace Thelia\Core\Template;
 
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 
+#[AutoconfigureTag('thelia.parser.template')]
 /**
  * @author Manuel Raynaud <manu@raynaud.io>
  */
@@ -162,4 +164,8 @@ interface ParserInterface
      * @return \Thelia\Core\Template\TemplateHelperInterface the parser template helper instance
      */
     public function getTemplateHelper();
+
+    public function supportTemplateRender(?string $templateName): bool;
+    public function getFileExtension(): string;
+
 }
