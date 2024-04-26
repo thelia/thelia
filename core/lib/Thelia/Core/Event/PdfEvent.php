@@ -35,14 +35,14 @@ class PdfEvent extends ActionEvent
     protected $object;
 
     /**
-     * @param string $content     html content to transform into pdf
-     * @param string $orientation page orientation, same as TCPDF
-     * @param string $format      The format used for pages, same as TCPDF
-     * @param string $lang        Lang : fr, en, it...
-     * @param bool   $unicode     TRUE means that the input text is unicode (default = true)
-     * @param string $encoding    charset encoding; default is UTF-8
-     * @param array  $marges      Default marges (left, top, right, bottom)
-     * @param string $fontName    Default font name
+     * @param string $content      html content to transform into pdf
+     * @param string $orientation  page orientation, same as TCPDF
+     * @param string $format       The format used for pages, same as TCPDF
+     * @param string $lang         Lang : fr, en, it...
+     * @param bool   $unicode      TRUE means that the input text is unicode (default = true)
+     * @param string $encoding     charset encoding; default is UTF-8
+     * @param array  $marges       Default marges (left, top, right, bottom)
+     * @param string $fontName     Default font name
      * @param string $templateName
      * @param string $fileName
      * @param string $object
@@ -267,5 +267,4 @@ class PdfEvent extends ActionEvent
 
         return $this;
     }
-
 }
