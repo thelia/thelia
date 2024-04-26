@@ -168,4 +168,14 @@ class ParserFallback implements ParserInterface
     {
         $this->throwException();
     }
+
+    public function supportTemplateRender($templateName): bool
+    {
+        return false;
+    }
+
+    public function getFileExtension(): string
+    {
+        $this->throwException();
+    }
 }
