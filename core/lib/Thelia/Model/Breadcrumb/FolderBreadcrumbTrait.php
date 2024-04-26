@@ -19,7 +19,7 @@ use Thelia\Tools\URL;
 
 trait FolderBreadcrumbTrait
 {
-    public function getBaseBreadcrumb(Router $router, $folderId)
+    public function getBaseBreadcrumb(Router $router, $folderId, $locale)
     {
         $translator = Translator::getInstance();
         $foldersUrl = $router->generate('admin.folders.default', [], Router::ABSOLUTE_URL);
@@ -42,7 +42,7 @@ trait FolderBreadcrumbTrait
             if ($folder != null) {
                 $results[] = [
                     'ID' => $folder->getId(),
-                    'TITLE' => $folder->getTitle(),
+                    'TITLE' => $folder->setLocale($locale)->getTitle(),
                     'URL' => $folder->getUrl(),
                 ];
 
@@ -88,7 +88,7 @@ trait FolderBreadcrumbTrait
 
         /** @var \Thelia\Model\Folder $folder */
         $folder = $this->getFolder();
-        $breadcrumb = $this->getBaseBreadcrumb($router, $this->getParentId());
+        $breadcrumb = $this->getBaseBreadcrumb($router, $this->getParentId(), $locale);
 
         $folder->setLocale($locale);
 
@@ -114,7 +114,7 @@ trait FolderBreadcrumbTrait
         /** @var \Thelia\Model\Content $content */
         $content = $this->getContent();
 
-        $breadcrumb = $this->getBaseBreadcrumb($router, $content->getDefaultFolderId());
+        $breadcrumb = $this->getBaseBreadcrumb($router, $content->getDefaultFolderId(), $locale);
 
         $content->setLocale($locale);
 
