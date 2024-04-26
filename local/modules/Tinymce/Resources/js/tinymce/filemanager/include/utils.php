@@ -634,6 +634,9 @@ function config_loading($current_path, $fld)
 function image_check_memory_usage($img, $max_breedte, $max_hoogte)
 {
     if (file_exists($img)) {
+        if(ini_get('memory_limit') == -1){
+			return true;
+		}
         $K64 = 65536; // number of bytes in 64K
         $memory_usage = memory_get_usage();
         $memory_limit = abs((int) (str_replace('M', '', ini_get('memory_limit')) * 1024 * 1024));
