@@ -62,6 +62,8 @@ use Thelia\Core\Security\UserProvider\AdminUserProvider;
 use Thelia\Core\Security\UserProvider\CustomerUserProvider;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Template\Element\LoopInterface;
+use Thelia\Core\Template\Parser\ParserResolver;
+use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
@@ -73,7 +75,6 @@ use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\ModuleManagement;
 use Thelia\TaxEngine\TaxTypeInterface;
-use TheliaSmarty\Template\SmartyParser;
 
 class Thelia extends Kernel
 {
@@ -81,25 +82,25 @@ class Thelia extends Kernel
 
     public const THELIA_VERSION = '2.5.4';
 
-    /** @var SchemaLocator */
-    protected $propelSchemaLocator;
+    protected SchemaLocator $propelSchemaLocator;
 
-    /** @var PropelInitService */
-    protected $propelInitService;
+    protected PropelInitService $propelInitService;
 
-    protected $propelConnectionAvailable;
+    protected ParserResolver $parserResolver;
 
-    protected $theliaDatabaseConnection;
+    protected bool $propelConnectionAvailable;
 
-    protected $cacheRefresh;
+    protected ConnectionInterface $theliaDatabaseConnection;
+
+    protected bool $cacheRefresh = false;
 
     public function __construct($environment, $debug)
     {
         $loader = new ClassLoader();
 
-        $loader->addPsr4('', THELIA_ROOT."var/cache/{$environment}/propel/model");
+        $loader->addPsr4('', THELIA_ROOT."var/cache/$environment/propel/model");
 
-        $loader->addPsr4('TheliaMain\\', THELIA_ROOT."var/cache/{$environment}/propel/database/TheliaMain");
+        $loader->addPsr4('TheliaMain\\', THELIA_ROOT."var/cache/$environment/propel/database/TheliaMain");
         $loader->register();
 
         parent::__construct($environment, $debug);
@@ -109,21 +110,65 @@ class Thelia extends Kernel
         }
     }
 
-    /** Get the front and back templates "components" directory path.
-     *
+    /**
+     * @throws \Exception
      */
-    public static function getTemplateComponentsDirectories(): array
+    public function boot(): void
     {
-        return [
-            'backOffice\\' => THELIA_TEMPLATE_DIR
-                .TemplateDefinition::BACK_OFFICE_SUBDIR.DS
-                .ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME, 'default').DS
-                .'components',
-            'frontOffice\\' => THELIA_TEMPLATE_DIR
-                .TemplateDefinition::FRONT_OFFICE_SUBDIR.DS
-                .ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME, 'default').DS
-                .'components',
+        parent::boot();
+
+        if ($this->cacheRefresh) {
+            $moduleManagement = new ModuleManagement($this->getContainer());
+            $moduleManagement->updateModules($this->getContainer());
+        }
+
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = $this->getContainer()->get('event_dispatcher');
+
+        if ($this->propelConnectionAvailable) {
+            $this->theliaDatabaseConnection->setEventDispatcher($eventDispatcher);
+        }
+
+        $this->addModuleTemplateToParsers();
+
+        if (self::isInstalled()) {
+            $eventDispatcher->dispatch(new Event(), TheliaEvents::BOOT);
+        }
+    }
+
+    public function registerBundles(): iterable
+    {
+        $contents = [
+            Bundle\TheliaBundle::class => ['all' => true],
         ];
+
+        if (file_exists(THELIA_ROOT.'config/bundles.php')) {
+            $contents = array_merge($contents, require THELIA_ROOT.'config/bundles.php');
+        }
+
+        foreach ($contents as $class => $envs) {
+            if ($envs[$this->environment] ?? $envs['all'] ?? false) {
+                yield new $class();
+            }
+        }
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): \Symfony\Component\HttpFoundation\Response
+    {
+        if (!$this->booted) {
+            $container = $this->container ?? $this->preBoot();
+
+            if ($container->has('http_cache')) {
+                return $container->get('http_cache')?->handle($request, $type, $catch);
+            }
+        }
+
+        $this->boot();
+
+        return parent::handle($request, $type, $catch);
     }
 
     /**
@@ -163,9 +208,35 @@ class Thelia extends Kernel
         }
     }
 
-    public static function isInstalled()
+    /**
+     * @throws \Throwable
+     */
+    protected function initializeContainer(): void
     {
-        return file_exists(THELIA_CONF_DIR.'database.yml') || (!empty($_SERVER['DB_HOST']));
+        // initialize Propel, building its cache if necessary
+        $this->propelSchemaLocator = new SchemaLocator(
+            THELIA_CONF_DIR,
+            THELIA_MODULE_DIR
+        );
+
+        $this->propelInitService = new PropelInitService(
+            $this->getEnvironment(),
+            $this->isDebug(),
+            $this->getKernelParameters(),
+            $this->propelSchemaLocator
+        );
+
+        $this->propelConnectionAvailable = $this->initializePropelService(false, $this->cacheRefresh);
+
+        if ($this->propelConnectionAvailable) {
+            $this->theliaDatabaseConnection = Propel::getConnection('TheliaMain');
+            $this->checkMySQLConfigurations($this->theliaDatabaseConnection);
+        }
+
+        parent::initializeContainer();
+
+        $this->getContainer()->set('thelia.propel.schema.locator', $this->propelSchemaLocator);
+        $this->getContainer()->set('thelia.propel.init', $this->propelInitService);
     }
 
     protected function checkMySQLConfigurations(ConnectionInterface $con): void
@@ -264,87 +335,10 @@ class Thelia extends Kernel
         return TheliaContainer::class;
     }
 
-    protected function initializeContainer(): void
-    {
-        // initialize Propel, building its cache if necessary
-        $this->propelSchemaLocator = new SchemaLocator(
-            THELIA_CONF_DIR,
-            THELIA_MODULE_DIR
-        );
-
-        $this->propelInitService = new PropelInitService(
-            $this->getEnvironment(),
-            $this->isDebug(),
-            $this->getKernelParameters(),
-            $this->propelSchemaLocator
-        );
-
-        $this->propelConnectionAvailable = $this->initializePropelService(false, $this->cacheRefresh);
-
-        if ($this->propelConnectionAvailable) {
-            $this->theliaDatabaseConnection = Propel::getConnection('TheliaMain');
-            $this->checkMySQLConfigurations($this->theliaDatabaseConnection);
-        }
-
-        parent::initializeContainer();
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function boot(): void
-    {
-        if (!$this->booted) {
-            $this->container ?? $this->preBoot();
-        }
-
-        parent::boot();
-
-        if ($this->cacheRefresh) {
-            $moduleManagement = new ModuleManagement($this->getContainer());
-            $moduleManagement->updateModules($this->getContainer());
-        }
-
-        /** @var EventDispatcherInterface $eventDispatcher */
-        $eventDispatcher = $this->getContainer()->get('event_dispatcher');
-
-        if ($this->propelConnectionAvailable) {
-            $this->theliaDatabaseConnection->setEventDispatcher($eventDispatcher);
-        }
-
-        if (self::isInstalled()) {
-            $eventDispatcher->dispatch(new Event(), TheliaEvents::BOOT);
-        }
-    }
-
-    public function initCacheConfigs(bool $force = false): void
-    {
-        if ($force || !file_exists($this->getCacheDir().DS.'thelia_configs.php')) {
-            $caches = [];
-
-            $configs = ConfigQuery::create()->find();
-
-            foreach ($configs as $config) {
-                $caches[$config->getName()] = $config->getValue();
-            }
-
-            (new Filesystem())->dumpFile(
-                $this->getCacheDir().DS.'thelia_configs.php',
-                '<?php return '.VarExporter::export($caches).';'
-            );
-        }
-
-        ConfigQuery::initCache(
-            require $this->getCacheDir().DS.'thelia_configs.php'
-        );
-    }
-
     /**
      * @throws \Throwable
-     *
-     * @return bool
      */
-    public function initializePropelService($forcePropelCacheGeneration, &$cacheRefresh)
+    public function initializePropelService($forcePropelCacheGeneration, &$cacheRefresh): bool
     {
         $cacheRefresh = false;
 
@@ -352,121 +346,102 @@ class Thelia extends Kernel
     }
 
     /**
-     * Add all module's standard templates to the parser environment.
+     * Gets the cache directory.
      *
-     * @param Definition $parser the parser
-     * @param Module     $module the Module
+     * @api
      */
-    protected function addStandardModuleTemplatesToParserEnvironment($parser, $module): void
+    public function getCacheDir(): string
     {
-        $stdTpls = TemplateDefinition::getStandardTemplatesSubdirsIterator();
-
-        foreach ($stdTpls as $templateType => $templateSubdirName) {
-            $this->addModuleTemplateToParserEnvironment($parser, $module, $templateType, $templateSubdirName);
+        if (\defined('THELIA_ROOT')) {
+            return THELIA_CACHE_DIR.$this->environment;
         }
+
+        return parent::getCacheDir();
     }
 
     /**
-     * Add a module template directory to the parser environment.
+     * Gets the log directory.
      *
-     * @param Definition $parser             the parser
-     * @param Module     $module             the Module
-     * @param string     $templateType       the template type (one of the TemplateDefinition type constants)
-     * @param string     $templateSubdirName the template subdirectory name (one of the TemplateDefinition::XXX_SUBDIR constants)
+     * @api
      */
-    protected function addModuleTemplateToParserEnvironment($parser, $module, $templateType, $templateSubdirName): void
+    public function getLogDir(): string
     {
-        // Get template path
-        $templateDirectory = $module->getAbsoluteTemplateDirectoryPath($templateSubdirName);
-        try {
-            $templateDirBrowser = new \DirectoryIterator($templateDirectory);
-
-            $code = ucfirst($module->getCode());
-
-            /* browse the directory */
-            foreach ($templateDirBrowser as $templateDirContent) {
-                /* is it a directory which is not . or .. ? */
-                if ($templateDirContent->isDir() && !$templateDirContent->isDot()) {
-                    $parser->addMethodCall(
-                        'addTemplateDirectory',
-                        [
-                            $templateType,
-                            $templateDirContent->getFilename(),
-                            $templateDirContent->getPathName(),
-                            $code,
-                        ]
-                    );
-                }
-            }
-        } catch (\UnexpectedValueException $ex) {
-            // The directory does not exists, ignore it.
+        if (\defined('THELIA_ROOT')) {
+            return THELIA_LOG_DIR;
         }
+
+        return parent::getLogDir();
     }
 
-    private function preBoot(): ContainerInterface
+    /**
+     * Builds the service container.
+     *
+     * @throws \Exception
+     *
+     * @return ContainerBuilder The compiled service container
+     */
+    protected function buildContainer(): ContainerBuilder
     {
-        if (!self::isInstalled()) {
-            throw new \Exception('Thelia is not installed');
-        }
-        if ($this->debug) {
-            $this->startTime = microtime(true);
-        }
-        if ($this->debug && !isset($_ENV['SHELL_VERBOSITY']) && !isset($_SERVER['SHELL_VERBOSITY'])) {
-            putenv('SHELL_VERBOSITY=3');
-            $_ENV['SHELL_VERBOSITY'] = 3;
-            $_SERVER['SHELL_VERBOSITY'] = 3;
-        }
+        $container = parent::buildContainer();
 
-        $this->initializeBundles();
+        $this->loadService($container);
 
-        $this->initializeContainer();
-
-        $container = $this->container;
+        $this->loadAutoConfigureInterfaces($container);
+        $this->loadModulesConfiguration($container);
 
         $this->getContainer()->set('thelia.propel.schema.locator', $this->propelSchemaLocator);
         $this->getContainer()->set('thelia.propel.init', $this->propelInitService);
-
-        if ($container->hasParameter('kernel.trusted_hosts') && $trustedHosts = $container->getParameter('kernel.trusted_hosts')) {
-            Request::setTrustedHosts($trustedHosts);
-        }
-
-        if ($container->hasParameter('kernel.trusted_proxies') && $container->hasParameter('kernel.trusted_headers') && $trustedProxies = $container->getParameter('kernel.trusted_proxies')) {
-            Request::setTrustedProxies(\is_array($trustedProxies) ? $trustedProxies : array_map('trim', explode(',', $trustedProxies)), $container->getParameter('kernel.trusted_headers'));
-        }
+        $this->registerTemplateClassLoader($container);
 
         return $container;
     }
 
     /**
-     * @throws \Exception
+     * Returns the kernel parameters.
+     *
+     * @return array An array of kernel parameters
      */
-    public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): \Symfony\Component\HttpFoundation\Response
+    protected function getKernelParameters(): array
     {
-        if (!$this->booted) {
-            $container = $this->container ?? $this->preBoot();
+        $parameters = parent::getKernelParameters();
 
-            if ($container->has('http_cache')) {
-                return $container->get('http_cache')->handle($request, $type, $catch);
-            }
-        }
-
-        $this->boot();
-
-        return parent::handle($request, $type, $catch);
+        return array_merge($parameters, [
+            'kernel.runtime_environment' => $this->environment,
+            'thelia.root_dir' => THELIA_ROOT,
+            'thelia.core_dir' => \dirname(__DIR__), // This class is in core/lib/Thelia/Core.
+            'thelia.module_dir' => THELIA_MODULE_DIR,
+            'thelia.db_host' => $_SERVER['DB_HOST'] ?? null,
+            'thelia.db_port' => $_SERVER['DB_PORT'] ?? null,
+            'thelia.db_name' => $_SERVER['DB_NAME'] ?? null,
+            'thelia.db_user' => $_SERVER['DB_USER'] ?? null,
+            'thelia.db_password' => $_SERVER['DB_PASSWORD'] ?? null,
+        ]);
     }
 
-    /**
-     * Load some configuration
-     * Initialize all plugins.
+    /** Get the front and back templates "components" directory path.
      *
-     * @throws \Exception
      */
-    protected function loadConfiguration(ContainerBuilder $container): void
+    public static function getTemplateComponentsDirectories(): array
     {
-        $fileLocator = new FileLocator(__DIR__.'/../Config/Resources');
-        $phpLoader = new PhpFileLoader($container, $fileLocator);
-        $phpLoader->load('services.php');
+        return [
+            'backOffice\\' => THELIA_TEMPLATE_DIR
+                .TemplateDefinition::BACK_OFFICE_SUBDIR.DS
+                .ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME, 'default').DS
+                .'components',
+            'frontOffice\\' => THELIA_TEMPLATE_DIR
+                .TemplateDefinition::FRONT_OFFICE_SUBDIR.DS
+                .ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME, 'default').DS
+                .'components',
+        ];
+    }
 
+    public static function isInstalled(): bool
+    {
+        return file_exists(THELIA_CONF_DIR.'database.yml') || (!empty($_SERVER['DB_HOST']));
+    }
+
+    private function loadAutoConfigureInterfaces(ContainerBuilder $container): void
+    {
         $autoconfiguredInterfaces = [
             SerializerInterface::class => 'thelia.serializer',
             ArchiverInterface::class => 'thelia.archiver',
@@ -508,6 +483,16 @@ class Thelia extends Kernel
         $container->registerForAutoconfiguration(BaseHookInterface::class)
             ->addTag('hook.event_listener')
             ->setPublic(true);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function loadService(ContainerBuilder $container): void
+    {
+        $fileLocator = new FileLocator(__DIR__.'/../Config/Resources');
+        $phpLoader = new PhpFileLoader($container, $fileLocator);
+        $phpLoader->load('services.php');
 
         $loader = new XmlFileLoader($container, $fileLocator);
         $finder = Finder::create()
@@ -519,126 +504,137 @@ class Thelia extends Kernel
         foreach ($finder as $file) {
             $loader->load($file->getBaseName());
         }
+    }
 
-        if (\defined('THELIA_INSTALL_MODE') === false) {
-            $modules = ModuleQuery::getActivated();
+    /**
+     * @throws \Exception
+     */
+    private function loadModulesConfiguration(ContainerBuilder $container): void
+    {
+        if (\defined('THELIA_INSTALL_MODE') !== false) {
+            return;
+        }
+        $modules = ModuleQuery::getActivated();
 
-            $translationDirs = [];
+        /** @var Module $module */
+        foreach ($modules as $module) {
+            try {
+                // In case modules want add configuration
+                \call_user_func([$module->getFullNamespace(), 'loadConfiguration'], $container);
 
-            /** @var Module $module */
-            foreach ($modules as $module) {
-                try {
-                    // In case modules want add configuration
-                    \call_user_func([$module->getFullNamespace(), 'loadConfiguration'], $container);
+                $definition = new Definition();
+                $definition->setClass($module->getFullNamespace());
+                $definition->addMethodCall('setContainer', [new Reference('service_container')]);
+                $definition->setPublic(true);
 
-                    $definition = new Definition();
-                    $definition->setClass($module->getFullNamespace());
-                    $definition->addMethodCall('setContainer', [new Reference('service_container')]);
-                    $definition->setPublic(true);
-
-                    $container->setDefinition(
-                        'module.'.$module->getCode(),
-                        $definition
-                    );
-
-                    $compilers = \call_user_func([$module->getFullNamespace(), 'getCompilers']);
-
-                    foreach ($compilers as $compiler) {
-                        if (\is_array($compiler)) {
-                            $container->addCompilerPass($compiler[0], $compiler[1]);
-                        } else {
-                            $container->addCompilerPass($compiler);
-                        }
-                    }
-
-                    $loader = new XmlFileLoader($container, new FileLocator($module->getAbsoluteConfigPath()));
-                    $loader->load('config.xml', 'module.'.$module->getCode());
-
-                    $envConfigFileName = sprintf('config_%s.xml', $this->environment);
-                    $envConfigFile = sprintf('%s%s%s', $module->getAbsoluteConfigPath(), DS, $envConfigFileName);
-
-                    if (is_file($envConfigFile) && is_readable($envConfigFile)) {
-                        $loader->load($envConfigFileName, 'module.'.$module->getCode());
-                    }
-
-                    $templateBasePath = $module->getAbsoluteTemplateBasePath();
-                    if (is_dir($templateBasePath)) {
-                        $container->loadFromExtension('twig', [
-                            'paths' => [
-                                $templateBasePath => $module->getCode().'Module',
-                            ],
-                        ]);
-                    }
-                } catch (\Exception $e) {
-                    if ($this->debug) {
-                        throw $e;
-                    }
-                    Tlog::getInstance()->addError(
-                        sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
-                        $e
-                    );
-                }
-            }
-
-            // Register templates 'component' directories in a class loader.
-            $templateClassLoader = new ClassLoader();
-
-            foreach (self::getTemplateComponentsDirectories() as $namespace => $resource) {
-                if (is_dir($resource)) {
-                    $templateClassLoader->addPsr4($namespace, $resource);
-                }
-            }
-
-            $templateClassLoader->register();
-
-            $parser = $container->getDefinition(SmartyParser::class);
-
-            /** @var \Thelia\Core\Template\TemplateHelperInterface $templateHelper */
-            $templateHelper = $container->get('thelia.template_helper');
-
-            /** @var Module $module */
-            foreach ($modules as $module) {
-                try {
-                    $this->loadModuleTranslationDirectories($module, $translationDirs, $templateHelper);
-
-                    $this->addStandardModuleTemplatesToParserEnvironment($parser, $module);
-                } catch (\Exception $e) {
-                    if ($this->debug) {
-                        throw $e;
-                    }
-                    Tlog::getInstance()->addError(
-                        sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
-                        $e
-                    );
-                }
-            }
-
-            // Load core translation
-            $translationDirs['core'] = THELIA_LIB.'Config'.DS.'I18n';
-
-            // Load core translation
-            $translationDirs[Translator::GLOBAL_FALLBACK_DOMAIN] = THELIA_LOCAL_DIR.'I18n';
-
-            // Standard templates (front, back, pdf, mail)
-            /** @var TemplateDefinition $templateDefinition */
-            foreach ($templateHelper->getStandardTemplateDefinitions() as $templateDefinition) {
-                // Load parent templates transaltions, the current template translations.
-                $templateList = array_merge(
-                    $templateDefinition->getParentList(),
-                    [$templateDefinition]
+                $container->setDefinition(
+                    'module.'.$module->getCode(),
+                    $definition
                 );
 
-                /** @var TemplateDefinition $tplDef */
-                foreach ($templateList as $tplDef) {
-                    if (is_dir($dir = $tplDef->getAbsoluteI18nPath())) {
-                        $translationDirs[$tplDef->getTranslationDomain()] = $dir;
+                $compilers = \call_user_func([$module->getFullNamespace(), 'getCompilers']);
+
+                foreach ($compilers as $compiler) {
+                    if (\is_array($compiler)) {
+                        $container->addCompilerPass($compiler[0], $compiler[1]);
+                    } else {
+                        $container->addCompilerPass($compiler);
                     }
                 }
-            }
 
-            if ($translationDirs) {
-                $this->loadTranslation($container, $translationDirs);
+                $loader = new XmlFileLoader($container, new FileLocator($module->getAbsoluteConfigPath()));
+                $loader->load('config.xml', 'module.'.$module->getCode());
+
+                $envConfigFileName = sprintf('config_%s.xml', $this->environment);
+                $envConfigFile = sprintf('%s%s%s', $module->getAbsoluteConfigPath(), DS, $envConfigFileName);
+
+                if (is_file($envConfigFile) && is_readable($envConfigFile)) {
+                    $loader->load($envConfigFileName, 'module.'.$module->getCode());
+                }
+
+                $templateBasePath = $module->getAbsoluteTemplateBasePath();
+                if (is_dir($templateBasePath)) {
+                    $container->loadFromExtension('twig', [
+                        'paths' => [
+                            $templateBasePath => $module->getCode().'Module',
+                        ],
+                    ]);
+                }
+            } catch (\Exception $e) {
+                if ($this->debug) {
+                    throw $e;
+                }
+                Tlog::getInstance()->addError(
+                    sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
+                    $e
+                );
             }
+        }
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function registerTemplateClassLoader(ContainerBuilder $container): void
+    {
+        if (\defined('THELIA_INSTALL_MODE') !== false) {
+            return;
+        }
+
+        $translationDirs = [];
+
+        // Register templates 'component' directories in a class loader.
+        $templateClassLoader = new ClassLoader();
+
+        foreach (self::getTemplateComponentsDirectories() as $namespace => $resource) {
+            if (is_dir($resource)) {
+                $templateClassLoader->addPsr4($namespace, $resource);
+            }
+        }
+
+        $templateClassLoader->register();
+        /** @var TemplateHelperInterface $templateHelper */
+        $templateHelper = $container->get('thelia.template_helper');
+        $modules = ModuleQuery::getActivated();
+        /** @var Module $module */
+        foreach ($modules as $module) {
+            try {
+                $this->loadModuleTranslationDirectories($module, $translationDirs, $templateHelper);
+            } catch (\Exception $e) {
+                if ($this->debug) {
+                    throw $e;
+                }
+                Tlog::getInstance()->addError(
+                    sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
+                    $e
+                );
+            }
+        }
+        // Load core translation
+        $translationDirs['core'] = THELIA_LIB.'Config'.DS.'I18n';
+
+        // Load core translation
+        $translationDirs[Translator::GLOBAL_FALLBACK_DOMAIN] = THELIA_LOCAL_DIR.'I18n';
+
+        // Standard templates (front, back, pdf, mail)
+        /** @var TemplateDefinition $templateDefinition */
+        foreach ($templateHelper->getStandardTemplateDefinitions() as $templateDefinition) {
+            // Load parent templates transaltions, the current template translations.
+            $templateList = array_merge(
+                $templateDefinition->getParentList(),
+                [$templateDefinition]
+            );
+
+            /** @var TemplateDefinition $tplDef */
+            foreach ($templateList as $tplDef) {
+                if (is_dir($dir = $tplDef->getAbsoluteI18nPath())) {
+                    $translationDirs[$tplDef->getTranslationDomain()] = $dir;
+                }
+            }
+        }
+
+        if ($translationDirs) {
+            $this->loadTranslation($container, $translationDirs);
         }
 
         $this->loadDefaultSecurityConfig($container);
@@ -712,70 +708,6 @@ class Thelia extends Kernel
         $extensionConfigsReflection->setValue($container, $extensionConfigs);
     }
 
-    /**
-     * @param TemplateHelperInterface $templateHelper
-     */
-    private function loadModuleTranslationDirectories(Module $module, array &$translationDirs, $templateHelper): void
-    {
-        // Core module translation
-        if (is_dir($dir = $module->getAbsoluteI18nPath())) {
-            $translationDirs[$module->getTranslationDomain()] = $dir;
-        }
-
-        // Admin includes translation
-        if (is_dir($dir = $module->getAbsoluteAdminIncludesI18nPath())) {
-            $translationDirs[$module->getAdminIncludesTranslationDomain()] = $dir;
-        }
-
-        // Module back-office template, if any
-        $templates =
-            $templateHelper->getList(
-                TemplateDefinition::BACK_OFFICE,
-                $module->getAbsoluteTemplateBasePath()
-            );
-
-        foreach ($templates as $template) {
-            $translationDirs[$module->getBackOfficeTemplateTranslationDomain($template->getName())] =
-                $module->getAbsoluteBackOfficeI18nTemplatePath($template->getName());
-        }
-
-        // Module front-office template, if any
-        $templates =
-            $templateHelper->getList(
-                TemplateDefinition::FRONT_OFFICE,
-                $module->getAbsoluteTemplateBasePath()
-            );
-
-        foreach ($templates as $template) {
-            $translationDirs[$module->getFrontOfficeTemplateTranslationDomain($template->getName())] =
-                $module->getAbsoluteFrontOfficeI18nTemplatePath($template->getName());
-        }
-
-        // Module pdf template, if any
-        $templates =
-            $templateHelper->getList(
-                TemplateDefinition::PDF,
-                $module->getAbsoluteTemplateBasePath()
-            );
-
-        foreach ($templates as $template) {
-            $translationDirs[$module->getPdfTemplateTranslationDomain($template->getName())] =
-                $module->getAbsolutePdfI18nTemplatePath($template->getName());
-        }
-
-        // Module email template, if any
-        $templates =
-            $templateHelper->getList(
-                TemplateDefinition::EMAIL,
-                $module->getAbsoluteTemplateBasePath()
-            );
-
-        foreach ($templates as $template) {
-            $translationDirs[$module->getEmailTemplateTranslationDomain($template->getName())] =
-                $module->getAbsoluteEmailI18nTemplatePath($template->getName());
-        }
-    }
-
     private function loadTranslation(ContainerBuilder $container, array $dirs): void
     {
         $translator = $container->getDefinition(Translator::class);
@@ -801,92 +733,117 @@ class Thelia extends Kernel
     }
 
     /**
-     * Builds the service container.
-     *
-     * @throws \Exception
-     *
-     * @return ContainerBuilder The compiled service container
+     * @throws \Throwable
      */
-    protected function buildContainer(): ContainerBuilder
+    private function preBoot(): ContainerInterface
     {
-        $container = parent::buildContainer();
+        if (!self::isInstalled()) {
+            throw new \RuntimeException('Thelia is not installed');
+        }
+        if ($this->debug) {
+            $this->startTime = microtime(true);
+        }
+        if ($this->debug && !isset($_ENV['SHELL_VERBOSITY']) && !isset($_SERVER['SHELL_VERBOSITY'])) {
+            putenv('SHELL_VERBOSITY=3');
+            $_ENV['SHELL_VERBOSITY'] = 3;
+            $_SERVER['SHELL_VERBOSITY'] = 3;
+        }
 
-        $this->loadConfiguration($container);
+        $this->initializeBundles();
+        $this->initializeContainer();
+
+        $container = $this->container;
+
+        if ($container->hasParameter('kernel.trusted_hosts') && $trustedHosts = $container->getParameter('kernel.trusted_hosts')) {
+            Request::setTrustedHosts($trustedHosts);
+        }
+
+        if ($container->hasParameter('kernel.trusted_proxies') && $container->hasParameter('kernel.trusted_headers') && $trustedProxies = $container->getParameter('kernel.trusted_proxies')) {
+            Request::setTrustedProxies(\is_array($trustedProxies) ? $trustedProxies : array_map('trim', explode(',', $trustedProxies)), $container->getParameter('kernel.trusted_headers'));
+        }
 
         return $container;
     }
 
-    /**
-     * Gets the cache directory.
-     *
-     * @return string The cache directory
-     *
-     * @api
-     */
-    public function getCacheDir(): string
-    {
-        if (\defined('THELIA_ROOT')) {
-            return THELIA_CACHE_DIR.$this->environment;
+    private function loadModuleTranslationDirectories(
+        Module $module,
+        array &$translationDirs,
+        TemplateHelperInterface $templateHelper
+    ): void {
+        // Core module translation
+        if (is_dir($dir = $module->getAbsoluteI18nPath())) {
+            $translationDirs[$module->getTranslationDomain()] = $dir;
         }
 
-        return parent::getCacheDir();
-    }
-
-    /**
-     * Gets the log directory.
-     *
-     * @return string The log directory
-     *
-     * @api
-     */
-    public function getLogDir(): string
-    {
-        if (\defined('THELIA_ROOT')) {
-            return THELIA_LOG_DIR;
+        // Admin includes translation
+        if (is_dir($dir = $module->getAbsoluteAdminIncludesI18nPath())) {
+            $translationDirs[$module->getAdminIncludesTranslationDomain()] = $dir;
         }
 
-        return parent::getLogDir();
-    }
-
-    /**
-     * Returns the kernel parameters.
-     *
-     * @return array An array of kernel parameters
-     */
-    protected function getKernelParameters(): array
-    {
-        $parameters = parent::getKernelParameters();
-
-        // Todo replace this by real runtime env
-        $parameters['kernel.runtime_environment'] = $this->environment;
-
-        $parameters['thelia.root_dir'] = THELIA_ROOT;
-        $parameters['thelia.core_dir'] = \dirname(__DIR__); // This class is in core/lib/Thelia/Core.
-        $parameters['thelia.module_dir'] = THELIA_MODULE_DIR;
-
-        $parameters['thelia.db_host'] = $_SERVER['DB_HOST'] ?? null;
-        $parameters['thelia.db_port'] = $_SERVER['DB_PORT'] ?? null;
-        $parameters['thelia.db_name'] = $_SERVER['DB_NAME'] ?? null;
-        $parameters['thelia.db_user'] = $_SERVER['DB_USER'] ?? null;
-        $parameters['thelia.db_password'] = $_SERVER['DB_PASSWORD'] ?? null;
-
-        return $parameters;
-    }
-
-    public function registerBundles(): iterable
-    {
-        $contents = [
+        $templateTypes = [
+            TemplateDefinition::BACK_OFFICE => 'getBackOfficeTemplateTranslationDomain',
+            TemplateDefinition::FRONT_OFFICE => 'getFrontOfficeTemplateTranslationDomain',
+            TemplateDefinition::PDF => 'getPdfTemplateTranslationDomain',
+            TemplateDefinition::EMAIL => 'getEmailTemplateTranslationDomain',
         ];
 
-        if (file_exists(THELIA_ROOT.'config/bundles.php')) {
-            $contents = array_merge($contents, require THELIA_ROOT.'config/bundles.php');
+        foreach ($templateTypes as $type => $translationMethod) {
+            $templates = $templateHelper->getList($type, $module->getAbsoluteTemplateBasePath());
+
+            foreach ($templates as $template) {
+                $templateName = $template->getName();
+                $moduleMethod = 'getAbsolute'.ucfirst(strtolower($type)).'I18nTemplatePath';
+                if (!method_exists($moduleMethod, $module)) {
+                    continue;
+                }
+                $translationDirs[$module->{$translationMethod}($templateName)] =
+                    $module->{$moduleMethod}($templateName);
+            }
         }
+    }
+
+    private function addModuleTemplateToParsers(): void
+    {
+        $parserResolver = $this->container->get('thelia.parser.resolver');
+        $modules = ModuleQuery::getActivated();
+
+        foreach ($parserResolver->getParsers() as $parser) {
+            foreach ($modules as $module) {
+                $this->addTemplatesFromModule($parser, $module);
+            }
+        }
+    }
+
+    private function addTemplatesFromModule(ParserInterface $parser, Module $module): void
+    {
+        $stdTpls = TemplateDefinition::getStandardTemplatesSubdirsIterator();
+
+        foreach ($stdTpls as $templateType => $templateSubdirName) {
+            $templateDirectory = $module->getAbsoluteTemplateDirectoryPath($templateSubdirName);
+
+            try {
+                $this->addTemplatesFromDirectory($parser, $module, $templateType, $templateDirectory);
+            } catch (\UnexpectedValueException) {
+                // The directory does not exist, ignore it.
+            }
+        }
+    }
+
+    private function addTemplatesFromDirectory(ParserInterface $parser, Module $module, string $templateType, string $templateDirectory): void
+    {
+        $code = ucfirst($module->getCode());
+        $templateDirBrowser = new \DirectoryIterator($templateDirectory);
 
         $contents[Bundle\TheliaBundle::class] = ['all' => true];
 
-        foreach ($contents as $class => $envs) {
-            if ($envs[$this->environment] ?? $envs['all'] ?? false) {
-                yield new $class();
+        foreach ($templateDirBrowser as $templateDirContent) {
+            if ($templateDirContent->isDir() && !$templateDirContent->isDot()) {
+                $parser->addTemplateDirectory(
+                    $templateType,
+                    $templateDirContent->getFilename(),
+                    $templateDirContent->getPathName(),
+                    $code
+                );
             }
         }
     }

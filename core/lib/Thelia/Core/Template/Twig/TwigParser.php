@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Template\Twig;
 
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Twig\Environment;
@@ -21,6 +22,7 @@ use Twig\Environment;
  *
  * @author Alexandre Nozière - anoziere@openstudio.fr
  */
+#[AutoconfigureTag('thelia.parser.template')]
 class TwigParser implements ParserInterface
 {
     public function __construct(
@@ -124,5 +126,10 @@ class TwigParser implements ParserInterface
     private function getFullPathByTemplateName(string $templateName): string
     {
         return THELIA_ROOT.'templates/'.$templateName.$this->getFileExtension();
+    }
+
+    public static function getDefaultPriority(): int
+    {
+        return 10;
     }
 }

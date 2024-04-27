@@ -138,4 +138,14 @@ class DataCollectorSmartyParser extends \Smarty implements ParserInterface
     {
         return $this->translator->{$method}(...$args);
     }
+
+    public function supportTemplateRender(?string $templateName): bool
+    {
+        return $this->smartyParser->supportTemplateRender($templateName);
+    }
+
+    public function getFileExtension(): string
+    {
+        return 'html';
+    }
 }
