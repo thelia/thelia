@@ -21,7 +21,6 @@ use Symfony\Component\Finder\Finder;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Tools\Version\Version;
-use TheliaSmarty\Template\SmartyParser;
 
 /**
  * Class GenerateSQLCommand.
@@ -33,7 +32,6 @@ class GenerateSQLCommand extends ContainerAwareCommand
     /** @var Translator */
     protected $translator;
 
-    /** @var SmartyParser */
     protected $parser;
 
     /** @var \PDO */
