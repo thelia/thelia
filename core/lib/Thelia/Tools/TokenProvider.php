@@ -13,7 +13,6 @@
 namespace Thelia\Tools;
 
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\Exception\TokenAuthenticationException;
@@ -29,11 +28,6 @@ class TokenProvider
      * @var string The stored token for this page
      */
     protected $token;
-
-    /**
-     * @var SessionInterface The session where the token is stored
-     */
-    protected $session;
 
     /**
      * @var RequestStack
@@ -53,12 +47,11 @@ class TokenProvider
     public function __construct(RequestStack $requestStack, TranslatorInterface $translator, $tokenName)
     {
         $this->requestStack = $requestStack;
-        $this->setSessionFromRequest();
         $this->translator = $translator;
         $this->tokenName = $tokenName;
-
-        if (null !== $this->session) {
-            $this->token = $this->session->get($this->tokenName);
+        $session = $this->requestStack->getCurrentRequest()?->getSession();
+        if (null !== $session) {
+            $this->token = $session->get($this->tokenName);
         }
     }
 
@@ -80,8 +73,10 @@ class TokenProvider
     {
         if (null === $this->token) {
             $this->token = $this->getToken();
-
-            $this->session->set($this->tokenName, $this->token);
+            $session = $this->requestStack->getCurrentRequest()?->getSession();
+            if (null !== $session) {
+                $session->set($this->tokenName, $this->token);
+            }
         }
 
         return $this->token;

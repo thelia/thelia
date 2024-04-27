@@ -26,7 +26,6 @@ use Thelia\Model\Lang;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 use Thelia\Module\BaseModule;
-use TheliaSmarty\Template\SmartyParser;
 
 /**
  * The base class for hook. If you provide hooks in your module you have to extends
@@ -84,7 +83,7 @@ abstract class BaseHook implements BaseHookInterface
     /** @var Currency */
     protected $currency;
 
-    public function __construct(SmartyParser $parser = null, AssetResolverInterface $resolver = null, EventDispatcherInterface $eventDispatcher = null)
+    public function __construct(ParserInterface $parser = null, AssetResolverInterface $resolver = null, EventDispatcherInterface $eventDispatcher = null)
     {
         if (null !== $parser) {
             $this->parser = $parser;

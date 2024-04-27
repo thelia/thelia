@@ -12,32 +12,42 @@
 
 namespace Thelia\Controller;
 
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\Attribute\Required;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\ActionEvent;
-use Thelia\Core\Event\DefaultActionEvent;
 use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Form\TheliaFormFactory;
+use Thelia\Core\Form\TheliaFormValidator;
 use Thelia\Core\HttpFoundation\Response;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserContext;
-use Thelia\Core\Translation\Translator;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
-use Thelia\Mailer\MailerFactory;
 use Thelia\Model\OrderQuery;
+use Thelia\Tools\TokenProvider;
 use Thelia\Tools\URL;
 
 /**
@@ -50,22 +60,51 @@ use Thelia\Tools\URL;
  */
 abstract class BaseController implements ControllerInterface
 {
-    use ContainerAwareTrait;
-
     public const EMPTY_FORM_NAME = 'thelia.empty';
 
-    protected $tokenProvider;
+    #[Required]
+    public TokenProvider $tokenProvider;
 
-    protected $currentRouter;
+    #[Required]
+    public ParserResolver $parserResolver;
 
-    protected $translator;
+    #[Required]
+    public RequestStack $requestStack;
 
-    protected $templateHelper;
+    #[Required]
+    public SecurityContext $securityContext;
 
-    protected $adminResources;
+    #[Required]
+    public TranslatorInterface $translator;
+
+    #[Required]
+    public TemplateHelperInterface $templateHelper;
+
+    #[Required]
+    public ParserContext $parserContext;
+
+    #[Required]
+    public AdminResources $adminResources;
+
+    #[Required]
+    public TheliaFormValidator $theliaFormValidator;
+
+    #[Required]
+    public ParameterBagInterface $parameterBag;
+
+    #[Required]
+    public TheliaFormFactory $theliaFormFactory;
+
+    #[Required]
+    public ContainerInterface $container;
+
+    #[Required]
+    public MailerInterface $mailer;
+
+    protected string $currentRouter;
 
     /** @var bool Fallback on default template when setting the templateDefinition */
-    protected $useFallbackTemplate = true;
+    protected bool $useFallbackTemplate = true;
 
     /**
      * Return an empty response (after an ajax request, for example).
@@ -134,118 +173,47 @@ abstract class BaseController implements ControllerInterface
         throw new \Exception('Since Thelia 2.5 this->getDispatcher() function is not allowed in controllers, use autowiring instead');
     }
 
-    /**
-     * return the Translator.
-     *
-     * @return Translator
-     *
-     * @deprecated since Thelia 2.5, use autowiring instead.
-     */
-    public function getTranslator()
+    public function getTranslator(): TranslatorInterface
     {
-        if (null === $this->translator) {
-            $this->translator = $this->container->get('thelia.translator');
-        }
-
         return $this->translator;
     }
 
-    /**
-     * Return the parser context,.
-     *
-     * @return ParserContext
-     *
-     * @deprecated since Thelia 2.5, use autowiring instead.
-     */
-    protected function getParserContext()
+    protected function getParserContext(): ParserContext
     {
-        return $this->container->get('thelia.parser.context');
+        return $this->parserContext;
     }
 
-    /**
-     * Return the security context, by default in admin mode.
-     *
-     * @return \Thelia\Core\Security\SecurityContext
-     *
-     * @deprecated since Thelia 2.5, use autowiring instead.
-     */
-    protected function getSecurityContext()
+    protected function getSecurityContext(): SecurityContext
     {
-        return $this->container->get('thelia.securityContext');
+        return $this->securityContext;
     }
 
-    /**
-     * @return \Thelia\Core\HttpFoundation\Request
-     *
-     * @deprecated since Thelia 2.5, use autowiring instead.
-     */
-    protected function getRequest()
+    protected function getRequest(): \Symfony\Component\HttpFoundation\Request
     {
-        return $this->container->get('request_stack')->getCurrentRequest();
+        return $this->requestStack->getCurrentRequest();
     }
 
-    /**
-     * Returns the session from the current request.
-     *
-     * @return \Thelia\Core\HttpFoundation\Session\Session
-     *
-     * @deprecated since Thelia 2.5, use autowiring instead.
-     */
-    protected function getSession()
+    protected function getSession(): SessionInterface
     {
-        return $this->container->get('request_stack')->getCurrentRequest()->getSession();
+        return $this->getRequest()->getSession();
     }
 
-    /**
-     * @return \Thelia\Tools\TokenProvider
-     *
-     * @deprecated since Thelia 2.5, use autowiring instead.
-     */
-    protected function getTokenProvider()
+    protected function getTokenProvider(): TokenProvider
     {
-        if (null === $this->tokenProvider) {
-            $this->tokenProvider = $this->container->get('thelia.token_provider');
-        }
-
         return $this->tokenProvider;
     }
 
-    /**
-     * @return \Thelia\Core\Template\TemplateHelperInterface
-     *
-     * @deprecated since Thelia 2.5, use autowiring instead.
-     */
-    protected function getTemplateHelper()
+    protected function getTemplateHelper(): TemplateHelperInterface
     {
-        if (null === $this->templateHelper) {
-            $this->templateHelper = $this->container->get('thelia.template_helper');
-        }
-
         return $this->templateHelper;
     }
 
-    /**
-     * @since 2.3
-     *
-     * @return \Thelia\Core\Security\Resource\AdminResources
-     *
-     * @deprecated since Thelia 2.5, use autowiring instead.
-     */
-    protected function getAdminResources()
+    protected function getAdminResources(): AdminResources
     {
-        if (null === $this->adminResources) {
-            $this->adminResources = $this->container->get('thelia.admin.resources');
-        }
-
         return $this->adminResources;
     }
 
-    /**
-     * Get all errors that occurred in a form.
-     *
-     * @return string the error string
-     */
-    protected function getErrorMessages(Form $form)
+    protected function getErrorMessages(Form $form): string
     {
         return $this->getTheliaFormValidator()->getErrorMessages($form);
     }
@@ -270,31 +238,24 @@ abstract class BaseController implements ControllerInterface
         return $form;
     }
 
-    /**
-     * @return \Thelia\Core\Form\TheliaFormValidator
-     */
-    protected function getTheliaFormValidator()
+    protected function getTheliaFormValidator(): TheliaFormValidator
     {
-        return $this->container->get('thelia.form_validator');
+        return $this->theliaFormValidator;
     }
 
-    /**
-     * @param int    $order_id
-     * @param string $fileName
-     * @param bool   $checkOrderStatus
-     * @param bool   $checkAdminUser
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    protected function generateOrderPdf(EventDispatcherInterface $eventDispatcher, $order_id, $fileName, $checkOrderStatus = true, $checkAdminUser = true, $browser = false)
-    {
+    protected function generateOrderPdf(
+        EventDispatcherInterface $eventDispatcher,
+        int $order_id,
+        string $fileName,
+        bool $checkOrderStatus = true,
+        bool $checkAdminUser = true,
+        $browser = false
+    ): Response {
         $order = OrderQuery::create()->findPk($order_id);
 
         // check if the order has the paid status
-        if ($checkAdminUser && !$this->getSecurityContext()->hasAdminUser()) {
-            if ($checkOrderStatus && !$order->isPaid(false)) {
-                throw new NotFoundHttpException();
-            }
+        if ($checkAdminUser && $checkOrderStatus && !$order->isPaid(false) && !$this->getSecurityContext()->hasAdminUser()) {
+            throw new NotFoundHttpException();
         }
 
         $html = $this->renderRaw(
@@ -355,20 +316,15 @@ abstract class BaseController implements ControllerInterface
 
     /**
      * Search url in a form parameter, or in a request parameter.
-     *
-     * @param string   $parameterName the form parameter name, or request parameter name
-     * @param BaseForm $form          the form
-     *
-     * @return mixed|string|null
      */
-    protected function retrieveFormBasedUrl($parameterName, BaseForm $form = null)
+    protected function retrieveFormBasedUrl(string $parameterName, BaseForm $form = null)
     {
         $url = null;
 
-        if ($form != null) {
+        if ($form !== null) {
             $url = $form->getFormDefinedUrl($parameterName);
         } else {
-            $url = $this->container->get('request_stack')->getCurrentRequest()->get($parameterName);
+            $url = $this->requestStack->getCurrentRequest()?->get($parameterName);
         }
 
         return $url;
@@ -512,20 +468,13 @@ abstract class BaseController implements ControllerInterface
         return $router->generate($routeId, $parameters, $referenceType);
     }
 
-    /**
-     * @return Router
-     */
-    protected function getRouter($routerName)
+    protected function getRouter($routerName): ?object
     {
         return $this->container->get($routerName);
     }
 
     /**
      * Return a 404 error.
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     *
-     * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function pageNotFound()
     {
@@ -534,12 +483,10 @@ abstract class BaseController implements ControllerInterface
 
     /**
      * Check if environment is in debug mode.
-     *
-     * @return bool
      */
-    protected function isDebug()
+    protected function isDebug(): bool
     {
-        return $this->container->getParameter('kernel.debug');
+        return (bool) $this->parameterBag->get('kernel.debug');
     }
 
     protected function accessDenied(): void
@@ -554,24 +501,17 @@ abstract class BaseController implements ControllerInterface
      */
     protected function checkXmlHttpRequest(): void
     {
-        if (false === $this->container->get('request_stack')->getCurrentRequest()->isXmlHttpRequest() && false === $this->isDebug()) {
+        if (false === $this->requestStack->getCurrentRequest()?->isXmlHttpRequest() && false === $this->isDebug()) {
             $this->accessDenied();
         }
     }
 
-    /**
-     * return an instance of \Swift_Mailer with good Transporter configured.
-     *
-     * @return MailerFactory
-     *
-     * @deprecated since Thelia 2.5, use autowiring instead.
-     */
-    public function getMailer()
+    public function getMailer(): MailerInterface
     {
-        return $this->container->get('mailer');
+        return $this->mailer;
     }
 
-    protected function getCurrentRouter()
+    protected function getCurrentRouter(): string
     {
         return $this->currentRouter;
     }
@@ -586,29 +526,21 @@ abstract class BaseController implements ControllerInterface
      *
      * This method builds a thelia form with its name
      */
-    public function createForm($name, $type = FormType::class, array $data = [], array $options = [])
+    public function createForm($name, $type = FormType::class, array $data = [], array $options = []): BaseForm
     {
         if (empty($name)) {
             $name = static::EMPTY_FORM_NAME;
         }
 
-        return $this->getTheliaFormFactory()->createForm($name, $type, $data, $options);
+        return $this->theliaFormFactory->createForm($name, $type, $data, $options);
     }
 
-    /**
-     * @return \Thelia\Core\Form\TheliaFormFactory
-     *
-     * @deprecated since Thelia 2.5, use autowiring instead.
-     */
-    protected function getTheliaFormFactory()
+    protected function getTheliaFormFactory(): TheliaFormFactory
     {
-        return $this->container->get('thelia.form_factory');
+        return $this->theliaFormFactory;
     }
 
-    /**
-     * @return \Symfony\Component\DependencyInjection\ContainerInterface
-     */
-    public function getContainer()
+    public function getContainer(): ContainerInterface
     {
         return $this->container;
     }
