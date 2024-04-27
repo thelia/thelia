@@ -27,10 +27,7 @@ class BaseFrontController extends BaseController
 {
     public const CONTROLLER_TYPE = 'front';
 
-    protected $currentRouter = 'router.front';
-
-    #[Required]
-    public ParserResolver $parserResolver;
+    protected string $currentRouter = 'router.front';
 
     public function checkAuth(): void
     {

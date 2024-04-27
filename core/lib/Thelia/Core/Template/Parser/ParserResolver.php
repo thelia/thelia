@@ -20,7 +20,7 @@ use Thelia\Core\Template\ParserInterface;
 class ParserResolver
 {
     public function __construct(
-        #[TaggedIterator('thelia.parser.template')]
+        #[TaggedIterator('thelia.parser.template', exclude: [ParserFallback::class])]
         private readonly iterable $parsers
     ) {
     }
@@ -41,5 +41,13 @@ class ParserResolver
         }
 
         throw new \Exception(sprintf('Parser %s not found', $templateName));
+    }
+
+    /**
+     * @return iterable
+     */
+    public function getParsers(): iterable
+    {
+        return $this->parsers;
     }
 }

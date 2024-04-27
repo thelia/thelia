@@ -698,17 +698,6 @@ abstract class AbstractCrudController extends BaseAdminController
         return $this->defaultAction();
     }
 
-    /**
-     * @return \Thelia\Core\HttpFoundation\Request
-     *
-     * @since 2.3
-     * @deprecated since Thelia 2.5, use autowiring instead.
-     */
-    protected function getRequest()
-    {
-        return $this->container->get('request_stack')->getCurrentRequest();
-    }
-
     protected function bindFormToPropelEvent(ActiveRecordEvent $propelEvent, Form $form): void
     {
         $fields = $form->getIterator();

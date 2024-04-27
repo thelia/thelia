@@ -12,6 +12,8 @@
 
 namespace Thelia\Core\Security\Resource;
 
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Thelia\Core\Security\Exception\ResourceException;
 
 /**
@@ -19,6 +21,7 @@ use Thelia\Core\Security\Exception\ResourceException;
  *
  * @author Etienne roudeix <eroudeix@openstudio.fr>
  */
+#[AutoconfigureTag('thelia.admin.resources')]
 class AdminResources
 {
     /**
@@ -153,8 +156,10 @@ class AdminResources
      *
      * @param array $resources with format module => [ KEY => value ]
      */
-    public function __construct($resources)
-    {
+    public function __construct(
+        #[Autowire('%admin.resources%')]
+        array $resources
+    ) {
         $this->resources = $resources;
     }
 
