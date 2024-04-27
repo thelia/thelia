@@ -20,7 +20,6 @@ use Thelia\Core\Form\TheliaFormValidator;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Thelia;
 use Thelia\Form\BaseForm;
-use TheliaSmarty\Template\Exception\SmartyPluginException;
 
 /**
  * The parser context is an application-wide context, which stores var-value pairs.
@@ -98,7 +97,7 @@ class ParserContext implements \IteratorAggregate
         $form = end($this->formStore);
 
         if (false === $form) {
-            throw new SmartyPluginException(
+            throw new \RuntimeException(
                 'There is currently no defined form'
             );
         }

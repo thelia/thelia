@@ -34,7 +34,7 @@ use TheliaMigrateCountry\Events\MigrateCountryEvents;
  */
 class MigrateController extends BaseAdminController
 {
-    protected $useFallbackTemplate = true;
+    protected bool $useFallbackTemplate = true;
 
     public function migrateSystemAction()
     {
