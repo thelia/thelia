@@ -59,7 +59,7 @@ class DataAccessService
             $this->parameterBag->get('Thelia.parser.loops'),
             $this->parameterBag->get('kernel.environment')
         );
-
+        $instance->initializeArgs($params);
         $loopResults = $instance->exec($pagination);
 
         $datas = [];
