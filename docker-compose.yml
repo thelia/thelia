@@ -1,7 +1,7 @@
 services:
   mariadb:
     image: mariadb:11.2
-    container_name: docker-thelia-mariadb
+    container_name: docker-thelia-twig-mariadb
     working_dir: /application
     volumes:
       - .:/application
@@ -16,7 +16,7 @@ services:
 
   webserver:
     image: nginx:alpine
-    container_name: docker-thelia-webserver
+    container_name: docker-thelia-twig-webserver
     working_dir: /application
     volumes:
       - .:/application
@@ -26,7 +26,7 @@ services:
 
   php-fpm:
     build: .docker/php-fpm
-    container_name: docker-thelia-php-fpm
+    container_name: docker-thelia-twig-php-fpm
     working_dir: /application
     volumes:
       - .:/application
@@ -43,6 +43,6 @@ services:
 
   mailhog:
     image: mailhog/mailhog:latest
-    container_name: docker-thelia-mailhog
+    container_name: docker-thelia-twig-mailhog
     ports:
       - 8085:8025
