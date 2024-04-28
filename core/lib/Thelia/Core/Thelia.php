@@ -389,8 +389,8 @@ class Thelia extends Kernel
         $this->loadAutoConfigureInterfaces($container);
         $this->loadModulesConfiguration($container);
 
-        $this->getContainer()->set('thelia.propel.schema.locator', $this->propelSchemaLocator);
-        $this->getContainer()->set('thelia.propel.init', $this->propelInitService);
+        $container->set('thelia.propel.schema.locator', $this->propelSchemaLocator);
+        $container->set('thelia.propel.init', $this->propelInitService);
         $this->registerTemplateClassLoader($container);
 
         return $container;
