@@ -718,7 +718,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->findOneByLocale($event->getLocale());
 
             // Nothing found for this lang and the new value is not empty : create FeatureAvI18n
-            if ($freeTextFeatureAvI18n === null && !empty($featureAvId)) {
+            if ($freeTextFeatureAvI18n === null && $featureAvId) != '') {
                 $featureAvI18n = new FeatureAvI18n();
                 $featureAvI18n
                     ->setId($freeTextFeatureAv->getId())
@@ -728,7 +728,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
                 $featureAvId = $featureAvI18n->getId();
             } // Else if i18n exists but new value is empty : delete FeatureAvI18n
-            elseif ($freeTextFeatureAvI18n !== null && empty($featureAvId)) {
+            elseif ($freeTextFeatureAvI18n !== null && $featureAvId == '') {
                 $freeTextFeatureAvI18n->delete();
 
                 // Check if there are still some FeatureAvI18n for this FeatureAv
@@ -746,13 +746,13 @@ class Product extends BaseAction implements EventSubscriberInterface
 
                 return;
             } // Else if a FeatureAvI18n is found and the new value is not empty : update existing FeatureAvI18n
-            elseif ($freeTextFeatureAvI18n !== null && !empty($featureAvId)) {
+            elseif ($freeTextFeatureAvI18n !== null && $featureAvId != '') {
                 $freeTextFeatureAvI18n->setTitle($featureAvId);
                 $freeTextFeatureAvI18n->save();
 
                 $featureAvId = $freeTextFeatureAvI18n->getId();
             } // To prevent Integrity constraint violation
-            elseif (empty($featureAvId)) {
+            elseif ($featureAvId == '') {
                 return;
             }
         }
