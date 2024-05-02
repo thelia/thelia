@@ -718,7 +718,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->findOneByLocale($event->getLocale());
 
             // Nothing found for this lang and the new value is not empty : create FeatureAvI18n
-            if ($freeTextFeatureAvI18n === null && $featureAvId) != '') {
+            if ($freeTextFeatureAvI18n === null && $featureAvId != '') {
                 $featureAvI18n = new FeatureAvI18n();
                 $featureAvI18n
                     ->setId($freeTextFeatureAv->getId())
