@@ -21,6 +21,7 @@ use TheliaSmarty\Template\Plugins\TheliaLoop;
 
 /**
  * Give information about the given loop.
+ * This information is the arguments names, types, default value, mandatory status, examples of use and enum possible value.
  *
  * Class LoopInfoCommand
  *
@@ -70,12 +71,21 @@ class LoopInfoCommand extends ContainerAwareCommand
         return 0;
     }
 
+    /**
+     * Manage the display of all loops info in json format.
+     *
+     * @throws \ReflectionException
+     */
     protected function getAllLoopsInfo(): void
     {
+        // We get the list of all loops
         $loops = $this->theliaLoop->getLoopList();
         $classes = [];
         $allArgs = [];
         $result = [];
+
+        // Put all the classes in the array $classes and associate them with the loop names associated
+        // (A same loop can have several names)
         foreach ($loops as $name => $class) {
             if (!isset($classes[$class])) {
                 $classes[$class] = [$name];
@@ -83,6 +93,9 @@ class LoopInfoCommand extends ContainerAwareCommand
                 $classes[$class][] = $name;
             }
         }
+
+        // Put all the arguments of the loops in an array $parentClass
+        // Put the parent class name in the $result array
         foreach ($classes as $class => $names) {
             $arguments = $this->getLoopArgs($class);
             $allArgs[$names[0]] = $arguments;
@@ -92,30 +105,30 @@ class LoopInfoCommand extends ContainerAwareCommand
 
         foreach ($allArgs as $loop => $args) {
             foreach ($args as $arg) {
+                // The array of all arrays of the enum possible value by arguments
                 $additionalArrays = [];
+                // The array of all titles for each enum possible value
                 $additionalTitle = [];
+                $positionInAdditionalArrays = 0;
+
+                // Get all the argument types
                 $reflectionClass = new \ReflectionClass($arg->type);
                 $property = $reflectionClass->getProperty('types');
                 $property->setAccessible(true);
                 $types = $property->getValue($arg->type);
+
                 if ($arg->mandatory) {
                     $mandatory = 'yes';
                 } else {
                     $mandatory = '';
                 }
+
                 $formatedTypes = '';
                 $nbTypes = 0;
+                $argumentExample = '';
+                $nbEnumExample = 0;
                 foreach ($types as $type) {
-                    ++$nbTypes;
-                    if ($nbTypes > 1) {
-                        $formatedTypes .= ' or ';
-                    }
-                    $formatedTypes .= $type->getType();
-
-                    // If this is an enum type, we must generate a specific table
-                    if ($type->getType() == 'Enum list type' || $type->getType() == 'Enum type') {
-                        $this->enumArrayGenerator($additionalArrays, $additionalTitle, $type, $arg->name);
-                    }
+                    $this->parseType($nbTypes, $formatedTypes, $type, $nbEnumExample, $argumentExample, $arg->name, $additionalArrays, $additionalTitle, $positionInAdditionalArrays);
                     for ($i = 0; $i < \count($additionalTitle); ++$i) {
                         foreach ($additionalArrays as $additionalArray) {
                             foreach ($additionalArray as $enumPossibility) {
@@ -129,12 +142,17 @@ class LoopInfoCommand extends ContainerAwareCommand
                 } else {
                     $default = $arg->default;
                 }
-                $result[$loop]['args'][$arg->name] = [$formatedTypes, $default, $mandatory];
+                $result[$loop]['args'][$arg->name] = [$formatedTypes, $default, $mandatory, $argumentExample];
             }
         }
         print_r(json_encode($result));
     }
 
+    /**
+     * Return the detailed loop arguments.
+     *
+     * @throws \ReflectionException
+     */
     protected function getLoopArgs(string $loopClass): mixed
     {
         $loop = new $loopClass();
@@ -157,6 +175,9 @@ class LoopInfoCommand extends ContainerAwareCommand
         return $result;
     }
 
+    /**
+     * Return the parent loop name of the loop given in parameter.
+     */
     protected function getParentLoop(string $loopClass): string
     {
         $parentClass = get_parent_class(new $loopClass());
@@ -164,6 +185,11 @@ class LoopInfoCommand extends ContainerAwareCommand
         return $parentClass !== false ? $parentClass : '';
     }
 
+    /**
+     * Manage the display of the loop given by parameter.
+     *
+     * @throws \ReflectionException
+     */
     protected function getOneLoopInfo(OutputInterface $output, string $loopName): void
     {
         $loops = $this->theliaLoop->getLoopList();
@@ -174,7 +200,8 @@ class LoopInfoCommand extends ContainerAwareCommand
             }
         }
         if (!isset($loopClass)) {
-            trigger_error("The loop name '".$loopName."' doesn't correspond to any loop in the project.\n'php Thelia loop:list' can help you find the loop name you're looking for.", \E_USER_ERROR);
+            trigger_error("The loop name '".$loopName."' doesn't correspond to any loop in the project.\n".
+                "'php Thelia loop:list' can help you find the loop name you're looking for.", \E_USER_ERROR);
         }
         $arguments = $this->getLoopArgs($loopClass);
 
@@ -188,6 +215,8 @@ class LoopInfoCommand extends ContainerAwareCommand
         $additionalArrays = [];
         $additionalTitle = [];
 
+        $positionInAdditionalArrays = 0;
+
         foreach ($arguments as $argument) {
             $reflectionClass = new \ReflectionClass($argument->type);
             $property = $reflectionClass->getProperty('types');
@@ -200,17 +229,10 @@ class LoopInfoCommand extends ContainerAwareCommand
             }
             $formatedTypes = '';
             $nbTypes = 0;
+            $argumentExample = '';
+            $nbEnumExample = 0;
             foreach ($types as $type) {
-                ++$nbTypes;
-                if ($nbTypes > 1) {
-                    $formatedTypes .= ' or ';
-                }
-                $formatedTypes .= $type->getType();
-
-                // If this is an enum type, we must generate a specific table
-                if ($type->getType() == 'Enum list type' || $type->getType() == 'Enum type') {
-                    $this->enumArrayGenerator($additionalArrays, $additionalTitle, $type, $argument->name);
-                }
+                $this->parseType($nbTypes, $formatedTypes, $type, $nbEnumExample, $argumentExample, $argument->name, $additionalArrays, $additionalTitle, $positionInAdditionalArrays);
             }
 
             if ($argument->default === false) {
@@ -218,16 +240,16 @@ class LoopInfoCommand extends ContainerAwareCommand
             } else {
                 $default = $argument->default;
             }
-            $tableToSort[] = [$argument->name, $formatedTypes, $default, $mandatory];
+            $tableToSort[] = [$argument->name, $formatedTypes, $default, $mandatory, $argumentExample];
         }
 
         sort($tableToSort);
         foreach ($tableToSort as $line) {
-            $table->addRow([$line[0], $line[1], $line[2], $line[3]]);
+            $table->addRow([$line[0], $line[1], $line[2], $line[3], $line[4]]);
         }
 
         $table
-            ->setHeaders(['Name', 'Type', 'Default', 'Mandatory'])
+            ->setHeaders(['Name', 'Type', 'Default', 'Mandatory', 'Examples'])
             ->render()
         ;
 
@@ -252,6 +274,61 @@ class LoopInfoCommand extends ContainerAwareCommand
         }
     }
 
+    /**
+     * Manage the loop argument type analysis.
+     */
+    protected function parseType(int &$nbTypes, &$formatedTypes, $type, &$nbEnumExample, &$argumentExample, string $argumentName, array &$additionalArrays, array &$additionalTitle, int &$positionInAdditionalArrays): void
+    {
+        ++$nbTypes;
+        if ($nbTypes > 1) {
+            $formatedTypes .= ' or ';
+            if (!(($type->getType() == 'Enum list type' || $type->getType() == 'Enum type') && $nbEnumExample > 0)) {
+                $argumentExample .= ', ';
+            }
+        }
+        $formatedTypes .= $type->getType();
+        if (!(($type->getType() == 'Enum list type' || $type->getType() == 'Enum type') && $nbEnumExample > 0)) {
+            $argumentExample .= $argumentName.'=';
+        }
+
+        // If this is an enum type, we must generate a specific table
+        if ($type->getType() == 'Enum list type' || $type->getType() == 'Enum type') {
+            $this->enumArrayGenerator($additionalArrays, $additionalTitle, $type, $argumentName);
+            if ($nbEnumExample <= 0) {
+                $argumentExample .= '"'.$additionalArrays[$positionInAdditionalArrays][0][0].'"';
+                ++$positionInAdditionalArrays;
+            }
+            ++$nbEnumExample;
+        } elseif ($type->getType() == 'Int type') {
+            $argumentExample .= '"2"';
+        } elseif ($type->getType() == 'Int list type') {
+            $argumentExample .= '"2", '.$argumentName.'="1,4,7"';
+        } elseif ($type->getType() == 'Boolean type') {
+            $argumentExample .= '"true"';
+        } elseif ($type->getType() == 'Boolean or both type') {
+            $argumentExample .= '"true", '.$argumentName.'="*"';
+        } elseif ($type->getType() == 'Float type') {
+            $argumentExample .= '"30.1"';
+        } elseif ($type->getType() == 'Any type') {
+            $argumentExample .= '"foo"';
+        } elseif ($type->getType() == 'Any list type') {
+            $argumentExample .= '"foo", '.$argumentName.'="foo,bar,baz"';
+        } elseif ($type->getType() == 'Alphanumeric string type') {
+            $argumentExample .= '"foo"';
+        } elseif ($type->getType() == 'Alphanumeric string list type') {
+            $argumentExample .= '"foo", '.$argumentName.'="foo,bar,baz"';
+        } else {
+            // If we don't recognize the type, there is no need to display the argument name in the examples section
+            $argumentExample = preg_replace('/'.$argumentName.'=$/', ' ', $argumentExample);
+            $argumentExample = preg_replace('/, /', ' ', $argumentExample);
+        }
+    }
+
+    /**
+     * Manage the generation of the enum type possibles values arrays.
+     *
+     * @throws \ReflectionException
+     */
     protected function enumArrayGenerator(array &$additionalArrays, array &$additionalTitle, mixed $type, string $argumentName): void
     {
         $reflectionClass = new \ReflectionClass($type);
