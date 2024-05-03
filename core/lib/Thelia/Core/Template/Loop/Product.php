@@ -1098,7 +1098,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $search->withColumn('`pse`.WEIGHT', 'weight');
             $search->withColumn('`pse`.EAN_CODE', 'ean_code');
 
-            $search->withColumn('COUNT(`pse_count`.ID)', 'pse_count');
+            $search->withColumn('COUNT(distinct(`pse_count`.ID))', 'pse_count');
         }
 
         $orders = $this->getOrder();
