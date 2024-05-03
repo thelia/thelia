@@ -40,7 +40,7 @@
         {/loop}
 
         {loop type="module-config" name="dummy" module="tinymce" variable="show_menu_bar" default_value="0"}
-            {if $VALUE == 0}
+            {if $VALUE != 1}
                 menubar : false,
             {/if}
         {/loop}
