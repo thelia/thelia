@@ -158,7 +158,12 @@ class LoopInfoCommand extends ContainerAwareCommand
     /**
      * Return the detailed loop arguments.
      *
+     * @param string $loopClass                The loop class file path
+     * @param string $dynamicDefinitionWarning To report any warnings
+     *
      * @throws \ReflectionException
+     *
+     * @return mixed All detailed loop arguments
      */
     protected function getLoopArgs(string $loopClass, string &$dynamicDefinitionWarning): mixed
     {
@@ -174,7 +179,7 @@ class LoopInfoCommand extends ContainerAwareCommand
             // Try to execute the method to get the arguments details
             $result = $method->invoke($loop);
         } catch (\Throwable $error1) {
-            // If execution failed, maybe there is a dynamically defined argument detail
+            // If execution failed, there is a dynamically defined argument detail
             try {
                 // A known case of failure is the not defined request stack
                 // Try to define one
@@ -191,15 +196,16 @@ class LoopInfoCommand extends ContainerAwareCommand
                 $property->setAccessible(true);
                 $property->setValue($loop, $this->getContainer()->get('request_stack'));
 
-
                 $result = $method->invoke($loop);
 
-                // If the first method execution failed,
                 error_log("[Info] One or more \033[4;33m".$loopClass."\033[0m arguments or enum possible values are dynamically defined, you need to be careful");
                 $dynamicDefinitionWarning = 'One or more loop argument values are defined dynamically, you need to be careful.';
             } catch (\Throwable $error2) {
+                // If execution fails again, the problem will not be repaired and the result will be an empty loop.
                 $result = $loop;
                 $dynamicDefinitionWarning = 'An error occur when trying to get the loop arguments.';
+
+                // The program will display errors, but will not crash
                 error_log("[\033[31mWarning\033[0m] Error while trying to get the \033[4;33m".$loopClass."\033[0m arguments.");
                 error_log('[Hint] This is probably due to the lack of an element instantiation in the getArgDefinitions() function, which creates and retrieves the loop arguments.');
                 error_log($error2);
@@ -210,28 +216,11 @@ class LoopInfoCommand extends ContainerAwareCommand
     }
 
     /**
-     * To get the argument name in a line passed by parameter.
-     */
-    protected function getArgumentInLine(string $line): string
-    {
-        $isArgName = false;
-        $argName = '';
-        foreach (str_split($line) as $letter) {
-            if ($letter == '\'') {
-                if ($isArgName) {
-                    break;
-                }
-                $isArgName = true;
-            } elseif ($isArgName) {
-                $argName .= $letter;
-            }
-        }
-
-        return $argName;
-    }
-
-    /**
      * Return the parent loop name of the loop given in parameter.
+     *
+     * @param string $loopClass The loop class file path
+     *
+     * @return string The parent loop class file path
      */
     protected function getParentLoop(string $loopClass): string
     {
@@ -247,13 +236,18 @@ class LoopInfoCommand extends ContainerAwareCommand
      */
     protected function getOneLoopInfo(OutputInterface $output, string $loopName): void
     {
+        // Get the list of all loop in the project
         $loops = $this->theliaLoop->getLoopList();
+
+        // Search for the loop name given in parameter to get the loop class file path
         foreach ($loops as $name => $class) {
             if ($loopName === $name) {
                 $loopClass = $class;
                 break;
             }
         }
+
+        // If the loop doesn't exist in the project
         if (!isset($loopClass)) {
             trigger_error("The loop name '".$loopName."' doesn't correspond to any loop in the project.\n".
                 "'php Thelia loop:list' can help you find the loop name you're looking for.", \E_USER_ERROR);
@@ -262,50 +256,61 @@ class LoopInfoCommand extends ContainerAwareCommand
         $dynamicDefinitionWarning = '';
         $arguments = $this->getLoopArgs($loopClass, $dynamicDefinitionWarning);
 
+        // Output display
         echo "\033[1m\033[32m".$loopName." loop\033[0m\n\n";
-
         echo "\033[1m\033[4mArguments\033[0m\n";
         echo $dynamicDefinitionWarning."\n" ?? '';
 
+        // An array to save all arguments and associated details
         $tableToSort = [];
-        $table = new Table($output);
 
+        // An array to save the enum possible values
         $additionalArrays = [];
+        // Another one to save the arguments relative to the previous enum possible values
         $additionalTitle = [];
-
         $positionInAdditionalArrays = 0;
 
         foreach ($arguments as $argument) {
-            $reflectionClass = new \ReflectionClass($argument->type);
-            $property = $reflectionClass->getProperty('types');
-            $property->setAccessible(true);
-            $types = $property->getValue($argument->type);
             if ($argument->mandatory) {
                 $mandatory = 'yes';
             } else {
                 $mandatory = '';
             }
+
+            // To access the protected attribute of the argument types
+            $reflectionClass = new \ReflectionClass($argument->type);
+            $property = $reflectionClass->getProperty('types');
+            $property->setAccessible(true);
+            $types = $property->getValue($argument->type);
+            // To get the types list in string format
             $formatedTypes = '';
             $nbTypes = 0;
             $argumentExample = '';
             $nbEnumExample = 0;
+
+            // There are one or many type foreach argument
             foreach ($types as $type) {
                 $this->parseType($nbTypes, $formatedTypes, $type, $nbEnumExample, $argumentExample, $argument->name, $additionalArrays, $additionalTitle, $positionInAdditionalArrays);
             }
 
             if ($argument->default === false) {
+                // If the default argument value is a Boolean false, no value is displayed
+                // Conversion in string format
                 $default = 'false';
             } else {
                 $default = $argument->default;
             }
+
             $tableToSort[] = [$argument->name, $formatedTypes, $default, $mandatory, $argumentExample];
         }
 
         sort($tableToSort);
+
+        // To get a table display of the arguments
+        $table = new Table($output);
         foreach ($tableToSort as $line) {
             $table->addRow([$line[0], $line[1], $line[2], $line[3], $line[4]]);
         }
-
         $table
             ->setHeaders(['Name', 'Type', 'Default', 'Mandatory', 'Examples'])
             ->render()
@@ -315,42 +320,46 @@ class LoopInfoCommand extends ContainerAwareCommand
             echo "\n\033[1m\033[4mEnum possible values\033[0m\n";
         }
 
-        $additionnalTables = [];
+        $additionalTitleIterator = 0;
+        // To get a table display of all the enum possible values
+        // There may be several enumerable arguments foreach loop
         foreach ($additionalArrays as $additionalArray) {
             $newTable = new Table($output);
+            $newTable->setHeaders([$additionalTitle[$additionalTitleIterator]]);
+            // There may also be several possible value foreach enumerable argument
             foreach ($additionalArray as $enumPossibility) {
                 $newTable->addRow($enumPossibility);
             }
-
-            $additionnalTables[] = $newTable;
-        }
-        for ($i = 0; $i < \count($additionnalTables); ++$i) {
-            $additionnalTables[$i]
-                ->setHeaders([$additionalTitle[$i]])
-                ->render()
-            ;
+            ++$additionalTitleIterator;
+            $newTable->render();
         }
     }
 
     /**
      * Manage the loop argument type analysis.
+     *
+     * @param string $formatedTypes    The types list in string format
+     * @param array  $additionalArrays An array to save the enum possible values
+     * @param array  $additionalTitle  An array to save the arguments relative to the enum possible values
+     *
+     * @throws \ReflectionException
      */
-    protected function parseType(int &$nbTypes, &$formatedTypes, $type, &$nbEnumExample, &$argumentExample, string $argumentName, array &$additionalArrays, array &$additionalTitle, int &$positionInAdditionalArrays): void
+    protected function parseType(int &$nbTypes, string &$formatedTypes, $type, int &$nbEnumExample, string &$argumentExample, string $argumentName, array &$additionalArrays, array &$additionalTitle, int &$positionInAdditionalArrays): void
     {
         ++$nbTypes;
         if ($nbTypes > 1) {
             $formatedTypes .= ' or ';
-            if (!(($type->getType() == 'Enum list type' || $type->getType() == 'Enum type') && $nbEnumExample > 0)) {
+            if (($type->getType() != 'Enum list type' && $type->getType() != 'Enum type') || $nbEnumExample <= 0) {
                 $argumentExample .= ', ';
             }
         }
         $formatedTypes .= $type->getType();
-        if (!(($type->getType() == 'Enum list type' || $type->getType() == 'Enum type') && $nbEnumExample > 0)) {
+        if (($type->getType() != 'Enum list type' && $type->getType() != 'Enum type') || $nbEnumExample <= 0) {
             $argumentExample .= $argumentName.'=';
         }
 
-        // If this is an enum type, we must generate a specific table
         if ($type->getType() == 'Enum list type' || $type->getType() == 'Enum type') {
+            // If this is an enum type, we must generate a specific array
             $this->enumArrayGenerator($additionalArrays, $additionalTitle, $type, $argumentName);
             if ($nbEnumExample <= 0) {
                 $argumentExample .= '"'.$additionalArrays[$positionInAdditionalArrays][0][0].'"';
