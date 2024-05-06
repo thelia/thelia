@@ -17,6 +17,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Thelia\Model\Currency;
+use Thelia\Model\Lang;
 use TheliaSmarty\Template\Plugins\TheliaLoop;
 
 /**
@@ -56,6 +58,9 @@ class LoopInfoCommand extends ContainerAwareCommand
         ;
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($input->getOption('all')) {
@@ -97,10 +102,12 @@ class LoopInfoCommand extends ContainerAwareCommand
         // Put all the arguments of the loops in an array $parentClass
         // Put the parent class name in the $result array
         foreach ($classes as $class => $names) {
-            $arguments = $this->getLoopArgs($class);
+            $dynamicDefinitionWarning = '';
+            $arguments = $this->getLoopArgs($class, $dynamicDefinitionWarning);
             $allArgs[$names[0]] = $arguments;
+            $result[$names[0]]['warning'] = $dynamicDefinitionWarning;
             $parentClass = $this->getParentLoop($class);
-            $result[$names[0]]['extends'] = [$parentClass];
+            $result[$names[0]]['extends'] = $parentClass;
         }
 
         foreach ($allArgs as $loop => $args) {
@@ -153,26 +160,74 @@ class LoopInfoCommand extends ContainerAwareCommand
      *
      * @throws \ReflectionException
      */
-    protected function getLoopArgs(string $loopClass): mixed
+    protected function getLoopArgs(string $loopClass, string &$dynamicDefinitionWarning): mixed
     {
         $loop = new $loopClass();
 
-        // That's hideous, but it works.
-        // We need to use a protected method, so we reflect the class to modify it.
+        // Need to use a protected method to get the arguments details
+        // Reflecting the class to modify the accessibility.
         $reflectionClass = new \ReflectionClass($loop);
         $method = $reflectionClass->getMethod('getArgDefinitions');
         $method->setAccessible(true);
 
         try {
+            // Try to execute the method to get the arguments details
             $result = $method->invoke($loop);
-        } catch (\Throwable $e) {
-            $result = $loop;
-            error_log("[\033[31mWarning\033[0m] Error while trying to get the ".$loopClass.' arguments.');
-            error_log('[Hint] This is probably due to the lack of an element instantiation in the getArgDefinitions() function, which creates and retrieves the loop arguments.');
-            error_log($e);
+        } catch (\Throwable $error1) {
+            // If execution failed, maybe there is a dynamically defined argument detail
+            try {
+                // A known case of failure is the not defined request stack
+                // Try to define one
+                $this->initRequest();
+                $session = $this->getContainer()->get('request_stack')->getCurrentRequest()->getSession();
+                $session
+                    ->setLang(Lang::getDefaultLanguage())
+                    ->setCurrency(Currency::getDefaultCurrency())
+                ;
+                $this->getContainer()->get('request')->setSession($session);
+
+                // To access the request stack's private attribute
+                $property = $reflectionClass->getProperty('requestStack');
+                $property->setAccessible(true);
+                $property->setValue($loop, $this->getContainer()->get('request_stack'));
+
+
+                $result = $method->invoke($loop);
+
+                // If the first method execution failed,
+                error_log("[Info] One or more \033[4;33m".$loopClass."\033[0m arguments or enum possible values are dynamically defined, you need to be careful");
+                $dynamicDefinitionWarning = 'One or more loop argument values are defined dynamically, you need to be careful.';
+            } catch (\Throwable $error2) {
+                $result = $loop;
+                $dynamicDefinitionWarning = 'An error occur when trying to get the loop arguments.';
+                error_log("[\033[31mWarning\033[0m] Error while trying to get the \033[4;33m".$loopClass."\033[0m arguments.");
+                error_log('[Hint] This is probably due to the lack of an element instantiation in the getArgDefinitions() function, which creates and retrieves the loop arguments.');
+                error_log($error2);
+            }
         }
 
         return $result;
+    }
+
+    /**
+     * To get the argument name in a line passed by parameter.
+     */
+    protected function getArgumentInLine(string $line): string
+    {
+        $isArgName = false;
+        $argName = '';
+        foreach (str_split($line) as $letter) {
+            if ($letter == '\'') {
+                if ($isArgName) {
+                    break;
+                }
+                $isArgName = true;
+            } elseif ($isArgName) {
+                $argName .= $letter;
+            }
+        }
+
+        return $argName;
     }
 
     /**
@@ -203,11 +258,14 @@ class LoopInfoCommand extends ContainerAwareCommand
             trigger_error("The loop name '".$loopName."' doesn't correspond to any loop in the project.\n".
                 "'php Thelia loop:list' can help you find the loop name you're looking for.", \E_USER_ERROR);
         }
-        $arguments = $this->getLoopArgs($loopClass);
+
+        $dynamicDefinitionWarning = '';
+        $arguments = $this->getLoopArgs($loopClass, $dynamicDefinitionWarning);
 
         echo "\033[1m\033[32m".$loopName." loop\033[0m\n\n";
 
         echo "\033[1m\033[4mArguments\033[0m\n";
+        echo $dynamicDefinitionWarning."\n" ?? '';
 
         $tableToSort = [];
         $table = new Table($output);
