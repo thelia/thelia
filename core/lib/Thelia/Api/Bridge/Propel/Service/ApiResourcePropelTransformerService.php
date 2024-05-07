@@ -102,6 +102,8 @@ readonly class ApiResourcePropelTransformerService
             foreach ($this->getResourceAddonDefinitions($resourceClass) as $addonShortName => $addonClass) {
                 if (is_subclass_of($addonClass, ResourceAddonInterface::class)) {
                     $addon = (new $addonClass())->buildFromModel($propelModel, $apiResource);
+                    // maybe find a better way to set the addon in the model (symfony property accessor need to access this property)
+                    $apiResource->{$addonShortName} = $addon;
                     $apiResource->setResourceAddon($addonShortName, $addon);
                 }
             }
