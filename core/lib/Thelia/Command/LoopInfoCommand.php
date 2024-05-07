@@ -19,6 +19,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Model\Currency;
 use Thelia\Model\Lang;
+use Thelia\Type\BaseType;
 use TheliaSmarty\Template\Plugins\TheliaLoop;
 
 /**
@@ -110,14 +111,17 @@ class LoopInfoCommand extends ContainerAwareCommand
             $result[$names[0]]['extends'] = $parentClass;
         }
 
+        // For each loop
         foreach ($allArgs as $loop => $args) {
-            foreach ($args as $arg) {
-                // The array of all arrays of the enum possible value by arguments
-                $additionalArrays = [];
-                // The array of all titles for each enum possible value
-                $additionalTitle = [];
-                $positionInAdditionalArrays = 0;
+            // The array of all arrays of the enum possible value by arguments
+            // This array of array is useful in case an argument is an enum type AND an enum list type
+            $additionalArrays = [];
+            // The array of all titles for each enum possible value
+            $additionalTitle = [];
+            $positionInAdditionalArrays = 0;
 
+            // Each loop can have several arguments
+            foreach ($args as $arg) {
                 // Get all the argument types
                 $reflectionClass = new \ReflectionClass($arg->type);
                 $property = $reflectionClass->getProperty('types');
@@ -134,22 +138,25 @@ class LoopInfoCommand extends ContainerAwareCommand
                 $nbTypes = 0;
                 $argumentExample = '';
                 $nbEnumExample = 0;
+
+                // Each argument can hava several types
                 foreach ($types as $type) {
                     $this->parseType($nbTypes, $formatedTypes, $type, $nbEnumExample, $argumentExample, $arg->name, $additionalArrays, $additionalTitle, $positionInAdditionalArrays);
-                    for ($i = 0; $i < \count($additionalTitle); ++$i) {
-                        foreach ($additionalArrays as $additionalArray) {
-                            foreach ($additionalArray as $enumPossibility) {
-                                $result[$loop]['enums'][$additionalTitle[$i]][] = $enumPossibility;
-                            }
-                        }
-                    }
                 }
+
                 if ($arg->default === false) {
                     $default = 'false';
                 } else {
                     $default = $arg->default;
                 }
                 $result[$loop]['args'][$arg->name] = [$formatedTypes, $default, $mandatory, $argumentExample];
+            }
+            // Each loop can have several enumerable arguments
+            foreach ($additionalArrays as $index => $additionalArray) {
+                // Each enumerable argument can have several enum possible values
+                foreach ($additionalArray as $enumPossibility) {
+                    $result[$loop]['enums'][$additionalTitle[$index]][] = $enumPossibility;
+                }
             }
         }
         print_r(json_encode($result));
@@ -322,7 +329,7 @@ class LoopInfoCommand extends ContainerAwareCommand
 
         $additionalTitleIterator = 0;
         // To get a table display of all the enum possible values
-        // There may be several enumerable arguments foreach loop
+        // There may be several enumerable arguments for the loop
         foreach ($additionalArrays as $additionalArray) {
             $newTable = new Table($output);
             $newTable->setHeaders([$additionalTitle[$additionalTitleIterator]]);
@@ -338,16 +345,23 @@ class LoopInfoCommand extends ContainerAwareCommand
     /**
      * Manage the loop argument type analysis.
      *
-     * @param string $formatedTypes    The types list in string format
-     * @param array  $additionalArrays An array to save the enum possible values
-     * @param array  $additionalTitle  An array to save the arguments relative to the enum possible values
+     * @param int      $nbTypes                    Counts the number of types an argument has
+     * @param string   $formatedTypes              The types list in string format
+     * @param BaseType $type                       The argument type studied
+     * @param int      $nbEnumExample              Counts the number of enumerable types an argument has
+     * @param string   $argumentExample            The example of use deduced for each types of the argument
+     * @param string   $argumentName               The argument name
+     * @param array    $additionalArrays           An array to save the arrays of enum possible values
+     * @param array    $additionalTitle            An array to save the arguments relative to the enum possible values
+     * @param int      $positionInAdditionalArrays A way to know where the type is in the $additionalArrays to get an enum possible value for the $argumentExample
      *
      * @throws \ReflectionException
      */
-    protected function parseType(int &$nbTypes, string &$formatedTypes, $type, int &$nbEnumExample, string &$argumentExample, string $argumentName, array &$additionalArrays, array &$additionalTitle, int &$positionInAdditionalArrays): void
+    protected function parseType(int &$nbTypes, string &$formatedTypes, BaseType $type, int &$nbEnumExample, string &$argumentExample, string $argumentName, array &$additionalArrays, array &$additionalTitle, int &$positionInAdditionalArrays): void
     {
         ++$nbTypes;
         if ($nbTypes > 1) {
+            // If there are several types for a common argument, we need to separate the elements them with 'or' or ','
             $formatedTypes .= ' or ';
             if (($type->getType() != 'Enum list type' && $type->getType() != 'Enum type') || $nbEnumExample <= 0) {
                 $argumentExample .= ', ';
@@ -359,14 +373,17 @@ class LoopInfoCommand extends ContainerAwareCommand
         }
 
         if ($type->getType() == 'Enum list type' || $type->getType() == 'Enum type') {
-            // If this is an enum type, we must generate a specific array
+            // If this is an enum type, we must generate a specific array to list all the enum possible values
             $this->enumArrayGenerator($additionalArrays, $additionalTitle, $type, $argumentName);
             if ($nbEnumExample <= 0) {
+                // If there isn't any example for an enumerable type already
+                // Add example with a possible enum value
                 $argumentExample .= '"'.$additionalArrays[$positionInAdditionalArrays][0][0].'"';
                 ++$positionInAdditionalArrays;
             }
             ++$nbEnumExample;
         } elseif ($type->getType() == 'Int type') {
+            // Case-by-case treatment for each type to deduce an example
             $argumentExample .= '"2"';
         } elseif ($type->getType() == 'Int list type') {
             $argumentExample .= '"2", '.$argumentName.'="1,4,7"';
@@ -392,21 +409,34 @@ class LoopInfoCommand extends ContainerAwareCommand
     }
 
     /**
-     * Manage the generation of the enum type possibles values arrays.
+     * Manage the generation of the enum possibles values arrays.
+     *
+     * @param array    $additionalArrays An array to save the arrays of enum possible values
+     * @param array    $additionalTitle  An array to save the arguments relative to the enum possible values
+     * @param BaseType $type             The argument type studied
+     * @param string   $argumentName     The argument name
      *
      * @throws \ReflectionException
      */
-    protected function enumArrayGenerator(array &$additionalArrays, array &$additionalTitle, mixed $type, string $argumentName): void
+    protected function enumArrayGenerator(array &$additionalArrays, array &$additionalTitle, BaseType $type, string $argumentName): void
     {
+        // To access the type values protected attribute, where all the enum possible values are defined
         $reflectionClass = new \ReflectionClass($type);
         $property = $reflectionClass->getProperty('values');
         $property->setAccessible(true);
         $values = $property->getValue($type);
+
+        // The new array to save the enum possible values of the studied enum type
         $newArray = [];
+
+        // Specific treatment if the argument is an order enumerable to separate normal and reverse values
         if ($argumentName == 'order') {
+            // An array to distinguish the normal order values
             $arrayNormal = [];
+            // An array to distinguish the reverse order values
             $arrayReverse = [];
-            $arrayOrder = [];
+
+            // Sorting of each enum possible value according to whether they are normal or reverse
             foreach ($values as $value) {
                 if (str_contains($value, '_reverse') || str_contains($value, '-reverse')) {
                     $arrayReverse[] = $value;
@@ -414,11 +444,17 @@ class LoopInfoCommand extends ContainerAwareCommand
                     $arrayNormal[] = $value;
                 }
             }
+
+            // Association of normal and reverse values
+            // The $newArray which save the enum possible values will save pairs of normal-reverse values
             foreach ($arrayNormal as $normalValue) {
                 $isReverseFind = false;
                 foreach ($arrayReverse as $reverseValue) {
                     if ($normalValue.'_reverse' == $reverseValue || $normalValue.'-reverse' == $reverseValue) {
-                        $arrayOrder[] = [$normalValue, $reverseValue];
+                        // If normal and reverse values correspond
+                        $newArray[] = [$normalValue, $reverseValue];
+
+                        // Search and delete the reverse value matched
                         $index = array_search($reverseValue, $arrayReverse);
                         if ($index !== false) {
                             unset($arrayReverse[$index]);
@@ -428,22 +464,24 @@ class LoopInfoCommand extends ContainerAwareCommand
                     }
                 }
                 if (!$isReverseFind) {
-                    $arrayOrder[] = [$normalValue, ''];
+                    // If no match were found, save of the normal value without any reverse one
+                    $newArray[] = [$normalValue, ''];
                 }
             }
+
+            // Save of all the no matched reverse values without any normal one
             foreach ($arrayReverse as $reverseValue) {
-                $arrayOrder[] = ['', $reverseValue];
-            }
-            sort($arrayOrder);
-            foreach ($arrayOrder as $order) {
-                $newArray[] = $order;
+                $newArray[] = ['', $reverseValue];
             }
         } else {
-            sort($values);
             foreach ($values as $value) {
+                // Use of an array [$value] to enable the same treatment to be used for classic enums
+                // and order enums with an array of normal-reverse pairs
                 $newArray[] = [$value];
             }
         }
+        sort($newArray);
+
         $additionalArrays[] = $newArray;
         $additionalTitle[] = $argumentName;
     }
