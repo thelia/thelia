@@ -59,12 +59,7 @@ use Thelia\Model\Map\StateTableMap;
             uriTemplate: '/admin/states/{id}'
         ),
     ],
-    uriVariables: [
-        'id' => new Link(
-            fromClass: Country::class,
-            identifiers: ['id']
-        ),
-    ],
+    uriVariables: ['id'],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
     denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
