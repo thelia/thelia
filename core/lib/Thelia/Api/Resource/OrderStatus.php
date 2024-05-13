@@ -38,12 +38,7 @@ use Thelia\Model\Map\OrderStatusTableMap;
         ),
         new Get(
             uriTemplate: '/admin/order_statutes/code/{code}',
-            uriVariables: [
-                'code' => new Link(
-                    fromProperty: 'code',
-                    fromClass: self::class
-                ),
-            ],
+            uriVariables: ['code'],
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
