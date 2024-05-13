@@ -38,12 +38,7 @@ use Thelia\Model\Map\CountryTableMap;
         ),
         new Get(
             uriTemplate: '/admin/countries/iso/{isoalpha3}',
-            uriVariables: [
-                'isoalpha3' => new Link(
-                    fromProperty: 'isoalpha3',
-                    fromClass: Country::class
-                ),
-            ],
+            uriVariables: ['isoalpha3'],
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
