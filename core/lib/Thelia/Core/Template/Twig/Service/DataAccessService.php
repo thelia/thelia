@@ -10,21 +10,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Core\Service;
+namespace Thelia\Core\Template\Twig\Service;
 
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
-use Psr\Cache\InvalidArgumentException;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\BaseLoop;
 
@@ -37,64 +32,51 @@ readonly class DataAccessService
         private SecurityContext $securityContext,
         private TranslatorInterface $translator,
         private RequestStack $requestStack,
-        private Security $security,
-        private JWTTokenManagerInterface $jwtManager,
-        private HttpKernelInterface $httpKernel,
-        private CacheInterface $cache,
+        private RouterInterface $router,
+        private ApiPlatformMetadataService $apiPlatformMetadataService,
     ) {
     }
 
-    /**
-     * @throws \JsonException
-     * @throws InvalidArgumentException
-     */
-    public function resources(string $path, array $params = [], bool $useCache = true): array
+    public function resources(string $path, array $parameters = []): object|array
     {
-        $cacheKey = md5($path.http_build_query($params));
+        $route = $this->router->match($path);
 
-        /**
-         * @throws \JsonException
-         * @throws \Exception
-         */
-        $fetchData = function () use ($path, $params) {
-            $queryString = http_build_query($params);
-            $fullUrl = $path.'?'.$queryString;
+        $resourceClass = $route['_api_resource_class'];
+        $routeName = $route['_route'];
 
-            $session = $this->requestStack->getSession();
-            $request = Request::create($fullUrl);
-            $request->setSession($session);
-            $request->headers->set('Accept', 'application/json');
-
-            $user = $this->security->getUser();
-            if ($user) {
-                $jwtToken = $this->jwtManager->create($user);
-                $request->headers->set('Authorization', 'Bearer '.$jwtToken);
-            }
-
-            $response = $this->httpKernel->handle($request, HttpKernelInterface::SUB_REQUEST);
-            if ($response->isSuccessful()) {
-                $datas = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
-
-                return $this->extractHydraMembers($datas);
-            }
-
-            throw new NotFoundHttpException('API route not found or error occurred');
-        };
-
-        if ($useCache) {
-            return $this->cache->get($cacheKey, function (ItemInterface $item) use ($fetchData) {
-                $item->expiresAfter(3600);
-
-                return $fetchData();
-            });
+        $operation = $this->apiPlatformMetadataService->getOperation(
+            $resourceClass,
+            $routeName
+        );
+        if ($operation === null) {
+            throw new \RuntimeException('Operation not found');
         }
 
-        return $fetchData();
-    }
+        $context = [
+            'operation' => $operation,
+            'uri_variables' => [],
+            'resource_class' => $resourceClass,
+            'filters' => $parameters,
+            'groups' => $operation->getNormalizationContext()['groups'] ?? null,
+        ];
 
-    private function extractHydraMembers(array $data): array
-    {
-        return $data['hydra:member'] ?? [];
+        if (
+            !$this->apiPlatformMetadataService->canUserAccessResource(
+                $resourceClass,
+                $path,
+                Request::METHOD_GET,
+                $operation,
+                $context
+            )
+        ) {
+            throw new AccessDeniedHttpException('Access Denied');
+        }
+
+        return $this->apiPlatformMetadataService->getProvider($operation)->provide(
+            $operation,
+            [],
+            $context
+        );
     }
 
     /** @deprecated use new data access layer */

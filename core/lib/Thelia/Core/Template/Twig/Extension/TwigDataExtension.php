@@ -13,7 +13,7 @@
 namespace Thelia\Core\Template\Twig\Extension;
 
 use Psr\Cache\InvalidArgumentException;
-use Thelia\Core\Service\DataAccessService;
+use Thelia\Core\Template\Twig\Service\DataAccessService;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -36,9 +36,9 @@ class TwigDataExtension extends AbstractExtension
      * @throws \JsonException
      * @throws InvalidArgumentException
      */
-    public function resources(string $path, array $params = [], bool $cache = true): array
+    public function resources(string $path, array $params = []): array|object
     {
-        return $this->dataAccessService->resources($path, $params, $cache);
+        return $this->dataAccessService->resources($path, $params);
     }
 
     public function getLoop(string $path, array $params = []): mixed
