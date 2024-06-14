@@ -43,9 +43,6 @@ class ParserResolver
         throw new \Exception(sprintf('Parser %s not found', $templateName));
     }
 
-    /**
-     * @return iterable
-     */
     public function getParsers(): iterable
     {
         return $this->parsers;

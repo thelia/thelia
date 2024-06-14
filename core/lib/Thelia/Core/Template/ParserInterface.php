@@ -166,6 +166,6 @@ interface ParserInterface
     public function getTemplateHelper();
 
     public function supportTemplateRender(?string $templateName): bool;
-    public function getFileExtension(): string;
 
+    public function getFileExtension(): string;
 }

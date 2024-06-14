@@ -68,7 +68,6 @@ class CustomerTitle extends AbstractTranslatableResource
 
     public const GROUP_FRONT_READ = 'front:customer_title:read';
 
-
     #[Groups([
         self::GROUP_ADMIN_READ,
         Customer::GROUP_ADMIN_READ_SINGLE,
@@ -82,10 +81,10 @@ class CustomerTitle extends AbstractTranslatableResource
     ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public string $position;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public int $byDefault;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
@@ -94,7 +93,7 @@ class CustomerTitle extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ,Customer::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, Customer::GROUP_FRONT_READ_SINGLE])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int
