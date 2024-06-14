@@ -10,31 +10,73 @@
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Core\Service;
+namespace Thelia\Core\Template\Twig\Service;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\BaseLoop;
 
-class DataAccessService
+readonly class DataAccessService
 {
     public function __construct(
-        private readonly ParameterBagInterface $parameterBag,
-        private readonly ContainerInterface $container,
-        private readonly EventDispatcherInterface $eventDispatcher,
-        private readonly SecurityContext $securityContext,
-        private readonly TranslatorInterface $translator,
-        private readonly RequestStack $requestStack,
+        private ParameterBagInterface $parameterBag,
+        private ContainerInterface $container,
+        private EventDispatcherInterface $eventDispatcher,
+        private SecurityContext $securityContext,
+        private TranslatorInterface $translator,
+        private RequestStack $requestStack,
+        private RouterInterface $router,
+        private ApiPlatformMetadataService $apiPlatformMetadataService,
     ) {
     }
 
-    public function datas(string $path, array $params = [], $locale = null, $cache = true): mixed
+    public function resources(string $path, array $parameters = []): object|array
     {
-        return ['test' => 'success'];
+        $route = $this->router->match($path);
+
+        $resourceClass = $route['_api_resource_class'];
+        $routeName = $route['_route'];
+
+        $operation = $this->apiPlatformMetadataService->getOperation(
+            $resourceClass,
+            $routeName
+        );
+        if ($operation === null) {
+            throw new \RuntimeException('Operation not found');
+        }
+
+        $context = [
+            'operation' => $operation,
+            'uri_variables' => [],
+            'resource_class' => $resourceClass,
+            'filters' => $parameters,
+            'groups' => $operation->getNormalizationContext()['groups'] ?? null,
+        ];
+
+        if (
+            !$this->apiPlatformMetadataService->canUserAccessResource(
+                $resourceClass,
+                $path,
+                Request::METHOD_GET,
+                $operation,
+                $context
+            )
+        ) {
+            throw new AccessDeniedHttpException('Access Denied');
+        }
+
+        return $this->apiPlatformMetadataService->getProvider($operation)->provide(
+            $operation,
+            [],
+            $context
+        );
     }
 
     /** @deprecated use new data access layer */

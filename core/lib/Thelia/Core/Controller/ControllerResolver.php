@@ -13,9 +13,7 @@
 namespace Thelia\Core\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
-use Thelia\Controller\ControllerInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>

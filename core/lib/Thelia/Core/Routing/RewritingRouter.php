@@ -241,6 +241,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
             foreach ($rewrittenUrlData->otherParameters as $parameter => $value) {
                 $request->query->set($parameter, $value);
             }
+
             return [
                 '_controller' => 'Thelia\\Controller\\Front\\DefaultController::noAction',
                 '_route' => 'rewrite',
