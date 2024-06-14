@@ -13,8 +13,6 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Thelia\Core\Service\ConfigCacheService;
-use Thelia\Core\Template\Parser\ParserResolver;
-use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Thelia;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
