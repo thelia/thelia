@@ -13,20 +13,14 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Contracts\Service\Attribute\Required;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Controller\BaseController;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
-use Thelia\Core\Security\SecurityContext;
-use Thelia\Core\Template\Parser\ParserResolver;
-use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
