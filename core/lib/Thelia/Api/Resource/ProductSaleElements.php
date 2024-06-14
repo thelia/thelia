@@ -12,6 +12,7 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -23,6 +24,7 @@ use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 
 #[ApiResource(
@@ -61,6 +63,16 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
+)]
+#[ApiFilter(
+    filterClass: SearchFilter::class,
+    properties: [
+        'ref',
+        'product.id' => [
+            'strategy' => 'exact',
+            'fieldPath' => 'product_sale_elements.product_id',
+        ],
+    ]
 )]
 class ProductSaleElements implements PropelResourceInterface
 {
