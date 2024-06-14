@@ -33,6 +33,19 @@ trait PropelResourceTrait
         throw new NoSuchPropertyException(sprintf('Can\'t get a way to read the property "%s" in class "%s".', $property, $this::class));
     }
 
+    public function __isset(string $property)
+    {
+        return \array_key_exists($property, $this->resourceAddons);
+    }
+
+    public function __set(string $name, $value): void
+    {
+        if (\array_key_exists($name, $this->resourceAddons)) {
+            $this->setResourceAddon($name, $value);
+        }
+        throw new NoSuchPropertyException(sprintf('Can\'t get a way to write the property "%s" in class "%s".', $name, $this::class));
+    }
+
     public function setPropelModel(ActiveRecordInterface $propelModel = null): PropelResourceInterface
     {
         $this->propelModel = $propelModel;

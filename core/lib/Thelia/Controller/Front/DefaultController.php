@@ -64,7 +64,6 @@ class DefaultController extends BaseFrontController
                 }
             }
         }
-
     }
 
     public function emptyRoute()

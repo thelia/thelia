@@ -553,6 +553,7 @@ class SmartyParser extends \Smarty implements ParserInterface
                 $found = false;
             }
         }
+
         return $found;
     }
 
