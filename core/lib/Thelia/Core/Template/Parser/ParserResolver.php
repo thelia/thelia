@@ -28,14 +28,14 @@ class ParserResolver
     /**
      * @throws \Exception
      */
-    public function getParser(?string $templateName): ParserInterface
+    public function getParser(string $pathTemplate, ?string $templateName): ParserInterface
     {
         if ('' === (string) $templateName) {
             $templateName = 'index';
         }
         /** @var ParserInterface $parser */
         foreach ($this->parsers as $parser) {
-            if ($parser->supportTemplateRender($templateName)) {
+            if ($parser->supportTemplateRender($pathTemplate, $templateName)) {
                 return $parser;
             }
         }

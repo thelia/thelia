@@ -10,17 +10,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Core\Template\Twig\Extension;
+namespace TheliaTwig\Extension;
 
 use Psr\Cache\InvalidArgumentException;
-use Thelia\Core\Template\Twig\Service\DataAccessService;
+use TheliaTwig\Service\AttributeAccessService;
+use TheliaTwig\Service\DataAccessService;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class TwigDataExtension extends AbstractExtension
+class TwigDataAccessExtension extends AbstractExtension
 {
     public function __construct(
-        private readonly DataAccessService $dataAccessService
+        private readonly DataAccessService $dataAccessService,
+        private readonly AttributeAccessService $attributeAccessService,
     ) {
     }
 
@@ -29,6 +31,7 @@ class TwigDataExtension extends AbstractExtension
         return [
             new TwigFunction('resources', [$this, 'resources']),
             new TwigFunction('loop', [$this, 'getLoop']),
+            new TwigFunction('attr', [$this, 'attribute']),
         ];
     }
 
@@ -39,6 +42,16 @@ class TwigDataExtension extends AbstractExtension
     public function resources(string $path, array $params = []): array|object
     {
         return $this->dataAccessService->resources($path, $params);
+    }
+
+    public function attribute(string $type, string $attributeName): mixed
+    {
+        $methodName = 'attribute'.ucfirst($type);
+        if (!method_exists($this->attributeAccessService, $methodName)) {
+            throw new \RuntimeException(sprintf('Method %s not found in %s', $methodName, DataAccessService::class));
+        }
+
+        return $this->attributeAccessService->$methodName($attributeName);
     }
 
     public function getLoop(string $path, array $params = []): mixed
