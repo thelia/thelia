@@ -4,12 +4,10 @@ import { usePaymentModulessQuery } from '@openstudio/thelia-api-utils';
 export default function useValidPaymentModules(type?: any) {
   const { data = [], isLoading } = usePaymentModulessQuery();
 
-  const validModules = (data as DeliveryModule[]).filter((m) => m.valid);
+  const validModules = (data as PaymentModule[]).filter((m) => m.valid);
 
   return {
-    data: type
-      ? validModules.filter((m) => m.deliveryMode === type)
-      : validModules,
+    data: validModules,
     isLoading: isLoading
   };
 }

@@ -141,6 +141,7 @@ export interface PaymentModule {
   images: Image[];
   currentLocale: string;
   i18n: I18N;
+  optionGroups: Array<object>;
 }
 
 export interface Address {
