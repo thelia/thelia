@@ -5,7 +5,7 @@ import Loader from '../Loader';
 import { useIntl } from 'react-intl';
 import useValidPaymentModules from './hooks/useValidPaymentModules';
 import { useGetCheckout, useSetCheckout } from '@openstudio/thelia-api-utils';
-import { DeliveryModule, PaymentModule } from '@js/types/common';
+import { PaymentModule } from '@js/types/common';
 
 export default function PaymentModules() {
   const intl = useIntl();
@@ -27,9 +27,10 @@ export default function PaymentModules() {
         />
       ) : (
         <div className="flex-start item-start mt-8 flex flex-col gap-3">
-          {modules.map((module: DeliveryModule, index: number) => {
+          {modules.map((module: PaymentModule, index: number) => {
             const isSelected = module.id === checkout?.paymentModuleId;
             return (
+              <>
               <label
                 key={index}
                 htmlFor={`option_${module?.code}`}
@@ -43,7 +44,8 @@ export default function PaymentModules() {
                   onChange={() => {
                     mutate({
                       ...checkout,
-                      paymentModuleId: module.id
+                      paymentModuleId: module.id,
+                      mustSelectPaymentOption: module?.optionGroups.length > 0,
                     });
                   }}
                 />
@@ -58,6 +60,37 @@ export default function PaymentModules() {
                   </span>
                 </span>
               </label>
+                {isSelected && module?.optionGroups ?
+                  <div>
+                    {module.optionGroups.map((group) => (
+                        <div key={group.code} className={"block bg-gray-100 p-4 rounded-md mt-4"}>
+                          {group.options.map((option) => {
+                            const optionSelected = option.code === checkout?.paymentOptionChoices.code;
+                            return (
+                              <label key={option.code} className={'Radio my-3'} htmlFor={`module_option_${option?.code}`}>
+                                <input
+                                  type="radio"
+                                  name="option_radio"
+                                  id={`module_option_${option?.code}`}
+                                  checked={optionSelected}
+                                  onChange={() => {
+                                    mutate({
+                                      ...checkout,
+                                      paymentOptionChoices: option
+                                    });
+                                  }}
+                                />
+                                <div>{option?.description}</div>
+                              </label>
+                            )
+                          })}
+                        </div>
+                      )
+                    )
+                    }
+                  </div> :
+                  ''}
+              </>
             );
           })}
         </div>
