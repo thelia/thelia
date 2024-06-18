@@ -852,8 +852,8 @@ class ProductController extends AbstractSeoCrudController
                         ->filterByIsFreeText(true)
                         ->findOneByFeatureId($featureId);
 
-                    // If no corresponding FeatureProduct exists AND if the feature_text_value is empty, do nothing
-                    if (null === $freeTextFeatureProduct && $featureValue != '') {
+                    // If no corresponding FeatureProduct exists AND if the feature_text_value is null or 'empty', do nothing
+                    if (null === $freeTextFeatureProduct && (null === $featureValue || '' === $featureValue)) {
                         continue;
                     }
 
