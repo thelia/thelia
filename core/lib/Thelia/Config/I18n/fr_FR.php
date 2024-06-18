@@ -246,7 +246,7 @@ return [
     'Fixed amount discount for selected products' => 'Remise sur produit - montant fixe',
     'Folder' => 'Dossier',
     'Folder page' => 'Page dossier',
-    'Folder title *' => 'Titre du dossier *',
+    'Folder title *' => 'Titre du dossier',
     'For one ore more customers' => 'Valable pour un ou plusieurs clients',
     'Format' => 'Format',
     'Free product when buying one or more selected products' => 'Produit offert pour l\'achat d\'un ou plusieurs produits',
