@@ -10,7 +10,7 @@
  * file that was distributed with this source code.
  */
 
-namespace TheliaTwig\Service;
+namespace TheliaTwig\Service\DataAccess;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Exception\PropelException;
@@ -18,14 +18,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Thelia\Core\Event\Image\ImageEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
-use Thelia\Core\Template\ParserContext;
 use Thelia\Coupon\CouponManager;
 use Thelia\Coupon\Type\CouponInterface;
-use Thelia\Log\Tlog;
 use Thelia\Model\Base\BrandQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\CategoryQuery;
@@ -49,7 +45,6 @@ class AttributeAccessService
         private readonly RequestStack $requestStack,
         private readonly SecurityContext $securityContext,
         private readonly TaxEngine $taxEngine,
-        private readonly ParserContext $parserContext,
         private readonly EventDispatcherInterface $dispatcher,
         private readonly CouponManager $couponManager
     ) {

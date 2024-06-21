@@ -12,12 +12,14 @@
 
 namespace Thelia\Core\Hook;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
-use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Cart;
 use Thelia\Model\Currency;
@@ -50,17 +52,8 @@ abstract class BaseHook implements BaseHookInterface
     /** @var array list of templates automatically injected */
     protected $templates = [];
 
-    /** @var \Thelia\Core\Template\ParserInterface */
-    public $parser;
-
     /** @var TranslatorInterface */
     public $translator;
-
-    /** @var AssetResolverInterface */
-    public $assetsResolver;
-
-    /** @var EventDispatcherInterface */
-    public $dispatcher;
 
     /** @var Request */
     protected $request;
@@ -83,18 +76,22 @@ abstract class BaseHook implements BaseHookInterface
     /** @var Currency */
     protected $currency;
 
-    public function __construct(ParserInterface $parser = null, AssetResolverInterface $resolver = null, EventDispatcherInterface $eventDispatcher = null)
-    {
-        if (null !== $parser) {
-            $this->parser = $parser;
-        }
-        if (null !== $resolver) {
-            $this->assetsResolver = $resolver;
-        }
-        if (null !== $eventDispatcher) {
-            $this->dispatcher = $eventDispatcher;
-        }
+    #[Required]
+    public ContainerInterface $container;
 
+    public ?EventDispatcherInterface $dispatcher = null;
+    public ?ParserResolver $parserResolver = null;
+
+    public function __construct(
+        EventDispatcherInterface $dispatcher = null,
+        ParserResolver $parserResolver = null,
+    ) {
+        if (null !== $dispatcher) {
+            $this->dispatcher = $dispatcher;
+        }
+        if (null !== $parserResolver) {
+            $this->parserResolver = $parserResolver;
+        }
         $moduleCode = explode('\\', static::class)[0];
         $module = ModuleQuery::create()->findOneByCode($moduleCode);
         $this->module = $module;
@@ -155,11 +152,11 @@ abstract class BaseHook implements BaseHookInterface
      */
     public function render($templateName, array $parameters = [])
     {
-        $templateDir = $this->assetsResolver->resolveAssetSourcePath($this->module->getCode(), false, $templateName, $this->parser);
+        $templateDir = $this->getAssetsResolver()->resolveAssetSourcePath($this->module->getCode(), false, $templateName, $this->getParser());
 
         if (null !== $templateDir) {
             // retrieve the template
-            $content = $this->parser->render($templateDir.DS.$templateName, $parameters);
+            $content = $this->getParser()->render($templateDir.DS.$templateName, $parameters);
         } else {
             $content = sprintf('ERR: Unknown template %s for module %s', $templateName, $this->module->getCode());
         }
@@ -176,7 +173,7 @@ abstract class BaseHook implements BaseHookInterface
      */
     public function dump($fileName)
     {
-        $fileDir = $this->assetsResolver->resolveAssetSourcePath($this->module->getCode(), false, $fileName, $this->parser);
+        $fileDir = $this->getAssetsResolver()->resolveAssetSourcePath($this->module->getCode(), false, $fileName, $this->getParser());
 
         if (null !== $fileDir) {
             $content = file_get_contents($fileDir.DS.$fileName);
@@ -202,8 +199,7 @@ abstract class BaseHook implements BaseHookInterface
     public function addCSS($fileName, $attributes = [], $filters = [])
     {
         $tag = '';
-
-        $url = $this->assetsResolver->resolveAssetURL($this->module->getCode(), $fileName, 'css', $this->parser, $filters);
+        $url = $this->getAssetsResolver()->resolveAssetURL($this->module->getCode(), $fileName, 'css', $this->getParser(), $filters);
 
         if ('' !== $url) {
             $tags = [];
@@ -233,8 +229,7 @@ abstract class BaseHook implements BaseHookInterface
     public function addJS($fileName, $attributes = [], $filters = [])
     {
         $tag = '';
-
-        $url = $this->assetsResolver->resolveAssetURL($this->module->getCode(), $fileName, 'js', $this->parser, $filters);
+        $url = $this->getAssetsResolver()->resolveAssetURL($this->module->getCode(), $fileName, 'js', $this->getParser(), $filters);
 
         if ('' !== $url) {
             $tags = [];
@@ -268,17 +263,12 @@ abstract class BaseHook implements BaseHookInterface
         return $this->module;
     }
 
-    public function setParser(ParserInterface $parser): void
-    {
-        $this->parser = $parser;
-    }
-
     /**
      * @return \Thelia\Core\Template\ParserInterface
      */
     public function getParser()
     {
-        return $this->parser;
+        return ParserResolver::getCurrentParser();
     }
 
     /**
@@ -484,5 +474,10 @@ abstract class BaseHook implements BaseHookInterface
     public static function getSubscribedHooks()
     {
         return [];
+    }
+
+    public function getAssetsResolver(): AssetResolverInterface
+    {
+        return $this->parserResolver->getAssetResolver($this->getParser());
     }
 }

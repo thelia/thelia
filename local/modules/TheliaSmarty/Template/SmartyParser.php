@@ -13,6 +13,7 @@
 namespace TheliaSmarty\Template;
 
 use Smarty;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
@@ -30,6 +31,7 @@ use Thelia\Model\Lang;
  * @author Franck Allimant <franck@cqfdev.fr>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
+#[AutoconfigureTag('thelia.parser.template')]
 class SmartyParser extends \Smarty implements ParserInterface
 {
     use ParserTemplateTrait;

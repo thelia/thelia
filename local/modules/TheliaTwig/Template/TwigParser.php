@@ -122,4 +122,9 @@ class TwigParser implements ParserInterface
     {
         return 10;
     }
+
+    public function getTwig(): Environment
+    {
+        return $this->twig;
+    }
 }

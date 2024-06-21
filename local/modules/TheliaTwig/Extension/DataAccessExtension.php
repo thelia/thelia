@@ -13,12 +13,12 @@
 namespace TheliaTwig\Extension;
 
 use Psr\Cache\InvalidArgumentException;
-use TheliaTwig\Service\AttributeAccessService;
-use TheliaTwig\Service\DataAccessService;
+use TheliaTwig\Service\DataAccess\AttributeAccessService;
+use TheliaTwig\Service\DataAccess\DataAccessService;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class TwigDataAccessExtension extends AbstractExtension
+class DataAccessExtension extends AbstractExtension
 {
     public function __construct(
         private readonly DataAccessService $dataAccessService,
@@ -31,6 +31,7 @@ class TwigDataAccessExtension extends AbstractExtension
         return [
             new TwigFunction('resources', [$this, 'resources']),
             new TwigFunction('loop', [$this, 'getLoop']),
+            new TwigFunction('loopCount', [$this, 'getLoopCount']),
             new TwigFunction('attr', [$this, 'attribute']),
         ];
     }
@@ -54,8 +55,13 @@ class TwigDataAccessExtension extends AbstractExtension
         return $this->attributeAccessService->$methodName($attributeName);
     }
 
-    public function getLoop(string $path, array $params = []): mixed
+    public function getLoop(string $name, string $type, array $params = []): array
     {
-        return $this->dataAccessService->loop($path, $params);
+        return $this->dataAccessService->loop($name, $type, $params);
+    }
+
+    public function getLoopCount(string $type, array $params = []): int
+    {
+        return $this->dataAccessService->loopCount($type, $params);
     }
 }

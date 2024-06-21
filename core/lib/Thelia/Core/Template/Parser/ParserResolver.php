@@ -14,14 +14,19 @@ namespace Thelia\Core\Template\Parser;
 
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Thelia\Core\Template\Assets\AssetResolverInterface;
 use Thelia\Core\Template\ParserInterface;
 
 #[AsAlias(id: 'thelia.parser.resolver', public: true)]
 class ParserResolver
 {
+    private static ?ParserInterface $currentParser = null;
+
     public function __construct(
         #[TaggedIterator('thelia.parser.template', exclude: [ParserFallback::class])]
-        private readonly iterable $parsers
+        private readonly iterable $parsers,
+        #[TaggedIterator('thelia.parser.asset', exclude: [ParserAssetResolverFallback::class])]
+        private readonly iterable $assetResolvers
     ) {
     }
 
@@ -36,6 +41,8 @@ class ParserResolver
         /** @var ParserInterface $parser */
         foreach ($this->parsers as $parser) {
             if ($parser->supportTemplateRender($pathTemplate, $templateName)) {
+                self::$currentParser = $parser;
+
                 return $parser;
             }
         }
@@ -43,8 +50,30 @@ class ParserResolver
         throw new \Exception(sprintf('Parser %s not found', $templateName));
     }
 
+    /**
+     * @throws \Exception
+     */
+    public function getAssetResolver(ParserInterface $parser): AssetResolverInterface
+    {
+        if (null === self::$currentParser) {
+            throw new \Exception('Parser not found');
+        }
+        /* @var AssetResolverInterface $parserAsset */
+        foreach ($this->assetResolvers as $assetResolvers) {
+            if ($assetResolvers->supportParser($parser)) {
+                return $assetResolvers;
+            }
+        }
+        throw new \Exception('Assets parser not found');
+    }
+
     public function getParsers(): iterable
     {
         return $this->parsers;
+    }
+
+    public static function getCurrentParser(): ?ParserInterface
+    {
+        return self::$currentParser;
     }
 }
