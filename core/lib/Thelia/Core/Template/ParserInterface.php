@@ -58,7 +58,7 @@ interface ParserInterface
     /**
      * @return int the HTTP status of the response
      */
-    public function getStatus();
+    public function getStatus(): int;
 
     /**
      * Sets the HTTP status of the response.
@@ -67,7 +67,7 @@ interface ParserInterface
      *
      * @param int $status
      */
-    public function setStatus($status);
+    public function setStatus(int $status): self;
 
     /**
      * Returns the request used by the parser.
@@ -165,7 +165,7 @@ interface ParserInterface
      */
     public function getTemplateHelper();
 
-    public function supportTemplateRender(?string $templateName): bool;
+    public function supportTemplateRender(string $templatePath, ?string $templateName): bool;
 
     public function getFileExtension(): string;
 }

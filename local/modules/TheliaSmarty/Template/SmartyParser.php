@@ -12,15 +12,14 @@
 
 namespace TheliaSmarty\Template;
 
-use Imagine\Exception\InvalidArgumentException;
 use Smarty;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Template\ParserTemplateTrait;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
@@ -32,8 +31,11 @@ use Thelia\Model\Lang;
  * @author Franck Allimant <franck@cqfdev.fr>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
+#[AutoconfigureTag('thelia.parser.template')]
 class SmartyParser extends \Smarty implements ParserInterface
 {
+    use ParserTemplateTrait;
+
     public $plugins = [];
 
     /** @var EventDispatcherInterface */
@@ -42,34 +44,16 @@ class SmartyParser extends \Smarty implements ParserInterface
     /** @var ParserContext */
     protected $parserContext;
 
-    /** @var TemplateHelperInterface */
-    protected $templateHelper;
-
-    /** @var RequestStack */
-    protected $requestStack;
-
     protected $backOfficeTemplateDirectories = [];
     protected $frontOfficeTemplateDirectories = [];
 
     protected $templateDirectories = [];
-
-    /** @var TemplateDefinition */
-    protected $templateDefinition;
-
-    /** @var bool if true, resources will also be searched in the default template */
-    protected $fallbackToDefaultTemplate = false;
-
-    /** @var int */
-    protected $status = 200;
 
     /** @var string */
     protected $env;
 
     /** @var bool */
     protected $debug;
-
-    /** @var array The template stack */
-    protected $tplStack = [];
 
     /** @var bool */
     protected $useMethodCallWrapper = false;
@@ -81,7 +65,6 @@ class SmartyParser extends \Smarty implements ParserInterface
      * @throws \SmartyException
      */
     public function __construct(
-        RequestStack $requestStack,
         EventDispatcherInterface $dispatcher,
         ParserContext $parserContext,
         TemplateHelperInterface $templateHelper,
@@ -90,7 +73,6 @@ class SmartyParser extends \Smarty implements ParserInterface
     ) {
         parent::__construct();
 
-        $this->requestStack = $requestStack;
         $this->dispatcher = $dispatcher;
         $this->parserContext = $parserContext;
         $this->templateHelper = $templateHelper;
@@ -104,12 +86,16 @@ class SmartyParser extends \Smarty implements ParserInterface
 
         $compile_dir = THELIA_CACHE_DIR.DS.$kernelEnvironment.DS.'smarty'.DS.'compile';
         if (!is_dir($compile_dir)) {
-            @mkdir($compile_dir, 0777, true);
+            if (!mkdir($compile_dir, 0777, true) && !is_dir($compile_dir)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $compile_dir));
+            }
         }
 
         $cache_dir = THELIA_CACHE_DIR.DS.$kernelEnvironment.DS.'smarty'.DS.'cache';
         if (!is_dir($cache_dir)) {
-            @mkdir($cache_dir, 0777, true);
+            if (!mkdir($cache_dir, 0777, true) && !is_dir($cache_dir)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $cache_dir));
+            }
         }
 
         $this->setCompileDir($compile_dir);
@@ -123,16 +109,6 @@ class SmartyParser extends \Smarty implements ParserInterface
 
         $this->registerFilter('output', [$this, 'trimWhitespaces']);
         $this->registerFilter('variable', [__CLASS__, 'theliaEscape']);
-    }
-
-    /**
-     * Return the current request or null if no request exists.
-     *
-     * @return Request|null
-     */
-    public function getRequest()
-    {
-        return $this->requestStack->getCurrentRequest();
     }
 
     /**
@@ -242,47 +218,6 @@ class SmartyParser extends \Smarty implements ParserInterface
         return $source;
     }
 
-    /**
-     * Add a template directory to the current template list.
-     *
-     * @param int    $templateType      the template type (a TemplateDefinition type constant)
-     * @param string $templateName      the template name
-     * @param string $templateDirectory path to the template directory
-     * @param string $key               ???
-     * @param bool   $addAtBeginning    if true, the template definition should be added at the beginning of the template directory list
-     */
-    public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $addAtBeginning = false): void
-    {
-        Tlog::getInstance()->addDebug("Adding template directory $templateDirectory, type:$templateType name:$templateName, key: $key");
-
-        if (true === $addAtBeginning && isset($this->templateDirectories[$templateType][$templateName])) {
-            // When using array_merge, the key was set to 0. Use + instead.
-            $this->templateDirectories[$templateType][$templateName] =
-                [$key => $templateDirectory] + $this->templateDirectories[$templateType][$templateName]
-            ;
-        } else {
-            $this->templateDirectories[$templateType][$templateName][$key] = $templateDirectory;
-        }
-    }
-
-    /**
-     * Return the registered template directories for a given template type.
-     *
-     * @param int $templateType
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return mixed:
-     */
-    public function getTemplateDirectories($templateType)
-    {
-        if (!isset($this->templateDirectories[$templateType])) {
-            throw new InvalidArgumentException('Failed to get template type %', $templateType);
-        }
-
-        return $this->templateDirectories[$templateType];
-    }
-
     public static function theliaEscape($content, /* @noinspection PhpUnusedParameterInspection */ $smarty)
     {
         if (\is_scalar($content)) {
@@ -290,32 +225,6 @@ class SmartyParser extends \Smarty implements ParserInterface
         }
 
         return $content;
-    }
-
-    /**
-     * Set a new template definition, and save the current one.
-     *
-     * @param bool $fallbackToDefaultTemplate if true, resources will be also searched in the "default" template
-     */
-    public function pushTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false): void
-    {
-        if (null !== $this->templateDefinition) {
-            $this->tplStack[] = [$this->templateDefinition, $this->fallbackToDefaultTemplate];
-        }
-
-        $this->setTemplateDefinition($templateDefinition, $fallbackToDefaultTemplate);
-    }
-
-    /**
-     * Restore the previous stored template definition, if one exists.
-     */
-    public function popTemplateDefinition(): void
-    {
-        if (\count($this->tplStack) > 0) {
-            [$templateDefinition, $fallbackToDefaultTemplate] = array_pop($this->tplStack);
-
-            $this->setTemplateDefinition($templateDefinition, $fallbackToDefaultTemplate);
-        }
     }
 
     /**
@@ -338,7 +247,6 @@ class SmartyParser extends \Smarty implements ParserInterface
         // -------------------------------------------------------------------------------------------------------------
 
         $templateList = ['' => $templateDefinition] + $templateDefinition->getParentList();
-
         /** @var TemplateDefinition $template */
         foreach (array_reverse($templateList) as $template) {
             // Add template directories  in the current template, in order to get assets
@@ -432,26 +340,6 @@ class SmartyParser extends \Smarty implements ParserInterface
     }
 
     /**
-     * Check if template definition is not null.
-     *
-     * @return bool
-     */
-    public function hasTemplateDefinition()
-    {
-        return $this->templateDefinition !== null;
-    }
-
-    /**
-     * Get the current status of the fallback to "default" feature.
-     *
-     * @return bool
-     */
-    public function getFallbackToDefaultTemplate()
-    {
-        return $this->fallbackToDefaultTemplate;
-    }
-
-    /**
      * @return string the template path
      */
     public function getTemplatePath()
@@ -502,7 +390,6 @@ class SmartyParser extends \Smarty implements ParserInterface
         foreach ($this->parserContext as $var => $value) {
             $this->assign($var, $value);
         }
-
         $this->assign($parameters);
 
         if (ConfigQuery::read('smarty_mute_undefined_or_null', 0)) {
@@ -574,24 +461,6 @@ class SmartyParser extends \Smarty implements ParserInterface
         return $this->internalRenderer('string', $templateText, $parameters, $compressOutput);
     }
 
-    /**
-     * @return int the status of the response
-     */
-    public function getStatus()
-    {
-        return $this->status;
-    }
-
-    /**
-     * status HTTP of the response.
-     *
-     * @param int $status
-     */
-    public function setStatus($status): void
-    {
-        $this->status = $status;
-    }
-
     public function addPlugins(AbstractSmartyPlugin $plugin): void
     {
         $this->plugins[] = $plugin;
@@ -640,15 +509,7 @@ class SmartyParser extends \Smarty implements ParserInterface
         }
     }
 
-    /**
-     * @return \Thelia\Core\Template\TemplateHelperInterface the parser template helper instance
-     */
-    public function getTemplateHelper()
-    {
-        return $this->templateHelper;
-    }
-
-    public function supportTemplateRender($templateName): bool
+    public function supportTemplateRender(string $templatePath, ?string $templateName): bool
     {
         return $this->checkTemplate($templateName);
     }
