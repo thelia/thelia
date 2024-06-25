@@ -162,7 +162,6 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
             $urlTool = URL::getInstance();
 
             $pathInfo = $request instanceof TheliaRequest ? $request->getRealPathInfo() : $request->getPathInfo();
-
             try {
                 $rewrittenUrlData = $urlTool->resolve($pathInfo);
             } catch (UrlRewritingException $e) {
@@ -174,7 +173,6 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
                         throw $e;
                 }
             }
-
             // If we have a "lang" parameter, whe have to check if the found URL has the proper locale
             // If it's not the case, find the rewritten URL with the requested locale, and redirect to it.
             if (null == !$requestedLocale = $request->get('lang')) {

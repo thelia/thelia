@@ -64,8 +64,8 @@ class ViewListener implements EventSubscriberInterface
         $response = null;
         try {
             $view = $this->request->attributes->get('_view');
-            $parser = $this->parserResolver->getParser($view);
-
+            $templatePath = $this->templateHelper->getActiveFrontTemplate()->getAbsolutePath();
+            $parser = $this->parserResolver->getParser($templatePath, $view);
             $parser->setTemplateDefinition($this->templateHelper->getActiveFrontTemplate(), true);
             $viewId = $this->request->attributes->get($view.'_id');
 
