@@ -12,9 +12,11 @@
 
 namespace Thelia\Core\Template\Assets;
 
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 
+#[AsAlias(id: 'thelia.parser.asset.resolver', public: true)]
 interface AssetResolverInterface
 {
     /** The name of the subdirectory in a template asset directory in which modules assets can be overridden */
@@ -78,4 +80,6 @@ interface AssetResolverInterface
         ParserInterface $parserInterface,
         TemplateDefinition &$templateDefinition
     );
+
+    public function supportParser(ParserInterface $parser): bool;
 }
