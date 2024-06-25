@@ -71,14 +71,16 @@ class DataCollectorSmartyParser extends \Smarty implements ParserInterface
         ];
     }
 
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->smartyParser->getStatus();
     }
 
-    public function setStatus($status): void
+    public function setStatus($status): ParserInterface
     {
         $this->smartyParser->setStatus($status);
+
+        return $this;
     }
 
     public function getRequest()
@@ -139,9 +141,9 @@ class DataCollectorSmartyParser extends \Smarty implements ParserInterface
         return $this->translator->{$method}(...$args);
     }
 
-    public function supportTemplateRender(?string $templateName): bool
+    public function supportTemplateRender(string $templatePath, ?string $templateName): bool
     {
-        return $this->smartyParser->supportTemplateRender($templateName);
+        return $this->smartyParser->supportTemplateRender($templatePath, $templateName);
     }
 
     public function getFileExtension(): string

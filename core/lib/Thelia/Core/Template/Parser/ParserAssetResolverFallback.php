@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Template\Parser;
 
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
@@ -21,8 +22,10 @@ use Thelia\Core\Template\TemplateDefinition;
  *
  * @author manuel raynaud <manu@raynaud.io>
  */
+#[AutoconfigureTag('thelia.parser.asset')]
 class ParserAssetResolverFallback implements AssetResolverInterface
 {
+    private ParserInterface $parser;
     /**
      * Generate an asset URL.
      *
@@ -92,6 +95,11 @@ class ParserAssetResolverFallback implements AssetResolverInterface
         ParserInterface $parserInterface,
         TemplateDefinition &$templateDefinition
     ) {
+        throw new \RuntimeException('if you want to use a parser, please register one');
+    }
+
+    public function supportParser(ParserInterface $parser): bool
+    {
         throw new \RuntimeException('if you want to use a parser, please register one');
     }
 }

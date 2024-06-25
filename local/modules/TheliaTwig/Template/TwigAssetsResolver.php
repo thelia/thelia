@@ -10,7 +10,7 @@
  * file that was distributed with this source code.
  */
 
-namespace TheliaSmarty\Template\Assets;
+namespace TheliaTwig\Template;
 
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Thelia\Core\Template\Assets\AssetManagerInterface;
@@ -20,54 +20,35 @@ use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
-use TheliaSmarty\Template\SmartyParser;
 
 #[AutoconfigureTag('thelia.parser.asset')]
-class SmartyAssetsResolver implements AssetResolverInterface
+class TwigAssetsResolver implements AssetResolverInterface
 {
-    protected $path_relative_to_web_root;
+    protected ?string $pathRelativeToWebRoot = null;
+    protected ?string $cdnBaseUrl = null;
 
-    protected $assetsManager;
-
-    protected $cdnBaseUrl;
-
-
-    /**
-     * Creates a new SmartyAssetsManager instance.
-     *
-     * @param AssetManagerInterface $assetsManager an asset manager instance
-     */
-    public function __construct(AssetManagerInterface $assetsManager)
-    {
-        $this->path_relative_to_web_root = ConfigQuery::read('asset_dir_from_web_root', 'assets');
-
-        $this->assetsManager = $assetsManager;
-
-        $this->cdnBaseUrl = ConfigQuery::read('cdn.assets-base-url', null);
+    public function __construct(
+        protected AssetManagerInterface $assetsManager
+    ) {
+        $this->pathRelativeToWebRoot = ConfigQuery::read('asset_dir_from_web_root', 'assets');
+        $this->cdnBaseUrl = ConfigQuery::read('cdn.assets-base-url');
     }
 
-    /**
-     * @param string $url the fully qualified CDN URL that will be used to create doucments URL
-     */
-    public function setCdnBaseUrl($url): void
+    public function setCdnBaseUrl(string $url): void
     {
         $this->cdnBaseUrl = $url;
     }
 
-    /**
-     * Generate an asset URL.
-     *
-     * @param string          $source                  a module code, or ParserInterface::TEMPLATE_ASSETS_KEY
-     * @param string          $file                    the file path, relative to a template base directory (e.g. assets/css/style.css)
-     * @param string          $type                    the asset type, either 'css' or '
-     * @param ParserInterface $parserInterface         the current template parser
-     * @param array           $filters                 the filters to pass to the asset manager
-     * @param bool            $debug                   the debug mode
-     * @param string          $declaredAssetsDirectory if not null, this is the assets directory declared in the {declare_assets} function of a template
-     * @param mixed           $sourceTemplateName      A template name, of false. If provided, the assets will be searched in this template directory instead of the current one.
-     */
-    public function resolveAssetURL($source, $file, $type, ParserInterface $parserInterface, $filters = [], $debug = false, $declaredAssetsDirectory = null, $sourceTemplateName = false)
-    {
+    public function resolveAssetURL(
+        $source,
+        $file,
+        $type,
+        ParserInterface $parserInterface,
+        $filters = [],
+        $debug = false,
+        $declaredAssetsDirectory = null,
+        $sourceTemplateName = false
+    ): string {
         // Shortcut external uri resolving
         if (preg_match('#^(https?:)?//#', $file)) {
             return $file;
@@ -79,17 +60,16 @@ class SmartyAssetsResolver implements AssetResolverInterface
         $file = $this->fixPathSeparator($file);
 
         $templateDefinition = $parserInterface->getTemplateDefinition($sourceTemplateName);
-
         $fileRoot = $this->resolveAssetSourcePathAndTemplate($source, $sourceTemplateName, $file, $parserInterface, $templateDefinition);
 
         if (null !== $fileRoot) {
             $url = $this->assetsManager->processAsset(
                 $fileRoot.DS.$file,
                 $fileRoot,
-                THELIA_WEB_DIR.$this->path_relative_to_web_root,
+                THELIA_WEB_DIR.$this->pathRelativeToWebRoot,
                 $templateDefinition->getPath(),
                 $source,
-                URL::getInstance()->absoluteUrl($this->path_relative_to_web_root, null, URL::PATH_TO_FILE /* path only */ , $this->cdnBaseUrl),
+                URL::getInstance()->absoluteUrl($this->pathRelativeToWebRoot, null, URL::PATH_TO_FILE /* path only */ , $this->cdnBaseUrl),
                 $type,
                 $filters,
                 $debug
@@ -97,28 +77,16 @@ class SmartyAssetsResolver implements AssetResolverInterface
         } else {
             Tlog::getInstance()->addError("Asset $file (type $type) was not found.");
         }
-
         return $url;
     }
 
-    /**
-     * Return an asset source file path.
-     *
-     * A system of fallback enables file overriding. It will look for the template :
-     *      - in the current template in directory /modules/{module code}/
-     *      - in the module in the current template if it exists
-     *      - in the module in the default template
-     *
-     * @param string          $source          a module code, or or ParserInterface::TEMPLATE_ASSETS_KEY
-     * @param string          $templateName    a template name, or false to use the current template
-     * @param string          $fileName        the filename
-     * @param ParserInterface $parserInterface the current template parser
-     *
-     * @return mixed the path to directory containing the file, or null if the file doesn't exists
-     */
-    public function resolveAssetSourcePath($source, $templateName, $fileName, ParserInterface $parserInterface)
-    {
-        $tpl = $parserInterface->getTemplateDefinition(false);
+    public function resolveAssetSourcePath(
+        $source,
+        $templateName,
+        $fileName,
+        ParserInterface $parserInterface
+    ) {
+        $tpl = $parserInterface->getTemplateDefinition();
 
         return $this->resolveAssetSourcePathAndTemplate(
             $source,
@@ -129,24 +97,6 @@ class SmartyAssetsResolver implements AssetResolverInterface
         );
     }
 
-    /**
-     * Return an asset source file path, and get the original template where it was found.
-     *
-     * A system of fallback enables file overriding. It will look for the template :
-     *      - in the current template in directory /modules/{module code}/
-     *      - in the parent templates (if any) in directory /modules/{module code}/
-     *      - in the module in the current template if it exists
-     *      - in the module in the default template
-     *
-     * @param string             $source              a module code, or or ParserInterface::TEMPLATE_ASSETS_KEY
-     * @param string             $templateName        a template name, or false to use the current template
-     * @param string             $fileName            the filename
-     * @param ParserInterface    $parserInterface     the current template parser
-     * @param TemplateDefinition &$templateDefinition the template where to start search.
-     *                                                This parameter will contain the template where the asset was found.
-     *
-     * @return mixed the path to directory containing the file, or null if the file doesn't exists
-     */
     public function resolveAssetSourcePathAndTemplate(
         $source,
         $templateName,
@@ -207,7 +157,7 @@ class SmartyAssetsResolver implements AssetResolverInterface
         $fileName = ltrim($fileName, DS);
 
         /* Navigating in the server's directory tree is not allowed :) */
-        if (preg_match('!\.\.\\'.DS.'!', $fileName)) {
+        if (preg_match('!\.\.'.DS.'!', $fileName)) {
             // This time, we will not forgive.
             throw new \InvalidArgumentException('Relative paths are not allowed in assets names.');
         }
@@ -232,31 +182,16 @@ class SmartyAssetsResolver implements AssetResolverInterface
         return null;
     }
 
-    /**
-     * Be sure that the pat separator of a pathname is always the platform path separator.
-     *
-     * @param string $path the iput path
-     *
-     * @return string the fixed path
-     */
     protected function fixPathSeparator($path)
     {
-        if (DS != '/') {
+        if (DS !== '/') {
             $path = str_replace('/', DS, $path);
         }
 
         return $path;
     }
 
-    /**
-     * Check if a file(s) exists in a directory.
-     *
-     * @param string $dir  the directory path
-     * @param string $file the file path. It can contain wildcard. eg: /path/*.css
-     *
-     * @return bool true if file(s)
-     */
-    protected function filesExist($dir, $file)
+    protected function filesExist($dir, $file): bool
     {
         if (!file_exists($dir)) {
             return false;
@@ -277,15 +212,6 @@ class SmartyAssetsResolver implements AssetResolverInterface
         return $files_found;
     }
 
-    /**
-     * Get all possible directories from which the asset can be found.
-     * It returns an array of directories ordered by priority.
-     *
-     * @param array  $directories  all directories source available for the template type
-     * @param string $templateName the name of the template
-     * @param string $source       the module code or ParserInterface::TEMPLATE_ASSETS_KEY
-     * @param array  $pathList     the pathList that will be updated
-     */
     protected function getPossibleAssetSources($directories, $templateName, $source, &$pathList): void
     {
         if ($source !== ParserInterface::TEMPLATE_ASSETS_KEY) {
@@ -319,7 +245,6 @@ class SmartyAssetsResolver implements AssetResolverInterface
 
     public function supportParser(ParserInterface $parser): bool
     {
-        return SmartyParser::class === $parser::class;
+        return TwigParser::class === $parser::class;
     }
-
 }
