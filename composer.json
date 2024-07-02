@@ -65,7 +65,6 @@
         "symfony/flex": "^1.12",
         "spipu/html2pdf": "~5.2.5",
         "symfony/mailer": "6.4.*",
-        "symfony/webpack-encore-bundle": "^1.14",
         "composer/composer": "~2.3.0",
         "thelia/smarty-redirection-module": "~2.0.0",
         "thelia/choice-filter-module": "^2.1",
@@ -88,7 +87,8 @@
         "symfony/property-info": "6.4.*",
         "symfony/runtime": "6.4.*",
         "lexik/jwt-authentication-bundle": "^2.20",
-        "symfony/debug-bundle": "6.4.*"
+        "symfony/debug-bundle": "6.4.*",
+        "thelia/flexy": "dev-flexy"
     },
     "require-dev": {
         "thelia/hooktest-module": "~1.1",
@@ -145,9 +145,6 @@
         "assets-install": [
             "php Thelia assets:install web"
         ],
-        "post-autoload-dump": [
-            "Thelia\\Config\\InitConfig::initConfig"
-        ],
         "post-install-cmd": [
             "@cache-clear",
             "@assets-install"
@@ -188,7 +185,8 @@
             "thelia/installer": true,
             "phpstan/extension-installer": true,
             "symfony/flex": true,
-            "symfony/runtime": true
+            "symfony/runtime": true,
+            "composer/installers": true
         }
     }
 }
