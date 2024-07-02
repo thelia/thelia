@@ -1,5 +1,6 @@
 {
     "name": "thelia/core",
+    "type": "thelia-core",
     "description": "Core of Thelia",
     "license": "LGPL-3.0+",
     "homepage": "http://thelia.net/",
