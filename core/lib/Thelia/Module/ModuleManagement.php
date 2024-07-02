@@ -15,6 +15,7 @@ namespace Thelia\Module;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -47,34 +48,37 @@ class ModuleManagement
 
     public function updateModules(ContainerInterface $container): void
     {
-        $finder = new Finder();
+        try {
+            $finder = new Finder();
 
-        $finder
-            ->name('module.xml')
-            ->in($this->baseModuleDir.'*'.DS.'Config')
-        ;
+            $finder
+                ->name('module.xml')
+                ->in($this->baseModuleDir . '*' . DS . 'Config');
 
-        $errors = [];
+            $errors = [];
 
-        $modulesUpdated = [];
+            $modulesUpdated = [];
 
-        foreach ($finder as $file) {
-            try {
-                $this->updateModule($file, $container);
-            } catch (\Exception $ex) {
-                // Guess module code
-                $moduleCode = basename(\dirname($file, 2));
+            foreach ($finder as $file) {
+                try {
+                    $this->updateModule($file, $container);
+                } catch (\Exception $ex) {
+                    // Guess module code
+                    $moduleCode = basename(\dirname($file, 2));
 
-                $errors[$moduleCode] = $ex;
+                    $errors[$moduleCode] = $ex;
+                }
             }
-        }
 
-        if (\count($errors) > 0) {
-            throw new InvalidModuleException($errors);
-        }
+            if (\count($errors) > 0) {
+                throw new InvalidModuleException($errors);
+            }
 
-        if (\count($modulesUpdated)) {
-            $this->cacheClear();
+            if (\count($modulesUpdated)) {
+                $this->cacheClear();
+            }
+        } catch(DirectoryNotFoundException $e) {
+            // No module installed
         }
     }
 
