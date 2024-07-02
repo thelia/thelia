@@ -59,7 +59,7 @@
         "spipu/html2pdf": "~5.2.5",
         "symfony/mailer": "6.4.*",
         "composer/composer": "~2.3.0",
-        "api-platform/core": "3.2.*",
+        "api-platform/core": "^3.2.9",
         "nelmio/cors-bundle": "^2.2",
         "symfony/asset": "6.4.*",
         "doctrine/annotations": "^2.0",
