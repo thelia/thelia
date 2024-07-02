@@ -1,5 +1,5 @@
 {
-  "name": "your-vendor/thelia-twig-module",
+  "name": "thelia/thelia-twig-module",
   "description": "TheliaTwig module for Thelia",
   "license": "LGPL-3.0-or-later",
   "type": "thelia-module",
