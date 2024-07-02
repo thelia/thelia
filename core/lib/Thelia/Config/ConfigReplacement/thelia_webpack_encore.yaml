@@ -1,8 +1,0 @@
-webpack_encore:
-  output_path: '%kernel.project_dir%/public/build'
-  script_attributes:
-    defer: true
-  builds:
-    _default: ''
-    frontOffice: '%kernel.project_dir%/templates/frontOffice/%thelia_front_template%/dist'
-    backOffice: '%kernel.project_dir%/templates/backOffice/%thelia_admin_template%/dist'

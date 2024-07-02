@@ -59,7 +59,6 @@
         "symfony/flex": "^1.12",
         "spipu/html2pdf": "~5.2.5",
         "symfony/mailer": "6.4.*",
-        "symfony/webpack-encore-bundle": "^1.14",
         "composer/composer": "~2.3.0",
         "api-platform/core": "3.2.*",
         "nelmio/cors-bundle": "^2.2",
