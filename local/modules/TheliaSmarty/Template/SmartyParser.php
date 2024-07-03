@@ -518,4 +518,9 @@ class SmartyParser extends \Smarty implements ParserInterface
     {
         return 'html';
     }
+
+    public function getDefaultPriority(): int
+    {
+        return 0;
+    }
 }
