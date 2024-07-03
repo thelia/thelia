@@ -48,6 +48,8 @@ bin/
 
 # Ignore everything in the "modules" directory, except the "default modules"
 local/modules/*
+!local/modules/TheliaSmarty
+!local/modules/TwigEngine
 
 # Ignore everything in the "templates" directory, except the "default template"
 templates/*

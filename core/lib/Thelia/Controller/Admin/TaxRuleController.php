@@ -430,9 +430,11 @@ class TaxRuleController extends AbstractCrudController
         return $data;
     }
 
-    /**
-     * @Route("/admin/configuration/taxes_rules/delivery_module/update", name="admin.configuration.tax-rule.delivery.modules.update", methods="POST")
-     */
+    #[Route(
+        '/admin/configuration/taxes_rules/delivery_module/update',
+        name: 'admin.configuration.tax-rule.delivery.modules.update',
+        methods: ['POST']
+    )]
     public function updateDeliveryModulesTaxRule()
     {
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {

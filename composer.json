@@ -22,6 +22,17 @@
         "thelia/web-profiler-module": "2.5.*",
         "thelia/hook-navigation-module": "2.5.*",
         "thelia/hook-admin-home-module": "2.5.*",
+        "thelia/hook-analytics-module": "2.5.*",
+        "thelia/hook-cart-module": "2.5.*",
+        "thelia/hook-contact-module": "2.5.*",
+        "thelia/hook-currency-module": "2.5.*",
+        "thelia/hook-customer-module": "2.5.*",
+        "thelia/hook-lang-module": "2.5.*",
+        "thelia/hook-links-module": "2.5.*",
+        "thelia/hook-newsletter-module": "2.5.*",
+        "thelia/hook-products-new-module": "2.5.*",
+        "thelia/hook-search-module": "2.5.*",
+        "thelia/hook-social-module": "2.5.*",
         "thelia/twig-engine-module": "*"
     },
     "require-dev": {

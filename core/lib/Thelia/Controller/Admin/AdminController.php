@@ -13,7 +13,6 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Routing\Annotation\Route;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Tools\URL;
@@ -22,10 +21,6 @@ class AdminController extends BaseAdminController
 {
     public const RESOURCE_CODE = 'admin.home';
 
-    /**
-     * @Route("/admin", name="admin", defaults={"not-logged": 1})
-     * @Route("/admin/home", name="admin_home")
-     */
     public function indexAction(SecurityContext $securityContext)
     {
         if (!$securityContext->hasAdminUser()) {
