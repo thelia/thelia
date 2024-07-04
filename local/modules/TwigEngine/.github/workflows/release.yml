@@ -1,0 +1,7 @@
+name: "Auto Release" 
+on:
+  push:
+    branches: [ master, main ]
+jobs:
+  release:
+    uses: thelia-modules/ReusableWorkflow/.github/workflows/auto_release.yml@main 
