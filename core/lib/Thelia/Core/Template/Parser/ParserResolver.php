@@ -47,7 +47,7 @@ class ParserResolver
             }
         }
 
-        throw new \Exception(sprintf('Parser %s not found', $templateName));
+        throw new \Exception(sprintf('Parser for template %s not found', $templateName));
     }
 
     /**
@@ -75,5 +75,24 @@ class ParserResolver
     public static function getCurrentParser(): ?ParserInterface
     {
         return self::$currentParser;
+    }
+
+    public function getDefaultParser(): ParserInterface
+    {
+        $defaultParser = null;
+        /** @var ParserInterface $parser */
+        foreach ($this->parsers as $parser) {
+            if (
+                null === $defaultParser
+                || $defaultParser::getDefaultPriority() < $parser::getDefaultPriority()
+            ) {
+                $defaultParser = $parser;
+            }
+        }
+        if (null === $defaultParser) {
+            throw new \Exception('No parser found.');
+        }
+
+        return $defaultParser;
     }
 }

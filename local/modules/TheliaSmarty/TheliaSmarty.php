@@ -15,7 +15,6 @@ namespace TheliaSmarty;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Thelia\Module\BaseModule;
-use TheliaSmarty\Compiler\RegisterLoopPass;
 use TheliaSmarty\Compiler\RegisterParserPluginPass;
 use TheliaSmarty\Template\SmartyPluginInterface;
 
@@ -32,7 +31,6 @@ class TheliaSmarty extends BaseModule
     {
         return [
             new RegisterParserPluginPass(),
-            new RegisterLoopPass(),
         ];
     }
 

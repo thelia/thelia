@@ -264,7 +264,6 @@ class SessionController extends BaseAdminController
             if (!str_contains($user->getEmail(), '@')) {
                 return $this->generateRedirectFromRoute('admin.set-email-address');
             }
-
             // Redirect to the success URL, passing the cookie if one exists.
             return $this->generateSuccessRedirect($adminLoginForm);
         } catch (FormValidationException $ex) {
