@@ -17,7 +17,6 @@
         "php": ">= 8.2",
         "thelia/core": "dev-twig",
         "thelia/installer": "1.*",
-        "thelia/smarty-module": "dev-twig",
         "thelia/tinymce-module": "2.5.*",
         "thelia/front-module": "2.5.*",
         "thelia/hook-navigation-module": "2.5.*",
@@ -33,7 +32,6 @@
         "thelia/hook-products-new-module": "2.5.*",
         "thelia/hook-search-module": "2.5.*",
         "thelia/hook-social-module": "2.5.*",
-        "thelia/twig-engine-module": "*",
         "thelia/web-profiler-module": "2.5.*"
     },
     "require-dev": {
@@ -91,7 +89,8 @@
         ],
         "post-install-cmd": [
             "@cache-clear",
-            "@assets-install"
+            "@assets-install",
+            "php bin/console jwt:generate-key --skip-if-exists"
         ],
         "post-update-cmd": [
             "@cache-clear",
