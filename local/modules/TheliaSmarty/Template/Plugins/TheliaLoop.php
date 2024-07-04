@@ -13,6 +13,7 @@
 namespace TheliaSmarty\Template\Plugins;
 
 use Propel\Runtime\Util\PropelModelPager;
+use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -22,6 +23,7 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
 use Thelia\Core\Template\Element\LoopInterface;
 use Thelia\Core\Template\Element\LoopResult;
+use Thelia\Core\Template\Parser\ParserAssetResolverFallback;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
@@ -78,7 +80,8 @@ class TheliaLoop extends AbstractSmartyPlugin
         SecurityContext $securityContext,
         TranslatorInterface $translator,
         bool $kernelDebug,
-        array $theliaParserLoops,
+        #[TaggedIterator('thelia.loop')]
+        iterable $theliaLoops,
         string $kernelEnvironment
     ) {
         $this->container = $container;
@@ -88,8 +91,8 @@ class TheliaLoop extends AbstractSmartyPlugin
         $this->securityContext = $securityContext;
         $this->translator = $translator;
         $this->isDebugActive = $kernelDebug;
-        $this->theliaParserLoops = $theliaParserLoops;
-        $this->setLoopList($theliaParserLoops);
+        $this->theliaParserLoops = [...$theliaLoops];
+        $this->setLoopList($this->theliaParserLoops);
         $this->kernelEnvironment = $kernelEnvironment;
     }
 
@@ -176,7 +179,6 @@ class TheliaLoop extends AbstractSmartyPlugin
                 $this->translator->trans("Missing 'type' parameter in loop arguments")
             );
         }
-
         if ($content === null) {
             // Check if a loop with the same name exists in the current scope, and abort if it's the case.
             if (\array_key_exists($name, $this->varstack)) {
@@ -187,7 +189,6 @@ class TheliaLoop extends AbstractSmartyPlugin
 
             try {
                 $loop = $this->createLoopInstance($params);
-
                 self::$pagination[$name] = null;
 
                 // We have to clone the result, as exec() returns a cached LoopResult object, which may cause side effects
@@ -254,7 +255,6 @@ class TheliaLoop extends AbstractSmartyPlugin
                 unset($this->varstack[$name]);
             }
         }
-
         if ($content !== null) {
             if ($loopResults->isEmpty()) {
                 $content = '';
@@ -443,7 +443,6 @@ class TheliaLoop extends AbstractSmartyPlugin
     protected function createLoopInstance($smartyParams): LoopInterface
     {
         $type = strtolower($smartyParams['type']);
-
         if (!isset($this->loopDefinition[$type])) {
             throw new ElementNotFoundException(
                 $this->translator->trans("Loop type '%type' is not defined.", ['%type' => $type])
@@ -451,7 +450,6 @@ class TheliaLoop extends AbstractSmartyPlugin
         }
 
         $serviceId = $this->loopDefinition[$type];
-
         /** @var LoopInterface $loop */
         $loop = $this->container->has($serviceId) ? $this->container->get($serviceId) : new $serviceId();
         $loop->init(
@@ -460,7 +458,7 @@ class TheliaLoop extends AbstractSmartyPlugin
             $this->dispatcher,
             $this->securityContext,
             $this->translator,
-            $this->theliaParserLoops,
+            $this->loopDefinition,
             $this->kernelEnvironment
         );
 
@@ -487,8 +485,11 @@ class TheliaLoop extends AbstractSmartyPlugin
      */
     public function setLoopList(array $loopDefinition): void
     {
-        foreach ($loopDefinition as $name => $className) {
-            $this->registerLoop($className, $name);
+        foreach ($loopDefinition as $key => $namespace) {
+            $className = substr(strrchr($namespace::class, '\\'), 1);
+            $kebabCase = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $className));
+
+            $this->registerLoop($namespace::class, $kebabCase);
         }
     }
 

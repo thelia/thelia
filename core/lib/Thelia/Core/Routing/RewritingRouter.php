@@ -158,95 +158,96 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
      */
     public function matchRequest(Request $request): array
     {
-        if (ConfigQuery::isRewritingEnable()) {
-            $urlTool = URL::getInstance();
-
-            $pathInfo = $request instanceof TheliaRequest ? $request->getRealPathInfo() : $request->getPathInfo();
-            try {
-                $rewrittenUrlData = $urlTool->resolve($pathInfo);
-            } catch (UrlRewritingException $e) {
-                switch ($e->getCode()) {
-                    case UrlRewritingException::URL_NOT_FOUND:
-                        throw new ResourceNotFoundException();
-                        break;
-                    default:
-                        throw $e;
-                }
-            }
-            // If we have a "lang" parameter, whe have to check if the found URL has the proper locale
-            // If it's not the case, find the rewritten URL with the requested locale, and redirect to it.
-            if (null == !$requestedLocale = $request->get('lang')) {
-                if (null !== $requestedLang = LangQuery::create()->filterByActive(true)->findOneByLocale($requestedLocale)) {
-                    if ($requestedLang->getLocale() != $rewrittenUrlData->locale) {
-                        // Save one redirection if requested locale is disabled.
-                        if (!$requestedLang->getActive()) {
-                            $requestedLang = Lang::getDefaultLanguage();
-                        }
-
-                        $localizedUrl = $urlTool->retrieve(
-                            $rewrittenUrlData->view,
-                            $rewrittenUrlData->viewId,
-                            $requestedLang->getLocale()
-                        )->toString();
-
-                        $this->redirect($urlTool->absoluteUrl($localizedUrl), 301);
-                    }
-                }
-            }
-
-            // If the rewritten URL locale is disabled, redirect to the URL in the default language
-            if (null === $lang = LangQuery::create()
-                    ->filterByActive(true)
-                    ->filterByLocale($rewrittenUrlData->locale)
-                    ->findOne()) {
-                $lang = Lang::getDefaultLanguage();
-
-                $localizedUrl = $urlTool->retrieve(
-                    $rewrittenUrlData->view,
-                    $rewrittenUrlData->viewId,
-                    $lang->getLocale()
-                )->toString();
-
-                $this->redirect($urlTool->absoluteUrl($localizedUrl), 301);
-            }
-
-            /* is the URL redirected ? */
-            if (null !== $rewrittenUrlData->redirectedToUrl) {
-                $redirect = RewritingUrlQuery::create()
-                    ->filterByView($rewrittenUrlData->view)
-                    ->filterByViewId($rewrittenUrlData->viewId)
-                    ->filterByViewLocale($rewrittenUrlData->locale)
-                    ->filterByRedirected(null, Criteria::ISNULL)
-                    ->findOne()
-                ;
-
-                $this->redirect($urlTool->absoluteUrl($redirect->getUrl()), 301);
-            }
-
-            /* define GET arguments in request */
-
-            if (null !== $rewrittenUrlData->view) {
-                $request->attributes->set('_view', $rewrittenUrlData->view);
-                if (null !== $rewrittenUrlData->viewId) {
-                    $request->query->set($rewrittenUrlData->view.'_id', $rewrittenUrlData->viewId);
-                }
-            }
-
-            if (null !== $rewrittenUrlData->locale) {
-                $this->manageLocale($rewrittenUrlData, $request);
-            }
-
-            foreach ($rewrittenUrlData->otherParameters as $parameter => $value) {
-                $request->query->set($parameter, $value);
-            }
-
-            return [
-                '_controller' => 'Thelia\\Controller\\Front\\DefaultController::noAction',
-                '_route' => 'rewrite',
-                '_rewritten' => true,
-            ];
+        if (!ConfigQuery::isRewritingEnable()) {
+            throw new ResourceNotFoundException();
         }
-        throw new ResourceNotFoundException();
+        $urlTool = URL::getInstance();
+
+        $pathInfo = $request instanceof TheliaRequest ? $request->getRealPathInfo() : $request->getPathInfo();
+        try {
+            $rewrittenUrlData = $urlTool->resolve($pathInfo);
+        } catch (UrlRewritingException $e) {
+            switch ($e->getCode()) {
+                case UrlRewritingException::URL_NOT_FOUND:
+                    throw new ResourceNotFoundException();
+                    break;
+                default:
+                    throw $e;
+            }
+        }
+        // If we have a "lang" parameter, whe have to check if the found URL has the proper locale
+        // If it's not the case, find the rewritten URL with the requested locale, and redirect to it.
+        if (null == !$requestedLocale = $request->get('lang')) {
+            if (null !== $requestedLang = LangQuery::create()->filterByActive(true)->findOneByLocale($requestedLocale)) {
+                if ($requestedLang->getLocale() != $rewrittenUrlData->locale) {
+                    // Save one redirection if requested locale is disabled.
+                    if (!$requestedLang->getActive()) {
+                        $requestedLang = Lang::getDefaultLanguage();
+                    }
+
+                    $localizedUrl = $urlTool->retrieve(
+                        $rewrittenUrlData->view,
+                        $rewrittenUrlData->viewId,
+                        $requestedLang->getLocale()
+                    )->toString();
+
+                    $this->redirect($urlTool->absoluteUrl($localizedUrl), 301);
+                }
+            }
+        }
+
+        // If the rewritten URL locale is disabled, redirect to the URL in the default language
+        if (null === $lang = LangQuery::create()
+                ->filterByActive(true)
+                ->filterByLocale($rewrittenUrlData->locale)
+                ->findOne()) {
+            $lang = Lang::getDefaultLanguage();
+
+            $localizedUrl = $urlTool->retrieve(
+                $rewrittenUrlData->view,
+                $rewrittenUrlData->viewId,
+                $lang->getLocale()
+            )->toString();
+
+            $this->redirect($urlTool->absoluteUrl($localizedUrl), 301);
+        }
+
+        /* is the URL redirected ? */
+        if (null !== $rewrittenUrlData->redirectedToUrl) {
+            $redirect = RewritingUrlQuery::create()
+                ->filterByView($rewrittenUrlData->view)
+                ->filterByViewId($rewrittenUrlData->viewId)
+                ->filterByViewLocale($rewrittenUrlData->locale)
+                ->filterByRedirected(null, Criteria::ISNULL)
+                ->findOne()
+            ;
+
+            $this->redirect($urlTool->absoluteUrl($redirect->getUrl()), 301);
+        }
+
+        /* define GET arguments in request */
+
+        if (null !== $rewrittenUrlData->view) {
+            $request->attributes->set('_view', $rewrittenUrlData->view);
+            if (null !== $rewrittenUrlData->viewId) {
+                $request->query->set($rewrittenUrlData->view.'_id', $rewrittenUrlData->viewId);
+            }
+        }
+
+        if (null !== $rewrittenUrlData->locale) {
+            $this->manageLocale($rewrittenUrlData, $request);
+        }
+
+        foreach ($rewrittenUrlData->otherParameters as $parameter => $value) {
+            $request->query->set($parameter, $value);
+        }
+
+        return [
+            '_controller' => 'Thelia\\Controller\\Front\\DefaultController::noAction',
+            '_route' => 'rewrite',
+            '_rewritten' => true,
+        ];
+
     }
 
     protected function manageLocale(RewritingResolver $rewrittenUrlData, TheliaRequest $request): void

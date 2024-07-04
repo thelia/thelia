@@ -135,6 +135,7 @@
 
 
         <service id="thelia.parser.context" alias="Thelia\Core\Template\ParserContext" public="true"/>
+        <service id="Thelia\Core\Template\ParserInterface" alias="Thelia\Core\Template\Parser\ParserFallback" public="true"/>
 
         <!-- The file manager -->
         <service id="Thelia\Files\FileManager">

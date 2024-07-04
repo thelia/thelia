@@ -4,6 +4,15 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
+    <route id="admin" path="/admin">
+      <default key="_controller">Thelia\Controller\Admin\AdminController::indexAction</default>
+      <default key="not-logged">1</default>
+    </route>
+    <route id="admin.home" path="/admin/home">
+      <default key="_controller">Thelia\Controller\Admin\AdminController::indexAction</default>
+    </route>
+
+
     <!-- Route to the administration login page -->
     <route id="admin.login" path="/admin/login">
         <default key="_controller">Thelia\Controller\Admin\SessionController::showLoginAction</default>

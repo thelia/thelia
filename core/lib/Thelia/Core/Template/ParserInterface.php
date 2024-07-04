@@ -168,4 +168,5 @@ interface ParserInterface
     public function supportTemplateRender(string $templatePath, ?string $templateName): bool;
 
     public function getFileExtension(): string;
+    public static function getDefaultPriority(): int;
 }
