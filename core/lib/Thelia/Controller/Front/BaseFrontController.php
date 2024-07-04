@@ -78,7 +78,8 @@ class BaseFrontController extends BaseController
      */
     protected function getParser($template = null)
     {
-        $parser = $this->parserResolver->getParser($template);
+        $path = $this->getTemplateHelper()->getActiveFrontTemplate()->getAbsolutePath();
+        $parser = $this->parserResolver->getParser($path, $template);
 
         // Define the template that should be used
         $parser->setTemplateDefinition(

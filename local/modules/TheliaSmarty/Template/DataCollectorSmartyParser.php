@@ -150,4 +150,9 @@ class DataCollectorSmartyParser extends \Smarty implements ParserInterface
     {
         return 'html';
     }
+
+    public static function getDefaultPriority(): int
+    {
+        return -10;
+    }
 }

@@ -210,7 +210,8 @@ class BaseAdminController extends BaseController
      */
     protected function getParser($template = null)
     {
-        $parser = $this->parserResolver->getParser($template);
+        $path = $this->templateHelper->getActiveAdminTemplate()->getAbsolutePath();
+        $parser = $this->parserResolver->getParser($path, $template);
         // Define the template that should be used
         $parser->setTemplateDefinition(
             $parser->getTemplateDefinition() ?: $this->templateHelper->getActiveAdminTemplate(),
