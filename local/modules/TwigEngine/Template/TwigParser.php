@@ -50,6 +50,9 @@ class TwigParser implements ParserInterface
         if (str_contains($realTemplateName, '.html')) {
             $realTemplateName = str_replace('.html', '', $realTemplateName);
         }
+        if (str_contains($realTemplateName, '.twig')) {
+            $realTemplateName = str_replace('.twig', '', $realTemplateName);
+        }
         $this->loader->addPath($this->getTemplateDefinition()?->getAbsolutePath());
 
         if (!str_ends_with($realTemplateName, '.'.$this->getFileExtension())) {
