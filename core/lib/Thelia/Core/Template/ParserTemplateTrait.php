@@ -16,7 +16,9 @@ trait ParserTemplateTrait
     protected ?TemplateDefinition $templateDefinition = null;
     protected bool $fallbackToDefaultTemplate = false;
     protected int $status = 200;
-    protected TemplateHelperInterface $templateHelper;
+
+    #[Required]
+    public TemplateHelperInterface $templateHelper;
 
     #[Required]
     public RequestStack $requestStack;

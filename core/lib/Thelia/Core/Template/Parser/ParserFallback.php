@@ -178,4 +178,9 @@ class ParserFallback implements ParserInterface
     {
         $this->throwException();
     }
+
+    public static function getDefaultPriority(): int
+    {
+        return -10;
+    }
 }

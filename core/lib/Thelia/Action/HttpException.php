@@ -18,6 +18,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException as BaseHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\HttpFoundation\Response;
+use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Exception\AdminAccessDenied;
 use Thelia\Model\ConfigQuery;
@@ -30,12 +31,12 @@ use Thelia\Model\ConfigQuery;
  */
 class HttpException extends BaseAction implements EventSubscriberInterface
 {
-    /** @var ParserInterface */
-    protected $parser;
+    protected ?ParserInterface $parser = null;
 
-    public function __construct(ParserInterface $parser)
-    {
-        $this->parser = $parser;
+    public function __construct(
+        protected ParserResolver $parserResolver,
+    ) {
+        $this->parser = $this->parserResolver->getDefaultParser();
     }
 
     public function checkHttpException(ExceptionEvent $event): void
@@ -82,7 +83,6 @@ class HttpException extends BaseAction implements EventSubscriberInterface
 
     protected function display404(ExceptionEvent $event): void
     {
-        // Define the template thant shoud be used
         $this->parser->setTemplateDefinition(
             $this->parser->getTemplateHelper()->getActiveFrontTemplate()
         );

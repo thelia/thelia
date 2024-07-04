@@ -67,10 +67,8 @@ class TheliaHttpKernel extends HttpKernel
      */
     public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = true): \Symfony\Component\HttpFoundation\Response
     {
-        $this->container->get('request.context')->fromRequest($request);
+        $this->container->get('request.context')?->fromRequest($request);
 
-        $response = parent::handle($request, $type, $catch);
-
-        return $response;
+        return parent::handle($request, $type, $catch);
     }
 }
