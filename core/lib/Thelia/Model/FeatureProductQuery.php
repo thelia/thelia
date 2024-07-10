@@ -26,8 +26,6 @@ use Thelia\Model\Base\FeatureProductQuery as BaseFeatureProductQuery;
 class FeatureProductQuery extends BaseFeatureProductQuery
 {
     /**
-     * {@inheritdoc}
-     *
      * @deprecated since version 2.4.0, to be removed in 3.0.
      *                      Please use  filterByIsFreeText() instead
      */
@@ -40,8 +38,6 @@ class FeatureProductQuery extends BaseFeatureProductQuery
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @deprecated since version 2.4.0, to be removed in 3.0.
      *                      Please use  orderByIsFreeText() instead
      */
@@ -54,8 +50,6 @@ class FeatureProductQuery extends BaseFeatureProductQuery
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @deprecated since version 2.4.0, to be removed in 3.0.
      *                      Please use  groupByIsFreeText() instead
      */
@@ -68,8 +62,6 @@ class FeatureProductQuery extends BaseFeatureProductQuery
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @deprecated since version 2.4.0, to be removed in 3.0.
      *                      Please use  findByIsFreeText() instead
      */
@@ -82,8 +74,6 @@ class FeatureProductQuery extends BaseFeatureProductQuery
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @deprecated since version 2.4.0, to be removed in 3.0.
      *                      Please use  findOneByIsFreeText() instead
      */

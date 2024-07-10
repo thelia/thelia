@@ -50,9 +50,6 @@ class Payment implements EventSubscriberInterface
             ->setMaximumAmount($module->getMaximumAmount());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

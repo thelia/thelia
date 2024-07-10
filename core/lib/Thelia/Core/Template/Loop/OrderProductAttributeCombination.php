@@ -31,8 +31,6 @@ use Thelia\Type\TypeCollection;
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
- * {@inheritdoc}
- *
  * @method int      getOrderProduct()
  * @method string[] getOrder()
  * @method bool     getVirtual()

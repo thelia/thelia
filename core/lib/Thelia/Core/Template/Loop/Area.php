@@ -29,8 +29,6 @@ use Thelia\Type\TypeCollection;
  *
  * @author Manuel Raynaud <manu@raynaud.io>
  *
- * {@inheritdoc}
- *
  * @method int[]       getId()
  * @method int[]       getCountry()
  * @method int         getWithZone()

@@ -42,18 +42,12 @@ class FreeProduct extends AbstractRemoveOnProducts
      */
     public const ADD_TO_CART_IN_PROCESS = -1;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setFieldsValue($effects): void
     {
         $this->offeredProductId = $effects[self::OFFERED_PRODUCT_ID];
         $this->offeredCategoryId = $effects[self::OFFERED_CATEGORY_ID];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCartItemDiscount(CartItem $cartItem)
     {
         // This method is not used, we use our own implementation of exec();
@@ -173,9 +167,6 @@ class FreeProduct extends AbstractRemoveOnProducts
         return $match;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exec()
     {
         $discount = 0;
@@ -243,17 +234,11 @@ class FreeProduct extends AbstractRemoveOnProducts
         return $discount;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getFieldList()
     {
         return $this->getBaseFieldList([self::OFFERED_CATEGORY_ID, self::OFFERED_PRODUCT_ID]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function checkCouponFieldValue($fieldName, $fieldValue)
     {
         $this->checkBaseCouponFieldValue($fieldName, $fieldValue);
@@ -291,9 +276,6 @@ class FreeProduct extends AbstractRemoveOnProducts
             ->trans('Free product when buying one or more selected products', []);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getToolTip()
     {
         $toolTip = $this->facade
@@ -306,9 +288,6 @@ class FreeProduct extends AbstractRemoveOnProducts
         return $toolTip;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function drawBackOfficeInputs()
     {
         return $this->drawBaseBackOfficeInputs('coupon/type-fragments/free-product.html', [
@@ -320,9 +299,6 @@ class FreeProduct extends AbstractRemoveOnProducts
             ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clear(): void
     {
         // Clear the session variable when the coupon is cleared.

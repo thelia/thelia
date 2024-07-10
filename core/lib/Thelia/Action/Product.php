@@ -717,8 +717,8 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->filterById($freeTextFeatureAv->getId())
                 ->findOneByLocale($event->getLocale());
 
-            // Nothing found for this lang and the new value is not empty : create FeatureAvI18n
-            if ($freeTextFeatureAvI18n === null && !empty($featureAvId)) {
+            // Nothing found for this lang and the new value is not null and not 'empty' : create FeatureAvI18n
+            if ($freeTextFeatureAvI18n === null && $featureAvId !== null && $featureAvId !== '') {
                 $featureAvI18n = new FeatureAvI18n();
                 $featureAvI18n
                     ->setId($freeTextFeatureAv->getId())
@@ -727,8 +727,8 @@ class Product extends BaseAction implements EventSubscriberInterface
                     ->save();
 
                 $featureAvId = $featureAvI18n->getId();
-            } // Else if i18n exists but new value is empty : delete FeatureAvI18n
-            elseif ($freeTextFeatureAvI18n !== null && empty($featureAvId)) {
+            } // Else if i18n exists but new value is null or 'empty' : delete FeatureAvI18n
+            elseif ($freeTextFeatureAvI18n !== null && ($featureAvId === null || $featureAvId === '')) {
                 $freeTextFeatureAvI18n->delete();
 
                 // Check if there are still some FeatureAvI18n for this FeatureAv
@@ -745,14 +745,14 @@ class Product extends BaseAction implements EventSubscriberInterface
                 }
 
                 return;
-            } // Else if a FeatureAvI18n is found and the new value is not empty : update existing FeatureAvI18n
-            elseif ($freeTextFeatureAvI18n !== null && !empty($featureAvId)) {
+            } // Else if a FeatureAvI18n is found and the new value is not null and not 'empty' : update existing FeatureAvI18n
+            elseif ($freeTextFeatureAvI18n !== null && $featureAvId !== null && $featureAvId !== '') {
                 $freeTextFeatureAvI18n->setTitle($featureAvId);
                 $freeTextFeatureAvI18n->save();
 
                 $featureAvId = $freeTextFeatureAvI18n->getId();
             } // To prevent Integrity constraint violation
-            elseif (empty($featureAvId)) {
+            elseif ($featureAvId === null || $featureAvId === '') {
                 return;
             }
         }
@@ -870,9 +870,6 @@ class Product extends BaseAction implements EventSubscriberInterface
         throw new NotFoundHttpException();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

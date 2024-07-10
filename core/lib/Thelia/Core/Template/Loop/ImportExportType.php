@@ -30,8 +30,6 @@ use Thelia\Type\TypeCollection;
  *
  * @author Benjamin Perche <bperche@openstudio.fr>
  *
- * {@inheritdoc}
- *
  * @method int[]|null    getId()
  * @method string[]|null getRef()
  * @method int[]|null    getCategory()

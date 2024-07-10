@@ -22,17 +22,11 @@ use Thelia\Exception\UnmatchableConditionException;
  */
 class MatchDeliveryCountries extends AbstractMatchCountries
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getServiceId()
     {
         return 'thelia.condition.match_delivery_countries';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isMatching()
     {
         if (null === $this->facade->getCustomer()) {
@@ -50,9 +44,6 @@ class MatchDeliveryCountries extends AbstractMatchCountries
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->translator->trans(
@@ -61,9 +52,6 @@ class MatchDeliveryCountries extends AbstractMatchCountries
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getToolTip()
     {
         $toolTip = $this->translator->trans(

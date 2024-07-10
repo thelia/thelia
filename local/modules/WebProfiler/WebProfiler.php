@@ -12,12 +12,12 @@
 
 namespace WebProfiler;
 
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
-
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Thelia\Module\BaseModule;
 use TheliaSmarty\Template\DataCollectorSmartyParser;
 use WebProfiler\DataCollector\SmartyDataCollector;
+
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 class WebProfiler extends BaseModule
 {

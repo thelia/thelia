@@ -44,8 +44,6 @@ use Thelia\Type\TypeCollection;
  * @author Manuel Raynaud <manu@raynaud.io>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
- * {@inheritdoc}
- *
  * @method int[]       getId()
  * @method int[]       getParent()
  * @method int[]       getExcludeParent()

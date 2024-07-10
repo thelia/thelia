@@ -29,8 +29,6 @@ use Thelia\Model\TemplateQuery;
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
- * {@inheritdoc}
- *
  * @method int[] getId()
  * @method int[] getExclude()
  */

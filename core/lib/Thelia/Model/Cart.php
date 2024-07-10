@@ -25,10 +25,7 @@ class Cart extends BaseCart
     /**
      * Duplicate the current existing cart. Only the token is changed.
      *
-     * @param string                   $token
-     * @param Customer                 $customer
-     * @param Currency                 $currency
-     * @param EventDispatcherInterface $dispatcher
+     * @param string $token
      *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
@@ -75,12 +72,9 @@ class Cart extends BaseCart
             $productSaleElements = $cartItem->getProductSaleElements();
 
             if ($product
-                &&
-                $productSaleElements
-                &&
-                (int) $product->getVisible() === 1
-                &&
-                ($productSaleElements->getQuantity() >= $cartItem->getQuantity() || $product->getVirtual() === 1 || !ConfigQuery::checkAvailableStock())
+                && $productSaleElements
+                && (int) $product->getVisible() === 1
+                && ($productSaleElements->getQuantity() >= $cartItem->getQuantity() || $product->getVirtual() === 1 || !ConfigQuery::checkAvailableStock())
             ) {
                 $item = new CartItem();
                 $item->setCart($cart);
@@ -269,9 +263,7 @@ class Cart extends BaseCart
     }
 
     /**
-     * @param bool                       $withTaxes
-     * @param \Thelia\Model\Country|null $country
-     * @param \Thelia\Model\State|null   $state
+     * @param bool $withTaxes
      *
      * @throws \Propel\Runtime\Exception\PropelException
      *

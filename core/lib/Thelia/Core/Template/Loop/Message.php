@@ -34,8 +34,6 @@ use Thelia\Type\BooleanOrBothType;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  *
- * {@inheritdoc}
- *
  * @method int         getId()
  * @method int[]       getExclude()
  * @method string      getVariable()

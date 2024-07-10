@@ -16,24 +16,24 @@ $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
     ->exclude([
         'var',
-         'vendor',
-         '.docker',
-         'config',
-         'local/modules/OpenApi',
-         'local/modules/SmartyRedirection',
-         'local/modules/ChoiceFilter',
-         'local/modules/StoreSeo',
-         'local/modules/BetterSeo',
-         'local/modules/ShortCode',
-         'local/modules/ShortCodeMeta',
-         'local/modules/ForcePhone',
-         'local/modules/HookTest',
-         'local/modules/CustomDelivery',
-         'local/modules/Tinymce/Resources',
-         'local/modules/TheliaLibrary',
-         'local/modules/TheliaBlocks',
-         'local/modules/ProductLoopAttributeFilter',
-      ])
+        'vendor',
+        '.docker',
+        'config',
+        'local/modules/OpenApi',
+        'local/modules/SmartyRedirection',
+        'local/modules/ChoiceFilter',
+        'local/modules/StoreSeo',
+        'local/modules/BetterSeo',
+        'local/modules/ShortCode',
+        'local/modules/ShortCodeMeta',
+        'local/modules/ForcePhone',
+        'local/modules/HookTest',
+        'local/modules/CustomDelivery',
+        'local/modules/Tinymce/Resources',
+        'local/modules/TheliaLibrary',
+        'local/modules/TheliaBlocks',
+        'local/modules/ProductLoopAttributeFilter',
+    ])
 ;
 
 (new Filesystem())->mkdir(__DIR__.'/var/cache-ci');
@@ -63,4 +63,4 @@ return (new PhpCsFixer\Config())
         ],
     ])
     ->setFinder($finder)
-;
+    ;

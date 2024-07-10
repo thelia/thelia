@@ -26,7 +26,7 @@ class AdminResources
      *
      * @removed 2.5
      */
-    private static $selfReflection = null;
+    private static $selfReflection;
 
     /**
      * @deprecated 2.3
@@ -181,11 +181,11 @@ class AdminResources
     }
 
     /**
-     * @param $data with format
-     * [
-     *     "ADDRESS" => "admin.address",
-     *     ...
-     * ]
+     * @param $data   with format
+     *                 [
+     *                 "ADDRESS" => "admin.address",
+     *                 ...
+     *                 ]
      * @param $module string ModuleCode
      *
      * @throws \Exception

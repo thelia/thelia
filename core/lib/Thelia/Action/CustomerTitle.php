@@ -97,9 +97,6 @@ class CustomerTitle extends BaseAction implements EventSubscriberInterface
         $event->setCustomerTitle($customerTitle);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

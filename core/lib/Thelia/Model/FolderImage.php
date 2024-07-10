@@ -38,9 +38,6 @@ class FolderImage extends BaseFolderImage implements BreadcrumbInterface, FileMo
         $query->filterByFolder($this->getFolder());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);
@@ -50,9 +47,6 @@ class FolderImage extends BaseFolderImage implements BreadcrumbInterface, FileMo
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setParentId($parentId)
     {
         $this->setFolderId($parentId);
@@ -60,9 +54,6 @@ class FolderImage extends BaseFolderImage implements BreadcrumbInterface, FileMo
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParentId()
     {
         return $this->getFolderId();
@@ -81,9 +72,6 @@ class FolderImage extends BaseFolderImage implements BreadcrumbInterface, FileMo
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBreadcrumb(Router $router, $tab, $locale)
     {
         return $this->getFolderBreadcrumb($router, $tab, $locale);

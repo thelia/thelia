@@ -41,7 +41,7 @@ class ImportHandler
     protected $eventDispatcher;
 
     /**
-     *  @var \Thelia\Core\Serializer\SerializerManager The serializer manager service
+     * @var \Thelia\Core\Serializer\SerializerManager The serializer manager service
      */
     protected $serializerManager;
 

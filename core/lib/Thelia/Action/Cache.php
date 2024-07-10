@@ -82,9 +82,6 @@ class Cache extends BaseAction implements EventSubscriberInterface
         $fs->remove($dir);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

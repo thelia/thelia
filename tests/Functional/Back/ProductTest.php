@@ -57,23 +57,23 @@ class ProductTest extends WebTestCase
 
         $form = $formCrawlerNode->form([]);
 
-//        $this->assertFormSameValues([
-//            'page' => '1',
-//            'product_id' => '1',
-//            'current_tab' => 'general',
-//            'thelia_product_modification[id]' => '1',
-//            'thelia_product_modification[success_url]' => 'http://localhost/admin/categories?category_id=1&page=1',
-//            'thelia_product_modification[locale]' => 'en_US',
-//            'thelia_product_modification[ref]' => 'PROD001',
-//            'thelia_product_modification[title]' => 'Horatio',
-//            'thelia_product_modification[chapo]' => 'Contemporary atypical chair',
-//            'thelia_product_modification[description]' => "Its design is based on a very simple idea\u{a0}:  atypical aesthetics for an everyday use. You may even choose to combine the various colours ! A specific look that will happily and impertinently fit with your furniture. ",
-//            'thelia_product_modification[postscriptum]' => "Dimensions : Width\u{a0}: 20'' – Depth: 19'' – Height: 42''",
-//            'thelia_product_modification[default_category]' => '1',
-//            'thelia_product_modification[virtual_document_id]' => '-1',
-//            'thelia_product_modification[brand_id]' => '1',
-//            'thelia_product_modification[visible]' => '1',
-//        ], $form);
+        //        $this->assertFormSameValues([
+        //            'page' => '1',
+        //            'product_id' => '1',
+        //            'current_tab' => 'general',
+        //            'thelia_product_modification[id]' => '1',
+        //            'thelia_product_modification[success_url]' => 'http://localhost/admin/categories?category_id=1&page=1',
+        //            'thelia_product_modification[locale]' => 'en_US',
+        //            'thelia_product_modification[ref]' => 'PROD001',
+        //            'thelia_product_modification[title]' => 'Horatio',
+        //            'thelia_product_modification[chapo]' => 'Contemporary atypical chair',
+        //            'thelia_product_modification[description]' => "Its design is based on a very simple idea\u{a0}:  atypical aesthetics for an everyday use. You may even choose to combine the various colours ! A specific look that will happily and impertinently fit with your furniture. ",
+        //            'thelia_product_modification[postscriptum]' => "Dimensions : Width\u{a0}: 20'' – Depth: 19'' – Height: 42''",
+        //            'thelia_product_modification[default_category]' => '1',
+        //            'thelia_product_modification[virtual_document_id]' => '-1',
+        //            'thelia_product_modification[brand_id]' => '1',
+        //            'thelia_product_modification[visible]' => '1',
+        //        ], $form);
 
         $form->setValues([
             'thelia_product_modification[ref]' => 'test ref',

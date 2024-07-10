@@ -35,9 +35,6 @@ class Category extends BaseCategory implements FileModelParentInterface
         return CategoryQuery::countChild($this->getId());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getRewrittenUrlViewName()
     {
         return 'category';
@@ -132,9 +129,6 @@ class Category extends BaseCategory implements FileModelParentInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         $this->setPosition($this->getNextPosition());
@@ -144,9 +138,6 @@ class Category extends BaseCategory implements FileModelParentInterface
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preDelete(ConnectionInterface $con = null)
     {
         parent::preDelete($con);
@@ -161,9 +152,6 @@ class Category extends BaseCategory implements FileModelParentInterface
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function postDelete(ConnectionInterface $con = null): void
     {
         parent::postDelete($con);
@@ -182,7 +170,6 @@ class Category extends BaseCategory implements FileModelParentInterface
      * Overload for the position management.
      *
      * @param Base\ProductCategory $productCategory
-     *                                              {@inheritdoc}
      */
     protected function doAddProductCategory($productCategory): void
     {

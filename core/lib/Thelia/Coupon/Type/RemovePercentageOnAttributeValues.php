@@ -25,17 +25,11 @@ class RemovePercentageOnAttributeValues extends AbstractRemoveOnAttributeValues
     /** @var string Service Id */
     protected $serviceId = 'thelia.coupon.type.remove_percentage_on_attribute_av';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getPercentageFieldName()
     {
         return self::PERCENTAGE;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->facade
@@ -43,9 +37,6 @@ class RemovePercentageOnAttributeValues extends AbstractRemoveOnAttributeValues
             ->trans('Percentage discount for selected attribute values', []);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getToolTip()
     {
         $toolTip = $this->facade
@@ -58,9 +49,6 @@ class RemovePercentageOnAttributeValues extends AbstractRemoveOnAttributeValues
         return $toolTip;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function drawBackOfficeInputs()
     {
         return $this->callDrawBackOfficeInputs('coupon/type-fragments/remove-percentage-on-attributes.html');

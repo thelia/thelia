@@ -46,9 +46,6 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
      */
     abstract public function getCartItemDiscount(CartItem $cartItem);
 
-    /**
-     * {@inheritdoc}
-     */
     public function set(
         FacadeInterface $facade,
         $code,
@@ -97,9 +94,6 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exec()
     {
         // This coupon subtracts the specified amount from the order total
@@ -153,17 +147,11 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
         ]));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBaseFieldList($otherFields)
     {
         return array_merge($otherFields, [self::ATTRIBUTE, self::ATTRIBUTES_AV_LIST]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function checkBaseCouponFieldValue($fieldName, $fieldValue)
     {
         if ($fieldName === self::ATTRIBUTE) {

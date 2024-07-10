@@ -39,9 +39,6 @@ class ProductDocument extends BaseProductDocument implements BreadcrumbInterface
         $query->filterByProduct($this->getProduct());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);
@@ -51,9 +48,6 @@ class ProductDocument extends BaseProductDocument implements BreadcrumbInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setParentId($parentId)
     {
         $this->setProductId($parentId);
@@ -61,9 +55,6 @@ class ProductDocument extends BaseProductDocument implements BreadcrumbInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParentId()
     {
         return $this->getProductId();
@@ -82,9 +73,6 @@ class ProductDocument extends BaseProductDocument implements BreadcrumbInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBreadcrumb(Router $router, $tab, $locale)
     {
         return $this->getProductBreadcrumb($router, $tab, $locale);

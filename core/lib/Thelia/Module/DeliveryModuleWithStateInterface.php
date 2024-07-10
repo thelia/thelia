@@ -27,7 +27,6 @@ interface DeliveryModuleWithStateInterface extends BaseModuleInterface
      * If you return false, the delivery method will not be displayed
      *
      * @param Country $country the country to deliver to
-     * @param State   $state
      *
      * @return bool
      */
@@ -37,7 +36,6 @@ interface DeliveryModuleWithStateInterface extends BaseModuleInterface
      * Calculate and return delivery price in the shop's default currency.
      *
      * @param Country $country the country to deliver to
-     * @param State   $state
      *
      * @throws DeliveryException if the postage price cannot be calculated
      *

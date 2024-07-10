@@ -7,7 +7,7 @@
 composer.lock
 symfony.lock
 phpunit.xml
-.php-cs-fixer.cache
+config
 ###< symfony/framework-bundle ###
 
 ###> thelia/thelia ###
@@ -85,20 +85,12 @@ templates/pdf/*
 ###< thelia/thelia ###
 
 #other
-.DS_Store
 .idea/
 .history/
 .husky/
 .lighthouseci
 setup/audit/lighthouserc.yaml
 setup/audit/greenit.yaml
-composer.phar
-
-###> friendsofphp/php-cs-fixer ###
-/.php_cs
-/.php_cs.cache
-###< friendsofphp/php-cs-fixer ###
-
 ###> phpunit/phpunit ###
 /phpunit.xml
 .phpunit.result.cache
@@ -106,8 +98,6 @@ composer.phar
 
 ###> symfony/phpunit-bridge ###
 .phpunit
-.phpunit.result.cache
-/phpunit.xml
 ###< symfony/phpunit-bridge ###
 
 ###> symfony/webpack-encore-bundle ###
@@ -122,3 +112,12 @@ yarn-error.log
 tests/cypress/videos
 tests/cypress/screenshots
 tests/cypress/downloads
+
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###
+
+###> phpstan/phpstan ###
+phpstan.neon
+###< phpstan/phpstan ###

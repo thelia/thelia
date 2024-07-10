@@ -21,9 +21,6 @@ use Thelia\Coupon\FacadeInterface;
  */
 class MatchForEveryone extends ConditionAbstract
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(FacadeInterface $facade)
     {
         // Define the allowed comparison operators
@@ -32,17 +29,11 @@ class MatchForEveryone extends ConditionAbstract
         parent::__construct($facade);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getServiceId()
     {
         return 'thelia.condition.match_for_everyone';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setValidatorsFromForm(array $operators, array $values)
     {
         $this->operators = [];
@@ -51,17 +42,11 @@ class MatchForEveryone extends ConditionAbstract
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isMatching()
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->translator->trans(
@@ -70,9 +55,6 @@ class MatchForEveryone extends ConditionAbstract
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getToolTip()
     {
         $toolTip = $this->translator->trans(
@@ -83,9 +65,6 @@ class MatchForEveryone extends ConditionAbstract
         return $toolTip;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSummary()
     {
         $toolTip = $this->translator->trans(
@@ -96,17 +75,11 @@ class MatchForEveryone extends ConditionAbstract
         return $toolTip;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function generateInputs()
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function drawBackOfficeInputs()
     {
         // No input

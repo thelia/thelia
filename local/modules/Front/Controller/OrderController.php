@@ -113,7 +113,9 @@ class OrderController extends BaseFrontController
         $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
 
         $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_DELIVERY_ADDRESS);
+        $orderEvent->resetStopPropagation();
         $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_DELIVERY_MODULE);
+        $orderEvent->resetStopPropagation();
         $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_POSTAGE);
 
         return $this->generateRedirectFromRoute('order.invoice');
@@ -193,7 +195,9 @@ class OrderController extends BaseFrontController
             $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
 
             $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_DELIVERY_ADDRESS);
+            $orderEvent->resetStopPropagation();
             $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_DELIVERY_MODULE);
+            $orderEvent->resetStopPropagation();
             $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_POSTAGE);
 
             return $this->generateRedirectFromRoute('order.invoice');
@@ -264,6 +268,7 @@ class OrderController extends BaseFrontController
             $orderEvent->setPaymentModule($paymentModuleId);
 
             $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_INVOICE_ADDRESS);
+            $orderEvent->resetStopPropagation();
             $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_PAYMENT_MODULE);
 
             return $this->generateRedirectFromRoute('order.payment.process');
@@ -338,6 +343,7 @@ class OrderController extends BaseFrontController
                 ['order_id' => $orderEvent->getPlacedOrder()->getId()]
             );
         }
+
         /* order has not been placed */
         return $this->generateRedirectFromRoute('cart.view');
     }

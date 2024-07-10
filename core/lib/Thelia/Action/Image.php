@@ -100,7 +100,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         }
 
         // Find cached file path
-        $cacheFilePath = $this->getCacheFilePath($subdir, $sourceFile, $event->isOriginalImage(), $event->getOptionsHash());
+        $cacheFilePath = $this->getCacheFilePath($subdir, $sourceFile, $event->isOriginalImage());
 
         // Alternative image path is for browser that don't support webp
         $alternativeImagePath = null;
@@ -147,8 +147,8 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                     if (!$svg->hasAttribute('viewBox')) {
                         $pattern = '/^(\d*\.\d+|\d+)(px)?$/';
 
-                        $interpretable = preg_match($pattern, $svg->getAttribute('width'), $width) &&
-                            preg_match($pattern, $svg->getAttribute('height'), $height);
+                        $interpretable = preg_match($pattern, $svg->getAttribute('width'), $width)
+                            && preg_match($pattern, $svg->getAttribute('height'), $height);
 
                         if (!$interpretable || !isset($width) || !isset($height)) {
                             throw new \Exception("can't create viewBox if height and width is not defined in the svg file");
@@ -175,6 +175,9 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         // compute the full resolution image path in cache
         $originalImageUrl = $this->getCacheFileURL($subdir, basename($originalImagePathInCache));
 
+        if ($event->getOptionsHash() !== null) {
+            $processedImageUrl .= '?v='.$event->getOptionsHash();
+        }
         // Update the event with file path and file URL
         $event->setCacheFilepath($cacheFilePath);
         $event->setCacheOriginalFilepath($originalImagePathInCache);
@@ -489,9 +492,6 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         return $image;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

@@ -11,7 +11,7 @@ export default function zoom() {
     image.addEventListener('mousemove', (e) => {
       const backgroundImage = 'url(' + image.src + ')';
 
-      image.parentElement.insertBefore(zoomer, image);
+      image.parentElement?.insertBefore(zoomer, image);
 
       zoomer.classList.add('is-visible');
 

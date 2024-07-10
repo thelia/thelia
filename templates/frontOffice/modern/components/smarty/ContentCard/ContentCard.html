@@ -6,11 +6,13 @@
 
 <a href="{$URL}"  class="ContentCard" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>
   <figure class="ContentCard-img">
-    {loop name="category_thumbnail" type="image" source_id=$ID source=$object_type|default:"content" width=$width height=$height resize_mode="crop" limit="1" format="webp"}
+    {$source = $object_type|default:"content"}
+
+    {loop name="category_thumbnail" type="image" source_id=$ID source=$source width=$width height=$height resize_mode="crop" limit="1" format="webp"}
         {$images = [
           [
             "breakpoint" => "(min-width: 1440px)",
-            "url" => "/legacy-image-library/category_image_{$ID}/square/^!324,324/0/default.webp",
+            "url" => "/legacy-image-library/{$source}_image_{$ID}/square/^!324,324/0/default.webp",
             "link" => $URL,
             "description" => $DESCRIPTION,
             "width" => '324',
@@ -18,7 +20,7 @@
           ],
           [
             "breakpoint" => "(min-width: 1280px)",
-            "url" => "/legacy-image-library/category_image_{$ID}/square/!242,242/0/default.webp",
+            "url" => "/legacy-image-library/{$source}_image_{$ID}/square/!242,242/0/default.webp",
             "link" => $URL,
             "description" => $DESCRIPTION,
             "width" => '242',
@@ -26,7 +28,7 @@
           ],
           [
             "breakpoint" => "(min-width: 1024px)",
-            "url" => "/legacy-image-library/category_image_{$ID}/square/!210,210/0/default.webp",
+            "url" => "/legacy-image-library/{$source}_image_{$ID}/square/!210,210/0/default.webp",
             "link" => $URL,
             "description" => $DESCRIPTION,
             "width" => '210',
@@ -34,7 +36,7 @@
           ],
           [
             "breakpoint" => "(min-width: 768px)",
-            "url" => "/legacy-image-library/category_image_{$ID}/square/!146,146/0/default.webp",
+            "url" => "/legacy-image-library/{$source}_image_{$ID}/square/!146,146/0/default.webp",
             "link" => $URL,
             "description" => $DESCRIPTION,
             "width" => '146',
@@ -42,7 +44,7 @@
           ],
           [
             "breakpoint" => "(min-width: 1px)",
-            "url" => "/legacy-image-library/category_image_{$ID}/square/!166,166/0/default.webp",
+            "url" => "/legacy-image-library/{$source}_image_{$ID}/square/!166,166/0/default.webp",
             "link" => $URL,
             "description" => $DESCRIPTION,
             "width" => '166',

@@ -116,7 +116,7 @@ return [
   'Max price' => 'Prix max',
   'Min price' => 'Prix min',
   'My Addresses' => 'Mes adresses',
-  'My Profile' => 'Mon Profil',
+  'My Profile' => 'Mon profil',
   'My account' => 'Mon compte',
   'My cart' => 'Mon panier',
   'My orders' => 'Mes commandes',

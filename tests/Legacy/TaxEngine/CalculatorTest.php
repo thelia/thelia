@@ -277,38 +277,38 @@ class CalculatorTest extends TestCase
         $this->assertEquals(500, $untaxedPrice);
     }
 
-//    public function testGetFeatureFixAmountTaxTypeTaxedPrice(): void
-//    {
-//        $defaultLang = Lang::getDefaultLanguage();
-//
-//        $featureProduct = FeatureProductQuery::create()->findOneByIsFreeText(true);
-//        $aProduct = $featureProduct->getProduct();
-//        $featureAv = $featureProduct->getFeatureAv();
-//
-//        $featureAv->setLocale($defaultLang->getLocale())->setTitle(123);
-//
-//        $taxRulesCollection = new ObjectCollection();
-//        $taxRulesCollection->setModel('\Thelia\Model\Tax');
-//
-//        $tax = new Tax();
-//        $tax->setType('\Thelia\TaxEngine\TaxType\FeatureFixAmountTaxType')
-//            ->setRequirements([
-//                'feature' => $featureProduct->getFeatureId(),
-//                'lang' => $defaultLang->getId(),
-//            ])
-//            ->setVirtualColumn('taxRuleCountryPosition', 1);
-//        $taxRulesCollection->append($tax);
-//
-//        $calculator = new Calculator();
-//
-//        $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
-//        $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
-//
-//        $product = $this->getProperty('product');
-//        $product->setValue($calculator, $aProduct);
-//
-//        $taxedPrice = $calculator->getTaxedPrice(500);
-//
-//        $this->assertEquals(623, $taxedPrice);
-//    }
+    //    public function testGetFeatureFixAmountTaxTypeTaxedPrice(): void
+    //    {
+    //        $defaultLang = Lang::getDefaultLanguage();
+    //
+    //        $featureProduct = FeatureProductQuery::create()->findOneByIsFreeText(true);
+    //        $aProduct = $featureProduct->getProduct();
+    //        $featureAv = $featureProduct->getFeatureAv();
+    //
+    //        $featureAv->setLocale($defaultLang->getLocale())->setTitle(123);
+    //
+    //        $taxRulesCollection = new ObjectCollection();
+    //        $taxRulesCollection->setModel('\Thelia\Model\Tax');
+    //
+    //        $tax = new Tax();
+    //        $tax->setType('\Thelia\TaxEngine\TaxType\FeatureFixAmountTaxType')
+    //            ->setRequirements([
+    //                'feature' => $featureProduct->getFeatureId(),
+    //                'lang' => $defaultLang->getId(),
+    //            ])
+    //            ->setVirtualColumn('taxRuleCountryPosition', 1);
+    //        $taxRulesCollection->append($tax);
+    //
+    //        $calculator = new Calculator();
+    //
+    //        $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
+    //        $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
+    //
+    //        $product = $this->getProperty('product');
+    //        $product->setValue($calculator, $aProduct);
+    //
+    //        $taxedPrice = $calculator->getTaxedPrice(500);
+    //
+    //        $this->assertEquals(623, $taxedPrice);
+    //    }
 }

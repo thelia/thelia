@@ -168,7 +168,7 @@ class UrlGenerator extends AbstractSmartyPlugin
         $placeholder = [];
 
         foreach ($params as $key => $value) {
-            if (false !== strpos($path, "%$key")) {
+            if (str_contains($path, "%$key")) {
                 $placeholder["%$key"] = SmartyParser::theliaEscape($value, $smarty);
                 unset($params[$key]);
             }

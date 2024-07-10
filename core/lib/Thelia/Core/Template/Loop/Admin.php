@@ -29,8 +29,6 @@ use Thelia\Model\AdminQuery;
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
- * {@inheritdoc}
- *
  * @method int[] getId()
  * @method int[] getProfile()
  */

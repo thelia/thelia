@@ -61,7 +61,7 @@ class LoopResult implements \Iterator, \JsonSerializable
         return \count($this->collection) == 0;
     }
 
-    public function addRow(LoopResultRow $row): void
+    public function addRow(LoopResultRow $row, $key = null): void
     {
         if (true === $this->versioned) {
             foreach ($this->getVersionOutputs() as $output) {
@@ -78,7 +78,11 @@ class LoopResult implements \Iterator, \JsonSerializable
             $row->set('LOOP_TOTAL', $this->getResultDataCollectionCount());
         }
 
-        $this->collection[] = $row;
+        if (null !== $key) {
+            $this->collection[$key] = $row;
+        } else {
+            $this->collection[] = $row;
+        }
     }
 
     /**
@@ -210,9 +214,6 @@ class LoopResult implements \Iterator, \JsonSerializable
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function jsonSerialize()
     {
         $return = [];

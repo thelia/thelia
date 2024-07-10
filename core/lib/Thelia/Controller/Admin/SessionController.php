@@ -261,7 +261,7 @@ class SessionController extends BaseAdminController
 
             // Check if we have to ask the user to set its address email.
             // This is the case if Thelia has been updated from a pre 2.3.0 version
-            if (false === strpos($user->getEmail(), '@')) {
+            if (!str_contains($user->getEmail(), '@')) {
                 return $this->generateRedirectFromRoute('admin.set-email-address');
             }
 

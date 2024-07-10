@@ -29,8 +29,6 @@ use Thelia\Type\TypeCollection;
  *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  *
- * {@inheritdoc}
- *
  * @method int[]       getId()
  * @method string[]    getCode()
  * @method string[]    getHook_type()
@@ -42,9 +40,6 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $timestampable = true;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
@@ -79,9 +74,6 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildModelCriteria()
     {
         $search = HookQuery::create();
@@ -161,9 +153,6 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
         return $search;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function parseResults(LoopResult $loopResult)
     {
         /** @var \Thelia\Model\Hook $hook */

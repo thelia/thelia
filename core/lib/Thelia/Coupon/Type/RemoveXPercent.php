@@ -23,17 +23,11 @@ class RemoveXPercent extends AbstractRemove
     /** @var string Service Id */
     protected $serviceId = 'thelia.coupon.type.remove_x_percent';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getPercentageFieldName()
     {
         return self::INPUT_PERCENTAGE_NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->facade
@@ -41,9 +35,6 @@ class RemoveXPercent extends AbstractRemove
             ->trans('Remove X percent to total cart', []);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getToolTip()
     {
         $toolTip = $this->facade
@@ -56,17 +47,11 @@ class RemoveXPercent extends AbstractRemove
         return $toolTip;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exec()
     {
         return $this->facade->getCartTotalTaxPrice($this->isAvailableOnSpecialOffers()) * $this->percentage / 100;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function drawBackOfficeInputs()
     {
         return $this->callDrawBackOfficeInputs('coupon/type-fragments/remove-x-percent.html');

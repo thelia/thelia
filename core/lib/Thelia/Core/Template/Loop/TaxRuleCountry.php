@@ -36,8 +36,6 @@ use Thelia\Type\TypeCollection;
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
- * {@inheritdoc}
- *
  * @method int      getCountry()
  * @method int|null getState()
  * @method int      getTaxRule()
@@ -67,9 +65,6 @@ class TaxRuleCountry extends BaseI18nLoop implements PropelSearchLoopInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildModelCriteria()
     {
         $ask = $this->getAsk();
@@ -101,9 +96,6 @@ class TaxRuleCountry extends BaseI18nLoop implements PropelSearchLoopInterface
         return $search;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function parseResults(LoopResult $loopResult)
     {
         if ($this->getAsk() === 'countries') {

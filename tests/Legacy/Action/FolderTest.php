@@ -35,7 +35,7 @@ class FolderTest extends TestCaseWithURLToolSetup
     use RewrittenUrlTestTrait;
 
     /** @var int folder id used in position tests */
-    protected static $folderIdForPositionTest = null;
+    protected static $folderIdForPositionTest;
 
     public function getUpdateEvent(&$folder)
     {

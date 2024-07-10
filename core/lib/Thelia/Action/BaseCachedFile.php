@@ -194,7 +194,7 @@ abstract class BaseCachedFile extends BaseAction
         // Check if path is valid, e.g. in the cache dir
         $cache_base = realpath(sprintf('%s/%s', $web_root, $this->getCachePathFromWebRoot()));
 
-        if (strpos(realpath($path), $cache_base) !== 0) {
+        if (!str_starts_with(realpath($path), $cache_base)) {
             throw new \InvalidArgumentException(sprintf('Invalid cache path %s, with subdirectory %s', $path, $subdir));
         }
 
@@ -224,7 +224,7 @@ abstract class BaseCachedFile extends BaseAction
                     sprintf(
                         'File "%s" (type %s) with parent id %s failed to be saved',
                         $event->getParentName(),
-                        \get_class($model),
+                        $model::class,
                         $event->getParentId()
                     )
                 );
@@ -255,6 +255,7 @@ abstract class BaseCachedFile extends BaseAction
             // Remove old picture file from file storage
             $url = $event->getModel()->getUploadDir().'/'.$event->getOldModel()->getFile();
             unlink(str_replace('..', '', $url));
+            $event->getModel()->setFile('')->save();
 
             $newUploadedFile = $this->fileManager->copyUploadedFile($event->getModel(), $event->getUploadedFile());
             $event->setUploadedFile($newUploadedFile);

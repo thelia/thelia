@@ -502,9 +502,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      * END CLONING *
      ***************/
 
-    /**
-     * {@inheritDoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

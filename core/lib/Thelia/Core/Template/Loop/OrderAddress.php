@@ -29,8 +29,6 @@ use Thelia\Model\OrderAddressQuery;
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
- * {@inheritdoc}
- *
  * @method int getId()
  */
 class OrderAddress extends BaseLoop implements PropelSearchLoopInterface

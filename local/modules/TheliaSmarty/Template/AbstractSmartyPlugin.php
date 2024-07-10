@@ -107,7 +107,7 @@ abstract class AbstractSmartyPlugin implements SmartyPluginInterface
      */
     public function __call($functionName, $args)
     {
-        if (false !== strpos($functionName, self::WRAPPED_METHOD_PREFIX)) {
+        if (str_contains($functionName, self::WRAPPED_METHOD_PREFIX)) {
             $functionName = str_replace(self::WRAPPED_METHOD_PREFIX, '', $functionName);
 
             $params = $args[0] ?? [];

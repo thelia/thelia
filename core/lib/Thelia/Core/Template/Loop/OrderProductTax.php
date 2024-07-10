@@ -29,8 +29,6 @@ use Thelia\Model\OrderProductTaxQuery;
  *
  * @author Zzuutt
  *
- * {@inheritdoc}
- *
  * @method int getOrderProduct()
  */
 class OrderProductTax extends BaseLoop implements PropelSearchLoopInterface

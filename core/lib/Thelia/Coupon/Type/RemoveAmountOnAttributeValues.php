@@ -29,9 +29,6 @@ class RemoveAmountOnAttributeValues extends AbstractRemoveOnAttributeValues
         return self::AMOUNT_FIELD_NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->facade
@@ -39,9 +36,6 @@ class RemoveAmountOnAttributeValues extends AbstractRemoveOnAttributeValues
             ->trans('Fixed amount discount for selected attribute values', []);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getToolTip()
     {
         $toolTip = $this->facade
@@ -54,9 +48,6 @@ class RemoveAmountOnAttributeValues extends AbstractRemoveOnAttributeValues
         return $toolTip;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function drawBackOfficeInputs()
     {
         return $this->callDrawBackOfficeInputs('coupon/type-fragments/remove-amount-on-attributes.html');

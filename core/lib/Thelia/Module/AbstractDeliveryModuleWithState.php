@@ -38,8 +38,6 @@ abstract class AbstractDeliveryModuleWithState extends BaseModule implements Del
     /**
      * Return the first area that matches the given  country for the given module.
      *
-     * @param State $state
-     *
      * @return Area|null
      */
     public function getAreaForCountry(Country $country, State $state = null)

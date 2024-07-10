@@ -19,9 +19,6 @@ use Thelia\Form\Image\ImageModification;
  */
 class BrandImageModification extends ImageModification
 {
-    /**
-     * {@inheritdoc}
-     */
     public static function getName()
     {
         return 'thelia_brand_image_modification';

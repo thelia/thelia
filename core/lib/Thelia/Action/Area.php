@@ -79,9 +79,6 @@ class Area extends BaseAction implements EventSubscriberInterface
             ->save();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

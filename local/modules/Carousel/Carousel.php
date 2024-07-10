@@ -67,9 +67,8 @@ class Carousel extends BaseModule
     }
 
     /**
-     * @param string              $currentVersion
-     * @param string              $newVersion
-     * @param ConnectionInterface $con
+     * @param string $currentVersion
+     * @param string $newVersion
      *
      * @author Thomas Arnaud <tarnaud@openstudio.fr>
      */

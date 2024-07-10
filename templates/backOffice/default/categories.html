@@ -121,6 +121,8 @@
                                           <a href="{url path='admin/catalog' category_id=$ID}" title="{intl l='Browse this category'}">
                                             {$TITLE}
                                           </a>
+                                          ( {count type="product" visible="*" backend_context="1" visible="*" category={$ID} } {intl l="Products" d='hookadminhome.bo.default'} - 
+                                          {count type="category" visible="*" backend_context="1" visible="*" category={$ID} } {intl l="Categories" d='hookadminhome.bo.default'} )
                                      </td>
 
                                      {hook name="categories.row" location="category_list_row" category_id={$ID} }
@@ -257,7 +259,8 @@
                                     request_parameter_name='product_order'
                                     label="{intl l='ID'}"
                                  }
-
+                                 </th>
+                                 
                                  <th>&nbsp;</th>
 
                                  <th class="object-title">
@@ -280,7 +283,8 @@
                                     request_parameter_name='product_order'
                                     label="{intl l='Product title'}"
                                  }
-
+                                 </th>
+                                 
                                  {hook name="products.header" location="product_list_header" }
 
                                  <th class="text-right">

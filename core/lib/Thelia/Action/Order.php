@@ -533,17 +533,14 @@ class Order extends BaseAction implements EventSubscriberInterface
             }
 
             if (($order->isPaid(false) && $newStatus->isNotPaid(false)) // Case 1
-                ||
-                ($order->isNotPaid(true) && $newStatus->isNotPaid(false) && $manageStockOnCreation === true) // Case 3
+                || ($order->isNotPaid(true) && $newStatus->isNotPaid(false) && $manageStockOnCreation === true) // Case 3
             ) {
                 $event->setOperation($event::INCREASE_STOCK);
             }
 
             if ($order->isNotPaid(false) // Case 2
-                &&
-                $newStatus->isPaid(false)
-                &&
-                $manageStockOnCreation === false) {
+                && $newStatus->isPaid(false)
+                && $manageStockOnCreation === false) {
                 $event->setOperation($event::DECREASE_STOCK);
             }
 
@@ -682,9 +679,6 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->setTax($tax);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

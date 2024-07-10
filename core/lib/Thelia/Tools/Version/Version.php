@@ -67,15 +67,15 @@ class Version
                 $expression = $defaultComparison.$expression;
             }
 
-            if (strpos($expression, '>=') !== false) {
+            if (str_contains($expression, '>=')) {
                 $constraint = new ConstraintGreater($expression);
-            } elseif (strpos($expression, '>') !== false) {
+            } elseif (str_contains($expression, '>')) {
                 $constraint = new ConstraintGreater($expression, true);
-            } elseif (strpos($expression, '<=') !== false) {
+            } elseif (str_contains($expression, '<=')) {
                 $constraint = new ConstraintLower($expression);
-            } elseif (strpos($expression, '<') !== false) {
+            } elseif (str_contains($expression, '<')) {
                 $constraint = new ConstraintLower($expression, true);
-            } elseif (strpos($expression, '~') !== false) {
+            } elseif (str_contains($expression, '~')) {
                 $constraint = new ConstraintNearlyEqual($expression);
             } else {
                 $constraint = new ConstraintEqual($expression);

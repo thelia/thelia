@@ -28,8 +28,6 @@ use Thelia\Type\TypeCollection;
  *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  *
- * {@inheritdoc}
- *
  * @method int[]       getId()
  * @method int         getHook()
  * @method int         getModule()

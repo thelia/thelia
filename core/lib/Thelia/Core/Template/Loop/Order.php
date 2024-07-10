@@ -34,8 +34,6 @@ use Thelia\Type\TypeCollection;
  * @author Franck Allimant <franck@cqfdev.fr>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
- * {@inheritdoc}
- *
  * @method int[]|null    getId()
  * @method int[]|null    getRef()
  * @method int[]|null    getInvoiceRef()

@@ -118,9 +118,6 @@ class Attribute extends BaseAction implements EventSubscriberInterface
         AttributeTemplateQuery::create()->filterByAttribute($event->getAttribute())->delete();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

@@ -18,8 +18,6 @@ use Thelia\Model\Base\FeatureProduct as BaseFeatureProduct;
 class FeatureProduct extends BaseFeatureProduct
 {
     /**
-     * {@inheritdoc}
-     *
      * @deprecated since version 2.4.0, to be removed in 3.0.
      *                      Please use  getIsFreeText() instead
      */
@@ -32,8 +30,6 @@ class FeatureProduct extends BaseFeatureProduct
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @deprecated since version 2.4.0, to be removed in 3.0.
      *                      Please use  setIsFreeText() instead
      */
@@ -46,9 +42,6 @@ class FeatureProduct extends BaseFeatureProduct
         return parent::setFreeTextValue($v);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function setIsFreeText($v)
     {
         parent::setFreeTextValue($v ? 1 : null); // for preventing log deprecation and infinity recursion

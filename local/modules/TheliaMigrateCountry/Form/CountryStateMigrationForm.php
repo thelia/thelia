@@ -25,9 +25,6 @@ use TheliaMigrateCountry\Form\Type\CountryStateMigrationType;
  */
 class CountryStateMigrationForm extends BaseForm
 {
-    /**
-     * {@inheritDoc}
-     */
     protected function buildForm(): void
     {
         $this->formBuilder

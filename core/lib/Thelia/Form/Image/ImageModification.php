@@ -32,9 +32,6 @@ abstract class ImageModification extends BaseForm
 {
     use StandardDescriptionFieldsTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function buildForm(): void
     {
         $translator = Translator::getInstance();

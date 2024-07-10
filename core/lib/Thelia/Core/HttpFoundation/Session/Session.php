@@ -36,7 +36,7 @@ use Thelia\Tools\URL;
 class Session extends BaseSession
 {
     /** @var Cart|null */
-    protected static $transientCart = null;
+    protected static $transientCart;
 
     /**
      * @param bool $forceDefault if true, the default language will be returned if no current language is defined
@@ -364,8 +364,7 @@ class Session extends BaseSession
         $customer = $this->getCustomerUser();
 
         return (null !== $customer && $cart->getCustomerId() == $customer->getId())
-            ||
-        (null === $customer && $cart->getCustomerId() === null);
+        || (null === $customer && $cart->getCustomerId() === null);
     }
 
     // -- Order ------------------------------------------------------------------

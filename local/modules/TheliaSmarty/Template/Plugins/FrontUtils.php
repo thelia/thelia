@@ -13,6 +13,7 @@
 namespace TheliaSmarty\Template\Plugins;
 
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\CategoryQuery;
@@ -21,6 +22,7 @@ use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\TaxEngine\TaxEngine;
 use Thelia\Tools\URL;
+use TheliaSmarty\Events\PseByProductEvent;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 
@@ -42,14 +44,19 @@ class FrontUtils extends AbstractSmartyPlugin
     /** @var string */
     protected $assetsPublicPath;
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     public function __construct(
         RequestStack $requestStack,
         TaxEngine $taxEngine,
         SecurityContext $securityContext,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->request = $requestStack->getCurrentRequest();
         $this->taxEngine = $taxEngine;
         $this->securityContext = $securityContext;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function getPluginDescriptors()
@@ -151,6 +158,8 @@ class FrontUtils extends AbstractSmartyPlugin
                 $attributes[$attribute->getAttributeId()] = $attribute->getAttributeAvId();
             }
 
+            $this->eventDispatcher->dispatch(new PseByProductEvent($pse));
+
             $result[] = [
                 'id' => $pse->getId(),
                 'isDefault' => $pse->isDefault(),
@@ -235,8 +244,7 @@ class FrontUtils extends AbstractSmartyPlugin
     }
 
     /**
-     * @param array   $params
-     * @param \Smarty $smarty
+     * @param array $params
      */
     public function isInFolder($params)
     {
@@ -271,8 +279,7 @@ class FrontUtils extends AbstractSmartyPlugin
     }
 
     /**
-     * @param array   $params
-     * @param \Smarty $smarty
+     * @param array $params
      */
     public function isInCategory($params)
     {

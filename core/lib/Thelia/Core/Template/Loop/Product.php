@@ -47,8 +47,6 @@ use Thelia\Type\TypeCollection;
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
- * {@inheritdoc}
- *
  * @method int[]       getId()
  * @method bool        getComplex()
  * @method string[]    getRef()
@@ -257,7 +255,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             if (!$this->getBackendContext()
                 && $securityContext->hasCustomerUser()
                 && $securityContext->getCustomerUser()->getDiscount() > 0) {
-                $price = $price * (1 - ($securityContext->getCustomerUser()->getDiscount() / 100));
+                $price *= (1 - ($securityContext->getCustomerUser()->getDiscount() / 100));
             }
 
             try {
@@ -274,7 +272,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             if (!$this->getBackendContext()
                 && $securityContext->hasCustomerUser()
                 && $securityContext->getCustomerUser()->getDiscount() > 0) {
-                $promoPrice = $promoPrice * (1 - ($securityContext->getCustomerUser()->getDiscount() / 100));
+                $promoPrice *= (1 - ($securityContext->getCustomerUser()->getDiscount() / 100));
             }
             try {
                 $taxedPromoPrice = $product->getTaxedPromoPrice(
@@ -338,7 +336,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $price = $product->getRealLowestPrice();
 
             if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {
-                $price = $price * (1 - ($securityContext->getCustomerUser()->getDiscount() / 100));
+                $price *= (1 - ($securityContext->getCustomerUser()->getDiscount() / 100));
             }
 
             try {
@@ -1100,7 +1098,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $search->withColumn('`pse`.WEIGHT', 'weight');
             $search->withColumn('`pse`.EAN_CODE', 'ean_code');
 
-            $search->withColumn('COUNT(`pse_count`.ID)', 'pse_count');
+            $search->withColumn('COUNT(distinct(`pse_count`.ID))', 'pse_count');
         }
 
         $orders = $this->getOrder();

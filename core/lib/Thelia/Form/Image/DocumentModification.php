@@ -31,9 +31,6 @@ abstract class DocumentModification extends BaseForm
 {
     use StandardDescriptionFieldsTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function buildForm(): void
     {
         $translator = Translator::getInstance();

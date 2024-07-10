@@ -27,9 +27,6 @@ class FeatureAv extends BaseFeatureAv
         $query->filterByFeatureId($this->getFeatureId());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);

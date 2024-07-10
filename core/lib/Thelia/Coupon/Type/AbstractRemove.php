@@ -38,9 +38,6 @@ abstract class AbstractRemove extends CouponAbstract implements AmountAndPercent
      */
     abstract public function getCartItemDiscount(CartItem $cartItem);
 
-    /**
-     * {@inheritdoc}
-     */
     public function set(
         FacadeInterface $facade,
         $code,
@@ -81,25 +78,16 @@ abstract class AbstractRemove extends CouponAbstract implements AmountAndPercent
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function drawBaseBackOfficeInputs($templateName, $otherFields)
     {
         return $this->facade->getParser()->render($templateName, $otherFields);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBaseFieldList($otherFields)
     {
         return array_merge($otherFields);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function checkBaseCouponFieldValue($fieldName, $fieldValue)
     {
         return $fieldValue;

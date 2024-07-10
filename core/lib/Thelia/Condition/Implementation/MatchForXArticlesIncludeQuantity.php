@@ -21,25 +21,16 @@ use Thelia\Condition\Operators;
  */
 class MatchForXArticlesIncludeQuantity extends MatchForXArticles
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getServiceId()
     {
         return 'thelia.condition.match_for_x_articles_include_quantity';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->translator->trans('Cart item include quantity count');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isMatching()
     {
         return $this->conditionValidator->variableOpComparison(
@@ -49,9 +40,6 @@ class MatchForXArticlesIncludeQuantity extends MatchForXArticles
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function drawBackOfficeInputs()
     {
         $labelQuantity = $this->facade->getTranslator()->trans('Cart item include quantity count is');
@@ -59,9 +47,6 @@ class MatchForXArticlesIncludeQuantity extends MatchForXArticles
         return $this->drawBackOfficeBaseInputsText($labelQuantity, self::CART_QUANTITY);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSummary()
     {
         $i18nOperator = Operators::getI18n(

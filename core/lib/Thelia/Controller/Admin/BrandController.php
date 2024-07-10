@@ -274,9 +274,6 @@ class BrandController extends AbstractSeoCrudController
         return new BrandToggleVisibilityEvent($this->getExistingObject());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
     {
         return new UpdatePositionEvent(

@@ -57,7 +57,7 @@ abstract class AbstractExport implements \Iterator
     private $dataIsArray;
 
     /**
-     *  @var bool True if data is a path to a JSON file, false otherwise
+     * @var bool True if data is a path to a JSON file, false otherwise
      */
     private $dataIsJSONFile;
 

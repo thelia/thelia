@@ -34,7 +34,7 @@ class URL
     public const PATH_TO_FILE = true;
     public const WITH_INDEX_PAGE = false;
 
-    protected static $instance = null;
+    protected static $instance;
 
     /** @var string a cache for the base URL scheme */
     private $baseUrlScheme;
@@ -144,7 +144,7 @@ class URL
                 // We have to compensate for this.
                 $rcbu = $this->requestContext->getBaseUrl();
 
-                $hasSubdirectory = !empty($rcbu) && (0 === strpos($path, $rcbu));
+                $hasSubdirectory = !empty($rcbu) && str_starts_with($path, $rcbu);
 
                 $base_url = $this->getBaseUrl($hasSubdirectory);
             } else {

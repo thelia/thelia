@@ -47,7 +47,7 @@ class CouponCreationForm extends BaseForm
     protected function buildForm(): void
     {
         // Create countries and shipping modules list
-        $countries = [0 => '   '];
+        $countries = [Translator::getInstance()->trans('All countries') => 0];
 
         $list = CountryQuery::create()->find();
 
@@ -58,20 +58,16 @@ class CouponCreationForm extends BaseForm
 
         asort($countries);
 
-        $countries[0] = Translator::getInstance()->trans('All countries');
-
-        $modules = ['   ' => 0];
+        $modules = [Translator::getInstance()->trans('All shipping methods') => 0];
 
         $list = ModuleQuery::create()->filterByActivate(BaseModule::IS_ACTIVATED)->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->find();
 
         /** @var Module $item */
         foreach ($list as $item) {
-            $modules[$item->getId()] = $item->getTitle();
+            $modules[$item->getTitle()] = $item->getId();
         }
 
         asort($modules);
-
-        $modules[Translator::getInstance()->trans('All shipping methods')] = 0;
 
         $this->formBuilder
             ->add(

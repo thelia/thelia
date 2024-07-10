@@ -52,7 +52,7 @@ class VarDumper extends AbstractSmartyPlugin
             echo '<div class="sf-dump" style="background-color: #1b1b1b;color: #FFFFFF;padding-left: 5px;">'
                 .$name
                 .' : '
-                .($type === 'object' ? \get_class($param) : $type)
+                .($type === 'object' ? $param::class : $type)
                 .'</div>';
             dump($param);
         }

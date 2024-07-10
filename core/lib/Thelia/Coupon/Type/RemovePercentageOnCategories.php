@@ -23,17 +23,11 @@ class RemovePercentageOnCategories extends AbstractRemoveOnCategories
     /** @var string Service Id */
     protected $serviceId = 'thelia.coupon.type.remove_percentage_on_categories';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getPercentageFieldName()
     {
         return self::PERCENTAGE;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->facade
@@ -41,9 +35,6 @@ class RemovePercentageOnCategories extends AbstractRemoveOnCategories
             ->trans('Percentage discount for selected categories', []);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getToolTip()
     {
         $toolTip = $this->facade
@@ -56,9 +47,6 @@ class RemovePercentageOnCategories extends AbstractRemoveOnCategories
         return $toolTip;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function drawBackOfficeInputs()
     {
         return $this->callDrawBackOfficeInputs('coupon/type-fragments/remove-percentage-on-categories.html');

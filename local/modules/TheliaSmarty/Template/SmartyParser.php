@@ -550,7 +550,7 @@ class SmartyParser extends \Smarty implements ParserInterface
         foreach ($templates as $key => $value) {
             $absolutePath = rtrim(realpath(\dirname($value.$fileName)), '/');
             $templateDir = rtrim(realpath($value), '/');
-            if (!empty($absolutePath) && strpos($absolutePath, $templateDir) !== 0) {
+            if (!empty($absolutePath) && !str_starts_with($absolutePath, $templateDir)) {
                 $found = false;
             }
         }

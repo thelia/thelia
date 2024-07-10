@@ -34,8 +34,6 @@ use Thelia\Module\Exception\DeliveryException;
  * @author Manuel Raynaud <manu@raynaud.io>
  * @author Etienne Roudeix <eroudeix@gmail.com>
  *
- * {@inheritdoc}
- *
  * @method int getAddress()
  * @method int getCountry()
  * @method int getState()

@@ -72,7 +72,7 @@ class Thelia extends Kernel
 {
     use MicroKernelTrait;
 
-    public const THELIA_VERSION = '2.5.3';
+    public const THELIA_VERSION = '2.5.4';
 
     /** @var SchemaLocator */
     protected $propelSchemaLocator;
@@ -171,7 +171,7 @@ class Thelia extends Kernel
                 }
 
                 // MariaDB is not impacted by this problem
-                if (false === strpos($data['version'], 'MariaDB')) {
+                if (!str_contains($data['version'], 'MariaDB')) {
                     // MySQL 5.6+ compatibility
                     if (version_compare($data['version'], '5.6.0', '>=')) {
                         // add NO_ENGINE_SUBSTITUTION
@@ -280,8 +280,6 @@ class Thelia extends Kernel
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @throws \Exception
      */
     public function boot(): void
@@ -782,9 +780,6 @@ class Thelia extends Kernel
         return $parameters;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function registerBundles(): iterable
     {
         $contents = [

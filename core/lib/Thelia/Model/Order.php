@@ -100,8 +100,6 @@ class Order extends BaseOrder
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function preSave(ConnectionInterface $con = null)

@@ -164,12 +164,9 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     {
         if (
             (null === $config = ConfigQuery::create()->findPk($event->getConfigId()))
-            ||
-            ($config->getValue() === $event->getValue())
-            ||
-            ($config->getName() !== TemplateDefinition::BACK_OFFICE_CONFIG_NAME
-             &&
-             $config->getName() !== TemplateDefinition::FRONT_OFFICE_CONFIG_NAME)
+            || ($config->getValue() === $event->getValue())
+            || ($config->getName() !== TemplateDefinition::BACK_OFFICE_CONFIG_NAME
+             && $config->getName() !== TemplateDefinition::FRONT_OFFICE_CONFIG_NAME)
         ) {
             return;
         }
@@ -178,9 +175,6 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
         $dispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

@@ -297,58 +297,37 @@ class Customer extends BaseCustomer implements UserInterface
         return parent::setEmail($email);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getUsername()
     {
         return $this->getEmail();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function checkPassword($password)
     {
         return password_verify($password, $this->password);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function eraseCredentials(): void
     {
         parent::setPassword(null);
         $this->resetModified();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getRoles()
     {
         return [new Role('CUSTOMER')];
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getToken()
     {
         return $this->getRememberMeToken();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function setToken($token): void
     {
         $this->setRememberMeToken($token)->save();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getSerial()
     {
         return $this->getRememberMeSerial();
@@ -373,17 +352,11 @@ class Customer extends BaseCustomer implements UserInterface
         return $order > 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function setSerial($serial): void
     {
         $this->setRememberMeSerial($serial)->save();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);

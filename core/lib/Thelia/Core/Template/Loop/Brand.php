@@ -34,8 +34,6 @@ use Thelia\Type\TypeCollection;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  *
- * {@inheritdoc}
- *
  * @method int[]       getId()
  * @method int         getProduct()
  * @method bool|string getVisible()

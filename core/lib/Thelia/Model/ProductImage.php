@@ -38,9 +38,6 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
         $query->filterByProduct($this->getProduct());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);
@@ -50,9 +47,6 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setParentId($parentId)
     {
         $this->setProductId($parentId);
@@ -60,9 +54,6 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParentId()
     {
         return $this->getProductId();
@@ -81,9 +72,6 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBreadcrumb(Router $router, $tab, $locale)
     {
         return $this->getProductBreadcrumb($router, $tab, $locale);

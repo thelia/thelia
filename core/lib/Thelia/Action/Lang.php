@@ -242,9 +242,6 @@ class Lang extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

@@ -120,7 +120,6 @@ class DatabaseConfigurationSource
     {
         $connectionParameterBag = new ParameterBag($envParameters);
         $connectionParameterBag->add($parameters);
-        $connectionParameterBag->resolve();
         $this->connections[$name] = $connectionParameterBag;
     }
 
