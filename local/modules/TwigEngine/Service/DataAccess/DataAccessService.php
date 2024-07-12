@@ -12,10 +12,15 @@
 
 namespace TwigEngine\Service\DataAccess;
 
+use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use TwigEngine\Service\ApiPlatformMetadataService;
+use TwigEngine\Service\LocaleService;
 
 readonly class DataAccessService
 {
@@ -23,12 +28,20 @@ readonly class DataAccessService
         private RouterInterface $router,
         private ApiPlatformMetadataService $apiPlatformMetadataService,
         private LoopDataAccessService $loopDataAccessService,
+        private NormalizerInterface $normalizer,
+        private LocaleService $localeService
     ) {
     }
 
+    /**
+     * @throws ExceptionInterface
+     * @throws ResourceClassNotFoundException
+     */
     public function resources(string $path, array $parameters = []): object|array
     {
-        $route = $this->router->match($path);
+        /** @var Router $router */
+        $router = $this->router;
+        $route = $router->match($path);
 
         $resourceClass = $route['_api_resource_class'];
         $routeName = $route['_route'];
@@ -58,14 +71,17 @@ readonly class DataAccessService
                 $context
             )
         ) {
-            throw new AccessDeniedHttpException('Access Denied');
+            throw new AccessDeniedHttpException('Access Denied on '.$path);
         }
 
-        return $this->apiPlatformMetadataService->getProvider($operation)->provide(
+        $result = $this->apiPlatformMetadataService->getProvider($operation)->provide(
             $operation,
             [],
             $context
         );
+        $datasNormalized = $this->normalizer->normalize($result, null, $context);
+
+        return $this->formatI18ns($datasNormalized, $this->localeService->getLocale());
     }
 
     /** @deprecated use new data access layer */
@@ -78,5 +94,17 @@ readonly class DataAccessService
     public function loopCount(string $loopType, array $params = []): int
     {
         return $this->loopDataAccessService->theliaCount($loopType, $params);
+    }
+
+    private function formatI18ns(array $datas, string $locale = null): array
+    {
+        foreach ($datas as $key => $data) {
+            if (!isset($data['i18ns'][$locale])) {
+                continue;
+            }
+            $datas[$key]['i18ns'] = $data['i18ns'][$locale];
+        }
+
+        return $datas;
     }
 }
