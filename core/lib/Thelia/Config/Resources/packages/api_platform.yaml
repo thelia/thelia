@@ -17,6 +17,7 @@ api_platform:
             mime_types: [ 'text/html' ]
 
     swagger:
+        versions: [3]
         api_keys:
             JWT:
                 name: Authorization
