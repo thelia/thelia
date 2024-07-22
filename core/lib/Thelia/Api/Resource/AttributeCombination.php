@@ -62,6 +62,7 @@ class AttributeCombination implements PropelResourceInterface
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
         ProductSaleElements::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_WRITE,
     ])]
     public Attribute $attribute;
 
@@ -74,6 +75,7 @@ class AttributeCombination implements PropelResourceInterface
         ProductSaleElements::GROUP_ADMIN_WRITE,
         ProductSaleElements::GROUP_ADMIN_READ_SINGLE,
         ProductSaleElements::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_ADMIN_WRITE,
     ])]
     public AttributeAv $attributeAv;
 
