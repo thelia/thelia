@@ -270,6 +270,6 @@ class CartItem extends BaseCartItem
      */
     public function getTotalRealPrice()
     {
-        return round($this->getRealPrice(),2) * $this->getQuantity();
+        return round($this->getRealPrice(), 2) * $this->getQuantity();
     }
 }
