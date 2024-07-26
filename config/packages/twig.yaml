@@ -1,5 +1,9 @@
 twig:
     file_name_pattern: '*.twig'
+    paths:
+        '%kernel.project_dir%/templates/frontOffice/%thelia_front_template%/components': components
+        '%kernel.project_dir%/templates/frontOffice/%thelia_front_template%/assets': assets
+
 
 when@test:
     twig:
