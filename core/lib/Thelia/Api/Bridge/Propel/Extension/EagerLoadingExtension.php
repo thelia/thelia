@@ -137,7 +137,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 }
 
                 // Join only for non collection relation (Many to One or One to One) or if filter is applied to it
-                if ($property->getType()->getName() === Collection::class) {
+                if ($property->getType()->getName() === 'array') {
                     if (!$isInFilters) {
                         continue;
                     }
