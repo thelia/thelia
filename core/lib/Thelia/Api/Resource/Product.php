@@ -159,7 +159,12 @@ class Product extends AbstractTranslatableResource
     public ?\DateTime $updatedAt;
 
     #[Relation(targetResource: ProductCategory::class)]
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ])]
+    #[Groups([
+        self::GROUP_ADMIN_READ_SINGLE,
+        self::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ_SINGLE,
+        self::GROUP_FRONT_READ
+    ])]
     public array $productCategories;
 
     #[Column(propelFieldName: 'productSaleElementss')]
