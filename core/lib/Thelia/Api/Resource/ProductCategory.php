@@ -57,7 +57,7 @@ class ProductCategory implements PropelResourceInterface
         self::GROUP_FRONT_READ,
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
-        Product::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_WRITE
     ])]
     public Category $category;
 
@@ -65,7 +65,13 @@ class ProductCategory implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public Product $product;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Product::GROUP_FRONT_READ_SINGLE, Product::GROUP_ADMIN_READ_SINGLE, Product::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_ADMIN_WRITE
+    ])]
     public ?bool $defaultCategory = false;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Product::GROUP_FRONT_READ_SINGLE, Product::GROUP_ADMIN_READ_SINGLE, Product::GROUP_ADMIN_WRITE])]
