@@ -99,10 +99,15 @@ readonly class DataAccessService
     private function formatI18ns(array $datas, string $locale = null): array
     {
         foreach ($datas as $key => $data) {
-            if (!isset($data['i18ns'][$locale])) {
+            if ($key === 'i18ns' && isset($datas['i18ns'][$locale])) {
+                $datas['i18ns'] = $datas['i18ns'][$locale];
                 continue;
             }
-            $datas[$key]['i18ns'] = $data['i18ns'][$locale];
+            if (\is_array($data)) {
+                $datas[$key] = $this->formatI18ns($data, $locale);
+                continue;
+            }
+            $datas[$key] = $data;
         }
 
         return $datas;
