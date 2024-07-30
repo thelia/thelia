@@ -164,7 +164,7 @@ class Product extends AbstractTranslatableResource
     public ?\DateTime $updatedAt;
 
     #[Relation(targetResource: ProductCategory::class)]
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ])]
     public array $productCategories;
 
     #[Column(propelFieldName: 'productSaleElementss')]
@@ -370,6 +370,27 @@ class Product extends AbstractTranslatableResource
                 Translator::getInstance()->trans(
                     'A product with reference %ref already exists. Please choose another reference.',
                     ['%ref' => $resource->ref], null, 'en_US'
+                )
+            );
+        }
+    }
+    #[Callback(groups: [self::GROUP_ADMIN_WRITE])]
+    public function checkTitleAndLocaleNotBlank(ExecutionContextInterface $context): void
+    {
+        $resource = $context->getRoot();
+        $titleAndLocaleCount = 0;
+        /** @var I18nCollection $i18nData */
+        $i18nData = $resource->getI18ns();
+        foreach ($i18nData->i18ns as $i18n) {
+            if ($i18n->getTitle() !== null && !empty($i18n->getTitle())) {
+                ++$titleAndLocaleCount;
+            }
+        }
+        if ($titleAndLocaleCount === 0) {
+            $context->addViolation(
+                Translator::getInstance()->trans(
+                    'The title and locale must be defined at least once.',
+                    [], null, 'en_US'
                 )
             );
         }

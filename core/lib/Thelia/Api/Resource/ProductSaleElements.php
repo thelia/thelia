@@ -94,6 +94,7 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
         Product::GROUP_ADMIN_WRITE_UPDATE,
+        Product::GROUP_FRONT_READ,
     ])]
     public ?int $id = null;
 
@@ -110,6 +111,7 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_ADMIN_WRITE,
         CartItem::GROUP_ADMIN_READ,
         CartItem::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ,
     ])]
     public string $ref;
 
@@ -122,6 +124,7 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_ADMIN_WRITE,
         CartItem::GROUP_ADMIN_READ,
         CartItem::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ,
     ])]
     public int $quantity;
 
@@ -134,6 +137,7 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_ADMIN_WRITE,
         CartItem::GROUP_ADMIN_READ,
         CartItem::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ,
     ])]
     public ?bool $promo;
 
@@ -146,6 +150,7 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_ADMIN_WRITE,
         CartItem::GROUP_ADMIN_READ,
         CartItem::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ,
     ])]
     public ?bool $newness;
 
@@ -158,6 +163,7 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_ADMIN_WRITE,
         CartItem::GROUP_ADMIN_READ,
         CartItem::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ,
     ])]
     public ?float $weight;
 
@@ -168,6 +174,7 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_ADMIN_WRITE,
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_FRONT_READ,
     ])]
     public ?bool $isDefault;
 
@@ -189,6 +196,7 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_ADMIN_WRITE,
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_FRONT_READ,
     ])]
     public array $productPrices;
 
