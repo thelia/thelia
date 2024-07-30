@@ -16,7 +16,6 @@ use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
