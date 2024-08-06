@@ -23,6 +23,7 @@ use Propel\Runtime\Propel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
+use Thelia\Api\Resource\ItemFileResourceInterface;
 use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Api\Resource\ResourceAddonInterface;
 use Thelia\Config\DatabaseConfiguration;
@@ -45,10 +46,14 @@ readonly class PropelPersistProcessor implements ProcessorInterface
         $connection->beginTransaction();
         try {
             $this->beforeSave($data, $operation, $propelModel);
+            $implementsItemFileResource = \in_array(ItemFileResourceInterface::class, class_implements($data), true);
+            if ($implementsItemFileResource) {
+                $propelModel->setNew(false);
+            }
             $propelModel->save();
-
-            $resourceAddons = $this->manageResourceAddons($propelModel, $data);
-
+            if (!$implementsItemFileResource) {
+                $resourceAddons = $this->manageResourceAddons($propelModel, $data);
+            }
             $connection->commit();
 
             $propelModel->reload();
