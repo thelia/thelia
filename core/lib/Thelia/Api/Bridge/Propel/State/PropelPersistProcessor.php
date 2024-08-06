@@ -23,6 +23,7 @@ use Propel\Runtime\Propel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
+use Thelia\Api\Controller\Admin\PostItemFileController;
 use Thelia\Api\Resource\ItemFileResourceInterface;
 use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Api\Resource\ResourceAddonInterface;
@@ -46,7 +47,10 @@ readonly class PropelPersistProcessor implements ProcessorInterface
         $connection->beginTransaction();
         try {
             $this->beforeSave($data, $operation, $propelModel);
-            $implementsItemFileResource = \in_array(ItemFileResourceInterface::class, class_implements($data), true);
+            $implementsItemFileResource =
+                \in_array(ItemFileResourceInterface::class, class_implements($data), true)
+                && $operation->getController() === PostItemFileController::class;
+
             if ($implementsItemFileResource) {
                 $propelModel->setNew(false);
             }
