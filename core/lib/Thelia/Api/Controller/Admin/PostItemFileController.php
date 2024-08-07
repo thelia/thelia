@@ -35,14 +35,17 @@ class PostItemFileController
             throw new \Exception('Resource must implements ItemFileResourceInterface to use the PostItemFileController');
         }
 
-        $itemId = $request->get($resourceClass::getItemType());
-
+        $itemType = $resourceClass::getItemType();
+        $fileType = $resourceClass::getFileType();
+        $itemId = $request->get($itemType);
         $modelTableMap = $resourceClass::getPropelRelatedTableMap();
         $modelClassName = $modelTableMap->getClassName();
         $propelModel = new $modelClassName();
         $itemDocumentResourceService->createItemFile(
             $itemId,
-            $propelModel
+            $propelModel,
+            $itemType,
+            $fileType,
         );
 
         /** @var Post $operation */
