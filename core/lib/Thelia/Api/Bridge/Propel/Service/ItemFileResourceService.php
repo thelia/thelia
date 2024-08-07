@@ -17,21 +17,27 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
+use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Files\FileModelInterface;
+use Thelia\Model\ConfigQuery;
 
 readonly class ItemFileResourceService
 {
     public function __construct(
-        private RequestStack $requestStack,
+        private RequestStack             $requestStack,
         private EventDispatcherInterface $eventDispatcher
-    ) {
+    )
+    {
     }
 
     public function createItemFile(
-        int $parentId,
-        FileModelInterface $fileModel
-    ): void {
+        int                $parentId,
+        FileModelInterface $fileModel,
+        string $itemType,
+        string $fileType,
+    ): void
+    {
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
             return;
@@ -61,9 +67,36 @@ readonly class ItemFileResourceService
         $fileEvent->setModel($fileModel);
         $fileEvent->setUploadedFile($file);
 
-        $this->eventDispatcher->dispatch(
+        $file = $this->eventDispatcher->dispatch(
             $fileEvent,
             TheliaEvents::DOCUMENT_SAVE
         );
+
+        if ($fileType !== "image"){
+            return;
+        }
+        $event = new ImageEvent();
+
+        $baseSourceFilePath = ConfigQuery::read('images_library_path');
+        if ($baseSourceFilePath === null) {
+            $baseSourceFilePath = THELIA_LOCAL_DIR . 'media' . DS . 'images';
+        } else {
+            $baseSourceFilePath = THELIA_ROOT . $baseSourceFilePath;
+        }
+
+        $sourceFilePath = sprintf(
+            '%s/%s/%s',
+            $baseSourceFilePath,
+            $itemType,
+            basename($file->getUploadedFile()->getFilename())
+        );
+
+        $event->setSourceFilepath($sourceFilePath);
+        $event->setCacheSubdirectory($fileType);
+        $event->setHeight(100);
+        $event->setWidth(200);
+        $event->setRotation(0);
+        $event->setResizeMode(1);
+        $this->eventDispatcher->dispatch($event, TheliaEvents::IMAGE_PROCESS);
     }
 }
