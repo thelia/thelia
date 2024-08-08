@@ -12,6 +12,7 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -20,6 +21,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\AttributeTableMap;
 
 #[ApiResource(
@@ -56,6 +58,12 @@ use Thelia\Model\Map\AttributeTableMap;
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
+#[ApiFilter(
+    filterClass: SearchFilter::class,
+    properties: [
+        'title' => 'exact',
+    ]
+)]
 class Attribute extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:attribute:read';
@@ -84,7 +92,13 @@ class Attribute extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_READ_SINGLE, Product::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        self::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE
+    ])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int
