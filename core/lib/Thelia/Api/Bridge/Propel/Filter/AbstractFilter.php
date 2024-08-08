@@ -163,6 +163,6 @@ abstract class AbstractFilter implements FilterInterface
     ) {
         $locale = $context['filters']['locale'] ?? Lang::getDefaultLanguage()->getLocale();
 
-        return $query->getTableMap()->getName().'_lang_'.$locale.'.'.$property;
+        return str_replace("_", "", $query->getTableMap()->getName()).'_lang_'.$locale.'.'.$property;
     }
 }
