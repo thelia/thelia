@@ -6,7 +6,8 @@
   "require": {
     "php": ">=8.2",
     "thelia/installer": "~1.1",
-    "symfony/twig-bundle": "6.4.*"
+    "symfony/twig-bundle": "6.4.*",
+    "twigphp/intl-extra": "^3.0"
   },
   "extra": {
     "installer-name": "TwigEngine"
