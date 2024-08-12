@@ -116,6 +116,6 @@ class BaseFrontController extends BaseController
     protected function renderRaw($templateName, $args = [], $templateDir = null)
     {
         // Render the template.
-        return $this->getParser($templateName)->render($templateName, $args);
+        return $this->getParser()->render($templateName, $args);
     }
 }
