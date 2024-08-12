@@ -12,6 +12,7 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -21,7 +22,9 @@ use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\ContentTableMap;
+use Thelia\Model\Tools\UrlRewritingTrait;
 
 #[ApiResource(
     operations: [
@@ -57,8 +60,16 @@ use Thelia\Model\Map\ContentTableMap;
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
+#[ApiFilter(
+    filterClass: SearchFilter::class,
+    properties: [
+        'id'
+    ]
+)]
 class Content extends AbstractTranslatableResource
 {
+    use UrlRewritingTrait;
+
     public const GROUP_ADMIN_READ = 'admin:content:read';
     public const GROUP_ADMIN_READ_SINGLE = 'admin:content:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:content:write';
@@ -183,5 +194,20 @@ class Content extends AbstractTranslatableResource
     public static function getI18nResourceClass(): string
     {
         return ContentI18n::class;
+    }
+
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    public function getPublicUrl()
+    {
+        /** @var \Thelia\Model\Content $propelModel */
+        $propelModel = $this->getPropelModel();
+        return $this->getUrl($propelModel->getLocale());
+    }
+
+    public function getRewrittenUrlViewName(): string
+    {
+        /** @var \Thelia\Model\Content $propelModel */
+        $propelModel = $this->getPropelModel();
+        return $propelModel->getRewrittenUrlViewName();
     }
 }
