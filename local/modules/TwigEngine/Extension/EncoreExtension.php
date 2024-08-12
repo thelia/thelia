@@ -18,9 +18,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
-use Thelia\Tools\URL;
 use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
 
 class EncoreExtension extends AbstractExtension
 {
@@ -44,13 +42,6 @@ class EncoreExtension extends AbstractExtension
         }
     }
 
-    public function getFunctions(): array
-    {
-        return [
-            new TwigFunction('encore_manifest_file', [$this, 'getWebpackManifestFile']),
-        ];
-    }
-
     private function createSymlink($origin, $dest, $isDir = true, $forceOverWrite = false): void
     {
         $fileSystem = new Filesystem();
@@ -63,18 +54,5 @@ class EncoreExtension extends AbstractExtension
         }
 
         $fileSystem->symlink($origin, $dest);
-    }
-
-    public function getWebpackManifestFile($file): string
-    {
-        if (!$file) {
-            return '';
-        }
-
-        if (isset($this->packages['manifest'])) {
-            return URL::getInstance()->absoluteUrl($this->packages['manifest']->geturl($file), null, URL::PATH_TO_FILE);
-        }
-
-        return '';
     }
 }
