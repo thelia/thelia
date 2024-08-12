@@ -35,6 +35,7 @@ use Thelia\Api\Bridge\Propel\Validator\I18nConstraint;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductQuery;
+use Thelia\Model\Tools\UrlRewritingTrait;
 
 #[ApiResource(
     operations: [
@@ -107,6 +108,8 @@ use Thelia\Model\ProductQuery;
 )]
 class Product extends AbstractTranslatableResource
 {
+    use UrlRewritingTrait;
+
     public const GROUP_ADMIN_READ = 'admin:product:read';
     public const GROUP_ADMIN_READ_SINGLE = 'admin:product:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:product:write';
@@ -413,5 +416,20 @@ class Product extends AbstractTranslatableResource
                 )
             );
         }
+    }
+
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
+    public function getPublicUrl()
+    {
+        /** @var \Thelia\Model\Product $propelModel */
+        $propelModel = $this->getPropelModel();
+        return $this->getUrl($propelModel->getLocale());
+    }
+
+    public function getRewrittenUrlViewName(): string
+    {
+        /** @var \Thelia\Model\Product $propelModel */
+        $propelModel = $this->getPropelModel();
+        return $propelModel->getRewrittenUrlViewName();
     }
 }
