@@ -12,6 +12,7 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -20,7 +21,9 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\FolderTableMap;
+use Thelia\Model\Tools\UrlRewritingTrait;
 
 #[ApiResource(
     operations: [
@@ -44,26 +47,50 @@ use Thelia\Model\Map\FolderTableMap;
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
     denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            uriTemplate: '/front/folders'
+        ),
+        new Get(
+            uriTemplate: '/front/folders/{id}',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
+)]
+#[ApiFilter(
+    filterClass: SearchFilter::class,
+    properties: [
+        'id'
+    ]
+)]
 class Folder extends AbstractTranslatableResource
 {
+    use UrlRewritingTrait;
+
     public const GROUP_ADMIN_READ = 'admin:folder:read';
     public const GROUP_ADMIN_READ_SINGLE = 'admin:folder:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:folder:write';
+
+    public const GROUP_FRONT_READ = 'front:folder:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:folder:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ,
         ContentFolder::GROUP_ADMIN_READ,
         FolderImage::GROUP_ADMIN_READ_SINGLE,
         FolderDocument::GROUP_ADMIN_READ_SINGLE,
+        self::GROUP_FRONT_READ
     ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public bool $parent;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public bool $visible;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public ?int $position;
 
     #[Groups([self::GROUP_ADMIN_READ])]
@@ -155,5 +182,20 @@ class Folder extends AbstractTranslatableResource
     public static function getI18nResourceClass(): string
     {
         return FolderI18n::class;
+    }
+
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    public function getPublicUrl()
+    {
+        /** @var \Thelia\Model\Folder $propelModel */
+        $propelModel = $this->getPropelModel();
+        return $this->getUrl($propelModel->getLocale());
+    }
+
+    public function getRewrittenUrlViewName(): string
+    {
+        /** @var \Thelia\Model\Folder $propelModel */
+        $propelModel = $this->getPropelModel();
+        return $propelModel->getRewrittenUrlViewName();
     }
 }
