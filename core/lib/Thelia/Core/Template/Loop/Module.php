@@ -323,9 +323,19 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
             }
         }
 
-        if ($this->container->has('router.annotation')) {
+        if ($this->container->has('thelia.loader.module_attributes')) {
             try {
-                if ($this->container->get('router.annotation')->match('/admin/module/'.$module->getCode())) {
+                if ($this->container->get('thelia.loader.module_attributes')->match('/admin/module/'.$module->getCode())) {
+                    return true;
+                }
+            } catch (\Exception $e) {
+                /* Keep searching */
+            }
+        }
+
+        if ($this->container->has('thelia.loader.module_annotations')) {
+            try {
+                if ($this->container->get('thelia.loader.module_annotations')->match('/admin/module/'.$module->getCode())) {
                     return true;
                 }
             } catch (\Exception $e) {

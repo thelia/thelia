@@ -79,6 +79,13 @@
               <tag name="router.register" priority="255"/>
           </service>
 
+          <service id="thelia.loader.module_attributes" class="Thelia\Core\Routing\ModuleAttributeLoader" public="false">
+            <tag name="routing.loader" />
+          </service>
+          <service id="thelia.loader.module_annotations" class="Thelia\Core\Routing\ModuleAnnotationLoader" public="false">
+            <tag name="routing.loader" />
+          </service>
+
           <service id="router.chainRequest" class="%router.chainrouter.class%">
               <call method="setContext">
                   <argument type="service" id="request.context"/>
