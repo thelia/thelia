@@ -13,3 +13,7 @@ module_attribute_controllers:
 module_annotation_controllers:
   resource: .
   type: module_annotation
+
+module_xml_controllers:
+  resource: .
+  type: module_xml
