@@ -52,32 +52,5 @@ class RegisterRouterPass implements CompilerPassInterface
 
             $chainRouter->addMethodCall('add', [new Reference($id), $priority]);
         }
-        if (\defined('THELIA_INSTALL_MODE') === false) {
-            $modules = ModuleQuery::getActivated();
-
-            /** @var Module $module */
-            foreach ($modules as $module) {
-                $moduleBaseDir = $module->getBaseDir();
-                $routingConfigFilePath = $module->getAbsoluteBaseDir().DS.'Config'.DS.'routing.xml';
-
-                if (file_exists($routingConfigFilePath)) {
-                    $moduleRouter = new Definition(
-                        $container->getParameter('router.class'),
-                        [
-                            new Reference('router.module.xmlLoader'),
-                            $routingConfigFilePath,
-                            [],
-                            new Reference('request.context'),
-                        ]
-                    );
-
-                    $routerId = 'router.'.$moduleBaseDir;
-                    $container->setDefinition($routerId, $moduleRouter);
-
-                    $moduleRouter->addMethodCall('setOption', ['cache_dir', THELIA_CACHE_DIR.$container->getParameter('kernel.environment').DS.'routing'.DS.$routerId]);
-                    $chainRouter->addMethodCall('add', [new Reference($routerId), 150 + $module->getPosition()]);
-                }
-            }
-        }
     }
 }
