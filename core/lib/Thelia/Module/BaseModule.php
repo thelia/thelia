@@ -493,11 +493,24 @@ class BaseModule implements BaseModuleInterface
         // Override this method load more configuration for your module
     }
 
+    /**
+     * @deprecated use getRoutePrefix instead
+     */
     public static function getAnnotationRoutePrefix(): string
     {
         // Override to add a prefix to all your module annotated routes
         return '';
     }
+
+    /**
+     * @return string
+     */
+    public static function getRoutePrefix(): string
+    {
+        return '';
+    }
+
+
 
     public function install(ConnectionInterface $con = null): void
     {

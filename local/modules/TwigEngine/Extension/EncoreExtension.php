@@ -42,13 +42,13 @@ class EncoreExtension extends AbstractExtension
         }
     }
 
-    private function createSymlink($origin, $dest, $isDir = true, $forceOverWrite = false): void
+    private function createSymlink(string $origin, string $dest, bool $isDir = true, bool $forceOverWrite = false): void
     {
         $fileSystem = new Filesystem();
 
         if (
-            $isDir && (!is_dir($origin) || (is_dir($dest) && !$forceOverWrite))
-            || !$isDir && (!file_exists($origin) || (file_exists($dest) && !$forceOverWrite))
+            ($isDir && (!is_dir($origin) || (is_dir($dest) && !$forceOverWrite)))
+            || (!$isDir && (!file_exists($origin) || (file_exists($dest) && !$forceOverWrite)))
         ) {
             return;
         }
