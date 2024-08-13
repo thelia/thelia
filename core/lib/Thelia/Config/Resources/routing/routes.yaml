@@ -5,3 +5,11 @@ api_front_login_check:
   path: /api/front/login
 api_admin_login_check:
   path: /api/admin/login
+
+module_attribute_controllers:
+  resource: .
+  type: module_attribute
+
+module_annotation_controllers:
+  resource: .
+  type: module_annotation

@@ -43,7 +43,6 @@ class RegisterRouterPass implements CompilerPassInterface
             return;
         }
 
-        $router = $container->getDefinition('router.default');
         $chainRouter->addMethodCall('add', [new Reference('router.default'), 512]);
 
         foreach ($container->findTaggedServiceIds('router.register') as $id => $attributes) {
