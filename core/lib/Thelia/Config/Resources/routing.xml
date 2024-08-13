@@ -85,6 +85,11 @@
           <service id="thelia.loader.module_annotations" class="Thelia\Core\Routing\ModuleAnnotationLoader" public="false">
             <tag name="routing.loader" />
           </service>
+          <service id="thelia.loader.module_xml" class="Thelia\Core\Routing\ModuleXmlLoader" public="false">
+            <argument type="service" id="service_container" />
+            <argument>%env(APP_ENV)%</argument>
+            <tag name="routing.loader" />
+          </service>
 
           <service id="router.chainRequest" class="%router.chainrouter.class%">
               <call method="setContext">
