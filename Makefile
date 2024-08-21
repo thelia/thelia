@@ -54,6 +54,7 @@ remove-encore-files:
 
 activate-module:
 	@php Thelia module:refresh
+	@php Thelia module:activate TwigEngine
 	@php Thelia module:activate OpenApi
 	@php Thelia module:activate ProductLoopAttributeFilter
 	@php Thelia module:activate ChoiceFilter
