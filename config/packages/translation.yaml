@@ -2,6 +2,7 @@ framework:
     default_locale: en
     translator:
         default_path: '%kernel.project_dir%/translations'
+        paths: ['%kernel.project_dir%/templates/frontOffice/%thelia_front_template%/translations']
         fallbacks:
-            - en
+            - fr
         providers:
