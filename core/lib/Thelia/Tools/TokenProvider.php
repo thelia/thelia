@@ -13,6 +13,7 @@
 namespace Thelia\Tools;
 
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Security\Exception\TokenAuthenticationException;
 
@@ -43,15 +44,14 @@ class TokenProvider
      */
     protected $tokenName;
 
+    protected ?SessionInterface $session;
+
     public function __construct(RequestStack $requestStack, TranslatorInterface $translator, $tokenName)
     {
         $this->requestStack = $requestStack;
         $this->translator = $translator;
         $this->tokenName = $tokenName;
-        $session = $this->requestStack->getCurrentRequest()?->getSession();
-        if (null !== $session) {
-            $this->token = $session->get($this->tokenName);
-        }
+        $this->assignTokenFromSession();
     }
 
     private function setSessionFromRequest(): void
@@ -60,8 +60,19 @@ class TokenProvider
         if ($currentRequest && $currentRequest->hasSession()) {
             $session = $this->requestStack->getSession();
             $this->session = $session->isStarted() ? $session : null;
-        } else {
-            $this->session = null;
+            return;
+        }
+        $this->session = null;
+    }
+
+    private function assignTokenFromSession(): void
+    {
+        if (null !== $this->token) {
+            return;
+        }
+        $session = $this->requestStack->getCurrentRequest()?->getSession();
+        if (null !== $session) {
+            $this->token = $session->get($this->tokenName);
         }
     }
 
@@ -90,10 +101,12 @@ class TokenProvider
      */
     public function checkToken($entryValue)
     {
+        $this->assignTokenFromSession();
         if (null === $this->token) {
             throw new TokenAuthenticationException(
                 'Tried to check a token without assigning it before'
             );
+
         }
         if ($this->token !== $entryValue) {
             throw new TokenAuthenticationException(
