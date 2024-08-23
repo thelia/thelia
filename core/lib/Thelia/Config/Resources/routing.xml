@@ -63,18 +63,19 @@
 
         <service id="router.rewrite" class="Thelia\Core\Routing\RewritingRouter" />
 
+
         <service id="thelia.loader.template_attributes" class="Thelia\Core\Routing\TemplateAttributeLoader" public="false">
           <tag name="routing.loader" priority="254"/>
         </service>
         <service id="thelia.loader.module_attributes" class="Thelia\Core\Routing\ModuleAttributeLoader" public="false">
-          <tag name="routing.loader" priority="253"/>
+          <tag name="routing.loader" priority="254"/>
         </service>
         <service id="thelia.loader.module_annotations" class="Thelia\Core\Routing\ModuleAnnotationLoader" public="false">
-          <tag name="routing.loader" priority="252" />
+          <tag name="routing.loader" priority="253" />
         </service>
         <service id="thelia.loader.module_xml" class="Thelia\Core\Routing\ModuleXmlLoader" public="false">
           <argument>%env(APP_ENV)%</argument>
-          <tag name="routing.loader" priority="251" />
+          <tag name="routing.loader" priority="252" />
         </service>
 
         <service id="router.chainRequest" class="%router.chainrouter.class%">

@@ -71,6 +71,7 @@ class Lang extends BaseLang
             $con->rollBack();
             throw $e;
         }
+
     }
 
     public function preSave(ConnectionInterface $con = null): bool

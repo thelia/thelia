@@ -58,6 +58,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
         $urlTool = URL::getInstance();
 
         $pathInfo = $request instanceof TheliaRequest ? $request->getRealPathInfo() : $request->getPathInfo();
+
         try {
             $rewrittenUrlData = $urlTool->resolve($pathInfo);
         } catch (UrlRewritingException $e) {
@@ -92,6 +93,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
                 ->filterByActive(true)
                 ->filterByLocale($rewrittenUrlData->locale)
                 ->findOne()) {
+
             $lang = Lang::getDefaultLanguage();
 
             $localizedUrl = $urlTool->retrieve(
