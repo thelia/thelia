@@ -41,166 +41,62 @@ use Thelia\Tools\URL;
  */
 class RewritingRouter implements RouterInterface, RequestMatcherInterface
 {
-    /**
-     * @var RequestContext The context
-     */
-    protected $context;
+    protected RequestContext $context;
+    protected array $options;
 
-    /**
-     * @var array options, don't use for now but mandatory
-     */
-    protected $options;
-
-    /**
-     * Sets the request context.
-     *
-     * @param RequestContext $context The context
-     *
-     * @api
-     */
-    public function setContext(RequestContext $context): void
+    public function match(string $pathinfo): array
     {
-        $this->context = $context;
+        return $this->matchRequest(Request::create($pathinfo));
     }
 
     /**
-     * Gets the request context.
-     *
-     * @return RequestContext The context
-     *
-     * @api
-     */
-    public function getContext(): RequestContext
-    {
-        return $this->context;
-    }
-
-    public function setOption($key, $value): void
-    {
-        // NOTHING TO DO FOR NOW
-    }
-
-    /**
-     * Gets the RouteCollection instance associated with this Router.
-     *
-     * @return RouteCollection A RouteCollection instance
-     */
-    public function getRouteCollection()
-    {
-        return new RouteCollection();
-    }
-
-    /**
-     * Generates a URL or path for a specific route based on the given parameters.
-     *
-     * Parameters that reference placeholders in the route pattern will substitute them in the
-     * path or host. Extra params are added as query string to the URL.
-     *
-     * When the passed reference type cannot be generated for the route because it requires a different
-     * host or scheme than the current one, the method will return a more comprehensive reference
-     * that includes the required params. For example, when you call this method with $referenceType = ABSOLUTE_PATH
-     * but the route requires the https scheme whereas the current scheme is http, it will instead return an
-     * ABSOLUTE_URL with the https scheme and the current host. This makes sure the generated URL matches
-     * the route in any case.
-     *
-     * If there is no route with the given name, the generator must throw the RouteNotFoundException.
-     *
-     * @param string      $name          The name of the route
-     * @param mixed       $parameters    An array of parameters
-     * @param bool|string $referenceType The type of reference to be generated (one of the constants)
-     *
-     * @throws RouteNotFoundException              If the named route doesn't exist
-     * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
-     * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
-     *                                             it does not match the requirement
-     *
-     * @return string The generated URL
-     *
-     * @api
-     */
-    public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH): string
-    {
-        throw new RouteNotFoundException();
-    }
-
-    /**
-     * Tries to match a URL path with a set of routes.
-     *
-     * If the matcher can not find information, it must throw one of the exceptions documented
-     * below.
-     *
-     * @param string $pathinfo The path info to be parsed (raw format, i.e. not urldecoded)
-     *
-     * @throws ResourceNotFoundException If the resource could not be found
-     * @throws MethodNotAllowedException If the resource was found but the request method is not allowed
-     *
-     * @return array An array of parameters
-     *
-     * @api
-     */
-    public function match($pathinfo): array
-    {
-        throw new ResourceNotFoundException('impossible to find route with this method, please use matchRequest method');
-    }
-
-    /**
-     * Tries to match a request with a set of routes.
-     *
-     * If the matcher can not find information, it must throw one of the exceptions documented
-     * below.
-     *
-     * @param Request $request The request to match
-     *
-     * @throws \Exception|\Thelia\Exception\UrlRewritingException
-     * @throws \Symfony\Component\Routing\Exception\ResourceNotFoundException
-     *
-     * @return array An array of parameters
+     * @throws UrlRewritingException
      */
     public function matchRequest(Request $request): array
     {
         if (!ConfigQuery::isRewritingEnable()) {
             throw new ResourceNotFoundException();
         }
+
         $urlTool = URL::getInstance();
 
         $pathInfo = $request instanceof TheliaRequest ? $request->getRealPathInfo() : $request->getPathInfo();
+
         try {
             $rewrittenUrlData = $urlTool->resolve($pathInfo);
         } catch (UrlRewritingException $e) {
-            switch ($e->getCode()) {
-                case UrlRewritingException::URL_NOT_FOUND:
-                    throw new ResourceNotFoundException();
-                    break;
-                default:
-                    throw $e;
-            }
+            throw match ($e->getCode()) {
+                UrlRewritingException::URL_NOT_FOUND => new ResourceNotFoundException(),
+                default => $e,
+            };
         }
-        // If we have a "lang" parameter, whe have to check if the found URL has the proper locale
-        // If it's not the case, find the rewritten URL with the requested locale, and redirect to it.
-        if (null == !$requestedLocale = $request->get('lang')) {
-            if (null !== $requestedLang = LangQuery::create()->filterByActive(true)->findOneByLocale($requestedLocale)) {
-                if ($requestedLang->getLocale() != $rewrittenUrlData->locale) {
-                    // Save one redirection if requested locale is disabled.
-                    if (!$requestedLang->getActive()) {
-                        $requestedLang = Lang::getDefaultLanguage();
-                    }
 
-                    $localizedUrl = $urlTool->retrieve(
-                        $rewrittenUrlData->view,
-                        $rewrittenUrlData->viewId,
-                        $requestedLang->getLocale()
-                    )->toString();
+        // Check if there is a "lang" parameter in the request
+        $requestedLocale = $request->get('lang');
+        if ($requestedLocale !== null) {
+            // Find the requested language by locale if it's active
+            $requestedLang = LangQuery::create()
+                ->filterByActive(true)
+                ->findOneByLocale($requestedLocale);
 
-                    $this->redirect($urlTool->absoluteUrl($localizedUrl), 301);
-                }
+            if ($requestedLang !== null && $requestedLang->getLocale() !== $rewrittenUrlData->locale) {
+                // Retrieve the localized URL and perform a redirection
+                $localizedUrl = $urlTool->retrieve(
+                    $rewrittenUrlData->view,
+                    $rewrittenUrlData->viewId,
+                    $requestedLang->getLocale()
+                )->toString();
+
+                $this->redirect($urlTool->absoluteUrl($localizedUrl), 301);
             }
         }
 
         // If the rewritten URL locale is disabled, redirect to the URL in the default language
-        if (null === $lang = LangQuery::create()
+        if (null === LangQuery::create()
                 ->filterByActive(true)
                 ->filterByLocale($rewrittenUrlData->locale)
                 ->findOne()) {
+
             $lang = Lang::getDefaultLanguage();
 
             $localizedUrl = $urlTool->retrieve(
@@ -222,7 +118,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
                 ->findOne()
             ;
 
-            $this->redirect($urlTool->absoluteUrl($redirect->getUrl()), 301);
+            $this->redirect($urlTool->absoluteUrl($redirect?->getUrl()), 301);
         }
 
         /* define GET arguments in request */
@@ -273,5 +169,30 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
     protected function redirect($url, $status = 302): void
     {
         throw new RedirectException($url, $status);
+    }
+
+    public function setContext(RequestContext $context): void
+    {
+        $this->context = $context;
+    }
+
+    public function getContext(): RequestContext
+    {
+        return $this->context;
+    }
+
+    public function setOption($key, $value): void
+    {
+        // NOTHING TO DO FOR NOW
+    }
+
+    public function getRouteCollection(): RouteCollection
+    {
+        return new RouteCollection();
+    }
+
+    public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH): string
+    {
+        throw new RouteNotFoundException();
     }
 }

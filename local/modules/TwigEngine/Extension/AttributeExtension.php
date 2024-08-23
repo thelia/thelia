@@ -12,27 +12,21 @@
 
 namespace TwigEngine\Extension;
 
-use Symfony\Component\Form\FormView;
+use Thelia\Service\Model\AttributeService;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
-use TwigEngine\Service\FormService;
 
-class FormExtension extends AbstractExtension
+class AttributeExtension extends AbstractExtension
 {
     public function __construct(
-        private readonly FormService $formService
+        private readonly AttributeService $attributeService
     ) {
     }
 
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('getForm', [$this, 'getForm'], ['is_safe' => ['html']]),
+            new TwigFunction('getAttributesAndValues', [$this->attributeService, 'getAttributesAndValues']),
         ];
-    }
-
-    public function getForm(string $name, array $data = []): FormView
-    {
-        return $this->formService->getFormByName($name, $data);
     }
 }

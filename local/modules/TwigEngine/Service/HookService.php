@@ -31,7 +31,7 @@ readonly class HookService
      */
     public function processHookFunction(
         string $hookName,
-        array  $parameters,
+        array $parameters,
     ): string {
         $module = $parameters['module'] ?? 0;
         $moduleCode = $parameters['modulecode'] ?? '';
@@ -65,8 +65,6 @@ readonly class HookService
 
         return $content;
     }
-
-
 
     protected function showHook(string $hookName, array $parameters, array $templateVars): string
     {

@@ -62,7 +62,7 @@ use Thelia\Model\Tools\UrlRewritingTrait;
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
-        'id'
+        'id',
     ]
 )]
 class Category extends AbstractTranslatableResource
@@ -207,6 +207,7 @@ class Category extends AbstractTranslatableResource
     {
         /** @var \Thelia\Model\Category $propelModel */
         $propelModel = $this->getPropelModel();
+
         return $this->getUrl($propelModel->getLocale());
     }
 
@@ -214,6 +215,7 @@ class Category extends AbstractTranslatableResource
     {
         /** @var \Thelia\Model\Category $propelModel */
         $propelModel = $this->getPropelModel();
+
         return $propelModel->getRewrittenUrlViewName();
     }
 }
