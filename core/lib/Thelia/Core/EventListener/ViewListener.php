@@ -25,6 +25,7 @@ use Symfony\Component\Routing\Router;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\ViewCheckEvent;
 use Thelia\Core\HttpFoundation\Response;
+use Thelia\Core\Routing\RewritingLoader;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
@@ -72,15 +73,14 @@ class ViewListener implements EventSubscriberInterface
             $this->eventDispatcher->dispatch(new ViewCheckEvent($view, $viewId), TheliaEvents::VIEW_CHECK);
 
             $content = $parser->render($view.'.'.$parser->getFileExtension());
+            $response = $content instanceof Response
+                ? $content
+                : new Response($content, $parser->getStatus() ?: 200);
 
-            if ($content instanceof Response) {
-                $response = $content;
-            } else {
-                $response = new Response($content, $parser->getStatus() ?: 200);
-            }
         } catch (ResourceNotFoundException $e) {
             throw new NotFoundHttpException();
         } catch (OrderException $e) {
+
             switch ($e->getCode()) {
                 case OrderException::CART_EMPTY:
                     // Redirect to the cart template
@@ -95,7 +95,6 @@ class ViewListener implements EventSubscriberInterface
                 throw $e;
             }
         }
-
         $event->setResponse($response);
     }
 

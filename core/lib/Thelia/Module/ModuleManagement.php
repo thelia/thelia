@@ -53,7 +53,7 @@ class ModuleManagement
 
             $finder
                 ->name('module.xml')
-                ->in($this->baseModuleDir . '*' . DS . 'Config');
+                ->in($this->baseModuleDir.'*'.DS.'Config');
 
             $errors = [];
 
@@ -77,7 +77,7 @@ class ModuleManagement
             if (\count($modulesUpdated)) {
                 $this->cacheClear();
             }
-        } catch(DirectoryNotFoundException $e) {
+        } catch (DirectoryNotFoundException $e) {
             // No module installed
         }
     }

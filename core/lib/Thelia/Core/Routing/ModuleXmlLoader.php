@@ -12,14 +12,9 @@
 
 namespace Thelia\Core\Routing;
 
-use Symfony\Bundle\FrameworkBundle\Routing\AttributeRouteControllerLoader;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Routing\Loader\AttributeDirectoryLoader;
 use Symfony\Component\Routing\Loader\XmlFileLoader;
 use Symfony\Component\Routing\RouteCollection;
 use Thelia\Model\Module;
@@ -30,10 +25,8 @@ class ModuleXmlLoader extends Loader
     private bool $isLoaded = false;
 
     public function __construct(
-        private readonly ContainerInterface $container,
-        ?string $env = null
-    )
-    {
+        string $env = null
+    ) {
         parent::__construct($env);
     }
 

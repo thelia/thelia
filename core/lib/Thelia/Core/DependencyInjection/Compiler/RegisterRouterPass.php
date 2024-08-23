@@ -15,11 +15,8 @@ namespace Thelia\Core\DependencyInjection\Compiler;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
-use Thelia\Model\Module;
-use Thelia\Model\ModuleQuery;
 
 /**
  * this compiler can add many router to symfony-cms routing.
@@ -43,6 +40,7 @@ class RegisterRouterPass implements CompilerPassInterface
             return;
         }
 
+        $chainRouter->addMethodCall('add', [new Reference('router.rewrite'), 1024]);
         $chainRouter->addMethodCall('add', [new Reference('router.default'), 512]);
 
         foreach ($container->findTaggedServiceIds('router.register') as $id => $attributes) {

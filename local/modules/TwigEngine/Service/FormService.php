@@ -12,15 +12,12 @@
 
 namespace TwigEngine\Service;
 
-use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormView;
 use Thelia\Core\Form\TheliaFormFactory;
 use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
 use Thelia\Core\Template\ParserContext;
-use Thelia\Form\BaseForm;
 
 class FormService
 {
@@ -32,7 +29,6 @@ class FormService
         private readonly ParserContext $parserContext,
         private readonly ParameterBagInterface $parameterBag,
     ) {
-
     }
 
     public function getFormByName(
