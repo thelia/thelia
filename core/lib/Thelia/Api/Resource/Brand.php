@@ -67,7 +67,7 @@ use Thelia\Model\Tools\UrlRewritingTrait;
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
-        'id'
+        'id',
     ]
 )]
 class Brand extends AbstractTranslatableResource
@@ -160,12 +160,12 @@ class Brand extends AbstractTranslatableResource
         return BrandI18n::class;
     }
 
-
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public function getPublicUrl()
     {
         /** @var \Thelia\Model\Brand $propelModel */
         $propelModel = $this->getPropelModel();
+
         return $this->getUrl($propelModel->getLocale());
     }
 
@@ -173,6 +173,7 @@ class Brand extends AbstractTranslatableResource
     {
         /** @var \Thelia\Model\Brand $propelModel */
         $propelModel = $this->getPropelModel();
+
         return $propelModel->getRewrittenUrlViewName();
     }
 }

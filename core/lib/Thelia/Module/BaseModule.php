@@ -502,15 +502,10 @@ class BaseModule implements BaseModuleInterface
         return '';
     }
 
-    /**
-     * @return string
-     */
     public static function getRoutePrefix(): string
     {
         return '';
     }
-
-
 
     public function install(ConnectionInterface $con = null): void
     {

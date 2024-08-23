@@ -13,9 +13,9 @@
 namespace TwigEngine\Extension;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use TwigEngine\Service\URLService;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
+use TwigEngine\Service\URLService;
 
 class URLExtension extends AbstractExtension
 {

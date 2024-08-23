@@ -60,6 +60,7 @@ class TokenProvider
         if ($currentRequest && $currentRequest->hasSession()) {
             $session = $this->requestStack->getSession();
             $this->session = $session->isStarted() ? $session : null;
+
             return;
         }
         $this->session = null;
@@ -106,7 +107,6 @@ class TokenProvider
             throw new TokenAuthenticationException(
                 'Tried to check a token without assigning it before'
             );
-
         }
         if ($this->token !== $entryValue) {
             throw new TokenAuthenticationException(

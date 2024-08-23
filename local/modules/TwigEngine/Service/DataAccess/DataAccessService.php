@@ -19,8 +19,8 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Thelia\Service\Model\LangService;
 use TwigEngine\Service\ApiPlatformMetadataService;
-use TwigEngine\Service\LocaleService;
 
 readonly class DataAccessService
 {
@@ -29,7 +29,7 @@ readonly class DataAccessService
         private ApiPlatformMetadataService $apiPlatformMetadataService,
         private LoopDataAccessService $loopDataAccessService,
         private NormalizerInterface $normalizer,
-        private LocaleService $localeService
+        private LangService $localeService
     ) {
     }
 
