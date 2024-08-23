@@ -15,9 +15,7 @@ namespace Thelia\Core\Routing;
 use Symfony\Bundle\FrameworkBundle\Routing\AttributeRouteControllerLoader;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
-use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Loader\AttributeDirectoryLoader;
-use Symfony\Component\Routing\Loader\AttributeFileLoader;
 use Symfony\Component\Routing\RouteCollection;
 use Thelia\Model\ModuleQuery;
 

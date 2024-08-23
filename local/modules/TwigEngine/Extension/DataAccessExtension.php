@@ -13,10 +13,10 @@
 namespace TwigEngine\Extension;
 
 use Psr\Cache\InvalidArgumentException;
-use TwigEngine\Service\DataAccess\AttributeAccessService;
-use TwigEngine\Service\DataAccess\DataAccessService;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
+use TwigEngine\Service\DataAccess\AttributeAccessService;
+use TwigEngine\Service\DataAccess\DataAccessService;
 
 class DataAccessExtension extends AbstractExtension
 {

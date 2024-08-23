@@ -26,6 +26,7 @@ use Thelia\Core\Template\TemplateDefinition;
 class ParserAssetResolverFallback implements AssetResolverInterface
 {
     private ParserInterface $parser;
+
     /**
      * Generate an asset URL.
      *

@@ -476,7 +476,7 @@ abstract class BaseController implements ControllerInterface
     /**
      * Return a 404 error.
      */
-    protected function pageNotFound()
+    protected function pageNotFound(): Response|null
     {
         throw new NotFoundHttpException();
     }

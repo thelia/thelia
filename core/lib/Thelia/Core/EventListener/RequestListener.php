@@ -48,11 +48,9 @@ class RequestListener implements EventSubscriberInterface
 {
     use RememberMeTrait;
 
-    /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
+    protected EventDispatcherInterface $eventDispatcher;
 
-    /** @var \Thelia\Core\Translation\Translator */
-    private $translator;
+    private Translator $translator;
 
     public function __construct(Translator $translator, EventDispatcherInterface $eventDispatcher)
     {
@@ -65,7 +63,9 @@ class RequestListener implements EventSubscriberInterface
         /** @var \Thelia\Core\HttpFoundation\Request $request */
         $request = $event->getRequest();
 
-        $lang = !$request->get('isApiRoute', false) && $request->hasSession(true) ? $request->getSession()->getLang() : Lang::getDefaultLanguage();
+        $lang = !$request->get('isApiRoute', false) && $request->hasSession(true)
+            ? $request->getSession()?->getLang()
+            : Lang::getDefaultLanguage();
 
         $vendorFormDir = THELIA_VENDOR.'symfony'.DS.'form';
         $vendorValidatorDir = THELIA_VENDOR.'symfony'.DS.'validator';

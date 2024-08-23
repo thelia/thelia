@@ -23,7 +23,6 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
 use Thelia\Core\Template\Element\LoopInterface;
 use Thelia\Core\Template\Element\LoopResult;
-use Thelia\Core\Template\Parser\ParserAssetResolverFallback;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 use TheliaSmarty\Template\AbstractSmartyPlugin;

@@ -402,6 +402,7 @@ class Product extends AbstractTranslatableResource
     {
         /** @var \Thelia\Model\Product $propelModel */
         $propelModel = $this->getPropelModel();
+
         return $this->getUrl($propelModel->getLocale());
     }
 
@@ -409,6 +410,7 @@ class Product extends AbstractTranslatableResource
     {
         /** @var \Thelia\Model\Product $propelModel */
         $propelModel = $this->getPropelModel();
+
         return $propelModel->getRewrittenUrlViewName();
     }
 }
