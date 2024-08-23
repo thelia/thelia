@@ -64,8 +64,6 @@ interface ParserInterface
      * Sets the HTTP status of the response.
      *
      * status An HTTP status (200, 404, ...)
-     *
-     * @param int $status
      */
     public function setStatus(int $status): self;
 
@@ -168,5 +166,6 @@ interface ParserInterface
     public function supportTemplateRender(string $templatePath, ?string $templateName): bool;
 
     public function getFileExtension(): string;
+
     public static function getDefaultPriority(): int;
 }

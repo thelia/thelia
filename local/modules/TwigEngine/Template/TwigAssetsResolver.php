@@ -77,6 +77,7 @@ class TwigAssetsResolver implements AssetResolverInterface
         } else {
             Tlog::getInstance()->addError("Asset $file (type $type) was not found.");
         }
+
         return $url;
     }
 

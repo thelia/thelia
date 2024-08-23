@@ -10,27 +10,30 @@
  * file that was distributed with this source code.
  */
 
-namespace TwigEngine\Service;
+namespace Thelia\Service\Model;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Model\Lang;
 
-class LocaleService
+readonly class LangService
 {
     public function __construct(
-        private readonly RequestStack $requestStack
+        private RequestStack $requestStack
     ) {
     }
 
-    public function getLocale(): ?string
+    public function getLang(): ?Lang
     {
         $request = $this->requestStack->getCurrentRequest();
         if (!$request instanceof \Thelia\Core\HttpFoundation\Request) {
             return null;
         }
+        return $request->getSession()?->getLang();
+    }
 
-        $locale = $request->getSession()?->getLang()->getLocale();
-
+    public function getLocale(): ?string
+    {
+        $locale = $this->getLang()?->getLocale();
         return $locale ?? Lang::getDefaultLanguage()?->getLocale();
     }
 }

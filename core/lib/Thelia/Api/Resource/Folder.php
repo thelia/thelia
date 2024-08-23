@@ -62,7 +62,7 @@ use Thelia\Model\Tools\UrlRewritingTrait;
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
-        'id'
+        'id',
     ]
 )]
 class Folder extends AbstractTranslatableResource
@@ -80,7 +80,7 @@ class Folder extends AbstractTranslatableResource
         ContentFolder::GROUP_ADMIN_READ,
         FolderImage::GROUP_ADMIN_READ_SINGLE,
         FolderDocument::GROUP_ADMIN_READ_SINGLE,
-        self::GROUP_FRONT_READ
+        self::GROUP_FRONT_READ,
     ])]
     public ?int $id = null;
 
@@ -189,6 +189,7 @@ class Folder extends AbstractTranslatableResource
     {
         /** @var \Thelia\Model\Folder $propelModel */
         $propelModel = $this->getPropelModel();
+
         return $this->getUrl($propelModel->getLocale());
     }
 
@@ -196,6 +197,7 @@ class Folder extends AbstractTranslatableResource
     {
         /** @var \Thelia\Model\Folder $propelModel */
         $propelModel = $this->getPropelModel();
+
         return $propelModel->getRewrittenUrlViewName();
     }
 }

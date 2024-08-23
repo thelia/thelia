@@ -31,7 +31,6 @@ class SmartyAssetsResolver implements AssetResolverInterface
 
     protected $cdnBaseUrl;
 
-
     /**
      * Creates a new SmartyAssetsManager instance.
      *
@@ -321,5 +320,4 @@ class SmartyAssetsResolver implements AssetResolverInterface
     {
         return SmartyParser::class === $parser::class;
     }
-
 }

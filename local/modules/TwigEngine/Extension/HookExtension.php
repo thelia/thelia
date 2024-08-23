@@ -12,9 +12,9 @@
 
 namespace TwigEngine\Extension;
 
-use TwigEngine\Service\HookService;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
+use TwigEngine\Service\HookService;
 
 class HookExtension extends AbstractExtension
 {
