@@ -487,7 +487,7 @@ class TheliaLoop extends AbstractSmartyPlugin
         foreach ($loopDefinition as $key => $namespace) {
             $className = substr(strrchr($namespace::class, '\\'), 1);
             $kebabCase = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $className));
-
+            $kebabCase = str_replace('_', '-', $kebabCase);
             $this->registerLoop($namespace::class, $kebabCase);
         }
     }
