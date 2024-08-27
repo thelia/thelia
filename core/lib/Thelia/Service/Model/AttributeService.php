@@ -48,7 +48,10 @@ readonly class AttributeService
             $values = [];
             /** @var AttributeAv $attributeValue */
             foreach ($attributeValues as $attributeValue) {
-                $values[] = [
+                if (isset($values[$attributeValue->getId()])) {
+                    continue;
+                }
+                $values[$attributeValue->getId()] = [
                     'id' => $attributeValue->getId(),
                     'title' => $attributeValue->getTitle(),
                 ];
