@@ -15,6 +15,7 @@ namespace TwigEngine\Service\DataAccess;
 use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
@@ -29,6 +30,7 @@ readonly class DataAccessService
         private ApiPlatformMetadataService $apiPlatformMetadataService,
         private LoopDataAccessService $loopDataAccessService,
         private NormalizerInterface $normalizer,
+        private RequestStack $requestStack,
         private LangService $localeService
     ) {
     }
@@ -41,7 +43,18 @@ readonly class DataAccessService
     {
         /** @var Router $router */
         $router = $this->router;
-        $route = $router->match($path);
+        /** @var Request $currentRequest */
+        $currentRequest = $this->requestStack->getCurrentRequest();
+
+        $apiRequest = Request::create(
+            $path,
+            Request::METHOD_GET,
+            [],
+            $currentRequest->cookies->all(),
+            [],
+            $currentRequest->server->all()
+        );
+        $route = $router->matchRequest($apiRequest);
 
         $resourceClass = $route['_api_resource_class'];
         $routeName = $route['_route'];
