@@ -187,6 +187,7 @@ class TheliaLoop extends AbstractSmartyPlugin
             }
 
             try {
+                $params['type'] = str_replace('_', '-', $params['type']);
                 $loop = $this->createLoopInstance($params);
                 self::$pagination[$name] = null;
 
