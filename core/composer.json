@@ -57,7 +57,6 @@
         "symfony/framework-bundle": "6.4.*",
         "wikimedia/less.php": "^3.1",
         "symfony/psr-http-message-bridge": "^2.1",
-        "symfony/flex": "^1.12",
         "spipu/html2pdf": "~5.2.5",
         "symfony/mailer": "6.4.*",
         "composer/composer": "~2.3.0",
