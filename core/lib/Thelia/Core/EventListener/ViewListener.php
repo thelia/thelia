@@ -25,7 +25,6 @@ use Symfony\Component\Routing\Router;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\ViewCheckEvent;
 use Thelia\Core\HttpFoundation\Response;
-use Thelia\Core\Routing\RewritingLoader;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
@@ -41,6 +40,7 @@ use Thelia\Exception\OrderException;
 class ViewListener implements EventSubscriberInterface
 {
     protected readonly Request $request;
+    public const IGNORE_THELIA_VIEW = 'ignore_thelia_view';
 
     /**
      * ViewListener constructor.
@@ -50,7 +50,7 @@ class ViewListener implements EventSubscriberInterface
         protected TemplateHelperInterface $templateHelper,
         protected RequestStack $requestStack,
         protected EventDispatcherInterface $eventDispatcher,
-        protected ChainRouterInterface $chainRouter
+        protected ChainRouterInterface $chainRouter,
     ) {
         $this->request = $requestStack->getCurrentRequest();
     }
@@ -63,6 +63,11 @@ class ViewListener implements EventSubscriberInterface
     public function onKernelView(ViewEvent $event): void
     {
         $response = null;
+
+        if (null !== $this->request->attributes->get(self::IGNORE_THELIA_VIEW)) {
+            return;
+        }
+
         try {
             $view = $this->request->attributes->get('_view');
             $templatePath = $this->templateHelper->getActiveFrontTemplate()->getAbsolutePath();
@@ -76,11 +81,9 @@ class ViewListener implements EventSubscriberInterface
             $response = $content instanceof Response
                 ? $content
                 : new Response($content, $parser->getStatus() ?: 200);
-
         } catch (ResourceNotFoundException $e) {
             throw new NotFoundHttpException();
         } catch (OrderException $e) {
-
             switch ($e->getCode()) {
                 case OrderException::CART_EMPTY:
                     // Redirect to the cart template
@@ -101,6 +104,10 @@ class ViewListener implements EventSubscriberInterface
     public function beforeKernelView(ViewEvent $event): void
     {
         $request = $this->request;
+
+        if (null !== $this->request->attributes->get(self::IGNORE_THELIA_VIEW)) {
+            return;
+        }
 
         if (null === $view = $request->attributes->get('_view')) {
             $request->attributes->set('_view', $this->findView($request));
