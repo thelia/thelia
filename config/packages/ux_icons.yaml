@@ -1,0 +1,3 @@
+ux_icons:
+    # The local directory where icons are stored.
+    icon_dir: '%kernel.project_dir%/templates/frontOffice/%thelia_front_template%/assets/icons'
