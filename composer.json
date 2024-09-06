@@ -13,14 +13,23 @@
         "forum": "http://thelia.net/forum",
         "wiki": "http://doc.thelia.net"
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "core/"
+        },
+        {
+            "type": "path",
+            "url": "templates/frontOffice/flexy/"
+        }
+    ],
     "require": {
         "php": ">= 8.2",
-        "thelia/core": "dev-twig",
+        "thelia/core": "*",
         "thelia/carousel-module": "2.5.*",
         "thelia/cheque-module": "2.5.*",
-        "thelia/flexy": "dev-flexy",
+        "thelia/flexy": "*",
         "thelia/front-module": "2.5.*",
-
         "thelia/hook-admin-home-module": "2.5.*",
         "thelia/hook-analytics-module": "2.5.*",
         "thelia/hook-cart-module": "2.5.*",
@@ -40,7 +49,8 @@
         "thelia/virtual-product-control-module": "2.5.*",
         "thelia/web-profiler-module": "2.5.*",
         "thelia/thelia-library-module": "1.*",
-        "thelia/thelia-blocks-module": "^2.1"
+        "thelia/thelia-blocks-module": "^2.1",
+        "symfony/flex": "^2.4"
     },
     "require-dev": {
         "phpunit/phpunit": "9.5.*",
@@ -103,7 +113,11 @@
         "post-update-cmd": [
             "@cache-clear",
             "@assets-install"
-        ]
+        ],
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        }
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -129,6 +143,13 @@
     "extra": {
         "branch-alias": {
             "dev-master": "2.4-dev"
+        },
+        "symfony": {
+            "allow-contrib": true,
+            "endpoint": [
+                "https://api.github.com/repos/YannLe/thelia-test-recipes/contents/index.json?ref=flex/main",
+                "flex://defaults"
+            ]
         }
     },
     "config": {
