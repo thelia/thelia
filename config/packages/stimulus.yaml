@@ -1,0 +1,5 @@
+stimulus:
+    # the default values
+    controller_paths:
+        - '%kernel.project_dir%/templates/frontOffice/%thelia_front_template%/assets/controllers'
+    controllers_json: '%kernel.project_dir%/templates/frontOffice/%thelia_front_template%/assets/controllers.json'
