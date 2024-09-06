@@ -20,15 +20,15 @@
         },
         {
             "type": "path",
-            "url": "templates/frontOffice/flexy-dev/"
+            "url": "templates/frontOffice/flexy/"
         }
     ],
     "require": {
         "php": ">= 8.2",
-        "thelia/core": "dev-twig",
+        "thelia/core": "*",
         "thelia/carousel-module": "2.5.*",
         "thelia/cheque-module": "2.5.*",
-        "thelia/flexy": "dev-add-recipes",
+        "thelia/flexy": "*",
         "thelia/front-module": "2.5.*",
         "thelia/hook-admin-home-module": "2.5.*",
         "thelia/hook-analytics-module": "2.5.*",
@@ -102,12 +102,17 @@
         "cache-clear": [
             "rm -Rf var/cache/*"
         ],
+        "assets-install": [
+            "php Thelia assets:install web"
+        ],
         "post-install-cmd": [
             "@cache-clear",
+            "@assets-install",
             "php bin/console lexik:jwt:generate-key --skip-if-exists"
         ],
         "post-update-cmd": [
-            "@cache-clear"
+            "@cache-clear",
+            "@assets-install"
         ],
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
