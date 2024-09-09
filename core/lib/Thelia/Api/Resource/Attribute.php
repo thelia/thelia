@@ -97,7 +97,7 @@ class Attribute extends AbstractTranslatableResource
         self::GROUP_FRONT_READ,
         self::GROUP_ADMIN_WRITE,
         Product::GROUP_ADMIN_READ_SINGLE,
-        Product::GROUP_FRONT_READ_SINGLE
+        Product::GROUP_FRONT_READ_SINGLE,
     ])]
     public I18nCollection $i18ns;
 

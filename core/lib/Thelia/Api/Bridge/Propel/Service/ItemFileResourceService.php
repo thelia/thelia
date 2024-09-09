@@ -15,7 +15,8 @@ namespace Thelia\Api\Bridge\Propel\Service;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Validator\Constraints as Assert;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -25,23 +26,17 @@ use Thelia\Model\ConfigQuery;
 readonly class ItemFileResourceService
 {
     public function __construct(
-        private RequestStack             $requestStack,
         private EventDispatcherInterface $eventDispatcher
-    )
-    {
+    ) {
     }
 
     public function createItemFile(
-        int                $parentId,
+        int $parentId,
         FileModelInterface $fileModel,
         string $itemType,
         string $fileType,
-    ): void
-    {
-        $request = $this->requestStack->getCurrentRequest();
-        if (null === $request) {
-            return;
-        }
+        Request $request,
+    ): void {
         /** @var UploadedFile $file */
         $file = $request->files->get('fileToUpload');
 
@@ -72,16 +67,16 @@ readonly class ItemFileResourceService
             TheliaEvents::DOCUMENT_SAVE
         );
 
-        if ($fileType !== "image"){
+        if ($fileType !== 'image') {
             return;
         }
         $event = new ImageEvent();
 
         $baseSourceFilePath = ConfigQuery::read('images_library_path');
         if ($baseSourceFilePath === null) {
-            $baseSourceFilePath = THELIA_LOCAL_DIR . 'media' . DS . 'images';
+            $baseSourceFilePath = THELIA_LOCAL_DIR.'media'.DS.'images';
         } else {
-            $baseSourceFilePath = THELIA_ROOT . $baseSourceFilePath;
+            $baseSourceFilePath = THELIA_ROOT.$baseSourceFilePath;
         }
 
         $sourceFilePath = sprintf(
@@ -98,5 +93,31 @@ readonly class ItemFileResourceService
         $event->setRotation(0);
         $event->setResizeMode(1);
         $this->eventDispatcher->dispatch($event, TheliaEvents::IMAGE_PROCESS);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function getPropertyFileConstraints(string $className, string $propertyName): array
+    {
+        $constraints = [];
+
+        $reflectionClass = new \ReflectionClass($className);
+        if ($reflectionClass->hasProperty($propertyName)) {
+            $property = $reflectionClass->getProperty($propertyName);
+
+            $attributes = $property->getAttributes(Assert\File::class);
+            foreach ($attributes as $attribute) {
+                $constraintInstance = $attribute->newInstance();
+                $constraints[] = $constraintInstance;
+            }
+            $attributes = $property->getAttributes(Assert\Image::class);
+            foreach ($attributes as $attribute) {
+                $constraintInstance = $attribute->newInstance();
+                $constraints[] = $constraintInstance;
+            }
+        }
+
+        return $constraints;
     }
 }
