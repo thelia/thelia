@@ -67,10 +67,10 @@ class OrderStatus extends AbstractTranslatableResource
     public ?int $id = null;
 
     #[ApiProperty(identifier: true)]
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ,Order::GROUP_FRONT_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ, Order::GROUP_FRONT_READ])]
     public string $code;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ,Order::GROUP_FRONT_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ, Order::GROUP_FRONT_READ])]
     public ?string $color = '#c3c3c3';
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
@@ -85,7 +85,7 @@ class OrderStatus extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE,Order::GROUP_FRONT_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_FRONT_READ])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int
