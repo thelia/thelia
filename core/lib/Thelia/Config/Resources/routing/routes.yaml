@@ -10,6 +10,10 @@ module_attribute_controllers:
   resource: .
   type: module_attribute
 
+template_attribute_controllers:
+  resource: .
+  type: template_attribute
+
 module_annotation_controllers:
   resource: .
   type: module_annotation
