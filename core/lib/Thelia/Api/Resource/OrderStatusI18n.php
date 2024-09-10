@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class OrderStatusI18n extends I18n
 {
-    #[Groups([OrderStatus::GROUP_ADMIN_READ, OrderStatus::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE,Order::GROUP_FRONT_READ])]
+    #[Groups([OrderStatus::GROUP_ADMIN_READ, OrderStatus::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE, Order::GROUP_FRONT_READ])]
     protected ?string $title;
 
     #[Groups([OrderStatus::GROUP_ADMIN_READ, OrderStatus::GROUP_ADMIN_WRITE])]

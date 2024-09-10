@@ -67,8 +67,7 @@ use Thelia\Model\Map\OrderProductTableMap;
         'productSaleElementsId' => 'exact',
         'productSaleElementsRef' => 'exact',
         'productRef' => 'exact',
-        'order.id' =>
-        [
+        'order.id' => [
             'strategy' => 'exact',
             'fieldPath' => 'order_product.order_id',
         ],
@@ -93,7 +92,7 @@ class OrderProduct implements PropelResourceInterface
     public ?int $id = null;
 
     #[Relation(targetResource: Order::class)]
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE,self::GROUP_FRONT_READ])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
     public Order $order;
     private $orderId;
 
@@ -102,7 +101,7 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
-        self::GROUP_FRONT_READ
+        self::GROUP_FRONT_READ,
     ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public string $productRef;
@@ -112,7 +111,7 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
-        self::GROUP_FRONT_READ_SINGLE
+        self::GROUP_FRONT_READ_SINGLE,
     ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public string $productSaleElementsRef;
@@ -122,7 +121,7 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
-        self::GROUP_FRONT_READ_SINGLE
+        self::GROUP_FRONT_READ_SINGLE,
     ])]
     public ?int $productSaleElementsId;
 
@@ -130,25 +129,25 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
-        self::GROUP_FRONT_READ_SINGLE
+        self::GROUP_FRONT_READ_SINGLE,
     ])]
     public ?string $title;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
-        self::GROUP_FRONT_READ_SINGLE
+        self::GROUP_FRONT_READ_SINGLE,
     ])]
     public ?string $chapo;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
-        self::GROUP_FRONT_READ_SINGLE
+        self::GROUP_FRONT_READ_SINGLE,
     ])]
     public ?string $description;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     public ?string $postscriptum;
 
     #[Groups([
@@ -156,7 +155,7 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
-        self::GROUP_FRONT_READ
+        self::GROUP_FRONT_READ,
     ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public int $quantity;
@@ -166,7 +165,7 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
-        self::GROUP_FRONT_READ
+        self::GROUP_FRONT_READ,
     ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public float $price;
@@ -176,18 +175,18 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
-        self::GROUP_FRONT_READ
+        self::GROUP_FRONT_READ,
     ])]
     public ?float $promoPrice;
 
-    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE,self::GROUP_FRONT_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
     public ?float $unitTaxedPrice;
 
     #[Groups([self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
-        self::GROUP_FRONT_READ_SINGLE
+        self::GROUP_FRONT_READ_SINGLE,
     ])]
     #[Type(type: 'bool', groups: [Order::GROUP_ADMIN_WRITE])]
     #[NotNull(groups: [Order::GROUP_ADMIN_WRITE])]
@@ -198,7 +197,7 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
-        self::GROUP_FRONT_READ_SINGLE
+        self::GROUP_FRONT_READ_SINGLE,
     ])]
     #[Type(type: 'bool', groups: [Order::GROUP_ADMIN_WRITE])]
     #[NotNull(groups: [Order::GROUP_ADMIN_WRITE])]
@@ -209,7 +208,7 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
-        self::GROUP_FRONT_READ_SINGLE
+        self::GROUP_FRONT_READ_SINGLE,
     ])]
     public ?string $weight;
 
@@ -218,7 +217,7 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
-        self::GROUP_FRONT_READ_SINGLE
+        self::GROUP_FRONT_READ_SINGLE,
     ])]
     public ?string $eanCode;
 
@@ -226,17 +225,17 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_WRITE,
-        self::GROUP_FRONT_READ_SINGLE
+        self::GROUP_FRONT_READ_SINGLE,
     ])]
     public ?string $taxRuleTitle;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     public ?string $taxRuleDescription;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     public ?int $parent;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     #[Type(type: 'bool', groups: [Order::GROUP_ADMIN_WRITE])]
     #[NotNull(groups: [Order::GROUP_ADMIN_WRITE])]
     public bool $virtual;
@@ -245,11 +244,11 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_WRITE,
-        self::GROUP_FRONT_READ_SINGLE
+        self::GROUP_FRONT_READ_SINGLE,
     ])]
     public ?bool $virtualDocument;
 
-    #[Groups([self::GROUP_ADMIN_READ,self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
     public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_ADMIN_READ])]
@@ -260,7 +259,7 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
-        self::GROUP_FRONT_READ_SINGLE
+        self::GROUP_FRONT_READ_SINGLE,
     ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public array $orderProductTaxes;

@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -33,7 +43,7 @@ use Thelia\Model\Map\NewsletterTableMap;
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
     denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
-)]//todo custom route for front
+)] // todo custom route for front
 class NewsLetter implements PropelResourceInterface
 {
     use PropelResourceTrait;
@@ -45,19 +55,19 @@ class NewsLetter implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_ADMIN_READ,self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public string $email;
 
-    #[Groups([self::GROUP_ADMIN_READ,self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public string $firstname;
 
-    #[Groups([self::GROUP_ADMIN_READ,self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public string $lastname;
 
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE,self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
     public string $locale;
 
-    #[Groups([self::GROUP_ADMIN_READ,self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public bool $unsubscribed;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
@@ -71,9 +81,10 @@ class NewsLetter implements PropelResourceInterface
         return $this->id;
     }
 
-    public function setId(?int $id): NewsLetter
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -82,9 +93,10 @@ class NewsLetter implements PropelResourceInterface
         return $this->email;
     }
 
-    public function setEmail(string $email): NewsLetter
+    public function setEmail(string $email): self
     {
         $this->email = $email;
+
         return $this;
     }
 
@@ -93,9 +105,10 @@ class NewsLetter implements PropelResourceInterface
         return $this->firstname;
     }
 
-    public function setFirstname(string $firstname): NewsLetter
+    public function setFirstname(string $firstname): self
     {
         $this->firstname = $firstname;
+
         return $this;
     }
 
@@ -104,9 +117,10 @@ class NewsLetter implements PropelResourceInterface
         return $this->lastname;
     }
 
-    public function setLastname(string $lastname): NewsLetter
+    public function setLastname(string $lastname): self
     {
         $this->lastname = $lastname;
+
         return $this;
     }
 
@@ -115,9 +129,10 @@ class NewsLetter implements PropelResourceInterface
         return $this->locale;
     }
 
-    public function setLocale(string $locale): NewsLetter
+    public function setLocale(string $locale): self
     {
         $this->locale = $locale;
+
         return $this;
     }
 
@@ -126,9 +141,10 @@ class NewsLetter implements PropelResourceInterface
         return $this->unsubscribed;
     }
 
-    public function setUnsubscribed(bool $unsubscribed): NewsLetter
+    public function setUnsubscribed(bool $unsubscribed): self
     {
         $this->unsubscribed = $unsubscribed;
+
         return $this;
     }
 
@@ -137,9 +153,10 @@ class NewsLetter implements PropelResourceInterface
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): NewsLetter
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
@@ -148,9 +165,10 @@ class NewsLetter implements PropelResourceInterface
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): NewsLetter
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
