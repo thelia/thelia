@@ -22,7 +22,6 @@ use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
-use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\LangTableMap;
 
 #[ApiResource(
@@ -72,7 +71,6 @@ class Lang implements PropelResourceInterface
 
     public const GROUP_FRONT_READ = 'front:lang:read';
 
-
     #[Groups([self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
@@ -84,13 +82,13 @@ class Lang implements PropelResourceInterface
     ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_READ_SINGLE,self::GROUP_FRONT_READ,Customer::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ, Customer::GROUP_FRONT_READ_SINGLE])]
     public ?string $title;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ,Customer::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, Customer::GROUP_FRONT_READ_SINGLE])]
     public ?string $code;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ,Customer::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, Customer::GROUP_FRONT_READ_SINGLE])]
     public ?string $locale;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
@@ -111,16 +109,16 @@ class Lang implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?string $thousandsSeparator;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public ?bool $active;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public ?bool $visible;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?string $decimals;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public ?bool $byDefault;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]

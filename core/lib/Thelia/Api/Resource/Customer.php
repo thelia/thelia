@@ -98,7 +98,6 @@ class Customer implements PropelResourceInterface
     public const GROUP_FRONT_READ_SINGLE = 'front:customer:read:single';
     public const GROUP_FRONT_WRITE = 'front:customer:write';
 
-
     #[Groups([self::GROUP_ADMIN_READ,
         Address::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_ADMIN_READ,
@@ -114,16 +113,16 @@ class Customer implements PropelResourceInterface
         self::GROUP_ADMIN_WRITE,
         Address::GROUP_ADMIN_READ_SINGLE,
         self::GROUP_FRONT_READ_SINGLE,
-        self::GROUP_FRONT_WRITE
+        self::GROUP_FRONT_WRITE,
     ])]
     #[Column(propelSetter: 'setTitleId')]
     public CustomerTitle $customerTitle;
 
     #[Relation(targetResource: Lang::class, relationAlias: 'LangModel')]
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE,self::GROUP_FRONT_READ_SINGLE,self::GROUP_FRONT_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_WRITE])]
     public ?Lang $lang;
 
-    #[Groups([self::GROUP_ADMIN_READ, Address::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_READ,self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, Address::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
     public ?string $ref;
 
     #[Groups([self::GROUP_ADMIN_READ,
