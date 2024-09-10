@@ -35,9 +35,8 @@ trait PropelResourceTrait
 
     public function __isset(string $property)
     {
-        return array_key_exists($property, $this->resourceAddons);
+        return \array_key_exists($property, $this->resourceAddons);
     }
-
 
     public function setPropelModel(ActiveRecordInterface $propelModel = null): PropelResourceInterface
     {
