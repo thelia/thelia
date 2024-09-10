@@ -13,8 +13,10 @@
 namespace Thelia\Api\Controller\Admin;
 
 use ApiPlatform\Metadata\Post;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Bridge\Propel\Service\ItemFileResourceService;
 use Thelia\Api\Resource\ItemFileResourceInterface;
@@ -26,13 +28,27 @@ class PostItemFileController
     public function __invoke(
         Request $request,
         ItemFileResourceService $itemDocumentResourceService,
-        ApiResourcePropelTransformerService $apiResourceService
+        ApiResourcePropelTransformerService $apiResourceService,
+        ValidatorInterface $validator,
     ) {
         /** @var ItemFileResourceInterface|PropelResourceInterface $resourceClass */
         $resourceClass = $request->get('_api_resource_class');
 
         if (!\in_array(ItemFileResourceInterface::class, class_implements($resourceClass))) {
             throw new \Exception('Resource must implements ItemFileResourceInterface to use the PostItemFileController');
+        }
+        /** @var UploadedFile $file */
+        $file = $request->files->get('fileToUpload');
+
+        $constraints = $itemDocumentResourceService->getPropertyFileConstraints($resourceClass, 'fileToUpload');
+        $violations = $validator->validate($file, $constraints);
+
+        if (\count($violations) > 0) {
+            $errors = [];
+            foreach ($violations as $violation) {
+                $errors[] = $violation->getMessage();
+            }
+            throw new \Exception('Validation error: '.implode(', ', $errors));
         }
 
         $itemType = $resourceClass::getItemType();
@@ -46,6 +62,7 @@ class PostItemFileController
             $propelModel,
             $itemType,
             $fileType,
+            $request,
         );
 
         /** @var Post $operation */

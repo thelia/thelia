@@ -23,6 +23,7 @@ use ApiPlatform\OpenApi\Model\Operation;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Controller\Admin\BinaryFileController;
 use Thelia\Api\Controller\Admin\PostItemFileController;
@@ -114,6 +115,17 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
             'type' => 'string',
             'format' => 'binary',
         ]
+    )]
+    #[Assert\Image(
+        mimeTypes: [
+            'image/bmp',
+            'image/gif',
+            'image/jpeg',
+            'image/png',
+            'image/vnd.wap.wbmp',
+            'image/webp',
+            'image/xbm',
+        ],
     )]
     public UploadedFile $fileToUpload;
 
