@@ -127,7 +127,7 @@ class OrderProductTax implements PropelResourceInterface
 
     public function getAmount(): float
     {
-        return $this->amount;
+        return round($this->amount, 2);
     }
 
     public function setAmount(float $amount): self
@@ -139,7 +139,7 @@ class OrderProductTax implements PropelResourceInterface
 
     public function getPromoAmount(): ?float
     {
-        return $this->promoAmount;
+        return round($this->promoAmount, 2);
     }
 
     public function setPromoAmount(?float $promoAmount): self

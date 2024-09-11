@@ -233,7 +233,7 @@ class Order implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ])]
     public function getTotalAmount(): ?float
     {
-        return $this->getPropelModel()->getTotalAmount();
+        return round($this->getPropelModel()->getTotalAmount(), 2);
     }
 
     #[Groups([self::GROUP_ADMIN_READ])]
@@ -244,7 +244,7 @@ class Order implements PropelResourceInterface
         $orderPropelModel = $this->getPropelModel();
         $itemsAmount = $orderPropelModel->getTotalAmount($itemsTax, false, false);
 
-        return $itemsAmount - $itemsTax;
+        return round($itemsAmount - $itemsTax, 2);
     }
 
     #[Groups([self::GROUP_ADMIN_READ])]
@@ -254,7 +254,7 @@ class Order implements PropelResourceInterface
         $postage = $this->getPostage();
         $discount = $this->getDiscount();
 
-        return $totalTaxedAmount - $postage + $discount;
+        return round($totalTaxedAmount - $postage + $discount, 2);
     }
 
     #[Groups([self::GROUP_ADMIN_READ])]
@@ -263,7 +263,7 @@ class Order implements PropelResourceInterface
         /** @var \Thelia\Model\Order $orderPropelModel */
         $orderPropelModel = $this->getPropelModel();
 
-        return $orderPropelModel->getDiscount();
+        return round($orderPropelModel->getDiscount(), 2);
     }
 
     #[Groups([self::GROUP_ADMIN_READ])]
@@ -272,7 +272,7 @@ class Order implements PropelResourceInterface
         $totalTaxedAmount = $this->getTotalAmount();
         $postage = $this->getPostage();
 
-        return $totalTaxedAmount - $postage;
+        return round($totalTaxedAmount - $postage, 2);
     }
 
     #[Groups([self::GROUP_ADMIN_READ])]
@@ -281,7 +281,7 @@ class Order implements PropelResourceInterface
         /** @var \Thelia\Model\Order $orderPropelModel */
         $orderPropelModel = $this->getPropelModel();
 
-        return $orderPropelModel->getPostage();
+        return round($orderPropelModel->getPostage(), 2);
     }
 
     public function __construct()
@@ -376,7 +376,7 @@ class Order implements PropelResourceInterface
 
     public function getPostage(): float
     {
-        return $this->postage;
+        return round($this->postage, 2);
     }
 
     public function setPostage(float $postage): self
@@ -388,7 +388,7 @@ class Order implements PropelResourceInterface
 
     public function getPostageTax(): float
     {
-        return $this->postageTax;
+        return round($this->postageTax, 2);
     }
 
     public function setPostageTax(float $postageTax): self
