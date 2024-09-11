@@ -391,7 +391,7 @@ class OrderProduct implements PropelResourceInterface
 
     public function getPrice(): float
     {
-        return $this->price;
+        return round($this->price, 2);
     }
 
     public function setPrice(float $price): self
@@ -403,7 +403,7 @@ class OrderProduct implements PropelResourceInterface
 
     public function getPromoPrice(): ?float
     {
-        return $this->promoPrice;
+        return round($this->promoPrice, 2);
     }
 
     public function setPromoPrice(?float $promoPrice): self
@@ -415,7 +415,7 @@ class OrderProduct implements PropelResourceInterface
 
     public function getUnitTaxedPrice(): ?float
     {
-        return $this->unitTaxedPrice;
+        return round($this->unitTaxedPrice, 2);
     }
 
     public function isWasNew(): bool
