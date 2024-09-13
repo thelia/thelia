@@ -12,7 +12,7 @@
 
 namespace TheliaSmarty\Template\Plugins;
 
-use CommerceGuys\Addressing\Model\Address;
+use CommerceGuys\Addressing\Address;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Session\Session;
@@ -452,7 +452,9 @@ class Format extends AbstractSmartyPlugin
             'address_line1',
             'address_line2',
             'organization',
-            'recipient',
+            'given_name',
+            'additional_name',
+            'family_name',
             'locale',
         ];
         $valid = false;
