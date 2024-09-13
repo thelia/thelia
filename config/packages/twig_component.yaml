@@ -3,5 +3,4 @@ twig_component:
   defaults:
     # Namespace & directory for components
     FlexyBundle\Twig\:
-      template_directory: 'frontOffice/%thelia_front_template%/twig-components/'
       name_prefix: Flexy
