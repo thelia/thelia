@@ -5,6 +5,12 @@
     {$breadcrumbs = [['title' => {intl l="Contact Us"}, 'url'=>{url path="/contact"}]]}
 {/block}
 
+{loop type="customer" name="the-loop-name" }
+      {$valueName = "`$FIRSTNAME` `$LASTNAME`"}
+      {$valueEmail = $EMAIL}
+      {$readOnly = true}
+    {/loop}
+
 {block name="main-content"}
     {include file="components/smarty/PageHeader/PageHeader.html" TITLE={intl l="Contact Us"}}
 
@@ -33,10 +39,11 @@
                             type="text"
                             name=$name
                             label=$label
-                            value=$value
+                            value={$valueName|default:$value}
                             placeholder={intl l="You name"}
                             id="{$label_attr.for|default:null}-mini"
                             required=$required
+                            readonly={$readOnly|default:false}
                           }
                         {/form_field}
                         {form_field field="email"}
@@ -45,10 +52,11 @@
                             type="text"
                             name=$name
                             label=$label
-                            value=$value
+                            value={$valueEmail|default:$value}
                             placeholder={intl l="Your email"}
                             id="{$label_attr.for|default:null}-mini"
                             required=$required
+                            readonly={$readOnly|default:false}
                           }
                         {/form_field}
                         {form_field field="subject"}
