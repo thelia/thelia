@@ -31,7 +31,7 @@ readonly class DataAccessService
         private LoopDataAccessService $loopDataAccessService,
         private NormalizerInterface $normalizer,
         private RequestStack $requestStack,
-        private LangService $localeService
+        private LangService $localeService,
     ) {
     }
 
@@ -54,6 +54,10 @@ readonly class DataAccessService
             [],
             $currentRequest->server->all()
         );
+
+        $context = $router->getContext();
+        $context->setMethod(Request::METHOD_GET);
+
         $route = $router->matchRequest($apiRequest);
 
         $resourceClass = $route['_api_resource_class'];
@@ -109,7 +113,7 @@ readonly class DataAccessService
         return $this->loopDataAccessService->theliaCount($loopType, $params);
     }
 
-    private function formatI18ns(array $datas, string $locale = null): array
+    private function formatI18ns(array $datas, ?string $locale = null): array
     {
         foreach ($datas as $key => $data) {
             if ($key === 'i18ns' && isset($datas['i18ns'][$locale])) {
