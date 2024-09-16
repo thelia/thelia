@@ -322,7 +322,7 @@ class FrontUtils extends AbstractSmartyPlugin
 
         if (!$rewritingUrl) {
             parse_str(ltrim($url, '?'), $urlParams);
-            if (!isset($urlParams['view'])){
+            if (!isset($urlParams['view'])) {
                 return null;
             }
             $view = $urlParams['view'];
