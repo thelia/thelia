@@ -20,6 +20,7 @@ use Thelia\Model\CategoryQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\RewritingUrlQuery;
 use Thelia\TaxEngine\TaxEngine;
 use Thelia\Tools\URL;
 use TheliaSmarty\Events\PseByProductEvent;
@@ -70,6 +71,7 @@ class FrontUtils extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'extractOptions', $this, 'extractOptions'),
             new SmartyPluginDescriptor('function', 'isInCategory', $this, 'isInCategory'),
             new SmartyPluginDescriptor('function', 'isInFolder', $this, 'isInFolder'),
+            new SmartyPluginDescriptor('function', 'rewritingUrl', $this, 'rewritingUrl'),
         ];
     }
 
@@ -311,5 +313,38 @@ class FrontUtils extends AbstractSmartyPlugin
         $list[] = $category->getId();
 
         return $this->iterateCategories($category->getParent(), $list);
+    }
+
+    public function rewritingUrl($params): ?string
+    {
+        $url = basename($params['currentUrl']);
+        $rewritingUrl = RewritingUrlQuery::create()->filterByUrl(urldecode($url))->findOne();
+
+        if (!$rewritingUrl) {
+            parse_str(ltrim($url, '?'), $urlParams);
+            if (!isset($urlParams['view'])){
+                return null;
+            }
+            $view = $urlParams['view'];
+            $rewritingUrl = RewritingUrlQuery::create()
+                ->filterByView($urlParams['view'])
+                ->filterByViewId($urlParams[$view.'_id'])
+                ->findOne();
+        }
+        if (!$rewritingUrl) {
+            return null;
+        }
+        $locale = $params['locale'];
+        $searchUrl = RewritingUrlQuery::create()
+            ->filterByView($rewritingUrl->getView())
+            ->filterByViewId($rewritingUrl->getViewId())
+            ->filterByViewLocale($locale)
+            ->findOne();
+
+        if (!$searchUrl) {
+            return null;
+        }
+
+        return $searchUrl->getUrl() ? URL::getInstance()->absoluteUrl($searchUrl->getUrl()) : null;
     }
 }
