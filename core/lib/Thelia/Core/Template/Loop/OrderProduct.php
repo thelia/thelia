@@ -114,7 +114,7 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $orderProduct) {
             $loopResultRow = new LoopResultRow($orderProduct);
 
-            $tax = $orderProduct->getVirtualColumn('TOTAL_TAX');
+            $tax = $orderProduct->getVirtualColumn('TOTAL_TAX'); // 1,39755 => 1.4
             $promoTax = $orderProduct->getVirtualColumn('TOTAL_PROMO_TAX');
 
             // To prevent price changes in pre-2.4 orders, use the legacy calculation method
@@ -131,16 +131,19 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
                 $totalTaxedPrice = round($taxedPrice, 2) * $orderProduct->getQuantity();
                 $totalTaxedPromoPrice = round($taxedPromoPrice, 2) * $orderProduct->getQuantity();
             } else {
+                $tax = round($tax, 2);
+                $promoTax = round($promoTax, 2);
+
                 $totalTax = $tax * $orderProduct->getQuantity();
                 $totalPromoTax = $promoTax * $orderProduct->getQuantity();
 
-                $taxedPrice = round((float) $orderProduct->getPrice() + $tax, 2);
-                $taxedPromoPrice = round((float) $orderProduct->getPromoPrice() + $promoTax, 2);
+                $taxedPrice = round((float) $orderProduct->getPrice(), 2) + $tax;
+                $taxedPromoPrice = round((float) $orderProduct->getPromoPrice(), 2) + $promoTax;
 
                 // Price calculation should use the same rounding method as in CartItem::getTotalTaxedPromoPrice()
                 // For each order line, we first round the taxed price, then we multiply by the quantity.
-                $totalPrice = round($orderProduct->getPrice(), 2) * $orderProduct->getQuantity();
-                $totalPromoPrice = round($orderProduct->getPromoPrice(), 2) * $orderProduct->getQuantity();
+                $totalPrice = round((float) $orderProduct->getPrice(), 2) * $orderProduct->getQuantity();
+                $totalPromoPrice = round((float) $orderProduct->getPromoPrice(), 2) * $orderProduct->getQuantity();
 
                 $totalTaxedPrice = $taxedPrice * $orderProduct->getQuantity();
                 $totalTaxedPromoPrice = $taxedPromoPrice * $orderProduct->getQuantity();

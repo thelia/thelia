@@ -221,51 +221,42 @@
 
     <table width="100%" cellspacing="0" cellpadding="0" style="padding-top: 5mm; padding-bottom: 8mm">
         <col style="width: 40%; padding: 1mm;" />
-        <col style="width: 20%; padding: 1mm;" />
-        <col style="width: 20%; padding: 1mm;" />
-        <col style="width: 20%; padding: 1mm;" />
+        <col style="width: 12%; padding: 1mm;" />
+        <col style="width: 12%; padding: 1mm;" />
+        <col style="width: 12%; padding: 1mm;" />
+        <col style="width: 12%; padding: 1mm;" />
+        <col style="width: 12%; padding: 1mm;" />
 
 
         <tr class="table-1">
             <td><h4>{intl l="Product"}</h4></td>
             <td><h4 class="align-center">{intl l="Unit. price"}</h4></td>
-            <!--
             <td><h4 class="align-center">{intl l="Tax"}</h4></td>
-            <td><h4 class="align-center">{intl l="Unit taxed price"}</h4></td>--->
+            <td><h4 class="align-center">{intl l="Unit taxed price"}</h4></td>
             <td><h4 class="align-center">{intl l="Quantity"}</h4></td>
             <td style="background:#f6993c"><h4 style="color:white;" class="align-center">{intl l="Total without tax"}</h4></td>
         </tr>
         {loop type="order_product" name="order-products" order=$ID}
-        {if $WAS_IN_PROMO == 1}
-        {assign "realPrice" $PROMO_PRICE}
-        {assign "realTax" $PROMO_PRICE_TAX}
-        {assign "realTaxedPrice" $TAXED_PROMO_PRICE}
-        {assign "realTotalPrice" $PROMO_PRICE*$QUANTITY}
-        {else}
-        {assign "realPrice" $PRICE}
-        {assign "realTax" $PRICE_TAX}
-        {assign "realTaxedPrice" $TAXED_PRICE}
-        {assign "realTotalPrice" $PRICE*$QUANTITY}
-        {/if}
+            {$taxes[{$TAX_RULE_TITLE}][] = floatval($REAL_PRICE_TAX) * $QUANTITY}
 
-        {$taxes[{$TAX_RULE_TITLE}][] = floatval($realTax) * $QUANTITY}
+            <tr class="table-2">
+                <td>
+                    <p>
+                        {$TITLE} <br>
+                        {intl l="Product ref : "}{$REF}<br>
+                        {intl l="Combination ref : "}{$PRODUCT_SALE_ELEMENTS_REF}
+                    </p>
 
-        <tr class="table-2">
-            <td>
-                <p>
-                    {$TITLE} <br>
-                    {intl l="Product ref : "}{$REF}<br>
-                    {intl l="Combination ref : "}{$PRODUCT_SALE_ELEMENTS_REF}
-                </p>
+                    {hook name="invoice.product-list" order_product=$ID order=$order_id}
+                </td>
+                <td><p class="align-right">{format_money number=$REAL_PRICE currency_id=$currency}</p></td>
+                <td><p class="align-right">{format_money number=$REAL_PRICE_TAX currency_id=$currency}</p></td>
+                <td><p class="align-right">{format_money number=$REAL_TAXED_PRICE currency_id=$currency}</p></td>
+                <td><p class="align-center">{$QUANTITY}</p></td>
+                <td><p class="align-right">{format_money number=$REAL_TOTAL_PRICE currency_id=$currency}</p></td>
+            </tr>
 
-                {hook name="invoice.product-list" order_product=$ID order=$order_id}
-            </td>
-            <td><p class="align-right">{format_money number=$realPrice currency_id=$currency}</p></td>
-            <td><p class="align-center">{$QUANTITY}</p></td>
-            <td><p class="align-right">{format_money number=$realTotalPrice currency_id=$currency}</p></td>
-        </tr>
-
-        {hook name="invoice.order-product" order={$order_id} order_product={$ID}}
+            {hook name="invoice.order-product" order={$order_id} order_product={$ID}}
         {/loop}
     </table>
 
@@ -302,8 +293,8 @@
 
                     {assign "tva" 0.20}
                     {loop type="order_address" name="invoice_address" id=$INVOICE_ADDRESS}
-                    {if $COUNTRY == 20 && $INVOICE_DATE > date_create('2020-07-07')}
-                    {assign "tva" 0.21}
+                        {if $COUNTRY == 20 && $INVOICE_DATE > date_create('2020-07-07')}
+                        {assign "tva" 0.21}
                     {/if}
                     {/loop}
 
@@ -312,10 +303,10 @@
                     {assign "discountTax" {$DISCOUNT*$tva}}
                     {/if}
 
-                    {assign "untaxedCart" {$TOTAL_ITEMS_AMOUNT}}
-                    {assign "untaxedPostage" {$POSTAGE/(1+$tva)}}
-                    {assign "postageTax" {$untaxedPostage*$tva}}
-                    {assign "untaxedTotalWithUntaxedPostage" {$untaxedCart+$untaxedPostage}}
+                    {assign "untaxedCart" $TOTAL_ITEMS_AMOUNT}
+                    {assign "untaxedPostage" $POSTAGE_UNTAXED}
+                    {assign "postageTax" $POSTAGE_TAX}
+                    {assign "untaxedTotalWithUntaxedPostage" {$TOTAL_ITEMS_AMOUNT+$POSTAGE_UNTAXED}}
 
                     {* Totaux des frais de livraison : HT / TVA / TTC *}
                     <tr>
