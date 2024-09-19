@@ -46,7 +46,7 @@
         "simplepie/simplepie": "1.5.*",
         "imagine/imagine": "1.2.4",
         "michelf/php-markdown": "1.9.*",
-        "smarty/smarty": "~4.1.0",
+        "smarty/smarty": "~4.5.0",
         "commerceguys/addressing": "1.1.*",
         "symfony/cache": "6.4.*",
         "symfony/polyfill-php73": "^1.0",
@@ -56,12 +56,12 @@
         "symfony/framework-bundle": "6.4.*",
         "wikimedia/less.php": "^3.1",
         "symfony/psr-http-message-bridge": "^2.1",
-        "symfony/flex": "^1.12",
+        "symfony/flex": "^2.4",
         "assetic/framework": "~3.0.0",
         "spipu/html2pdf": "~5.2.5",
         "symfony/mailer": "6.4.*",
         "symfony/webpack-encore-bundle": "^1.14",
-        "composer/composer": "~2.3.0",
+        "composer/composer": "~2.7.0",
         "doctrine/annotations": "^2.0"
     },
     "require-dev": {

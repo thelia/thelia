@@ -22,9 +22,10 @@ RUN docker-php-ext-install zip
 RUN docker-php-ext-install calendar
 
 # Imagick extension needed for webp
-RUN apk add --update --no-cache autoconf g++ imagemagick imagemagick-dev libtool make pcre-dev
+RUN apk add --update --no-cache autoconf g++ imagemagick imagemagick-dev libtool make pcre-dev libgomp
 RUN pecl install imagick
 RUN docker-php-ext-enable imagick
+
 
 # GD extension needed for html2pdf
 RUN apk add --no-cache freetype libpng libjpeg-turbo freetype-dev libpng-dev libjpeg-turbo-dev && \
