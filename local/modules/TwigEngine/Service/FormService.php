@@ -14,6 +14,7 @@ namespace TwigEngine\Service;
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormView;
 use Thelia\Core\Form\TheliaFormFactory;
 use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
@@ -50,6 +51,10 @@ class FormService
         }
 
         $this->parserContext->pushCurrentForm($form);
+
+        if ($form->hasError()) {
+            $form->getForm()->addError(new FormError($form->getErrorMessage()));
+        }
 
         return $form->getForm()->createView();
     }
