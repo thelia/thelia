@@ -14,19 +14,23 @@ namespace Thelia\Api\Bridge\Propel\State;
 
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\Collection\Collection;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\Event\ItemProviderQueryEvent;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\PropelResourceInterface;
+use Thelia\Model\LangQuery;
 
 readonly class PropelItemProvider implements ProviderInterface
 {
     public function __construct(
         private ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
         private iterable $propelItemExtensions = [],
-        private EventDispatcherInterface $eventDispatcher
+        private EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -65,11 +69,19 @@ readonly class PropelItemProvider implements ProviderInterface
         if (null === $propelModel) {
             return null;
         }
-
+        $langs = null;
+        if (in_array($operation::class,[Patch::class,Put::class])) {
+            $langs = new Collection();
+            $content = json_decode($context['request']->getContent(), true, 512, JSON_THROW_ON_ERROR);
+            if (isset($content['i18ns'])){
+                $langs = LangQuery::create()->filterByLocale(array_keys($content['i18ns']))->find();
+            }
+        }
         return $this->apiResourcePropelTransformerService->modelToResource(
             resourceClass: $resourceClass,
             propelModel: $propelModel,
-            context: $context
+            context: $context,
+            langs : $langs
         );
     }
 }

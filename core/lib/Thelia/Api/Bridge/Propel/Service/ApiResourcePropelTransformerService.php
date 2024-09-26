@@ -12,6 +12,8 @@
 
 namespace Thelia\Api\Bridge\Propel\Service;
 
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Validator\ValidatorInterface;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
@@ -80,7 +82,8 @@ readonly class ApiResourcePropelTransformerService
             baseModel: $baseModel,
             context: $context,
             withRelation: $withRelation,
-            withAddon: $withAddon
+            withAddon: $withAddon,
+            langs: $langs
         );
 
         if (is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
@@ -115,16 +118,16 @@ readonly class ApiResourcePropelTransformerService
         return $modelToResourceEvent->getResource();
     }
 
-    public function resourceToModel(PropelResourceInterface $data, array $context = []): ActiveRecordInterface
+    public function resourceToModel(PropelResourceInterface $data, array $context = [], Operation $operation): ActiveRecordInterface
     {
-        $operation = $context['operation'] ?? null;
-        if ($operation) {
-            $this->validator->validate($data, $operation->getDenormalizationContext());
+        $operationContext = $context['operation'] ?? null;
+        if ($operationContext) {
+            $this->validator->validate($data, $operationContext->getDenormalizationContext());
         }
 
         $propelModel = $this->initializePropelModel($data);
 
-        $this->processPropertiesModel($data, $propelModel, $context);
+        $this->processPropertiesModel($data, $propelModel, $context, $operation);
         $this->processTranslations($data, $propelModel);
 
         return $propelModel;
@@ -179,7 +182,8 @@ readonly class ApiResourcePropelTransformerService
     private function processPropertiesModel(
         PropelResourceInterface $data,
         ActiveRecordInterface $propelModel,
-        array $context
+        array $context,
+        Operation $operation
     ): void {
         $resourceReflection = new \ReflectionClass($data);
         foreach ($resourceReflection->getProperties() as $property) {
@@ -188,11 +192,10 @@ readonly class ApiResourcePropelTransformerService
             }
             $setterForced = false;
             $propelSetter = $this->determinePropelSetterName($property, $setterForced);
-
             if (method_exists($propelModel, $propelSetter)) {
                 $value = $this->getPropertyValue($data, $property);
-                $value = $this->getRelationValue($value, $propelSetter, $setterForced);
-                $value = $this->getArrayValue($value, $context, $property);
+                $value = $this->getRelationValue($value, $propelSetter, $setterForced,$operation);
+                $value = $this->getArrayValue($value, $context, $property, $operation);
 
                 $propelModel->$propelSetter($value);
             }
@@ -254,7 +257,8 @@ readonly class ApiResourcePropelTransformerService
     private function getRelationValue(
         mixed $value,
         string &$propelSetter,
-        bool $setterForced
+        bool $setterForced,
+        Operation $operation
     ): mixed {
         if (\is_object($value) && method_exists($value, 'getPropelModel')) {
             if (!$setterForced) {
@@ -262,7 +266,7 @@ readonly class ApiResourcePropelTransformerService
             }
 
             $valuePropelModel = $value->getPropelModel();
-            if (null !== $valuePropelModel && method_exists($valuePropelModel, 'getId')) {
+            if (null !== $valuePropelModel && !$operation instanceof Patch && method_exists($valuePropelModel, 'getId')) {
                 $value = $valuePropelModel->getId();
             }
 
@@ -278,14 +282,15 @@ readonly class ApiResourcePropelTransformerService
     private function getArrayValue(
         mixed $value,
         array $context,
-        \ReflectionProperty $property
+        \ReflectionProperty $property,
+        Operation $operation
     ): mixed {
         if (\is_array($value)) {
             $value = new Collection(
                 array_map(
-                    function ($value, $index) use ($context, $property) {
+                    function ($value, $index) use ($context, $property,$operation) {
                         try {
-                            return $this->resourceToModel($value, $context);
+                            return $this->resourceToModel($value, $context,$operation);
                         } catch (ValidationException $exception) {
                             $constrainViolationList = new ConstraintViolationList(
                                 array_map(
@@ -325,6 +330,7 @@ readonly class ApiResourcePropelTransformerService
         array $context,
         bool $withRelation,
         bool $withAddon,
+        Collection $langs
     ): void {
         foreach ($reflector->getProperties() as $property) {
             $defaultGetter = 'get'.ucfirst($property->getName());
@@ -354,6 +360,7 @@ readonly class ApiResourcePropelTransformerService
                             resourceClass: $parentReflector?->getName(),
                             propelModel: $parentModel,
                             context: $context,
+                            langs: $langs,
                             withRelation: false,
                             withAddon: $withAddon
                         )
@@ -367,7 +374,8 @@ readonly class ApiResourcePropelTransformerService
                     propelModel: $propelModel,
                     baseModel: $baseModel,
                     context: $context,
-                    withAddon: $withAddon
+                    withAddon: $withAddon,
+                    langs: $langs
                 );
             }
             $apiResource->$resourceSetter($value);
@@ -408,7 +416,8 @@ readonly class ApiResourcePropelTransformerService
         ActiveRecordInterface $propelModel,
         ActiveRecordInterface $baseModel,
         array $context,
-        bool $withAddon
+        bool $withAddon,
+        Collection $langs
     ): void {
         if ($value instanceof Collection) {
             $collection = new Collection();
@@ -419,6 +428,7 @@ readonly class ApiResourcePropelTransformerService
                         resourceClass: $targetClass,
                         propelModel: $childPropelModel,
                         context: $context,
+                        langs: $langs,
                         parentReflector: $reflector,
                         parentModel: $propelModel,
                         baseModel: $baseModel,
@@ -435,6 +445,7 @@ readonly class ApiResourcePropelTransformerService
             resourceClass: $targetClass,
             propelModel: $value,
             context: $context,
+            langs: $langs,
             parentReflector: $reflector,
             parentModel: $propelModel,
             baseModel: $baseModel,
