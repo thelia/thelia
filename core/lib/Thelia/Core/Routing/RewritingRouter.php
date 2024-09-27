@@ -14,9 +14,6 @@ namespace Thelia\Core\Routing;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Exception\InvalidParameterException;
-use Symfony\Component\Routing\Exception\MethodNotAllowedException;
-use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
@@ -96,7 +93,6 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
                 ->filterByActive(true)
                 ->filterByLocale($rewrittenUrlData->locale)
                 ->findOne()) {
-
             $lang = Lang::getDefaultLanguage();
 
             $localizedUrl = $urlTool->retrieve(
@@ -143,7 +139,6 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
             '_route' => 'rewrite',
             '_rewritten' => true,
         ];
-
     }
 
     protected function manageLocale(RewritingResolver $rewrittenUrlData, TheliaRequest $request): void

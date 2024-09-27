@@ -43,7 +43,6 @@ readonly class PropelItemProvider implements ProviderInterface
 
         /** @var ModelCriteria $query */
         $query = $queryClass::create();
-
         $itemProviderEvent = new ItemProviderQueryEvent(
             query: $query,
             operation: $operation,

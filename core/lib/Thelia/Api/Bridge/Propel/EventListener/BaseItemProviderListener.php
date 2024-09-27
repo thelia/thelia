@@ -32,7 +32,6 @@ class BaseItemProviderListener implements EventSubscriberInterface
         $compositeIdentifiers = $this->apiResourcePropelTransformerService->getResourceCompositeIdentifierValues(reflector: $reflector, param: 'keys');
 
         $columnValues = $this->apiResourcePropelTransformerService->getColumnValues(reflector: $reflector, columns: $compositeIdentifiers);
-
         foreach ($event->getUriVariables() as $field => $value) {
             $filterMethod = null;
             $filterName = $columnValues[$field]['propelQueryFilter'] ?? null;
