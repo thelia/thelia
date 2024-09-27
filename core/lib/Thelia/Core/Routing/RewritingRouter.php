@@ -93,7 +93,6 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
                 ->filterByActive(true)
                 ->filterByLocale($rewrittenUrlData->locale)
                 ->findOne()) {
-
             $lang = Lang::getDefaultLanguage();
 
             $localizedUrl = $urlTool->retrieve(
