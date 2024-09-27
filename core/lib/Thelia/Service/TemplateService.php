@@ -27,6 +27,7 @@ class TemplateService
                 $templatesPath[$templateType] = $templatePath;
             }
         }
+
         return $templatesPath;
     }
 
@@ -36,6 +37,7 @@ class TemplateService
             throw new \InvalidArgumentException("Invalid template type: $type");
         }
         $configName = TemplateDefinition::CONFIG_NAMES[$type];
+
         return THELIA_TEMPLATE_DIR.$type.DS.ConfigQuery::read($configName, 'default');
     }
 }

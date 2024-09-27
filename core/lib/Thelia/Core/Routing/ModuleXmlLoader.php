@@ -14,7 +14,6 @@ namespace Thelia\Core\Routing;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Loader\XmlFileLoader;
 use Symfony\Component\Routing\RouteCollection;
 use Thelia\Model\Module;
