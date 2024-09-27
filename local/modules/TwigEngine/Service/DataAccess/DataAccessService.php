@@ -13,25 +13,14 @@
 namespace TwigEngine\Service\DataAccess;
 
 use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Thelia\Service\Model\LangService;
-use TwigEngine\Service\ApiPlatformMetadataService;
+use TwigEngine\Service\API\ResourceService;
 
-readonly class DataAccessService
+class DataAccessService
 {
     public function __construct(
-        private RouterInterface $router,
-        private ApiPlatformMetadataService $apiPlatformMetadataService,
-        private LoopDataAccessService $loopDataAccessService,
-        private NormalizerInterface $normalizer,
-        private RequestStack $requestStack,
-        private LangService $localeService,
+        private readonly LoopDataAccessService $loopDataAccessService,
+        private readonly ResourceService       $resourceService
     ) {
     }
 
@@ -41,64 +30,7 @@ readonly class DataAccessService
      */
     public function resources(string $path, array $parameters = []): object|array
     {
-        /** @var Router $router */
-        $router = $this->router;
-        /** @var Request $currentRequest */
-        $currentRequest = $this->requestStack->getCurrentRequest();
-
-        $apiRequest = Request::create(
-            $path,
-            Request::METHOD_GET,
-            [],
-            $currentRequest->cookies->all(),
-            [],
-            $currentRequest->server->all()
-        );
-
-        $context = $router->getContext();
-        $context->setMethod(Request::METHOD_GET);
-
-        $route = $router->matchRequest($apiRequest);
-
-        $resourceClass = $route['_api_resource_class'];
-        $routeName = $route['_route'];
-
-        $operation = $this->apiPlatformMetadataService->getOperation(
-            $resourceClass,
-            $routeName
-        );
-        if ($operation === null) {
-            throw new \RuntimeException('Operation not found');
-        }
-
-        $context = [
-            'operation' => $operation,
-            'uri_variables' => [],
-            'resource_class' => $resourceClass,
-            'filters' => $parameters,
-            'groups' => $operation->getNormalizationContext()['groups'] ?? null,
-        ];
-
-        if (
-            !$this->apiPlatformMetadataService->canUserAccessResource(
-                $resourceClass,
-                $path,
-                Request::METHOD_GET,
-                $operation,
-                $context
-            )
-        ) {
-            throw new AccessDeniedHttpException('Access Denied on '.$path);
-        }
-
-        $result = $this->apiPlatformMetadataService->getProvider($operation)->provide(
-            $operation,
-            [],
-            $context
-        );
-        $datasNormalized = $this->normalizer->normalize($result, null, $context);
-
-        return $this->formatI18ns($datasNormalized, $this->localeService->getLocale());
+        return $this->resourceService->resources($path, $parameters);
     }
 
     /** @deprecated use new data access layer */
@@ -111,22 +43,5 @@ readonly class DataAccessService
     public function loopCount(string $loopType, array $params = []): int
     {
         return $this->loopDataAccessService->theliaCount($loopType, $params);
-    }
-
-    private function formatI18ns(array $datas, ?string $locale = null): array
-    {
-        foreach ($datas as $key => $data) {
-            if ($key === 'i18ns' && isset($datas['i18ns'][$locale])) {
-                $datas['i18ns'] = $datas['i18ns'][$locale];
-                continue;
-            }
-            if (\is_array($data)) {
-                $datas[$key] = $this->formatI18ns($data, $locale);
-                continue;
-            }
-            $datas[$key] = $data;
-        }
-
-        return $datas;
     }
 }
