@@ -17,7 +17,6 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\Loader\AttributeDirectoryLoader;
 use Symfony\Component\Routing\RouteCollection;
-use Thelia\Model\ModuleQuery;
 use Thelia\Service\TemplateService;
 
 class TemplateAttributeLoader extends Loader

@@ -28,12 +28,14 @@ readonly class LangService
         if (!$request instanceof \Thelia\Core\HttpFoundation\Request) {
             return null;
         }
+
         return $request->getSession()?->getLang();
     }
 
     public function getLocale(): ?string
     {
         $locale = $this->getLang()?->getLocale();
+
         return $locale ?? Lang::getDefaultLanguage()?->getLocale();
     }
 }
