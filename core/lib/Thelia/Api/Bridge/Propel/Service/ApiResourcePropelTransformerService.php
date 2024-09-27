@@ -40,10 +40,11 @@ use Thelia\Model\ProductQuery as ChildProductQuery;
 readonly class ApiResourcePropelTransformerService
 {
     public function __construct(
-        private array $apiResourceAddons,
-        private ValidatorInterface $validator,
+        private array                    $apiResourceAddons,
+        private ValidatorInterface       $validator,
         private EventDispatcherInterface $eventDispatcher,
-    ) {
+    )
+    {
     }
 
     public function getResourceAddonDefinitions($resourceClass): array
@@ -55,16 +56,17 @@ readonly class ApiResourcePropelTransformerService
      * @throws \ReflectionException
      */
     public function modelToResource(
-        string $resourceClass,
+        string                $resourceClass,
         ActiveRecordInterface $propelModel,
-        array $context,
-        Collection $langs = null,
-        \ReflectionClass $parentReflector = null,
+        array                 $context,
+        Collection            $langs = null,
+        \ReflectionClass      $parentReflector = null,
         ActiveRecordInterface $parentModel = null,
-        bool $withRelation = true,
+        bool                  $withRelation = true,
         ActiveRecordInterface $baseModel = null,
-        bool $withAddon = true
-    ): PropelResourceInterface {
+        bool                  $withAddon = true
+    ): PropelResourceInterface
+    {
         if ($langs === null) {
             $langs = LangQuery::create()->filterByActive(1)->find();
         }
@@ -124,7 +126,7 @@ readonly class ApiResourcePropelTransformerService
         return $modelToResourceEvent->getResource();
     }
 
-    public function resourceToModel(PropelResourceInterface $data,Operation $operation,array $context = [], ?ActiveRecordInterface $previousPropelModel = null ): ActiveRecordInterface
+    public function resourceToModel(PropelResourceInterface $data, Operation $operation, array $context = [], ?ActiveRecordInterface $previousPropelModel = null): ActiveRecordInterface
     {
         $operationContext = $context['operation'] ?? null;
         if ($operationContext) {
@@ -136,7 +138,7 @@ readonly class ApiResourcePropelTransformerService
             operation: $operation,
             context: $context
         );
-        if (method_exists($data,'getId') && $data->getId()) {
+        if (method_exists($data, 'getId') && $data->getId()) {
             $propelModel->setNew(false);
         }
         $this->processPropertiesModel($data, $propelModel, $context, $operation);
@@ -183,10 +185,9 @@ readonly class ApiResourcePropelTransformerService
 
     private function initializePropelModel(
         PropelResourceInterface $data,
-        ?ActiveRecordInterface $previousPropelModel,
-        Operation $operation,
-        array $context)
-    : ActiveRecordInterface
+        ?ActiveRecordInterface  $previousPropelModel,
+        Operation               $operation,
+        array                   $context): ActiveRecordInterface
     {
         $propelModel = $data->getPropelModel();
         if ($propelModel === null) {
@@ -194,33 +195,52 @@ readonly class ApiResourcePropelTransformerService
             $modelClassName = $propelTableMap?->getClassName();
             $propelModel = new $modelClassName();
         }
-        if (!$previousPropelModel && in_array($operation::class,[Patch::class,Put::class])){
+        if (in_array($operation::class, [Patch::class, Put::class])) {
             $request = $context['request'];
             $reflector = new \ReflectionClass($data::class);
             /** @var ModelCriteria $queryClass */
-            $queryClass = $data::getPropelRelatedTableMap()->getClassName().'Query';
+            $queryClass = $data::getPropelRelatedTableMap()->getClassName() . 'Query';
             /** @var ModelCriteria $query */
             $query = $queryClass::create();
             $compositeIdentifiers = $this->getResourceCompositeIdentifierValues(reflector: $reflector, param: 'keys');
             $columnValues = $this->getColumnValues(reflector: $reflector, columns: $compositeIdentifiers);
             $uriVariables = [];
-            $id = $request->get('id');
+            $id = null;
+            if (!$previousPropelModel && $request->get('id')){
+                $id = $request->get('id');
+            }
+            if (method_exists($data, 'getId') && $data->getId()) {
+                $id = $data->getId();
+            }
             if ($id){
                 $uriVariables['id'] = $id;
             }
-            if (!$id){
-                foreach ($compositeIdentifiers as $compositeIdentifier){
-                    $compositeIdentifierId = $request->get($compositeIdentifier);
-                    if ($request->get($compositeIdentifier)){
-                        $uriVariables[$compositeIdentifier] = $compositeIdentifierId;
+            $compositeIdentifiersUriVariable = [];
+            foreach ($compositeIdentifiers as $compositeIdentifier) {
+                $compositeIdentifierId = $request->get($compositeIdentifier);
+                if ($reflector->hasProperty($compositeIdentifier) && $reflector->getProperty($compositeIdentifier)->isInitialized($data)) {
+                    $getter = 'get' . ucfirst($compositeIdentifier);
+                    $getterId = 'getId';
+                    $compositeIdentifierId = $data->$getter()->$getterId();
+                }
+                if ($previousPropelModel){
+                    $reflectorPreviousPropelModel = new \ReflectionClass($previousPropelModel::class);
+                    if (ucfirst($compositeIdentifier) === $reflectorPreviousPropelModel->getShortName()){
+                        $compositeIdentifierId = $previousPropelModel->getId();
                     }
                 }
+                if ($compositeIdentifierId) {
+                    $compositeIdentifiersUriVariable[$compositeIdentifier] = $compositeIdentifierId;
+                }
             }
-            $this->queryFilterById(uriVariables: $uriVariables,query: $query,columnValues: $columnValues);
-            if ($id && count($query->getMap()) === 1 && $query->findOne() !== null){
+            if (!empty($compositeIdentifiersUriVariable)) {
+                $uriVariables = $compositeIdentifiersUriVariable;
+            }
+            $this->queryFilterById(uriVariables: $uriVariables, query: $query, columnValues: $columnValues);
+            if (empty($compositeIdentifiersUriVariable) && count($query->getMap()) === 1 && $query->findOne() !== null) {
                 $propelModel = $query->findOne();
             }
-            if (!$id && count($query->getMap()) >= 2 && $query->findOne() !== null){
+            if (!empty($compositeIdentifiersUriVariable) && count($query->getMap()) >= 2 && $query->findOne() !== null) {
                 $propelModel = $query->findOne();
             }
         }
@@ -229,10 +249,11 @@ readonly class ApiResourcePropelTransformerService
 
     private function processPropertiesModel(
         PropelResourceInterface $data,
-        ActiveRecordInterface $propelModel,
-        array $context,
-        Operation $operation
-    ): void {
+        ActiveRecordInterface   $propelModel,
+        array                   $context,
+        Operation               $operation
+    ): void
+    {
         $resourceReflection = new \ReflectionClass($data);
         foreach ($resourceReflection->getProperties() as $property) {
             if (!$property->isInitialized($data)) {
@@ -243,8 +264,8 @@ readonly class ApiResourcePropelTransformerService
 
             if (method_exists($propelModel, $propelSetter)) {
                 $value = $this->getPropertyValue($data, $property);
-                $value = $this->getRelationValue($value, $propelSetter, $setterForced,$operation);
-                $value = $this->getArrayValue($value, $context, $property,$propelModel, $operation);
+                $value = $this->getRelationValue($value, $propelSetter, $setterForced, $operation);
+                $value = $this->getArrayValue($value, $context, $property, $propelModel, $operation);
 
                 $propelModel->$propelSetter($value);
             }
@@ -253,13 +274,14 @@ readonly class ApiResourcePropelTransformerService
 
     private function determinePropelSetterName(
         \ReflectionProperty $property,
-        bool &$setterForced = false
-    ): string {
-        $propelSetter = 'set'.ucfirst($property->getName());
+        bool                &$setterForced = false
+    ): string
+    {
+        $propelSetter = 'set' . ucfirst($property->getName());
 
         foreach ($property->getAttributes(Column::class) as $columnAttribute) {
             if (isset($columnAttribute->getArguments()['propelFieldName'])) {
-                $propelSetter = 'set'.ucfirst($columnAttribute->getArguments()['propelFieldName']);
+                $propelSetter = 'set' . ucfirst($columnAttribute->getArguments()['propelFieldName']);
             }
             if (isset($columnAttribute->getArguments()['propelSetter'])) {
                 $setterForced = true;
@@ -272,13 +294,14 @@ readonly class ApiResourcePropelTransformerService
 
     private function determinePropelGetterName(
         \ReflectionProperty $property,
-        string $attributeClass,
-        string $argumentKey,
-        string $defaultGetter
-    ): string {
+        string              $attributeClass,
+        string              $argumentKey,
+        string              $defaultGetter
+    ): string
+    {
         foreach ($property->getAttributes($attributeClass) as $attribute) {
             if (isset($attribute->getArguments()[$argumentKey])) {
-                return 'get'.ucfirst($attribute->getArguments()[$argumentKey]);
+                return 'get' . ucfirst($attribute->getArguments()[$argumentKey]);
             }
         }
 
@@ -288,8 +311,8 @@ readonly class ApiResourcePropelTransformerService
     private function getPropertyValue(PropelResourceInterface $data, \ReflectionProperty $property): mixed
     {
         $possibleGetters = [
-            'get'.ucfirst($property->getName()),
-            'is'.ucfirst($property->getName()),
+            'get' . ucfirst($property->getName()),
+            'is' . ucfirst($property->getName()),
         ];
 
         $availableMethods = array_filter(array_intersect($possibleGetters, get_class_methods($data)));
@@ -304,11 +327,12 @@ readonly class ApiResourcePropelTransformerService
     }
 
     private function getRelationValue(
-        mixed $value,
-        string &$propelSetter,
-        bool $setterForced,
+        mixed     $value,
+        string    &$propelSetter,
+        bool      $setterForced,
         Operation $operation
-    ): mixed {
+    ): mixed
+    {
         if (\is_object($value) && method_exists($value, 'getPropelModel')) {
             if (!$setterForced) {
                 $propelSetter .= 'Id';
@@ -329,16 +353,17 @@ readonly class ApiResourcePropelTransformerService
     }
 
     private function getArrayValue(
-        mixed $value,
-        array $context,
-        \ReflectionProperty $property,
+        mixed                 $value,
+        array                 $context,
+        \ReflectionProperty   $property,
         ActiveRecordInterface $propelModel,
-        Operation $operation,
-    ): mixed {
+        Operation             $operation,
+    ): mixed
+    {
         if (\is_array($value)) {
             $value = new Collection(
                 array_map(
-                    function ($value, $index) use ($context, $property,$propelModel, $operation) {
+                    function ($value, $index) use ($context, $property, $propelModel, $operation) {
                         try {
                             return $this->resourceToModel(data: $value, operation: $operation, context: $context, previousPropelModel: $propelModel);
                         } catch (ValidationException $exception) {
@@ -348,7 +373,7 @@ readonly class ApiResourcePropelTransformerService
                                         $newViolation = new \ReflectionClass($violation);
                                         $newViolation->getProperty('propertyPath')->setValue(
                                             $violation,
-                                            $property->getName().'['.$index.'].'.$violation->getPropertyPath()
+                                            $property->getName() . '[' . $index . '].' . $violation->getPropertyPath()
                                         );
 
                                         return $violation;
@@ -372,18 +397,19 @@ readonly class ApiResourcePropelTransformerService
 
     private function processPropertiesRessource(
         PropelResourceInterface $apiResource,
-        \ReflectionClass $reflector,
-        ?\ReflectionClass $parentReflector,
-        ActiveRecordInterface $propelModel,
-        ?ActiveRecordInterface $parentModel,
-        ActiveRecordInterface $baseModel,
-        array $context,
-        bool $withRelation,
-        bool $withAddon,
-        Collection $langs
-    ): void {
+        \ReflectionClass        $reflector,
+        ?\ReflectionClass       $parentReflector,
+        ActiveRecordInterface   $propelModel,
+        ?ActiveRecordInterface  $parentModel,
+        ActiveRecordInterface   $baseModel,
+        array                   $context,
+        bool                    $withRelation,
+        bool                    $withAddon,
+        Collection              $langs
+    ): void
+    {
         foreach ($reflector->getProperties() as $property) {
-            $defaultGetter = 'get'.ucfirst($property->getName());
+            $defaultGetter = 'get' . ucfirst($property->getName());
             $propelGetter = $this->determinePropelGetterName($property, Column::class, 'propelFieldName', $defaultGetter);
             $propelGetter = $this->determinePropelGetterName($property, Relation::class, 'relationAlias', $propelGetter);
 
@@ -391,7 +417,7 @@ readonly class ApiResourcePropelTransformerService
                 continue;
             }
 
-            $resourceSetter = 'set'.ucfirst($property->getName());
+            $resourceSetter = 'set' . ucfirst($property->getName());
             if (!method_exists($apiResource, $resourceSetter)) {
                 continue;
             }
@@ -439,7 +465,7 @@ readonly class ApiResourcePropelTransformerService
                 $i18nGetters = array_filter(
                     array_map(
                         static function (\ReflectionProperty $reflectionProperty) use ($i18n) {
-                            return $reflectionProperty->isInitialized($i18n) ? 'get'.ucfirst($reflectionProperty->getName()) : null;
+                            return $reflectionProperty->isInitialized($i18n) ? 'get' . ucfirst($reflectionProperty->getName()) : null;
                         },
                         (new \ReflectionClass($i18n))->getProperties()
                     )
@@ -460,15 +486,16 @@ readonly class ApiResourcePropelTransformerService
     }
 
     private function manageCollectionAttribute(
-        mixed &$value,
-        string $targetClass,
-        \ReflectionClass $reflector,
+        mixed                 &$value,
+        string                $targetClass,
+        \ReflectionClass      $reflector,
         ActiveRecordInterface $propelModel,
         ActiveRecordInterface $baseModel,
-        array $context,
-        bool $withAddon,
-        Collection $langs
-    ): void {
+        array                 $context,
+        bool                  $withAddon,
+        Collection            $langs
+    ): void
+    {
         if ($value instanceof Collection) {
             $collection = new Collection();
 
@@ -504,15 +531,16 @@ readonly class ApiResourcePropelTransformerService
     }
 
     private function manageTranslatableResource(
-        string $resourceClass,
-        ActiveRecordInterface $propelModel,
-        ActiveRecordInterface $baseModel,
+        string                  $resourceClass,
+        ActiveRecordInterface   $propelModel,
+        ActiveRecordInterface   $baseModel,
         PropelResourceInterface $apiResource,
-        ?\ReflectionClass $parentReflector,
-        \ReflectionClass $reflector,
-        array $context,
-        Collection $langs
-    ): void {
+        ?\ReflectionClass       $parentReflector,
+        \ReflectionClass        $reflector,
+        array                   $context,
+        Collection              $langs
+    ): void
+    {
         foreach ($langs as $lang) {
             $i18nResource = new ($resourceClass::getI18nResourceClass());
 
@@ -547,7 +575,7 @@ readonly class ApiResourcePropelTransformerService
 
                 $fieldValue = null;
 
-                $virtualColumn = ltrim(strtolower($parentReflector?->getShortName().'_'.$reflector->getShortName()).'_lang_'.$lang->getLocale().'_'.$i18nFieldName, '_');
+                $virtualColumn = ltrim(strtolower($parentReflector?->getShortName() . '_' . $reflector->getShortName()) . '_lang_' . $lang->getLocale() . '_' . $i18nFieldName, '_');
 
                 if ($baseModel->hasVirtualColumn($virtualColumn)) {
                     $fieldValue = $baseModel->getVirtualColumn($virtualColumn);
@@ -555,7 +583,7 @@ readonly class ApiResourcePropelTransformerService
 
                 if (null === $fieldValue) {
                     $propelModel->setlocale($lang->getLocale());
-                    $getter = 'get'.ucfirst($i18nFieldName);
+                    $getter = 'get' . ucfirst($i18nFieldName);
 
                     $fieldValue = $propelModel->$getter();
                 }
@@ -564,7 +592,7 @@ readonly class ApiResourcePropelTransformerService
                     continue;
                 }
 
-                $setter = 'set'.ucfirst($i18nFieldName);
+                $setter = 'set' . ucfirst($i18nFieldName);
                 $i18nResource->$setter($fieldValue);
 
                 if ('id' !== $i18nFieldName && !empty($fieldValue)) {
@@ -580,38 +608,38 @@ readonly class ApiResourcePropelTransformerService
 
     private function hasCompositeIdentifiersAlready(
         PropelResourceInterface $data,
-        ?ActiveRecordInterface $previousPropelModel,
+        ?ActiveRecordInterface  $previousPropelModel,
     ): bool
     {
         $reflector = new \ReflectionClass($data::class);
-        $compositeIdentifiers = $this->getResourceCompositeIdentifierValues(reflector: $reflector,param: 'keys' );
+        $compositeIdentifiers = $this->getResourceCompositeIdentifierValues(reflector: $reflector, param: 'keys');
 
-        if ($compositeIdentifiers){
+        if ($compositeIdentifiers) {
             /** @var ModelCriteria $queryClass */
-            $queryClass = $data::getPropelRelatedTableMap()->getClassName().'Query';
+            $queryClass = $data::getPropelRelatedTableMap()->getClassName() . 'Query';
             /** @var ModelCriteria $query */
             $query = $queryClass::create();
             $columnValues = $this->getColumnValues(reflector: $reflector, columns: $compositeIdentifiers);
             $uriVariables = [];
             foreach ($compositeIdentifiers as $compositeIdentifier) {
                 if ($reflector->hasProperty($compositeIdentifier) && $reflector->getProperty($compositeIdentifier)->isInitialized($data)) {
-                    $getter = 'get'.ucfirst($compositeIdentifier);
-                    if (method_exists($data,$getter)){
+                    $getter = 'get' . ucfirst($compositeIdentifier);
+                    if (method_exists($data, $getter)) {
                         $getterId = 'getId';
                         $uriVariables[$compositeIdentifier] = $data->$getter()->$getterId();
                     }
                 }
-                if ($previousPropelModel){
+                if ($previousPropelModel) {
                     $previousPropelModelRefector = new \ReflectionClass($previousPropelModel::class);
                     if (ucfirst($compositeIdentifier) === $previousPropelModelRefector->getShortName()) {
-                        if (method_exists($previousPropelModel,'getId')){
+                        if (method_exists($previousPropelModel, 'getId')) {
                             $uriVariables[$compositeIdentifier] = $previousPropelModel->getId();
                         }
                     }
                 }
             }
-            $this->queryFilterById(uriVariables: $uriVariables,query: $query,columnValues: $columnValues);
-            if (count($query->getMap())< 2){
+            $this->queryFilterById(uriVariables: $uriVariables, query: $query, columnValues: $columnValues);
+            if (count($query->getMap()) < 2) {
                 return false;
             }
             return $query->findOne() !== null;
@@ -619,7 +647,7 @@ readonly class ApiResourcePropelTransformerService
         return false;
     }
 
-    public function queryFilterById($uriVariables,$query,$columnValues): void
+    public function queryFilterById($uriVariables, $query, $columnValues): void
     {
         foreach ($uriVariables as $field => $value) {
             $filterMethod = null;
@@ -629,12 +657,12 @@ readonly class ApiResourcePropelTransformerService
                 $value = $uriVariables[$field];
             }
 
-            $filterName = 'filterBy'.ucfirst($field).'Id';
+            $filterName = 'filterBy' . ucfirst($field) . 'Id';
             if (null === $filterMethod && method_exists($query, $filterName)) {
                 $filterMethod = $filterName;
             }
 
-            $filterName = 'filterBy'.ucfirst($field);
+            $filterName = 'filterBy' . ucfirst($field);
             if (null === $filterMethod && method_exists($query, $filterName)) {
                 $filterMethod = $filterName;
             }
