@@ -33,28 +33,7 @@ class BaseItemProviderListener implements EventSubscriberInterface
 
         $columnValues = $this->apiResourcePropelTransformerService->getColumnValues(reflector: $reflector, columns: $compositeIdentifiers);
 
-        foreach ($event->getUriVariables() as $field => $value) {
-            $filterMethod = null;
-            $filterName = $columnValues[$field]['propelQueryFilter'] ?? null;
-            if ($filterName && method_exists($query, $filterName)) {
-                $filterMethod = $columnValues[$field]['propelQueryFilter'];
-                $value = $event->getUriVariables()[$field];
-            }
-
-            $filterName = 'filterBy'.ucfirst($field).'Id';
-            if (null === $filterMethod && method_exists($query, $filterName)) {
-                $filterMethod = $filterName;
-            }
-
-            $filterName = 'filterBy'.ucfirst($field);
-            if (null === $filterMethod && method_exists($query, $filterName)) {
-                $filterMethod = $filterName;
-            }
-
-            if ($filterMethod !== null) {
-                $query->$filterMethod($value);
-            }
-        }
+        $this->apiResourcePropelTransformerService->queryFilterById(uriVariables: $event->getUriVariables(),query: $query,columnValues: $columnValues);
     }
 
     public static function getSubscribedEvents(): array

@@ -39,7 +39,7 @@ use Thelia\Model\Map\AttributeCombinationTableMap;
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
-#[CompositeIdentifiers(['productSaleElements', 'attributeAv'])]
+#[CompositeIdentifiers(['productSaleElements', 'attributeAv','attribute'])]
 class AttributeCombination implements PropelResourceInterface
 {
     use PropelResourceTrait;

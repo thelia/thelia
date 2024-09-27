@@ -47,7 +47,8 @@ use Thelia\Model\ProductQuery;
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
-            uriTemplate: '/admin/products/{id}'
+            uriTemplate: '/admin/products/{id}',
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE,self::GROUP_ADMIN_WRITE_UPDATE]]
         ),
         new Patch(
             uriTemplate: '/admin/products/{id}'
@@ -99,6 +100,7 @@ class Product extends AbstractTranslatableResource
     public const GROUP_ADMIN_READ = 'admin:product:read';
     public const GROUP_ADMIN_READ_SINGLE = 'admin:product:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:product:write';
+    public const GROUP_ADMIN_WRITE_UPDATE = 'admin:product:write:update';
 
     public const GROUP_FRONT_READ = 'front:product:read';
     public const GROUP_FRONT_READ_SINGLE = 'front:product:read:single';
@@ -157,7 +159,7 @@ class Product extends AbstractTranslatableResource
 
     #[Column(propelFieldName: 'productSaleElementss')]
     #[Relation(targetResource: ProductSaleElements::class)]
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE,self::GROUP_ADMIN_WRITE_UPDATE])]
     public array $productSaleElements;
 
     #[Relation(targetResource: FeatureProduct::class)]

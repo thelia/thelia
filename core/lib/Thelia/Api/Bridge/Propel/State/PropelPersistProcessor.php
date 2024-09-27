@@ -13,7 +13,6 @@
 namespace Thelia\Api\Bridge\Propel\State;
 
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\State\ProcessorInterface;
@@ -28,7 +27,6 @@ use Thelia\Api\Controller\Admin\PostItemFileController;
 use Thelia\Api\Resource\ItemFileResourceInterface;
 use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Api\Resource\ResourceAddonInterface;
-use Thelia\Api\Resource\TranslatableResourceInterface;
 use Thelia\Config\DatabaseConfiguration;
 
 readonly class PropelPersistProcessor implements ProcessorInterface
@@ -41,7 +39,7 @@ readonly class PropelPersistProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-        $propelModel = $this->apiResourcePropelTransformerService->resourceToModel($data, $context, $operation);
+        $propelModel = $this->apiResourcePropelTransformerService->resourceToModel(data: $data, operation: $operation, context: $context);
         if (isset($uriVariables['id'])) {
             $propelModel->setId($uriVariables['id']);
         }
@@ -56,7 +54,6 @@ readonly class PropelPersistProcessor implements ProcessorInterface
             if ($implementsItemFileResource) {
                 $propelModel->setNew(false);
             }
-
             $propelModel->save();
             if (!$implementsItemFileResource) {
                 $resourceAddons = $this->manageResourceAddons($propelModel, $data);
@@ -93,6 +90,7 @@ readonly class PropelPersistProcessor implements ProcessorInterface
     {
         if (!in_array($operation::class,[Patch::class,Put::class])) {
             $propelModel->setNew(true);
+
             return;
         }
         $propelModel->setNew(false);

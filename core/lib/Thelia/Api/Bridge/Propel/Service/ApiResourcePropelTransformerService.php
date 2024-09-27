@@ -16,6 +16,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Validator\ValidatorInterface;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -25,6 +26,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\CompositeIdentifiers;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Event\ItemProviderQueryEvent;
 use Thelia\Api\Bridge\Propel\Event\ModelToResourceEvent;
 use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Api\Resource\ResourceAddonInterface;
@@ -118,18 +120,21 @@ readonly class ApiResourcePropelTransformerService
         return $modelToResourceEvent->getResource();
     }
 
-    public function resourceToModel(PropelResourceInterface $data, array $context = [], Operation $operation): ActiveRecordInterface
+    public function resourceToModel(PropelResourceInterface $data,Operation $operation,array $context = [], ?ActiveRecordInterface $oldPropelModel = null ): ActiveRecordInterface
     {
         $operationContext = $context['operation'] ?? null;
         if ($operationContext) {
             $this->validator->validate($data, $operationContext->getDenormalizationContext());
         }
-
         $propelModel = $this->initializePropelModel($data);
-
+        if (method_exists($data,'getId') && $data->getId()) {
+            $propelModel->setNew(false);
+        }
         $this->processPropertiesModel($data, $propelModel, $context, $operation);
         $this->processTranslations($data, $propelModel);
-
+        if ($this->hasCompositeIdentifiersAlready($data, $oldPropelModel)) {
+            $propelModel->setNew(false);
+        }
         return $propelModel;
     }
 
@@ -192,6 +197,7 @@ readonly class ApiResourcePropelTransformerService
             }
             $setterForced = false;
             $propelSetter = $this->determinePropelSetterName($property, $setterForced);
+
             if (method_exists($propelModel, $propelSetter)) {
                 $value = $this->getPropertyValue($data, $property);
                 $value = $this->getRelationValue($value, $propelSetter, $setterForced,$operation);
@@ -283,14 +289,15 @@ readonly class ApiResourcePropelTransformerService
         mixed $value,
         array $context,
         \ReflectionProperty $property,
-        Operation $operation
+        ActiveRecordInterface $propelModel,
+        Operation $operation,
     ): mixed {
         if (\is_array($value)) {
             $value = new Collection(
                 array_map(
-                    function ($value, $index) use ($context, $property,$operation) {
+                    function ($value, $index) use ($context, $property,$propelModel, $operation) {
                         try {
-                            return $this->resourceToModel($value, $context,$operation);
+                            return $this->resourceToModel(data: $value, operation: $operation, context: $context, oldPropelModel: $propelModel);
                         } catch (ValidationException $exception) {
                             $constrainViolationList = new ConstraintViolationList(
                                 array_map(
@@ -524,6 +531,73 @@ readonly class ApiResourcePropelTransformerService
 
             if ($langHasI18nValue) {
                 $apiResource->addI18n($i18nResource, $lang->getLocale());
+            }
+        }
+    }
+
+    private function hasCompositeIdentifiersAlready(
+        PropelResourceInterface $data,
+        ?ActiveRecordInterface $oldPropelModel,
+    ): bool
+    {
+        $reflector = new \ReflectionClass($data::class);
+        $compositeIdentifiers = $this->getResourceCompositeIdentifierValues(reflector: $reflector,param: 'keys' );
+
+        if ($compositeIdentifiers){
+            /** @var ModelCriteria $queryClass */
+            $queryClass = $data::getPropelRelatedTableMap()->getClassName().'Query';
+            /** @var ModelCriteria $query */
+            $query = $queryClass::create();
+            $columnValues = $this->getColumnValues(reflector: $reflector, columns: $compositeIdentifiers);
+            $uriVariables = [];
+            foreach ($compositeIdentifiers as $compositeIdentifier) {
+                if ($reflector->hasProperty($compositeIdentifier) && $reflector->getProperty($compositeIdentifier)->isInitialized($data)) {
+                    $getter = 'get'.ucfirst($compositeIdentifier);
+                    if (method_exists($data,$getter)){
+                        $getterId = 'getId';
+                        $uriVariables[$compositeIdentifier] = $data->$getter()->$getterId();
+                    }
+                }
+                if ($oldPropelModel){
+                    $oldPropelModelRefector = new \ReflectionClass($oldPropelModel::class);
+                    if (ucfirst($compositeIdentifier) === $oldPropelModelRefector->getShortName()) {
+                        if (method_exists($oldPropelModel,'getId')){
+                            $uriVariables[$compositeIdentifier] = $oldPropelModel->getId();
+                        }
+                    }
+                }
+            }
+            $this->queryFilterById(uriVariables: $uriVariables,query: $query,columnValues: $columnValues);
+            if (count($query->getMap())< 2){
+                return false;
+            }
+            return $query->findOne() !== null;
+        }
+        return false;
+    }
+
+    public function queryFilterById($uriVariables,$query,$columnValues): void
+    {
+        foreach ($uriVariables as $field => $value) {
+            $filterMethod = null;
+            $filterName = $columnValues[$field]['propelQueryFilter'] ?? null;
+            if ($filterName && method_exists($query, $filterName)) {
+                $filterMethod = $columnValues[$field]['propelQueryFilter'];
+                $value = $uriVariables[$field];
+            }
+
+            $filterName = 'filterBy'.ucfirst($field).'Id';
+            if (null === $filterMethod && method_exists($query, $filterName)) {
+                $filterMethod = $filterName;
+            }
+
+            $filterName = 'filterBy'.ucfirst($field);
+            if (null === $filterMethod && method_exists($query, $filterName)) {
+                $filterMethod = $filterName;
+            }
+
+            if ($filterMethod !== null) {
+                $query->$filterMethod($value);
             }
         }
     }
