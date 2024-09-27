@@ -31,7 +31,7 @@ class Lang extends BaseLang
      *
      * @throws \RuntimeException
      */
-    public static function getDefaultLanguage(): Lang
+    public static function getDefaultLanguage(): self
     {
         if (null !== self::$defaultLanguage) {
             return self::$defaultLanguage;
@@ -71,7 +71,6 @@ class Lang extends BaseLang
             $con->rollBack();
             throw $e;
         }
-
     }
 
     public function preSave(ConnectionInterface $con = null): bool
