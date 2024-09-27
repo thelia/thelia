@@ -12,7 +12,6 @@
 
 namespace TwigEngine\Extension;
 
-use Thelia\Service\Model\AttributeService;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use TwigEngine\Service\DataAccess\ProductSaleElementsAccessService;

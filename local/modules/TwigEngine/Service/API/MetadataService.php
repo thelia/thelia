@@ -10,7 +10,7 @@
  * file that was distributed with this source code.
  */
 
-namespace TwigEngine\Service;
+namespace TwigEngine\Service\API;
 
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
@@ -25,17 +25,17 @@ use Thelia\Api\Bridge\Propel\State\PropelCollectionProvider;
 use Thelia\Api\Bridge\Propel\State\PropelItemProvider;
 use Thelia\Core\Security\SecurityContext;
 
-class ApiPlatformMetadataService
+readonly class MetadataService
 {
     public function __construct(
-        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
-        private readonly PropelCollectionProvider $propelCollectionProvider,
-        private readonly PropelItemProvider $propelItemProvider,
+        private ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+        private PropelCollectionProvider                   $propelCollectionProvider,
+        private PropelItemProvider                         $propelItemProvider,
         #[Autowire(service: 'security.access_map')]
-        private readonly AccessMapInterface $accessMap,
-        private readonly SecurityContext $securityContext,
+        private AccessMapInterface                         $accessMap,
+        private SecurityContext                            $securityContext,
         #[Autowire(service: 'api_platform.security.resource_access_checker')]
-        private readonly ResourceAccessCheckerInterface $resourceAccessChecker,
+        private ResourceAccessCheckerInterface             $resourceAccessChecker,
     ) {
     }
 
