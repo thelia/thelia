@@ -3,9 +3,6 @@ name: CI/CD to push nursit
 on:
   push:
     branches:
-      - feature/ci
-  pull_request:
-    branches:
       - main
 jobs:
   build:
