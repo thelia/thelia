@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feature/git-ci
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -29,12 +30,14 @@ jobs:
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER }} 'bash -s' << 'EOF'
           cd ${{ secrets.PATH_TO_DEPLOY }}
-          cd ..
           nursit-root site:chmod
-          rm -rf public_html
-          mkdir -p public_html
+          git stash
+          git fetch --all
+          git checkout main
+          git pull --rebase
+          git stash apply
           nursit-root site:chmod
-          php8.2 composer.phar create-project thelia/thelia public_html dev-main
+          php8.2 composer.phar install
           nursit-root site:chmod
           EOF
         timeout-minutes: 15
