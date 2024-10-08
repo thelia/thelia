@@ -82,6 +82,9 @@ class ErrorListener implements EventSubscriberInterface
 
     public function handleException(ExceptionEvent $event): void
     {
+        if($event->getRequest()->get('_api_operation_name',false)){
+            return;
+        }
         if ('prod' === $this->env && ConfigQuery::isShowingErrorMessage()) {
             $this->eventDispatcher
                 ->dispatch(
