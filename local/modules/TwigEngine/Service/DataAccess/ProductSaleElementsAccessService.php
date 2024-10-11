@@ -18,8 +18,11 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\AttributeAvQuery;
+use Thelia\Model\AttributeQuery;
 use Thelia\TaxEngine\TaxEngine;
 use TheliaSmarty\Events\PseByProductEvent;
+use Thelia\Model\Lang;
 
 class ProductSaleElementsAccessService
 {
@@ -29,7 +32,7 @@ class ProductSaleElementsAccessService
         RequestStack $requestStack,
         private readonly TaxEngine $taxEngine,
         private readonly SecurityContext $securityContext,
-        private readonly EventDispatcherInterface $eventDispatcher
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
         $this->request = $requestStack->getCurrentRequest();
     }
@@ -82,5 +85,39 @@ class ProductSaleElementsAccessService
         }
 
         return json_encode($result);
+    }
+
+    public function attrAvByProduct($product_id)
+    {
+        $locale = Lang::getDefaultLanguage()->getLocale();
+        $attributes = [];
+        $attributesId = [];
+        $attributeAvailabilitiesId = [];
+
+        foreach (ProductSaleElementsQuery::create()->findByProductId($product_id) as $pse) {
+            foreach ($pse->getAttributeCombinations() as $combination) {
+                $attributesId[] = $combination->getAttributeId();
+                $attributeAvailabilitiesId[] = $combination->getAttributeAvId();
+            }
+        }
+
+        foreach (array_unique($attributesId) as $atributeId) {
+            $attribute = AttributeQuery::create()->joinWithI18n($locale)->findOneById($atributeId);
+
+            $attributes[$atributeId] = [
+                'label' => $attribute->getTitle(),
+                'id' => $attribute->getId()
+            ];
+        }
+
+        foreach (array_unique($attributeAvailabilitiesId) as $attributeAvId) {
+            $attributeAv = AttributeAvQuery::create()->joinWithI18n($locale)->findOneById($attributeAvId);
+            $attributes[$attributeAv->getAttributeId()]['values'][] = [
+                'id' => $attributeAv->getId(),
+                'label' => $attributeAv->getTitle()
+            ];
+        }
+
+        return $attributes;
     }
 }
