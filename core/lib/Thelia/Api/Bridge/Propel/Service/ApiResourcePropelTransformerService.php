@@ -20,8 +20,6 @@ use ApiPlatform\Validator\ValidatorInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
-use Propel\Runtime\Exception\PropelException;
-use Propel\Runtime\Propel;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -34,8 +32,6 @@ use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Api\Resource\ResourceAddonInterface;
 use Thelia\Api\Resource\TranslatableResourceInterface;
 use Thelia\Model\LangQuery;
-use Thelia\Model\Map\ProductTableMap;
-use Thelia\Model\ProductQuery as ChildProductQuery;
 
 readonly class ApiResourcePropelTransformerService
 {
@@ -126,12 +122,14 @@ readonly class ApiResourcePropelTransformerService
         return $modelToResourceEvent->getResource();
     }
 
-    public function resourceToModel(PropelResourceInterface $data, Operation $operation, array $context = [], ?ActiveRecordInterface $previousPropelModel = null): ActiveRecordInterface
+    public function resourceToModel(
+        PropelResourceInterface $data,
+        Operation               $operation,
+        array                   $context = [],
+        ?ActiveRecordInterface  $previousPropelModel = null
+    ): ActiveRecordInterface
     {
-        $operationContext = $context['operation'] ?? null;
-        if ($operationContext) {
-            $this->validator->validate($data, $operationContext->getDenormalizationContext());
-        }
+        $this->validator->validate($data, $operation->getDenormalizationContext());
         $propelModel = $this->initializePropelModel(
             data: $data,
             previousPropelModel: $previousPropelModel,
@@ -141,7 +139,10 @@ readonly class ApiResourcePropelTransformerService
         if (method_exists($data, 'getId') && $data->getId()) {
             $propelModel->setNew(false);
         }
-        $this->processPropertiesModel($data, $propelModel, $context, $operation);
+        if (method_exists($data, 'getId') && !$data->getId()) {
+            $propelModel->setNew(true);
+        }
+        $this->processPropertiesModel($data, $propelModel, $context, $operation, $previousPropelModel);
         $this->processTranslations($data, $propelModel);
         if ($this->hasCompositeIdentifiersAlready($data, $previousPropelModel)) {
             $propelModel->setNew(false);
@@ -206,41 +207,38 @@ readonly class ApiResourcePropelTransformerService
             $columnValues = $this->getColumnValues(reflector: $reflector, columns: $compositeIdentifiers);
             $uriVariables = [];
             $id = null;
-            if (!$previousPropelModel && $request->get('id')){
+            if (!$previousPropelModel && $request->get('id')) {
                 $id = $request->get('id');
             }
             if (method_exists($data, 'getId') && $data->getId()) {
                 $id = $data->getId();
             }
-            if ($id){
+            if ($id) {
                 $uriVariables['id'] = $id;
             }
-            $compositeIdentifiersUriVariable = [];
             foreach ($compositeIdentifiers as $compositeIdentifier) {
-                $compositeIdentifierId = $request->get($compositeIdentifier);
-                if ($reflector->hasProperty($compositeIdentifier) && $reflector->getProperty($compositeIdentifier)->isInitialized($data)) {
-                    $getter = 'get' . ucfirst($compositeIdentifier);
-                    $getterId = 'getId';
-                    $compositeIdentifierId = $data->$getter()->$getterId();
-                }
-                if ($previousPropelModel){
+                if ($previousPropelModel) {
                     $reflectorPreviousPropelModel = new \ReflectionClass($previousPropelModel::class);
-                    if (ucfirst($compositeIdentifier) === $reflectorPreviousPropelModel->getShortName()){
-                        $compositeIdentifierId = $previousPropelModel->getId();
+                    if (ucfirst($compositeIdentifier) === $reflectorPreviousPropelModel->getShortName()) {
+                        $id = $previousPropelModel->getId();
+                        $setter = 'set' . ucfirst($compositeIdentifier) . 'Id';
+                        $propelModel->$setter($id);
+
+                        // This is a fix related to Propel. It enables database persistence of my entity in its child collections.
+                        // It's not very clean, but it's the only workaround I found.
+                        $previousPropelId = $previousPropelModel->getId();
+                        $previousPropelModel->setId(null);
+                        $previousPropelModel->setId($previousPropelId);
+
+                        return $propelModel;
                     }
                 }
-                if ($compositeIdentifierId) {
-                    $compositeIdentifiersUriVariable[$compositeIdentifier] = $compositeIdentifierId;
-                }
             }
-            if (!empty($compositeIdentifiersUriVariable)) {
-                $uriVariables = $compositeIdentifiersUriVariable;
+            if (!empty($compositeIdentifiers)) {
+                return $propelModel;
             }
             $this->queryFilterById(uriVariables: $uriVariables, query: $query, columnValues: $columnValues);
-            if (empty($compositeIdentifiersUriVariable) && count($query->getMap()) === 1 && $query->findOne() !== null) {
-                $propelModel = $query->findOne();
-            }
-            if (!empty($compositeIdentifiersUriVariable) && count($query->getMap()) >= 2 && $query->findOne() !== null) {
+            if ($query->findOne() !== null && count($query->getMap()) > 0) {
                 $propelModel = $query->findOne();
             }
         }
@@ -251,22 +249,51 @@ readonly class ApiResourcePropelTransformerService
         PropelResourceInterface $data,
         ActiveRecordInterface   $propelModel,
         array                   $context,
-        Operation               $operation
+        Operation               $operation,
+        ?ActiveRecordInterface  $previousPropelModel,
     ): void
     {
         $resourceReflection = new \ReflectionClass($data);
         foreach ($resourceReflection->getProperties() as $property) {
-            if (!$property->isInitialized($data)) {
+            if ($property->name === 'id' && !$previousPropelModel) {
                 continue;
             }
             $setterForced = false;
             $propelSetter = $this->determinePropelSetterName($property, $setterForced);
+            if ($operation instanceof Put && !$property->isInitialized($data)) {
+                foreach ($property->getAttributes(Groups::class) as $groupAttribute) {
+                    $propertyGroups = null;
+                    if (isset($groupAttribute->getArguments()[0])){
+                        $propertyGroups = $groupAttribute->getArguments()[0];
+                    }
+                    if (isset($groupAttribute->getArguments()['groups'])){
+                        $propertyGroups = $groupAttribute->getArguments()['groups'];
+                    }
+                    if (!$property){
+                        continue 2;
+                    }
+                    $contextGroups = $operation->getDenormalizationContext()['groups'];
+                    $isInContext = !empty(array_intersect($contextGroups, $propertyGroups));
+                    foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
+                        if ($isInContext && $property->getType()?->getName() !== 'array') {
+                            $propelModel->$propelSetter(null);
+                            continue 3;
+                        }
+                    }
+                    if ($isInContext && $property->getType()?->isBuiltin()) {
+                        $propelModel->$propelSetter(null);
+                    }
+                }
+                continue;
+            }
+            if (!$property->isInitialized($data)) {
+                continue;
+            }
 
             if (method_exists($propelModel, $propelSetter)) {
                 $value = $this->getPropertyValue($data, $property);
                 $value = $this->getRelationValue($value, $propelSetter, $setterForced, $operation);
                 $value = $this->getArrayValue($value, $context, $property, $propelModel, $operation);
-
                 $propelModel->$propelSetter($value);
             }
         }
