@@ -19,6 +19,7 @@ use Symfony\Component\Form\FormView;
 use Thelia\Core\Form\TheliaFormFactory;
 use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
 use Thelia\Core\Template\ParserContext;
+use Symfony\Component\Form\Form;
 
 class FormService
 {
@@ -29,13 +30,20 @@ class FormService
         private readonly TheliaFormFactory $formFactory,
         private readonly ParserContext $parserContext,
         private readonly ParameterBagInterface $parameterBag,
-    ) {
+    ) {}
+
+
+    public function getFormViewByName(
+        ?string $name,
+        array $data = []
+    ): FormView {
+        return $this->getFormByName($name, $data)->createView();
     }
 
     public function getFormByName(
         ?string $name,
         array $data = []
-    ): FormView {
+    ): Form {
         $formConfigs = $this->parameterBag->get('Thelia.parser.forms');
         if (null === $name) {
             $name = 'thelia.empty';
@@ -56,6 +64,6 @@ class FormService
             $form->getForm()->addError(new FormError($form->getErrorMessage()));
         }
 
-        return $form->getForm()->createView();
+        return $form->getForm();
     }
 }

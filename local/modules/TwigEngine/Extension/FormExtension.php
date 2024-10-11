@@ -21,8 +21,7 @@ class FormExtension extends AbstractExtension
 {
     public function __construct(
         private readonly FormService $formService
-    ) {
-    }
+    ) {}
 
     public function getFunctions(): array
     {
@@ -33,6 +32,6 @@ class FormExtension extends AbstractExtension
 
     public function getForm(string $name, array $data = []): FormView
     {
-        return $this->formService->getFormByName($name, $data);
+        return $this->formService->getFormViewByName($name, $data);
     }
 }
