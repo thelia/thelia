@@ -16,10 +16,12 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 
@@ -36,6 +38,9 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
+            uriTemplate: '/admin/product_sale_elements/{id}'
+        ),
+        new Patch(
             uriTemplate: '/admin/product_sale_elements/{id}'
         ),
         new Delete(
@@ -76,6 +81,7 @@ class ProductSaleElements implements PropelResourceInterface
         ProductPrice::GROUP_ADMIN_READ,
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_ADMIN_WRITE_UPDATE,
     ])]
     public ?int $id = null;
 

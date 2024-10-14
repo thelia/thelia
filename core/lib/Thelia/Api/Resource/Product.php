@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
@@ -29,6 +30,7 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Api\Bridge\Propel\Validator\I18nConstraint;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductQuery;
@@ -46,7 +48,12 @@ use Thelia\Model\ProductQuery;
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
-            uriTemplate: '/admin/products/{id}'
+            uriTemplate: '/admin/products/{id}',
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE,self::GROUP_ADMIN_WRITE_UPDATE]]
+        ),
+        new Patch(
+            uriTemplate: '/admin/products/{id}',
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE,self::GROUP_ADMIN_WRITE_UPDATE]]
         ),
         new Delete(
             uriTemplate: '/admin/products/{id}'
@@ -95,6 +102,7 @@ class Product extends AbstractTranslatableResource
     public const GROUP_ADMIN_READ = 'admin:product:read';
     public const GROUP_ADMIN_READ_SINGLE = 'admin:product:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:product:write';
+    public const GROUP_ADMIN_WRITE_UPDATE = 'admin:product:write:update';
 
     public const GROUP_FRONT_READ = 'front:product:read';
     public const GROUP_FRONT_READ_SINGLE = 'front:product:read:single';
@@ -153,7 +161,12 @@ class Product extends AbstractTranslatableResource
 
     #[Column(propelFieldName: 'productSaleElementss')]
     #[Relation(targetResource: ProductSaleElements::class)]
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ_SINGLE,
+        self::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ_SINGLE,
+        self::GROUP_ADMIN_WRITE_UPDATE,
+    ])]
     public array $productSaleElements;
 
     #[Relation(targetResource: FeatureProduct::class)]
@@ -161,6 +174,7 @@ class Product extends AbstractTranslatableResource
     public array $featureProducts;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
+    #[I18nConstraint(groups: [self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
 
     public function __construct()
@@ -348,28 +362,6 @@ class Product extends AbstractTranslatableResource
                 Translator::getInstance()->trans(
                     'A product with reference %ref already exists. Please choose another reference.',
                     ['%ref' => $resource->ref], null, 'en_US'
-                )
-            );
-        }
-    }
-
-    #[Callback(groups: [self::GROUP_ADMIN_WRITE])]
-    public function checkTitleAndLocaleNotBlank(ExecutionContextInterface $context): void
-    {
-        $resource = $context->getRoot();
-        $titleAndLocaleCount = 0;
-        /** @var I18nCollection $i18nData */
-        $i18nData = $resource->getI18ns();
-        foreach ($i18nData->i18ns as $i18n) {
-            if ($i18n->getTitle() !== null && !empty($i18n->getTitle())) {
-                ++$titleAndLocaleCount;
-            }
-        }
-        if ($titleAndLocaleCount === 0) {
-            $context->addViolation(
-                Translator::getInstance()->trans(
-                    'The title and locale must be defined at least once.',
-                    [], null, 'en_US'
                 )
             );
         }

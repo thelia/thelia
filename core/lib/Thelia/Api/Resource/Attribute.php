@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
@@ -37,6 +38,9 @@ use Thelia\Model\Map\AttributeTableMap;
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
+            uriTemplate: '/admin/attributes/{id}'
+        ),
+        new Patch(
             uriTemplate: '/admin/attributes/{id}'
         ),
         new Delete(

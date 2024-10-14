@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
@@ -39,6 +40,9 @@ use Thelia\Model\Map\OrderProductTableMap;
         ),
         new Put(
             uriTemplate: '/admin/order_products/{id}'
+        ),
+        new Patch(
+            uriTemplate: '/admin/order_products/{id}',
         ),
         new Delete(
             uriTemplate: '/admin/order_products/{id}'
