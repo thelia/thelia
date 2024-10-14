@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
@@ -47,7 +48,12 @@ use Thelia\Model\Map\CustomerTableMap;
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
-            uriTemplate: '/admin/customers/{id}'
+            uriTemplate: '/admin/customers/{id}',
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE,self::GROUP_ADMIN_WRITE_UPDATE]]
+        ),
+        new Patch(
+            uriTemplate: '/admin/customers/{id}',
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE,self::GROUP_ADMIN_WRITE_UPDATE]]
         ),
         new Delete(
             uriTemplate: '/admin/customers/{id}'
@@ -94,6 +100,7 @@ class Customer implements PropelResourceInterface
     public const GROUP_ADMIN_READ = 'admin:customer:read';
     public const GROUP_ADMIN_READ_SINGLE = 'admin:customer:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:customer:write';
+    public const GROUP_ADMIN_WRITE_UPDATE = 'admin:customer:write:update';
 
     public const GROUP_FRONT_READ_SINGLE = 'front:customer:read:single';
     public const GROUP_FRONT_WRITE = 'front:customer:write';
