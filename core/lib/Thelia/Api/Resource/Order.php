@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
@@ -30,6 +31,7 @@ use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\RangeFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\OrderTableMap;
+use Thelia\Model\OrderQuery;
 
 #[ApiResource(
     operations: [
@@ -44,6 +46,9 @@ use Thelia\Model\Map\OrderTableMap;
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
+            uriTemplate: '/admin/orders/{id}'
+        ),
+        new Patch(
             uriTemplate: '/admin/orders/{id}'
         ),
         new Delete(
@@ -233,7 +238,12 @@ class Order implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ])]
     public function getTotalAmount(): ?float
     {
-        return round($this->getPropelModel()->getTotalAmount(), 2);
+        $propelModel = $this->getPropelModel();
+        if (!$propelModel){
+            $propelModel = OrderQuery::create()->findOneById($this->getId());
+            $this->setPropelModel($propelModel);
+        }
+        return round($propelModel?->getTotalAmount(), 2);
     }
 
     #[Groups([self::GROUP_ADMIN_READ])]
@@ -242,6 +252,10 @@ class Order implements PropelResourceInterface
         $itemsTax = 0;
         /** @var \Thelia\Model\Order $orderPropelModel */
         $orderPropelModel = $this->getPropelModel();
+        if (!$orderPropelModel){
+            $orderPropelModel = OrderQuery::create()->findOneById($this->getId());
+            $this->setPropelModel($orderPropelModel);
+        }
         $itemsAmount = $orderPropelModel->getTotalAmount($itemsTax, false, false);
 
         return round($itemsAmount - $itemsTax, 2);
@@ -262,7 +276,10 @@ class Order implements PropelResourceInterface
     {
         /** @var \Thelia\Model\Order $orderPropelModel */
         $orderPropelModel = $this->getPropelModel();
-
+        if (!$orderPropelModel){
+            $orderPropelModel = OrderQuery::create()->findOneById($this->getId());
+            $this->setPropelModel($orderPropelModel);
+        }
         return round($orderPropelModel->getDiscount(), 2);
     }
 
@@ -280,7 +297,10 @@ class Order implements PropelResourceInterface
     {
         /** @var \Thelia\Model\Order $orderPropelModel */
         $orderPropelModel = $this->getPropelModel();
-
+        if (!$orderPropelModel){
+            $orderPropelModel = OrderQuery::create()->findOneById($this->getId());
+            $this->setPropelModel($orderPropelModel);
+        }
         return round($orderPropelModel->getPostage(), 2);
     }
 

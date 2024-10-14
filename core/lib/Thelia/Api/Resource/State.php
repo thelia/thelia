@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
@@ -53,6 +54,9 @@ use Thelia\Model\Map\StateTableMap;
             name: 'state_by_iso',
         ),
         new Put(
+            uriTemplate: '/admin/states/{id}'
+        ),
+        new Patch(
             uriTemplate: '/admin/states/{id}'
         ),
         new Delete(

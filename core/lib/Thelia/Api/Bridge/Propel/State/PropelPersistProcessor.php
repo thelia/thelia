@@ -13,6 +13,7 @@
 namespace Thelia\Api\Bridge\Propel\State;
 
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\State\ProcessorInterface;
@@ -27,6 +28,7 @@ use Thelia\Api\Controller\Admin\PostItemFileController;
 use Thelia\Api\Resource\ItemFileResourceInterface;
 use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Api\Resource\ResourceAddonInterface;
+use Thelia\Api\Resource\TranslatableResourceInterface;
 use Thelia\Config\DatabaseConfiguration;
 
 readonly class PropelPersistProcessor implements ProcessorInterface
@@ -39,12 +41,16 @@ readonly class PropelPersistProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-        $propelModel = $this->apiResourcePropelTransformerService->resourceToModel($data, $context);
+        if (isset($uriVariables['id'])) {
+            $data->setId($uriVariables['id']);
+        }
+        $propelModel = $this->apiResourcePropelTransformerService->resourceToModel(data: $data, operation: $operation, context: $context);
         if (isset($uriVariables['id'])) {
             $propelModel->setId($uriVariables['id']);
         }
         $connection = Propel::getWriteConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME);
         $connection->beginTransaction();
+
         try {
             $this->beforeSave($data, $operation, $propelModel);
             $implementsItemFileResource =
@@ -65,7 +71,6 @@ readonly class PropelPersistProcessor implements ProcessorInterface
             $data->setId($propelModel->getId());
         } catch (\Exception $exception) {
             $connection->rollBack();
-
             throw $exception;
         }
 
@@ -88,17 +93,28 @@ readonly class PropelPersistProcessor implements ProcessorInterface
 
     private function beforeSave(mixed $data, Operation $operation, &$propelModel): void
     {
-        if ($operation::class !== Put::class) {
+        if (!in_array($operation::class,[Patch::class,Put::class])) {
             $propelModel->setNew(true);
 
             return;
         }
         $propelModel->setNew(false);
+        if (is_subclass_of($data, TranslatableResourceInterface::class) && $operation instanceof Put && method_exists($data, 'getI18ns')) {
+            $i18nResourceClass = $data::getI18nResourceClass();
+            $array = explode("\\", $i18nResourceClass);
+            $i18nGetter = 'get'.end($array).'s';
+            $i18nRemove = 'remove'.end($array);
+            if (method_exists($propelModel, $i18nGetter)) {
+                foreach ($propelModel->$i18nGetter() as $i18n) {
+                    if (!$i18n->isNew() && method_exists($propelModel,$i18nRemove)){
+                        $propelModel->$i18nRemove($i18n);
+                    }
+                }
+            }
+        }
         $reflector = new \ReflectionClass($data);
-
         foreach ($reflector->getProperties() as $property) {
             $propelGetter = 'get'.ucfirst($property->getName());
-
             foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
                 if (isset($relationAttribute->getArguments()['targetResource'])) {
                     $reflectorChild = new \ReflectionClass($relationAttribute->getArguments()['targetResource']);
