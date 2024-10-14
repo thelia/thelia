@@ -15,6 +15,7 @@ namespace Thelia\Api\Resource;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
@@ -34,6 +35,9 @@ use Thelia\Model\Map\OrderCouponTableMap;
         ),
         new Put(
             uriTemplate: '/admin/order_coupons/{id}'
+        ),
+        new Patch(
+            uriTemplate: '/admin/order_coupons/{id}',
         ),
         new Delete(
             uriTemplate: '/admin/order_coupons/{id}'
