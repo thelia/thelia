@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\Cart\CartEvent;
-use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -27,6 +26,7 @@ use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Coupon\CouponManager;
 use Thelia\Coupon\Type\CouponInterface;
@@ -46,7 +46,10 @@ readonly class CartService
         private EventDispatcherInterface $eventDispatcher,
         private TranslatorInterface      $translator,
         private ContainerInterface       $container,
-        private RequestStack             $requestStack,private CouponManager $couponManager, private Session $session)
+        private RequestStack             $requestStack,
+        private CouponManager            $couponManager,
+        private Session                  $session
+    )
     {
     }
 
