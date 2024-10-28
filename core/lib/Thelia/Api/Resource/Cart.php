@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Controller\Front\CartController;
 use Thelia\Model\Map\CartTableMap;
 
 #[ApiResource(
@@ -54,13 +55,15 @@ use Thelia\Model\Map\CartTableMap;
         new Post(
             uriTemplate: '/front/carts'
         ),
-        new GetCollection(
-            uriTemplate: '/front/carts'
-        ),
         new Get(
             uriTemplate: '/front/carts/{id}',
             normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
             security: 'is_granted("ROLE_CUSTOMER") and object.customer.getId() == user.getId()'
+        ),
+        new Get(
+            uriTemplate: '/front/cart',
+            controller: CartController::class,
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
         new Put(
             uriTemplate: '/front/carts/{id}',
@@ -121,6 +124,23 @@ class Cart implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     public ?\DateTime $updatedAt;
 
+    #[Groups([self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $totalWithoutTax;
+
+    #[Groups([self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $deliveryTax;
+
+    #[Groups([self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $taxes;
+
+    #[Groups([self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $delivery;
+
+    #[Groups([self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $total;
+
+    #[Groups([self::GROUP_FRONT_READ_SINGLE])]
+    public ?bool $virtual;
     public function __construct()
     {
         $this->cartItems = [];
@@ -243,6 +263,72 @@ class Cart implements PropelResourceInterface
     {
         $this->updatedAt = $updatedAt;
 
+        return $this;
+    }
+
+    public function getDelivery(): ?float
+    {
+        return $this->delivery;
+    }
+
+    public function setDelivery(?float $delivery): Cart
+    {
+        $this->delivery = $delivery;
+        return $this;
+    }
+
+    public function getDeliveryTax(): ?float
+    {
+        return $this->deliveryTax;
+    }
+
+    public function setDeliveryTax(?float $deliveryTax): Cart
+    {
+        $this->deliveryTax = $deliveryTax;
+        return $this;
+    }
+
+    public function getTaxes(): ?float
+    {
+        return round($this->taxes,2);
+    }
+
+    public function setTaxes(?float $taxes): Cart
+    {
+        $this->taxes = $taxes;
+        return $this;
+    }
+
+    public function getTotal(): ?float
+    {
+        return $this->total;
+    }
+
+    public function setTotal(?float $total): Cart
+    {
+        $this->total = $total;
+        return $this;
+    }
+
+    public function getTotalWithoutTax(): ?float
+    {
+        return $this->totalWithoutTax;
+    }
+
+    public function setTotalWithoutTax(?float $totalWithoutTax): Cart
+    {
+        $this->totalWithoutTax = $totalWithoutTax;
+        return $this;
+    }
+
+    public function getVirtual(): ?bool
+    {
+        return $this->virtual;
+    }
+
+    public function setVirtual(?bool $virtual): Cart
+    {
+        $this->virtual = $virtual;
         return $this;
     }
 
