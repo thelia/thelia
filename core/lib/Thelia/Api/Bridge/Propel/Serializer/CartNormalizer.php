@@ -22,7 +22,7 @@ use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 
 
-class CartDenormalizer extends AbstractItemNormalizer
+class CartNormalizer extends AbstractItemNormalizer
 {
 
     public function __construct(

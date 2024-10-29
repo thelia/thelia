@@ -25,6 +25,7 @@ readonly class CartController
     ): PropelResourceInterface
     {
         $request = $requestStack->getCurrentRequest();
+        $request->setSession($session);
         $cart = $session->getSessionCart($eventDispatcher);
         if (null === $cart) {
             throw new NotFoundHttpException('Cart not found.');

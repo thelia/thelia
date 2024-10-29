@@ -21,7 +21,7 @@ use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 
 
-class CartItemDenormalizer extends AbstractItemNormalizer
+class CartItemNormalizer extends AbstractItemNormalizer
 {
 
     public function __construct(
