@@ -15,6 +15,7 @@ namespace Thelia\Api\Resource;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
@@ -33,6 +34,9 @@ use Thelia\Model\Map\OrderProductTaxTableMap;
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
+            uriTemplate: '/admin/order_product_taxes/{id}'
+        ),
+        new Patch(
             uriTemplate: '/admin/order_product_taxes/{id}'
         ),
         new Delete(

@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
@@ -44,6 +45,9 @@ use Thelia\Model\Map\AddressTableMap;
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Put(
+            uriTemplate: '/admin/addresses/{id}'
+        ),
+        new Patch(
             uriTemplate: '/admin/addresses/{id}'
         ),
         new Delete(
@@ -111,7 +115,13 @@ class Address implements PropelResourceInterface
         self::GROUP_FRONT_WRITE,
     ];
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Customer::GROUP_ADMIN_READ_SINGLE, Cart::GROUP_ADMIN_READ_SINGLE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        Customer::GROUP_ADMIN_READ_SINGLE,
+        Cart::GROUP_ADMIN_READ_SINGLE,
+        Customer::GROUP_ADMIN_WRITE_UPDATE
+    ])]
     public ?int $id = null;
 
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
