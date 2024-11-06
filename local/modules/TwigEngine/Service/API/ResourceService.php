@@ -14,6 +14,7 @@ namespace TwigEngine\Service\API;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
+use Thelia\Api\Resource\TranslatableResourceInterface;
 use Thelia\Service\Model\LangService;
 
 readonly class ResourceService
@@ -37,7 +38,7 @@ readonly class ResourceService
     {
         $apiRequest = $this->requestBuilder->createApiRequest($this->requestStack, $path);
         $route = $this->routeMatcher->matchRoute($this->router, $apiRequest);
-
+        $currentLocale = $this->localeService->getLocale();
         $operation = $this->operationProvider->getOperation($this->metadataService, $route);
         $resourceClass = $route['_api_resource_class'];
         $uriVariables = $this->operationProvider->getUriVariables($route, $operation, $resourceClass);
@@ -48,8 +49,11 @@ readonly class ResourceService
 
         $result = $this->dataProvider->fetchData($operation, $uriVariables, $context);
         $normalizedData = $this->normalizer->normalizeData($result, $context);
-
-        return $this->formatI18ns($normalizedData, $this->localeService->getLocale());
+        if($this->isTranslatableResult($result)) {
+            // can't use Serializer in this use case, so need to manually add publicUrl
+            $normalizedData = $this->addPublicUrl($result, $normalizedData, $currentLocale);
+        }
+        return $this->formatI18ns($normalizedData, $currentLocale);
     }
 
     private function formatI18ns(array $datas, string $locale = null): array
@@ -68,4 +72,38 @@ readonly class ResourceService
 
         return $datas;
     }
+
+    private function isTranslatableResult(mixed $result): bool
+    {
+        if(!\is_array($result)) {
+            return is_a($result, TranslatableResourceInterface::class);
+        }
+        return isset($result[0]) && is_a($result[0], TranslatableResourceInterface::class);
+    }
+
+    private function addPublicUrl(mixed $result, array $normalizedData, string $currentLocale): array
+    {
+        $finalNormalizedData = [];
+        $isMultidimensional = isset($normalizedData[0]);
+
+        if (!$isMultidimensional) {
+            return $this->addUrlToEntry($result, $normalizedData, $currentLocale);
+        }
+
+        foreach ($normalizedData as $key => $entry) {
+            $finalNormalizedData[] = $this->addUrlToEntry($result[$key], $entry, $currentLocale);
+        }
+
+        return $finalNormalizedData;
+    }
+
+    private function addUrlToEntry(mixed $resource, array $entry, string $currentLocale): array
+    {
+        if (method_exists($resource, 'getUrl')) {
+            $entry['publicUrl'] = $resource->getUrl($currentLocale);
+        }
+
+        return $entry;
+    }
+
 }
