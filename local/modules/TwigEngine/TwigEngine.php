@@ -1,15 +1,5 @@
 <?php
 
-/*
- * This file is part of the Thelia package.
- * http://www.thelia.net
- *
- * (c) OpenStudio <info@thelia.net>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace TwigEngine;
 
 use Propel\Runtime\Connection\ConnectionInterface;
@@ -21,7 +11,7 @@ use Thelia\Module\BaseModule;
 class TwigEngine extends BaseModule
 {
     /** @var string */
-    public const DOMAIN_NAME = 'theliatwig';
+    const DOMAIN_NAME = 'theliatwig';
 
     /*
      * You may now override BaseModuleInterface methods, such as:
@@ -31,24 +21,30 @@ class TwigEngine extends BaseModule
      */
 
     /**
-     * Defines how services are loaded in your modules.
+     * Defines how services are loaded in your modules
+     *
+     * @param ServicesConfigurator $servicesConfigurator
      */
     public static function configureServices(ServicesConfigurator $servicesConfigurator): void
     {
         $servicesConfigurator->load(self::getModuleCode().'\\', __DIR__)
-            ->exclude([THELIA_MODULE_DIR.ucfirst(self::getModuleCode()).'/I18n/*'])
+            ->exclude([THELIA_MODULE_DIR . ucfirst(self::getModuleCode()). "/I18n/*"])
             ->autowire(true)
             ->autoconfigure(true);
     }
 
     /**
      * Execute sql files in Config/update/ folder named with module version (ex: 1.0.1.sql).
+     *
+     * @param $currentVersion
+     * @param $newVersion
+     * @param ConnectionInterface $con
      */
     public function update($currentVersion, $newVersion, ConnectionInterface $con = null): void
     {
         $updateDir = __DIR__.DS.'Config'.DS.'update';
 
-        if (!is_dir($updateDir)) {
+        if (! is_dir($updateDir)) {
             return;
         }
 

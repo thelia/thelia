@@ -50,17 +50,17 @@ class AttributeAccessService
     ) {
     }
 
-    public function attributeAdmin(string $attributeName): string
+    public function attributeAdmin(string $attributeName): ?string
     {
         return $this->dataAccess('Admin User', $attributeName, $this->securityContext->getAdminUser());
     }
 
-    public function attributeCustomer(string $attributeName): string
+    public function attributeCustomer(string $attributeName): ?string
     {
         return $this->dataAccess('Customer User', $attributeName, $this->securityContext->getCustomerUser());
     }
 
-    public function attributeProduct(string $attributeName): string
+    public function attributeProduct(string $attributeName): ?string
     {
         if (null === $productId = $this->getRequestParam('product_id')) {
             return '';
@@ -73,7 +73,7 @@ class AttributeAccessService
         );
     }
 
-    public function attributeCategory(string $attributeName): string
+    public function attributeCategory(string $attributeName): ?string
     {
         $categoryId = $this->getRequestParam('category_id');
 
@@ -98,7 +98,7 @@ class AttributeAccessService
         );
     }
 
-    public function attributeContent(string $attributeName): string
+    public function attributeContent(string $attributeName): ?string
     {
         $contentId = $this->getRequestParam('content_id');
 
@@ -113,7 +113,7 @@ class AttributeAccessService
         );
     }
 
-    public function attributeFolder(string $attributeName): string
+    public function attributeFolder(string $attributeName): ?string
     {
         $folderId = $this->getRequestParam('folder_id');
 
@@ -139,7 +139,7 @@ class AttributeAccessService
         );
     }
 
-    public function attributeBrand(string $attributeName): string
+    public function attributeBrand(string $attributeName): ?string
     {
         $brandId = $this->getRequestParam('brand_id');
 
@@ -165,7 +165,7 @@ class AttributeAccessService
         );
     }
 
-    public function attributeCurrency(string $attributeName): string
+    public function attributeCurrency(string $attributeName): ?string
     {
         $currency = $this->getSession()->getCurrency();
 
@@ -181,7 +181,7 @@ class AttributeAccessService
         return '';
     }
 
-    public function attributeCountry(string $attributeName): string
+    public function attributeCountry(string $attributeName): ?string
     {
         if ($attributeName !== 'default') {
             return '';
@@ -197,7 +197,7 @@ class AttributeAccessService
     /**
      * @throws PropelException
      */
-    public function attributeCart(string $attributeName): string
+    public function attributeCart(string $attributeName): ?string
     {
         if (!\array_key_exists('currentCountry', self::$dataAccessCache)) {
             self::$dataAccessCache['currentCountry'] = $this->taxEngine->getDeliveryCountry();
@@ -314,7 +314,7 @@ class AttributeAccessService
         throw new \InvalidArgumentException(sprintf("%s has no '%s' attribute", 'Order', $attributeName));
     }
 
-    public function attributeLang(string $attributeName): string
+    public function attributeLang(string $attributeName): ?string
     {
         return $this->dataAccess('Lang', $attributeName, $this->getSession()->getLang());
     }
@@ -331,7 +331,7 @@ class AttributeAccessService
         array $columns = ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'],
         string $foreignTable = null,
         string $foreignKey = 'ID'
-    ): string {
+    ): ?string {
         $cacheKey = 'data_'.$objectLabel;
 
         $data = self::$dataAccessCache[$cacheKey] ?? null;
@@ -367,7 +367,7 @@ class AttributeAccessService
         string $attributeName,
         ?object $data,
         array $noGetterData = []
-    ): string {
+    ): ?string {
         if (empty($attributeName) || $data === null) {
             return '';
         }
@@ -393,7 +393,7 @@ class AttributeAccessService
         throw new \InvalidArgumentException(sprintf("%s has no '%s' attribute", $objectLabel, $attributeName));
     }
 
-    private function underscoreToCamelcase(string $str): string
+    private function underscoreToCamelcase(string $str): ?string
     {
         $words = explode('_', strtolower($str));
 
