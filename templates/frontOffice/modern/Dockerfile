@@ -1,4 +1,4 @@
-FROM node:14 as thelia_encore
+FROM node:14 AS thelia_encore
 ENV NODE_ENV development
 EXPOSE 8081
 
