@@ -31,12 +31,12 @@ fi
   echo -e "\e[1;37;46m Starting docker \e[0m"
 docker compose up -d --build
 
-docker exec php-fpm docker-init
+docker compose exec php-fpm docker-init
 
 if  [[ $1 = "-demo" ]]; then
-   docker exec php-fpm php setup/import.php
+   docker compose exec php-fpm php setup/import.php
 fi
 
-docker exec php-fpm php Thelia c:c
-docker exec php-fpm php Thelia c:c --env=prod
-docker exec php-fpm php Thelia c:c --env=propel
+docker compose exec php-fpm php Thelia c:c
+docker compose exec php-fpm php Thelia c:c --env=prod
+docker compose exec php-fpm php Thelia c:c --env=propel
