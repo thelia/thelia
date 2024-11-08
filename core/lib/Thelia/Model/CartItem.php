@@ -230,7 +230,7 @@ class CartItem extends BaseCartItem
      */
     public function getTotalTaxedPrice(Country $country, State $state = null)
     {
-        return round($this->getTaxedPrice($country, $state) * $this->getQuantity(), 2);
+        return round($this->getTaxedPrice($country, $state), 2) * $this->getQuantity();
     }
 
     /**
@@ -240,7 +240,7 @@ class CartItem extends BaseCartItem
      */
     public function getTotalTaxedPromoPrice(Country $country, State $state = null)
     {
-        return round($this->getTaxedPromoPrice($country, $state) * $this->getQuantity(), 2);
+        return round($this->getTaxedPromoPrice($country, $state), 2) * $this->getQuantity();
     }
 
     /**
@@ -250,7 +250,7 @@ class CartItem extends BaseCartItem
      */
     public function getTotalPrice()
     {
-        return round($this->getPrice() * $this->getQuantity(), 2);
+        return round($this->getPrice(), 2) * $this->getQuantity();
     }
 
     /**
@@ -260,7 +260,7 @@ class CartItem extends BaseCartItem
      */
     public function getTotalPromoPrice()
     {
-        return round($this->getPromoPrice() * $this->getQuantity(), 2);
+        return round($this->getPromoPrice(), 2) * $this->getQuantity();
     }
 
     /**
@@ -270,6 +270,6 @@ class CartItem extends BaseCartItem
      */
     public function getTotalRealPrice()
     {
-        return round($this->getRealPrice() * $this->getQuantity(), 2);
+        return round($this->getRealPrice(), 2) * $this->getQuantity();
     }
 }

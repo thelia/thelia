@@ -91,7 +91,11 @@ class ProductTaxedPricesExport extends JsonFileAbstractExport
     {
         $data = parent::current();
 
-        if (!\array_key_exists('tax_rule_i18n_id', $data)) {
+        if (empty($data)) {
+            return $data;
+        }
+
+        if (\array_key_exists('tax_rule_i18n_id', $data)) {
             $taxRule = TaxRuleQuery::create()
                 ->filterById($data['tax_rule_i18n_id'])
                 ->findOne();

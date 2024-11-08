@@ -852,8 +852,8 @@ class ProductController extends AbstractSeoCrudController
                         ->filterByIsFreeText(true)
                         ->findOneByFeatureId($featureId);
 
-                    // If no corresponding FeatureProduct exists AND if the feature_text_value is empty, do nothing
-                    if (null === $freeTextFeatureProduct && empty($featureValue)) {
+                    // If no corresponding FeatureProduct exists AND if the feature_text_value is null or 'empty', do nothing
+                    if (null === $freeTextFeatureProduct && (null === $featureValue || '' === $featureValue)) {
                         continue;
                     }
 
@@ -1820,7 +1820,10 @@ class ProductController extends AbstractSeoCrudController
      */
     protected function createLoopInstance(EventDispatcherInterface $eventDispatcher, $loopClass)
     {
-        return new $loopClass(
+        /** @var Image|Document $instance */
+        $instance = new $loopClass();
+
+        $instance->init(
             $this->container,
             $this->container->get('request_stack'),
             $eventDispatcher,
@@ -1829,6 +1832,8 @@ class ProductController extends AbstractSeoCrudController
             $this->container->getParameter('Thelia.parser.loops'),
             $this->container->getParameter('kernel.environment')
         );
+
+        return $instance;
     }
 
     protected function arrayHasEntries(array $data, array $entries)

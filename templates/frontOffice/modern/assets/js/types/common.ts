@@ -141,6 +141,23 @@ export interface PaymentModule {
   images: Image[];
   currentLocale: string;
   i18n: I18N;
+  optionGroups: PaymentOptionGroup[];
+}
+
+export interface PaymentOptionGroup {
+  code: string,
+  minimumSelectedOption: number;
+  maximumSelectedOption: number;
+  title: string,
+  description: string,
+  options: PaymentOption[],
+}
+
+export interface PaymentOption {
+  code: string,
+  title: string,
+  description: string,
+  currentLocale: string,
 }
 
 export interface Address {

@@ -13,14 +13,17 @@
 namespace TheliaSmarty\Template\Plugins;
 
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\RewritingUrlQuery;
 use Thelia\TaxEngine\TaxEngine;
 use Thelia\Tools\URL;
+use TheliaSmarty\Events\PseByProductEvent;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 
@@ -42,14 +45,19 @@ class FrontUtils extends AbstractSmartyPlugin
     /** @var string */
     protected $assetsPublicPath;
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     public function __construct(
         RequestStack $requestStack,
         TaxEngine $taxEngine,
         SecurityContext $securityContext,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->request = $requestStack->getCurrentRequest();
         $this->taxEngine = $taxEngine;
         $this->securityContext = $securityContext;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function getPluginDescriptors()
@@ -63,6 +71,7 @@ class FrontUtils extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'extractOptions', $this, 'extractOptions'),
             new SmartyPluginDescriptor('function', 'isInCategory', $this, 'isInCategory'),
             new SmartyPluginDescriptor('function', 'isInFolder', $this, 'isInFolder'),
+            new SmartyPluginDescriptor('function', 'rewritingUrl', $this, 'rewritingUrl'),
         ];
     }
 
@@ -150,6 +159,8 @@ class FrontUtils extends AbstractSmartyPlugin
             foreach ($pse->getAttributeCombinations() as $attribute) {
                 $attributes[$attribute->getAttributeId()] = $attribute->getAttributeAvId();
             }
+
+            $this->eventDispatcher->dispatch(new PseByProductEvent($pse));
 
             $result[] = [
                 'id' => $pse->getId(),
@@ -302,5 +313,38 @@ class FrontUtils extends AbstractSmartyPlugin
         $list[] = $category->getId();
 
         return $this->iterateCategories($category->getParent(), $list);
+    }
+
+    public function rewritingUrl($params): ?string
+    {
+        $url = basename($params['currentUrl']);
+        $rewritingUrl = RewritingUrlQuery::create()->filterByUrl(urldecode($url))->findOne();
+
+        if (!$rewritingUrl) {
+            parse_str(ltrim($url, '?'), $urlParams);
+            if (!isset($urlParams['view'])) {
+                return null;
+            }
+            $view = $urlParams['view'];
+            $rewritingUrl = RewritingUrlQuery::create()
+                ->filterByView($urlParams['view'])
+                ->filterByViewId($urlParams[$view.'_id'])
+                ->findOne();
+        }
+        if (!$rewritingUrl) {
+            return null;
+        }
+        $locale = $params['locale'];
+        $searchUrl = RewritingUrlQuery::create()
+            ->filterByView($rewritingUrl->getView())
+            ->filterByViewId($rewritingUrl->getViewId())
+            ->filterByViewLocale($locale)
+            ->findOne();
+
+        if (!$searchUrl) {
+            return null;
+        }
+
+        return $searchUrl->getUrl() ? URL::getInstance()->absoluteUrl($searchUrl->getUrl()) : null;
     }
 }
