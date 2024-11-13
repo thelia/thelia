@@ -19,7 +19,7 @@ use Thelia\Tools\URL;
 
 trait CatalogBreadcrumbTrait
 {
-    public function getBaseBreadcrumb(Router $router, $categoryId)
+    public function getBaseBreadcrumb(Router $router, $categoryId, $locale = 'en_US'): array
     {
         $translator = Translator::getInstance();
         $catalogUrl = $router->generate('admin.catalog', [], Router::ABSOLUTE_URL);
@@ -39,10 +39,10 @@ trait CatalogBreadcrumbTrait
                 ->filterById($currentId)
                 ->findOne();
 
-            if ($category != null) {
+            if ($category !== null) {
                 $results[] = [
                     'ID' => $category->getId(),
-                    'TITLE' => $category->getTitle(),
+                    'TITLE' => $category->setLocale($locale)->getTitle(),
                     'URL' => $category->getUrl(),
                 ];
 
@@ -63,7 +63,7 @@ trait CatalogBreadcrumbTrait
                     $ids[] = $currentId;
                 }
             }
-        } while ($category != null && $currentId > 0 && --$depth > 0);
+        } while ($category !== null && $currentId > 0 && --$depth > 0);
 
         foreach ($results as $result) {
             $breadcrumb[$result['TITLE']] = sprintf('%s?category_id=%d', $catalogUrl, $result['ID']);
@@ -72,20 +72,26 @@ trait CatalogBreadcrumbTrait
         return $breadcrumb;
     }
 
-    public function getProductBreadcrumb(Router $router, $tab, $locale)
+    /**
+     * @param Router $router
+     * @param $tab
+     * @param $locale
+     * @return array|null
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function getProductBreadcrumb(Router $router, $tab, $locale): ?array
     {
         if (!method_exists($this, 'getProduct')) {
             return null;
         }
 
-        /** @var \Thelia\Model\Product $product */
         $product = $this->getProduct();
 
-        $breadcrumb = $this->getBaseBreadcrumb($router, $product->getDefaultCategoryId());
+        $breadcrumb = $this->getBaseBreadcrumb($router, $product->getDefaultCategoryId(), $locale);
 
         $product->setLocale($locale);
 
-        $breadcrumb[$product->getTitle()] = sprintf(
+        $breadcrumb[$product->setLocale($locale)->getTitle()] = sprintf(
             '%s?product_id=%d&current_tab=%s',
             $router->generate('admin.products.update', [], Router::ABSOLUTE_URL),
             $product->getId(),
@@ -95,19 +101,25 @@ trait CatalogBreadcrumbTrait
         return $breadcrumb;
     }
 
-    public function getCategoryBreadcrumb(Router $router, $tab, $locale)
+    /**
+     * @param Router $router
+     * @param $tab
+     * @param $locale
+     * @return array|null
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function getCategoryBreadcrumb(Router $router, $tab, $locale): ?array
     {
         if (!method_exists($this, 'getCategory')) {
             return null;
         }
 
-        /** @var \Thelia\Model\Category $category */
         $category = $this->getCategory();
-        $breadcrumb = $this->getBaseBreadcrumb($router, $this->getParentId());
+        $breadcrumb = $this->getBaseBreadcrumb($router, $this->getParentId(), $locale);
 
         $category->setLocale($locale);
 
-        $breadcrumb[$category->getTitle()] = sprintf(
+        $breadcrumb[$category->setLocale($locale)->getTitle()] = sprintf(
             '%s?category_id=%d&current_tab=%s',
             $router->generate(
                 'admin.categories.update',

@@ -8,7 +8,7 @@
                 <span itemprop="name">{intl l="Home"}</span>
             </a>
         </li>
-        {foreach $breadcrumbs as $breadcrumb}
+        {foreach $breadcrumbs|default:[] as $breadcrumb}
             {if $breadcrumb.title}
                 <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"{if $breadcrumb@last} class="active"{/if}>
                     <meta itemprop="position" content="{$breadcrumb@key+2}" />
