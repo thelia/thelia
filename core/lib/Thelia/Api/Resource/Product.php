@@ -31,7 +31,6 @@ use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
-use Thelia\Api\Bridge\Propel\Validator\I18nConstraint;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductQuery;
@@ -51,11 +50,11 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         ),
         new Put(
             uriTemplate: '/admin/products/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE,self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
         ),
         new Patch(
             uriTemplate: '/admin/products/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE,self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
         ),
         new Delete(
             uriTemplate: '/admin/products/{id}'
@@ -130,6 +129,7 @@ class Product extends AbstractTranslatableResource
             ProductSaleElements::GROUP_ADMIN_WRITE,
             ProductImage::GROUP_ADMIN_READ_SINGLE,
             ProductDocument::GROUP_ADMIN_READ_SINGLE,
+            CartItem::GROUP_FRONT_READ_SINGLE,
         ]
     )]
     public ?int $id = null;
@@ -171,7 +171,7 @@ class Product extends AbstractTranslatableResource
         self::GROUP_ADMIN_READ_SINGLE,
         self::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
-        self::GROUP_FRONT_READ
+        self::GROUP_FRONT_READ,
     ])]
     public array $productCategories;
 
@@ -181,7 +181,7 @@ class Product extends AbstractTranslatableResource
         self::GROUP_ADMIN_READ_SINGLE,
         self::GROUP_ADMIN_WRITE,
         self::GROUP_ADMIN_WRITE_UPDATE,
-        self::GROUP_ADMIN_WRITE_UPDATE,
+        self::GROUP_FRONT_READ
     ])]
     public array $productSaleElements;
 
@@ -189,7 +189,12 @@ class Product extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     public array $featureProducts;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ,
+        CartItem::GROUP_FRONT_READ_SINGLE,
+    ])]
     #[I18nConstraint(groups: [self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
 
