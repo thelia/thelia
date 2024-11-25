@@ -398,7 +398,12 @@ class Product extends AbstractTranslatableResource
         }
     }
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ,
+        CartItem::GROUP_FRONT_READ_SINGLE,
+    ])]
     public function getPublicUrl()
     {
         /** @var \Thelia\Model\Product $propelModel */
