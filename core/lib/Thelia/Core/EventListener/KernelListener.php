@@ -148,7 +148,7 @@ class KernelListener implements EventSubscriberInterface
     }
 
     /**
-     * @return \Thelia\Model\Lang|null
+     * @return Lang|null
      */
     protected function detectAdminLang(TheliaRequest $request)
     {
@@ -162,7 +162,7 @@ class KernelListener implements EventSubscriberInterface
     }
 
     /**
-     * @return \Thelia\Model\Lang|null
+     * @return Lang|null
      */
     protected function detectLang(TheliaRequest $request)
     {
@@ -230,7 +230,10 @@ class KernelListener implements EventSubscriberInterface
     public function sessionInit(RequestEvent $event): void
     {
         $isApiRoute = preg_match('/^\/api\//', $event->getRequest()->getPathInfo());
-        $event->getRequest()->request->set('isApiRoute', $isApiRoute);
+        if ($isApiRoute) {
+            $event->getRequest()->request->set('isApiRoute', $isApiRoute);
+        }
+
         if (!$isApiRoute && $event->getRequestType() === HttpKernelInterface::MAIN_REQUEST) {
             $request = $event->getRequest();
             if (null === $session = self::$session) {
