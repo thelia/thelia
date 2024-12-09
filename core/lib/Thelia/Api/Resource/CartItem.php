@@ -107,7 +107,7 @@ class CartItem implements PropelResourceInterface
     public ?float $price;
 
     #[Groups([self::GROUP_ADMIN_READ, Cart::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Cart::GROUP_FRONT_READ])]
-    public ?float $promo_price;
+    public ?float $promoPrice;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $priceEndOfLife;
@@ -139,6 +139,7 @@ class CartItem implements PropelResourceInterface
 
     #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     public ?bool $isPromo;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -213,12 +214,12 @@ class CartItem implements PropelResourceInterface
 
     public function getPromoPrice(): ?float
     {
-        return $this->promo_price;
+        return $this->promoPrice;
     }
 
     public function setPromoPrice(?float $promo_price): self
     {
-        $this->promo_price = $promo_price;
+        $this->promoPrice = $promo_price;
 
         return $this;
     }
@@ -276,9 +277,10 @@ class CartItem implements PropelResourceInterface
         return $this->calculatedRealPrice;
     }
 
-    public function setCalculatedRealPrice(?float $calculatedRealPrice): CartItem
+    public function setCalculatedRealPrice(?float $calculatedRealPrice): self
     {
         $this->calculatedRealPrice = $calculatedRealPrice;
+
         return $this;
     }
 
@@ -287,9 +289,10 @@ class CartItem implements PropelResourceInterface
         return $this->calculatedRealTaxedPrice;
     }
 
-    public function setCalculatedRealTaxedPrice(?float $calculatedRealTaxedPrice): CartItem
+    public function setCalculatedRealTaxedPrice(?float $calculatedRealTaxedPrice): self
     {
         $this->calculatedRealTaxedPrice = $calculatedRealTaxedPrice;
+
         return $this;
     }
 
@@ -298,9 +301,10 @@ class CartItem implements PropelResourceInterface
         return $this->calculatedRealTotalPrice;
     }
 
-    public function setCalculatedRealTotalPrice(?float $calculatedRealTotalPrice): CartItem
+    public function setCalculatedRealTotalPrice(?float $calculatedRealTotalPrice): self
     {
         $this->calculatedRealTotalPrice = $calculatedRealTotalPrice;
+
         return $this;
     }
 
@@ -309,9 +313,10 @@ class CartItem implements PropelResourceInterface
         return $this->calculatedRealTotalTaxedPrice;
     }
 
-    public function setCalculatedRealTotalTaxedPrice(?float $calculatedRealTotalTaxedPrice): CartItem
+    public function setCalculatedRealTotalTaxedPrice(?float $calculatedRealTotalTaxedPrice): self
     {
         $this->calculatedRealTotalTaxedPrice = $calculatedRealTotalTaxedPrice;
+
         return $this;
     }
 
@@ -320,9 +325,10 @@ class CartItem implements PropelResourceInterface
         return $this->calculatedTotalPrice;
     }
 
-    public function setCalculatedTotalPrice(?float $calculatedTotalPrice): CartItem
+    public function setCalculatedTotalPrice(?float $calculatedTotalPrice): self
     {
         $this->calculatedTotalPrice = $calculatedTotalPrice;
+
         return $this;
     }
 
@@ -331,9 +337,10 @@ class CartItem implements PropelResourceInterface
         return $this->calculatedTotalPromoPrice;
     }
 
-    public function setCalculatedTotalPromoPrice(?float $calculatedTotalPromoPrice): CartItem
+    public function setCalculatedTotalPromoPrice(?float $calculatedTotalPromoPrice): self
     {
         $this->calculatedTotalPromoPrice = $calculatedTotalPromoPrice;
+
         return $this;
     }
 
@@ -342,9 +349,10 @@ class CartItem implements PropelResourceInterface
         return $this->calculatedTotalPromoTaxedPrice;
     }
 
-    public function setCalculatedTotalPromoTaxedPrice(?float $calculatedTotalPromoTaxedPrice): CartItem
+    public function setCalculatedTotalPromoTaxedPrice(?float $calculatedTotalPromoTaxedPrice): self
     {
         $this->calculatedTotalPromoTaxedPrice = $calculatedTotalPromoTaxedPrice;
+
         return $this;
     }
 
@@ -353,9 +361,10 @@ class CartItem implements PropelResourceInterface
         return $this->calculatedTotalTaxedPrice;
     }
 
-    public function setCalculatedTotalTaxedPrice(?float $calculatedTotalTaxedPrice): CartItem
+    public function setCalculatedTotalTaxedPrice(?float $calculatedTotalTaxedPrice): self
     {
         $this->calculatedTotalTaxedPrice = $calculatedTotalTaxedPrice;
+
         return $this;
     }
 
@@ -364,9 +373,10 @@ class CartItem implements PropelResourceInterface
         return $this->isPromo;
     }
 
-    public function setIsPromo(?bool $isPromo): CartItem
+    public function setIsPromo(?bool $isPromo): self
     {
         $this->isPromo = $isPromo;
+
         return $this;
     }
 

@@ -1,15 +1,15 @@
 {
-  "name": "thelia/twig-engine-module",
-  "description": "TwigEngine module for Thelia",
-  "license": "LGPL-3.0-or-later",
-  "type": "thelia-module",
-  "require": {
-    "php": ">=8.2",
-    "thelia/installer": "~1.1",
-    "symfony/twig-bundle": "6.4.*",
-    "twigphp/intl-extra": "^3.0"
-  },
-  "extra": {
-    "installer-name": "TwigEngine"
-  }
+    "name": "thelia/twig-engine-module",
+    "description": "TwigEngine module for Thelia",
+    "license": "LGPL-3.0-or-later",
+    "type": "thelia-module",
+    "require": {
+        "php": ">=8.2",
+        "thelia/installer": "~1.1",
+        "symfony/twig-bundle": "6.4.*",
+        "twig/intl-extra": "^3.16"
+    },
+    "extra": {
+        "installer-name": "TwigEngine"
+    }
 }
