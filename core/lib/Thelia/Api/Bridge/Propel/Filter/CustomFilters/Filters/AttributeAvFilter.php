@@ -4,8 +4,10 @@ namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoiceFilterInterface;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
 
-class AttributeAvFilter implements TheliaFilterInterface
+class AttributeAvFilter implements TheliaFilterInterface,TheliaChoiceFilterInterface
 {
 
     public function getResourceType(): array
@@ -13,7 +15,7 @@ class AttributeAvFilter implements TheliaFilterInterface
         return ['products'];
     }
 
-    public function getFilterName(): array
+    public static function getFilterName(): array
     {
         return ['attributesAvs'];
     }
@@ -31,10 +33,14 @@ class AttributeAvFilter implements TheliaFilterInterface
                 [
                     'id' => $attributeAv->getAttributeAvId(),
                     'title' => $attributeAv->getAttributeAv()->getTitle(),
-                    'value' => 1
                 ]
             ;
         }
         return $value;
+    }
+
+    public function getChoiceFilterType(ActiveRecordInterface $activeRecord): ActiveRecordInterface
+    {
+        return $activeRecord->getDefaultSaleElements()->getAttributeCombinationsJoinAttributeAv()->getFirst()->getAttribute();
     }
 }

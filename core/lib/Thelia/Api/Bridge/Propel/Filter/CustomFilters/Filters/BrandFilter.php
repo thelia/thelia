@@ -4,6 +4,7 @@ namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
 
 class BrandFilter implements TheliaFilterInterface
 {
@@ -12,9 +13,9 @@ class BrandFilter implements TheliaFilterInterface
         return ['products'];
     }
 
-    public function getFilterName(): array
+    public static function getFilterName(): array
     {
-        return ['brands'];
+        return ['brands','brand'];
     }
 
     public function filter(ModelCriteria $query, $value): void

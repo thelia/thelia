@@ -2,28 +2,26 @@
 
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters;
 
-use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
-use Thelia\Model\Map\FeatureProductTableMap;
-use Thelia\Model\Map\ProductTableMap;
-use Thelia\Model\ProductQuery;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoiceFilterInterface;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
 
-class FeatureAvFilter implements TheliaFilterInterface
+class FeatureAvFilter implements TheliaFilterInterface,TheliaChoiceFilterInterface
 {
     public function getResourceType(): array
     {
         return ['products'];
     }
 
-    public function getFilterName(): array
+    public static function getFilterName(): array
     {
         return ['featureAvs'];
     }
 
     public function filter(ModelCriteria $query, $value): void
     {
-        $query->useFeatureProductQuery()->filterByFeatureAv($value)->endUse();
+        $query->useFeatureProductQuery()->filterByFeatureAvId($value)->endUse();
     }
 
     public function getValue(ActiveRecordInterface $activeRecord): array
@@ -34,10 +32,14 @@ class FeatureAvFilter implements TheliaFilterInterface
                 [
                     'id' => $featureProduct->getFeatureAv()->getId(),
                     'title' => $featureProduct->getFeatureAv()->getTitle(),
-                    'value' => 1
                 ]
             ;
         }
         return $value;
+    }
+
+    public function getChoiceFilterType(ActiveRecordInterface $activeRecord): ActiveRecordInterface
+    {
+        return $activeRecord->getFeatureProductsJoinFeatureAv()->getFirst()->getFeature();
     }
 }

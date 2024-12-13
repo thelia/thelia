@@ -4,6 +4,7 @@ namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
 
 class AttributeFilter implements TheliaFilterInterface
 {
@@ -12,7 +13,7 @@ class AttributeFilter implements TheliaFilterInterface
         return ['products'];
     }
 
-    public function getFilterName(): array
+    public static function getFilterName(): array
     {
         return ['attributes'];
     }
@@ -30,7 +31,6 @@ class AttributeFilter implements TheliaFilterInterface
                 [
                     'id' => $attribute->getAttributeId(),
                     'title' => $attribute->getAttribute()->getTitle(),
-                    'value' => 1
                 ]
             ;
         }

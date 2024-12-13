@@ -1,6 +1,6 @@
 <?php
 
-namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters;
+namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
@@ -11,7 +11,7 @@ interface TheliaFilterInterface
 {
     public function getResourceType(): array;
 
-    public function getFilterName(): array;
+    public static function getFilterName(): array;
 
     public function filter(ModelCriteria $query, $value): void;
 

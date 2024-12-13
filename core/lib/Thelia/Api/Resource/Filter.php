@@ -34,7 +34,7 @@ class Filter
 {
     public const GROUP_FRONT_READ = 'front:filter:read';
     #[Groups([self::GROUP_FRONT_READ])]
-    private int $id;
+    private ?int $id;
     #[Groups([self::GROUP_FRONT_READ])]
     private string $title;
     #[Groups([self::GROUP_FRONT_READ])]
@@ -43,15 +43,18 @@ class Filter
     private string $inputType;
     #[Groups([self::GROUP_FRONT_READ])]
     private bool $visible;
+
+    #[Groups([self::GROUP_FRONT_READ])]
+    private ?int $position;
     #[Groups([self::GROUP_FRONT_READ])]
     private array $values;
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(int $id): Filter
+    public function setId(?int $id): Filter
     {
         $this->id = $id;
         return $this;
@@ -109,6 +112,17 @@ class Filter
     public function setVisible(bool $visible): Filter
     {
         $this->visible = $visible;
+        return $this;
+    }
+
+    public function getPosition(): ?int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(?int $position): Filter
+    {
+        $this->position = $position;
         return $this;
     }
 }

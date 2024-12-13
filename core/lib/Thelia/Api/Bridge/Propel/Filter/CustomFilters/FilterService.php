@@ -3,9 +3,9 @@
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
-use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\TheliaFilterInterface;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\CategoryFilter;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
 
 readonly class FilterService
 {
@@ -46,7 +46,7 @@ readonly class FilterService
         return $filters;
     }
 
-    public function filterWithTFilter($request, ?ModelCriteria $query = null)
+    public function filterWithTFilter($request, ?ModelCriteria $query = null,?bool &$isCategoryFilter = false): iterable
     {
         $tfilters = $request->get('tfilters', []);
         $resource = $uriVariables['resource'] ?? null;
@@ -72,6 +72,9 @@ readonly class FilterService
             $value = $filter['value'];
             if (!$filterClass instanceof TheliaFilterInterface) {
                 throw new \RuntimeException(sprintf('The "%s" filter must implements TheliaFilterInterface.', $filterClass::class));
+            }
+            if ($filterClass instanceof CategoryFilter){
+                $isCategoryFilter = true;
             }
             $filterClass->filter($query, $value);
         }
