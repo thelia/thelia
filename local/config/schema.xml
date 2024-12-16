@@ -1923,4 +1923,45 @@
       <parameter name="i18n_columns" value="title" />
     </behavior>
   </table>
+
+  <table name="choice_filter_other" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="type" size="55" type="VARCHAR" />
+    <column name="visible" type="BOOLEAN" />
+    <column name="title" size="255" type="VARCHAR" />
+    <column name="description" type="CLOB" />
+
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description" />
+    </behavior>
+  </table>
+
+  <table name="choice_filter" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="feature_id" required="false" type="INTEGER" />
+    <column name="attribute_id" required="false" type="INTEGER" />
+    <column name="other_id" required="false" type="INTEGER" />
+    <column name="category_id" required="false" type="INTEGER" />
+    <column name="template_id" required="false" type="INTEGER"  />
+    <column defaultValue="0" name="position" required="true" type="INTEGER" />
+    <column name="visible" type="BOOLEAN" />
+
+    <foreign-key foreignTable="attribute" onDelete="CASCADE" onUpdate="RESTRICT" >
+      <reference foreign="id" local="attribute_id" />
+    </foreign-key>
+    <foreign-key foreignTable="feature" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="feature_id" />
+    </foreign-key>
+    <foreign-key foreignTable="choice_filter_other" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="other_id" />
+    </foreign-key>
+    <foreign-key foreignTable="category" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="category_id" />
+    </foreign-key>
+    <foreign-key foreignTable="template" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="template_id" />
+    </foreign-key>
+
+    <behavior name="timestampable" />
+  </table>
 </database>

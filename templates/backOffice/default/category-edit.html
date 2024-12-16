@@ -277,6 +277,8 @@
                                             </table>
                                         </div>
                                     </div>
+                                    {categoryChoiceFilter category_id=$category_id}
+                                    {include file="includes/choice-filter-edit.bottom.html" category_id=$category_id}
                                 </div>
 
                                 <div class="tab-pane fade" id="images">
@@ -357,7 +359,17 @@
     {javascripts file='assets/js/jquery-ui-1.10.3.custom.min.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
+<script>
+    (function($, $module){
+        $module.find('table.disabled').find('input, select, button').attr('disabled', true);
 
+        $module.on('click', '.js-action-enable', function(event){
+            event.preventDefault();
+            $(this).parent().remove();
+            $module.find('table.disabled').find('input, select, button').attr('disabled', false);
+        });
+    }(jQuery, jQuery('#module-choice-filter')))
+</script>
 <script>
 
 $(function() {
