@@ -109,6 +109,9 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         'ref',
     ]
 )]
+#[ApiFilter(
+    filterClass: TheliaFilter::class,
+)]
 class Product extends AbstractTranslatableResource
 {
     use UrlRewritingTrait;
