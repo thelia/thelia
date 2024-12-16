@@ -28,4 +28,8 @@ return [
     'Related loop name \'%name\'\' is not defined.' => 'La loop ayant pour nom "%name" n\'est pas défini',
     'Template file %file cannot be found.' => 'Le fichier %s ne semble pas présent',
     'The loop name \'%name\' is already defined in %className class' => 'La loop "%name" est déjà définie dans la class %className',
+    'This category uses its own filter configuration' => 'Cette catégorie utilise sa propre configuration des filtres',
+    'This category uses no filter configuration' => 'Cette catégorie utilise aucune configuration des filtres',
+    'This category uses the filter configuration of the category %categoryId' => 'Cette catégorie utilise la configuration des filtres de la catégorie %categoryId',
+    'This category uses the template configuration %templateId' => 'Cette catégorie utilise la configuration du gabarit %templateId',
 ];

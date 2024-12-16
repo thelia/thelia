@@ -875,4 +875,5 @@ return [
     'update form' => 'Formulaire de modification',
     'value table header' => 'colonne tableau valeur',
     'value table row' => 'ligne tableau valeurs',
+    'Configuration saved successfully' => 'Configuration sauvegardée avec succès',
 ];
