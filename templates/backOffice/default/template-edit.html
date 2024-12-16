@@ -182,6 +182,8 @@
                     </div>
 
                 </div>
+                {templateChoiceFilter template_id=$template_id}
+                {include file="includes/choice-filter-edit.bottom.html" template_id=$template_id}
 
             {hook name="template-edit.bottom" template_id=$template_id}
             {/loop}
