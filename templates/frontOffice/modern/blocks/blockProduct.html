@@ -1,7 +1,0 @@
-<div class="block-{$type['id']} mb-8 grid grid-flow-row-dense grid-rows-1 gap-8 CategoryProducts-list md:grid-cols-2 lg:grid-cols-3">
-  {foreach $data["productList"] as $productId}
-    {loop type="product" name="product_list" id=$productId}
-      {include file="components/smarty/SingleProduct/SingleProduct.html"}
-    {/loop}
-  {/foreach}
-</div>

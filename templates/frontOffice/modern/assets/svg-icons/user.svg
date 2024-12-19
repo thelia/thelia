@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 20">
-  <g id="user" transform="translate(-3 -2)">
-    <path id="Tracé_17" data-name="Tracé 17" d="M20,21h0a6.018,6.018,0,0,0-6-6H10a6.018,6.018,0,0,0-6,6H4" fill="none"
-      stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
-    <circle id="Ellipse_2" data-name="Ellipse 2" cx="4" cy="4" r="4" transform="translate(8 3)" fill="none"
-      stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
-  </g>
-</svg>

@@ -1,9 +1,0 @@
-
-
-<div class="Alert {if $type|default:"default"}Alert--{$type}{/if} {$class|default:''}" role="alert">
-  {renderIconSvg icon="info" class="w-6 h-6 mb-4 text-current xs:mb-0 Alert_icon"}
-  <div class="xs:ml-4">
-    {if $title|default:null}<p class="mb-2 font-bold">{$title}</p>{/if}
-    {if $message|default:null}<p class="text-sm">{$message nofilter}</p>{/if}
-  </div>
-</div>
