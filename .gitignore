@@ -1,13 +1,16 @@
 ###> symfony/framework-bundle ###
-/var/
-/vendor/
 /.env.local
 /.env.local.php
 /.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
 composer.lock
 symfony.lock
 phpunit.xml
-###< symfony/framework-bundle ###
 
 ###> thelia/thelia ###
 local/config/build.properties
@@ -74,7 +77,8 @@ setup/audit/greenit.yaml
 ###< phpunit/phpunit ###
 
 ###> symfony/phpunit-bridge ###
-.phpunit
+.phpunit.result.cache
+/phpunit.xml
 ###< symfony/phpunit-bridge ###
 
 ###> symfony/webpack-encore-bundle ###
