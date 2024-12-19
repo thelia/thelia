@@ -14,6 +14,8 @@ namespace Thelia\Core\Translation;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\Translator as BaseTranslator;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
 
 class Translator extends BaseTranslator
 {
@@ -55,8 +57,11 @@ class Translator extends BaseTranslator
     public function getLocale(): string
     {
         $currentRequest = $this->requestStack->getCurrentRequest();
-        if (null !== $currentRequest) {
-            return $currentRequest->getSession()->getLang()->getLocale();
+        if ($currentRequest instanceof Request) {
+            $session = $currentRequest->getSession();
+            if ($session instanceof Session) {
+                return $session->getLang()->getLocale();
+            }
         }
 
         return parent::getLocale();

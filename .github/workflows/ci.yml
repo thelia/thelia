@@ -1,0 +1,60 @@
+name: CI/CD to push nursit
+
+on:
+  push:
+    branches:
+      - main
+      - feature/git-ci
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: install prerequisites
+        run: |
+          sudo apt-get update && sudo apt-get install -y wireguard-tools
+          echo "${{ secrets.SSH_WG_PROFILE }}" > ./wg0.conf
+          wg-quick up ./wg0.conf
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -v -H "${{ secrets.SSH_SERVER }}" >> ~/.ssh/known_hosts
+
+      - name: SSH into server and execute commands
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER }} 'bash -s' << 'EOF'
+          cd ${{ secrets.PATH_TO_DEPLOY }}
+          nursit-root site:chmod
+          git stash
+          git fetch --all
+          git checkout main
+          git pull --rebase
+          git stash apply
+          nursit-root site:chmod
+          php8.2 composer.phar install
+          nursit-root site:chmod
+          EOF
+        timeout-minutes: 15
+
+      - name: SSH post install
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER }} 'bash -s' << 'EOF'
+          cd ${{ secrets.PATH_TO_DEPLOY }}
+          nursit-root site:chmod
+          cp ../.env* .
+          cp ../composer.phar .
+          php8.2 -d post_max_size=200M Thelia thelia:install --db_host=${{ secrets.DB_HOST }} --db_port=${{ secrets.DB_PORT }} --db_username=${{ secrets.DB_USER }} --db_name=${{ secrets.DB_NAME }} --db_password=${{ secrets.DB_PASSWORD }}
+          php8.2 Thelia assets:install web
+          rm -Rf var/cache/*
+          php8.2 Thelia c:c
+          mkdir -p tmp
+          mkdir -p local/session
+          nursit-root site:chmod
+          EOF
+        timeout-minutes: 3
