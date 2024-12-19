@@ -42,6 +42,7 @@ local/I18n/*.php
 .docker/mysql-data/*
 !.docker/mysql-data/.gitkeep
 local/session/
+local/setup/
 translations/
 
 # Ignore everything in the "modules" directory

@@ -78,7 +78,6 @@
         "thelia/config": "dev-twig",
         "thelia/currency-converter": "~1.0",
         "thelia/propel": "dev-thelia-2.5",
-        "thelia/setup": "dev-twig",
         "thelia/web-profiler-module": "2.5.*"
     },
     "require-dev": {
