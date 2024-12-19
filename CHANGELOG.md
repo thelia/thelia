@@ -1,3 +1,60 @@
+# 2.5.5
+- #3267 Fix wrong .env location in TinyMCE filemanager config
+- #3263 fix: better get current locale
+- #3261 Bump cross-spawn from 7.0.3 to 7.0.6 in /templates/frontOffice/modern
+- #3258 fix : alt and title in image
+- #3254 Bump http-proxy-middleware from 2.0.6 to 2.0.7 in /templates/frontOffice/modern
+- #3249 feat(ci): use git deploy
+- #3248 fix(ci): preprod only on main
+- #3247 Bump express from 4.19.2 to 4.21.0 in /templates/frontOffice/modern
+- #3246 Bump axios from 1.1.3 to 1.7.4 in /templates/frontOffice/modern
+- #3245 feat(ci): put in place ci
+- #3242 Fixed rounding in taxes and taxed prices caclulation
+- #3241 autofill contact form if user is a customer
+- #3240 Fix/lang url
+- #3230 forgot a rounding
+- #3228 fix : rounding in cart and order
+- #3226 Fix attributes and path commerce guys address
+- #3221 Feat/payment modules
+- #3220 Count in admin
+- #3218 Fix Export product TTC
+- #3214 Feat: add php Thelia loop:info command
+- #3213 Show menu bar option
+- #3212 Allow feature free text value to be set to 0
+- #3208 Give the possibility to modify the PDF filename
+- #3205 Update order-edit.html
+- #3201 Fix a wrong loop instantiation (new + init instread of new)
+- #3200 Update utils.php
+- #3199 Fix uploaded file mode
+- #3198 fix: image source in content card
+- #3196 Bump express from 4.18.2 to 4.19.2 in /templates/frontOffice/modern
+- #3195 Update CustomerController.php
+- #3194 Update BaseCachedFile.php
+- #3193 Update FolderBreadcrumbTrait.php
+- #3192 Update CatalogBreadcrumbTrait.php
+- #3191 Update CatalogBreadcrumbTrait.php
+- #3189 Update FeatureAvController.php
+- #3188 Update Product.php
+- #3187 Bump webpack-dev-middleware from 5.3.3 to 5.3.4 in /templates/frontOffice/modern
+- #3186 Fix Bo pse attribute value display when product doesn't have template
+- #3185 Bump follow-redirects from 1.15.2 to 1.15.6 in /templates/frontOffice/modern
+- #3183 Fix bad "setContainer" call on Symfony AbstractController
+- #3182 Adding products & sub categories count by categorie
+- #3179 Allow to modify pse from psesByProduct plugin by event
+- #3175 Add symfony debug bunudle
+- #3174 Fix inverted condition in ProductTaxedPricesExport
+- #3173 Update BaseHook.php
+- #3171 Fix order event not being dispatched if previous dispatch stop propagation
+- #3170 Fix bad select values for coupon who remove postage
+- #3169 fix: change default tttl for apache mod_expires
+- #3159 Update categories.html
+- #3158 DockerFile: Php image changed to php:8.2-fpm-alpine
+- #3155 Mon Profil > Mon profil
+- #3154 Adding Taiwan SQL
+- #3153 Adding Taiwan locale
+- #3147 Bump semver from 5.7.1 to 5.7.2 in /templates/frontOffice/modern
+- #3146 Bump word-wrap from 1.2.3 to 1.2.5 in /templates/frontOffice/modern
+
 # 2.5.4
 - #3145 Feat Change Thelia version 2.5.3 to 2.5.4
 - #3137 Fix translations countries

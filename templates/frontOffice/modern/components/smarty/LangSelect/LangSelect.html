@@ -7,9 +7,16 @@
         <ul class="text-center">
             {loop type="lang" name="lang_available" exclude="{lang attr="id"}"}
             <li>
-                <a class="LangSelect-dropdownLink block py-2 text-center w-8" href="{url path={navigate to='current'} lang={$LOCALE}}">
-                    {$CODE}
+              {assign var='rewritingUrl' value="{rewritingUrl locale="$LOCALE" currentUrl="$current_url"}"}
+              {if !empty($rewritingUrl)}
+                <a class="LangSelect-dropdownLink block py-2 text-center w-8" href="{$rewritingUrl}">
+                  {$CODE}
                 </a>
+              {else}
+                <a class="LangSelect-dropdownLink block py-2 text-center w-8" href="{url path={navigate to='current'} lang={$LOCALE}}">
+                  {$CODE}
+                </a>
+              {/if}
             </li>
             {/loop}
         </ul>

@@ -164,16 +164,24 @@ class Order extends BaseOrder
                     SUM(
                         '.OrderProductTableMap::COL_QUANTITY.'
                         *
-                        ROUND(
+                        (
+                            ROUND(
+                                IF('.OrderProductTableMap::COL_WAS_IN_PROMO.'=1, '.OrderProductTableMap::COL_PROMO_PRICE.', '.OrderProductTableMap::COL_PRICE.'),
+                                2
+                            )
+                            +
                             (
-                                IF('.OrderProductTableMap::COL_WAS_IN_PROMO.'=1, '.OrderProductTableMap::COL_PROMO_PRICE.', '.OrderProductTableMap::COL_PRICE.')
-                                +
-                                (
-                                    SELECT COALESCE(SUM(IF('.OrderProductTableMap::COL_WAS_IN_PROMO.'=1, '.OrderProductTaxTableMap::COL_PROMO_AMOUNT.', '.OrderProductTaxTableMap::COL_AMOUNT.')), 0)
-                                    FROM '.OrderProductTaxTableMap::TABLE_NAME.'
-                                    WHERE '.OrderProductTaxTableMap::COL_ORDER_PRODUCT_ID.' = '.OrderProductTableMap::COL_ID.'
-                                )
-                            ), 2
+                                SELECT COALESCE(
+                                    SUM(
+                                        ROUND(
+                                            IF('.OrderProductTableMap::COL_WAS_IN_PROMO.'=1, '.OrderProductTaxTableMap::COL_PROMO_AMOUNT.', '.OrderProductTaxTableMap::COL_AMOUNT.'),
+                                            2
+                                        )
+                                    ),
+                                0)
+                                FROM '.OrderProductTaxTableMap::TABLE_NAME.'
+                                WHERE '.OrderProductTaxTableMap::COL_ORDER_PRODUCT_ID.' = '.OrderProductTableMap::COL_ID.'
+                            )
                         )
                     ) as total_taxed_price,
                     SUM(
