@@ -44,30 +44,19 @@ local/I18n/*.php
 local/session/
 translations/
 
-# Ignore everything in the "modules" directory, except the "default modules"
+# Ignore everything in the "modules" directory
 local/modules/*
-!local/modules/TheliaSmarty
-!local/modules/TwigEngine
 
 # Ignore everything in the "templates" directory, except the "default template"
 templates/*
 !templates/frontOffice
 templates/frontOffice/*
-!templates/frontOffice/default
-!templates/frontOffice/modern
-!templates/frontOffice/new_default
-templates/frontOffice/modern/node_modules
-templates/frontOffice/modern/dist
-templates/frontOffice/modern/core
 !templates/backOffice
 templates/backOffice/*
-!templates/backOffice/default
 !templates/email
 templates/email/*
-!templates/email/default
 !templates/pdf
 templates/pdf/*
-!templates/pdf/default
 
 ###< thelia/thelia ###
 
