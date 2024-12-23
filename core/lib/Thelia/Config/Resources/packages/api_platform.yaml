@@ -18,15 +18,13 @@ api_platform:
 
     swagger:
         versions: [3]
+        swagger_ui_extra_configuration:
+            docExpansion: none
+            filter: true
         api_keys:
             JWT:
                 name: Authorization
                 type: header
-        swagger_ui_extra_configuration:
-            docExpansion: 'none'
-            filter: true
-            persistAuthorization: true
-            showCommonExtensions: true
 when@prod:
     api_platform:
         enable_swagger_ui: false
