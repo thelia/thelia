@@ -42,10 +42,6 @@ class OrderFilter extends AbstractFilter
             return;
         }
 
-        if (!\in_array($value, [self::DIRECTION_ASC, self::DIRECTION_DESC])) {
-            return; // todo need fix this (if we use same attribute in different filter)
-        }
-
         $direction = $this->normalizeValue($value, $property);
         if (null === $direction) {
             return;
