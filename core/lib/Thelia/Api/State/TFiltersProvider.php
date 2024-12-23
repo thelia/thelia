@@ -45,7 +45,7 @@ class TFiltersProvider implements ProviderInterface
                     $values [] = $value;
                 }
             }
-            if ($filter instanceof PriceFilter){
+            if ($filter instanceof PriceFilter && count($values) > 0){
                 $values = [
                     'min' => min($values),
                     'max' => max($values)
