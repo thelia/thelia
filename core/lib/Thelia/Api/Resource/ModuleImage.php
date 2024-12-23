@@ -12,6 +12,7 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -26,6 +27,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Controller\Admin\BinaryFileController;
 use Thelia\Api\Controller\Admin\PostItemFileController;
 use Thelia\Model\Map\ModuleImageTableMap;
@@ -72,6 +74,12 @@ use Thelia\Model\Map\ModuleImageTableMap;
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
     denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'position',
+    ]
 )]
 class ModuleImage extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
