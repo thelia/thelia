@@ -23,12 +23,15 @@ class BrandFilter implements TheliaFilterInterface
         $query->filterByBrandId($value);
     }
 
-    public function getValue(ActiveRecordInterface $activeRecord): array
+    public function getValue(ActiveRecordInterface $activeRecord,string $locale): ?array
     {
+        if (empty($activeRecord->getBrand())){
+            return null;
+        }
         return [
             [
                 'id' => $activeRecord->getBrand()->getId(),
-                'title' => $activeRecord->getBrand()->getTitle(),
+                'title' => $activeRecord->getBrand()->setLocale($locale)->getTitle(),
                 'value' => $activeRecord->getBrand()->getId()
             ]
         ];
