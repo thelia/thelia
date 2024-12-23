@@ -4,6 +4,14 @@ api_platform:
         paths: [
 
         ]
+    formats:
+        json:
+            mime_types: [ 'application/json' ]
+        jsonld:
+            mime_types: [ 'application/ld+json' ]
+        html:
+            mime_types: [ 'text/html' ]
+
     swagger:
         versions: [3]
         swagger_ui_extra_configuration:
