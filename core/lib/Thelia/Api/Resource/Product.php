@@ -31,6 +31,7 @@ use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\TheliaFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Api\Bridge\Propel\Validator\I18nConstraint;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductQuery;
@@ -50,11 +51,11 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         ),
         new Put(
             uriTemplate: '/admin/products/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE,self::GROUP_ADMIN_WRITE_UPDATE]]
         ),
         new Patch(
             uriTemplate: '/admin/products/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE,self::GROUP_ADMIN_WRITE_UPDATE]]
         ),
         new Delete(
             uriTemplate: '/admin/products/{id}'
@@ -176,6 +177,7 @@ class Product extends AbstractTranslatableResource
     #[Groups([
         self::GROUP_ADMIN_READ_SINGLE,
         self::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ_SINGLE,
         self::GROUP_ADMIN_WRITE_UPDATE,
         self::GROUP_FRONT_READ,
     ])]
@@ -185,6 +187,7 @@ class Product extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     public array $featureProducts;
 
+    #[I18nConstraint(groups: [self::GROUP_ADMIN_WRITE])]
     #[Groups([
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
