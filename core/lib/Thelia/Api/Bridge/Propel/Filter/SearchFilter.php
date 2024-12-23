@@ -29,7 +29,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Api\Resource\TranslatableResourceInterface;
 
-final class SearchFilter extends AbstractFilter implements FilterInterface
+final class SearchFilter extends AbstractFilter
 {
     /**
      * @var string Exact matching

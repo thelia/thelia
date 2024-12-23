@@ -17,7 +17,7 @@ namespace Thelia\Api\Bridge\Propel\Filter;
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 
-final class BooleanFilter extends AbstractFilter implements FilterInterface
+final class BooleanFilter extends AbstractFilter
 {
     protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
     {

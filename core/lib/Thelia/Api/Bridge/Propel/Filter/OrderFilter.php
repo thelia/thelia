@@ -48,7 +48,6 @@ class OrderFilter extends AbstractFilter
         }
 
         $fieldPath = $this->getPropertyQueryPath($query, $property, $context);
-
         $query->orderBy($fieldPath, $direction);
     }
 
@@ -86,7 +85,6 @@ class OrderFilter extends AbstractFilter
             // fallback to default direction
             $value = $defaultDirection;
         }
-
         $value = strtoupper($value);
         if (!\in_array($value, [self::DIRECTION_ASC, self::DIRECTION_DESC], true)) {
             return null;
