@@ -52,11 +52,11 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         ),
         new Put(
             uriTemplate: '/admin/products/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE,self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
         ),
         new Patch(
             uriTemplate: '/admin/products/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE,self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
         ),
         new Delete(
             uriTemplate: '/admin/products/{id}'
@@ -101,14 +101,14 @@ use Thelia\Model\Tools\UrlRewritingTrait;
     ]
 )]
 #[ApiFilter(
+    filterClass: TheliaFilter::class,
+)]
+#[ApiFilter(
     filterClass: NotInFilter::class,
     properties: [
         'id',
         'ref',
     ]
-)]
-#[ApiFilter(
-    filterClass: TheliaFilter::class,
 )]
 class Product extends AbstractTranslatableResource
 {
