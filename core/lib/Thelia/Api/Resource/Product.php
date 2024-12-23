@@ -28,12 +28,14 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\TheliaFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Api\Bridge\Propel\Validator\I18nConstraint;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductQuery;
+use Thelia\Model\Tools\UrlRewritingTrait;
 
 #[ApiResource(
     operations: [
@@ -97,8 +99,13 @@ use Thelia\Model\ProductQuery;
         'productCategories.position',
     ]
 )]
+#[ApiFilter(
+    filterClass: TheliaFilter::class,
+)]
 class Product extends AbstractTranslatableResource
 {
+    use UrlRewritingTrait;
+
     public const GROUP_ADMIN_READ = 'admin:product:read';
     public const GROUP_ADMIN_READ_SINGLE = 'admin:product:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:product:write';
@@ -119,6 +126,7 @@ class Product extends AbstractTranslatableResource
             ProductSaleElements::GROUP_ADMIN_WRITE,
             ProductImage::GROUP_ADMIN_READ_SINGLE,
             ProductDocument::GROUP_ADMIN_READ_SINGLE,
+            CartItem::GROUP_FRONT_READ_SINGLE,
         ]
     )]
     public ?int $id = null;
@@ -156,7 +164,12 @@ class Product extends AbstractTranslatableResource
     public ?\DateTime $updatedAt;
 
     #[Relation(targetResource: ProductCategory::class)]
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ_SINGLE,
+        self::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ_SINGLE,
+        self::GROUP_FRONT_READ,
+    ])]
     public array $productCategories;
 
     #[Column(propelFieldName: 'productSaleElementss')]
@@ -166,6 +179,7 @@ class Product extends AbstractTranslatableResource
         self::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
         self::GROUP_ADMIN_WRITE_UPDATE,
+        self::GROUP_FRONT_READ,
     ])]
     public array $productSaleElements;
 
@@ -173,8 +187,13 @@ class Product extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     public array $featureProducts;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     #[I18nConstraint(groups: [self::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ,
+        CartItem::GROUP_FRONT_READ_SINGLE,
+    ])]
     public I18nCollection $i18ns;
 
     public function __construct()
@@ -384,5 +403,27 @@ class Product extends AbstractTranslatableResource
                 )
             );
         }
+    }
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ,
+        CartItem::GROUP_FRONT_READ_SINGLE,
+    ])]
+    public function getPublicUrl()
+    {
+        /** @var \Thelia\Model\Product $propelModel */
+        $propelModel = $this->getPropelModel();
+
+        return $this->getUrl($propelModel->getLocale());
+    }
+
+    public function getRewrittenUrlViewName(): string
+    {
+        /** @var \Thelia\Model\Product $propelModel */
+        $propelModel = $this->getPropelModel();
+
+        return $propelModel->getRewrittenUrlViewName();
     }
 }

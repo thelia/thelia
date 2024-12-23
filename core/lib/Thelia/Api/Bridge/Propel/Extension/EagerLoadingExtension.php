@@ -16,7 +16,6 @@ use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
@@ -137,7 +136,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 }
 
                 // Join only for non collection relation (Many to One or One to One) or if filter is applied to it
-                if ($property->getType()->getName() === Collection::class) {
+                if ($property->getType()->getName() === 'array') {
                     if (!$isInFilters) {
                         continue;
                     }

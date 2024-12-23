@@ -1,0 +1,38 @@
+webpack_encore:
+  # The path where Encore is building the assets - i.e. Encore.setOutputPath()
+  # if you customize this, you will also need to change framework.assets.json_manifest_path (it usually lives in assets.yaml)
+  output_path: '%kernel.project_dir%/templates/frontOffice/%thelia_front_template%/dist'
+  # If multiple builds are defined (as shown below), you can disable the default build:
+  # output_path: false
+
+  # Set attributes that will be rendered on all script and link tags
+  script_attributes:
+    defer: true
+    # referrerpolicy: origin
+    # link_attributes:
+    #     referrerpolicy: origin
+
+    # if using Encore.enableIntegrityHashes() and need the crossorigin attribute (default: false, or use 'anonymous' or 'use-credentials')
+    # crossorigin: 'anonymous'
+
+    # preload all rendered script and link tags automatically via the http2 Link header
+    # preload: true
+
+    # Throw an exception if the entrypoints.json file is missing or an entry is missing from the data
+    # strict_mode: false
+
+    # if you have multiple builds:
+    # builds:
+    # frontend: '%kernel.project_dir%/public/frontend/build'
+
+    # pass the build name" as the 3rd argument to the Twig functions
+    # {{ encore_entry_script_tags('entry1', null, 'frontend') }}
+
+  # Cache the entrypoints.json (rebuild Symfony's cache when entrypoints.json changes)
+  # Available in version 1.2
+  # Put in config/packages/prod/webpack_encore.yaml
+  # cache: true
+
+framework:
+  assets:
+    json_manifest_path: '%kernel.project_dir%/templates/frontOffice/%thelia_front_template%/dist/manifest.json'

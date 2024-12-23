@@ -14,6 +14,7 @@ namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 use Thelia\Controller\BaseController;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Exception\AuthenticationException;
@@ -40,7 +41,7 @@ class BaseAdminController extends BaseController
      * setCurrentRouter() method to pass their own router, and use the route related
      * methods of this class.
      */
-    protected $currentRouter = 'router.admin';
+    protected string $currentRouter = 'router.admin';
 
     /**
      * This method process the rendering of view called from an admin page.
@@ -56,7 +57,7 @@ class BaseAdminController extends BaseController
                 // If we have a view in the URL, render this view
                 return $this->render($template);
             }
-            if (null != $view = $this->getRequest()->get('view')) {
+            if (null !== $view = $this->requestStack->getCurrentRequest()?->get('view')) {
                 return $this->render($view);
             }
         } catch (\Exception $ex) {
@@ -80,8 +81,8 @@ class BaseAdminController extends BaseController
             $resource,
             $action,
             $message,
-            $this->getRequest(),
-            $this->getSecurityContext()->getAdminUser(),
+            $this->requestStack->getCurrentRequest(),
+            $this->securityContext->getAdminUser(),
             true,
             $resourceId
         );
@@ -89,10 +90,8 @@ class BaseAdminController extends BaseController
 
     /**
      * Return a 404 error.
-     *
-     * @return \Thelia\Core\HttpFoundation\Response
      */
-    protected function pageNotFound()
+    protected function pageNotFound(): Response
     {
         return new Response($this->renderRaw(self::TEMPLATE_404), 404);
     }
@@ -108,7 +107,7 @@ class BaseAdminController extends BaseController
     protected function errorPage($message, $status = 500)
     {
         if ($message instanceof \Exception) {
-            $strMessage = $this->getTranslator()->trans(
+            $strMessage = $this->translator->trans(
                 'Sorry, an error occured: %msg',
                 ['%msg' => $message->getMessage()]
             );
@@ -144,7 +143,7 @@ class BaseAdminController extends BaseController
         $modules = \is_array($modules) ? $modules : [$modules];
         $accesses = \is_array($accesses) ? $accesses : [$accesses];
 
-        if ($this->getSecurityContext()->isGranted(['ADMIN'], $resources, $modules, $accesses)) {
+        if ($this->securityContext->isGranted(['ADMIN'], $resources, $modules, $accesses)) {
             // Okay !
             return null;
         }
@@ -152,7 +151,7 @@ class BaseAdminController extends BaseController
         // Log the problem
         $this->adminLogAppend(implode(',', $resources), implode(',', $accesses), 'User is not granted for resources %s with accesses %s', implode(', ', $resources));
 
-        return $this->errorPage($this->getTranslator()->trans("Sorry, you're not allowed to perform this action"), 403);
+        return $this->errorPage($this->translator->trans("Sorry, you're not allowed to perform this action"), 403);
     }
 
     /*
@@ -160,7 +159,7 @@ class BaseAdminController extends BaseController
      */
     protected function createStandardFormValidationErrorMessage(FormValidationException $exception)
     {
-        return $this->getTranslator()->trans(
+        return $this->translator->trans(
             'Please check your input: %error',
             [
                 '%error' => $exception->getMessage(),
@@ -181,7 +180,7 @@ class BaseAdminController extends BaseController
         if ($error_message !== false) {
             // Log the error message
             Tlog::getInstance()->error(
-                $this->getTranslator()->trans(
+                $this->translator->trans(
                     'Error during %action process : %error. Exception was %exc',
                     [
                         '%action' => $action,
@@ -191,7 +190,7 @@ class BaseAdminController extends BaseController
                 )
             );
 
-            if ($form != null) {
+            if ($form !== null) {
                 // Mark the form as errored
                 $form->setErrorMessage($error_message);
 
@@ -211,11 +210,11 @@ class BaseAdminController extends BaseController
      */
     protected function getParser($template = null)
     {
-        $parser = $this->container->get('thelia.parser');
-
+        $path = $this->templateHelper->getActiveAdminTemplate()->getAbsolutePath();
+        $parser = $this->parserResolver->getParser($path, $template);
         // Define the template that should be used
         $parser->setTemplateDefinition(
-            $template ?: $this->getTemplateHelper()->getActiveAdminTemplate(),
+            $parser->getTemplateDefinition() ?: $this->templateHelper->getActiveAdminTemplate(),
             $this->useFallbackTemplate
         );
 
@@ -234,7 +233,7 @@ class BaseAdminController extends BaseController
     protected function forward(string $controller, array $path = [], array $query = [])
     {
         $path['_controller'] = $controller;
-        $subRequest = $this->container->get('request_stack')->getCurrentRequest()->duplicate($query, null, $path);
+        $subRequest = $this->requestStack->getCurrentRequest()?->duplicate($query, null, $path);
 
         return $this->container->get('http_kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
     }
@@ -245,7 +244,7 @@ class BaseAdminController extends BaseController
     protected function getCurrentEditionCurrency()
     {
         // Return the new language if a change is required.
-        if (null !== $edit_currency_id = $this->getRequest()->get('edit_currency_id', null)) {
+        if (null !== $edit_currency_id = $this->requestStack->getCurrentRequest()?->get('edit_currency_id', null)) {
             if (null !== $edit_currency = CurrencyQuery::create()->findOneById($edit_currency_id)) {
                 return $edit_currency;
             }
@@ -261,7 +260,7 @@ class BaseAdminController extends BaseController
     protected function getCurrentEditionLang()
     {
         // Return the new language if a change is required.
-        if (null !== $edit_language_id = $this->getRequest()->get('edit_language_id', null)) {
+        if (null !== $edit_language_id = $this->requestStack->getCurrentRequest()?->get('edit_language_id', null)) {
             if (null !== $edit_language = LangQuery::create()->findOneById($edit_language_id)) {
                 return $edit_language;
             }
@@ -321,7 +320,7 @@ class BaseAdminController extends BaseController
         }
 
         // Find the current order
-        $order = $this->getRequest()->get(
+        $order = $this->requestStack->getCurrentRequest()?->get(
             $requestParameterName,
             $this->getSession()->get($orderSessionIdentifier, $defaultListOrder)
         );
@@ -364,8 +363,10 @@ class BaseAdminController extends BaseController
      */
     protected function renderRaw($templateName, $args = [], $templateDir = null)
     {
+        $parser = $this->getParser($templateDir.'/'.$templateName);
+
         // Add the template standard extension
-        $templateName .= '.html';
+        $templateName .= '.'.$parser->getFileExtension();
 
         // Find the current edit language ID
         $edition_language = $this->getCurrentEditionLang();
@@ -388,14 +389,14 @@ class BaseAdminController extends BaseController
 
         // Render the template.
         try {
-            $content = $this->getParser($templateDir)->render($templateName, $args);
+            $content = $parser->render($templateName, $args);
         } catch (AuthenticationException $ex) {
             // User is not authenticated, and templates requires authentication -> redirect to login page
             // We user login_tpl as a path, not a template.
             $content = new RedirectResponse(URL::getInstance()->absoluteUrl($ex->getLoginTemplate()));
         } catch (AuthorizationException $ex) {
             // User is not allowed to perform the required action. Return the error page instead of the requested page.
-            $content = $this->errorPage($this->getTranslator()->trans('Sorry, you are not allowed to perform this action.'), 403);
+            $content = $this->errorPage($this->translator->trans('Sorry, you are not allowed to perform this action.'), 403);
         }
 
         return $content;

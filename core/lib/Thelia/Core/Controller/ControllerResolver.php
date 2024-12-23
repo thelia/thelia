@@ -13,9 +13,7 @@
 namespace Thelia\Core\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
-use Thelia\Controller\ControllerInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -30,9 +28,6 @@ class ControllerResolver extends ContainerControllerResolver
 
     private function configureController($controller, string $class): object
     {
-        if ($controller instanceof ContainerAwareInterface) {
-            $controller->setContainer($this->container);
-        }
         if ($controller instanceof AbstractController) {
             if (null === $previousContainer = $controller->setContainer($this->container)) {
                 throw new \LogicException(sprintf('"%s" has no container set, did you forget to define it as a service subscriber?', $class));
@@ -63,11 +58,6 @@ class ControllerResolver extends ContainerControllerResolver
                 $this->container->get('request_stack')->getCurrentRequest()->setControllerType(
                     $controllerinstance->getControllerType()
                 );
-            }
-
-            // Todo remove in 2.7
-            if (is_subclass_of($controllerinstance, ControllerInterface::class)) {
-                $controllerinstance->setContainer($this->container);
             }
         }
 

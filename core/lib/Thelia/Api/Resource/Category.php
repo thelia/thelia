@@ -12,6 +12,7 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -21,7 +22,9 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\CategoryTableMap;
+use Thelia\Model\Tools\UrlRewritingTrait;
 
 #[ApiResource(
     operations: [
@@ -60,8 +63,15 @@ use Thelia\Model\Map\CategoryTableMap;
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
+#[ApiFilter(
+    filterClass: SearchFilter::class,
+    properties: [
+        'id',
+    ]
+)]
 class Category extends AbstractTranslatableResource
 {
+    use UrlRewritingTrait;
     public const GROUP_ADMIN_READ = 'admin:category:read';
     public const GROUP_ADMIN_READ_SINGLE = 'admin:category:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:category:write';
@@ -99,7 +109,7 @@ class Category extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, Product::GROUP_FRONT_READ_SINGLE])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int
@@ -194,5 +204,22 @@ class Category extends AbstractTranslatableResource
     public static function getI18nResourceClass(): string
     {
         return CategoryI18n::class;
+    }
+
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    public function getPublicUrl()
+    {
+        /** @var \Thelia\Model\Category $propelModel */
+        $propelModel = $this->getPropelModel();
+
+        return $this->getUrl($propelModel->getLocale());
+    }
+
+    public function getRewrittenUrlViewName(): string
+    {
+        /** @var \Thelia\Model\Category $propelModel */
+        $propelModel = $this->getPropelModel();
+
+        return $propelModel->getRewrittenUrlViewName();
     }
 }

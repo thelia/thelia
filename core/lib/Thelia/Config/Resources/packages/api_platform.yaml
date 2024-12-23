@@ -1,5 +1,7 @@
 api_platform:
     show_webby: false
+    defaults:
+        pagination_client_items_per_page: true
     mapping:
         paths: [
 

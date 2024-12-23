@@ -18,7 +18,7 @@ use Symfony\Component\Routing\RequestContext;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
-use Thelia\Core\Routing\RewritingRouter;
+use Thelia\Core\Routing\RewritingLoader;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Model\ProductQuery;
@@ -42,7 +42,7 @@ class RewritingRouterTest extends TestCase
      */
     public function testGenerate(): void
     {
-        $rewritingRouter = new RewritingRouter();
+        $rewritingRouter = new RewritingLoader();
 
         $this->expectException(\Symfony\Component\Routing\Exception\RouteNotFoundException::class);
         $rewritingRouter->generate('foo');
@@ -53,7 +53,7 @@ class RewritingRouterTest extends TestCase
      */
     public function testMatch(): void
     {
-        $rewritingRouter = new RewritingRouter();
+        $rewritingRouter = new RewritingLoader();
 
         $this->expectException(\Symfony\Component\Routing\Exception\ResourceNotFoundException::class);
         $rewritingRouter->match('foo');
@@ -67,7 +67,7 @@ class RewritingRouterTest extends TestCase
         ConfigQuery::write('rewriting_enable', 0);
         $request = new Request();
 
-        $rewritingRouter = new RewritingRouter();
+        $rewritingRouter = new RewritingLoader();
 
         $this->expectException(\Symfony\Component\Routing\Exception\ResourceNotFoundException::class);
         $rewritingRouter->matchRequest($request);
@@ -81,7 +81,7 @@ class RewritingRouterTest extends TestCase
         ConfigQuery::write('rewriting_enable', 1);
         $request = Request::create('http://test.com/foo');
 
-        $rewritingRouter = new RewritingRouter();
+        $rewritingRouter = new RewritingLoader();
 
         $this->expectException(\Symfony\Component\Routing\Exception\ResourceNotFoundException::class);
         $rewritingRouter->matchRequest($request);
@@ -115,7 +115,7 @@ class RewritingRouterTest extends TestCase
         $requestContext->fromRequest($request);
         $url->setRequestContext($requestContext);
 
-        $rewritingRouter = new RewritingRouter();
+        $rewritingRouter = new RewritingLoader();
         $parameters = $rewritingRouter->matchRequest($request);
 
         $this->assertEquals('Thelia\\Controller\\Front\\DefaultController::noAction', $parameters['_controller']);
@@ -154,7 +154,7 @@ class RewritingRouterTest extends TestCase
         $requestContext->fromRequest($request);
         $url->setRequestContext($requestContext);
 
-        $rewritingRouter = new RewritingRouter();
+        $rewritingRouter = new RewritingLoader();
         $parameters = $rewritingRouter->matchRequest($request);
 
         $this->assertEquals('Thelia\\Controller\\Front\\DefaultController::noAction', $parameters['_controller']);
@@ -201,7 +201,7 @@ class RewritingRouterTest extends TestCase
         $url->setRequestContext($requestContext);
 
         try {
-            $rewritingRouter = new RewritingRouter();
+            $rewritingRouter = new RewritingLoader();
             $parameters = $rewritingRouter->matchRequest($request);
         } catch (RedirectException $e) {
             $this->assertMatchesRegularExpression("/http:\/\/test\.com\/.*/", $e->getUrl());

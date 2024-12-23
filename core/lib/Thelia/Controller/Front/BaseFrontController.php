@@ -25,7 +25,7 @@ class BaseFrontController extends BaseController
 {
     public const CONTROLLER_TYPE = 'front';
 
-    protected $currentRouter = 'router.front';
+    protected string $currentRouter = 'router.front';
 
     public function checkAuth(): void
     {
@@ -78,7 +78,8 @@ class BaseFrontController extends BaseController
      */
     protected function getParser($template = null)
     {
-        $parser = $this->container->get('thelia.parser');
+        $path = $this->getTemplateHelper()->getActiveFrontTemplate()->getAbsolutePath();
+        $parser = $this->parserResolver->getParser($path, $template);
 
         // Define the template that should be used
         $parser->setTemplateDefinition(
@@ -114,12 +115,7 @@ class BaseFrontController extends BaseController
      */
     protected function renderRaw($templateName, $args = [], $templateDir = null)
     {
-        // Add the template standard extension
-        $templateName .= '.html';
-
         // Render the template.
-        $data = $this->getParser($templateDir)->render($templateName, $args);
-
-        return $data;
+        return $this->getParser()->render($templateName, $args);
     }
 }

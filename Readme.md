@@ -91,7 +91,7 @@ You can get the sources from git and then let composer install dependencies, or 
 ``` bash
 $ git clone --recursive https://github.com/thelia/thelia path
 $ cd path
-$ git checkout 2.5.4
+$ git checkout 2.5.5
 $ curl -sS https://getcomposer.org/installer | php
 $ php composer.phar install
 ```
@@ -100,7 +100,7 @@ $ php composer.phar install
 
 ``` bash
 $ curl -sS https://getcomposer.org/installer | php
-$ php composer.phar create-project thelia/thelia path/ 2.5.4
+$ php composer.phar create-project thelia/thelia path/ 2.5.5
 ```
 
 If something goes wrong during the install process, you can restart Thelia install wizard with
@@ -143,47 +143,8 @@ Warning, this docker configuration is not ready for production.
 
 It requires obviously [docker](https://docker.com/) and [docker-compose](https://docs.docker.com/compose/)
 
-To install Thelia within Docker, run :
-
-``` bash
-./start-docker.sh
-```
-
-It will ask you for a template name (usually your project name) if you don't have a .env file but you can create the .env by yourself, take a look at .env.docker to make your own.
-
-If your folder template does not exist it will copy the "modern" template.
-
-Next just go to http://localhost:8080 and you should see your Thelia installed !
-
-And run the same command everytime you want launch your Thelia.
-
-If you want add some sample data just add the option `-demo`
-``` bash
-./start-docker.sh -demo
-```
-
-If you want to access your database from your computer (with DBeaver, Sequel Pro or anything else) by default the host is `localhost` and the port is `8086`
-
-### Using Makefile
-
-To install Thelia, run :
-````bash
-make install
-````
-If you have been missing `ACTIVE_FRONT_TEMPLATE` and/or `ACTIVE_ADMIN_TEMPLATE`, you should set them up in .env.local and launch :
-````bash
-make install-front
-make build
-````
-If you need an example of thelia database, you can run:
-````bash
-make import-demo-db
-````
-
-Documentation
--------------
-
-Thelia documentation is available at https://doc.thelia.net
+Please, follow the official documentation to install docker and docker-compose on your system :
+https://doc.thelia.net/docs/getting_started/docker
 
 
 Contribute

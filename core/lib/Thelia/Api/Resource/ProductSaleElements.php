@@ -12,6 +12,7 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -23,6 +24,7 @@ use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 
 #[ApiResource(
@@ -62,6 +64,16 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
+#[ApiFilter(
+    filterClass: SearchFilter::class,
+    properties: [
+        'ref',
+        'product.id' => [
+            'strategy' => 'exact',
+            'fieldPath' => 'product_sale_elements.product_id',
+        ],
+    ]
+)]
 class ProductSaleElements implements PropelResourceInterface
 {
     use PropelResourceTrait;
@@ -81,6 +93,7 @@ class ProductSaleElements implements PropelResourceInterface
         ProductPrice::GROUP_ADMIN_READ,
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_FRONT_READ,
         Product::GROUP_ADMIN_WRITE_UPDATE,
     ])]
     public ?int $id = null;
@@ -98,6 +111,7 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_ADMIN_WRITE,
         CartItem::GROUP_ADMIN_READ,
         CartItem::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ,
     ])]
     public string $ref;
 
@@ -110,6 +124,7 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_ADMIN_WRITE,
         CartItem::GROUP_ADMIN_READ,
         CartItem::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ,
     ])]
     public int $quantity;
 
@@ -122,6 +137,7 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_ADMIN_WRITE,
         CartItem::GROUP_ADMIN_READ,
         CartItem::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ,
     ])]
     public ?bool $promo;
 
@@ -134,6 +150,7 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_ADMIN_WRITE,
         CartItem::GROUP_ADMIN_READ,
         CartItem::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ,
     ])]
     public ?bool $newness;
 
@@ -146,6 +163,7 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_ADMIN_WRITE,
         CartItem::GROUP_ADMIN_READ,
         CartItem::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ,
     ])]
     public ?float $weight;
 
@@ -156,6 +174,7 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_ADMIN_WRITE,
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_FRONT_READ,
     ])]
     public ?bool $isDefault;
 
@@ -177,6 +196,7 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_ADMIN_WRITE,
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_FRONT_READ,
     ])]
     public array $productPrices;
 

@@ -26,7 +26,7 @@
 
         <div class="row">
 
-            {if $module_errors}
+            {if isset($module_errors) && $module_errors}
             {include file="includes/module-errors.html"}
             {/if}
 

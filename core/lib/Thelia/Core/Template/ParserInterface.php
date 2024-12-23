@@ -12,9 +12,11 @@
 
 namespace Thelia\Core\Template;
 
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 
+#[AutoconfigureTag('thelia.parser.template')]
 /**
  * @author Manuel Raynaud <manu@raynaud.io>
  */
@@ -56,16 +58,14 @@ interface ParserInterface
     /**
      * @return int the HTTP status of the response
      */
-    public function getStatus();
+    public function getStatus(): int;
 
     /**
      * Sets the HTTP status of the response.
      *
      * status An HTTP status (200, 404, ...)
-     *
-     * @param int $status
      */
-    public function setStatus($status);
+    public function setStatus(int $status): self;
 
     /**
      * Returns the request used by the parser.
@@ -162,4 +162,10 @@ interface ParserInterface
      * @return \Thelia\Core\Template\TemplateHelperInterface the parser template helper instance
      */
     public function getTemplateHelper();
+
+    public function supportTemplateRender(string $templatePath, ?string $templateName): bool;
+
+    public function getFileExtension(): string;
+
+    public static function getDefaultPriority(): int;
 }

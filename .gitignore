@@ -1,14 +1,16 @@
 ###> symfony/framework-bundle ###
-/var/
-/vendor/
 /.env.local
 /.env.local.php
 /.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
 composer.lock
 symfony.lock
 phpunit.xml
-config
-###< symfony/framework-bundle ###
 
 ###> thelia/thelia ###
 local/config/build.properties
@@ -43,44 +45,22 @@ local/I18n/*.php
 .docker/mysql-data/*
 !.docker/mysql-data/.gitkeep
 local/session/
+local/setup/
 translations/
-bin/
 
-# Ignore everything in the "modules" directory, except the "default modules"
+# Ignore everything in the "modules" directory
 local/modules/*
-!local/modules/Cheque/
-!local/modules/Carousel/
-!local/modules/Front/
-!local/modules/FreeOrder/
-!local/modules/Tinymce/
-!local/modules/Colissimo/
-!local/modules/Hook*/
-!local/modules/VirtualProductDelivery/
-!local/modules/VirtualProductControl/
-!local/modules/TheliaSmarty/
-!local/modules/TheliaMigrateCountry/
-!local/modules/WebProfiler/
-local/modules/HookTest/
 
 # Ignore everything in the "templates" directory, except the "default template"
 templates/*
 !templates/frontOffice
 templates/frontOffice/*
-!templates/frontOffice/default
-!templates/frontOffice/modern
-!templates/frontOffice/new_default
-templates/frontOffice/modern/node_modules
-templates/frontOffice/modern/dist
-templates/frontOffice/modern/core
 !templates/backOffice
 templates/backOffice/*
-!templates/backOffice/default
 !templates/email
 templates/email/*
-!templates/email/default
 !templates/pdf
 templates/pdf/*
-!templates/pdf/default
 
 ###< thelia/thelia ###
 
@@ -97,7 +77,8 @@ setup/audit/greenit.yaml
 ###< phpunit/phpunit ###
 
 ###> symfony/phpunit-bridge ###
-.phpunit
+.phpunit.result.cache
+/phpunit.xml
 ###< symfony/phpunit-bridge ###
 
 ###> symfony/webpack-encore-bundle ###
@@ -116,12 +97,6 @@ tests/cypress/downloads
 ###> lexik/jwt-authentication-bundle ###
 /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
-/config/packages
-/config/routes
-/config/bundles.php
-/config/preload.php
-/config/routes.yaml
-/config/services.yaml
 
 ###> friendsofphp/php-cs-fixer ###
 /.php-cs-fixer.php
@@ -133,7 +108,7 @@ phpstan.neon
 ###< phpstan/phpstan ###
 
 /web/bundles/apiplatform/
-/public/bundles/apiplatform/
+/public
 /.env
 /.env.test
 /webpack.config.js
@@ -141,3 +116,4 @@ phpstan.neon
 /assets
 /compose.override.yaml
 /phpstan.dist.neon
+

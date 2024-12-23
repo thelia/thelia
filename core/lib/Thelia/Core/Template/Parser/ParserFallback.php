@@ -34,12 +34,12 @@ class ParserFallback implements ParserInterface
         $this->throwException();
     }
 
-    public function getStatus(): void
+    public function getStatus(): int
     {
         $this->throwException();
     }
 
-    public function setStatus($status): void
+    public function setStatus($status): self
     {
         $this->throwException();
     }
@@ -167,5 +167,20 @@ class ParserFallback implements ParserInterface
     public function getFallbackToDefaultTemplate(): void
     {
         $this->throwException();
+    }
+
+    public function supportTemplateRender(string $templatePath, ?string $templateName): bool
+    {
+        return false;
+    }
+
+    public function getFileExtension(): string
+    {
+        $this->throwException();
+    }
+
+    public static function getDefaultPriority(): int
+    {
+        return -10;
     }
 }

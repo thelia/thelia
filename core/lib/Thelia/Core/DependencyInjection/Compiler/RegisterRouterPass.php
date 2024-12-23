@@ -15,11 +15,8 @@ namespace Thelia\Core\DependencyInjection\Compiler;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
-use Thelia\Model\Module;
-use Thelia\Model\ModuleQuery;
 
 /**
  * this compiler can add many router to symfony-cms routing.
@@ -43,7 +40,7 @@ class RegisterRouterPass implements CompilerPassInterface
             return;
         }
 
-        $router = $container->getDefinition('router.default');
+        $chainRouter->addMethodCall('add', [new Reference('router.rewrite'), 1024]);
         $chainRouter->addMethodCall('add', [new Reference('router.default'), 512]);
 
         foreach ($container->findTaggedServiceIds('router.register') as $id => $attributes) {
@@ -52,33 +49,6 @@ class RegisterRouterPass implements CompilerPassInterface
             $router->addMethodCall('setOption', ['cache_dir', THELIA_CACHE_DIR.$container->getParameter('kernel.environment').DS.'routing'.DS.$id]);
 
             $chainRouter->addMethodCall('add', [new Reference($id), $priority]);
-        }
-        if (\defined('THELIA_INSTALL_MODE') === false) {
-            $modules = ModuleQuery::getActivated();
-
-            /** @var Module $module */
-            foreach ($modules as $module) {
-                $moduleBaseDir = $module->getBaseDir();
-                $routingConfigFilePath = $module->getAbsoluteBaseDir().DS.'Config'.DS.'routing.xml';
-
-                if (file_exists($routingConfigFilePath)) {
-                    $moduleRouter = new Definition(
-                        $container->getParameter('router.class'),
-                        [
-                            new Reference('router.module.xmlLoader'),
-                            $routingConfigFilePath,
-                            [],
-                            new Reference('request.context'),
-                        ]
-                    );
-
-                    $routerId = 'router.'.$moduleBaseDir;
-                    $container->setDefinition($routerId, $moduleRouter);
-
-                    $moduleRouter->addMethodCall('setOption', ['cache_dir', THELIA_CACHE_DIR.$container->getParameter('kernel.environment').DS.'routing'.DS.$routerId]);
-                    $chainRouter->addMethodCall('add', [new Reference($routerId), 150 + $module->getPosition()]);
-                }
-            }
         }
     }
 }

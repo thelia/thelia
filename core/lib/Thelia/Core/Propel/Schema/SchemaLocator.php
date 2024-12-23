@@ -13,6 +13,7 @@
 namespace Thelia\Core\Propel\Schema;
 
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Thelia\Module\Validator\ModuleValidator;
@@ -63,18 +64,26 @@ class SchemaLocator
     public function findForAllModules()
     {
         $finder = new Finder();
+        $filesystem = new Filesystem();
+        $modulesPath = THELIA_MODULE_DIR.'*'.DS.'Config';
 
-        $finder
-            ->name('module.xml')
-            ->in(THELIA_MODULE_DIR.'*'.DS.'Config')
-        ;
+        try {
+            // Vérifiez si le répertoire existe avant d'utiliser Finder
+            if (!$filesystem->exists(THELIA_MODULE_DIR)) {
+                throw new DirectoryNotFoundException(sprintf('The directory "%s" does not exist.', THELIA_MODULE_DIR));
+            }
 
-        // reset keys
-        $codes = array_map(function ($file) {
-            return basename(\dirname($file, 2));
-        }, iterator_to_array($finder));
+            $finder->name('module.xml')->in($modulesPath);
 
-        return $this->findForModules($codes);
+            // reset keys
+            $codes = array_map(function ($file) {
+                return basename(\dirname($file, 2));
+            }, iterator_to_array($finder));
+
+            return $this->findForModules($codes);
+        } catch (\Exception) {
+            return $this->findForModules(['Thelia']);
+        }
     }
 
     /**

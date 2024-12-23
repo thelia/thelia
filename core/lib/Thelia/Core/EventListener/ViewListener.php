@@ -26,7 +26,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\ViewCheckEvent;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
-use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Exception\OrderException;
 
@@ -39,36 +39,20 @@ use Thelia\Exception\OrderException;
  */
 class ViewListener implements EventSubscriberInterface
 {
-    /** @var ParserInterface */
-    protected $parser;
-
-    /** @var TemplateHelperInterface */
-    protected $templateHelper;
-
-    /** @var Request */
-    protected $request;
-
-    /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
-
-    /** @var ChainRouterInterface */
-    protected $chainRouter;
+    protected readonly Request $request;
+    public const IGNORE_THELIA_VIEW = 'ignore_thelia_view';
 
     /**
      * ViewListener constructor.
      */
     public function __construct(
-        ParserInterface $parser,
-        TemplateHelperInterface $templateHelper,
-        RequestStack $requestStack,
-        EventDispatcherInterface $eventDispatcher,
-        ChainRouterInterface $chainRouter
+        protected ParserResolver $parserResolver,
+        protected TemplateHelperInterface $templateHelper,
+        protected RequestStack $requestStack,
+        protected EventDispatcherInterface $eventDispatcher,
+        protected ChainRouterInterface $chainRouter,
     ) {
-        $this->parser = $parser;
-        $this->templateHelper = $templateHelper;
         $this->request = $requestStack->getCurrentRequest();
-        $this->eventDispatcher = $eventDispatcher;
-        $this->chainRouter = $chainRouter;
     }
 
     /**
@@ -78,22 +62,25 @@ class ViewListener implements EventSubscriberInterface
      */
     public function onKernelView(ViewEvent $event): void
     {
-        $this->parser->setTemplateDefinition($this->templateHelper->getActiveFrontTemplate(), true);
         $response = null;
+
+        if (null !== $this->request->attributes->get(self::IGNORE_THELIA_VIEW)) {
+            return;
+        }
+
         try {
             $view = $this->request->attributes->get('_view');
-
+            $templatePath = $this->templateHelper->getActiveFrontTemplate()->getAbsolutePath();
+            $parser = $this->parserResolver->getParser($templatePath, $view);
+            $parser->setTemplateDefinition($this->templateHelper->getActiveFrontTemplate(), true);
             $viewId = $this->request->attributes->get($view.'_id');
 
             $this->eventDispatcher->dispatch(new ViewCheckEvent($view, $viewId), TheliaEvents::VIEW_CHECK);
 
-            $content = $this->parser->render($view.'.html');
-
-            if ($content instanceof Response) {
-                $response = $content;
-            } else {
-                $response = new Response($content, $this->parser->getStatus() ?: 200);
-            }
+            $content = $parser->render($view.'.'.$parser->getFileExtension());
+            $response = $content instanceof Response
+                ? $content
+                : new Response($content, $parser->getStatus() ?: 200);
         } catch (ResourceNotFoundException $e) {
             throw new NotFoundHttpException();
         } catch (OrderException $e) {
@@ -111,13 +98,16 @@ class ViewListener implements EventSubscriberInterface
                 throw $e;
             }
         }
-
         $event->setResponse($response);
     }
 
     public function beforeKernelView(ViewEvent $event): void
     {
         $request = $this->request;
+
+        if (null !== $this->request->attributes->get(self::IGNORE_THELIA_VIEW)) {
+            return;
+        }
 
         if (null === $view = $request->attributes->get('_view')) {
             $request->attributes->set('_view', $this->findView($request));

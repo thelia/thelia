@@ -86,7 +86,8 @@ class CartItem implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, Cart::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Cart::GROUP_FRONT_READ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, Cart::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Cart::GROUP_FRONT_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, Cart::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Cart::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
+    #[NotNull(groups: [Order::GROUP_ADMIN_WRITE])]
     public ?int $quantity;
 
     #[Relation(targetResource: Product::class)]
@@ -98,14 +99,15 @@ class CartItem implements PropelResourceInterface
     public Cart $cart;
 
     #[Relation(targetResource: ProductSaleElements::class)]
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
+    #[NotNull(groups: [Order::GROUP_ADMIN_WRITE])]
     public ProductSaleElements $productSaleElements;
 
     #[Groups([self::GROUP_ADMIN_READ, Cart::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Cart::GROUP_FRONT_READ])]
     public ?float $price;
 
     #[Groups([self::GROUP_ADMIN_READ, Cart::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Cart::GROUP_FRONT_READ])]
-    public ?float $promo_price;
+    public ?float $promoPrice;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $priceEndOfLife;
@@ -118,9 +120,25 @@ class CartItem implements PropelResourceInterface
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $updatedAt;
+    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $calculatedTotalPrice;
+    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $calculatedTotalPromoPrice;
+    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $calculatedTotalTaxedPrice;
+    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $calculatedTotalPromoTaxedPrice;
+    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $calculatedRealPrice;
+    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $calculatedRealTaxedPrice;
+    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $calculatedRealTotalPrice;
+    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $calculatedRealTotalTaxedPrice;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
-    public I18nCollection $i18ns;
+    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?bool $isPromo;
 
     public function getId(): ?int
     {
@@ -196,12 +214,12 @@ class CartItem implements PropelResourceInterface
 
     public function getPromoPrice(): ?float
     {
-        return $this->promo_price;
+        return $this->promoPrice;
     }
 
     public function setPromoPrice(?float $promo_price): self
     {
-        $this->promo_price = $promo_price;
+        $this->promoPrice = $promo_price;
 
         return $this;
     }
@@ -250,6 +268,114 @@ class CartItem implements PropelResourceInterface
     public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getCalculatedRealPrice(): ?float
+    {
+        return $this->calculatedRealPrice;
+    }
+
+    public function setCalculatedRealPrice(?float $calculatedRealPrice): self
+    {
+        $this->calculatedRealPrice = $calculatedRealPrice;
+
+        return $this;
+    }
+
+    public function getCalculatedRealTaxedPrice(): ?float
+    {
+        return $this->calculatedRealTaxedPrice;
+    }
+
+    public function setCalculatedRealTaxedPrice(?float $calculatedRealTaxedPrice): self
+    {
+        $this->calculatedRealTaxedPrice = $calculatedRealTaxedPrice;
+
+        return $this;
+    }
+
+    public function getCalculatedRealTotalPrice(): ?float
+    {
+        return $this->calculatedRealTotalPrice;
+    }
+
+    public function setCalculatedRealTotalPrice(?float $calculatedRealTotalPrice): self
+    {
+        $this->calculatedRealTotalPrice = $calculatedRealTotalPrice;
+
+        return $this;
+    }
+
+    public function getCalculatedRealTotalTaxedPrice(): ?float
+    {
+        return $this->calculatedRealTotalTaxedPrice;
+    }
+
+    public function setCalculatedRealTotalTaxedPrice(?float $calculatedRealTotalTaxedPrice): self
+    {
+        $this->calculatedRealTotalTaxedPrice = $calculatedRealTotalTaxedPrice;
+
+        return $this;
+    }
+
+    public function getCalculatedTotalPrice(): ?float
+    {
+        return $this->calculatedTotalPrice;
+    }
+
+    public function setCalculatedTotalPrice(?float $calculatedTotalPrice): self
+    {
+        $this->calculatedTotalPrice = $calculatedTotalPrice;
+
+        return $this;
+    }
+
+    public function getCalculatedTotalPromoPrice(): ?float
+    {
+        return $this->calculatedTotalPromoPrice;
+    }
+
+    public function setCalculatedTotalPromoPrice(?float $calculatedTotalPromoPrice): self
+    {
+        $this->calculatedTotalPromoPrice = $calculatedTotalPromoPrice;
+
+        return $this;
+    }
+
+    public function getCalculatedTotalPromoTaxedPrice(): ?float
+    {
+        return $this->calculatedTotalPromoTaxedPrice;
+    }
+
+    public function setCalculatedTotalPromoTaxedPrice(?float $calculatedTotalPromoTaxedPrice): self
+    {
+        $this->calculatedTotalPromoTaxedPrice = $calculatedTotalPromoTaxedPrice;
+
+        return $this;
+    }
+
+    public function getCalculatedTotalTaxedPrice(): ?float
+    {
+        return $this->calculatedTotalTaxedPrice;
+    }
+
+    public function setCalculatedTotalTaxedPrice(?float $calculatedTotalTaxedPrice): self
+    {
+        $this->calculatedTotalTaxedPrice = $calculatedTotalTaxedPrice;
+
+        return $this;
+    }
+
+    public function getIsPromo(): ?bool
+    {
+        return $this->isPromo;
+    }
+
+    public function setIsPromo(?bool $isPromo): self
+    {
+        $this->isPromo = $isPromo;
 
         return $this;
     }

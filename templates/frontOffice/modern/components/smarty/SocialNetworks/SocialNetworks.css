@@ -1,7 +1,0 @@
-.SocialNetworks {
-  display: flex;
-  flex-wrap: wrap;
-  gap: rem(28px);
-  align-items: center;
-  color: white;
-}

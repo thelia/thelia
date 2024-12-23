@@ -1362,4 +1362,9 @@ return [
     'version' => 'Version',
     'warning' => 'Attention',
     'you can combine taxes in tax rules and chose if they are applied one after the other or at the same time : it allows to apply taxes on an already taxed price or not.' => 'vous pouvez combiner des taxes en règles de taxe et choisir si elle sont appliquées l\'une après l\'autre ou en même temps: cela permet d\'appliquer des taxes sur un produit déjà taxé ou non.',
+    'Customize filter configuration for this category' => 'Personnaliser la configuration des filtres pour cette catégorie',
+    'Position of the filters in front for this category' => 'Position des filtres en front pour cette catégorie',
+    'Position of the filters in front for this template' => 'Position des filtres en front pour ce gabarit',
+    'The position of the filters is for now the default one.' => 'La position des filtres est pour le moment celle par défaut.',
+    'Reset default values' => 'Réinitialiser les valeurs par défaut',
 ];
