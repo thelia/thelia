@@ -12,6 +12,7 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -26,6 +27,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Controller\Admin\BinaryFileController;
 use Thelia\Api\Controller\Admin\PostItemFileController;
 use Thelia\Model\Map\ProductImageTableMap;
@@ -64,7 +66,7 @@ use Thelia\Model\Map\ProductImageTableMap;
         ),
         new Patch(
             uriTemplate: '/admin/product_images/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE,self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
         ),
         new Delete(
             uriTemplate: '/admin/product_images/{id}'
@@ -95,6 +97,12 @@ use Thelia\Model\Map\ProductImageTableMap;
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'position',
+    ]
 )]
 class ProductImage extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
