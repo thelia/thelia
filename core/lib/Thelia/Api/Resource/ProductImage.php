@@ -67,7 +67,7 @@ use Thelia\Model\Map\ProductImageTableMap;
         ),
         new Patch(
             uriTemplate: '/admin/product_images/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE,self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
         ),
         new Delete(
             uriTemplate: '/admin/product_images/{id}'
