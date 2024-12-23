@@ -81,16 +81,36 @@ class Category extends AbstractTranslatableResource
     ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ_SINGLE
+    ])]
     public int $parent;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ_SINGLE
+    ])]
     public bool $visible;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ_SINGLE
+    ])]
     public ?int $position;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ_SINGLE
+    ])]
     public ?int $defaultTemplateId;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
