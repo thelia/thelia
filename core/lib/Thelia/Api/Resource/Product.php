@@ -28,6 +28,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
+use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\TheliaFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
@@ -97,6 +98,13 @@ use Thelia\Model\Tools\UrlRewritingTrait;
     properties: [
         'ref',
         'productCategories.position',
+    ]
+)]
+#[ApiFilter(
+    filterClass: NotInFilter::class,
+    properties: [
+        'id',
+        'ref',
     ]
 )]
 #[ApiFilter(
@@ -194,6 +202,7 @@ class Product extends AbstractTranslatableResource
         self::GROUP_FRONT_READ,
         CartItem::GROUP_FRONT_READ_SINGLE,
     ])]
+    #[I18nConstraint(groups: [self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
 
     public function __construct()

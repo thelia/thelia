@@ -93,6 +93,7 @@ class ProductSaleElements implements PropelResourceInterface
         ProductPrice::GROUP_ADMIN_READ,
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_ADMIN_WRITE_UPDATE,
         Product::GROUP_FRONT_READ,
         Product::GROUP_ADMIN_WRITE_UPDATE,
     ])]
