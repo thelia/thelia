@@ -91,20 +91,21 @@
             "php Thelia assets:install web"
         ],
         "pre-install-cmd": [
-            "mkdir -p templates/frontOffice/flexy/"
+            "rm -rf templates/frontOffice/flexy",
+            "mkdir -p templates/frontOffice/flexy"
         ],
         "pre-update-cmd": [
-            "mkdir -p templates/frontOffice/flexy/"
+            "rm -rf templates/frontOffice/flexy",
+            "mkdir -p templates/frontOffice/flexy"
         ],
         "post-install-cmd": [
-            "cp -r vendor/thelia/flexy templates/frontOffice",
             "cp -r vendor/thelia/flexy templates/frontOffice",
             "@cache-clear",
             "@assets-install",
             "php bin/console lexik:jwt:generate-key --skip-if-exists"
         ],
         "post-update-cmd": [
-            "cp -r --remove-destination vendor/thelia/flexy templates/frontOffice",
+            "cp -r vendor/thelia/flexy templates/frontOffice",
             "@cache-clear",
             "@assets-install"
         ],
