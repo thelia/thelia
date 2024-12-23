@@ -187,7 +187,7 @@ class Product extends AbstractTranslatableResource
         self::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
         self::GROUP_ADMIN_WRITE_UPDATE,
-        self::GROUP_FRONT_READ
+        self::GROUP_FRONT_READ,
     ])]
     public array $productSaleElements;
 
@@ -394,6 +394,7 @@ class Product extends AbstractTranslatableResource
             );
         }
     }
+
     #[Callback(groups: [self::GROUP_ADMIN_WRITE])]
     public function checkDefaultCategoryNotBlank(ExecutionContextInterface $context): void
     {
