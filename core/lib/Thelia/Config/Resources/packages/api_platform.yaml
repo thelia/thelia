@@ -1,5 +1,8 @@
 api_platform:
+    title: API Thelia
+    version: 1.0.0
     show_webby: false
+
     mapping:
         paths: [
 
