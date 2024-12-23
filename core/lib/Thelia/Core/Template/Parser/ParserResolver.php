@@ -35,7 +35,7 @@ class ParserResolver
      */
     public function getParser(string $pathTemplate, ?string $templateName): ParserInterface
     {
-        if ('' === (string) $templateName) {
+        if ('' === (string) $templateName || '/' === $templateName) {
             $templateName = 'index';
         }
         /** @var ParserInterface $parser */

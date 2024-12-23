@@ -1,6 +1,7 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
+index:
+    path: /
+    controller: Thelia\Controller\Front\DefaultController::noAction
+
 api_front_login_check:
   path: /api/front/login
 api_admin_login_check:

@@ -21,17 +21,11 @@ use Thelia\Model\ConfigQuery;
 
 class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberInterface
 {
-    protected $kernelCacheDir;
-
-    public function __construct($kernelCacheDir)
+    public function __construct(protected string $kernelCacheDir)
     {
-        $this->kernelCacheDir = $kernelCacheDir;
     }
 
-    /**
-     * @return TemplateDefinition
-     */
-    public function getActiveMailTemplate()
+    public function getActiveMailTemplate(): TemplateDefinition
     {
         return new TemplateDefinition(
             ConfigQuery::read('active-mail-template', 'default'),
@@ -44,32 +38,29 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
      *
      * @return bool true is the given template is the active template
      */
-    public function isActive(TemplateDefinition $tplDefinition)
+    public function isActive(TemplateDefinition $templateDefinition): bool
     {
-        $tplVar = '';
+        $configTemplateName = '';
 
-        switch ($tplDefinition->getType()) {
+        switch ($templateDefinition->getType()) {
             case TemplateDefinition::FRONT_OFFICE:
-                $tplVar = 'active-front-template';
+                $configTemplateName = 'active-front-template';
                 break;
             case TemplateDefinition::BACK_OFFICE:
-                $tplVar = 'active-admin-template';
+                $configTemplateName = 'active-admin-template';
                 break;
             case TemplateDefinition::PDF:
-                $tplVar = 'active-pdf-template';
+                $configTemplateName = 'active-pdf-template';
                 break;
             case TemplateDefinition::EMAIL:
-                $tplVar = 'active-mail-template';
+                $configTemplateName = 'active-mail-template';
                 break;
         }
 
-        return $tplDefinition->getName() == ConfigQuery::read($tplVar, 'default');
+        return $templateDefinition->getName() === ConfigQuery::read($configTemplateName, 'default');
     }
 
-    /**
-     * @return TemplateDefinition
-     */
-    public function getActivePdfTemplate()
+    public function getActivePdfTemplate(): TemplateDefinition
     {
         return new TemplateDefinition(
             ConfigQuery::read('active-pdf-template', 'default'),
@@ -77,10 +68,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
         );
     }
 
-    /**
-     * @return TemplateDefinition
-     */
-    public function getActiveAdminTemplate()
+    public function getActiveAdminTemplate(): TemplateDefinition
     {
         return new TemplateDefinition(
             ConfigQuery::read('active-admin-template', 'default'),
@@ -88,10 +76,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
         );
     }
 
-    /**
-     * @return TemplateDefinition
-     */
-    public function getActiveFrontTemplate()
+    public function getActiveFrontTemplate(): TemplateDefinition
     {
         return new TemplateDefinition(
             ConfigQuery::read('active-front-template', 'default'),
@@ -99,10 +84,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
         );
     }
 
-    /**
-     * Returns an array which contains all standard template definitions.
-     */
-    public function getStandardTemplateDefinitions()
+    public function getStandardTemplateDefinitions(): array
     {
         return [
             $this->getActiveFrontTemplate(),
@@ -114,44 +96,41 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
 
     /**
      * Return a list of existing templates for a given template type.
-     *
-     * @param int    $templateType the template type
-     * @param string $base         the template base (module or core, default to core)
-     *
-     * @return TemplateDefinition[] of \Thelia\Core\Template\TemplateDefinition
      */
-    public function getList($templateType, $base = THELIA_TEMPLATE_DIR)
+    public function getList(int $templateType, string $base = THELIA_TEMPLATE_DIR): array
     {
         $list = $exclude = [];
 
         $tplIterator = TemplateDefinition::getStandardTemplatesSubdirsIterator();
 
         foreach ($tplIterator as $type => $subdir) {
-            if ($templateType == $type) {
-                $baseDir = rtrim($base, DS).DS.$subdir;
-
-                try {
-                    // Every subdir of the basedir is supposed to be a template.
-                    $di = new \DirectoryIterator($baseDir);
-
-                    /** @var \DirectoryIterator $file */
-                    foreach ($di as $file) {
-                        // Ignore 'dot' elements
-                        if ($file->isDot() || !$file->isDir()) {
-                            continue;
-                        }
-
-                        // Ignore reserved directory names
-                        if (\in_array($file->getFilename(), $exclude)) {
-                            continue;
-                        }
-
-                        $list[] = new TemplateDefinition($file->getFilename(), $templateType);
-                    }
-                } catch (\UnexpectedValueException $ex) {
-                    // Ignore the exception and continue
-                }
+            if ($templateType !== $type) {
+                continue;
             }
+            $baseDir = rtrim($base, DS).DS.$subdir;
+
+            try {
+                // Every subdir of the basedir is supposed to be a template.
+                $di = new \DirectoryIterator($baseDir);
+
+                /** @var \DirectoryIterator $file */
+                foreach ($di as $file) {
+                    // Ignore 'dot' elements
+                    if ($file->isDot() || !$file->isDir()) {
+                        continue;
+                    }
+
+                    // Ignore reserved directory names
+                    if (\in_array($file->getFilename(), $exclude, true)) {
+                        continue;
+                    }
+
+                    $list[] = new TemplateDefinition($file->getFilename(), $templateType);
+                }
+            } catch (\Exception) {
+                continue;
+            }
+
         }
 
         return $list;
@@ -175,7 +154,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
         $dispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::CONFIG_SETVALUE => ['clearCache', 130],

@@ -26,16 +26,19 @@ use Thelia\Model\Map\RewritingUrlTableMap;
  */
 class RewritingUrlQuery extends BaseRewritingUrlQuery
 {
-    /**
-     * @return array|mixed|\Propel\Runtime\Collection\ObjectCollection
-     */
-    public function getResolverSearch($rewrittenUrl)
+    public function getResolverSearch($rewrittenUrl): ?RewritingArgument
     {
         $redirectedJoin = new Join();
-        $redirectedJoin->addExplicitCondition(RewritingUrlTableMap::TABLE_NAME, 'REDIRECTED', 'ru', RewritingUrlTableMap::TABLE_NAME, 'ID', 'is_redirected');
+        $redirectedJoin->addExplicitCondition(
+            RewritingUrlTableMap::TABLE_NAME,
+            'REDIRECTED', 'ru',
+            RewritingUrlTableMap::TABLE_NAME,
+            'ID',
+            'is_redirected'
+        );
         $redirectedJoin->setJoinType(Criteria::LEFT_JOIN);
 
-        $search = RewritingArgumentQuery::create()
+        return RewritingArgumentQuery::create()
             ->joinRewritingUrl('ru', Criteria::RIGHT_JOIN)
             ->addJoinObject($redirectedJoin)
             ->where('`ru`.URL = ?', $rewrittenUrl, \PDO::PARAM_STR)
@@ -44,9 +47,7 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
             ->withColumn('`ru`.VIEW_LOCALE', 'ru_locale')
             ->withColumn('`ru`.VIEW_ID', 'ru_viewId')
             ->withColumn('`is_redirected`.URL', 'ru_redirected_to_url')
-            ->find();
-
-        return $search;
+            ->findOne();
     }
 
     /**

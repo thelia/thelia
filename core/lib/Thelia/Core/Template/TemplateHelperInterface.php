@@ -14,32 +14,20 @@ namespace Thelia\Core\Template;
 
 interface TemplateHelperInterface
 {
-    /**
-     * @return TemplateDefinition
-     */
-    public function getActiveMailTemplate();
+    public function getActiveMailTemplate(): TemplateDefinition;
 
     /**
      * Check if a template definition is the current active template.
      *
      * @return bool true is the given template is the active template
      */
-    public function isActive(TemplateDefinition $tplDefinition);
+    public function isActive(TemplateDefinition $templateDefinition): bool;
 
-    /**
-     * @return TemplateDefinition
-     */
-    public function getActivePdfTemplate();
+    public function getActivePdfTemplate(): TemplateDefinition;
 
-    /**
-     * @return TemplateDefinition
-     */
-    public function getActiveAdminTemplate();
+    public function getActiveAdminTemplate(): TemplateDefinition;
 
-    /**
-     * @return TemplateDefinition
-     */
-    public function getActiveFrontTemplate();
+    public function getActiveFrontTemplate(): TemplateDefinition;
 
     /**
      * Returns an array which contains all standard template definitions.
@@ -54,5 +42,5 @@ interface TemplateHelperInterface
      *
      * @return TemplateDefinition[] of \Thelia\Core\Template\TemplateDefinition
      */
-    public function getList($templateType, $base = THELIA_TEMPLATE_DIR);
+    public function getList(int $templateType, string $base = THELIA_TEMPLATE_DIR): array;
 }

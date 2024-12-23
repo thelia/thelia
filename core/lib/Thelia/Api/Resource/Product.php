@@ -202,7 +202,6 @@ class Product extends AbstractTranslatableResource
         self::GROUP_FRONT_READ,
         CartItem::GROUP_FRONT_READ_SINGLE,
     ])]
-    #[I18nConstraint(groups: [self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
 
     public function __construct()

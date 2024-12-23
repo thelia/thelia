@@ -58,7 +58,6 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
         $urlTool = URL::getInstance();
 
         $pathInfo = $request instanceof TheliaRequest ? $request->getRealPathInfo() : $request->getPathInfo();
-
         try {
             $rewrittenUrlData = $urlTool->resolve($pathInfo);
         } catch (UrlRewritingException $e) {
@@ -134,6 +133,11 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
             $request->query->set($parameter, $value);
         }
 
+        return $this->defaultActionOptions();
+    }
+
+    private function defaultActionOptions(): array
+    {
         return [
             '_controller' => 'Thelia\\Controller\\Front\\DefaultController::noAction',
             '_route' => 'rewrite',

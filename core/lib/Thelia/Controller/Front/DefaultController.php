@@ -39,35 +39,23 @@ class DefaultController extends BaseFrontController
      */
     public function noAction(Request $request): void
     {
-        $view = null;
-
-        if (!$view = $request->query->get('view')) {
-            if ($request->request->has('view')) {
-                $view = $request->request->get('view');
-            }
+        if (!$view = ($request->query->get('view') && $request->request->has('view'))) {
+            $view = $request->request->get('view');
         }
         if (null !== $view) {
             $request->attributes->set('_view', $view);
         }
-
         if (null === $view && null === $request->attributes->get('_view')) {
             $request->attributes->set('_view', 'index');
         }
 
-        if (ConfigQuery::isRewritingEnable()) {
-            if ($request->attributes->get('_rewritten', false) === false) {
-                /* Does the query GET parameters match a rewritten URL ? */
-                $rewrittenUrl = URL::getInstance()->retrieveCurrent($request);
-                if ($rewrittenUrl->rewrittenUrl !== null) {
-                    /* 301 redirection to rewritten URL */
-                    throw new RedirectException($rewrittenUrl->rewrittenUrl, 301);
-                }
+        if (ConfigQuery::isRewritingEnable() && $request->attributes->get('_rewritten', false) === false) {
+            /* Does the query GET parameters match a rewritten URL ? */
+            $rewrittenUrl = URL::getInstance()->retrieveCurrent($request);
+            if ($rewrittenUrl->rewrittenUrl !== null) {
+                /* 301 redirection to rewritten URL */
+                throw new RedirectException($rewrittenUrl->rewrittenUrl, 301);
             }
         }
-    }
-
-    public function emptyRoute()
-    {
-        return new Response(null, 204);
     }
 }

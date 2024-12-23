@@ -12,7 +12,9 @@
 
 namespace Thelia\Rewriting;
 
+use Propel\Runtime\Exception\PropelException;
 use Thelia\Exception\UrlRewritingException;
+use Thelia\Model\RewritingArgument;
 use Thelia\Model\RewritingUrlQuery;
 
 /**
@@ -43,6 +45,10 @@ class RewritingResolver
         }
     }
 
+    /**
+     * @throws PropelException
+     * @throws UrlRewritingException
+     */
     public function load($rewrittenUrl): void
     {
         $rewrittenUrl = ltrim($rewrittenUrl, '/');
@@ -50,19 +56,18 @@ class RewritingResolver
         $this->rewrittenUrl = $rewrittenUrl;
         $this->search = $this->rewritingUrlQuery->getResolverSearch($rewrittenUrl);
 
-        if ($this->search->count() == 0) {
+        if (!$this->search instanceof RewritingArgument) {
             throw new UrlRewritingException('URL NOT FOUND', UrlRewritingException::URL_NOT_FOUND);
         }
-
-        $this->view = $this->search->getFirst()->getVirtualColumn('ru_view');
-        $this->viewId = $this->search->getFirst()->getVirtualColumn('ru_viewId');
-        $this->locale = $this->search->getFirst()->getVirtualColumn('ru_locale');
-        $this->redirectedToUrl = $this->search->getFirst()->getVirtualColumn('ru_redirected_to_url');
+        $this->view = $this->search->getVirtualColumn('ru_view');
+        $this->viewId = $this->search->getVirtualColumn('ru_viewId');
+        $this->locale = $this->search->getVirtualColumn('ru_locale');
+        $this->redirectedToUrl = $this->search->getVirtualColumn('ru_redirected_to_url');
 
         $this->otherParameters = $this->getOtherParameters();
     }
 
-    protected function getOtherParameters()
+    protected function getOtherParameters(): array
     {
         if ($this->search === null) {
             throw new UrlRewritingException('RESOLVER NULL SEARCH', UrlRewritingException::RESOLVER_NULL_SEARCH);
