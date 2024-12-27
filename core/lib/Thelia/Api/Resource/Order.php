@@ -82,6 +82,7 @@ use Thelia\Model\OrderQuery;
         'totalAmount',
         'ref' => 'partial',
         'orderStatus.code',
+        'customer.id' => 'exact',
     ]
 )]
 #[ApiFilter(
