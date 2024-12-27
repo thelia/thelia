@@ -54,25 +54,59 @@ class OrderProductTax implements PropelResourceInterface
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order_product_tax:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:order_product_tax:write';
 
-    #[Groups([self::GROUP_ADMIN_READ, OrderProduct::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_READ_SINGLE, OrderProduct::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        OrderProduct::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_FRONT_READ_SINGLE,
+        OrderProduct::GROUP_FRONT_READ_SINGLE,
+    ])]
     public ?int $id = null;
 
     #[Relation(targetResource: OrderProduct::class)]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public OrderProduct $orderProduct;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, OrderProduct::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        OrderProduct::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_FRONT_READ_SINGLE,
+        Order::GROUP_ADMIN_WRITE,
+    ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public string $title;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, OrderProduct::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        OrderProduct::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_FRONT_READ_SINGLE,
+        Order::GROUP_ADMIN_WRITE,
+    ])]
     public ?string $description;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, OrderProduct::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        OrderProduct::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_FRONT_READ_SINGLE,
+        Order::GROUP_ADMIN_WRITE,
+    ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public float $amount;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, OrderProduct::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        OrderProduct::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_FRONT_READ_SINGLE,
+        Order::GROUP_ADMIN_WRITE,
+    ])]
     public ?float $promoAmount;
 
     #[Groups([self::GROUP_ADMIN_READ])]

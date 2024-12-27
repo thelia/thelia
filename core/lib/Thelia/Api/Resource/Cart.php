@@ -141,6 +141,7 @@ class Cart implements PropelResourceInterface
 
     #[Groups([self::GROUP_FRONT_READ_SINGLE])]
     public ?bool $virtual;
+
     public function __construct()
     {
         $this->cartItems = [];
@@ -271,9 +272,10 @@ class Cart implements PropelResourceInterface
         return $this->delivery;
     }
 
-    public function setDelivery(?float $delivery): Cart
+    public function setDelivery(?float $delivery): self
     {
         $this->delivery = $delivery;
+
         return $this;
     }
 
@@ -282,20 +284,22 @@ class Cart implements PropelResourceInterface
         return $this->deliveryTax;
     }
 
-    public function setDeliveryTax(?float $deliveryTax): Cart
+    public function setDeliveryTax(?float $deliveryTax): self
     {
         $this->deliveryTax = $deliveryTax;
+
         return $this;
     }
 
     public function getTaxes(): ?float
     {
-        return round($this->taxes,2);
+        return round($this->taxes, 2);
     }
 
-    public function setTaxes(?float $taxes): Cart
+    public function setTaxes(?float $taxes): self
     {
         $this->taxes = $taxes;
+
         return $this;
     }
 
@@ -304,9 +308,10 @@ class Cart implements PropelResourceInterface
         return $this->total;
     }
 
-    public function setTotal(?float $total): Cart
+    public function setTotal(?float $total): self
     {
         $this->total = $total;
+
         return $this;
     }
 
@@ -315,9 +320,10 @@ class Cart implements PropelResourceInterface
         return $this->totalWithoutTax;
     }
 
-    public function setTotalWithoutTax(?float $totalWithoutTax): Cart
+    public function setTotalWithoutTax(?float $totalWithoutTax): self
     {
         $this->totalWithoutTax = $totalWithoutTax;
+
         return $this;
     }
 
@@ -326,9 +332,10 @@ class Cart implements PropelResourceInterface
         return $this->virtual;
     }
 
-    public function setVirtual(?bool $virtual): Cart
+    public function setVirtual(?bool $virtual): self
     {
         $this->virtual = $virtual;
+
         return $this;
     }
 
