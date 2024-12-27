@@ -104,6 +104,7 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ,
     ])]
@@ -114,6 +115,7 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
@@ -124,6 +126,7 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
@@ -133,6 +136,7 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_FRONT_READ_SINGLE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
     public ?string $title;
@@ -158,6 +162,7 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ,
     ])]
@@ -168,6 +173,7 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ,
     ])]
@@ -178,6 +184,7 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ,
     ])]
@@ -189,6 +196,7 @@ class OrderProduct implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
@@ -200,6 +208,7 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
@@ -211,6 +220,7 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
@@ -220,6 +230,7 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
@@ -262,6 +273,7 @@ class OrderProduct implements PropelResourceInterface
     #[Groups([
         self::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
