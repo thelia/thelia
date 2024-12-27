@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Controller\Front;
 
 use Symfony\Bundle\SecurityBundle\Security;
@@ -17,13 +27,12 @@ use Thelia\Model\CartQuery;
 readonly class CartController
 {
     public function __invoke(
-        Security                            $security,
+        Security $security,
         ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
-        RequestStack                        $requestStack,
-        EventDispatcherInterface            $eventDispatcher,
-        Session                             $session,
-    ): PropelResourceInterface
-    {
+        RequestStack $requestStack,
+        EventDispatcherInterface $eventDispatcher,
+        Session $session,
+    ): PropelResourceInterface {
         $request = $requestStack->getCurrentRequest();
         $request->setSession($session);
         $cart = $session->getSessionCart($eventDispatcher);
@@ -36,6 +45,6 @@ readonly class CartController
         }
         $operation = $request->get('_api_operation');
 
-        return $apiResourcePropelTransformerService->modelToResource(Cart::class,$cart,$operation->getNormalizationContext());
+        return $apiResourcePropelTransformerService->modelToResource(Cart::class, $cart, $operation->getNormalizationContext());
     }
 }

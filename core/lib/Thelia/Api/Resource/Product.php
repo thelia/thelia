@@ -101,6 +101,9 @@ use Thelia\Model\Tools\UrlRewritingTrait;
     ]
 )]
 #[ApiFilter(
+    filterClass: TheliaFilter::class,
+)]
+#[ApiFilter(
     filterClass: NotInFilter::class,
     properties: [
         'id',

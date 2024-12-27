@@ -67,7 +67,7 @@ use Thelia\Model\Map\ProductImageTableMap;
         ),
         new Patch(
             uriTemplate: '/admin/product_images/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE,self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
         ),
         new Delete(
             uriTemplate: '/admin/product_images/{id}'
@@ -98,6 +98,21 @@ use Thelia\Model\Map\ProductImageTableMap;
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
+)]
+#[ApiFilter(
+    filterClass: SearchFilter::class,
+    properties: [
+        'product.id' => [
+            'strategy' => 'exact',
+            'fieldPath' => 'productimage_product.id',
+        ],
+    ]
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'position',
+    ]
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,

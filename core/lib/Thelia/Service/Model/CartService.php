@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Service\Model;
 
 use Propel\Runtime\Exception\PropelException;
@@ -157,9 +167,9 @@ readonly class CartService
     /**
      * Return the minimum expected postage for a cart in a given country.
      *
-     * @return array
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return array
      */
     public function getEstimatedPostageForCountry(Cart $cart, Country $country, State $state = null)
     {
@@ -211,7 +221,7 @@ readonly class CartService
         }
         return [
             'postage' => $postage,
-            'tax' => $postageTax
+            'tax' => $postageTax,
         ];
     }
 

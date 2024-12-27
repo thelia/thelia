@@ -93,7 +93,7 @@ readonly class PropelPersistProcessor implements ProcessorInterface
 
     private function beforeSave(mixed $data, Operation $operation, &$propelModel): void
     {
-        if (!in_array($operation::class,[Patch::class,Put::class])) {
+        if (!\in_array($operation::class, [Patch::class, Put::class])) {
             $propelModel->setNew(true);
 
             return;
@@ -101,12 +101,12 @@ readonly class PropelPersistProcessor implements ProcessorInterface
         $propelModel->setNew(false);
         if (is_subclass_of($data, TranslatableResourceInterface::class) && $operation instanceof Put && method_exists($data, 'getI18ns')) {
             $i18nResourceClass = $data::getI18nResourceClass();
-            $array = explode("\\", $i18nResourceClass);
+            $array = explode('\\', $i18nResourceClass);
             $i18nGetter = 'get'.end($array).'s';
             $i18nRemove = 'remove'.end($array);
             if (method_exists($propelModel, $i18nGetter)) {
                 foreach ($propelModel->$i18nGetter() as $i18n) {
-                    if (!$i18n->isNew() && method_exists($propelModel,$i18nRemove)){
+                    if (!$i18n->isNew() && method_exists($propelModel, $i18nRemove)) {
                         $propelModel->$i18nRemove($i18n);
                     }
                 }

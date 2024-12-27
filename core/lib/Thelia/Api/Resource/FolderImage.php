@@ -66,7 +66,7 @@ use Thelia\Model\Map\FolderImageTableMap;
         ),
         new Patch(
             uriTemplate: '/admin/folder_images/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE,self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
         ),
         new Delete(
             uriTemplate: '/admin/folder_images/{id}'
