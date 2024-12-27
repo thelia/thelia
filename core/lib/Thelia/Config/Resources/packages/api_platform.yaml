@@ -21,6 +21,8 @@ api_platform:
         swagger_ui_extra_configuration:
             docExpansion: none
             filter: true
+            persistAuthorization: true
+            showCommonExtensions: true
         api_keys:
             JWT:
                 name: Authorization
