@@ -12,17 +12,19 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
+use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\OrderStatusTableMap;
 
 #[ApiResource(
@@ -35,6 +37,7 @@ use Thelia\Model\Map\OrderStatusTableMap;
         ),
         new Get(
             uriTemplate: '/admin/order_statutes/{id}',
+            uriVariables: ['id'],
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Get(
@@ -52,14 +55,37 @@ use Thelia\Model\Map\OrderStatusTableMap;
             uriTemplate: '/admin/order_statutes/{id}'
         ),
     ],
-    uriVariables: [
-        'id' => new Link(
-            fromClass: self::class,
-            identifiers: ['id']
-        ),
-    ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
     denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+)]
+#[ApiResource(
+    operations: [
+        new Get(
+            uriTemplate: '/front/order_statutes/{id}',
+            uriVariables: ['id']
+        ),
+        new Get(
+            uriTemplate: '/front/order_statutes/code/{code}',
+            uriVariables: ['code']
+        ),
+        new GetCollection(
+            uriTemplate: '/front/order_statutes'
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]]
+)]
+#[ApiFilter(
+    filterClass: SearchFilter::class,
+    properties: [
+        'id' => 'exact',
+        'code' => 'exact',
+    ]
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'position',
+    ]
 )]
 class OrderStatus extends AbstractTranslatableResource
 {
@@ -67,20 +93,47 @@ class OrderStatus extends AbstractTranslatableResource
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order_status:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:order_status:write';
 
-    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
+    public const GROUP_FRONT_READ = 'front:order_status:read';
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        Order::GROUP_ADMIN_READ,
+        Order::GROUP_ADMIN_WRITE,
+    ])]
     public ?int $id = null;
 
     #[ApiProperty(identifier: true)]
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ, Order::GROUP_FRONT_READ])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        Order::GROUP_ADMIN_READ,
+        Order::GROUP_FRONT_READ,
+        self::GROUP_FRONT_READ,
+    ])]
     public string $code;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ, Order::GROUP_FRONT_READ])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        Order::GROUP_ADMIN_READ,
+        Order::GROUP_FRONT_READ,
+        self::GROUP_FRONT_READ,
+    ])]
     public ?string $color = '#c3c3c3';
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ,
+    ])]
     public ?int $position;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ,
+    ])]
     public ?bool $protectedStatus = false;
 
     #[Groups([self::GROUP_ADMIN_READ])]

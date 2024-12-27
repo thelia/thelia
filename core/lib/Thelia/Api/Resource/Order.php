@@ -82,6 +82,7 @@ use Thelia\Model\OrderQuery;
         'totalAmount',
         'ref' => 'partial',
         'orderStatus.code',
+        'customer.id' => 'exact',
     ]
 )]
 #[ApiFilter(
@@ -165,16 +166,16 @@ class Order implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?float $totalAmountWithoutTaxes;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?float $totalAmountWithTaxBeforeDiscount;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?float $amountDiscountWithTaxes;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?float $totalAmountWithTaxesAfterDiscount;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?float $totalShippingWithTaxes;
 
     #[Relation(targetResource: OrderProduct::class)]
@@ -235,24 +236,25 @@ class Order implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
     public int $cartId;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public function getTotalAmount(): ?float
     {
         $propelModel = $this->getPropelModel();
-        if (!$propelModel){
+        if (!$propelModel) {
             $propelModel = OrderQuery::create()->findOneById($this->getId());
             $this->setPropelModel($propelModel);
         }
+
         return round($propelModel?->getTotalAmount(), 2);
     }
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public function getTotalAmountWithoutTaxes(): ?float
     {
         $itemsTax = 0;
         /** @var \Thelia\Model\Order $orderPropelModel */
         $orderPropelModel = $this->getPropelModel();
-        if (!$orderPropelModel){
+        if (!$orderPropelModel) {
             $orderPropelModel = OrderQuery::create()->findOneById($this->getId());
             $this->setPropelModel($orderPropelModel);
         }
@@ -261,7 +263,7 @@ class Order implements PropelResourceInterface
         return round($itemsAmount - $itemsTax, 2);
     }
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public function getTotalAmountWithTaxBeforeDiscount(): ?float
     {
         $totalTaxedAmount = $this->getTotalAmount();
@@ -271,19 +273,20 @@ class Order implements PropelResourceInterface
         return round($totalTaxedAmount - $postage + $discount, 2);
     }
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public function getAmountDiscountWithTaxes(): ?float
     {
         /** @var \Thelia\Model\Order $orderPropelModel */
         $orderPropelModel = $this->getPropelModel();
-        if (!$orderPropelModel){
+        if (!$orderPropelModel) {
             $orderPropelModel = OrderQuery::create()->findOneById($this->getId());
             $this->setPropelModel($orderPropelModel);
         }
+
         return round($orderPropelModel->getDiscount(), 2);
     }
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public function getTotalAmountWithTaxesAfterDiscount(): ?float
     {
         $totalTaxedAmount = $this->getTotalAmount();
@@ -292,15 +295,16 @@ class Order implements PropelResourceInterface
         return round($totalTaxedAmount - $postage, 2);
     }
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public function getTotalShippingWithTaxes(): ?float
     {
         /** @var \Thelia\Model\Order $orderPropelModel */
         $orderPropelModel = $this->getPropelModel();
-        if (!$orderPropelModel){
+        if (!$orderPropelModel) {
             $orderPropelModel = OrderQuery::create()->findOneById($this->getId());
             $this->setPropelModel($orderPropelModel);
         }
+
         return round($orderPropelModel->getPostage(), 2);
     }
 

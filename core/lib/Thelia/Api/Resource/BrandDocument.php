@@ -63,7 +63,7 @@ use Thelia\Model\Map\BrandDocumentTableMap;
         ),
         new Patch(
             uriTemplate: '/admin/brand_documents/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE,self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
         ),
         new Delete(
             uriTemplate: '/admin/brand_documents/{id}'

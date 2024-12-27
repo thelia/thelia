@@ -120,7 +120,7 @@ class Address implements PropelResourceInterface
         self::GROUP_FRONT_READ,
         Customer::GROUP_ADMIN_READ_SINGLE,
         Cart::GROUP_ADMIN_READ_SINGLE,
-        Customer::GROUP_ADMIN_WRITE_UPDATE
+        Customer::GROUP_ADMIN_WRITE_UPDATE,
     ])]
     public ?int $id = null;
 

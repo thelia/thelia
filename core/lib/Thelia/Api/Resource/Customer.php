@@ -49,11 +49,11 @@ use Thelia\Model\Map\CustomerTableMap;
         ),
         new Put(
             uriTemplate: '/admin/customers/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE,self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
         ),
         new Patch(
             uriTemplate: '/admin/customers/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE,self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
         ),
         new Delete(
             uriTemplate: '/admin/customers/{id}'
