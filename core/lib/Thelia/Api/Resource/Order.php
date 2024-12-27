@@ -240,10 +240,11 @@ class Order implements PropelResourceInterface
     public function getTotalAmount(): ?float
     {
         $propelModel = $this->getPropelModel();
-        if (!$propelModel){
+        if (!$propelModel) {
             $propelModel = OrderQuery::create()->findOneById($this->getId());
             $this->setPropelModel($propelModel);
         }
+
         return round($propelModel?->getTotalAmount(), 2);
     }
 
@@ -253,7 +254,7 @@ class Order implements PropelResourceInterface
         $itemsTax = 0;
         /** @var \Thelia\Model\Order $orderPropelModel */
         $orderPropelModel = $this->getPropelModel();
-        if (!$orderPropelModel){
+        if (!$orderPropelModel) {
             $orderPropelModel = OrderQuery::create()->findOneById($this->getId());
             $this->setPropelModel($orderPropelModel);
         }
@@ -277,10 +278,11 @@ class Order implements PropelResourceInterface
     {
         /** @var \Thelia\Model\Order $orderPropelModel */
         $orderPropelModel = $this->getPropelModel();
-        if (!$orderPropelModel){
+        if (!$orderPropelModel) {
             $orderPropelModel = OrderQuery::create()->findOneById($this->getId());
             $this->setPropelModel($orderPropelModel);
         }
+
         return round($orderPropelModel->getDiscount(), 2);
     }
 
@@ -298,10 +300,11 @@ class Order implements PropelResourceInterface
     {
         /** @var \Thelia\Model\Order $orderPropelModel */
         $orderPropelModel = $this->getPropelModel();
-        if (!$orderPropelModel){
+        if (!$orderPropelModel) {
             $orderPropelModel = OrderQuery::create()->findOneById($this->getId());
             $this->setPropelModel($orderPropelModel);
         }
+
         return round($orderPropelModel->getPostage(), 2);
     }
 

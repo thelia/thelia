@@ -1,9 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Service\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
@@ -21,16 +30,16 @@ use Thelia\Module\Exception\DeliveryException;
 
 class CartService
 {
-    public function __construct(private CouponManager $couponManager,private Session $session)
+    public function __construct(private CouponManager $couponManager, private Session $session)
     {
     }
 
     /**
      * Return the minimum expected postage for a cart in a given country.
      *
-     * @return array
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return array
      */
     public function getEstimatedPostageForCountry(Cart $cart, Country $country, State $state = null)
     {
@@ -94,7 +103,7 @@ class CartService
 
         return [
             'postage' => $postage,
-            'tax' => $postageTax
+            'tax' => $postageTax,
         ];
     }
 

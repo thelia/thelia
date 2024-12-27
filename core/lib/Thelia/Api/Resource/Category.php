@@ -65,7 +65,7 @@ use Thelia\Model\Map\CategoryTableMap;
 #[ApiFilter(
     filterClass: NotInFilter::class,
     properties: [
-        'id'
+        'id',
     ]
 )]
 class Category extends AbstractTranslatableResource
@@ -93,7 +93,7 @@ class Category extends AbstractTranslatableResource
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ,
-        Product::GROUP_FRONT_READ_SINGLE
+        Product::GROUP_FRONT_READ_SINGLE,
     ])]
     public int $parent;
 
@@ -101,7 +101,7 @@ class Category extends AbstractTranslatableResource
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ,
-        Product::GROUP_FRONT_READ_SINGLE
+        Product::GROUP_FRONT_READ_SINGLE,
     ])]
     public bool $visible;
 
@@ -109,7 +109,7 @@ class Category extends AbstractTranslatableResource
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ,
-        Product::GROUP_FRONT_READ_SINGLE
+        Product::GROUP_FRONT_READ_SINGLE,
     ])]
     public ?int $position;
 
@@ -117,7 +117,7 @@ class Category extends AbstractTranslatableResource
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ,
-        Product::GROUP_FRONT_READ_SINGLE
+        Product::GROUP_FRONT_READ_SINGLE,
     ])]
     public ?int $defaultTemplateId;
 

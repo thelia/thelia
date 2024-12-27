@@ -33,7 +33,7 @@ class BaseItemProviderListener implements EventSubscriberInterface
 
         $columnValues = $this->apiResourcePropelTransformerService->getColumnValues(reflector: $reflector, columns: $compositeIdentifiers);
 
-        $this->apiResourcePropelTransformerService->queryFilterById(uriVariables: $event->getUriVariables(),query: $query,columnValues: $columnValues);
+        $this->apiResourcePropelTransformerService->queryFilterById(uriVariables: $event->getUriVariables(), query: $query, columnValues: $columnValues);
     }
 
     public static function getSubscribedEvents(): array

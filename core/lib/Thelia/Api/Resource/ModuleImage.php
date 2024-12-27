@@ -77,7 +77,6 @@ use Thelia\Model\Map\ModuleImageTableMap;
 )]
 #[ApiResource(
     operations: [
-
         new GetCollection(
             uriTemplate: '/front/module_images'
         ),
