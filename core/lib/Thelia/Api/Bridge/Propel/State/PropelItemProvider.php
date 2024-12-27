@@ -70,13 +70,14 @@ readonly class PropelItemProvider implements ProviderInterface
             return null;
         }
         $langs = null;
-        if (in_array($operation::class,[Patch::class,Put::class])) {
+        if (\in_array($operation::class, [Patch::class, Put::class])) {
             $langs = new Collection();
-            $content = json_decode($context['request']->getContent(), true, 512, JSON_THROW_ON_ERROR);
-            if (isset($content['i18ns'])){
+            $content = json_decode($context['request']->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+            if (isset($content['i18ns'])) {
                 $langs = LangQuery::create()->filterByLocale(array_keys($content['i18ns']))->find();
             }
         }
+
         return $this->apiResourcePropelTransformerService->modelToResource(
             resourceClass: $resourceClass,
             propelModel: $propelModel,

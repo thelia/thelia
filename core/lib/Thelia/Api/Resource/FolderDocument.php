@@ -63,7 +63,7 @@ use Thelia\Model\Map\FolderDocumentTableMap;
         ),
         new Patch(
             uriTemplate: '/admin/folder_documents/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE,self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
         ),
         new Delete(
             uriTemplate: '/admin/folder_documents/{id}'

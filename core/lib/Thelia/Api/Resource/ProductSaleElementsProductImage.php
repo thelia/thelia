@@ -30,12 +30,12 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Controller\Admin\BinaryFileController;
 use Thelia\Api\Controller\Admin\PostItemFileController;
-use Thelia\Model\Map\BrandImageTableMap;
+use Thelia\Model\Map\ProductSaleElementsProductImageTableMap;
 
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/brand_images',
+            uriTemplate: '/admin/product_sale_elements_product_image',
             inputFormats: ['multipart' => ['multipart/form-data']],
             controller: PostItemFileController::class,
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
@@ -43,14 +43,14 @@ use Thelia\Model\Map\BrandImageTableMap;
             deserialize: false
         ),
         new GetCollection(
-            uriTemplate: '/admin/brand_images'
+            uriTemplate: '/admin/product_sale_elements_product_image'
         ),
         new Get(
-            uriTemplate: '/admin/brand_images/{id}',
+            uriTemplate: '/admin/product_sale_elements_product_image/{id}',
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
         ),
         new Get(
-            uriTemplate: '/admin/brand_images/{id}/file',
+            uriTemplate: '/admin/product_sale_elements_product_image/{id}/file',
             controller: BinaryFileController::class,
             openapi: new Operation(
                 responses: [
@@ -61,15 +61,15 @@ use Thelia\Model\Map\BrandImageTableMap;
             )
         ),
         new Put(
-            uriTemplate: '/admin/brand_images/{id}',
+            uriTemplate: '/admin/product_sale_elements_product_image/{id}',
             denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
         ),
         new Patch(
-            uriTemplate: '/admin/brand_images/{id}',
+            uriTemplate: '/admin/product_sale_elements_product_image/{id}',
             denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
         ),
         new Delete(
-            uriTemplate: '/admin/brand_images/{id}'
+            uriTemplate: '/admin/product_sale_elements_product_image/{id}'
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
@@ -78,14 +78,14 @@ use Thelia\Model\Map\BrandImageTableMap;
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/admin/brand_images'
+            uriTemplate: '/front/product_sale_elements_product_image'
         ),
         new Get(
-            uriTemplate: '/admin/brand_images/{id}',
+            uriTemplate: '/front/product_sale_elements_product_image/{id}',
             normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
         ),
         new Get(
-            uriTemplate: '/admin/brand_images/{id}/file',
+            uriTemplate: '/front/product_sale_elements_product_image/{id}/file',
             controller: BinaryFileController::class,
             openapi: new Operation(
                 responses: [
@@ -104,23 +104,26 @@ use Thelia\Model\Map\BrandImageTableMap;
         'position',
     ]
 )]
-class BrandImage extends AbstractTranslatableResource implements ItemFileResourceInterface
+class ProductSaleElementsProductImage extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
-    public const GROUP_ADMIN_READ = 'admin:brand_image:read';
-    public const GROUP_ADMIN_READ_SINGLE = 'admin:brand_image:read:single';
-    public const GROUP_ADMIN_WRITE = 'admin:brand_image:write';
-    public const GROUP_ADMIN_WRITE_FILE = 'admin:brand_image:write_file';
-    public const GROUP_ADMIN_WRITE_UPDATE = 'admin:brand_image:write_update';
+    use PropelResourceTrait;
 
-    public const GROUP_FRONT_READ = 'front:brand_image:read';
-    public const GROUP_FRONT_READ_SINGLE = 'front:brand_image:read:single';
+    public const GROUP_ADMIN_READ = 'admin:product_sale_elements_product_image:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:product_sale_elements_product_image:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:product_sale_elements_product_image:write';
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    public const GROUP_ADMIN_WRITE_FILE = 'admin:product_sale_elements_product_image:write_file';
+    public const GROUP_ADMIN_WRITE_UPDATE = 'admin:product_sale_elements_product_image:write_update';
+
+    public const GROUP_FRONT_READ = 'front:product_sale_elements_product_image:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:product_sale_elements_product_image:read:single';
+
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?int $id = null;
 
-    #[Relation(targetResource: Brand::class)]
+    #[Relation(targetResource: ProductSaleElements::class)]
     #[Groups([self::GROUP_ADMIN_WRITE_FILE, self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public Brand $brand;
+    public ProductSaleElements $productSaleElements;
 
     #[Groups([self::GROUP_ADMIN_WRITE_FILE])]
     #[ApiProperty(
@@ -175,14 +178,14 @@ class BrandImage extends AbstractTranslatableResource implements ItemFileResourc
         return $this;
     }
 
-    public function getBrand(): Brand
+    public function getProductSaleElements(): ProductSaleElements
     {
-        return $this->brand;
+        return $this->productSaleElements;
     }
 
-    public function setBrand(Brand $brand): self
+    public function setProductSaleElements(ProductSaleElements $productSaleElements): self
     {
-        $this->brand = $brand;
+        $this->productSaleElements = $productSaleElements;
 
         return $this;
     }
@@ -247,18 +250,6 @@ class BrandImage extends AbstractTranslatableResource implements ItemFileResourc
         return $this;
     }
 
-    public function getFile(): string
-    {
-        return $this->file;
-    }
-
-    public function setFile(string $file): self
-    {
-        $this->file = $file;
-
-        return $this;
-    }
-
     public function getFileUrl(): ?string
     {
         return $this->fileUrl;
@@ -271,14 +262,26 @@ class BrandImage extends AbstractTranslatableResource implements ItemFileResourc
         return $this;
     }
 
-    public static function getI18nResourceClass(): string
+    public function getFile(): string
     {
-        return BrandImageI18n::class;
+        return $this->file;
+    }
+
+    public function setFile(string $file): self
+    {
+        $this->file = $file;
+
+        return $this;
+    }
+
+    public static function getPropelRelatedTableMap(): ?TableMap
+    {
+        return new ProductSaleElementsProductImageTableMap();
     }
 
     public static function getItemType(): string
     {
-        return 'brand';
+        return 'product';
     }
 
     public static function getFileType(): string
@@ -288,11 +291,11 @@ class BrandImage extends AbstractTranslatableResource implements ItemFileResourc
 
     public function getItemId(): string
     {
-        return $this->getBrand()->getId();
+        return $this->getProduct()->getId();
     }
 
-    public static function getPropelRelatedTableMap(): ?TableMap
+    public static function getI18nResourceClass(): string
     {
-        return new BrandImageTableMap();
+        return ProductSaleElementsProductImageI18n::class;
     }
 }
