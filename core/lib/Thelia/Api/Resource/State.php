@@ -79,18 +79,19 @@ class State extends AbstractTranslatableResource
         Address::GROUP_ADMIN_READ,
         TaxRuleCountry::GROUP_ADMIN_READ,
         OrderAddress::GROUP_ADMIN_WRITE,
+        Order::GROUP_FRONT_READ_SINGLE,
     ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, OrderAddress::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, OrderAddress::GROUP_ADMIN_READ, Order::GROUP_FRONT_READ_SINGLE])]
     public bool $visible;
 
     #[ApiProperty(identifier: true)]
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, OrderAddress::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, OrderAddress::GROUP_ADMIN_READ, Order::GROUP_FRONT_READ_SINGLE])]
     public ?string $isocode;
 
     #[Relation(targetResource: Country::class)]
-    #[Groups(groups: [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE])]
+    #[Groups(groups: [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE])]
     public Country $country;
 
     #[Groups([self::GROUP_ADMIN_READ])]
@@ -99,7 +100,7 @@ class State extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_FRONT_READ_SINGLE])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int
