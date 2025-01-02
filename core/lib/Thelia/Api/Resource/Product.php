@@ -134,6 +134,8 @@ class Product extends AbstractTranslatableResource
             ProductAssociatedContent::GROUP_ADMIN_READ,
             FeatureProduct::GROUP_ADMIN_READ_SINGLE,
             ProductSaleElements::GROUP_ADMIN_READ,
+            ProductSaleElements::GROUP_FRONT_READ,
+            ProductSaleElements::GROUP_FRONT_READ_SINGLE,
             ProductSaleElements::GROUP_ADMIN_WRITE,
             ProductImage::GROUP_ADMIN_READ_SINGLE,
             ProductDocument::GROUP_ADMIN_READ_SINGLE,
