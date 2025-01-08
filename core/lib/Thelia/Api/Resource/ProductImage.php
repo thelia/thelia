@@ -114,15 +114,6 @@ use Thelia\Model\Map\ProductImageTableMap;
         'position',
     ]
 )]
-#[ApiFilter(
-    filterClass: SearchFilter::class,
-    properties: [
-        'product.id' => [
-            'strategy' => 'exact',
-            'fieldPath' => 'productimage_product.id',
-        ],
-    ]
-)]
 class ProductImage extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     use PropelResourceTrait;
