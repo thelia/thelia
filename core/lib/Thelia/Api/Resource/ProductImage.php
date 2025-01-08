@@ -123,12 +123,6 @@ use Thelia\Model\Map\ProductImageTableMap;
         ],
     ]
 )]
-#[ApiFilter(
-    filterClass: OrderFilter::class,
-    properties: [
-        'position',
-    ]
-)]
 class ProductImage extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     use PropelResourceTrait;
