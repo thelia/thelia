@@ -28,6 +28,7 @@ use Symfony\Component\Validator\Constraints\Type;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\OrderProductTableMap;
+use Thelia\Model\ProductQuery;
 
 #[ApiResource(
     operations: [
@@ -283,6 +284,18 @@ class OrderProduct implements PropelResourceInterface
     public function __construct()
     {
         $this->orderProductTaxes = [];
+    }
+
+    #[Groups([
+        Order::GROUP_FRONT_READ_SINGLE,
+        self::GROUP_FRONT_READ,
+    ])]
+    public function getProductId(): ?int
+    {
+        if(null === $this->getProductRef()) {
+            return null;
+        }
+        return ProductQuery::create()->findOneByRef($this->getProductRef())?->getId();
     }
 
     public function getId(): ?int
