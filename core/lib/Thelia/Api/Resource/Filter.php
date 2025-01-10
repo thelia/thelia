@@ -1,12 +1,24 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
+use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\State\TFiltersProvider;
+use Thelia\Model\Map\ChoiceFilterTableMap;
 
 #[ApiResource(
     operations: [
@@ -30,8 +42,10 @@ use Thelia\Api\State\TFiltersProvider;
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]]
 )]
-class Filter
+class Filter implements PropelResourceInterface
 {
+    use PropelResourceTrait;
+
     public const GROUP_FRONT_READ = 'front:filter:read';
     #[Groups([self::GROUP_FRONT_READ])]
     private ?int $id;
@@ -54,9 +68,10 @@ class Filter
         return $this->id;
     }
 
-    public function setId(?int $id): Filter
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -65,9 +80,10 @@ class Filter
         return $this->inputType;
     }
 
-    public function setInputType(string $inputType): Filter
+    public function setInputType(string $inputType): self
     {
         $this->inputType = $inputType;
+
         return $this;
     }
 
@@ -76,9 +92,10 @@ class Filter
         return $this->title;
     }
 
-    public function setTitle(string $title): Filter
+    public function setTitle(string $title): self
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -87,9 +104,10 @@ class Filter
         return $this->type;
     }
 
-    public function setType(string $type): Filter
+    public function setType(string $type): self
     {
         $this->type = $type;
+
         return $this;
     }
 
@@ -98,9 +116,10 @@ class Filter
         return $this->values;
     }
 
-    public function setValues(array $values): Filter
+    public function setValues(array $values): self
     {
         $this->values = $values;
+
         return $this;
     }
 
@@ -109,9 +128,10 @@ class Filter
         return $this->visible;
     }
 
-    public function setVisible(bool $visible): Filter
+    public function setVisible(bool $visible): self
     {
         $this->visible = $visible;
+
         return $this;
     }
 
@@ -120,9 +140,15 @@ class Filter
         return $this->position;
     }
 
-    public function setPosition(?int $position): Filter
+    public function setPosition(?int $position): self
     {
         $this->position = $position;
+
         return $this;
+    }
+
+    public static function getPropelRelatedTableMap(): ?TableMap
+    {
+        return ChoiceFilterTableMap::getTableMap();
     }
 }
