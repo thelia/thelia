@@ -23,14 +23,17 @@ class AttributeFilter implements TheliaFilterInterface
         $query->useProductSaleElementsQuery()->filterByIsDefault(1)->useAttributeCombinationQuery()->filterByAttributeId($value)->endUse()->endUse();
     }
 
-    public function getValue(ActiveRecordInterface $activeRecord): array
+    public function getValue(ActiveRecordInterface $activeRecord,string $locale): ?array
     {
+        if (empty($activeRecord->getDefaultSaleElements()?->getAttributeCombinationsJoinAttribute())){
+            return null;
+        }
         $value = [];
         foreach ($activeRecord->getDefaultSaleElements()->getAttributeCombinationsJoinAttribute() as $attribute) {
             $value[] =
                 [
                     'id' => $attribute->getAttributeId(),
-                    'title' => $attribute->getAttribute()->getTitle(),
+                    'title' => $attribute->getAttribute()->setLocale($locale)->getTitle(),
                 ]
             ;
         }

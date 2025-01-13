@@ -25,14 +25,17 @@ class AttributeAvFilter implements TheliaFilterInterface,TheliaChoiceFilterInter
         $query->useProductSaleElementsQuery()->filterByIsDefault(1)->useAttributeCombinationQuery()->filterByAttributeAvId($value)->endUse()->endUse();
     }
 
-    public function getValue(ActiveRecordInterface $activeRecord): array
+    public function getValue(ActiveRecordInterface $activeRecord,string $locale): ?array
     {
+        if (empty($activeRecord->getDefaultSaleElements()?->getAttributeCombinationsJoinAttributeAv())){
+            return null;
+        }
         $value = [];
         foreach ($activeRecord->getDefaultSaleElements()->getAttributeCombinationsJoinAttributeAv() as $attributeAv) {
             $value[] =
                 [
                     'id' => $attributeAv->getAttributeAvId(),
-                    'title' => $attributeAv->getAttributeAv()->getTitle(),
+                    'title' => $attributeAv->getAttributeAv()->setLocale($locale)->getTitle(),
                 ]
             ;
         }

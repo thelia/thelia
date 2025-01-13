@@ -24,14 +24,17 @@ class FeatureAvFilter implements TheliaFilterInterface,TheliaChoiceFilterInterfa
         $query->useFeatureProductQuery()->filterByFeatureAvId($value)->endUse();
     }
 
-    public function getValue(ActiveRecordInterface $activeRecord): array
+    public function getValue(ActiveRecordInterface $activeRecord,string $locale): ?array
     {
+        if (empty($activeRecord->getFeatureProductsJoinFeatureAv())){
+            return null;
+        }
         $value = [];
         foreach ($activeRecord->getFeatureProductsJoinFeatureAv() as $featureProduct) {
             $value[] =
                 [
                     'id' => $featureProduct->getFeatureAv()->getId(),
-                    'title' => $featureProduct->getFeatureAv()->getTitle(),
+                    'title' => $featureProduct->getFeatureAv()->setLocale($locale)->getTitle(),
                 ]
             ;
         }

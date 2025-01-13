@@ -23,14 +23,17 @@ class FeatureFilter implements TheliaFilterInterface
         $query->useFeatureProductQuery()->filterByFeatureId($value)->endUse();
     }
 
-    public function getValue(ActiveRecordInterface $activeRecord): array
+    public function getValue(ActiveRecordInterface $activeRecord,string $locale): ?array
     {
+        if (empty($activeRecord->getFeatureProducts())){
+            return null;
+        }
         $value = [];
         foreach ($activeRecord->getFeatureProducts() as $featureProduct) {
             $value[] =
                 [
                     'id' => $featureProduct->getFeature()->getId(),
-                    'title' => $featureProduct->getFeature()->getTitle(),
+                    'title' => $featureProduct->getFeature()->setLocale($locale)->getTitle(),
                 ]
             ;
         }

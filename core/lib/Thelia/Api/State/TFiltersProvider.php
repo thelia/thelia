@@ -7,6 +7,7 @@ use ApiPlatform\State\ProviderInterface;
 use InvalidArgumentException;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\CategoryFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoiceFilterInterface;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\PriceFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\FilterService;
 use Thelia\Api\Resource\Filter;
 use Thelia\Model\ChoiceFilterQuery;
@@ -30,16 +31,29 @@ class TFiltersProvider implements ProviderInterface
 
         $filterObjects = [];
 
+        $locale = $request->get('locale') ?? "en_US";
         $objects = $query->find();
         $filters = $this->filterService->getAvailableFilters($resource);
         foreach ($filters as $filter) {
             $values = [];
             foreach ($objects as $item) {
-                foreach ($filter->getValue($item) as $value) {
+                $possibleValues = $filter->getValue($item,$locale);
+                if (!$possibleValues){
+                    continue;
+                }
+                foreach ($possibleValues as $value) {
                     $values [] = $value;
                 }
             }
-            $values = array_intersect_key($values, array_unique(array_column($values, 'id')));
+            if ($filter instanceof PriceFilter && count($values) > 0){
+                $values = [
+                    'min' => min($values),
+                    'max' => max($values)
+                ];
+            }
+            if (!$filter instanceof PriceFilter){
+                $values = array_intersect_key($values, array_unique(array_column($values, 'id')));
+            }
             $id = null;
             $isVisible = true;
             $position = null;

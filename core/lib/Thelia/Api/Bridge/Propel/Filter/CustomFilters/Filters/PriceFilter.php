@@ -5,6 +5,8 @@ namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
+use Thelia\Model\CurrencyQuery;
+use Thelia\Model\ProductPriceQuery;
 
 class PriceFilter implements TheliaFilterInterface
 {
@@ -30,9 +32,14 @@ class PriceFilter implements TheliaFilterInterface
         }
     }
 
-    public function getValue(ActiveRecordInterface $activeRecord): array
+    public function getValue(ActiveRecordInterface $activeRecord,string $locale): ?array
     {
-        return [];
+        $defaultCurrencyId = CurrencyQuery::create()->filterByByDefault(true)->findOne()?->getId();
+        $defaultPseId = $activeRecord->getDefaultSaleElements()->getId();
+        if (!$defaultPseId || !$defaultCurrencyId) {
+            return null;
+        }
+        return ['price' => ProductPriceQuery::create()->filterByCurrencyId($defaultCurrencyId)->filterByProductSaleElementsId($defaultPseId)->findOne()?->getPrice()];
     }
 
     private function betweenFilter(ModelCriteria $query, string $item): void

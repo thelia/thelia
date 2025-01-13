@@ -23,14 +23,17 @@ class CategoryFilter implements TheliaFilterInterface
         return ['categories','category'];
     }
 
-    public function getValue(ActiveRecordInterface $activeRecord): array
+    public function getValue(ActiveRecordInterface $activeRecord,string $locale): ?array
     {
+        if (empty($activeRecord->getCategories())){
+            return null;
+        }
         $value = [];
         foreach ($activeRecord->getCategories() as $category) {
             $value[] =
                 [
                     'id' => $category->getId(),
-                    'title' => $category->getTitle(),
+                    'title' => $category->setLocale($locale)->getTitle(),
                 ]
             ;
         }
