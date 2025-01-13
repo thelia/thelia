@@ -17,10 +17,10 @@ class TheliaFilter extends AbstractFilter
     protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
     {
         $request = $context['request'] ?? null;
-        if (!$request || count($request->get('tfilters', [])) < 1){
+        if ((!$request && !isset($context["filters"]["tfilters"]) && count($request->get('tfilters', [])) < 1)){
             return;
         }
-        $this->filterService->filterWithTFilter(request: $request,query: $query);
+        $this->filterService->filterWithTFilter(request: $request,context: $context,query: $query);
     }
 
     public function getDescription(string $resourceClass): array

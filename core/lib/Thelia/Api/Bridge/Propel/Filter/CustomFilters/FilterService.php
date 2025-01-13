@@ -2,6 +2,7 @@
 
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters;
 
+use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\CategoryFilter;
@@ -46,12 +47,22 @@ readonly class FilterService
         return $filters;
     }
 
-    public function filterWithTFilter($request, ?ModelCriteria $query = null,?bool &$isCategoryFilter = false): iterable
+    public function filterWithTFilter($request, ?array $uriVariables = [],?array $context = null,?ModelCriteria $query = null,?bool &$isCategoryFilter = false): iterable
     {
-        $tfilters = $request->get('tfilters', []);
+        $tfilters = null;
+        if (isset($context['path_info'])){
+            $pathInfo = $context['path_info'];
+        }
+        if ($request){
+            $tfilters = $request->get('tfilters', []);
+            $pathInfo = $request->getPathInfo();
+        }
         $resource = $uriVariables['resource'] ?? null;
-        if (!$resource){
-            $segments = explode('/', $request->getPathInfo());
+        if (!$tfilters && isset($context["filters"]["tfilters"])){
+            $tfilters = $context["filters"]["tfilters"];
+        }
+        if (!$resource && $pathInfo){
+            $segments = explode('/', $pathInfo);
             $resource = end($segments);
         }
         $filters = $this->getAvailableFiltersWithTFilter($resource, $tfilters);
@@ -75,6 +86,9 @@ readonly class FilterService
             }
             if ($filterClass instanceof CategoryFilter){
                 $isCategoryFilter = true;
+            }
+            if (is_string($value)){
+                $value = explode(',',$value);
             }
             $filterClass->filter($query, $value);
         }
