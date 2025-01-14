@@ -4,12 +4,13 @@ namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters;
 
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Api\Bridge\Propel\Filter\AbstractFilter;
 
 class TheliaFilter extends AbstractFilter
 {
 
-    public function __construct(private readonly FilterService $filterService)
+    public function __construct(private readonly FilterService $filterService, private RequestStack $requestStack)
     {
         parent::__construct();
     }
@@ -17,10 +18,19 @@ class TheliaFilter extends AbstractFilter
     protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
     {
         $request = $context['request'] ?? null;
-        if (!$request || count($request->get('tfilters', [])) < 1){
+        if (!$request){
+            $request = $this->requestStack->getCurrentRequest();
+        }
+        if ((!$request || (!isset($context["filters"]["tfilters"]) && count($request->get('tfilters', [])) < 1))){
             return;
         }
-        $this->filterService->filterWithTFilter(request: $request,query: $query);
+        $isApiRoute = $request->get('isApiRoute',false);
+        if ($isApiRoute){
+            $query = $this->filterService->filterTFilterWithRequest(request: $request, query: $query);
+        }
+        if (!$isApiRoute){
+            $query = $this->filterService->filterTFilterWithContext(context: $context,  query: $query);
+        }
     }
 
     public function getDescription(string $resourceClass): array

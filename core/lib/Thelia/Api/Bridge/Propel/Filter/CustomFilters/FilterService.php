@@ -2,6 +2,7 @@
 
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters;
 
+use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\CategoryFilter;
@@ -46,14 +47,27 @@ readonly class FilterService
         return $filters;
     }
 
-    public function filterWithTFilter($request, ?ModelCriteria $query = null,?bool &$isCategoryFilter = false): iterable
+
+    public function filterTFilterWithRequest($request,?bool &$isCategoryFilter = false,?ModelCriteria $query = null): iterable
     {
         $tfilters = $request->get('tfilters', []);
-        $resource = $uriVariables['resource'] ?? null;
-        if (!$resource){
-            $segments = explode('/', $request->getPathInfo());
-            $resource = end($segments);
-        }
+        $pathInfo = $request->getPathInfo();
+        $segments = explode('/', $pathInfo);
+        $resource = end($segments);
+        return $this->filterWithTFilter(tfilters: $tfilters,resource: $resource,query: $query,isCategoryFilter: $isCategoryFilter);
+    }
+
+    public function filterTFilterWithContext(?array $context = null,?bool &$isCategoryFilter = false,?ModelCriteria $query = null): iterable
+    {
+        $tfilters = isset($context["filters"]["tfilters"]) ? $context["filters"]["tfilters"] : [];
+        $pathInfo = $context['path_info'];
+        $segments = explode('/', $pathInfo);
+        $resource = end($segments);
+        return $this->filterWithTFilter(tfilters: $tfilters,resource: $resource,query: $query,isCategoryFilter: $isCategoryFilter);
+    }
+
+    public function filterWithTFilter(array $tfilters,string $resource, ?ModelCriteria $query = null,?bool &$isCategoryFilter = false): iterable
+    {
         $filters = $this->getAvailableFiltersWithTFilter($resource, $tfilters);
 
         if (!$query){
@@ -75,6 +89,9 @@ readonly class FilterService
             }
             if ($filterClass instanceof CategoryFilter){
                 $isCategoryFilter = true;
+            }
+            if (is_string($value)){
+                $value = explode(',',$value);
             }
             $filterClass->filter($query, $value);
         }

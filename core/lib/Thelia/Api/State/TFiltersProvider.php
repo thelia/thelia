@@ -11,11 +11,11 @@ use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\PriceFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\FilterService;
 use Thelia\Api\Resource\Filter;
 use Thelia\Model\ChoiceFilterQuery;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class TFiltersProvider implements ProviderInterface
 {
-
-    public function __construct(protected FilterService $filterService)
+    public function __construct(protected FilterService $filterService,private readonly RequestStack $requestStack)
     {
     }
 
@@ -26,12 +26,24 @@ class TFiltersProvider implements ProviderInterface
         if (!$resource) {
             throw new InvalidArgumentException('The "resource" parameter is required.');
         }
-        $request = $context['request'];
-        $query = $this->filterService->filterWithTFilter(request: $request, isCategoryFilter: $isCategoryFilter);
+        $request = $this->requestStack->getCurrentRequest();
+        $isApiRoute = $request->get('isApiRoute',false);
+        if ($isApiRoute){
+            $query = $this->filterService->filterTFilterWithRequest(request: $request, isCategoryFilter: $isCategoryFilter);
+        }
+        if (!$isApiRoute){
+            $query = $this->filterService->filterTFilterWithContext(context: $context, isCategoryFilter: $isCategoryFilter);
+        }
 
         $filterObjects = [];
-
-        $locale = $request->get('locale') ?? "en_US";
+        $locale = null;
+        if ($request){
+            $locale = $request->get('locale');
+        }
+        if (isset($context["filters"]["locale"])){
+            $locale = $context["filters"]["locale"];
+        }
+        $locale = $locale ?? "en_US";
         $objects = $query->find();
         $filters = $this->filterService->getAvailableFilters($resource);
         foreach ($filters as $filter) {
