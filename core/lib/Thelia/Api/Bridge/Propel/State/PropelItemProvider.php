@@ -45,7 +45,7 @@ readonly class PropelItemProvider implements ProviderInterface
             throw new RuntimeException('Bad provider');
         }
 
-        if ($resourceClass === Filter::class){
+        if ($operation->getProvider() !== self::class){
             return $this->filtersProvider->provide(operation: $operation,uriVariables: $uriVariables,context: $context);
         }
 

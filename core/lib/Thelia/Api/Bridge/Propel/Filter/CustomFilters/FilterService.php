@@ -47,24 +47,27 @@ readonly class FilterService
         return $filters;
     }
 
-    public function filterWithTFilter($request, ?array $uriVariables = [],?array $context = null,?ModelCriteria $query = null,?bool &$isCategoryFilter = false): iterable
+
+    public function filterTFilterWithRequest($request,?bool &$isCategoryFilter = false,?ModelCriteria $query = null): iterable
     {
-        $tfilters = null;
-        if (isset($context['path_info'])){
-            $pathInfo = $context['path_info'];
-        }
-        if ($request){
-            $tfilters = $request->get('tfilters', []);
-            $pathInfo = $request->getPathInfo();
-        }
-        $resource = $uriVariables['resource'] ?? null;
-        if (!$tfilters && isset($context["filters"]["tfilters"])){
-            $tfilters = $context["filters"]["tfilters"];
-        }
-        if (!$resource && $pathInfo){
-            $segments = explode('/', $pathInfo);
-            $resource = end($segments);
-        }
+        $tfilters = $request->get('tfilters', []);
+        $pathInfo = $request->getPathInfo();
+        $segments = explode('/', $pathInfo);
+        $resource = end($segments);
+        return $this->filterWithTFilter(tfilters: $tfilters,resource: $resource,query: $query,isCategoryFilter: $isCategoryFilter);
+    }
+
+    public function filterTFilterWithContext(?array $context = null,?bool &$isCategoryFilter = false,?ModelCriteria $query = null): iterable
+    {
+        $tfilters = isset($context["filters"]["tfilters"]) ? $context["filters"]["tfilters"] : [];
+        $pathInfo = $context['path_info'];
+        $segments = explode('/', $pathInfo);
+        $resource = end($segments);
+        return $this->filterWithTFilter(tfilters: $tfilters,resource: $resource,query: $query,isCategoryFilter: $isCategoryFilter);
+    }
+
+    public function filterWithTFilter(array $tfilters,string $resource, ?ModelCriteria $query = null,?bool &$isCategoryFilter = false): iterable
+    {
         $filters = $this->getAvailableFiltersWithTFilter($resource, $tfilters);
 
         if (!$query){

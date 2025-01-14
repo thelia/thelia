@@ -27,7 +27,13 @@ class TFiltersProvider implements ProviderInterface
             throw new InvalidArgumentException('The "resource" parameter is required.');
         }
         $request = $this->requestStack->getCurrentRequest();
-        $query = $this->filterService->filterWithTFilter(request: $request, uriVariables: $uriVariables, context: $context, isCategoryFilter: $isCategoryFilter);
+        $isApiRoute = $request->get('isApiRoute',false);
+        if ($isApiRoute){
+            $query = $this->filterService->filterTFilterWithRequest(request: $request, isCategoryFilter: $isCategoryFilter);
+        }
+        if (!$isApiRoute){
+            $query = $this->filterService->filterTFilterWithContext(context: $context, isCategoryFilter: $isCategoryFilter);
+        }
 
         $filterObjects = [];
         $locale = null;
