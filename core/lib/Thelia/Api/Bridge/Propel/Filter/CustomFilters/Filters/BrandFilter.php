@@ -16,7 +16,7 @@ class BrandFilter implements TheliaFilterInterface
 
     public static function getFilterName(): array
     {
-        return ['brands','brand'];
+        return ['brand'];
     }
 
     public function filter(ModelCriteria $query, $value): void
@@ -34,7 +34,6 @@ class BrandFilter implements TheliaFilterInterface
             [
                 'id' => $brand->getId(),
                 'title' => $brand->setLocale($locale)->getTitle(),
-                'value' => $brand->getId()
             ]
         ];
     }

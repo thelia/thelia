@@ -20,7 +20,7 @@ class CategoryFilter implements TheliaFilterInterface
 
     public static function getFilterName(): array
     {
-        return ['categories','category'];
+        return ['category'];
     }
 
     public function getValue(ActiveRecordInterface $activeRecord,string $locale): ?array

@@ -16,7 +16,7 @@ class FeatureAvFilter implements TheliaFilterInterface,TheliaChoiceFilterInterfa
 
     public static function getFilterName(): array
     {
-        return ['featureAvs'];
+        return ['feature'];
     }
 
     public function filter(ModelCriteria $query, $value): void
@@ -33,6 +33,8 @@ class FeatureAvFilter implements TheliaFilterInterface,TheliaChoiceFilterInterfa
         foreach ($activeRecord->getFeatureProductsJoinFeatureAv() as $featureProduct) {
             $value[] =
                 [
+                    'mainTitle' => $featureProduct->getFeature()->setLocale($locale)->getTitle(),
+                    'mainId' => $featureProduct->getFeature()->getId(),
                     'id' => $featureProduct->getFeatureAv()->getId(),
                     'title' => $featureProduct->getFeatureAv()->setLocale($locale)->getTitle(),
                 ]

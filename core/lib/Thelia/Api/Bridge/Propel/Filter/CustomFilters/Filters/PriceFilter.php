@@ -7,9 +7,9 @@ use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\ProductPriceQuery;
-
-class PriceFilter implements TheliaFilterInterface
+class PriceFilter// implements TheliaFilterInterface
 {
+    //maybe we will use this filter but not for the moment
     public function getResourceType(): array
     {
         return ['products'];

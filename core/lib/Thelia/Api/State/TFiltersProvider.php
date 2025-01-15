@@ -7,7 +7,6 @@ use ApiPlatform\State\ProviderInterface;
 use InvalidArgumentException;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\CategoryFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoiceFilterInterface;
-use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\PriceFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\FilterService;
 use Thelia\Api\Resource\Filter;
 use Thelia\Model\ChoiceFilterQuery;
@@ -48,6 +47,7 @@ class TFiltersProvider implements ProviderInterface
         $filters = $this->filterService->getAvailableFilters($resource);
         foreach ($filters as $filter) {
             $values = [];
+            $hasMain = false;
             foreach ($objects as $item) {
                 $possibleValues = $filter->getValue($item,$locale);
                 if (!$possibleValues){
@@ -57,13 +57,15 @@ class TFiltersProvider implements ProviderInterface
                     $values [] = $value;
                 }
             }
-            if ($filter instanceof PriceFilter && count($values) > 0){
-                $values = [
-                    'min' => min($values),
-                    'max' => max($values)
-                ];
-            }
-            if (!$filter instanceof PriceFilter){
+            if ((isset($values[0]["mainId"]))){
+                $hasMain = true;
+                $values = array_intersect_key($values, array_unique(array_map(
+                    static function($item) {
+                        return $item['id'] . '-' . $item['mainId'];
+                    },
+                    $values
+                )));
+            }else{
                 $values = array_intersect_key($values, array_unique(array_column($values, 'id')));
             }
             $id = null;
@@ -103,14 +105,37 @@ class TFiltersProvider implements ProviderInterface
                     }
                 }
             }
-            $filterObjects[] = (new Filter())
-                ->setId($id)
-                ->setTitle($filter->getFilterName()[0])
-                ->setType($filter->getFilterName()[0])
-                ->setInputType('checkbox')
-                ->setPosition($position)
-                ->setVisible($isVisible)
-                ->setValues($values);
+            if ($hasMain){
+                $splitValues = [];
+                foreach ($values as $value){
+                    $splitValues[$value['mainId']][] = $value;
+                }
+                foreach ($splitValues as $value){
+                    $filterDto = new Filter();
+                    $filterDto
+                        ->setId($value[0]['mainId'])
+                        ->setTitle($value[0]['mainTitle'])
+                        ->setType($filter->getFilterName()[0])
+                        ->setInputType('checkbox')
+                        ->setPosition($position)
+                        ->setVisible($isVisible);
+                    $value = array_map(function ($val){
+                        unset($val['mainId'], $val['mainTitle']);
+                        return $val;
+                    },$value);
+                    $filterDto->setValues($value);
+                    $filterObjects[] = $filterDto;
+                }
+            }else {
+                $filterObjects[] = (new Filter())
+                    ->setId($id)
+                    ->setTitle($filter->getFilterName()[0])
+                    ->setType($filter->getFilterName()[0])
+                    ->setInputType('checkbox')
+                    ->setPosition($position)
+                    ->setVisible($isVisible)
+                    ->setValues(array_values($values));
+            }
         }
 
         foreach ($filterObjects as $filterObject) {
