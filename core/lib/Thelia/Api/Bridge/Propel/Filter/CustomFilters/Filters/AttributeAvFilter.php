@@ -17,7 +17,7 @@ class AttributeAvFilter implements TheliaFilterInterface,TheliaChoiceFilterInter
 
     public static function getFilterName(): array
     {
-        return ['attributesAvs'];
+        return ['attribute'];
     }
 
     public function filter(ModelCriteria $query, $value): void
@@ -34,6 +34,8 @@ class AttributeAvFilter implements TheliaFilterInterface,TheliaChoiceFilterInter
         foreach ($activeRecord->getDefaultSaleElements()->getAttributeCombinationsJoinAttributeAv() as $attributeAv) {
             $value[] =
                 [
+                    'mainTitle' => $attributeAv->getAttribute()->setLocale($locale)->getTitle(),
+                    'mainId' => $attributeAv->getAttribute()->getId(),
                     'id' => $attributeAv->getAttributeAvId(),
                     'title' => $attributeAv->getAttributeAv()->setLocale($locale)->getTitle(),
                 ]
