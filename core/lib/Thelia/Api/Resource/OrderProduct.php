@@ -27,6 +27,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Type;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\ProductQuery;
 
@@ -296,6 +297,24 @@ class OrderProduct implements PropelResourceInterface
             return null;
         }
         return ProductQuery::create()->findOneByRef($this->getProductRef())?->getId();
+    }
+
+    #[Groups([
+        Order::GROUP_FRONT_READ_SINGLE,
+        self::GROUP_FRONT_READ,
+    ])]
+    public function getAttribute()
+    {
+        $pseId = $this->getProductSaleElementsId();
+        if(!$pseId) {
+            return null;
+        }
+        $attributesAvs = array_map(
+            function (\Thelia\Model\AttributeCombination $attributeCombination) {
+                return [$attributeCombination->getAttribute()->getTitle() => $attributeCombination->getAttributeAv()->getTitle()];
+            }
+        ,AttributeCombinationQuery::create()->filterByProductSaleElementsId($pseId)->find()->getData());
+        return $attributesAvs;
     }
 
     public function getId(): ?int

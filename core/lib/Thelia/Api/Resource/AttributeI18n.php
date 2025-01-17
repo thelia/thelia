@@ -22,6 +22,8 @@ class AttributeI18n extends I18n
         Attribute::GROUP_ADMIN_WRITE,
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
+        ProductSaleElements::GROUP_ADMIN_READ_SINGLE,
+        ProductSaleElements::GROUP_FRONT_READ_SINGLE,
     ])]
     protected ?string $title;
 
