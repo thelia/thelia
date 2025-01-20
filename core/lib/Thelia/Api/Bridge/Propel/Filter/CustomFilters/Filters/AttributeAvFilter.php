@@ -31,7 +31,12 @@ class AttributeAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInte
 
     public function filter(ModelCriteria $query, $value): void
     {
-        $query->useProductSaleElementsQuery()->filterByIsDefault(1)->useAttributeCombinationQuery()->filterByAttributeAvId($value)->endUse()->endUse();
+        $query
+            ->useProductSaleElementsQuery()
+                    ->useAttributeCombinationQuery()
+                        ->filterByAttributeAvId($value)
+                ->endUse()
+            ->endUse();
     }
 
     public function getValue(ActiveRecordInterface $activeRecord, string $locale): ?array

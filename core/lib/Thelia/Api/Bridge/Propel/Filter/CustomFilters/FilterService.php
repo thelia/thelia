@@ -28,7 +28,6 @@ readonly class FilterService
     private function getAvailableFiltersWithTFilter(string $resourceType, array $tfilters): array
     {
         $filters = $this->getAvailableFilters($resourceType);
-        dd($filters);
         $filterResult = [];
         foreach ($filters as $filter) {
             foreach ($tfilters as $tfilter => $tfilterValue) {
@@ -42,7 +41,6 @@ readonly class FilterService
                 }
             }
         }
-
         return $filterResult;
     }
 
