@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -7,7 +17,7 @@ use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoiceFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
 
-class FeatureAvFilter implements TheliaFilterInterface,TheliaChoiceFilterInterface
+class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterface
 {
     public function getResourceType(): array
     {
@@ -24,9 +34,9 @@ class FeatureAvFilter implements TheliaFilterInterface,TheliaChoiceFilterInterfa
         $query->useFeatureProductQuery()->filterByFeatureAvId($value)->endUse();
     }
 
-    public function getValue(ActiveRecordInterface $activeRecord,string $locale): ?array
+    public function getValue(ActiveRecordInterface $activeRecord, string $locale): ?array
     {
-        if (empty($activeRecord->getFeatureProductsJoinFeatureAv())){
+        if (empty($activeRecord->getFeatureProductsJoinFeatureAv())) {
             return null;
         }
         $value = [];
@@ -40,6 +50,7 @@ class FeatureAvFilter implements TheliaFilterInterface,TheliaChoiceFilterInterfa
                 ]
             ;
         }
+
         return $value;
     }
 

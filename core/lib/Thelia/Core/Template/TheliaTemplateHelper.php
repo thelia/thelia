@@ -130,7 +130,6 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
             } catch (\Exception) {
                 continue;
             }
-
         }
 
         return $list;

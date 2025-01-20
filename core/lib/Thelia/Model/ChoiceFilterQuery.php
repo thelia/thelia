@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -8,8 +18,6 @@ use Thelia\Model\Base\ChoiceFilterQuery as BaseChoiceFilterQuery;
 
 /**
  * Skeleton subclass for performing query and update operations on the 'choice_filter' table.
- *
- *
  *
  * You should add additional methods to this class to meet the
  * application requirements.  This class will only be generated as
@@ -20,6 +28,7 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
     /**
      * @param int $templateId
      * @param string[] list of locale
+     *
      * @return Attribute[]|ObjectCollection
      */
     public static function findAttributesByTemplateId($templateId, $locales = ['en_US']): ObjectCollection|array
@@ -34,10 +43,10 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
             ->endUse();
 
         $locales = array_map(function ($value) {
-            return '"' . $value . '"';
+            return '"'.$value.'"';
         }, $locales);
 
-        $attributeQuery->addJoinCondition('AttributeI18n', 'AttributeI18n.locale IN (' . implode(',', $locales) . ')');
+        $attributeQuery->addJoinCondition('AttributeI18n', 'AttributeI18n.locale IN ('.implode(',', $locales).')');
 
         $attributeQuery->withColumn('AttributeI18n.title', 'Title');
         $attributeQuery->withColumn('AttributeTemplate.position', 'Position');
@@ -52,6 +61,7 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
     /**
      * @param int $templateId
      * @param string[] list of locale
+     *
      * @return Feature[]|ObjectCollection
      */
     public static function findFeaturesByTemplateId($templateId, $locales = ['en_US']): ObjectCollection|array
@@ -66,10 +76,10 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
             ->endUse();
 
         $locales = array_map(function ($value) {
-            return '"' . $value . '"';
+            return '"'.$value.'"';
         }, $locales);
 
-        $featureQuery->addJoinCondition('FeatureI18n', 'FeatureI18n.locale IN (' . implode(',', $locales) . ')');
+        $featureQuery->addJoinCondition('FeatureI18n', 'FeatureI18n.locale IN ('.implode(',', $locales).')');
 
         $featureQuery->withColumn('FeatureI18n.title', 'Title');
         $featureQuery->withColumn('FeatureTemplate.position', 'Position');
@@ -82,7 +92,6 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
     }
 
     /**
-     * @param Category $category
      * @return Category[]
      */
     protected static function getParentCategoriesHasTemplate(Category $category): array
@@ -103,10 +112,9 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
 
     public static function findChoiceFilterByCategory(
         Category $category,
-                 &$templateId = null,
-                 &$categoryId = null
-    ): array|ObjectCollection
-    {
+        &$templateId = null,
+        &$categoryId = null
+    ): array|ObjectCollection {
         $choiceFilters = self::create()
             ->filterByCategoryId($category->getId())
             ->orderByPosition()
@@ -114,10 +122,11 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
 
         $parents = static::getParentCategoriesHasTemplate($category);
 
-        if (count($choiceFilters)) {
+        if (\count($choiceFilters)) {
             if (null !== $category->getDefaultTemplateId()) {
                 $templateId = $category->getDefaultTemplateId();
                 $categoryId = $category->getId();
+
                 return $choiceFilters;
             }
 
@@ -125,6 +134,7 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
                 if (null !== $parent->getDefaultTemplateId()) {
                     $templateId = $parent->getDefaultTemplateId();
                     $categoryId = $category->getId();
+
                     return $choiceFilters;
                 }
             }
@@ -136,9 +146,10 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
                 ->orderByPosition()
                 ->find();
 
-            if (count($choiceFilters)) {
+            if (\count($choiceFilters)) {
                 $templateId = $category->getDefaultTemplateId();
                 $categoryId = $category->getId();
+
                 return $choiceFilters;
             }
         }
@@ -149,9 +160,10 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
                 ->orderByPosition()
                 ->find();
 
-            if (count($choiceFilters)) {
+            if (\count($choiceFilters)) {
                 $templateId = $parent->getDefaultTemplateId();
                 $categoryId = $parent->getId();
+
                 return $choiceFilters;
             }
         }
@@ -164,6 +176,7 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
 
             $templateId = $category->getDefaultTemplateId();
             $categoryId = null;
+
             return $choiceFilters;
         }
 
@@ -173,9 +186,10 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
                 ->orderByPosition()
                 ->find();
 
-            if (count($choiceFilters)) {
+            if (\count($choiceFilters)) {
                 $templateId = $parent->getDefaultTemplateId();
                 $categoryId = null;
+
                 return $choiceFilters;
             }
         }

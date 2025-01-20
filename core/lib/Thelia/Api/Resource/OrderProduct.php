@@ -293,9 +293,10 @@ class OrderProduct implements PropelResourceInterface
     ])]
     public function getProductId(): ?int
     {
-        if(null === $this->getProductRef()) {
+        if (null === $this->getProductRef()) {
             return null;
         }
+
         return ProductQuery::create()->findOneByRef($this->getProductRef())?->getId();
     }
 
@@ -306,14 +307,14 @@ class OrderProduct implements PropelResourceInterface
     public function getAttribute()
     {
         $pseId = $this->getProductSaleElementsId();
-        if(!$pseId) {
+        if (!$pseId) {
             return null;
         }
         $attributesAvs = array_map(
             function (\Thelia\Model\AttributeCombination $attributeCombination) {
                 return [$attributeCombination->getAttribute()->getTitle() => $attributeCombination->getAttributeAv()->getTitle()];
-            }
-        ,AttributeCombinationQuery::create()->filterByProductSaleElementsId($pseId)->find()->getData());
+            }, AttributeCombinationQuery::create()->filterByProductSaleElementsId($pseId)->find()->getData());
+
         return $attributesAvs;
     }
 

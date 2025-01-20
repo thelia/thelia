@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -7,9 +17,8 @@ use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoiceFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
 
-class AttributeAvFilter implements TheliaFilterInterface,TheliaChoiceFilterInterface
+class AttributeAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterface
 {
-
     public function getResourceType(): array
     {
         return ['products'];
@@ -25,9 +34,9 @@ class AttributeAvFilter implements TheliaFilterInterface,TheliaChoiceFilterInter
         $query->useProductSaleElementsQuery()->filterByIsDefault(1)->useAttributeCombinationQuery()->filterByAttributeAvId($value)->endUse()->endUse();
     }
 
-    public function getValue(ActiveRecordInterface $activeRecord,string $locale): ?array
+    public function getValue(ActiveRecordInterface $activeRecord, string $locale): ?array
     {
-        if (empty($activeRecord->getDefaultSaleElements()?->getAttributeCombinationsJoinAttributeAv())){
+        if (empty($activeRecord->getDefaultSaleElements()?->getAttributeCombinationsJoinAttributeAv())) {
             return null;
         }
         $value = [];
@@ -41,6 +50,7 @@ class AttributeAvFilter implements TheliaFilterInterface,TheliaChoiceFilterInter
                 ]
             ;
         }
+
         return $value;
     }
 

@@ -22,7 +22,6 @@ use Propel\Runtime\Collection\Collection;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\Event\ItemProviderQueryEvent;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
-use Thelia\Api\Resource\Filter;
 use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Api\State\TFiltersProvider;
 use Thelia\Model\LangQuery;
@@ -45,8 +44,8 @@ readonly class PropelItemProvider implements ProviderInterface
             throw new RuntimeException('Bad provider');
         }
 
-        if ($operation->getProvider() !== self::class){
-            return $this->filtersProvider->provide(operation: $operation,uriVariables: $uriVariables,context: $context);
+        if ($operation->getProvider() !== self::class) {
+            return $this->filtersProvider->provide(operation: $operation, uriVariables: $uriVariables, context: $context);
         }
 
         /** @var ModelCriteria $queryClass */

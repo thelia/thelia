@@ -13,7 +13,6 @@
 namespace Thelia\Controller\Front;
 
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;

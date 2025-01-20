@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -15,5 +25,5 @@ interface TheliaFilterInterface
 
     public function filter(ModelCriteria $query, $value): void;
 
-    public function getValue(ActiveRecordInterface $activeRecord,string $locale): ?array;
+    public function getValue(ActiveRecordInterface $activeRecord, string $locale): ?array;
 }

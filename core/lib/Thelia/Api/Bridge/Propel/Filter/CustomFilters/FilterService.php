@@ -1,8 +1,17 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters;
 
-use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\CategoryFilter;
@@ -12,19 +21,19 @@ readonly class FilterService
 {
     public function __construct(
         #[TaggedIterator('api.thelia.filter')]
-        private readonly iterable             $filters,
-    )
-    {
+        private readonly iterable $filters,
+    ) {
     }
 
     private function getAvailableFiltersWithTFilter(string $resourceType, array $tfilters): array
     {
         $filters = $this->getAvailableFilters($resourceType);
+        dd($filters);
         $filterResult = [];
         foreach ($filters as $filter) {
             foreach ($tfilters as $tfilter => $tfilterValue) {
-                if (in_array($tfilter, $filter->getFilterName(), true)) {
-                    $filterResult [] = [
+                if (\in_array($tfilter, $filter->getFilterName(), true)) {
+                    $filterResult[] = [
                         'filter' => $filter,
                         'tfilter' => $tfilter,
                         'value' => $tfilterValue,
@@ -33,6 +42,7 @@ readonly class FilterService
                 }
             }
         }
+
         return $filterResult;
     }
 
@@ -40,43 +50,44 @@ readonly class FilterService
     {
         $filters = [];
         foreach ($this->filters as $filter) {
-            if (in_array($resourceType, $filter->getResourceType(), true)) {
-                $filters [] = $filter;
+            if (\in_array($resourceType, $filter->getResourceType(), true)) {
+                $filters[] = $filter;
             }
         }
+
         return $filters;
     }
 
-
-    public function filterTFilterWithRequest($request,?bool &$isCategoryFilter = false,?ModelCriteria $query = null): iterable
+    public function filterTFilterWithRequest($request, ?bool &$isCategoryFilter = false, ModelCriteria $query = null): iterable
     {
         $tfilters = $request->get('tfilters', []);
         $pathInfo = $request->getPathInfo();
         $segments = explode('/', $pathInfo);
         $resource = end($segments);
-        return $this->filterWithTFilter(tfilters: $tfilters,resource: $resource,query: $query,isCategoryFilter: $isCategoryFilter);
+
+        return $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, query: $query, isCategoryFilter: $isCategoryFilter);
     }
 
-    public function filterTFilterWithContext(?array $context = null,?bool &$isCategoryFilter = false,?ModelCriteria $query = null): iterable
+    public function filterTFilterWithContext(array $context = null, ?bool &$isCategoryFilter = false, ModelCriteria $query = null): iterable
     {
-        $tfilters = isset($context["filters"]["tfilters"]) ? $context["filters"]["tfilters"] : [];
+        $tfilters = $context['filters']['tfilters'] ?? [];
         $pathInfo = $context['path_info'];
         $segments = explode('/', $pathInfo);
         $resource = end($segments);
-        return $this->filterWithTFilter(tfilters: $tfilters,resource: $resource,query: $query,isCategoryFilter: $isCategoryFilter);
+
+        return $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, query: $query, isCategoryFilter: $isCategoryFilter);
     }
 
-    public function filterWithTFilter(array $tfilters,string $resource, ?ModelCriteria $query = null,?bool &$isCategoryFilter = false): iterable
+    public function filterWithTFilter(array $tfilters, string $resource, ModelCriteria $query = null, ?bool &$isCategoryFilter = false): iterable
     {
         $filters = $this->getAvailableFiltersWithTFilter($resource, $tfilters);
-
-        if (!$query){
-            $queryClass = "Thelia\Model\\" . ucfirst($resource) . 'Query';
+        if (!$query) {
+            $queryClass = "Thelia\Model\\".ucfirst($resource).'Query';
             if (!class_exists($queryClass)) {
-                $queryClass = "Thelia\Model\\" . ucfirst(mb_substr($resource, 0, -1)) . 'Query';
+                $queryClass = "Thelia\Model\\".ucfirst(mb_substr($resource, 0, -1)).'Query';
             }
             if (!class_exists($queryClass)) {
-                throw new \RuntimeException('Not found class: ' . $queryClass);
+                throw new \RuntimeException('Not found class: '.$queryClass);
             }
             $query = $queryClass::create();
         }
@@ -87,14 +98,15 @@ readonly class FilterService
             if (!$filterClass instanceof TheliaFilterInterface) {
                 throw new \RuntimeException(sprintf('The "%s" filter must implements TheliaFilterInterface.', $filterClass::class));
             }
-            if ($filterClass instanceof CategoryFilter){
+            if ($filterClass instanceof CategoryFilter) {
                 $isCategoryFilter = true;
             }
-            if (is_string($value)){
-                $value = explode(',',$value);
+            if (\is_string($value)) {
+                $value = explode(',', $value);
             }
             $filterClass->filter($query, $value);
         }
+
         return $query->groupById();
     }
 }

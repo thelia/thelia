@@ -12,6 +12,7 @@
 
 namespace Thelia\Service\Model;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Form;
@@ -22,15 +23,14 @@ use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Form\Exception\FormValidationException;
-use Thelia\Log\Tlog;
-use Thelia\Model\AddressQuery;
-use Thelia\Model\Cart;
-use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Coupon\CouponManager;
 use Thelia\Coupon\Type\CouponInterface;
+use Thelia\Form\Exception\FormValidationException;
+use Thelia\Log\Tlog;
+use Thelia\Model\AddressQuery;
 use Thelia\Model\AreaDeliveryModuleQuery;
+use Thelia\Model\Cart;
 use Thelia\Model\Country;
 use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponModule;
@@ -39,18 +39,16 @@ use Thelia\Model\State;
 use Thelia\Module\BaseModule;
 use Thelia\Module\Exception\DeliveryException;
 
-
 readonly class CartService
 {
     public function __construct(
         private EventDispatcherInterface $eventDispatcher,
-        private TranslatorInterface      $translator,
-        private ContainerInterface       $container,
-        private RequestStack             $requestStack,
-        private CouponManager            $couponManager,
-        private Session                  $session
-    )
-    {
+        private TranslatorInterface $translator,
+        private ContainerInterface $container,
+        private RequestStack $requestStack,
+        private CouponManager $couponManager,
+        private Session $session
+    ) {
     }
 
     public function addItem(Form $form, bool $validatedForm = false): void
@@ -161,6 +159,7 @@ readonly class CartService
     protected function getCartEvent(): CartEvent
     {
         $cart = $this->requestStack->getCurrentRequest()?->getSession()->getSessionCart($this->eventDispatcher);
+
         return new CartEvent($cart);
     }
 
@@ -219,6 +218,7 @@ readonly class CartService
             $postage = 0;
             $postageTax = 0;
         }
+
         return [
             'postage' => $postage,
             'tax' => $postageTax,
@@ -268,9 +268,11 @@ readonly class CartService
                     continue;
                 }
             }
+
             // All conditions are met, the shipping is free !
             return true;
         }
+
         return false;
     }
 }

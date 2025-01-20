@@ -67,7 +67,7 @@ use Thelia\Model\Tools\UrlRewritingTrait;
 #[ApiFilter(
     filterClass: NotInFilter::class,
     properties: [
-        'id'
+        'id',
     ]
 )]
 #[ApiFilter(

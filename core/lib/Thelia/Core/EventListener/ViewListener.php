@@ -25,7 +25,6 @@ use Symfony\Component\Routing\Router;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\ViewCheckEvent;
 use Thelia\Core\HttpFoundation\Response;
-use Thelia\Core\Routing\RewritingLoader;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
@@ -85,7 +84,6 @@ class ViewListener implements EventSubscriberInterface
         } catch (ResourceNotFoundException $e) {
             throw new NotFoundHttpException();
         } catch (OrderException $e) {
-
             switch ($e->getCode()) {
                 case OrderException::CART_EMPTY:
                     // Redirect to the cart template

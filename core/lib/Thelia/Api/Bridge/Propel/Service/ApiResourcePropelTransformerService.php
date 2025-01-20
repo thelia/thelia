@@ -305,7 +305,7 @@ readonly class ApiResourcePropelTransformerService
 
         foreach ($property->getAttributes(Column::class) as $columnAttribute) {
             if (isset($columnAttribute->getArguments()['propelFieldName'])) {
-                $propelSetter = 'set' . ucfirst($columnAttribute->getArguments()['propelFieldName']);
+                $propelSetter = 'set'.ucfirst($columnAttribute->getArguments()['propelFieldName']);
             }
             if (isset($columnAttribute->getArguments()['propelSetter'])) {
                 $setterForced = true;
@@ -485,7 +485,7 @@ readonly class ApiResourcePropelTransformerService
                 $i18nGetters = array_filter(
                     array_map(
                         static function (\ReflectionProperty $reflectionProperty) use ($i18n) {
-                            return $reflectionProperty->isInitialized($i18n) ? 'get' . ucfirst($reflectionProperty->getName()) : null;
+                            return $reflectionProperty->isInitialized($i18n) ? 'get'.ucfirst($reflectionProperty->getName()) : null;
                         },
                         (new \ReflectionClass($i18n))->getProperties()
                     )

@@ -62,7 +62,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
         Tlog::getInstance()->addAlert($message);
 
         if (!$failSafe && $this->debugEnabled) {
-            //throw new \InvalidArgumentException($message);
+            // throw new \InvalidArgumentException($message);
         }
     }
 

@@ -1,20 +1,29 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use InvalidArgumentException;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\CategoryFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoiceFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\FilterService;
 use Thelia\Api\Resource\Filter;
 use Thelia\Model\ChoiceFilterQuery;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 class TFiltersProvider implements ProviderInterface
 {
-    public function __construct(protected FilterService $filterService,private readonly RequestStack $requestStack)
+    public function __construct(protected FilterService $filterService, private readonly RequestStack $requestStack)
     {
     }
 
@@ -23,49 +32,49 @@ class TFiltersProvider implements ProviderInterface
         $resource = $uriVariables['resource'] ?? null;
 
         if (!$resource) {
-            throw new InvalidArgumentException('The "resource" parameter is required.');
+            throw new \InvalidArgumentException('The "resource" parameter is required.');
         }
         $request = $this->requestStack->getCurrentRequest();
-        $isApiRoute = $request->get('isApiRoute',false);
-        if ($isApiRoute){
+        $isApiRoute = $request->get('isApiRoute', false);
+        if ($isApiRoute) {
             $query = $this->filterService->filterTFilterWithRequest(request: $request, isCategoryFilter: $isCategoryFilter);
         }
-        if (!$isApiRoute){
+        if (!$isApiRoute) {
             $query = $this->filterService->filterTFilterWithContext(context: $context, isCategoryFilter: $isCategoryFilter);
         }
 
         $filterObjects = [];
         $locale = null;
-        if ($request){
+        if ($request) {
             $locale = $request->get('locale');
         }
-        if (isset($context["filters"]["locale"])){
-            $locale = $context["filters"]["locale"];
+        if (isset($context['filters']['locale'])) {
+            $locale = $context['filters']['locale'];
         }
-        $locale = $locale ?? "en_US";
+        $locale = $locale ?? 'en_US';
         $objects = $query->find();
         $filters = $this->filterService->getAvailableFilters($resource);
         foreach ($filters as $filter) {
             $values = [];
             $hasMain = false;
             foreach ($objects as $item) {
-                $possibleValues = $filter->getValue($item,$locale);
-                if (!$possibleValues){
+                $possibleValues = $filter->getValue($item, $locale);
+                if (!$possibleValues) {
                     continue;
                 }
                 foreach ($possibleValues as $value) {
-                    $values [] = $value;
+                    $values[] = $value;
                 }
             }
-            if ((isset($values[0]["mainId"]))){
+            if (isset($values[0]['mainId'])) {
                 $hasMain = true;
                 $values = array_intersect_key($values, array_unique(array_map(
-                    static function($item) {
-                        return $item['id'] . '-' . $item['mainId'];
+                    static function ($item) {
+                        return $item['id'].'-'.$item['mainId'];
                     },
                     $values
                 )));
-            }else{
+            } else {
                 $values = array_intersect_key($values, array_unique(array_column($values, 'id')));
             }
             $id = null;
@@ -87,7 +96,7 @@ class TFiltersProvider implements ProviderInterface
                 }
                 foreach ($choiceFilters as $choiceFilter) {
                     $otherType = $choiceFilter->getChoiceFilterOther()?->getType();
-                    if (in_array($otherType, $filter->getFilterName(), true)) {
+                    if (\in_array($otherType, $filter->getFilterName(), true)) {
                         $isVisible = $choiceFilter->isVisible();
                         $position = $choiceFilter->getPosition();
                     }
@@ -105,12 +114,12 @@ class TFiltersProvider implements ProviderInterface
                     }
                 }
             }
-            if ($hasMain){
+            if ($hasMain) {
                 $splitValues = [];
-                foreach ($values as $value){
+                foreach ($values as $value) {
                     $splitValues[$value['mainId']][] = $value;
                 }
-                foreach ($splitValues as $value){
+                foreach ($splitValues as $value) {
                     $filterDto = new Filter();
                     $filterDto
                         ->setId($value[0]['mainId'])
@@ -119,14 +128,15 @@ class TFiltersProvider implements ProviderInterface
                         ->setInputType('checkbox')
                         ->setPosition($position)
                         ->setVisible($isVisible);
-                    $value = array_map(function ($val){
+                    $value = array_map(function ($val) {
                         unset($val['mainId'], $val['mainTitle']);
+
                         return $val;
-                    },$value);
+                    }, $value);
                     $filterDto->setValues($value);
                     $filterObjects[] = $filterDto;
                 }
-            }else {
+            } else {
                 $filterObjects[] = (new Filter())
                     ->setId($id)
                     ->setTitle($filter->getFilterName()[0])
@@ -150,6 +160,7 @@ class TFiltersProvider implements ProviderInterface
         usort($filterObjects, static function ($a, $b) {
             return $a->getPosition() <=> $b->getPosition();
         });
+
         return $filterObjects;
     }
 }

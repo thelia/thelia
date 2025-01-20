@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -24,17 +34,18 @@ class BrandFilter implements TheliaFilterInterface
         $query->filterByBrandId($value);
     }
 
-    public function getValue(ActiveRecordInterface $activeRecord,string $locale): ?array
+    public function getValue(ActiveRecordInterface $activeRecord, string $locale): ?array
     {
         $brand = $activeRecord->getBrand();
-        if (!$brand instanceof Brand){
+        if (!$brand instanceof Brand) {
             return null;
         }
+
         return [
             [
                 'id' => $brand->getId(),
                 'title' => $brand->setLocale($locale)->getTitle(),
-            ]
+            ],
         ];
     }
 }

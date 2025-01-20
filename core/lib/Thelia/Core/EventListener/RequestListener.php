@@ -72,13 +72,13 @@ class RequestListener implements EventSubscriberInterface
 
         $this->translator->addResource(
             'xlf',
-            \sprintf($vendorFormDir.DS.'Resources'.DS.'translations'.DS.'validators.%s.xlf', $lang->getCode()),
+            sprintf($vendorFormDir.DS.'Resources'.DS.'translations'.DS.'validators.%s.xlf', $lang->getCode()),
             $lang->getLocale(),
             'validators'
         );
         $this->translator->addResource(
             'xlf',
-            \sprintf($vendorValidatorDir.DS.'Resources'.DS.'translations'.DS.'validators.%s.xlf', $lang->getCode()),
+            sprintf($vendorValidatorDir.DS.'Resources'.DS.'translations'.DS.'validators.%s.xlf', $lang->getCode()),
             $lang->getLocale(),
             'validators'
         );
@@ -248,7 +248,7 @@ class RequestListener implements EventSubscriberInterface
                 if (ConfigQuery::isMultiDomainActivated()) {
                     $components = parse_url($referrer);
                     $lang = LangQuery::create()
-                        ->filterByUrl(\sprintf('%s://%s', $components['scheme'], $components['host']), ModelCriteria::LIKE)
+                        ->filterByUrl(sprintf('%s://%s', $components['scheme'], $components['host']), ModelCriteria::LIKE)
                         ->findOne();
 
                     if (null !== $lang) {

@@ -82,7 +82,7 @@ class CustomerTitle extends AbstractTranslatableResource
         OrderAddress::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ,
         Customer::GROUP_FRONT_WRITE,
-        Order::GROUP_FRONT_READ_SINGLE
+        Order::GROUP_FRONT_READ_SINGLE,
     ])]
     public ?int $id = null;
 
