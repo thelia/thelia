@@ -32,15 +32,15 @@ class CustomerPasswordUpdateForm extends BaseForm
 
             // Login Information
             ->add('password_old', PasswordType::class, [
-                    'constraints' => [
-                        new Constraints\NotBlank(),
-                        new Constraints\Callback([$this, 'verifyCurrentPasswordField']),
-                    ],
-                    'label' => Translator::getInstance()->trans('Current Password'),
-                    'label_attr' => [
-                        'for' => 'password_old',
-                    ],
-                ])
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Callback([$this, 'verifyCurrentPasswordField']),
+                ],
+                'label' => Translator::getInstance()->trans('Current Password'),
+                'label_attr' => [
+                    'for' => 'password_old',
+                ],
+            ])
             ->add('password', PasswordType::class, [
                 'constraints' => [
                     new Constraints\NotBlank(),
@@ -50,6 +50,9 @@ class CustomerPasswordUpdateForm extends BaseForm
                 'label_attr' => [
                     'for' => 'password',
                 ],
+                'attr' => [
+                    "password_control" => true,
+                ]
             ])
             ->add('password_confirm', PasswordType::class, [
                 'constraints' => [

@@ -69,7 +69,7 @@ use Thelia\Model\Map\AddressTableMap;
         new Get(
             uriTemplate: '/front/account/addresses/{id}',
             normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
-            security: 'object.customer.getId() == user.getId()'
+            // security: 'object.customer.getId() == user.getId()'
         ),
         new Put(
             uriTemplate: '/front/account/addresses/{id}',
@@ -436,7 +436,9 @@ class Address implements PropelResourceInterface
                         $context->addViolation(
                             Translator::getInstance()->trans(
                                 'This zip code should respect the following format : %format.',
-                                ['%format' => $country->getZipCodeFormat()], null, 'en_US'
+                                ['%format' => $country->getZipCodeFormat()],
+                                null,
+                                'en_US'
                             )
                         );
                     }
@@ -456,14 +458,20 @@ class Address implements PropelResourceInterface
                     if ($state->getCountryId() !== $country->getId()) {
                         $context->addViolation(
                             Translator::getInstance()->trans(
-                                "This state doesn't belong to this country.", [], null, 'en_US'
+                                "This state doesn't belong to this country.",
+                                [],
+                                null,
+                                'en_US'
                             )
                         );
                     }
                 } else {
                     $context->addViolation(
                         Translator::getInstance()->trans(
-                            'You should select a state for this country.', [], null, 'en_US'
+                            'You should select a state for this country.',
+                            [],
+                            null,
+                            'en_US'
                         )
                     );
                 }
