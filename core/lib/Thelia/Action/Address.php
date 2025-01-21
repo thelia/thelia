@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Service\CustomerService;
 use Thelia\Model\Address as AddressModel;
 use Thelia\Model\Event\AddressEvent;
 use Thelia\Model\Map\AddressTableMap;
@@ -29,6 +30,10 @@ use Thelia\Model\Map\AddressTableMap;
  */
 class Address extends BaseAction implements EventSubscriberInterface
 {
+    public function __construct(private readonly CustomerService $customerService)
+    {
+    }
+
     public function create(AddressCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $address = new AddressModel();
@@ -64,7 +69,7 @@ class Address extends BaseAction implements EventSubscriberInterface
         try {
             $addressModel
                 ->setLabel($event->getLabel())
-                ->setTitleId($event->getTitle())
+                ->setTitleId($event->getTitle() ?? $this->customerService->getDefaultCustomerTitle()->getId())
                 ->setFirstname($event->getFirstname())
                 ->setLastname($event->getLastname())
                 ->setAddress1($event->getAddress1())
@@ -77,8 +82,7 @@ class Address extends BaseAction implements EventSubscriberInterface
                 ->setCellphone($event->getCellphone())
                 ->setPhone($event->getPhone())
                 ->setCompany($event->getCompany())
-                ->save()
-            ;
+                ->save();
 
             if ($event->getIsDefault() && !$addressModel->getIsDefault()) {
                 $addressModel->makeItDefault();
@@ -95,9 +99,9 @@ class Address extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            TheliaEvents::ADDRESS_CREATE => ['create', 128],
-            TheliaEvents::ADDRESS_UPDATE => ['update', 128],
-            TheliaEvents::ADDRESS_DELETE => ['delete', 128],
+            TheliaEvents::ADDRESS_CREATE  => ['create', 128],
+            TheliaEvents::ADDRESS_UPDATE  => ['update', 128],
+            TheliaEvents::ADDRESS_DELETE  => ['delete', 128],
             TheliaEvents::ADDRESS_DEFAULT => ['useDefault', 128],
         ];
     }

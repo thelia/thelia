@@ -13,9 +13,11 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Service\CountryService;
 use Thelia\Core\Translation\Translator;
 
 /**
@@ -26,6 +28,11 @@ use Thelia\Core\Translation\Translator;
 class AddressCreateForm extends FirewallForm
 {
     use AddressCountryValidationTrait;
+
+    public function __construct(
+        private CountryService $countryService
+    ) {
+    }
 
     /**
      * in this function you add all the fields you need for your Form.
@@ -50,141 +57,128 @@ class AddressCreateForm extends FirewallForm
     {
         $this->formBuilder
             ->add('label', TextType::class, [
-                    'constraints' => [
-                        new NotBlank(),
-                    ],
-                    'label' => Translator::getInstance()->trans('Address label'),
-                    'label_attr' => [
-                        'for' => 'address_label',
-                    ],
-                ])
-            ->add('title', TextType::class, [
-                    'constraints' => [
-                        new Constraints\NotBlank(),
-                    ],
-                    'label' => Translator::getInstance()->trans('Title'),
-                    'label_attr' => [
-                        'for' => 'title',
-                    ],
-                ])
+                'constraints' => [
+                    new NotBlank(),
+                ],
+                'label'       => Translator::getInstance()->trans('Address label'),
+                'label_attr'  => [
+                    'for' => 'address_label',
+                ],
+            ])
             ->add('firstname', TextType::class, [
-                    'constraints' => [
-                        new Constraints\NotBlank(),
-                    ],
-                    'label' => Translator::getInstance()->trans('First Name'),
-                    'label_attr' => [
-                        'for' => 'firstname',
-                    ],
-                ])
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                ],
+                'label'       => Translator::getInstance()->trans('First Name'),
+                'label_attr'  => [
+                    'for' => 'firstname',
+                ],
+            ])
             ->add('lastname', TextType::class, [
-                    'constraints' => [
-                        new Constraints\NotBlank(),
-                    ],
-                    'label' => Translator::getInstance()->trans('Last Name'),
-                    'label_attr' => [
-                        'for' => 'lastname',
-                    ],
-                ])
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                ],
+                'label'       => Translator::getInstance()->trans('Last Name'),
+                'label_attr'  => [
+                    'for' => 'lastname',
+                ],
+            ])
             ->add('company', TextType::class, [
-                    'label' => Translator::getInstance()->trans('Company Name'),
-                    'label_attr' => [
-                        'for' => 'company',
-                    ],
-                    'required' => false,
-                ])
+                'label'      => Translator::getInstance()->trans('Company Name'),
+                'label_attr' => [
+                    'for' => 'company',
+                ],
+                'required'   => false,
+            ])
             ->add('address1', TextType::class, [
-                    'constraints' => [
-                        new Constraints\NotBlank(),
-                    ],
-                    'label' => Translator::getInstance()->trans('Street Address'),
-                    'label_attr' => [
-                        'for' => 'address1',
-                    ],
-                ])
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                ],
+                'label'       => Translator::getInstance()->trans('Street Address'),
+                'label_attr'  => [
+                    'for' => 'address1',
+                ],
+            ])
             ->add('address2', TextType::class, [
-                    'label' => Translator::getInstance()->trans('Address Line 2'),
-                    'label_attr' => [
-                        'for' => 'address2',
-                    ],
-                    'required' => false,
-                ])
+                'label'      => Translator::getInstance()->trans('Address Line 2'),
+                'label_attr' => [
+                    'for' => 'address2',
+                ],
+                'required'   => false,
+            ])
             ->add('address3', TextType::class, [
-                    'label' => Translator::getInstance()->trans('Address Line 3'),
-                    'label_attr' => [
-                        'for' => 'address3',
-                    ],
-                    'required' => false,
-                ])
+                'label'      => Translator::getInstance()->trans('Address Line 3'),
+                'label_attr' => [
+                    'for' => 'address3',
+                ],
+                'required'   => false,
+            ])
             ->add('city', TextType::class, [
-                    'constraints' => [
-                        new Constraints\NotBlank(),
-                        new Constraints\Callback(
-                            [$this, 'verifyCity']
-                        ),
-                    ],
-                    'label' => Translator::getInstance()->trans('City'),
-                    'label_attr' => [
-                        'for' => 'city',
-                    ],
-                ])
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Callback(
+                        [$this, 'verifyCity']
+                    ),
+                ],
+                'label'       => Translator::getInstance()->trans('City'),
+                'label_attr'  => [
+                    'for' => 'city',
+                ],
+            ])
             ->add('zipcode', TextType::class, [
-                    'constraints' => [
-                        new Constraints\NotBlank(),
-                        new Constraints\Callback(
-                            [$this, 'verifyZipCode']
-                        ),
-                    ],
-                    'label' => Translator::getInstance()->trans('Zip code'),
-                    'label_attr' => [
-                        'for' => 'zipcode',
-                    ],
-                ])
-            ->add('country', TextType::class, [
-                    'constraints' => [
-                        new Constraints\NotBlank(),
-                    ],
-                    'label' => Translator::getInstance()->trans('Country'),
-                    'label_attr' => [
-                        'for' => 'country',
-                    ],
-                ])
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Callback(
+                        [$this, 'verifyZipCode']
+                    ),
+                ],
+                'label'       => Translator::getInstance()->trans('Zip code'),
+                'label_attr'  => [
+                    'for' => 'zipcode',
+                ],
+            ])
+            ->add('country', ChoiceType::class, [
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                ],
+                'choices'     => $this->countryService->getAllCountriesChoiceType(),
+                'label'       => Translator::getInstance()->trans('Country'),
+                'expanded'    => false,
+                'multiple'    => false,
+                'data'        => $this->countryService->getDefaultCountry()?->getId(),
+                'label_attr'  => [
+                    'for' => 'country',
+                ],
+            ])
             ->add('state', TextType::class, [
-                'required' => false,
+                'required'    => false,
                 'constraints' => [
                     new Constraints\Callback(
                         [$this, 'verifyState']
                     ),
                 ],
 
-                'label' => Translator::getInstance()->trans('State *'),
+                'label'      => Translator::getInstance()->trans('State *'),
                 'label_attr' => [
                     'for' => 'state',
                 ],
             ])
             // Phone
             ->add('phone', TextType::class, [
-                    'label' => Translator::getInstance()->trans('Phone'),
-                    'label_attr' => [
-                       'for' => 'phone',
-                    ],
-                    'required' => false,
-                ])
-            ->add('cellphone', TextType::class, [
-                    'label' => Translator::getInstance()->trans('Cellphone'),
-                    'label_attr' => [
-                       'for' => 'cellphone',
-                    ],
-                    'required' => false,
-                ])
+                'label'      => Translator::getInstance()->trans('Phone'),
+                'label_attr' => [
+                    'for' => 'phone',
+                ],
+                'required'   => false,
+            ])
             // Default address
             ->add('is_default', CheckboxType::class, [
-                    'label' => Translator::getInstance()->trans('Make this address as my primary address'),
-                    'label_attr' => [
-                       'for' => 'default_address',
-                    ],
-                    'required' => false,
-                ])
-        ;
+                'label'      => Translator::getInstance()->trans('Make this address as my primary address'),
+                'label_attr' => [
+                    'for' => 'default_address',
+                ],
+                'required'   => false,
+            ]);
     }
 
     /**

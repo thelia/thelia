@@ -21,6 +21,7 @@ use Thelia\Core\Event\Customer\CustomerLoginEvent;
 use Thelia\Core\Event\LostPasswordEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\Service\CustomerService;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\CustomerException;
 use Thelia\Mailer\MailerFactory;
@@ -49,11 +50,19 @@ class Customer extends BaseAction implements EventSubscriberInterface
     /** @var RequestStack */
     protected $requestStack;
 
-    public function __construct(SecurityContext $securityContext, MailerFactory $mailer, RequestStack $requestStack = null)
-    {
+    /** @var CustomerService */
+    protected $customerService;
+
+    public function __construct(
+        SecurityContext $securityContext,
+        MailerFactory $mailer,
+        RequestStack $requestStack = null,
+        CustomerService $customerService
+    ) {
         $this->securityContext = $securityContext;
-        $this->mailer = $mailer;
-        $this->requestStack = $requestStack;
+        $this->mailer          = $mailer;
+        $this->requestStack    = $requestStack;
+        $this->customerService = $customerService;
     }
 
     /**
@@ -81,8 +90,11 @@ class Customer extends BaseAction implements EventSubscriberInterface
         );
     }
 
-    public function customerConfirmationEmail(CustomerEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
-    {
+    public function customerConfirmationEmail(
+        CustomerEvent $event,
+        $eventName,
+        EventDispatcherInterface $dispatcher
+    ): void {
         $customer = $event->getModel();
 
         if (ConfigQuery::isCustomerEmailConfirmationEnable() && $customer->getConfirmationToken() !== null) {
@@ -115,8 +127,11 @@ class Customer extends BaseAction implements EventSubscriberInterface
     /**
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function updateProfile(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
-    {
+    public function updateProfile(
+        CustomerCreateOrUpdateEvent $event,
+        $eventName,
+        EventDispatcherInterface $dispatcher
+    ): void {
         $customer = $event->getCustomer();
 
         if ($event->getTitle() !== null) {
@@ -177,10 +192,13 @@ class Customer extends BaseAction implements EventSubscriberInterface
     /**
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    private function createOrUpdateCustomer(CustomerModel $customer, CustomerCreateOrUpdateEvent $event, EventDispatcherInterface $dispatcher): void
-    {
+    private function createOrUpdateCustomer(
+        CustomerModel $customer,
+        CustomerCreateOrUpdateEvent $event,
+        EventDispatcherInterface $dispatcher
+    ): void {
         $customer->createOrUpdate(
-            $event->getTitle(),
+            $event->getTitle() ?? $this->customerService->getDefaultCustomerTitle()->getId(),
             $event->getFirstname(),
             $event->getLastname(),
             $event->getAddress1(),
@@ -243,8 +261,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
             $customer
                 ->setPassword($password)
-                ->save()
-            ;
+                ->save();
 
             $this->mailer->sendEmailToCustomer('lost_password', $customer, ['password' => $password]);
         }
