@@ -40,18 +40,18 @@ class CustomerUpdateForm extends BaseForm
                 IntegerType::class// In a front office context, update the in-memory logged-in user data
             )
             ->add('company', TextType::class, [
-                'label' => Translator::getInstance()->trans('Company'),
+                'label'      => Translator::getInstance()->trans('Company'),
                 'label_attr' => [
                     'for' => 'company',
                 ],
-                'required' => false,
+                'required'   => false,
             ])
             ->add('firstname', TextType::class, [
                 'constraints' => [
                     new Constraints\NotBlank(),
                 ],
-                'label' => Translator::getInstance()->trans('First Name'),
-                'label_attr' => [
+                'label'       => Translator::getInstance()->trans('First Name'),
+                'label_attr'  => [
                     'for' => 'firstname',
                 ],
             ])
@@ -59,8 +59,8 @@ class CustomerUpdateForm extends BaseForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                 ],
-                'label' => Translator::getInstance()->trans('Last Name'),
-                'label_attr' => [
+                'label'       => Translator::getInstance()->trans('Last Name'),
+                'label_attr'  => [
                     'for' => 'lastname',
                 ],
             ])
@@ -69,8 +69,8 @@ class CustomerUpdateForm extends BaseForm
                     new Constraints\NotBlank(),
                     new Constraints\Email(),
                 ],
-                'label' => Translator::getInstance()->trans('Email address'),
-                'label_attr' => [
+                'label'       => Translator::getInstance()->trans('Email address'),
+                'label_attr'  => [
                     'for' => 'email',
                 ],
             ])
@@ -79,16 +79,16 @@ class CustomerUpdateForm extends BaseForm
                     new Constraints\Email(),
                     new Constraints\Callback([$this, 'verifyEmailField']),
                 ],
-                'label' => Translator::getInstance()->trans('Confirm Email address'),
-                'label_attr' => [
+                'label'       => Translator::getInstance()->trans('Confirm Email address'),
+                'label_attr'  => [
                     'for' => 'email_confirm',
                 ],
             ])
             ->add('password', TextType::class, [
-                'label' => Translator::getInstance()->trans('Password'),
-                'required' => false,
+                'label'      => Translator::getInstance()->trans('Password'),
+                'required'   => false,
                 'label_attr' => [
-                    'for' => 'password',
+                    'for'  => 'password',
                     'help' => Translator::getInstance()->trans('Leave blank to keep current customer password'),
                 ],
             ])
@@ -96,47 +96,47 @@ class CustomerUpdateForm extends BaseForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                 ],
-                'label_attr' => [
+                'label_attr'  => [
                     'for' => 'address',
                 ],
-                'label' => Translator::getInstance()->trans('Street Address '),
+                'label'       => Translator::getInstance()->trans('Street Address '),
             ])
             ->add('address2', TextType::class, [
-                'required' => false,
-                'label' => Translator::getInstance()->trans('Address Line 2'),
+                'required'   => false,
+                'label'      => Translator::getInstance()->trans('Address Line 2'),
                 'label_attr' => [
                     'for' => 'address2',
                 ],
             ])
             ->add('address3', TextType::class, [
-                'required' => false,
-                'label' => Translator::getInstance()->trans('Address Line 3'),
+                'required'   => false,
+                'label'      => Translator::getInstance()->trans('Address Line 3'),
                 'label_attr' => [
                     'for' => 'address3',
                 ],
             ])
             ->add('phone', TextType::class, [
-                'label' => Translator::getInstance()->trans('Phone'),
+                'label'      => Translator::getInstance()->trans('Phone'),
                 'label_attr' => [
                     'for' => 'phone',
                 ],
-                'required' => false,
+                'required'   => false,
             ])
             ->add('cellphone', TextType::class, [
-                'label' => Translator::getInstance()->trans('Cellphone'),
+                'label'      => Translator::getInstance()->trans('Cellphone'),
                 'label_attr' => [
                     'for' => 'cellphone',
                 ],
-                'required' => false,
+                'required'   => false,
             ])
             ->add('zipcode', TextType::class, [
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
                         [$this, 'verifyZipCode']),
-                    ],
-                'label' => Translator::getInstance()->trans('Zip code'),
-                'label_attr' => [
+                ],
+                'label'       => Translator::getInstance()->trans('Zip code'),
+                'label_attr'  => [
                     'for' => 'zipcode',
                 ],
             ])
@@ -144,8 +144,8 @@ class CustomerUpdateForm extends BaseForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                 ],
-                'label' => Translator::getInstance()->trans('City'),
-                'label_attr' => [
+                'label'       => Translator::getInstance()->trans('City'),
+                'label_attr'  => [
                     'for' => 'city',
                 ],
             ])
@@ -153,54 +153,44 @@ class CustomerUpdateForm extends BaseForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                 ],
-                'label' => Translator::getInstance()->trans('Country'),
-                'label_attr' => [
+                'label'       => Translator::getInstance()->trans('Country'),
+                'label_attr'  => [
                     'for' => 'country',
                 ],
             ])
             ->add('state', TextType::class, [
-                'required' => false,
+                'required'    => false,
                 'constraints' => [
                     new Constraints\Callback(
                         [$this, 'verifyState']
                     ),
                 ],
-                'label' => Translator::getInstance()->trans('State *'),
-                'label_attr' => [
+                'label'       => Translator::getInstance()->trans('State *'),
+                'label_attr'  => [
                     'for' => 'state',
                 ],
             ])
-            ->add('title', TextType::class, [
-                'constraints' => [
-                    new Constraints\NotBlank(),
-                ],
-                'label' => Translator::getInstance()->trans('Title'),
-                'label_attr' => [
-                    'for' => 'title',
-                ],
-            ])
             ->add('discount', TextType::class, [
-                'required' => false,
-                'label' => Translator::getInstance()->trans('permanent discount (in percent)'),
+                'required'   => false,
+                'label'      => Translator::getInstance()->trans('permanent discount (in percent)'),
                 'label_attr' => [
                     'for' => 'discount',
                 ],
             ])
             ->add('reseller', CheckboxType::class, [
-                'required' => false,
-                'label' => Translator::getInstance()->trans('Reseller'),
+                'required'   => false,
+                'label'      => Translator::getInstance()->trans('Reseller'),
                 'label_attr' => [
                     'for' => 'reseller',
                 ],
             ])
             ->add('lang_id', IntegerType::class, [
-                'required' => false,
-                'label' => Translator::getInstance()->trans('Preferred language'),
+                'required'   => false,
+                'label'      => Translator::getInstance()->trans('Preferred language'),
                 'label_attr' => [
                     'for' => 'lang_id',
                 ],
-            ])
-        ;
+            ]);
     }
 
     public function verifyEmailField($value, ExecutionContextInterface $context): void

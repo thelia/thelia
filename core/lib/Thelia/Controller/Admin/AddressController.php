@@ -75,7 +75,8 @@ class AddressController extends AbstractCrudController
                 $address_id
             );
         } catch (\Exception $e) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf('error during address setting as default with message %s', $e->getMessage()));
+            \Thelia\Log\Tlog::getInstance()->error(sprintf('error during address setting as default with message %s',
+                $e->getMessage()));
         }
 
         return $this->redirectToEditionTemplate();
@@ -107,20 +108,19 @@ class AddressController extends AbstractCrudController
     protected function createFormDataArray($object)
     {
         return [
-            'label' => $object->getLabel(),
-            'title' => $object->getTitleId(),
+            'label'     => $object->getLabel(),
             'firstname' => $object->getFirstname(),
-            'lastname' => $object->getLastname(),
-            'address1' => $object->getAddress1(),
-            'address2' => $object->getAddress2(),
-            'address3' => $object->getAddress3(),
-            'zipcode' => $object->getZipcode(),
-            'city' => $object->getCity(),
-            'country' => $object->getCountryId(),
-            'state' => $object->getStateId(),
+            'lastname'  => $object->getLastname(),
+            'address1'  => $object->getAddress1(),
+            'address2'  => $object->getAddress2(),
+            'address3'  => $object->getAddress3(),
+            'zipcode'   => $object->getZipcode(),
+            'city'      => $object->getCity(),
+            'country'   => $object->getCountryId(),
+            'state'     => $object->getStateId(),
             'cellphone' => $object->getCellphone(),
-            'phone' => $object->getPhone(),
-            'company' => $object->getCompany(),
+            'phone'     => $object->getPhone(),
+            'company'   => $object->getCompany(),
         ];
     }
 
@@ -168,7 +168,7 @@ class AddressController extends AbstractCrudController
     {
         $event = new AddressCreateOrUpdateEvent(
             $formData['label'],
-            $formData['title'],
+            $formData['title'] ?? null,
             $formData['firstname'],
             $formData['lastname'],
             $formData['address1'],
@@ -256,8 +256,8 @@ class AddressController extends AbstractCrudController
     protected function renderEditionTemplate()
     {
         return $this->render('customer-edit', [
-            'address_id' => $this->getRequest()->get('address_id'),
-            'page' => $this->getRequest()->get('page'),
+            'address_id'  => $this->getRequest()->get('address_id'),
+            'page'        => $this->getRequest()->get('page'),
             'customer_id' => $this->getCustomerId(),
         ]);
     }
@@ -271,7 +271,7 @@ class AddressController extends AbstractCrudController
         return $this->generateRedirectFromRoute(
             'admin.customer.update.view',
             [
-                'page' => $this->getRequest()->get('page'),
+                'page'        => $this->getRequest()->get('page'),
                 'customer_id' => $this->getCustomerId(),
             ]
         );
