@@ -62,11 +62,11 @@ class Request extends BaseRequest
      */
     public function getPathInfo(): string
     {
-        $pathInfo = parent::getPathInfo();
+        $pathInfo   = parent::getPathInfo();
         $pathLength = \strlen($pathInfo);
 
         if ($pathInfo !== '/' && $pathInfo[$pathLength - 1] === '/'
-            && (bool) ConfigQuery::read('allow_slash_ended_uri', false)
+            && (bool)ConfigQuery::read('allow_slash_ended_uri', false)
         ) {
             if (null === $this->resolvedPathInfo) {
                 $this->resolvedPathInfo = substr($pathInfo, 0, $pathLength - 1); // Remove the slash
@@ -99,18 +99,17 @@ class Request extends BaseRequest
         }
 
         if ('' == $this->getQueryString()) {
-            $additionalQs = '?'.ltrim($additionalQs, '&');
+            $additionalQs = '?' . ltrim($additionalQs, '&');
         }
 
-        return $uri.$additionalQs;
+        return $uri . $additionalQs;
     }
 
     public function toString($withContent = true)
     {
         $string =
             sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))
-            ."\r\n".$this->headers."\r\n"
-        ;
+            . "\r\n" . $this->headers . "\r\n";
 
         if (true === $withContent) {
             $string .= $this->getContent();
@@ -169,8 +168,7 @@ class Request extends BaseRequest
     public function getSession(): SessionInterface
     {
         if (!$this->hasSession()) {
-            $this->session = $session = new Session();
-            $session->start();
+            $this->setSession(new Session());
         }
 
         return parent::getSession();
