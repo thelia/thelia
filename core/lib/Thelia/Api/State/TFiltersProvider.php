@@ -20,38 +20,37 @@ use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoice
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\FilterService;
 use Thelia\Api\Resource\Filter;
 use Thelia\Model\ChoiceFilterQuery;
+use Thelia\Service\Model\LangService;
 
 class TFiltersProvider implements ProviderInterface
 {
-    public function __construct(protected FilterService $filterService, private readonly RequestStack $requestStack)
-    {
+    public function __construct(
+        protected FilterService $filterService,
+        private readonly RequestStack $requestStack,
+        private readonly LangService $langService
+    ) {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
         $resource = $uriVariables['resource'] ?? null;
-
         if (!$resource) {
             throw new \InvalidArgumentException('The "resource" parameter is required.');
         }
         $request = $this->requestStack->getCurrentRequest();
+        if (!$request) {
+            throw new \InvalidArgumentException('The request is required.');
+        }
         $isApiRoute = $request->get('isApiRoute', false);
         if ($isApiRoute) {
             $query = $this->filterService->filterTFilterWithRequest(request: $request, isCategoryFilter: $isCategoryFilter);
-        }
-        if (!$isApiRoute) {
+        } else {
             $query = $this->filterService->filterTFilterWithContext(context: $context, isCategoryFilter: $isCategoryFilter);
         }
 
         $filterObjects = [];
-        $locale = null;
-        if ($request) {
-            $locale = $request->get('locale');
-        }
-        if (isset($context['filters']['locale'])) {
-            $locale = $context['filters']['locale'];
-        }
-        $locale = $locale ?? 'en_US';
+        $locale = $context['filters']['locale'] ?? $request->get('locale');
+        $locale = $locale ?? $this->langService->getLocale();
         $objects = $query->find();
         $filters = $this->filterService->getAvailableFilters($resource);
         foreach ($filters as $filter) {
@@ -128,7 +127,7 @@ class TFiltersProvider implements ProviderInterface
                         ->setInputType('checkbox')
                         ->setPosition($position)
                         ->setVisible($isVisible);
-                    $value = array_map(function ($val) {
+                    $value = array_map(static function ($val) {
                         unset($val['mainId'], $val['mainTitle']);
 
                         return $val;
@@ -147,7 +146,6 @@ class TFiltersProvider implements ProviderInterface
                     ->setValues(array_values($values));
             }
         }
-
         foreach ($filterObjects as $filterObject) {
             if ($filterObject->getPosition() === null) {
                 $allPosition = array_map(static function ($filterObject) {

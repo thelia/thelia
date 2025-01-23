@@ -41,21 +41,23 @@ class AttributeAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInte
 
     public function getValue(ActiveRecordInterface $activeRecord, string $locale): ?array
     {
-        if (empty($activeRecord->getDefaultSaleElements()?->getAttributeCombinationsJoinAttributeAv())) {
+        $productSaleElementss = $activeRecord->getProductSaleElementss();
+        if (empty($productSaleElementss)) {
             return null;
         }
         $value = [];
-        foreach ($activeRecord->getDefaultSaleElements()->getAttributeCombinationsJoinAttributeAv() as $attributeAv) {
-            $value[] =
-                [
-                    'mainTitle' => $attributeAv->getAttribute()->setLocale($locale)->getTitle(),
-                    'mainId' => $attributeAv->getAttribute()->getId(),
-                    'id' => $attributeAv->getAttributeAvId(),
-                    'title' => $attributeAv->getAttributeAv()->setLocale($locale)->getTitle(),
-                ]
-            ;
+        foreach ($productSaleElementss as $productSaleElements) {
+            foreach ($productSaleElements->getAttributeCombinationsJoinAttributeAv() as $attributeAv) {
+                $value[] =
+                    [
+                        'mainTitle' => $attributeAv->getAttribute()->setLocale($locale)->getTitle(),
+                        'mainId' => $attributeAv->getAttribute()->getId(),
+                        'id' => $attributeAv->getAttributeAvId(),
+                        'title' => $attributeAv->getAttributeAv()->setLocale($locale)->getTitle(),
+                    ]
+                ;
+            }
         }
-
         return $value;
     }
 

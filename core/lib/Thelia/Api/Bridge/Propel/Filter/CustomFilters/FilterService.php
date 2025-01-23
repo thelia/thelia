@@ -52,7 +52,6 @@ readonly class FilterService
                 $filters[] = $filter;
             }
         }
-
         return $filters;
     }
 
@@ -89,7 +88,6 @@ readonly class FilterService
             }
             $query = $queryClass::create();
         }
-
         foreach ($filters as $filter) {
             $filterClass = $filter['filter'];
             $value = $filter['value'];
@@ -104,7 +102,6 @@ readonly class FilterService
             }
             $filterClass->filter($query, $value);
         }
-
         return $query->groupById();
     }
 }
