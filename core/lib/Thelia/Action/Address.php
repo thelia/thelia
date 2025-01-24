@@ -18,10 +18,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Service\CustomerService;
 use Thelia\Model\Address as AddressModel;
 use Thelia\Model\Event\AddressEvent;
 use Thelia\Model\Map\AddressTableMap;
+use Thelia\Service\Model\CustomerService;
 
 /**
  * Class Address.

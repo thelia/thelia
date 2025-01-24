@@ -10,7 +10,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Core\Service;
+namespace Thelia\Service\Model;
 
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\Country;

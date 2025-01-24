@@ -32,7 +32,7 @@
         "thelia/pdf-default-template": "dev-twig",
         "thelia/virtual-product-control-module": "dev-main",
         "thelia/virtual-product-delivery-module": "dev-main",
-        "thelia/custom-delivery-module": "dev-main",
+        "thelia/custom-delivery-module": "dev-twig",
         "thelia/cheque-module": "dev-main",
         "thelia/free-order-module": "dev-main",
         "symfony/flex": "^2.4"

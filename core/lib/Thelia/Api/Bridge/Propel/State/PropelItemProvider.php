@@ -23,7 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\Event\ItemProviderQueryEvent;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\PropelResourceInterface;
-use Thelia\Api\State\TFiltersProvider;
+use Thelia\Api\State\Provider\TFiltersProvider;
 use Thelia\Model\LangQuery;
 
 readonly class PropelItemProvider implements ProviderInterface

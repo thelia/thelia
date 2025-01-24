@@ -18,14 +18,10 @@ use Symfony\Component\Form\Extension\Core\Type\TelType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Core\Service\CountryService;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\Base\CountryQuery;
-use Thelia\Model\CustomerTitleQuery;
-use Thelia\Model\Map\CountryI18nTableMap;
-use Thelia\Model\Map\CustomerTitleI18nTableMap;
 use Thelia\Model\Map\StateI18nTableMap;
 use Thelia\Model\StateQuery;
+use Thelia\Service\Model\CountryService;
 
 /**
  * Class AddressCreateForm.
