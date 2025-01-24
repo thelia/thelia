@@ -245,7 +245,6 @@ class KernelListener implements EventSubscriberInterface
 
         $session->start();
         $request->setSession($session);
-
     }
 
     public static function getSubscribedEvents(): array

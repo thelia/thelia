@@ -93,6 +93,7 @@ class DeliveryModuleApiService
         foreach ($theliaDeliveryModule->getModuleI18ns() as $i18n) {
             $deliveryModuleApi->addI18n(new ModuleI18n($i18n->toArray()), $i18n->getLocale());
         }
+
         return $deliveryModuleApi;
     }
 }

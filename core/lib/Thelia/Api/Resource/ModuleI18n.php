@@ -22,7 +22,7 @@ class ModuleI18n extends I18n
         Order::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
-        DeliveryModule::GROUP_FRONT_READ
+        DeliveryModule::GROUP_FRONT_READ,
     ])]
     protected ?string $title;
 

@@ -45,12 +45,10 @@ use Thelia\Tools\TokenProvider;
  */
 class Cart extends BaseAction implements EventSubscriberInterface
 {
-
     public function __construct(
         protected Request $request,
         protected TokenProvider $tokenProvider
-    )
-    {
+    ) {
     }
 
     public function persistCart(CartPersistEvent $event): void

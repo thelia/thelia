@@ -60,8 +60,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
         CustomerService $customerService
     ) {
         $this->securityContext = $securityContext;
-        $this->mailer          = $mailer;
-        $this->requestStack    = $requestStack;
+        $this->mailer = $mailer;
+        $this->requestStack = $requestStack;
         $this->customerService = $customerService;
     }
 

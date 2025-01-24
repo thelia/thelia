@@ -13,7 +13,6 @@
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Thelia\Api\State\Provider\DeliveryPickupLocationProvider;
@@ -104,11 +103,8 @@ use Thelia\Model\PickupLocationAddress;
                     ],
                 ],
             ],
+            paginationEnabled: false,
             provider: DeliveryPickupLocationProvider::class,
-        ),
-        new Get(
-            uriTemplate: '/front/delivery_pickup_locations/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]]
@@ -256,15 +252,7 @@ class DeliveryPickupLocation
         return $this;
     }
 
-    /**
-     * @param int    $day
-     * @param string $hours
-     *
-     * @throws \Exception
-     *
-     * @return $this
-     */
-    public function setOpeningHours($day, $hours)
+    public function setOpeningHours(int $day, string $hours): static
     {
         if (!\array_key_exists($day, $this->openingHours)) {
             throw new \Exception(Translator::getInstance()->trans('Tried to set the opening hours for a non existant day in the array. Please use the constants defined in the PickupLocation class.'));
@@ -273,5 +261,10 @@ class DeliveryPickupLocation
         $this->openingHours[$day] = $hours;
 
         return $this;
+    }
+
+    public function getOpeningHours(): array
+    {
+        return $this->openingHours;
     }
 }

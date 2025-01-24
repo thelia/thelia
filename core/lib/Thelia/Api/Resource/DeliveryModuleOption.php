@@ -58,14 +58,14 @@ class DeliveryModuleOption
         example: '2025-10-01T00:00:00Z',
     )]
     #[Groups([DeliveryModule::GROUP_FRONT_READ])]
-    private string $minimumDeliveryDate;
+    private ?string $minimumDeliveryDate;
 
     #[ApiProperty(
         description: 'Maximum delivery date',
         example: '2025-10-05T00:00:00Z',
     )]
     #[Groups([DeliveryModule::GROUP_FRONT_READ])]
-    private string $maximumDeliveryDate;
+    private ?string $maximumDeliveryDate;
 
     #[ApiProperty(
         description: 'Postage cost',
@@ -149,24 +149,24 @@ class DeliveryModuleOption
         return $this;
     }
 
-    public function getMinimumDeliveryDate(): string
+    public function getMinimumDeliveryDate(): ?string
     {
         return $this->minimumDeliveryDate;
     }
 
-    public function setMinimumDeliveryDate(string $minimumDeliveryDate): self
+    public function setMinimumDeliveryDate(?string $minimumDeliveryDate): self
     {
         $this->minimumDeliveryDate = $minimumDeliveryDate;
 
         return $this;
     }
 
-    public function getMaximumDeliveryDate(): string
+    public function getMaximumDeliveryDate(): ?string
     {
         return $this->maximumDeliveryDate;
     }
 
-    public function setMaximumDeliveryDate(string $maximumDeliveryDate): self
+    public function setMaximumDeliveryDate(?string $maximumDeliveryDate): self
     {
         $this->maximumDeliveryDate = $maximumDeliveryDate;
 

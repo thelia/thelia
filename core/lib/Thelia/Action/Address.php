@@ -99,9 +99,9 @@ class Address extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            TheliaEvents::ADDRESS_CREATE  => ['create', 128],
-            TheliaEvents::ADDRESS_UPDATE  => ['update', 128],
-            TheliaEvents::ADDRESS_DELETE  => ['delete', 128],
+            TheliaEvents::ADDRESS_CREATE => ['create', 128],
+            TheliaEvents::ADDRESS_UPDATE => ['update', 128],
+            TheliaEvents::ADDRESS_DELETE => ['delete', 128],
             TheliaEvents::ADDRESS_DEFAULT => ['useDefault', 128],
         ];
     }

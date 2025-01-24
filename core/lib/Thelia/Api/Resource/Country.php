@@ -61,17 +61,45 @@ use Thelia\Model\Map\CountryTableMap;
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
     denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
 )]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            uriTemplate: '/front/countries'
+        ),
+        new Get(
+            uriTemplate: '/front/countries/{id}',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
+        ),
+        new Get(
+            uriTemplate: '/front/countries/iso/{isoalpha3}',
+            uriVariables: ['isoalpha3'],
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
+        ),
+    ],
+    uriVariables: [
+        'id' => new Link(
+            fromClass: Country::class,
+            identifiers: ['id']
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
+)]
 class Country extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:country:read';
     public const GROUP_ADMIN_READ_SINGLE = 'admin:country:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:country:write';
 
+    public const GROUP_FRONT_READ = 'front:country:read';
+    public const GROUP_FRONT_READ_SINGLE = 'front:country:read:single';
+
     #[Groups([
         self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
         Order::GROUP_ADMIN_READ_SINGLE,
         Customer::GROUP_ADMIN_READ_SINGLE,
         Address::GROUP_ADMIN_READ,
+        Address::GROUP_FRONT_READ,
         State::GROUP_ADMIN_READ_SINGLE,
         State::GROUP_ADMIN_READ,
         TaxRuleCountry::GROUP_ADMIN_READ,
@@ -80,32 +108,32 @@ class Country extends AbstractTranslatableResource
     ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public bool $visible;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE, Address::GROUP_FRONT_READ])]
     public string $isocode;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE, Address::GROUP_FRONT_READ])]
     public ?string $isoalpha2;
 
     #[ApiProperty(identifier: true)]
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ,  self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE, Address::GROUP_FRONT_READ])]
     public ?string $isoalpha3;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public ?bool $hasStates;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public ?bool $needZipCode;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public ?string $zipCodeFormat;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public ?bool $byDefault;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public ?bool $shopCountry;
 
     #[Groups([self::GROUP_ADMIN_READ])]
@@ -114,7 +142,7 @@ class Country extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_FRONT_READ_SINGLE, Address::GROUP_FRONT_READ])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int

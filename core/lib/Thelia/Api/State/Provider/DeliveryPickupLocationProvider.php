@@ -21,11 +21,11 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\StateQuery;
 
-class DeliveryPickupLocationProvider implements ProviderInterface
+readonly class DeliveryPickupLocationProvider implements ProviderInterface
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,
-        private readonly Request $request
+        private Request $request
     ) {
     }
 

@@ -34,7 +34,8 @@ class AddressCreateForm extends FirewallForm
 
     public function __construct(
         private CountryService $countryService
-    ) {}
+    ) {
+    }
 
     /**
      * in this function you add all the fields you need for your Form.
@@ -57,14 +58,13 @@ class AddressCreateForm extends FirewallForm
      */
     protected function buildForm()
     {
-
         $this->formBuilder
             ->add('label', TextType::class, [
                 'constraints' => [
                     new NotBlank(),
                 ],
-                'label'       => Translator::getInstance()->trans('Address label'),
-                'label_attr'  => [
+                'label' => Translator::getInstance()->trans('Address label'),
+                'label_attr' => [
                     'for' => 'address_label',
                 ],
             ])
@@ -72,8 +72,8 @@ class AddressCreateForm extends FirewallForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                 ],
-                'label'       => Translator::getInstance()->trans('First Name'),
-                'label_attr'  => [
+                'label' => Translator::getInstance()->trans('First Name'),
+                'label_attr' => [
                     'for' => 'firstname',
                 ],
             ])
@@ -81,40 +81,40 @@ class AddressCreateForm extends FirewallForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                 ],
-                'label'       => Translator::getInstance()->trans('Last Name'),
-                'label_attr'  => [
+                'label' => Translator::getInstance()->trans('Last Name'),
+                'label_attr' => [
                     'for' => 'lastname',
                 ],
             ])
             ->add('company', TextType::class, [
-                'label'      => Translator::getInstance()->trans('Company Name'),
+                'label' => Translator::getInstance()->trans('Company Name'),
                 'label_attr' => [
                     'for' => 'company',
                 ],
-                'required'   => false,
+                'required' => false,
             ])
             ->add('address1', TextType::class, [
                 'constraints' => [
                     new Constraints\NotBlank(),
                 ],
-                'label'       => Translator::getInstance()->trans('Street Address'),
-                'label_attr'  => [
+                'label' => Translator::getInstance()->trans('Street Address'),
+                'label_attr' => [
                     'for' => 'address1',
                 ],
             ])
             ->add('address2', TextType::class, [
-                'label'      => Translator::getInstance()->trans('Address Line 2'),
+                'label' => Translator::getInstance()->trans('Address Line 2'),
                 'label_attr' => [
                     'for' => 'address2',
                 ],
-                'required'   => false,
+                'required' => false,
             ])
             ->add('address3', TextType::class, [
-                'label'      => Translator::getInstance()->trans('Address Line 3'),
+                'label' => Translator::getInstance()->trans('Address Line 3'),
                 'label_attr' => [
                     'for' => 'address3',
                 ],
-                'required'   => false,
+                'required' => false,
             ])
             ->add('city', TextType::class, [
                 'constraints' => [
@@ -123,8 +123,8 @@ class AddressCreateForm extends FirewallForm
                         [$this, 'verifyCity']
                     ),
                 ],
-                'label'       => Translator::getInstance()->trans('City'),
-                'label_attr'  => [
+                'label' => Translator::getInstance()->trans('City'),
+                'label_attr' => [
                     'for' => 'city',
                 ],
             ])
@@ -135,8 +135,8 @@ class AddressCreateForm extends FirewallForm
                         [$this, 'verifyZipCode']
                     ),
                 ],
-                'label'       => Translator::getInstance()->trans('Zip code'),
-                'label_attr'  => [
+                'label' => Translator::getInstance()->trans('Zip code'),
+                'label_attr' => [
                     'for' => 'zipcode',
                 ],
             ])
@@ -144,17 +144,17 @@ class AddressCreateForm extends FirewallForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                 ],
-                'choices'     => $this->countryService->getAllCountriesChoiceType(),
-                'label'       => Translator::getInstance()->trans('Country'),
-                'expanded'    => false,
-                'multiple'    => false,
-                'data'        => $this->countryService->getDefaultCountry()?->getId(),
-                'label_attr'  => [
+                'choices' => $this->countryService->getAllCountriesChoiceType(),
+                'label' => Translator::getInstance()->trans('Country'),
+                'expanded' => false,
+                'multiple' => false,
+                'data' => $this->countryService->getDefaultCountry()?->getId(),
+                'label_attr' => [
                     'for' => 'country',
                 ],
             ])
             ->add('state', ChoiceType::class, [
-                'required'    => false,
+                'required' => false,
                 'constraints' => [
                     new Constraints\Callback(
                         [$this, 'verifyState']
@@ -168,19 +168,19 @@ class AddressCreateForm extends FirewallForm
             ])
             // Phone
             ->add('phone', TelType::class, [
-                'label'      => Translator::getInstance()->trans('Phone'),
+                'label' => Translator::getInstance()->trans('Phone'),
                 'label_attr' => [
                     'for' => 'phone',
                 ],
-                'required'   => false,
+                'required' => false,
             ])
             // Default address
             ->add('is_default', CheckboxType::class, [
-                'label'      => Translator::getInstance()->trans('Make this address as my primary address'),
+                'label' => Translator::getInstance()->trans('Make this address as my primary address'),
                 'label_attr' => [
                     'for' => 'default_address',
                 ],
-                'required'   => false,
+                'required' => false,
             ]);
     }
 
@@ -195,12 +195,12 @@ class AddressCreateForm extends FirewallForm
     protected function getLocale()
     {
         $session = $this->request?->getSession();
+
         return $session?->getLang()->getLocale();
     }
 
     protected function getStatesChoices(): array
     {
-
         $states = StateQuery::create()
             ->useStateI18nQuery()
             ->filterByLocale($this->getLocale())
@@ -212,6 +212,7 @@ class AddressCreateForm extends FirewallForm
         foreach ($states as $state) {
             $statesChoices[$state->getVirtualColumn('title')] = $state->getId();
         }
+
         return $statesChoices;
     }
 }

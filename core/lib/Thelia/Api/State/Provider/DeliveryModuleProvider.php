@@ -14,7 +14,6 @@ namespace Thelia\Api\State\Provider;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use OpenApi\OpenApi;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\Service\Resource\DeliveryModuleApiService;
@@ -64,10 +63,9 @@ class DeliveryModuleProvider implements ProviderInterface
 
         $modules = $this->deliveryModuleService->getDeliveryModules();
         $deliveryModules = [];
-
         /** @var Module $module */
         foreach ($modules as $module) {
-            $deliveryModules = $this->deliveryModuleApiService->getDeliveryModuleResource(
+            $deliveryModules[] = $this->deliveryModuleApiService->getDeliveryModuleResource(
                 $module,
                 $cart,
                 $deliveryAddress,
