@@ -51,8 +51,8 @@ class CustomerPasswordUpdateForm extends BaseForm
                     'for' => 'password',
                 ],
                 'attr' => [
-                    "password_control" => true,
-                ]
+                    'password_control' => true,
+                ],
             ])
             ->add('password_confirm', PasswordType::class, [
                 'constraints' => [

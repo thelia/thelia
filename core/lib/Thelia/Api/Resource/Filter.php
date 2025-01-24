@@ -17,7 +17,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Thelia\Api\State\TFiltersProvider;
+use Thelia\Api\State\Provider\TFiltersProvider;
 use Thelia\Model\Map\ChoiceFilterTableMap;
 
 #[ApiResource(

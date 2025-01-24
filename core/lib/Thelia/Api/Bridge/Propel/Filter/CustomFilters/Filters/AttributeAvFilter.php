@@ -58,6 +58,7 @@ class AttributeAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInte
                 ;
             }
         }
+
         return $value;
     }
 

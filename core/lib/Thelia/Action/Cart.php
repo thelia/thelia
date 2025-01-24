@@ -14,7 +14,6 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Cart\CartCreateEvent;
 use Thelia\Core\Event\Cart\CartDuplicationEvent;
 use Thelia\Core\Event\Cart\CartEvent;
@@ -22,6 +21,8 @@ use Thelia\Core\Event\Cart\CartPersistEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\Currency\CurrencyChangeEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\Base\CustomerQuery;
 use Thelia\Model\Base\ProductSaleElementsQuery;
 use Thelia\Model\Cart as CartModel;
@@ -44,17 +45,10 @@ use Thelia\Tools\TokenProvider;
  */
 class Cart extends BaseAction implements EventSubscriberInterface
 {
-    /** @var RequestStack */
-    protected $requestStack;
-
-    /** @var TokenProvider */
-    protected $tokenProvider;
-
-    public function __construct(RequestStack $requestStack, TokenProvider $tokenProvider)
-    {
-        $this->requestStack = $requestStack;
-
-        $this->tokenProvider = $tokenProvider;
+    public function __construct(
+        protected Request $request,
+        protected TokenProvider $tokenProvider
+    ) {
     }
 
     public function persistCart(CartPersistEvent $event): void
@@ -307,7 +301,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         $cart = null;
 
-        if ($this->requestStack->getCurrentRequest()->cookies->has($cookieName) && $persistentCookie) {
+        if ($this->request->cookies->has($cookieName) && $persistentCookie) {
             $cart = $this->managePersistentCart($cartRestoreEvent, $cookieName, $dispatcher);
         } elseif (!$persistentCookie) {
             $cart = $this->manageNonPersistentCookie($cartRestoreEvent, $dispatcher);
@@ -357,7 +351,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     protected function managePersistentCart(CartRestoreEvent $cartRestoreEvent, $cookieName, EventDispatcherInterface $dispatcher)
     {
         // The cart cookie exists -> get the cart token
-        $token = $this->requestStack->getCurrentRequest()->cookies->get($cookieName);
+        $token = $this->request->cookies->get($cookieName);
 
         // Check if a cart exists for this token
         if (null !== $cart = CartQuery::create()->findOneByToken($token)) {
@@ -497,13 +491,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * Returns the session from the current request.
-     *
-     * @return \Thelia\Core\HttpFoundation\Session\Session
-     */
-    protected function getSession()
+    protected function getSession(): Session
     {
-        return $this->requestStack->getCurrentRequest()->getSession();
+        return $this->request->getSession();
     }
 }

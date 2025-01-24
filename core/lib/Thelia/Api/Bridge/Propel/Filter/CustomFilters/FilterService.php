@@ -41,6 +41,7 @@ readonly class FilterService
                 }
             }
         }
+
         return $filterResult;
     }
 
@@ -52,6 +53,7 @@ readonly class FilterService
                 $filters[] = $filter;
             }
         }
+
         return $filters;
     }
 
@@ -102,6 +104,7 @@ readonly class FilterService
             }
             $filterClass->filter($query, $value);
         }
+
         return $query->groupById();
     }
 }

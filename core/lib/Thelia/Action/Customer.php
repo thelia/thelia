@@ -21,7 +21,6 @@ use Thelia\Core\Event\Customer\CustomerLoginEvent;
 use Thelia\Core\Event\LostPasswordEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\SecurityContext;
-use Thelia\Core\Service\CustomerService;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\CustomerException;
 use Thelia\Mailer\MailerFactory;
@@ -30,6 +29,7 @@ use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Event\CustomerEvent;
 use Thelia\Model\LangQuery;
+use Thelia\Service\Model\CustomerService;
 use Thelia\Tools\Password;
 
 /**
@@ -60,8 +60,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
         CustomerService $customerService
     ) {
         $this->securityContext = $securityContext;
-        $this->mailer          = $mailer;
-        $this->requestStack    = $requestStack;
+        $this->mailer = $mailer;
+        $this->requestStack = $requestStack;
         $this->customerService = $customerService;
     }
 

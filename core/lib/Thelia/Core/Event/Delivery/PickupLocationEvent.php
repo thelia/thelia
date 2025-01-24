@@ -12,10 +12,10 @@
 
 namespace Thelia\Core\Event\Delivery;
 
+use Thelia\Api\Resource\DeliveryPickupLocation;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Address;
 use Thelia\Model\Country;
-use Thelia\Model\PickupLocation;
 use Thelia\Model\State;
 
 /**
@@ -25,73 +25,37 @@ use Thelia\Model\State;
  */
 class PickupLocationEvent extends ActionEvent
 {
-    /**
-     * @var string|null
-     */
-    protected $address;
-    /**
-     * @var string|null
-     */
-    protected $city;
-    /**
-     * @var string|null
-     */
-    protected $zipCode;
-    /**
-     * @var State|null
-     */
-    protected $state;
-    /**
-     * @var Country|null
-     */
-    protected $country;
-    /**
-     * @var int|null
-     */
-    protected $radius;
-    /**
-     * @var int|null
-     */
-    protected $maxRelays;
-    /**
-     * @var int|null
-     */
-    protected $orderWeight;
-    /**
-     * @var array|null
-     */
-    protected $moduleIds;
-    /**
-     * @var array
-     */
-    protected $locations = [];
+    protected ?string $address;
+    protected ?string $city;
+    protected ?string $zipCode;
+    protected ?State $state;
+    protected ?Country $country;
+    protected ?int $radius;
+    protected ?int $maxRelays;
+    protected ?int $orderWeight;
+    protected ?array $moduleIds;
+    protected array $locations = [];
 
     /**
      * PickupLocationEvent constructor.
      *
-     * @param int|null    $radius
-     * @param int|null    $maxRelays
-     * @param string|null $address
-     * @param string|null $city
-     * @param string|null $zipCode
-     * @param int|null    $orderWeight
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     * @throws \Exception
      */
     public function __construct(
         Address $addressModel = null,
-        $radius = null,
-        $maxRelays = null,
-        $address = null,
-        $city = null,
-        $zipCode = null,
-        $orderWeight = null,
+        int $radius = null,
+        int $maxRelays = null,
+        string $address = null,
+        string $city = null,
+        string $zipCode = null,
+        int $orderWeight = null,
         State $state = null,
         Country $country = null,
         array $moduleIds = null
     ) {
-        $this->radius = $radius !== null ? $radius : 20000;
-        $this->maxRelays = $maxRelays !== null ? $maxRelays : 15;
+        $this->radius = $radius ?? 20000;
+        $this->maxRelays = $maxRelays ?? 15;
         $this->orderWeight = $orderWeight;
         $this->address = $address;
         $this->city = $city;
@@ -99,7 +63,6 @@ class PickupLocationEvent extends ActionEvent
         $this->state = $state;
         $this->country = $country;
         $this->moduleIds = $moduleIds;
-
         if (null !== $addressModel) {
             $this->address = $addressModel->getAddress1();
             $this->city = $addressModel->getCity();
@@ -113,180 +76,113 @@ class PickupLocationEvent extends ActionEvent
         }
     }
 
-    /**
-     * @return string|null
-     */
-    public function getAddress()
+    public function getAddress(): ?string
     {
         return $this->address;
     }
 
-    /**
-     * @param string|null $address
-     */
-    public function setAddress($address): void
+    public function setAddress(?string $address): void
     {
         $this->address = $address;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getCity()
+    public function getCity(): ?string
     {
         return $this->city;
     }
 
-    /**
-     * @param string|null $city
-     */
-    public function setCity($city): void
+    public function setCity(?string $city): void
     {
         $this->city = $city;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getZipCode()
+    public function getZipCode(): ?string
     {
         return $this->zipCode;
     }
 
-    /**
-     * @param string|null $zipCode
-     */
-    public function setZipCode($zipCode): void
+    public function setZipCode(?string $zipCode): void
     {
         $this->zipCode = $zipCode;
     }
 
-    /**
-     * @return State|null
-     */
-    public function getState()
+    public function getState(): ?State
     {
         return $this->state;
     }
 
-    /**
-     * @param State|null $state
-     */
-    public function setState($state): void
+    public function setState(?State $state): void
     {
         $this->state = $state;
     }
 
-    /**
-     * @return Country|null
-     */
-    public function getCountry()
+    public function getCountry(): ?Country
     {
         return $this->country;
     }
 
-    /**
-     * @param Country|null $country
-     */
-    public function setCountry($country): void
+    public function setCountry(?Country $country): void
     {
         $this->country = $country;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getRadius()
+    public function getRadius(): ?int
     {
         return $this->radius;
     }
 
-    /**
-     * @param int|null $radius
-     */
-    public function setRadius($radius): void
+    public function setRadius(?int $radius): void
     {
         $this->radius = $radius;
     }
 
-    /**
-     * @return array|null
-     */
-    public function getModuleIds()
+    public function getModuleIds(): ?array
     {
         return $this->moduleIds;
     }
 
-    /**
-     * @param array|null $moduleIds
-     */
-    public function setModuleIds($moduleIds): void
+    public function setModuleIds(?array $moduleIds): void
     {
         $this->moduleIds = $moduleIds;
     }
 
-    /** @return array */
-    public function getLocations()
+    public function getLocations(): array
     {
         return $this->locations;
     }
 
-    /**
-     * @param $locations PickupLocation[]
-     *
-     * @return PickupLocationEvent
-     */
-    public function setLocations($locations)
+    public function setLocations(array $locations): static
     {
         $this->locations = $locations;
 
         return $this;
     }
 
-    /** @param $location PickupLocation
-     * @return PickupLocationEvent
-     */
-    public function appendLocation($location)
+    public function appendLocation(DeliveryPickupLocation $location): static
     {
         $this->locations[] = $location;
 
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getOrderWeight()
+    public function getOrderWeight(): ?int
     {
         return $this->orderWeight;
     }
 
-    /**
-     * @param int|null $orderWeight
-     *
-     * @return PickupLocationEvent
-     */
-    public function setOrderWeight($orderWeight)
+    public function setOrderWeight(?int $orderWeight): static
     {
         $this->orderWeight = $orderWeight;
 
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getMaxRelays()
+    public function getMaxRelays(): ?int
     {
         return $this->maxRelays;
     }
 
-    /**
-     * @param int|null $maxRelays
-     *
-     * @return PickupLocationEvent
-     */
-    public function setMaxRelays($maxRelays)
+    public function setMaxRelays(?int $maxRelays): static
     {
         $this->maxRelays = $maxRelays;
 

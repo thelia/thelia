@@ -21,6 +21,10 @@ RUN docker-php-ext-install zip
 # Calendar extension
 RUN docker-php-ext-install calendar
 
+# SOAP extension
+RUN apk add --no-cache libxml2-dev
+RUN docker-php-ext-install soap
+
 # Imagick extension needed for webp
 RUN apk add --update --no-cache autoconf g++ imagemagick imagemagick-dev libtool make pcre-dev libgomp
 RUN pecl install imagick

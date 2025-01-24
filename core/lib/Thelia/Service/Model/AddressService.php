@@ -10,14 +10,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Core\Service;
+namespace Thelia\Service\Model;
 
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Exception\AddressNotFoundException;
 use Thelia\Exception\CustomerException;
 use Thelia\Model\Address;
@@ -25,11 +27,11 @@ use Thelia\Model\AddressQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\Event\AddressEvent;
 
-class AddressService
+readonly class AddressService
 {
     public function __construct(
-        private readonly EventDispatcherInterface $dispatcher,
-        private readonly Session $session
+        private EventDispatcherInterface $dispatcher,
+        private Session $session
     ) {
     }
 
@@ -71,7 +73,9 @@ class AddressService
     public function updateAddress(int $addressId, FormInterface $form): void
     {
         $customer = $this->session->getCustomerUser();
-
+        if (null === $customer) {
+            throw new CustomerException();
+        }
         $address = AddressQuery::create()->findPk($addressId);
 
         if (null === $address) {
@@ -139,5 +143,27 @@ class AddressService
             $data['is_default'] ?? false,
             $data['state'] ?? null
         );
+    }
+
+    public function getDeliveryAddress(Request $request, SecurityContext $securityContext): ?Address
+    {
+        $addressId = $request->get('addressId');
+
+        if (null === $addressId) {
+            $session = $request->getSession();
+            if (!$session instanceof Session) {
+                return null;
+            }
+            $addressId = $session->getOrder()->getChoosenDeliveryAddress();
+        }
+
+        if (null !== $addressId) {
+            $address = AddressQuery::create()->findPk($addressId);
+            if (null !== $address) {
+                return $address;
+            }
+        }
+
+        return $securityContext->getCustomerUser()?->getDefaultAddress();
     }
 }

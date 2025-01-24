@@ -234,19 +234,17 @@ class KernelListener implements EventSubscriberInterface
             $event->getRequest()->request->set('isApiRoute', $isApiRoute);
         }
 
-        if (!$isApiRoute && $event->getRequestType() === HttpKernelInterface::MAIN_REQUEST) {
-            $request = $event->getRequest();
-            if (null === $session = self::$session) {
-                $event = new SessionEvent($this->cacheDir, $this->debug, $this->env);
+        $request = $event->getRequest();
+        if (null === $session = self::$session) {
+            $event = new SessionEvent($this->cacheDir, $this->debug, $this->env);
 
-                $this->eventDispatcher->dispatch($event, TheliaKernelEvents::SESSION);
+            $this->eventDispatcher->dispatch($event, TheliaKernelEvents::SESSION);
 
-                self::$session = $session = $event->getSession();
-            }
-
-            $session->start();
-            $request->setSession($session);
+            self::$session = $session = $event->getSession();
         }
+
+        $session->start();
+        $request->setSession($session);
     }
 
     public static function getSubscribedEvents(): array

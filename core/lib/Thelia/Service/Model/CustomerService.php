@@ -10,13 +10,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Core\Service;
+namespace Thelia\Service\Model;
 
+use Thelia\Model\CustomerTitle;
 use Thelia\Model\CustomerTitleQuery;
 
 class CustomerService
 {
-    public function getDefaultCustomerTitle()
+    public function getDefaultCustomerTitle(): ?CustomerTitle
     {
         return CustomerTitleQuery::create()
             ->filterByByDefault(1)

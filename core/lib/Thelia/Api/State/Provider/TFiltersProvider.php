@@ -10,7 +10,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Api\State;
+namespace Thelia\Api\State\Provider;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;

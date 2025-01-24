@@ -112,26 +112,26 @@ class CustomerController extends AbstractCrudController
 
         // Prepare the data that will hydrate the form
         $data = [
-            'id'        => $object->getId(),
+            'id' => $object->getId(),
             'firstname' => $object->getFirstname(),
-            'lastname'  => $object->getLastname(),
-            'email'     => $object->getEmail(),
-            'lang_id'   => $object->getLangId(),
-            'discount'  => $object->getDiscount(),
-            'reseller'  => $object->getReseller() ? true : false,
+            'lastname' => $object->getLastname(),
+            'email' => $object->getEmail(),
+            'lang_id' => $object->getLangId(),
+            'discount' => $object->getDiscount(),
+            'reseller' => $object->getReseller() ? true : false,
         ];
 
         if ($address !== null) {
-            $data['company']   = $address->getCompany();
-            $data['address1']  = $address->getAddress1();
-            $data['address2']  = $address->getAddress2();
-            $data['address3']  = $address->getAddress3();
-            $data['phone']     = $address->getPhone();
+            $data['company'] = $address->getCompany();
+            $data['address1'] = $address->getAddress1();
+            $data['address2'] = $address->getAddress2();
+            $data['address3'] = $address->getAddress3();
+            $data['phone'] = $address->getPhone();
             $data['cellphone'] = $address->getCellphone();
-            $data['zipcode']   = $address->getZipcode();
-            $data['city']      = $address->getCity();
-            $data['country']   = $address->getCountryId();
-            $data['state']     = $address->getStateId();
+            $data['zipcode'] = $address->getZipcode();
+            $data['city'] = $address->getCity();
+            $data['country'] = $address->getCountryId();
+            $data['state'] = $address->getStateId();
         }
 
         // A loop is used in the template
@@ -199,7 +199,7 @@ class CustomerController extends AbstractCrudController
      */
     protected function getObjectLabel($object)
     {
-        return $object->getRef() . '(' . $object->getLastname() . ' ' . $object->getFirstname() . ')';
+        return $object->getRef().'('.$object->getLastname().' '.$object->getFirstname().')';
     }
 
     /**
@@ -216,8 +216,8 @@ class CustomerController extends AbstractCrudController
     {
         return [
             'customer_id' => $this->getRequest()->get('customer_id', 0),
-            'page'        => $this->getRequest()->get('page', 1),
-            'page_order'  => $this->getRequest()->get('page_order', 1),
+            'page' => $this->getRequest()->get('page', 1),
+            'page_order' => $this->getRequest()->get('page_order', 1),
         ];
     }
 
@@ -227,7 +227,7 @@ class CustomerController extends AbstractCrudController
             'customers',
             array_merge([
                 'customer_order' => $currentOrder,
-                'page'           => $this->getRequest()->get('page', 1),
+                'page' => $this->getRequest()->get('page', 1),
             ], $customParams)
         );
     }
@@ -261,7 +261,7 @@ class CustomerController extends AbstractCrudController
         EventDispatcherInterface $eventDispatcher,
         ParserContext $parserContext
     ) {
-        $errorMsg     = 'No error.';
+        $errorMsg = 'No error.';
         $removalError = false;
 
         try {

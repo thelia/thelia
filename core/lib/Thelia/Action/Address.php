@@ -18,10 +18,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Service\CustomerService;
 use Thelia\Model\Address as AddressModel;
 use Thelia\Model\Event\AddressEvent;
 use Thelia\Model\Map\AddressTableMap;
+use Thelia\Service\Model\CustomerService;
 
 /**
  * Class Address.
@@ -99,9 +99,9 @@ class Address extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            TheliaEvents::ADDRESS_CREATE  => ['create', 128],
-            TheliaEvents::ADDRESS_UPDATE  => ['update', 128],
-            TheliaEvents::ADDRESS_DELETE  => ['delete', 128],
+            TheliaEvents::ADDRESS_CREATE => ['create', 128],
+            TheliaEvents::ADDRESS_UPDATE => ['update', 128],
+            TheliaEvents::ADDRESS_DELETE => ['delete', 128],
             TheliaEvents::ADDRESS_DEFAULT => ['useDefault', 128],
         ];
     }
