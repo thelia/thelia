@@ -130,7 +130,7 @@ class DeliveryModule extends AbstractTranslatableResource
         return $this->options;
     }
 
-    public function setOptions(array $options): DeliveryModule
+    public function setOptions(array $options): self
     {
         $this->options = $options;
 
@@ -142,7 +142,7 @@ class DeliveryModule extends AbstractTranslatableResource
         return $this->valid;
     }
 
-    public function setValid(bool $valid): DeliveryModule
+    public function setValid(bool $valid): self
     {
         $this->valid = $valid;
 
