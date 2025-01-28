@@ -13,6 +13,7 @@
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\CategoryFilter;
@@ -100,16 +101,20 @@ readonly class FilterService
         }
         foreach ($filters as $filter) {
             $filterClass = $filter['filter'];
-            $value = $filter['value'];
+            $values = $filter['value'];
             if (!$filterClass instanceof TheliaFilterInterface) {
                 throw new \RuntimeException(sprintf('The "%s" filter must implements TheliaFilterInterface.', $filterClass::class));
             }
-            if (\is_string($value)) {
-                $value = explode(',', $value);
+            if (\is_string($values)) {
+                $values = explode(',', $values);
             }
-            $filterClass->filter($query, $value);
+            if (\is_array($values)){
+                $values = array_map(static function ($value){
+                    return (int)$value;
+                }, $values);
+            }
+            $filterClass->filter($query, $values);
         }
-
         return $query->groupById();
     }
 
@@ -209,7 +214,7 @@ readonly class FilterService
                 }
             }
 
-            if (!$isTheliaChoiceFilter) {
+            if (!$isTheliaChoiceFilter && !empty($values)) {
                 $values = array_intersect_key($values, array_unique(array_column($values, 'id')));
 
                 $filterObjects[] = (new Filter())
