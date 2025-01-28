@@ -44,7 +44,7 @@ class PriceFilter // implements TheliaFilterInterface
         }
     }
 
-    public function getValue(ActiveRecordInterface $activeRecord, string $locale): ?array
+    public function getValue(ActiveRecordInterface $activeRecord, string $locale, $valueSearched = null, ?int $depth = 1): ?array
     {
         $defaultCurrencyId = CurrencyQuery::create()->filterByByDefault(true)->findOne()?->getId();
         $defaultPseId = $activeRecord->getDefaultSaleElements()->getId();
