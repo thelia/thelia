@@ -207,7 +207,9 @@ class Update
             $this->connection->commit();
             $this->log('debug', 'update successfully');
         } catch (\Exception $e) {
-            $this->connection->rollBack();
+            if ($this->connection->inTransaction()) {
+                $this->connection->rollBack();
+            }
 
             $this->log('error', sprintf('error during update process with message : %s', $e->getMessage()));
 
