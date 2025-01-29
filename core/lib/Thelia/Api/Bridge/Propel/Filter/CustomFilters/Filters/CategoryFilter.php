@@ -18,7 +18,7 @@ use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoice
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
 use Thelia\Model\CategoryQuery;
 
-class CategoryFilter implements TheliaFilterInterface, TheliaChoiceFilterInterface
+class CategoryFilter implements TheliaFilterInterface
 {
     public const CATEGORY_DEPTH_NAME = 'category_depth';
     public function filter(ModelCriteria $query, $value): void
@@ -90,10 +90,5 @@ class CategoryFilter implements TheliaFilterInterface, TheliaChoiceFilterInterfa
             );
         }
         return $categoriesFound;
-    }
-
-    public function getChoiceFilterType(ActiveRecordInterface $activeRecord): ActiveRecordInterface
-    {
-        // TODO: Implement getChoiceFilterType() method.
     }
 }

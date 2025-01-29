@@ -13,14 +13,17 @@
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\CategoryFilter;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\FeatureAvFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoiceFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
 use Thelia\Api\Resource\Filter;
+use Thelia\Model\CategoryQuery;
+use Thelia\Model\ChoiceFilter;
 use Thelia\Model\ChoiceFilterQuery;
+use Thelia\Model\Feature;
 use Thelia\Service\Model\LangService;
 
 readonly class FilterService
@@ -175,14 +178,15 @@ readonly class FilterService
                 tfilters: $tfilters,
                 filter: $filter,
                 item: $item,
+                values: $values,
                 isVisible: $isVisible,
                 position: $position,
                 id: $id
             );
 
-            $isTheliaChoiceFilter = ($filter instanceof TheliaChoiceFilterInterface);
+            $hasMainResource = (isset($values[0]['mainId'], $values[0]['mainTitle']));
 
-            if ($isTheliaChoiceFilter) {
+            if ($hasMainResource) {
                 $values = array_intersect_key($values, array_unique(array_map(
                     static function ($item) {
                         return $item['id'] . '-' . $item['mainId'];
@@ -195,10 +199,18 @@ readonly class FilterService
                     $splitValues[$value['mainId']][] = $value;
                 }
                 foreach ($splitValues as $value) {
+                    if (isset($value[0]['visible']) && $value[0]['position']) {
+                        $position = $value[0]['position'];
+                        $isVisible = $value[0]['visible'];
+                        $value = array_map(static function ($val) {
+                            unset($val['visible'], $val['position']);
+                            return $val;
+                        }, $value);
+                    }
                     $filterDto = new Filter();
                     $filterDto
-                        ->setId($value[0]['mainId'])
-                        ->setTitle($value[0]['mainTitle'])
+                        ->setId($value[0]['mainId'] ?? null)
+                        ->setTitle($value[0]['mainTitle'] ?? "")
                         ->setType($filter::getFilterName()[0])
                         ->setInputType('checkbox')
                         ->setPosition($position)
@@ -214,13 +226,13 @@ readonly class FilterService
                 }
             }
 
-            if (!$isTheliaChoiceFilter && !empty($values)) {
+            if (!$hasMainResource && !empty($values)) {
                 $values = array_intersect_key($values, array_unique(array_column($values, 'id')));
 
                 $filterObjects[] = (new Filter())
                     ->setId($id)
-                    ->setTitle($filter::getFilterName()[0])
-                    ->setType($filter::getFilterName()[0])
+                    ->setTitle($filter::getFilterName()[0] ?? "")
+                    ->setType($filter::getFilterName()[0] ?? "")
                     ->setInputType('checkbox')
                     ->setPosition($position)
                     ->setVisible($isVisible)
@@ -257,38 +269,49 @@ readonly class FilterService
         return $ids;
     }
 
-    private function isFilterRequested(array $theliaFilterNames, array $tfilters): bool
+    private function choiceFiltersManagement(array $tfilters,TheliaFilterInterface $filter,mixed $item, array &$values, bool &$isVisible, ?int &$position, ?int &$id): void
     {
-        return empty($this->retrieveFilterValue($theliaFilterNames, $tfilters));
-    }
-
-    private function choiceFiltersManagement(array $tfilters, $filter, mixed $item, bool &$isVisible, ?int &$position, ?int &$id): void
-    {
-        $choiceFilters = [];
-        if ($this->isFilterRequested(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters)) {
-            $categoryId = $this->retrieveFilterValue(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters);
-            if ($categoryId) {
-                $choiceFilters = ChoiceFilterQuery::create()->filterByCategoryId($categoryId)->find()->getData();
+        if (!$this->hasFilter(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters)){
+            return;
+        }
+        $categoryId = $this->retrieveFilterValue(theliaFilterNames: CategoryFilter::getFilterName(),tfilters: $tfilters);
+        $category = CategoryQuery::create()->findPk(key: $categoryId);
+        $choiceFiltersCategory = ChoiceFilterQuery::findChoiceFilterByCategory(category: $category, templateId: $templateIdFind)->getData();
+        $choiceFiltersTemplate = [];
+        if ($templateIdFind){
+            $choiceFiltersTemplate = ChoiceFilterQuery::create()->filterByTemplateId($templateIdFind)->find()->getData();
+        }
+        $choiceFilters = $choiceFiltersTemplate;
+        if (empty($choiceFilters)){
+            $choiceFilters = $choiceFiltersCategory;
+        }
+        /** @var ChoiceFilter $choiceFilter */
+        foreach ($choiceFilters as $choiceFilter) {
+            $otherType = $choiceFilter->getChoiceFilterOther()?->getType();
+            if (\in_array($otherType, $filter->getFilterName(), true)) {
+                $isVisible = (bool)$choiceFilter->isVisible();
+                $position = $choiceFilter->getPosition();
+                return;
             }
-            foreach ($choiceFilters as $choiceFilter) {
-                $otherType = $choiceFilter->getChoiceFilterOther()?->getType();
-                if (\in_array($otherType, $filter->getFilterName(), true)) {
-                    $isVisible = $choiceFilter->isVisible();
-                    $position = $choiceFilter->getPosition();
-                }
+            foreach ($values as $index => $value){
                 if ($filter instanceof TheliaChoiceFilterInterface && !empty($item)) {
                     $mainType = $filter->getChoiceFilterType($item);
-                    $id = $mainType->getId();
-                    if ($choiceFilter->getAttribute() instanceof $mainType && $choiceFilter->getAttribute()->getId() === $mainType->getId()) {
-                        $isVisible = $choiceFilter->isVisible();
-                        $position = $choiceFilter->getPosition();
+                    if ($choiceFilter->getAttribute() instanceof $mainType && $choiceFilter->getAttribute()->getId() === $value['mainId']) {
+                        $values[$index]['visible'] = (bool)$choiceFilter->isVisible();
+                        $values[$index]['position'] = $choiceFilter->getPosition();
                     }
-                    if ($choiceFilter->getFeature() instanceof $mainType && $choiceFilter->getFeature()->getId() === $mainType->getId()) {
-                        $isVisible = $choiceFilter->isVisible();
-                        $position = $choiceFilter->getPosition();
+                    if ($choiceFilter->getFeature() instanceof $mainType && $choiceFilter->getFeature()->getId() === $value['mainId']) {
+                        $values[$index]['visible'] = (bool)$choiceFilter->isVisible();
+                        $values[$index]['position'] = $choiceFilter->getPosition();
                     }
                 }
             }
         }
+    }
+
+
+    private function hasFilter(array $theliaFilterNames, array $tfilters): bool
+    {
+        return !empty($this->retrieveFilterValue($theliaFilterNames, $tfilters));
     }
 }
