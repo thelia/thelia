@@ -206,14 +206,16 @@ readonly class FilterService
                             return $val;
                         }, $value);
                     }
+                    if (!$isVisible) {
+                        continue;
+                    }
                     $filterDto = new Filter();
                     $filterDto
                         ->setId($value[0]['mainId'] ?? null)
                         ->setTitle($value[0]['mainTitle'] ?? '')
                         ->setType($filter::getFilterName()[0])
                         ->setInputType('checkbox')
-                        ->setPosition($position)
-                        ->setVisible($isVisible);
+                        ->setPosition($position);
 
                     $value = array_map(static function ($val) {
                         unset($val['mainId'], $val['mainTitle']);
@@ -228,14 +230,15 @@ readonly class FilterService
 
             if (!$hasMainResource && !empty($values)) {
                 $values = array_intersect_key($values, array_unique(array_column($values, 'id')));
-
+                if (!$isVisible) {
+                    continue;
+                }
                 $filterObjects[] = (new Filter())
                     ->setId($id)
                     ->setTitle($filter::getFilterName()[0] ?? '')
                     ->setType($filter::getFilterName()[0] ?? '')
                     ->setInputType('checkbox')
                     ->setPosition($position)
-                    ->setVisible($isVisible)
                     ->setValues(array_values($values));
             }
         }
