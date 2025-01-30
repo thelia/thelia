@@ -39,7 +39,7 @@ class AttributeAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInte
             ->endUse();
     }
 
-    public function getValue(ActiveRecordInterface $activeRecord, string $locale): ?array
+    public function getValue(ActiveRecordInterface $activeRecord, string $locale, $valueSearched = null, ?int $depth = 1): ?array
     {
         $productSaleElementss = $activeRecord->getProductSaleElementss();
         if (empty($productSaleElementss)) {

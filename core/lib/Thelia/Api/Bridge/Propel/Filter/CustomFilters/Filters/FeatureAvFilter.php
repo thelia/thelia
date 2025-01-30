@@ -34,7 +34,7 @@ class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterf
         $query->useFeatureProductQuery()->filterByFeatureAvId($value)->endUse();
     }
 
-    public function getValue(ActiveRecordInterface $activeRecord, string $locale): ?array
+    public function getValue(ActiveRecordInterface $activeRecord, string $locale, $valueSearched = null, ?int $depth = 1): ?array
     {
         if (empty($activeRecord->getFeatureProductsJoinFeatureAv())) {
             return null;

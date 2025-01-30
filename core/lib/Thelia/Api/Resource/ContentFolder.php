@@ -54,10 +54,10 @@ class ContentFolder implements PropelResourceInterface
     public Content $content;
 
     #[Relation(targetResource: Folder::class)]
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Content::GROUP_FRONT_READ])]
     public Folder $folder;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Content::GROUP_FRONT_READ])]
     public bool $defaultFolder = false;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]

@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\ContentTableMap;
 use Thelia\Model\Tools\UrlRewritingTrait;
@@ -68,6 +69,20 @@ use Thelia\Model\Tools\UrlRewritingTrait;
     filterClass: SearchFilter::class,
     properties: [
         'id',
+        'contentFolders.folder.id' => [
+            'strategy' => 'exact',
+            'fieldPath' => 'content_folder.folder_id',
+        ],
+        'contentFolders.content.id' => [
+            'strategy' => 'exact',
+            'fieldPath' => 'content_folder.content_id',
+        ],
+    ]
+)]
+#[ApiFilter(
+    filterClass: BooleanFilter::class,
+    properties: [
+        'contentFolders.defaultFolder',
     ]
 )]
 class Content extends AbstractTranslatableResource
@@ -100,7 +115,7 @@ class Content extends AbstractTranslatableResource
     public ?int $position;
 
     #[Relation(targetResource: ContentFolder::class)]
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
     public array $contentFolders;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]

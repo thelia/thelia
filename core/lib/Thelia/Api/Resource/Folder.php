@@ -85,6 +85,7 @@ class Folder extends AbstractTranslatableResource
         FolderImage::GROUP_ADMIN_READ_SINGLE,
         FolderDocument::GROUP_ADMIN_READ_SINGLE,
         self::GROUP_FRONT_READ,
+        Content::GROUP_FRONT_READ,
     ])]
     public ?int $id = null;
 

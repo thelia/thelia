@@ -15,9 +15,12 @@ namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
+use Thelia\Model\CategoryQuery;
 
 class CategoryFilter implements TheliaFilterInterface
 {
+    public const CATEGORY_DEPTH_NAME = 'category_depth';
+
     public function filter(ModelCriteria $query, $value): void
     {
         $query->useProductCategoryQuery()->filterByCategoryId($value)->endUse();
@@ -33,21 +36,61 @@ class CategoryFilter implements TheliaFilterInterface
         return ['category'];
     }
 
-    public function getValue(ActiveRecordInterface $activeRecord, string $locale): ?array
+    public function getValue(ActiveRecordInterface $activeRecord, string $locale, $valueSearched = null, ?int $depth = 1): ?array
     {
-        if (empty($activeRecord->getCategories())) {
-            return null;
+        if (\is_string($valueSearched)) {
+            $valueSearched = explode(',', $valueSearched);
+        }
+        if (empty($valueSearched)) {
+            return [];
         }
         $value = [];
-        foreach ($activeRecord->getCategories() as $category) {
-            $value[] =
-                [
-                    'id' => $category->getId(),
-                    'title' => $category->setLocale($locale)->getTitle(),
-                ]
-            ;
+        foreach ($valueSearched as $categoryId) {
+            $mainCategory = CategoryQuery::create()->findOneById($categoryId);
+            if (!$mainCategory) {
+                continue;
+            }
+            $categoriesWithDepth = $this->getCategoriesRecursively(categoryId: $categoryId, maxDepth: $depth);
+            if (empty($categoriesWithDepth)) {
+                return [];
+            }
+            foreach ($categoriesWithDepth as $depthIndex => $categories) {
+                foreach ($categories as $category) {
+                    $value[] =
+                        [
+                            'mainTitle' => $mainCategory->setLocale($locale)->getTitle(),
+                            'mainId' => $mainCategory->getId(),
+                            'id' => $category->getId(),
+                            'depth' => $depthIndex,
+                            'title' => $category->setLocale($locale)->getTitle(),
+                        ]
+                    ;
+                }
+            }
         }
 
         return $value;
+    }
+
+    private function getCategoriesRecursively($categoryId, int $maxDepth, array $categoriesFound = [], int $depth = 1): array
+    {
+        $categories = CategoryQuery::create()->filterByParent($categoryId)->find();
+        if ($depth > $maxDepth) {
+            return $categoriesFound;
+        }
+        foreach ($categories as $category) {
+            if (!$category->getVisible()) {
+                continue;
+            }
+            $categoriesFound[$depth][] = $category;
+            $categoriesFound = $this->getCategoriesRecursively(
+                categoryId: $category->getId(),
+                maxDepth: $maxDepth,
+                categoriesFound: $categoriesFound,
+                depth: $depth + 1
+            );
+        }
+
+        return $categoriesFound;
     }
 }

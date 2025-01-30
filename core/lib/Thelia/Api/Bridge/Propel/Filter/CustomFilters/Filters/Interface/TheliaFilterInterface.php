@@ -25,5 +25,5 @@ interface TheliaFilterInterface
 
     public function filter(ModelCriteria $query, $value): void;
 
-    public function getValue(ActiveRecordInterface $activeRecord, string $locale): ?array;
+    public function getValue(ActiveRecordInterface $activeRecord, string $locale, $valueSearched = null, ?int $depth = 1): ?array;
 }
