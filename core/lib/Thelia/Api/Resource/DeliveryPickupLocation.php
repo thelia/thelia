@@ -17,7 +17,6 @@ use ApiPlatform\Metadata\GetCollection;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Thelia\Api\State\Provider\DeliveryPickupLocationProvider;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\PickupLocationAddress;
 
 #[ApiResource(
     operations: [
@@ -166,6 +165,9 @@ class DeliveryPickupLocation
         self::SUNDAY_OPENING_HOURS_KEY => null,
     ];
 
+    #[Groups([
+        self::GROUP_FRONT_READ,
+    ])]
     protected PickupLocationAddress $address;
 
     public function getId(): string
