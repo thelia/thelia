@@ -82,7 +82,7 @@ use Thelia\Model\Tools\UrlRewritingTrait;
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
-        'contentFolders.defaultFolder'
+        'contentFolders.defaultFolder',
     ]
 )]
 class Content extends AbstractTranslatableResource

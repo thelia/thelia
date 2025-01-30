@@ -29,6 +29,7 @@ class TFiltersProvider implements ProviderInterface
         if (!$resource) {
             throw new \InvalidArgumentException('The "resource" parameter is required.');
         }
+
         return $this->filterService->getFilters(context: $context, resource: $resource);
     }
 }

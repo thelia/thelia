@@ -14,13 +14,13 @@ namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
-use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoiceFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
 use Thelia\Model\CategoryQuery;
 
 class CategoryFilter implements TheliaFilterInterface
 {
     public const CATEGORY_DEPTH_NAME = 'category_depth';
+
     public function filter(ModelCriteria $query, $value): void
     {
         $query->useProductCategoryQuery()->filterByCategoryId($value)->endUse();
@@ -38,7 +38,7 @@ class CategoryFilter implements TheliaFilterInterface
 
     public function getValue(ActiveRecordInterface $activeRecord, string $locale, $valueSearched = null, ?int $depth = 1): ?array
     {
-        if (is_string($valueSearched)){
+        if (\is_string($valueSearched)) {
             $valueSearched = explode(',', $valueSearched);
         }
         if (empty($valueSearched)) {
@@ -47,10 +47,10 @@ class CategoryFilter implements TheliaFilterInterface
         $value = [];
         foreach ($valueSearched as $categoryId) {
             $mainCategory = CategoryQuery::create()->findOneById($categoryId);
-            if (!$mainCategory){
+            if (!$mainCategory) {
                 continue;
             }
-            $categoriesWithDepth = $this->getCategoriesRecursively(categoryId: $categoryId,maxDepth: $depth);
+            $categoriesWithDepth = $this->getCategoriesRecursively(categoryId: $categoryId, maxDepth: $depth);
             if (empty($categoriesWithDepth)) {
                 return [];
             }
@@ -68,17 +68,18 @@ class CategoryFilter implements TheliaFilterInterface
                 }
             }
         }
+
         return $value;
     }
 
-    private function getCategoriesRecursively($categoryId,int $maxDepth, array $categoriesFound = [],int $depth = 1): array
+    private function getCategoriesRecursively($categoryId, int $maxDepth, array $categoriesFound = [], int $depth = 1): array
     {
         $categories = CategoryQuery::create()->filterByParent($categoryId)->find();
-        if ($depth > $maxDepth){
+        if ($depth > $maxDepth) {
             return $categoriesFound;
         }
         foreach ($categories as $category) {
-            if (!$category->getVisible()){
+            if (!$category->getVisible()) {
                 continue;
             }
             $categoriesFound[$depth][] = $category;
@@ -89,6 +90,7 @@ class CategoryFilter implements TheliaFilterInterface
                 depth: $depth + 1
             );
         }
+
         return $categoriesFound;
     }
 }
