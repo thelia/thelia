@@ -26,7 +26,19 @@ use Thelia\Model\Map\ModuleTableMap;
     operations: [
         new GetCollection(
             uriTemplate: '/front/delivery_modules',
-            provider: DeliveryModuleProvider::class
+            provider: DeliveryModuleProvider::class,
+            openapiContext: [
+                'parameters' => [
+                    [
+                        'name'     => 'by_code',
+                        'in'       => 'query',
+                        'required' => false,
+                        'schema'   => [
+                            'type' => 'integer',
+                        ],
+                    ],
+                ],
+            ],
         ),
         new Get(
             uriTemplate: '/front/delivery_modules/{id}',
@@ -41,7 +53,7 @@ use Thelia\Model\Map\ModuleTableMap;
 )]
 class DeliveryModule extends AbstractTranslatableResource
 {
-    public const GROUP_FRONT_READ = 'front:delivery_module:read';
+    public const GROUP_FRONT_READ        = 'front:delivery_module:read';
     public const GROUP_FRONT_READ_SINGLE = 'front:delivery_module:read:single';
 
     #[Groups([

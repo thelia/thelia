@@ -74,6 +74,14 @@ class DeliveryModuleProvider implements ProviderInterface
             );
         }
 
+        if ($context["filters"]["by_code"] ?? null === "1") {
+            $deliveryModules = array_reduce($deliveryModules, function ($carry, $item) {
+                $carry[$item->getDeliveryMode()][] = $item;
+
+                return $carry;
+            }, []);
+        }
+
         return $deliveryModules;
     }
 }
