@@ -98,6 +98,7 @@ use Thelia\Model\Tools\UrlRewritingTrait;
     filterClass: OrderFilter::class,
     properties: [
         'ref',
+        'position',
         'productCategories.position',
     ]
 )]
