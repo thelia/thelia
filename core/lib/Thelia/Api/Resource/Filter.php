@@ -56,9 +56,6 @@ class Filter implements PropelResourceInterface
     #[Groups([self::GROUP_FRONT_READ])]
     private string $inputType;
     #[Groups([self::GROUP_FRONT_READ])]
-    private bool $visible;
-
-    #[Groups([self::GROUP_FRONT_READ])]
     private ?int $position;
     #[Groups([self::GROUP_FRONT_READ])]
     private array $values;
@@ -119,18 +116,6 @@ class Filter implements PropelResourceInterface
     public function setValues(array $values): self
     {
         $this->values = $values;
-
-        return $this;
-    }
-
-    public function isVisible(): bool
-    {
-        return $this->visible;
-    }
-
-    public function setVisible(bool $visible): self
-    {
-        $this->visible = $visible;
 
         return $this;
     }

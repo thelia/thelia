@@ -28,6 +28,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\ProductFilter\ProductPriceOrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\TheliaFilter;
 use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
@@ -97,6 +98,7 @@ use Thelia\Model\Tools\UrlRewritingTrait;
     filterClass: OrderFilter::class,
     properties: [
         'ref',
+        'position',
         'productCategories.position',
     ]
 )]
@@ -111,7 +113,7 @@ use Thelia\Model\Tools\UrlRewritingTrait;
     ]
 )]
 #[ApiFilter(
-    filterClass: TheliaFilter::class,
+    filterClass: ProductPriceOrderFilter::class,
 )]
 class Product extends AbstractTranslatableResource
 {

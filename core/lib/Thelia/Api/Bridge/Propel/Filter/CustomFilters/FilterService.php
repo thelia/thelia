@@ -19,6 +19,7 @@ use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\CategoryFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoiceFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
 use Thelia\Api\Resource\Filter;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ChoiceFilter;
 use Thelia\Model\ChoiceFilterQuery;
@@ -31,6 +32,7 @@ readonly class FilterService
         private readonly iterable $filters,
         private readonly LangService $langService,
         private readonly RequestStack $requestStack,
+        private readonly Translator $translator,
     ) {
     }
 
@@ -206,14 +208,20 @@ readonly class FilterService
                             return $val;
                         }, $value);
                     }
+                    if (!$isVisible) {
+                        continue;
+                    }
+                    $title = $value[0]['mainTitle'] ?? '';
+                    if ($filter instanceof CategoryFilter) {
+                        $title = $this->translator->trans(id: 'Category', locale: $locale);
+                    }
                     $filterDto = new Filter();
                     $filterDto
                         ->setId($value[0]['mainId'] ?? null)
-                        ->setTitle($value[0]['mainTitle'] ?? '')
+                        ->setTitle($title)
                         ->setType($filter::getFilterName()[0])
                         ->setInputType('checkbox')
-                        ->setPosition($position)
-                        ->setVisible($isVisible);
+                        ->setPosition($position);
 
                     $value = array_map(static function ($val) {
                         unset($val['mainId'], $val['mainTitle']);
@@ -228,14 +236,15 @@ readonly class FilterService
 
             if (!$hasMainResource && !empty($values)) {
                 $values = array_intersect_key($values, array_unique(array_column($values, 'id')));
-
+                if (!$isVisible) {
+                    continue;
+                }
                 $filterObjects[] = (new Filter())
                     ->setId($id)
                     ->setTitle($filter::getFilterName()[0] ?? '')
                     ->setType($filter::getFilterName()[0] ?? '')
                     ->setInputType('checkbox')
                     ->setPosition($position)
-                    ->setVisible($isVisible)
                     ->setValues(array_values($values));
             }
         }

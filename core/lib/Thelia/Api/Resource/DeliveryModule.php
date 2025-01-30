@@ -30,10 +30,10 @@ use Thelia\Model\Map\ModuleTableMap;
             openapiContext: [
                 'parameters' => [
                     [
-                        'name'     => 'by_code',
-                        'in'       => 'query',
+                        'name' => 'by_code',
+                        'in' => 'query',
                         'required' => false,
-                        'schema'   => [
+                        'schema' => [
                             'type' => 'integer',
                         ],
                     ],
@@ -53,7 +53,7 @@ use Thelia\Model\Map\ModuleTableMap;
 )]
 class DeliveryModule extends AbstractTranslatableResource
 {
-    public const GROUP_FRONT_READ        = 'front:delivery_module:read';
+    public const GROUP_FRONT_READ = 'front:delivery_module:read';
     public const GROUP_FRONT_READ_SINGLE = 'front:delivery_module:read:single';
 
     #[Groups([
