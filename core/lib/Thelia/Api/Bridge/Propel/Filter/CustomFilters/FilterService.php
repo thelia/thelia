@@ -213,7 +213,7 @@ readonly class FilterService
                     }
                     $title = $value[0]['mainTitle'] ?? '';
                     if ($filter instanceof CategoryFilter) {
-                        $title = $this->translator->trans(id: 'Category',locale: $locale);
+                        $title = $this->translator->trans(id: 'Category', locale: $locale);
                     }
                     $filterDto = new Filter();
                     $filterDto
