@@ -28,6 +28,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
+use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Api\Controller\Admin\BinaryFileController;
 use Thelia\Api\Controller\Admin\PostItemFileController;
 use Thelia\Model\Map\CategoryImageTableMap;
@@ -104,6 +105,15 @@ use Thelia\Model\Map\CategoryImageTableMap;
         'position',
     ]
 )]
+#[ApiFilter(
+    filterClass: SearchFilter::class,
+    properties: [
+        'category.id' => [
+            'strategy' => 'exact',
+            'fieldPath' => 'categoryimage_category.id',
+        ],
+    ]
+)]    
 class CategoryImage extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     public const GROUP_ADMIN_READ = 'admin:category_image:read';
