@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -114,7 +124,7 @@ class PickupLocationAddress
         return $this->label;
     }
 
-    public function setLabel(string $label): PickupLocationAddress
+    public function setLabel(string $label): self
     {
         $this->label = $label;
 
@@ -126,7 +136,7 @@ class PickupLocationAddress
         return $this->title;
     }
 
-    public function setTitle(string $title): PickupLocationAddress
+    public function setTitle(string $title): self
     {
         $this->title = $title;
 
@@ -138,7 +148,7 @@ class PickupLocationAddress
         return $this->firstName;
     }
 
-    public function setFirstName(string $firstName): PickupLocationAddress
+    public function setFirstName(string $firstName): self
     {
         $this->firstName = $firstName;
 
@@ -150,7 +160,7 @@ class PickupLocationAddress
         return $this->lastName;
     }
 
-    public function setLastName(string $lastName): PickupLocationAddress
+    public function setLastName(string $lastName): self
     {
         $this->lastName = $lastName;
 
@@ -162,7 +172,7 @@ class PickupLocationAddress
         return $this->cellphoneNumber;
     }
 
-    public function setCellphoneNumber(string $cellphoneNumber): PickupLocationAddress
+    public function setCellphoneNumber(string $cellphoneNumber): self
     {
         $this->cellphoneNumber = $cellphoneNumber;
 
@@ -174,7 +184,7 @@ class PickupLocationAddress
         return $this->phoneNumber;
     }
 
-    public function setPhoneNumber(string $phoneNumber): PickupLocationAddress
+    public function setPhoneNumber(string $phoneNumber): self
     {
         $this->phoneNumber = $phoneNumber;
 
@@ -186,7 +196,7 @@ class PickupLocationAddress
         return $this->company;
     }
 
-    public function setCompany(string $company): PickupLocationAddress
+    public function setCompany(string $company): self
     {
         $this->company = $company;
 
@@ -198,7 +208,7 @@ class PickupLocationAddress
         return $this->address1;
     }
 
-    public function setAddress1(string $address1): PickupLocationAddress
+    public function setAddress1(string $address1): self
     {
         $this->address1 = $address1;
 
@@ -210,7 +220,7 @@ class PickupLocationAddress
         return $this->address2;
     }
 
-    public function setAddress2(string $address2): PickupLocationAddress
+    public function setAddress2(string $address2): self
     {
         $this->address2 = $address2;
 
@@ -222,7 +232,7 @@ class PickupLocationAddress
         return $this->address3;
     }
 
-    public function setAddress3(string $address3): PickupLocationAddress
+    public function setAddress3(string $address3): self
     {
         $this->address3 = $address3;
 
@@ -234,7 +244,7 @@ class PickupLocationAddress
         return $this->zipCode;
     }
 
-    public function setZipCode(string $zipCode): PickupLocationAddress
+    public function setZipCode(string $zipCode): self
     {
         $this->zipCode = $zipCode;
 
@@ -246,7 +256,7 @@ class PickupLocationAddress
         return $this->city;
     }
 
-    public function setCity(string $city): PickupLocationAddress
+    public function setCity(string $city): self
     {
         $this->city = $city;
 
@@ -258,7 +268,7 @@ class PickupLocationAddress
         return $this->countryCode;
     }
 
-    public function setCountryCode(string $countryCode): PickupLocationAddress
+    public function setCountryCode(string $countryCode): self
     {
         $this->countryCode = $countryCode;
 
@@ -270,7 +280,7 @@ class PickupLocationAddress
         return $this->additionalData;
     }
 
-    public function setAdditionalData(?array $additionalData): PickupLocationAddress
+    public function setAdditionalData(?array $additionalData): self
     {
         $this->additionalData = $additionalData;
 
