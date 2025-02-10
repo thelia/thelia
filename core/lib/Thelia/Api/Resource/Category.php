@@ -74,6 +74,7 @@ use Thelia\Model\Tools\UrlRewritingTrait;
     filterClass: SearchFilter::class,
     properties: [
         'id',
+        'parent',
     ]
 )]
 class Category extends AbstractTranslatableResource

@@ -113,7 +113,7 @@ use Thelia\Model\Map\CategoryImageTableMap;
             'fieldPath' => 'categoryimage_category.id',
         ],
     ]
-)]    
+)]
 class CategoryImage extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     public const GROUP_ADMIN_READ = 'admin:category_image:read';
