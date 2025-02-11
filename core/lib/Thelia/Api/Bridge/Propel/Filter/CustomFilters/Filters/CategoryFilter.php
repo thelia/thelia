@@ -15,11 +15,16 @@ namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\FilterService;
 use Thelia\Model\CategoryQuery;
 
 class CategoryFilter implements TheliaFilterInterface
 {
     public const CATEGORY_DEPTH_NAME = 'category_depth';
+
+    public function __construct(private readonly FilterService $filterService)
+    {
+    }
 
     public function filter(ModelCriteria $query, $value): void
     {
@@ -50,7 +55,7 @@ class CategoryFilter implements TheliaFilterInterface
             if (!$mainCategory) {
                 continue;
             }
-            $categoriesWithDepth = $this->getCategoriesRecursively(categoryId: $categoryId, maxDepth: $depth);
+            $categoriesWithDepth = $this->filterService->getCategoriesRecursively(categoryId: $categoryId, maxDepth: $depth);
             if (empty($categoriesWithDepth)) {
                 return [];
             }
@@ -70,27 +75,5 @@ class CategoryFilter implements TheliaFilterInterface
         }
 
         return $value;
-    }
-
-    private function getCategoriesRecursively($categoryId, int $maxDepth, array $categoriesFound = [], int $depth = 1): array
-    {
-        $categories = CategoryQuery::create()->filterByParent($categoryId)->find();
-        if ($depth > $maxDepth) {
-            return $categoriesFound;
-        }
-        foreach ($categories as $category) {
-            if (!$category->getVisible()) {
-                continue;
-            }
-            $categoriesFound[$depth][] = $category;
-            $categoriesFound = $this->getCategoriesRecursively(
-                categoryId: $category->getId(),
-                maxDepth: $maxDepth,
-                categoriesFound: $categoriesFound,
-                depth: $depth + 1
-            );
-        }
-
-        return $categoriesFound;
     }
 }
