@@ -291,9 +291,9 @@ readonly class FilterService
         if ($templateIdFind) {
             $choiceFiltersTemplate = ChoiceFilterQuery::create()->filterByTemplateId($templateIdFind)->find()->getData();
         }
-        $choiceFilters = $choiceFiltersTemplate;
+        $choiceFilters = $choiceFiltersCategory;
         if (empty($choiceFilters)) {
-            $choiceFilters = $choiceFiltersCategory;
+            $choiceFilters = $choiceFiltersTemplate;
         }
         /** @var ChoiceFilter $choiceFilter */
         foreach ($choiceFilters as $choiceFilter) {
@@ -323,5 +323,27 @@ readonly class FilterService
     private function hasFilter(array $theliaFilterNames, array $tfilters): bool
     {
         return !empty($this->retrieveFilterValue($theliaFilterNames, $tfilters));
+    }
+
+    public function getCategoriesRecursively($categoryId, int $maxDepth, array $categoriesFound = [], int $depth = 1): array
+    {
+        $categories = CategoryQuery::create()->filterByParent($categoryId)->find();
+        if ($depth > $maxDepth) {
+            return $categoriesFound;
+        }
+        foreach ($categories as $category) {
+            if (!$category->getVisible()) {
+                continue;
+            }
+            $categoriesFound[$depth][] = $category;
+            $categoriesFound = $this->getCategoriesRecursively(
+                categoryId: $category->getId(),
+                maxDepth: $maxDepth,
+                categoriesFound: $categoriesFound,
+                depth: $depth + 1
+            );
+        }
+
+        return $categoriesFound;
     }
 }
