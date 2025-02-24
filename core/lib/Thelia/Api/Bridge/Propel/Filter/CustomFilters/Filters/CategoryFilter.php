@@ -26,8 +26,19 @@ class CategoryFilter implements TheliaFilterInterface
     {
     }
 
-    public function filter(ModelCriteria $query, $value): void
+    public function filter(ModelCriteria $query, $value, int $categoryDepth = null): void
     {
+        if (!\is_array($value)) {
+            $value = [$value];
+        }
+        if ($categoryDepth) {
+            $categories = $this->filterService->getCategoriesRecursively($value, $categoryDepth);
+            foreach ($categories as $categoryList) {
+                foreach ($categoryList as $category) {
+                    $value[] = $category->getId();
+                }
+            }
+        }
         $query->useProductCategoryQuery()->filterByCategoryId($value)->endUse();
     }
 
