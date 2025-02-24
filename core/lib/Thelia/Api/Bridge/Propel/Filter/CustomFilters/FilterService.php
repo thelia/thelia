@@ -71,24 +71,26 @@ readonly class FilterService
     public function filterTFilterWithRequest($request, ModelCriteria $query = null): iterable
     {
         $tfilters = $request->get('tfilters', []);
+        $categoryDepth = $request->get(CategoryFilter::CATEGORY_DEPTH_NAME, null);
         $pathInfo = $request->getPathInfo();
         $segments = explode('/', $pathInfo);
         $resource = end($segments);
 
-        return $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, query: $query);
+        return $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, query: $query, categoryDepth: $categoryDepth);
     }
 
     public function filterTFilterWithContext(array $context = null, ModelCriteria $query = null): iterable
     {
         $tfilters = $context['filters']['tfilters'] ?? [];
+        $categoryDepth = $context['filters'][CategoryFilter::CATEGORY_DEPTH_NAME] ?? null;
         $pathInfo = $context['path_info'];
         $segments = explode('/', $pathInfo);
         $resource = end($segments);
 
-        return $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, query: $query);
+        return $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, query: $query, categoryDepth: $categoryDepth);
     }
 
-    public function filterWithTFilter(array $tfilters, string $resource, ModelCriteria $query = null): iterable
+    public function filterWithTFilter(array $tfilters, string $resource, ModelCriteria $query = null, int $categoryDepth = null): iterable
     {
         $filters = $this->getAvailableFiltersWithTFilter($resource, $tfilters);
         if (!$query) {
@@ -115,7 +117,11 @@ readonly class FilterService
                     return (int) $value;
                 }, $values);
             }
-            $filterClass->filter($query, $values);
+            if ($filterClass instanceof CategoryFilter) {
+                $filterClass->filter($query, $values, $categoryDepth);
+            } else {
+                $filterClass->filter($query, $values);
+            }
         }
 
         return $query->groupById();
