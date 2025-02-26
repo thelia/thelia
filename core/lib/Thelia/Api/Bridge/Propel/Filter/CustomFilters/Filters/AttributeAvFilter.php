@@ -16,6 +16,7 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoiceFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
+use Thelia\Model\Attribute;
 
 class AttributeAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterface
 {
@@ -62,8 +63,8 @@ class AttributeAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInte
         return $value;
     }
 
-    public function getChoiceFilterType(ActiveRecordInterface $activeRecord): ActiveRecordInterface
+    public function getChoiceFilterType(): ActiveRecordInterface
     {
-        return $activeRecord->getDefaultSaleElements()->getAttributeCombinationsJoinAttributeAv()->getFirst()->getAttribute();
+        return new Attribute();
     }
 }

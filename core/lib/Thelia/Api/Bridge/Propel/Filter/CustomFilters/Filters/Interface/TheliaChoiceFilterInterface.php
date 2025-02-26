@@ -16,5 +16,5 @@ use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 
 interface TheliaChoiceFilterInterface
 {
-    public function getChoiceFilterType(ActiveRecordInterface $activeRecord): ActiveRecordInterface;
+    public function getChoiceFilterType(): ActiveRecordInterface;
 }

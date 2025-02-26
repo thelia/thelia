@@ -183,7 +183,6 @@ readonly class FilterService
             $this->choiceFiltersManagement(
                 tfilters: $tfilters,
                 filter: $filter,
-                item: $item,
                 values: $values,
                 isVisible: $isVisible,
                 position: $position,
@@ -285,7 +284,7 @@ readonly class FilterService
         return $ids;
     }
 
-    private function choiceFiltersManagement(array $tfilters, TheliaFilterInterface $filter, mixed $item, array &$values, bool &$isVisible, ?int &$position, ?int &$id): void
+    private function choiceFiltersManagement(array $tfilters, TheliaFilterInterface $filter, array &$values, bool &$isVisible, ?int &$position, ?int &$id): void
     {
         if (!$this->hasFilter(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters)) {
             return;
@@ -311,8 +310,8 @@ readonly class FilterService
                 return;
             }
             foreach ($values as $index => $value) {
-                if ($filter instanceof TheliaChoiceFilterInterface && !empty($item)) {
-                    $mainType = $filter->getChoiceFilterType($item);
+                if ($filter instanceof TheliaChoiceFilterInterface) {
+                    $mainType = $filter->getChoiceFilterType();
                     if ($choiceFilter->getAttribute() instanceof $mainType && $choiceFilter->getAttribute()->getId() === $value['mainId']) {
                         $values[$index]['visible'] = (bool) $choiceFilter->isVisible();
                         $values[$index]['position'] = $choiceFilter->getPosition();

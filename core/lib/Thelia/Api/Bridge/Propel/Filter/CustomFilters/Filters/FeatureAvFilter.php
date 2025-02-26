@@ -12,10 +12,14 @@
 
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoiceFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
+use Thelia\Model\FeatureAvQuery;
+use Thelia\Model\Map\FeatureProductTableMap;
+use Thelia\Model\Feature;
 
 class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterface
 {
@@ -31,7 +35,21 @@ class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterf
 
     public function filter(ModelCriteria $query, $value): void
     {
-        $query->useFeatureProductQuery()->filterByFeatureAvId($value)->endUse();
+        if (!is_array($value)) {
+            $value = [$value];
+        }
+        $count = FeatureAvQuery::create()
+            ->filterById($value, Criteria::IN)
+            ->withColumn('COUNT(DISTINCT feature_id)', 'distinct_feature_count')
+            ->select(['distinct_feature_count'])
+            ->findOne();
+
+        $query
+            ->useFeatureProductQuery()
+            ->filterByFeatureAvId($value, Criteria::IN)
+            ->endUse()
+            ->groupBy(FeatureProductTableMap::COL_PRODUCT_ID)
+            ->having('COUNT(DISTINCT '.FeatureProductTableMap::COL_FEATURE_ID.') = ?', $count);
     }
 
     public function getValue(ActiveRecordInterface $activeRecord, string $locale, $valueSearched = null, ?int $depth = 1): ?array
@@ -54,8 +72,8 @@ class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterf
         return $value;
     }
 
-    public function getChoiceFilterType(ActiveRecordInterface $activeRecord): ActiveRecordInterface
+    public function getChoiceFilterType(): ActiveRecordInterface
     {
-        return $activeRecord->getFeatureProductsJoinFeatureAv()->getFirst()->getFeature();
+        return new Feature();
     }
 }
