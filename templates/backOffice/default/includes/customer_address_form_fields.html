@@ -6,20 +6,13 @@
 <input type="hidden" name="page" value="{$page}">
 
 {form_field field='success_url'}
-    <input type="hidden" name="{$name}" value="{url path='/admin/customer/update'} customer_id=$customer_id page=$page" />
+    <input type="hidden" name="{$name}"
+           value="{url path='/admin/customer/update'} customer_id=$customer_id page=$page"/>
 {/form_field}
 
 {render_form_field field='label'}
 {render_form_field field='company'}
 
-
-{custom_render_form_field field='title'}
-    <select {form_field_attributes field='title'} >
-        {loop type="title" name="title1"}
-            <option value="{$ID}"{if $value == $ID} selected{/if}>{$LONG}</option>
-        {/loop}
-    </select>
-{/custom_render_form_field}
 
 <div class="row">
     <div class="col-sm-6">{render_form_field field="firstname"}</div>
@@ -48,13 +41,13 @@
                         {else}
                             {if $IS_DEFAULT}selected{/if}
                         {/if}
-                    
+
                     >{$TITLE}</option>
                 {/loop}
             </select>
         {/custom_render_form_field}
     </div>
-    
+
     <div class="col-md-6 group-modal-state">
         {custom_render_form_field field='state' field_id="{$dialog_type}-state"}
             <select {form_field_attributes field='state' field_id="{$dialog_type}-state"}
@@ -74,5 +67,4 @@
 
 <div class="row">
     <div class="col-md-6">{render_form_field field='phone'}</div>
-    <div class="col-md-6">{render_form_field field='cellphone'}</div>
 </div>
