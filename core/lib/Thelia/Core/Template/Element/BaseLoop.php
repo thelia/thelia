@@ -29,6 +29,9 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\Exception\LoopException;
+use Thelia\Core\Template\Element\Pagination\ArrayPagination;
+use Thelia\Core\Template\Element\Pagination\PaginationInterface;
+use Thelia\Core\Template\Element\Pagination\PropelPagination;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Translation\Translator;
@@ -155,9 +158,9 @@ abstract class BaseLoop implements LoopInterface
             }
 
             self::$loopDefinitionsArgs[$class] = $this->args;
+        } else {
+            $this->args = self::$loopDefinitionsArgs[$class];
         }
-
-        $this->args = self::$loopDefinitionsArgs[$class];
 
         // reset all arguments to default value, as argument list is cached in a static variable and holds
         // values defined by previous loop usage across loop instances.
@@ -225,7 +228,7 @@ abstract class BaseLoop implements LoopInterface
      */
     public function __call($name, $arguments)
     {
-        if (substr($name, 0, 3) == 'get') {
+        if (str_starts_with($name, 'get')) {
             // camelCase to underscore: getNotEmpty -> not_empty
             $argName = strtolower(preg_replace('/([^A-Z])([A-Z])/', '$1_$2', substr($name, 3)));
 
@@ -355,14 +358,17 @@ abstract class BaseLoop implements LoopInterface
     }
 
     /**
-     * @param ModelCriteria         $search     the search request
-     * @param PropelModelPager|null $pagination the pagination part
-     *
-     * @throws \InvalidArgumentException if the search mode is undefined
-     *
-     * @return array|PropelModelPager|ObjectCollection
+     * Backward compatibility, search() was before only usable for Propel loops.
      */
-    protected function search(ModelCriteria $search, &$pagination = null)
+    protected function search(ModelCriteria $search, PaginationInterface &$pagination = null): iterable
+    {
+        return $this->searchPropel($search, $pagination);
+    }
+
+    /**
+     * @throws \InvalidArgumentException if the search mode is undefined
+     */
+    protected function searchPropel(ModelCriteria $search, PaginationInterface &$pagination = null): iterable
     {
         if (false === $this->countable) {
             return $search->find();
@@ -371,10 +377,27 @@ abstract class BaseLoop implements LoopInterface
         $this->setupSearchContext($search);
 
         if ($this->getArgValue('page') !== null) {
-            return $this->searchWithPagination($search, $pagination);
+            $page = (int) $this->getArgValue('page');
+            $limit = (int) $this->getArgValue('limit');
+
+            $pagination = new PropelPagination($search->paginate($page, $limit));
+
+            if ($page > $pagination->getLastPage()) {
+                return new ObjectCollection();
+            }
+
+            return $pagination->getPropelPager();
         }
 
-        return $this->searchWithOffset($search);
+        $limit = (int) $this->getArgValue('limit');
+
+        if ($limit >= 0) {
+            $search->limit($limit);
+        }
+
+        $search->offset((int) $this->getArgValue('offset'));
+
+        return $search->find();
     }
 
     protected function setupSearchContext(ModelCriteria $search): void
@@ -408,7 +431,7 @@ abstract class BaseLoop implements LoopInterface
         }
     }
 
-    protected function searchArray(array $search)
+    protected function searchArray(array $search, PaginationInterface &$pagination = null): iterable
     {
         if (false === $this->countable) {
             return $search;
@@ -420,53 +443,41 @@ abstract class BaseLoop implements LoopInterface
         if ($this->getArgValue('page') !== null) {
             $pageNum = (int) $this->getArgValue('page');
 
+            $pagination = new ArrayPagination($pageNum, $limit, \count($search));
+
             $totalPageCount = ceil(\count($search) / $limit);
 
             if ($pageNum > $totalPageCount || $pageNum <= 0) {
                 return [];
             }
 
-            $firstItem = ($pageNum - 1) * $limit + 1;
+            $firstItem = (($pageNum - 1) * $limit + 1) - 1;
 
-            return \array_slice($search, $firstItem, $firstItem + $limit, false);
+            return \array_slice($search, $firstItem, $limit, false);
         }
 
         return \array_slice($search, $offset, $limit, false);
     }
 
-    /**
-     * @return ObjectCollection
-     */
-    protected function searchWithOffset(ModelCriteria $search)
+    protected function getResults(PaginationInterface &$pagination = null): iterable
     {
-        $limit = (int) $this->getArgValue('limit');
+        $results = [];
 
-        if ($limit >= 0) {
-            $search->limit($limit);
+        if ($this instanceof PropelSearchLoopInterface) {
+            $searchModelCriteria = $this->extendsBuildModelCriteria($this->buildModelCriteria());
+
+            if (null !== $searchModelCriteria) {
+                $results = $this->searchPropel($searchModelCriteria, $pagination);
+            }
+        } elseif ($this instanceof ArraySearchLoopInterface) {
+            $searchArray = $this->extendsBuildArray($this->buildArray());
+
+            if (null !== $searchArray) {
+                $results = $this->searchArray($searchArray, $pagination);
+            }
         }
 
-        $search->offset((int) $this->getArgValue('offset'));
-
-        return $search->find();
-    }
-
-    /**
-     * @param PropelModelPager|null $pagination
-     *
-     * @return array|PropelModelPager
-     */
-    protected function searchWithPagination(ModelCriteria $search, &$pagination)
-    {
-        $page = (int) $this->getArgValue('page');
-        $limit = (int) $this->getArgValue('limit');
-
-        $pagination = $search->paginate($page, $limit);
-
-        if ($page > $pagination->getLastPage()) {
-            return [];
-        }
-
-        return $pagination;
+        return $results;
     }
 
     public function count()
@@ -478,23 +489,19 @@ abstract class BaseLoop implements LoopInterface
         }
 
         $count = 0;
-        if ($this instanceof PropelSearchLoopInterface) {
-            $searchModelCriteria = $this->extendsBuildModelCriteria($this->buildModelCriteria());
 
-            if (null === $searchModelCriteria) {
-                $count = 0;
-            } else {
-                $this->setupSearchContext($searchModelCriteria);
+        if (($this instanceof PropelSearchLoopInterface)
+            && null !== $searchModelCriteria = $this->extendsBuildModelCriteria($this->buildModelCriteria())
+        ) {
+            $this->setupSearchContext($searchModelCriteria);
 
-                $count = $searchModelCriteria->count();
-            }
-        } elseif ($this instanceof ArraySearchLoopInterface) {
+            $count = $searchModelCriteria->count();
+        }
+
+        if ($this instanceof ArraySearchLoopInterface) {
             $searchArray = $this->extendsBuildArray($this->buildArray());
-            if (null === $searchArray) {
-                $count = 0;
-            } else {
-                $count = \count($searchArray);
-            }
+
+            $count = null === $searchArray ? 0 : \count($searchArray);
         }
 
         if ($isCaching) {
@@ -505,7 +512,7 @@ abstract class BaseLoop implements LoopInterface
     }
 
     /**
-     * @param PropelModelPager $pagination
+     * @param PaginationInterface $pagination
      *
      * @return LoopResult
      */
@@ -521,26 +528,7 @@ abstract class BaseLoop implements LoopInterface
             return self::$cacheLoopResult[$hash];
         }
 
-        $results = [];
-
-        if ($this instanceof PropelSearchLoopInterface) {
-            $searchModelCriteria = $this->extendsBuildModelCriteria($this->buildModelCriteria());
-
-            if (null !== $searchModelCriteria) {
-                $results = $this->search(
-                    $searchModelCriteria,
-                    $pagination
-                );
-            }
-        } elseif ($this instanceof ArraySearchLoopInterface) {
-            $searchArray = $this->extendsBuildArray($this->buildArray());
-
-            if (null !== $searchArray) {
-                $results = $this->searchArray($searchArray);
-            }
-        }
-
-        $loopResult = new LoopResult($results);
+        $loopResult = new LoopResult($this->getResults($pagination));
 
         if (true === $this->countable) {
             $loopResult->setCountable();
