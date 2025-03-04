@@ -51,7 +51,7 @@ use Thelia\Model\Map\FeatureProductTableMap;
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
-        'position'
+        'position',
     ]
 )]
 class FeatureProduct implements PropelResourceInterface

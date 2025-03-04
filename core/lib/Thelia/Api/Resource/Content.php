@@ -99,13 +99,13 @@ use Thelia\Model\Tools\UrlRewritingTrait;
     filterClass: BooleanFilter::class,
     properties: [
         'contentFolders.defaultFolder',
-        'visible'
+        'visible',
     ]
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
-        'position'
+        'position',
     ]
 )]
 class Content extends AbstractTranslatableResource

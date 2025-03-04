@@ -68,13 +68,13 @@ use Thelia\Model\Map\FeatureAvTableMap;
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
-        'position'
+        'position',
     ]
 )]
 #[ApiFilter(
     filterClass: NotInFilter::class,
     properties: [
-        'id'
+        'id',
     ]
 )]
 #[ApiFilter(
@@ -84,7 +84,7 @@ use Thelia\Model\Map\FeatureAvTableMap;
         'feature.id' => [
             'strategy' => 'exact',
             'fieldPath' => 'feature_av.feature_id',
-        ]
+        ],
     ]
 )]
 class FeatureAv extends AbstractTranslatableResource

@@ -102,13 +102,13 @@ use Thelia\Model\Map\CategoryDocumentTableMap;
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
-        'position'
+        'position',
     ]
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
-        'visible'
+        'visible',
     ]
 )]
 #[ApiFilter(

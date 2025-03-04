@@ -79,13 +79,13 @@ use Thelia\Model\Map\FolderDocumentTableMap;
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
-        'position'
+        'position',
     ]
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
-        'visible'
+        'visible',
     ]
 )]
 #[ApiFilter(

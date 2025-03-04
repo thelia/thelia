@@ -68,7 +68,7 @@ use Thelia\Model\Map\FeatureTableMap;
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
-        'position'
+        'position',
     ]
 )]
 #[ApiFilter(
@@ -81,7 +81,7 @@ use Thelia\Model\Map\FeatureTableMap;
     filterClass: SearchFilter::class,
     properties: [
         'id',
-        'title'
+        'title',
     ]
 )]
 #[ApiFilter(

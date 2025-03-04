@@ -125,9 +125,10 @@ class NewsLetter implements PropelResourceInterface
         return $this->firstname;
     }
 
-    public function setFirstname(?string $firstname): NewsLetter
+    public function setFirstname(?string $firstname): self
     {
         $this->firstname = $firstname;
+
         return $this;
     }
 
@@ -136,9 +137,10 @@ class NewsLetter implements PropelResourceInterface
         return $this->lastname;
     }
 
-    public function setLastname(?string $lastname): NewsLetter
+    public function setLastname(?string $lastname): self
     {
         $this->lastname = $lastname;
+
         return $this;
     }
 

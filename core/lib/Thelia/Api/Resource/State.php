@@ -72,7 +72,7 @@ use Thelia\Model\Map\StateTableMap;
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
-        'visible'
+        'visible',
     ]
 )]
 class State extends AbstractTranslatableResource

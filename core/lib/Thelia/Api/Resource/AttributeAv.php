@@ -70,7 +70,7 @@ use Thelia\Model\Map\AttributeAvTableMap;
     properties: [
         'title',
         'id',
-        'attribute.id'
+        'attribute.id',
     ]
 )]
 #[ApiFilter(
@@ -82,7 +82,7 @@ use Thelia\Model\Map\AttributeAvTableMap;
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
-        'position'
+        'position',
     ]
 )]
 class AttributeAv extends AbstractTranslatableResource

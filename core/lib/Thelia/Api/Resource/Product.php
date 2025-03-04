@@ -91,7 +91,7 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         'productSaleElements.productPrices.currency.id',
         'taxRule.id',
         'featureProducts.feature.id',
-        'featureProducts.featureAv.id'
+        'featureProducts.featureAv.id',
     ]
 )]
 #[ApiFilter(
@@ -102,7 +102,7 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         'productCategories.defaultCategory',
         'productSaleElements.isDefault',
         'productSaleElements.promo',
-        'productSaleElements.newness'
+        'productSaleElements.newness',
     ]
 )]
 #[ApiFilter(
@@ -122,7 +122,7 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         'id',
         'ref',
         'productCategories.category.id',
-        'taxRule.id'
+        'taxRule.id',
     ]
 )]
 #[ApiFilter(
@@ -409,9 +409,10 @@ class Product extends AbstractTranslatableResource
         return $this->productAssociatedContents;
     }
 
-    public function setProductAssociatedContents(array $productAssociatedContents): Product
+    public function setProductAssociatedContents(array $productAssociatedContents): self
     {
         $this->productAssociatedContents = $productAssociatedContents;
+
         return $this;
     }
 

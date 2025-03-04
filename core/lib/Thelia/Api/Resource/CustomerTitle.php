@@ -69,13 +69,13 @@ use Thelia\Model\Map\CustomerTitleTableMap;
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
-        'position'
+        'position',
     ]
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
-        'byDefault'
+        'byDefault',
     ]
 )]
 class CustomerTitle extends AbstractTranslatableResource

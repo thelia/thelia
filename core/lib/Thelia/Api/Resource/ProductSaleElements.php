@@ -81,7 +81,7 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
         'promo',
         'newness',
     ]
-)]//todo add visible filter from product
+)] // todo add visible filter from product
 class ProductSaleElements implements PropelResourceInterface
 {
     use PropelResourceTrait;

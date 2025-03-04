@@ -102,16 +102,15 @@ use Thelia\Model\Map\ContentDocumentTableMap;
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
-        'position'
+        'position',
     ]
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
-        'visible'
+        'visible',
     ]
 )]
-
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [

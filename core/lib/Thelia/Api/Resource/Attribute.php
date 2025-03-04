@@ -80,7 +80,7 @@ use Thelia\Model\Map\AttributeTableMap;
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
-        'position'
+        'position',
     ]
 )]
 class Attribute extends AbstractTranslatableResource

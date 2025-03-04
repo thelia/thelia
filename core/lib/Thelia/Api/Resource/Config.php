@@ -54,7 +54,7 @@ use Thelia\Model\Map\ConfigTableMap;
     filterClass: SearchFilter::class,
     properties: [
         'id',
-        'name'
+        'name',
     ]
 )]
 class Config extends AbstractTranslatableResource

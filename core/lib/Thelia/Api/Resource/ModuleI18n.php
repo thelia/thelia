@@ -27,13 +27,13 @@ class ModuleI18n extends I18n
     ])]
     protected ?string $title;
 
-    #[Groups([Module::GROUP_ADMIN_READ_SINGLE, Module::GROUP_FRONT_READ_SINGLE, Module::GROUP_ADMIN_WRITE, DeliveryModule::GROUP_FRONT_READ,PaymentModule::GROUP_FRONT_READ,])]
+    #[Groups([Module::GROUP_ADMIN_READ_SINGLE, Module::GROUP_FRONT_READ_SINGLE, Module::GROUP_ADMIN_WRITE, DeliveryModule::GROUP_FRONT_READ, PaymentModule::GROUP_FRONT_READ])]
     protected ?string $description;
 
-    #[Groups([Module::GROUP_ADMIN_READ_SINGLE, Module::GROUP_FRONT_READ_SINGLE, Module::GROUP_ADMIN_WRITE, DeliveryModule::GROUP_FRONT_READ,PaymentModule::GROUP_FRONT_READ,])]
+    #[Groups([Module::GROUP_ADMIN_READ_SINGLE, Module::GROUP_FRONT_READ_SINGLE, Module::GROUP_ADMIN_WRITE, DeliveryModule::GROUP_FRONT_READ, PaymentModule::GROUP_FRONT_READ])]
     protected ?string $chapo;
 
-    #[Groups([Module::GROUP_ADMIN_READ_SINGLE, Module::GROUP_FRONT_READ_SINGLE, Module::GROUP_ADMIN_WRITE, DeliveryModule::GROUP_FRONT_READ,PaymentModule::GROUP_FRONT_READ,])]
+    #[Groups([Module::GROUP_ADMIN_READ_SINGLE, Module::GROUP_FRONT_READ_SINGLE, Module::GROUP_ADMIN_WRITE, DeliveryModule::GROUP_FRONT_READ, PaymentModule::GROUP_FRONT_READ])]
     protected ?string $postscriptum;
 
     public function getTitle(): ?string

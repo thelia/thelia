@@ -66,21 +66,21 @@ use Thelia\Model\Map\CurrencyTableMap;
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
-        'position'
+        'position',
     ]
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
         'visible',
-        'byDefault'
+        'byDefault',
     ]
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
         'id',
-        'code'
+        'code',
     ]
 )]
 #[ApiFilter(

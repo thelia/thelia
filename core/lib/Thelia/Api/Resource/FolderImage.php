@@ -86,7 +86,7 @@ use Thelia\Model\Map\FolderImageTableMap;
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
-        'visible'
+        'visible',
     ]
 )]
 #[ApiFilter(

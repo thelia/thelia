@@ -89,7 +89,7 @@ use Thelia\Model\Map\CountryTableMap;
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
-        'visible'
+        'visible',
     ]
 )]
 class Country extends AbstractTranslatableResource

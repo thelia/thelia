@@ -43,7 +43,7 @@ use Thelia\Model\Map\ProductAssociatedContentTableMap;
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
-        'position'
+        'position',
     ]
 )]
 class ProductAssociatedContent implements PropelResourceInterface
@@ -57,7 +57,7 @@ class ProductAssociatedContent implements PropelResourceInterface
     public const GROUP_FRONT_READ = 'front:product_associated_content:read';
     public const GROUP_FRONT_READ_SINGLE = 'front:product_associated_content:read:single';
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Product::GROUP_FRONT_READ_SINGLE,Product::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Product::GROUP_FRONT_READ_SINGLE, Product::GROUP_FRONT_READ_SINGLE])]
     public ?int $id = null;
 
     #[Relation(targetResource: Product::class)]
@@ -65,7 +65,7 @@ class ProductAssociatedContent implements PropelResourceInterface
     public Product $product;
 
     #[Relation(targetResource: Content::class)]
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE, Product::GROUP_FRONT_READ_SINGLE,Product::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE, Product::GROUP_FRONT_READ_SINGLE, Product::GROUP_FRONT_READ_SINGLE])]
     public Content $content;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]

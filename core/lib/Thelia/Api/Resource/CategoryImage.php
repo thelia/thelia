@@ -118,7 +118,7 @@ use Thelia\Model\Map\CategoryImageTableMap;
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
-        'visible'
+        'visible',
     ]
 )]
 class CategoryImage extends AbstractTranslatableResource implements ItemFileResourceInterface

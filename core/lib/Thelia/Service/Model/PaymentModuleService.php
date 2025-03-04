@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Service\Model;
 
 use OpenApi\Events\OpenApiEvents;
@@ -20,11 +30,10 @@ use Thelia\Module\BaseModule;
 readonly class PaymentModuleService
 {
     public function __construct(
-        private Request                  $request,
+        private Request $request,
         private EventDispatcherInterface $dispatcher,
-        private ContainerInterface       $container,
-    )
-    {
+        private ContainerInterface $container,
+    ) {
     }
 
     public function getPaymentModules($moduleId = null): array
@@ -48,18 +57,17 @@ readonly class PaymentModuleService
         // Return formatted valid payment
         return
             array_map(
-                fn($module) => $this->getPaymentModule($dispatcher, $module, $cart, $lang),
+                fn ($module) => $this->getPaymentModule($dispatcher, $module, $cart, $lang),
                 iterator_to_array($modules)
             );
     }
 
     protected function getPaymentModule(
         EventDispatcherInterface $dispatcher,
-        Module                   $paymentModule,
-        Cart                     $cart,
-        Lang                     $lang
-    ): PaymentModule
-    {
+        Module $paymentModule,
+        Cart $cart,
+        Lang $lang
+    ): PaymentModule {
         $paymentModule->setLocale($lang->getLocale());
         $moduleInstance = $paymentModule->getPaymentModuleInstance($this->container);
 
@@ -89,7 +97,6 @@ readonly class PaymentModuleService
 
             $paymentModuleApi
                 ->setOptionGroups($paymentModuleOptionEvent->getPaymentModuleOptionGroups());
-
         }
         foreach ($paymentModule->getModuleI18ns() as $i18n) {
             $paymentModuleApi->addI18n(new ModuleI18n($i18n->toArray()), $i18n->getLocale());

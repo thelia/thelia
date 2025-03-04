@@ -66,16 +66,15 @@ use Thelia\Model\Map\LangTableMap;
     properties: [
         'visible',
         'active',
-        'byDefault'
+        'byDefault',
     ]
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
-        'position'
+        'position',
     ]
 )]
-
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
@@ -86,7 +85,7 @@ use Thelia\Model\Map\LangTableMap;
 #[ApiFilter(
     filterClass: NotInFilter::class,
     properties: [
-        'id'
+        'id',
     ]
 )]
 class Lang implements PropelResourceInterface

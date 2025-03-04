@@ -197,7 +197,7 @@ class Address implements PropelResourceInterface
     public ?State $state;
 
     #[Relation(targetResource: Customer::class)]
-    #[Groups(groups: [self::GROUP_ADMIN_READ,self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_WRITE])]
+    #[Groups(groups: [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_WRITE])]
     public Customer $customer;
 
     #[Relation(targetResource: CustomerTitle::class)]

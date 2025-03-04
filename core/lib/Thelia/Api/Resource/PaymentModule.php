@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -78,9 +88,10 @@ class PaymentModule extends AbstractTranslatableResource
         return $this->code;
     }
 
-    public function setCode(string $code): PaymentModule
+    public function setCode(string $code): self
     {
         $this->code = $code;
+
         return $this;
     }
 
@@ -89,9 +100,10 @@ class PaymentModule extends AbstractTranslatableResource
         return $this->id;
     }
 
-    public function setId(?int $id): PaymentModule
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -100,9 +112,10 @@ class PaymentModule extends AbstractTranslatableResource
         return $this->images;
     }
 
-    public function setImages(array $images): PaymentModule
+    public function setImages(array $images): self
     {
         $this->images = $images;
+
         return $this;
     }
 
@@ -111,9 +124,10 @@ class PaymentModule extends AbstractTranslatableResource
         return $this->maximumAmount;
     }
 
-    public function setMaximumAmount(?float $maximumAmount): PaymentModule
+    public function setMaximumAmount(?float $maximumAmount): self
     {
         $this->maximumAmount = $maximumAmount;
+
         return $this;
     }
 
@@ -122,9 +136,10 @@ class PaymentModule extends AbstractTranslatableResource
         return $this->minimumAmount;
     }
 
-    public function setMinimumAmount(?float $minimumAmount): PaymentModule
+    public function setMinimumAmount(?float $minimumAmount): self
     {
         $this->minimumAmount = $minimumAmount;
+
         return $this;
     }
 
@@ -133,9 +148,10 @@ class PaymentModule extends AbstractTranslatableResource
         return $this->optionGroups;
     }
 
-    public function setOptionGroups(array $optionGroups): PaymentModule
+    public function setOptionGroups(array $optionGroups): self
     {
         $this->optionGroups = $optionGroups;
+
         return $this;
     }
 
@@ -144,15 +160,15 @@ class PaymentModule extends AbstractTranslatableResource
         return $this->valid;
     }
 
-    public function setValid(?bool $valid): PaymentModule
+    public function setValid(?bool $valid): self
     {
         $this->valid = $valid;
+
         return $this;
     }
 
-
-
-    #[Ignore] public static function getPropelRelatedTableMap(): ?TableMap
+    #[Ignore]
+    public static function getPropelRelatedTableMap(): ?TableMap
     {
         return new ModuleTableMap();
     }

@@ -102,7 +102,7 @@ use Thelia\Model\Map\BrandDocumentTableMap;
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
-        'position'
+        'position',
     ]
 )]
 #[ApiFilter(

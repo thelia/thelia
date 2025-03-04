@@ -63,7 +63,6 @@ use Thelia\Model\Map\OrderCouponTableMap;
         ],
     ]
 )]
-
 class OrderCoupon implements PropelResourceInterface
 {
     use PropelResourceTrait;

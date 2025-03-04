@@ -67,7 +67,7 @@ use Thelia\Model\Map\ModuleTableMap;
         'id',
         'category' => 'exact',
         'type' => 'exact',
-        'code'
+        'code',
     ]
 )]
 #[ApiFilter(
@@ -83,7 +83,7 @@ use Thelia\Model\Map\ModuleTableMap;
     properties: [
         'activate',
         'hidden',
-        'mandatory'
+        'mandatory',
     ]
 )]
 class Module extends AbstractTranslatableResource

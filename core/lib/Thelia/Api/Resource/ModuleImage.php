@@ -109,7 +109,7 @@ use Thelia\Model\Map\ModuleImageTableMap;
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
-        'visible'
+        'visible',
     ]
 )]
 #[ApiFilter(
