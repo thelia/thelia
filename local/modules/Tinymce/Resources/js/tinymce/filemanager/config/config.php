@@ -64,7 +64,11 @@ if (file_exists(__DIR__.'/../../../../../../../../bootstrap.php')) {
     require_once __DIR__.'/../../../../vendor/autoload.php';
 }
 
-(new \Symfony\Component\Dotenv\Dotenv())->bootEnv(__DIR__.'/../../../../../../../../.env');
+if (file_exists(__DIR__.'/../../../../../../../../.env')) {
+    (new \Symfony\Component\Dotenv\Dotenv())->bootEnv(__DIR__ . '/../../../../../../../../.env');
+} elseif (file_exists(__DIR__.'/../../../../.env')) {
+    (new \Symfony\Component\Dotenv\Dotenv())->bootEnv(__DIR__ . '/../../../../.env');
+}
 
 $thelia = new App\Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
 $request = Request::createFromGlobals();
