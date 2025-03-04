@@ -42,7 +42,7 @@ jobs:
         id: composercache
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"
       - name: Cache composer dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4  #https://github.com/actions/cache
         with:
           path: ${{ steps.composercache.outputs.dir }}
           # Use composer.json for key, if composer.lock is not committed.
