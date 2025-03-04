@@ -22,7 +22,9 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
+use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\CategoryTableMap;
 use Thelia\Model\Tools\UrlRewritingTrait;
@@ -68,6 +70,7 @@ use Thelia\Model\Tools\UrlRewritingTrait;
     filterClass: NotInFilter::class,
     properties: [
         'id',
+        'parent',
     ]
 )]
 #[ApiFilter(
@@ -75,6 +78,18 @@ use Thelia\Model\Tools\UrlRewritingTrait;
     properties: [
         'id',
         'parent',
+    ]
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'position',
+    ]
+)]
+#[ApiFilter(
+    filterClass: BooleanFilter::class,
+    properties: [
+        'visible',
     ]
 )]
 class Category extends AbstractTranslatableResource

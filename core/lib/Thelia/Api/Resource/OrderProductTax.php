@@ -12,9 +12,11 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
@@ -22,10 +24,14 @@ use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\OrderProductTaxTableMap;
 
 #[ApiResource(
     operations: [
+        new GetCollection(
+            uriTemplate: '/admin/order_product_taxes'
+        ),
         new Post(
             uriTemplate: '/admin/order_product_taxes'
         ),
@@ -45,6 +51,16 @@ use Thelia\Model\Map\OrderProductTaxTableMap;
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
     denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+)]
+#[ApiFilter(
+    filterClass: SearchFilter::class,
+    properties: [
+        'id',
+        'orderProduct.id' => [
+            'strategy' => 'exact',
+            'fieldPath' => 'order_product_tax.order_product_id',
+        ],
+    ]
 )]
 class OrderProductTax implements PropelResourceInterface
 {

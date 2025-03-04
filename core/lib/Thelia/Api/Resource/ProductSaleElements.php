@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 
@@ -73,6 +74,14 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
         ],
     ]
 )]
+#[ApiFilter(
+    filterClass: BooleanFilter::class,
+    properties: [
+        'isDefault',
+        'promo',
+        'newness',
+    ]
+)] // todo add visible filter from product
 class ProductSaleElements implements PropelResourceInterface
 {
     use PropelResourceTrait;

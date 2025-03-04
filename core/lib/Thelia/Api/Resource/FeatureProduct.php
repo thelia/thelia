@@ -12,11 +12,13 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Model\Map\FeatureProductTableMap;
 
 #[ApiResource(
@@ -45,6 +47,12 @@ use Thelia\Model\Map\FeatureProductTableMap;
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'position',
+    ]
 )]
 class FeatureProduct implements PropelResourceInterface
 {

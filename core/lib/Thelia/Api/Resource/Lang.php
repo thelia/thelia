@@ -23,6 +23,9 @@ use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
+use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
+use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
+use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\LangTableMap;
 
 #[ApiResource(
@@ -63,6 +66,26 @@ use Thelia\Model\Map\LangTableMap;
     properties: [
         'visible',
         'active',
+        'byDefault',
+    ]
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'position',
+    ]
+)]
+#[ApiFilter(
+    filterClass: SearchFilter::class,
+    properties: [
+        'id',
+        'code',
+    ]
+)]
+#[ApiFilter(
+    filterClass: NotInFilter::class,
+    properties: [
+        'id',
     ]
 )]
 class Lang implements PropelResourceInterface

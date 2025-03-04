@@ -29,7 +29,9 @@ final class BooleanFilter extends AbstractFilter
         }
 
         $fieldPath = $this->getPropertyQueryPath($query, $property, $context);
-
+        if (\is_array($this->properties[$property])) {
+            $fieldPath = $this->properties[$property]['fieldPath'];
+        }
         $query->where($fieldPath.' = ?', filter_var($value, \FILTER_VALIDATE_BOOLEAN));
     }
 

@@ -12,6 +12,7 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -25,6 +26,9 @@ use Propel\Runtime\Map\TableMap;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
+use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
+use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Api\Controller\Admin\BinaryFileController;
 use Thelia\Api\Controller\Admin\PostItemFileController;
 use Thelia\Model\Map\FolderDocumentTableMap;
@@ -71,6 +75,28 @@ use Thelia\Model\Map\FolderDocumentTableMap;
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
     denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'position',
+    ]
+)]
+#[ApiFilter(
+    filterClass: BooleanFilter::class,
+    properties: [
+        'visible',
+    ]
+)]
+#[ApiFilter(
+    filterClass: SearchFilter::class,
+    properties: [
+        'id',
+        'folder.id' => [
+            'strategy' => 'exact',
+            'fieldPath' => 'folder_document.folder_id',
+        ],
+    ]
 )]
 class FolderDocument extends AbstractTranslatableResource implements ItemFileResourceInterface
 {

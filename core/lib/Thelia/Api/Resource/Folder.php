@@ -22,6 +22,9 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
+use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
+use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\FolderTableMap;
 use Thelia\Model\Tools\UrlRewritingTrait;
@@ -67,6 +70,25 @@ use Thelia\Model\Tools\UrlRewritingTrait;
     filterClass: SearchFilter::class,
     properties: [
         'id',
+        'parent',
+    ]
+)]
+#[ApiFilter(
+    filterClass: NotInFilter::class,
+    properties: [
+        'id',
+    ]
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'position',
+    ]
+)]
+#[ApiFilter(
+    filterClass: BooleanFilter::class,
+    properties: [
+        'visible',
     ]
 )]
 class Folder extends AbstractTranslatableResource
@@ -90,7 +112,7 @@ class Folder extends AbstractTranslatableResource
     public ?int $id = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
-    public bool $parent;
+    public int $parent;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public bool $visible;

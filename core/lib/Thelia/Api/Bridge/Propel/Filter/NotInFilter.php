@@ -39,7 +39,7 @@ class NotInFilter extends AbstractFilter
         Operation $operation = null,
         array $context = []
     ): void {
-        if (!$this->isPropertyEnabled($property, $resourceClass)) {
+        if (!isset($context['filters']['not_in']) || !$this->isPropertyEnabled($property, $resourceClass)) {
             return;
         }
         if (\is_string($value)) {

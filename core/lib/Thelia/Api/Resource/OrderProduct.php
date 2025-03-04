@@ -26,6 +26,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Type;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\Map\OrderProductTableMap;
@@ -33,6 +34,9 @@ use Thelia\Model\ProductQuery;
 
 #[ApiResource(
     operations: [
+        new GetCollection(
+            uriTemplate: '/admin/order_products'
+        ),
         new Post(
             uriTemplate: '/admin/order_products'
         ),
@@ -70,6 +74,7 @@ use Thelia\Model\ProductQuery;
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
+        'id',
         'productSaleElementsId' => 'exact',
         'productSaleElementsRef' => 'exact',
         'productRef' => 'exact',
@@ -77,6 +82,12 @@ use Thelia\Model\ProductQuery;
             'strategy' => 'exact',
             'fieldPath' => 'order_product.order_id',
         ],
+    ]
+)]
+#[ApiFilter(
+    filterClass: BooleanFilter::class,
+    properties: [
+        'virtual',
     ]
 )]
 class OrderProduct implements PropelResourceInterface

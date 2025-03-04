@@ -21,6 +21,8 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
+use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\ModuleTableMap;
@@ -62,15 +64,27 @@ use Thelia\Model\Map\ModuleTableMap;
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
+        'id',
         'category' => 'exact',
         'type' => 'exact',
-        'activate' => 'exact',
-        'hidden' => 'exact',
+        'code',
     ]
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: ['position']
+)]
+#[ApiFilter(
+    filterClass: NotInFilter::class,
+    properties: ['id']
+)]
+#[ApiFilter(
+    filterClass: BooleanFilter::class,
+    properties: [
+        'activate',
+        'hidden',
+        'mandatory',
+    ]
 )]
 class Module extends AbstractTranslatableResource
 {

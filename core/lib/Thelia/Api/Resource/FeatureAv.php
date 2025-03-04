@@ -12,6 +12,7 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -22,6 +23,9 @@ use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
+use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
+use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\FeatureAvTableMap;
 
 #[ApiResource(
@@ -60,6 +64,28 @@ use Thelia\Model\Map\FeatureAvTableMap;
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'position',
+    ]
+)]
+#[ApiFilter(
+    filterClass: NotInFilter::class,
+    properties: [
+        'id',
+    ]
+)]
+#[ApiFilter(
+    filterClass: SearchFilter::class,
+    properties: [
+        'id',
+        'feature.id' => [
+            'strategy' => 'exact',
+            'fieldPath' => 'feature_av.feature_id',
+        ],
+    ]
 )]
 class FeatureAv extends AbstractTranslatableResource
 {

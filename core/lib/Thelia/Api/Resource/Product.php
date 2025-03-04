@@ -33,6 +33,7 @@ use Thelia\Api\Bridge\Propel\Filter\CustomFilters\ProductFilter\ProductPriceOrde
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\TheliaFilter;
 use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
+use Thelia\Api\Bridge\Propel\Filter\RangeFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Api\Bridge\Propel\Validator\I18nConstraint;
 use Thelia\Core\Translation\Translator;
@@ -85,6 +86,12 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         'ref',
         'productCategories.category.id',
         'title' => 'word_start',
+        'brand.id',
+        'productAssociatedContents.content.id',
+        'productSaleElements.productPrices.currency.id',
+        'taxRule.id',
+        'featureProducts.feature.id',
+        'featureProducts.featureAv.id',
     ]
 )]
 #[ApiFilter(
@@ -93,6 +100,9 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         'visible',
         'virtual',
         'productCategories.defaultCategory',
+        'productSaleElements.isDefault',
+        'productSaleElements.promo',
+        'productSaleElements.newness',
     ]
 )]
 #[ApiFilter(
@@ -111,6 +121,8 @@ use Thelia\Model\Tools\UrlRewritingTrait;
     properties: [
         'id',
         'ref',
+        'productCategories.category.id',
+        'taxRule.id',
     ]
 )]
 #[ApiFilter(
@@ -118,6 +130,15 @@ use Thelia\Model\Tools\UrlRewritingTrait;
 )]
 #[ApiFilter(
     filterClass: DepthProductFilter::class,
+)]
+#[ApiFilter(
+    filterClass: RangeFilter::class,
+    properties: [
+        'productSaleElements.productPrices.price',
+        'productSaleElements.productPrices.promoPrice',
+        'productSaleElements.weight',
+        'productSaleElements.quantity',
+    ]
 )]
 class Product extends AbstractTranslatableResource
 {
@@ -205,6 +226,10 @@ class Product extends AbstractTranslatableResource
     #[Relation(targetResource: FeatureProduct::class)]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     public array $featureProducts;
+
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    #[Relation(targetResource: ProductAssociatedContent::class)]
+    public array $productAssociatedContents;
 
     #[I18nConstraint(groups: [self::GROUP_ADMIN_WRITE])]
     #[Groups([
@@ -375,6 +400,18 @@ class Product extends AbstractTranslatableResource
     public function setFeatureProducts(array $featureProducts): self
     {
         $this->featureProducts = $featureProducts;
+
+        return $this;
+    }
+
+    public function getProductAssociatedContents(): array
+    {
+        return $this->productAssociatedContents;
+    }
+
+    public function setProductAssociatedContents(array $productAssociatedContents): self
+    {
+        $this->productAssociatedContents = $productAssociatedContents;
 
         return $this;
     }

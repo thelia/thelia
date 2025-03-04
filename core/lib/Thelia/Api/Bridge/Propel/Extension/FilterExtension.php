@@ -58,5 +58,8 @@ class FilterExtension implements QueryCollectionExtensionInterface
             $context['filters'] ??= [];
             $orderFilter->apply($query, $resourceClass, $operation, $context);
         }
+        if (\is_callable([$query, 'groupById'])) {
+            $query->groupById();
+        }
     }
 }

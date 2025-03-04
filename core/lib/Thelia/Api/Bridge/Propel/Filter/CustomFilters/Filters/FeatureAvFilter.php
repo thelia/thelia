@@ -17,9 +17,9 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoiceFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
+use Thelia\Model\Feature;
 use Thelia\Model\FeatureAvQuery;
 use Thelia\Model\Map\FeatureProductTableMap;
-use Thelia\Model\Feature;
 
 class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterface
 {
@@ -35,7 +35,7 @@ class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterf
 
     public function filter(ModelCriteria $query, $value): void
     {
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             $value = [$value];
         }
         $count = FeatureAvQuery::create()

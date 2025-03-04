@@ -22,6 +22,8 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
+use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\AttributeTableMap;
 
@@ -66,6 +68,19 @@ use Thelia\Model\Map\AttributeTableMap;
     filterClass: SearchFilter::class,
     properties: [
         'title' => 'exact',
+        'id',
+    ]
+)]
+#[ApiFilter(
+    filterClass: NotInFilter::class,
+    properties: [
+        'id',
+    ]
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'position',
     ]
 )]
 class Attribute extends AbstractTranslatableResource

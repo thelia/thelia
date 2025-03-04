@@ -22,6 +22,8 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
+use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\CustomerTitleTableMap;
 
@@ -62,6 +64,18 @@ use Thelia\Model\Map\CustomerTitleTableMap;
     filterClass: SearchFilter::class,
     properties: [
         'id' => 'exact',
+    ]
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'position',
+    ]
+)]
+#[ApiFilter(
+    filterClass: BooleanFilter::class,
+    properties: [
+        'byDefault',
     ]
 )]
 class CustomerTitle extends AbstractTranslatableResource

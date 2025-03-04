@@ -28,6 +28,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Core\Translation\Translator;
@@ -82,6 +83,7 @@ use Thelia\Model\Map\CustomerTableMap;
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
+        'id',
         'ref',
         'firstname',
         'lastname',
@@ -91,6 +93,14 @@ use Thelia\Model\Map\CustomerTableMap;
     filterClass: OrderFilter::class,
     properties: [
         'createdAt',
+        'firstname',
+        'lastname',
+    ]
+)]
+#[ApiFilter(
+    filterClass: BooleanFilter::class,
+    properties: [
+        'reseller',
     ]
 )]
 class Customer implements PropelResourceInterface
@@ -106,7 +116,7 @@ class Customer implements PropelResourceInterface
     public const GROUP_FRONT_WRITE = 'front:customer:write';
 
     #[Groups([self::GROUP_ADMIN_READ,
-        Address::GROUP_ADMIN_READ_SINGLE,
+        Address::GROUP_ADMIN_READ,
         Order::GROUP_ADMIN_READ,
         Cart::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,

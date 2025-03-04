@@ -27,6 +27,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\DateFilter;
+use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\RangeFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
@@ -74,6 +75,7 @@ use Thelia\Model\OrderQuery;
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
+        'id',
         'invoiceOrderAddress.firstname' => 'partial',
         'invoiceOrderAddress.lastname' => 'partial',
         'invoiceOrderAddress.company' => 'partial',
@@ -83,6 +85,12 @@ use Thelia\Model\OrderQuery;
         'ref' => 'partial',
         'orderStatus.code',
         'customer.id' => 'exact',
+    ]
+)]
+#[ApiFilter(
+    filterClass: NotInFilter::class,
+    properties: [
+        'orderStatus.code',
     ]
 )]
 #[ApiFilter(

@@ -27,7 +27,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
+use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Api\Controller\Admin\BinaryFileController;
 use Thelia\Api\Controller\Admin\PostItemFileController;
 use Thelia\Model\Map\FolderImageTableMap;
@@ -79,6 +81,22 @@ use Thelia\Model\Map\FolderImageTableMap;
     filterClass: OrderFilter::class,
     properties: [
         'position',
+    ]
+)]
+#[ApiFilter(
+    filterClass: BooleanFilter::class,
+    properties: [
+        'visible',
+    ]
+)]
+#[ApiFilter(
+    filterClass: SearchFilter::class,
+    properties: [
+        'id',
+        'folder.id' => [
+            'strategy' => 'exact',
+            'fieldPath' => 'folder_image.folder_id',
+        ],
     ]
 )]
 class FolderImage extends AbstractTranslatableResource implements ItemFileResourceInterface

@@ -23,6 +23,9 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
+use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\BrandTableMap;
 use Thelia\Model\Tools\UrlRewritingTrait;
@@ -68,6 +71,20 @@ use Thelia\Model\Tools\UrlRewritingTrait;
     filterClass: SearchFilter::class,
     properties: [
         'id',
+        'products.id',
+        'title',
+    ]
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'position',
+    ]
+)]
+#[ApiFilter(
+    filterClass: BooleanFilter::class,
+    properties: [
+        'visible',
     ]
 )]
 class Brand extends AbstractTranslatableResource
@@ -93,6 +110,10 @@ class Brand extends AbstractTranslatableResource
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public bool $visible;
+
+    #[Relation(targetResource: Product::class)]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public array $products;
 
     #[Groups([
         self::GROUP_ADMIN_READ,

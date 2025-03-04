@@ -27,6 +27,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
+use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Map\AddressTableMap;
@@ -86,8 +88,21 @@ use Thelia\Model\Map\AddressTableMap;
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
+        'id',
         'label',
-        'customer.id' => 'exact',
+        'customer.id',
+    ]
+)]
+#[ApiFilter(
+    filterClass: NotInFilter::class,
+    properties: [
+        'id',
+    ]
+)]
+#[ApiFilter(
+    filterClass: BooleanFilter::class,
+    properties: [
+        'isDefault',
     ]
 )]
 class Address implements PropelResourceInterface
@@ -182,7 +197,7 @@ class Address implements PropelResourceInterface
     public ?State $state;
 
     #[Relation(targetResource: Customer::class)]
-    #[Groups(groups: [self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_WRITE])]
+    #[Groups(groups: [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_WRITE])]
     public Customer $customer;
 
     #[Relation(targetResource: CustomerTitle::class)]

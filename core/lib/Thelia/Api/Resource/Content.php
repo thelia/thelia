@@ -24,6 +24,8 @@ use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
+use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
+use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\ContentTableMap;
 use Thelia\Model\Tools\UrlRewritingTrait;
@@ -80,9 +82,30 @@ use Thelia\Model\Tools\UrlRewritingTrait;
     ]
 )]
 #[ApiFilter(
+    filterClass: NotInFilter::class,
+    properties: [
+        'id',
+        'contentFolders.folder.id' => [
+            'strategy' => 'exact',
+            'fieldPath' => 'content_folder.folder_id',
+        ],
+        'contentFolders.content.id' => [
+            'strategy' => 'exact',
+            'fieldPath' => 'content_folder.content_id',
+        ],
+    ]
+)]
+#[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
         'contentFolders.defaultFolder',
+        'visible',
+    ]
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'position',
     ]
 )]
 class Content extends AbstractTranslatableResource
@@ -105,6 +128,8 @@ class Content extends AbstractTranslatableResource
         ContentImage::GROUP_FRONT_READ_SINGLE,
         ContentDocument::GROUP_ADMIN_READ_SINGLE,
         ProductAssociatedContent::GROUP_ADMIN_READ,
+        Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
     ])]
     public ?int $id = null;
 
