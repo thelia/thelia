@@ -17,6 +17,7 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Thelia\Core\Event\Hook\HookRenderBlockEvent;
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
+use Thelia\Log\Tlog;
 
 /**
  * Class AdminHook.
@@ -102,10 +103,12 @@ class AdminHook extends BaseHook
     private function getGithubReleases(): array
     {
         $cachedReleases = $this->theliaCache->getItem('thelia_github_releases');
+
         if (!$cachedReleases->isHit()) {
             try {
                 $resource = curl_init();
 
+                curl_setopt($resource, \CURLOPT_TIMEOUT, 5);
                 curl_setopt($resource, \CURLOPT_URL, 'https://api.github.com/repos/thelia/thelia/releases');
                 curl_setopt($resource, \CURLOPT_RETURNTRANSFER, 1);
                 curl_setopt($resource, \CURLOPT_HTTPHEADER, ['accept: application/vnd.github.v3+json']);
@@ -117,13 +120,19 @@ class AdminHook extends BaseHook
 
                 $theliaReleases = json_decode($results, true);
 
-                $publishedAtSort = function ($a, $b) {return (new \DateTime($a['published_at'])) < (new \DateTime($b['published_at'])); };
+                $publishedAtSort = function ($a, $b) {
+                    return (new \DateTime($a['published_at'])) < (new \DateTime($b['published_at']));
+                };
 
-                $stableReleases = array_filter($theliaReleases, function ($theliaRelease) { return !$theliaRelease['prerelease']; });
+                $stableReleases = array_filter($theliaReleases, static function ($theliaRelease) {
+                    return !$theliaRelease['prerelease'];
+                });
                 usort($stableReleases, $publishedAtSort);
                 $latestStableRelease = $stableReleases[0] ?? null;
 
-                $preReleases = array_filter($theliaReleases, function ($theliaRelease) { return $theliaRelease['prerelease']; });
+                $preReleases = array_filter($theliaReleases, static function ($theliaRelease) {
+                    return $theliaRelease['prerelease'];
+                });
                 usort($preReleases, $publishedAtSort);
                 $latestPreRelease = $preReleases[0] ?? null;
 
@@ -131,21 +140,34 @@ class AdminHook extends BaseHook
                 if (version_compare($latestPreRelease['tag_name'], $latestStableRelease['tag_name'], '<')) {
                     $latestPreRelease = null;
                 }
-            } catch (\Exception $exception) {
-                $latestPreRelease = null;
-                $latestStableRelease = null;
-            }
 
-            $cachedReleases->expiresAfter(3600);
-            $cachedReleases->set(
-                [
-                    'latestStableRelease' => $latestStableRelease,
-                    'latestPreRelease' => $latestPreRelease,
-                ]
-            );
-            $this->theliaCache->save($cachedReleases);
+                $cachedReleases->expiresAfter(3600);
+                $cachedReleases->set(
+                    [
+                        'latestStableRelease' => $latestStableRelease,
+                        'latestPreRelease' => $latestPreRelease,
+                    ]
+                );
+
+                $this->theliaCache->save($cachedReleases);
+
+                return $cachedReleases->get();
+            } catch (\Throwable $exception) {
+                Tlog::getInstance()->warning(
+                    'Failed to get current Thelia version from Github : '.$exception->getMessage()
+                );
+            }
         }
 
-        return $cachedReleases->get();
+        return [
+            'latestStableRelease' => [
+                'html_url' => '#',
+                'tag_name' => 'N/A',
+            ],
+            'latestPreRelease' => [
+                'html_url' => '#',
+                'tag_name' => 'N/A',
+            ],
+        ];
     }
 }
