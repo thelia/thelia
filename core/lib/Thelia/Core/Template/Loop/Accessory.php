@@ -76,7 +76,7 @@ class Accessory extends Product
             $this->args->get('order')->setValue(implode(',', $order));
         }
 
-        $accessories = $this->search($search);
+        $accessories = $this->searchPropel($search);
 
         $accessoryIdList = [0];
         $this->accessoryPosition = $this->accessoryId = [];

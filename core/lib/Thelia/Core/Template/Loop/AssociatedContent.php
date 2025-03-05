@@ -116,7 +116,7 @@ class AssociatedContent extends Content
             $this->args->get('order')->setValue(implode(',', $order));
         }
 
-        $associatedContents = $this->search($search);
+        $associatedContents = $this->searchPropel($search);
 
         $associatedContentIdList = [0];
 
