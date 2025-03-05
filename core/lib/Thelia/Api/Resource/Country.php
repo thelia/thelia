@@ -26,14 +26,15 @@ use Thelia\Model\Map\CountryTableMap;
 
 #[ApiResource(
     operations: [
-        new Post(
+        new GetCollection(
             uriTemplate: '/admin/countries'
         ),
-        new GetCollection(
+        new Post(
             uriTemplate: '/admin/countries'
         ),
         new Get(
             uriTemplate: '/admin/countries/{id}',
+            uriVariables: ['id'],
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Get(
@@ -42,16 +43,12 @@ use Thelia\Model\Map\CountryTableMap;
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/countries/{id}'
+            uriTemplate: '/admin/countries/{id}',
+            uriVariables: ['id']
         ),
         new Delete(
-            uriTemplate: '/admin/countries/{id}'
-        ),
-    ],
-    uriVariables: [
-        'id' => new Link(
-            fromClass: Country::class,
-            identifiers: ['id']
+            uriTemplate: '/admin/countries/{id}',
+            uriVariables: ['id']
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
