@@ -42,7 +42,7 @@
                                         current_order=$orders_order
                                         order='id'
                                         reverse_order='id-reverse'
-                                        path={url path='/admin/orders'}
+                                        path={url path='/admin/orders' status=$view_status}
                                         request_parameter_name='orders_order'
                                         label="{intl l='ID'}"
                                     } </th>
@@ -52,7 +52,7 @@
                                         current_order=$orders_order
                                         order='reference'
                                         reverse_order='reference-reverse'
-                                        path={url path='/admin/orders'}
+                                        path={url path='/admin/orders' status=$view_status}
                                         request_parameter_name='orders_order'
                                         label="{intl l='Reference'}"
                                     } </th>
@@ -62,7 +62,7 @@
                                         current_order=$orders_order
                                         order='create-date'
                                         reverse_order='create-date-reverse'
-                                        path={url path='/admin/orders'}
+                                        path={url path='/admin/orders' status=$view_status}
                                         request_parameter_name='orders_order'
                                         label="{intl l='Date & Hour'}"
                                     } </th>
@@ -72,7 +72,7 @@
                                         current_order=$orders_order
                                         order='company'
                                         reverse_order='company-reverse'
-                                        path={url path='/admin/orders'}
+                                        path={url path='/admin/orders' status=$view_status}
                                         request_parameter_name='orders_order'
                                         label="{intl l='Company'}"
                                     } </th>
@@ -82,7 +82,7 @@
                                         current_order=$orders_order
                                         order='customer-name'
                                         reverse_order='customer-name-reverse'
-                                        path={url path='/admin/orders'}
+                                        path={url path='/admin/orders' status=$view_status}
                                         request_parameter_name='orders_order'
                                         label="{intl l='Cutomer Name'}"
                                      } </th>
@@ -94,7 +94,7 @@
                                         current_order=$orders_order
                                         order='status'
                                         reverse_order='status-reverse'
-                                        path={url path='/admin/orders'}
+                                        path={url path='/admin/orders' status=$view_status}
                                         request_parameter_name='orders_order'
                                         label="{intl l='Status'}"
                                     } </th>
