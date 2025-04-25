@@ -314,7 +314,7 @@ abstract class BaseController implements ControllerInterface
             $eventDispatcher->dispatch($pdfEvent, TheliaEvents::GENERATE_PDF);
 
             if ($pdfEvent->hasPdf()) {
-                return $this->pdfResponse($pdfEvent->getPdf(), $order->getRef(), 200, $browser);
+                return $this->pdfResponse($pdfEvent->getPdf(), $pdfEvent->getFileName(), 200, $browser);
             }
         } catch (\Exception $e) {
             Tlog::getInstance()->error(
