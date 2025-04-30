@@ -279,13 +279,11 @@ class ImageEvent extends CachedFileEvent
     /**
      * Pass true to get image data in the event after processing.
      * Warning: it could consume some memory and take some time!
-     *
-     * @param bool $loadImageDataInEvent
-     * @return $this
      */
     public function setLoadImageDataInEvent($loadImageDataInEvent): self
     {
         $this->loadImageDataInEvent = $loadImageDataInEvent;
+
         return $this;
     }
 }
