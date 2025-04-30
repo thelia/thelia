@@ -114,8 +114,8 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $orderProduct) {
             $loopResultRow = new LoopResultRow($orderProduct);
 
-            $tax = $orderProduct->getVirtualColumn('TOTAL_TAX'); // 1,39755 => 1.4
-            $promoTax = $orderProduct->getVirtualColumn('TOTAL_PROMO_TAX');
+            $tax = (float) $orderProduct->getVirtualColumn('TOTAL_TAX'); // 1,39755 => 1.4
+            $promoTax = (float) $orderProduct->getVirtualColumn('TOTAL_PROMO_TAX');
 
             // To prevent price changes in pre-2.4 orders, use the legacy calculation method
             if ($orderProduct->getOrderId() <= $lastLegacyRoundingOrderId) {
