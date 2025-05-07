@@ -142,7 +142,7 @@
         "symfony": {
             "allow-contrib": true,
             "endpoint": [
-                "https://api.github.com/repos/YannLe/thelia-test-recipes/contents/index.json?ref=flex/main",
+                "https://api.github.com/repos/thelia/thelia-recipes/contents/index.json?ref=main",
                 "flex://defaults"
             ]
         }
