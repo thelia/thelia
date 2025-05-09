@@ -48,6 +48,11 @@ class OrderFilter extends AbstractFilter
         }
 
         $fieldPath = $this->getPropertyQueryPath($query, $property, $context);
+
+        if (\is_array($this->properties[$property])) {
+            $fieldPath = $this->properties[$property]['fieldPath'];
+        }
+
         $query->orderBy($fieldPath, $direction);
     }
 
