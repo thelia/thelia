@@ -2,7 +2,6 @@
 /.env.local
 /.env.local.php
 /.env.*.local
-/config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/
 /vendor/
@@ -11,6 +10,8 @@
 composer.lock
 symfony.lock
 phpunit.xml
+/config/
+/bin/
 
 ###> thelia/thelia ###
 local/config/build.properties
