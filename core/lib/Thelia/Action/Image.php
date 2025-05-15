@@ -182,9 +182,11 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $event->setFileUrl(URL::getInstance()->absoluteUrl($processedImageUrl, null, URL::PATH_TO_FILE, $this->cdnBaseUrl));
         $event->setOriginalFileUrl(URL::getInstance()->absoluteUrl($originalImageUrl, null, URL::PATH_TO_FILE, $this->cdnBaseUrl));
 
-        $imagine = $this->createImagineInstance();
-        $image = $imagine->open($cacheFilePath);
-        $event->setImageObject($image);
+        if ($event->isLoadImageDataInEvent()) {
+            $imagine = $this->createImagineInstance();
+            $image = $imagine->open($cacheFilePath);
+            $event->setImageObject($image);
+        }
     }
 
     private function applyTransformation(

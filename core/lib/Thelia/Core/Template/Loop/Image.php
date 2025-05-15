@@ -59,6 +59,7 @@ use Thelia\Type\TypeCollection;
  * @method bool        getWithPrevNextInfo()
  * @method string      getFormat()
  * @method string[]    getOrder()
+ * @method bool        getWithHeightAndWidth()
  */
 class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -113,6 +114,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createBooleanTypeArgument('allow_zoom', false),
             Argument::createBooleanTypeArgument('base64', false),
             Argument::createBooleanTypeArgument('with_prev_next_info', false),
+            Argument::createBooleanTypeArgument('with_height_and_width', false),
             Argument::createAnyTypeArgument('format')
         );
 
@@ -282,8 +284,13 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         $quality = $this->getQuality();
         $effects = $this->getEffects();
         $format = $this->getFormat();
+        $withHeightAndWidth = $this->getWithHeightAndWidth();
 
-        $event->setAllowZoom($this->getAllowZoom());
+        $event
+            ->setAllowZoom($this->getAllowZoom())
+            // Get the image back is a width & height is required
+            ->setLoadImageDataInEvent($withHeightAndWidth)
+        ;
 
         if (null !== $effects) {
             $effects = explode(',', $effects);
@@ -377,9 +384,17 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set('IMAGE_PATH', $event->getCacheFilepath())
                     ->set('PROCESSING_ERROR', false)
                     ->set('IS_SVG', 'svg' === $imageExt)
-                    ->set('IMAGE_HEIGHT', $event->getImageObject()->getSize()->getHeight())
-                    ->set('IMAGE_WIDTH', $event->getImageObject()->getSize()->getWidth())
+                    // Backward compatibility, define these two variable to prevent Smarty error
+                    ->set('IMAGE_HEIGHT', '')
+                    ->set('IMAGE_WIDTH', '')
                 ;
+
+                if ($withHeightAndWidth) {
+                    $loopResultRow
+                        ->set('IMAGE_HEIGHT', $event->getImageObject()?->getSize()->getHeight())
+                        ->set('IMAGE_WIDTH', $event->getImageObject()?->getSize()->getWidth());
+                }
+
                 if ($this->getBase64()) {
                     $loopResultRow->set('IMAGE_BASE64', $this->toBase64($event->getCacheFilepath()));
                 }
@@ -393,8 +408,6 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                         ->set('ORIGINAL_IMAGE_URL', '')
                         ->set('IMAGE_PATH', '')
                         ->set('PROCESSING_ERROR', true)
-                        ->set('IMAGE_HEIGHT', '')
-                        ->set('IMAGE_WIDTH', '')
                     ;
                 } else {
                     $addRow = false;

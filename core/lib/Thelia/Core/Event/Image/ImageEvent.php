@@ -83,6 +83,9 @@ class ImageEvent extends CachedFileEvent
     /** @var string */
     protected $format;
 
+    /** @var bool */
+    protected $loadImageDataInEvent = false;
+
     /**
      * @return bool true if the required image is the original image (resize_mode and background_color are not significant)
      */
@@ -264,6 +267,22 @@ class ImageEvent extends CachedFileEvent
     public function setFormat(string $format): self
     {
         $this->format = $format;
+
+        return $this;
+    }
+
+    public function isLoadImageDataInEvent(): bool
+    {
+        return $this->loadImageDataInEvent;
+    }
+
+    /**
+     * Pass true to get image data in the event after processing.
+     * Warning: it could consume some memory and take some time!
+     */
+    public function setLoadImageDataInEvent($loadImageDataInEvent): self
+    {
+        $this->loadImageDataInEvent = $loadImageDataInEvent;
 
         return $this;
     }
