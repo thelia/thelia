@@ -49,19 +49,6 @@ local/session/
 local/setup/
 translations/
 
-# Ignore everything in the "modules" directory
-local/modules/*
-
-# Ignore everything in the "templates" directory, except the "default template"
-templates/*
-!templates/frontOffice
-templates/frontOffice/*
-!templates/backOffice
-templates/backOffice/*
-!templates/email
-templates/email/*
-!templates/pdf
-templates/pdf/*
 
 ###< thelia/thelia ###
 
