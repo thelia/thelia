@@ -147,7 +147,7 @@ class Cart extends BaseCart
             }
         }
 
-        return round($total, 2);
+        return ConfigQuery::isRoundingModeSumOfRoundings() ? round($total, 2) : $total;
     }
 
     /**
@@ -175,7 +175,7 @@ class Cart extends BaseCart
             }
         }
 
-        return round($total, 2);
+        return ConfigQuery::isRoundingModeSumOfRoundings() ? round($total, 2) : $total;
     }
 
     /**
@@ -259,7 +259,9 @@ class Cart extends BaseCart
      */
     public function setDiscount($discount)
     {
-        return parent::setDiscount(round($discount, 2));
+        return parent::setDiscount(
+            ConfigQuery::isRoundingModeSumOfRoundings() ? round($discount, 2) : $discount
+        );
     }
 
     /**
@@ -275,6 +277,8 @@ class Cart extends BaseCart
             return parent::getDiscount();
         }
 
-        return round(Calculator::getUntaxedCartDiscount($this, $country, $state), 2);
+        $discount = Calculator::getUntaxedCartDiscount($this, $country, $state);
+
+        return ConfigQuery::isRoundingModeSumOfRoundings() ? round($discount, 2) : $discount;
     }
 }

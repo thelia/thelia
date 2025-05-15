@@ -26,6 +26,9 @@ class ConfigQuery extends BaseConfigQuery
     protected static $booted = false;
     protected static $cache = [];
 
+    public const ROUNDING_MODE_SUM_OF_ROUNDINGS = 1;
+    public const ROUNDING_MODE_ROUNDING_OF_SUMS = 2;
+
     /**
      * @internal
      *
@@ -340,6 +343,31 @@ class ConfigQuery extends BaseConfigQuery
     public static function getMinimuAdminPasswordLength()
     {
         return self::read('minimum_admin_password_length', 4);
+    }
+
+    public static function isOrderWithLegacyRounding(int $orderId): bool
+    {
+        return $orderId <= self::read('last_legacy_rounding_order_id', 0);
+    }
+
+    public static function getOrderRoundingMode(int $orderId = null): int
+    {
+        // Legacy (pre 2.4.0) rounding mode
+        if (null !== $orderId && self::isOrderWithLegacyRounding($orderId)) {
+            return self::ROUNDING_MODE_ROUNDING_OF_SUMS;
+        }
+
+        return self::read('order_rounding_mode', self::ROUNDING_MODE_SUM_OF_ROUNDINGS);
+    }
+
+    public static function isRoundingModeSumOfRoundings(int $orderId = null): bool
+    {
+        return self::getOrderRoundingMode($orderId) === self::ROUNDING_MODE_SUM_OF_ROUNDINGS;
+    }
+
+    public static function isRoundingModeRoundingOfSums(int $orderId = null): bool
+    {
+        return self::getOrderRoundingMode($orderId) === self::ROUNDING_MODE_ROUNDING_OF_SUMS;
     }
 }
 // ConfigQuery
