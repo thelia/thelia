@@ -101,13 +101,11 @@
         "post-install-cmd": [
             "cp -r vendor/thelia/flexy templates/frontOffice",
             "@cache-clear",
-            "@assets-install",
             "php bin/console lexik:jwt:generate-key --skip-if-exists"
         ],
         "post-update-cmd": [
             "cp -r vendor/thelia/flexy templates/frontOffice",
-            "@cache-clear",
-            "@assets-install"
+            "@cache-clear"
         ],
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
