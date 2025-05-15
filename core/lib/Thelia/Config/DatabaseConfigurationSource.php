@@ -36,21 +36,21 @@ class DatabaseConfigurationSource
      * @param array $envParameters environment parameters
      */
     public function __construct(
-        array $envParameters
+        array $envParameters,
     ) {
         $this->configureConnections($envParameters);
     }
 
     protected function configureConnections($envParameters): void
     {
-        if (null !== $envParameters['thelia.db_host'] && null !== $envParameters['thelia.db_name']) {
+        if (null !== $envParameters['thelia.database_host'] && null !== $envParameters['thelia.database_name']) {
             $this->addConnection(
                 DatabaseConfiguration::THELIA_CONNECTION_NAME,
                 [
                     'driver' => 'mysql',
-                    'user' => $envParameters['thelia.db_user'],
-                    'password' => $envParameters['thelia.db_password'],
-                    'dsn' => sprintf('mysql:host=%s;dbname=%s;port=%s', $envParameters['thelia.db_host'], $envParameters['thelia.db_name'], $envParameters['thelia.db_port']),
+                    'user' => $envParameters['thelia.database_user'],
+                    'password' => $envParameters['thelia.database_password'],
+                    'dsn' => \sprintf('mysql:host=%s;dbname=%s;port=%s', $envParameters['thelia.database_host'], $envParameters['thelia.database_name'], $envParameters['thelia.database_port']),
                     'classname' => ConnectionWrapper::class,
                 ],
                 $envParameters
@@ -104,7 +104,7 @@ class DatabaseConfigurationSource
 
         throw new \LogicException(
             'Connection configuration not found'
-            .' This is checked at configuration validation, and should not happen.'
+                .' This is checked at configuration validation, and should not happen.'
         );
     }
 

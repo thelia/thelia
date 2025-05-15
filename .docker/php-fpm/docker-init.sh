@@ -13,7 +13,7 @@ composer install
 
 DB_FILE=local/config/database.yml
 if ! test -f "$DB_FILE"; then
-    php Thelia thelia:install --db_host=mariadb --db_port=3306 --db_username=root --db_name="${MYSQL_DATABASE}" --db_password="${MYSQL_ROOT_PASSWORD}"
+    php Thelia thelia:install --database_host=mariadb --database_port=3306 --database_username=root --database_name="${MYSQL_DATABASE}" --database_password="${MYSQL_ROOT_PASSWORD}"
     php Thelia module:refresh
     php Thelia module:activate OpenApi
     php Thelia module:activate ChoiceFilter
