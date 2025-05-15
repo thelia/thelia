@@ -410,11 +410,11 @@ class Thelia extends Kernel
             'thelia.root_dir' => THELIA_ROOT,
             'thelia.core_dir' => \dirname(__DIR__), // This class is in core/lib/Thelia/Core.
             'thelia.module_dir' => THELIA_MODULE_DIR,
-            'thelia.db_host' => $_SERVER['DB_HOST'] ?? null,
-            'thelia.db_port' => $_SERVER['DB_PORT'] ?? null,
-            'thelia.db_name' => $_SERVER['DB_NAME'] ?? null,
-            'thelia.db_user' => $_SERVER['DB_USER'] ?? null,
-            'thelia.db_password' => $_SERVER['DB_PASSWORD'] ?? null,
+            'thelia.database_host' => $_SERVER['DATABASE_HOST'] ?? null,
+            'thelia.database_port' => $_SERVER['DATABASE_PORT'] ?? null,
+            'thelia.database_name' => $_SERVER['DATABASE_NAME'] ?? null,
+            'thelia.database_user' => $_SERVER['DATABASE_USER'] ?? null,
+            'thelia.database_password' => $_SERVER['DATABASE_PASSWORD'] ?? null,
         ]);
     }
 
@@ -437,7 +437,7 @@ class Thelia extends Kernel
 
     public static function isInstalled(): bool
     {
-        return file_exists(THELIA_CONF_DIR.'database.yml') || (!empty($_SERVER['DB_HOST']));
+        return file_exists(THELIA_CONF_DIR.'database.yml') || (!empty($_SERVER['DATABASE_HOST']));
     }
 
     private function loadAutoConfigureInterfaces(ContainerBuilder $container): void
@@ -545,8 +545,8 @@ class Thelia extends Kernel
                 $loader = new XmlFileLoader($container, new FileLocator($module->getAbsoluteConfigPath()));
                 $loader->load('config.xml', 'module.'.$module->getCode());
 
-                $envConfigFileName = sprintf('config_%s.xml', $this->environment);
-                $envConfigFile = sprintf('%s%s%s', $module->getAbsoluteConfigPath(), DS, $envConfigFileName);
+                $envConfigFileName = \sprintf('config_%s.xml', $this->environment);
+                $envConfigFile = \sprintf('%s%s%s', $module->getAbsoluteConfigPath(), DS, $envConfigFileName);
 
                 if (is_file($envConfigFile) && is_readable($envConfigFile)) {
                     $loader->load($envConfigFileName, 'module.'.$module->getCode());
@@ -565,7 +565,7 @@ class Thelia extends Kernel
                     throw $e;
                 }
                 Tlog::getInstance()->addError(
-                    sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
+                    \sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
                     $e
                 );
             }
@@ -605,7 +605,7 @@ class Thelia extends Kernel
                     throw $e;
                 }
                 Tlog::getInstance()->addError(
-                    sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
+                    \sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
                     $e
                 );
             }
@@ -768,7 +768,7 @@ class Thelia extends Kernel
     private function loadModuleTranslationDirectories(
         Module $module,
         array &$translationDirs,
-        TemplateHelperInterface $templateHelper
+        TemplateHelperInterface $templateHelper,
     ): void {
         // Core module translation
         if (is_dir($dir = $module->getAbsoluteI18nPath())) {

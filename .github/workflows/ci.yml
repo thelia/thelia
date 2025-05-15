@@ -49,7 +49,7 @@ jobs:
           nursit-root site:chmod
           cp ../.env* .
           cp ../composer.phar .
-          php8.2 -d post_max_size=200M Thelia thelia:install --db_host=${{ secrets.DB_HOST }} --db_port=${{ secrets.DB_PORT }} --db_username=${{ secrets.DB_USER }} --db_name=${{ secrets.DB_NAME }} --db_password=${{ secrets.DB_PASSWORD }}
+          php8.2 -d post_max_size=200M Thelia thelia:install --database_host=${{ secrets.DB_HOST }} --database_port=${{ secrets.DB_PORT }} --database_username=${{ secrets.DB_USER }} --database_name=${{ secrets.DB_NAME }} --database_password=${{ secrets.DB_PASSWORD }}
           php8.2 Thelia assets:install web
           rm -Rf var/cache/*
           php8.2 Thelia c:c

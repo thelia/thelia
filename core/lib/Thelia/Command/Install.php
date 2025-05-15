@@ -45,32 +45,32 @@ class Install extends ContainerAwareCommand
             ->setDescription('Install thelia using cli tools. For now Thelia only use mysql database')
             ->setHelp('The <info>thelia:install</info> command install Thelia database and create config file needed.')
             ->addOption(
-                'db_host',
+                'database_host',
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'host for your database',
                 'localhost'
             )
             ->addOption(
-                'db_username',
+                'database_username',
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'username for your database'
             )
             ->addOption(
-                'db_password',
+                'database_password',
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'password for your database'
             )
             ->addOption(
-                'db_name',
+                'database_name',
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'database name'
             )
             ->addOption(
-                'db_port',
+                'database_port',
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'database port',
@@ -94,11 +94,11 @@ class Install extends ContainerAwareCommand
         $this->checkPermission($output);
 
         $connectionInfo = [
-            'host' => $input->getOption('db_host'),
-            'dbName' => $input->getOption('db_name'),
-            'username' => $input->getOption('db_username'),
-            'password' => $input->getOption('db_password'),
-            'port' => $input->getOption('db_port'),
+            'host' => $input->getOption('database_host'),
+            'dbName' => $input->getOption('database_name'),
+            'username' => $input->getOption('database_username'),
+            'password' => $input->getOption('database_password'),
+            'port' => $input->getOption('database_port'),
         ];
 
         while (false === $connection = $this->tryConnection($connectionInfo, $output)) {
@@ -158,7 +158,7 @@ class Install extends ContainerAwareCommand
             if ($data['status']) {
                 $output->writeln(
                     [
-                        sprintf(
+                        \sprintf(
                             '<info>%s ...</info> %s',
                             $data['text'],
                             '<info>Ok</info>'
@@ -167,10 +167,10 @@ class Install extends ContainerAwareCommand
                 );
             } else {
                 $output->writeln([
-                    sprintf(
+                    \sprintf(
                         '<error>%s </error>%s',
                         $data['text'],
-                        sprintf('<error>%s</error>', $data['hint'])
+                        \sprintf('<error>%s</error>', $data['hint'])
                     ),
                 ]);
             }
@@ -194,8 +194,10 @@ class Install extends ContainerAwareCommand
             $fs->touch(THELIA_ROOT.'.env.local');
         }
 
-        file_put_contents(THELIA_ROOT.'.env.local',
-            sprintf("\n###> thelia/database-configuration ###\nDB_HOST=%s\nDB_PORT=%s\nDB_NAME=%s\nDB_USER=%s\nDB_PASSWORD=%s\n###< thelia/database-configuration ###",
+        file_put_contents(
+            THELIA_ROOT.'.env.local',
+            \sprintf(
+                "\n###> thelia/database-configuration ###\nDATABASE_HOST=%s\nDATABASE_PORT=%s\nDATABASE_NAME=%s\nDATABASE_USER=%s\nDATABASE_PASSWORD=%s\n###< thelia/database-configuration ###",
                 $connectionInfo['host'],
                 $connectionInfo['port'],
                 $connectionInfo['dbName'],
@@ -223,7 +225,7 @@ class Install extends ContainerAwareCommand
 
         try {
             $connection = new \PDO(
-                sprintf($dsn, $connectionInfo['host'], $connectionInfo['port']),
+                \sprintf($dsn, $connectionInfo['host'], $connectionInfo['port']),
                 $connectionInfo['username'],
                 $connectionInfo['password']
             );
@@ -309,7 +311,7 @@ class Install extends ContainerAwareCommand
         $errorMessage,
         $hidden = false,
         $defaultValue = null,
-        $beEmpty = false
+        $beEmpty = false,
     ) {
         $question = new Question($label, $defaultValue);
 
@@ -369,6 +371,6 @@ class Install extends ContainerAwareCommand
 
     protected function decorateInfo($text)
     {
-        return sprintf('<info>%s</info>', $text);
+        return \sprintf('<info>%s</info>', $text);
     }
 }
