@@ -43,11 +43,11 @@ if (!defined('THELIA_MODULE_DIR')) {
 }
 
 if (!defined('THELIA_WEB_DIR')) {
-    define('THELIA_WEB_DIR', THELIA_ROOT.'web'.DS);
+    define('THELIA_WEB_DIR', THELIA_ROOT.'public'.DS);
 }
 
 if (!defined('THELIA_WEB_ASSETS_DIR')) {
-    define('THELIA_WEB_ASSETS_DIR', THELIA_ROOT.'web'.DS.'assets'.DS);
+    define('THELIA_WEB_ASSETS_DIR', THELIA_ROOT.'public'.DS.'assets'.DS);
 }
 
 if (!defined('THELIA_CACHE_DIR')) {
@@ -71,7 +71,7 @@ if (!defined('THELIA_SETUP_DIRECTORY')) {
 }
 
 if (!defined('THELIA_SETUP_WIZARD_DIRECTORY')) {
-    define('THELIA_SETUP_WIZARD_DIRECTORY', THELIA_ROOT.'web'.DS.'install'.DS);
+    define('THELIA_SETUP_WIZARD_DIRECTORY', THELIA_ROOT.'public'.DS.'install'.DS);
 }
 
 if (version_compare(\PHP_VERSION, '7.2', '<')) {
