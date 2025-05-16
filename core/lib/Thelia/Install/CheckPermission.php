@@ -27,7 +27,7 @@ class CheckPermission extends BaseInstall
 {
     public const DIR_CONF = 'local/config';
     public const DIR_VAR = 'var';
-    public const DIR_WEB = 'web';
+    public const DIR_WEB = 'public';
     public const DIR_MEDIA = 'local/media';
 
     /** @var array Directory needed to be writable */
@@ -75,7 +75,7 @@ class CheckPermission extends BaseInstall
      * @param bool            $verifyInstall If verify install
      * @param Translator|null $translator    Translator Service necessary for install wizard
      */
-    public function __construct($verifyInstall = true, Translator $translator = null)
+    public function __construct($verifyInstall = true, ?Translator $translator = null)
     {
         $this->translator = $translator;
 

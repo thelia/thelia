@@ -27,21 +27,14 @@ local/library/*
 !local/media/images/store/favicon.png
 !local/media/images/store/thelia.svg
 !local/media/images/store/banner.png
-web/assets/*
-web/cache/*
-web/image-library/*
-web/legacy-image-library/*
-web/tinymce
-web/media
-web/modules-assets/
-web/templates-assets/
+
 phpdoc*.log
 xhprof/
 phpunit.phar
 .DS_Store
 phpmyadmin
 composer.phar
-web/.htaccess
+
 local/I18n/*.php
 .docker/mysql-data/*
 !.docker/mysql-data/.gitkeep
@@ -95,13 +88,27 @@ tests/cypress/downloads
 phpstan.neon
 ###< phpstan/phpstan ###
 
-/web/bundles/apiplatform/
-/public
+
+
 /.env
 /.env.test
-/webpack.config.js
-/package.json
-/assets
 /compose.override.yaml
 /phpstan.dist.neon
 
+
+public/assets/*
+public/cache/*
+public/image-library/*
+public/legacy-image-library/*
+public/tinymce
+public/media
+public/modules-assets/
+public/templates-assets/
+public/.htaccess
+
+###< TEMP ###
+local/modules/
+templates/frontOffice/
+templates/backOffice/
+templates/email/
+templates/pdf/
