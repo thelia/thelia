@@ -45,7 +45,7 @@ return static function (ContainerConfigurator $configurator): void {
         ->autowire()
         ->autoconfigure();
 
-    foreach (Thelia::getTemplateComponentsDirectories() as $templatePath) {
+    foreach (Thelia::getTemplateBundlesDirectories() as $templatePath) {
         if (is_dir($templatePath)) {
             $bundleFQCN = detectNamespaceFromBundle($templatePath);
             if ($bundleFQCN === null) {

@@ -418,10 +418,7 @@ class Thelia extends Kernel
         ]);
     }
 
-    /** Get the front and back templates "components" directory path.
-     *
-     */
-    public static function getTemplateComponentsDirectories(): array
+    public static function getTemplateBundlesDirectories(): array
     {
         return [
             'backOffice\\' => THELIA_TEMPLATE_DIR
@@ -586,7 +583,7 @@ class Thelia extends Kernel
         // Register templates 'component' directories in a class loader.
         $templateClassLoader = new ClassLoader();
 
-        foreach (self::getTemplateComponentsDirectories() as $namespace => $resource) {
+        foreach (self::getTemplateBundlesDirectories() as $namespace => $resource) {
             if (is_dir($resource)) {
                 $templateClassLoader->addPsr4($namespace, $resource);
             }
