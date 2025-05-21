@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurat
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
+use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\Hook\HookCreateAllEvent;
 use Thelia\Core\Event\Hook\HookUpdateEvent;
 use Thelia\Core\Event\Order\OrderPayTotalEvent;
@@ -99,6 +100,11 @@ class BaseModule implements BaseModuleInterface
                 $moduleModel->save();
 
                 $this->initializeCoreI18n();
+                $cacheEvent = new CacheEvent(
+                    $this->getContainer()?->getParameter('kernel.cache_dir')
+                );
+                $this->getDispatcher()->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
+
                 $this->postActivation($con);
                 $con->commit();
             } catch (\Exception $e) {

@@ -39,7 +39,11 @@ if (!defined('THELIA_CONF_DIR')) {
 }
 
 if (!defined('THELIA_MODULE_DIR')) {
-    define('THELIA_MODULE_DIR', THELIA_LOCAL_DIR.'modules'.DS);
+    define('THELIA_MODULE_DIR', THELIA_VENDOR.'thelia'.DS.'modules'.DS);
+}
+
+if (!defined('THELIA_LOCAL_MODULE_DIR')) {
+    define('THELIA_LOCAL_MODULE_DIR', THELIA_LOCAL_DIR.'modules'.DS);
 }
 
 if (!defined('THELIA_WEB_DIR')) {

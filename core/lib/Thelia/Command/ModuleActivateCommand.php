@@ -17,10 +17,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\Module\ModuleInstallEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
+use Thelia\Module\Validator\ModuleValidator;
 
 /**
  * activates a module.
@@ -32,12 +35,14 @@ use Thelia\Module\BaseModule;
 class ModuleActivateCommand extends BaseModuleGenerate
 {
     protected $eventDispatcher;
+    private \Thelia\Command\Install $install;
 
-    public function __construct(EventDispatcherInterface $eventDispatcher)
+    public function __construct(EventDispatcherInterface $eventDispatcher, Install $install)
     {
         $this->eventDispatcher = $eventDispatcher;
 
         parent::__construct();
+        $this->install = $install;
     }
 
     protected function configure(): void
@@ -72,10 +77,15 @@ class ModuleActivateCommand extends BaseModuleGenerate
             $module = ModuleQuery::create()->findOneByCode($moduleCode);
 
             if (null === $module) {
-                throw new \RuntimeException(sprintf('module %s not found', $moduleCode));
+                if (is_dir(THELIA_MODULE_DIR.$moduleCode)) {
+                    $module = $this->installModule(THELIA_MODULE_DIR.$moduleCode);
+                }
+                if (null === $module) {
+                    throw new \RuntimeException(sprintf('module %s not found', $moduleCode));
+                }
             }
 
-            if ($module->getActivate() == BaseModule::IS_ACTIVATED) {
+            if ($module->getActivate() === BaseModule::IS_ACTIVATED) {
                 throw new \RuntimeException(sprintf('module %s is already actived', $moduleCode));
             }
 
@@ -111,5 +121,22 @@ class ModuleActivateCommand extends BaseModuleGenerate
         }
 
         return 0;
+    }
+
+    private function installModule(string $path): Module
+    {
+        $moduleValidator = new ModuleValidator($path);
+        $moduleValidator->loadModuleDefinition();
+
+        $moduleDefinition = $moduleValidator->getModuleDefinition();
+
+        $moduleInstallEvent = new ModuleInstallEvent();
+        $moduleInstallEvent
+            ->setModulePath($path)
+            ->setModuleDefinition($moduleDefinition);
+
+        $this->eventDispatcher->dispatch($moduleInstallEvent, TheliaEvents::MODULE_INSTALL);
+
+        return $moduleInstallEvent->getModule();
     }
 }

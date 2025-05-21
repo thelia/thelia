@@ -12,18 +12,15 @@
 
 namespace Thelia\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Filesystem\Filesystem;
-use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Install\CheckPermission;
 use Thelia\Install\Database;
-use Thelia\Model\ModuleQuery;
-use Thelia\Module\BaseModule;
 use Thelia\Tools\TokenProvider;
 
 /**
@@ -79,7 +76,7 @@ class Install extends ContainerAwareCommand
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln([
             '',
@@ -132,7 +129,7 @@ class Install extends ContainerAwareCommand
             '',
         ]);
 
-        exit;
+        return Command::SUCCESS;
     }
 
     protected function manageSecret(Database $database): void
@@ -158,7 +155,7 @@ class Install extends ContainerAwareCommand
             if ($data['status']) {
                 $output->writeln(
                     [
-                        \sprintf(
+                        sprintf(
                             '<info>%s ...</info> %s',
                             $data['text'],
                             '<info>Ok</info>'
@@ -167,10 +164,10 @@ class Install extends ContainerAwareCommand
                 );
             } else {
                 $output->writeln([
-                    \sprintf(
+                    sprintf(
                         '<error>%s </error>%s',
                         $data['text'],
-                        \sprintf('<error>%s</error>', $data['hint'])
+                        sprintf('<error>%s</error>', $data['hint'])
                     ),
                 ]);
             }
@@ -196,7 +193,7 @@ class Install extends ContainerAwareCommand
 
         file_put_contents(
             THELIA_ROOT.'.env.local',
-            \sprintf(
+            sprintf(
                 "\n###> thelia/database-configuration ###\nDATABASE_HOST=%s\nDATABASE_PORT=%s\nDATABASE_NAME=%s\nDATABASE_USER=%s\nDATABASE_PASSWORD=%s\n###< thelia/database-configuration ###",
                 $connectionInfo['host'],
                 $connectionInfo['port'],
@@ -225,7 +222,7 @@ class Install extends ContainerAwareCommand
 
         try {
             $connection = new \PDO(
-                \sprintf($dsn, $connectionInfo['host'], $connectionInfo['port']),
+                sprintf($dsn, $connectionInfo['host'], $connectionInfo['port']),
                 $connectionInfo['username'],
                 $connectionInfo['password']
             );
@@ -331,46 +328,5 @@ class Install extends ContainerAwareCommand
         });
 
         return $helper->ask($input, $output, $question);
-    }
-
-    protected function initModernTemplatesRequirements(OutputInterface $output): void
-    {
-        $output->writeln([
-            '',
-            '<info>Init modern template requirements</info>',
-            '',
-        ]);
-        $moduleToActivates = [
-            'OpenApi',
-            'StoreSeo',
-            'SmartyRedirection',
-            'ChoiceFilter',
-        ];
-
-        foreach ($moduleToActivates as $moduleToActivate) {
-            $module = ModuleQuery::create()->findOneByCode($moduleToActivate);
-
-            if (null === $module) {
-                throw new \Exception("The module $moduleToActivate is needed to use the modern template.");
-            }
-
-            if ($module->getActivate() == BaseModule::IS_ACTIVATED) {
-                continue;
-            }
-            $output->writeln([
-                '',
-                "<info>Activating module $moduleToActivate</info>",
-                '',
-            ]);
-            $event = new ModuleToggleActivationEvent($module->getId());
-            $event->setRecursive(true);
-
-            $this->getDispatcher()->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
-        }
-    }
-
-    protected function decorateInfo($text)
-    {
-        return \sprintf('<info>%s</info>', $text);
     }
 }

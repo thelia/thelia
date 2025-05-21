@@ -30,11 +30,6 @@
         "thelia/backoffice-default-template": "dev-twig",
         "thelia/email-default-template": "dev-twig",
         "thelia/pdf-default-template": "dev-twig",
-        "thelia/virtual-product-control-module": "dev-main",
-        "thelia/virtual-product-delivery-module": "dev-main",
-        "thelia/custom-delivery-module": "dev-twig",
-        "thelia/cheque-module": "dev-main",
-        "thelia/free-order-module": "dev-main",
         "symfony/flex": "^2.4"
     },
     "require-dev": {
@@ -118,7 +113,8 @@
         "psr-4": {
             "Thelia\\": "core/lib/Thelia",
             "": [
-                "local/modules/"
+                "local/modules/",
+                "vendor/thelia/modules"
             ],
             "App\\": "src/"
         },
