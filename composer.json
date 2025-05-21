@@ -143,6 +143,9 @@
                 "https://api.github.com/repos/thelia/thelia-recipes/contents/index.json?ref=main",
                 "flex://defaults"
             ]
+        },
+        "installer-paths": {
+            "vendor/{$vendor}/modules/{$name}": ["type:thelia-module"]
         }
     },
     "config": {
