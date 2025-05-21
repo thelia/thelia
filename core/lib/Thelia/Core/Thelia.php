@@ -427,11 +427,11 @@ class Thelia extends Kernel
             'backOffice\\' => THELIA_TEMPLATE_DIR
                 .TemplateDefinition::BACK_OFFICE_SUBDIR.DS
                 .ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME, 'default').DS
-                .'components',
+                .'src',
             'frontOffice\\' => THELIA_TEMPLATE_DIR
                 .TemplateDefinition::FRONT_OFFICE_SUBDIR.DS
-                .ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME, 'default').DS
-                .'components',
+                .ConfigQuery::read(TemplateDefinition::FRONT_OFFICE_CONFIG_NAME, 'default').DS
+                .'src',
         ];
     }
 
