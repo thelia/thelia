@@ -1,0 +1,93 @@
+Options +FollowSymlinks -Indexes
+
+AddDefaultCharset UTF-8
+
+# If you defined a CDN that is an alias of your shop domaine, be sure to uncomment this line, and change "*" by your
+# shop hostname. For example, if your shop hostname is www.theshop.tld, use : Header set Access-Control-Allow-Origin "www.theshop.tld".
+# You may also use Access-Control-Allow-Origin "*" to allow all origins.
+#Header set Access-Control-Allow-Origin "*"
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # SEO, remove the subdomain www in URL
+    # Exemple : http://www.yourdomain.com/contact redirect 301 to http://yourdomain.com/contact
+    # To activate uncomment the following two lines
+    #RewriteCond %{HTTP_HOST} ^www.yourdomain.com$
+    #RewriteRule ^(.*) http://yourdomain.com/$1 [QSA,L,R=301]
+
+    # SEO, add the subdomain www in URL
+    # Exemple : http://yourdomain.com/contact redirect 301 to http://www.yourdomain.com/contact
+    # To activate uncomment the following two lines
+    #RewriteCond %{HTTP_HOST} ^yourdomain.com$
+    #RewriteRule ^(.*) http://www.yourdomain.com/$1 [QSA,L,R=301]
+
+    # SEO, to avoid duplicate content with index.php in url
+    # Exemple : http://www.yourdomain.com/index.php/contact redirect 301 to http://www.yourdomain.com/contact
+    RewriteCond %{THE_REQUEST} ^GET.*index\.php [NC]
+    RewriteRule (.*?)index\.php/*(.*) /$1$2 [R=301,NE,L]
+
+    # If thelia is installed in a subdirectory (e.g., thelia2)
+    # define the RewriteBase below to get a proper URL rewriting
+    # RewriteBase /thelia2
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    RewriteRule ^(.*)$ index.php [QSA,L]
+    RewriteRule .* - [env=HTTP_AUTHORIZATION:%{HTTP:Authorization},last]
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive on
+  ExpiresByType image/gif "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/x-icon "access plus 1 year"
+  ExpiresByType application/x-javascript "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType text/css "access plus 1 year"
+  <FilesMatch "\.(ttf|otf|eot|svg|woff|woff2)$" >
+    ExpiresDefault "access plus 1 year"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+# Compress HTML
+AddOutputFilterByType DEFLATE text/html
+
+# Compress Text Files
+AddOutputFilterByType DEFLATE text/plain
+
+# Compress CSS
+AddOutputFilterByType DEFLATE text/css
+
+# Compress JavaScript
+AddOutputFilterByType DEFLATE application/javascript
+AddOutputFilterByType DEFLATE text/javascript
+AddOutputFilterByType DEFLATE application/x-javascript
+
+# Compress Images
+AddOutputFilterByType DEFLATE image/svg+xml
+AddOutputFilterByType DEFLATE image/x-icon
+
+# Compress Fonts
+AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
+AddOutputFilterByType DEFLATE application/x-font
+AddOutputFilterByType DEFLATE application/x-font-opentype
+AddOutputFilterByType DEFLATE application/x-font-otf
+AddOutputFilterByType DEFLATE application/x-font-truetype
+AddOutputFilterByType DEFLATE application/x-font-ttf
+AddOutputFilterByType DEFLATE font/opentype
+AddOutputFilterByType DEFLATE font/otf
+AddOutputFilterByType DEFLATE font/ttf
+
+# Compress XML Files
+AddOutputFilterByType DEFLATE application/rss+xml
+AddOutputFilterByType DEFLATE application/xhtml+xml
+AddOutputFilterByType DEFLATE application/xml
+AddOutputFilterByType DEFLATE text/xml
+
+</IfModule>
