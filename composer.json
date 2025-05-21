@@ -26,7 +26,7 @@
     "require": {
         "php": ">= 8.2",
         "thelia/core": "dev-twig",
-        "thelia/flexy": "0.1",
+        "thelia/flexy": "dev-twig",
         "thelia/backoffice-default-template": "dev-twig",
         "thelia/email-default-template": "dev-twig",
         "thelia/pdf-default-template": "dev-twig",
