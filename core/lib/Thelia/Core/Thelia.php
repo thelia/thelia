@@ -580,16 +580,6 @@ class Thelia extends Kernel
 
         $translationDirs = [];
 
-        // Register templates 'component' directories in a class loader.
-        $templateClassLoader = new ClassLoader();
-
-        foreach (self::getTemplateBundlesDirectories() as $namespace => $resource) {
-            if (is_dir($resource)) {
-                $templateClassLoader->addPsr4($namespace, $resource);
-            }
-        }
-
-        $templateClassLoader->register();
         /** @var TemplateHelperInterface $templateHelper */
         $templateHelper = $container->get('thelia.template_helper');
         $modules = ModuleQuery::getActivated();

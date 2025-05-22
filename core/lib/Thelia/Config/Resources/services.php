@@ -13,7 +13,6 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Thelia\Core\Service\ConfigCacheService;
-use Thelia\Core\Thelia;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Module;
@@ -44,22 +43,6 @@ return static function (ContainerConfigurator $configurator): void {
         )
         ->autowire()
         ->autoconfigure();
-
-    foreach (Thelia::getTemplateBundlesDirectories() as $templatePath) {
-        if (is_dir($templatePath)) {
-            $bundleFQCN = detectNamespaceFromBundle($templatePath);
-            if ($bundleFQCN === null) {
-                continue;
-            }
-            $namespaceParts = explode('\\', $bundleFQCN);
-            array_pop($namespaceParts);
-            $namespace = implode('\\', $namespaceParts).'\\';
-            $configurator->services()
-                ->load($namespace, $templatePath)
-                ->autowire()
-                ->autoconfigure();
-        }
-    }
 
     if (!isset($_SERVER['MAILER_DSN'])) {
         $dsn = 'smtp://localhost:25';
@@ -102,7 +85,7 @@ return static function (ContainerConfigurator $configurator): void {
                     throw $e;
                 }
                 Tlog::getInstance()->addError(
-                    sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
+                    \sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
                     $e
                 );
             }
@@ -114,38 +97,3 @@ return static function (ContainerConfigurator $configurator): void {
     $serviceConfigurator->get(ConfigCacheService::class)
         ->public();
 };
-
-function detectNamespaceFromBundle(string $directory): ?string
-{
-    $rii = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($directory));
-
-    foreach ($rii as $file) {
-        if ($file->isDir()) {
-            continue;
-        }
-
-        if (!str_ends_with($file->getFilename(), 'Bundle.php')) {
-            continue;
-        }
-
-        $content = file($file->getPathname());
-        $namespace = null;
-        $class = null;
-
-        foreach ($content as $line) {
-            if (str_starts_with(trim($line), 'namespace ')) {
-                $namespace = trim(str_replace(['namespace', ';'], '', $line));
-            }
-
-            if (preg_match('/class\s+([^\s]+)/', $line, $matches)) {
-                $class = $matches[1];
-            }
-
-            if ($namespace && $class) {
-                return $namespace.'\\'.$class;
-            }
-        }
-    }
-
-    return null;
-}
