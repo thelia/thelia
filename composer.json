@@ -26,7 +26,7 @@
         "thelia/email-default-template": "dev-twig",
         "thelia/pdf-default-template": "dev-twig",
         "symfony/flex": "^2.4",
-        "thelia/flexy": "dev-composer-installer"
+        "thelia/flexy": "dev-twig"
     },
     "require-dev": {
         "phpunit/phpunit": "9.5.*",
