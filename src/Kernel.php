@@ -24,24 +24,6 @@ class Kernel extends Thelia
     {
         parent::configureContainer($container);
 
-        foreach (Thelia::getTemplateBundlesDirectories() as $templatePath) {
-            if (is_dir($templatePath)) {
-                $bundleInfos = detectNamespaceFromBundle($templatePath);
-                if ($bundleInfos === null || !isset($this->bundles[$bundleInfos['namespace']])) {
-                    continue;
-                }
-                $bundleFQCN = $bundleInfos['namespace'].'\\'.$bundleInfos['class'];
-
-                $namespaceParts = explode('\\', $bundleFQCN);
-                array_pop($namespaceParts);
-                $namespace = implode('\\', $namespaceParts).'\\';
-                $container->services()
-                    ->load($namespace, $templatePath)
-                    ->autowire()
-                    ->autoconfigure();
-            }
-        }
-
         $container->import('../config/{packages}/*.yaml');
         $container->import('../config/{packages}/'.$this->environment.'/*.yaml');
 
@@ -78,41 +60,4 @@ class Kernel extends Thelia
             (require $path)($routes->withPath($path), $this);
         }
     }
-}
-function detectNamespaceFromBundle(string $directory): ?array
-{
-    $rii = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($directory));
-
-    foreach ($rii as $file) {
-        if ($file->isDir()) {
-            continue;
-        }
-
-        if (!str_ends_with($file->getFilename(), 'Bundle.php')) {
-            continue;
-        }
-
-        $content = file($file->getPathname());
-        $namespace = null;
-        $class = null;
-
-        foreach ($content as $line) {
-            if (str_starts_with(trim($line), 'namespace ')) {
-                $namespace = trim(str_replace(['namespace', ';'], '', $line));
-            }
-
-            if (preg_match('/class\s+([^\s]+)/', $line, $matches)) {
-                $class = $matches[1];
-            }
-
-            if ($namespace && $class) {
-                return [
-                    'namespace' => $namespace,
-                    'class' => $class,
-                ];
-            }
-        }
-    }
-
-    return null;
 }
