@@ -17,20 +17,16 @@
         {
             "type": "path",
             "url": "core/"
-        },
-        {
-            "type": "path",
-            "url": "templates/frontOffice/flexy/"
         }
     ],
     "require": {
         "php": ">= 8.2",
         "thelia/core": "dev-twig",
-        "thelia/flexy": "dev-twig",
         "thelia/backoffice-default-template": "dev-twig",
         "thelia/email-default-template": "dev-twig",
         "thelia/pdf-default-template": "dev-twig",
-        "symfony/flex": "^2.4"
+        "symfony/flex": "^2.4",
+        "thelia/flexy": "dev-composer-installer"
     },
     "require-dev": {
         "phpunit/phpunit": "9.5.*",
@@ -85,21 +81,11 @@
         "assets-install": [
             "php Thelia assets:install web"
         ],
-        "pre-install-cmd": [
-            "rm -rf templates/frontOffice/flexy",
-            "mkdir -p templates/frontOffice/flexy"
-        ],
-        "pre-update-cmd": [
-            "rm -rf templates/frontOffice/flexy",
-            "mkdir -p templates/frontOffice/flexy"
-        ],
         "post-install-cmd": [
-            "cp -r vendor/thelia/flexy templates/frontOffice",
             "@cache-clear",
             "php bin/console lexik:jwt:generate-key --skip-if-exists"
         ],
         "post-update-cmd": [
-            "cp -r vendor/thelia/flexy templates/frontOffice",
             "@cache-clear"
         ],
         "auto-scripts": {
@@ -141,7 +127,9 @@
             ]
         },
         "installer-paths": {
-            "vendor/{$vendor}/modules/{$name}": ["type:thelia-module"]
+            "vendor/{$vendor}/modules/{$name}": [
+                "type:thelia-module"
+            ]
         }
     },
     "config": {

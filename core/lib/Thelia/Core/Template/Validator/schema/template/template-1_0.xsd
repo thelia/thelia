@@ -133,11 +133,6 @@
                         <xs:documentation>Assets directory path</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element type="xs:string" name="components" minOccurs="0" maxOccurs="1">
-                    <xs:annotation>
-                        <xs:documentation>components directory path</xs:documentation>
-                    </xs:annotation>
-                </xs:element>
             </xs:sequence>
         </xs:complexType>
     </xs:element>

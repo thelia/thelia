@@ -226,7 +226,7 @@ class TemplateDefinition
 
         /** @var TemplateDefinition $templateDefinition */
         foreach ($templateList as $templateDefinition) {
-            $templateFilePath = sprintf(
+            $templateFilePath = \sprintf(
                 '%s%s/%s',
                 THELIA_TEMPLATE_DIR,
                 $templateDefinition->getPath(),
@@ -262,17 +262,5 @@ class TemplateDefinition
     public function getAbsoluteAssetsPath()
     {
         return $this->getAbsolutePath().DS.$this->templateDescriptor->getAssets();
-    }
-
-    public function getComponentsPath()
-    {
-        return $this->templateDescriptor->getComponents();
-    }
-
-    public function setComponentsPath($path)
-    {
-        $this->$this->templateDescriptor->setComponents($path);
-
-        return $this;
     }
 }

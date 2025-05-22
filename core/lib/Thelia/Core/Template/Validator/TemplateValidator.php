@@ -93,7 +93,6 @@ class TemplateValidator
                 ->setStability((string) $this->xmlDescriptorContent->stability)
                 ->setDocumentation((string) $this->xmlDescriptorContent->documentation)
                 ->setAssets((string) $this->xmlDescriptorContent->assets)
-                ->setComponents((string) $this->xmlDescriptorContent->components)
             ;
 
             $this->checkVersion($templateDescriptor);
@@ -119,7 +118,7 @@ class TemplateValidator
                             ]
                         );
                     } catch (\Exception $ex) {
-                        $message = sprintf(
+                        $message = \sprintf(
                             'The parent template "%s" of template "%s" could not be found',
                             $templateDescriptor->getParent()->getName(),
                             $templateDescriptor->getName()
@@ -151,7 +150,7 @@ class TemplateValidator
                         ]
                     );
                 } catch (\Exception $ex) {
-                    $message = sprintf(
+                    $message = \sprintf(
                         'The template "%s" requires Thelia %s or newer',
                         $templateDescriptor->getName(),
                         $templateDescriptor->getTheliaVersion()

@@ -418,20 +418,6 @@ class Thelia extends Kernel
         ]);
     }
 
-    public static function getTemplateBundlesDirectories(): array
-    {
-        return [
-            'backOffice\\' => THELIA_TEMPLATE_DIR
-                .TemplateDefinition::BACK_OFFICE_SUBDIR.DS
-                .ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME, 'default').DS
-                .'src',
-            'frontOffice\\' => THELIA_TEMPLATE_DIR
-                .TemplateDefinition::FRONT_OFFICE_SUBDIR.DS
-                .ConfigQuery::read(TemplateDefinition::FRONT_OFFICE_CONFIG_NAME, 'default').DS
-                .'src',
-        ];
-    }
-
     public static function isInstalled(): bool
     {
         return file_exists(THELIA_CONF_DIR.'database.yml') || (!empty($_SERVER['DATABASE_HOST']));
@@ -580,16 +566,6 @@ class Thelia extends Kernel
 
         $translationDirs = [];
 
-        // Register templates 'component' directories in a class loader.
-        $templateClassLoader = new ClassLoader();
-
-        foreach (self::getTemplateBundlesDirectories() as $namespace => $resource) {
-            if (is_dir($resource)) {
-                $templateClassLoader->addPsr4($namespace, $resource);
-            }
-        }
-
-        $templateClassLoader->register();
         /** @var TemplateHelperInterface $templateHelper */
         $templateHelper = $container->get('thelia.template_helper');
         $modules = ModuleQuery::getActivated();
