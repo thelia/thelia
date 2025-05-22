@@ -50,7 +50,7 @@ class DatabaseConfigurationSource
                     'driver' => 'mysql',
                     'user' => $envParameters['thelia.database_user'],
                     'password' => $envParameters['thelia.database_password'],
-                    'dsn' => \sprintf('mysql:host=%s;dbname=%s;port=%s', $envParameters['thelia.database_host'], $envParameters['thelia.database_name'], $envParameters['thelia.database_port']),
+                    'dsn' => sprintf('mysql:host=%s;dbname=%s;port=%s', $envParameters['thelia.database_host'], $envParameters['thelia.database_name'], $envParameters['thelia.database_port']),
                     'classname' => ConnectionWrapper::class,
                 ],
                 $envParameters

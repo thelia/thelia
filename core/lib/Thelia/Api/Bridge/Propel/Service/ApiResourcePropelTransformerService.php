@@ -20,8 +20,6 @@ use ApiPlatform\Validator\ValidatorInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
-use ReflectionMethod;
-use ReflectionParameter;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -302,12 +300,12 @@ readonly class ApiResourcePropelTransformerService
                 $value = $this->getPropertyValue($data, $property);
                 $value = $this->getRelationValue($value, $propelSetter, $setterForced, $operation);
                 $value = $this->getArrayValue($value, $context, $property, $propelModel, $operation);
-                $method = new ReflectionMethod($propelModel::class, $propelSetter);
+                $method = new \ReflectionMethod($propelModel::class, $propelSetter);
                 $paramNames = array_map(
-                    fn(ReflectionParameter $param) => $param->getName(),
+                    fn (\ReflectionParameter $param) => $param->getName(),
                     $method->getParameters()
                 );
-                if (in_array('force', $paramNames, true)){
+                if (\in_array('force', $paramNames, true)) {
                     $propelModel->$propelSetter($value, true);
                 }
                 $propelModel->$propelSetter($value);

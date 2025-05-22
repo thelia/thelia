@@ -10,20 +10,23 @@
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Handler;
+namespace Thelia\Service\Handler;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\File;
+use Thelia\Core\Archiver\AbstractArchiver;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\Event\ImportEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Serializer\AbstractSerializer;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\ImportExport\Import\AbstractImport;
 use Thelia\Model\Import;
+use Thelia\Model\ImportCategory;
 use Thelia\Model\ImportCategoryQuery;
 use Thelia\Model\ImportQuery;
 use Thelia\Model\Lang;
@@ -35,52 +38,17 @@ use Thelia\Model\Lang;
  */
 class ImportHandler
 {
-    /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface An event dispatcher interface
-     */
-    protected $eventDispatcher;
-
-    /**
-     * @var \Thelia\Core\Serializer\SerializerManager The serializer manager service
-     */
-    protected $serializerManager;
-
-    /**
-     * @var \Thelia\Core\Archiver\ArchiverManager The archiver manager service
-     */
-    protected $archiverManager;
-
-    /**
-     * Class constructor.
-     *
-     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
-     *                                                                                       An event dispatcher interface
-     * @param \Thelia\Core\Serializer\SerializerManager                   $serializerManager
-     *                                                                                       The serializer manager service
-     * @param \Thelia\Core\Archiver\ArchiverManager                       $archiverManager
-     *                                                                                       The archiver manager service
-     */
     public function __construct(
-        EventDispatcherInterface $eventDispatcher,
-        SerializerManager $serializerManager,
-        ArchiverManager $archiverManager
+        protected EventDispatcherInterface $eventDispatcher,
+        protected SerializerManager $serializerManager,
+        protected ArchiverManager $archiverManager
     ) {
-        $this->eventDispatcher = $eventDispatcher;
-        $this->serializerManager = $serializerManager;
-        $this->archiverManager = $archiverManager;
     }
 
     /**
-     * Get import model based on given identifier.
-     *
-     * @param int  $importId          An import identifier
-     * @param bool $dispatchException Dispatch exception if model doesn't exist
-     *
      * @throws \ErrorException
-     *
-     * @return \Thelia\Model\Import|null
      */
-    public function getImport($importId, $dispatchException = false)
+    public function getImport(int $importId, bool $dispatchException = false): ?Import
     {
         $import = (new ImportQuery())->findPk($importId);
 
@@ -99,16 +67,9 @@ class ImportHandler
     }
 
     /**
-     * Get import model based on given reference.
-     *
-     * @param string $importRef         An import reference
-     * @param bool   $dispatchException Dispatch exception if model doesn't exist
-     *
      * @throws \ErrorException
-     *
-     * @return \Thelia\Model\Import|null
      */
-    public function getImportByRef($importRef, $dispatchException = false)
+    public function getImportByRef(string $importRef, bool $dispatchException = false): ?Import
     {
         $import = (new ImportQuery())->findOneByRef($importRef);
 
@@ -127,16 +88,9 @@ class ImportHandler
     }
 
     /**
-     * Get import category model based on given identifier.
-     *
-     * @param int  $importCategoryId  An import category identifier
-     * @param bool $dispatchException Dispatch exception if model doesn't exist
-     *
      * @throws \ErrorException
-     *
-     * @return \Thelia\Model\ImportCategory|null
      */
-    public function getCategory($importCategoryId, $dispatchException = false)
+    public function getCategory(int $importCategoryId, bool $dispatchException = false): ?ImportCategory
     {
         $category = (new ImportCategoryQuery())->findPk($importCategoryId);
 
@@ -154,12 +108,7 @@ class ImportHandler
         return $category;
     }
 
-    /**
-     * Import.
-     *
-     * @return \Thelia\Core\Event\ImportEvent
-     */
-    public function import(Import $import, File $file, Lang $language = null)
+    public function import(Import $import, File $file, Lang $language = null): ImportEvent
     {
         $archiver = $this->matchArchiverByExtension($file->getFilename());
 
@@ -182,7 +131,7 @@ class ImportHandler
 
         $importHandleClass = $import->getHandleClass();
 
-        /** @var \Thelia\ImportExport\Import\AbstractImport $instance */
+        /** @var AbstractImport $instance */
         $instance = new $importHandleClass();
 
         // Configure handle class
@@ -205,16 +154,9 @@ class ImportHandler
         return $event;
     }
 
-    /**
-     * Match archiver relative to file name.
-     *
-     * @param string $fileName File name
-     *
-     * @return \Thelia\Core\Archiver\AbstractArchiver|null
-     */
-    public function matchArchiverByExtension($fileName)
+    public function matchArchiverByExtension(string $fileName): ?AbstractArchiver
     {
-        /** @var \Thelia\Core\Archiver\AbstractArchiver $archiver */
+        /** @var AbstractArchiver $archiver */
         foreach ($this->archiverManager->getArchivers(true) as $archiver) {
             if (stripos($fileName, '.'.$archiver->getExtension()) !== false) {
                 return $archiver;
@@ -224,16 +166,9 @@ class ImportHandler
         return null;
     }
 
-    /**
-     * Match serializer relative to file name.
-     *
-     * @param string $fileName File name
-     *
-     * @return \Thelia\Core\Serializer\AbstractSerializer|null
-     */
-    public function matchSerializerByExtension($fileName)
+    public function matchSerializerByExtension($fileName): ?AbstractSerializer
     {
-        /** @var \Thelia\Core\Serializer\AbstractSerializer $serializer */
+        /** @var AbstractSerializer $serializer */
         foreach ($this->serializerManager->getSerializers() as $serializer) {
             if (stripos($fileName, '.'.$serializer->getExtension()) !== false) {
                 return $serializer;
@@ -243,21 +178,16 @@ class ImportHandler
         return null;
     }
 
-    /**
-     * Extract archive.
-     *
-     * @return \Symfony\Component\HttpFoundation\File\File First file in unarchiver
-     */
-    public function extractArchive(File $file, ArchiverInterface $archiver)
+    public function extractArchive(File $file, ArchiverInterface $archiver): File
     {
         $archiver->open($file->getPathname());
 
-        $extractpath = \dirname($archiver->getArchivePath()).DS.uniqid();
+        $extractPath = \dirname($archiver->getArchivePath()).DS.uniqid('', true);
 
-        $archiver->extract($extractpath);
+        $archiver->extract($extractPath);
 
         /** @var \DirectoryIterator $item */
-        foreach (new \DirectoryIterator($extractpath) as $item) {
+        foreach (new \DirectoryIterator($extractPath) as $item) {
             if (!$item->isDot() && $item->isFile()) {
                 $file = new File($item->getPathname());
 
@@ -268,21 +198,13 @@ class ImportHandler
         return $file;
     }
 
-    /**
-     * Process import.
-     *
-     * @param \Thelia\ImportExport\Import\AbstractImport  $import     An import
-     * @param \Thelia\Core\Serializer\SerializerInterface $serializer A serializer interface
-     *
-     * @return array List of errors
-     */
-    protected function processImport(AbstractImport $import, SerializerInterface $serializer)
+    protected function processImport(AbstractImport $import, SerializerInterface $serializer): array
     {
         $errors = [];
 
         $import->setData($serializer->unserialize($import->getFile()->openFile('r')));
 
-        foreach ($import as $idx => $data) {
+        foreach ($import as $data) {
             $import->checkMandatoryColumns($data);
 
             $error = $import->importData($data);

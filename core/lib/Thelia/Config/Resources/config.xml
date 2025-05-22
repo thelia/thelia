@@ -97,6 +97,7 @@
         <!-- Thelia template helper -->
         <service id="thelia.template_helper" class="Thelia\Core\Template\TheliaTemplateHelper" public="true">
           <argument>%kernel.cache_dir%</argument>
+          <argument type="service" id="Thelia\Service\Composer\ComposerHelper" />
         </service>
 
         <!--  URL maganement -->
@@ -257,8 +258,8 @@
         </service>
 
         <!-- Handlers -->
-        <service id="thelia.export.handler" alias="Thelia\Handler\ExportHandler" public="true"/>
-        <service id="thelia.import.handler" alias="Thelia\Handler\ImportHandler" public="true"/>
+        <service id="thelia.export.handler" alias="Thelia\Service\Handler\ExportHandler" public="true"/>
+        <service id="thelia.import.handler" alias="Thelia\Service\Handler\ImportHandler" public="true"/>
 
         <!-- Cache -->
         <service id="Symfony\Component\Cache\Adapter\AdapterInterface" class="Symfony\Component\Cache\Adapter\FilesystemAdapter" public="true">

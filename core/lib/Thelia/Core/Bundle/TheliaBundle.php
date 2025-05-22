@@ -30,7 +30,7 @@ use Thelia\Core\DependencyInjection\Compiler\RegisterHookListenersPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterRouterPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\DependencyInjection\Compiler\TranslatorPass;
-use Thelia\Core\Service\ConfigCacheService;
+use Thelia\Service\ConfigCacheService;
 
 /**
  * First Bundle use in Thelia

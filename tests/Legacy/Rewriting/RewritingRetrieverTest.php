@@ -15,7 +15,7 @@ namespace Thelia\Tests\Rewriting;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Thelia\Model\RewritingUrl;
-use Thelia\Rewriting\RewritingRetriever;
+use Thelia\Service\Rewriting\RewritingRetriever;
 use Thelia\Tools\URL;
 
 /**
@@ -55,7 +55,7 @@ class RewritingRetrieverTest extends TestCase
 
     protected function getMethod($name)
     {
-        $class = new \ReflectionClass('\Thelia\Rewriting\RewritingRetriever');
+        $class = new \ReflectionClass('\Thelia\Service\Rewriting\RewritingRetriever');
         $method = $class->getMethod($name);
         $method->setAccessible(true);
 
@@ -64,7 +64,7 @@ class RewritingRetrieverTest extends TestCase
 
     protected function getProperty($name)
     {
-        $class = new \ReflectionClass('\Thelia\Rewriting\RewritingRetriever');
+        $class = new \ReflectionClass('\Thelia\Service\Rewriting\RewritingRetriever');
         $property = $class->getProperty($name);
         $property->setAccessible(true);
 

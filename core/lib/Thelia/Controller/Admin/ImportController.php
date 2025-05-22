@@ -133,7 +133,7 @@ class ImportController extends BaseAdminController
      */
     public function configureAction($id)
     {
-        /** @var \Thelia\Handler\ImportHandler $importHandler */
+        /** @var \Thelia\Service\Handler\ImportHandler $importHandler */
         $importHandler = $this->container->get('thelia.import.handler');
 
         $import = $importHandler->getImport($id);
@@ -181,7 +181,7 @@ class ImportController extends BaseAdminController
      */
     public function importAction($id)
     {
-        /** @var \Thelia\Handler\Importhandler $importHandler */
+        /** @var \Thelia\Service\Handler\Importhandler $importHandler */
         $importHandler = $this->container->get('thelia.import.handler');
 
         $import = $importHandler->getImport($id);

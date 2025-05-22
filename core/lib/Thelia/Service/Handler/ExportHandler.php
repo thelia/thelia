@@ -10,7 +10,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Handler;
+namespace Thelia\Service\Handler;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -21,6 +21,7 @@ use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Export\AbstractExport;
 use Thelia\Model\Export;
+use Thelia\Model\ExportCategory;
 use Thelia\Model\ExportCategoryQuery;
 use Thelia\Model\ExportQuery;
 use Thelia\Model\Lang;
@@ -32,32 +33,11 @@ use Thelia\Model\Lang;
  */
 class ExportHandler
 {
-    /**
-     * @var EventDispatcherInterface An event dispatcher interface
-     */
-    protected $eventDispatcher;
-
-    /**
-     * Class constructor.
-     *
-     * @param EventDispatcherInterface $eventDispatcher An event dispatcher interface
-     */
-    public function __construct(EventDispatcherInterface $eventDispatcher)
+    public function __construct(protected EventDispatcherInterface $eventDispatcher)
     {
-        $this->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * Get export model based on given identifier.
-     *
-     * @param int  $exportId          An export identifier
-     * @param bool $dispatchException Dispatch exception if model doesn't exist
-     *
-     * @throws \ErrorException
-     *
-     * @return \Thelia\Model\Export|null
-     */
-    public function getExport($exportId, $dispatchException = false)
+    public function getExport(int $exportId, bool $dispatchException = false): ?Export
     {
         $export = (new ExportQuery())->findPk($exportId);
 
@@ -75,17 +55,7 @@ class ExportHandler
         return $export;
     }
 
-    /**
-     * Get export model based on given reference.
-     *
-     * @param string $exportRef         An export reference
-     * @param bool   $dispatchException Dispatch exception if model doesn't exist
-     *
-     * @throws \ErrorException
-     *
-     * @return \Thelia\Model\Export|null
-     */
-    public function getExportByRef($exportRef, $dispatchException = false)
+    public function getExportByRef(string $exportRef, bool $dispatchException = false): ?Export
     {
         $export = (new ExportQuery())->findOneByRef($exportRef);
 
@@ -103,17 +73,7 @@ class ExportHandler
         return $export;
     }
 
-    /**
-     * Get export category model based on given identifier.
-     *
-     * @param int  $exportCategoryId  An export category identifier
-     * @param bool $dispatchException Dispatch exception if model doesn't exist
-     *
-     * @throws \ErrorException
-     *
-     * @return \Thelia\Model\ExportCategory|null
-     */
-    public function getCategory($exportCategoryId, $dispatchException = false)
+    public function getCategory(int $exportCategoryId, bool $dispatchException = false): ?ExportCategory
     {
         $category = (new ExportCategoryQuery())->findPk($exportCategoryId);
 
@@ -131,24 +91,15 @@ class ExportHandler
         return $category;
     }
 
-    /**
-     * Export.
-     *
-     * @param bool       $includeImages
-     * @param bool       $includeDocuments
-     * @param array|null $rangeDate
-     *
-     * @return \Thelia\Core\Event\ExportEvent
-     */
     public function export(
         Export $export,
         SerializerInterface $serializer,
         ArchiverInterface $archiver = null,
         Lang $language = null,
-        $includeImages = false,
-        $includeDocuments = false,
-        $rangeDate = null
-    ) {
+        bool $includeImages = false,
+        bool $includeDocuments = false,
+        array $rangeDate = null
+    ): ExportEvent {
         $exportHandleClass = $export->getHandleClass();
 
         /** @var \Thelia\ImportExport\Export\AbstractExport $instance */
@@ -227,20 +178,12 @@ class ExportHandler
         return $event;
     }
 
-    /**
-     * Process export.
-     *
-     * @param \Thelia\ImportExport\Export\AbstractExport  $export     An export
-     * @param \Thelia\Core\Serializer\SerializerInterface $serializer A serializer interface
-     *
-     * @return string Export file path
-     */
-    protected function processExport(AbstractExport $export, SerializerInterface $serializer)
+    protected function processExport(AbstractExport $export, SerializerInterface $serializer): string
     {
         $filename = sprintf(
             '%s-%s-%s.%s',
             (new \DateTime())->format('Ymd'),
-            uniqid(),
+            uniqid('', true),
             $export->getFileName(),
             $serializer->getExtension()
         );
@@ -274,11 +217,6 @@ class ExportHandler
         return $filePath;
     }
 
-    /**
-     * Add images to archive.
-     *
-     * @param \Thelia\ImportExport\Export\AbstractExport $export An export instance
-     */
     protected function processExportImages(AbstractExport $export, ArchiverInterface $archiver): void
     {
         foreach ($export->getImagesPaths() as $imagePath) {
@@ -286,11 +224,6 @@ class ExportHandler
         }
     }
 
-    /**
-     * Add documents to archive.
-     *
-     * @param \Thelia\ImportExport\Export\AbstractExport $export An export instance
-     */
     protected function processExportDocuments(AbstractExport $export, ArchiverInterface $archiver): void
     {
         foreach ($export->getDocumentsPaths() as $documentPath) {

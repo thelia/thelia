@@ -16,9 +16,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Handler\ImportHandler;
 use Thelia\Model\ImportCategoryQuery;
 use Thelia\Model\ImportQuery;
+use Thelia\Service\Handler\ImportHandler;
 
 /**
  * Class Import.
@@ -28,12 +28,12 @@ use Thelia\Model\ImportQuery;
 class Import extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * @var \Thelia\Handler\ImportHandler The import handler
+     * @var \Thelia\Service\Handler\ImportHandler The import handler
      */
     protected $handler;
 
     /**
-     * @param \Thelia\Handler\ImportHandler $importHandler The import handler
+     * @param \Thelia\Service\Handler\ImportHandler $importHandler The import handler
      */
     public function __construct(ImportHandler $importHandler)
     {

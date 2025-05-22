@@ -10,7 +10,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Rewriting;
+namespace Thelia\Service\Rewriting;
 
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Exception\UrlRewritingException;
@@ -26,15 +26,15 @@ use Thelia\Model\RewritingUrlQuery;
  */
 class RewritingResolver
 {
-    protected $search;
-    protected $rewritingUrlQuery;
+    protected ?RewritingArgument $search = null;
+    protected ?RewritingUrlQuery $rewritingUrlQuery = null;
 
-    public $view;
-    public $viewId;
-    public $locale;
-    public $otherParameters;
-    public $redirectedToUrl;
-    public $rewrittenUrl;
+    public mixed $view;
+    public mixed $viewId;
+    public mixed $locale;
+    public mixed $otherParameters;
+    public mixed $redirectedToUrl;
+    public ?string $rewrittenUrl = null;
 
     public function __construct($url = null)
     {
@@ -67,6 +67,9 @@ class RewritingResolver
         $this->otherParameters = $this->getOtherParameters();
     }
 
+    /**
+     * @throws UrlRewritingException
+     */
     protected function getOtherParameters(): array
     {
         if ($this->search === null) {

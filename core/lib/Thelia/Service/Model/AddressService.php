@@ -114,7 +114,7 @@ readonly class AddressService
             throw new AddressNotFoundException();
         }
 
-        if ($address->getCustomer()->getId() != $customer->getId()) {
+        if ($address->getCustomer()->getId() !== $customer?->getId()) {
             throw new CustomerException();
         }
 

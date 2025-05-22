@@ -23,6 +23,8 @@ use Thelia\Model\ConfigQuery;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  * @author Manuel Raynaud <manu@raynaud.io>
+ *
+ * @deprecated use Psr\Log\LoggerInterface from Symfony instead
  */
 class Tlog implements LoggerInterface
 {

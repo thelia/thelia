@@ -110,7 +110,7 @@ class ExportCommand extends ContainerAwareCommand
             );
         }
 
-        /** @var \Thelia\Handler\ExportHandler $exportHandler */
+        /** @var \Thelia\Service\Handler\ExportHandler $exportHandler */
         $exportHandler = $this->getContainer()->get('thelia.export.handler');
 
         $export = $exportHandler->getExportByRef($exportRef);

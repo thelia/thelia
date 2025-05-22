@@ -105,7 +105,7 @@ readonly class CartService
         }
     }
 
-    public function getCart(): Cart
+    public function getCart(): ?Cart
     {
         return $this->requestStack->getCurrentRequest()?->getSession()->getSessionCart($this->eventDispatcher);
     }
@@ -120,45 +120,57 @@ readonly class CartService
      */
     protected function afterModifyCart(EventDispatcherInterface $eventDispatcher): void
     {
-        /* recalculate postage amount */
+        /** @var Session $session */
         $session = $this->requestStack->getCurrentRequest()?->getSession();
+        if (null === $session) {
+            return;
+        }
         $order = $session->getOrder();
-        if (null !== $order) {
-            $deliveryModule = $order->getModuleRelatedByDeliveryModuleId();
-            $deliveryAddress = AddressQuery::create()->findPk($order->getChoosenDeliveryAddress());
-            if (null !== $deliveryModule && null !== $deliveryAddress) {
-                $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
-                $orderEvent = new OrderEvent($order);
-                try {
-                    $deliveryPostageEvent = new DeliveryPostageEvent(
-                        $moduleInstance,
-                        $session->getSessionCart($eventDispatcher),
-                        $deliveryAddress
-                    );
-                    $eventDispatcher->dispatch(
-                        $deliveryPostageEvent,
-                        TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
-                    );
-                    $postage = $deliveryPostageEvent->getPostage();
-                    if (null !== $postage) {
-                        $orderEvent->setPostage($postage->getAmount());
-                        $orderEvent->setPostageTax($postage->getAmountTax());
-                        $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
-                    }
-                    $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_POSTAGE);
-                } catch (\Exception $ex) {
-                    // The postage has been chosen, but changes in the cart causes an exception.
-                    // Reset the postage data in the order
-                    $orderEvent->setDeliveryModule(0);
-                    $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_DELIVERY_MODULE);
-                }
+        if (null === $order) {
+            return;
+        }
+        $deliveryModule = $order->getModuleRelatedByDeliveryModuleId();
+        $deliveryAddress = AddressQuery::create()->findPk($order->getChoosenDeliveryAddress());
+        if (null === $deliveryModule || null === $deliveryAddress) {
+            return;
+        }
+        $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
+        $orderEvent = new OrderEvent($order);
+        try {
+            $deliveryPostageEvent = new DeliveryPostageEvent(
+                $moduleInstance,
+                $session->getSessionCart($eventDispatcher),
+                $deliveryAddress
+            );
+            $eventDispatcher->dispatch(
+                $deliveryPostageEvent,
+                TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
+            );
+            $postage = $deliveryPostageEvent->getPostage();
+            if (null !== $postage) {
+                $orderEvent->setPostage($postage->getAmount());
+                $orderEvent->setPostageTax($postage->getAmountTax());
+                $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
             }
+            $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_POSTAGE);
+        } catch (\Exception) {
+            // The postage has been chosen, but changes in the cart causes an exception.
+            // Reset the postage data in the order
+            $orderEvent->setDeliveryModule(0);
+            $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_DELIVERY_MODULE);
         }
     }
 
     protected function getCartEvent(): CartEvent
     {
-        $cart = $this->requestStack->getCurrentRequest()?->getSession()->getSessionCart($this->eventDispatcher);
+        $session = $this->requestStack->getCurrentRequest()?->getSession();
+        if (!$session instanceof Session) {
+            throw new \RuntimeException('Failed to get cart event : no session found.');
+        }
+        $cart = $session->getSessionCart($this->eventDispatcher);
+        if (null === $cart) {
+            throw new \RuntimeException('Failed to get cart event : no cart in session.');
+        }
 
         return new CartEvent($cart);
     }
@@ -167,10 +179,8 @@ readonly class CartService
      * Return the minimum expected postage for a cart in a given country.
      *
      * @throws \Propel\Runtime\Exception\PropelException
-     *
-     * @return array
      */
-    public function getEstimatedPostageForCountry(Cart $cart, Country $country, State $state = null)
+    public function getEstimatedPostageForCountry(Cart $cart, Country $country, State $state = null): array
     {
         $orderSession = $this->session->getOrder();
         $deliveryModules = [];
@@ -199,18 +209,18 @@ readonly class CartService
             }
             try {
                 $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, null, $country, $state);
-                $this->dispatcher->dispatch(
+                $this->eventDispatcher->dispatch(
                     $deliveryPostageEvent,
                     TheliaEvents::MODULE_DELIVERY_GET_POSTAGE
                 );
                 if ($deliveryPostageEvent->isValidModule()) {
                     $modulePostage = $deliveryPostageEvent->getPostage();
-                    if (null === $postage || $postage > $modulePostage->getAmount()) {
+                    if (null !== $modulePostage && (null === $postage || $postage > $modulePostage->getAmount())) {
                         $postage = $modulePostage->getAmount() - $modulePostage->getAmountTax();
                         $postageTax = $modulePostage->getAmountTax();
                     }
                 }
-            } catch (DeliveryException $ex) {
+            } catch (DeliveryException) {
                 // Module is not available
             }
         }
@@ -225,10 +235,10 @@ readonly class CartService
         ];
     }
 
-    private function isCouponRemovingPostage(int $countryId, int $deliveryModuleId)
+    private function isCouponRemovingPostage(int $countryId, int $deliveryModuleId): bool
     {
         $couponsKept = $this->couponManager->getCouponsKept();
-        if (\count($couponsKept) == 0) {
+        if (\count($couponsKept) === 0) {
             return false;
         }
         /** @var CouponInterface $coupon */
@@ -259,7 +269,7 @@ readonly class CartService
                 $moduleValid = false;
                 /** @var CouponModule $couponModule */
                 foreach ($couponModules as $couponModule) {
-                    if ($deliveryModuleId == $couponModule->getModuleId()) {
+                    if ($deliveryModuleId === $couponModule->getModuleId()) {
                         $moduleValid = true;
                         break;
                     }

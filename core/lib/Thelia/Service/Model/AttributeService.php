@@ -28,8 +28,6 @@ readonly class AttributeService
 
     /**
      * @throws PropelException
-     *
-     * @return array An array of attributes and their values
      */
     public function getAttributesAndValues(int $productId): array
     {
@@ -48,11 +46,12 @@ readonly class AttributeService
             $values = [];
             /** @var AttributeAv $attributeValue */
             foreach ($attributeValues as $attributeValue) {
-                if (isset($values[$attributeValue->getId()])) {
+                if ($attributeValue === null || isset($values[$attributeValue->getId()])) {
                     continue;
                 }
-                $values[$attributeValue->getId()] = [
-                    'id' => $attributeValue->getId(),
+                $attributeValueId = $attributeValue->getId();
+                $values[$attributeValueId] = [
+                    'id' => $attributeValueId,
                     'title' => $attributeValue->getTitle(),
                 ];
             }

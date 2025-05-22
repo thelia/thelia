@@ -18,13 +18,19 @@ use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\Config\ConfigUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\ConfigQuery;
+use Thelia\Service\Composer\ComposerHelper;
 
 class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberInterface
 {
-    public function __construct(protected string $kernelCacheDir)
-    {
+    public function __construct(
+        protected string $kernelCacheDir,
+        protected ComposerHelper $composerHelper
+    ) {
     }
 
+    /**
+     * @throws \Exception
+     */
     public function getActiveMailTemplate(): TemplateDefinition
     {
         return new TemplateDefinition(
@@ -60,6 +66,9 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
         return $templateDefinition->getName() === ConfigQuery::read($configTemplateName, 'default');
     }
 
+    /**
+     * @throws \Exception
+     */
     public function getActivePdfTemplate(): TemplateDefinition
     {
         return new TemplateDefinition(
@@ -68,6 +77,9 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
         );
     }
 
+    /**
+     * @throws \Exception
+     */
     public function getActiveAdminTemplate(): TemplateDefinition
     {
         return new TemplateDefinition(
@@ -76,6 +88,9 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
         );
     }
 
+    /**
+     * @throws \Exception
+     */
     public function getActiveFrontTemplate(): TemplateDefinition
     {
         return new TemplateDefinition(
@@ -84,6 +99,9 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
         );
     }
 
+    /**
+     * @throws \Exception
+     */
     public function getStandardTemplateDefinitions(): array
     {
         return [
@@ -151,6 +169,15 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
 
         $cacheEvent = new CacheEvent($this->kernelCacheDir);
         $dispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
+    }
+
+    public function enableThemeAsBundle(string $path): void
+    {
+        $bundleName = $this->composerHelper->findFirstClassBundle($path);
+        if (null === $bundleName) {
+            return;
+        }
+        $this->composerHelper->addNamespaceToBundlesSymfony($bundleName, ['all' => true]);
     }
 
     public static function getSubscribedEvents(): array

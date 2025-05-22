@@ -12,11 +12,11 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Thelia\Core\Service\ConfigCacheService;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
+use Thelia\Service\ConfigCacheService;
 
 return static function (ContainerConfigurator $configurator): void {
     $serviceConfigurator = $configurator->services();

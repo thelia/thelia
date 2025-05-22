@@ -10,7 +10,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Core\Service;
+namespace Thelia\Service;
 
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Contracts\Cache\ItemInterface;

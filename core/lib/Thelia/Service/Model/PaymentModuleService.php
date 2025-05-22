@@ -14,6 +14,7 @@ namespace Thelia\Service\Model;
 
 use OpenApi\Events\OpenApiEvents;
 use OpenApi\Events\PaymentModuleOptionEvent;
+use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Resource\ModuleI18n;
@@ -62,6 +63,9 @@ readonly class PaymentModuleService
             );
     }
 
+    /**
+     * @throws PropelException
+     */
     protected function getPaymentModule(
         EventDispatcherInterface $dispatcher,
         Module $paymentModule,
