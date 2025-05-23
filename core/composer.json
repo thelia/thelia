@@ -76,6 +76,7 @@
         "symfony-cmf/routing": "3.0.*",
 
         "thelia/config": "dev-twig",
+        "thelia/setup": "dev-twig",
         "thelia/currency-converter": "~1.0",
         "thelia/propel": "dev-thelia-2.5",
         "thelia/web-profiler-module": "2.5.*"
