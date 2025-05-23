@@ -35,7 +35,12 @@ if (!defined('THELIA_LOCAL_DIR')) {
 }
 
 if (!defined('THELIA_CONF_DIR')) {
-    define('THELIA_CONF_DIR', THELIA_LOCAL_DIR.'config'.DS);
+    $pathConfDir = THELIA_LOCAL_DIR.'config'.DS;
+    if (is_dir($pathConfDir) ) {
+        define('THELIA_CONF_DIR', $pathConfDir);
+    } else {
+        define('THELIA_CONF_DIR', THELIA_VENDOR.'thelia'.DS.'config'.DS);
+    }
 }
 
 if (!defined('THELIA_MODULE_DIR')) {
@@ -71,16 +76,21 @@ if (!defined('THELIA_TEMPLATE_FRONTOFFICE_DIR')) {
 }
 
 if (!defined('THELIA_SETUP_DIRECTORY')) {
-    define('THELIA_SETUP_DIRECTORY', THELIA_ROOT.'setup'.DS);
+    $pathSetupDir = THELIA_LOCAL_DIR.'setup'.DS;
+    if (is_dir($pathSetupDir) ) {
+        define('THELIA_SETUP_DIRECTORY', $pathSetupDir);
+    } else {
+        define('THELIA_SETUP_DIRECTORY', THELIA_VENDOR.'thelia'.DS.'setup'.DS);
+    }
 }
 
 if (!defined('THELIA_SETUP_WIZARD_DIRECTORY')) {
     define('THELIA_SETUP_WIZARD_DIRECTORY', THELIA_ROOT.'public'.DS.'install'.DS);
 }
 
-if (version_compare(\PHP_VERSION, '7.2', '<')) {
+if (PHP_VERSION_ID < 80200) {
     exit(sprintf(
-        "Thelia needs at least php 7.2, but you are using php %s. Please upgrade before using Thelia.\n",
+        "Thelia needs at least php 8.2, but you are using php %s. Please upgrade before using Thelia.\n",
         \PHP_VERSION
     ));
 }
