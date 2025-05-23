@@ -33,35 +33,63 @@ class ComposerHelper
         if (!file($bundlesPath)) {
             throw new \InvalidArgumentException("No bundles.php file found in '$bundlesPath'");
         }
-        $formatedNamespace = $namespace.'::class';
         $bundles = require $bundlesPath;
-        if (isset($bundles[$formatedNamespace])) {
-            return;
+        if (!isset($bundles[$namespace])) {
+            $bundles[$namespace] = $environnement;
+            ksort($bundles);
         }
-        $bundles[$formatedNamespace] = $environnement;
-        file_put_contents($bundlesPath, '<?php return '.var_export($bundles, true).';');
+        file_put_contents($bundlesPath, $this->dumpBundlesPhp($bundles));
     }
 
     public function findFirstClassBundle(string $directory): ?string
     {
-        $rii = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($directory));
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($directory)
+        );
 
-        foreach ($rii as $file) {
+        /** @var \SplFileInfo $file */
+        foreach ($iterator as $file) {
             if (!$file->isFile() || $file->getExtension() !== 'php') {
                 continue;
             }
 
-            $content = file_get_contents($file->getPathname());
-
-            if (preg_match('/namespace\s+([^;]+);/', $content, $nsMatch)
-                && preg_match('/class\s+(\w+)/', $content, $classMatch)) {
-                $namespace = trim($nsMatch[1]);
-                $className = trim($classMatch[1]);
-
-                return $namespace.'\\'.$className;
+            $content = file_get_contents($file->getRealPath());
+            if (!$content) {
+                continue;
             }
+
+            if (!preg_match('/namespace\s+([^;]+);/', $content, $nsMatch)) {
+                continue;
+            }
+
+            if (!preg_match('/class\s+(\w+Bundle)\b/', $content, $classMatch)) {
+                continue;
+            }
+
+            return $nsMatch[1] . '\\' . $classMatch[1];
         }
 
         return null;
+    }
+
+
+
+    private function dumpBundlesPhp(array $bundles): string
+    {
+        $lines = ["<?php\n", "return [\n"];
+
+        foreach ($bundles as $fqcn => $envs) {
+            $envParts = [];
+            foreach ($envs as $env => $enabled) {
+                $envParts[] = "'$env' => " . ($enabled ? 'true' : 'false');
+            }
+
+            $line = "    $fqcn::class => [" . implode(', ', $envParts) . "],\n";
+            $lines[] = $line;
+        }
+
+        $lines[] = "];\n";
+
+        return implode('', $lines);
     }
 }

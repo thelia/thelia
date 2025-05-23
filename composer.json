@@ -119,12 +119,24 @@
         "installer-paths": {
             "vendor/{$vendor}/modules/{$name}": [
                 "type:thelia-module"
+            ],
+            "template/frontOffice/{$name}": [
+                "thelia-frontoffice-template"
+            ],
+            "template/email/{$name}": [
+                "thelia-email-template"
+            ],
+            "template/pdf/{$name}": [
+                "thelia-pdf-template"
+            ],
+            "local/": [
+                "thelia-local"
             ]
         }
     },
     "config": {
         "allow-plugins": {
-            "thelia/installer": true,
+            "thelia/installer": false,
             "phpstan/extension-installer": true,
             "symfony/flex": true,
             "symfony/runtime": true,

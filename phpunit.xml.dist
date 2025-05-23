@@ -26,6 +26,16 @@
         <!-- ###+ nelmio/cors-bundle ### -->
         <env name="CORS_ALLOW_ORIGIN" value="'^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$'"/>
         <!-- ###- nelmio/cors-bundle ### -->
+
+        <!-- ###+ symfony/mailer ### -->
+        <env name="MAILER_DSN" value="null://null"/>
+        <!-- ###- symfony/mailer ### -->
+
+        <!-- ###+ symfony/lock ### -->
+        <!-- Choose one of the stores below -->
+        <!-- postgresql+advisory://db_user:db_password@localhost/db_name -->
+        <env name="LOCK_DSN" value="flock"/>
+        <!-- ###- symfony/lock ### -->
     </php>
 
     <testsuites>
