@@ -25,7 +25,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class CheckPermission extends BaseInstall
 {
-    public const DIR_CONF = 'local/config';
+    public const DIR_CONF = 'vendor/thelia/config';
     public const DIR_VAR = 'var';
     public const DIR_WEB = 'public';
     public const DIR_MEDIA = 'local/media';
