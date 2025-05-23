@@ -120,17 +120,17 @@
             "vendor/{$vendor}/modules/{$name}": [
                 "type:thelia-module"
             ],
-            "template/frontOffice/{$name}": [
-                "thelia-frontoffice-template"
+            "templates/frontOffice/{$name}": [
+                "type:thelia-frontoffice-template"
             ],
-            "template/email/{$name}": [
-                "thelia-email-template"
+            "templates/email/{$name}": [
+                "type:thelia-email-template"
             ],
-            "template/pdf/{$name}": [
-                "thelia-pdf-template"
+            "templates/pdf/{$name}": [
+                "type:thelia-pdf-template"
             ],
             "local/": [
-                "thelia-local"
+                "type:thelia-local"
             ]
         }
     },
