@@ -35,7 +35,7 @@ if (!defined('THELIA_LOCAL_DIR')) {
 }
 
 if (!defined('THELIA_CONF_DIR')) {
-    define('THELIA_CONF_DIR', THELIA_VENDOR.'thelia'.DS.'config'.DS);
+    define('THELIA_CONF_DIR', THELIA_LOCAL_DIR.'config'.DS);
 }
 
 if (!defined('THELIA_MODULE_DIR')) {
