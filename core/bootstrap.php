@@ -76,13 +76,12 @@ if (!defined('THELIA_TEMPLATE_FRONTOFFICE_DIR')) {
 }
 
 if (!defined('THELIA_SETUP_DIRECTORY')) {
-    $pathSetupDir = THELIA_LOCAL_DIR.'setup'.DS;
-    if (is_dir(THELIA_LOCAL_DIR.'setup'.DS) ) {
-        define('THELIA_SETUP_DIRECTORY', THELIA_LOCAL_DIR.'setup'.DS);
+    if (is_dir(THELIA_VENDOR.'thelia'.DS.'setup'.DS) ) {
+        define('THELIA_SETUP_DIRECTORY', THELIA_VENDOR.'thelia'.DS.'setup'.DS);
     } elseif(is_dir(THELIA_ROOT.'setup'.DS)) {
         define('THELIA_SETUP_DIRECTORY', THELIA_ROOT.'setup'.DS);
     } else {
-        define('THELIA_SETUP_DIRECTORY', THELIA_VENDOR.'thelia'.DS.'setup'.DS);
+        define('THELIA_SETUP_DIRECTORY', THELIA_LOCAL_DIR.'setup'.DS);
     }
 }
 
