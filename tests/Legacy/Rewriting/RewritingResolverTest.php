@@ -15,7 +15,7 @@ namespace Thelia\Tests\Rewriting;
 use PHPUnit\Framework\TestCase;
 use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Model\RewritingArgument;
-use Thelia\Rewriting\RewritingResolver;
+use Thelia\Service\Rewriting\RewritingResolver;
 
 /**
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
@@ -24,7 +24,7 @@ class RewritingResolverTest extends TestCase
 {
     protected function getMethod($name)
     {
-        $class = new \ReflectionClass('\Thelia\Rewriting\RewritingResolver');
+        $class = new \ReflectionClass('\Thelia\Service\Rewriting\RewritingResolver');
         $method = $class->getMethod($name);
         $method->setAccessible(true);
 
@@ -33,7 +33,7 @@ class RewritingResolverTest extends TestCase
 
     protected function getProperty($name)
     {
-        $class = new \ReflectionClass('\Thelia\Rewriting\RewritingResolver');
+        $class = new \ReflectionClass('\Thelia\Service\Rewriting\RewritingResolver');
         $property = $class->getProperty($name);
         $property->setAccessible(true);
 

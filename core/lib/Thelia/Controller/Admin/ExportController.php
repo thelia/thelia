@@ -135,7 +135,7 @@ class ExportController extends BaseAdminController
      */
     public function configureAction($id)
     {
-        /** @var \Thelia\Handler\Exporthandler $exportHandler */
+        /** @var \Thelia\Service\Handler\Exporthandler $exportHandler */
         $exportHandler = $this->container->get('thelia.export.handler');
 
         $export = $exportHandler->getExport($id);
@@ -169,7 +169,7 @@ class ExportController extends BaseAdminController
      */
     public function exportAction($id)
     {
-        /** @var \Thelia\Handler\Exporthandler $exportHandler */
+        /** @var \Thelia\Service\Handler\Exporthandler $exportHandler */
         $exportHandler = $this->container->get('thelia.export.handler');
 
         $export = $exportHandler->getExport($id);

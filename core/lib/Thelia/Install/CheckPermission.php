@@ -75,7 +75,7 @@ class CheckPermission extends BaseInstall
      * @param bool            $verifyInstall If verify install
      * @param Translator|null $translator    Translator Service necessary for install wizard
      */
-    public function __construct($verifyInstall = true, ?Translator $translator = null)
+    public function __construct($verifyInstall = true, Translator $translator = null)
     {
         $this->translator = $translator;
 

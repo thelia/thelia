@@ -13,20 +13,14 @@
 namespace Thelia\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Service\ConfigCacheService;
 use Thelia\Model\Event\ConfigEvent;
+use Thelia\Service\ConfigCacheService;
 
-class ModelConfigListener implements EventSubscriberInterface
+readonly class ModelConfigListener implements EventSubscriberInterface
 {
-    /**
-     * @var ConfigCacheService
-     */
-    private $configCacheService;
-
     public function __construct(
-        ConfigCacheService $configCacheService
+        private ConfigCacheService $configCacheService
     ) {
-        $this->configCacheService = $configCacheService;
     }
 
     public function resetCache(): void
@@ -34,10 +28,6 @@ class ModelConfigListener implements EventSubscriberInterface
         $this->configCacheService->initCacheConfigs(true);
     }
 
-    /**
-     * {@inheritdoc}
-     * api.
-     */
     public static function getSubscribedEvents(): array
     {
         return [

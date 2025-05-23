@@ -16,9 +16,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Handler\ExportHandler;
 use Thelia\Model\ExportCategoryQuery;
 use Thelia\Model\ExportQuery;
+use Thelia\Service\Handler\ExportHandler;
 
 /**
  * Class Export.
@@ -28,12 +28,12 @@ use Thelia\Model\ExportQuery;
 class Export extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * @var \Thelia\Handler\ExportHandler The export handler
+     * @var \Thelia\Service\Handler\ExportHandler The export handler
      */
     protected $handler;
 
     /**
-     * @param \Thelia\Handler\ExportHandler $exportHandler The export handler
+     * @param \Thelia\Service\Handler\ExportHandler $exportHandler The export handler
      */
     public function __construct(ExportHandler $exportHandler)
     {

@@ -22,7 +22,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\RewritingArgumentQuery;
 use Thelia\Model\RewritingUrl;
 use Thelia\Model\RewritingUrlQuery;
-use Thelia\Rewriting\RewritingResolver;
+use Thelia\Service\Rewriting\RewritingResolver;
 use Thelia\Tools\URL;
 
 /**

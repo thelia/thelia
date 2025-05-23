@@ -76,7 +76,7 @@ class ImportCommand extends ContainerAwareCommand
             );
         }
 
-        /** @var \Thelia\Handler\ImportHandler $importHandler */
+        /** @var \Thelia\Service\Handler\ImportHandler $importHandler */
         $importHandler = $this->getContainer()->get('thelia.import.handler');
 
         $import = $importHandler->getImportByRef($importRef);

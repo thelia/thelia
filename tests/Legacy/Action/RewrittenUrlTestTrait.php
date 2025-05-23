@@ -18,7 +18,7 @@ use Thelia\Exception\UrlRewritingException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\RewritingUrlQuery;
-use Thelia\Rewriting\RewritingResolver;
+use Thelia\Service\Rewriting\RewritingResolver;
 
 /**
  * Class RewrittenUrlTestTrait.

@@ -20,11 +20,11 @@ use Thelia\Core\Event\Config\ConfigUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Service\ConfigCacheService;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Config;
 use Thelia\Model\ConfigQuery;
+use Thelia\Service\ConfigCacheService;
 
 /**
  * Manages variables.

@@ -16,9 +16,9 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
 
-class CountryService
+readonly class CountryService
 {
-    public function __construct(protected readonly Session $session)
+    public function __construct(protected Session $session)
     {
     }
 
@@ -44,6 +44,9 @@ class CountryService
             ->filterByByDefault(1)
             ->limit(1)
             ->findOne();
+        if (null === $country) {
+            throw new \RuntimeException('No default country found');
+        }
         $locale = $this->session->getLang()->getLocale();
         $country->setLocale($locale);
 

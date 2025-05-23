@@ -112,3 +112,6 @@ templates/frontOffice/
 templates/backOffice/
 templates/email/
 templates/pdf/
+###> liip/imagine-bundle ###
+/public/media/cache/
+###< liip/imagine-bundle ###

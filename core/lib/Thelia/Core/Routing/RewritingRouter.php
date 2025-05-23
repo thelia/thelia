@@ -27,7 +27,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 use Thelia\Model\RewritingUrlQuery;
-use Thelia\Rewriting\RewritingResolver;
+use Thelia\Service\Rewriting\RewritingResolver;
 use Thelia\Tools\URL;
 
 /**

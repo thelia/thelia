@@ -528,8 +528,8 @@ class Thelia extends Kernel
                 $loader = new XmlFileLoader($container, new FileLocator($module->getAbsoluteConfigPath()));
                 $loader->load('config.xml', 'module.'.$module->getCode());
 
-                $envConfigFileName = \sprintf('config_%s.xml', $this->environment);
-                $envConfigFile = \sprintf('%s%s%s', $module->getAbsoluteConfigPath(), DS, $envConfigFileName);
+                $envConfigFileName = sprintf('config_%s.xml', $this->environment);
+                $envConfigFile = sprintf('%s%s%s', $module->getAbsoluteConfigPath(), DS, $envConfigFileName);
 
                 if (is_file($envConfigFile) && is_readable($envConfigFile)) {
                     $loader->load($envConfigFileName, 'module.'.$module->getCode());
@@ -548,7 +548,7 @@ class Thelia extends Kernel
                     throw $e;
                 }
                 Tlog::getInstance()->addError(
-                    \sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
+                    sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
                     $e
                 );
             }
@@ -578,7 +578,7 @@ class Thelia extends Kernel
                     throw $e;
                 }
                 Tlog::getInstance()->addError(
-                    \sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
+                    sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
                     $e
                 );
             }

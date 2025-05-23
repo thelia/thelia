@@ -10,7 +10,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Rewriting;
+namespace Thelia\Service\Rewriting;
 
 use Thelia\Model\RewritingUrlQuery;
 use Thelia\Tools\URL;
