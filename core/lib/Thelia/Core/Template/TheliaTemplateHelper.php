@@ -178,6 +178,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
             return;
         }
         $this->composerHelper->addNamespaceToBundlesSymfony($bundleName, ['all' => true]);
+        $this->composerHelper->addPsr4NamespaceToComposer($bundleName, $path);
     }
 
     public static function getSubscribedEvents(): array

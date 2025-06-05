@@ -72,6 +72,39 @@ class ComposerHelper
         return null;
     }
 
+    public function addPsr4NamespaceToComposer(
+        string $bundleNamespace,
+        string $path
+    ): void
+    {
+        $composerJsonPath = THELIA_ROOT . 'composer.json';
+
+        if (!file_exists($composerJsonPath)) {
+            throw new \InvalidArgumentException("No composer.json found at '$composerJsonPath'");
+        }
+
+        try {
+            $composerData = json_decode(file_get_contents($composerJsonPath), true, 512, \JSON_THROW_ON_ERROR);
+
+            $namespaceParts = explode('\\', $bundleNamespace);
+            array_pop($namespaceParts);
+            $baseNamespace = implode('\\', $namespaceParts) . '\\';
+
+            if (!isset($composerData['autoload']['psr-4'][$baseNamespace])) {
+                $path = str_replace(THELIA_ROOT, '', $path);
+                $composerData['autoload']['psr-4'][$baseNamespace] = $path. DS.'src'.DS;
+
+                ksort($composerData['autoload']['psr-4']);
+
+                file_put_contents(
+                    $composerJsonPath,
+                    json_encode($composerData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n"
+                );
+            }
+        } catch (\JsonException $e) {
+            throw new \InvalidArgumentException("Invalid JSON in composer.json: " . $e->getMessage());
+        }
+    }
 
 
     private function dumpBundlesPhp(array $bundles): string

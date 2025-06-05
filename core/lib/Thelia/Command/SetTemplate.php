@@ -71,7 +71,7 @@ class SetTemplate extends ContainerAwareCommand
                 return self::FAILURE;
             }
             // copy directory vendor to template
-            if (!mkdir($path) && !is_dir($path)) {
+            if (!is_dir($path) && !mkdir($path) && !is_dir($path)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $path));
             }
             $filesystem = new Filesystem();
@@ -85,6 +85,7 @@ class SetTemplate extends ContainerAwareCommand
         $output->writeln(sprintf('<info>%d modules installed and activated.</info>', \count($moduledInstalled)));
         $this->theliaTemplateHelper->enableThemeAsBundle($path);
         $output->writeln('<info>Theme ready</info>');
+        $output->writeln('<info>You should run the composer dump-autoload command</info>');
 
         return self::SUCCESS;
     }

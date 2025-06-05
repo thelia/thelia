@@ -87,12 +87,13 @@
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
-            "Thelia\\": "core/lib/Thelia",
             "": [
                 "local/modules/",
                 "vendor/thelia/modules"
             ],
-            "App\\": "src/"
+            "App\\": "src/",
+            "FlexyBundle\\": "templates/frontOffice/flexy/src/",
+            "Thelia\\": "core/lib/Thelia"
         },
         "files": [
             "core/bootstrap.php"
