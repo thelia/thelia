@@ -83,16 +83,11 @@ class Thelia extends Kernel
     public const THELIA_VERSION = '2.5.5';
 
     protected SchemaLocator $propelSchemaLocator;
-
     protected PropelInitService $propelInitService;
-
     protected ParserResolver $parserResolver;
-
-    protected bool $propelConnectionAvailable;
-
     protected ConnectionInterface $theliaDatabaseConnection;
-
     protected bool $cacheRefresh = false;
+    protected bool $propelConnectionAvailable;
 
     public function __construct($environment, $debug)
     {
@@ -319,10 +314,8 @@ class Thelia extends Kernel
 
         $cache = require $this->getCacheDir().DS.'check_mysql_configurations.php';
 
-        if (!empty($cache['canUpdate'])) {
-            if (null === $con->query("SET SESSION sql_mode='".implode(',', $cache['modes'])."';")) {
-                throw new \RuntimeException('Failed to set MySQL global and session sql_mode');
-            }
+        if (!empty($cache['canUpdate']) && null === $con->query("SET SESSION sql_mode='" . implode(',', $cache['modes']) . "';")) {
+            throw new \RuntimeException('Failed to set MySQL global and session sql_mode');
         }
     }
 
@@ -397,11 +390,6 @@ class Thelia extends Kernel
         return $container;
     }
 
-    /**
-     * Returns the kernel parameters.
-     *
-     * @return array An array of kernel parameters
-     */
     protected function getKernelParameters(): array
     {
         $parameters = parent::getKernelParameters();

@@ -30,6 +30,10 @@ if (!defined('THELIA_VENDOR')) {
     define('THELIA_VENDOR', THELIA_ROOT.'vendor'.DS);
 }
 
+if (!defined('THELIA_VENDOR_ROOT')) {
+    define('THELIA_VENDOR_ROOT', THELIA_VENDOR.'thelia'.DS);
+}
+
 if (!defined('THELIA_LOCAL_DIR')) {
     define('THELIA_LOCAL_DIR', THELIA_ROOT.'local'.DS);
 }

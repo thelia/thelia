@@ -120,9 +120,6 @@
             "vendor/{$vendor}/modules/{$name}": [
                 "type:thelia-module"
             ],
-            "templates/frontOffice/{$name}": [
-                "type:thelia-frontoffice-template"
-            ],
             "templates/email/{$name}": [
                 "type:thelia-email-template"
             ],

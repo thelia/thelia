@@ -12,7 +12,7 @@
 
 namespace Thelia\Api\Bridge\Propel\State;
 
-use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Put;
@@ -30,9 +30,9 @@ readonly class PropelItemProvider implements ProviderInterface
 {
     public function __construct(
         private ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
-        private iterable $propelItemExtensions = [],
         private EventDispatcherInterface $eventDispatcher,
         private TFiltersProvider $filtersProvider,
+        private iterable $propelItemExtensions = []
     ) {
     }
 

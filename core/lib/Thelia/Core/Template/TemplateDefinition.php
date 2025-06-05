@@ -40,34 +40,26 @@ class TemplateDefinition
         self::EMAIL_SUBDIR => self::EMAIL_CONFIG_NAME,
     ];
 
-    /** @var string the template directory full path */
-    protected $path;
+    protected ?string $path = null;
+    protected ?TemplateDescriptor $templateDescriptor = null;
+    protected ?string $translationDomainPrefix = null;
 
-    /** @var TemplateDescriptor */
-    protected $templateDescriptor;
-
-    /** @var string the prefix for translation domain name */
-    protected $translationDomainPrefix;
-
-    protected static $standardTemplatesSubdirs = [
+    protected static array $standardTemplatesSubdirs = [
         self::FRONT_OFFICE => self::FRONT_OFFICE_SUBDIR,
         self::BACK_OFFICE => self::BACK_OFFICE_SUBDIR,
         self::PDF => self::PDF_SUBDIR,
         self::EMAIL => self::EMAIL_SUBDIR,
     ];
 
-    /** @var array|null the parent list cache */
-    protected $parentList;
+    protected ?array $parentList = null;
 
     /**
-     * TemplateDefinition constructor.
-     *
      * @param string $name the template name (= directory name)
-     * @param int    $type the remplate type (see $standardTemplatesSubdirs)
+     * @param int $type the remplate type (see $standardTemplatesSubdirs)
      *
      * @throws \Exception
      */
-    public function __construct($name, $type)
+    public function __construct(string $name, int $type)
     {
         switch ($type) {
             case self::FRONT_OFFICE:
@@ -92,132 +84,28 @@ class TemplateDefinition
                 break;
         }
 
-        // Load template descriprot, if any.
         $this->templateDescriptor = (new TemplateValidator($this->getAbsolutePath()))->getTemplateDefinition($name, $type);
     }
 
-    public function getTranslationDomain()
-    {
-        return $this->translationDomainPrefix.strtolower($this->getName());
-    }
 
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->templateDescriptor->getName();
-    }
-
-    public function setName($name)
-    {
-        $this->templateDescriptor->setName($name);
-
-        return $this;
-    }
-
-    public function getI18nPath()
-    {
-        return $this->getPath().DS.'I18n';
-    }
-
-    public function getAbsoluteI18nPath()
-    {
-        return THELIA_TEMPLATE_DIR.$this->getI18nPath();
-    }
-
-    public function getPath()
-    {
-        return $this->path;
-    }
-
-    public function getAbsolutePath()
-    {
-        return THELIA_TEMPLATE_DIR.$this->getPath();
-    }
-
-    public function getConfigPath()
-    {
-        return $this->getPath().DS.'configs';
-    }
-
-    public function getAbsoluteConfigPath()
-    {
-        return THELIA_TEMPLATE_DIR.$this->getConfigPath();
-    }
-
-    public function setPath($path)
-    {
-        $this->path = $path;
-
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getType()
-    {
-        return $this->templateDescriptor->getType();
-    }
-
-    public function setType($type)
-    {
-        $this->$this->templateDescriptor->setType($type);
-
-        return $this;
-    }
-
-    /**
-     * Get teh template descriptor.
-     *
-     * @return TemplateDescriptor
-     */
-    public function getDescriptor()
-    {
-        return $this->templateDescriptor;
-    }
-
-    /**
-     * Returns an iterator on the standard templates subdir names.
-     */
-    public static function getStandardTemplatesSubdirsIterator()
-    {
-        return new \ArrayIterator(self::$standardTemplatesSubdirs);
-    }
-
-    /**
-     * Return the template parent list.
-     *
-     * @return array|null
-     */
-    public function getParentList()
+    public function getParentList(): ?array
     {
         if (null === $this->parentList) {
             $this->parentList = [];
 
-            $parent = $this->getDescriptor()->getParent();
+            $parent = $this->getDescriptor()?->getParent();
 
             for ($index = 1; null !== $parent; ++$index) {
                 $this->parentList[$parent->getName().'-'] = $parent;
 
-                $parent = $parent->getDescriptor()->getParent();
+                $parent = $parent->getDescriptor()?->getParent();
             }
         }
 
         return $this->parentList;
     }
 
-    /**
-     * Find a template file path, considering the template parents, if any.
-     *
-     * @param string $templateName the template name, with path
-     *
-     * @throws TemplateException
-     *
-     * @return string
-     */
-    public function getTemplateFilePath($templateName)
+    public function getTemplateFilePath(string $templateName): string
     {
         $templateList = array_merge(
             [$this],
@@ -241,26 +129,97 @@ class TemplateDefinition
         throw new TemplateException("Template file not found: $templateName");
     }
 
-    /**
-     * @return string
-     */
-    public function getAssetsPath()
+    public function getAssetsPath(): string
     {
         return $this->templateDescriptor->getAssets();
     }
 
-    public function setAssetsPath($assets)
+    public function setAssetsPath($assets): static
     {
         $this->$this->templateDescriptor->setAssets($assets);
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getAbsoluteAssetsPath()
+    public function getAbsoluteAssetsPath(): string
     {
         return $this->getAbsolutePath().DS.$this->templateDescriptor->getAssets();
+    }
+
+
+    public function getTranslationDomain(): string
+    {
+        return $this->translationDomainPrefix.strtolower($this->getName());
+    }
+
+    public function getName(): string
+    {
+        return $this->templateDescriptor->getName();
+    }
+
+    public function setName($name): static
+    {
+        $this->templateDescriptor->setName($name);
+
+        return $this;
+    }
+
+    public function getI18nPath(): string
+    {
+        return $this->getPath().DS.'I18n';
+    }
+
+    public function getAbsoluteI18nPath(): string
+    {
+        return THELIA_TEMPLATE_DIR.$this->getI18nPath();
+    }
+
+    public function getPath(): ?string
+    {
+        return $this->path;
+    }
+
+    public function getAbsolutePath(): string
+    {
+        return THELIA_TEMPLATE_DIR.$this->getPath();
+    }
+
+    public function getConfigPath(): string
+    {
+        return $this->getPath().DS.'configs';
+    }
+
+    public function getAbsoluteConfigPath(): string
+    {
+        return THELIA_TEMPLATE_DIR.$this->getConfigPath();
+    }
+
+    public function setPath($path): static
+    {
+        $this->path = $path;
+
+        return $this;
+    }
+
+    public function getType(): int
+    {
+        return $this->templateDescriptor->getType();
+    }
+
+    public function setType($type): static
+    {
+        $this->$this->templateDescriptor->setType($type);
+
+        return $this;
+    }
+
+    public function getDescriptor(): ?TemplateDescriptor
+    {
+        return $this->templateDescriptor;
+    }
+
+    public static function getStandardTemplatesSubdirsIterator(): \ArrayIterator
+    {
+        return new \ArrayIterator(self::$standardTemplatesSubdirs);
     }
 }

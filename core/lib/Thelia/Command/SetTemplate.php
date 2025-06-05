@@ -15,6 +15,7 @@ namespace Thelia\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TheliaTemplateHelper;
 use Thelia\Model\ConfigQuery;
@@ -60,11 +61,21 @@ class SetTemplate extends ContainerAwareCommand
 
             return self::FAILURE;
         }
+
         $path = THELIA_TEMPLATE_DIR.$type.DS.$name;
         if (!is_dir($path)) {
-            $output->writeln("<error>Template {$path} not found.</error>");
+            $pathVendor = THELIA_VENDOR_ROOT.$name;
+            if (!is_dir($pathVendor)) {
+                $output->writeln("<error>Template {$pathVendor} not found.</error>");
 
-            return self::FAILURE;
+                return self::FAILURE;
+            }
+            // copy directory vendor to template
+            if (!mkdir($path) && !is_dir($path)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $path));
+            }
+            $filesystem = new Filesystem();
+            $filesystem->mirror($pathVendor, $path);
         }
 
         ConfigQuery::write(TemplateDefinition::CONFIG_NAMES[$type], $name);

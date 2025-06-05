@@ -1,5 +1,13 @@
 #!/usr/bin/env php
 <?php
+error_reporting(0);
+ini_set('display_errors', '0');
+ini_set('log_errors', '0');
+
+// Désactiver les dépréciations Symfony
+$_ENV['SYMFONY_DEPRECATIONS_HELPER'] = 'disabled';
+$_SERVER['SYMFONY_DEPRECATIONS_HELPER'] = 'disabled';
+putenv('SYMFONY_DEPRECATIONS_HELPER=disabled');
 
 $bootstrapFile = __DIR__ . "/vendor/autoload.php";
 include __DIR__ . "/core/Thelia";
