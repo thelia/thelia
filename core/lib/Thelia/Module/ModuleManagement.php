@@ -32,28 +32,30 @@ use Thelia\Model\ModuleQuery;
  */
 class ModuleManagement
 {
-    protected $baseModuleDir;
-    protected $reflected;
 
-    /** @var ModuleDescriptorValidator */
-    protected $descriptorValidator;
+    protected ?ModuleDescriptorValidator $descriptorValidator = null;
 
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
+    public function __construct(protected ContainerInterface $container)
     {
-        $this->container = $container;
-        $this->baseModuleDir = THELIA_MODULE_DIR;
     }
 
+
     public function updateModules(ContainerInterface $container): void
+    {
+        $directories = [THELIA_MODULE_DIR, THELIA_LOCAL_MODULE_DIR];
+        foreach($directories as $directory) {
+            $this->fetchDirModuleForUpdate($directory, $container);
+        }
+    }
+
+    private function fetchDirModuleForUpdate(string $dir, ContainerInterface $container): void
     {
         try {
             $finder = new Finder();
 
             $finder
                 ->name('module.xml')
-                ->in($this->baseModuleDir.'*'.DS.'Config');
+                ->in($dir.'*'.DS.'Config');
 
             $errors = [];
 
@@ -86,15 +88,14 @@ class ModuleManagement
      * Update module information, and invoke install() for new modules (e.g. modules
      * just discovered), or update() modules for which version number ha changed.
      *
-     * @param \SplFileInfo       $file      the module.xml file descriptor
+     * @param \SplFileInfo $file      the module.xml file descriptor
      * @param ContainerInterface $container the container
      *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      *
-     * @return Module
      */
-    public function updateModule($file, ContainerInterface $container)
+    public function updateModule(\SplFileInfo $file, ContainerInterface $container): Module
     {
         $descriptorValidator = $this->getDescriptorValidator();
 
@@ -153,9 +154,9 @@ class ModuleManagement
 
             $instance->setContainer($container);
 
-            if ($action == 'install') {
+            if ($action === 'install') {
                 $instance->install($con);
-            } elseif ($action == 'update') {
+            } elseif ($action === 'update') {
                 $instance->update($currentVersion, $version, $con);
             }
 
@@ -174,10 +175,7 @@ class ModuleManagement
         return $module;
     }
 
-    /**
-     * @return \Thelia\Module\ModuleDescriptorValidator
-     */
-    public function getDescriptorValidator()
+    public function getDescriptorValidator(): ModuleDescriptorValidator
     {
         if (null === $this->descriptorValidator) {
             $this->descriptorValidator = new ModuleDescriptorValidator();
@@ -192,10 +190,10 @@ class ModuleManagement
             $this->container->getParameter('kernel.cache_dir')
         );
 
-        $this->container->get('event_dispatcher')->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
+        $this->container->get('event_dispatcher')?->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
     }
 
-    private function getModuleType(\ReflectionClass $reflected)
+    private function getModuleType(\ReflectionClass $reflected): int
     {
         if (
             $reflected->implementsInterface('Thelia\Module\DeliveryModuleInterface')

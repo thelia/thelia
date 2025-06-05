@@ -524,7 +524,6 @@ class Thelia extends Kernel
                         $container->addCompilerPass($compiler);
                     }
                 }
-
                 $loader = new XmlFileLoader($container, new FileLocator($module->getAbsoluteConfigPath()));
                 $loader->load('config.xml', 'module.'.$module->getCode());
 

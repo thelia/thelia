@@ -51,15 +51,9 @@ class XmlFileLoader extends FileLoader
 {
     public const DEFAULT_HOOK_CLASS = 'Thelia\\Core\\Hook\\DefaultHook';
 
-    /**
-     * Loads an XML file.
-     *
-     * @param mixed  $file The resource
-     * @param string $type The resource type
-     */
-    public function load($file, $type = null): void
+    public function load(mixed $resource, string $type = null): void
     {
-        $path = $this->locator->locate($file);
+        $path = $this->locator->locate($resource);
 
         $xml = $this->parseFile($path);
         $xml->registerXPathNamespace('config', 'http://thelia.net/schema/dic/config');
