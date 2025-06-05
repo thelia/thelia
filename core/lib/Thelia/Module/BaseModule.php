@@ -777,9 +777,9 @@ class BaseModule implements BaseModuleInterface
      *
      * @return string
      */
-    protected function getPropelSchemaDir()
+    protected function getPropelSchemaDir(): string
     {
-        return THELIA_MODULE_DIR.$this->getCode().DS.'Config'.DS.'schema.xml';
+        return $this->getModuleDir().DS.'Config'.DS.'schema.xml';
     }
 
     /**
@@ -787,7 +787,7 @@ class BaseModule implements BaseModuleInterface
      *
      * @return bool
      */
-    protected function hasPropelSchema()
+    protected function hasPropelSchema(): bool
     {
         return (new Filesystem())->exists($this->getPropelSchemaDir());
     }
@@ -803,7 +803,7 @@ class BaseModule implements BaseModuleInterface
             $translator = $this->container->get('thelia.translator');
 
             if (null !== $translator) {
-                $i18nPath = sprintf('%s%s/I18n/', THELIA_MODULE_DIR, $this->getCode());
+                $i18nPath = sprintf('%s/I18n/', $this->getModuleDir());
                 $languages = LangQuery::create()->find();
 
                 foreach ($languages as $language) {
@@ -816,5 +816,12 @@ class BaseModule implements BaseModuleInterface
                 }
             }
         }
+    }
+
+    public function getModuleDir(): string
+    {
+        return is_dir(THELIA_MODULE_DIR.$this->getCode())
+            ? THELIA_MODULE_DIR.$this->getCode()
+            : THELIA_LOCAL_MODULE_DIR.$this->getCode();
     }
 }

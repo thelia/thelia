@@ -74,11 +74,12 @@ class ModuleActivateCommand extends BaseModuleGenerate
         try {
             $moduleCode = $this->formatModuleName($input->getArgument('module'));
 
+            /** @var Module $module */
             $module = ModuleQuery::create()->findOneByCode($moduleCode);
 
             if (null === $module) {
-                if (is_dir(THELIA_MODULE_DIR.$moduleCode)) {
-                    $module = $this->installModule(THELIA_MODULE_DIR.$moduleCode);
+                if (is_dir($module->getModuleDir().$moduleCode)) {
+                    $module = $this->installModule($module->getModuleDir().$moduleCode);
                 }
                 if (null === $module) {
                     throw new \RuntimeException(sprintf('module %s not found', $moduleCode));

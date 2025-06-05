@@ -216,7 +216,8 @@ class Thelia extends Kernel
         // initialize Propel, building its cache if necessary
         $this->propelSchemaLocator = new SchemaLocator(
             THELIA_CONF_DIR,
-            THELIA_MODULE_DIR
+            THELIA_MODULE_DIR,
+            THELIA_LOCAL_MODULE_DIR
         );
 
         $this->propelInitService = new PropelInitService(
@@ -525,7 +526,8 @@ class Thelia extends Kernel
                     }
                 }
                 $loader = new XmlFileLoader($container, new FileLocator($module->getAbsoluteConfigPath()));
-                $loader->load('config.xml', 'module.'.$module->getCode());
+                $loader->load('config.xml', 'module.' . $module->getCode());
+
 
                 $envConfigFileName = sprintf('config_%s.xml', $this->environment);
                 $envConfigFile = sprintf('%s%s%s', $module->getAbsoluteConfigPath(), DS, $envConfigFileName);

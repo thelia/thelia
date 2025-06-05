@@ -25,64 +25,42 @@ class SchemaLocator
 {
     /**
      * Argument to Finder::name() used to filter schema files.
-     *
-     * @var string
      */
-    protected static $SCHEMA_FILE_PATTERN = '*schema.xml';
+    protected static string $SCHEMA_FILE_PATTERN = '*schema.xml';
 
-    /**
-     * Thelia configuration directory.
-     * Used to find Thelia schema files.
-     *
-     * @var string
-     */
-    protected $theliaConfDir;
-
-    /**
-     * Thelia module directory.
-     * Used to find modules schema files.
-     *
-     * @var string
-     */
-    protected $theliaModuleDir;
-
-    /**
-     * @param string $theliaConfDir   thelia configuration directory
-     * @param string $theliaModuleDir thelia module directory
-     */
-    public function __construct($theliaConfDir, $theliaModuleDir)
+    public function __construct(
+        protected string $theliaConfDir,
+        protected string $theliaModuleDir,
+        protected string $theliaLocalModuleDir,
+    )
     {
-        $this->theliaConfDir = $theliaConfDir;
-        $this->theliaModuleDir = $theliaModuleDir;
     }
 
     /**
      * Get schema documents for Thelia core and active modules, as well as included external schemas.
-     *
-     * @return \DOMDocument[] schema documents
      */
-    public function findForAllModules()
+    public function findForAllModules(): array
     {
         $finder = new Finder();
         $filesystem = new Filesystem();
-        $modulesPath = THELIA_MODULE_DIR.'*'.DS.'Config';
+        $modulesPath =[
+            THELIA_MODULE_DIR => THELIA_MODULE_DIR.'*'.DS.'Config',
+            THELIA_LOCAL_MODULE_DIR => THELIA_LOCAL_MODULE_DIR.'*'.DS.'Config',
+        ];
+        foreach ($modulesPath as $rootPath => $modulePath) {
+            try {
+                if (!$filesystem->exists($rootPath)) {
+                    throw new DirectoryNotFoundException(sprintf('The directory "%s" does not exist.', $rootPath));
+                }
+                $finder->name('module.xml')->in($modulesPath);
 
-        try {
-            // Vérifiez si le répertoire existe avant d'utiliser Finder
-            if (!$filesystem->exists(THELIA_MODULE_DIR)) {
-                throw new DirectoryNotFoundException(sprintf('The directory "%s" does not exist.', THELIA_MODULE_DIR));
+                $codes = array_map(static function ($file) {
+                    return basename(\dirname($file, 2));
+                }, iterator_to_array($finder));
+                return $this->findForModules($codes);
+            } catch (\Exception $e) {
+                return $this->findForModules(['Thelia']);
             }
-
-            $finder->name('module.xml')->in($modulesPath);
-
-            // reset keys
-            $codes = array_map(function ($file) {
-                return basename(\dirname($file, 2));
-            }, iterator_to_array($finder));
-
-            return $this->findForModules($codes);
-        } catch (\Exception) {
-            return $this->findForModules(['Thelia']);
         }
     }
 
@@ -92,11 +70,11 @@ class SchemaLocator
      *
      * @param string[] $modules          Codes of the modules to fetch schemas for. 'Thelia' can be used to include Thelia core
      *                                   schemas.
-     * @param bool     $withDependencies whether to also return schemas for the specified modules dependencies
+     * @param bool $withDependencies whether to also return schemas for the specified modules dependencies
      *
      * @return \DOMDocument[] schema documents
      */
-    public function findForModules(array $modules = [], $withDependencies = true)
+    public function findForModules(array $modules = [], bool $withDependencies = true): array
     {
         if ($withDependencies) {
             $modules = $this->addModulesDependencies($modules);
@@ -134,7 +112,7 @@ class SchemaLocator
      *
      * @return string[] modules codes with added dependencies
      */
-    protected function addModulesDependencies(array $modules = [])
+    protected function addModulesDependencies(array $modules = []): array
     {
         if (empty($modules)) {
             return [];
@@ -150,11 +128,14 @@ class SchemaLocator
             if ($module === 'Thelia') {
                 continue;
             }
+            $modulePath = is_dir("{$this->theliaModuleDir}/{$module}")
+                ? "{$this->theliaModuleDir}/{$module}"
+                : "{$this->theliaLocalModuleDir}/{$module}";
 
-            $moduleValidator = new ModuleValidator("{$this->theliaModuleDir}/{$module}");
+            $moduleValidator = new ModuleValidator($modulePath);
             $dependencies = $moduleValidator->getCurrentModuleDependencies(true);
             foreach ($dependencies as $dependency) {
-                if (!\in_array($dependency['code'], $modules)) {
+                if (!\in_array($dependency['code'], $modules, true)) {
                     $modules[] = $dependency['code'];
                 }
             }
@@ -166,7 +147,7 @@ class SchemaLocator
     /**
      * @return Finder thelia schema files
      */
-    protected function getSchemaPathsForThelia()
+    protected function getSchemaPathsForThelia(): Finder
     {
         return Finder::create()
             ->files()
@@ -174,12 +155,7 @@ class SchemaLocator
             ->in($this->theliaConfDir);
     }
 
-    /**
-     * @param string $module module code
-     *
-     * @return Finder schema files for this module
-     */
-    protected function getSchemaPathsForModule($module)
+    protected function getSchemaPathsForModule(string $module): Finder
     {
         $moduleSchemas = Finder::create()
             ->files()
@@ -187,7 +163,10 @@ class SchemaLocator
             ->depth(0);
 
         try {
-            $moduleSchemas->in("{$this->theliaModuleDir}/{$module}/Config");
+            $modulePath = is_dir("{$this->theliaModuleDir}/{$module}")
+                ? "{$this->theliaModuleDir}/{$module}/Config"
+                : "{$this->theliaLocalModuleDir}/{$module}/Config";
+            $moduleSchemas->in($modulePath);
         } catch (\InvalidArgumentException $e) {
             // just continue if the module has no Config directory
         }
@@ -197,12 +176,8 @@ class SchemaLocator
 
     /**
      * Add external schema documents not already included.
-     *
-     * @param \DOMDocument[] $schemaDocuments schema documents
-     *
-     * @return \DOMDocument[] schema documents
      */
-    protected function addExternalSchemaDocuments(array $schemaDocuments)
+    protected function addExternalSchemaDocuments(array $schemaDocuments): array
     {
         $fs = new Filesystem();
 
@@ -238,14 +213,14 @@ class SchemaLocator
      *
      * @return \DOMDocument[]
      */
-    protected function mergeDOMDocumentsArrays(array $documentArrays)
+    protected function mergeDOMDocumentsArrays(array $documentArrays): array
     {
         $result = [];
         $includedDocumentURIs = [];
 
         foreach ($documentArrays as $documentArray) {
             foreach ($documentArray as $document) {
-                if (\in_array($document->baseURI, $includedDocumentURIs)) {
+                if (\in_array($document->baseURI, $includedDocumentURIs, true)) {
                     continue;
                 }
 

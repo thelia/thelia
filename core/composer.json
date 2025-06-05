@@ -78,8 +78,7 @@
         "thelia/config": "dev-twig",
         "thelia/setup": "dev-twig",
         "thelia/currency-converter": "~1.0",
-        "thelia/propel": "dev-thelia-2.5",
-        "thelia/web-profiler-module": "2.5.*"
+        "thelia/propel": "dev-thelia-2.5"
     },
     "require-dev": {
         "phpunit/phpunit": "9.5.*",
@@ -89,7 +88,8 @@
         "phpstan/extension-installer": "1.1.0",
         "symfony/css-selector": "6.4.*",
         "friendsofphp/php-cs-fixer": "3.41.*",
-        "symfony/debug-bundle": "6.4.*"
+        "symfony/debug-bundle": "6.4.*",
+        "thelia/web-profiler-module": "dev-twig"
     },
     "bin": [
         "Thelia"

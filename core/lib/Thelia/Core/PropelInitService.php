@@ -95,78 +95,6 @@ class PropelInitService
     }
 
     /**
-     * @return string propel subdirectory in the Thelia cache directory
-     */
-    public function getPropelCacheDir()
-    {
-        return THELIA_CACHE_DIR.$this->environment.DS.'propel'.DS;
-    }
-
-    /**
-     * @return string propel configuration directory
-     */
-    public function getPropelConfigDir()
-    {
-        return $this->getPropelCacheDir().'config'.DS;
-    }
-
-    /**
-     * @return string propel cached configuration file
-     */
-    public function getPropelConfigFile()
-    {
-        return $this->getPropelConfigDir().'propel.yml';
-    }
-
-    /**
-     * @return string propel cached initialization file
-     */
-    public function getPropelInitFile()
-    {
-        return $this->getPropelConfigDir().static::$PROPEL_CONFIG_CACHE_FILENAME;
-    }
-
-    /**
-     * @return string generated global Propel schema(s) directory
-     */
-    public function getPropelSchemaDir()
-    {
-        return $this->getPropelCacheDir().'schema'.DS;
-    }
-
-    /**
-     * @return string generated Propel models directory
-     */
-    public function getPropelModelDir()
-    {
-        return $this->getPropelCacheDir().'model'.DS;
-    }
-
-    /**
-     * @return string generated Propel models directory
-     */
-    public function getPropelDatabaseDir()
-    {
-        return $this->getPropelCacheDir().'database'.DS;
-    }
-
-    /**
-     * @return string generated Propel migrations directory
-     */
-    public function getPropelMigrationDir()
-    {
-        return $this->getPropelCacheDir().'migration'.DS;
-    }
-
-    /**
-     * @return string generated Propel loader directory
-     */
-    public function getPropelLoaderScriptDir()
-    {
-        return $this->getPropelCacheDir().'loader'.DS;
-    }
-
-    /**
      * Run a Propel command.
      *
      * @param Command              $command    command to run
@@ -175,9 +103,8 @@ class PropelInitService
      *
      * @throws \Exception
      *
-     * @return int command exit code
      */
-    public function runCommand(Command $command, array $parameters = [], OutputInterface $output = null)
+    public function runCommand(Command $command, array $parameters = [], OutputInterface $output = null): int
     {
         $parameters['command'] = $command->getName();
         $input = new ArrayInput($parameters);
@@ -270,7 +197,7 @@ class PropelInitService
     /**
      * Generate the global Propel schema(s).
      */
-    public function buildPropelGlobalSchema()
+    public function buildPropelGlobalSchema(): bool
     {
         $fs = new Filesystem();
 
@@ -308,7 +235,7 @@ class PropelInitService
      *
      * @throws \Exception
      */
-    public function buildPropelModels()
+    public function buildPropelModels(): bool
     {
         $fs = new Filesystem();
 
@@ -328,7 +255,6 @@ class PropelInitService
                 '--loader-script-dir' => $this->getPropelLoaderScriptDir(),
             ]
         );
-
         $fs->copy(
             $this->getPropelCacheDir().'hash',
             $this->getPropelModelDir().'hash'
@@ -427,5 +353,51 @@ class PropelInitService
         }
 
         return true;
+    }
+
+
+    public function getPropelCacheDir(): string
+    {
+        return THELIA_CACHE_DIR.$this->environment.DS.'propel'.DS;
+    }
+
+    public function getPropelConfigDir(): string
+    {
+        return $this->getPropelCacheDir().'config'.DS;
+    }
+
+    public function getPropelConfigFile(): string
+    {
+        return $this->getPropelConfigDir().'propel.yml';
+    }
+
+    public function getPropelInitFile(): string
+    {
+        return $this->getPropelConfigDir().static::$PROPEL_CONFIG_CACHE_FILENAME;
+    }
+
+    public function getPropelSchemaDir(): string
+    {
+        return $this->getPropelCacheDir().'schema'.DS;
+    }
+
+    public function getPropelModelDir(): string
+    {
+        return $this->getPropelCacheDir().'model'.DS;
+    }
+
+    public function getPropelDatabaseDir(): string
+    {
+        return $this->getPropelCacheDir().'database'.DS;
+    }
+
+    public function getPropelMigrationDir(): string
+    {
+        return $this->getPropelCacheDir().'migration'.DS;
+    }
+
+    public function getPropelLoaderScriptDir(): string
+    {
+        return $this->getPropelCacheDir().'loader'.DS;
     }
 }

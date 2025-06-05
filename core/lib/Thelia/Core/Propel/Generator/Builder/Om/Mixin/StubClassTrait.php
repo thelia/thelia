@@ -37,8 +37,12 @@ trait StubClassTrait
                 THELIA_ROOT
             );
         } else {
+            $modulePath = file_exists(THELIA_MODULE_DIR.parent::getClassFilePath())
+                ? THELIA_MODULE_DIR.parent::getClassFilePath()
+                : THELIA_LOCAL_MODULE_DIR.parent::getClassFilePath();
+
             $path = $fs->makePathRelative(
-                THELIA_MODULE_DIR.parent::getClassFilePath(),
+                $modulePath,
                 THELIA_ROOT
             );
         }

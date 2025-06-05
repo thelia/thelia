@@ -31,83 +31,29 @@ use Thelia\Tools\Version\Version;
  */
 class ModuleValidator
 {
-    protected $modulePath;
-
-    /** @var \SimpleXMLElement */
-    protected $moduleDescriptor;
-
-    /** @var ModuleDefinition */
-    protected $moduleDefinition;
-
-    protected $moduleVersion;
-
-    /** @var Translator */
-    protected $translator;
-
-    /** @var array array of errors */
-    protected $errors = [];
-
-    protected $moduleDirName;
+    protected ?\SimpleXMLElement $moduleDescriptor = null;
+    protected ?ModuleDefinition $moduleDefinition = null;
+    protected ?string $moduleVersion = null;
+    protected array $errors = [];
+    protected ?string $moduleDirName = null;
 
     /**
-     * @param string                              $modulePath the path of the module directory
-     * @param \Thelia\Core\Translation\Translator $translator FOR UNIT TEST PURPOSE ONLY
+     * @param string|null $modulePath the path of the module directory
+     * @param Translator|null $translator FOR UNIT TEST PURPOSE ONLY
+     * @throws FileNotFoundException
      */
-    public function __construct($modulePath = null, $translator = null)
+    public function __construct(
+        protected ?string $modulePath = null,
+        protected ?Translator $translator = null
+    )
     {
-        $this->translator = $translator;
-
-        $this->modulePath = $modulePath;
-
         $this->moduleDirName = basename($this->modulePath);
-
         $this->checkDirectoryStructure();
-
         $this->loadModuleDescriptor();
-
         $this->loadModuleDefinition();
     }
 
-    public function setModulePath($modulePath): void
-    {
-        $this->modulePath = $modulePath;
-    }
-
-    public function getModulePath()
-    {
-        return $this->modulePath;
-    }
-
-    /**
-     * @return ModuleDescriptorValidator|null
-     */
-    public function getModuleDescriptor()
-    {
-        return $this->moduleDescriptor;
-    }
-
-    /**
-     * @return ModuleDefinition|null
-     */
-    public function getModuleDefinition()
-    {
-        return $this->moduleDefinition;
-    }
-
-    public function getModuleVersion()
-    {
-        return $this->moduleVersion;
-    }
-
-    /**
-     * @return array
-     */
-    public function getErrors()
-    {
-        return $this->errors;
-    }
-
-    protected function trans($id, array $parameters = [])
+    protected function trans($id, array $parameters = []): string
     {
         if (null === $this->translator) {
             try {
@@ -128,8 +74,9 @@ class ModuleValidator
      *
      * @param bool $checkCurrentVersion if true it will also check if the module is
      *                                  already installed (not activated - present in module list)
+     * @throws \Exception
      */
-    public function validate($checkCurrentVersion = true): void
+    public function validate(bool $checkCurrentVersion = true): void
     {
         if (null === $this->moduleDescriptor) {
             throw new \Exception(
@@ -150,6 +97,9 @@ class ModuleValidator
         $this->checkModulePropelSchema();
     }
 
+    /**
+     * @throws FileNotFoundException
+     */
     protected function checkDirectoryStructure(): void
     {
         if (false === file_exists($this->modulePath)) {
@@ -188,15 +138,14 @@ class ModuleValidator
 
         $descriptorValidator = new ModuleDescriptorValidator();
 
-        try {
-            // validation with xsd
-            $this->moduleDescriptor = $descriptorValidator->getDescriptor($path);
-            $this->moduleVersion = $descriptorValidator->getModuleVersion();
-        } catch (InvalidXmlDocumentException $ex) {
-            throw $ex;
-        }
+        // validation with xsd
+        $this->moduleDescriptor = $descriptorValidator->getDescriptor($path);
+        $this->moduleVersion = $descriptorValidator->getModuleVersion();
     }
 
+    /**
+     * @throws \Exception
+     */
     public function loadModuleDefinition(): void
     {
         if (null === $this->moduleDescriptor) {
@@ -215,7 +164,7 @@ class ModuleValidator
 
         $namespaceComponents = explode('\\', $fullnamespace);
 
-        if (!isset($namespaceComponents[0]) || empty($namespaceComponents[0])) {
+        if (empty($namespaceComponents[0])) {
             throw new ModuleException(
                 $this->trans(
                     "Unable to get module code from the fullnamespace element of the module descriptor: '%val'",
@@ -269,18 +218,18 @@ class ModuleValidator
 
     protected function checkVersion(): void
     {
-        if ($this->moduleDefinition->getTheliaVersion()) {
-            if (!Version::test(Thelia::THELIA_VERSION, $this->moduleDefinition->getTheliaVersion(), false, '>=')) {
-                throw new ModuleException(
-                    $this->trans(
-                        'The module %name requires Thelia %version or newer',
-                        [
-                            '%name' => $this->moduleDirName,
-                            '%version' => $this->moduleDefinition->getTheliaVersion(),
-                        ]
-                    )
-                );
-            }
+        if ($this->moduleDefinition->getTheliaVersion()
+            && !Version::test(Thelia::THELIA_VERSION, $this->moduleDefinition->getTheliaVersion(), false, '>='))
+        {
+            throw new ModuleException(
+                $this->trans(
+                    'The module %name requires Thelia %version or newer',
+                    [
+                        '%name' => $this->moduleDirName,
+                        '%version' => $this->moduleDefinition->getTheliaVersion(),
+                    ]
+                )
+            );
         }
     }
 
@@ -289,15 +238,13 @@ class ModuleValidator
         $module = ModuleQuery::create()
             ->findOneByFullNamespace($this->moduleDefinition->getNamespace());
 
-        if (null !== $module) {
-            if (version_compare($module->getVersion(), $this->moduleDefinition->getVersion(), '>=')) {
-                throw new ModuleException(
-                    $this->trans(
-                        'The module %name is already installed in the same or greater version.',
-                        ['%name' => $this->moduleDirName]
-                    )
-                );
-            }
+        if ((null !== $module) && version_compare($module->getVersion(), $this->moduleDefinition->getVersion(), '>=')) {
+            throw new ModuleException(
+                $this->trans(
+                    'The module %name is already installed in the same or greater version.',
+                    ['%name' => $this->moduleDirName]
+                )
+            );
         }
     }
 
@@ -311,11 +258,9 @@ class ModuleValidator
 
             $pass = false;
 
-            if (null !== $module) {
-                if ($module->getActivate() === BaseModule::IS_ACTIVATED) {
-                    if ('' == $dependency[1] || Version::test($module->getVersion(), $dependency[1], false, '>=')) {
-                        $pass = true;
-                    }
+            if ((null !== $module) && $module->getActivate() === BaseModule::IS_ACTIVATED) {
+                if ('' === $dependency[1] || Version::test($module->getVersion(), $dependency[1], false, '>=')) {
+                    $pass = true;
                 }
             }
 
@@ -352,7 +297,7 @@ class ModuleValidator
      * @return array array of array with `code` which is the module code that depends of this current module and
      *               `version` which is the required version of current module
      */
-    public function getModulesDependOf($active = true)
+    public function getModulesDependOf(?bool $active = true): array
     {
         $code = $this->getModuleDefinition()->getCode();
         $query = ModuleQuery::create();
@@ -399,8 +344,9 @@ class ModuleValidator
      * @param bool $recursive Whether to also get the dependencies of dependencies, their dependencies, and so on...
      *
      * @return array Array of dependencies as ["code" => ..., "version" => ...]. No check for duplicates is made.
+     * @throws FileNotFoundException
      */
-    public function getCurrentModuleDependencies($recursive = false)
+    public function getCurrentModuleDependencies(bool $recursive = false): array
     {
         if (empty($this->moduleDescriptor->required)) {
             return [];
@@ -412,7 +358,7 @@ class ModuleValidator
                 'code' => (string) $dependency,
                 'version' => (string) $dependency['version'],
             ];
-            if (!\in_array($dependencyArray, $dependencies)) {
+            if (!\in_array($dependencyArray, $dependencies, true)) {
                 $dependencies[] = $dependencyArray;
             }
 
@@ -431,7 +377,7 @@ class ModuleValidator
     protected function getModuleLanguages(ModuleDefinition $moduleDefinition): void
     {
         $languages = [];
-        if ($this->getModuleVersion() != '1') {
+        if ($this->getModuleVersion() !== '1') {
             foreach ($this->moduleDescriptor->languages->language as $language) {
                 $languages[] = (string) $language;
             }
@@ -486,7 +432,7 @@ class ModuleValidator
         $moduleDefinition->setAuthors($authors);
     }
 
-    protected function getModuleAuthors22(ModuleDefinition $moduleDefinition)
+    protected function getModuleAuthors22(ModuleDefinition $moduleDefinition): array
     {
         $authors = [];
 
@@ -506,5 +452,36 @@ class ModuleValidator
         }
 
         return $authors;
+    }
+
+
+    public function setModulePath($modulePath): void
+    {
+        $this->modulePath = $modulePath;
+    }
+
+    public function getModulePath(): ?string
+    {
+        return $this->modulePath;
+    }
+
+    public function getModuleDescriptor(): \SimpleXMLElement|ModuleDescriptorValidator|null
+    {
+        return $this->moduleDescriptor;
+    }
+
+    public function getModuleDefinition(): ?ModuleDefinition
+    {
+        return $this->moduleDefinition;
+    }
+
+    public function getModuleVersion(): ?string
+    {
+        return $this->moduleVersion;
+    }
+
+    public function getErrors(): array
+    {
+        return $this->errors;
     }
 }
