@@ -47,21 +47,24 @@ class SchemaLocator
             THELIA_MODULE_DIR => THELIA_MODULE_DIR.'*'.DS.'Config',
             THELIA_LOCAL_MODULE_DIR => THELIA_LOCAL_MODULE_DIR.'*'.DS.'Config',
         ];
+        $modules = [];
         foreach ($modulesPath as $rootPath => $modulePath) {
             try {
                 if (!$filesystem->exists($rootPath)) {
                     throw new DirectoryNotFoundException(sprintf('The directory "%s" does not exist.', $rootPath));
                 }
-                $finder->name('module.xml')->in($modulesPath);
+                $finder->name('module.xml')->in($modulePath);
 
                 $codes = array_map(static function ($file) {
                     return basename(\dirname($file, 2));
                 }, iterator_to_array($finder));
-                return $this->findForModules($codes);
-            } catch (\Exception $e) {
-                return $this->findForModules(['Thelia']);
+                $modules = array_merge($this->findForModules($codes), $modules);
+            } catch (\Exception) {
+                continue;
             }
         }
+
+        return $modules;
     }
 
     /**

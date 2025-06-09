@@ -81,7 +81,6 @@ class SetTemplate extends ContainerAwareCommand
             }
             $filesystem = new Filesystem();
             $filesystem->mirror($pathVendor, $path);
-            $filesystem->remove($pathVendor);
 
             $output->writeln("<fg=green>Template copied from {$pathVendor} to {$path}.</>");
         }
