@@ -181,19 +181,42 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
         $this->composerHelper->addPsr4NamespaceToComposer($bundleName, $path);
     }
 
+
     public function setConfigToTemplate(string $configType, string $name): void
     {
         ConfigQuery::write($configType, $name);
         $envName = mb_strtoupper(str_replace('-', '_', $configType));
-        file_put_contents(
-            THELIA_ROOT.'.env.local',
-            sprintf(
-                "\n\n###> thelia/templates ###\n%s=%s\n###< thelia/templates ###\n",
-                $envName,
-                $name
-            ),
-            \FILE_APPEND
+        $envFilePath = THELIA_ROOT.'.env.local';
+
+        $envContent = '';
+        if (file_exists($envFilePath)) {
+            $envContent = file_get_contents($envFilePath);
+        }
+
+        $pattern = '/^' . preg_quote($envName, '/') . '=.*$/m';
+        if (preg_match($pattern, $envContent)) {
+            $envContent = preg_replace($pattern, $envName . '=' . $name, $envContent);
+            file_put_contents($envFilePath, $envContent);
+            return;
+        }
+
+        // Vérifier si la section thelia/templates existe
+        $sectionStart = '###> thelia/templates ###';
+        $sectionEnd = '###< thelia/templates ###';
+
+        if (str_contains($envContent, $sectionStart)) {
+            $newVariable = $envName . '=' . $name . "\n";
+            $envContent = str_replace($sectionEnd, $newVariable . $sectionEnd, $envContent);
+            file_put_contents($envFilePath, $envContent);
+            return;
+        }
+        $newSection = sprintf(
+            "\n\n###> thelia/templates ###\n%s=%s\n###< thelia/templates ###\n",
+            $envName,
+            $name
         );
+        file_put_contents($envFilePath, $newSection, \FILE_APPEND);
+
     }
 
     public static function getSubscribedEvents(): array
