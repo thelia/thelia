@@ -92,7 +92,7 @@ class SetTemplate extends ContainerAwareCommand
         $moduledInstalled = $this->moduleManager->installModulesFromTemplatePath($path);
         $output->writeln(sprintf('<fg=blue>%d modules installed and activated.</>', \count($moduledInstalled)));
         $this->theliaTemplateHelper->enableThemeAsBundle($path);
-        $output->writeln('<fg=blue>Theme ready</fg>');
+        $output->writeln('<fg=blue>Theme ready</>');
         $output->writeln('<fg=red>You have to run the `composer dump-autoload` command</>');
 
         return self::SUCCESS;
