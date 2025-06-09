@@ -181,6 +181,21 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
         $this->composerHelper->addPsr4NamespaceToComposer($bundleName, $path);
     }
 
+    public function setConfigToTemplate(string $configType, string $name): void
+    {
+        ConfigQuery::write($configType, $name);
+        $envName = mb_strtoupper(str_replace('-', '_', $configType));
+        file_put_contents(
+            THELIA_ROOT.'.env.local',
+            sprintf(
+                "\n###> thelia/templates ###\n%s=%s\n###< thelia/templates ###",
+                $envName,
+                $name
+            ),
+            \FILE_APPEND
+        );
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [

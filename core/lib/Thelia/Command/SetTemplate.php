@@ -76,16 +76,17 @@ class SetTemplate extends ContainerAwareCommand
             }
             $filesystem = new Filesystem();
             $filesystem->mirror($pathVendor, $path);
+            $output->writeln("<fg=green>Template copied from {$pathVendor} to {$path}.</fg>");
         }
 
-        ConfigQuery::write(TemplateDefinition::CONFIG_NAMES[$type], $name);
+        $this->theliaTemplateHelper->setConfigToTemplate(TemplateDefinition::CONFIG_NAMES[$type], $name);
 
-        $output->writeln('<info>Template successfully changed.</info>');
+        $output->writeln('<fg=green>Template successfully changed.</fg>');
         $moduledInstalled = $this->moduleManager->installModulesFromTemplatePath($path);
-        $output->writeln(sprintf('<info>%d modules installed and activated.</info>', \count($moduledInstalled)));
+        $output->writeln(sprintf('<fg=blue>%d modules installed and activated.</fg>', \count($moduledInstalled)));
         $this->theliaTemplateHelper->enableThemeAsBundle($path);
-        $output->writeln('<info>Theme ready</info>');
-        $output->writeln('<info>You should run the composer dump-autoload command</info>');
+        $output->writeln('<fg=blue>Theme ready</fg>');
+        $output->writeln('<comment>You have to run the `composer dump-autoload` command</comment>');
 
         return self::SUCCESS;
     }

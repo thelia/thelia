@@ -144,7 +144,7 @@ class ModuleManagement
                 if (isset($content->{'images-folder'}) && !$module->isModuleImageDeployed($con)) {
                     /** @var \Thelia\Module\BaseModule $moduleInstance */
                     $moduleInstance = $reflected->newInstance();
-                    $imagesFolder = $moduleInstance->getModuleDir().$code.DS.$content->{'images-folder'};
+                    $imagesFolder = $moduleInstance->getModuleDir().DS.$content->{'images-folder'};
                     $moduleInstance->deployImageFolder($module, $imagesFolder, $con);
                 }
             }
