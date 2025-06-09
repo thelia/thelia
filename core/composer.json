@@ -54,6 +54,8 @@
         "symfony/lock": "6.4.*",
         "symfony/mailer": "6.4.*",
         "symfony/mime": "6.4.*",
+        "symfony/monolog-bundle": "3.*",
+
         "symfony/options-resolver": "6.4.*",
         "symfony/polyfill-php73": "^1.0",
         "symfony/process": "6.4.*",
