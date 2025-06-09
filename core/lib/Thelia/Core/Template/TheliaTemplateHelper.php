@@ -188,7 +188,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
         file_put_contents(
             THELIA_ROOT.'.env.local',
             sprintf(
-                "\n###> thelia/templates ###\n%s=%s\n###< thelia/templates ###",
+                "\n\n###> thelia/templates ###\n%s=%s\n###< thelia/templates ###\n",
                 $envName,
                 $name
             ),

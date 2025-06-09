@@ -12,10 +12,13 @@
 
 namespace Thelia\Command;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Core\Event\Cache\CacheEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TheliaTemplateHelper;
 use Thelia\Model\ConfigQuery;
@@ -26,6 +29,8 @@ class SetTemplate extends ContainerAwareCommand
     public function __construct(
         private readonly ModuleManager $moduleManager,
         private readonly TheliaTemplateHelper $theliaTemplateHelper,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly string $kernelCacheDir,
         string $name = null
     ) {
         parent::__construct($name);
@@ -76,17 +81,20 @@ class SetTemplate extends ContainerAwareCommand
             }
             $filesystem = new Filesystem();
             $filesystem->mirror($pathVendor, $path);
-            $output->writeln("<fg=green>Template copied from {$pathVendor} to {$path}.</fg>");
+            $filesystem->remove($pathVendor);
+
+            $output->writeln("<fg=green>Template copied from {$pathVendor} to {$path}.</>");
         }
 
         $this->theliaTemplateHelper->setConfigToTemplate(TemplateDefinition::CONFIG_NAMES[$type], $name);
+        $this->eventDispatcher->dispatch(new CacheEvent($this->kernelCacheDir), TheliaEvents::CACHE_CLEAR);
 
-        $output->writeln('<fg=green>Template successfully changed.</fg>');
+        $output->writeln('<fg=green>Template successfully changed.</>');
         $moduledInstalled = $this->moduleManager->installModulesFromTemplatePath($path);
-        $output->writeln(sprintf('<fg=blue>%d modules installed and activated.</fg>', \count($moduledInstalled)));
+        $output->writeln(sprintf('<fg=blue>%d modules installed and activated.</>', \count($moduledInstalled)));
         $this->theliaTemplateHelper->enableThemeAsBundle($path);
         $output->writeln('<fg=blue>Theme ready</fg>');
-        $output->writeln('<comment>You have to run the `composer dump-autoload` command</comment>');
+        $output->writeln('<fg=red>You have to run the `composer dump-autoload` command</>');
 
         return self::SUCCESS;
     }
