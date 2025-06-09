@@ -93,8 +93,25 @@ class SetTemplate extends ContainerAwareCommand
         $output->writeln(sprintf('<fg=blue>%d modules installed and activated.</>', \count($moduledInstalled)));
         $this->theliaTemplateHelper->enableThemeAsBundle($path);
 
-        passthru(THELIA_VENDOR.'bin'.DS.'composer dump-autoload');
+        $this->execDumpAutoload($output);
         $output->writeln('<fg=green>Theme ready !</>');
         return self::SUCCESS;
+    }
+
+    private function execDumpAutoload(
+        OutputInterface $output,
+    )
+    {
+        $command = THELIA_VENDOR.'bin'.DS.'composer dump-autoload 2>&1';
+        $returnCode = 0;
+
+        exec($command, $outputExec, $returnCode);
+
+        if ($returnCode !== 0) {
+            $errors = implode("\n", $outputExec);
+            $output->writeln("<error>Composer dump-autoload failed: {$errors}</error>");
+            return self::FAILURE;
+        }
+        $output->writeln('<fg=green>Autoload dump completed successfully</>');
     }
 }
