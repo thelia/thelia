@@ -42,7 +42,7 @@ class ModuleManagement
 
     public function updateModules(ContainerInterface $container): void
     {
-        $directories = [THELIA_MODULE_DIR, THELIA_LOCAL_MODULE_DIR];
+        $directories = [THELIA_LOCAL_MODULE_DIR, THELIA_MODULE_DIR];
         foreach($directories as $directory) {
             $this->fetchDirModuleForUpdate($directory, $container);
         }

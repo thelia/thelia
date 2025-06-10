@@ -12,6 +12,7 @@
 
 namespace Thelia\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -78,16 +79,22 @@ class ModuleActivateCommand extends BaseModuleGenerate
             $module = ModuleQuery::create()->findOneByCode($moduleCode);
 
             if (null === $module) {
-                if (is_dir($module->getModuleDir().$moduleCode)) {
-                    $module = $this->installModule($module->getModuleDir().$moduleCode);
+                if (is_dir(THELIA_LOCAL_MODULE_DIR.$moduleCode)) {
+                    $module = $this->installModule(THELIA_LOCAL_MODULE_DIR.$moduleCode);
                 }
+                if (is_dir(THELIA_MODULE_DIR.$moduleCode)) {
+                    $module = $this->installModule(THELIA_MODULE_DIR.$moduleCode);
+                }
+
                 if (null === $module) {
                     throw new \RuntimeException(sprintf('module %s not found', $moduleCode));
                 }
             }
 
             if ($module->getActivate() === BaseModule::IS_ACTIVATED) {
-                throw new \RuntimeException(sprintf('module %s is already actived', $moduleCode));
+                $output->writeln(sprintf('<error>module %s is already activated</error>', $moduleCode));
+
+                return Command::FAILURE;
             }
 
             try {

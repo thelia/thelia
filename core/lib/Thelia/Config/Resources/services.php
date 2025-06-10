@@ -12,6 +12,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Module;
@@ -74,6 +75,9 @@ return static function (ContainerConfigurator $configurator): void {
         /** @var Module $module */
         foreach ($modules as $module) {
             try {
+                if (!class_exists($module->getFullNamespace())) {
+                    throw new ClassNotFoundException($module->getFullNamespace());
+                }
                 \call_user_func([$module->getFullNamespace(), 'configureContainer'], $configurator);
                 \call_user_func([$module->getFullNamespace(), 'configureServices'], $serviceConfigurator);
                 $apiModulePath = $module->getAbsoluteBaseDir().'/Api/Resource';

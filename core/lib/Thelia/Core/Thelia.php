@@ -399,6 +399,7 @@ class Thelia extends Kernel
             'thelia.root_dir' => THELIA_ROOT,
             'thelia.core_dir' => \dirname(__DIR__), // This class is in core/lib/Thelia/Core.
             'thelia.module_dir' => THELIA_MODULE_DIR,
+            'thelia.local_module_dir' => THELIA_LOCAL_MODULE_DIR,
             'thelia.database_host' => $_SERVER['DATABASE_HOST'] ?? null,
             'thelia.database_port' => $_SERVER['DATABASE_PORT'] ?? null,
             'thelia.database_name' => $_SERVER['DATABASE_NAME'] ?? null,

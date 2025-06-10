@@ -346,8 +346,8 @@ class Module extends BaseModule
 
     public function getModuleDir(): string
     {
-        return is_dir(THELIA_MODULE_DIR.$this->getBaseDir())
-            ? THELIA_MODULE_DIR
-            : THELIA_LOCAL_MODULE_DIR;
+        return is_dir(THELIA_LOCAL_MODULE_DIR.$this->getBaseDir())
+            ? THELIA_LOCAL_MODULE_DIR
+            : THELIA_MODULE_DIR;
     }
 }

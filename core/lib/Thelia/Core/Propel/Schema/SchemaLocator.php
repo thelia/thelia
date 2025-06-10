@@ -63,7 +63,6 @@ class SchemaLocator
                 continue;
             }
         }
-
         return $modules;
     }
 
@@ -71,40 +70,37 @@ class SchemaLocator
      * Get schema documents for specific modules and their dependencies (including Thelia), as well as included
      * external schemas.
      *
-     * @param string[] $modules          Codes of the modules to fetch schemas for. 'Thelia' can be used to include Thelia core
+     * @param string[] $modulesCodes          Codes of the modules to fetch schemas for. 'Thelia' can be used to include Thelia core
      *                                   schemas.
      * @param bool $withDependencies whether to also return schemas for the specified modules dependencies
      *
      * @return \DOMDocument[] schema documents
      */
-    public function findForModules(array $modules = [], bool $withDependencies = true): array
+    public function findForModules(array $modulesCodes = [], bool $withDependencies = true): array
     {
         if ($withDependencies) {
-            $modules = $this->addModulesDependencies($modules);
+            $modulesCodes = $this->addModulesDependencies($modulesCodes);
         }
 
         $schemas = [];
-
-        foreach ($modules as $module) {
-            if ($module === 'Thelia') {
+        foreach ($modulesCodes as $moduleCode) {
+            if ($moduleCode === 'Thelia') {
                 $moduleSchemas = $this->getSchemaPathsForThelia();
             } else {
-                $moduleSchemas = $this->getSchemaPathsForModule($module);
+                $moduleSchemas = $this->getSchemaPathsForModule($moduleCode);
             }
-
             $schemaDocuments = [];
             /** @var SplFileInfo $schemaFile */
             foreach ($moduleSchemas as $schemaFile) {
                 $schemaDocument = new \DOMDocument();
-                $schemaDocument->load($schemaFile->getRealPath());
-                $schemaDocuments[] = $schemaDocument;
+                $isValid = $schemaDocument->load($schemaFile->getRealPath());
+                if ($isValid) {
+                    $schemaDocuments[] = $schemaDocument;
+                }
             }
-
             $schemaDocuments = $this->addExternalSchemaDocuments($schemaDocuments);
-
             $schemas = $this->mergeDOMDocumentsArrays([$schemas, $schemaDocuments]);
         }
-
         return $schemas;
     }
 
@@ -167,7 +163,7 @@ class SchemaLocator
 
         try {
             $modulePath = is_dir("{$this->theliaModuleDir}/{$module}")
-                ? "{$this->theliaModuleDir}/{$module}/Config"
+                ? "{$this->theliaModuleDir}{$module}/Config"
                 : "{$this->theliaLocalModuleDir}/{$module}/Config";
             $moduleSchemas->in($modulePath);
         } catch (\InvalidArgumentException $e) {
@@ -219,19 +215,17 @@ class SchemaLocator
     protected function mergeDOMDocumentsArrays(array $documentArrays): array
     {
         $result = [];
-        $includedDocumentURIs = [];
-
         foreach ($documentArrays as $documentArray) {
             foreach ($documentArray as $document) {
-                if (\in_array($document->baseURI, $includedDocumentURIs, true)) {
+                $baseUri = str_replace(THELIA_LOCAL_MODULE_DIR, '', $document->baseURI);
+                $baseUri = str_replace(THELIA_MODULE_DIR, '', $baseUri);
+                if (isset($result[$baseUri])) {
                     continue;
                 }
 
-                $result[] = $document;
-                $includedDocumentURIs[] = $document->baseURI;
+                $result[$baseUri] = $document;
             }
         }
-
         return $result;
     }
 }
