@@ -22,9 +22,11 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\ProductSaleElementsProductImageTableMap;
+use Thelia\Model\ProductSaleElementsQuery;
 
 #[ApiResource(
     operations: [
@@ -77,6 +79,10 @@ use Thelia\Model\Map\ProductSaleElementsProductImageTableMap;
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
+        'productSaleElements.product.id' => [
+            'strategy' => 'exact',
+            'fieldPath' => 'productsaleelementsproductimage_productsaleelements.product_id'
+        ],
         'productSaleElementsId' => 'exact',
         'productImageId' => 'exact',
     ]
@@ -101,8 +107,25 @@ class ProductSaleElementsProductImage implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE_UPDATE])]
     public ?int $productSaleElementsId;
 
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    #[Relation(targetResource: ProductSaleElements::class)]
+    public ?ProductSaleElements $productSaleElements;
+
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE_UPDATE])]
     public ?int $productImageId;
+
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    public ?int $productId = null;
+
+    public function getProductId(): ?int
+    {
+        if ($this->productSaleElementsId !== null) {
+            $pse = ProductSaleElementsQuery::create()->findPk($this->productSaleElementsId);
+            return $pse ? $pse->getProductId() : null;
+        }
+        return null;
+    }
+
 
     public function getId(): ?int
     {
@@ -136,6 +159,18 @@ class ProductSaleElementsProductImage implements PropelResourceInterface
     public function setProductImageId(?int $productImageId): static
     {
         $this->productImageId = $productImageId;
+
+        return $this;
+    }
+
+    public function getProductSaleElements(): ?ProductSaleElements
+    {
+        return $this->productSaleElements;
+    }
+
+    public function setProductSaleElements(?ProductSaleElements $productSaleElements): ProductSaleElementsProductImage
+    {
+        $this->productSaleElements = $productSaleElements;
 
         return $this;
     }
