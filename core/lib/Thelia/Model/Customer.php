@@ -46,9 +46,16 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
      * @param string $phone            customer phone number
      * @param string $cellphone        customer cellphone number
      * @param string $zipcode          customer zipcode
+     * @param string $city
      * @param int    $countryId        customer country id (from Country table)
      * @param string $email            customer email, must be unique
      * @param string $plainPassword    customer plain password, hash is made calling setPassword method. Not mandatory parameter but an exception is thrown if customer is new without password
+     * @param int    $lang
+     * @param int    $reseller
+     * @param null   $sponsor
+     * @param int    $discount
+     * @param null   $company
+     * @param null   $ref
      * @param bool   $forceEmailUpdate true if the email address could be updated
      * @param int    $stateId          customer state id (from State table)
      *
@@ -150,6 +157,43 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
 
             throw $propelException;
         }
+    }
+
+    public function createOrUpdateMinimal(
+        int $titleId,
+        string $firstname,
+        string $lastname,
+        string $email,
+        string $plainPassword,
+        bool $forceEmailUpdate = false,
+        int $langId = null,
+        bool $reseller = false,
+        string $sponsor = null,
+        float $discount = null,
+        string $ref = null,
+        bool $enabled = false
+    ): void {
+        $this
+            ->setTitleId($titleId)
+            ->setFirstname($firstname)
+            ->setLastname($lastname)
+            ->setEmail($email, $forceEmailUpdate)
+            ->setPassword($plainPassword)
+            ->setReseller($reseller)
+            ->setSponsor($sponsor)
+            ->setDiscount($discount)
+            ->setRef($ref)
+            ->setEnable($enabled);
+
+        if (ConfigQuery::isCustomerEmailConfirmationEnable()) {
+            $this->setConfirmationToken(bin2hex(random_bytes(32)));
+        }
+
+        if (null !== $langId) {
+            $this->setLangId($langId);
+        }
+
+        $this->save();
     }
 
     /**

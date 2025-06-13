@@ -119,7 +119,13 @@ final class TheliaEvents
     /** sent on customer account creation. */
     public const CUSTOMER_CREATEACCOUNT = 'action.createCustomer';
 
-    /** sent on customer account update. */
+    /**
+     * sent on customer account simple creation.
+     */
+    public const CREATE_CUSTOMER_MINIMAL = 'action.create.customer.minimal';
+    /**
+     * sent on customer account update.
+     */
     public const CUSTOMER_UPDATEACCOUNT = 'action.updateCustomer';
 
     /** sent on customer account update profile. */
