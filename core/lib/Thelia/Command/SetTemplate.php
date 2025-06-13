@@ -76,7 +76,7 @@ class SetTemplate extends ContainerAwareCommand
                 return self::FAILURE;
             }
             // copy directory vendor to template
-            if (!is_dir($path) && !mkdir($path) && !is_dir($path)) {
+            if (!is_dir($path) && !mkdir($path, 0777, true) && !is_dir($path)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $path));
             }
             $filesystem = new Filesystem();
