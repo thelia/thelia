@@ -28,6 +28,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
+use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Api\Controller\Admin\BinaryFileController;
@@ -129,6 +130,12 @@ use Thelia\Model\Map\ProductImageTableMap;
             'strategy' => 'exact',
             'fieldPath' => 'product_image.product_id',
         ],
+    ]
+)]
+#[ApiFilter(
+    filterClass: NotInFilter::class,
+    properties: [
+        'id',
     ]
 )]
 class ProductImage extends AbstractTranslatableResource implements ItemFileResourceInterface
