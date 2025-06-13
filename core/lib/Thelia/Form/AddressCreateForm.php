@@ -198,6 +198,12 @@ class AddressCreateForm extends FirewallForm
                     'for' => 'default_address',
                 ],
                 'required' => false,
+            ])
+            ->add('title', IntegerType::class, [
+                'required' => false,
+            ])
+            ->add('cellphone', IntegerType::class, [
+                'required' => false,
             ]);
     }
 

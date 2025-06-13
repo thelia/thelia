@@ -37,24 +37,14 @@ class Order extends BaseOrder
 
     protected bool $disableVersioning = false;
 
-    /**
-     * @param int $choosenDeliveryAddress the choosen delivery address ID
-     *
-     * @return $this
-     */
-    public function setChoosenDeliveryAddress(int $choosenDeliveryAddress)
-    {
-        $this->choosenDeliveryAddress = $choosenDeliveryAddress;
-
-        return $this;
-    }
+    protected ?Cart $cart = null;
 
     /**
      * @return $this
      */
     public function setDisableVersioning(bool $disableVersioning)
     {
-        $this->disableVersioning = (bool) $disableVersioning;
+        $this->disableVersioning = (bool)$disableVersioning;
 
         return $this;
     }
@@ -74,17 +64,30 @@ class Order extends BaseOrder
     }
 
     /**
+     * @param int $choosenDeliveryAddress the choosen delivery address ID
+     * @deprecated Use the cart model
+     * @return $this
+     */
+    public function setChoosenDeliveryAddress($choosenDeliveryAddress)
+    {
+        return $this;
+    }
+
+    /**
      * @return int|null the choosen delivery address ID
+     * @deprecated Use the cart model
      */
     public function getChoosenDeliveryAddress(): ?int
     {
+        $this->choosenDeliveryAddress = $this->getCart()?->getAddressDeliveryId();
         return $this->choosenDeliveryAddress;
     }
 
     /**
      * @param int $choosenInvoiceAddress the choosen invoice address
-     *
      * @return $this
+     * @deprecated Use the cart model
+     *
      */
     public function setChoosenInvoiceAddress(int $choosenInvoiceAddress)
     {
@@ -95,9 +98,11 @@ class Order extends BaseOrder
 
     /**
      * @return int|null the choosen invoice address ID
+     * @deprecated Use the cart model
      */
     public function getChoosenInvoiceAddress(): ?int
     {
+        $this->choosenDeliveryAddress = $this->getCart()?->getAddressInvoiceId();
         return $this->choosenInvoiceAddress;
     }
 
@@ -162,11 +167,11 @@ class Order extends BaseOrder
             $query = '
                 SELECT
                     SUM(
-                        '.OrderProductTableMap::COL_QUANTITY.'
+                        ' . OrderProductTableMap::COL_QUANTITY . '
                         *
                         (
                             ROUND(
-                                IF('.OrderProductTableMap::COL_WAS_IN_PROMO.'=1, '.OrderProductTableMap::COL_PROMO_PRICE.', '.OrderProductTableMap::COL_PRICE.'),
+                                IF(' . OrderProductTableMap::COL_WAS_IN_PROMO . '=1, ' . OrderProductTableMap::COL_PROMO_PRICE . ', ' . OrderProductTableMap::COL_PRICE . '),
                                 2
                             )
                             +
@@ -174,31 +179,31 @@ class Order extends BaseOrder
                                 SELECT COALESCE(
                                     SUM(
                                         ROUND(
-                                            IF('.OrderProductTableMap::COL_WAS_IN_PROMO.'=1, '.OrderProductTaxTableMap::COL_PROMO_AMOUNT.', '.OrderProductTaxTableMap::COL_AMOUNT.'),
+                                            IF(' . OrderProductTableMap::COL_WAS_IN_PROMO . '=1, ' . OrderProductTaxTableMap::COL_PROMO_AMOUNT . ', ' . OrderProductTaxTableMap::COL_AMOUNT . '),
                                             2
                                         )
                                     ),
                                 0)
-                                FROM '.OrderProductTaxTableMap::TABLE_NAME.'
-                                WHERE '.OrderProductTaxTableMap::COL_ORDER_PRODUCT_ID.' = '.OrderProductTableMap::COL_ID.'
+                                FROM ' . OrderProductTaxTableMap::TABLE_NAME . '
+                                WHERE ' . OrderProductTaxTableMap::COL_ORDER_PRODUCT_ID . ' = ' . OrderProductTableMap::COL_ID . '
                             )
                         )
                     ) as total_taxed_price,
                     SUM(
-                        '.OrderProductTableMap::COL_QUANTITY.'
+                        ' . OrderProductTableMap::COL_QUANTITY . '
                         *
                         ROUND(
                             IF(
-                                '.OrderProductTableMap::COL_WAS_IN_PROMO.'=1,
-                                '.OrderProductTableMap::COL_PROMO_PRICE.',
-                                '.OrderProductTableMap::COL_PRICE.'
+                                ' . OrderProductTableMap::COL_WAS_IN_PROMO . '=1,
+                                ' . OrderProductTableMap::COL_PROMO_PRICE . ',
+                                ' . OrderProductTableMap::COL_PRICE . '
                             ), 2
                         )
                     ) as total_untaxed_price
                 from
-                    '.OrderProductTableMap::TABLE_NAME.'
+                    ' . OrderProductTableMap::TABLE_NAME . '
                 where
-                    '.OrderProductTableMap::COL_ORDER_ID.'=:order_id
+                    ' . OrderProductTableMap::COL_ORDER_ID . '=:order_id
             ';
 
             $con = Propel::getConnection();
@@ -499,7 +504,7 @@ class Order extends BaseOrder
     public function getPaymentModuleInstance(): PaymentModuleInterface
     {
         if (null === $paymentModule = ModuleQuery::create()->findPk($this->getPaymentModuleId())) {
-            throw new TheliaProcessException('Payment module ID='.$this->getPaymentModuleId().' was not found.');
+            throw new TheliaProcessException('Payment module ID=' . $this->getPaymentModuleId() . ' was not found.');
         }
 
         return $paymentModule->createInstance();
@@ -513,7 +518,7 @@ class Order extends BaseOrder
     public function getDeliveryModuleInstance(): BaseModuleInterface
     {
         if (null === $deliveryModule = ModuleQuery::create()->findPk($this->getDeliveryModuleId())) {
-            throw new TheliaProcessException('Delivery module ID='.$this->getDeliveryModuleId().' was not found.');
+            throw new TheliaProcessException('Delivery module ID=' . $this->getDeliveryModuleId() . ' was not found.');
         }
 
         return $deliveryModule->createInstance();
@@ -540,5 +545,14 @@ class Order extends BaseOrder
         );
 
         return $event->getManageStock() ?? $paymentModule->manageStockOnCreation();
+    }
+
+    protected function getCart(): ?Cart
+    {
+        if (!$cartId = $this->getCartId()) {
+            return null;
+        }
+
+        return CartQuery::create()->filterById($cartId)->findOne();
     }
 }
