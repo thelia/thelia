@@ -249,9 +249,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         }
 
         $i18nFields = array_map(
-            function (\ReflectionProperty $reflectionProperty) {
-                return $reflectionProperty->getName();
-            },
+            fn(\ReflectionProperty $reflectionProperty) => $reflectionProperty->getName(),
             (new \ReflectionClass($i18nResource))->getProperties()
         );
 

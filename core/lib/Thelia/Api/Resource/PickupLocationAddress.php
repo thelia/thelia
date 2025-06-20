@@ -93,7 +93,7 @@ class PickupLocationAddress
     #[Groups([
         DeliveryPickupLocation::GROUP_FRONT_READ,
     ])]
-    protected ?array $additionalData;
+    protected ?array $additionalData = null;
 
     public function getId(): string
     {

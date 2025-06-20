@@ -143,7 +143,7 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?int $productSaleElementsId;
+    public ?int $productSaleElementsId = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -152,24 +152,24 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_FRONT_READ_SINGLE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?string $title;
+    public ?string $title = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?string $chapo;
+    public ?string $chapo = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?string $description;
+    public ?string $description = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?string $postscriptum;
+    public ?string $postscriptum = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -201,10 +201,10 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ,
     ])]
-    public ?float $promoPrice;
+    public ?float $promoPrice = null;
 
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
-    public ?float $unitTaxedPrice;
+    public ?float $unitTaxedPrice = null;
 
     #[Groups([self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
@@ -237,7 +237,7 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?string $weight;
+    public ?string $weight = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -247,7 +247,7 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?string $eanCode;
+    public ?string $eanCode = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -255,13 +255,13 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?string $taxRuleTitle;
+    public ?string $taxRuleTitle = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?string $taxRuleDescription;
+    public ?string $taxRuleDescription = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?int $parent;
+    public ?int $parent = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     #[Type(type: 'bool', groups: [Order::GROUP_ADMIN_WRITE])]
@@ -274,13 +274,13 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?bool $virtualDocument;
+    public ?bool $virtualDocument = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
-    public ?\DateTime $createdAt;
+    public ?\DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $updatedAt;
+    public ?\DateTime $updatedAt = null;
 
     #[Relation(targetResource: OrderProductTax::class)]
     #[Groups([
@@ -322,9 +322,7 @@ class OrderProduct implements PropelResourceInterface
             return null;
         }
         $attributesAvs = array_map(
-            function (\Thelia\Model\AttributeCombination $attributeCombination) {
-                return [$attributeCombination->getAttribute()->getTitle() => $attributeCombination->getAttributeAv()->getTitle()];
-            }, AttributeCombinationQuery::create()->filterByProductSaleElementsId($pseId)->find()->getData());
+            fn(\Thelia\Model\AttributeCombination $attributeCombination) => [$attributeCombination->getAttribute()->getTitle() => $attributeCombination->getAttributeAv()->getTitle()], AttributeCombinationQuery::create()->filterByProductSaleElementsId($pseId)->find()->getData());
 
         return $attributesAvs;
     }

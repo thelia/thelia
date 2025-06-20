@@ -55,9 +55,7 @@ class SchemaLocator
                 }
                 $finder->name('module.xml')->in($modulePath);
 
-                $codes = array_map(static function ($file) {
-                    return basename(\dirname($file, 2));
-                }, iterator_to_array($finder));
+                $codes = array_map(static fn($file) => basename(\dirname($file, 2)), iterator_to_array($finder));
                 $modules = array_merge($this->findForModules($codes), $modules);
             } catch (\Exception) {
                 continue;

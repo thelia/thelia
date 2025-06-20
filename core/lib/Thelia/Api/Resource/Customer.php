@@ -137,10 +137,10 @@ class Customer implements PropelResourceInterface
 
     #[Relation(targetResource: Lang::class, relationAlias: 'LangModel')]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_WRITE])]
-    public ?Lang $lang;
+    public ?Lang $lang = null;
 
     #[Groups([self::GROUP_ADMIN_READ, Address::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
-    public ?string $ref;
+    public ?string $ref = null;
 
     #[Groups([self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
@@ -171,43 +171,43 @@ class Customer implements PropelResourceInterface
     ])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
     #[Email(groups: [self::GROUP_ADMIN_WRITE])]
-    public ?string $email;
+    public ?string $email = null;
 
     #[Groups([self::GROUP_ADMIN_WRITE])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
-    public ?string $password;
+    public ?string $password = null;
 
-    public ?string $algo;
-
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?bool $reseller;
-
-    #[Groups([self::GROUP_FRONT_READ_SINGLE])]
-    public ?string $sponsor;
+    public ?string $algo = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?float $discount;
-
-    public ?string $rememberMeToken;
-
-    public ?string $rememberMeSerial;
-
-    public ?bool $enable;
+    public ?bool $reseller = null;
 
     #[Groups([self::GROUP_FRONT_READ_SINGLE])]
-    public ?string $confirmationToken;
+    public ?string $sponsor = null;
+
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $discount = null;
+
+    public ?string $rememberMeToken = null;
+
+    public ?string $rememberMeSerial = null;
+
+    public ?bool $enable = null;
+
+    #[Groups([self::GROUP_FRONT_READ_SINGLE])]
+    public ?string $confirmationToken = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $createdAt;
+    public ?\DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
-    public ?\DateTime $updatedAt;
+    public ?\DateTime $updatedAt = null;
 
-    public ?int $version;
+    public ?int $version = null;
 
-    public ?\DateTime $versionCreatedAt;
+    public ?\DateTime $versionCreatedAt = null;
 
-    public ?string $versionCreatedBy;
+    public ?string $versionCreatedBy = null;
 
     #[Relation(targetResource: Address::class)]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]

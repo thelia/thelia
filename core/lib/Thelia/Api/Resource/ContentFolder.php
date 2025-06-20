@@ -61,13 +61,13 @@ class ContentFolder implements PropelResourceInterface
     public bool $defaultFolder = false;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?int $position;
+    public ?int $position = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?\DateTime $createdAt;
+    public ?\DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?\DateTime $updatedAt;
+    public ?\DateTime $updatedAt = null;
 
     public function getContent(): Content
     {

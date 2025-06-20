@@ -65,7 +65,7 @@ readonly class ApiResourcePropelTransformerService
             $langs = LangQuery::create()->filterByActive(1)->find();
         }
 
-        $baseModel = $baseModel ?? $propelModel;
+        $baseModel ??= $propelModel;
 
         $modelToResourceEvent = new ModelToResourceEvent($baseModel, $parentModel);
         $this->eventDispatcher->dispatch($modelToResourceEvent, ModelToResourceEvent::BEFORE_TRANSFORM);
@@ -500,9 +500,7 @@ readonly class ApiResourcePropelTransformerService
             foreach ($data->getI18ns() as $locale => $i18n) {
                 $i18nGetters = array_filter(
                     array_map(
-                        static function (\ReflectionProperty $reflectionProperty) use ($i18n) {
-                            return $reflectionProperty->isInitialized($i18n) ? 'get'.ucfirst($reflectionProperty->getName()) : null;
-                        },
+                        static fn(\ReflectionProperty $reflectionProperty) => $reflectionProperty->isInitialized($i18n) ? 'get'.ucfirst($reflectionProperty->getName()) : null,
                         (new \ReflectionClass($i18n))->getProperties()
                     )
                 );
@@ -579,9 +577,7 @@ readonly class ApiResourcePropelTransformerService
             $i18nResource = new ($resourceClass::getI18nResourceClass());
 
             $i18nFields = array_map(
-                static function (\ReflectionProperty $reflectionProperty) {
-                    return $reflectionProperty;
-                },
+                static fn(\ReflectionProperty $reflectionProperty) => $reflectionProperty,
                 (new \ReflectionClass($i18nResource))->getProperties()
             );
 

@@ -76,60 +76,60 @@ class OrderCoupon implements PropelResourceInterface
 
     #[Relation(targetResource: Order::class)]
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?Order $order;
+    public ?Order $order = null;
 
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
-    public ?string $code;
+    public ?string $code = null;
 
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
-    public ?string $type;
+    public ?string $type = null;
 
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ,  Order::GROUP_ADMIN_WRITE])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
-    public ?float $amount;
+    public ?float $amount = null;
 
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
-    public ?string $title;
+    public ?string $title = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?string $shortDescription;
+    public ?string $shortDescription = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?string $description;
+    public ?string $description = null;
 
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ])]
-    public ?\DateTime $startDate;
+    public ?\DateTime $startDate = null;
 
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
-    public ?\DateTime $expirationDate;
+    public ?\DateTime $expirationDate = null;
 
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
-    public ?bool $isCumulative;
+    public ?bool $isCumulative = null;
 
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
-    public ?bool $isRemovingPostage;
+    public ?bool $isRemovingPostage = null;
 
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
-    public ?bool $isAvailableOnSpecialOffers;
+    public ?bool $isAvailableOnSpecialOffers = null;
 
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
-    public ?string $serializedConditions;
+    public ?string $serializedConditions = null;
 
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
-    public ?bool $perCustomerUsageCount;
+    public ?bool $perCustomerUsageCount = null;
 
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
-    public ?bool $usageCanceled;
+    public ?bool $usageCanceled = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $createdAt;
+    public ?\DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $updatedAt;
+    public ?\DateTime $updatedAt = null;
 
     public function getId(): ?int
     {

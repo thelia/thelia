@@ -58,35 +58,35 @@ class DeliveryModuleOption
         example: '2025-10-01T00:00:00Z',
     )]
     #[Groups([DeliveryModule::GROUP_FRONT_READ])]
-    private ?string $minimumDeliveryDate;
+    private ?string $minimumDeliveryDate = null;
 
     #[ApiProperty(
         description: 'Maximum delivery date',
         example: '2025-10-05T00:00:00Z',
     )]
     #[Groups([DeliveryModule::GROUP_FRONT_READ])]
-    private ?string $maximumDeliveryDate;
+    private ?string $maximumDeliveryDate = null;
 
     #[ApiProperty(
         description: 'Postage cost',
         example: 5.99,
     )]
     #[Groups([DeliveryModule::GROUP_FRONT_READ])]
-    private ?float $postage;
+    private ?float $postage = null;
 
     #[ApiProperty(
         description: 'Postage tax',
         example: 1.20,
     )]
     #[Groups([DeliveryModule::GROUP_FRONT_READ])]
-    private ?float $postageTax;
+    private ?float $postageTax = null;
 
     #[ApiProperty(
         description: 'Untaxed postage cost',
         example: 4.79,
     )]
     #[Groups([DeliveryModule::GROUP_FRONT_READ])]
-    private ?float $postageUntaxed;
+    private ?float $postageUntaxed = null;
 
     // Getters and setters for each property
     public function getCode(): string

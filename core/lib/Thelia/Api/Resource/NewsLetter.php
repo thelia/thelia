@@ -79,10 +79,10 @@ class NewsLetter implements PropelResourceInterface
     public string $email;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
-    public ?string $firstname;
+    public ?string $firstname = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
-    public ?string $lastname;
+    public ?string $lastname = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
     public string $locale;
@@ -91,10 +91,10 @@ class NewsLetter implements PropelResourceInterface
     public bool $unsubscribed;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
-    public ?\DateTime $createdAt;
+    public ?\DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
-    public ?\DateTime $updatedAt;
+    public ?\DateTime $updatedAt = null;
 
     public function getId(): ?int
     {

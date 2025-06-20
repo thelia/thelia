@@ -102,7 +102,7 @@ class OrderProductTax implements PropelResourceInterface
         Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
     ])]
-    public ?string $description;
+    public ?string $description = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -123,13 +123,13 @@ class OrderProductTax implements PropelResourceInterface
         Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
     ])]
-    public ?float $promoAmount;
+    public ?float $promoAmount = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $createdAt;
+    public ?\DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $updatedAt;
+    public ?\DateTime $updatedAt = null;
 
     public function getId(): ?int
     {

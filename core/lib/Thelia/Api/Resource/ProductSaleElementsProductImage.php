@@ -105,14 +105,14 @@ class ProductSaleElementsProductImage implements PropelResourceInterface
     public ?int $id = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE_UPDATE])]
-    public ?int $productSaleElementsId;
+    public ?int $productSaleElementsId = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     #[Relation(targetResource: ProductSaleElements::class)]
-    public ?ProductSaleElements $productSaleElements;
+    public ?ProductSaleElements $productSaleElements = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE_UPDATE])]
-    public ?int $productImageId;
+    public ?int $productImageId = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?int $productId = null;

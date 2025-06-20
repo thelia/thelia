@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class StateI18n extends I18n
 {
     #[Groups([State::GROUP_ADMIN_READ])]
-    protected ?string $title;
+    protected ?string $title = null;
 
     public function getTitle(): ?string
     {

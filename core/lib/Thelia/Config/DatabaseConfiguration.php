@@ -45,9 +45,7 @@ class DatabaseConfiguration implements ConfigurationInterface
         $connectionsNode
             ->validate()
             ->ifTrue(
-                function ($connections) {
-                    return !isset($connections[static::THELIA_CONNECTION_NAME]);
-                }
+                fn($connections) => !isset($connections[static::THELIA_CONNECTION_NAME])
             )
             ->thenInvalid(
                 "The '".static::THELIA_CONNECTION_NAME."' connection must be defined."
@@ -57,9 +55,7 @@ class DatabaseConfiguration implements ConfigurationInterface
         $databaseNode
             ->validate()
             ->ifTrue(
-                function ($database) {
-                    return !empty($database['connection']) && !empty($database['connections']);
-                }
+                fn($database) => !empty($database['connection']) && !empty($database['connections'])
             )
             ->thenInvalid(
                 "The 'database' node must contain either a 'connection' node or a 'connections' node, but not both."

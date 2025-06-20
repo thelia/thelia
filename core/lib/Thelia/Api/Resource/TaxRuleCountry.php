@@ -52,28 +52,28 @@ class TaxRuleCountry implements PropelResourceInterface
 
     #[Relation(targetResource: TaxRule::class)]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?TaxRule $taxRule;
+    public ?TaxRule $taxRule = null;
 
     #[Relation(targetResource: Country::class)]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?Country $country;
+    public ?Country $country = null;
 
     #[Relation(targetResource: State::class)]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?State $state;
+    public ?State $state = null;
 
     #[Relation(targetResource: Tax::class)]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?Tax $tax;
+    public ?Tax $tax = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?int $position;
+    public ?int $position = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?\DateTime $createdAt;
+    public ?\DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?\DateTime $updatedAt;
+    public ?\DateTime $updatedAt = null;
 
     public function getId(): ?int
     {

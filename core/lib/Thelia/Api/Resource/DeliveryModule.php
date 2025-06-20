@@ -69,7 +69,7 @@ class DeliveryModule extends AbstractTranslatableResource
     #[Groups([
         self::GROUP_FRONT_READ,
     ])]
-    public ?int $position;
+    public ?int $position = null;
 
     #[Groups([
         self::GROUP_FRONT_READ,

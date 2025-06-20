@@ -67,14 +67,12 @@ readonly class PropelCollectionProvider implements ProviderInterface
         $langs = LangQuery::create()->filterByActive(1)->find();
 
         return array_map(
-            function ($propelModel) use ($resourceClass, $context, $langs) {
-                return $this->apiResourcePropelTransformerService->modelToResource(
-                    resourceClass: $resourceClass,
-                    propelModel: $propelModel,
-                    context: $context,
-                    langs: $langs
-                );
-            },
+            fn($propelModel) => $this->apiResourcePropelTransformerService->modelToResource(
+                resourceClass: $resourceClass,
+                propelModel: $propelModel,
+                context: $context,
+                langs: $langs
+            ),
             iterator_to_array($results)
         );
     }

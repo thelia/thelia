@@ -145,7 +145,7 @@ class Module extends AbstractTranslatableResource
         Order::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?bool $activate;
+    public ?bool $activate = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -153,7 +153,7 @@ class Module extends AbstractTranslatableResource
         Order::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?string $fullNamespace;
+    public ?string $fullNamespace = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -161,7 +161,7 @@ class Module extends AbstractTranslatableResource
         Order::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?bool $hidden;
+    public ?bool $hidden = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -169,7 +169,7 @@ class Module extends AbstractTranslatableResource
         Order::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?int $position;
+    public ?int $position = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -177,7 +177,7 @@ class Module extends AbstractTranslatableResource
         Order::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?bool $mandatory;
+    public ?bool $mandatory = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -185,7 +185,7 @@ class Module extends AbstractTranslatableResource
         Order::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?\DateTime $createdAt;
+    public ?\DateTime $createdAt = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -193,7 +193,7 @@ class Module extends AbstractTranslatableResource
         Order::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?\DateTime $updatedAt;
+    public ?\DateTime $updatedAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;

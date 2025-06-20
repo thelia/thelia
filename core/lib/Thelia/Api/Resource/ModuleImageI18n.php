@@ -17,16 +17,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class ModuleImageI18n extends I18n
 {
     #[Groups([ModuleImage::GROUP_ADMIN_READ, ModuleImage::GROUP_FRONT_READ, ModuleImage::GROUP_ADMIN_WRITE])]
-    protected ?string $title;
+    protected ?string $title = null;
 
     #[Groups([ModuleImage::GROUP_ADMIN_READ, ModuleImage::GROUP_FRONT_READ, ModuleImage::GROUP_ADMIN_WRITE])]
-    protected ?string $description;
+    protected ?string $description = null;
 
     #[Groups([ModuleImage::GROUP_ADMIN_READ, ModuleImage::GROUP_FRONT_READ, ModuleImage::GROUP_ADMIN_WRITE])]
-    protected ?string $chapo;
+    protected ?string $chapo = null;
 
     #[Groups([ModuleImage::GROUP_ADMIN_READ, ModuleImage::GROUP_FRONT_READ, ModuleImage::GROUP_ADMIN_WRITE])]
-    protected ?string $postscriptum;
+    protected ?string $postscriptum = null;
 
     public function getTitle(): ?string
     {

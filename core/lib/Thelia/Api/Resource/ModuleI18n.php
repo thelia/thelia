@@ -25,16 +25,16 @@ class ModuleI18n extends I18n
         DeliveryModule::GROUP_FRONT_READ,
         PaymentModule::GROUP_FRONT_READ,
     ])]
-    protected ?string $title;
+    protected ?string $title = null;
 
     #[Groups([Module::GROUP_ADMIN_READ_SINGLE, Module::GROUP_FRONT_READ_SINGLE, Module::GROUP_ADMIN_WRITE, DeliveryModule::GROUP_FRONT_READ, PaymentModule::GROUP_FRONT_READ])]
-    protected ?string $description;
+    protected ?string $description = null;
 
     #[Groups([Module::GROUP_ADMIN_READ_SINGLE, Module::GROUP_FRONT_READ_SINGLE, Module::GROUP_ADMIN_WRITE, DeliveryModule::GROUP_FRONT_READ, PaymentModule::GROUP_FRONT_READ])]
-    protected ?string $chapo;
+    protected ?string $chapo = null;
 
     #[Groups([Module::GROUP_ADMIN_READ_SINGLE, Module::GROUP_FRONT_READ_SINGLE, Module::GROUP_ADMIN_WRITE, DeliveryModule::GROUP_FRONT_READ, PaymentModule::GROUP_FRONT_READ])]
-    protected ?string $postscriptum;
+    protected ?string $postscriptum = null;
 
     public function getTitle(): ?string
     {

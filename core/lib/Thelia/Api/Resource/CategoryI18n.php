@@ -23,7 +23,7 @@ class CategoryI18n extends I18n
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
     ])]
-    protected ?string $title;
+    protected ?string $title = null;
 
     #[Groups([
         Category::GROUP_ADMIN_READ,
@@ -32,7 +32,7 @@ class CategoryI18n extends I18n
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
     ])]
-    protected ?string $chapo;
+    protected ?string $chapo = null;
 
     #[Groups([
         Category::GROUP_ADMIN_READ,
@@ -41,19 +41,19 @@ class CategoryI18n extends I18n
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
     ])]
-    protected ?string $description;
+    protected ?string $description = null;
 
     #[Groups([Category::GROUP_ADMIN_READ, Category::GROUP_FRONT_READ, Category::GROUP_ADMIN_WRITE])]
-    protected ?string $postscriptum;
+    protected ?string $postscriptum = null;
 
     #[Groups([Category::GROUP_ADMIN_READ, Category::GROUP_FRONT_READ, Category::GROUP_ADMIN_WRITE])]
-    protected ?string $metaTitle;
+    protected ?string $metaTitle = null;
 
     #[Groups([Category::GROUP_ADMIN_READ, Category::GROUP_FRONT_READ, Category::GROUP_ADMIN_WRITE])]
-    protected ?string $metaDescription;
+    protected ?string $metaDescription = null;
 
     #[Groups([Category::GROUP_ADMIN_READ, Category::GROUP_FRONT_READ, Category::GROUP_ADMIN_WRITE])]
-    protected ?string $metaKeywords;
+    protected ?string $metaKeywords = null;
 
     public function getTitle(): ?string
     {

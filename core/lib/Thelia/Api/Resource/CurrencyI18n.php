@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class CurrencyI18n extends I18n
 {
     #[Groups([Currency::GROUP_ADMIN_READ])]
-    protected ?string $name;
+    protected ?string $name = null;
 
     public function getName(): ?string
     {

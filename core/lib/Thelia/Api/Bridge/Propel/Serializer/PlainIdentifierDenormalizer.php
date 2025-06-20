@@ -71,14 +71,12 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
         if (\is_array($data[$property->getName()])) {
             $propelAttributes = array_filter(
                 $property->getAttributes(),
-                function (\ReflectionAttribute $attribute) {
-                    return \in_array(
-                        $attribute->getName(),
-                        [
-                            Relation::class,
-                        ]
-                    );
-                }
+                fn(\ReflectionAttribute $attribute) => \in_array(
+                    $attribute->getName(),
+                    [
+                        Relation::class,
+                    ]
+                )
             );
 
             $resource = null;
@@ -90,11 +88,9 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
 
             if (null !== $resource) {
                 return array_map(
-                    function ($value) use ($resource) {
-                        return $this->iriConverter->getIriFromResource(
-                            resource: $resource,
-                            context: ['uri_variables' => ['id' => $value]]);
-                    },
+                    fn($value) => $this->iriConverter->getIriFromResource(
+                        resource: $resource,
+                        context: ['uri_variables' => ['id' => $value]]),
                     $data[$property->getName()]
                 );
             }
@@ -110,22 +106,20 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
 
         return array_filter(
             $properties,
-            function (\ReflectionProperty $property) use ($data) {
-                return null !== $property->getType()
-                    && isset($data[$property->getName()])
-                    && (
-                        (
-                            \is_array($data[$property->getName()])
-                            && array_filter($data[$property->getName()], fn ($value) => (\is_string($value) || \is_int($value)) && !str_contains($value, '/'))
-                            && Collection::class === $property->getType()->getName()
-                        )
-                        || (
-                            (\is_string($data[$property->getName()]) || \is_int($data[$property->getName()]))
-                            && !str_contains($data[$property->getName()], '/')
-                            && $this->resourceClassResolver->isResourceClass($property->getType()->getName())
-                        )
-                    );
-            }
+            fn(\ReflectionProperty $property) => null !== $property->getType()
+                && isset($data[$property->getName()])
+                && (
+                    (
+                        \is_array($data[$property->getName()])
+                        && array_filter($data[$property->getName()], fn ($value) => (\is_string($value) || \is_int($value)) && !str_contains($value, '/'))
+                        && Collection::class === $property->getType()->getName()
+                    )
+                    || (
+                        (\is_string($data[$property->getName()]) || \is_int($data[$property->getName()]))
+                        && !str_contains($data[$property->getName()], '/')
+                        && $this->resourceClassResolver->isResourceClass($property->getType()->getName())
+                    )
+                )
         );
     }
 

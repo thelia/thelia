@@ -44,7 +44,7 @@ class TokenProvider
      */
     protected $tokenName;
 
-    protected ?SessionInterface $session;
+    protected ?SessionInterface $session = null;
 
     public function __construct(RequestStack $requestStack, TranslatorInterface $translator, $tokenName)
     {

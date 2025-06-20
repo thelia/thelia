@@ -42,9 +42,7 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
         $attributeQuery->useAttributeI18nQuery(null, Criteria::LEFT_JOIN)
             ->endUse();
 
-        $locales = array_map(function ($value) {
-            return '"'.$value.'"';
-        }, $locales);
+        $locales = array_map(fn($value) => '"'.$value.'"', $locales);
 
         $attributeQuery->addJoinCondition('AttributeI18n', 'AttributeI18n.locale IN ('.implode(',', $locales).')');
 
@@ -75,9 +73,7 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
         $featureQuery->useFeatureI18nQuery(null, Criteria::LEFT_JOIN)
             ->endUse();
 
-        $locales = array_map(function ($value) {
-            return '"'.$value.'"';
-        }, $locales);
+        $locales = array_map(fn($value) => '"'.$value.'"', $locales);
 
         $featureQuery->addJoinCondition('FeatureI18n', 'FeatureI18n.locale IN ('.implode(',', $locales).')');
 

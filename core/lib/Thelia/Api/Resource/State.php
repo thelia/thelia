@@ -96,17 +96,17 @@ class State extends AbstractTranslatableResource
 
     #[ApiProperty(identifier: true)]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, OrderAddress::GROUP_ADMIN_READ, Order::GROUP_FRONT_READ_SINGLE])]
-    public ?string $isocode;
+    public ?string $isocode = null;
 
     #[Relation(targetResource: Country::class)]
     #[Groups(groups: [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE])]
     public Country $country;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $createdAt;
+    public ?\DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $updatedAt;
+    public ?\DateTime $updatedAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_FRONT_READ_SINGLE])]
     public I18nCollection $i18ns;

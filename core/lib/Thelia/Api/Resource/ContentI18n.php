@@ -17,25 +17,25 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class ContentI18n extends I18n
 {
     #[Groups([Content::GROUP_ADMIN_READ, Content::GROUP_FRONT_READ, Content::GROUP_ADMIN_WRITE])]
-    protected ?string $title;
+    protected ?string $title = null;
 
     #[Groups([Content::GROUP_ADMIN_READ, Content::GROUP_FRONT_READ, Content::GROUP_ADMIN_WRITE])]
-    protected ?string $description;
+    protected ?string $description = null;
 
     #[Groups([Content::GROUP_ADMIN_READ, Content::GROUP_FRONT_READ, Content::GROUP_ADMIN_WRITE])]
-    protected ?string $chapo;
+    protected ?string $chapo = null;
 
     #[Groups([Content::GROUP_ADMIN_READ, Content::GROUP_FRONT_READ, Content::GROUP_ADMIN_WRITE])]
-    protected ?string $postscriptum;
+    protected ?string $postscriptum = null;
 
     #[Groups([Content::GROUP_ADMIN_READ, Content::GROUP_FRONT_READ, Content::GROUP_ADMIN_WRITE])]
-    protected ?string $metaTitle;
+    protected ?string $metaTitle = null;
 
     #[Groups([Content::GROUP_ADMIN_READ, Content::GROUP_FRONT_READ, Content::GROUP_ADMIN_WRITE])]
-    protected ?string $metaDescription;
+    protected ?string $metaDescription = null;
 
     #[Groups([Content::GROUP_ADMIN_READ, Content::GROUP_FRONT_READ, Content::GROUP_ADMIN_WRITE])]
-    protected ?string $metaKeywords;
+    protected ?string $metaKeywords = null;
 
     public function getTitle(): ?string
     {

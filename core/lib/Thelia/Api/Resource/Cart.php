@@ -93,54 +93,54 @@ class Cart implements PropelResourceInterface
     public ?int $id = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
-    public ?string $token;
+    public ?string $token = null;
 
     #[Relation(targetResource: Customer::class)]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
-    public ?Customer $customer;
+    public ?Customer $customer = null;
 
     #[Relation(targetResource: Address::class, relationAlias: 'AddressRelatedByAddressDeliveryId')]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?Address $addressDelivery;
+    public ?Address $addressDelivery = null;
 
     #[Relation(targetResource: Address::class, relationAlias: 'AddressRelatedByAddressInvoiceId')]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?Address $addressInvoice;
+    public ?Address $addressInvoice = null;
 
     #[Relation(targetResource: Currency::class)]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?Currency $currency;
+    public ?Currency $currency = null;
 
     #[Relation(targetResource: CartItem::class, )]
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?array $cartItems;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
-    public ?float $discount;
+    public ?float $discount = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?\DateTime $createdAt;
+    public ?\DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?\DateTime $updatedAt;
+    public ?\DateTime $updatedAt = null;
 
     #[Groups([self::GROUP_FRONT_READ_SINGLE])]
-    public ?float $totalWithoutTax;
+    public ?float $totalWithoutTax = null;
 
     #[Groups([self::GROUP_FRONT_READ_SINGLE])]
-    public ?float $deliveryTax;
+    public ?float $deliveryTax = null;
 
     #[Groups([self::GROUP_FRONT_READ_SINGLE])]
-    public ?float $taxes;
+    public ?float $taxes = null;
 
     #[Groups([self::GROUP_FRONT_READ_SINGLE])]
-    public ?float $delivery;
+    public ?float $delivery = null;
 
     #[Groups([self::GROUP_FRONT_READ_SINGLE])]
-    public ?float $total;
+    public ?float $total = null;
 
     #[Groups([self::GROUP_FRONT_READ_SINGLE])]
-    public ?bool $virtual;
+    public ?bool $virtual = null;
 
     public function __construct()
     {

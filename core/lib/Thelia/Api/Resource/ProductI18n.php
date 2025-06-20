@@ -22,16 +22,16 @@ class ProductI18n extends I18n
         Product::GROUP_ADMIN_WRITE,
         CartItem::GROUP_FRONT_READ_SINGLE,
     ])]
-    protected ?string $title;
+    protected ?string $title = null;
 
     #[Groups([Product::GROUP_ADMIN_READ, Product::GROUP_FRONT_READ, Product::GROUP_ADMIN_WRITE, CartItem::GROUP_FRONT_READ_SINGLE])]
-    protected ?string $chapo;
+    protected ?string $chapo = null;
 
     #[Groups([Product::GROUP_ADMIN_READ, Product::GROUP_FRONT_READ, Product::GROUP_ADMIN_WRITE])]
-    protected ?string $description;
+    protected ?string $description = null;
 
     #[Groups([Product::GROUP_ADMIN_READ, Product::GROUP_FRONT_READ, Product::GROUP_ADMIN_WRITE])]
-    protected ?string $postscriptum;
+    protected ?string $postscriptum = null;
 
     public function getTitle(): string
     {

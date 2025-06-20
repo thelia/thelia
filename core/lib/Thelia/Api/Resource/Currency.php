@@ -120,7 +120,7 @@ class Currency extends AbstractTranslatableResource
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?string $code;
+    public ?string $code = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -131,28 +131,28 @@ class Currency extends AbstractTranslatableResource
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?string $symbol;
+    public ?string $symbol = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
-    public ?string $format;
+    public ?string $format = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
-    public ?float $rate;
+    public ?float $rate = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?int $position;
+    public ?int $position = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?bool $visible;
+    public ?bool $visible = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?bool $byDefault;
+    public ?bool $byDefault = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $createdAt;
+    public ?\DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $updatedAt;
+    public ?\DateTime $updatedAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;

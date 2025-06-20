@@ -78,25 +78,25 @@ class OrderAddress implements PropelResourceInterface
     public string $address1;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE])]
-    public ?string $address2;
+    public ?string $address2 = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE])]
-    public ?string $address3;
+    public ?string $address3 = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE,  Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE])]
-    public ?string $zipcode;
+    public ?string $zipcode = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE])]
     public string $city;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE])]
-    public ?string $phone;
+    public ?string $phone = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE])]
-    public ?string $cellphone;
+    public ?string $cellphone = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE])]
-    public ?string $company;
+    public ?string $company = null;
 
     #[Relation(targetResource: CustomerTitle::class)]
     #[Groups(groups: [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE])]
@@ -111,10 +111,10 @@ class OrderAddress implements PropelResourceInterface
     public ?State $state = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $createdAt;
+    public ?\DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $updatedAt;
+    public ?\DateTime $updatedAt = null;
 
     public function getId(): ?int
     {

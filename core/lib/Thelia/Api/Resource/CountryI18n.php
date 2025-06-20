@@ -17,16 +17,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class CountryI18n extends I18n
 {
     #[Groups([Country::GROUP_ADMIN_READ])]
-    protected ?string $title;
+    protected ?string $title = null;
 
     #[Groups([Country::GROUP_ADMIN_READ])]
-    protected ?string $description;
+    protected ?string $description = null;
 
     #[Groups([Country::GROUP_ADMIN_READ])]
-    protected ?string $chapo;
+    protected ?string $chapo = null;
 
     #[Groups([Country::GROUP_ADMIN_READ])]
-    protected ?string $postscriptum;
+    protected ?string $postscriptum = null;
 
     public function getTitle(): ?string
     {

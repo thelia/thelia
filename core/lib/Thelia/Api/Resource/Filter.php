@@ -48,7 +48,7 @@ class Filter implements PropelResourceInterface
 
     public const GROUP_FRONT_READ = 'front:filter:read';
     #[Groups([self::GROUP_FRONT_READ])]
-    private ?int $id;
+    private ?int $id = null;
     #[Groups([self::GROUP_FRONT_READ])]
     private string $title;
     #[Groups([self::GROUP_FRONT_READ])]
@@ -56,7 +56,7 @@ class Filter implements PropelResourceInterface
     #[Groups([self::GROUP_FRONT_READ])]
     private string $inputType;
     #[Groups([self::GROUP_FRONT_READ])]
-    private ?int $position;
+    private ?int $position = null;
     #[Groups([self::GROUP_FRONT_READ])]
     private array $values;
 

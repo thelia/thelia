@@ -129,10 +129,10 @@ class Order implements PropelResourceInterface
     public ?int $id = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?string $ref;
+    public ?string $ref = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?\DateTime $invoiceDate;
+    public ?\DateTime $invoiceDate = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
@@ -140,13 +140,13 @@ class Order implements PropelResourceInterface
     public float $currencyRate;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?\DateTime $createdAt;
+    public ?\DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
-    public ?\DateTime $updatedAt;
+    public ?\DateTime $updatedAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?float $discount;
+    public ?float $discount = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
@@ -157,34 +157,34 @@ class Order implements PropelResourceInterface
     public float $postageTax;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?string $postageTaxRuleTitle;
+    public ?string $postageTaxRuleTitle = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?string $transactionRef;
+    public ?string $transactionRef = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?string $deliveryRef;
+    public ?string $deliveryRef = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?string $invoiceRef;
+    public ?string $invoiceRef = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?float $totalAmount;
+    public ?float $totalAmount = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?float $totalAmountWithoutTaxes;
+    public ?float $totalAmountWithoutTaxes = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?float $totalAmountWithTaxBeforeDiscount;
+    public ?float $totalAmountWithTaxBeforeDiscount = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?float $amountDiscountWithTaxes;
+    public ?float $amountDiscountWithTaxes = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?float $totalAmountWithTaxesAfterDiscount;
+    public ?float $totalAmountWithTaxesAfterDiscount = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?float $totalShippingWithTaxes;
+    public ?float $totalShippingWithTaxes = null;
 
     #[Relation(targetResource: OrderProduct::class)]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]

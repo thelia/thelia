@@ -25,7 +25,7 @@ class CustomerTitleI18n extends I18n
         CustomerTitle::GROUP_FRONT_READ,
         Customer::GROUP_FRONT_READ_SINGLE,
     ])]
-    protected ?string $short;
+    protected ?string $short = null;
 
     #[Groups([
         CustomerTitle::GROUP_ADMIN_READ,
@@ -35,7 +35,7 @@ class CustomerTitleI18n extends I18n
         CustomerTitle::GROUP_FRONT_READ,
         Customer::GROUP_FRONT_READ_SINGLE,
     ])]
-    protected ?string $long;
+    protected ?string $long = null;
 
     public function getShort(): ?string
     {

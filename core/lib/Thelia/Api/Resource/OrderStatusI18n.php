@@ -17,16 +17,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class OrderStatusI18n extends I18n
 {
     #[Groups([OrderStatus::GROUP_ADMIN_READ, OrderStatus::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE, Order::GROUP_FRONT_READ])]
-    protected ?string $title;
+    protected ?string $title = null;
 
     #[Groups([OrderStatus::GROUP_ADMIN_READ, OrderStatus::GROUP_ADMIN_WRITE])]
-    protected ?string $description;
+    protected ?string $description = null;
 
     #[Groups([OrderStatus::GROUP_ADMIN_READ, OrderStatus::GROUP_ADMIN_WRITE])]
-    protected ?string $chapo;
+    protected ?string $chapo = null;
 
     #[Groups([OrderStatus::GROUP_ADMIN_READ, OrderStatus::GROUP_ADMIN_WRITE])]
-    protected ?string $postscriptum;
+    protected ?string $postscriptum = null;
 
     public function getTitle(): ?string
     {

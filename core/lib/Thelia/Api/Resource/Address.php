@@ -166,26 +166,26 @@ class Address implements PropelResourceInterface
     public string $zipcode;
 
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
-    public ?string $company;
+    public ?string $company = null;
 
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
-    public ?string $cellphone;
+    public ?string $cellphone = null;
 
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
-    public ?string $phone;
+    public ?string $phone = null;
 
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_WRITE])]
-    public ?string $city;
+    public ?string $city = null;
 
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
-    public ?bool $isDefault;
+    public ?bool $isDefault = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?\DateTime $createdAt;
+    public ?\DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?\DateTime $updatedAt;
+    public ?\DateTime $updatedAt = null;
 
     #[Relation(targetResource: Country::class)]
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
@@ -194,7 +194,7 @@ class Address implements PropelResourceInterface
 
     #[Relation(targetResource: State::class)]
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
-    public ?State $state;
+    public ?State $state = null;
 
     #[Relation(targetResource: Customer::class)]
     #[Groups(groups: [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_WRITE])]

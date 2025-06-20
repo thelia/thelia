@@ -65,9 +65,7 @@ class IntToCombinedStringsListType extends BaseType
 
                 $return[trim($parts[0])] = [
                     'values' => array_map(
-                        function ($item) {
-                            return trim(self::unescape($item));
-                        },
+                        fn($item) => trim(self::unescape($item)),
                         preg_split(
                             '#(?<!\\\)[&|]#',
                             preg_replace(

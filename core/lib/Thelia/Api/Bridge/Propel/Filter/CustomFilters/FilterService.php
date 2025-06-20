@@ -113,9 +113,7 @@ readonly class FilterService
                 $values = explode(',', $values);
             }
             if (\is_array($values)) {
-                $values = array_map(static function ($value) {
-                    return (int) $value;
-                }, $values);
+                $values = array_map(static fn($value) => (int) $value, $values);
             }
             if ($filterClass instanceof CategoryFilter) {
                 $filterClass->filter($query, $values, $categoryDepth);
@@ -144,7 +142,7 @@ readonly class FilterService
 
         $filterObjects = [];
         $locale = $context['filters']['locale'] ?? $request->get('locale');
-        $locale = $locale ?? $this->langService->getLocale();
+        $locale ??= $this->langService->getLocale();
         $objects = $query->find();
         $filters = $this->getAvailableFilters($resource);
         foreach ($filters as $filter) {
@@ -193,9 +191,7 @@ readonly class FilterService
 
             if ($hasMainResource) {
                 $values = array_intersect_key($values, array_unique(array_map(
-                    static function ($item) {
-                        return $item['id'].'-'.$item['mainId'];
-                    },
+                    static fn($item) => $item['id'].'-'.$item['mainId'],
                     $values
                 )));
 
@@ -256,17 +252,13 @@ readonly class FilterService
 
         foreach ($filterObjects as $filterObject) {
             if ($filterObject->getPosition() === null) {
-                $allPosition = array_map(static function ($filterObject) {
-                    return $filterObject->getPosition();
-                }, $filterObjects);
+                $allPosition = array_map(static fn($filterObject) => $filterObject->getPosition(), $filterObjects);
                 $max = max($allPosition);
                 $filterObject->setPosition($max + 1);
             }
         }
 
-        usort($filterObjects, static function ($a, $b) {
-            return $a->getPosition() <=> $b->getPosition();
-        });
+        usort($filterObjects, static fn($a, $b) => $a->getPosition() <=> $b->getPosition());
 
         return $filterObjects;
     }

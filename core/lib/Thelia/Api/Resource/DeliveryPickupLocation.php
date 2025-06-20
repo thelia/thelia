@@ -130,27 +130,27 @@ class DeliveryPickupLocation
     #[Groups([
         self::GROUP_FRONT_READ,
     ])]
-    protected ?float $latitude;
+    protected ?float $latitude = null;
 
     #[Groups([
         self::GROUP_FRONT_READ,
     ])]
-    protected ?float $longitude;
+    protected ?float $longitude = null;
 
     #[Groups([
         self::GROUP_FRONT_READ,
     ])]
-    protected ?string $title;
+    protected ?string $title = null;
 
     #[Groups([
         self::GROUP_FRONT_READ,
     ])]
-    protected ?int $moduleId;
+    protected ?int $moduleId = null;
 
     #[Groups([
         self::GROUP_FRONT_READ,
     ])]
-    protected ?string $moduleOptionCode;
+    protected ?string $moduleOptionCode = null;
 
     #[Groups([
         self::GROUP_FRONT_READ,

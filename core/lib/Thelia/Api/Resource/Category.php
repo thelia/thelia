@@ -136,7 +136,7 @@ class Category extends AbstractTranslatableResource
         self::GROUP_FRONT_READ,
         Product::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?int $position;
+    public ?int $position = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -144,13 +144,13 @@ class Category extends AbstractTranslatableResource
         self::GROUP_FRONT_READ,
         Product::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?int $defaultTemplateId;
+    public ?int $defaultTemplateId = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
-    public ?\DateTime $createdAt;
+    public ?\DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
-    public ?\DateTime $updatedAt;
+    public ?\DateTime $updatedAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, Product::GROUP_FRONT_READ_SINGLE])]
     public I18nCollection $i18ns;

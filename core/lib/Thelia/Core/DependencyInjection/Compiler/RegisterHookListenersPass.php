@@ -423,9 +423,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
                 return $event;
             }
-            $callback = function ($matches) {
-                return strtoupper($matches[0]);
-            };
+            $callback = (fn($matches) => strtoupper($matches[0]));
             $event['method'] = 'on'.preg_replace_callback(
                 [
                     '/(?<=\b)[a-z]/i',

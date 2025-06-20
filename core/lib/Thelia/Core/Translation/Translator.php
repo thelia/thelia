@@ -75,7 +75,7 @@ class Translator extends BaseTranslator
         $returnDefaultIfNotAvailable = true,
         $useFallback = true
     ): string {
-        $domain = $domain ?? 'core';
+        $domain ??= 'core';
         if (null === $locale) {
             $locale = $this->getLocale();
         }

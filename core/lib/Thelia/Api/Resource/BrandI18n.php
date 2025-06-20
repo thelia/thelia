@@ -22,7 +22,7 @@ class BrandI18n extends I18n
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
     ])]
-    protected ?string $title;
+    protected ?string $title = null;
 
     #[Groups([
         Brand::GROUP_ADMIN_READ,
@@ -30,7 +30,7 @@ class BrandI18n extends I18n
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
     ])]
-    protected ?string $chapo;
+    protected ?string $chapo = null;
 
     #[Groups([
         Brand::GROUP_ADMIN_READ,
@@ -38,7 +38,7 @@ class BrandI18n extends I18n
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
     ])]
-    protected ?string $description;
+    protected ?string $description = null;
 
     public function getTitle(): string
     {

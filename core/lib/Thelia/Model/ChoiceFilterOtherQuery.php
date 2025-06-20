@@ -32,9 +32,7 @@ class ChoiceFilterOtherQuery extends BaseChoiceFilterOtherQuery
         $otherQuery->useChoiceFilterOtherI18nQuery(null, Criteria::LEFT_JOIN)
             ->endUse();
 
-        $locales = array_map(function ($value) {
-            return '"'.$value.'"';
-        }, $locales);
+        $locales = array_map(fn($value) => '"'.$value.'"', $locales);
 
         $otherQuery->addJoinCondition('ChoiceFilterOtherI18n', 'ChoiceFilterOtherI18n.locale IN ('.implode(',', $locales).')');
 

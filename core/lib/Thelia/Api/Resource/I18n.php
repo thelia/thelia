@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Annotation\Ignore;
 class I18n
 {
     #[Ignore]
-    public ?int $id;
+    public ?int $id = null;
 
     public function __construct($data = [])
     {

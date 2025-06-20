@@ -23,28 +23,28 @@ class FeatureI18n extends I18n
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
     ])]
-    protected ?string $title;
+    protected ?string $title = null;
 
     #[Groups([
         Feature::GROUP_ADMIN_READ,
         Feature::GROUP_FRONT_READ,
         Feature::GROUP_ADMIN_WRITE,
     ])]
-    protected ?string $description;
+    protected ?string $description = null;
 
     #[Groups([
         Feature::GROUP_ADMIN_READ,
         Feature::GROUP_FRONT_READ,
         Feature::GROUP_ADMIN_WRITE,
     ])]
-    protected ?string $chapo;
+    protected ?string $chapo = null;
 
     #[Groups([
         Feature::GROUP_ADMIN_READ,
         Feature::GROUP_FRONT_READ,
         Feature::GROUP_ADMIN_WRITE,
     ])]
-    protected ?string $postscriptum;
+    protected ?string $postscriptum = null;
 
     public function getTitle(): ?string
     {

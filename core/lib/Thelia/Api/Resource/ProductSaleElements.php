@@ -148,7 +148,7 @@ class ProductSaleElements implements PropelResourceInterface
         CartItem::GROUP_FRONT_READ,
         Product::GROUP_FRONT_READ,
     ])]
-    public ?bool $promo;
+    public ?bool $promo = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -161,7 +161,7 @@ class ProductSaleElements implements PropelResourceInterface
         CartItem::GROUP_FRONT_READ,
         Product::GROUP_FRONT_READ,
     ])]
-    public ?bool $newness;
+    public ?bool $newness = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -174,7 +174,7 @@ class ProductSaleElements implements PropelResourceInterface
         CartItem::GROUP_FRONT_READ,
         Product::GROUP_FRONT_READ,
     ])]
-    public ?float $weight;
+    public ?float $weight = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -185,7 +185,7 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_FRONT_READ_SINGLE,
         Product::GROUP_FRONT_READ,
     ])]
-    public ?bool $isDefault;
+    public ?bool $isDefault = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -195,7 +195,7 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?string $eanCode;
+    public ?string $eanCode = null;
 
     #[Relation(targetResource: ProductPrice::class)]
     #[Groups([
@@ -221,10 +221,10 @@ class ProductSaleElements implements PropelResourceInterface
     public array $attributeCombinations;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?\DateTime $createdAt;
+    public ?\DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?\DateTime $updatedAt;
+    public ?\DateTime $updatedAt = null;
 
     public function __construct()
     {

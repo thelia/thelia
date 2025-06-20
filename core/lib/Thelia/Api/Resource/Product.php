@@ -184,24 +184,24 @@ class Product extends AbstractTranslatableResource
     public bool $visible;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
-    public ?int $position;
+    public ?int $position = null;
 
     #[Relation(targetResource: Template::class)]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
-    public ?Template $template;
+    public ?Template $template = null;
 
     #[Relation(targetResource: Brand::class)]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?Brand $brand;
+    public ?Brand $brand = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public bool $virtual = false;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?\DateTime $createdAt;
+    public ?\DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?\DateTime $updatedAt;
+    public ?\DateTime $updatedAt = null;
 
     #[Relation(targetResource: ProductCategory::class)]
     #[Groups([

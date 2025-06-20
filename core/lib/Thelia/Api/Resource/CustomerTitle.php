@@ -107,10 +107,10 @@ class CustomerTitle extends AbstractTranslatableResource
     public int $byDefault;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
-    public ?\DateTime $createdAt;
+    public ?\DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
-    public ?\DateTime $updatedAt;
+    public ?\DateTime $updatedAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, Customer::GROUP_FRONT_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE])]
     public I18nCollection $i18ns;

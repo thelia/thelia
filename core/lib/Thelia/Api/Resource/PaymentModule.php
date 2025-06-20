@@ -53,7 +53,7 @@ class PaymentModule extends AbstractTranslatableResource
     #[Groups([
         self::GROUP_FRONT_READ,
     ])]
-    public ?bool $valid;
+    public ?bool $valid = null;
 
     #[Groups([
         self::GROUP_FRONT_READ,
@@ -63,12 +63,12 @@ class PaymentModule extends AbstractTranslatableResource
     #[Groups([
         self::GROUP_FRONT_READ,
     ])]
-    public ?float $minimumAmount;
+    public ?float $minimumAmount = null;
 
     #[Groups([
         self::GROUP_FRONT_READ,
     ])]
-    public ?float $maximumAmount;
+    public ?float $maximumAmount = null;
 
     #[Groups([
         self::GROUP_FRONT_READ,
