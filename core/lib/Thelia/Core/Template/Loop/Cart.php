@@ -120,7 +120,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             $loopResultRow
                 ->set('REAL_PRICE', $cartItem->getRealPrice())
                 ->set('REAL_TAXED_PRICE', $cartItem->getRealTaxedPrice($taxCountry))
-                ->set('REAL_TOTAL_PRICE', $cartItem->getTotalRealPrice($taxCountry))
+                ->set('REAL_TOTAL_PRICE', $cartItem->getTotalRealPrice())
                 ->set('REAL_TOTAL_TAXED_PRICE', $cartItem->getTotalRealTaxedPrice($taxCountry))
             ;
 

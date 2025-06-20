@@ -44,36 +44,37 @@ class TaxEngine
      * Then look at the current customer default address country
      * Else look at the default website country.
      *
-     * @return Country|null
      */
-    public function getDeliveryCountry()
+    public function getDeliveryCountry(): Country
     {
-        if (null === $this->taxCountry) {
-            /* is there a logged in customer ? */
-            /** @var Customer $customer */
-            if (null !== $customer = $this->getSession()?->getCustomerUser()) {
-                if (
-                    null !== $this->getSession()->getOrder()
-                        && null !== $this->getSession()->getOrder()->getChoosenDeliveryAddress()
-                        && null !== $currentDeliveryAddress = AddressQuery::create()->findPk($this->getSession()->getOrder()->getChoosenDeliveryAddress())
-                ) {
-                    $this->taxCountry = $currentDeliveryAddress->getCountry();
-                    $this->taxState = $currentDeliveryAddress->getState();
-                } else {
-                    $customerDefaultAddress = $customer->getDefaultAddress();
-                    if (isset($customerDefaultAddress)) {
-                        $this->taxCountry = $customerDefaultAddress->getCountry();
-                        $this->taxState = $customerDefaultAddress->getState();
-                    }
-                }
-            }
-
-            if (null == $this->taxCountry) {
-                $this->taxCountry = CountryQuery::create()->findOneByByDefault(1);
-                $this->taxState = null;
+        if (null !== $this->taxCountry) {
+            return $this->taxCountry;
+        }
+        /* is there a logged in customer ? */
+        /** @var Customer $customer */
+        if (null !== $customer = $this->getSession()?->getCustomerUser()) {
+            if (
+                null !== $this->getSession()?->getOrder()
+                    && null !== $this->getSession()?->getOrder()->getChoosenDeliveryAddress()
+                    && null !== $currentDeliveryAddress = AddressQuery::create()->findPk($this->getSession()?->getOrder()->getChoosenDeliveryAddress())
+            ) {
+                $this->taxCountry = $currentDeliveryAddress->getCountry();
+                $this->taxState = $currentDeliveryAddress->getState();
+            } else {
+                $customerDefaultAddress = $customer->getDefaultAddress();
+                $this->taxCountry = $customerDefaultAddress->getCountry();
+                $this->taxState = $customerDefaultAddress->getState();
             }
         }
 
+        if (null === $this->taxCountry) {
+            $this->taxCountry = CountryQuery::create()->findOneByByDefault(1);
+            $this->taxState = null;
+        }
+
+        if(null === $this->taxCountry) {
+            throw new \LogicException('No country found for tax calculation.');
+        }
         return $this->taxCountry;
     }
 
