@@ -20,16 +20,10 @@ namespace Thelia\Core\Event\Folder;
 class FolderDeleteEvent extends FolderEvent
 {
     /**
-     * @var int folder id
-     */
-    protected $folder_id;
-
-    /**
      * @param int $folder_id
      */
-    public function __construct($folder_id)
+    public function __construct(protected $folder_id)
     {
-        $this->folder_id = $folder_id;
     }
 
     /**

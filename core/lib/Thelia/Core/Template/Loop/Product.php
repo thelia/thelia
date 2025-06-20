@@ -280,7 +280,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     $promoPrice,
                     $taxState
                 );
-            } catch (TaxEngineException $e) {
+            } catch (TaxEngineException) {
                 $taxedPromoPrice = null;
             }
 
@@ -345,7 +345,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     $price,
                     $taxState
                 );
-            } catch (TaxEngineException $e) {
+            } catch (TaxEngineException) {
                 $taxedPrice = null;
             }
 

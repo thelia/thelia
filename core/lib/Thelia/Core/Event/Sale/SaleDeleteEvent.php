@@ -19,15 +19,11 @@ namespace Thelia\Core\Event\Sale;
  */
 class SaleDeleteEvent extends SaleEvent
 {
-    /** @var int */
-    protected $saleId;
-
     /**
      * @param int $saleId
      */
-    public function __construct($saleId)
+    public function __construct(protected $saleId)
     {
-        $this->saleId = $saleId;
     }
 
     /**

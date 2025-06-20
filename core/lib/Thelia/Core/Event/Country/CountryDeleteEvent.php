@@ -20,16 +20,10 @@ namespace Thelia\Core\Event\Country;
 class CountryDeleteEvent extends CountryEvent
 {
     /**
-     * @var int country id
-     */
-    protected $country_id;
-
-    /**
      * @param int $country_id
      */
-    public function __construct($country_id)
+    public function __construct(protected $country_id)
     {
-        $this->country_id = $country_id;
     }
 
     /**

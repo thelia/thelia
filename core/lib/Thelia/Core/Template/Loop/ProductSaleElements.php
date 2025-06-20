@@ -265,7 +265,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                     'price_PROMO_PRICE',
                     $discount
                 );
-            } catch (TaxEngineException $e) {
+            } catch (TaxEngineException) {
                 $taxedPromoPrice = null;
             }
 

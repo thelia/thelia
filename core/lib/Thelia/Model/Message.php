@@ -39,7 +39,7 @@ class Message extends BaseMessage
         if (!empty($template)) {
             try {
                 $body = $parser->render($template, [], $compressOutput);
-            } catch (ResourceNotFoundException $ex) {
+            } catch (ResourceNotFoundException) {
                 Tlog::getInstance()->addError("Failed to get mail message template body $template");
             }
         }

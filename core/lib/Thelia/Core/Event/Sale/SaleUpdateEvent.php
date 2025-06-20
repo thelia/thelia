@@ -21,8 +21,6 @@ use Propel\Runtime\Util\PropelDateTime;
  */
 class SaleUpdateEvent extends SaleCreateEvent
 {
-    protected $saleId;
-
     protected $chapo;
     protected $description;
     protected $postscriptum;
@@ -38,9 +36,8 @@ class SaleUpdateEvent extends SaleCreateEvent
     /**
      * @param int $saleId
      */
-    public function __construct($saleId)
+    public function __construct(protected $saleId)
     {
-        $this->saleId = $saleId;
     }
 
     /**

@@ -19,20 +19,8 @@ namespace Thelia\Core\Event;
  */
 class PdfEvent extends ActionEvent
 {
-    protected $content;
-
     protected $pdf;
-
-    protected $orientation;
-    protected $format;
-    protected $lang;
-    protected $unicode;
-    protected $encoding;
     protected $marges;
-    protected $fontName;
-    protected $templateName;
-    protected $fileName;
-    protected $object;
 
     /**
      * @param string $content      html content to transform into pdf
@@ -48,29 +36,19 @@ class PdfEvent extends ActionEvent
      * @param string $object
      */
     public function __construct(
-        $content,
-        $orientation = 'P',
-        $format = 'A4',
-        $lang = 'fr',
-        $unicode = true,
-        $encoding = 'UTF-8',
+        protected $content,
+        protected $orientation = 'P',
+        protected $format = 'A4',
+        protected $lang = 'fr',
+        protected $unicode = true,
+        protected $encoding = 'UTF-8',
         array $marges = [0, 0, 0, 0],
-        $fontName = 'freesans',
-        $templateName = null,
-        $fileName = null,
-        $object = null
+        protected $fontName = 'freesans',
+        protected $templateName = null,
+        protected $fileName = null,
+        protected $object = null
     ) {
-        $this->content = $content;
-        $this->orientation = $orientation;
-        $this->format = $format;
-        $this->lang = $lang;
-        $this->unicode = $unicode;
-        $this->encoding = $encoding;
         $this->marges = $marges;
-        $this->fontName = $fontName;
-        $this->templateName = $templateName;
-        $this->fileName = $fileName;
-        $this->object = $object;
     }
 
     /**

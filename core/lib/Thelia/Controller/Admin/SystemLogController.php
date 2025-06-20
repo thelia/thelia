@@ -68,7 +68,7 @@ class SystemLogController extends BaseAdminController
                     }
                 }
             }
-        } catch (\UnexpectedValueException $ex) {
+        } catch (\UnexpectedValueException) {
             // Directory does no exists -> Nothing to do
         }
     }

@@ -20,21 +20,15 @@ use Thelia\Type\TypeCollection;
  */
 class Argument
 {
-    public $name;
     public $type;
-    public $default;
     public $mandatory;
-    public $empty;
 
     private $value;
 
-    public function __construct($name, TypeCollection $type, $default = null, $mandatory = false, $empty = true, $value = null)
+    public function __construct(public $name, TypeCollection $type, public $default = null, $mandatory = false, public $empty = true, $value = null)
     {
-        $this->name = $name;
         $this->type = $type;
         $this->mandatory = $mandatory ? true : false;
-        $this->default = $default;
-        $this->empty = $empty;
 
         $this->setValue($value);
     }

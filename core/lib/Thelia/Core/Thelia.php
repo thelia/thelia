@@ -688,7 +688,7 @@ class Thelia extends Kernel
 
                     $translator->addMethodCall('addResource', [$format, (string) $file, $locale, $domain]);
                 }
-            } catch (\InvalidArgumentException $ex) {
+            } catch (\InvalidArgumentException) {
                 // Ignore missing I18n directories
                 Tlog::getInstance()->addWarning("loadTranslation: missing $dir directory");
             }

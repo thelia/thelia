@@ -26,32 +26,11 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /** @var ConditionCollection Array of ConditionInterface */
     protected $conditions;
 
-    /** @var string Coupon code (ex: XMAS) */
-    protected $code;
-
-    /** @var string Coupon title (ex: Coupon for XMAS) */
-    protected $title;
-
-    /** @var string Coupon short description */
-    protected $shortDescription;
-
-    /** @var string Coupon description */
-    protected $description;
-
-    /** @var bool if Coupon is enabled */
-    protected $isEnabled = false;
-
     /** @var \DateTime Coupon start date */
     protected $startDate;
 
     /** @var \DateTime Coupon expiration date */
     protected $expirationDate;
-
-    /** @var bool if Coupon is cumulative */
-    protected $isCumulative = false;
-
-    /** @var bool if Coupon is removing postage */
-    protected $isRemovingPostage = false;
 
     /** @var float Amount that will be removed from the Checkout (Coupon Effect) */
     protected $amount = 0;
@@ -59,29 +38,8 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /** @var array Effects ready to be serialized */
     protected $effects = [];
 
-    /** @var int Max time a Coupon can be used (-1 = unlimited) */
-    protected $maxUsage = -1;
-
-    /** @var bool if Coupon is available for Products already on special offers */
-    protected $isAvailableOnSpecialOffers = false;
-
     /** @var Coupon Coupon model */
     protected $couponModel;
-
-    /** @var string Coupon Service id */
-    protected $serviceId;
-
-    /** @var string Language code ISO (ex: fr_FR) */
-    protected $locale;
-
-    /** @var array ID of Countries to which shipping is free */
-    protected $freeShippingForCountries;
-
-    /** @var array ID of Shipping modules for which shipping is free */
-    protected $freeShippingForMethods;
-
-    /** @var true if usage count is per customer only */
-    protected $perCustomerUsageCount;
 
     /**
      * Constructor.
@@ -107,40 +65,26 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      * @param \DateTime $startDate                  Coupon start date
      */
     public function __construct(
-        $code,
-        $serviceId,
-        $title,
+        protected $code,
+        protected $serviceId,
+        protected $title,
         array $effects,
-        $shortDescription,
-        $description,
-        $isEnabled,
+        protected $shortDescription,
+        protected $description,
+        protected $isEnabled,
         \DateTime $expirationDate,
-        $isAvailableOnSpecialOffers,
-        $isCumulative,
-        $isRemovingPostage,
-        $maxUsage,
-        $locale,
-        $freeShippingForCountries,
-        $freeShippingForMethods,
-        $perCustomerUsageCount,
+        protected $isAvailableOnSpecialOffers,
+        protected $isCumulative,
+        protected $isRemovingPostage,
+        protected $maxUsage,
+        protected $locale,
+        protected $freeShippingForCountries,
+        protected $freeShippingForMethods,
+        protected $perCustomerUsageCount,
         \DateTime $startDate = null
     ) {
-        $this->code = $code;
-        $this->description = $description;
         $this->expirationDate = $expirationDate;
-        $this->isAvailableOnSpecialOffers = $isAvailableOnSpecialOffers;
-        $this->isCumulative = $isCumulative;
-        $this->isEnabled = $isEnabled;
-        $this->isRemovingPostage = $isRemovingPostage;
-        $this->maxUsage = $maxUsage;
-        $this->shortDescription = $shortDescription;
-        $this->title = $title;
-        $this->serviceId = $serviceId;
-        $this->locale = $locale;
         $this->setEffects($effects);
-        $this->freeShippingForCountries = $freeShippingForCountries;
-        $this->freeShippingForMethods = $freeShippingForMethods;
-        $this->perCustomerUsageCount = $perCustomerUsageCount;
         $this->startDate = $startDate;
     }
 

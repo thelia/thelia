@@ -19,20 +19,13 @@ namespace Thelia\Model;
  */
 class OrderPostage
 {
-    /** @var float */
-    protected $amount;
-
-    /** @var float */
-    protected $amountTax;
-
-    /** @var string */
-    protected $taxRuleTitle;
-
-    public function __construct($amount = 0.0, $amountTax = 0.0, $taxRuleTitle = '')
+    /**
+     * @param float $amount
+     * @param float $amountTax
+     * @param string $taxRuleTitle
+     */
+    public function __construct(protected $amount = 0.0, protected $amountTax = 0.0, protected $taxRuleTitle = '')
     {
-        $this->amount = $amount;
-        $this->amountTax = $amountTax;
-        $this->taxRuleTitle = $taxRuleTitle;
     }
 
     /**

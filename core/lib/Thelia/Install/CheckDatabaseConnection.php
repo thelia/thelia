@@ -33,18 +33,6 @@ class CheckDatabaseConnection extends BaseInstall
     /** @var TranslatorInterface Translator Service */
     protected $translator;
 
-    /** @var string Database host information */
-    protected $host;
-
-    /** @var string Database user information */
-    protected $user;
-
-    /** @var string Database password information */
-    protected $password;
-
-    /** @var int Database port information */
-    protected $port;
-
     /**
      * @var \PDO instance
      */
@@ -61,12 +49,8 @@ class CheckDatabaseConnection extends BaseInstall
      * @param Translator $translator    Translator Service
      *                                  necessary for install wizard
      */
-    public function __construct($host, $user, $password, $port, $verifyInstall = true, Translator $translator = null)
+    public function __construct(protected $host, protected $user, protected $password, protected $port, $verifyInstall = true, Translator $translator = null)
     {
-        $this->host = $host;
-        $this->user = $user;
-        $this->password = $password;
-        $this->port = $port;
         $this->translator = $translator;
 
         parent::__construct($verifyInstall);
@@ -87,7 +71,7 @@ class CheckDatabaseConnection extends BaseInstall
                 $this->user,
                 $this->password
             );
-        } catch (\PDOException $e) {
+        } catch (\PDOException) {
             $this->validationMessages = 'Wrong connection information';
 
             $this->isValid = false;

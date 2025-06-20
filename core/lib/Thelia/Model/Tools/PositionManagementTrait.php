@@ -111,7 +111,7 @@ trait PositionManagementTrait
                 $result->setPosition($myPosition)->save($cnx);
 
                 $cnx->commit();
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 $cnx->rollback();
             }
         }
@@ -175,7 +175,7 @@ trait PositionManagementTrait
                 ;
 
                 $cnx->commit();
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 $cnx->rollback();
             }
         }

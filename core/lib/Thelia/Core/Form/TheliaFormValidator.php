@@ -28,13 +28,12 @@ class TheliaFormValidator
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var string */
-    protected $environment;
-
-    public function __construct(TranslatorInterface $translator, $kernelEnvironment)
+    /**
+     * @param string $kernelEnvironment
+     */
+    public function __construct(TranslatorInterface $translator, protected $environment)
     {
         $this->translator = $translator;
-        $this->environment = $kernelEnvironment;
     }
 
     /**

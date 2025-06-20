@@ -25,15 +25,8 @@ use Thelia\Model\State;
  */
 class PickupLocationEvent extends ActionEvent
 {
-    protected ?string $address;
-    protected ?string $city;
-    protected ?string $zipCode;
-    protected ?State $state;
-    protected ?Country $country;
     protected ?int $radius;
     protected ?int $maxRelays;
-    protected ?int $orderWeight;
-    protected ?array $moduleIds;
     protected array $locations = [];
 
     /**
@@ -46,23 +39,16 @@ class PickupLocationEvent extends ActionEvent
         Address $addressModel = null,
         int $radius = null,
         int $maxRelays = null,
-        string $address = null,
-        string $city = null,
-        string $zipCode = null,
-        int $orderWeight = null,
-        State $state = null,
-        Country $country = null,
-        array $moduleIds = null
+        protected ?string $address = null,
+        protected ?string $city = null,
+        protected ?string $zipCode = null,
+        protected ?int $orderWeight = null,
+        protected ?State $state = null,
+        protected ?Country $country = null,
+        protected ?array $moduleIds = null
     ) {
         $this->radius = $radius ?? 20000;
         $this->maxRelays = $maxRelays ?? 15;
-        $this->orderWeight = $orderWeight;
-        $this->address = $address;
-        $this->city = $city;
-        $this->zipCode = $zipCode;
-        $this->state = $state;
-        $this->country = $country;
-        $this->moduleIds = $moduleIds;
         if (null !== $addressModel) {
             $this->address = $addressModel->getAddress1();
             $this->city = $addressModel->getCity();

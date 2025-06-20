@@ -39,7 +39,7 @@ class Tax extends BaseTax
     {
         try {
             $taxRuleCountryPosition = $this->getVirtualColumn(TaxRuleQuery::ALIAS_FOR_TAX_RULE_COUNTRY_POSITION);
-        } catch (PropelException $e) {
+        } catch (PropelException) {
             throw new PropelException('Virtual column `'.TaxRuleQuery::ALIAS_FOR_TAX_RULE_COUNTRY_POSITION.'` does not exist in Tax::getTaxRuleCountryPosition');
         }
 

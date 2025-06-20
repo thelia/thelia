@@ -21,13 +21,8 @@ use Thelia\Core\Event\ActionEvent;
  */
 class ShippingZoneAddAreaEvent extends ActionEvent
 {
-    protected $area_id;
-    protected $shipping_zone_id;
-
-    public function __construct($area_id, $shipping_zone_id)
+    public function __construct(protected $area_id, protected $shipping_zone_id)
     {
-        $this->area_id = $area_id;
-        $this->shipping_zone_id = $shipping_zone_id;
     }
 
     /**

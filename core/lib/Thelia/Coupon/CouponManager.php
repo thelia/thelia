@@ -45,19 +45,14 @@ class CouponManager
      * @var Request
      */
     private $request;
-    /**
-     * @var CouponFactory
-     */
-    private $couponFactory;
 
     /**S
      * Constructor
      *
      * @param FacadeInterface $facade Service container
      */
-    public function __construct(FacadeInterface $facade, CouponFactory $couponFactory)
+    public function __construct(FacadeInterface $facade, private CouponFactory $couponFactory)
     {
-        $this->couponFactory = $couponFactory;
         $this->facade = $facade;
     }
 
@@ -260,7 +255,7 @@ class CouponManager
                 if ($coupon->isMatching()) {
                     $couponsKept[] = $coupon;
                 }
-            } catch (UnmatchableConditionException $e) {
+            } catch (UnmatchableConditionException) {
                 // ignore unmatchable coupon
                 continue;
             }

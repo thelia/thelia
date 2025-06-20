@@ -30,9 +30,6 @@ use Thelia\Form\Exception\FormValidationException;
  */
 abstract class AbstractSeoCrudController extends AbstractCrudController
 {
-    // Events
-    protected $updateSeoEventIdentifier;
-
     /**
      * @param string $objectName                      the lower case object name. Example. "message"
      * @param string $defaultListOrder                the default object list order, or null if list is not sortable. Example: manual
@@ -56,7 +53,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
         $deleteEventIdentifier,
         $visibilityToggleEventIdentifier = null,
         $changePositionEventIdentifier = null,
-        $updateSeoEventIdentifier = null,
+        protected $updateSeoEventIdentifier = null,
         $moduleCode = null
     ) {
         parent::__construct(
@@ -71,8 +68,6 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             $changePositionEventIdentifier,
             $moduleCode
         );
-
-        $this->updateSeoEventIdentifier = $updateSeoEventIdentifier;
     }
 
     /**

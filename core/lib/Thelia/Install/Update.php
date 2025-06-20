@@ -42,9 +42,6 @@ class Update
 
     protected $version;
 
-    /** @var bool */
-    protected $usePropel;
-
     /** @var Tlog|null */
     protected $logger;
 
@@ -72,10 +69,11 @@ class Update
     /** @var Translator */
     protected $translator;
 
-    public function __construct($usePropel = true)
+    /**
+     * @param bool $usePropel
+     */
+    public function __construct(protected $usePropel = true)
     {
-        $this->usePropel = $usePropel;
-
         if ($this->usePropel) {
             $this->logger = Tlog::getInstance();
             $this->logger->setLevel(Tlog::DEBUG);
@@ -609,7 +607,7 @@ class Update
             if (Version::parse($res)) {
                 return trim($res);
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return null;
         }
     }

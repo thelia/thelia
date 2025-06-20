@@ -21,14 +21,12 @@ use Thelia\Model\Area;
  */
 class AreaRemoveCountryEvent extends AreaAddCountryEvent
 {
-    /** @var int|null */
-    protected $stateId;
-
-    public function __construct(Area $area, array $countryIds, $stateId = null)
+    /**
+     * @param int|null $stateId
+     */
+    public function __construct(Area $area, array $countryIds, protected $stateId = null)
     {
         parent::__construct($area, $countryIds);
-
-        $this->stateId = $stateId;
     }
 
     /**

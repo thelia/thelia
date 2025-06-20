@@ -113,7 +113,7 @@ class XmlFileLoader extends FileLoader
         }
         try {
             $commandConfig = $this->container->getParameter('command.definition');
-        } catch (ParameterNotFoundException $e) {
+        } catch (ParameterNotFoundException) {
             $commandConfig = [];
         }
 
@@ -146,7 +146,7 @@ class XmlFileLoader extends FileLoader
         }
         try {
             $loopConfig = $this->container->getParameter('Thelia.parser.loops');
-        } catch (ParameterNotFoundException $e) {
+        } catch (ParameterNotFoundException) {
             $loopConfig = [];
         }
 
@@ -165,7 +165,7 @@ class XmlFileLoader extends FileLoader
 
         try {
             $formConfig = $this->container->getParameter('Thelia.parser.forms');
-        } catch (ParameterNotFoundException $e) {
+        } catch (ParameterNotFoundException) {
             $formConfig = [];
         }
 
@@ -186,7 +186,7 @@ class XmlFileLoader extends FileLoader
         }
         try {
             $filterConfig = $this->container->getParameter('Thelia.parser.filters');
-        } catch (ParameterNotFoundException $e) {
+        } catch (ParameterNotFoundException) {
             $filterConfig = [];
         }
 
@@ -207,7 +207,7 @@ class XmlFileLoader extends FileLoader
         }
         try {
             $baseParamConfig = $this->container->getParameter('Thelia.parser.templateDirectives');
-        } catch (ParameterNotFoundException $e) {
+        } catch (ParameterNotFoundException) {
             $baseParamConfig = [];
         }
 

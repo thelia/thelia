@@ -22,14 +22,13 @@ use Thelia\Model\Content;
 class ContentAddFolderEvent extends ContentEvent
 {
     /**
+     * @param int $folderId
+     */
+    public function __construct(Content $content, /**
      * @var int folder id
      */
-    protected $folderId;
-
-    public function __construct(Content $content, $folderId)
+    protected $folderId)
     {
-        $this->folderId = $folderId;
-
         parent::__construct($content);
     }
 

@@ -21,11 +21,8 @@ abstract class BaseConstraint implements ConstraintInterface
 {
     protected $operator = '=';
 
-    protected $expression;
-
-    public function __construct($expression)
+    public function __construct(protected $expression)
     {
-        $this->expression = $expression;
     }
 
     public function test($version, $strict = false)

@@ -20,16 +20,10 @@ namespace Thelia\Core\Event\State;
 class StateDeleteEvent extends StateEvent
 {
     /**
-     * @var int state id
-     */
-    protected $state_id;
-
-    /**
      * @param int $state_id
      */
-    public function __construct($state_id)
+    public function __construct(protected $state_id)
     {
-        $this->state_id = $state_id;
     }
 
     /**

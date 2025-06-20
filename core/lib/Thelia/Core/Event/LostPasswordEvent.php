@@ -19,11 +19,8 @@ namespace Thelia\Core\Event;
  */
 class LostPasswordEvent extends ActionEvent
 {
-    protected $email;
-
-    public function __construct($email)
+    public function __construct(protected $email)
     {
-        $this->email = $email;
     }
 
     public function getEmail()

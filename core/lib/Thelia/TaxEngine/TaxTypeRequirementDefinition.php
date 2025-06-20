@@ -22,11 +22,6 @@ use Thelia\Type\TypeInterface;
 class TaxTypeRequirementDefinition
 {
     /**
-     * @var string The requirement name
-     */
-    protected $name;
-
-    /**
      * @var TypeInterface The requirement type
      */
     protected $type;
@@ -42,11 +37,10 @@ class TaxTypeRequirementDefinition
      * @param string        $name the name of the requirement
      * @param TypeInterface $type the type of the data
      */
-    public function __construct($name, TypeInterface $type, $title = null)
+    public function __construct(protected $name, TypeInterface $type, $title = null)
     {
-        $this->name = $name;
         $this->type = $type;
-        $this->title = $title ?: $name;
+        $this->title = $title ?: $this->name;
     }
 
     public function getName()

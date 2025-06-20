@@ -19,13 +19,9 @@ namespace Thelia\Core\Event\MetaData;
  */
 class MetaDataCreateOrUpdateEvent extends MetaDataDeleteEvent
 {
-    protected $value;
-
-    public function __construct($metaKey = null, $elementKey = null, $elementId = null, $value = null)
+    public function __construct($metaKey = null, $elementKey = null, $elementId = null, protected $value = null)
     {
         parent::__construct($metaKey, $elementKey, $elementId);
-
-        $this->value = $value;
     }
 
     public function setValue($value)

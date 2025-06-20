@@ -80,16 +80,11 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     $priceWithTax = $taxCalculator->getTaxedPrice($productPrice->getPrice());
 
                     // Remove the price offset to get the taxed promo price
-                    switch ($offsetType) {
-                        case SaleModel::OFFSET_TYPE_AMOUNT:
-                            $promoPrice = max(0, $priceWithTax - $offset);
-                            break;
-                        case SaleModel::OFFSET_TYPE_PERCENTAGE:
-                            $promoPrice = $priceWithTax * (1 - $offset / 100);
-                            break;
-                        default:
-                            $promoPrice = $priceWithTax;
-                    }
+                    $promoPrice = match ($offsetType) {
+                        SaleModel::OFFSET_TYPE_AMOUNT => max(0, $priceWithTax - $offset),
+                        SaleModel::OFFSET_TYPE_PERCENTAGE => $priceWithTax * (1 - $offset / 100),
+                        default => $priceWithTax,
+                    };
 
                     // and then get the untaxed promo price.
                     $promoPrice = $taxCalculator->getUntaxedPrice($promoPrice);

@@ -160,7 +160,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
                     ->convert($baseValue);
 
                 $currency->setRate($rate->getNumber(-1))->save();
-            } catch (CurrencyNotFoundException $ex) {
+            } catch (CurrencyNotFoundException) {
                 Tlog::getInstance()->addError(
                     sprintf('Unable to find exchange rate for currency %s, ID %d', $currency->getCode(), $currency->getId())
                 );

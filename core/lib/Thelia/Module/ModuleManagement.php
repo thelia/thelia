@@ -79,7 +79,7 @@ class ModuleManagement
             if (\count($modulesUpdated)) {
                 $this->cacheClear();
             }
-        } catch (DirectoryNotFoundException $e) {
+        } catch (DirectoryNotFoundException) {
             // No module installed
         }
     }

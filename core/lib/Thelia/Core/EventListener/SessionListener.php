@@ -29,11 +29,8 @@ use Thelia\Model\ConfigQuery;
  */
 class SessionListener implements EventSubscriberInterface
 {
-    protected $sessionSavePath;
-
-    public function __construct($sessionSavePath)
+    public function __construct(protected $sessionSavePath)
     {
-        $this->sessionSavePath = $sessionSavePath;
     }
 
     public function prodSession(SessionEvent $event): void

@@ -48,14 +48,8 @@ class RequestListener implements EventSubscriberInterface
 {
     use RememberMeTrait;
 
-    protected EventDispatcherInterface $eventDispatcher;
-
-    private Translator $translator;
-
-    public function __construct(Translator $translator, EventDispatcherInterface $eventDispatcher)
+    public function __construct(private Translator $translator, protected EventDispatcherInterface $eventDispatcher)
     {
-        $this->translator = $translator;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function registerValidatorTranslator(RequestEvent $event): void
@@ -159,7 +153,7 @@ class RequestListener implements EventSubscriberInterface
                     new CustomerLoginEvent($user),
                     TheliaEvents::CUSTOMER_LOGIN
                 );
-            } catch (TokenAuthenticationException $ex) {
+            } catch (TokenAuthenticationException) {
                 // Clear the cookie
                 $this->clearRememberMeCookie($cookieCustomerName);
             }
@@ -188,7 +182,7 @@ class RequestListener implements EventSubscriberInterface
                 $this->applyUserLocale($user, $session);
 
                 AdminLog::append('admin', 'LOGIN', 'Authentication successful', $request, $user, false);
-            } catch (TokenAuthenticationException $ex) {
+            } catch (TokenAuthenticationException) {
                 AdminLog::append('admin', 'LOGIN', 'Token based authentication failed.', $request);
 
                 // Clear the cookie

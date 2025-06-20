@@ -38,12 +38,8 @@ class AccessManager
         self::DELETE => 0,
     ];
 
-    protected $accessValue;
-
-    public function __construct($accessValue)
+    public function __construct(protected $accessValue)
     {
-        $this->accessValue = $accessValue;
-
         $this->fillGrantedAccess();
     }
 

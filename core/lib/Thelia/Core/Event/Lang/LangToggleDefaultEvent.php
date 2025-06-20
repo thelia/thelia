@@ -20,16 +20,10 @@ namespace Thelia\Core\Event\Lang;
 class LangToggleDefaultEvent extends LangEvent
 {
     /**
-     * @var int
-     */
-    protected $lang_id;
-
-    /**
      * @param int $lang_id
      */
-    public function __construct($lang_id)
+    public function __construct(protected $lang_id)
     {
-        $this->lang_id = $lang_id;
     }
 
     /**

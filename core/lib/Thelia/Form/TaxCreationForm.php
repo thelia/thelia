@@ -32,12 +32,10 @@ class TaxCreationForm extends BaseForm
 {
     use StandardDescriptionFieldsTrait;
 
-    private iterable $taxTypeIterator;
-
     public function __construct(
-        #[TaggedIterator('thelia.taxType')] iterable $taxTypeIterator
-    ) {
-        $this->taxTypeIterator = $taxTypeIterator;
+        #[TaggedIterator('thelia.taxType')]private iterable $taxTypeIterator
+    )
+    {
     }
 
     protected static $typeList = [];

@@ -37,7 +37,7 @@ class Product extends BaseProduct implements FileModelParentInterface
     {
         try {
             $amount = $this->getVirtualColumn($virtualColumnName);
-        } catch (PropelException $e) {
+        } catch (PropelException) {
             throw new PropelException("Virtual column `$virtualColumnName` does not exist in Product::getRealLowestPrice");
         }
 

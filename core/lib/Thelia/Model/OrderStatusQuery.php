@@ -142,28 +142,15 @@ class OrderStatusQuery extends BaseOrderStatusQuery
 
             /** @var OrderStatus $status */
             foreach ($statusList as $status) {
-                switch ($statusCode) {
-                    case OrderStatus::CODE_NOT_PAID:
-                        $match = $status->isNotPaid(false);
-                        break;
-                    case OrderStatus::CODE_PAID:
-                        $match = $status->isPaid(false);
-                        break;
-                    case OrderStatus::CODE_PROCESSING:
-                        $match = $status->isProcessing(false);
-                        break;
-                    case OrderStatus::CODE_SENT:
-                        $match = $status->isSent(false);
-                        break;
-                    case OrderStatus::CODE_CANCELED:
-                        $match = $status->isCancelled(false);
-                        break;
-                    case OrderStatus::CODE_REFUNDED:
-                        $match = $status->isRefunded(false);
-                        break;
-                    default:
-                        throw new InvalidArgumentException("Status code '$statusCode' is not a valid value.");
-                }
+                $match = match ($statusCode) {
+                    OrderStatus::CODE_NOT_PAID => $status->isNotPaid(false),
+                    OrderStatus::CODE_PAID => $status->isPaid(false),
+                    OrderStatus::CODE_PROCESSING => $status->isProcessing(false),
+                    OrderStatus::CODE_SENT => $status->isSent(false),
+                    OrderStatus::CODE_CANCELED => $status->isCancelled(false),
+                    OrderStatus::CODE_REFUNDED => $status->isRefunded(false),
+                    default => throw new InvalidArgumentException("Status code '$statusCode' is not a valid value."),
+                };
 
                 if ($match) {
                     $statusIdList[] = $status->getId();

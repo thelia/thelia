@@ -70,7 +70,7 @@ class IriConverter implements IriConverterInterface
                 );
 
                 return $this->router->generate($operation->getName(), $identifiers, $operation->getUrlGenerationStrategy() ?? $referenceType);
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 // try with not decorated converter
             }
         }

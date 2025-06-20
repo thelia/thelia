@@ -36,7 +36,7 @@ class RegisterRouterPass implements CompilerPassInterface
     {
         try {
             $chainRouter = $container->getDefinition('router.chainRequest');
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             return;
         }
 

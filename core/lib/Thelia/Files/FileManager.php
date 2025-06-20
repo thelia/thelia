@@ -25,16 +25,13 @@ use Thelia\Exception\ImageException;
  */
 class FileManager
 {
-    protected $supportedFileModels = [];
-
     /**
      * Create a new FileManager instance.
      *
      * @param array $supportedFileModels The key should have form type.parent, where type is the file type (document or image) and parent is the parent object of the file, form example product, brand, folder, etc.
      */
-    public function __construct($supportedFileModels)
+    public function __construct(protected $supportedFileModels)
     {
-        $this->supportedFileModels = $supportedFileModels;
     }
 
     /**

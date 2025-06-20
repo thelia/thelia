@@ -97,7 +97,7 @@ class Cart extends BaseCart
 
         try {
             $this->delete();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // just fail silently in some cases
         }
 

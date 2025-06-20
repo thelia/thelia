@@ -174,7 +174,7 @@ class TranslationsController extends BaseAdminController
                         ;
 
                         $hasAdminIncludes = $finder->count() > 0;
-                    } catch (\InvalidArgumentException $ex) {
+                    } catch (\InvalidArgumentException) {
                         $hasAdminIncludes = false;
                     }
 
@@ -361,7 +361,7 @@ class TranslationsController extends BaseAdminController
 
                 Translator::getInstance()->addResource($format, $file->getPathname(), $locale, $domain);
             }
-        } catch (\InvalidArgumentException $ex) {
+        } catch (\InvalidArgumentException) {
             // Ignore missing I18n directories
         }
     }

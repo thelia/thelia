@@ -63,14 +63,11 @@ class Archiver extends BaseLoop implements ArraySearchLoopInterface
             }
         }
 
-        switch ($this->getArgValue('order')) {
-            case 'alpha':
-                ksort($archivers);
-                break;
-            case 'alpha_reverse':
-                krsort($archivers);
-                break;
-        }
+        match ($this->getArgValue('order')) {
+            'alpha' => ksort($archivers),
+            'alpha_reverse' => krsort($archivers),
+            default => $archivers,
+        };
 
         return $archivers;
     }

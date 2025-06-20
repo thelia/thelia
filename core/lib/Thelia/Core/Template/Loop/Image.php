@@ -289,17 +289,11 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             $effects = explode(',', $effects);
         }
 
-        switch ($this->getResizeMode()) {
-            case 'crop':
-                $resizeMode = \Thelia\Action\Image::EXACT_RATIO_WITH_CROP;
-                break;
-            case 'borders':
-                $resizeMode = \Thelia\Action\Image::EXACT_RATIO_WITH_BORDERS;
-                break;
-            case 'none':
-            default:
-                $resizeMode = \Thelia\Action\Image::KEEP_IMAGE_RATIO;
-        }
+        $resizeMode = match ($this->getResizeMode()) {
+            'crop' => \Thelia\Action\Image::EXACT_RATIO_WITH_CROP,
+            'borders' => \Thelia\Action\Image::EXACT_RATIO_WITH_BORDERS,
+            default => \Thelia\Action\Image::KEEP_IMAGE_RATIO,
+        };
 
         $baseSourceFilePath = ConfigQuery::read('images_library_path');
         if ($baseSourceFilePath === null) {

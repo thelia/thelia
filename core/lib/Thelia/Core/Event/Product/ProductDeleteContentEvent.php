@@ -16,13 +16,9 @@ use Thelia\Model\Product;
 
 class ProductDeleteContentEvent extends ProductEvent
 {
-    protected $content_id;
-
-    public function __construct(Product $product, $content_id)
+    public function __construct(Product $product, protected $content_id)
     {
         parent::__construct($product);
-
-        $this->content_id = $content_id;
     }
 
     public function getContentId()

@@ -107,7 +107,7 @@ class TemplateValidator
                             $type
                         )
                     );
-                } catch (\Exception $ex) {
+                } catch (\Exception) {
                     // The Translator could not be initialized, take care of this.
                     try {
                         $message = Translator::getInstance()->trans(
@@ -117,7 +117,7 @@ class TemplateValidator
                                 '%name' => $templateDescriptor->getName(),
                             ]
                         );
-                    } catch (\Exception $ex) {
+                    } catch (\Exception) {
                         $message = \sprintf(
                             'The parent template "%s" of template "%s" could not be found',
                             $templateDescriptor->getParent()->getName(),
@@ -149,7 +149,7 @@ class TemplateValidator
                             '%version' => $templateDescriptor->getTheliaVersion(),
                         ]
                     );
-                } catch (\Exception $ex) {
+                } catch (\Exception) {
                     $message = \sprintf(
                         'The template "%s" requires Thelia %s or newer',
                         $templateDescriptor->getName(),

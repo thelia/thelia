@@ -197,7 +197,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
                     }
                 }
             }
-        } catch (\UnexpectedValueException $ex) {
+        } catch (\UnexpectedValueException) {
             // Directory does not exists => ignore it.
         }
 

@@ -21,33 +21,18 @@ use Thelia\Core\Event\ActionEvent;
  */
 class CouponConsumeEvent extends ActionEvent
 {
-    /** @var string Coupon code */
-    protected $code;
-
-    /** @var float Total discount given by this coupon */
-    protected $discount = 0;
-
-    /** @var bool If Coupon is valid or if Customer meets coupon conditions */
-    protected $isValid;
-
-    /** @var bool true if coupon offers free shipping */
-    protected $freeShipping = false;
-
     /**
      * Constructor.
      *
      * @param string $code         Coupon code
      * @param float  $discount     Total discount given by this coupon
      * @param bool   $freeShipping true if coupon offers free shipping
+     * @param bool $isValid
      */
-    public function __construct($code, $discount = null, $isValid = null, $freeShipping = false)
+    public function __construct(protected $code, protected $discount = null, /** @var bool If Coupon is valid or if Customer meets coupon conditions */
+    protected $isValid = null, protected $freeShipping = false)
     {
-        $this->code = $code;
-        $this->discount = $discount;
-        $this->discount = $discount;
-        $this->isValid = $isValid;
-
-        $this->freeShipping = $freeShipping;
+        $this->discount = $this->discount;
     }
 
     /**

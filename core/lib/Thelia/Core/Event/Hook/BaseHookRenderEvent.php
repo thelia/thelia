@@ -22,18 +22,18 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class BaseHookRenderEvent extends Event
 {
-    /** @var string the code of the hook */
-    protected $code;
-
     /** @var array an array of arguments passed to the template engine function */
     protected $arguments = [];
 
     /** @var array the variable currently defined in the template */
     protected $templateVars = [];
 
-    public function __construct($code, array $arguments = [], array $templateVars = [])
+    /**
+     * @param string $code
+     */
+    public function __construct(/** @var string the code of the hook */
+    protected $code, array $arguments = [], array $templateVars = [])
     {
-        $this->code = $code;
         $this->arguments = $arguments;
         $this->templateVars = $templateVars;
     }

@@ -14,13 +14,10 @@ namespace Thelia\Core\Event;
 
 class ToggleVisibilityEvent extends ActionEvent
 {
-    protected $object_id;
-
     protected $object;
 
-    public function __construct($object_id)
+    public function __construct(protected $object_id)
     {
-        $this->object_id = $object_id;
     }
 
     public function getObjectId()

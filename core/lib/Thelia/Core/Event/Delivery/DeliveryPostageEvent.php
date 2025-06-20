@@ -29,9 +29,6 @@ use Thelia\Module\BaseModuleInterface;
  */
 class DeliveryPostageEvent extends ActionEvent
 {
-    /** @var BaseModuleInterface */
-    protected $module;
-
     /** @var Cart */
     protected $cart;
 
@@ -65,15 +62,15 @@ class DeliveryPostageEvent extends ActionEvent
 
     /**
      * DeliveryPostageEvent constructor.
+     * @param BaseModuleInterface $module
      */
     public function __construct(
-        $module,
+        protected $module,
         Cart $cart,
         Address $address = null,
         Country $country = null,
         State $state = null
     ) {
-        $this->module = $module;
         $this->cart = $cart;
         $this->address = $address;
         $this->country = $country;

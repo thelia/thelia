@@ -32,37 +32,18 @@ use Thelia\Model\LangQuery;
 
 class KernelListener implements EventSubscriberInterface
 {
-    /**
-     * @var HttpKernelInterface
-     */
-    protected $app;
-
-    /**
-     * @var Translator
-     */
-    protected $translator;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $eventDispatcher;
-
-    protected $cacheDir;
-
-    protected $env;
-
-    protected $debug;
 
     protected static $session;
 
-    public function __construct(HttpKernelInterface $app, Translator $translator, EventDispatcherInterface $eventDispatcher, $kernelCacheDir, $kernelDebug, $kernelEnvironment)
+    public function __construct(
+        protected HttpKernelInterface $app,
+        protected Translator $translator,
+        protected EventDispatcherInterface $eventDispatcher,
+        protected $cacheDir,
+        protected $debug,
+        protected $env
+    )
     {
-        $this->app = $app;
-        $this->translator = $translator;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->cacheDir = $kernelCacheDir;
-        $this->debug = $kernelDebug;
-        $this->env = $kernelEnvironment;
     }
 
     public function paramInit(RequestEvent $event)

@@ -14,23 +14,15 @@ namespace Thelia\Core\Event\ProductSaleElement;
 
 class ProductSaleElementDeleteEvent extends ProductSaleElementEvent
 {
-    /** @var int */
-    protected $product_sale_element_id;
-    /** @var int */
-    protected $currency_id;
-
     /**
      * ProductSaleElementDeleteEvent constructor.
      *
      * @param int $product_sale_element_id
      * @param int $currency_id
      */
-    public function __construct($product_sale_element_id, $currency_id)
+    public function __construct(protected $product_sale_element_id, protected $currency_id)
     {
         parent::__construct();
-
-        $this->product_sale_element_id = $product_sale_element_id;
-        $this->currency_id = $currency_id;
     }
 
     /**

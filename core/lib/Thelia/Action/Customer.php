@@ -56,8 +56,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
     public function __construct(
         SecurityContext $securityContext,
         MailerFactory $mailer,
-        RequestStack $requestStack = null,
-        CustomerService $customerService
+        CustomerService $customerService,
+        RequestStack $requestStack = null
     ) {
         $this->securityContext = $securityContext;
         $this->mailer = $mailer;

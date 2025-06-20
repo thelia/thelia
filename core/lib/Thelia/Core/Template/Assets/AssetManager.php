@@ -23,15 +23,12 @@ use Thelia\Model\ConfigQuery;
  */
 class AssetManager implements AssetManagerInterface
 {
-    protected $debugMode;
-
     protected $source_file_extensions = ['less', 'js', 'coffee', 'html', 'tpl', 'htm', 'xml'];
 
     protected $assetFilters = [];
 
-    public function __construct($kernelDebug)
+    public function __construct(protected $debugMode)
     {
-        $this->debugMode = $kernelDebug;
     }
 
     /**

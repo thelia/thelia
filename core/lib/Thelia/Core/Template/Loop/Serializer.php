@@ -56,14 +56,11 @@ class Serializer extends BaseLoop implements ArraySearchLoopInterface
             $serializers = [$serializerManager->get($serializerId)];
         }
 
-        switch ($this->getArgValue('order')) {
-            case 'alpha':
-                ksort($serializers);
-                break;
-            case 'alpha_reverse':
-                krsort($serializers);
-                break;
-        }
+        match ($this->getArgValue('order')) {
+            'alpha' => ksort($serializers),
+            'alpha_reverse' => krsort($serializers),
+            default => $serializers,
+        };
 
         return $serializers;
     }

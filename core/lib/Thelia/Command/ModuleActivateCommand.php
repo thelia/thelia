@@ -36,14 +36,12 @@ use Thelia\Module\Validator\ModuleValidator;
 class ModuleActivateCommand extends BaseModuleGenerate
 {
     protected $eventDispatcher;
-    private \Thelia\Command\Install $install;
 
-    public function __construct(EventDispatcherInterface $eventDispatcher, Install $install)
+    public function __construct(EventDispatcherInterface $eventDispatcher, private \Thelia\Command\Install $install)
     {
         $this->eventDispatcher = $eventDispatcher;
 
         parent::__construct();
-        $this->install = $install;
     }
 
     protected function configure(): void

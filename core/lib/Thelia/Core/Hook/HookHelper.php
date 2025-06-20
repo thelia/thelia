@@ -50,22 +50,13 @@ class HookHelper
      */
     public function parseActiveTemplate($templateType = TemplateDefinition::FRONT_OFFICE)
     {
-        switch ($templateType) {
-            case TemplateDefinition::FRONT_OFFICE:
-                $tplVar = 'active-front-template';
-                break;
-            case TemplateDefinition::BACK_OFFICE:
-                $tplVar = 'active-admin-template';
-                break;
-            case TemplateDefinition::PDF:
-                $tplVar = 'active-pdf-template';
-                break;
-            case TemplateDefinition::EMAIL:
-                $tplVar = 'active-mail-template';
-                break;
-            default:
-                throw new TheliaProcessException("Unknown template type: $templateType");
-        }
+        $tplVar = match ($templateType) {
+            TemplateDefinition::FRONT_OFFICE => 'active-front-template',
+            TemplateDefinition::BACK_OFFICE => 'active-admin-template',
+            TemplateDefinition::PDF => 'active-pdf-template',
+            TemplateDefinition::EMAIL => 'active-mail-template',
+            default => throw new TheliaProcessException("Unknown template type: $templateType"),
+        };
 
         return $this->parseTemplate($templateType, ConfigQuery::read($tplVar, 'default'));
     }
@@ -152,7 +143,7 @@ class HookHelper
                     }
                 }
             }
-        } catch (\UnexpectedValueException $ex) {
+        } catch (\UnexpectedValueException) {
             // Directory does not exists => ignore/
         }
     }

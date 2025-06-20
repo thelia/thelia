@@ -119,7 +119,7 @@ class TemplateDescriptorValidator
             }
 
             libxml_use_internal_errors(false);
-        } catch (\Exception $ex) {
+        } catch (\Exception) {
             libxml_use_internal_errors(false);
         }
 

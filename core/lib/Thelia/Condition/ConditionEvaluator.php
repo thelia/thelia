@@ -54,33 +54,24 @@ class ConditionEvaluator
      */
     public function variableOpComparison($v1, $o, $v2)
     {
-        switch ($o) {
-            case Operators::DIFFERENT:
-                // !=
-                return $v1 != $v2;
-            case Operators::SUPERIOR:
-                // >
-                return $v1 > $v2;
-            case Operators::SUPERIOR_OR_EQUAL:
-                // >=
-                return $v1 >= $v2;
-            case Operators::INFERIOR:
-                // <
-                return $v1 < $v2;
-            case Operators::INFERIOR_OR_EQUAL:
-                // <=
-                return $v1 <= $v2;
-            case Operators::EQUAL:
-                // ==
-                return $v1 == $v2;
-            case Operators::IN:
-                // in
-                return \in_array($v1, $v2);
-            case Operators::OUT:
-                // not in
-                return !\in_array($v1, $v2);
-            default:
-                throw new \Exception('Unrecognized operator '.$o);
-        }
+        return match ($o) {
+            // !=
+            Operators::DIFFERENT => $v1 != $v2,
+            // >
+            Operators::SUPERIOR => $v1 > $v2,
+            // >=
+            Operators::SUPERIOR_OR_EQUAL => $v1 >= $v2,
+            // <
+            Operators::INFERIOR => $v1 < $v2,
+            // <=
+            Operators::INFERIOR_OR_EQUAL => $v1 <= $v2,
+            // ==
+            Operators::EQUAL => $v1 == $v2,
+            // in
+            Operators::IN => \in_array($v1, $v2),
+            // not in
+            Operators::OUT => !\in_array($v1, $v2),
+            default => throw new \Exception('Unrecognized operator '.$o),
+        };
     }
 }

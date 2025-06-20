@@ -21,29 +21,9 @@ class UpdatePositionEvent extends ActionEvent
     /**
      * @var int
      *
-     * @deprecated since 2.3, will be removed in 2.5, this variable has been replaced by $objectId
-     */
-    protected $object_id;
-
-    /**
-     * @var int
-     *
      * @since 2.3
      */
     protected $objectId;
-
-    /**
-     * @var int|null
-     *
-     * @since 2.3
-     */
-    protected $referrerId;
-
-    /** @var int */
-    protected $mode;
-
-    /** @var int|null */
-    protected $position;
 
     /**
      * @deprecated since 2.3, will be removed in 2.5, because this variable is not used
@@ -55,14 +35,18 @@ class UpdatePositionEvent extends ActionEvent
      *
      * @param null $position
      * @param null $referrerId
+     * @param int $objectId
+     * @param int $mode
      */
-    public function __construct($objectId, $mode, $position = null, $referrerId = null)
+    public function __construct(/**
+     * @deprecated since 2.3, will be removed in 2.5, this variable has been replaced by $objectId
+     */
+    protected $object_id, protected $mode, protected $position = null, /**
+     * @since 2.3
+     */
+    protected $referrerId = null)
     {
-        $this->object_id = $objectId;
-        $this->objectId = $objectId;
-        $this->mode = $mode;
-        $this->position = $position;
-        $this->referrerId = $referrerId;
+        $this->objectId = $this->object_id;
     }
 
     /**

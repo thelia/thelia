@@ -88,7 +88,7 @@ class Auth extends BaseLoop implements ArraySearchLoopInterface
                 // Create an empty row: loop is no longer empty :)
                 $loopResult->addRow(new LoopResultRow());
             }
-        } catch (\Exception $ex) {
+        } catch (\Exception) {
             // Not granted, loop is empty
         }
 

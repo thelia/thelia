@@ -35,26 +35,13 @@ class ParserContext implements \IteratorAggregate
     private $formStore = [];
     private $store = [];
 
-    /** @var TheliaFormFactory */
-    private $formFactory;
-
-    /** @var TheliaFormValidator */
-    private $formValidator;
-
-    /** @var RequestStack */
-    private $requestStack;
-
     public function __construct(
-        RequestStack $requestStack,
-        TheliaFormFactory $formFactory,
-        TheliaFormValidator $formValidator
+        private RequestStack $requestStack,
+        private TheliaFormFactory $formFactory,
+        private TheliaFormValidator $formValidator
     ) {
         // Setup basic variables
         $this->set('THELIA_VERSION', Thelia::THELIA_VERSION);
-
-        $this->requestStack = $requestStack;
-        $this->formFactory = $formFactory;
-        $this->formValidator = $formValidator;
 
         // Purge outdated error form contexts
         if (null !== $this->requestStack->getCurrentRequest()) {
@@ -213,7 +200,7 @@ class ParserContext implements \IteratorAggregate
                 if (true === $formInfo['hasError']) {
                     try {
                         $this->formValidator->validateForm($form, $formInfo['method']);
-                    } catch (\Exception $ex) {
+                    } catch (\Exception) {
                         // Ignore the exception.
                     }
 

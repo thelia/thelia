@@ -113,7 +113,7 @@ class ModuleDescriptorValidator
             }
 
             libxml_use_internal_errors(false);
-        } catch (\ErrorException $ex) {
+        } catch (\ErrorException) {
             libxml_use_internal_errors(false);
         }
 

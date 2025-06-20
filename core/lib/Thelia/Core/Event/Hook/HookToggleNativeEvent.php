@@ -19,11 +19,8 @@ namespace Thelia\Core\Event\Hook;
  */
 class HookToggleNativeEvent extends HookEvent
 {
-    protected $hook_id;
-
-    public function __construct($hook_id)
+    public function __construct(protected $hook_id)
     {
-        $this->hook_id = $hook_id;
     }
 
     public function setHookId($hook_id)

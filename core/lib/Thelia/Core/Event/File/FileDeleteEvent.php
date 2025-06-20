@@ -22,17 +22,13 @@ use Thelia\Files\FileModelInterface;
  */
 class FileDeleteEvent extends ActionEvent
 {
-    /** @var FileModelInterface Image about to be deleted */
-    protected $fileToDelete;
-
     /**
      * Constructor.
      *
      * @param FileModelInterface $fileToDelete Image about to be deleted
      */
-    public function __construct($fileToDelete)
+    public function __construct(protected $fileToDelete)
     {
-        $this->fileToDelete = $fileToDelete;
     }
 
     /**

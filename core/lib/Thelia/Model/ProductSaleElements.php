@@ -35,7 +35,7 @@ class ProductSaleElements extends BaseProductSaleElements
             if ($discount > 0) {
                 $amount *= (1 - ($discount / 100));
             }
-        } catch (PropelException $e) {
+        } catch (PropelException) {
             throw new PropelException("Virtual column `$virtualColumnName` does not exist in ProductSaleElements::getPrice");
         }
 
@@ -58,7 +58,7 @@ class ProductSaleElements extends BaseProductSaleElements
             if ($discount > 0) {
                 $amount *= (1 - ($discount / 100));
             }
-        } catch (PropelException $e) {
+        } catch (PropelException) {
             throw new PropelException("Virtual column `$virtualColumnName` does not exist in ProductSaleElements::getPromoPrice");
         }
 

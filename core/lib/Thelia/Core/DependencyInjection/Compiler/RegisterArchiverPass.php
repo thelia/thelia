@@ -40,7 +40,7 @@ class RegisterArchiverPass implements CompilerPassInterface
     {
         try {
             $manager = $container->getDefinition(self::MANAGER_SERVICE_ID);
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             return;
         }
 

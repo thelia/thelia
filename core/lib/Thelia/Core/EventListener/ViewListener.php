@@ -81,7 +81,7 @@ class ViewListener implements EventSubscriberInterface
             $response = $content instanceof Response
                 ? $content
                 : new Response($content, $parser->getStatus() ?: 200);
-        } catch (ResourceNotFoundException $e) {
+        } catch (ResourceNotFoundException) {
             throw new NotFoundHttpException();
         } catch (OrderException $e) {
             switch ($e->getCode()) {

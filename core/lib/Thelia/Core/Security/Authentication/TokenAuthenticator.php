@@ -17,14 +17,10 @@ use Thelia\Core\Security\UserProvider\TokenUserProvider;
 
 class TokenAuthenticator implements AuthenticatorInterface
 {
-    protected $key;
-
     protected $userProvider;
 
-    public function __construct($key, TokenUserProvider $userProvider)
+    public function __construct(protected $key, TokenUserProvider $userProvider)
     {
-        $this->key = $key;
-
         $this->userProvider = $userProvider;
     }
 

@@ -250,7 +250,7 @@ class ModuleHookController extends AbstractCrudController
                 $object->getModule()->getTitle(),
                 $object->getHook()->getTitle()
             );
-        } catch (\Exception $ex) {
+        } catch (\Exception) {
             return 'Undefined module hook';
         }
     }

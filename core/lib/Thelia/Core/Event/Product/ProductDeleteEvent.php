@@ -14,15 +14,11 @@ namespace Thelia\Core\Event\Product;
 
 class ProductDeleteEvent extends ProductEvent
 {
-    /** @var int */
-    protected $product_id;
-
     /**
      * @param int $product_id
      */
-    public function __construct($product_id)
+    public function __construct(protected $product_id)
     {
-        $this->product_id = $product_id;
     }
 
     /**

@@ -22,13 +22,15 @@ use Thelia\Core\Event\ActionEvent;
 class LangDefaultBehaviorEvent extends ActionEvent
 {
     /**
-     * @var int default behavior status
+     * @param int $defaultBehavior
      */
-    protected $defaultBehavior;
-
-    public function __construct($defaultBehavior)
+    public function __construct(
+        /**
+         * @var int default behavior status
+         */
+        protected $defaultBehavior
+    )
     {
-        $this->defaultBehavior = $defaultBehavior;
     }
 
     /**

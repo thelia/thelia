@@ -20,11 +20,6 @@ namespace Thelia\Core\Event\Module;
 class ModuleToggleActivationEvent extends ModuleEvent
 {
     /**
-     * @var int
-     */
-    protected $module_id;
-
-    /**
      * @var bool
      */
     protected $noCheck;
@@ -35,17 +30,11 @@ class ModuleToggleActivationEvent extends ModuleEvent
     protected $recursive;
 
     /**
-     * @var bool
-     */
-    protected $assume_deactivate;
-
-    /**
      * @param int $module_id
+     * @param bool $assume_deactivate
      */
-    public function __construct($module_id, $assume_deactivate = false)
+    public function __construct(protected $module_id, protected $assume_deactivate = false)
     {
-        $this->module_id = $module_id;
-        $this->assume_deactivate = $assume_deactivate;
     }
 
     /**

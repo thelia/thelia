@@ -29,9 +29,6 @@ use Thelia\Model\Order;
  */
 class VirtualProductOrderHandleEvent extends ActionEvent
 {
-    /** @var int the product sale element id */
-    protected $pseId;
-
     /** @var Order the order */
     protected $order;
 
@@ -44,10 +41,13 @@ class VirtualProductOrderHandleEvent extends ActionEvent
     /** @var bool use the stock for this virtual product */
     protected $useStock = false;
 
-    public function __construct(Order $order, $pseId)
+    /**
+     * @param int $pseId
+     */
+    public function __construct(Order $order, /** @var int the product sale element id */
+    protected $pseId)
     {
         $this->order = $order;
-        $this->pseId = $pseId;
     }
 
     /**

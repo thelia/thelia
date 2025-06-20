@@ -23,7 +23,7 @@ class RegisterApiResourceAddonPass implements CompilerPassInterface
     {
         try {
             $resourceAddons = $container->getParameter('Thelia.api.resource.addons');
-        } catch (ParameterNotFoundException $e) {
+        } catch (ParameterNotFoundException) {
             $resourceAddons = [];
         }
 

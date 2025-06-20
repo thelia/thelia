@@ -30,22 +30,13 @@ final class JsonResponse extends BaseJsonResponse
 
     public static function createAuthError($access)
     {
-        switch ($access) {
-            case AccessManager::VIEW:
-                $errorMessage = "You don't have the right to view this content";
-                break;
-            case AccessManager::UPDATE:
-                $errorMessage = "You don't have the right to edit this content";
-                break;
-            case AccessManager::CREATE:
-                $errorMessage = "You don't have the right to create this content";
-                break;
-            case AccessManager::DELETE:
-                $errorMessage = "You don't have the right to delete this content";
-                break;
-            default:
-                $errorMessage = "You don't have the right to do this";
-        }
+        $errorMessage = match ($access) {
+            AccessManager::VIEW => "You don't have the right to view this content",
+            AccessManager::UPDATE => "You don't have the right to edit this content",
+            AccessManager::CREATE => "You don't have the right to create this content",
+            AccessManager::DELETE => "You don't have the right to delete this content",
+            default => "You don't have the right to do this",
+        };
 
         $errorMessage = Translator::getInstance()->trans($errorMessage);
 

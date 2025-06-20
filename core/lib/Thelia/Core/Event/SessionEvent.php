@@ -21,12 +21,6 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class SessionEvent extends ActionEvent
 {
-    protected $cacheDir;
-
-    protected $env;
-
-    protected $debug;
-
     protected $session;
 
     /**
@@ -34,11 +28,8 @@ class SessionEvent extends ActionEvent
      * @param bool   $debug    debug for the current request
      * @param string $env      environment for the current request
      */
-    public function __construct($cacheDir, $debug, $env)
+    public function __construct(protected $cacheDir, protected $debug, protected $env)
     {
-        $this->cacheDir = $cacheDir;
-        $this->debug = $debug;
-        $this->env = $env;
     }
 
     /**

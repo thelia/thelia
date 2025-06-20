@@ -22,23 +22,20 @@ namespace Thelia\Model\Tools;
 class ProductPriceTools
 {
     /**
-     * The value for the price field.
-     *
-     * @var float
+     * @param float $price
+     * @param float $promoPrice
      */
-    protected $price;
-
-    /**
-     * The value for the promoPrice field.
-     *
-     * @var float
-     */
-    protected $promoPrice;
-
-    public function __construct($price, $promoPrice)
+    public function __construct(
+        /**
+         * The value for the price field.
+         */
+        protected $price,
+        /**
+         * The value for the promoPrice field.
+         */
+        protected $promoPrice
+    )
     {
-        $this->price = $price;
-        $this->promoPrice = $promoPrice;
     }
 
     /**

@@ -49,20 +49,6 @@ class PropelInitService
     protected static $PROPEL_CONFIG_CACHE_FILENAME = 'propel.init.php';
 
     /**
-     * Application environment.
-     *
-     * @var string
-     */
-    protected $environment;
-
-    /**
-     * Whether the application is in debug mode.
-     *
-     * @var bool
-     */
-    protected $debug;
-
-    /**
      * Map of environment parameters.
      *
      * @var array
@@ -83,13 +69,17 @@ class PropelInitService
      * @param SchemaLocator $schemaLocator propel schema locator service
      */
     public function __construct(
-        $environment,
-        $debug,
+        /**
+         * Application environment.
+         */
+        protected $environment,
+        /**
+         * Whether the application is in debug mode.
+         */
+        protected $debug,
         array $envParameters,
         SchemaLocator $schemaLocator
     ) {
-        $this->environment = $environment;
-        $this->debug = $debug;
         $this->envParameters = $envParameters;
         $this->schemaLocator = $schemaLocator;
     }

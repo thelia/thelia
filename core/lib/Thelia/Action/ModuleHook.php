@@ -41,15 +41,14 @@ use Thelia\Module\BaseModule;
  */
 class ModuleHook extends BaseAction implements EventSubscriberInterface
 {
-    /** @var string */
-    protected $cacheDir;
-
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
-    public function __construct($kernelCacheDir, EventDispatcherInterface $dispatcher)
+    /**
+     * @param string $kernelCacheDir
+     */
+    public function __construct(protected $cacheDir, EventDispatcherInterface $dispatcher)
     {
-        $this->cacheDir = $kernelCacheDir;
         $this->dispatcher = $dispatcher;
     }
 

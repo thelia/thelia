@@ -32,9 +32,6 @@ class FileCreateOrUpdateEvent extends ActionEvent
     /** @var UploadedFile Document file to save */
     protected $uploadedFile;
 
-    /** @var int Document parent id */
-    protected $parentId;
-
     /** @var string Parent name */
     protected $parentName;
 
@@ -43,9 +40,8 @@ class FileCreateOrUpdateEvent extends ActionEvent
      *
      * @param int $parentId file parent id
      */
-    public function __construct($parentId)
+    public function __construct(protected $parentId)
     {
-        $this->parentId = $parentId;
     }
 
     /**

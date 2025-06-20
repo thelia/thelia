@@ -16,13 +16,9 @@ use Thelia\Model\Product;
 
 class ProductAddCategoryEvent extends ProductEvent
 {
-    protected $category_id;
-
-    public function __construct(Product $product, $category_id)
+    public function __construct(Product $product, protected $category_id)
     {
         parent::__construct($product);
-
-        $this->category_id = $category_id;
     }
 
     public function getCategoryId()

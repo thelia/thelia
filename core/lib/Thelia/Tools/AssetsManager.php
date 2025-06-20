@@ -18,12 +18,9 @@ class AssetsManager
 
     protected $processed = [];
     protected $entrypoints = [];
-    protected $entrypointsPath;
 
-    protected function __construct($entrypointsPath)
+    protected function __construct(protected $entrypointsPath)
     {
-        $this->entrypointsPath = $entrypointsPath;
-
         if (null !== $this->entrypointsPath && file_exists($this->entrypointsPath)) {
             $json = json_decode(file_get_contents($this->entrypointsPath), true);
             $this->entrypoints = $json['entrypoints'];

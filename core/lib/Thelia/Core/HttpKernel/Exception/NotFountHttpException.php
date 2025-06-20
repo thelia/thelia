@@ -23,12 +23,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as BaseNotFount
  */
 class NotFountHttpException extends BaseNotFountHttpException
 {
-    protected $adminContext = false;
-
-    public function __construct($message = null, \Exception $previous = null, $code = 0, $adminContext = false)
+    public function __construct($message = null, \Exception $previous = null, $code = 0, protected $adminContext = false)
     {
-        $this->adminContext = $adminContext;
-
         parent::__construct($message, $previous, $code);
     }
 

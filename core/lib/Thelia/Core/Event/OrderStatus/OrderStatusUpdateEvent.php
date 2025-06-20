@@ -19,17 +19,13 @@ namespace Thelia\Core\Event\OrderStatus;
  */
 class OrderStatusUpdateEvent extends OrderStatusEvent
 {
-    /** @var int */
-    protected $id;
-
     /**
      * OrderStatusUpdateEvent constructor.
      *
      * @param int $id
      */
-    public function __construct($id)
+    public function __construct(protected $id)
     {
-        $this->id = $id;
     }
 
     /**

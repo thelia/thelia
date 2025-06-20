@@ -14,13 +14,6 @@ namespace Thelia\Core\Event;
 
 class UpdateSeoEvent extends ActionEvent
 {
-    protected $object_id;
-    protected $locale;
-    protected $url;
-    protected $meta_title;
-    protected $meta_description;
-    protected $meta_keywords;
-
     protected $object;
 
     /**
@@ -30,14 +23,8 @@ class UpdateSeoEvent extends ActionEvent
      * @param null $meta_description
      * @param null $meta_keywords
      */
-    public function __construct($object_id, $locale = null, $url = null, $meta_title = null, $meta_description = null, $meta_keywords = null)
+    public function __construct(protected $object_id, protected $locale = null, protected $url = null, protected $meta_title = null, protected $meta_description = null, protected $meta_keywords = null)
     {
-        $this->object_id = $object_id;
-        $this->locale = $locale;
-        $this->url = $url;
-        $this->meta_title = $meta_title;
-        $this->meta_description = $meta_description;
-        $this->meta_keywords = $meta_keywords;
     }
 
     public function getObjectId()

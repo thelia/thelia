@@ -18,21 +18,10 @@ class TlogDestinationConfig
 {
     public const TYPE_TEXTAREA = 1;
     public const TYPE_TEXTFIELD = 2;
-
-    protected $name;
-    protected $title;
-    protected $label;
-    protected $default;
-    protected $type;
     protected $value;
 
-    public function __construct($name, $title, $label, $default, $type)
+    public function __construct(protected $name, protected $title, protected $label, protected $default, protected $type)
     {
-        $this->name = $name;
-        $this->title = $title;
-        $this->label = $label;
-        $this->default = $default;
-        $this->type = $type;
         $this->value = ConfigQuery::read($this->name, $this->default);
     }
 

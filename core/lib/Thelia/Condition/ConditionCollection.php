@@ -22,7 +22,7 @@ use Thelia\Condition\Implementation\ConditionInterface;
  *
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  */
-class ConditionCollection implements \Iterator, \Countable, \ArrayAccess
+class ConditionCollection implements \Iterator, \Countable, \ArrayAccess, \Stringable
 {
     /** @var ConditionInterface[] */
     protected $conditions = [];
@@ -184,7 +184,7 @@ class ConditionCollection implements \Iterator, \Countable, \ArrayAccess
      *
      * @return string Jsoned data
      */
-    public function __toString()
+    public function __toString(): string
     {
         $arrayToSerialize = [];
         /** @var ConditionInterface $condition */
@@ -192,6 +192,6 @@ class ConditionCollection implements \Iterator, \Countable, \ArrayAccess
             $arrayToSerialize[] = $condition->getSerializableCondition();
         }
 
-        return json_encode($arrayToSerialize);
+        return (string) json_encode($arrayToSerialize);
     }
 }

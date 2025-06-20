@@ -27,11 +27,6 @@ class NewsletterEvent extends ActionEvent
     protected $id;
 
     /**
-     * @var string email to save
-     */
-    protected $email;
-
-    /**
      * @var string first name subscriber
      */
     protected $firstname;
@@ -42,19 +37,25 @@ class NewsletterEvent extends ActionEvent
     protected $lastname;
 
     /**
-     * @var string current locale
-     */
-    protected $locale;
-
-    /**
      * @var \Thelia\Model\Newsletter
      */
     protected $newsletter;
 
-    public function __construct($email, $locale)
+    /**
+     * @param string $email
+     * @param string $locale
+     */
+    public function __construct(
+        /**
+         * @var string email to save
+         */
+        protected $email,
+        /**
+         * @var string current locale
+         */
+        protected $locale
+    )
     {
-        $this->email = $email;
-        $this->locale = $locale;
     }
 
     /**

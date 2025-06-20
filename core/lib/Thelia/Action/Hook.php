@@ -33,16 +33,12 @@ use Thelia\Model\HookQuery;
  */
 class Hook extends BaseAction implements EventSubscriberInterface
 {
-    /** @var string */
-    protected $cacheDir;
 
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
-
-    public function __construct($kernelCacheDir, EventDispatcherInterface $dispatcher)
+    public function __construct(
+        protected EventDispatcherInterface $dispatcher,
+        protected string $cacheDir
+    )
     {
-        $this->cacheDir = $kernelCacheDir;
-        $this->dispatcher = $dispatcher;
     }
 
     public function create(HookCreateEvent $event): void

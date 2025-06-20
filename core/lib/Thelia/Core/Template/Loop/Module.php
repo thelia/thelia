@@ -235,7 +235,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 new \ReflectionClass($module->getFullNamespace());
 
                 $exists = true;
-            } catch (\ReflectionException $ex) {
+            } catch (\ReflectionException) {
                 $exists = false;
             }
 
@@ -318,7 +318,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 if ($this->container->get($routerId)->match('/admin/module/'.$module->getCode())) {
                     return true;
                 }
-            } catch (ResourceNotFoundException $e) {
+            } catch (ResourceNotFoundException) {
                 /* Keep searching */
             }
         }
@@ -328,7 +328,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 if ($this->container->get('thelia.loader.module_attributes')->match('/admin/module/'.$module->getCode())) {
                     return true;
                 }
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 /* Keep searching */
             }
         }
@@ -338,7 +338,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 if ($this->container->get('thelia.loader.module_annotations')->match('/admin/module/'.$module->getCode())) {
                     return true;
                 }
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 /* Keep searching */
             }
         }

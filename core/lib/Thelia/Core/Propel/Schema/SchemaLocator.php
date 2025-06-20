@@ -164,7 +164,7 @@ class SchemaLocator
                 ? "{$this->theliaModuleDir}{$module}/Config"
                 : "{$this->theliaLocalModuleDir}/{$module}/Config";
             $moduleSchemas->in($modulePath);
-        } catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException) {
             // just continue if the module has no Config directory
         }
 

@@ -20,16 +20,13 @@ class LoopResult implements \Iterator, \JsonSerializable
     private $position;
     protected $collection = [];
 
-    public $resultsCollection;
-
     protected $versioned = false;
     protected $timestamped = false;
     protected $countable = false;
 
-    public function __construct($resultsCollection)
+    public function __construct(public $resultsCollection)
     {
         $this->position = 0;
-        $this->resultsCollection = $resultsCollection;
     }
 
     /**

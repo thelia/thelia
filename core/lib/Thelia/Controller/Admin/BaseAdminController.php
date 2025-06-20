@@ -394,7 +394,7 @@ class BaseAdminController extends BaseController
             // User is not authenticated, and templates requires authentication -> redirect to login page
             // We user login_tpl as a path, not a template.
             $content = new RedirectResponse(URL::getInstance()->absoluteUrl($ex->getLoginTemplate()));
-        } catch (AuthorizationException $ex) {
+        } catch (AuthorizationException) {
             // User is not allowed to perform the required action. Return the error page instead of the requested page.
             $content = $this->errorPage($this->translator->trans('Sorry, you are not allowed to perform this action.'), 403);
         }

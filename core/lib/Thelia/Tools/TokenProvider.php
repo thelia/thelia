@@ -39,18 +39,18 @@ class TokenProvider
      */
     protected $translator;
 
-    /**
-     * @var string the current name of the token
-     */
-    protected $tokenName;
-
     protected ?SessionInterface $session = null;
 
-    public function __construct(RequestStack $requestStack, TranslatorInterface $translator, $tokenName)
+    /**
+     * @param string $tokenName
+     */
+    public function __construct(RequestStack $requestStack, TranslatorInterface $translator, /**
+     * @var string the current name of the token
+     */
+    protected $tokenName)
     {
         $this->requestStack = $requestStack;
         $this->translator = $translator;
-        $this->tokenName = $tokenName;
         $this->assignTokenFromSession();
     }
 

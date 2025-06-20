@@ -91,27 +91,14 @@ abstract class BaseSpecificModule extends BaseI18nLoop implements PropelSearchLo
 
         $order = $this->getOrder();
 
-        switch ($order) {
-            case 'id':
-                $search->orderById(Criteria::ASC);
-                break;
-            case 'id_reverse':
-                $search->orderById(Criteria::DESC);
-                break;
-            case 'alpha':
-                $search->addAscendingOrderByColumn('i18n_TITLE');
-                break;
-            case 'alpha_reverse':
-                $search->addDescendingOrderByColumn('i18n_TITLE');
-                break;
-            case 'manual_reverse':
-                $search->orderByPosition(Criteria::DESC);
-                break;
-            case 'manual':
-            default:
-                $search->orderByPosition(Criteria::ASC);
-                break;
-        }
+        match ($order) {
+            'id' => $search->orderById(Criteria::ASC),
+            'id_reverse' => $search->orderById(Criteria::DESC),
+            'alpha' => $search->addAscendingOrderByColumn('i18n_TITLE'),
+            'alpha_reverse' => $search->addDescendingOrderByColumn('i18n_TITLE'),
+            'manual_reverse' => $search->orderByPosition(Criteria::DESC),
+            default => $search->orderByPosition(Criteria::ASC),
+        };
 
         return $search;
     }

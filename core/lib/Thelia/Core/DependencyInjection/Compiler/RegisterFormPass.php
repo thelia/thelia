@@ -23,7 +23,7 @@ class RegisterFormPass implements CompilerPassInterface
     {
         try {
             $formConfig = $container->getParameter('Thelia.parser.forms');
-        } catch (ParameterNotFoundException $e) {
+        } catch (ParameterNotFoundException) {
             $formConfig = [];
         }
 

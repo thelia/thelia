@@ -16,13 +16,9 @@ use Thelia\Model\Category;
 
 class CategoryAddContentEvent extends CategoryEvent
 {
-    protected $content_id;
-
-    public function __construct(Category $category, $content_id)
+    public function __construct(Category $category, protected $content_id)
     {
         parent::__construct($category);
-
-        $this->content_id = $content_id;
     }
 
     public function getContentId()

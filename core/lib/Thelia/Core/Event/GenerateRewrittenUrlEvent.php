@@ -19,21 +19,19 @@ namespace Thelia\Core\Event;
  */
 class GenerateRewrittenUrlEvent extends ActionEvent
 {
-    protected $object;
-
-    /** @var string local */
-    protected $locale;
-
     /** @var string local */
     protected $url;
 
     /**
      * GenerateRewrittenUrlEvent constructor.
+     * @param string $locale
      */
-    public function __construct($object, $locale)
+    public function __construct(
+        protected $object,
+        /** @var string local */
+        protected $locale
+    )
     {
-        $this->object = $object;
-        $this->locale = $locale;
     }
 
     /**

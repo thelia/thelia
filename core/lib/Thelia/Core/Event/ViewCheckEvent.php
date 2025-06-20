@@ -14,15 +14,8 @@ namespace Thelia\Core\Event;
 
 class ViewCheckEvent extends ActionEvent
 {
-    protected $view;
-
-    protected $view_id;
-
-    public function __construct($view, $view_id)
+    public function __construct(protected $view, protected $view_id)
     {
-        $this->view = $view;
-
-        $this->view_id = $view_id;
     }
 
     public function getView()

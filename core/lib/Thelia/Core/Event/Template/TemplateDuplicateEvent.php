@@ -14,23 +14,15 @@ namespace Thelia\Core\Event\Template;
 
 class TemplateDuplicateEvent extends TemplateEvent
 {
-    /** @var int */
-    protected $sourceTemplateId;
-
-    /** @var string */
-    protected $locale;
-
     /**
      * TemplateCreateEvent constructor.
      *
      * @param int $sourceTemplateId
+     * @param string $locale
      */
-    public function __construct($sourceTemplateId, $locale)
+    public function __construct(protected $sourceTemplateId, protected $locale)
     {
         parent::__construct();
-
-        $this->sourceTemplateId = $sourceTemplateId;
-        $this->locale = $locale;
     }
 
     /**

@@ -58,7 +58,7 @@ class ModuleValidator
         if (null === $this->translator) {
             try {
                 $this->translator = Translator::getInstance();
-            } catch (\RuntimeException $e) {
+            } catch (\RuntimeException) {
                 return strtr($id, $parameters);
             }
         }
@@ -331,7 +331,7 @@ class ModuleValidator
                         }
                     }
                 }
-            } catch (\Exception $ex) {
+            } catch (\Exception) {
             }
         }
 

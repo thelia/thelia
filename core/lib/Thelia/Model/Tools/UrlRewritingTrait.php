@@ -96,7 +96,7 @@ trait UrlRewritingTrait
                 ++$i;
                 $urlFilePart = sprintf('%s-%d.html', $cleanString, $i);
             }
-        } catch (UrlRewritingException $e) {
+        } catch (UrlRewritingException) {
             $rewritingUrl = new RewritingUrl();
             $rewritingUrl->setUrl($urlFilePart)
                 ->setView($this->getRewrittenUrlViewName())

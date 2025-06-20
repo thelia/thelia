@@ -22,7 +22,7 @@ class RegisterCommandPass implements CompilerPassInterface
     {
         try {
             $commands = $container->getParameter('command.definition');
-        } catch (ParameterNotFoundException $e) {
+        } catch (ParameterNotFoundException) {
             $commands = [];
         }
 

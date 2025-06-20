@@ -71,7 +71,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
         // Initialize Thelia translator, if not already done.
         try {
             Translator::getInstance();
-        } catch (\Exception $ex) {
+        } catch (\Exception) {
             $this->container->get('thelia.translator');
         }
 

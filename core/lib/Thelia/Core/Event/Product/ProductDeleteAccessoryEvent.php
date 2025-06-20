@@ -16,13 +16,9 @@ use Thelia\Model\Product;
 
 class ProductDeleteAccessoryEvent extends ProductEvent
 {
-    protected $accessory_id;
-
-    public function __construct(Product $product, $accessory_id)
+    public function __construct(Product $product, protected $accessory_id)
     {
         parent::__construct($product);
-
-        $this->accessory_id = $accessory_id;
     }
 
     public function getAccessoryId()

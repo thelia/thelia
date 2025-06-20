@@ -137,7 +137,7 @@ class Delivery extends BaseSpecificModule
 
                     $loopResult->addRow($loopResultRow);
                 }
-            } catch (DeliveryException $ex) {
+            } catch (DeliveryException) {
                 // Module is not available
             }
         }

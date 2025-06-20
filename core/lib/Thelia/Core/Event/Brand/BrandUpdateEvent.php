@@ -19,8 +19,6 @@ namespace Thelia\Core\Event\Brand;
  */
 class BrandUpdateEvent extends BrandCreateEvent
 {
-    protected $brandId;
-
     protected $chapo;
     protected $description;
     protected $postscriptum;
@@ -29,9 +27,8 @@ class BrandUpdateEvent extends BrandCreateEvent
     /**
      * @param int $brandId
      */
-    public function __construct($brandId)
+    public function __construct(protected $brandId)
     {
-        $this->brandId = $brandId;
     }
 
     /**
