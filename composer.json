@@ -140,5 +140,8 @@
             "symfony/runtime": true,
             "composer/installers": true
         }
+    },
+    "require-dev": {
+        "rector/rector": "^2.0"
     }
 }
