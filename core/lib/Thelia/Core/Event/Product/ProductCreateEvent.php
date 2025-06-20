@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,23 +11,32 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Product;
 
 class ProductCreateEvent extends ProductEvent
 {
     protected $ref;
+
     protected $title;
+
     protected $locale;
+
     protected $default_category;
+
     protected $visible;
+
     protected $virtual;
 
     protected $basePrice;
+
     protected $baseWeight;
+
     protected $taxRuleId;
+
     protected $currencyId;
+
     protected $baseQuantity;
+
     protected $templateId;
 
     public function getRef()
@@ -33,7 +44,7 @@ class ProductCreateEvent extends ProductEvent
         return $this->ref;
     }
 
-    public function setRef($ref)
+    public function setRef($ref): static
     {
         $this->ref = $ref;
 
@@ -45,7 +56,7 @@ class ProductCreateEvent extends ProductEvent
         return $this->title;
     }
 
-    public function setTitle($title)
+    public function setTitle($title): static
     {
         $this->title = $title;
 
@@ -57,7 +68,7 @@ class ProductCreateEvent extends ProductEvent
         return $this->locale;
     }
 
-    public function setLocale($locale)
+    public function setLocale($locale): static
     {
         $this->locale = $locale;
 
@@ -69,7 +80,7 @@ class ProductCreateEvent extends ProductEvent
         return $this->default_category;
     }
 
-    public function setDefaultCategory($default_category)
+    public function setDefaultCategory($default_category): static
     {
         $this->default_category = $default_category;
 
@@ -81,14 +92,14 @@ class ProductCreateEvent extends ProductEvent
         return $this->visible;
     }
 
-    public function setVisible($visible)
+    public function setVisible($visible): static
     {
         $this->visible = $visible;
 
         return $this;
     }
 
-    public function setVirtual($virtual)
+    public function setVirtual($virtual): static
     {
         $this->virtual = $virtual;
 
@@ -105,7 +116,7 @@ class ProductCreateEvent extends ProductEvent
         return $this->basePrice;
     }
 
-    public function setBasePrice($basePrice)
+    public function setBasePrice($basePrice): static
     {
         $this->basePrice = $basePrice;
 
@@ -117,7 +128,7 @@ class ProductCreateEvent extends ProductEvent
         return $this->baseWeight;
     }
 
-    public function setBaseWeight($baseWeight)
+    public function setBaseWeight($baseWeight): static
     {
         $this->baseWeight = $baseWeight;
 
@@ -129,7 +140,7 @@ class ProductCreateEvent extends ProductEvent
         return $this->taxRuleId;
     }
 
-    public function setTaxRuleId($taxRuleId)
+    public function setTaxRuleId($taxRuleId): static
     {
         $this->taxRuleId = $taxRuleId;
 
@@ -141,7 +152,7 @@ class ProductCreateEvent extends ProductEvent
         return $this->currencyId;
     }
 
-    public function setCurrencyId($currencyId)
+    public function setCurrencyId($currencyId): static
     {
         $this->currencyId = $currencyId;
 
@@ -157,7 +168,7 @@ class ProductCreateEvent extends ProductEvent
      *
      * @see setBasePrice
      */
-    public function setPrice($price)
+    public function setPrice($price): static
     {
         return $this->setBasePrice($price);
     }
@@ -171,7 +182,7 @@ class ProductCreateEvent extends ProductEvent
      *
      * @see setBaseWeight
      */
-    public function setWeight($weight)
+    public function setWeight($weight): static
     {
         return $this->setBaseWeight($weight);
     }
@@ -183,7 +194,7 @@ class ProductCreateEvent extends ProductEvent
      *
      * @see setCurrencyId
      */
-    public function setCurrency($currencyId)
+    public function setCurrency($currencyId): static
     {
         return $this->setCurrencyId($currencyId);
     }
@@ -195,7 +206,7 @@ class ProductCreateEvent extends ProductEvent
      *
      * @see setTaxRuleId
      */
-    public function setTaxRule($taxRuleId)
+    public function setTaxRule($taxRuleId): static
     {
         return $this->setTaxRuleId($taxRuleId);
     }
@@ -213,7 +224,7 @@ class ProductCreateEvent extends ProductEvent
      *
      * @return $this
      */
-    public function setBaseQuantity($baseQuantity)
+    public function setBaseQuantity($baseQuantity): static
     {
         $this->baseQuantity = $baseQuantity;
 
@@ -229,7 +240,7 @@ class ProductCreateEvent extends ProductEvent
      *
      * @see setBaseQuantity
      */
-    public function setQuantity($quantity)
+    public function setQuantity($quantity): static
     {
         return $this->setBaseQuantity($quantity);
     }
@@ -247,7 +258,7 @@ class ProductCreateEvent extends ProductEvent
      *
      * @return $this
      */
-    public function setTemplateId($templateId)
+    public function setTemplateId($templateId): static
     {
         $this->templateId = $templateId;
 

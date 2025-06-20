@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Product;
 
 use Thelia\Core\Event\ActionEvent;
@@ -29,9 +30,6 @@ use Thelia\Model\Order;
  */
 class VirtualProductOrderHandleEvent extends ActionEvent
 {
-    /** @var Order the order */
-    protected $order;
-
     /** @var string the path of the file */
     protected $path;
 
@@ -44,24 +42,21 @@ class VirtualProductOrderHandleEvent extends ActionEvent
     /**
      * @param int $pseId
      */
-    public function __construct(Order $order, /** @var int the product sale element id */
-    protected $pseId)
+    public function __construct(
+        /** @var Order the order */
+        protected Order $order,
+        /** @var int the product sale element id */
+        protected $pseId
+    )
     {
-        $this->order = $order;
     }
 
-    /**
-     * @return Order
-     */
-    public function getOrder()
+    public function getOrder(): Order
     {
         return $this->order;
     }
 
-    /**
-     * @param Order $order
-     */
-    public function setOrder($order)
+    public function setOrder(Order $order): static
     {
         $this->order = $order;
 
@@ -79,7 +74,7 @@ class VirtualProductOrderHandleEvent extends ActionEvent
     /**
      * @param string $path
      */
-    public function setPath($path)
+    public function setPath($path): static
     {
         $this->path = $path;
 
@@ -97,7 +92,7 @@ class VirtualProductOrderHandleEvent extends ActionEvent
     /**
      * @param int $pseId
      */
-    public function setPseId($pseId)
+    public function setPseId($pseId): static
     {
         $this->pseId = $pseId;
 
@@ -115,7 +110,7 @@ class VirtualProductOrderHandleEvent extends ActionEvent
     /**
      * @param bool $useStock
      */
-    public function setUseStock($useStock)
+    public function setUseStock($useStock): static
     {
         $this->useStock = $useStock;
 
@@ -133,7 +128,7 @@ class VirtualProductOrderHandleEvent extends ActionEvent
     /**
      * @param bool $virtual
      */
-    public function setVirtual($virtual)
+    public function setVirtual($virtual): static
     {
         $this->virtual = $virtual;
 

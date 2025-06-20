@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
+use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
@@ -128,7 +130,7 @@ class Content extends BaseContent implements FileModelParentInterface
      *
      * Here pre and post insert event are fired
      *
-     * @throws \Exception
+     * @throws Exception
      *
      * @return $this Return $this, allow chaining
      */
@@ -144,10 +146,10 @@ class Content extends BaseContent implements FileModelParentInterface
             $this->setDefaultFolder($defaultFolderId)->save($con);
 
             $con->commit();
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             $con->rollback();
 
-            throw $ex;
+            throw $exception;
         }
 
         return $this;
@@ -179,16 +181,11 @@ class Content extends BaseContent implements FileModelParentInterface
     public function postSave(ConnectionInterface $con = null): void
     {
         // For BC, will be removed in 2.4
-        if (!$this->isNew()) {
-            if (isset($this->modifiedColumns[ContentTableMap::COL_POSITION]) && $this->modifiedColumns[ContentTableMap::COL_POSITION]) {
-                if (null !== $productCategory = ContentFolderQuery::create()
-                        ->filterByContent($this)
-                        ->filterByDefaultFolder(true)
-                        ->findOne()
-                ) {
-                    $productCategory->changeAbsolutePosition($this->getPosition());
-                }
-            }
+        if (!$this->isNew() && (isset($this->modifiedColumns[ContentTableMap::COL_POSITION]) && $this->modifiedColumns[ContentTableMap::COL_POSITION]) && null !== $productCategory = ContentFolderQuery::create()
+                ->filterByContent($this)
+                ->filterByDefaultFolder(true)
+                ->findOne()) {
+            $productCategory->changeAbsolutePosition($this->getPosition());
         }
 
         parent::postSave();

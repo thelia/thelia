@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,12 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 /**
  * @author Franck Allimant <franck@cqfdev.fr>
  * Creation date: 26/03/2015 16:01
  */
-
 namespace Thelia\Core\Event\Translation;
 
 use Thelia\Core\Event\ActionEvent;
@@ -22,6 +22,7 @@ use Thelia\Core\Event\ActionEvent;
 class TranslationEvent extends ActionEvent
 {
     public const WALK_MODE_PHP = 'php';
+
     public const WALK_MODE_TEMPLATE = 'tpl';
 
     /** @var string */
@@ -57,7 +58,7 @@ class TranslationEvent extends ActionEvent
     /** @var bool */
     protected $createFileIfNotExists;
 
-    public static function createGetStringsEvent($directory, $mode, $locale, $domain)
+    public static function createGetStringsEvent($directory, $mode, $locale, $domain): self
     {
         $event = new self();
 
@@ -74,7 +75,7 @@ class TranslationEvent extends ActionEvent
         $translatableStrings,
         $translatedStrings,
         $createFileIfNotExists
-    ) {
+    ): self {
         $event = new self();
 
         $event->setTranslatableStrings($translatableStrings);
@@ -276,7 +277,7 @@ class TranslationEvent extends ActionEvent
     /**
      * @param array $customFallbackStrings
      */
-    public function setCustomFallbackStrings($customFallbackStrings)
+    public function setCustomFallbackStrings($customFallbackStrings): static
     {
         $this->customFallbackStrings = $customFallbackStrings;
 
@@ -294,7 +295,7 @@ class TranslationEvent extends ActionEvent
     /**
      * @param array $globalFallbackStrings
      */
-    public function setGlobalFallbackStrings($globalFallbackStrings)
+    public function setGlobalFallbackStrings($globalFallbackStrings): static
     {
         $this->globalFallbackStrings = $globalFallbackStrings;
 

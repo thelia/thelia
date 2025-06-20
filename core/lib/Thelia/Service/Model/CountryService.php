@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Service\Model;
 
+use RuntimeException;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
@@ -45,8 +47,9 @@ readonly class CountryService
             ->limit(1)
             ->findOne();
         if (null === $country) {
-            throw new \RuntimeException('No default country found');
+            throw new RuntimeException('No default country found');
         }
+
         $locale = $this->session->getLang()->getLocale();
         $country->setLocale($locale);
 

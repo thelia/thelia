@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use InvalidArgumentException;
+use Exception;
+use Thelia\Core\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
@@ -69,18 +73,19 @@ class OrderController extends BaseAdminController
             $status = OrderStatusQuery::create()->findPk($statusId);
 
             if (null === $order) {
-                throw new \InvalidArgumentException('The order you want to update status does not exist');
+                throw new InvalidArgumentException('The order you want to update status does not exist');
             }
+
             if (null === $status) {
-                throw new \InvalidArgumentException('The status you want to set to the order does not exist');
+                throw new InvalidArgumentException('The status you want to set to the order does not exist');
             }
 
             $event = new OrderEvent($order);
             $event->setStatus($statusId);
 
             $eventDispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
-        } catch (\Exception $e) {
-            $message = $e->getMessage();
+        } catch (Exception $exception) {
+            $message = $exception->getMessage();
         }
 
         $params = [];
@@ -123,15 +128,15 @@ class OrderController extends BaseAdminController
             $deliveryRef = $this->getRequest()->get('delivery_ref');
 
             if (null === $order) {
-                throw new \InvalidArgumentException('The order you want to update status does not exist');
+                throw new InvalidArgumentException('The order you want to update status does not exist');
             }
 
             $event = new OrderEvent($order);
             $event->setDeliveryRef($deliveryRef);
 
             $eventDispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_DELIVERY_REF);
-        } catch (\Exception $e) {
-            $message = $e->getMessage();
+        } catch (Exception $exception) {
+            $message = $exception->getMessage();
         }
 
         $params = [];
@@ -163,7 +168,7 @@ class OrderController extends BaseAdminController
             $order = OrderQuery::create()->findPk($order_id);
 
             if (null === $order) {
-                throw new \InvalidArgumentException('The order you want to update does not exist');
+                throw new InvalidArgumentException('The order you want to update does not exist');
             }
 
             $form = $this->validateForm($orderUpdateAddress, 'post');
@@ -171,7 +176,7 @@ class OrderController extends BaseAdminController
             $orderAddress = OrderAddressQuery::create()->findPk($form->get('id')->getData());
 
             if ($orderAddress->getId() !== $order->getInvoiceOrderAddressId() && $orderAddress->getId() !== $order->getDeliveryOrderAddressId()) {
-                throw new \InvalidArgumentException('The order address you want to update does not belong to the current order not exist');
+                throw new InvalidArgumentException('The order address you want to update does not belong to the current order not exist');
             }
 
             $event = new OrderAddressEvent(
@@ -193,8 +198,8 @@ class OrderController extends BaseAdminController
             $event->setOrder($order);
 
             $eventDispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_ADDRESS);
-        } catch (\Exception $e) {
-            $message = $e->getMessage();
+        } catch (Exception $exception) {
+            $message = $exception->getMessage();
         }
 
         $params = [];
@@ -230,9 +235,9 @@ class OrderController extends BaseAdminController
         return $this->generateBackOfficeOrderPdf($eventDispatcher, $order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'), $browser == 0);
     }
 
-    private function generateBackOfficeOrderPdf(EventDispatcherInterface $eventDispatcher, $order_id, $fileName, $browser)
+    private function generateBackOfficeOrderPdf(EventDispatcherInterface $eventDispatcher, $order_id, $fileName, bool $browser)
     {
-        if (null === $response = $this->generateOrderPdf($eventDispatcher, $order_id, $fileName, true, true, $browser == 0)) {
+        if (!($response = $this->generateOrderPdf($eventDispatcher, $order_id, $fileName, true, true, $browser == 0)) instanceof Response) {
             return $this->generateRedirectFromRoute(
                 'admin.order.update.view',
                 [],

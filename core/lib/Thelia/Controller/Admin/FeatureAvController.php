@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Thelia\Form\BaseForm;
+use LogicException;
 use Thelia\Core\Event\Feature\FeatureAvCreateEvent;
 use Thelia\Core\Event\Feature\FeatureAvDeleteEvent;
 use Thelia\Core\Event\Feature\FeatureAvUpdateEvent;
@@ -45,17 +48,17 @@ class FeatureAvController extends AbstractCrudController
         );
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::FEATURE_AV_CREATION);
     }
 
     protected function getUpdateForm(): void
     {
-        throw new \LogicException('Featiure Av. modification is not yet implemented');
+        throw new LogicException('Featiure Av. modification is not yet implemented');
     }
 
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent($formData): FeatureAvCreateEvent
     {
         $createEvent = new FeatureAvCreateEvent();
 
@@ -68,7 +71,7 @@ class FeatureAvController extends AbstractCrudController
         return $createEvent;
     }
 
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent($formData): FeatureAvUpdateEvent
     {
         $changeEvent = new FeatureAvUpdateEvent($formData['id']);
 
@@ -83,7 +86,7 @@ class FeatureAvController extends AbstractCrudController
         return $changeEvent;
     }
 
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
             $this->getRequest()->get('featureav_id', null),
@@ -92,7 +95,7 @@ class FeatureAvController extends AbstractCrudController
         );
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): FeatureAvDeleteEvent
     {
         return new FeatureAvDeleteEvent($this->getRequest()->get('featureav_id'));
     }
@@ -104,7 +107,7 @@ class FeatureAvController extends AbstractCrudController
 
     protected function hydrateObjectForm(ParserContext $parserContext, $object): void
     {
-        throw new \LogicException('Feature Av. modification is not yet implemented');
+        throw new LogicException('Feature Av. modification is not yet implemented');
     }
 
     protected function getObjectFromEvent($event)
@@ -144,7 +147,7 @@ class FeatureAvController extends AbstractCrudController
         return $object->getId();
     }
 
-    protected function getViewArguments()
+    protected function getViewArguments(): array
     {
         return [
             'feature_id' => $this->getRequest()->get('feature_id'),

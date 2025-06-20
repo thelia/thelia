@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Folder;
 
 /**
@@ -19,16 +20,14 @@ namespace Thelia\Core\Event\Folder;
  */
 class FolderUpdateEvent extends FolderCreateEvent
 {
-    /** @var int */
-    protected $folder_id;
-
     protected $chapo;
+
     protected $description;
+
     protected $postscriptum;
 
-    public function __construct(int $folder_id)
+    public function __construct(protected int $folder_id)
     {
-        $this->folder_id = $folder_id;
     }
 
     public function setChapo(?string $chapo): self
@@ -55,14 +54,14 @@ class FolderUpdateEvent extends FolderCreateEvent
         return $this->description;
     }
 
-    public function setFolderId($folder_id): self
+    public function setFolderId(int $folder_id): self
     {
         $this->folder_id = $folder_id;
 
         return $this;
     }
 
-    public function getFolderId()
+    public function getFolderId(): int
     {
         return $this->folder_id;
     }

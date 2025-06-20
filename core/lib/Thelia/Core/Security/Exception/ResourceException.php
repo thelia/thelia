@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,10 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Security\Exception;
 
-class ResourceException extends \RuntimeException
+use RuntimeException;
+
+class ResourceException extends RuntimeException
 {
     public const UNKNOWN_EXCEPTION = 0;
 
@@ -23,6 +26,7 @@ class ResourceException extends \RuntimeException
         if ($code === null) {
             $code = self::UNKNOWN_EXCEPTION;
         }
+
         parent::__construct($message, $code, $previous);
     }
 }

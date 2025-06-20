@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,23 +11,24 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Element;
+
+use Iterator;
+use ReturnTypeWillChange;
 
 /**
  * Class FlashMessage.
  *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class FlashMessage implements \Iterator
+class FlashMessage implements Iterator
 {
-    private $position;
+    private int $position = 0;
+
     protected $collection = [];
 
     public function __construct()
     {
-        $this->position = 0;
-        $this->collection = [];
     }
 
     public function add($type, $messages): void
@@ -63,7 +66,7 @@ class FlashMessage implements \Iterator
      *
      * @return mixed can return any type
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function current()
     {
         return $this->collection[$this->position];
@@ -90,7 +93,7 @@ class FlashMessage implements \Iterator
      *
      * @return mixed scalar on success, or null on failure
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function key()
     {
         return $this->position;

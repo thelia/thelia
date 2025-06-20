@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Loop;
 
 use Thelia\Core\Template\Element\BaseLoop;
@@ -21,16 +22,13 @@ use Thelia\Core\Template\Element\BaseLoop;
  */
 class LoopExtendsInitializeArgsEvent extends LoopExtendsEvent
 {
-    /** @var array the loop parameters when called. an array of name => value pairs */
-    protected $loopParameters;
-
     /**
      * LoopExtendsInitializeArgs constructor.
      */
-    public function __construct(BaseLoop $loop, array $loopParameters)
+    public function __construct(BaseLoop $loop, /** @var array the loop parameters when called. an array of name => value pairs */
+    protected array $loopParameters)
     {
         parent::__construct($loop);
-        $this->loopParameters = $loopParameters;
     }
 
     /**
@@ -38,15 +36,12 @@ class LoopExtendsInitializeArgsEvent extends LoopExtendsEvent
      *
      * @return array the loop parameters when called. an array of name => value pairs
      */
-    public function getLoopParameters()
+    public function getLoopParameters(): array
     {
         return $this->loopParameters;
     }
 
-    /**
-     * @param array $loopParameters
-     */
-    public function setLoopParameters($loopParameters)
+    public function setLoopParameters(array $loopParameters): static
     {
         $this->loopParameters = $loopParameters;
 

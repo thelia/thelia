@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Administrator;
 
 use Thelia\Core\Event\ActionEvent;
@@ -17,39 +18,45 @@ use Thelia\Model\Admin;
 
 class AdministratorEvent extends ActionEvent
 {
-    protected $administrator;
+
     protected $id;
+
     protected $firstname;
+
     protected $lastname;
+
     protected $login;
+
     protected $email;
+
     protected $password;
+
     protected $profile;
+
     protected $locale;
 
-    public function __construct(Admin $administrator = null)
+    public function __construct(protected ?Admin $administrator = null)
     {
-        $this->administrator = $administrator;
     }
 
-    public function hasAdministrator()
+    public function hasAdministrator(): bool
     {
-        return null !== $this->administrator;
+        return $this->administrator instanceof Admin;
     }
 
-    public function getAdministrator()
+    public function getAdministrator(): ?Admin
     {
         return $this->administrator;
     }
 
-    public function setAdministrator(Admin $administrator)
+    public function setAdministrator(Admin $administrator): static
     {
         $this->administrator = $administrator;
 
         return $this;
     }
 
-    public function setId($id)
+    public function setId($id): static
     {
         $this->id = $id;
 
@@ -61,7 +68,7 @@ class AdministratorEvent extends ActionEvent
         return $this->id;
     }
 
-    public function setFirstname($firstname)
+    public function setFirstname($firstname): static
     {
         $this->firstname = $firstname;
 
@@ -73,7 +80,7 @@ class AdministratorEvent extends ActionEvent
         return $this->firstname;
     }
 
-    public function setLastname($lastname)
+    public function setLastname($lastname): static
     {
         $this->lastname = $lastname;
 
@@ -85,7 +92,7 @@ class AdministratorEvent extends ActionEvent
         return $this->lastname;
     }
 
-    public function setLogin($login)
+    public function setLogin($login): static
     {
         $this->login = $login;
 
@@ -97,7 +104,7 @@ class AdministratorEvent extends ActionEvent
         return $this->login;
     }
 
-    public function setPassword($password)
+    public function setPassword($password): static
     {
         $this->password = $password;
 
@@ -109,7 +116,7 @@ class AdministratorEvent extends ActionEvent
         return $this->password;
     }
 
-    public function setProfile($profile)
+    public function setProfile($profile): static
     {
         if (0 === $profile) {
             $profile = null;
@@ -125,7 +132,7 @@ class AdministratorEvent extends ActionEvent
         return $this->profile;
     }
 
-    public function setLocale($locale)
+    public function setLocale($locale): static
     {
         $this->locale = $locale;
 

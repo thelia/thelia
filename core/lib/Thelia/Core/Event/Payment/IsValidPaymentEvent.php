@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Payment;
 
 use Thelia\Model\Cart;
@@ -22,9 +23,6 @@ use Thelia\Module\PaymentModuleInterface;
  */
 class IsValidPaymentEvent extends BasePaymentEvent
 {
-    /** @var Cart */
-    protected $cart;
-
     /** @var bool */
     protected $validModule = false;
 
@@ -37,24 +35,17 @@ class IsValidPaymentEvent extends BasePaymentEvent
     /**
      * IsValidPaymentEvent constructor.
      */
-    public function __construct(PaymentModuleInterface $module, Cart $cart)
+    public function __construct(PaymentModuleInterface $module, protected Cart $cart)
     {
         parent::__construct($module);
-        $this->cart = $cart;
     }
 
-    /**
-     * @return Cart
-     */
-    public function getCart()
+    public function getCart(): Cart
     {
         return $this->cart;
     }
 
-    /**
-     * @param Cart $cart
-     */
-    public function setCart($cart)
+    public function setCart(Cart $cart): static
     {
         $this->cart = $cart;
 
@@ -72,7 +63,7 @@ class IsValidPaymentEvent extends BasePaymentEvent
     /**
      * @param bool $validModule
      */
-    public function setValidModule($validModule)
+    public function setValidModule($validModule): static
     {
         $this->validModule = $validModule;
 
@@ -90,7 +81,7 @@ class IsValidPaymentEvent extends BasePaymentEvent
     /**
      * @param float $minimumAmount
      */
-    public function setMinimumAmount($minimumAmount)
+    public function setMinimumAmount($minimumAmount): static
     {
         $this->minimumAmount = $minimumAmount;
 
@@ -108,7 +99,7 @@ class IsValidPaymentEvent extends BasePaymentEvent
     /**
      * @param float $maximumAmount
      */
-    public function setMaximumAmount($maximumAmount)
+    public function setMaximumAmount($maximumAmount): static
     {
         $this->maximumAmount = $maximumAmount;
 

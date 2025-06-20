@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
+use Exception;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -59,7 +61,7 @@ class Template extends BaseAction implements EventSubscriberInterface
     /**
      * Dupliucate an existing template entry.
      *
-     * @param \Thelia\Core\Event\Template\TemplateCreateEvent $event
+     * @param TemplateCreateEvent $event
      */
     public function duplicate(TemplateDuplicateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -120,7 +122,7 @@ class Template extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a product template entry.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function delete(TemplateDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -145,7 +147,7 @@ class Template extends BaseAction implements EventSubscriberInterface
                         ->update(['DefaultTemplateId' => null], $con);
 
                     $con->commit();
-                } catch (\Exception $ex) {
+                } catch (Exception $ex) {
                     $con->rollback();
 
                     throw $ex;

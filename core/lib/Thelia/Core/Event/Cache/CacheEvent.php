@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Cache;
 
 use Thelia\Core\Event\ActionEvent;
@@ -22,22 +23,17 @@ use Thelia\Core\Event\ActionEvent;
  */
 class CacheEvent extends ActionEvent
 {
-    /**
-     * @var string cache directory
-     */
-    protected $dir;
-
-    /**
-     * @since 2.4.0
-     *
-     * @var bool
-     */
-    protected $onKernelTerminate = true;
-
-    public function __construct(string $dir, bool $onKernelTerminate = true)
+    public function __construct(
+        /**
+         * @var string cache directory
+         */
+        protected string $dir,
+        /**
+         * @since 2.4.0
+         */
+        protected bool $onKernelTerminate = true
+    )
     {
-        $this->dir = $dir;
-        $this->onKernelTerminate = $onKernelTerminate;
     }
 
     public function setDir(string $dir): self

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\File;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -51,7 +52,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setModel($model)
+    public function setModel($model): static
     {
         $this->model = $model;
 
@@ -75,7 +76,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setParentId($parentId)
+    public function setParentId($parentId): static
     {
         $this->parentId = $parentId;
 
@@ -99,7 +100,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setUploadedFile($uploadedFile)
+    public function setUploadedFile($uploadedFile): static
     {
         $this->uploadedFile = $uploadedFile;
 
@@ -123,7 +124,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setParentName($parentName)
+    public function setParentName($parentName): static
     {
         $this->parentName = $parentName;
 

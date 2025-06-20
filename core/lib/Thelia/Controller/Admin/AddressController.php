@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use InvalidArgumentException;
+use Exception;
+use Thelia\Log\Tlog;
+use Thelia\Form\BaseForm;
+use Thelia\Model\Address;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
@@ -57,7 +63,7 @@ class AddressController extends AbstractCrudController
             $address = AddressQuery::create()->findPk($address_id);
 
             if (null === $address) {
-                throw new \InvalidArgumentException(sprintf('%d address does not exists', $address_id));
+                throw new InvalidArgumentException(sprintf('%d address does not exists', $address_id));
             }
 
             $addressEvent = new AddressEvent($address);
@@ -74,9 +80,9 @@ class AddressController extends AbstractCrudController
                 ),
                 $address_id
             );
-        } catch (\Exception $e) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf('error during address setting as default with message %s',
-                $e->getMessage()));
+        } catch (Exception $exception) {
+            Tlog::getInstance()->error(sprintf('error during address setting as default with message %s',
+                $exception->getMessage()));
         }
 
         return $this->redirectToEditionTemplate();
@@ -85,7 +91,7 @@ class AddressController extends AbstractCrudController
     /**
      * Return the creation form for this object.
      */
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AddressCreateForm::class);
     }
@@ -93,7 +99,7 @@ class AddressController extends AbstractCrudController
     /**
      * Return the update form for this object.
      */
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::ADDRESS_UPDATE);
     }
@@ -102,10 +108,8 @@ class AddressController extends AbstractCrudController
      * Fills in the form data array.
      *
      * @param unknown $object
-     *
-     * @return array
      */
-    protected function createFormDataArray($object)
+    protected function createFormDataArray($object): array
     {
         return [
             'label' => $object->getLabel(),
@@ -127,9 +131,9 @@ class AddressController extends AbstractCrudController
     /**
      * Hydrate the update form for this object, before passing it to the update template.
      *
-     * @param \Thelia\Model\Address $object
+     * @param Address $object
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
     {
         return $this->createForm(AdminForm::ADDRESS_UPDATE, FormType::class, $this->createFormDataArray($object));
     }
@@ -164,7 +168,7 @@ class AddressController extends AbstractCrudController
         return $event;
     }
 
-    protected function getCreateOrUpdateEvent($formData)
+    protected function getCreateOrUpdateEvent($formData): AddressCreateOrUpdateEvent
     {
         $event = new AddressCreateOrUpdateEvent(
             $formData['label'],
@@ -200,7 +204,7 @@ class AddressController extends AbstractCrudController
      *
      * @param unknown $event
      */
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return null !== $event->getAddress();
     }
@@ -208,7 +212,7 @@ class AddressController extends AbstractCrudController
     /**
      * Get the created object from an event.
      */
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): null
     {
         return null;
     }

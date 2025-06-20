@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Service\Rewriting;
 
 use Thelia\Model\RewritingUrlQuery;
@@ -25,9 +26,11 @@ use Thelia\Tools\URL;
 class RewritingRetriever
 {
     protected $search;
-    protected $rewritingUrlQuery;
+
+    protected RewritingUrlQuery $rewritingUrlQuery;
 
     public $url;
+
     public $rewrittenUrl;
 
     public function __construct()
@@ -38,7 +41,7 @@ class RewritingRetriever
     /**
      * @param null $viewId
      */
-    public function loadViewUrl($view, $viewLocale = null, $viewId = null): void
+    public function loadViewUrl(string $view, $viewLocale = null, $viewId = null): void
     {
         $this->search = $this->rewritingUrlQuery->getViewUrlQuery($view, $viewLocale, $viewId);
 
@@ -46,6 +49,7 @@ class RewritingRetriever
         if (null !== $viewLocale) {
             $allParametersWithoutView['lang'] = $viewLocale;
         }
+
         if (null !== $viewId) {
             $allParametersWithoutView[$view.'_id'] = $viewId;
         }
@@ -63,7 +67,7 @@ class RewritingRetriever
      * @param null  $viewId
      * @param array $viewOtherParameters
      */
-    public function loadSpecificUrl($view, $viewLocale, $viewId = null, $viewOtherParameters = []): void
+    public function loadSpecificUrl(string $view, $viewLocale, $viewId = null, $viewOtherParameters = []): void
     {
         if (empty($viewOtherParameters)) {
             $this->loadViewUrl($view, $viewLocale, $viewId);

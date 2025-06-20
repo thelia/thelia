@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
 
+
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -114,10 +117,13 @@ class Order implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:order:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:order:write';
 
     public const GROUP_FRONT_READ = 'front:order:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:order:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ,
@@ -132,7 +138,7 @@ class Order implements PropelResourceInterface
     public ?string $ref = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?\DateTime $invoiceDate = null;
+    public ?DateTime $invoiceDate = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
@@ -140,10 +146,10 @@ class Order implements PropelResourceInterface
     public float $currencyRate;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?\DateTime $createdAt = null;
+    public ?DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
-    public ?\DateTime $updatedAt = null;
+    public ?DateTime $updatedAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     public ?float $discount = null;
@@ -189,11 +195,11 @@ class Order implements PropelResourceInterface
     #[Relation(targetResource: OrderProduct::class)]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
-    public array $orderProducts;
+    public array $orderProducts = [];
 
     #[Relation(targetResource: OrderCoupon::class)]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
-    public array $orderCoupons;
+    public array $orderCoupons = [];
 
     #[Relation(targetResource: OrderAddress::class, relationAlias: 'OrderAddressRelatedByInvoiceOrderAddressId')]
     #[Column(propelSetter: 'setInvoiceOrderAddressId')]
@@ -248,7 +254,7 @@ class Order implements PropelResourceInterface
     public function getTotalAmount(): ?float
     {
         $propelModel = $this->getPropelModel();
-        if (!$propelModel) {
+        if (!$propelModel instanceof ActiveRecordInterface) {
             $propelModel = OrderQuery::create()->findOneById($this->getId());
             $this->setPropelModel($propelModel);
         }
@@ -266,6 +272,7 @@ class Order implements PropelResourceInterface
             $orderPropelModel = OrderQuery::create()->findOneById($this->getId());
             $this->setPropelModel($orderPropelModel);
         }
+
         $itemsAmount = $orderPropelModel->getTotalAmount($itemsTax, false, false);
 
         return round($itemsAmount - $itemsTax, 2);
@@ -318,8 +325,6 @@ class Order implements PropelResourceInterface
 
     public function __construct()
     {
-        $this->orderCoupons = [];
-        $this->orderProducts = [];
     }
 
     public function getId(): ?int
@@ -346,12 +351,12 @@ class Order implements PropelResourceInterface
         return $this;
     }
 
-    public function getInvoiceDate(): ?\DateTime
+    public function getInvoiceDate(): ?DateTime
     {
         return $this->invoiceDate;
     }
 
-    public function setInvoiceDate(?\DateTime $invoiceDate): self
+    public function setInvoiceDate(?DateTime $invoiceDate): self
     {
         $this->invoiceDate = $invoiceDate;
 
@@ -370,24 +375,24 @@ class Order implements PropelResourceInterface
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): self
+    public function setCreatedAt(?DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): self
+    public function setUpdatedAt(?DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 

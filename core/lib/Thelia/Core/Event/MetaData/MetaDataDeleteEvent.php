@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\MetaData;
 
 /**
@@ -31,7 +32,7 @@ class MetaDataDeleteEvent extends MetaDataEvent
         parent::__construct();
     }
 
-    public function setMetaKey(?string $metaKey)
+    public function setMetaKey(?string $metaKey): static
     {
         $this->metaKey = $metaKey;
 
@@ -43,7 +44,7 @@ class MetaDataDeleteEvent extends MetaDataEvent
         return $this->metaKey;
     }
 
-    public function setElementKey(?string $elementKey)
+    public function setElementKey(?string $elementKey): static
     {
         $this->elementKey = $elementKey;
 
@@ -55,7 +56,7 @@ class MetaDataDeleteEvent extends MetaDataEvent
         return $this->elementKey;
     }
 
-    public function setElementId(?int $elementId)
+    public function setElementId(?int $elementId): static
     {
         $this->elementId = $elementId;
 

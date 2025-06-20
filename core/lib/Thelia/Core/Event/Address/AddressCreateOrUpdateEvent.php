@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Address;
 
 use Thelia\Core\Event\ActionEvent;
@@ -24,12 +25,12 @@ use Thelia\Model\Customer;
 class AddressCreateOrUpdateEvent extends ActionEvent
 {
     /**
-     * @var \Thelia\Model\Customer
+     * @var Customer
      */
     protected $customer;
 
     /**
-     * @var \Thelia\Model\Address
+     * @var Address
      */
     protected $address;
 
@@ -238,7 +239,7 @@ class AddressCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * @return \Thelia\Model\Customer
+     * @return Customer
      */
     public function getCustomer()
     {
@@ -252,7 +253,7 @@ class AddressCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * @return \Thelia\Model\Address
+     * @return Address
      */
     public function getAddress()
     {

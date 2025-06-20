@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -27,25 +28,20 @@ use Thelia\Exception\AdminAccessDenied;
  */
 class ControllerListener implements EventSubscriberInterface
 {
-    protected $securityContext;
-
-    public function __construct(SecurityContext $securityContext)
+    public function __construct(protected SecurityContext $securityContext)
     {
-        $this->securityContext = $securityContext;
     }
 
     public function adminFirewall(ControllerEvent $event): void
     {
         $controller = $event->getController();
         // check if an admin is logged in
-        if (\is_array($controller) && $controller[0] instanceof BaseAdminController) {
-            if (false === $this->securityContext->hasAdminUser() && $event->getRequest()->attributes->get('not-logged') != 1) {
-                throw new AdminAccessDenied(
-                    Translator::getInstance()->trans(
-                        "You're not currently connected to the administration panel. Please log in to access this page"
-                    )
-                );
-            }
+        if (\is_array($controller) && $controller[0] instanceof BaseAdminController && (false === $this->securityContext->hasAdminUser() && $event->getRequest()->attributes->get('not-logged') != 1)) {
+            throw new AdminAccessDenied(
+                Translator::getInstance()->trans(
+                    "You're not currently connected to the administration panel. Please log in to access this page"
+                )
+            );
         }
     }
 

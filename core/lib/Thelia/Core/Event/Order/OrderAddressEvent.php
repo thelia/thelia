@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Order;
 
 use Thelia\Core\Event\ActionEvent;
@@ -19,12 +20,12 @@ use Thelia\Model\OrderAddress;
 class OrderAddressEvent extends ActionEvent
 {
     /**
-     * @var \Thelia\Model\OrderAddress
+     * @var OrderAddress
      */
     protected $orderAddress;
 
     /**
-     * @var \Thelia\Model\Order
+     * @var Order
      */
     protected $order;
 
@@ -215,7 +216,7 @@ class OrderAddressEvent extends ActionEvent
     }
 
     /**
-     * @return \Thelia\Model\OrderAddress
+     * @return OrderAddress
      */
     public function getOrderAddress()
     {
@@ -223,7 +224,7 @@ class OrderAddressEvent extends ActionEvent
     }
 
     /**
-     * @return \Thelia\Model\Order
+     * @return Order
      */
     public function getOrder()
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
+use Exception;
+
+use Propel\Runtime\Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Propel;
 use Thelia\Model\Base\Coupon as BaseCoupon;
 use Thelia\Model\Map\CouponTableMap;
@@ -39,7 +43,7 @@ class Coupon extends BaseCoupon
      * @param string    $shortDescription           Coupon short description
      * @param string    $description                Coupon description
      * @param bool      $isEnabled                  Enable/Disable
-     * @param \DateTime $expirationDate             Coupon expiration date
+     * @param DateTime $expirationDate Coupon expiration date
      * @param bool      $isAvailableOnSpecialOffers Is available on special offers
      * @param bool      $isCumulative               Is cumulative
      * @param int       $maxUsage                   Coupon quantity
@@ -49,7 +53,7 @@ class Coupon extends BaseCoupon
      * @param array     $freeShippingForMethods     ID of Shipping modules for which shipping is free
      * @param bool      $perCustomerUsageCount      True if usage coiunt is per customer
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function createOrUpdate(
         $code,
@@ -133,10 +137,10 @@ class Coupon extends BaseCoupon
             }
 
             $con->commit();
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             $con->rollback();
 
-            throw $ex;
+            throw $exception;
         }
     }
 
@@ -146,7 +150,7 @@ class Coupon extends BaseCoupon
      * @param string $serializableConditions Serialized conditions ready to be saved
      * @param string $locale                 Coupon Language code ISO (ex: fr_FR)
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function createOrUpdateConditions($serializableConditions, $locale): void
     {
@@ -250,7 +254,7 @@ class Coupon extends BaseCoupon
     /**
      * Return the countries for which free shipping is valid.
      *
-     * @return array|mixed|\Propel\Runtime\Collection\ObjectCollection
+     * @return array|mixed|ObjectCollection
      */
     public function getFreeShippingForCountries()
     {
@@ -260,7 +264,7 @@ class Coupon extends BaseCoupon
     /**
      * Return the modules for which free shipping is valid.
      *
-     * @return array|mixed|\Propel\Runtime\Collection\ObjectCollection
+     * @return array|mixed|ObjectCollection
      */
     public function getFreeShippingForModules()
     {
@@ -283,16 +287,14 @@ class Coupon extends BaseCoupon
     {
         $usageLeft = $this->getMaxUsage();
 
-        if ($this->getPerCustomerUsageCount()) {
-            // Get usage left for current customer. If the record is not found,
-            // it means that the customer has not yes used this coupon.
-            if (null !== $couponCustomerCount = CouponCustomerCountQuery::create()
-                    ->filterByCouponId($this->getId())
-                    ->filterByCustomerId($customerId)
-                    ->findOne()) {
-                // The coupon has already been used -> remove this customer's usage count
-                $usageLeft -= $couponCustomerCount->getCount();
-            }
+        // Get usage left for current customer. If the record is not found,
+        // it means that the customer has not yes used this coupon.
+        if ($this->getPerCustomerUsageCount() && null !== $couponCustomerCount = CouponCustomerCountQuery::create()
+                ->filterByCouponId($this->getId())
+                ->filterByCustomerId($customerId)
+                ->findOne()) {
+            // The coupon has already been used -> remove this customer's usage count
+            $usageLeft -= $couponCustomerCount->getCount();
         }
 
         return $usageLeft;

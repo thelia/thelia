@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\MetaData;
 
 use Thelia\Core\Event\ActionEvent;
@@ -22,11 +23,8 @@ use Thelia\Model\MetaData;
  */
 class MetaDataEvent extends ActionEvent
 {
-    protected $metaData;
-
-    public function __construct(MetaData $metaData = null)
+    public function __construct(protected ?MetaData $metaData = null)
     {
-        $this->metaData = $metaData;
     }
 
     public function setMetaData(?MetaData $metaData): self

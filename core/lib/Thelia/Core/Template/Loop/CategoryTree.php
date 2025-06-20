@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Type\EnumListType;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseI18nLoop;
@@ -20,7 +22,6 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\CategoryQuery;
-use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\TypeCollection;
 
@@ -42,10 +43,7 @@ use Thelia\Type\TypeCollection;
  */
 class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
 {
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('category', null, true),
@@ -56,7 +54,7 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(['position', 'position_reverse', 'id', 'id_reverse', 'alpha', 'alpha_reverse'])
+                    new EnumListType(['position', 'position_reverse', 'id', 'id_reverse', 'alpha', 'alpha_reverse'])
                 ),
                 'position'
             )
@@ -133,7 +131,7 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
         }
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         foreach ($loopResult->getResultDataCollection() as $result) {
             $loopResultRow = new LoopResultRow($result);

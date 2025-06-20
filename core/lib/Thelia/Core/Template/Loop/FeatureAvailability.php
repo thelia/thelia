@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Type\EnumListType;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -21,7 +23,6 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\FeatureAv;
 use Thelia\Model\FeatureAvQuery;
-use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
@@ -40,10 +41,7 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
 {
     protected $timestampable = true;
 
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
@@ -52,7 +50,7 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(['id', 'id_reverse', 'alpha', 'alpha-reverse', 'alpha_reverse', 'manual', 'manual_reverse'])
+                    new EnumListType(['id', 'id_reverse', 'alpha', 'alpha-reverse', 'alpha_reverse', 'manual', 'manual_reverse'])
                 ),
                 'manual'
             )
@@ -125,7 +123,7 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
         return $search;
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var FeatureAv $featureAv */
         foreach ($loopResult->getResultDataCollection() as $featureAv) {

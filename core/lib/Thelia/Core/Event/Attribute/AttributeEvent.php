@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Attribute;
 
 use Thelia\Core\Event\ActionEvent;
@@ -20,24 +21,21 @@ use Thelia\Model\Attribute;
  */
 class AttributeEvent extends ActionEvent
 {
-    protected $attribute;
-
-    public function __construct(Attribute $attribute = null)
+    public function __construct(protected ?Attribute $attribute = null)
     {
-        $this->attribute = $attribute;
     }
 
-    public function hasAttribute()
+    public function hasAttribute(): bool
     {
-        return null !== $this->attribute;
+        return $this->attribute instanceof Attribute;
     }
 
-    public function getAttribute()
+    public function getAttribute(): ?Attribute
     {
         return $this->attribute;
     }
 
-    public function setAttribute($attribute)
+    public function setAttribute(?Attribute $attribute): static
     {
         $this->attribute = $attribute;
 

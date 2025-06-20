@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
+
 
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
@@ -108,11 +110,15 @@ class Customer implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:customer:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:customer:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:customer:write';
+
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:customer:write:update';
 
     public const GROUP_FRONT_READ_SINGLE = 'front:customer:read:single';
+
     public const GROUP_FRONT_WRITE = 'front:customer:write';
 
     #[Groups([self::GROUP_ADMIN_READ,
@@ -198,24 +204,23 @@ class Customer implements PropelResourceInterface
     public ?string $confirmationToken = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $createdAt = null;
+    public ?DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
-    public ?\DateTime $updatedAt = null;
+    public ?DateTime $updatedAt = null;
 
     public ?int $version = null;
 
-    public ?\DateTime $versionCreatedAt = null;
+    public ?DateTime $versionCreatedAt = null;
 
     public ?string $versionCreatedBy = null;
 
     #[Relation(targetResource: Address::class)]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
-    public array $addresses;
+    public array $addresses = [];
 
     public function __construct()
     {
-        $this->addresses = [];
     }
 
     public function getId(): ?int
@@ -410,24 +415,24 @@ class Customer implements PropelResourceInterface
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): self
+    public function setCreatedAt(?DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): self
+    public function setUpdatedAt(?DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 
@@ -446,12 +451,12 @@ class Customer implements PropelResourceInterface
         return $this;
     }
 
-    public function getVersionCreatedAt(): ?\DateTime
+    public function getVersionCreatedAt(): ?DateTime
     {
         return $this->versionCreatedAt;
     }
 
-    public function setVersionCreatedAt(?\DateTime $versionCreatedAt): self
+    public function setVersionCreatedAt(?DateTime $versionCreatedAt): self
     {
         $this->versionCreatedAt = $versionCreatedAt;
 

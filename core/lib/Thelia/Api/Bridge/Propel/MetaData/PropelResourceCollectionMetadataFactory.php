@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel\MetaData;
 
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
@@ -47,7 +48,7 @@ final readonly class PropelResourceCollectionMetadataFactory implements Resource
         foreach ($resourceMetadataCollection as $i => $resourceMetadata) {
             $operations = $resourceMetadata->getOperations();
 
-            if ($operations) {
+            if ($operations instanceof Operations) {
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
                     if (!is_subclass_of($resourceClass, PropelResourceInterface::class)) {
                         continue;

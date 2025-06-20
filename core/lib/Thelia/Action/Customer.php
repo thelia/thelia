@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
+use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -41,32 +43,12 @@ use Thelia\Tools\Password;
  */
 class Customer extends BaseAction implements EventSubscriberInterface
 {
-    /** @var SecurityContext */
-    protected $securityContext;
-
-    /** @var MailerFactory */
-    protected $mailer;
-
-    /** @var RequestStack */
-    protected $requestStack;
-
-    /** @var CustomerService */
-    protected $customerService;
-
-    public function __construct(
-        SecurityContext $securityContext,
-        MailerFactory $mailer,
-        CustomerService $customerService,
-        RequestStack $requestStack = null
-    ) {
-        $this->securityContext = $securityContext;
-        $this->mailer = $mailer;
-        $this->requestStack = $requestStack;
-        $this->customerService = $customerService;
+    public function __construct(protected SecurityContext $securityContext, protected MailerFactory $mailer, protected CustomerService $customerService, protected ?RequestStack $requestStack = null)
+    {
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function create(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -107,7 +89,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function modify(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -119,13 +101,13 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
         $this->createOrUpdateCustomer($customer, $event, $dispatcher);
 
-        if ($event->getNotifyCustomerOfAccountModification() && (!empty($plainPassword) || $emailChanged)) {
+        if ($event->getNotifyCustomerOfAccountModification() && ($plainPassword !== null && $plainPassword !== '' && $plainPassword !== '0' || $emailChanged)) {
             $this->mailer->sendEmailToCustomer('customer_account_changed', $customer, ['password' => $plainPassword]);
         }
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function updateProfile(
         CustomerCreateOrUpdateEvent $event,
@@ -176,7 +158,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function delete(CustomerEvent $event): void
     {
@@ -190,7 +172,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     private function createOrUpdateCustomer(
         CustomerModel $customer,
@@ -235,7 +217,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
         $this->securityContext->setCustomerUser($event->getCustomer());
 
         // Set the preferred customer language
-        if (null !== $this->requestStack
+        if ($this->requestStack instanceof RequestStack
             && !empty($customer->getLangId())
             && (null !== $lang = LangQuery::create()->findPk($customer->getLangId()))
         ) {
@@ -252,7 +234,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function lostPassword(LostPasswordEvent $event): void
     {

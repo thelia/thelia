@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model\Breadcrumb;
 
+use LogicException;
+use Thelia\Model\Product;
+use Thelia\Model\Category;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\CategoryQuery;
@@ -19,7 +23,10 @@ use Thelia\Tools\URL;
 
 trait CatalogBreadcrumbTrait
 {
-    public function getBaseBreadcrumb(Router $router, $categoryId, $locale)
+    /**
+     * @return mixed[]
+     */
+    public function getBaseBreadcrumb(Router $router, $categoryId, $locale): array
     {
         $translator = Translator::getInstance();
         $catalogUrl = $router->generate('admin.catalog', [], Router::ABSOLUTE_URL);
@@ -51,7 +58,7 @@ trait CatalogBreadcrumbTrait
                 if ($currentId > 0) {
                     // Prevent circular refererences
                     if (\in_array($currentId, $ids)) {
-                        throw new \LogicException(
+                        throw new LogicException(
                             sprintf(
                                 'Circular reference detected in category ID=%d hierarchy (category ID=%d appears more than one times in path)',
                                 $categoryId,
@@ -78,7 +85,7 @@ trait CatalogBreadcrumbTrait
             return null;
         }
 
-        /** @var \Thelia\Model\Product $product */
+        /** @var Product $product */
         $product = $this->getProduct();
 
         $breadcrumb = $this->getBaseBreadcrumb($router, $product->getDefaultCategoryId(), $locale);
@@ -101,7 +108,7 @@ trait CatalogBreadcrumbTrait
             return null;
         }
 
-        /** @var \Thelia\Model\Category $category */
+        /** @var Category $category */
         $category = $this->getCategory();
         $breadcrumb = $this->getBaseBreadcrumb($router, $this->getParentId(), $locale);
 

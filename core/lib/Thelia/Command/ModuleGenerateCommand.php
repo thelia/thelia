@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+use RuntimeException;
+use Exception;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -25,13 +29,12 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
+#[AsCommand(name: 'module:generate', description: 'generate all needed files for creating a new Module')]
 class ModuleGenerateCommand extends BaseModuleGenerate
 {
     protected function configure(): void
     {
         $this
-            ->setName('module:generate')
-            ->setDescription('generate all needed files for creating a new Module')
             ->addArgument(
                 'name',
                 InputArgument::REQUIRED,
@@ -55,9 +58,9 @@ class ModuleGenerateCommand extends BaseModuleGenerate
 
         try {
             $this->verifyExistingModule();
-        } catch (\RuntimeException $ex) {
+        } catch (RuntimeException $runtimeException) {
             if (false === $input->getOption('force')) {
-                throw $ex;
+                throw $runtimeException;
             }
         }
 
@@ -96,7 +99,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         }
     }
 
-    protected function copyConfigFile($filename, $skeletonDir, Filesystem $fs): void
+    protected function copyConfigFile($filename, string $skeletonDir, Filesystem $fs): void
     {
         $filename = $this->moduleDirectory.\DIRECTORY_SEPARATOR.'Config'.\DIRECTORY_SEPARATOR.$filename;
         if (!$fs->exists($filename)) {
@@ -233,10 +236,10 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                     $this->moduleDirectory.\DIRECTORY_SEPARATOR.'I18n'.\DIRECTORY_SEPARATOR.'en_US.php'
                 );
             }
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             $fs->remove($this->moduleDirectory);
 
-            throw $ex;
+            throw $exception;
         }
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
+use RuntimeException;
+use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
@@ -101,8 +104,8 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Update the promo status of the sale's selected products and combinations.
      *
-     * @throws \RuntimeException
-     * @throws \Exception
+     * @throws RuntimeException
+     * @throws Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function updateProductsSaleStatus(ProductSaleStatusUpdateEvent $event): void
@@ -322,9 +325,9 @@ class Sale extends BaseAction implements EventSubscriberInterface
             $event->setSale($sale);
 
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (PropelException $propelException) {
             $con->rollback();
-            throw $e;
+            throw $propelException;
         }
     }
 
@@ -367,7 +370,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Clear all sales.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function clearStatus(/* @noinspection PhpUnusedParameterInspection */ SaleClearStatusEvent $event): void
     {
@@ -388,9 +391,9 @@ class Sale extends BaseAction implements EventSubscriberInterface
             ;
 
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (PropelException $propelException) {
             $con->rollback();
-            throw $e;
+            throw $propelException;
         }
     }
 
@@ -444,9 +447,9 @@ class Sale extends BaseAction implements EventSubscriberInterface
             }
 
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (PropelException $propelException) {
             $con->rollback();
-            throw $e;
+            throw $propelException;
         }
     }
 

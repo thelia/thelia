@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -54,7 +55,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
             $this->displayAdminGeneralError($event);
         }
 
-        if ($exception instanceof BaseHttpException && null === $event->getResponse()) {
+        if ($exception instanceof BaseHttpException && !$event->getResponse() instanceof \Symfony\Component\HttpFoundation\Response) {
             $this->displayException($event);
         }
     }
@@ -75,7 +76,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
                     'error_message' => $message,
                 ]
             ),
-            403
+            \Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN
         );
 
         $event->setResponse($response);
@@ -87,7 +88,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
             $this->parser->getTemplateHelper()->getActiveFrontTemplate()
         );
 
-        $response = new Response($this->parser->render(ConfigQuery::getPageNotFoundView()), 404);
+        $response = new Response($this->parser->render(ConfigQuery::getPageNotFoundView()), \Symfony\Component\HttpFoundation\Response::HTTP_NOT_FOUND);
 
         $event->setResponse($response);
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
+
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -82,11 +84,15 @@ class Cart implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:cart:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:cart:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:cart:write';
 
     public const GROUP_FRONT_READ = 'front:cart:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:cart:read:single';
+
     public const GROUP_FRONT_WRITE = 'front:cart:write';
 
     #[Groups([self::GROUP_ADMIN_READ, CartItem::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
@@ -113,16 +119,16 @@ class Cart implements PropelResourceInterface
 
     #[Relation(targetResource: CartItem::class, )]
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?array $cartItems;
+    public ?array $cartItems = [];
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
     public ?float $discount = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?\DateTime $createdAt = null;
+    public ?DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?\DateTime $updatedAt = null;
+    public ?DateTime $updatedAt = null;
 
     #[Groups([self::GROUP_FRONT_READ_SINGLE])]
     public ?float $totalWithoutTax = null;
@@ -144,7 +150,6 @@ class Cart implements PropelResourceInterface
 
     public function __construct()
     {
-        $this->cartItems = [];
     }
 
     public function getId(): ?int
@@ -243,24 +248,24 @@ class Cart implements PropelResourceInterface
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): self
+    public function setCreatedAt(?DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): self
+    public function setUpdatedAt(?DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 

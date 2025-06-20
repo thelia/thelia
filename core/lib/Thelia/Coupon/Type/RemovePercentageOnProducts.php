@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Coupon\Type;
 
 /**
@@ -22,27 +23,24 @@ class RemovePercentageOnProducts extends AbstractRemoveOnProducts
     use PercentageCouponTrait;
     public const PERCENTAGE = 'percentage';
 
-    /** @var string Service Id */
-    protected $serviceId = 'thelia.coupon.type.remove_percentage_on_products';
+    protected string $serviceId = 'thelia.coupon.type.remove_percentage_on_products';
 
-    protected function getPercentageFieldName()
+    protected function getPercentageFieldName(): string
     {
         return self::PERCENTAGE;
     }
 
     /**
      * Get I18n name.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->facade
             ->getTranslator()
             ->trans('Percentage discount for selected products', []);
     }
 
-    public function getToolTip()
+    public function getToolTip(): string
     {
         $toolTip = $this->facade
             ->getTranslator()
@@ -54,7 +52,7 @@ class RemovePercentageOnProducts extends AbstractRemoveOnProducts
         return $toolTip;
     }
 
-    public function drawBackOfficeInputs()
+    public function drawBackOfficeInputs(): string
     {
         return $this->callDrawBackOfficeInputs('coupon/type-fragments/remove-percentage-on-products.html');
     }

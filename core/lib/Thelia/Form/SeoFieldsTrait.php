@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -93,11 +94,11 @@ trait SeoFieldsTrait
                     'label' => Translator::getInstance()->trans('Meta Keywords'),
                     'label_attr' => [
                         'for' => 'meta_keywords',
-                        'help' => Translator::getInstance()->trans('You don\'t need to use commas or other punctuations.'),
+                        'help' => Translator::getInstance()->trans("You don't need to use commas or other punctuations."),
                     ],
                     'attr' => [
                         'rows' => 3,
-                        'placeholder' => Translator::getInstance()->trans('Don\'t repeat keywords over and over in a row. Rather, put in keyword phrases.'),
+                        'placeholder' => Translator::getInstance()->trans("Don't repeat keywords over and over in a row. Rather, put in keyword phrases."),
                     ],
                 ]
             );

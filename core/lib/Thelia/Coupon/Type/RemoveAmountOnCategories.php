@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Coupon\Type;
 
 /**
@@ -21,15 +22,14 @@ class RemoveAmountOnCategories extends AbstractRemoveOnCategories
 {
     use AmountCouponTrait;
 
-    /** @var string Service Id */
-    protected $serviceId = 'thelia.coupon.type.remove_amount_on_categories';
+    protected string $serviceId = 'thelia.coupon.type.remove_amount_on_categories';
 
-    protected function getAmountFieldName()
+    protected function getAmountFieldName(): string
     {
         return self::AMOUNT_FIELD_NAME;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->facade
             ->getTranslator()
@@ -48,7 +48,7 @@ class RemoveAmountOnCategories extends AbstractRemoveOnCategories
         return $toolTip;
     }
 
-    public function drawBackOfficeInputs()
+    public function drawBackOfficeInputs(): string
     {
         return $this->callDrawBackOfficeInputs('coupon/type-fragments/remove-amount-on-categories.html');
     }

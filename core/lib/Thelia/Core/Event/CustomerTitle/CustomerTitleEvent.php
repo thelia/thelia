@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\CustomerTitle;
 
 use Thelia\Core\Event\ActionEvent;
@@ -43,12 +44,12 @@ class CustomerTitleEvent extends ActionEvent
     protected $locale;
 
     /**
-     * @var \Thelia\Model\CustomerTitle|null
+     * @var CustomerTitle|null
      */
     protected $customerTitle;
 
     /**
-     * @return \Thelia\Model\CustomerTitle
+     * @return CustomerTitle
      */
     public function getCustomerTitle()
     {
@@ -58,7 +59,7 @@ class CustomerTitleEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setCustomerTitle(CustomerTitle $customerTitle = null)
+    public function setCustomerTitle(CustomerTitle $customerTitle = null): static
     {
         $this->customerTitle = $customerTitle;
 
@@ -78,7 +79,7 @@ class CustomerTitleEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setDefault($default)
+    public function setDefault($default): static
     {
         $this->default = $default;
 
@@ -98,7 +99,7 @@ class CustomerTitleEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setLocale($locale)
+    public function setLocale($locale): static
     {
         $this->locale = $locale;
 
@@ -118,7 +119,7 @@ class CustomerTitleEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setLong($long)
+    public function setLong($long): static
     {
         $this->long = $long;
 
@@ -138,7 +139,7 @@ class CustomerTitleEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setShort($short)
+    public function setShort($short): static
     {
         $this->short = $short;
 

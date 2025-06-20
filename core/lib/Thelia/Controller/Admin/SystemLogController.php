@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use DirectoryIterator;
+use UnexpectedValueException;
+use Exception;
+use Thelia\Core\HttpFoundation\Response;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
@@ -51,7 +56,7 @@ class SystemLogController extends BaseAdminController
     protected function loadDefinedDestinations($directory, &$destinations): void
     {
         try {
-            foreach (new \DirectoryIterator($directory) as $fileInfo) {
+            foreach (new DirectoryIterator($directory) as $fileInfo) {
                 if ($fileInfo->isDot()) {
                     continue;
                 }
@@ -68,13 +73,13 @@ class SystemLogController extends BaseAdminController
                     }
                 }
             }
-        } catch (\UnexpectedValueException) {
+        } catch (UnexpectedValueException) {
             // Directory does no exists -> Nothing to do
         }
     }
 
     /**
-     * @return mixed|\Thelia\Core\HttpFoundation\Response
+     * @return mixed|Response
      */
     public function defaultAction()
     {
@@ -144,14 +149,14 @@ class SystemLogController extends BaseAdminController
             );
 
             $response = $this->generateRedirectFromRoute('admin.configuration.system-logs.default');
-        } catch (\Exception $ex) {
-            $error_msg = $ex->getMessage();
+        } catch (Exception $exception) {
+            $error_msg = $exception->getMessage();
 
             $this->setupFormErrorContext(
                 $this->getTranslator()->trans('System log configuration failed.'),
                 $error_msg,
                 $systemLogForm,
-                $ex
+                $exception
             );
 
             $response = $this->renderTemplate();

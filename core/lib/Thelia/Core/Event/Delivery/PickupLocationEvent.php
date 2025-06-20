@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Delivery;
 
+use Exception;
+use Propel\Runtime\Exception\PropelException;
 use Thelia\Api\Resource\DeliveryPickupLocation;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Address;
@@ -26,14 +29,16 @@ use Thelia\Model\State;
 class PickupLocationEvent extends ActionEvent
 {
     protected ?int $radius;
+
     protected ?int $maxRelays;
+
     protected array $locations = [];
 
     /**
      * PickupLocationEvent constructor.
      *
-     * @throws \Propel\Runtime\Exception\PropelException
-     * @throws \Exception
+     * @throws PropelException
+     * @throws Exception
      */
     public function __construct(
         Address $addressModel = null,
@@ -49,7 +54,7 @@ class PickupLocationEvent extends ActionEvent
     ) {
         $this->radius = $radius ?? 20000;
         $this->maxRelays = $maxRelays ?? 15;
-        if (null !== $addressModel) {
+        if ($addressModel instanceof Address) {
             $this->address = $addressModel->getAddress1();
             $this->city = $addressModel->getCity();
             $this->zipCode = $addressModel->getZipcode();
@@ -58,7 +63,7 @@ class PickupLocationEvent extends ActionEvent
         }
 
         if ($this->address === null && $this->city === null && $this->zipCode === null) {
-            throw new \Exception('Not enough informations to retrieve pickup locations');
+            throw new Exception('Not enough informations to retrieve pickup locations');
         }
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Archiver;
 
+use Exception;
+use RuntimeException;
+use DirectoryIterator;
 use Thelia\Core\Translation\Translator;
 
 /**
@@ -34,7 +38,7 @@ abstract class AbstractArchiver implements ArchiverInterface
     public function __construct($checkIsAvailable = false)
     {
         if ($checkIsAvailable && !$this->isAvailable()) {
-            throw new \Exception(
+            throw new Exception(
                 Translator::getInstance()->trans(
                     'The archiver :name is not available. Please install the php extension :extension first.',
                     [
@@ -62,7 +66,7 @@ abstract class AbstractArchiver implements ArchiverInterface
     {
         $path = realpath($path);
         if (!file_exists($path)) {
-            throw new \RuntimeException('File '.$path.' doesn\'t exists');
+            throw new RuntimeException('File '.$path." doesn't exists");
         }
 
         if ($pathInArchive === null) {
@@ -70,10 +74,11 @@ abstract class AbstractArchiver implements ArchiverInterface
         }
 
         if (is_dir($path)) {
-            foreach (new \DirectoryIterator($path) as $dirItem) {
+            foreach (new DirectoryIterator($path) as $dirItem) {
                 if ($dirItem->isDot()) {
                     continue;
                 }
+
                 $this->add($dirItem->getPathname(), $pathInArchive.DS.$dirItem->getFilename());
             }
         } else {

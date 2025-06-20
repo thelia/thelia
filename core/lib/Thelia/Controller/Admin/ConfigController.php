@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Thelia\Form\BaseForm;
+use Thelia\Core\HttpFoundation\Response;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Config\ConfigCreateEvent;
@@ -51,29 +54,29 @@ class ConfigController extends AbstractCrudController
     /**
      * The default action is displaying the list.
      *
-     * @return \Thelia\Core\HttpFoundation\Response the response
+     * @return Response the response
      */
     public function defaultAction(ConfigCacheService $configCacheService = null)
     {
         // Force reinit config cache
-        if (null !== $configCacheService) {
+        if ($configCacheService instanceof ConfigCacheService) {
             $configCacheService->initCacheConfigs(true);
         }
 
         return parent::defaultAction();
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::CONFIG_CREATION);
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::CONFIG_MODIFICATION);
     }
 
-    protected function getCreationEvent($data)
+    protected function getCreationEvent($data): ConfigCreateEvent
     {
         $createEvent = new ConfigCreateEvent();
 
@@ -89,7 +92,7 @@ class ConfigController extends AbstractCrudController
         return $createEvent;
     }
 
-    protected function getUpdateEvent($data)
+    protected function getUpdateEvent($data): ConfigUpdateEvent
     {
         $changeEvent = new ConfigUpdateEvent($data['id']);
 
@@ -108,7 +111,7 @@ class ConfigController extends AbstractCrudController
         return $changeEvent;
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): ConfigDeleteEvent
     {
         return new ConfigDeleteEvent($this->getRequest()->get('variable_id'));
     }
@@ -118,7 +121,7 @@ class ConfigController extends AbstractCrudController
         return $event->hasConfig();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
     {
         // Prepare the data that will hydrate the form
         $data = [
@@ -201,7 +204,7 @@ class ConfigController extends AbstractCrudController
     /**
      * Change values modified directly from the variable list.
      *
-     * @return \Thelia\Core\HttpFoundation\Response the response
+     * @return Response the response
      */
     public function changeValuesAction(EventDispatcherInterface $dispatcher)
     {

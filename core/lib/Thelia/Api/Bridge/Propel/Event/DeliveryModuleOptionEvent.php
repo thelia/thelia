@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Bridge\Propel\Event;
 
+use RuntimeException;
 use Thelia\Api\Resource\DeliveryModuleOption;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Translation\Translator;
@@ -26,7 +28,7 @@ class DeliveryModuleOptionEvent extends ActionEvent
     protected array $deliveryModuleOptions = [];
 
     /**
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function __construct(
         protected Module $module,
@@ -35,12 +37,12 @@ class DeliveryModuleOptionEvent extends ActionEvent
         protected ?Country $country = null,
         protected ?State $state = null
     ) {
-        if (null === $this->address && null === $this->country) {
-            throw new \RuntimeException(Translator::getInstance()->trans('Not enough informations to retrieve module options'));
+        if (!$this->address instanceof Address && !$this->country instanceof Country) {
+            throw new RuntimeException(Translator::getInstance()->trans('Not enough informations to retrieve module options'));
         }
 
         if (!$this->module->isDeliveryModule()) {
-            throw new \RuntimeException(Translator::getInstance()->trans($this->module->getTitle().' is not a delivery module.'));
+            throw new RuntimeException(Translator::getInstance()->trans($this->module->getTitle().' is not a delivery module.'));
         }
     }
 

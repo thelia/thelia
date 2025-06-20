@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template;
 
+use ArrayIterator;
+use Exception;
 use Thelia\Core\Template\Exception\TemplateException;
 use Thelia\Core\Template\Validator\TemplateDescriptor;
 use Thelia\Core\Template\Validator\TemplateValidator;
@@ -19,18 +22,27 @@ use Thelia\Core\Template\Validator\TemplateValidator;
 class TemplateDefinition
 {
     public const FRONT_OFFICE = 1;
+
     public const BACK_OFFICE = 2;
+
     public const PDF = 3;
+
     public const EMAIL = 4;
 
     public const FRONT_OFFICE_SUBDIR = 'frontOffice';
+
     public const BACK_OFFICE_SUBDIR = 'backOffice';
+
     public const PDF_SUBDIR = 'pdf';
+
     public const EMAIL_SUBDIR = 'email';
 
     public const FRONT_OFFICE_CONFIG_NAME = 'active-front-template';
+
     public const BACK_OFFICE_CONFIG_NAME = 'active-admin-template';
+
     public const PDF_CONFIG_NAME = 'active-pdf-template';
+
     public const EMAIL_CONFIG_NAME = 'active-email-template';
 
     public const CONFIG_NAMES = [
@@ -41,10 +53,12 @@ class TemplateDefinition
     ];
 
     protected ?string $path = null;
+
     protected ?TemplateDescriptor $templateDescriptor = null;
+
     protected ?string $translationDomainPrefix = null;
 
-    protected static array $standardTemplatesSubdirs = [
+    public static array $standardTemplatesSubdirs = [
         self::FRONT_OFFICE => self::FRONT_OFFICE_SUBDIR,
         self::BACK_OFFICE => self::BACK_OFFICE_SUBDIR,
         self::PDF => self::PDF_SUBDIR,
@@ -57,7 +71,7 @@ class TemplateDefinition
      * @param string $name the template name (= directory name)
      * @param int $type the remplate type (see $standardTemplatesSubdirs)
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct(string $name, int $type)
     {
@@ -126,7 +140,7 @@ class TemplateDefinition
             }
         }
 
-        throw new TemplateException("Template file not found: $templateName");
+        throw new TemplateException('Template file not found: ' . $templateName);
     }
 
     public function getAssetsPath(): string
@@ -194,7 +208,7 @@ class TemplateDefinition
         return THELIA_TEMPLATE_DIR.$this->getConfigPath();
     }
 
-    public function setPath($path): static
+    public function setPath(?string $path): static
     {
         $this->path = $path;
 
@@ -218,8 +232,8 @@ class TemplateDefinition
         return $this->templateDescriptor;
     }
 
-    public static function getStandardTemplatesSubdirsIterator(): \ArrayIterator
+    public static function getStandardTemplatesSubdirsIterator(): ArrayIterator
     {
-        return new \ArrayIterator(self::$standardTemplatesSubdirs);
+        return new ArrayIterator(self::$standardTemplatesSubdirs);
     }
 }

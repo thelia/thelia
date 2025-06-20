@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Config;
 
+use LogicException;
+use PDO;
+use PDOException;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -41,7 +45,7 @@ class DatabaseConfigurationSource
         $this->configureConnections($envParameters);
     }
 
-    protected function configureConnections($envParameters): void
+    protected function configureConnections(array $envParameters): void
     {
         if (null !== $envParameters['thelia.database_host'] && null !== $envParameters['thelia.database_name']) {
             $this->addConnection(
@@ -67,7 +71,7 @@ class DatabaseConfigurationSource
         }
 
         if (!$fs->exists($databaseConfigFile)) {
-            throw new \LogicException('No database connection found. Add parameters to your .env file or a database.yml');
+            throw new LogicException('No database connection found. Add parameters to your .env file or a database.yml');
         }
 
         $theliaDatabaseConfiguration = Yaml::parse(file_get_contents($databaseConfigFile));
@@ -102,7 +106,7 @@ class DatabaseConfigurationSource
             return;
         }
 
-        throw new \LogicException(
+        throw new LogicException(
             'Connection configuration not found'
                 .' This is checked at configuration validation, and should not happen.'
         );
@@ -126,7 +130,7 @@ class DatabaseConfigurationSource
     /**
      * @return array propel configuration values
      */
-    public function getPropelConnectionsConfiguration()
+    public function getPropelConnectionsConfiguration(): array
     {
         $propelConnections = [];
         /**
@@ -156,21 +160,21 @@ class DatabaseConfigurationSource
     }
 
     /**
-     * @throws \PDOException
+     * @throws PDOException
      *
-     * @return \PDO thelia database connection
+     * @return PDO thelia database connection
      */
-    public function getTheliaConnectionPDO()
+    public function getTheliaConnectionPDO(): PDO
     {
         /** @var ParameterBag $theliaConnectionParameterBag */
         $theliaConnectionParameterBag = $this->connections[DatabaseConfiguration::THELIA_CONNECTION_NAME];
 
-        return new \PDO(
+        return new PDO(
             $theliaConnectionParameterBag->get('dsn'),
             $theliaConnectionParameterBag->get('user'),
             $theliaConnectionParameterBag->get('password'),
             [
-                \PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'UTF8'",
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'UTF8'",
             ]
         );
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Hook;
 
+use UnexpectedValueException;
+use DirectoryIterator;
+use Exception;
 use Thelia\Core\Template\ParserHelperInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Translation\Translator;
@@ -19,7 +23,6 @@ use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
-use TheliaSmarty\Template\SmartyHelper;
 
 /**
  * Class HookHelper.
@@ -31,31 +34,23 @@ class HookHelper
     /** @var array messages used to build title for hooks */
     protected $messages = [];
 
-    /**
-     * @var ParserHelperInterface
-     */
-    protected $parserHelper;
-
-    public function __construct(SmartyHelper $parserHelper)
+    public function __construct(protected ParserHelperInterface $parserHelper)
     {
-        $this->parserHelper = $parserHelper;
     }
 
     /**
      * @param int $templateType
      *
-     * @throws \Exception
-     *
-     * @return array
+     * @throws Exception
      */
-    public function parseActiveTemplate($templateType = TemplateDefinition::FRONT_OFFICE)
+    public function parseActiveTemplate($templateType = TemplateDefinition::FRONT_OFFICE): array
     {
         $tplVar = match ($templateType) {
             TemplateDefinition::FRONT_OFFICE => 'active-front-template',
             TemplateDefinition::BACK_OFFICE => 'active-admin-template',
             TemplateDefinition::PDF => 'active-pdf-template',
             TemplateDefinition::EMAIL => 'active-mail-template',
-            default => throw new TheliaProcessException("Unknown template type: $templateType"),
+            default => throw new TheliaProcessException('Unknown template type: ' . $templateType),
         };
 
         return $this->parseTemplate($templateType, ConfigQuery::read($tplVar, 'default'));
@@ -65,11 +60,11 @@ class HookHelper
      * @param int    $templateType
      * @param string $template
      *
-     * @throws \Exception
+     * @throws Exception
      *
      * @return array an array of hooks descriptors
      */
-    public function parseTemplate($templateType, $template)
+    public function parseTemplate($templateType, $template): array
     {
         $templateDefinition = new TemplateDefinition($template, $templateType);
 
@@ -90,7 +85,7 @@ class HookHelper
         foreach ($hooks as $hook) {
             try {
                 $ret[] = $this->prepareHook($hook);
-            } catch (\UnexpectedValueException $ex) {
+            } catch (UnexpectedValueException $ex) {
                 Tlog::getInstance()->warning($ex->getMessage());
             }
         }
@@ -120,8 +115,8 @@ class HookHelper
         $allowed_exts = ['html', 'tpl', 'xml', 'txt'];
 
         try {
-            /** @var \DirectoryIterator $fileInfo */
-            foreach (new \DirectoryIterator($directory) as $fileInfo) {
+            /** @var DirectoryIterator $fileInfo */
+            foreach (new DirectoryIterator($directory) as $fileInfo) {
                 if ($fileInfo->isDot()) {
                     continue;
                 }
@@ -133,26 +128,24 @@ class HookHelper
                 if ($fileInfo->isFile()) {
                     $ext = $fileInfo->getExtension();
 
-                    if (\in_array($ext, $allowed_exts)) {
-                        if ($content = file_get_contents($fileInfo->getPathName())) {
-                            foreach ($this->parserHelper->getFunctionsDefinition($content, ['hook', 'hookblock']) as $hook) {
-                                $hook['file'] = $fileInfo->getFilename();
-                                $hooks[] = $hook;
-                            }
+                    if (\in_array($ext, $allowed_exts) && $content = file_get_contents($fileInfo->getPathName())) {
+                        foreach ($this->parserHelper->getFunctionsDefinition($content, ['hook', 'hookblock']) as $hook) {
+                            $hook['file'] = $fileInfo->getFilename();
+                            $hooks[] = $hook;
                         }
                     }
                 }
             }
-        } catch (\UnexpectedValueException) {
+        } catch (UnexpectedValueException) {
             // Directory does not exists => ignore/
         }
     }
 
-    protected function prepareHook($hook)
+    protected function prepareHook(array $hook): array
     {
         $ret = [];
         if (!\array_key_exists('attributes', $hook)) {
-            throw new \UnexpectedValueException('The hook should have attributes.');
+            throw new UnexpectedValueException('The hook should have attributes.');
         }
 
         $attributes = $hook['attributes'];
@@ -169,12 +162,13 @@ class HookHelper
                     $ret['context'] = $attributes['name'];
                     $ret['type'] = '';
                 } else {
-                    throw new \UnexpectedValueException('skipping hook as name contains variable : '.$attributes['name']);
+                    throw new UnexpectedValueException('skipping hook as name contains variable : '.$attributes['name']);
                 }
             } else {
                 $ret['context'] = $params[0];
                 $ret['type'] = $params[1];
             }
+
             unset($attributes['name']);
 
             $ret['module'] = false;
@@ -192,17 +186,17 @@ class HookHelper
             // get a title
             $contextTitle = $this->trans('context', $ret['context']) ?: $ret['context'];
             $typeTitle = $this->trans('type', $ret['type']) ?: $ret['type'];
-            $ret['title'] = \sprintf('%s - %s', $contextTitle, $typeTitle);
+            $ret['title'] = sprintf('%s - %s', $contextTitle, $typeTitle);
             $ret['file'] = $hook['file'];
             $ret['attributes'] = $attributes;
         } else {
-            throw new \UnexpectedValueException('The hook should have a name attribute.');
+            throw new UnexpectedValueException('The hook should have a name attribute.');
         }
 
         return $ret;
     }
 
-    protected function normalizePath($path)
+    protected function normalizePath($path): string
     {
         $path = str_replace(
             str_replace('\\', '/', THELIA_ROOT),
@@ -222,10 +216,8 @@ class HookHelper
     {
         $message = '';
 
-        if (\array_key_exists($context, $this->messages)) {
-            if (\array_key_exists($key, $this->messages[$context])) {
-                $message = $this->messages[$context][$key];
-            }
+        if (\array_key_exists($context, $this->messages) && \array_key_exists($key, $this->messages[$context])) {
+            $message = $this->messages[$context][$key];
         }
 
         return $message;
@@ -249,7 +241,7 @@ class HookHelper
         }
     }
 
-    protected function loadFrontOfficeTrans($locale): void
+    protected function loadFrontOfficeTrans(?string $locale): void
     {
         $t = Translator::getInstance();
 
@@ -323,7 +315,7 @@ class HookHelper
         $this->messages['type']['top'] = $t->trans('at the top', [], 'core', $locale);
     }
 
-    protected function loadBackOfficeTrans($locale): void
+    protected function loadBackOfficeTrans(?string $locale): void
     {
         $t = Translator::getInstance();
 
@@ -502,7 +494,7 @@ class HookHelper
         $this->messages['type']['value-table-row'] = $t->trans('value table row', [], 'core', $locale);
     }
 
-    protected function loadPdfOfficeTrans($locale): void
+    protected function loadPdfOfficeTrans(?string $locale): void
     {
         $t = Translator::getInstance();
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -42,7 +43,7 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
         $attributeQuery->useAttributeI18nQuery(null, Criteria::LEFT_JOIN)
             ->endUse();
 
-        $locales = array_map(fn($value) => '"'.$value.'"', $locales);
+        $locales = array_map(fn($value): string => '"'.$value.'"', $locales);
 
         $attributeQuery->addJoinCondition('AttributeI18n', 'AttributeI18n.locale IN ('.implode(',', $locales).')');
 
@@ -73,7 +74,7 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
         $featureQuery->useFeatureI18nQuery(null, Criteria::LEFT_JOIN)
             ->endUse();
 
-        $locales = array_map(fn($value) => '"'.$value.'"', $locales);
+        $locales = array_map(fn($value): string => '"'.$value.'"', $locales);
 
         $featureQuery->addJoinCondition('FeatureI18n', 'FeatureI18n.locale IN ('.implode(',', $locales).')');
 
@@ -118,7 +119,7 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
 
         $parents = static::getParentCategoriesHasTemplate($category);
 
-        if (\count($choiceFilters)) {
+        if (\count($choiceFilters) > 0) {
             if (null !== $category->getDefaultTemplateId()) {
                 $templateId = $category->getDefaultTemplateId();
                 $categoryId = $category->getId();
@@ -142,7 +143,7 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
                 ->orderByPosition()
                 ->find();
 
-            if (\count($choiceFilters)) {
+            if (\count($choiceFilters) > 0) {
                 $templateId = $category->getDefaultTemplateId();
                 $categoryId = $category->getId();
 
@@ -156,7 +157,7 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
                 ->orderByPosition()
                 ->find();
 
-            if (\count($choiceFilters)) {
+            if (\count($choiceFilters) > 0) {
                 $templateId = $parent->getDefaultTemplateId();
                 $categoryId = $parent->getId();
 
@@ -182,7 +183,7 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
                 ->orderByPosition()
                 ->find();
 
-            if (\count($choiceFilters)) {
+            if (\count($choiceFilters) > 0) {
                 $templateId = $parent->getDefaultTemplateId();
                 $categoryId = null;
 

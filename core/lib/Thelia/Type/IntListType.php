@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Type;
 
 /**
@@ -22,11 +23,12 @@ class IntListType extends BaseType
         return 'Int list type';
     }
 
-    public function isValid($values)
+    public function isValid($values): bool
     {
         if (null === $values) {
             return false;
         }
+
         foreach (explode(',', $values) as $value) {
             if (filter_var($value, \FILTER_VALIDATE_INT) === false) {
                 return false;
@@ -41,7 +43,7 @@ class IntListType extends BaseType
         return $this->isValid($values) ? explode(',', (string) $values) : null;
     }
 
-    public function getFormOptions()
+    public function getFormOptions(): array
     {
         return [];
     }

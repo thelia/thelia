@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 return [
     ' content create form' => ' formulário de criação de conteúdo',
     ' note: only non-visible documents can be associated.' => ' nota: somente documentos não visíveis podem ser associados.',
@@ -32,7 +33,7 @@ return [
     'A product with reference %ref already exists. Please choose another reference.' => 'Um produto com referência %ref já existe. Por favor escolha outra referência.',
     'A short description, used when a summary or an introduction is required' => 'Uma breve descrição, usada quando é necessária um resumo ou uma introdução',
     'A short text, used when an additional or supplemental information is required.' => 'Um texto curto, usado quando informações adicionais ou complementares é necessário.',
-    'A user already exists with this email address. Please login or if you\'ve forgotten your password, go to Reset Your Password.' => 'Um usuário com esse endereço de email já existe. Por favor entre ou se você esqueceu sua senha, vá para Restaurar Sua Senha.',
+    "A user already exists with this email address. Please login or if you've forgotten your password, go to Reset Your Password." => 'Um usuário com esse endereço de email já existe. Por favor entre ou se você esqueceu sua senha, vá para Restaurar Sua Senha.',
     'A value for attribute "%name" is already present in the combination' => 'Um valor para o atributo "%name" já está presente na combinação',
     'A variable with name "%name" already exists.' => 'Uma variável com o nome "%name" já existe.',
     'Activate logs only for these IP Addresses' => 'Ativar logs somente para esses endereços de IP',
@@ -116,7 +117,7 @@ return [
     'Confirm Email Address' => 'Confirme o seu endereço de e-mail',
     'Confirm Email address' => 'Confirme o seu endereço de e-mail',
     'Constant amount' => 'Quantidade constante',
-    'Constant amount found in one of the product\'s feature' => 'Quantidade constante em uma das característica do produto',
+    "Constant amount found in one of the product's feature" => 'Quantidade constante em uma das característica do produto',
     'Contact and sender email address' => 'Endereço de e-mail do remetente e contato',
     'Contact page' => 'Página de Contato',
     'Content' => 'Conteúdo',
@@ -141,7 +142,7 @@ return [
     'Customer is %op% <strong>%customer_list%</strong>' => 'Cliente é %op% <strong>%customer_list%</strong>',
     'Customers' => 'Clientes',
     'Dashboard' => 'Dashboard',
-    'Date \'%date\' is invalid, please enter a valid date using %fmt format' => 'Data \'%date\' é inválida, por favor, introduza uma data válida usando o formato %fmt',
+    "Date '%date' is invalid, please enter a valid date using %fmt format" => 'Data \'%date\' é inválida, por favor, introduza uma data válida usando o formato %fmt',
     'Debug' => 'Depurar/Debug',
     'Decimal places' => 'Casas decimais',
     'Default folder *' => 'Pasta padrão *',
@@ -161,7 +162,7 @@ return [
     'Display initial product prices on front-office' => 'Exibir os preços do produto inicial em front-office',
     'Do compress' => 'Comprimir',
     'Document' => 'Documento',
-    'Don\'t repeat keywords over and over in a row. Rather, put in keyword phrases.' => 'Não repita palavras-chave várias vezes em uma fileira. Em vez disso, coloque-as em frases-chave.',
+    "Don't repeat keywords over and over in a row. Rather, put in keyword phrases." => 'Não repita palavras-chave várias vezes em uma fileira. Em vez disso, coloque-as em frases-chave.',
     'Edit' => 'Editar',
     'Edit JavaScript' => 'Editar JavaScript',
     'Email Address' => 'Endereço de e-mail',
@@ -240,6 +241,6 @@ Digite aqui o nome venda no idioma padrão (%title%)',
     'Quantity' => 'Quantidade',
     'Register' => 'Registrar',
     'Search' => 'Procurar',
-    'Sender\'s e-mail address: %email%' => 'Endereço de e-mail do remetente: %email%',
+    "Sender's e-mail address: %email%" => 'Endereço de e-mail do remetente: %email%',
     'Sender name: %name%' => 'Nome do remetente: %name%',
 ];

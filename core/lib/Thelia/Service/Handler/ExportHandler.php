@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Service\Handler;
 
+use ErrorException;
+
+use DateInterval;
+use SplFileObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Archiver\ArchiverInterface;
@@ -42,7 +47,7 @@ class ExportHandler
         $export = (new ExportQuery())->findPk($exportId);
 
         if ($export === null && $dispatchException) {
-            throw new \ErrorException(
+            throw new ErrorException(
                 Translator::getInstance()->trans(
                     'There is no id "%id" in the exports',
                     [
@@ -60,7 +65,7 @@ class ExportHandler
         $export = (new ExportQuery())->findOneByRef($exportRef);
 
         if ($export === null && $dispatchException) {
-            throw new \ErrorException(
+            throw new ErrorException(
                 Translator::getInstance()->trans(
                     'There is no ref "%ref" in the exports',
                     [
@@ -78,7 +83,7 @@ class ExportHandler
         $category = (new ExportCategoryQuery())->findPk($exportCategoryId);
 
         if ($category === null && $dispatchException) {
-            throw new \ErrorException(
+            throw new ErrorException(
                 Translator::getInstance()->trans(
                     'There is no id "%id" in the export categories',
                     [
@@ -102,40 +107,42 @@ class ExportHandler
     ): ExportEvent {
         $exportHandleClass = $export->getHandleClass();
 
-        /** @var \Thelia\ImportExport\Export\AbstractExport $instance */
+        /** @var AbstractExport $instance */
         $instance = new $exportHandleClass();
 
         // Configure handle class
         $instance->setLang($language);
-        if ($archiver !== null) {
+        if ($archiver instanceof ArchiverInterface) {
             if ($includeImages && $instance->hasImages()) {
                 $instance->setExportImages(true);
             }
+
             if ($includeDocuments && $instance->hasDocuments()) {
                 $instance->setExportDocuments(true);
             }
         }
 
-        if ($rangeDate['start'] && !($rangeDate['start'] instanceof \DateTime)) {
+        if ($rangeDate['start'] && !($rangeDate['start'] instanceof DateTime)) {
             $startYear = $rangeDate['start']['year'] !== '' ? $rangeDate['start']['year'] : (new \DateTime())->format('Y');
             $startMonth = $rangeDate['start']['month'] !== '' ? $rangeDate['start']['month'] : (new \DateTime())->format('m');
-            $rangeDate['start'] = \DateTime::createFromFormat(
+            $rangeDate['start'] = DateTime::createFromFormat(
                 'Y-m-d H:i:s',
                 $startYear.'-'.$startMonth.'-1 00:00:00'
             );
         }
-        if ($rangeDate['end'] && !($rangeDate['end'] instanceof \DateTime)) {
+
+        if ($rangeDate['end'] && !($rangeDate['end'] instanceof DateTime)) {
             $endYear = $rangeDate['end']['year'] !== '' ? $rangeDate['end']['year'] : (new \DateTime())->format('Y');
             $endMonth = $rangeDate['end']['month'] !== '' ? $rangeDate['end']['month'] : (new \DateTime())->format('m');
-            $rangeDate['end'] = \DateTime::createFromFormat(
+            $rangeDate['end'] = DateTime::createFromFormat(
                 'Y-m-d H:i:s',
                 $endYear.'-'.$endMonth.'-1 23:59:59'
             );
 
-            if ($rangeDate['end'] instanceof \DateTime) {
+            if ($rangeDate['end'] instanceof DateTime) {
                 $rangeDate['end']
-                    ->add(new \DateInterval('P1M'))
-                    ->sub(new \DateInterval('P1D'));
+                    ->add(new DateInterval('P1M'))
+                    ->sub(new DateInterval('P1D'));
             }
         }
 
@@ -152,7 +159,7 @@ class ExportHandler
 
         $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_FINISHED);
 
-        if ($event->getArchiver() !== null) {
+        if ($event->getArchiver() instanceof ArchiverInterface) {
             // Create archive
             $event->getArchiver()->create($filePath);
 
@@ -193,7 +200,7 @@ class ExportHandler
         $fileSystem = new Filesystem();
         $fileSystem->mkdir(\dirname($filePath));
 
-        $file = new \SplFileObject($filePath, 'w+b');
+        $file = new SplFileObject($filePath, 'w+b');
 
         $serializer->prepareFile($file);
 

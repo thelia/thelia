@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Parser;
 
+use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
 use Thelia\Core\Template\ParserInterface;
@@ -25,8 +27,6 @@ use Thelia\Core\Template\TemplateDefinition;
 #[AutoconfigureTag('thelia.parser.asset')]
 class ParserAssetResolverFallback implements AssetResolverInterface
 {
-    private readonly ParserInterface $parser;
-
     /**
      * Generate an asset URL.
      *
@@ -49,7 +49,7 @@ class ParserAssetResolverFallback implements AssetResolverInterface
         $declaredAssetsDirectory = null,
         $sourceTemplateName = false
     ): void {
-        throw new \RuntimeException('if you want to use a parser, please register one');
+        throw new RuntimeException('if you want to use a parser, please register one');
     }
 
     /**
@@ -69,7 +69,7 @@ class ParserAssetResolverFallback implements AssetResolverInterface
      */
     public function resolveAssetSourcePath($source, $templateName, $fileName, ParserInterface $parserInterface): never
     {
-        throw new \RuntimeException('if you want to use a parser, please register one');
+        throw new RuntimeException('if you want to use a parser, please register one');
     }
 
     /**
@@ -96,11 +96,11 @@ class ParserAssetResolverFallback implements AssetResolverInterface
         ParserInterface $parserInterface,
         TemplateDefinition &$templateDefinition
     ): never {
-        throw new \RuntimeException('if you want to use a parser, please register one');
+        throw new RuntimeException('if you want to use a parser, please register one');
     }
 
     public function supportParser(ParserInterface $parser): bool
     {
-        throw new \RuntimeException('if you want to use a parser, please register one');
+        throw new RuntimeException('if you want to use a parser, please register one');
     }
 }

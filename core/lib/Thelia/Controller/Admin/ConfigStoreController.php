@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Filesystem\Filesystem;
+use Exception;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
@@ -43,13 +46,13 @@ class ConfigStoreController extends BaseAdminController
         return $this->renderTemplate();
     }
 
-    protected function getAndWriteStoreMediaFileInConfig($form, $inputName, $configKey, $storeMediaUploadDir): void
+    protected function getAndWriteStoreMediaFileInConfig($form, $inputName, $configKey, string $storeMediaUploadDir): void
     {
         $file = $form->get($inputName)->getData();
 
         if ($file != null) {
             // Delete the old file
-            $fs = new \Symfony\Component\Filesystem\Filesystem();
+            $fs = new Filesystem();
             $oldFileName = ConfigQuery::read($configKey);
 
             if ($oldFileName !== null) {
@@ -72,7 +75,8 @@ class ConfigStoreController extends BaseAdminController
             return $response;
         }
 
-        $error_msg = $ex = false;
+        $error_msg = false;
+        $ex = false;
         $response = null;
         $configStoreForm = $this->createForm(AdminForm::CONFIG_STORE);
 
@@ -117,8 +121,8 @@ class ConfigStoreController extends BaseAdminController
             } else {
                 $response = $this->generateSuccessRedirect($configStoreForm);
             }
-        } catch (\Exception $ex) {
-            $error_msg = $ex->getMessage();
+        } catch (Exception $exception) {
+            $error_msg = $exception->getMessage();
         }
 
         if (false !== $error_msg) {
@@ -126,7 +130,7 @@ class ConfigStoreController extends BaseAdminController
                 $this->getTranslator()->trans('Store configuration failed.'),
                 $error_msg,
                 $configStoreForm,
-                $ex
+                $exception
             );
 
             $response = $this->renderTemplate();

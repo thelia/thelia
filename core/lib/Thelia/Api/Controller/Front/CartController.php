@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Controller\Front;
 
 use Symfony\Bundle\SecurityBundle\Security;
@@ -35,14 +36,17 @@ readonly class CartController
     ): PropelResourceInterface {
         $request = $requestStack->getCurrentRequest();
         $request->setSession($session);
+
         $cart = $session->getSessionCart($eventDispatcher);
         if (null === $cart) {
             throw new NotFoundHttpException('Cart not found.');
         }
+
         $cart = CartQuery::create()->findOneById($cart->getId());
         if (null === $cart) {
             throw new NotFoundHttpException('Cart not found.');
         }
+
         $operation = $request->get('_api_operation');
 
         return $apiResourcePropelTransformerService->modelToResource(Cart::class, $cart, $operation->getNormalizationContext());

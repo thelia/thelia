@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Request as BaseRequest;
@@ -29,7 +30,7 @@ use Thelia\Model\ConfigQuery;
 class Request extends BaseRequest
 {
     /** @var string Path info without trailing slash */
-    private $resolvedPathInfo;
+    private ?string $resolvedPathInfo = null;
 
     /** @var string */
     protected $controllerType;
@@ -78,17 +79,17 @@ class Request extends BaseRequest
         return $pathInfo;
     }
 
-    public function getRealPathInfo()
+    public function getRealPathInfo(): string
     {
         return parent::getPathInfo();
     }
 
-    public function getProductId()
+    public function getProductId(): mixed
     {
         return $this->get('product_id');
     }
 
-    public function getUriAddingParameters(array $parameters = null)
+    public function getUriAddingParameters(array $parameters = null): string
     {
         $uri = $this->getUri();
 
@@ -105,7 +106,7 @@ class Request extends BaseRequest
         return $uri.$additionalQs;
     }
 
-    public function toString($withContent = true)
+    public function toString($withContent = true): string
     {
         $string =
             sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))
@@ -132,30 +133,24 @@ class Request extends BaseRequest
      * <code>
      * if ($request->fromControllerType(BaseFrontController::CONTROLLER_TYPE)) {...}
      * </code>
-     *
-     * @return bool
      */
-    public function fromControllerType($controllerType)
+    public function fromControllerType($controllerType): bool
     {
         return $this->controllerType === $controllerType;
     }
 
     /**
      * Detect if the request comes from the admin.
-     *
-     * @return bool
      */
-    public function fromAdmin()
+    public function fromAdmin(): bool
     {
         return $this->controllerType === BaseAdminController::CONTROLLER_TYPE;
     }
 
     /**
      * Detect if the request comes from the front.
-     *
-     * @return bool
      */
-    public function fromFront()
+    public function fromFront(): bool
     {
         return $this->controllerType === BaseFrontController::CONTROLLER_TYPE;
     }
@@ -163,7 +158,7 @@ class Request extends BaseRequest
     /**
      * From a Thelia request, we always return a Thelia Session object.
      *
-     * @return \Thelia\Core\HttpFoundation\Session\Session|null
+     * @return Session|null
      */
     public function getSession(): SessionInterface
     {

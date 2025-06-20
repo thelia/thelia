@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event;
 
 class CachedFileEvent extends ActionEvent
@@ -18,6 +19,7 @@ class CachedFileEvent extends ActionEvent
      * @var string The complete file name (with path) of the source file
      */
     protected $source_filepath;
+
     /**
      * @var string The target subdirectory in the cache
      */
@@ -38,7 +40,7 @@ class CachedFileEvent extends ActionEvent
         return $this->file_url;
     }
 
-    public function setFileUrl($file_url)
+    public function setFileUrl($file_url): static
     {
         $this->file_url = $file_url;
 
@@ -50,7 +52,7 @@ class CachedFileEvent extends ActionEvent
         return $this->cache_filepath;
     }
 
-    public function setCacheFilepath($cache_filepath)
+    public function setCacheFilepath($cache_filepath): static
     {
         $this->cache_filepath = $cache_filepath;
 
@@ -62,7 +64,7 @@ class CachedFileEvent extends ActionEvent
         return $this->source_filepath;
     }
 
-    public function setSourceFilepath($source_filepath)
+    public function setSourceFilepath($source_filepath): static
     {
         $this->source_filepath = $source_filepath;
 
@@ -74,7 +76,7 @@ class CachedFileEvent extends ActionEvent
         return $this->cache_subdirectory;
     }
 
-    public function setCacheSubdirectory($cache_subdirectory)
+    public function setCacheSubdirectory($cache_subdirectory): static
     {
         $this->cache_subdirectory = $cache_subdirectory;
 

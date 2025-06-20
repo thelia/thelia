@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Hook;
 
 use Thelia\Core\Event\ActionEvent;
@@ -22,6 +23,9 @@ use Thelia\Model\Hook;
  */
 class HookEvent extends ActionEvent
 {
+    /**
+     * @var Hook|null
+     */
     public $hook;
 
     public function __construct(Hook $hook = null)
@@ -29,7 +33,7 @@ class HookEvent extends ActionEvent
         $this->hook = $hook;
     }
 
-    public function hasHook()
+    public function hasHook(): bool
     {
         return null !== $this->hook;
     }
@@ -39,7 +43,7 @@ class HookEvent extends ActionEvent
         return $this->hook;
     }
 
-    public function setHook(Hook $hook)
+    public function setHook(Hook $hook): static
     {
         $this->hook = $hook;
 

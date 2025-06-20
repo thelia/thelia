@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Front;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -96,10 +97,8 @@ class BaseFrontController extends BaseController
      * @param string $templateName the complete template name, with extension
      * @param array  $args         the template arguments
      * @param int    $status       http code status
-     *
-     * @return \Thelia\Core\HttpFoundation\Response
      */
-    protected function render($templateName, $args = [], $status = 200)
+    protected function render($templateName, $args = [], $status = 200): Response
     {
         return new Response($this->renderRaw($templateName, $args), $status);
     }

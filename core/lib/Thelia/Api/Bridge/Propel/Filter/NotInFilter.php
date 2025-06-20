@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Bridge\Propel\Filter;
 
+use InvalidArgumentException;
+use RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -42,15 +45,19 @@ class NotInFilter extends AbstractFilter
         if (!isset($context['filters']['not_in']) || !$this->isPropertyEnabled($property, $resourceClass)) {
             return;
         }
+
         if (\is_string($value)) {
             $value = json_decode($value, true, 512, \JSON_THROW_ON_ERROR);
         }
+
         if (!\is_array($value)) {
-            throw new \InvalidArgumentException(sprintf('The "NotIn" filter expects an array for the property "%s".', $property));
+            throw new InvalidArgumentException(sprintf('The "NotIn" filter expects an array for the property "%s".', $property));
         }
+
         if (!property_exists($resourceClass, $property)) {
-            throw new \RuntimeException(sprintf('Property "%s" does not exist in class "%s".', $property, $resourceClass));
+            throw new RuntimeException(sprintf('Property "%s" does not exist in class "%s".', $property, $resourceClass));
         }
+
         $property = ucfirst($property);
         $query->filterBy($property, $value, Criteria::NOT_IN);
     }
@@ -64,7 +71,7 @@ class NotInFilter extends AbstractFilter
             return [];
         }
 
-        foreach ($filterProperties as $property => $propertyOptions) {
+        foreach (array_keys($filterProperties) as $property) {
             $propertyName = $this->normalizePropertyName($property);
             $description[sprintf('%s[%s]', 'not_in', $propertyName)] = [
                 'property' => $propertyName,

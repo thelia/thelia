@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Sale;
 
 use Thelia\Core\Event\ActionEvent;
@@ -24,20 +25,11 @@ use Thelia\Model\Sale;
  */
 class SaleEvent extends ActionEvent
 {
-    /**
-     * @var \Thelia\Model\Sale
-     */
-    protected $sale;
-
-    public function __construct(Sale $sale = null)
+    public function __construct(protected ?Sale $sale = null)
     {
-        $this->sale = $sale;
     }
 
-    /**
-     * @return SaleEvent
-     */
-    public function setSale(Sale $sale)
+    public function setSale(Sale $sale): static
     {
         $this->sale = $sale;
 
@@ -45,20 +37,18 @@ class SaleEvent extends ActionEvent
     }
 
     /**
-     * @return \Thelia\Model\Sale
+     * @return Sale
      */
-    public function getSale()
+    public function getSale(): ?Sale
     {
         return $this->sale;
     }
 
     /**
      * check if sale exists.
-     *
-     * @return bool
      */
-    public function hasSale()
+    public function hasSale(): bool
     {
-        return null !== $this->sale;
+        return $this->sale instanceof Sale;
     }
 }

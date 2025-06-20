@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model\Breadcrumb;
 
+use LogicException;
+use Thelia\Model\Folder;
+use Thelia\Model\Content;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\FolderQuery;
@@ -19,7 +23,10 @@ use Thelia\Tools\URL;
 
 trait FolderBreadcrumbTrait
 {
-    public function getBaseBreadcrumb(Router $router, $folderId, $locale)
+    /**
+     * @return mixed[]
+     */
+    public function getBaseBreadcrumb(Router $router, $folderId, $locale): array
     {
         $translator = Translator::getInstance();
         $foldersUrl = $router->generate('admin.folders.default', [], Router::ABSOLUTE_URL);
@@ -51,7 +58,7 @@ trait FolderBreadcrumbTrait
                 if ($currentId > 0) {
                     // Prevent circular refererences
                     if (\in_array($currentId, $ids)) {
-                        throw new \LogicException(
+                        throw new LogicException(
                             sprintf(
                                 'Circular reference detected in folder ID=%d hierarchy (folder ID=%d appears more than one times in path)',
                                 $folderId,
@@ -86,7 +93,7 @@ trait FolderBreadcrumbTrait
             return null;
         }
 
-        /** @var \Thelia\Model\Folder $folder */
+        /** @var Folder $folder */
         $folder = $this->getFolder();
         $breadcrumb = $this->getBaseBreadcrumb($router, $this->getParentId(), $locale);
 
@@ -111,7 +118,7 @@ trait FolderBreadcrumbTrait
             return null;
         }
 
-        /** @var \Thelia\Model\Content $content */
+        /** @var Content $content */
         $content = $this->getContent();
 
         $breadcrumb = $this->getBaseBreadcrumb($router, $content->getDefaultFolderId(), $locale);

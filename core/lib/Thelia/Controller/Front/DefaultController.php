@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Front;
 
 use Thelia\Core\HttpFoundation\Request;
@@ -41,9 +42,11 @@ class DefaultController extends BaseFrontController
         if (!$view = ($request->query->get('view') && $request->request->has('view'))) {
             $view = $request->request->get('view');
         }
+
         if (null !== $view) {
             $request->attributes->set('_view', $view);
         }
+
         if (null === $view && null === $request->attributes->get('_view')) {
             $request->attributes->set('_view', 'index');
         }

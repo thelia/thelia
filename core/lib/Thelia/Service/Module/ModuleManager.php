@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Service\Module;
 
+use Exception;
+use JsonException;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Thelia\Core\Event\Cache\CacheEvent;
@@ -32,18 +35,19 @@ readonly class ModuleManager
     public function __construct(
         private EventDispatcherInterface $eventDispatcher,
         private ComposerHelper $composerHelper,
-        #[Autowire('%kernel.cache_dir%')]
+        #[Autowire(param: 'kernel.cache_dir')]
         private string $kernelCacheDir,
     ) {
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function installModule(string $absolutePathToModule): Module
     {
         $moduleValidator = new ModuleValidator($absolutePathToModule);
         $moduleValidator->loadModuleDefinition();
+
         $checkModule = ModuleQuery::create()->findOneByFullNamespace(
             $moduleValidator->getModuleDefinition()?->getNamespace() ?? ''
         );
@@ -64,7 +68,7 @@ readonly class ModuleManager
     }
 
     /**
-     * @throws \JsonException
+     * @throws JsonException
      *
      * @return ComposerTheliaModuleDTO[]
      */
@@ -78,6 +82,7 @@ readonly class ModuleManager
         if (!file_exists($installedJsonPath)) {
             return $modules;
         }
+
         $installed = json_decode(file_get_contents($installedJsonPath), true, 512, \JSON_THROW_ON_ERROR);
 
         $packages = $installed['packages'] ?? $installed;
@@ -87,6 +92,7 @@ readonly class ModuleManager
                || $package['type'] !== self::COMPOSER_TYPE_MODULE) {
                 continue;
             }
+
             $installPath = str_replace('..', '', $package['install-path']);
             $packagePath = $vendorDir.$installPath;
             $package['path'] = $packagePath;
@@ -97,7 +103,7 @@ readonly class ModuleManager
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      *
      * @return Module[]
      */
@@ -107,6 +113,7 @@ readonly class ModuleManager
         if (!file_exists($path.DS.'composer.json')) {
             return [];
         }
+
         $composerModuleDTOS = $this->listModulesFromTemplatePath($path);
         foreach ($composerModuleDTOS as $composerModuleDTO) {
             $module = $this->installModule($composerModuleDTO->getPath());
@@ -116,13 +123,14 @@ readonly class ModuleManager
             if ($module->getActivate() === BaseModule::IS_ACTIVATED) {
                 continue;
             }
+
             try {
                 $event = new ModuleToggleActivationEvent($module->getId());
                 $event->setRecursive(true);
 
                 $this->eventDispatcher->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
                 $modulesInstalled[] = $module;
-            } catch (\Exception) {
+            } catch (Exception) {
                 continue;
             }
         }

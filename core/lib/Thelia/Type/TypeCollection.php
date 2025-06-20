@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,15 +11,18 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Type;
+
+use Iterator;
+use ReturnTypeWillChange;
 
 /**
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class TypeCollection implements \Iterator
+class TypeCollection implements Iterator
 {
-    private $position;
+    private ?int $position = null;
+
     protected $types = [];
 
     public function __construct()
@@ -27,22 +32,19 @@ class TypeCollection implements \Iterator
         }
     }
 
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return \count($this->types) == 0;
     }
 
-    /**
-     * @return TypeCollection
-     */
-    public function addType(TypeInterface $type)
+    public function addType(TypeInterface $type): static
     {
         $this->types[] = $type;
 
         return $this;
     }
 
-    public function getCount()
+    public function getCount(): int
     {
         return \count($this->types);
     }
@@ -53,9 +55,9 @@ class TypeCollection implements \Iterator
      *
      * @see http://php.net/manual/en/iterator.current.php
      *
-     * @return \Thelia\Type\TypeInterface
+     * @return TypeInterface
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function current()
     {
         return $this->types[$this->position];
@@ -82,7 +84,7 @@ class TypeCollection implements \Iterator
      *
      * @return mixed scalar on success, or null on failure
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function key()
     {
         return $this->position;
@@ -115,10 +117,7 @@ class TypeCollection implements \Iterator
         $this->position = 0;
     }
 
-    /**
-     * @return bool
-     */
-    public function isValid($value)
+    public function isValid($value): bool
     {
         foreach ($this as $type) {
             if ($type->isValid($value)) {

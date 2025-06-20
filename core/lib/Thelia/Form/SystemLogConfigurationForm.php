@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,13 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Form;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Validator\Constraints;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 
@@ -49,7 +50,7 @@ class SystemLogConfigurationForm extends BaseForm
                 ],
             ])
             ->add('show_redirections', IntegerType::class, [
-                    'constraints' => [new Constraints\NotBlank()],
+                    'constraints' => [new NotBlank()],
                     'label' => Translator::getInstance()->trans('Show redirections *'),
                     'label_attr' => [
                             'for' => 'show_redirections_field',
@@ -70,7 +71,7 @@ class SystemLogConfigurationForm extends BaseForm
         ;
     }
 
-    public static function getName()
+    public static function getName(): string
     {
         return 'thelia_system_log_configuration';
     }

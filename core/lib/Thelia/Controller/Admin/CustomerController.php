@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Thelia\Form\BaseForm;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
@@ -47,12 +49,12 @@ class CustomerController extends AbstractCrudController
         );
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::CUSTOMER_CREATE);
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::CUSTOMER_UPDATE);
     }
@@ -102,10 +104,8 @@ class CustomerController extends AbstractCrudController
 
     /**
      * @param Customer $object
-     *
-     * @return \Thelia\Form\BaseForm
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
     {
         // Get default adress of the customer
         $address = $object->getDefaultAddress();
@@ -118,7 +118,7 @@ class CustomerController extends AbstractCrudController
             'email' => $object->getEmail(),
             'lang_id' => $object->getLangId(),
             'discount' => $object->getDiscount(),
-            'reseller' => $object->getReseller() ? true : false,
+            'reseller' => (bool) $object->getReseller(),
         ];
 
         if ($address !== null) {
@@ -151,10 +151,7 @@ class CustomerController extends AbstractCrudController
         return null;
     }
 
-    /**
-     * @return \Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent
-     */
-    private function createEventInstance($data)
+    private function createEventInstance($data): CustomerCreateOrUpdateEvent
     {
         // Use current language if it is not defined in the form
         if (empty($data['lang_id'])) {
@@ -194,10 +191,8 @@ class CustomerController extends AbstractCrudController
 
     /**
      * @param Customer $object
-     *
-     * @return string
      */
-    protected function getObjectLabel($object)
+    protected function getObjectLabel($object): string
     {
         return $object->getRef().'('.$object->getLastname().' '.$object->getFirstname().')';
     }
@@ -212,7 +207,7 @@ class CustomerController extends AbstractCrudController
         return $object->getId();
     }
 
-    protected function getEditionArguments()
+    protected function getEditionArguments(): array
     {
         return [
             'customer_id' => $this->getRequest()->get('customer_id', 0),
@@ -271,8 +266,8 @@ class CustomerController extends AbstractCrudController
                 $eventDispatcher,
                 $parserContext
             );
-        } catch (CustomerException $e) {
-            $errorMsg = $e->getMessage();
+        } catch (CustomerException $customerException) {
+            $errorMsg = $customerException->getMessage();
 
             $removalError = true;
         }

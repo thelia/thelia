@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Product;
 
 use Symfony\Component\HttpFoundation\Response;
@@ -23,21 +24,14 @@ use Thelia\Model\OrderProduct;
  */
 class VirtualProductOrderDownloadResponseEvent extends ActionEvent
 {
-    /** @var OrderProduct */
-    protected $orderProduct;
-
     /** @var Response */
     protected $response;
 
-    public function __construct(OrderProduct $orderProduct)
+    public function __construct(protected OrderProduct $orderProduct)
     {
-        $this->orderProduct = $orderProduct;
     }
 
-    /**
-     * @return OrderProduct
-     */
-    public function getOrderProduct()
+    public function getOrderProduct(): OrderProduct
     {
         return $this->orderProduct;
     }
@@ -45,7 +39,7 @@ class VirtualProductOrderDownloadResponseEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setOrderProduct(OrderProduct $orderProduct)
+    public function setOrderProduct(OrderProduct $orderProduct): static
     {
         $this->orderProduct = $orderProduct;
 
@@ -63,7 +57,7 @@ class VirtualProductOrderDownloadResponseEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setResponse(Response $response)
+    public function setResponse(Response $response): static
     {
         $this->response = $response;
 

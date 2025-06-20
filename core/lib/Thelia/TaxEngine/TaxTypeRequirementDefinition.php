@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\TaxEngine;
 
 use Thelia\Type\TypeInterface;
@@ -22,11 +23,6 @@ use Thelia\Type\TypeInterface;
 class TaxTypeRequirementDefinition
 {
     /**
-     * @var TypeInterface The requirement type
-     */
-    protected $type;
-
-    /**
      * @var string The translated requirement title
      */
     protected $title;
@@ -37,9 +33,8 @@ class TaxTypeRequirementDefinition
      * @param string        $name the name of the requirement
      * @param TypeInterface $type the type of the data
      */
-    public function __construct(protected $name, TypeInterface $type, $title = null)
+    public function __construct(protected $name, protected TypeInterface $type, $title = null)
     {
-        $this->type = $type;
         $this->title = $title ?: $this->name;
     }
 
@@ -48,7 +43,7 @@ class TaxTypeRequirementDefinition
         return $this->name;
     }
 
-    public function getType()
+    public function getType(): TypeInterface
     {
         return $this->type;
     }

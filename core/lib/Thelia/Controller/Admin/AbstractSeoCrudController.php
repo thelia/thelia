@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -44,17 +45,17 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
      * @param string $moduleCode                      The module code for ACL
      */
     public function __construct(
-        $objectName,
-        $defaultListOrder,
-        $orderRequestParameterName,
-        $resourceCode,
-        $createEventIdentifier,
-        $updateEventIdentifier,
-        $deleteEventIdentifier,
-        $visibilityToggleEventIdentifier = null,
-        $changePositionEventIdentifier = null,
+        string $objectName,
+        ?string $defaultListOrder,
+        ?string $orderRequestParameterName,
+        string $resourceCode,
+        ?string $createEventIdentifier,
+        ?string $updateEventIdentifier,
+        ?string $deleteEventIdentifier,
+        ?string $visibilityToggleEventIdentifier = null,
+        ?string $changePositionEventIdentifier = null,
         protected $updateSeoEventIdentifier = null,
-        $moduleCode = null
+        ?string $moduleCode = null
     ) {
         parent::__construct(
             $objectName,
@@ -95,7 +96,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
      *
      * @return UpdateSeoEvent
      */
-    protected function getUpdateSeoEvent($formData)
+    protected function getUpdateSeoEvent(array $formData)
     {
         $updateSeoEvent = new UpdateSeoEvent($formData['id']);
 
@@ -137,7 +138,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
     /**
      * Update SEO modification, and either go back to the object list, or stay on the edition page.
      *
-     * @return \Thelia\Core\HttpFoundation\Response the response
+     * @return Response the response
      */
     public function processUpdateSeoAction(
         Request $request,
@@ -186,9 +187,9 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             }
 
             return $response;
-        } catch (FormValidationException $ex) {
+        } catch (FormValidationException $formValidationException) {
             // Form cannot be validated
-            $errorMessage = $this->createStandardFormValidationErrorMessage($ex);
+            $errorMessage = $this->createStandardFormValidationErrorMessage($formValidationException);
         }
 
         // Load object if exist
@@ -204,7 +205,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             Translator::getInstance()->trans('%obj SEO modification', ['%obj' => $this->objectName]),
             $errorMessage,
             $updateSeoForm,
-            $ex
+            $formValidationException
         );
 
         // At this point, the form has errors, and should be redisplayed.

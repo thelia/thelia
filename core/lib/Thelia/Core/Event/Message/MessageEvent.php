@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Message;
 
 use Thelia\Core\Event\ActionEvent;
@@ -20,24 +21,21 @@ use Thelia\Model\Message;
  */
 class MessageEvent extends ActionEvent
 {
-    protected $message;
-
-    public function __construct(Message $message = null)
+    public function __construct(protected ?Message $message = null)
     {
-        $this->message = $message;
     }
 
-    public function hasMessage()
+    public function hasMessage(): bool
     {
-        return null !== $this->message;
+        return $this->message instanceof Message;
     }
 
-    public function getMessage()
+    public function getMessage(): ?Message
     {
         return $this->message;
     }
 
-    public function setMessage($message)
+    public function setMessage(?Message $message): static
     {
         $this->message = $message;
 

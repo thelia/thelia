@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
+use Propel\Runtime\Exception\PropelException;
 use Thelia\Model\Base\AreaDeliveryModuleQuery as BaseAreaDeliveryModuleQuery;
 
 /**
@@ -26,7 +28,7 @@ class AreaDeliveryModuleQuery extends BaseAreaDeliveryModuleQuery
     /**
      * Check if a delivery module is suitable for the given country.
      *
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
      * @return AreaDeliveryModule|null
      */
@@ -51,4 +53,5 @@ class AreaDeliveryModuleQuery extends BaseAreaDeliveryModuleQuery
         return $response;
     }
 }
+
 // AreaDeliveryModuleQuery

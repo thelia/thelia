@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,14 +11,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Form;
 
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TelType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Map\StateI18nTableMap;
@@ -70,7 +71,7 @@ class AddressCreateForm extends FirewallForm
             ])
             ->add('firstname', TextType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
+                    new NotBlank(),
                 ],
                 'label' => Translator::getInstance()->trans('First Name'),
                 'label_attr' => [
@@ -79,7 +80,7 @@ class AddressCreateForm extends FirewallForm
             ])
             ->add('lastname', TextType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
+                    new NotBlank(),
                 ],
                 'label' => Translator::getInstance()->trans('Last Name'),
                 'label_attr' => [
@@ -95,7 +96,7 @@ class AddressCreateForm extends FirewallForm
             ])
             ->add('address1', TextType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
+                    new NotBlank(),
                 ],
                 'label' => Translator::getInstance()->trans('Street Address'),
                 'label_attr' => [
@@ -118,8 +119,8 @@ class AddressCreateForm extends FirewallForm
             ])
             ->add('city', TextType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Callback(
+                    new NotBlank(),
+                    new Callback(
                         $this->verifyCity(...)
                     ),
                 ],
@@ -130,8 +131,8 @@ class AddressCreateForm extends FirewallForm
             ])
             ->add('zipcode', TextType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Callback(
+                    new NotBlank(),
+                    new Callback(
                         $this->verifyZipCode(...)
                     ),
                 ],
@@ -142,13 +143,13 @@ class AddressCreateForm extends FirewallForm
             ])
             ->add('country', ChoiceType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
+                    new NotBlank(),
                 ],
                 'choices' => $this->countryService->getAllCountriesChoiceType(),
                 'label' => Translator::getInstance()->trans('Country'),
                 'expanded' => false,
                 'multiple' => false,
-                'data' => $this->countryService->getDefaultCountry()?->getId(),
+                'data' => $this->countryService->getDefaultCountry()->getId(),
                 'label_attr' => [
                     'for' => 'country',
                 ],
@@ -156,7 +157,7 @@ class AddressCreateForm extends FirewallForm
             ->add('state', ChoiceType::class, [
                 'required' => false,
                 'constraints' => [
-                    new Constraints\Callback(
+                    new Callback(
                         $this->verifyState(...)
                     ),
                 ],
@@ -187,7 +188,7 @@ class AddressCreateForm extends FirewallForm
     /**
      * @return string the name of you form. This name must be unique
      */
-    public static function getName()
+    public static function getName(): string
     {
         return 'thelia_address_creation';
     }

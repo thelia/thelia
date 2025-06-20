@@ -1,5 +1,0 @@
-# see https://symfony.com/doc/current/reference/configuration/framework.html
-framework:
-    session:
-        save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'
-

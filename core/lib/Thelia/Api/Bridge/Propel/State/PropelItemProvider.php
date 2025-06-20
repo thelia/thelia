@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Bridge\Propel\State;
 
 use ApiPlatform\Metadata\Exception\RuntimeException;
@@ -74,6 +75,7 @@ readonly class PropelItemProvider implements ProviderInterface
         if (null === $propelModel) {
             return null;
         }
+
         $langs = null;
         if (\in_array($operation::class, [Patch::class, Put::class])) {
             $langs = new Collection();

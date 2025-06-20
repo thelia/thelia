@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use InvalidArgumentException;
+use Exception;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -53,7 +56,7 @@ class FileController extends BaseAdminController
      *
      * @deprecated use autowiring
      */
-    public function getFileManager()
+    public function getFileManager(): ?object
     {
         return $this->container->get('thelia.file_manager');
     }
@@ -103,7 +106,7 @@ class FileController extends BaseAdminController
             return new ResponseRest(['status' => true, 'message' => '']);
         }
 
-        return new Response('', 404);
+        return new Response('', \Symfony\Component\HttpFoundation\Response::HTTP_NOT_FOUND);
     }
 
     /**
@@ -128,7 +131,7 @@ class FileController extends BaseAdminController
         $objectType,
         $validMimeTypes = [],
         $extBlackList = []
-    ) {
+    ): FileCreateOrUpdateEvent {
         @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 2.6. Please use the process method File present in the same class.', \E_USER_DEPRECATED);
 
         return $this->processFile($eventDispatcher, $fileBeingUploaded, $parentId, $parentType, $objectType, $validMimeTypes, $extBlackList);
@@ -156,7 +159,7 @@ class FileController extends BaseAdminController
         $objectType,
         $validMimeTypes = [],
         $extBlackList = []
-    ) {
+    ): FileCreateOrUpdateEvent {
         $fileManager = $this->getFileManager();
 
         // Validate if file is too big
@@ -403,6 +406,7 @@ class FileController extends BaseAdminController
         if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) {
             return $response;
         }
+
         $fileManager = $this->getFileManager();
         $imageModel = $fileManager->getModelInstance('image', $parentType);
 
@@ -467,7 +471,7 @@ class FileController extends BaseAdminController
      *
      * @return FileModelInterface
      */
-    protected function updateFileAction(EventDispatcherInterface $eventDispatcher, $fileId, $parentType, $objectType, $eventName)
+    protected function updateFileAction(EventDispatcherInterface $eventDispatcher, $fileId, $parentType, $objectType, ?string $eventName)
     {
         $message = false;
 
@@ -484,7 +488,7 @@ class FileController extends BaseAdminController
             $oldFile = clone $file;
 
             if (null === $file) {
-                throw new \InvalidArgumentException(sprintf('%d %s id does not exist', $fileId, $objectType));
+                throw new InvalidArgumentException(sprintf('%d %s id does not exist', $fileId, $objectType));
             }
 
             $data = $this->validateForm($fileUpdateForm)->getData();
@@ -500,12 +504,15 @@ class FileController extends BaseAdminController
             if (\array_key_exists('title', $data)) {
                 $file->setTitle($data['title']);
             }
+
             if (\array_key_exists('chapo', $data)) {
                 $file->setChapo($data['chapo']);
             }
+
             if (\array_key_exists('description', $data)) {
                 $file->setDescription($data['description']);
             }
+
             if (\array_key_exists('postscriptum', $data)) {
                 $file->setPostscriptum($data['postscriptum']);
             }
@@ -542,12 +549,7 @@ class FileController extends BaseAdminController
             );
 
             if ($this->getRequest()->get('save_mode') == 'close') {
-                if ($objectType == 'document') {
-                    $tab = 'documents';
-                } else {
-                    $tab = 'images';
-                }
-
+                $tab = $objectType == 'document' ? 'documents' : 'images';
                 return $this->generateRedirect(
                     URL::getInstance()->absoluteUrl($file->getRedirectionUrl(), ['current_tab' => $tab])
                 );
@@ -558,7 +560,7 @@ class FileController extends BaseAdminController
             $message = sprintf('Please check your input: %s', $e->getMessage());
         } catch (PropelException $e) {
             $message = $e->getMessage();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $message = sprintf('Sorry, an error occurred: %s', $e->getMessage().' '.$e->getFile());
         }
 
@@ -641,7 +643,7 @@ class FileController extends BaseAdminController
      *
      * @return Response
      */
-    public function deleteFileAction(EventDispatcherInterface $eventDispatcher, $fileId, $parentType, $objectType, $eventName)
+    public function deleteFileAction(EventDispatcherInterface $eventDispatcher, $fileId, $parentType, $objectType, ?string $eventName)
     {
         $message = null;
 
@@ -677,14 +679,14 @@ class FileController extends BaseAdminController
                 ),
                 $fileDeleteEvent->getFileToDelete()->getId()
             );
-        } catch (\Exception $e) {
+        } catch (Exception $exception) {
             $message = $this->getTranslator()->trans(
                 'Fail to delete  %obj% for %id% with parent id %parentId% (Exception : %e%)',
                 [
                     '%obj%' => $objectType,
                     '%id%' => $fileDeleteEvent->getFileToDelete()->getId(),
                     '%parentId%' => $fileDeleteEvent->getFileToDelete()->getParentId(),
-                    '%e%' => $e->getMessage(),
+                    '%e%' => $exception->getMessage(),
                 ]
             );
 
@@ -733,7 +735,7 @@ class FileController extends BaseAdminController
         return $this->deleteFileAction($eventDispatcher, $documentId, $parentType, 'document', TheliaEvents::DOCUMENT_DELETE);
     }
 
-    public function updateFilePositionAction(EventDispatcherInterface $eventDispatcher, $parentType, $parentId, $objectType, $eventName)
+    public function updateFilePositionAction(EventDispatcherInterface $eventDispatcher, $parentType, $parentId, $objectType, ?string $eventName)
     {
         $message = null;
 
@@ -761,10 +763,10 @@ class FileController extends BaseAdminController
         // Dispatch Event to the Action
         try {
             $eventDispatcher->dispatch($event, $eventName);
-        } catch (\Exception $e) {
+        } catch (Exception $exception) {
             $message = $this->getTranslator()->trans(
                 'Fail to update %type% position: %err%',
-                ['%type%' => $objectType, '%err%' => $e->getMessage()]
+                ['%type%' => $objectType, '%err%' => $exception->getMessage()]
             );
         }
 
@@ -819,7 +821,7 @@ class FileController extends BaseAdminController
         return $this->updateFilePositionAction($eventDispatcher, $parentType, $documentId, 'document', TheliaEvents::DOCUMENT_UPDATE_POSITION);
     }
 
-    public function toggleVisibilityFileAction(EventDispatcherInterface $eventDispatcher, $documentId, $parentType, $objectType, $eventName)
+    public function toggleVisibilityFileAction(EventDispatcherInterface $eventDispatcher, $documentId, $parentType, $objectType, ?string $eventName)
     {
         $message = null;
 
@@ -846,10 +848,10 @@ class FileController extends BaseAdminController
         // Dispatch Event to the Action
         try {
             $eventDispatcher->dispatch($event, $eventName);
-        } catch (\Exception $e) {
+        } catch (Exception $exception) {
             $message = $this->getTranslator()->trans(
                 'Fail to update %type% visibility: %err%',
-                ['%type%' => $objectType, '%err%' => $e->getMessage()]
+                ['%type%' => $objectType, '%err%' => $exception->getMessage()]
             );
         }
 

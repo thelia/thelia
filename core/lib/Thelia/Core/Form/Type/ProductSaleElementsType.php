@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Form\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -32,19 +33,14 @@ use Thelia\Core\Form\Type\Field\TaxRuleIdType;
  */
 class ProductSaleElementsType extends AbstractTheliaType
 {
-    protected $productIdType;
-    protected $pseIdType;
 
     /**
      * @param ProductSaleElementsIdType $pseIdType
      *
      * The types are needed to load the validation groups
      */
-    public function __construct(ProductIdType $productIdType, ProductSaleElementsIdType $pseIdType)
+    public function __construct(protected ProductIdType $productIdType, protected ProductSaleElementsIdType $pseIdType)
     {
-        $this->productIdType = $productIdType;
-
-        $this->pseIdType = $pseIdType;
     }
 
     /**
@@ -133,7 +129,7 @@ class ProductSaleElementsType extends AbstractTheliaType
      *
      * @return string The name of this type
      */
-    public function getName()
+    public function getName(): string
     {
         return 'product_sale_elements';
     }

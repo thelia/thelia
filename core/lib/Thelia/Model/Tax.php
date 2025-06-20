@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
+use Thelia\TaxEngine\TaxTypeInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Thelia\Core\Event\Tax\TaxEvent;
@@ -54,7 +56,7 @@ class Tax extends BaseTax
 
         $typeService = $taxEvent->getTaxTypeService();
 
-        if (!$typeService) {
+        if (!$typeService instanceof TaxTypeInterface) {
             throw new TaxEngineException('Recorded type `'.$this->getType().'` does not exists', TaxEngineException::BAD_RECORDED_TYPE);
         }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Bridge\Propel\Extension;
 
 use ApiPlatform\Metadata\Operation;
@@ -36,6 +37,7 @@ final readonly class CustomerGetCollectionExtension implements QueryCollectionEx
         if (!$user instanceof Customer) {
             return;
         }
+
         $patterns = $this->accessMap->getPatterns($this->requestStack->getCurrentRequest());
 
         if (!isset($patterns[0][0]) || $patterns[0][0] !== 'ROLE_CUSTOMER') {
@@ -47,6 +49,7 @@ final readonly class CustomerGetCollectionExtension implements QueryCollectionEx
                 $use = 'use'.ucwords(strtolower((string) $joinTable)).'Query';
                 $query = $query->$use();
             }
+
             $query->filterByCustomer($user);
             $endUse = 'endUse';
             foreach ($operation->getExtraProperties()['usesForCustomer'] as $joinTable) {
@@ -55,6 +58,7 @@ final readonly class CustomerGetCollectionExtension implements QueryCollectionEx
 
             return;
         }
+
         if (method_exists($query, 'filterByCustomer')) {
             $query->filterByCustomer($user);
         }

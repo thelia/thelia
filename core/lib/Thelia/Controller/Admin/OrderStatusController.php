@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Thelia\Form\BaseForm;
+use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\OrderStatus\OrderStatusCreateEvent;
 use Thelia\Core\Event\OrderStatus\OrderStatusDeleteEvent;
@@ -54,7 +57,7 @@ class OrderStatusController extends AbstractCrudController
     /**
      * Return the creation form for this object.
      */
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::ORDER_STATUS_CREATION);
     }
@@ -62,7 +65,7 @@ class OrderStatusController extends AbstractCrudController
     /**
      * Return the update form for this object.
      */
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::ORDER_STATUS_MODIFICATION);
     }
@@ -98,10 +101,8 @@ class OrderStatusController extends AbstractCrudController
      * Creates the creation event with the provided form data.
      *
      * @param array $formData
-     *
-     * @return OrderStatusCreateEvent
      */
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent($formData): OrderStatusCreateEvent
     {
         $orderStatusCreateEvent = new OrderStatusCreateEvent();
 
@@ -119,10 +120,8 @@ class OrderStatusController extends AbstractCrudController
      * Creates the update event with the provided form data.
      *
      * @param array $formData
-     *
-     * @return OrderStatusUpdateEvent
      */
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent($formData): OrderStatusUpdateEvent
     {
         $orderStatusUpdateEvent = new OrderStatusUpdateEvent($formData['id']);
 
@@ -142,11 +141,9 @@ class OrderStatusController extends AbstractCrudController
     /**
      * Creates the delete event with the provided form data.
      *
-     * @throws \Exception
-     *
-     * @return OrderStatusDeleteEvent
+     * @throws Exception
      */
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): OrderStatusDeleteEvent
     {
         return new OrderStatusDeleteEvent((int) $this->getRequest()->get('order_status_id'));
     }
@@ -155,10 +152,8 @@ class OrderStatusController extends AbstractCrudController
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
      * @param OrderStatusEvent $event
-     *
-     * @return bool
      */
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasOrderStatus();
     }
@@ -178,7 +173,7 @@ class OrderStatusController extends AbstractCrudController
     /**
      * Load an existing object from the database.
      *
-     * @return \Thelia\Model\OrderStatus
+     * @return OrderStatus
      */
     protected function getExistingObject()
     {
@@ -232,7 +227,7 @@ class OrderStatusController extends AbstractCrudController
         ]);
     }
 
-    protected function getEditionArguments()
+    protected function getEditionArguments(): array
     {
         return [
             'order_status_id' => $this->getRequest()->get('order_status_id', 0),
@@ -271,7 +266,7 @@ class OrderStatusController extends AbstractCrudController
     /**
      * @return UpdatePositionEvent|void
      */
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
             $this->getRequest()->get('order_status_id', null),

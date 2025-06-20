@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Type\EnumListType;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -21,7 +23,6 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\OrderProductAttributeCombination as OrderProductAttributeCombinationModel;
 use Thelia\Model\OrderProductAttributeCombinationQuery;
-use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
@@ -39,17 +40,14 @@ class OrderProductAttributeCombination extends BaseI18nLoop implements PropelSea
 {
     protected $timestampable = true;
 
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('order_product', null, true),
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(['alpha', 'alpha_reverse'])
+                    new EnumListType(['alpha', 'alpha_reverse'])
                 ),
                 'alpha'
             )
@@ -80,7 +78,7 @@ class OrderProductAttributeCombination extends BaseI18nLoop implements PropelSea
         return $search;
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var OrderProductAttributeCombinationModel $orderAttributeCombination */
         foreach ($loopResult->getResultDataCollection() as $orderAttributeCombination) {

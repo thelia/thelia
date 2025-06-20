@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Service\Model;
 
 use OpenApi\Events\OpenApiEvents;
@@ -41,8 +42,8 @@ readonly class PaymentModuleService
     {
         $request = $this->request;
         $dispatcher = $this->dispatcher;
-        $cart = $request->getSession()?->getSessionCart($dispatcher);
-        $lang = $request->getSession()?->getLang();
+        $cart = $request->getSession()->getSessionCart($dispatcher);
+        $lang = $request->getSession()->getLang();
 
         $moduleQuery = ModuleQuery::create()
             ->filterByActivate(1)
@@ -58,7 +59,7 @@ readonly class PaymentModuleService
         // Return formatted valid payment
         return
             array_map(
-                fn ($module) => $this->getPaymentModule($dispatcher, $module, $cart, $lang),
+                fn ($module): PaymentModule => $this->getPaymentModule($dispatcher, $module, $cart, $lang),
                 iterator_to_array($modules)
             );
     }
@@ -102,6 +103,7 @@ readonly class PaymentModuleService
             $paymentModuleApi
                 ->setOptionGroups($paymentModuleOptionEvent->getPaymentModuleOptionGroups());
         }
+
         foreach ($paymentModule->getModuleI18ns() as $i18n) {
             $paymentModuleApi->addI18n(new ModuleI18n($i18n->toArray()), $i18n->getLocale());
         }

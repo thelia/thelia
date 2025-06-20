@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Form;
 
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -124,7 +125,7 @@ class ModuleHookCreationForm extends BaseForm
         ;
     }
 
-    protected function trans($id, $parameters = [])
+    protected function trans(?string $id, array $parameters = []): string
     {
         if (null === $this->translator) {
             $this->translator = Translator::getInstance();
@@ -133,7 +134,10 @@ class ModuleHookCreationForm extends BaseForm
         return $this->translator->trans($id, $parameters);
     }
 
-    protected function getModuleChoices()
+    /**
+     * @return mixed[]
+     */
+    protected function getModuleChoices(): array
     {
         $choices = [];
         $modules = ModuleQuery::getActivated();
@@ -153,7 +157,10 @@ class ModuleHookCreationForm extends BaseForm
         return $choices;
     }
 
-    protected function getHookChoices()
+    /**
+     * @return mixed[]
+     */
+    protected function getHookChoices(): array
     {
         $choices = [];
         $hooks = HookQuery::create()
@@ -172,8 +179,6 @@ class ModuleHookCreationForm extends BaseForm
 
     /**
      * Check if method is the right one if we want to use automatic inserted templates .
-     *
-     * @return bool
      */
     public function verifyTemplates($value, ExecutionContextInterface $context): void
     {
@@ -191,7 +196,7 @@ class ModuleHookCreationForm extends BaseForm
         }
     }
 
-    public static function getName()
+    public static function getName(): string
     {
         return 'thelia_module_hook_creation';
     }

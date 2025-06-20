@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Exception;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CustomerTitleQuery;
 
@@ -52,7 +54,7 @@ class TranslationsCustomerTitleController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $errorMessage = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $errorMessage = $ex->getMessage();
         }

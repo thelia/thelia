@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
+
 
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
@@ -51,10 +53,13 @@ class ProductAssociatedContent implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:product_associated_content:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:product_associated_content:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:product_associated_content:write';
 
     public const GROUP_FRONT_READ = 'front:product_associated_content:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:product_associated_content:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Product::GROUP_FRONT_READ_SINGLE, Product::GROUP_FRONT_READ_SINGLE])]
@@ -72,10 +77,10 @@ class ProductAssociatedContent implements PropelResourceInterface
     public ?int $position = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?\DateTime $createdAt = null;
+    public ?DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?\DateTime $updatedAt = null;
+    public ?DateTime $updatedAt = null;
 
     public function getId(): ?int
     {
@@ -125,24 +130,24 @@ class ProductAssociatedContent implements PropelResourceInterface
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): self
+    public function setCreatedAt(?DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): self
+    public function setUpdatedAt(?DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 

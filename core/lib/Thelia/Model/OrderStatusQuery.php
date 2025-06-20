@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
 use Thelia\Model\Base\OrderStatusQuery as BaseOrderStatusQuery;
@@ -25,6 +26,7 @@ use Thelia\Model\Exception\InvalidArgumentException;
 class OrderStatusQuery extends BaseOrderStatusQuery
 {
     protected static $statusIdListsCache = [];
+
     protected static $statusModelCache = [];
 
     public static function getNotPaidStatus()
@@ -149,7 +151,7 @@ class OrderStatusQuery extends BaseOrderStatusQuery
                     OrderStatus::CODE_SENT => $status->isSent(false),
                     OrderStatus::CODE_CANCELED => $status->isCancelled(false),
                     OrderStatus::CODE_REFUNDED => $status->isRefunded(false),
-                    default => throw new InvalidArgumentException("Status code '$statusCode' is not a valid value."),
+                    default => throw new InvalidArgumentException(sprintf("Status code '%s' is not a valid value.", $statusCode)),
                 };
 
                 if ($match) {
@@ -163,4 +165,5 @@ class OrderStatusQuery extends BaseOrderStatusQuery
         return self::$statusIdListsCache[$statusCode];
     }
 }
+
 // OrderStatusQuery

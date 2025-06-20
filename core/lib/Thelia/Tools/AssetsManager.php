@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,14 +11,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Tools;
 
 class AssetsManager
 {
-    private static $instance;
+    private static ?\Thelia\Tools\AssetsManager $instance = null;
 
     protected $processed = [];
+
     protected $entrypoints = [];
 
     protected function __construct(protected $entrypointsPath)
@@ -31,16 +33,19 @@ class AssetsManager
     {
     }
 
-    public static function getInstance($entrypointsPath)
+    public static function getInstance($entrypointsPath): \Thelia\Tools\AssetsManager
     {
-        if (self::$instance === null) {
+        if (!self::$instance instanceof \Thelia\Tools\AssetsManager) {
             self::$instance = new self($entrypointsPath);
         }
 
         return self::$instance;
     }
 
-    public function getAssets($entry, $type)
+    /**
+     * @return mixed[]
+     */
+    public function getAssets($entry, $type): array
     {
         $assets = [];
 

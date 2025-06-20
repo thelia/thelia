@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Thelia\Form\BaseForm;
+use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Sale\SaleActiveStatusCheckEvent;
@@ -55,7 +58,7 @@ class SaleController extends AbstractCrudController
     /**
      * Return the creation form for this object.
      */
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::SALE_CREATION);
     }
@@ -63,7 +66,7 @@ class SaleController extends AbstractCrudController
     /**
      * Return the update form for this object.
      */
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::SALE_MODIFICATION);
     }
@@ -75,12 +78,12 @@ class SaleController extends AbstractCrudController
      *
      * @return SaleModificationForm
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $sale)
+    protected function hydrateObjectForm(ParserContext $parserContext, $sale): BaseForm
     {
         // Find all categories of the selected products
         $saleProducts = $sale->getSaleProductList();
-
-        $categories = $products = [];
+        $categories = [];
+        $products = [];
 
         /** @var SaleProduct $saleProduct */
         foreach ($saleProducts as $saleProduct) {
@@ -128,10 +131,8 @@ class SaleController extends AbstractCrudController
      * Creates the creation event with the provided form data.
      *
      * @param array $formData
-     *
-     * @return SaleCreateEvent
      */
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent($formData): SaleCreateEvent
     {
         $saleCreateEvent = new SaleCreateEvent();
 
@@ -148,10 +149,8 @@ class SaleController extends AbstractCrudController
      * Creates the update event with the provided form data.
      *
      * @param array $formData
-     *
-     * @return SaleUpdateEvent
      */
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent($formData): SaleUpdateEvent
     {
         // Build the product attributes array
         $productAttributes = [];
@@ -186,10 +185,8 @@ class SaleController extends AbstractCrudController
 
     /**
      * Creates the delete event with the provided form data.
-     *
-     * @return SaleDeleteEvent
      */
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): SaleDeleteEvent
     {
         return new SaleDeleteEvent($this->getRequest()->get('sale_id'));
     }
@@ -198,10 +195,8 @@ class SaleController extends AbstractCrudController
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
      * @param SaleEvent $event
-     *
-     * @return bool
      */
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasSale();
     }
@@ -211,7 +206,7 @@ class SaleController extends AbstractCrudController
      *
      * @param $event \Thelia\Core\Event\Sale\SaleEvent
      *
-     * @return \Thelia\Model\Sale|null
+     * @return Sale|null
      */
     protected function getObjectFromEvent($event)
     {
@@ -221,7 +216,7 @@ class SaleController extends AbstractCrudController
     /**
      * Load an existing object from the database.
      *
-     * @return \Thelia\Model\Sale
+     * @return Sale
      */
     protected function getExistingObject()
     {
@@ -273,7 +268,7 @@ class SaleController extends AbstractCrudController
             ]);
     }
 
-    protected function getEditionArguments()
+    protected function getEditionArguments(): array
     {
         return [
             'sale_id' => $this->getRequest()->get('sale_id', 0),
@@ -322,9 +317,9 @@ class SaleController extends AbstractCrudController
                 ),
                 TheliaEvents::SALE_TOGGLE_ACTIVITY
             );
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             // Any error
-            return $this->errorPage($ex);
+            return $this->errorPage($exception);
         }
 
         return $this->nullResponse();
@@ -384,9 +379,9 @@ class SaleController extends AbstractCrudController
                 new SaleClearStatusEvent(),
                 TheliaEvents::SALE_CLEAR_SALE_STATUS
             );
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             // Any error
-            return $this->errorPage($ex);
+            return $this->errorPage($exception);
         }
 
         return $this->redirectToListTemplate();
@@ -400,9 +395,9 @@ class SaleController extends AbstractCrudController
                 new SaleActiveStatusCheckEvent(),
                 TheliaEvents::CHECK_SALE_ACTIVATION_EVENT
             );
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             // Any error
-            return $this->errorPage($ex);
+            return $this->errorPage($exception);
         }
 
         return $this->redirectToListTemplate();

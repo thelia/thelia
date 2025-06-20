@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Condition;
 
 use Thelia\Core\Translation\Translator;
@@ -23,18 +24,25 @@ abstract class Operators
 {
     /** Param1 is inferior to Param2 */
     public const INFERIOR = '<';
+
     /** Param1 is inferior to Param2 */
     public const INFERIOR_OR_EQUAL = '<=';
+
     /** Param1 is equal to Param2 */
     public const EQUAL = '==';
+
     /** Param1 is superior to Param2 */
     public const SUPERIOR_OR_EQUAL = '>=';
+
     /** Param1 is superior to Param2 */
     public const SUPERIOR = '>';
+
     /** Param1 is different to Param2 */
     public const DIFFERENT = '!=';
+
     /** Param1 is in Param2 */
     public const IN = 'in';
+
     /** Param1 is not in Param2 */
     public const OUT = 'out';
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Type\BooleanOrBothType;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -20,7 +22,6 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\LangQuery;
-use Thelia\Type;
 
 /**
  * Language loop, to get a list of available languages.
@@ -45,10 +46,7 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
 {
     protected $timestampable = true;
 
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
@@ -87,11 +85,11 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
             $search->filterByLocale($locale, Criteria::IN);
         }
 
-        if (!$this->getBackendContext() && Type\BooleanOrBothType::ANY !== $visible = $this->getVisible()) {
+        if (!$this->getBackendContext() && BooleanOrBothType::ANY !== $visible = $this->getVisible()) {
             $search->filterByVisible($visible);
         }
 
-        if (Type\BooleanOrBothType::ANY !== $active = $this->getActive()) {
+        if (BooleanOrBothType::ANY !== $active = $this->getActive()) {
             $search->filterByActive($active);
         }
 
@@ -135,7 +133,7 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
         return $search;
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var \Thelia\Model\Lang $result */
         foreach ($loopResult->getResultDataCollection() as $result) {

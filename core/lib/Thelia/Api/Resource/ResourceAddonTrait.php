@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
 
+use ReflectionClass;
+use Exception;
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -20,9 +23,9 @@ use Propel\Runtime\Map\TableMap;
 
 trait ResourceAddonTrait
 {
-    public static function getAddonName()
+    public static function getAddonName(): string
     {
-        return (new \ReflectionClass(static::class))->getShortName();
+        return (new ReflectionClass(static::class))->getShortName();
     }
 
     public static function getPropelRelatedTableMap(): ?TableMap
@@ -35,8 +38,8 @@ trait ResourceAddonTrait
         $addonName = static::getAddonName();
         $tableMap = static::getPropelRelatedTableMap();
 
-        if (null === $tableMap) {
-            throw new \Exception("You must either specify a propel related table or implement the extendQuery method in \"$addonName\" addon");
+        if (!$tableMap instanceof TableMap) {
+            throw new Exception(sprintf('You must either specify a propel related table or implement the extendQuery method in "%s" addon', $addonName));
         }
 
         $use = 'use'.$tableMap->getPhpName().'Query';
@@ -115,8 +118,8 @@ trait ResourceAddonTrait
         $addonName = static::getAddonName();
         $tableMap = static::getPropelRelatedTableMap();
 
-        if (null === $tableMap) {
-            throw new \Exception("You must either specify a propel related table or implement the doSave / doRemove method in \"$addonName\" addon");
+        if (!$tableMap instanceof TableMap) {
+            throw new Exception(sprintf('You must either specify a propel related table or implement the doSave / doRemove method in "%s" addon', $addonName));
         }
 
         /** @var ModelCriteria $queryClass */

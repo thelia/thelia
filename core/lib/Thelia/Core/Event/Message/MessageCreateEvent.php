@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,14 +11,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Message;
 
 class MessageCreateEvent extends MessageEvent
 {
     protected $message_name;
+
     protected $locale;
+
     protected $title;
+
     protected $secured;
 
     // Use message_name to prevent conflict with Event::name property.
@@ -25,7 +29,7 @@ class MessageCreateEvent extends MessageEvent
         return $this->message_name;
     }
 
-    public function setMessageName($message_name)
+    public function setMessageName($message_name): static
     {
         $this->message_name = $message_name;
 
@@ -37,7 +41,7 @@ class MessageCreateEvent extends MessageEvent
         return $this->locale;
     }
 
-    public function setLocale($locale)
+    public function setLocale($locale): static
     {
         $this->locale = $locale;
 
@@ -49,7 +53,7 @@ class MessageCreateEvent extends MessageEvent
         return $this->title;
     }
 
-    public function setTitle($title)
+    public function setTitle($title): static
     {
         $this->title = $title;
 
@@ -61,7 +65,7 @@ class MessageCreateEvent extends MessageEvent
         return $this->secured;
     }
 
-    public function setSecured($secured)
+    public function setSecured($secured): static
     {
         $this->secured = $secured;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Type\EnumListType;
+use PDO;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseI18nLoop;
@@ -24,7 +27,6 @@ use Thelia\Model\AttributeAv as AttributeAvModel;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\Map\AttributeCombinationTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
-use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
@@ -44,10 +46,7 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
 {
     protected $timestampable = true;
 
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
@@ -57,7 +56,7 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(['id', 'id_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse'])
+                    new EnumListType(['id', 'id_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse'])
                 ),
                 'manual'
             )
@@ -114,7 +113,7 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
                 ->leftJoinAttributeCombination('attribute_combination')
                 ->groupById()
                 ->addJoinObject($pseJoin)
-                ->where(ProductSaleElementsTableMap::COL_PRODUCT_ID.'=?', $product, \PDO::PARAM_INT)
+                ->where(ProductSaleElementsTableMap::COL_PRODUCT_ID.'=?', $product, PDO::PARAM_INT)
             ;
         }
 
@@ -146,7 +145,7 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
         return $search;
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var AttributeAvModel $attributeAv */
         foreach ($loopResult->getResultDataCollection() as $attributeAv) {

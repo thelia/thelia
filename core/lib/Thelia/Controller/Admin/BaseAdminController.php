@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,12 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Exception;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Contracts\Service\Attribute\Required;
 use Thelia\Controller\BaseController;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Exception\AuthenticationException;
@@ -53,15 +54,16 @@ class BaseAdminController extends BaseController
     public function processTemplateAction(string $template)
     {
         try {
-            if (!empty($template)) {
+            if ($template !== '' && $template !== '0') {
                 // If we have a view in the URL, render this view
                 return $this->render($template);
             }
+
             if (null !== $view = $this->requestStack->getCurrentRequest()?->get('view')) {
                 return $this->render($view);
             }
-        } catch (\Exception $ex) {
-            return $this->errorPage($ex->getMessage());
+        } catch (Exception $exception) {
+            return $this->errorPage($exception->getMessage());
         }
 
         return $this->pageNotFound();
@@ -93,20 +95,20 @@ class BaseAdminController extends BaseController
      */
     protected function pageNotFound(): Response
     {
-        return new Response($this->renderRaw(self::TEMPLATE_404), 404);
+        return new Response($this->renderRaw(self::TEMPLATE_404), \Symfony\Component\HttpFoundation\Response::HTTP_NOT_FOUND);
     }
 
     /**
      * Return a general error page.
      *
-     * @param \Exception|string $message a message string, or an exception instance
+     * @param Exception|string $message a message string, or an exception instance
      * @param int               $status  the HTTP status (default is 500)
      *
-     * @return \Thelia\Core\HttpFoundation\Response
+     * @return Response
      */
     protected function errorPage($message, $status = 500)
     {
-        if ($message instanceof \Exception) {
+        if ($message instanceof Exception) {
             $strMessage = $this->translator->trans(
                 'Sorry, an error occured: %msg',
                 ['%msg' => $message->getMessage()]
@@ -157,7 +159,7 @@ class BaseAdminController extends BaseController
     /*
      * Create the standard message displayed to the user when the form cannot be validated.
      */
-    protected function createStandardFormValidationErrorMessage(FormValidationException $exception)
+    protected function createStandardFormValidationErrorMessage(FormValidationException $exception): string
     {
         return $this->translator->trans(
             'Please check your input: %error',
@@ -173,9 +175,9 @@ class BaseAdminController extends BaseController
      * @param string          $action        the action that caused the error (category modification, variable creation, currency update, etc.)
      * @param BaseForm        $form          the form where the error occured, or null if no form was involved
      * @param string          $error_message the error message
-     * @param \Exception|null $exception     the exception or null if no exception
+     * @param Exception|null $exception the exception or null if no exception
      */
-    protected function setupFormErrorContext(string $action, string $error_message, BaseForm $form = null, \Exception $exception = null): void
+    protected function setupFormErrorContext(string $action, string $error_message, BaseForm $form = null, Exception $exception = null): void
     {
         if ($error_message !== false) {
             // Log the error message
@@ -190,7 +192,7 @@ class BaseAdminController extends BaseController
                 )
             );
 
-            if ($form !== null) {
+            if ($form instanceof BaseForm) {
                 // Mark the form as errored
                 $form->setErrorMessage($error_message);
 
@@ -244,10 +246,8 @@ class BaseAdminController extends BaseController
     protected function getCurrentEditionCurrency()
     {
         // Return the new language if a change is required.
-        if (null !== $edit_currency_id = $this->requestStack->getCurrentRequest()?->get('edit_currency_id', null)) {
-            if (null !== $edit_currency = CurrencyQuery::create()->findOneById($edit_currency_id)) {
-                return $edit_currency;
-            }
+        if (null !== ($edit_currency_id = $this->requestStack->getCurrentRequest()?->get('edit_currency_id', null)) && null !== $edit_currency = CurrencyQuery::create()->findOneById($edit_currency_id)) {
+            return $edit_currency;
         }
 
         // Otherwise return the lang stored in session.
@@ -260,10 +260,8 @@ class BaseAdminController extends BaseController
     protected function getCurrentEditionLang()
     {
         // Return the new language if a change is required.
-        if (null !== $edit_language_id = $this->requestStack->getCurrentRequest()?->get('edit_language_id', null)) {
-            if (null !== $edit_language = LangQuery::create()->findOneById($edit_language_id)) {
-                return $edit_language;
-            }
+        if (null !== ($edit_language_id = $this->requestStack->getCurrentRequest()?->get('edit_language_id', null)) && null !== $edit_language = LangQuery::create()->findOneById($edit_language_id)) {
+            return $edit_language;
         }
 
         // Otherwise return the lang stored in session.
@@ -339,7 +337,7 @@ class BaseAdminController extends BaseController
      * @param array  $args         the template arguments
      * @param int    $status       http code status
      *
-     * @return \Thelia\Core\HttpFoundation\Response
+     * @return Response
      */
     protected function render($templateName, $args = [], $status = 200)
     {
@@ -359,7 +357,7 @@ class BaseAdminController extends BaseController
      * @param array  $args         the template arguments
      * @param null   $templateDir
      *
-     * @return string|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return string|RedirectResponse
      */
     protected function renderRaw($templateName, $args = [], $templateDir = null)
     {

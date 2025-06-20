@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,20 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core;
 
+use Thelia\Core\Propel\Generator\Builder\Om\ObjectBuilder;
+use Thelia\Core\Propel\Generator\Builder\Om\ExtensionObjectBuilder;
+use Thelia\Core\Propel\Generator\Builder\Om\MultiExtendObjectBuilder;
+use Thelia\Core\Propel\Generator\Builder\Om\QueryBuilder;
+use Thelia\Core\Propel\Generator\Builder\Om\ExtensionQueryBuilder;
+use Thelia\Core\Propel\Generator\Builder\Om\QueryInheritanceBuilder;
+use Thelia\Core\Propel\Generator\Builder\Om\ExtensionQueryInheritanceBuilder;
+use Thelia\Core\Propel\Generator\Builder\Om\TableMapBuilder;
+use Thelia\Core\Propel\Generator\Builder\Om\EventBuilder;
+use Thelia\Core\Propel\Generator\Builder\ResolverBuilder;
+use Throwable;
+use Exception;
 use Propel\Generator\Command\ConfigConvertCommand;
 use Propel\Generator\Command\MigrationDiffCommand;
 use Propel\Generator\Command\MigrationUpCommand;
@@ -49,20 +62,6 @@ class PropelInitService
     protected static $PROPEL_CONFIG_CACHE_FILENAME = 'propel.init.php';
 
     /**
-     * Map of environment parameters.
-     *
-     * @var array
-     */
-    protected $envParameters = [];
-
-    /**
-     * Propel schema locator service.
-     *
-     * @var SchemaLocator
-     */
-    protected $schemaLocator;
-
-    /**
      * @param string        $environment   application environment
      * @param bool          $debug         whether the application is in debug mode
      * @param array         $envParameters map of environment parameters
@@ -77,11 +76,10 @@ class PropelInitService
          * Whether the application is in debug mode.
          */
         protected $debug,
-        array $envParameters,
-        SchemaLocator $schemaLocator
-    ) {
-        $this->envParameters = $envParameters;
-        $this->schemaLocator = $schemaLocator;
+        protected array $envParameters,
+        protected SchemaLocator $schemaLocator
+    )
+    {
     }
 
     /**
@@ -91,15 +89,14 @@ class PropelInitService
      * @param array                $parameters command parameters
      * @param OutputInterface|null $output     command output
      *
-     * @throws \Exception
-     *
+     * @throws Exception
      */
     public function runCommand(Command $command, array $parameters = [], OutputInterface $output = null): int
     {
         $parameters['command'] = $command->getName();
         $input = new ArrayInput($parameters);
 
-        if ($output === null) {
+        if (!$output instanceof OutputInterface) {
             $output = new NullOutput();
         }
 
@@ -128,19 +125,19 @@ class PropelInitService
 
         $propelConfig['propel']['paths']['phpDir'] = THELIA_ROOT;
         $propelConfig['propel']['generator']['objectModel']['builders'] = [
-            'object' => \Thelia\Core\Propel\Generator\Builder\Om\ObjectBuilder::class,
-            'objectstub' => \Thelia\Core\Propel\Generator\Builder\Om\ExtensionObjectBuilder::class,
-            'objectmultiextend' => \Thelia\Core\Propel\Generator\Builder\Om\MultiExtendObjectBuilder::class,
-            'query' => \Thelia\Core\Propel\Generator\Builder\Om\QueryBuilder::class,
-            'querystub' => \Thelia\Core\Propel\Generator\Builder\Om\ExtensionQueryBuilder::class,
-            'queryinheritance' => \Thelia\Core\Propel\Generator\Builder\Om\QueryInheritanceBuilder::class,
-            'queryinheritancestub' => \Thelia\Core\Propel\Generator\Builder\Om\ExtensionQueryInheritanceBuilder::class,
-            'tablemap' => \Thelia\Core\Propel\Generator\Builder\Om\TableMapBuilder::class,
-            'event' => \Thelia\Core\Propel\Generator\Builder\Om\EventBuilder::class,
+            'object' => ObjectBuilder::class,
+            'objectstub' => ExtensionObjectBuilder::class,
+            'objectmultiextend' => MultiExtendObjectBuilder::class,
+            'query' => QueryBuilder::class,
+            'querystub' => ExtensionQueryBuilder::class,
+            'queryinheritance' => QueryInheritanceBuilder::class,
+            'queryinheritancestub' => ExtensionQueryInheritanceBuilder::class,
+            'tablemap' => TableMapBuilder::class,
+            'event' => EventBuilder::class,
         ];
 
         $propelConfig['propel']['generator']['builders'] = [
-            'resolver' => \Thelia\Core\Propel\Generator\Builder\ResolverBuilder::class,
+            'resolver' => ResolverBuilder::class,
         ];
 
         $configOptions['propel']['paths']['migrationDir'] = $this->getPropelConfigDir();
@@ -153,7 +150,7 @@ class PropelInitService
     /**
      * Generate the Propel initialization file.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function buildPropelInitFile(): void
     {
@@ -206,7 +203,7 @@ class PropelInitService
 
         foreach ($schemaCombiner->getDatabases() as $database) {
             $databaseSchemaCache = new ConfigCache(
-                "{$this->getPropelSchemaDir()}{$database}.schema.xml",
+                sprintf('%s%s.schema.xml', $this->getPropelSchemaDir(), $database),
                 $this->debug
             );
 
@@ -223,7 +220,7 @@ class PropelInitService
     /**
      * Generate the base Propel models.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function buildPropelModels(): bool
     {
@@ -288,13 +285,13 @@ class PropelInitService
      * @param bool $force        force cache generation
      * @param bool $cacheRefresh
      *
-     * @throws \Throwable
+     * @throws Throwable
      *
      * @return bool whether a Propel connection is available
      *
      * @internal
      */
-    public function init($force = false, &$cacheRefresh = false)
+    public function init($force = false, &$cacheRefresh = false): bool
     {
         $flockFactory = new LockFactory(new FlockStore());
 
@@ -332,11 +329,11 @@ class PropelInitService
                 Propel::getServiceContainer()->setLogger('defaultLogger', Tlog::getInstance());
                 $theliaDatabaseConnection->useDebug(true);
             }
-        } catch (\Throwable $th) {
+        } catch (Throwable $throwable) {
             $fs = new Filesystem();
             $fs->remove(THELIA_CACHE_DIR.$this->environment);
             $fs->remove($this->getPropelModelDir());
-            throw $th;
+            throw $throwable;
         } finally {
             // Release cache generation lock
             $lock->release();

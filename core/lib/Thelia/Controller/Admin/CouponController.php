@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+
+use Exception;
+use Thelia\Form\BaseForm;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -80,12 +84,12 @@ class CouponController extends BaseAdminController
         $eventToDispatch = TheliaEvents::COUPON_CREATE;
 
         if ($this->getRequest()->isMethod('POST')) {
-            if (null !== $response = $this->validateCreateOrUpdateForm(
+            if (($response = $this->validateCreateOrUpdateForm(
                 $eventDispatcher,
                 $eventToDispatch,
                 'created',
                 'creation'
-            )) {
+            )) instanceof RedirectResponse) {
                 return $response;
             }
         } else {
@@ -145,13 +149,13 @@ class CouponController extends BaseAdminController
 
         // Update
         if ($this->getRequest()->isMethod('POST')) {
-            if (null !== $response = $this->validateCreateOrUpdateForm(
+            if (($response = $this->validateCreateOrUpdateForm(
                 $eventDispatcher,
                 $eventToDispatch,
                 'updated',
                 'update',
                 $coupon
-            )) {
+            )) instanceof RedirectResponse) {
                 return $response;
             }
         } else {
@@ -162,8 +166,8 @@ class CouponController extends BaseAdminController
             $conditions = $conditionFactory->unserializeConditionCollection(
                 $coupon->getSerializedConditions()
             );
-
-            $freeShippingForCountries = $freeShippingForModules = [];
+            $freeShippingForCountries = [];
+            $freeShippingForModules = [];
 
             /** @var CouponCountry $item */
             foreach ($coupon->getFreeShippingForCountries() as $item) {
@@ -175,10 +179,11 @@ class CouponController extends BaseAdminController
                 $freeShippingForModules[] = $item->getModuleId();
             }
 
-            if (empty($freeShippingForCountries)) {
+            if ($freeShippingForCountries === []) {
                 $freeShippingForCountries[] = 0;
             }
-            if (empty($freeShippingForModules)) {
+
+            if ($freeShippingForModules === []) {
                 $freeShippingForModules[] = 0;
             }
 
@@ -347,6 +352,7 @@ class CouponController extends BaseAdminController
         if (!isset($conditions[$conditionIndex])) {
             return $this->pageNotFound();
         }
+
         /** @var ConditionInterface $condition */
         $condition = $conditions[$conditionIndex];
 
@@ -409,6 +415,7 @@ class CouponController extends BaseAdminController
             // Insert mode
             $conditions[] = $conditionToSave;
         }
+
         $couponManager->setConditions($conditions);
 
         $this->manageConditionUpdate($eventDispatcher, $coupon, $conditions);
@@ -461,11 +468,11 @@ class CouponController extends BaseAdminController
      *
      * @param string     $action  Creation|Update|Delete
      * @param string     $message Message to log
-     * @param \Exception $e       Exception to log
+     * @param Exception $e Exception to log
      *
      * @return $this
      */
-    protected function logError($action, $message, $e)
+    protected function logError(string $action, $message, $e): static
     {
         Tlog::getInstance()->error(
             sprintf(
@@ -488,7 +495,7 @@ class CouponController extends BaseAdminController
      *
      * @return $this
      */
-    protected function validateCreateOrUpdateForm(EventDispatcherInterface $eventDispatcher, $eventToDispatch, $log, $action, Coupon $model = null)
+    protected function validateCreateOrUpdateForm(EventDispatcherInterface $eventDispatcher, ?string $eventToDispatch, string $log, $action, Coupon $model = null): ?RedirectResponse
     {
         // Create the form from the request
         $couponForm = $this->getForm($action, $model);
@@ -532,7 +539,7 @@ class CouponController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Invalid data entered
             $message = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $message = $this->getTranslator()->trans('Sorry, an error occurred: %err', ['%err' => $ex->getMessage()]);
 
@@ -554,10 +561,8 @@ class CouponController extends BaseAdminController
 
     /**
      * Get all available conditions.
-     *
-     * @return array
      */
-    protected function getAvailableConditions()
+    protected function getAvailableConditions(): array
     {
         /** @var CouponManager $couponManager */
         $couponManager = $this->container->get('thelia.coupon.manager');
@@ -577,10 +582,8 @@ class CouponController extends BaseAdminController
 
     /**
      * Get all available coupons.
-     *
-     * @return array
      */
-    protected function getAvailableCoupons()
+    protected function getAvailableCoupons(): array
     {
         /** @var CouponManager $couponManager */
         $couponManager = $this->container->get('thelia.coupon.manager');
@@ -603,10 +606,8 @@ class CouponController extends BaseAdminController
      * Clean condition for template.
      *
      * @param ConditionCollection $conditions Condition collection
-     *
-     * @return array
      */
-    protected function cleanConditionForTemplate(ConditionCollection $conditions)
+    protected function cleanConditionForTemplate(ConditionCollection $conditions): array
     {
         $cleanedConditions = [];
         /** @var $condition ConditionInterface */
@@ -700,10 +701,8 @@ class CouponController extends BaseAdminController
      *
      * @param Form   $form  Form containing user data
      * @param Coupon $model Model if in update mode
-     *
-     * @return CouponCreateOrUpdateEvent
      */
-    protected function feedCouponCreateOrUpdateEvent(Form $form, Coupon $model = null)
+    protected function feedCouponCreateOrUpdateEvent(Form $form, Coupon $model = null): CouponCreateOrUpdateEvent
     {
         // Get the form field values
         $data = $form->getData();
@@ -720,7 +719,7 @@ class CouponController extends BaseAdminController
             $data['shortDescription'],
             $data['description'],
             $data['isEnabled'],
-            \DateTime::createFromFormat($this->getDefaultDateFormat(), $data['expirationDate']),
+            DateTime::createFromFormat($this->getDefaultDateFormat(), $data['expirationDate']),
             $data['isAvailableOnSpecialOffers'],
             $data['isCumulative'],
             $data['isRemovingPostage'],
@@ -729,7 +728,7 @@ class CouponController extends BaseAdminController
             $data['freeShippingForCountries'],
             $data['freeShippingForModules'],
             $data['perCustomerUsageCount'],
-            empty($data['startDate']) ? null : \DateTime::createFromFormat($this->getDefaultDateFormat(), $data['startDate'])
+            empty($data['startDate']) ? null : DateTime::createFromFormat($this->getDefaultDateFormat(), $data['startDate'])
         );
 
         // If Update mode
@@ -823,10 +822,8 @@ class CouponController extends BaseAdminController
     /**
      * @param string      $action
      * @param Coupon|null $coupon
-     *
-     * @return \Thelia\Form\BaseForm
      */
-    protected function getForm($action, $coupon)
+    protected function getForm($action, $coupon): BaseForm
     {
         $data = [];
 
@@ -860,7 +857,7 @@ class CouponController extends BaseAdminController
 
             $eventDispatcher->dispatch($deleteEvent, TheliaEvents::COUPON_DELETE);
 
-            if (null !== $deletedObject = $deleteEvent->getCoupon()) {
+            if (($deletedObject = $deleteEvent->getCoupon()) instanceof Coupon) {
                 $this->adminLogAppend(
                     AdminResources::COUPON,
                     AccessManager::DELETE,
@@ -876,9 +873,9 @@ class CouponController extends BaseAdminController
             return new RedirectResponse(
                 URL::getInstance()->absoluteUrl($this->getRoute('admin.coupon.list'))
             );
-        } catch (\Exception $e) {
+        } catch (Exception $exception) {
             $this->getParserContext()
-                ->setGeneralError($e->getMessage())
+                ->setGeneralError($exception->getMessage())
             ;
 
             return $this->browseAction();

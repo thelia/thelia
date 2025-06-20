@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Service;
 
+use InvalidArgumentException;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Model\ConfigQuery;
 
@@ -34,8 +36,9 @@ class TemplateService
     public static function getTemplateAbsolutePathByType(string $type): string
     {
         if (!isset(TemplateDefinition::CONFIG_NAMES[$type])) {
-            throw new \InvalidArgumentException("Invalid template type: $type");
+            throw new InvalidArgumentException('Invalid template type: ' . $type);
         }
+
         $configName = TemplateDefinition::CONFIG_NAMES[$type];
 
         return THELIA_TEMPLATE_DIR.$type.DS.ConfigQuery::read($configName, 'default');

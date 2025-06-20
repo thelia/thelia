@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\ProductFilter;
 
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
@@ -30,11 +31,13 @@ class ProductPriceOrderFilter extends AbstractFilter
         if ($property !== self::PRICE_ORDER_NAME) {
             return;
         }
+
         $priceOrder = $value;
         $priceOrder = strtoupper((string) $priceOrder);
         if (!$query instanceof ProductQuery || !\in_array($priceOrder, [Criteria::DESC, Criteria::ASC], true)) {
             return;
         }
+
         /* ProductQuery $query * */
         $query
             ->useProductSaleElementsQuery()

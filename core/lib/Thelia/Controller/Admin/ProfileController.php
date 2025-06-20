@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Thelia\Form\BaseForm;
+use LogicException;
+use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Profile\ProfileEvent;
@@ -42,17 +46,17 @@ class ProfileController extends AbstractCrudController
         );
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::PROFILE_CREATION);
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::PROFILE_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent($formData): ProfileEvent
     {
         $event = new ProfileEvent();
 
@@ -66,7 +70,7 @@ class ProfileController extends AbstractCrudController
         return $event;
     }
 
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent($formData): ProfileEvent
     {
         $event = new ProfileEvent();
 
@@ -80,7 +84,7 @@ class ProfileController extends AbstractCrudController
         return $event;
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): ProfileEvent
     {
         $event = new ProfileEvent();
 
@@ -93,20 +97,16 @@ class ProfileController extends AbstractCrudController
 
     /**
      * @param ProfileEvent $event
-     *
-     * @return bool
      */
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasProfile();
     }
 
     /**
      * @param Profile $object
-     *
-     * @return \Thelia\Form\BaseForm
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -122,10 +122,8 @@ class ProfileController extends AbstractCrudController
 
     /**
      * @param Profile $object
-     *
-     * @return \Thelia\Form\BaseForm
      */
-    protected function hydrateResourceUpdateForm($object)
+    protected function hydrateResourceUpdateForm($object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -137,10 +135,8 @@ class ProfileController extends AbstractCrudController
 
     /**
      * @param Profile $object
-     *
-     * @return \Thelia\Form\BaseForm
      */
-    protected function hydrateModuleUpdateForm($object)
+    protected function hydrateModuleUpdateForm($object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -187,12 +183,12 @@ class ProfileController extends AbstractCrudController
         return $object->getId();
     }
 
-    protected function getViewArguments()
+    protected function getViewArguments(): array
     {
         return (null !== $tab = $this->getRequest()->get('tab')) ? ['tab' => $tab] : [];
     }
 
-    protected function getRouteArguments($profile_id = null)
+    protected function getRouteArguments($profile_id = null): array
     {
         return [
             'profile_id' => $profile_id ?? $this->getRequest()->get('profile_id'),
@@ -266,7 +262,7 @@ class ProfileController extends AbstractCrudController
         return parent::updateAction($parserContext);
     }
 
-    protected function getUpdateResourceAccessEvent($formData)
+    protected function getUpdateResourceAccessEvent(array $formData): ProfileEvent
     {
         $event = new ProfileEvent();
 
@@ -276,7 +272,7 @@ class ProfileController extends AbstractCrudController
         return $event;
     }
 
-    protected function getUpdateModuleAccessEvent($formData)
+    protected function getUpdateModuleAccessEvent(array $formData): ProfileEvent
     {
         $event = new ProfileEvent();
 
@@ -286,7 +282,10 @@ class ProfileController extends AbstractCrudController
         return $event;
     }
 
-    protected function getResourceAccess($formData)
+    /**
+     * @return mixed[]
+     */
+    protected function getResourceAccess($formData): array
     {
         $requirements = [];
         foreach ($formData as $data => $value) {
@@ -308,7 +307,10 @@ class ProfileController extends AbstractCrudController
         return $requirements;
     }
 
-    protected function getModuleAccess($formData)
+    /**
+     * @return mixed[]
+     */
+    protected function getModuleAccess($formData): array
     {
         $requirements = [];
         foreach ($formData as $data => $value) {
@@ -352,7 +354,7 @@ class ProfileController extends AbstractCrudController
             $eventDispatcher->dispatch($changeEvent, TheliaEvents::PROFILE_RESOURCE_ACCESS_UPDATE);
 
             if (!$this->eventContainsObject($changeEvent)) {
-                throw new \LogicException(
+                throw new LogicException(
                     $this->getTranslator()->trans('No %obj was updated.', ['%obj', $this->objectName])
                 );
             }
@@ -372,7 +374,7 @@ class ProfileController extends AbstractCrudController
                 );
             }
 
-            if ($response == null) {
+            if ($response === null) {
                 return $this->redirectToEditionTemplate();
             }
 
@@ -380,7 +382,7 @@ class ProfileController extends AbstractCrudController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -413,7 +415,7 @@ class ProfileController extends AbstractCrudController
             $eventDispatcher->dispatch($changeEvent, TheliaEvents::PROFILE_MODULE_ACCESS_UPDATE);
 
             if (!$this->eventContainsObject($changeEvent)) {
-                throw new \LogicException(
+                throw new LogicException(
                     $this->getTranslator()->trans('No %obj was updated.', ['%obj', $this->objectName])
                 );
             }
@@ -433,7 +435,7 @@ class ProfileController extends AbstractCrudController
                 );
             }
 
-            if ($response == null) {
+            if ($response === null) {
                 return $this->redirectToEditionTemplate();
             }
 
@@ -441,7 +443,7 @@ class ProfileController extends AbstractCrudController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }

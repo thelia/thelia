@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Routing;
 
+use Thelia\Controller\Front\DefaultController;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -39,6 +41,7 @@ use Thelia\Tools\URL;
 class RewritingRouter implements RouterInterface, RequestMatcherInterface
 {
     protected RequestContext $context;
+
     protected array $options;
 
     public function match(string $pathinfo): array
@@ -61,10 +64,10 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
 
         try {
             $rewrittenUrlData = $urlTool->resolve($pathInfo);
-        } catch (UrlRewritingException $e) {
-            throw match ($e->getCode()) {
+        } catch (UrlRewritingException $urlRewritingException) {
+            throw match ($urlRewritingException->getCode()) {
                 UrlRewritingException::URL_NOT_FOUND => new ResourceNotFoundException(),
-                default => $e,
+                default => $urlRewritingException,
             };
         }
 
@@ -140,7 +143,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
     private function defaultActionOptions(): array
     {
         return [
-            '_controller' => 'Thelia\\Controller\\Front\\DefaultController::noAction',
+            '_controller' => DefaultController::class . '::noAction',
             '_route' => 'rewrite',
             '_rewritten' => true,
         ];

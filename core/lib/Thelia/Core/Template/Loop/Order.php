@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Type\IntType;
+use Thelia\Type\EnumType;
+use Thelia\Type\IntListType;
+use Thelia\Type\AnyListType;
+use Thelia\Type\EnumListType;
+use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -27,7 +34,6 @@ use Thelia\Model\Map\OrderAddressTableMap;
 use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\TaxEngine\Calculator;
-use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
@@ -50,10 +56,12 @@ use Thelia\Type\TypeCollection;
 class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInterface
 {
     protected $countable = true;
+
     protected $timestampable = true;
+
     protected $versionable = false;
 
-    public function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
@@ -65,31 +73,31 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
             new Argument(
                 'customer',
                 new TypeCollection(
-                    new Type\IntType(),
-                    new Type\EnumType(['current', '*'])
+                    new IntType(),
+                    new EnumType(['current', '*'])
                 ),
                 'current'
             ),
             new Argument(
                 'status',
                 new TypeCollection(
-                    new Type\IntListType(),
-                    new Type\EnumType(['*'])
+                    new IntListType(),
+                    new EnumType(['*'])
                 )
             ),
             Argument::createIntListTypeArgument('exclude_status'),
             new Argument(
                 'status_code',
                 new TypeCollection(
-                    new Type\AnyListType(),
-                    new Type\EnumType(['*'])
+                    new AnyListType(),
+                    new EnumType(['*'])
                 )
             ),
             Argument::createAnyListTypeArgument('exclude_status_code'),
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(
+                    new EnumListType(
                         [
                             'id', 'id-reverse',
                             'reference', 'reference-reverse',
@@ -106,7 +114,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
         );
     }
 
-    public function getSearchIn()
+    public function getSearchIn(): array
     {
         return [
             'ref',
@@ -123,7 +131,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
     /**
      * @param OrderQuery $search
      *
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria): void
     {
@@ -132,6 +140,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
             if ($index > 0) {
                 $search->_or();
             }
+
             switch ($searchInElement) {
                 case 'ref':
                     $search->filterByRef($searchTerm, $searchCriteria);
@@ -309,18 +318,16 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
-     * @return LoopResult
+     * @throws PropelException
      */
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         $lastLegacyOrderId = ConfigQuery::read('last_legacy_rounding_order_id', 0);
 
         /** @var \Thelia\Model\Order $order */
         foreach ($loopResult->getResultDataCollection() as $order) {
-            $tax = $itemsTax = 0;
-
+            $tax = 0;
+            $itemsTax = 0;
             $amount = $order->getTotalAmount($tax);
             $itemsAmount = $order->getTotalAmount($itemsTax, false, false);
 

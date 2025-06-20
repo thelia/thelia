@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,15 +11,18 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Product;
 
 class ProductUpdateEvent extends ProductCreateEvent
 {
     protected $chapo;
+
     protected $description;
+
     protected $postscriptum;
+
     protected $brand_id;
+
     protected $virtual_document_id;
 
     /**
@@ -32,7 +37,7 @@ class ProductUpdateEvent extends ProductCreateEvent
         return $this->product_id;
     }
 
-    public function setProductId($product_id)
+    public function setProductId($product_id): static
     {
         $this->product_id = $product_id;
 
@@ -44,7 +49,7 @@ class ProductUpdateEvent extends ProductCreateEvent
         return $this->chapo;
     }
 
-    public function setChapo($chapo)
+    public function setChapo($chapo): static
     {
         $this->chapo = $chapo;
 
@@ -56,7 +61,7 @@ class ProductUpdateEvent extends ProductCreateEvent
         return $this->description;
     }
 
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->description = $description;
 
@@ -68,7 +73,7 @@ class ProductUpdateEvent extends ProductCreateEvent
         return $this->postscriptum;
     }
 
-    public function setPostscriptum($postscriptum)
+    public function setPostscriptum($postscriptum): static
     {
         $this->postscriptum = $postscriptum;
 
@@ -80,7 +85,7 @@ class ProductUpdateEvent extends ProductCreateEvent
      *
      * @return $this
      */
-    public function setBrandId($brand_id)
+    public function setBrandId($brand_id): static
     {
         $this->brand_id = $brand_id;
 
@@ -98,7 +103,7 @@ class ProductUpdateEvent extends ProductCreateEvent
     /**
      * @return $this
      */
-    public function setVirtualDocumentId($virtual_document_id)
+    public function setVirtualDocumentId($virtual_document_id): static
     {
         $this->virtual_document_id = $virtual_document_id;
 

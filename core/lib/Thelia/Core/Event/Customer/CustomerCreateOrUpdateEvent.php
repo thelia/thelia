@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Customer;
 
 /**
@@ -19,31 +20,31 @@ namespace Thelia\Core\Event\Customer;
  */
 class CustomerCreateOrUpdateEvent extends CustomerEvent
 {
-    // base parameters for creating new customer
-    protected $title;
-    protected $firstname;
-    protected $lastname;
-    protected $address1;
-    protected $address2;
-    protected $address3;
-    protected $phone;
-    protected $cellphone;
-    protected $zipcode;
-    protected $city;
-    protected $country;
-    protected $state;
-    protected $email;
-    protected $password;
-    protected $langId;
-    protected $reseller;
-    protected $sponsor;
-    protected $discount;
-    protected $company;
-    protected $ref;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     protected $emailUpdateAllowed;
 
     /** @var bool */
     protected $notifyCustomerOfAccountCreation;
+
     /** @var bool */
     protected $notifyCustomerOfAccountModification = true;
 
@@ -56,52 +57,31 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
      * @param int|null $state    thre State ID
      */
     public function __construct(
-        int $title = null,
-        string $firstname = null,
-        string $lastname = null,
-        string $address1 = null,
-        string $address2 = null,
-        string $address3 = null,
-        string $phone = null,
-        string $cellphone = null,
-        string $zipcode = null,
-        string $city = null,
-        string $country = null,
-        string $email = null,
-        string $password = null,
-        int $langId = null,
-        int $reseller = null,
-        int $sponsor = null,
-        float $discount = null,
-        string $company = null,
-        string $ref = null,
-        int $state = null
+        protected ?int $title = null,
+        protected ?string $firstname = null,
+        protected ?string $lastname = null,
+        protected ?string $address1 = null,
+        protected ?string $address2 = null,
+        protected ?string $address3 = null,
+        protected ?string $phone = null,
+        protected ?string $cellphone = null,
+        protected ?string $zipcode = null,
+        protected ?string $city = null,
+        protected ?string $country = null,
+        protected ?string $email = null,
+        protected ?string $password = null,
+        protected ?int $langId = null,
+        protected ?int $reseller = null,
+        protected ?int $sponsor = null,
+        protected ?float $discount = null,
+        protected ?string $company = null,
+        protected ?string $ref = null,
+        protected ?int $state = null
     ) {
         parent::__construct();
-
-        $this->address1 = $address1;
-        $this->address2 = $address2;
-        $this->address3 = $address3;
-        $this->country = $country;
-        $this->state = $state;
-        $this->email = $email;
-        $this->firstname = $firstname;
-        $this->langId = $langId;
-        $this->lastname = $lastname;
-        $this->password = $password;
-        $this->phone = $phone;
-        $this->cellphone = $cellphone;
-        $this->title = $title;
-        $this->zipcode = $zipcode;
-        $this->city = $city;
-        $this->reseller = $reseller;
-        $this->sponsor = $sponsor;
-        $this->discount = $discount;
-        $this->company = $company;
-        $this->ref = $ref;
     }
 
-    public function getCompany()
+    public function getCompany(): ?string
     {
         return $this->company;
     }
@@ -109,7 +89,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     /**
      * @return string
      */
-    public function getAddress1()
+    public function getAddress1(): ?string
     {
         return $this->address1;
     }
@@ -117,7 +97,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     /**
      * @return string
      */
-    public function getAddress2()
+    public function getAddress2(): ?string
     {
         return $this->address2;
     }
@@ -125,7 +105,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     /**
      * @return string
      */
-    public function getAddress3()
+    public function getAddress3(): ?string
     {
         return $this->address3;
     }
@@ -133,15 +113,12 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     /**
      * @return int
      */
-    public function getCountry()
+    public function getCountry(): ?string
     {
         return $this->country;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getState()
+    public function getState(): ?int
     {
         return $this->state;
     }
@@ -149,7 +126,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     /**
      * @return string
      */
-    public function getEmail()
+    public function getEmail(): ?string
     {
         return $this->email;
     }
@@ -157,12 +134,12 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     /**
      * @return string
      */
-    public function getFirstname()
+    public function getFirstname(): ?string
     {
         return $this->firstname;
     }
 
-    public function getLangId()
+    public function getLangId(): ?int
     {
         return $this->langId;
     }
@@ -170,7 +147,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     /**
      * @return string
      */
-    public function getLastname()
+    public function getLastname(): ?string
     {
         return $this->lastname;
     }
@@ -178,7 +155,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     /**
      * @return string
      */
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -188,7 +165,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
      *
      * @return $this
      */
-    public function setPassword($password)
+    public function setPassword(?string $password): static
     {
         $this->password = $password;
 
@@ -198,7 +175,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     /**
      * @return string
      */
-    public function getPhone()
+    public function getPhone(): ?string
     {
         return $this->phone;
     }
@@ -206,7 +183,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     /**
      * @return string
      */
-    public function getCellphone()
+    public function getCellphone(): ?string
     {
         return $this->cellphone;
     }
@@ -214,7 +191,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     /**
      * @return int
      */
-    public function getTitle()
+    public function getTitle(): ?int
     {
         return $this->title;
     }
@@ -222,7 +199,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     /**
      * @return string
      */
-    public function getZipcode()
+    public function getZipcode(): ?string
     {
         return $this->zipcode;
     }
@@ -230,7 +207,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     /**
      * @return string
      */
-    public function getCity()
+    public function getCity(): ?string
     {
         return $this->city;
     }
@@ -238,7 +215,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     /**
      * @return float
      */
-    public function getDiscount()
+    public function getDiscount(): ?float
     {
         return $this->discount;
     }
@@ -246,7 +223,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     /**
      * @return int
      */
-    public function getReseller()
+    public function getReseller(): ?int
     {
         return $this->reseller;
     }
@@ -254,7 +231,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     /**
      * @return int
      */
-    public function getSponsor()
+    public function getSponsor(): ?int
     {
         return $this->sponsor;
     }
@@ -262,7 +239,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     /**
      * @return string
      */
-    public function getRef()
+    public function getRef(): ?string
     {
         return $this->ref;
     }
@@ -270,7 +247,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     /**
      * @return $this
      */
-    public function setEmailUpdateAllowed($emailUpdateAllowed)
+    public function setEmailUpdateAllowed($emailUpdateAllowed): static
     {
         $this->emailUpdateAllowed = $emailUpdateAllowed;
 
@@ -287,7 +264,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
      *
      * @return $this
      */
-    public function setNotifyCustomerOfAccountCreation($notifyCustomerOfAccountCreation)
+    public function setNotifyCustomerOfAccountCreation($notifyCustomerOfAccountCreation): static
     {
         $this->notifyCustomerOfAccountCreation = $notifyCustomerOfAccountCreation;
 
@@ -315,7 +292,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
      *
      * @return $this
      */
-    public function setNotifyCustomerOfAccountModification($notifyCustomerOfAccountModification)
+    public function setNotifyCustomerOfAccountModification($notifyCustomerOfAccountModification): static
     {
         $this->notifyCustomerOfAccountModification = $notifyCustomerOfAccountModification;
 

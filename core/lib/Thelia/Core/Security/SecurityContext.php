@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Security;
 
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use LogicException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\Resource\AdminResources;
@@ -36,8 +39,8 @@ class SecurityContext
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
 
-        if ($session === null) {
-            throw new \LogicException('No session found.');
+        if (!$session instanceof SessionInterface) {
+            throw new LogicException('No session found.');
         }
 
         return $session;
@@ -48,7 +51,7 @@ class SecurityContext
      *
      * @return UserInterface|null A UserInterface instance or null if no user is available
      */
-    public function getAdminUser()
+    public function getAdminUser(): mixed
     {
         return $this->getSession()->getAdminUser();
     }
@@ -58,7 +61,7 @@ class SecurityContext
      *
      * @return true if an admin user is logged in, false otherwise
      */
-    public function hasAdminUser()
+    public function hasAdminUser(): bool
     {
         return $this->getSession()->getAdminUser() !== null;
     }
@@ -68,7 +71,7 @@ class SecurityContext
      *
      * @return Customer|null A UserInterface instance or null if no user is available
      */
-    public function getCustomerUser()
+    public function getCustomerUser(): mixed
     {
         return $this->getSession()->getCustomerUser();
     }
@@ -78,7 +81,7 @@ class SecurityContext
      *
      * @return true if a customer is logged in, false otherwise
      */
-    public function hasCustomerUser()
+    public function hasCustomerUser(): bool
     {
         return $this->getSession()->getCustomerUser() !== null;
     }
@@ -86,7 +89,7 @@ class SecurityContext
     /**
      * @return bool true if a user (either admin or customer) is logged in, false otherwise
      */
-    final public function hasLoggedInUser()
+    final public function hasLoggedInUser(): bool
     {
         return $this->hasCustomerUser() || $this->hasAdminUser();
     }
@@ -99,7 +102,7 @@ class SecurityContext
      *
      * @return bool true if the user has the required role, false otherwise
      */
-    final public function hasRequiredRole(UserInterface $user = null, array $roles = [])
+    final public function hasRequiredRole(UserInterface $user = null, array $roles = []): bool
     {
         if ($user != null) {
             // Check if user's roles matches required roles
@@ -115,13 +118,13 @@ class SecurityContext
         return false;
     }
 
-    final public function isUserGranted(array $roles, array $resources, array $modules, array $accesses, UserInterface $user)
+    final public function isUserGranted(array $roles, array $resources, array $modules, array $accesses, UserInterface $user): bool
     {
         if (!$this->hasRequiredRole($user, $roles)) {
             return false;
         }
 
-        if ((empty($resources) && empty($modules)) || empty($accesses)) {
+        if (($resources === [] && $modules === []) || $accesses === []) {
             return true;
         }
 

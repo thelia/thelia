@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 return [
     ' content create form' => ' tartalom-létrehozó űrlap',
     ' note: only non-visible documents can be associated.' => ' Megjegyzés: csak a nem látható dokumentumok társíthatók.',
@@ -21,7 +22,7 @@ return [
     'A comma separated list of email addresses' => 'E-mail címek egy vesszővel elválasztott listája',
     'A currency with code "%name" already exists.' => '"%name" kódú pénznem már létezik.',
     'A name such as Europe or Overseas' => 'név pl. Európai, Tengeren túli stb.',
-    'A user already exists with this email address. Please login or if you\'ve forgotten your password, go to Reset Your Password.' => 'Egy felhasználó már létezik ezzel az e-mail címmel. Kérjük, jelentkezzen be, vagy ha elfelejtette a jelszavát, használja a jelszó-emlékeztetőt.',
+    "A user already exists with this email address. Please login or if you've forgotten your password, go to Reset Your Password." => 'Egy felhasználó már létezik ezzel az e-mail címmel. Kérjük, jelentkezzen be, vagy ha elfelejtette a jelszavát, használja a jelszó-emlékeztetőt.',
     'Activate logs only for these IP Addresses' => 'Naplók aktiválása csak ezekhez az IP címekhez',
     'Activate logs only for these files' => 'Naplók aktiválása csak ezekhez a fájlokhoz',
     'Activate this sale' => 'A kampán indítása',
@@ -81,7 +82,7 @@ return [
     'Confirm Email Address' => 'Ismételje meg az email címet',
     'Confirm Email address' => 'Ismételje meg az email címet',
     'Constant amount' => 'Meghatározott érték',
-    'Constant amount found in one of the product\'s feature' => 'Meghatározott érték egy konkrét termékjellemzőhöz kötve',
+    "Constant amount found in one of the product's feature" => 'Meghatározott érték egy konkrét termékjellemzőhöz kötve',
     'Contact page' => 'Kapcsolat oldal',
     'Content' => 'Tartalom',
     'Content page' => 'Tartalmi oldal',
@@ -114,7 +115,7 @@ return [
     'Detailed description' => 'Részetes leírás',
     'Discount type' => 'Kedvezmény típus',
     'Display initial product prices on front-office' => 'Az eredeti ár megjelenítése a boltban',
-    'Don\'t repeat keywords over and over in a row. Rather, put in keyword phrases.' => 'Figyeljen arra, hogy a kulcsszavak ne ismétlődjenek. Különböző kifejezéseket keressen.',
+    "Don't repeat keywords over and over in a row. Rather, put in keyword phrases." => 'Figyeljen arra, hogy a kulcsszavak ne ismétlődjenek. Különböző kifejezéseket keressen.',
     'EAN Code' => 'EAN kód',
     'Edit' => 'Szerkesztés',
     'Email Address' => 'Email cím',
@@ -224,7 +225,7 @@ return [
     'Select the discount type that will be applied to original product prices' => 'Válassza ki a kedvezmény típusát, ami a termékek eredeti árát módosítani fogja',
     'Select the parent category of this category.' => 'Válassza ki a szülő kategóriát.',
     'Select the product brand, or supplier.' => 'Válassz márkát/beszállítót.',
-    'Sender\'s e-mail address: %email%' => 'A feladó e-mail címe: %email%',
+    "Sender's e-mail address: %email%" => 'A feladó e-mail címe: %email%',
     'Sender name: %name%' => 'Feladó neve: %name%',
     'Shipping configuration' => 'Szállítási beállítások',
     'Shipping zone name' => 'Szállítási zóna név',
@@ -236,7 +237,7 @@ return [
     'Sorry, an error occured: %s' => 'Elnézést, hiba történt: %s',
     'Sorry, an error occurred: %err' => 'Elnézést, hiba történt: %err',
     'Sorry, you are not allowed to perform this action.' => 'Elnézést, nem hajthatja végre ezt a műveletet.',
-    'Sorry, you\'re not allowed to perform this action' => 'Elnézést, nem hajthatja végre ezt a műveletet.',
+    "Sorry, you're not allowed to perform this action" => 'Elnézést, nem hajthatja végre ezt a műveletet.',
     'Start date' => 'Induló dátum',
     'Start date of sales' => 'Kampány indításának ideje',
     'Stock' => 'Raktár',
@@ -265,8 +266,8 @@ return [
     'The coupon applies to some customers only' => 'A kupon csak a megadott ügyfeleknek érvényes',
     'The coupon applies to the selected billing countries' => 'A kupon érvényes a kiválasztott számlázási cím(ország) esetén',
     'The coupon applies to the selected delivery countries' => 'A kupon érvényes a kiválasztott szállítási cím(ország) esetén',
-    'The coupon code \'%code\' already exist. Please choose another coupon code' => 'A kupon kód \'%code\' már létezik. Kérem adjon meg más kódot',
-    'The coupon code \'%code\' already exists. Please choose another coupon code' => 'A kupon kód \'%code\' már létezik. Kérem adjon meg más kódot',
+    "The coupon code '%code' already exist. Please choose another coupon code" => 'A kupon kód \'%code\' már létezik. Kérem adjon meg más kódot',
+    "The coupon code '%code' already exists. Please choose another coupon code" => 'A kupon kód \'%code\' már létezik. Kérem adjon meg más kódot',
     'The coupon is valid after a given date' => 'A kupon érvényes a megadott dátum után',
     'The date after which sales are de-activated. Please use %fmt format.' => 'A dátum/idő miután a kampány már nem lesz érvényes. Használja a %fmt dátumformátumot.',
     'The date from which sales are active. Please use %fmt format.' => 'A kampány indulásának dátuma/ideje. Használja a %fmt dátumformátumot.',
@@ -288,7 +289,7 @@ return [
     'This coupon subtracts the specified amount from the order total for each product which belongs to the selected categories. If the discount is greater than the total order, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.' => 'Ez a kupon a megadott értékkel csökkenti minden termék értékét a kiválasztott kategóriában. Ha a kedvezmény nagyobb mint a kosár összértéke, az ügyfélnek csak a szállítási költséget kell fizetnie(vagy azt sem ha a kupon ingyenes szállításra is jogosít).',
     'This coupon subtracts the specified amount from the order total for each product which uses the selected attribute values. If the discount is greater than the total order, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.' => 'Ez a kupon a megadott értékkel csökkenti minden kiválasztott tulajdonságú termék értékét. Ha a kedvezmény nagyobb mint a kosár összértéke, az ügyfélnek csak a szállítási költséget kell fizetnie(vagy azt sem ha a kupon ingyenes szállításra is jogosít).',
     'This coupon subtracts the specified amount from the order total for each selected product. If the discount is greater than the total order, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.' => 'Ez a kupon a megadott értékkel csökkenti minden termék kiválasztott termék értékét. Ha a kedvezmény nagyobb mint a kosár összértéke, az ügyfélnek csak a szállítási költséget kell fizetnie(vagy azt sem ha a kupon ingyenes szállításra is jogosít).',
-    'This coupon will offert a flat percentage off a shopper\'s entire order (not applied to shipping costs or tax rates). If the discount is greater than the total order corst, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.' => 'Ez a kupon a megadott százalékos értékkel csökkenti a kosár tartalmának értékét(nem vonatkozik a szállítási költségre). Ha a kedvezmény nagyobb mint a kosár összértéke, az ügyfélnek csak a szállítási költséget kell fizetnie(vagy azt sem ha a kupon ingyenes szállításra is jogosít).',
+    "This coupon will offert a flat percentage off a shopper's entire order (not applied to shipping costs or tax rates). If the discount is greater than the total order corst, the customer will only pay the shipping, or nothing if the coupon also provides free shipping." => 'Ez a kupon a megadott százalékos értékkel csökkenti a kosár tartalmának értékét(nem vonatkozik a szállítási költségre). Ha a kedvezmény nagyobb mint a kosár összértéke, az ügyfélnek csak a szállítási költséget kell fizetnie(vagy azt sem ha a kupon ingyenes szállításra is jogosít).',
     'This coupon will subtracts a set amount from the total cost of an order. If the discount is greater than the total order corst, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.' => 'Ez a kupon a megadott értékkel csökkenti a kosár tartalmának értékét. Ha a kedvezmény nagyobb mint a kosár összértéke, az ügyfélnek csak a szállítási költséget kell fizetnie(vagy azt sem ha a kupon ingyenes szállításra is jogosít).',
     'This document is online' => 'Elérhető az oldalon',
     'This folder is online.' => 'Elérhető az oldalon.',
@@ -296,8 +297,8 @@ return [
     'This is a comma separated list of email addresses where store notifications (such as order placed) are sent.' => 'Ez egy vesszővel elválasztott email-lista lehet, a listában szereplő címekre küld a rendszer értesítéseket(pl. megrendelés értesítője)',
     'This is an identifier that will be used in the code to get this message' => 'Ez egy azonosító amivel a programkódban hivatkozhat a sablonra',
     'This is the contact email address, and the sender email of all e-mails sent by your store.' => 'A rendszer ezzel az email címmel küld ki leveleket(mint feladó).',
-    'This is the message purpose, such as \'Order confirmation\'.' => '"Beszédes név", ami utal a levél tartalmára pl. \'Megrendelés Visszaigazolása\'.',
-    'This is the subject of the e-mail, such as \'Your order is confirmed\'.' => 'A levél tárgya, mint pl. \'Megrendelése jóváhagyásra került\'.',
+    "This is the message purpose, such as 'Order confirmation'." => '"Beszédes név", ami utal a levél tartalmára pl. \'Megrendelés Visszaigazolása\'.',
+    "This is the subject of the e-mail, such as 'Your order is confirmed'." => 'A levél tárgya, mint pl. \'Megrendelése jóváhagyásra került\'.',
     'This product does not have a physical presence' => 'Ez a termék fizikailag nem létezik',
     'This product is online' => 'Ez a termék elérhető az oldalon',
     'This the unique name of this message. Do not change this value unless you understand what you do.' => 'Egyedi megnevezés. Ne változtasson rajta, csak amennyiben tisztában azzal amit csinál!',
@@ -315,7 +316,7 @@ return [
     'Username' => 'Felhasználó',
     'Valid only from %date% to the coupon expiration date' => 'Érvényes a %date% dátumtól a kupon lejárati dátumáig',
     'Value' => 'Érték',
-    'You don\'t need to use commas or other punctuations.' => 'Nem kell vesszőt vagy más határolót használnia.',
+    "You don't need to use commas or other punctuations." => 'Nem kell vesszőt vagy más határolót használnia.',
     'Zip code' => 'Irányítószám',
     'date format' => 'Dátum formátum',
     'decimal separator' => 'Tizedesjegy jelölő',

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Security\Authentication;
 
+use Symfony\Component\Security\Core\User\UserInterface;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Validator\Exception\ValidatorException;
@@ -24,19 +27,15 @@ use Thelia\Model\Customer;
 
 class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
 {
-    protected $request;
+
     protected $loginForm;
-    protected $userProvider;
+
+
     protected $options;
 
-    protected $baseLoginForm;
-
-    public function __construct(Request $request, BaseForm $loginForm, UserProviderInterface $userProvider, array $options = [])
+    public function __construct(protected Request $request, protected BaseForm $baseLoginForm, protected UserProviderInterface $userProvider, array $options = [])
     {
-        $this->request = $request;
-        $this->baseLoginForm = $loginForm;
         $this->loginForm = $this->baseLoginForm->getForm();
-        $this->userProvider = $userProvider;
 
         $defaults = [
             'required_method' => 'POST',
@@ -71,27 +70,25 @@ class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
 
             $user = $this->userProvider->loadUserByIdentifier($username);
 
-            if ($user === null) {
+            if (!$user instanceof UserInterface) {
                 throw new UsernameNotFoundException(sprintf("Username '%s' was not found.", $username));
             }
 
             // Check user password
             $authOk = $user->checkPassword($password) === true;
 
-            if ($authOk !== true) {
+            if (!$authOk) {
                 throw new WrongPasswordException(sprintf("Wrong password for user '%s'.", $username));
             }
 
-            if (ConfigQuery::isCustomerEmailConfirmationEnable() && $user instanceof Customer) {
-                // Customer email confirmation feature is available since Thelia 2.3.4
-                if ($user->getConfirmationToken() !== null && !$user->getEnable()) {
-                    throw (new CustomerNotConfirmedException())->setUser($user);
-                }
+            // Customer email confirmation feature is available since Thelia 2.3.4
+            if (ConfigQuery::isCustomerEmailConfirmationEnable() && $user instanceof Customer && ($user->getConfirmationToken() !== null && !$user->getEnable())) {
+                throw (new CustomerNotConfirmedException())->setUser($user);
             }
 
             return $user;
         }
 
-        throw new \RuntimeException('Invalid method.');
+        throw new RuntimeException('Invalid method.');
     }
 }

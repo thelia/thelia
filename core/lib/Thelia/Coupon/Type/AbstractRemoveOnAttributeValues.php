@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Coupon\Type;
 
+
+use InvalidArgumentException;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\AttributeCombination;
@@ -25,26 +28,23 @@ use Thelia\Model\CartItem;
 abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements AmountAndPercentageCouponInterface
 {
     public const ATTRIBUTES_AV_LIST = 'attribute_avs';
+
     public const ATTRIBUTE = 'attribute_id';
 
-    public $attributeAvList = [];
-    public $attribute = 0;
+    public array $attributeAvList = [];
+
+    public int $attribute = 0;
 
     /**
      * Set the value of specific coupon fields.
      *
-     * @param array $effects the Coupon effects params
      */
-    abstract public function setFieldsValue($effects);
+    abstract public function setFieldsValue(array $effects);
 
     /**
      * Get the discount for a specific cart item.
-     *
-     * @param CartItem $cartItem the cart item
-     *
-     * @return float the discount value
      */
-    abstract public function getCartItemDiscount(CartItem $cartItem);
+    abstract public function getCartItemDiscount(CartItem $cartItem): float;
 
     public function set(
         FacadeInterface $facade,
@@ -58,11 +58,12 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
         $isAvailableOnSpecialOffers,
         $isEnabled,
         $maxUsage,
-        \DateTime $expirationDate,
+        DateTime $expirationDate,
         $freeShippingForCountries,
         $freeShippingForModules,
         $perCustomerUsageCount
-    ) {
+    ): static
+    {
         parent::set(
             $facade,
             $code,
@@ -94,7 +95,7 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
         return $this;
     }
 
-    public function exec()
+    public function exec(): float|int
     {
         // This coupon subtracts the specified amount from the order total
         // for each product which uses the selected attributes
@@ -128,13 +129,8 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
     /**
      * Renders the template which implements coupon specific user-input,
      * using the provided template file, and a list of specific input fields.
-     *
-     * @param string $templateName the path to the template
-     * @param array  $otherFields  the list of additional fields fields
-     *
-     * @return string the rendered template
      */
-    public function drawBaseBackOfficeInputs($templateName, $otherFields)
+    public function drawBaseBackOfficeInputs(string $templateName, array $otherFields): string
     {
         return $this->facade->getParser()->render($templateName, array_merge($otherFields, [
             // The attributes list field
@@ -147,24 +143,24 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
         ]));
     }
 
-    public function getBaseFieldList($otherFields)
+    public function getBaseFieldList($otherFields): array
     {
         return array_merge($otherFields, [self::ATTRIBUTE, self::ATTRIBUTES_AV_LIST]);
     }
 
-    public function checkBaseCouponFieldValue($fieldName, $fieldValue)
+    public function checkBaseCouponFieldValue(string $fieldName, string $fieldValue): string
     {
         if ($fieldName === self::ATTRIBUTE) {
-            if (empty($fieldValue)) {
-                throw new \InvalidArgumentException(
+            if ($fieldValue === '' || $fieldValue === '0') {
+                throw new InvalidArgumentException(
                     Translator::getInstance()->trans(
                         'Please select an attribute'
                     )
                 );
             }
         } elseif ($fieldName === self::ATTRIBUTES_AV_LIST) {
-            if (empty($fieldValue)) {
-                throw new \InvalidArgumentException(
+            if ($fieldValue === '' || $fieldValue === '0') {
+                throw new InvalidArgumentException(
                     Translator::getInstance()->trans(
                         'Please select at least one attribute value'
                     )

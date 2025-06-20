@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\ProductSaleElement;
 
 use Thelia\Model\Product;
@@ -17,7 +18,9 @@ use Thelia\Model\Product;
 class ProductSaleElementCreateEvent extends ProductSaleElementEvent
 {
     protected $product;
+
     protected $attribute_av_list;
+
     protected $currency_id;
 
     public function __construct(Product $product, $attribute_av_list, $currency_id)
@@ -34,7 +37,7 @@ class ProductSaleElementCreateEvent extends ProductSaleElementEvent
         return $this->attribute_av_list;
     }
 
-    public function setAttributeAvList($attribute_av_list)
+    public function setAttributeAvList($attribute_av_list): static
     {
         $this->attribute_av_list = $attribute_av_list;
 
@@ -46,7 +49,7 @@ class ProductSaleElementCreateEvent extends ProductSaleElementEvent
         return $this->currency_id;
     }
 
-    public function setCurrencyId($currency_id)
+    public function setCurrencyId($currency_id): static
     {
         $this->currency_id = $currency_id;
 
@@ -61,7 +64,7 @@ class ProductSaleElementCreateEvent extends ProductSaleElementEvent
         return $this->product;
     }
 
-    public function setProduct($product)
+    public function setProduct($product): static
     {
         $this->product = $product;
 

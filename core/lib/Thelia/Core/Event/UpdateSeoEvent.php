@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event;
 
 class UpdateSeoEvent extends ActionEvent
@@ -35,7 +36,7 @@ class UpdateSeoEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setObjectId($object_id)
+    public function setObjectId($object_id): static
     {
         $this->object_id = $object_id;
 
@@ -53,7 +54,7 @@ class UpdateSeoEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setLocale($locale)
+    public function setLocale($locale): static
     {
         $this->locale = $locale;
 
@@ -71,7 +72,7 @@ class UpdateSeoEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setUrl($url)
+    public function setUrl($url): static
     {
         $this->url = $url;
 
@@ -89,7 +90,7 @@ class UpdateSeoEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setMetaTitle($meta_title)
+    public function setMetaTitle($meta_title): static
     {
         $this->meta_title = $meta_title;
 
@@ -107,7 +108,7 @@ class UpdateSeoEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setMetaDescription($meta_description)
+    public function setMetaDescription($meta_description): static
     {
         $this->meta_description = $meta_description;
 
@@ -125,14 +126,14 @@ class UpdateSeoEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setMetaKeywords($meta_keywords)
+    public function setMetaKeywords($meta_keywords): static
     {
         $this->meta_keywords = $meta_keywords;
 
         return $this;
     }
 
-    public function setObject($object)
+    public function setObject($object): static
     {
         $this->object = $object;
 

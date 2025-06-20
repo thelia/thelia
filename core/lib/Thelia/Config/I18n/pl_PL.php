@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 return [
     ' content create form' => ' formularz tworzenia treści',
     ' note: only non-visible documents can be associated.' => ' uwaga: tylko niewidoczne dokumenty mogą być powiązane.',
@@ -30,7 +31,7 @@ return [
     'A name such as Europe or Overseas' => 'Nazwa taka jak Europa lub Zagranica',
     'A product with reference %ref already exists. Please choose another reference.' => 'Produkt odwołujący się do %ref już istnieje. Proszę wybrać inne odwołanie.',
     'A short text, used when an additional or supplemental information is required.' => 'Krótki tekst, używany, gdy wymagane są dodatkowe lub uzupełniające informacje.',
-    'A user already exists with this email address. Please login or if you\'ve forgotten your password, go to Reset Your Password.' => 'Użytkownik z podanym adresem email już istnieje. Proszę się zalogować, lub jeżeli zapomniałeś hasła, przejdź do resetowania hasła.',
+    "A user already exists with this email address. Please login or if you've forgotten your password, go to Reset Your Password." => 'Użytkownik z podanym adresem email już istnieje. Proszę się zalogować, lub jeżeli zapomniałeś hasła, przejdź do resetowania hasła.',
     'A value for attribute "%name" is already present in the combination' => 'Wartość dla atrybutu "%name" została już wprowadzona w kombinacji',
     'A variable with name "%name" already exists.' => 'Zmienna o nazwie "%name" już istnieje.',
     'Activate logs only for these IP Addresses' => 'Aktywuj logi tylko dla tych adresów IP',
@@ -110,7 +111,7 @@ return [
     'Confirm Email Address' => 'Potwierdź swój adres email',
     'Confirm Email address' => 'Potwierdź swój adres email',
     'Constant amount' => 'Stała kwota',
-    'Constant amount found in one of the product\'s feature' => 'W jednej z cech produktów znaleziono stałą kwotę',
+    "Constant amount found in one of the product's feature" => 'W jednej z cech produktów znaleziono stałą kwotę',
     'Contact and sender email address' => 'Kontakt i adres email nadawcy',
     'Contact page' => 'Strona kontaktowa',
     'Content' => 'Zawartość',
@@ -131,7 +132,7 @@ return [
     'Current Password' => 'Aktualne hasło',
     'Customer is %op% <strong>%customer_list%</strong>' => 'Klient jest %op% <strong>%customer_list%</strong>',
     'Customers' => 'Klienci',
-    'Date \'%date\' is invalid, please enter a valid date using %fmt format' => 'Data \'%date\' jest nieprawidłowa, proszę podać prawidłową datę w formacie %fmt',
+    "Date '%date' is invalid, please enter a valid date using %fmt format" => 'Data \'%date\' jest nieprawidłowa, proszę podać prawidłową datę w formacie %fmt',
     'Debug' => 'Debuguj',
     'Decimal places' => 'Miejsca dziesiętne',
     'Default folder *' => 'Domyślny folder *',
@@ -172,7 +173,7 @@ return [
     'Failed to deactivate hook with id %s' => 'Nie udało się zdezaktywować hooka o identyfikatorze %s',
     'Failed to delete selected countries' => 'Nie udało się usunąć wybranych krajów',
     'Failed to find a payment Module with ID=%mid for order ID=%oid' => 'Nie udało się znaleźć modułu o ID=%mid dla zamówienia o ID=%oid',
-    'Failed to load message with code \'%code%\', propably because it does\'nt exists.' => 'Nie udało się załadować wiadomości z kodem \'%code%\', prawdopodobnie wiadomość nie istnieje.',
+    "Failed to load message with code '%code%', propably because it does'nt exists." => 'Nie udało się załadować wiadomości z kodem \'%code%\', prawdopodobnie wiadomość nie istnieje.',
     'Failed to send message %code. Failed recipients: %failed_addresses' => 'Nie udało się wysłać wiadomości %code. Błędni odbiorcy: %failed_addresses',
     'Failed to update language definition: %ex' => 'Nie udało się zaktualizować definicji języka: %ex',
     'Fax' => 'Fax',
@@ -218,8 +219,8 @@ return [
     'Login page' => 'Strona logowania',
     'Logs' => 'Logi',
     'Loop cannot implements multiple Search Interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`' => 'Pętla nie może implementować wielu interfejsów wyszukiwania: `PropelSearchLoopInterface`, `ArraySearchLoopInterface`',
-    'Loop must implements \'PropelSearchLoopInterface\' to be timestampable' => 'Pętla musi implementować \'PropelSearchLoopInterface\' by być timestampable',
-    'Loop must implements \'PropelSearchLoopInterface\' to be versionable' => 'Pętla musi implementować \'PropelSearchLoopInterface\' by być wersjonowana',
+    "Loop must implements 'PropelSearchLoopInterface' to be timestampable" => 'Pętla musi implementować \'PropelSearchLoopInterface\' by być timestampable',
+    "Loop must implements 'PropelSearchLoopInterface' to be versionable" => 'Pętla musi implementować \'PropelSearchLoopInterface\' by być wersjonowana',
     'Loop must implements one of the following interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`' => 'Pętla musi implementować jeden z następujących interfejsów: `PropelSearchLoopInterface`, `ArraySearchLoopInterface`',
     'Lost password' => 'Zagubione hasło',
     'Mail template name' => 'Nazwa szablonu maila',
@@ -236,7 +237,7 @@ return [
     'Method Name' => 'Nazwa metody',
     'Missing or invalid data: %s' => 'Brakujące lub nieprawidłowe dane: %s',
     'Module "%name%" directory was not found' => 'Katalog modułu "%name%" nieodnaleziony',
-    'Module %name directory doesn\'t exists.' => 'Katalog modułu %name nie istnieje.',
+    "Module %name directory doesn't exists." => 'Katalog modułu %name nie istnieje.',
     'Module %name should have a config.xml in the Config directory.' => 'Moduł %name powinien mieć plik config.xml w katalogu Config.',
     'Module %name should have a module.xml in the Config directory.' => 'Moduł %name powinien mieć plik module.xml w katalogu Config.',
     'Module ID "%id" was not found.' => 'Moduł o identyfikatorze "%id" nieodnaleziony.',
@@ -249,7 +250,7 @@ return [
     'Native' => 'Natywny',
     'New Password' => 'Nowe hasło',
     'Newsletter page' => 'Strona newslettera',
-    'No module found for code \'%item\'' => 'Brak modułu dla kodu \'%item\'',
+    "No module found for code '%item'" => 'Brak modułu dla kodu \'%item\'',
     'No, I am a new customer.' => 'Nie, jestem nowym klientem.',
     'None' => 'Żaden',
     'Not equal to' => 'Różny',
@@ -347,7 +348,7 @@ return [
     'URL_ALREADY_EXISTS' => 'Ten URL już istnieje',
     'Unable to process your request. Please try again (%err).' => 'Nie można przetworzyć żądania. Proszę spróbować ponownie (%err).',
     'Undefined loop argument "%name"' => 'Niezdefiniowany argument pętli "%name"',
-    'Undefined search mode \'%mode\'' => 'Niezdefiniowany tryb wyszukiwania \'%mode\'',
+    "Undefined search mode '%mode'" => "Niezdefiniowany tryb wyszukiwania '%mode'",
     'Unknown order ID:  %id' => 'Nieznany ID zamówienia: %id',
     'Unsupported magic method %name. only getArgname() is supported.' => 'Nieobsługiwana metoda magiczna %name. Obsługiwana jest tylko metoda getArgname().',
     'Unsupported type' => 'Nieobsługiwany typ',
@@ -367,7 +368,7 @@ return [
     'plain, login, cram-md5 or empty' => 'zwykły, logowania, cram-md5 lub pusty',
     'product list' => 'lista produktów',
     'row' => 'wiersz',
-    'Sender\'s e-mail address: %email%' => 'Adres e-mail nadawcy: %email%',
+    "Sender's e-mail address: %email%" => 'Adres e-mail nadawcy: %email%',
     'Sender name: %name%' => 'Nazwa nadawcy: %name%',
     'tax rule' => 'zasady podatkowe',
     'thousands separator' => 'separator tysiąca',

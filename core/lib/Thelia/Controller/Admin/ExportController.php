@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\Response;
+use Exception;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Thelia\Service\Handler\Exporthandler;
+use Thelia\Core\Serializer\SerializerManager;
+use Thelia\Core\Archiver\ArchiverManager;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -57,7 +64,7 @@ class ExportController extends BaseAdminController
     /**
      * Handle export position change action.
      *
-     * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Thelia\Core\HttpFoundation\Response|RedirectResponse
      */
     public function changeExportPositionAction(EventDispatcherInterface $eventDispatcher)
     {
@@ -83,7 +90,7 @@ class ExportController extends BaseAdminController
     /**
      * Handle export category position change action.
      *
-     * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Thelia\Core\HttpFoundation\Response|RedirectResponse
      */
     public function changeCategoryPositionAction(EventDispatcherInterface $eventDispatcher)
     {
@@ -113,7 +120,7 @@ class ExportController extends BaseAdminController
      *
      * @return int Position mode constant value
      */
-    protected function matchPositionMode($mode)
+    protected function matchPositionMode($mode): int
     {
         if ($mode === 'up') {
             return UpdatePositionEvent::POSITION_UP;
@@ -133,9 +140,9 @@ class ExportController extends BaseAdminController
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
-    public function configureAction($id)
+    public function configureAction(int $id)
     {
-        /** @var \Thelia\Service\Handler\Exporthandler $exportHandler */
+        /** @var Exporthandler $exportHandler */
         $exportHandler = $this->container->get('thelia.export.handler');
 
         $export = $exportHandler->getExport($id);
@@ -165,11 +172,11 @@ class ExportController extends BaseAdminController
      *
      * @param int $id An export identifier
      *
-     * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\BinaryFileResponse
+     * @return \Thelia\Core\HttpFoundation\Response|BinaryFileResponse
      */
-    public function exportAction($id)
+    public function exportAction(int $id)
     {
-        /** @var \Thelia\Service\Handler\Exporthandler $exportHandler */
+        /** @var Exporthandler $exportHandler */
         $exportHandler = $this->container->get('thelia.export.handler');
 
         $export = $exportHandler->getExport($id);
@@ -186,13 +193,13 @@ class ExportController extends BaseAdminController
 
             $lang = (new LangQuery())->findPk($validatedForm->get('language')->getData());
 
-            /** @var \Thelia\Core\Serializer\SerializerManager $serializerManager */
+            /** @var SerializerManager $serializerManager */
             $serializerManager = $this->container->get(RegisterSerializerPass::MANAGER_SERVICE_ID);
             $serializer = $serializerManager->get($validatedForm->get('serializer')->getData());
 
             $archiver = null;
             if ($validatedForm->get('do_compress')->getData()) {
-                /** @var \Thelia\Core\Archiver\ArchiverManager $archiverManager */
+                /** @var ArchiverManager $archiverManager */
                 $archiverManager = $this->container->get(RegisterArchiverPass::MANAGER_SERVICE_ID);
                 $archiver = $archiverManager->get($validatedForm->get('archiver')->getData());
             }
@@ -235,10 +242,10 @@ class ExportController extends BaseAdminController
                 ),
             ];
 
-            return new BinaryFileResponse($exportEvent->getFilePath(), 200, $header, false);
+            return new BinaryFileResponse($exportEvent->getFilePath(), Response::HTTP_OK, $header, false);
         } catch (FormValidationException $e) {
             $form->setErrorMessage($this->createStandardFormValidationErrorMessage($e));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         }
 

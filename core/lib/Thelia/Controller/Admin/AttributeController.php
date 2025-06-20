@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Thelia\Form\BaseForm;
+use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Attribute\AttributeAvUpdateEvent;
@@ -50,17 +53,17 @@ class AttributeController extends AbstractCrudController
         );
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::ATTRIBUTE_CREATION);
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::ATTRIBUTE_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent($formData): AttributeCreateEvent
     {
         $createEvent = new AttributeCreateEvent();
 
@@ -73,7 +76,7 @@ class AttributeController extends AbstractCrudController
         return $createEvent;
     }
 
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent($formData): AttributeUpdateEvent
     {
         $changeEvent = new AttributeUpdateEvent($formData['id']);
 
@@ -93,7 +96,7 @@ class AttributeController extends AbstractCrudController
      *
      * @see \Thelia\Controller\Admin\AbstractCrudController::performAdditionalUpdateAction()
      */
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, $updateEvent)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, $updateEvent): null
     {
         $attr_values = $this->getRequest()->get('attribute_values', null);
 
@@ -111,7 +114,7 @@ class AttributeController extends AbstractCrudController
         return null;
     }
 
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
             $this->getRequest()->get('attribute_id', null),
@@ -120,7 +123,7 @@ class AttributeController extends AbstractCrudController
         );
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): AttributeDeleteEvent
     {
         return new AttributeDeleteEvent($this->getRequest()->get('attribute_id'));
     }
@@ -130,7 +133,7 @@ class AttributeController extends AbstractCrudController
         return $event->hasAttribute();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -231,7 +234,7 @@ class AttributeController extends AbstractCrudController
     /**
      * Add or Remove from all product templates.
      */
-    protected function addRemoveFromAllTemplates(EventDispatcherInterface $eventDispatcher, $eventType)
+    protected function addRemoveFromAllTemplates(EventDispatcherInterface $eventDispatcher, ?string $eventType)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -244,9 +247,9 @@ class AttributeController extends AbstractCrudController
 
                 $eventDispatcher->dispatch($event, $eventType);
             }
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             // Any error
-            return $this->errorPage($ex);
+            return $this->errorPage($exception);
         }
 
         return $this->redirectToListTemplate();

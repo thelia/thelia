@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Service\Handler;
 
+use ErrorException;
+use DirectoryIterator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Thelia\Core\Archiver\AbstractArchiver;
@@ -46,14 +49,14 @@ class ImportHandler
     }
 
     /**
-     * @throws \ErrorException
+     * @throws ErrorException
      */
     public function getImport(int $importId, bool $dispatchException = false): ?Import
     {
         $import = (new ImportQuery())->findPk($importId);
 
         if ($import === null && $dispatchException) {
-            throw new \ErrorException(
+            throw new ErrorException(
                 Translator::getInstance()->trans(
                     'There is no id "%id" in the imports',
                     [
@@ -67,14 +70,14 @@ class ImportHandler
     }
 
     /**
-     * @throws \ErrorException
+     * @throws ErrorException
      */
     public function getImportByRef(string $importRef, bool $dispatchException = false): ?Import
     {
         $import = (new ImportQuery())->findOneByRef($importRef);
 
         if ($import === null && $dispatchException) {
-            throw new \ErrorException(
+            throw new ErrorException(
                 Translator::getInstance()->trans(
                     'There is no id "%ref" in the imports',
                     [
@@ -88,14 +91,14 @@ class ImportHandler
     }
 
     /**
-     * @throws \ErrorException
+     * @throws ErrorException
      */
     public function getCategory(int $importCategoryId, bool $dispatchException = false): ?ImportCategory
     {
         $category = (new ImportCategoryQuery())->findPk($importCategoryId);
 
         if ($category === null && $dispatchException) {
-            throw new \ErrorException(
+            throw new ErrorException(
                 Translator::getInstance()->trans(
                     'There is no id "%id" in the import categories',
                     [
@@ -112,13 +115,13 @@ class ImportHandler
     {
         $archiver = $this->matchArchiverByExtension($file->getFilename());
 
-        if ($archiver !== null) {
+        if ($archiver instanceof AbstractArchiver) {
             $file = $this->extractArchive($file, $archiver);
         }
 
         $serializer = $this->matchSerializerByExtension($file->getFilename());
 
-        if ($serializer === null) {
+        if (!$serializer instanceof AbstractSerializer) {
             throw new FormValidationException(
                 Translator::getInstance()->trans(
                     'The extension "%extension" is not allowed',
@@ -186,8 +189,8 @@ class ImportHandler
 
         $archiver->extract($extractPath);
 
-        /** @var \DirectoryIterator $item */
-        foreach (new \DirectoryIterator($extractPath) as $item) {
+        /** @var DirectoryIterator $item */
+        foreach (new DirectoryIterator($extractPath) as $item) {
             if (!$item->isDot() && $item->isFile()) {
                 $file = new File($item->getPathname());
 

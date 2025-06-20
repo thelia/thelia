@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
+
 
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
@@ -78,7 +80,9 @@ use Thelia\Model\Map\StateTableMap;
 class State extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:state:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:state:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:state:write';
 
     #[Groups([
@@ -103,10 +107,10 @@ class State extends AbstractTranslatableResource
     public Country $country;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $createdAt = null;
+    public ?DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $updatedAt = null;
+    public ?DateTime $updatedAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_FRONT_READ_SINGLE])]
     public I18nCollection $i18ns;
@@ -159,24 +163,24 @@ class State extends AbstractTranslatableResource
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): self
+    public function setCreatedAt(?DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): self
+    public function setUpdatedAt(?DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,10 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Install;
 
-use Symfony\Contracts\Translation\TranslatorInterface;
+use PDO;
+use PDOException;
 use Thelia\Core\Translation\Translator;
 
 /**
@@ -30,11 +32,8 @@ class CheckDatabaseConnection extends BaseInstall
     /** @var bool If permissions are OK */
     protected $isValid = true;
 
-    /** @var TranslatorInterface Translator Service */
-    protected $translator;
-
     /**
-     * @var \PDO instance
+     * @var PDO instance
      */
     protected $connection;
 
@@ -49,10 +48,8 @@ class CheckDatabaseConnection extends BaseInstall
      * @param Translator $translator    Translator Service
      *                                  necessary for install wizard
      */
-    public function __construct(protected $host, protected $user, protected $password, protected $port, $verifyInstall = true, Translator $translator = null)
+    public function __construct(protected $host, protected $user, protected $password, protected $port, $verifyInstall = true, protected ?Translator $translator = null)
     {
-        $this->translator = $translator;
-
         parent::__construct($verifyInstall);
     }
 
@@ -66,12 +63,12 @@ class CheckDatabaseConnection extends BaseInstall
         $dsn = 'mysql:host=%s;port=%s';
 
         try {
-            $this->connection = new \PDO(
+            $this->connection = new PDO(
                 sprintf($dsn, $this->host, $this->port),
                 $this->user,
                 $this->password
             );
-        } catch (\PDOException) {
+        } catch (PDOException) {
             $this->validationMessages = 'Wrong connection information';
 
             $this->isValid = false;

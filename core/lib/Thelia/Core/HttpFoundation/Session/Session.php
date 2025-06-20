@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\HttpFoundation\Session;
 
+use InvalidArgumentException;
+use LogicException;
 use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartCreateEvent;
@@ -41,7 +44,7 @@ class Session extends BaseSession
     /**
      * @param bool $forceDefault if true, the default language will be returned if no current language is defined
      *
-     * @return \Thelia\Model\Lang
+     * @return Lang
      */
     public function getLang($forceDefault = true)
     {
@@ -57,7 +60,7 @@ class Session extends BaseSession
         return $lang;
     }
 
-    public function setLang(Lang $lang)
+    public function setLang(Lang $lang): static
     {
         $this->set('thelia.current.lang', $lang);
 
@@ -65,7 +68,7 @@ class Session extends BaseSession
     }
 
     /**
-     * @return \Thelia\Model\Lang
+     * @return Lang
      */
     public function getAdminLang()
     {
@@ -89,7 +92,7 @@ class Session extends BaseSession
         return $lang;
     }
 
-    public function setAdminLang(Lang $lang)
+    public function setAdminLang(Lang $lang): static
     {
         $this->set('thelia.current.admin_lang', $lang);
 
@@ -132,7 +135,7 @@ class Session extends BaseSession
         return $currency;
     }
 
-    public function setAdminEditionCurrency($currencyId)
+    public function setAdminEditionCurrency($currencyId): static
     {
         $this->set('thelia.admin.edition.currency', $currencyId);
 
@@ -167,7 +170,7 @@ class Session extends BaseSession
 
     // -- Customer user --------------------------------------------------------
 
-    public function setCustomerUser(UserInterface $user)
+    public function setCustomerUser(UserInterface $user): static
     {
         $this->set('thelia.customer_user', $user);
 
@@ -177,19 +180,19 @@ class Session extends BaseSession
     /**
      * @return UserInterface|null the current front office user, or null if none is legged in
      */
-    public function getCustomerUser()
+    public function getCustomerUser(): mixed
     {
         return $this->get('thelia.customer_user');
     }
 
-    public function clearCustomerUser()
+    public function clearCustomerUser(): mixed
     {
         return $this->remove('thelia.customer_user');
     }
 
     // -- Admin user -----------------------------------------------------------
 
-    public function setAdminUser(UserInterface $user)
+    public function setAdminUser(UserInterface $user): static
     {
         $this->set('thelia.admin_user', $user);
 
@@ -199,19 +202,19 @@ class Session extends BaseSession
     /**
      * @return Admin|UserInterface
      */
-    public function getAdminUser()
+    public function getAdminUser(): mixed
     {
         return $this->get('thelia.admin_user');
     }
 
-    public function clearAdminUser()
+    public function clearAdminUser(): mixed
     {
         return $this->remove('thelia.admin_user');
     }
 
     // -- Return page ----------------------------------------------------------
 
-    public function setReturnToUrl($url)
+    public function setReturnToUrl($url): static
     {
         $this->set('thelia.return_to_url', $url);
 
@@ -221,14 +224,14 @@ class Session extends BaseSession
     /**
      * @return string the return-to URL, or the index page if none is defined
      */
-    public function getReturnToUrl()
+    public function getReturnToUrl(): mixed
     {
         return $this->get('thelia.return_to_url', URL::getInstance()->getIndexPage());
     }
 
     // -- Return catalog last page ----------------------------------------------------------
 
-    public function setReturnToCatalogLastUrl($url)
+    public function setReturnToCatalogLastUrl($url): static
     {
         $this->set('thelia.return_to_catalog_last_url', $url);
 
@@ -238,7 +241,7 @@ class Session extends BaseSession
     /**
      * @return string the return-to catalog last URL, or the index page if none is defined
      */
-    public function getReturnToCatalogLastUrl()
+    public function getReturnToCatalogLastUrl(): mixed
     {
         return $this->get('thelia.return_to_catalog_last_url', URL::getInstance()->getIndexPage());
     }
@@ -254,7 +257,7 @@ class Session extends BaseSession
      */
     public function setSessionCart(Cart $cart = null): self
     {
-        if (null === $cart || $cart->isNew()) {
+        if (!$cart instanceof Cart || $cart->isNew()) {
             self::$transientCart = $cart;
             $this->remove('thelia.cart_id');
         } else {
@@ -275,11 +278,7 @@ class Session extends BaseSession
     public function getSessionCart(EventDispatcherInterface $dispatcher = null)
     {
         $cart_id = $this->get('thelia.cart_id', null);
-        if (null !== $cart_id) {
-            $cart = CartQuery::create()->findPk($cart_id);
-        } else {
-            $cart = self::$transientCart;
-        }
+        $cart = null !== $cart_id ? CartQuery::create()->findPk($cart_id) : self::$transientCart;
 
         // If we do not have a cart, or if the current cart is nor valid
         // restore it from the cart cookie, or create a new one
@@ -290,7 +289,7 @@ class Session extends BaseSession
             // a required parameter.
 
             if (null == $dispatcher) {
-                throw new \InvalidArgumentException(
+                throw new InvalidArgumentException(
                     'In this context (no cart in session), an EventDispatcher should be provided to Session::getSessionCart().'
                 );
             }
@@ -304,7 +303,7 @@ class Session extends BaseSession
             $dispatcher->dispatch($cartEvent, TheliaEvents::CART_RESTORE_CURRENT);
 
             if (null === $cart = $cartEvent->getCart()) {
-                throw new \LogicException(
+                throw new LogicException(
                     'Unable to get a Cart.'
                 );
             }
@@ -325,8 +324,8 @@ class Session extends BaseSession
 
         $dispatcher->dispatch($event, TheliaEvents::CART_CREATE_NEW);
 
-        if (null === $cart = $event->getCart()) {
-            throw new \LogicException(
+        if (!($cart = $event->getCart()) instanceof Cart) {
+            throw new LogicException(
                 'Unable to get a new empty Cart.'
             );
         }
@@ -338,7 +337,7 @@ class Session extends BaseSession
     /**
      * Return cart if it exists and is valid (checking customer).
      *
-     * @return \Thelia\Model\Cart|null
+     * @return Cart|null
      *
      * @deprecated use getSessionCart() instead
      */
@@ -359,7 +358,7 @@ class Session extends BaseSession
      *
      * @return bool true if the cart is valid, false otherwise
      */
-    protected function isValidCart(Cart $cart)
+    protected function isValidCart(Cart $cart): bool
     {
         $customer = $this->getCustomerUser();
 
@@ -369,7 +368,7 @@ class Session extends BaseSession
 
     // -- Order ------------------------------------------------------------------
 
-    public function setOrder(Order $order)
+    public function setOrder(Order $order): static
     {
         $this->set('thelia.order', $order);
 
@@ -410,7 +409,7 @@ class Session extends BaseSession
      *
      * @return array $couponsCode An array of Coupon code
      */
-    public function getConsumedCoupons()
+    public function getConsumedCoupons(): mixed
     {
         return $this->get('thelia.consumed_coupons', []);
     }
@@ -420,7 +419,7 @@ class Session extends BaseSession
      *
      * @return array
      */
-    public function getFormErrorInformation()
+    public function getFormErrorInformation(): mixed
     {
         return $this->get('thelia.form-errors', []);
     }
@@ -430,7 +429,7 @@ class Session extends BaseSession
      *
      * @param array $formInformation
      */
-    public function setFormErrorInformation($formInformation)
+    public function setFormErrorInformation($formInformation): static
     {
         $this->set('thelia.form-errors', $formInformation);
 

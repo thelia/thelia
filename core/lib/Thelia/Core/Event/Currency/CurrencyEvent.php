@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Currency;
 
 use Thelia\Core\Event\ActionEvent;
@@ -20,27 +21,18 @@ use Thelia\Model\Currency;
  */
 class CurrencyEvent extends ActionEvent
 {
-    protected $currency;
-
     protected $currencyId;
 
-    public function __construct(Currency $currency = null)
+    public function __construct(protected ?Currency $currency = null)
     {
-        $this->currency = $currency;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasCurrency()
+    public function hasCurrency(): bool
     {
-        return null !== $this->currency;
+        return $this->currency instanceof Currency;
     }
 
-    /**
-     * @return Currency|null
-     */
-    public function getCurrency()
+    public function getCurrency(): ?Currency
     {
         return $this->currency;
     }
@@ -48,7 +40,7 @@ class CurrencyEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setCurrency(Currency $currency)
+    public function setCurrency(Currency $currency): static
     {
         $this->currency = $currency;
 
@@ -65,7 +57,7 @@ class CurrencyEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setCurrencyId($currencyId)
+    public function setCurrencyId($currencyId): static
     {
         $this->currencyId = $currencyId;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\EventListener;
 
+use Symfony\Component\HttpFoundation\Response;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -58,7 +60,7 @@ class RequestListener implements EventSubscriberInterface
         $request = $event->getRequest();
 
         $lang = !$request->get('isApiRoute', false) && $request->hasSession(true)
-            ? $request->getSession()?->getLang()
+            ? $request->getSession()->getLang()
             : Lang::getDefaultLanguage();
 
         $vendorFormDir = THELIA_VENDOR.'symfony'.DS.'form';
@@ -103,28 +105,27 @@ class RequestListener implements EventSubscriberInterface
     public function jsonBody(RequestEvent $event): void
     {
         $request = $event->getRequest();
-        if (!\count($request->request->all()) && \in_array($request->getMethod(), ['POST', 'PUT', 'PATCH', 'DELETE'])) {
-            if ('json' === $request->getFormat($request->headers->get('Content-Type'))) {
-                $content = $request->getContent();
-                if (!empty($content)) {
-                    $data = json_decode($content, true);
+        if (!\count($request->request->all()) && \in_array($request->getMethod(), ['POST', 'PUT', 'PATCH', 'DELETE']) && 'json' === $request->getFormat($request->headers->get('Content-Type'))) {
+            $content = $request->getContent();
+            if (!empty($content)) {
+                $data = json_decode($content, true);
 
-                    if (null === $data) {
-                        $event->setResponse(
-                            new JsonResponse(['error' => 'The given data is not a valid json'], 400)
-                        );
+                if (null === $data) {
+                    $event->setResponse(
+                        new JsonResponse(['error' => 'The given data is not a valid json'], Response::HTTP_BAD_REQUEST)
+                    );
 
-                        $event->stopPropagation();
+                    $event->stopPropagation();
 
-                        return;
-                    }
-                    if (!\is_array($data)) {
-                        // This case happens for string like: "Foo", that json_decode returns as valid json
-                        $data = [$data];
-                    }
-
-                    $request->request = new InputBag($data);
+                    return;
                 }
+
+                if (!\is_array($data)) {
+                    // This case happens for string like: "Foo", that json_decode returns as valid json
+                    $data = [$data];
+                }
+
+                $request->request = new InputBag($data);
             }
         }
     }
@@ -244,7 +245,6 @@ class RequestListener implements EventSubscriberInterface
                     $lang = LangQuery::create()
                         ->filterByUrl(sprintf('%s://%s', $components['scheme'], $components['host']), ModelCriteria::LIKE)
                         ->findOne();
-
                     if (null !== $lang) {
                         $session->setReturnToUrl($referrer);
 
@@ -252,13 +252,10 @@ class RequestListener implements EventSubscriberInterface
                             $session->setReturnToCatalogLastUrl($referrer);
                         }
                     }
-                } else {
-                    if (str_contains($referrer, $request->getSchemeAndHttpHost())) {
-                        $session->setReturnToUrl($referrer);
-
-                        if (\in_array($view, $catalogViews)) {
-                            $session->setReturnToCatalogLastUrl($referrer);
-                        }
+                } elseif (str_contains($referrer, $request->getSchemeAndHttpHost())) {
+                    $session->setReturnToUrl($referrer);
+                    if (\in_array($view, $catalogViews)) {
+                        $session->setReturnToCatalogLastUrl($referrer);
                     }
                 }
             }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Template;
 
 class TemplateUpdateEvent extends TemplateCreateEvent
@@ -17,6 +18,7 @@ class TemplateUpdateEvent extends TemplateCreateEvent
     protected $template_id;
 
     protected $feature_list;
+
     protected $attribute_list;
 
     public function __construct($template_id)
@@ -29,7 +31,7 @@ class TemplateUpdateEvent extends TemplateCreateEvent
         return $this->template_id;
     }
 
-    public function setTemplateId($template_id)
+    public function setTemplateId($template_id): static
     {
         $this->template_id = $template_id;
 
@@ -41,7 +43,7 @@ class TemplateUpdateEvent extends TemplateCreateEvent
         return $this->feature_list;
     }
 
-    public function setFeatureList($feature_list)
+    public function setFeatureList($feature_list): static
     {
         $this->feature_list = $feature_list;
 
@@ -53,7 +55,7 @@ class TemplateUpdateEvent extends TemplateCreateEvent
         return $this->attribute_list;
     }
 
-    public function setAttributeList($attribute_list)
+    public function setAttributeList($attribute_list): static
     {
         $this->attribute_list = $attribute_list;
 

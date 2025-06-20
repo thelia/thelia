@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Propel\Generator\Command\MigrationDiffCommand as PropelMigrationDiffCommand;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,13 +27,11 @@ use Thelia\Core\PropelInitService;
  * Generate a SQL diff between the current database structure and the current global schema, using the Propel migration
  * system.
  */
+#[AsCommand(name: 'thelia:dev:db:diff', description: 'Generate SQL to update the database(s) structure to the global Propel schema')]
 class DiffDatabaseCommand extends ContainerAwareCommand
 {
     protected function configure(): void
     {
-        $this
-            ->setName('thelia:dev:db:diff')
-            ->setDescription('Generate SQL to update the database(s) structure to the global Propel schema');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -88,11 +88,12 @@ class DiffDatabaseCommand extends ContainerAwareCommand
 
         // output the generated SQL
         foreach ($migrationClass->getUpSQL() as $databaseName => $upSQL) {
-            $output->writeln("-- DATABASE {$databaseName}, UP");
+            $output->writeln(sprintf('-- DATABASE %s, UP', $databaseName));
             $output->writeln($upSQL);
         }
+
         foreach ($migrationClass->getDownSQL() as $databaseName => $downSQL) {
-            $output->writeln("-- DATABASE {$databaseName}, DOWN");
+            $output->writeln(sprintf('-- DATABASE %s, DOWN', $databaseName));
             $output->writeln($downSQL);
         }
 

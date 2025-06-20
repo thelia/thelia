@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Document;
 
 use Thelia\Core\Event\CachedFileEvent;
@@ -20,6 +21,7 @@ use Thelia\Core\Event\CachedFileEvent;
 class DocumentEvent extends CachedFileEvent
 {
     protected $documentPath;
+
     protected $documentUrl;
 
     /**
@@ -39,7 +41,7 @@ class DocumentEvent extends CachedFileEvent
      *
      * @return $this
      */
-    public function setDocumentPath($documentPath)
+    public function setDocumentPath($documentPath): static
     {
         $this->documentPath = $documentPath;
 
@@ -63,7 +65,7 @@ class DocumentEvent extends CachedFileEvent
      *
      * @return $this
      */
-    public function setDocumentUrl($documentUrl)
+    public function setDocumentUrl($documentUrl): static
     {
         $this->documentUrl = $documentUrl;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Coupon\Type;
 
+
+use InvalidArgumentException;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\CartItem;
@@ -26,23 +29,17 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
 {
     public const CATEGORIES_LIST = 'categories';
 
-    protected $category_list = [];
+    protected array $category_list = [];
 
     /**
      * Set the value of specific coupon fields.
-     *
-     * @param array $effects the Coupon effects params
      */
-    abstract public function setFieldsValue($effects);
+    abstract public function setFieldsValue(array $effects);
 
     /**
      * Get the discount for a specific cart item.
-     *
-     * @param CartItem $cartItem the cart item
-     *
-     * @return float the discount value
      */
-    abstract public function getCartItemDiscount(CartItem $cartItem);
+    abstract public function getCartItemDiscount(CartItem $cartItem): float;
 
     public function set(
         FacadeInterface $facade,
@@ -56,11 +53,12 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
         $isAvailableOnSpecialOffers,
         $isEnabled,
         $maxUsage,
-        \DateTime $expirationDate,
+        DateTime $expirationDate,
         $freeShippingForCountries,
         $freeShippingForModules,
         $perCustomerUsageCount
-    ) {
+    ): static
+    {
         parent::set(
             $facade,
             $code,
@@ -90,7 +88,7 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
         return $this;
     }
 
-    public function exec()
+    public function exec(): float|int
     {
         // This coupon subtracts the specified amount from the order total
         // for each product of the selected categories.
@@ -117,7 +115,7 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
         return $discount;
     }
 
-    public function drawBaseBackOfficeInputs($templateName, $otherFields)
+    public function drawBaseBackOfficeInputs(string $templateName, array $otherFields): string
     {
         return $this->facade->getParser()->render($templateName, array_merge($otherFields, [
                 // The categories list field
@@ -126,21 +124,19 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
             ]));
     }
 
-    public function getBaseFieldList($otherFields)
+    public function getBaseFieldList($otherFields): array
     {
         return array_merge($otherFields, [self::CATEGORIES_LIST]);
     }
 
-    public function checkBaseCouponFieldValue($fieldName, $fieldValue)
+    public function checkBaseCouponFieldValue(string $fieldName, string $fieldValue): string
     {
-        if ($fieldName === self::CATEGORIES_LIST) {
-            if (empty($fieldValue)) {
-                throw new \InvalidArgumentException(
-                    Translator::getInstance()->trans(
-                        'Please select at least one category'
-                    )
-                );
-            }
+        if ($fieldName === self::CATEGORIES_LIST && ($fieldValue === '' || $fieldValue === '0')) {
+            throw new InvalidArgumentException(
+                Translator::getInstance()->trans(
+                    'Please select at least one category'
+                )
+            );
         }
 
         return $fieldValue;

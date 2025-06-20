@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use LogicException;
+use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -59,6 +62,7 @@ class LangController extends BaseAdminController
         foreach (LangQuery::create()->find() as $lang) {
             $data[LangUrlForm::LANG_PREFIX.$lang->getId()] = $lang->getUrl();
         }
+
         $langUrlForm = $this->createForm(AdminForm::LANG_URL, FormType::class, $data);
         $this->getParserContext()->addForm($langUrlForm);
 
@@ -117,7 +121,7 @@ class LangController extends BaseAdminController
             $eventDispatcher->dispatch($event, TheliaEvents::LANG_UPDATE);
 
             if (false === $event->hasLang()) {
-                throw new \LogicException(
+                throw new LogicException(
                     $this->getTranslator()->trans('No %obj was updated.', ['%obj', 'Lang'])
                 );
             }
@@ -137,9 +141,9 @@ class LangController extends BaseAdminController
             );
 
             $response = $this->generateRedirectFromRoute('admin.configuration.languages');
-        } catch (\Exception $ex) {
-            $error_msg = $this->getTranslator()->trans('Failed to update language definition: %ex', ['%ex' => $ex->getMessage()]);
-            Tlog::getInstance()->addError('Failed to update language definition', $ex->getMessage());
+        } catch (Exception $exception) {
+            $error_msg = $this->getTranslator()->trans('Failed to update language definition: %ex', ['%ex' => $exception->getMessage()]);
+            Tlog::getInstance()->addError('Failed to update language definition', $exception->getMessage());
         }
 
         if (false !== $error_msg) {
@@ -151,10 +155,8 @@ class LangController extends BaseAdminController
 
     /**
      * @param LangCreateEvent $event
-     *
-     * @return LangCreateEvent
      */
-    protected function hydrateEvent($event, Form $form)
+    protected function hydrateEvent($event, Form $form): LangCreateEvent
     {
         return $event
             ->setTitle($form->get('title')->getData())
@@ -216,7 +218,7 @@ class LangController extends BaseAdminController
             $eventDispatcher->dispatch($createEvent, TheliaEvents::LANG_CREATE);
 
             if (false === $createEvent->hasLang()) {
-                throw new \LogicException(
+                throw new LogicException(
                     $this->getTranslator()->trans('No %obj was updated.', ['%obj', 'Lang'])
                 );
             }
@@ -239,7 +241,7 @@ class LangController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -277,9 +279,9 @@ class LangController extends BaseAdminController
             $eventDispatcher->dispatch($deleteEvent, TheliaEvents::LANG_DELETE);
 
             $response = $this->generateRedirectFromRoute('admin.configuration.languages');
-        } catch (\Exception $ex) {
-            Tlog::getInstance()->error(sprintf('error during language removal with message : %s', $ex->getMessage()));
-            $error_msg = $ex->getMessage();
+        } catch (Exception $exception) {
+            Tlog::getInstance()->error(sprintf('error during language removal with message : %s', $exception->getMessage()));
+            $error_msg = $exception->getMessage();
         }
 
         if (false !== $error_msg) {
@@ -313,7 +315,7 @@ class LangController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -360,7 +362,7 @@ class LangController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -390,7 +392,7 @@ class LangController extends BaseAdminController
         return $this->domainActivation(0);
     }
 
-    private function domainActivation($activate)
+    private function domainActivation(int $activate)
     {
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
             return $response;
@@ -409,7 +411,7 @@ class LangController extends BaseAdminController
      *
      * @return Response
      */
-    protected function toggleLangDispatch(EventDispatcherInterface $eventDispatcher, $eventName, $event)
+    protected function toggleLangDispatch(EventDispatcherInterface $eventDispatcher, ?string $eventName, $event)
     {
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
             return $response;
@@ -425,7 +427,7 @@ class LangController extends BaseAdminController
             $eventDispatcher->dispatch($event, $eventName);
 
             if (false === $event->hasLang()) {
-                throw new \LogicException(
+                throw new LogicException(
                     $this->getTranslator()->trans('No %obj was updated.', ['%obj', 'Lang'])
                 );
             }
@@ -442,9 +444,9 @@ class LangController extends BaseAdminController
                 ),
                 $changedObject->getId()
             );
-        } catch (\Exception $e) {
-            Tlog::getInstance()->error(sprintf('Error on changing languages with message : %s', $e->getMessage()));
-            $errorMessage = $e->getMessage();
+        } catch (Exception $exception) {
+            Tlog::getInstance()->error(sprintf('Error on changing languages with message : %s', $exception->getMessage()));
+            $errorMessage = $exception->getMessage();
         }
 
         if ($this->getRequest()->isXmlHttpRequest()) {

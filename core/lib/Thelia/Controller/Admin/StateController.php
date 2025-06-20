@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Thelia\Form\BaseForm;
+use Thelia\Model\State;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\State\StateCreateEvent;
 use Thelia\Core\Event\State\StateDeleteEvent;
@@ -47,7 +50,7 @@ class StateController extends AbstractCrudController
     /**
      * Return the creation form for this object.
      */
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::STATE_CREATION);
     }
@@ -55,7 +58,7 @@ class StateController extends AbstractCrudController
     /**
      * Return the update form for this object.
      */
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::STATE_MODIFICATION);
     }
@@ -63,14 +66,14 @@ class StateController extends AbstractCrudController
     /**
      * Hydrate the update form for this object, before passing it to the update template.
      *
-     * @param \Thelia\Model\State $object
+     * @param State $object
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
             'locale' => $object->getLocale(),
-            'visible' => $object->getVisible() ? true : false,
+            'visible' => (bool) $object->getVisible(),
             'country_id' => $object->getCountryId(),
             'title' => $object->getTitle(),
             'isocode' => $object->getIsocode(),
@@ -103,7 +106,7 @@ class StateController extends AbstractCrudController
         return $this->hydrateEvent($event, $formData);
     }
 
-    protected function hydrateEvent($event, $formData)
+    protected function hydrateEvent($event, array $formData)
     {
         $event
             ->setLocale($formData['locale'])
@@ -119,7 +122,7 @@ class StateController extends AbstractCrudController
     /**
      * Creates the delete event with the provided form data.
      */
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): StateDeleteEvent
     {
         return new StateDeleteEvent($this->getRequest()->get('state_id'));
     }
@@ -161,7 +164,7 @@ class StateController extends AbstractCrudController
     /**
      * Returns the object label form the object event (name, title, etc.).
      *
-     * @param \Thelia\Model\State $object
+     * @param State $object
      */
     protected function getObjectLabel($object)
     {
@@ -171,7 +174,7 @@ class StateController extends AbstractCrudController
     /**
      * Returns the object ID from the object.
      *
-     * @param \Thelia\Model\State $object
+     * @param State $object
      */
     protected function getObjectId($object)
     {
@@ -203,7 +206,7 @@ class StateController extends AbstractCrudController
         return $this->render('state-edit', $this->getEditionArgument());
     }
 
-    protected function getEditionArgument()
+    protected function getEditionArgument(): array
     {
         return [
             'state_id' => $this->getRequest()->get('state_id', 0),
@@ -237,7 +240,7 @@ class StateController extends AbstractCrudController
     /**
      * @return StateToggleVisibilityEvent|void
      */
-    protected function createToggleVisibilityEvent()
+    protected function createToggleVisibilityEvent(): StateToggleVisibilityEvent
     {
         return new StateToggleVisibilityEvent($this->getExistingObject());
     }

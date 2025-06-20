@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Template;
 
 use Thelia\Core\Event\ActionEvent;
@@ -20,28 +21,19 @@ use Thelia\Model\Template;
  */
 class TemplateEvent extends ActionEvent
 {
-    /**
-     * @var Template
-     */
-    protected $template;
-
-    public function __construct(Template $template = null)
+    public function __construct(protected ?Template $template = null)
     {
-        $this->template = $template;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasTemplate()
+    public function hasTemplate(): bool
     {
-        return null !== $this->template;
+        return $this->template instanceof Template;
     }
 
     /**
      * @return Template
      */
-    public function getTemplate()
+    public function getTemplate(): ?Template
     {
         return $this->template;
     }
@@ -51,7 +43,7 @@ class TemplateEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setTemplate($template)
+    public function setTemplate(?Template $template): static
     {
         $this->template = $template;
 

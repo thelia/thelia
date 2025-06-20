@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Files;
 
 use Symfony\Component\Filesystem\Filesystem;
@@ -39,12 +40,10 @@ class FileManager
      *
      * @param string $fileType   the file type, e.g. document or image.
      * @param string $parentType the parent object type, e.g. product, folder, brand, etc.
-     *
-     * @return string
      */
-    protected function getFileTypeIdentifier($fileType, $parentType)
+    protected function getFileTypeIdentifier($fileType, $parentType): string
     {
-        return strtolower("$fileType.$parentType");
+        return strtolower(sprintf('%s.%s', $fileType, $parentType));
     }
 
     /**
@@ -101,11 +100,9 @@ class FileManager
      * @param FileModelInterface $model        Model saved
      * @param UploadedFile       $uploadedFile Ready to be uploaded file
      *
-     * @throws \Thelia\Exception\ImageException
-     *
-     * @return UploadedFile|null
+     * @throws ImageException
      */
-    public function copyUploadedFile(FileModelInterface $model, UploadedFile $uploadedFile)
+    public function copyUploadedFile(FileModelInterface $model, UploadedFile $uploadedFile): UploadedFile
     {
         $fileSystem = new Filesystem();
 
@@ -120,6 +117,7 @@ class FileManager
 
         $fileSystem->rename($uploadedFile->getPathname(), $filePath);
         $fileSystem->chmod($filePath, 0660);
+
         $newUploadedFile = new UploadedFile($filePath, $fileName);
         $model->setFile($fileName);
 
@@ -142,7 +140,7 @@ class FileManager
      * @param int                $parentId  the parent object ID
      * @param FileModelInterface $fileModel the file model object (image or document) to save
      *
-     * @throws \Thelia\Exception\ImageException
+     * @throws ImageException
      *
      * @return int number of modified rows in database
      */
@@ -205,7 +203,7 @@ class FileManager
      *
      * @return string The sanitized filename
      */
-    public function sanitizeFileName($string)
+    public function sanitizeFileName($string): string
     {
         return strtolower((string) preg_replace('/[^a-zA-Z0-9-_\.]/', '', $string));
     }
@@ -229,15 +227,14 @@ class FileManager
      *
      * @param int          $modelId      Model id
      * @param UploadedFile $uploadedFile File being saved
-     *
-     * @return string
      */
-    public function renameFile($modelId, UploadedFile $uploadedFile)
+    public function renameFile($modelId, UploadedFile $uploadedFile): string
     {
         $extension = $uploadedFile->getClientOriginalExtension();
-        if (!empty($extension)) {
+        if ($extension !== '' && $extension !== '0') {
             $extension = '.'.strtolower($extension);
         }
+
         $fileName = $this->sanitizeFileName(
             str_replace(
                 $extension,

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event;
 
 /**
@@ -47,7 +48,7 @@ class GenerateRewrittenUrlEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setLocale($locale)
+    public function setLocale($locale): static
     {
         $this->locale = $locale;
 
@@ -62,7 +63,7 @@ class GenerateRewrittenUrlEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setObject($object)
+    public function setObject($object): static
     {
         $this->object = $object;
 
@@ -72,17 +73,14 @@ class GenerateRewrittenUrlEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setUrl($url)
+    public function setUrl($url): static
     {
         $this->url = $url;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isRewritten()
+    public function isRewritten(): bool
     {
         return null !== $this->url;
     }

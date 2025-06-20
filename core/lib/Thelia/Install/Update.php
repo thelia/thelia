@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Install;
 
+use PDOException;
+use PDO;
+use Exception;
+use RuntimeException;
+use SplFileInfo;
 use Michelf\Markdown;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
@@ -40,7 +46,7 @@ class Update
 
     public const INSTRUCTION_DIR = 'update/instruction/';
 
-    protected $version;
+    protected array $version;
 
     /** @var Tlog|null */
     protected $logger;
@@ -54,7 +60,7 @@ class Update
     /** @var array */
     protected $updatedVersions = [];
 
-    /** @var \PDO */
+    /** @var PDO */
     protected $connection;
 
     /** @var string|null */
@@ -94,7 +100,7 @@ class Update
             }
         } catch (ParseException $ex) {
             throw new UpdateException('database.yml is not a valid file : '.$ex->getMessage());
-        } catch (\PDOException $ex) {
+        } catch (PDOException $ex) {
             throw new UpdateException('Wrong connection information'.$ex->getMessage());
         }
 
@@ -105,11 +111,9 @@ class Update
      * retrieve the database connection.
      *
      * @throws ParseException
-     * @throws \PDOException
-     *
-     * @return \PDO
+     * @throws PDOException
      */
-    protected function getDatabasePDO()
+    protected function getDatabasePDO(): PDO
     {
         if (!Thelia::isInstalled()) {
             throw new UpdateException('Thelia is not installed yet');
@@ -129,7 +133,7 @@ class Update
      *
      * @return array An array of parameters
      */
-    protected function getEnvParameters()
+    protected function getEnvParameters(): array
     {
         $parameters = [];
         foreach ($_SERVER as $key => $value) {
@@ -141,11 +145,12 @@ class Update
         return $parameters;
     }
 
-    public function isLatestVersion($version = null)
+    public function isLatestVersion($version = null): bool
     {
         if (null === $version) {
             $version = $this->getCurrentVersion();
         }
+
         $lastEntry = end($this->version);
 
         return $lastEntry == $version;
@@ -158,12 +163,12 @@ class Update
         $currentVersion = $this->getCurrentVersion();
         $this->log('debug', 'start update process');
 
-        if (true === $this->isLatestVersion($currentVersion)) {
+        if ($this->isLatestVersion($currentVersion)) {
             $this->log('debug', 'You already have the latest version. No update available');
             throw new UpToDateException('You already have the latest version. No update available');
         }
 
-        $index = array_search($currentVersion, $this->version);
+        $index = array_search($currentVersion, $this->version, true);
 
         $this->connection->beginTransaction();
 
@@ -204,17 +209,18 @@ class Update
 
             $this->connection->commit();
             $this->log('debug', 'update successfully');
-        } catch (\Exception $e) {
+        } catch (Exception $exception) {
             if ($this->connection->inTransaction()) {
                 $this->connection->rollBack();
             }
 
-            $this->log('error', sprintf('error during update process with message : %s', $e->getMessage()));
+            $this->log('error', sprintf('error during update process with message : %s', $exception->getMessage()));
 
-            $ex = new UpdateException($e->getMessage(), $e->getCode(), $e->getPrevious());
+            $ex = new UpdateException($exception->getMessage(), $exception->getCode(), $exception->getPrevious());
             $ex->setVersion($version);
             throw $ex;
         }
+
         $this->log('debug', 'end of update processing');
 
         return $this->updatedVersions;
@@ -223,7 +229,7 @@ class Update
     /**
      * Backup current DB to file local/backup/update.sql.
      *
-     * @throws \Exception
+     * @throws Exception
      *
      * @return bool if it succeeds, false otherwise
      */
@@ -253,7 +259,7 @@ class Update
             }
 
             if (!is_writable($backupDir)) {
-                throw new \RuntimeException(sprintf('impossible to write in directory : %s', $backupDir));
+                throw new RuntimeException(sprintf('impossible to write in directory : %s', $backupDir));
             }
 
             // test if backup file already exists
@@ -263,9 +269,9 @@ class Update
             }
 
             $database->backupDb($this->backupFile);
-        } catch (\Exception $ex) {
-            $this->log('error', sprintf('error during backup process with message : %s', $ex->getMessage()));
-            throw $ex;
+        } catch (Exception $exception) {
+            $this->log('error', sprintf('error during backup process with message : %s', $exception->getMessage()));
+            throw $exception;
         }
     }
 
@@ -274,7 +280,7 @@ class Update
      *
      * @return bool if it succeeds, false otherwise
      */
-    public function restoreDb()
+    public function restoreDb(): bool
     {
         $database = new Database($this->connection);
 
@@ -286,9 +292,9 @@ class Update
             }
 
             $database->restoreDb($this->backupFile);
-        } catch (\Exception $ex) {
-            $this->log('error', sprintf('error during restore process with message : %s', $ex->getMessage()));
-            echo $ex->getMessage();
+        } catch (Exception $exception) {
+            $this->log('error', sprintf('error during restore process with message : %s', $exception->getMessage()));
+            echo $exception->getMessage();
 
             return false;
         }
@@ -337,7 +343,7 @@ class Update
         }
     }
 
-    protected function updateToVersion($version, Database $database): void
+    protected function updateToVersion(string $version, Database $database): void
     {
         // sql update
         $filename = sprintf(
@@ -397,7 +403,7 @@ class Update
             try {
                 $stmt = $this->connection->prepare('UPDATE config set value = ? where name = ?');
                 $stmt->execute([$version, 'thelia_version']);
-            } catch (\PDOException $e) {
+            } catch (PDOException $e) {
                 $this->log('error', sprintf('Error setting current version : %s', $e->getMessage()));
 
                 throw $e;
@@ -408,29 +414,25 @@ class Update
     /**
      * Returns the database size in Mo.
      *
-     * @throws \Exception
-     *
-     * @return float
+     * @throws Exception
      */
-    public function getDataBaseSize()
+    public function getDataBaseSize(): float
     {
         $stmt = $this->connection->query(
             "SELECT sum(data_length) / 1024 / 1024 'size' FROM information_schema.TABLES WHERE table_schema = DATABASE() GROUP BY table_schema"
         );
 
         if ($stmt->rowCount()) {
-            return (float) $stmt->fetch(\PDO::FETCH_OBJ)->size;
+            return (float) $stmt->fetch(PDO::FETCH_OBJ)->size;
         }
 
-        throw new \Exception('Impossible to calculate the database size');
+        throw new Exception('Impossible to calculate the database size');
     }
 
     /**
      * Checks whether it is possible to make a data base backup.
-     *
-     * @return bool
      */
-    public function checkBackupIsPossible()
+    public function checkBackupIsPossible(): bool
     {
         $size = 0;
         if (preg_match('/^(\d+)(.)$/', \ini_get('memory_limit'), $matches)) {
@@ -447,19 +449,15 @@ class Update
             }
         }
 
-        if ($this->getDataBaseSize() > ($size - 64) / 8) {
-            return false;
-        }
-
-        return true;
+        return !($this->getDataBaseSize() > ($size - 64) / 8);
     }
 
-    public function getLatestVersion()
+    public function getLatestVersion(): mixed
     {
         return end($this->version);
     }
 
-    public function getVersions()
+    public function getVersions(): array
     {
         return $this->version;
     }
@@ -527,17 +525,20 @@ class Update
         return $content;
     }
 
-    public function hasPostInstructions()
+    public function hasPostInstructions(): bool
     {
         return \count($this->postInstructions) !== 0;
     }
 
-    public function getVersionList()
+    /**
+     * @return list<string>
+     */
+    public function getVersionList(): array
     {
         $list = [];
         $finder = new Finder();
         $path = sprintf('%s%s', THELIA_SETUP_DIRECTORY, str_replace('/', DS, self::SQL_DIR));
-        $sort = function (\SplFileInfo $a, \SplFileInfo $b) {
+        $sort = function (SplFileInfo $a, SplFileInfo $b): int {
             $a = strtolower(substr($a->getRelativePathname(), 0, -4));
             $b = strtolower(substr($b->getRelativePathname(), 0, -4));
 
@@ -558,7 +559,7 @@ class Update
      *
      * @return $this
      */
-    public function setMessage($message, $type = 'info')
+    public function setMessage($message, $type = 'info'): static
     {
         $this->messages[] = [$message, $type];
 
@@ -586,14 +587,14 @@ class Update
     /**
      * @return $this
      */
-    public function setTranslator(Translator $translator)
+    public function setTranslator(Translator $translator): static
     {
         $this->translator = $translator;
 
         return $this;
     }
 
-    public function getWebVersion()
+    public function getWebVersion(): ?string
     {
         $url = 'http://thelia.net/version.php';
         $curl = curl_init($url);
@@ -607,8 +608,10 @@ class Update
             if (Version::parse($res)) {
                 return trim($res);
             }
-        } catch (\Exception) {
+        } catch (Exception) {
             return null;
         }
+
+        return null;
     }
 }

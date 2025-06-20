@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
+use SmartyException;
 use Symfony\Component\Mime\Email;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserInterface;
@@ -27,7 +29,7 @@ class Message extends BaseMessage
      * @param string          $message
      * @param bool            $compressOutput
      *
-     * @throws \SmartyException
+     * @throws SmartyException
      *
      * @return bool|string
      */
@@ -40,7 +42,7 @@ class Message extends BaseMessage
             try {
                 $body = $parser->render($template, [], $compressOutput);
             } catch (ResourceNotFoundException) {
-                Tlog::getInstance()->addError("Failed to get mail message template body $template");
+                Tlog::getInstance()->addError('Failed to get mail message template body ' . $template);
             }
         }
 
@@ -64,7 +66,7 @@ class Message extends BaseMessage
     /**
      * Get the HTML message body.
      *
-     * @throws \SmartyException
+     * @throws SmartyException
      *
      * @return bool|string
      */
@@ -79,7 +81,7 @@ class Message extends BaseMessage
     }
 
     /**
-     * @throws \SmartyException
+     * @throws SmartyException
      *
      * @return string|string[]|null
      */
@@ -107,7 +109,7 @@ class Message extends BaseMessage
      *                                  `templates/email/default/' directory is used if
      *                                  `$useFallbackTemplate` is set to `true`
      *
-     * @throws \SmartyException
+     * @throws SmartyException
      *
      * @return Email
      */

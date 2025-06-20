@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Exception;
+use Thelia\Core\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ShippingZone\ShippingZoneAddAreaEvent;
 use Thelia\Core\Event\ShippingZone\ShippingZoneRemoveAreaEvent;
@@ -52,7 +55,7 @@ class ShippingZoneController extends BaseAdminController
     }
 
     /**
-     * @return mixed|\Thelia\Core\HttpFoundation\Response
+     * @return mixed|Response
      */
     public function addArea(EventDispatcherInterface $eventDispatcher)
     {
@@ -78,7 +81,7 @@ class ShippingZoneController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -117,7 +120,7 @@ class ShippingZoneController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -143,7 +146,7 @@ class ShippingZoneController extends BaseAdminController
         );
     }
 
-    protected function getDeliveryModuleId()
+    protected function getDeliveryModuleId(): mixed
     {
         return $this->getRequest()->get('delivery_module_id', 0);
     }

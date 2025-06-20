@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Order;
 
 use Thelia\Core\Event\ActionEvent;
@@ -22,38 +23,26 @@ use Thelia\Model\OrderStatus;
 class GetStockUpdateOperationOnOrderStatusChangeEvent extends ActionEvent
 {
     public const DECREASE_STOCK = -1;
+
     public const INCREASE_STOCK = 1;
+
     public const DO_NOTHING = 0;
-
-    /** @var Order */
-    protected $order;
-
-    /** @var OrderStatus */
-    protected $newOrderStatus;
 
     protected $operation = self::DO_NOTHING;
 
     /**
      * StockUpdateOnOrderStatusChangeEvent constructor.
      */
-    public function __construct(Order $order, OrderStatus $newOrderStatus)
+    public function __construct(protected Order $order, protected OrderStatus $newOrderStatus)
     {
-        $this->order = $order;
-        $this->newOrderStatus = $newOrderStatus;
     }
 
-    /**
-     * @return Order
-     */
-    public function getOrder()
+    public function getOrder(): Order
     {
         return $this->order;
     }
 
-    /**
-     * @return OrderStatus
-     */
-    public function getNewOrderStatus()
+    public function getNewOrderStatus(): OrderStatus
     {
         return $this->newOrderStatus;
     }

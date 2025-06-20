@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Customer;
 
 use Thelia\Core\Event\ActionEvent;
@@ -31,7 +32,7 @@ class CustomerEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setCustomer(Customer $customer)
+    public function setCustomer(Customer $customer): static
     {
         $this->customer = $customer;
 
@@ -46,10 +47,7 @@ class CustomerEvent extends ActionEvent
         return $this->customer;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasCustomer()
+    public function hasCustomer(): bool
     {
         return $this->customer != null;
     }

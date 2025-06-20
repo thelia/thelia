@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\TaxEngine;
 
+use LogicException;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Country;
@@ -27,15 +30,11 @@ use Thelia\Model\State;
 class TaxEngine
 {
     protected $taxCountry;
+
     protected $taxState;
 
-    /** @var RequestStack */
-    protected $requestStack;
-
-    public function __construct(
-        RequestStack $requestStack,
-    ) {
-        $this->requestStack = $requestStack;
+    public function __construct(protected RequestStack $requestStack)
+    {
     }
 
     /**
@@ -50,6 +49,7 @@ class TaxEngine
         if (null !== $this->taxCountry) {
             return $this->taxCountry;
         }
+
         /* is there a logged in customer ? */
         /** @var Customer $customer */
         if (null !== $customer = $this->getSession()?->getCustomerUser()) {
@@ -73,8 +73,9 @@ class TaxEngine
         }
 
         if(null === $this->taxCountry) {
-            throw new \LogicException('No country found for tax calculation.');
+            throw new LogicException('No country found for tax calculation.');
         }
+
         return $this->taxCountry;
     }
 
@@ -99,7 +100,7 @@ class TaxEngine
         return $this->taxState;
     }
 
-    protected function getSession()
+    protected function getSession(): ?SessionInterface
     {
         return $this->requestStack?->getCurrentRequest()?->getSession();
     }

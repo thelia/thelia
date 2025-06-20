@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Coupon;
 
 use Thelia\Core\Event\ActionEvent;
@@ -38,7 +39,7 @@ class CouponConsumeEvent extends ActionEvent
     /**
      * @param bool $freeShipping
      */
-    public function setFreeShipping($freeShipping)
+    public function setFreeShipping($freeShipping): static
     {
         $this->freeShipping = $freeShipping;
 
@@ -60,7 +61,7 @@ class CouponConsumeEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setCode($code)
+    public function setCode($code): static
     {
         $this->code = $code;
 
@@ -84,7 +85,7 @@ class CouponConsumeEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setDiscount($discount)
+    public function setDiscount($discount): static
     {
         $this->discount = $discount;
 
@@ -109,7 +110,7 @@ class CouponConsumeEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setIsValid($isValid)
+    public function setIsValid($isValid): static
     {
         $this->isValid = $isValid;
 

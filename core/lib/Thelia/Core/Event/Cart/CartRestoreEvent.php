@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Cart;
 
 use Thelia\Core\Event\ActionEvent;
@@ -20,7 +21,7 @@ class CartRestoreEvent extends ActionEvent
     protected $cart;
 
     /**
-     * @return \Thelia\Model\Cart
+     * @return Cart
      */
     public function getCart()
     {
@@ -30,7 +31,7 @@ class CartRestoreEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setCart(Cart $cart)
+    public function setCart(Cart $cart): static
     {
         $this->cart = $cart;
 

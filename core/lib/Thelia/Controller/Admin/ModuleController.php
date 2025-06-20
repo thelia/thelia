@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Thelia\Form\BaseForm;
+use InvalidArgumentException;
+use LogicException;
+use DirectoryIterator;
 use Michelf\MarkdownExtra;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Finder\Finder;
@@ -63,22 +68,22 @@ class ModuleController extends AbstractCrudController
         );
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): null
     {
         return null;
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::MODULE_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent($formData): null
     {
         return null;
     }
 
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent($formData): ModuleEvent
     {
         $event = new ModuleEvent();
 
@@ -92,12 +97,12 @@ class ModuleController extends AbstractCrudController
         return $event;
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): null
     {
         return null;
     }
 
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
             $this->getRequest()->get('module_id', null),
@@ -111,7 +116,7 @@ class ModuleController extends AbstractCrudController
         return $event->hasModule();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
     {
         $object->setLocale($this->getCurrentEditionLocale());
         $data = [
@@ -164,12 +169,12 @@ class ModuleController extends AbstractCrudController
         return $object->getId();
     }
 
-    protected function getViewArguments()
+    protected function getViewArguments(): array
     {
         return [];
     }
 
-    protected function getRouteArguments($module_id = null)
+    protected function getRouteArguments($module_id = null): array
     {
         $request = $this->getRequest();
 
@@ -234,7 +239,7 @@ class ModuleController extends AbstractCrudController
         $module = ModuleQuery::create()->findOneByCode($module_code);
 
         if (null === $module) {
-            throw new \InvalidArgumentException(sprintf('Module `%s` does not exists', $module_code));
+            throw new InvalidArgumentException(sprintf('Module `%s` does not exists', $module_code));
         }
 
         if (null !== $response = $this->checkAuth([], $module_code, AccessManager::VIEW)) {
@@ -254,30 +259,27 @@ class ModuleController extends AbstractCrudController
         if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::UPDATE)) {
             return $response;
         }
+
         $message = null;
         try {
             $event = new ModuleToggleActivationEvent($module_id);
             $eventDispatcher->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
 
-            if (null === $event->getModule()) {
-                throw new \LogicException(
+            if (!$event->getModule() instanceof Module) {
+                throw new LogicException(
                     $this->getTranslator()->trans('No %obj was updated.', ['%obj' => 'Module'])
                 );
             }
-        } catch (\Exception $e) {
-            $message = $e->getMessage();
+        } catch (\Exception $exception) {
+            $message = $exception->getMessage();
 
-            Tlog::getInstance()->addError('Failed to activate/deactivate module:', $e);
+            Tlog::getInstance()->addError('Failed to activate/deactivate module:', $exception);
         }
 
         if ($this->getRequest()->isXmlHttpRequest()) {
-            if ($message) {
-                $response = $this->jsonResponse(json_encode([
-                    'error' => $message,
-                ]), 500);
-            } else {
-                $response = $this->nullResponse();
-            }
+            $response = $message ? $this->jsonResponse(json_encode([
+                'error' => $message,
+            ]), 500) : $this->nullResponse();
         } else {
             $response = $this->generateRedirectFromRoute('admin.module');
         }
@@ -311,14 +313,14 @@ class ModuleController extends AbstractCrudController
             $eventDispatcher->dispatch($deleteEvent, TheliaEvents::MODULE_DELETE);
 
             if ($deleteEvent->hasModule() === false) {
-                throw new \LogicException(
+                throw new LogicException(
                     Translator::getInstance()->trans('No %obj was updated.', ['%obj' => 'Module'])
                 );
             }
-        } catch (\Exception $e) {
-            $message = $e->getMessage();
+        } catch (\Exception $exception) {
+            $message = $exception->getMessage();
 
-            Tlog::getInstance()->addError('Error during module removal', $e);
+            Tlog::getInstance()->addError('Error during module removal', $exception);
         }
 
         if (false !== $message) {
@@ -359,7 +361,7 @@ class ModuleController extends AbstractCrudController
 
             $newModule = $moduleInstallEvent->getModule();
 
-            if (null !== $newModule) {
+            if ($newModule instanceof Module) {
                 $this->getSession()->getFlashBag()->add(
                     'module-installed',
                     $this->getTranslator()->trans(
@@ -370,6 +372,7 @@ class ModuleController extends AbstractCrudController
 
                 return $this->generateRedirectFromRoute('admin.module');
             }
+
             $message = $this->getTranslator()->trans(
                 'Sorry, an error occured.'
             );
@@ -451,7 +454,7 @@ class ModuleController extends AbstractCrudController
             if (false !== $xmlData = @simplexml_load_file($moduleDescriptor)) {
                 $documentationDirectory = (string) $xmlData->documentation;
 
-                if (!empty($documentationDirectory)) {
+                if ($documentationDirectory !== '' && $documentationDirectory !== '0') {
                     $finder = Finder::create()->files()->in($module->getAbsoluteBaseDir())->name('/.+\.md$/i');
                 }
             }
@@ -465,12 +468,13 @@ class ModuleController extends AbstractCrudController
             if ($finder && $finder->count() > 0) {
                 $finder->sortByName();
 
-                /** @var \DirectoryIterator $file */
+                /** @var DirectoryIterator $file */
                 foreach ($finder as $file) {
                     if (false !== $mdDocumentation = @file_get_contents($file->getPathname())) {
                         if ($content == null) {
                             $content = '';
                         }
+
                         $content .= MarkdownExtra::defaultTransform($mdDocumentation);
                     }
                 }

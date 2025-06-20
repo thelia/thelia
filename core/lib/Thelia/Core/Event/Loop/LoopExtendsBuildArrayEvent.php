@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Loop;
 
 use Thelia\Core\Template\Element\BaseLoop;
@@ -22,21 +23,14 @@ use Thelia\Core\Template\Element\BaseLoop;
 class LoopExtendsBuildArrayEvent extends LoopExtendsEvent
 {
     /**
-     * @var array Build array results
-     */
-    protected $array;
-
-    /**
      * Class constructor.
      *
-     * @param \Thelia\Core\Template\Element\BaseLoop $loop  Loop object
+     * @param BaseLoop $loop Loop object
      * @param array                                  $array Build array base results
      */
-    public function __construct(BaseLoop $loop, array $array)
+    public function __construct(BaseLoop $loop, protected array $array)
     {
         parent::__construct($loop);
-
-        $this->array = $array;
     }
 
     /**
@@ -44,7 +38,7 @@ class LoopExtendsBuildArrayEvent extends LoopExtendsEvent
      *
      * @return array Build array results
      */
-    public function getArray()
+    public function getArray(): array
     {
         return $this->array;
     }
@@ -54,7 +48,7 @@ class LoopExtendsBuildArrayEvent extends LoopExtendsEvent
      *
      * @return $this Return $this, allow chaining
      */
-    public function setArray(array $array)
+    public function setArray(array $array): static
     {
         $this->array = $array;
 

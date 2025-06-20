@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Type\EnumListType;
+use PDO;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -22,7 +25,6 @@ use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\SaleQuery;
-use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\TypeCollection;
 
@@ -46,10 +48,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
 
     protected $timestampable = true;
 
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
@@ -60,7 +59,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(
+                    new EnumListType(
                         [
                             'id',
                             'id-reverse',
@@ -89,7 +88,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
     /**
      * @return array of available field to search in
      */
-    public function getSearchIn()
+    public function getSearchIn(): array
     {
         return array_merge(
             ['sale_label'],
@@ -111,10 +110,9 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
             if ($index > 0) {
                 $search->_or();
             }
-            switch ($searchInElement) {
-                case 'sale_label':
-                    $this->addSearchInI18nColumn($search, 'SALE_LABEL', $searchCriteria, $searchTerm);
-                    break;
+
+            if ($searchInElement === 'sale_label') {
+                $this->addSearchInI18nColumn($search, 'SALE_LABEL', $searchCriteria, $searchTerm);
             }
         }
 
@@ -159,7 +157,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
 
         $search
             ->leftJoinSaleOffsetCurrency('SaleOffsetCurrency')
-            ->addJoinCondition('SaleOffsetCurrency', '`SaleOffsetCurrency`.`currency_id` = ?', $this->getCurrency(), null, \PDO::PARAM_INT)
+            ->addJoinCondition('SaleOffsetCurrency', '`SaleOffsetCurrency`.`currency_id` = ?', $this->getCurrency(), null, PDO::PARAM_INT)
         ;
 
         $search->withColumn('`SaleOffsetCurrency`.PRICE_OFFSET_VALUE', 'price_offset_value');
@@ -222,7 +220,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
         return $search;
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var \Thelia\Model\Sale $sale */
         foreach ($loopResult->getResultDataCollection() as $sale) {
@@ -238,7 +236,8 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
                     $priceOffsetSymbol = '%';
                     break;
                 default:
-                    $priceOffsetType = $priceOffsetSymbol = '?';
+                    $priceOffsetType = '?';
+                    $priceOffsetSymbol = '?';
             }
 
             $loopResultRow->set('ID', $sale->getId())

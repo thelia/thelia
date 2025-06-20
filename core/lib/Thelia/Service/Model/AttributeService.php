@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Service\Model;
 
 use Propel\Runtime\Exception\PropelException;
@@ -35,10 +36,12 @@ readonly class AttributeService
         if (null === $product) {
             return [];
         }
+
         $template = $product->getTemplate();
         if (null === $template) {
             return [];
         }
+
         $locale = $this->langService->getLocale();
         $attributesAndValues = [];
         foreach ($this->getAttributeInPses($product, $locale) as $attribute) {
@@ -49,12 +52,14 @@ readonly class AttributeService
                 if ($attributeValue === null || isset($values[$attributeValue->getId()])) {
                     continue;
                 }
+
                 $attributeValueId = $attributeValue->getId();
                 $values[$attributeValueId] = [
                     'id' => $attributeValueId,
                     'title' => $attributeValue->getTitle(),
                 ];
             }
+
             $attributesAndValues[] = [
                 'id' => $attribute->getId(),
                 'title' => $attribute->getTitle(),
@@ -98,6 +103,7 @@ readonly class AttributeService
                 if ($attributeCombination->getAttributeId() !== $attribute->getId()) {
                     continue;
                 }
+
                 $attributeAvs[] = $attributeCombination->getAttributeAv()->setLocale($locale);
             }
         }

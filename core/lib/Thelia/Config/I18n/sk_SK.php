@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 return [
     ' content create form' => ' obsah - fomulár pre tvorbu',
     ' note: only non-visible documents can be associated.' => ' poznámka: len neviditeľné dokumenty môžu byť spojené.',
@@ -33,7 +34,7 @@ return [
     'A product with reference %ref already exists. Please choose another reference.' => 'Výrobok s odkazom % ref už existuje. Zvoľte prosím iný odkaz.',
     'A short description, used when a summary or an introduction is required' => 'Krátky popis, používa sa, keď je vyžadovaný súhrn alebo uvedenie',
     'A short text, used when an additional or supplemental information is required.' => 'Krátky text, používaný, ak sa požadujú dodatočné alebo doplnkové informácie.',
-    'A user already exists with this email address. Please login or if you\'ve forgotten your password, go to Reset Your Password.' => 'Užívateľ s takou e-mailovou adresou existuje. Prosím, prihláste sa alebo ak ste zabudli svoje heslo, prejdite na Reset hesla.',
+    "A user already exists with this email address. Please login or if you've forgotten your password, go to Reset Your Password." => 'Užívateľ s takou e-mailovou adresou existuje. Prosím, prihláste sa alebo ak ste zabudli svoje heslo, prejdite na Reset hesla.',
     'A value for attribute "%name" is already present in the combination' => 'Hodnota pre atribút "%name" je už prítomná v danej kombinácii',
     'A variable with name "%name" already exists.' => 'Premenná s názvom "%name" už existuje.',
     'Activate logs only for these IP Addresses' => 'Aktivovať logovacie záznamy len pre tieto IP adresy',
@@ -145,7 +146,7 @@ return [
     'Customer' => 'Zákazník',
     'Customer is %op% <strong>%customer_list%</strong>' => 'Zákazník je %op% <strong>%customer_list%</strong>',
     'Customers' => 'Zákazníci',
-    'Date \'%date\' is invalid, please enter a valid date using %fmt format' => 'Dátum "%date" je neplatný, prosím zadajte platný dátum vo formáte %fmt',
+    "Date '%date' is invalid, please enter a valid date using %fmt format" => 'Dátum "%date" je neplatný, prosím zadajte platný dátum vo formáte %fmt',
     'Debug' => 'Debug',
     'Decimal places' => 'Desatinné miesta',
     'Default folder *' => 'Predvolený priečinok *',
@@ -162,7 +163,7 @@ return [
     'Display initial product prices on front-office' => 'Zobraziť ceny pôvodného produktu na front-office',
     'Do compress' => 'Kompresia',
     'Document' => 'Dokument',
-    'Don\'t repeat keywords over and over in a row. Rather, put in keyword phrases.' => 'Neopakujte kľúčové slová stále dookola. Skôr dať do kľúčových fráz.',
+    "Don't repeat keywords over and over in a row. Rather, put in keyword phrases." => 'Neopakujte kľúčové slová stále dookola. Skôr dať do kľúčových fráz.',
     'Edit' => 'Upraviť',
     'Edit JavaScript' => 'Upraviť JavaScript',
     'Email Address' => 'Emailová adresa',
@@ -255,14 +256,14 @@ return [
     'Method Name' => 'Názov metódy',
     'Missing or invalid data: %s' => 'Chýbajúce alebo neplatné údaje: %s',
     'Module "%name%" directory was not found' => 'Modul "%name%" adresár sa nenašiel',
-    'Module %name directory doesn\'t exists.' => 'Modul %name adresár neexistuje.',
+    "Module %name directory doesn't exists." => 'Modul %name adresár neexistuje.',
     'Name' => 'Názov',
     'Name *' => 'Meno *',
     'New Password' => 'Nové Heslo',
     'Newsletter page' => 'Novinky',
     'No %obj was created.' => '%obj nebola vytvorená.',
     'No %obj was updated.' => '%obj nebol aktualizovaný.',
-    'No module found for code \'%item\'' => 'Žiadny modul pre kód "%item" nenájdený',
+    "No module found for code '%item'" => 'Žiadny modul pre kód "%item" nenájdený',
     'No, I am a new customer.' => 'Som nový zákazník.',
     'None' => 'Žiadne',
     'Not equal to' => 'Nerovná sa',
@@ -323,7 +324,7 @@ return [
     'Search' => 'Hľadať',
     'Search page' => 'Vyhľadať',
     'Select the brand logo' => 'Vyberte logo značky',
-    'Sender\'s e-mail address: %email%' => 'E-mailová adresa odosielateľa: E-mailová adresa: %email%',
+    "Sender's e-mail address: %email%" => 'E-mailová adresa odosielateľa: E-mailová adresa: %email%',
     'Sender name: %name%' => 'Názov odosielateľa: %name%',
     'Shipping zone name' => 'Názov doručovacej zóny',
     'Short additional text' => 'Krátky doplňujúci text',
@@ -335,7 +336,7 @@ return [
     'Sorry, an error occured: %s' => 'Je nám ľúto, vyskytla sa chyba: %s',
     'Sorry, an error occurred: %err' => 'Je nám ľúto, vyskytla sa chyba: %err',
     'Sorry, you are not allowed to perform this action.' => 'Ospravedlňujeme sa, ale nemôžete vykonávať túto činnosť.',
-    'Sorry, you\'re not allowed to perform this action' => 'Ospravedlňujeme sa, ale nemôžete vykonávať túto činnosť',
+    "Sorry, you're not allowed to perform this action" => 'Ospravedlňujeme sa, ale nemôžete vykonávať túto činnosť',
     'Start date' => 'Počiatočný Dátum',
     'Start date of sales' => 'Dátum začatia predaja',
     'State *' => 'Štát *',
@@ -367,7 +368,7 @@ return [
     'Text Message' => 'Textová Správa',
     'The %name module definition has not been initialized.' => 'Definícia modulu %name nebola inicializovaná.',
     'The %name module descriptor has not been initialized.' => 'Popisovač modulu %name nebol inicializovaný.',
-    'The %obj_name id \'%id\' doesn\'t exist' => '%obj_name id "%id" neexistuje',
+    "The %obj_name id '%id' doesn't exist" => '%obj_name id "%id" neexistuje',
     'The HTML TITLE element is the most important element on your web page.' => 'Element HTML TITLE je najdôležitejším prvkom na vašej webovej stránke.',
     'The brand name or title' => 'Značka alebo názov',
     'The cart item count should match the condition' => 'Počet položiek v košíku by mal zodpovedať stavu skladu',
@@ -375,8 +376,8 @@ return [
     'The coupon applies if the cart contains at least one product of the specified product list' => 'Kupón platí, pokiaľ košíl obsahuje aspoň jeden produkt zo špecifického produktového zoznamu',
     'The coupon applies to some customers only' => 'Kupón platí iba pre niektorých zákazníkov',
     'The coupon applies to the selected billing countries' => 'Kupón platí pre vybrané fakturačné krajiny',
-    'The coupon code \'%code\' already exist. Please choose another coupon code' => 'Kupon kód "%code" už existuje. Zvoľte iný kód kupónu',
-    'The coupon code \'%code\' already exists. Please choose another coupon code' => 'Kupon kód "%code" už existuje. Zvoľte iný kód kupónu',
+    "The coupon code '%code' already exist. Please choose another coupon code" => 'Kupon kód "%code" už existuje. Zvoľte iný kód kupónu',
+    "The coupon code '%code' already exists. Please choose another coupon code" => 'Kupon kód "%code" už existuje. Zvoľte iný kód kupónu',
     'The coupon is valid after a given date' => 'Kód kupónu je platný do určeného dátumu',
     'The date after which sales are de-activated. Please use %fmt format.' => 'Dátum, po ktorom je výpredaj deaktivovaný. Prosím, použite formát %fmt.',
     'The date from which sales are active. Please use %fmt format.' => 'Dátum, po ktorom je výpredaj aktivovaný. Prosím, použite formát %fmt.',
@@ -389,7 +390,7 @@ return [
     'The module has to be activated.' => 'Modul musí byť aktivovaný.',
     'The module is not valid : %message' => 'Modul nie je platný: %message',
     'The module zip file' => 'Modul zip súbor',
-    'The product document id %id doesn\'t exists' => 'Neexistuje dokument produktu %id',
+    "The product document id %id doesn't exists" => 'Neexistuje dokument produktu %id',
     'The sale name or title' => 'Výpredajový názov, alebo titul',
     'The store fax number.' => 'Fax obchodu.',
     'The store phone number.' => 'Telefónny kontakt obchodu.',
@@ -436,13 +437,13 @@ return [
     'Variables' => 'Premenné',
     'Virtual document' => 'Virtuálne dokumenty',
     'Warnings' => 'Upozornenia',
-    'We\'re sorry, this PDF invoice is not available at the moment.' => 'Ľutujeme, ale táto faktúra nie je momentálne k dispozícii v PDF.',
+    "We're sorry, this PDF invoice is not available at the moment." => 'Ľutujeme, ale táto faktúra nie je momentálne k dispozícii v PDF.',
     'Weight' => 'Hmotnosť',
     'Yes, I have a password :' => 'Áno, mám heslo:',
     'You are already registered!' => 'Už ste registrovaný!',
-    'You don\'t need to use commas or other punctuations.' => 'Nemusíte použiť čiarky alebo inú interpunkciu.',
+    "You don't need to use commas or other punctuations." => 'Nemusíte použiť čiarky alebo inú interpunkciu.',
     'You have to configure your store email first !' => 'Musíte najprv nastaviť e-mail vášho obchodu!',
-    'You\'ve submitted this form too many times. ' => 'Odoslali ste tento formulár príliš mnohokrát. ',
+    "You've submitted this form too many times. " => 'Odoslali ste tento formulár príliš mnohokrát. ',
     'Your Email Address' => 'Vaša e-mailová adresa',
     'Your Message' => 'Vaša správa',
     'Your current password does not match.' => 'Aktuálne heslo sa nezhoduje.',

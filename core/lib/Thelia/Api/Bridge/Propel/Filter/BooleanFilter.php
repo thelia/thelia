@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel\Filter;
 
+use ReflectionProperty;
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 
@@ -32,6 +33,7 @@ final class BooleanFilter extends AbstractFilter
         if (\is_array($this->properties[$property])) {
             $fieldPath = $this->properties[$property]['fieldPath'];
         }
+
         $query->where($fieldPath.' = ?', filter_var($value, \FILTER_VALIDATE_BOOLEAN));
     }
 
@@ -44,11 +46,11 @@ final class BooleanFilter extends AbstractFilter
             return [];
         }
 
-        foreach ($filterProperties as $property => $strategy) {
+        foreach (array_keys($filterProperties) as $property) {
             $propertyName = $this->normalizePropertyName($property);
 
             $reflectionProperty = $this->getReflectionProperty($propertyName, $resourceClass);
-            if (null === $reflectionProperty) {
+            if (!$reflectionProperty instanceof ReflectionProperty) {
                 continue;
             }
 

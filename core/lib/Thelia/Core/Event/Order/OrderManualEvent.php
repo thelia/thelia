@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Order;
 
 use Thelia\Model\Cart;
@@ -21,9 +22,13 @@ use Thelia\Model\Order;
 class OrderManualEvent extends OrderEvent
 {
     protected $currency;
+
     protected $lang;
+
     protected $cart;
+
     protected $customer;
+
     protected $useOrderDefinedAddresses = false;
 
     public function __construct(Order $order, Currency $currency, Lang $lang, Cart $cart, Customer $customer)
@@ -48,7 +53,7 @@ class OrderManualEvent extends OrderEvent
      *
      * @return $this
      */
-    public function setCurrency($currency)
+    public function setCurrency($currency): static
     {
         $this->currency = $currency;
 
@@ -68,7 +73,7 @@ class OrderManualEvent extends OrderEvent
      *
      * @return $this
      */
-    public function setLang($lang)
+    public function setLang($lang): static
     {
         $this->lang = $lang;
 
@@ -88,7 +93,7 @@ class OrderManualEvent extends OrderEvent
      *
      * @return $this
      */
-    public function setCart($cart)
+    public function setCart($cart): static
     {
         $this->cart = $cart;
 
@@ -108,7 +113,7 @@ class OrderManualEvent extends OrderEvent
      *
      * @return $this
      */
-    public function setCustomer($customer)
+    public function setCustomer($customer): static
     {
         $this->customer = $customer;
 
@@ -131,7 +136,7 @@ class OrderManualEvent extends OrderEvent
      *
      * @return $this
      */
-    public function setUseOrderDefinedAddresses($useOrderDefinedAddresses)
+    public function setUseOrderDefinedAddresses($useOrderDefinedAddresses): static
     {
         $this->useOrderDefinedAddresses = $useOrderDefinedAddresses;
 

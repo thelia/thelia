@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,25 +11,24 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop\Argument;
+
+use Iterator;
+use ReturnTypeWillChange;
 
 /**
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class ArgumentCollection implements \Iterator
+class ArgumentCollection implements Iterator
 {
-    private $arguments = [];
+    private array $arguments = [];
 
     public function __construct()
     {
         $this->addArguments(\func_get_args(), true);
     }
 
-    /**
-     * @return bool
-     */
-    public function hasKey($key)
+    public function hasKey($key): bool
     {
         return isset($this->arguments[$key]);
     }
@@ -40,18 +41,12 @@ class ArgumentCollection implements \Iterator
         return $this->hasKey($key) ? $this->arguments[$key] : null;
     }
 
-    /**
-     * @return bool
-     */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return \count($this->arguments) == 0;
     }
 
-    /**
-     * @return ArgumentCollection
-     */
-    public function addArguments(array $argumentList, $force = true)
+    public function addArguments(array $argumentList, $force = true): static
     {
         foreach ($argumentList as $argument) {
             $this->addArgument($argument, $force);
@@ -60,10 +55,7 @@ class ArgumentCollection implements \Iterator
         return $this;
     }
 
-    /**
-     * @return ArgumentCollection
-     */
-    public function addArgument(Argument $argument, $force = true)
+    public function addArgument(Argument $argument, $force = true): static
     {
         if (isset($this->arguments[$argument->name]) && !$force) {
             return $this;
@@ -77,11 +69,10 @@ class ArgumentCollection implements \Iterator
     /**
      * @param array $argumentNames array with names of arguments to remove
      *
-     * @return ArgumentCollection
      *
      * @since 2.2.0-beta1
      */
-    public function removeArguments(array $argumentNames)
+    public function removeArguments(array $argumentNames): static
     {
         foreach ($argumentNames as $argumentName) {
             $this->removeArgument($argumentName);
@@ -93,11 +84,10 @@ class ArgumentCollection implements \Iterator
     /**
      * @param string $argumentName name of the argument to remove
      *
-     * @return ArgumentCollection
      *
      * @since 2.2.0-beta1
      */
-    public function removeArgument(string $argumentName)
+    public function removeArgument(string $argumentName): static
     {
         if (isset($this->arguments[$argumentName])) {
             unset($this->arguments[$argumentName]);
@@ -106,7 +96,7 @@ class ArgumentCollection implements \Iterator
         return $this;
     }
 
-    public function getCount()
+    public function getCount(): int
     {
         return \count($this->arguments);
     }
@@ -119,7 +109,7 @@ class ArgumentCollection implements \Iterator
      *
      * @return Argument
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function current()
     {
         return current($this->arguments);
@@ -146,7 +136,7 @@ class ArgumentCollection implements \Iterator
      *
      * @return mixed scalar on success, or null on failure
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function key()
     {
         return key($this->arguments);
@@ -179,7 +169,7 @@ class ArgumentCollection implements \Iterator
         reset($this->arguments);
     }
 
-    public function getHash()
+    public function getHash(): string
     {
         $arguments = $this->arguments;
 

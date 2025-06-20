@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Type\EnumType;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -22,7 +24,6 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\Map\TaxTableMap;
 use Thelia\Model\TaxRuleCountry as TaxRuleCountryModel;
 use Thelia\Model\TaxRuleCountryQuery;
-use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
@@ -47,17 +48,14 @@ class TaxRuleCountry extends BaseI18nLoop implements PropelSearchLoopInterface
 
     protected $timestampable = true;
 
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('country', null, true),
             new Argument(
                 'ask',
                 new TypeCollection(
-                    new Type\EnumType(['taxes', 'countries'])
+                    new EnumType(['taxes', 'countries'])
                 ),
                 'taxes'
             ),
@@ -96,7 +94,7 @@ class TaxRuleCountry extends BaseI18nLoop implements PropelSearchLoopInterface
         return $search;
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         if ($this->getAsk() === 'countries') {
             return $loopResult;

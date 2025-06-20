@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\Folder\FolderEvent;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Folder\FolderCreateEvent;
@@ -55,7 +57,7 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Return the creation form for this object.
      */
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::FOLDER_CREATION);
     }
@@ -63,7 +65,7 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Return the update form for this object.
      */
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::FOLDER_MODIFICATION);
     }
@@ -71,11 +73,9 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Hydrate the update form for this object, before passing it to the update template.
      *
-     * @param \Thelia\Model\Folder $object
-     *
-     * @return BaseForm
+     * @param Folder $object
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
     {
         // Hydrate the "SEO" tab form
         $this->hydrateSeoForm($parserContext, $object);
@@ -100,10 +100,8 @@ class FolderController extends AbstractSeoCrudController
      * Creates the creation event with the provided form data.
      *
      * @param array $formData
-     *
-     * @return FolderCreateEvent
      */
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent($formData): FolderCreateEvent
     {
         $creationEvent = new FolderCreateEvent();
 
@@ -120,10 +118,8 @@ class FolderController extends AbstractSeoCrudController
      * Creates the update event with the provided form data.
      *
      * @param array $formData
-     *
-     * @return FolderUpdateEvent
      */
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent($formData): FolderUpdateEvent
     {
         $updateEvent = new FolderUpdateEvent($formData['id']);
 
@@ -143,15 +139,15 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Creates the delete event with the provided form data.
      */
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): FolderDeleteEvent
     {
         return new FolderDeleteEvent($this->getRequest()->get('folder_id'));
     }
 
     /**
-     * @return \Thelia\Core\Event\Folder\FolderToggleVisibilityEvent|void
+     * @return FolderToggleVisibilityEvent|void
      */
-    protected function createToggleVisibilityEvent()
+    protected function createToggleVisibilityEvent(): FolderToggleVisibilityEvent
     {
         return new FolderToggleVisibilityEvent($this->getExistingObject());
     }
@@ -159,7 +155,7 @@ class FolderController extends AbstractSeoCrudController
     /**
      * @return UpdatePositionEvent|void
      */
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
             $this->getRequest()->get('folder_id', null),
@@ -171,11 +167,9 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
-     * @param \Thelia\Core\Event\Folder\FolderEvent $event
-     *
-     * @return bool
+     * @param FolderEvent $event
      */
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasFolder();
     }
@@ -185,7 +179,7 @@ class FolderController extends AbstractSeoCrudController
      *
      * @param $event \Thelia\Core\Event\Folder\FolderEvent $event
      *
-     * @return \Thelia\Model\Folder|null
+     * @return Folder|null
      */
     protected function getObjectFromEvent($event)
     {
@@ -259,9 +253,9 @@ class FolderController extends AbstractSeoCrudController
         return $this->render('folder-edit', $this->getEditionArguments());
     }
 
-    protected function getEditionArguments(Request $request = null)
+    protected function getEditionArguments(Request $request = null): array
     {
-        if (null === $request) {
+        if (!$request instanceof Request) {
             $request = $this->getRequest();
         }
 
@@ -272,7 +266,7 @@ class FolderController extends AbstractSeoCrudController
     }
 
     /**
-     * @param \Thelia\Core\Event\Folder\FolderUpdateEvent $updateEvent
+     * @param FolderUpdateEvent $updateEvent
      *
      * @return Response|void
      */
@@ -291,7 +285,7 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Put in this method post object delete processing if required.
      *
-     * @param \Thelia\Core\Event\Folder\FolderDeleteEvent $deleteEvent the delete event
+     * @param FolderDeleteEvent $deleteEvent the delete event
      *
      * @return Response a response, or null to continue normal processing
      */

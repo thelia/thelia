@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -47,12 +48,9 @@ class Config extends BaseAction implements EventSubscriberInterface
      */
     public function setValue(ConfigUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $config = ConfigQuery::create()->findPk($event->getConfigId())) {
-            if ($event->getValue() !== $config->getValue()) {
-                $config->setValue($event->getValue())->save();
-
-                $event->setConfig($config);
-            }
+        if (null !== ($config = ConfigQuery::create()->findPk($event->getConfigId())) && $event->getValue() !== $config->getValue()) {
+            $config->setValue($event->getValue())->save();
+            $event->setConfig($config);
         }
     }
 
@@ -81,12 +79,9 @@ class Config extends BaseAction implements EventSubscriberInterface
      */
     public function delete(ConfigDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== ($config = ConfigQuery::create()->findPk($event->getConfigId()))) {
-            if (!$config->getSecured()) {
-                $config->delete();
-
-                $event->setConfig($config);
-            }
+        if (null !== ($config = ConfigQuery::create()->findPk($event->getConfigId())) && !$config->getSecured()) {
+            $config->delete();
+            $event->setConfig($config);
         }
     }
 

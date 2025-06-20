@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -35,7 +36,7 @@ abstract class BaseSpecificModule extends BaseI18nLoop implements PropelSearchLo
     protected $timestampable = true;
 
     /**
-     * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
+     * @return ArgumentCollection
      */
     protected function getArgDefinitions()
     {

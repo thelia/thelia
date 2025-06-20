@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Tools;
 
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -29,28 +30,19 @@ class TokenProvider
      */
     protected $token;
 
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    /**
-     * @var TranslatorInterface The translator
-     */
-    protected $translator;
-
     protected ?SessionInterface $session = null;
 
     /**
      * @param string $tokenName
      */
-    public function __construct(RequestStack $requestStack, TranslatorInterface $translator, /**
+    public function __construct(protected RequestStack $requestStack, /**
+     * @var TranslatorInterface The translator
+     */
+    protected TranslatorInterface $translator, /**
      * @var string the current name of the token
      */
     protected $tokenName)
     {
-        $this->requestStack = $requestStack;
-        $this->translator = $translator;
         $this->assignTokenFromSession();
     }
 
@@ -63,6 +55,7 @@ class TokenProvider
 
             return;
         }
+
         $this->session = null;
     }
 
@@ -71,8 +64,9 @@ class TokenProvider
         if (null !== $this->token) {
             return;
         }
+
         $session = $this->requestStack->getCurrentRequest()?->getSession();
-        if (null !== $session) {
+        if ($session instanceof SessionInterface) {
             $this->token = $session->get($this->tokenName);
         }
     }
@@ -85,7 +79,7 @@ class TokenProvider
         if (null === $this->token) {
             $this->token = $this->getToken();
             $session = $this->requestStack->getCurrentRequest()?->getSession();
-            if (null !== $session) {
+            if ($session instanceof SessionInterface) {
                 $session->set($this->tokenName, $this->token);
             }
         }
@@ -96,11 +90,9 @@ class TokenProvider
     /**
      * @param string $entryValue
      *
-     * @throws \Thelia\Core\Security\Exception\TokenAuthenticationException
-     *
-     * @return bool
+     * @throws TokenAuthenticationException
      */
-    public function checkToken($entryValue)
+    public function checkToken($entryValue): bool
     {
         $this->assignTokenFromSession();
         if (null === $this->token) {
@@ -108,6 +100,7 @@ class TokenProvider
                 'Tried to check a token without assigning it before'
             );
         }
+
         if ($this->token !== $entryValue) {
             throw new TokenAuthenticationException(
                 'Tried to validate an invalid token'
@@ -123,10 +116,7 @@ class TokenProvider
         $this->assignToken();
     }
 
-    /**
-     * @return string
-     */
-    public function getToken()
+    public function getToken(): string
     {
         return self::generateToken();
     }
@@ -135,10 +125,8 @@ class TokenProvider
      * Same method as getToken but can be called statically.
      *
      * @alias getToken
-     *
-     * @return string
      */
-    public static function generateToken()
+    public static function generateToken(): string
     {
         return md5(random_bytes(32));
     }

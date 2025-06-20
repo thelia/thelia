@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Brand;
 
 /**
@@ -20,8 +21,11 @@ namespace Thelia\Core\Event\Brand;
 class BrandUpdateEvent extends BrandCreateEvent
 {
     protected $chapo;
+
     protected $description;
+
     protected $postscriptum;
+
     protected $logo_image_id;
 
     /**
@@ -36,7 +40,7 @@ class BrandUpdateEvent extends BrandCreateEvent
      *
      * @return BrandUpdateEvent $this
      */
-    public function setChapo($chapo)
+    public function setChapo($chapo): static
     {
         $this->chapo = $chapo;
 
@@ -56,7 +60,7 @@ class BrandUpdateEvent extends BrandCreateEvent
      *
      * @return BrandUpdateEvent $this
      */
-    public function setBrandId($brandId)
+    public function setBrandId($brandId): static
     {
         $this->brandId = $brandId;
 
@@ -76,7 +80,7 @@ class BrandUpdateEvent extends BrandCreateEvent
      *
      * @return BrandUpdateEvent $this
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->description = $description;
 
@@ -96,7 +100,7 @@ class BrandUpdateEvent extends BrandCreateEvent
      *
      * @return BrandUpdateEvent $this
      */
-    public function setPostscriptum($postscriptum)
+    public function setPostscriptum($postscriptum): static
     {
         $this->postscriptum = $postscriptum;
 
@@ -116,7 +120,7 @@ class BrandUpdateEvent extends BrandCreateEvent
      *
      * @return $this
      */
-    public function setLogoImageId($logo_image_id)
+    public function setLogoImageId($logo_image_id): static
     {
         $this->logo_image_id = $logo_image_id;
 

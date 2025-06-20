@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Attribute;
 
 class AttributeUpdateEvent extends AttributeCreateEvent
@@ -18,7 +19,9 @@ class AttributeUpdateEvent extends AttributeCreateEvent
     protected $attribute_id;
 
     protected $description;
+
     protected $chapo;
+
     protected $postscriptum;
 
     /**
@@ -34,7 +37,7 @@ class AttributeUpdateEvent extends AttributeCreateEvent
         return $this->attribute_id;
     }
 
-    public function setAttributeId($attribute_id)
+    public function setAttributeId($attribute_id): static
     {
         $this->attribute_id = $attribute_id;
 
@@ -46,7 +49,7 @@ class AttributeUpdateEvent extends AttributeCreateEvent
         return $this->description;
     }
 
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->description = $description;
 
@@ -58,7 +61,7 @@ class AttributeUpdateEvent extends AttributeCreateEvent
         return $this->chapo;
     }
 
-    public function setChapo($chapo)
+    public function setChapo($chapo): static
     {
         $this->chapo = $chapo;
 
@@ -70,7 +73,7 @@ class AttributeUpdateEvent extends AttributeCreateEvent
         return $this->postscriptum;
     }
 
-    public function setPostscriptum($postscriptum)
+    public function setPostscriptum($postscriptum): static
     {
         $this->postscriptum = $postscriptum;
 

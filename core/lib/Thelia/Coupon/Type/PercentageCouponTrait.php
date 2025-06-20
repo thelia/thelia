@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Coupon\Type;
 
+use InvalidArgumentException;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\CartItem;
 
@@ -34,17 +36,17 @@ trait PercentageCouponTrait
      */
     abstract protected function getPercentageFieldName();
 
-    public function setFieldsValue($effects): void
+    public function setFieldsValue(array $effects): void
     {
         $this->percentage = $effects[$this->getPercentageFieldName()];
     }
 
-    public function getCartItemDiscount(CartItem $cartItem)
+    public function getCartItemDiscount(CartItem $cartItem): float
     {
         return $cartItem->getTotalRealTaxedPrice($this->facade->getDeliveryCountry()) * ($this->percentage / 100);
     }
 
-    public function callDrawBackOfficeInputs($templateName)
+    public function callDrawBackOfficeInputs($templateName): string
     {
         return $this->drawBaseBackOfficeInputs($templateName, [
                 'percentage_field_name' => $this->makeCouponFieldName($this->getPercentageFieldName()),
@@ -52,12 +54,12 @@ trait PercentageCouponTrait
             ]);
     }
 
-    protected function getFieldList()
+    protected function getFieldList(): array
     {
         return $this->getBaseFieldList([$this->getPercentageFieldName()]);
     }
 
-    protected function checkCouponFieldValue($fieldName, $fieldValue)
+    protected function checkCouponFieldValue(string $fieldName, string $fieldValue): string
     {
         $this->checkBaseCouponFieldValue($fieldName, $fieldValue);
 
@@ -65,7 +67,7 @@ trait PercentageCouponTrait
             $pcent = (float) $fieldValue;
 
             if ($pcent <= 0 || $pcent > 100) {
-                throw new \InvalidArgumentException(
+                throw new InvalidArgumentException(
                     Translator::getInstance()->trans(
                         'Value %val for Percent Discount is invalid. Please enter a positive value between 1 and 100.',
                         ['%val' => $fieldValue]

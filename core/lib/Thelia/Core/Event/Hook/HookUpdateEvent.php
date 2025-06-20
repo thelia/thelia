@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Hook;
+
+use Thelia\Model\Hook;
 
 /**
  * Class HookUpdateEvent.
@@ -19,23 +22,23 @@ namespace Thelia\Core\Event\Hook;
  */
 class HookUpdateEvent extends HookCreateEvent
 {
-    protected $hook_id;
+
     protected $by_module;
+
     protected $block;
+
     protected $chapo;
+
     protected $description;
 
-    public function __construct(int $hook_id)
+    public function __construct(protected int $hook_id)
     {
-        $this->hook_id = $hook_id;
     }
 
     /**
-     * @param int $hook_id
-     *
      * @return $this
      */
-    public function setHookId($hook_id): self
+    public function setHookId(int $hook_id): self
     {
         $this->hook_id = $hook_id;
 
@@ -43,14 +46,14 @@ class HookUpdateEvent extends HookCreateEvent
     }
 
     /**
-     * @return \Thelia\Model\Hook
+     * @return Hook
      */
-    public function getHookId()
+    public function getHookId(): int
     {
         return $this->hook_id;
     }
 
-    public function setBlock($block)
+    public function setBlock($block): static
     {
         $this->block = $block;
 
@@ -62,7 +65,7 @@ class HookUpdateEvent extends HookCreateEvent
         return $this->block;
     }
 
-    public function setByModule($by_module)
+    public function setByModule($by_module): static
     {
         $this->by_module = $by_module;
 
@@ -74,7 +77,7 @@ class HookUpdateEvent extends HookCreateEvent
         return $this->by_module;
     }
 
-    public function setChapo($chapo)
+    public function setChapo($chapo): static
     {
         $this->chapo = $chapo;
 
@@ -86,7 +89,7 @@ class HookUpdateEvent extends HookCreateEvent
         return $this->chapo;
     }
 
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->description = $description;
 

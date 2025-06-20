@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Thelia\Form\BaseForm;
+use Exception;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Template\TemplateAddAttributeEvent;
@@ -55,17 +59,17 @@ class TemplateController extends AbstractCrudController
         );
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::TEMPLATE_CREATION);
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::TEMPLATE_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent($formData): TemplateCreateEvent
     {
         $createEvent = new TemplateCreateEvent();
 
@@ -77,7 +81,7 @@ class TemplateController extends AbstractCrudController
         return $createEvent;
     }
 
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent($formData): TemplateUpdateEvent
     {
         $changeEvent = new TemplateUpdateEvent($formData['id']);
 
@@ -91,7 +95,7 @@ class TemplateController extends AbstractCrudController
         return $changeEvent;
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): TemplateDeleteEvent
     {
         return new TemplateDeleteEvent($this->getRequest()->get('template_id'));
     }
@@ -101,7 +105,7 @@ class TemplateController extends AbstractCrudController
         return $event->hasTemplate();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -169,7 +173,7 @@ class TemplateController extends AbstractCrudController
      * @param Request $request
      * @param int     $id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     protected function redirectToEditionTemplate($request = null, $id = null)
     {
@@ -227,7 +231,7 @@ class TemplateController extends AbstractCrudController
                 if ($event->hasTemplate()) {
                     $template_id = $event->getTemplate()->getId();
                 }
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -269,7 +273,7 @@ class TemplateController extends AbstractCrudController
 
             try {
                 $eventDispatcher->dispatch($event, TheliaEvents::TEMPLATE_ADD_ATTRIBUTE);
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -292,9 +296,9 @@ class TemplateController extends AbstractCrudController
 
         try {
             $eventDispatcher->dispatch($event, TheliaEvents::TEMPLATE_DELETE_ATTRIBUTE);
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             // Any error
-            return $this->errorPage($ex);
+            return $this->errorPage($exception);
         }
 
         return $this->redirectToEditionTemplate();
@@ -336,7 +340,7 @@ class TemplateController extends AbstractCrudController
 
             try {
                 $eventDispatcher->dispatch($event, TheliaEvents::TEMPLATE_ADD_FEATURE);
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -359,9 +363,9 @@ class TemplateController extends AbstractCrudController
 
         try {
             $eventDispatcher->dispatch($event, TheliaEvents::TEMPLATE_DELETE_FEATURE);
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             // Any error
-            return $this->errorPage($ex);
+            return $this->errorPage($exception);
         }
 
         return $this->redirectToEditionTemplate();

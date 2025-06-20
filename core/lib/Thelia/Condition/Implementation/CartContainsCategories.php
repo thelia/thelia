@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Condition\Implementation;
 
 use Thelia\Condition\Operators;
@@ -41,12 +42,12 @@ class CartContainsCategories extends ConditionAbstract
         parent::__construct($facade);
     }
 
-    public function getServiceId()
+    public function getServiceId(): string
     {
         return 'thelia.condition.cart_contains_categories';
     }
 
-    public function setValidatorsFromForm(array $operators, array $values)
+    public function setValidatorsFromForm(array $operators, array $values): static
     {
         $this->checkComparisonOperatorValue($operators, self::CATEGORIES_LIST);
 
@@ -75,7 +76,7 @@ class CartContainsCategories extends ConditionAbstract
         return $this;
     }
 
-    public function isMatching()
+    public function isMatching(): bool
     {
         $cartItems = $this->facade->getCart()->getCartItems();
 
@@ -98,7 +99,7 @@ class CartContainsCategories extends ConditionAbstract
         return false;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->translator->trans(
             'Cart contains categories condition',
@@ -147,7 +148,7 @@ class CartContainsCategories extends ConditionAbstract
         return $toolTip;
     }
 
-    protected function generateInputs()
+    protected function generateInputs(): array
     {
         return [
             self::CATEGORIES_LIST => [

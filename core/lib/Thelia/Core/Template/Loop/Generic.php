@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -32,10 +33,7 @@ use TheliaMain\PropelResolver;
  */
 class Generic extends BaseLoop implements PropelSearchLoopInterface
 {
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createAlphaNumStringTypeArgument('table_name', null, true),
@@ -98,6 +96,7 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
             if (!\is_callable([$query, $orderByMethod])) {
                 continue;
             }
+
             $direction = $direction[0] ?? 'ASC';
             $query->$orderByMethod($direction);
         }
@@ -107,7 +106,7 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
         return $query;
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         $tableMapClass = PropelResolver::getTableMapByTableName($this->getTableName());
         $tableMap = new $tableMapClass();
@@ -139,7 +138,10 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
         return $loopResult;
     }
 
-    protected function getParsedParams($params)
+    /**
+     * @return list<string>[]|null[]
+     */
+    protected function getParsedParams(array $params): array
     {
         $rawParams = explode('|', (string) $params);
         $params = [];
@@ -149,6 +151,7 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
             if (!isset($paramData[0]) || empty($paramData[0])) {
                 continue;
             }
+
             $params[$paramData[0]] = isset($paramData[1]) ? explode(',', $paramData[1]) : null;
         }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Module;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
@@ -41,13 +44,13 @@ abstract class AbstractAdminResourcesCompiler implements CompilerPassInterface
     /**
      * Allow module to add resources in AdminResources Service.
      */
-    public function process(\Symfony\Component\DependencyInjection\ContainerBuilder $container): void
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('thelia.admin.resources')) {
             return;
         }
 
-        /** @var \Symfony\Component\DependencyInjection\Definition $adminResources */
+        /** @var Definition $adminResources */
         $adminResources = $container->getDefinition('thelia.admin.resources');
 
         $adminResources->addMethodCall('addModuleResources', [$this->getResources(), $this->getModuleCode()]);

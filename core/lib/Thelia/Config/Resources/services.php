@@ -1,17 +1,10 @@
 <?php
 
-/*
- * This file is part of the Thelia package.
- * http://www.thelia.net
- *
- * (c) OpenStudio <info@thelia.net>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Exception;
 use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
@@ -20,6 +13,12 @@ use Thelia\Model\ModuleQuery;
 use Thelia\Service\ConfigCacheService;
 
 return static function (ContainerConfigurator $configurator): void {
+    // Import service configurations
+    $configurator->import('packages/*');
+    $configurator->import('services/*');
+    $configurator->import('parameters/*');
+
+
     $serviceConfigurator = $configurator->services();
 
     $serviceConfigurator->defaults()
@@ -83,16 +82,18 @@ return static function (ContainerConfigurator $configurator): void {
                 if (!class_exists($module->getFullNamespace())) {
                     throw new ClassNotFoundException($module->getFullNamespace());
                 }
+
                 \call_user_func([$module->getFullNamespace(), 'configureContainer'], $configurator);
                 \call_user_func([$module->getFullNamespace(), 'configureServices'], $serviceConfigurator);
                 $apiModulePath = $module->getAbsoluteBaseDir().'/Api/Resource';
                 if (is_dir($apiModulePath)) {
                     $apiResourcePaths[] = $apiModulePath;
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 if ($_SERVER['APP_DEBUG']) {
                     throw $e;
                 }
+
                 Tlog::getInstance()->addError(
                     \sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
                     $e

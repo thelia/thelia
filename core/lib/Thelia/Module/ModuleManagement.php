@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Module;
 
+use Exception;
+use SplFileInfo;
+use ReflectionClass;
+use SimpleXMLElement;
+use Propel\Runtime\Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -64,7 +70,7 @@ class ModuleManagement
             foreach ($finder as $file) {
                 try {
                     $this->updateModule($file, $container);
-                } catch (\Exception $ex) {
+                } catch (Exception $ex) {
                     // Guess module code
                     $moduleCode = basename(\dirname($file, 2));
 
@@ -72,11 +78,11 @@ class ModuleManagement
                 }
             }
 
-            if (\count($errors) > 0) {
+            if ($errors !== []) {
                 throw new InvalidModuleException($errors);
             }
 
-            if (\count($modulesUpdated)) {
+            if ($modulesUpdated !== []) {
                 $this->cacheClear();
             }
         } catch (DirectoryNotFoundException) {
@@ -88,19 +94,18 @@ class ModuleManagement
      * Update module information, and invoke install() for new modules (e.g. modules
      * just discovered), or update() modules for which version number ha changed.
      *
-     * @param \SplFileInfo $file      the module.xml file descriptor
+     * @param SplFileInfo $file the module.xml file descriptor
      * @param ContainerInterface $container the container
      *
-     * @throws \Exception
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
+     * @throws Exception
+     * @throws PropelException
      */
-    public function updateModule(\SplFileInfo $file, ContainerInterface $container): Module
+    public function updateModule(SplFileInfo $file, ContainerInterface $container): Module
     {
         $descriptorValidator = $this->getDescriptorValidator();
 
         $content = $descriptorValidator->getDescriptor($file->getRealPath());
-        $reflected = new \ReflectionClass((string) $content->fullnamespace);
+        $reflected = new ReflectionClass((string) $content->fullnamespace);
         $code = basename(\dirname($reflected->getFileName()));
         $version = (string) $content->version;
         $currentVersion = $version;
@@ -142,7 +147,7 @@ class ModuleManagement
                 $this->saveDescription($module, $content, $con);
 
                 if (isset($content->{'images-folder'}) && !$module->isModuleImageDeployed($con)) {
-                    /** @var \Thelia\Module\BaseModule $moduleInstance */
+                    /** @var BaseModule $moduleInstance */
                     $moduleInstance = $reflected->newInstance();
                     $imagesFolder = $moduleInstance->getModuleDir().DS.$content->{'images-folder'};
                     $moduleInstance->deployImageFolder($module, $imagesFolder, $con);
@@ -165,11 +170,11 @@ class ModuleManagement
             }
 
             $con->commit();
-        } catch (\Exception $ex) {
-            Tlog::getInstance()->addError('Failed to update module '.$module->getCode(), $ex);
+        } catch (Exception $exception) {
+            Tlog::getInstance()->addError('Failed to update module '.$module->getCode(), $exception);
 
             $con->rollBack();
-            throw $ex;
+            throw $exception;
         }
 
         return $module;
@@ -177,7 +182,7 @@ class ModuleManagement
 
     public function getDescriptorValidator(): ModuleDescriptorValidator
     {
-        if (null === $this->descriptorValidator) {
+        if (!$this->descriptorValidator instanceof ModuleDescriptorValidator) {
             $this->descriptorValidator = new ModuleDescriptorValidator();
         }
 
@@ -193,22 +198,23 @@ class ModuleManagement
         $this->container->get('event_dispatcher')?->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
     }
 
-    private function getModuleType(\ReflectionClass $reflected): int
+    private function getModuleType(ReflectionClass $reflected): int
     {
         if (
-            $reflected->implementsInterface(\Thelia\Module\DeliveryModuleInterface::class)
-            || $reflected->implementsInterface(\Thelia\Module\DeliveryModuleWithStateInterface::class)
+            $reflected->implementsInterface(DeliveryModuleInterface::class)
+            || $reflected->implementsInterface(DeliveryModuleWithStateInterface::class)
         ) {
             return BaseModule::DELIVERY_MODULE_TYPE;
         }
-        if ($reflected->implementsInterface(\Thelia\Module\PaymentModuleInterface::class)) {
+
+        if ($reflected->implementsInterface(PaymentModuleInterface::class)) {
             return BaseModule::PAYMENT_MODULE_TYPE;
         }
 
         return BaseModule::CLASSIC_MODULE_TYPE;
     }
 
-    private function saveDescription(Module $module, \SimpleXMLElement $content, ConnectionInterface $con): void
+    private function saveDescription(Module $module, SimpleXMLElement $content, ConnectionInterface $con): void
     {
         foreach ($content->descriptive as $description) {
             $locale = (string) $description->attributes()->locale;

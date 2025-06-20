@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Thelia\Form\BaseForm;
+use InvalidArgumentException;
+use ErrorException;
+use Exception;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -53,17 +58,17 @@ class MessageController extends AbstractCrudController
         );
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::MESSAGE_CREATION);
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::MESSAGE_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent($formData): MessageCreateEvent
     {
         $createEvent = new MessageCreateEvent();
 
@@ -71,13 +76,13 @@ class MessageController extends AbstractCrudController
             ->setMessageName($formData['name'])
             ->setLocale($formData['locale'])
             ->setTitle($formData['title'])
-            ->setSecured($formData['secured'] ? true : false)
+            ->setSecured((bool) $formData['secured'])
         ;
 
         return $createEvent;
     }
 
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent($formData): MessageUpdateEvent
     {
         $changeEvent = new MessageUpdateEvent($formData['id']);
 
@@ -99,7 +104,7 @@ class MessageController extends AbstractCrudController
         return $changeEvent;
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): MessageDeleteEvent
     {
         return new MessageDeleteEvent($this->getRequest()->get('message_id'));
     }
@@ -109,13 +114,13 @@ class MessageController extends AbstractCrudController
         return $event->hasMessage();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
     {
         // Prepare the data that will hydrate the form
         $data = [
             'id' => $object->getId(),
             'name' => $object->getName(),
-            'secured' => $object->getSecured() ? true : false,
+            'secured' => (bool) $object->getSecured(),
             'locale' => $object->getLocale(),
             'title' => $object->getTitle(),
             'subject' => $object->getSubject(),
@@ -174,7 +179,10 @@ class MessageController extends AbstractCrudController
         return $this->render('messages');
     }
 
-    protected function listDirectoryContent($requiredExtension)
+    /**
+     * @return list
+     */
+    protected function listDirectoryContent(string $requiredExtension): array
     {
         $list = [];
 
@@ -188,7 +196,7 @@ class MessageController extends AbstractCrudController
             $finder->in($parentTemplate->getAbsolutePath());
         }
 
-        $finder->ignoreDotFiles(true)->sortByName()->name("*.$requiredExtension");
+        $finder->ignoreDotFiles(true)->sortByName()->name('*.' . $requiredExtension);
 
         /** @var SplFileInfo $file */
         foreach ($finder as $file) {
@@ -207,7 +215,7 @@ class MessageController extends AbstractCrudController
                     ->in($dir)
                     ->ignoreDotFiles(true)
                     ->sortByName()
-                    ->name("*.$requiredExtension");
+                    ->name('*.' . $requiredExtension);
 
                 foreach ($finder as $file) {
                     $fileName = $file->getBasename();
@@ -268,12 +276,12 @@ class MessageController extends AbstractCrudController
             } else {
                 $content = $message->setLocale($this->getCurrentEditionLocale())->getTextMessageBody($parser);
             }
-        } catch (\InvalidArgumentException|\ErrorException $exception) {
-            return new Response($this->getTranslator()->trans('You probably didn\'t inject the missing variable to preview the HTML. Error is : %err',
-                ['%err' => $exception->getMessage()]), 200);
-        } catch (\Exception $exception) {
+        } catch (InvalidArgumentException|ErrorException $exception) {
+            return new Response($this->getTranslator()->trans("You probably didn't inject the missing variable to preview the HTML. Error is : %err",
+                ['%err' => $exception->getMessage()]), \Symfony\Component\HttpFoundation\Response::HTTP_OK);
+        } catch (Exception $exception) {
             return new Response($this->getTranslator()->trans('Something goes wrong, error is : %err',
-                ['%err' => $exception->getMessage()]), 200);
+                ['%err' => $exception->getMessage()]), \Symfony\Component\HttpFoundation\Response::HTTP_OK);
         }
 
         return new Response($content);
@@ -327,7 +335,7 @@ class MessageController extends AbstractCrudController
                         ['%recipient' => $data['recipient_email']]
                     )
                 );
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 return new Response(
                     $this->getTranslator()->trans(
                         'Something goes wrong, the message was not sent to recipient. Error is : %err',

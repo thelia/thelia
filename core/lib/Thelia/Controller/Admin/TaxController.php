@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Thelia\Form\BaseForm;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\Tax\TaxEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -44,12 +46,12 @@ class TaxController extends AbstractCrudController
         return $form;
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::TAX_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent($formData): TaxEvent
     {
         $event = new TaxEvent();
 
@@ -62,7 +64,7 @@ class TaxController extends AbstractCrudController
         return $event;
     }
 
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent($formData): TaxEvent
     {
         $event = new TaxEvent();
 
@@ -76,7 +78,7 @@ class TaxController extends AbstractCrudController
         return $event;
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): TaxEvent
     {
         $event = new TaxEvent();
 
@@ -92,7 +94,7 @@ class TaxController extends AbstractCrudController
         return $event->hasTax();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -147,12 +149,12 @@ class TaxController extends AbstractCrudController
         return $object->getId();
     }
 
-    protected function getViewArguments()
+    protected function getViewArguments(): array
     {
         return [];
     }
 
-    protected function getRouteArguments($tax_id = null)
+    protected function getRouteArguments($tax_id = null): array
     {
         return [
             'tax_id' => $tax_id ?? $this->getRequest()->get('tax_id'),
@@ -203,7 +205,10 @@ class TaxController extends AbstractCrudController
         return $this->generateRedirectFromRoute('admin.configuration.taxes-rules.list');
     }
 
-    protected function getRequirements($type, $formData)
+    /**
+     * @return mixed[]
+     */
+    protected function getRequirements($type, $formData): array
     {
         $requirements = [];
         foreach ($formData as $data => $value) {

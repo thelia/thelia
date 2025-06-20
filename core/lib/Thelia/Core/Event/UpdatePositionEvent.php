@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,13 +11,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event;
 
 class UpdatePositionEvent extends ActionEvent
 {
     public const POSITION_UP = 1;
+
     public const POSITION_DOWN = 2;
+
     public const POSITION_ABSOLUTE = 3;
 
     /**
@@ -62,7 +65,7 @@ class UpdatePositionEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setMode($mode)
+    public function setMode($mode): static
     {
         $this->mode = $mode;
 
@@ -82,7 +85,7 @@ class UpdatePositionEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setPosition($position)
+    public function setPosition($position): static
     {
         $this->position = $position;
 
@@ -102,7 +105,7 @@ class UpdatePositionEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setObjectId($objectId)
+    public function setObjectId($objectId): static
     {
         $this->object_id = $objectId;
         $this->objectId = $objectId;

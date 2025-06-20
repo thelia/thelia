@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Exception;
+use LogicException;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Propel\Runtime\Event\ActiveRecordEvent;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\Form;
@@ -34,22 +38,11 @@ use Thelia\Tools\TokenProvider;
  */
 abstract class AbstractCrudController extends BaseAdminController
 {
-    protected $objectName;
 
-    // List ordering
-    protected $defaultListOrder;
-    protected $orderRequestParameterName;
 
-    // Permissions
-    protected $resourceCode;
-    protected $moduleCode;
 
-    // Events
-    protected $createEventIdentifier;
-    protected $updateEventIdentifier;
-    protected $deleteEventIdentifier;
-    protected $visibilityToggleEventIdentifier;
-    protected $changePositionEventIdentifier;
+
+
 
     /**
      * @param string      $objectName                      the lower case object name. Example. "message"
@@ -63,32 +56,8 @@ abstract class AbstractCrudController extends BaseAdminController
      * @param string|null $changePositionEventIdentifier   the dispatched position change TheliaEvent identifier, or null if the object has no position. Example: TheliaEvents::MESSAGE_UPDATE_POSITION
      * @param string|null $moduleCode                      The module code for ACL
      */
-    public function __construct(
-        string $objectName,
-        ?string $defaultListOrder,
-        ?string $orderRequestParameterName,
-        string $resourceCode,
-        ?string $createEventIdentifier,
-        ?string $updateEventIdentifier,
-        ?string $deleteEventIdentifier,
-        string $visibilityToggleEventIdentifier = null,
-        string $changePositionEventIdentifier = null,
-        string $moduleCode = null
-    ) {
-        $this->objectName = $objectName;
-
-        $this->defaultListOrder = $defaultListOrder;
-        $this->orderRequestParameterName = $orderRequestParameterName;
-
-        $this->resourceCode = $resourceCode;
-
-        $this->createEventIdentifier = $createEventIdentifier;
-        $this->updateEventIdentifier = $updateEventIdentifier;
-        $this->deleteEventIdentifier = $deleteEventIdentifier;
-        $this->visibilityToggleEventIdentifier = $visibilityToggleEventIdentifier;
-        $this->changePositionEventIdentifier = $changePositionEventIdentifier;
-
-        $this->moduleCode = $moduleCode;
+    public function __construct(protected string $objectName, protected ?string $defaultListOrder, protected ?string $orderRequestParameterName, protected string $resourceCode, protected ?string $createEventIdentifier, protected ?string $updateEventIdentifier, protected ?string $deleteEventIdentifier, protected ?string $visibilityToggleEventIdentifier = null, protected ?string $changePositionEventIdentifier = null, protected ?string $moduleCode = null)
+    {
     }
 
     /**
@@ -115,21 +84,21 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Creates the creation event with the provided form data.
      *
-     * @return \Thelia\Core\Event\ActionEvent
+     * @return ActionEvent
      */
     abstract protected function getCreationEvent($formData);
 
     /**
      * Creates the update event with the provided form data.
      *
-     * @return \Thelia\Core\Event\ActionEvent
+     * @return ActionEvent
      */
     abstract protected function getUpdateEvent($formData);
 
     /**
      * Creates the delete event with the provided form data.
      *
-     * @return \Thelia\Core\Event\ActionEvent
+     * @return ActionEvent
      */
     abstract protected function getDeleteEvent();
 
@@ -155,7 +124,7 @@ abstract class AbstractCrudController extends BaseAdminController
             return $event->getModel();
         }
 
-        throw new \Exception("If your event doesn't have  \"getModel\" method you must override \"getObjectFromEvent\" function.");
+        throw new Exception("If your event doesn't have  \"getModel\" method you must override \"getObjectFromEvent\" function.");
     }
 
     /**
@@ -176,28 +145,28 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Render the main list template.
      *
-     * @return \Thelia\Core\HttpFoundation\Response
+     * @return Response
      */
     abstract protected function renderListTemplate($currentOrder);
 
     /**
      * Render the edition template.
      *
-     * @return \Thelia\Core\HttpFoundation\Response
+     * @return Response
      */
     abstract protected function renderEditionTemplate();
 
     /**
      * Must return a RedirectResponse instance.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return RedirectResponse
      */
     abstract protected function redirectToEditionTemplate();
 
     /**
      * Must return a RedirectResponse instance.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return RedirectResponse
      */
     abstract protected function redirectToListTemplate();
 
@@ -206,7 +175,7 @@ abstract class AbstractCrudController extends BaseAdminController
      */
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
     {
-        throw new \LogicException('Position Update is not supported for this object');
+        throw new LogicException('Position Update is not supported for this object');
     }
 
     /**
@@ -214,7 +183,7 @@ abstract class AbstractCrudController extends BaseAdminController
      */
     protected function createToggleVisibilityEvent()
     {
-        throw new \LogicException('Toggle Visibility is not supported for this object');
+        throw new LogicException('Toggle Visibility is not supported for this object');
     }
 
     /**
@@ -289,7 +258,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Render the object list, ensuring the sort order is set.
      *
-     * @return \Thelia\Core\HttpFoundation\Response the response
+     * @return Response the response
      */
     protected function renderList()
     {
@@ -299,7 +268,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * The default action is displaying the list.
      *
-     * @return \Thelia\Core\HttpFoundation\Response the response
+     * @return Response the response
      */
     public function defaultAction()
     {
@@ -314,7 +283,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Create a new object.
      *
-     * @return \Thelia\Core\HttpFoundation\Response the response
+     * @return Response the response
      */
     public function createAction(
         EventDispatcherInterface $eventDispatcher,
@@ -348,7 +317,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
             // Check if object exist
             if (!$this->eventContainsObject($createEvent)) {
-                throw new \LogicException(
+                throw new LogicException(
                     $translator->trans('No %obj was created.', ['%obj' => $this->objectName])
                 );
             }
@@ -384,7 +353,7 @@ abstract class AbstractCrudController extends BaseAdminController
             // Form cannot be validated
             $errorMessage = $this->createStandardFormValidationErrorMessage($ex);
             $errorCode = 400;
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $errorMessage = $ex->getMessage();
             $errorCode = 500;
@@ -405,7 +374,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Load a object for modification, and display the edit template.
      *
-     * @return \Thelia\Core\HttpFoundation\Response the response
+     * @return Response the response
      */
     public function updateAction(
         ParserContext $parserContext
@@ -431,7 +400,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Save changes on a modified object, and either go back to the object list, or stay on the edition page.
      *
-     * @return \Thelia\Core\HttpFoundation\Response the response
+     * @return Response the response
      */
     public function processUpdateAction(
         Request $request,
@@ -466,7 +435,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
             // Check if object exist
             if (!$this->eventContainsObject($changeEvent)) {
-                throw new \LogicException(
+                throw new LogicException(
                     $translator->trans('No %obj was updated.', ['%obj' => $this->objectName])
                 );
             }
@@ -505,7 +474,7 @@ abstract class AbstractCrudController extends BaseAdminController
             // Form cannot be validated
             $errorMessage = $this->createStandardFormValidationErrorMessage($ex);
             $errorCode = 500;
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $errorMessage = $ex->getMessage();
             $errorCode = 400;
@@ -526,7 +495,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Update object position (only for objects whichsupport that).
      *
-     * @return mixed|string|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response|Response|null
+     * @return mixed|string|RedirectResponse|\Symfony\Component\HttpFoundation\Response|Response|null
      */
     public function updatePositionAction(
         Request $request,
@@ -553,9 +522,9 @@ abstract class AbstractCrudController extends BaseAdminController
             $event = $this->createUpdatePositionEvent($mode, $position);
 
             $eventDispatcher->dispatch($event, $this->changePositionEventIdentifier);
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             // Any error
-            return $this->errorPage($ex);
+            return $this->errorPage($exception);
         }
 
         $response = $this->performAdditionalUpdatePositionAction($event);
@@ -567,7 +536,7 @@ abstract class AbstractCrudController extends BaseAdminController
         return $response;
     }
 
-    protected function genericUpdatePositionAction(Request $request, EventDispatcherInterface $eventDispatcher, $object, $eventName, $doFinalRedirect = true)
+    protected function genericUpdatePositionAction(Request $request, EventDispatcherInterface $eventDispatcher, $object, ?string $eventName, $doFinalRedirect = true)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) {
@@ -591,7 +560,7 @@ abstract class AbstractCrudController extends BaseAdminController
                 $event = new UpdatePositionEvent($object->getId(), $mode, $position);
 
                 $eventDispatcher->dispatch($event, $eventName);
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -619,9 +588,9 @@ abstract class AbstractCrudController extends BaseAdminController
 
         try {
             $eventDispatcher->dispatch($changeEvent, $this->visibilityToggleEventIdentifier);
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             // Any error
-            return $this->errorPage($ex);
+            return $this->errorPage($exception);
         }
 
         return $this->nullResponse();
@@ -630,7 +599,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Delete an object.
      *
-     * @return \Thelia\Core\HttpFoundation\Response the response
+     * @return Response the response
      */
     public function deleteAction(
         Request $request,
@@ -675,15 +644,15 @@ abstract class AbstractCrudController extends BaseAdminController
             }
 
             return $response;
-        } catch (\Exception $e) {
-            return $this->renderAfterDeleteError($parserContext, $e)->setStatusCode(400);
+        } catch (Exception $exception) {
+            return $this->renderAfterDeleteError($parserContext, $exception)->setStatusCode(\Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
         }
     }
 
     /**
-     * @return \Thelia\Core\HttpFoundation\Response
+     * @return Response
      */
-    protected function renderAfterDeleteError(ParserContext $parserContext, \Exception $e)
+    protected function renderAfterDeleteError(ParserContext $parserContext, Exception $e)
     {
         $errorMessage = sprintf(
             "Unable to delete '%s'. Error message: %s",
@@ -702,7 +671,7 @@ abstract class AbstractCrudController extends BaseAdminController
     {
         $fields = $form->getIterator();
 
-        /** @var \Symfony\Component\Form\Form $field */
+        /** @var Form $field */
         foreach ($fields as $field) {
             $functionName = sprintf('set%s', Container::camelize($field->getName()));
             if (method_exists($propelEvent, $functionName)) {

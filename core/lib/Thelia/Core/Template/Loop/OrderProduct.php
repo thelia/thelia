@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseLoop;
@@ -41,10 +43,7 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
 {
     protected $timestampable = true;
 
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('order', null, true),
@@ -102,11 +101,9 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
-     * @return LoopResult
+     * @throws PropelException
      */
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         $lastLegacyRoundingOrderId = ConfigQuery::read('last_legacy_rounding_order_id', 0);
 

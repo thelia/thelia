@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Exception;
+use Thelia\Form\BaseForm;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -77,16 +80,12 @@ class ModuleHookController extends AbstractCrudController
 
         try {
             $eventDispatcher->dispatch($event, TheliaEvents::MODULE_HOOK_TOGGLE_ACTIVATION);
-        } catch (\Exception $ex) {
-            $message = $ex->getMessage();
+        } catch (Exception $exception) {
+            $message = $exception->getMessage();
         }
 
         if ($this->getRequest()->isXmlHttpRequest()) {
-            if ($message) {
-                $response = $this->jsonResponse(json_encode(['error' => $message]), 500);
-            } else {
-                $response = $this->nullResponse();
-            }
+            $response = $message ? $this->jsonResponse(json_encode(['error' => $message]), 500) : $this->nullResponse();
         } else {
             $response = $this->generateRedirectFromRoute('admin.module-hook');
         }
@@ -94,7 +93,7 @@ class ModuleHookController extends AbstractCrudController
         return $response;
     }
 
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
             $this->getRequest()->get('module_hook_id', null),
@@ -106,7 +105,7 @@ class ModuleHookController extends AbstractCrudController
     /**
      * Return the creation form for this object.
      */
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::MODULE_HOOK_CREATION);
     }
@@ -114,7 +113,7 @@ class ModuleHookController extends AbstractCrudController
     /**
      * Return the update form for this object.
      */
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::MODULE_HOOK_MODIFICATION);
     }
@@ -126,7 +125,7 @@ class ModuleHookController extends AbstractCrudController
      *
      * @return ModuleHookModificationForm
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -169,7 +168,7 @@ class ModuleHookController extends AbstractCrudController
         return $this->hydrateEvent($event, $formData, true);
     }
 
-    protected function hydrateEvent($event, $formData, $update = false)
+    protected function hydrateEvent($event, array $formData, $update = false)
     {
         if (!$update) {
             $event
@@ -193,7 +192,7 @@ class ModuleHookController extends AbstractCrudController
     /**
      * Creates the delete event with the provided form data.
      */
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): ModuleHookDeleteEvent
     {
         return new ModuleHookDeleteEvent($this->getRequest()->get('module_hook_id'));
     }
@@ -202,10 +201,8 @@ class ModuleHookController extends AbstractCrudController
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
      * @param ModuleHookEvent $event
-     *
-     * @return bool
      */
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasModuleHook();
     }
@@ -239,10 +236,8 @@ class ModuleHookController extends AbstractCrudController
      * Returns the object label form the object event (name, title, etc.).
      *
      * @param ModuleHook $object
-     *
-     * @return string
      */
-    protected function getObjectLabel($object)
+    protected function getObjectLabel($object): string
     {
         try {
             return sprintf(
@@ -250,7 +245,7 @@ class ModuleHookController extends AbstractCrudController
                 $object->getModule()->getTitle(),
                 $object->getHook()->getTitle()
             );
-        } catch (\Exception) {
+        } catch (Exception) {
             return 'Undefined module hook';
         }
     }
@@ -292,10 +287,7 @@ class ModuleHookController extends AbstractCrudController
         return $this->render('module-hook-edit', $this->getEditionArgument());
     }
 
-    /**
-     * @return array
-     */
-    protected function getEditionArgument()
+    protected function getEditionArgument(): array
     {
         return [
             'module_hook_id' => $this->getRequest()->get('module_hook_id', 0),
@@ -324,12 +316,12 @@ class ModuleHookController extends AbstractCrudController
         return $this->generateRedirectFromRoute('admin.module-hook');
     }
 
-    protected function getViewArguments()
+    protected function getViewArguments(): array
     {
         return [];
     }
 
-    protected function getRouteArguments($module_hook_id = null)
+    protected function getRouteArguments($module_hook_id = null): array
     {
         return [
             'module_hook_id' => $module_hook_id ?? $this->getRequest()->get('module_hook_id'),

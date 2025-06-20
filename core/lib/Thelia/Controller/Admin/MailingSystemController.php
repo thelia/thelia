@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\MailingSystem\MailingSystemEvent;
@@ -37,7 +39,7 @@ class MailingSystemController extends BaseAdminController
 
         // Hydrate the form abd pass it to the parser
         $data = [
-            'enabled' => ConfigQuery::isSmtpEnable() ? true : false,
+            'enabled' => (bool) ConfigQuery::isSmtpEnable(),
             'host' => ConfigQuery::getSmtpHost(),
             'port' => ConfigQuery::getSmtpPort(),
             'encryption' => ConfigQuery::getSmtpEncryption(),
@@ -94,7 +96,7 @@ class MailingSystemController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -135,7 +137,7 @@ class MailingSystemController extends BaseAdminController
 
             $message = $translator->trans('Email test from : %store%', ['%store%' => $storeName]);
 
-            $htmlMessage = "<p>$message</p>";
+            $htmlMessage = sprintf('<p>%s</p>', $message);
 
             try {
                 $mailer->sendSimpleEmailMessage(
@@ -147,7 +149,7 @@ class MailingSystemController extends BaseAdminController
                 );
                 $json_data['success'] = true;
                 $json_data['message'] = $translator->trans('Your configuration seems to be ok. Checked out your mailbox : %email%', ['%email%' => $emailTest]);
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 $json_data['message'] = $ex->getMessage();
             }
         } else {

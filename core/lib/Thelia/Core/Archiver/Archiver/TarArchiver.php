@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Archiver\Archiver;
 
+use Phar;
+use PharData;
 use Thelia\Core\Archiver\AbstractArchiver;
 
 /**
@@ -24,29 +27,29 @@ class TarArchiver extends AbstractArchiver
     /**
      * @var int Compression method
      */
-    public const COMPRESSION_METHOD = \Phar::NONE;
+    public const COMPRESSION_METHOD = Phar::NONE;
 
-    public function getId()
+    public function getId(): string
     {
         return 'thelia.tar';
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'Tar';
     }
 
-    public function getExtension()
+    public function getExtension(): string
     {
         return 'tar';
     }
 
-    public function getMimeType()
+    public function getMimeType(): string
     {
         return 'application/x-tar';
     }
 
-    public function isAvailable()
+    public function isAvailable(): bool
     {
         return class_exists('\\PharData');
     }
@@ -55,7 +58,7 @@ class TarArchiver extends AbstractArchiver
     {
         $this->archivePath = $baseName.'.'.$this->getExtension();
 
-        $this->archive = new \PharData($this->archivePath);
+        $this->archive = new PharData($this->archivePath);
 
         return $this;
     }
@@ -64,7 +67,7 @@ class TarArchiver extends AbstractArchiver
     {
         $this->archivePath = $path;
 
-        $this->archive = new \PharData($this->archivePath);
+        $this->archive = new PharData($this->archivePath);
 
         return $this;
     }

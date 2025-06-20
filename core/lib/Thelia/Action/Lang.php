@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
+use RuntimeException;
+use Propel\Runtime\Exception\PropelException;
+use Exception;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -41,20 +45,12 @@ use Thelia\Model\LangQuery;
  */
 class Lang extends BaseAction implements EventSubscriberInterface
 {
-    /** @var TemplateHelperInterface */
-    protected $templateHelper;
-
-    /** @var RequestStack */
-    protected $requestStack;
-
-    public function __construct(TemplateHelperInterface $templateHelper, RequestStack $requestStack)
+    public function __construct(protected TemplateHelperInterface $templateHelper, protected RequestStack $requestStack)
     {
-        $this->templateHelper = $templateHelper;
-        $this->requestStack = $requestStack;
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function update(LangUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -75,7 +71,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function toggleDefault(LangToggleDefaultEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -87,13 +83,13 @@ class Lang extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function toggleActive(LangToggleActiveEvent $event): void
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
             if ($lang->getByDefault()) {
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     Translator::getInstance()->trans('Cannot disable the default language')
                 );
             }
@@ -111,13 +107,13 @@ class Lang extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function toggleVisible(LangToggleVisibleEvent $event): void
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
             if ($lang->getByDefault()) {
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     Translator::getInstance()->trans('Cannot hide the default language')
                 );
             }
@@ -135,7 +131,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function create(LangCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -157,13 +153,13 @@ class Lang extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function delete(LangDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
             if ($lang->getByDefault()) {
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     Translator::getInstance()->trans('It is not allowed to delete the default language')
                 );
             }
@@ -189,8 +185,8 @@ class Lang extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Exception
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws Exception
+     * @throws PropelException
      */
     public function defaultBehavior(LangDefaultBehaviorEvent $event): void
     {
@@ -200,8 +196,8 @@ class Lang extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Exception
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws Exception
+     * @throws PropelException
      */
     public function langUrl(LangUrlEvent $event): void
     {
@@ -230,14 +226,14 @@ class Lang extends BaseAction implements EventSubscriberInterface
 
                 $fs->copy($unknownFlagPath, $countryFlag);
             }
-        } catch (TemplateException $ex) {
-            throw new \RuntimeException(
+        } catch (TemplateException $templateException) {
+            throw new RuntimeException(
                 Translator::getInstance()->trans(
                     'The image which replaces an undefined country flag (%file) was not found. Please check unknown-flag-path configuration variable, and check that the image exists.',
                     ['%file' => $unknownFlag]
                 ),
                 0,
-                $ex
+                $templateException
             );
         }
     }

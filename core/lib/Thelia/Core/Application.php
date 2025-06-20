@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use ReflectionClass;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -25,6 +29,9 @@ use Thelia\Command\Install;
  */
 class Application extends BaseApplication
 {
+    /**
+     * @var KernelInterface
+     */
     public $kernel;
 
     public function __construct(KernelInterface $kernel)
@@ -44,12 +51,12 @@ class Application extends BaseApplication
         return $this->kernel;
     }
 
-    public function getContainer()
+    public function getContainer(): ContainerInterface
     {
         return $this->kernel->getContainer();
     }
 
-    public function doRun(InputInterface $input, OutputInterface $output)
+    public function doRun(InputInterface $input, OutputInterface $output): int
     {
         $this->registerCommands();
 
@@ -68,9 +75,9 @@ class Application extends BaseApplication
 
         foreach ($container->getParameter('command.definition') as $commandId) {
             $command = $container->get($commandId);
-            $r = new \ReflectionClass($command);
+            $r = new ReflectionClass($command);
 
-            if (!$r->isSubclassOf(\Symfony\Component\Console\Command\Command::class)) {
+            if (!$r->isSubclassOf(Command::class)) {
                 continue;
             }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Coupon;
 
+
+use Thelia\Model\Exception\InvalidArgumentException;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Coupon;
@@ -25,12 +28,6 @@ class CouponCreateOrUpdateEvent extends ActionEvent
 {
     /** @var ConditionCollection Array of ConditionInterface */
     protected $conditions;
-
-    /** @var \DateTime Coupon start date */
-    protected $startDate;
-
-    /** @var \DateTime Coupon expiration date */
-    protected $expirationDate;
 
     /** @var float Amount that will be removed from the Checkout (Coupon Effect) */
     protected $amount = 0;
@@ -53,7 +50,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      * @param string    $shortDescription           Coupon short description
      * @param string    $description                Coupon description
      * @param bool      $isEnabled                  Enable/Disable
-     * @param \DateTime $expirationDate             Coupon expiration date
+     * @param DateTime $expirationDate Coupon expiration date
      * @param bool      $isAvailableOnSpecialOffers Is available on special offers
      * @param bool      $isCumulative               Is cumulative
      * @param bool      $isRemovingPostage          Is removing Postage
@@ -62,7 +59,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      * @param array     $freeShippingForCountries   ID of Countries to which shipping is free
      * @param array     $freeShippingForMethods     ID of Shipping modules for which shipping is free
      * @param bool      $perCustomerUsageCount      Usage count is per customer
-     * @param \DateTime $startDate                  Coupon start date
+     * @param DateTime $startDate Coupon start date
      */
     public function __construct(
         protected $code,
@@ -72,7 +69,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
         protected $shortDescription,
         protected $description,
         protected $isEnabled,
-        \DateTime $expirationDate,
+        protected DateTime $expirationDate,
         protected $isAvailableOnSpecialOffers,
         protected $isCumulative,
         protected $isRemovingPostage,
@@ -81,17 +78,15 @@ class CouponCreateOrUpdateEvent extends ActionEvent
         protected $freeShippingForCountries,
         protected $freeShippingForMethods,
         protected $perCustomerUsageCount,
-        \DateTime $startDate = null
+        protected ?DateTime $startDate = null
     ) {
-        $this->expirationDate = $expirationDate;
         $this->setEffects($effects);
-        $this->startDate = $startDate;
     }
 
     /**
      * @param true $perCustomerUsageCount
      */
-    public function setPerCustomerUsageCount($perCustomerUsageCount)
+    public function setPerCustomerUsageCount($perCustomerUsageCount): static
     {
         $this->perCustomerUsageCount = $perCustomerUsageCount;
 
@@ -111,7 +106,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setFreeShippingForCountries($freeShippingForCountries)
+    public function setFreeShippingForCountries($freeShippingForCountries): static
     {
         $this->freeShippingForCountries = $freeShippingForCountries;
 
@@ -131,7 +126,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setFreeShippingForMethods($freeShippingForMethods)
+    public function setFreeShippingForMethods($freeShippingForMethods): static
     {
         $this->freeShippingForMethods = $freeShippingForMethods;
 
@@ -221,11 +216,11 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /**
      * Return Coupon start date.
      *
-     * @return \DateTime
+     * @return DateTime
      */
-    public function getStartDate()
+    public function getStartDate(): ?DateTime
     {
-        if ($this->startDate === null) {
+        if (!$this->startDate instanceof DateTime) {
             return null;
         }
 
@@ -235,7 +230,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /**
      * Return Coupon expiration date.
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getExpirationDate()
     {
@@ -300,7 +295,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      *                       Needs at least the key 'amount'
      *                       with the amount removed from the cart
      *
-     * @throws \Thelia\Model\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function setEffects(array $effects): void
     {
@@ -365,7 +360,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setCouponModel(Coupon $couponModel)
+    public function setCouponModel(Coupon $couponModel): static
     {
         $this->couponModel = $couponModel;
 
@@ -375,7 +370,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /**
      * Return Coupon Model.
      *
-     * @return \Thelia\Model\Coupon
+     * @return Coupon
      */
     public function getCouponModel()
     {
@@ -399,7 +394,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setConditions(ConditionCollection $conditions)
+    public function setConditions(ConditionCollection $conditions): static
     {
         $this->conditions = $conditions;
 

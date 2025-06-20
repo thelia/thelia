@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
@@ -22,20 +23,11 @@ use Thelia\Form\BaseForm;
  */
 class TheliaFormEvent extends Event
 {
-    /**
-     * @var BaseForm
-     */
-    protected $form;
-
-    public function __construct(BaseForm $form)
+    public function __construct(protected BaseForm $form)
     {
-        $this->form = $form;
     }
 
-    /**
-     * @return BaseForm
-     */
-    public function getForm()
+    public function getForm(): BaseForm
     {
         return $this->form;
     }
@@ -43,14 +35,14 @@ class TheliaFormEvent extends Event
     /**
      * @return $this
      */
-    public function setForm(BaseForm $form)
+    public function setForm(BaseForm $form): static
     {
         $this->form = $form;
 
         return $this;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->form::getName();
     }

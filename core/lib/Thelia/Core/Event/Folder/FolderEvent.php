@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Folder;
 
 use Thelia\Core\Event\ActionEvent;
@@ -24,17 +25,11 @@ use Thelia\Model\Folder;
  */
 class FolderEvent extends ActionEvent
 {
-    /**
-     * @var \Thelia\Model\Folder
-     */
-    protected $folder;
-
-    public function __construct(Folder $folder = null)
+    public function __construct(protected ?Folder $folder = null)
     {
-        $this->folder = $folder;
     }
 
-    public function setFolder(Folder $folder)
+    public function setFolder(Folder $folder): static
     {
         $this->folder = $folder;
 
@@ -42,20 +37,18 @@ class FolderEvent extends ActionEvent
     }
 
     /**
-     * @return \Thelia\Model\Folder
+     * @return Folder
      */
-    public function getFolder()
+    public function getFolder(): ?Folder
     {
         return $this->folder;
     }
 
     /**
      * test if a folder object exists.
-     *
-     * @return bool
      */
-    public function hasFolder()
+    public function hasFolder(): bool
     {
-        return null !== $this->folder;
+        return $this->folder instanceof Folder;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use LogicException;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
@@ -84,20 +88,15 @@ abstract class BaseForm implements FormInterface
 
     /**
      * The form error message.
-     *
-     * @var string
      */
-    private $error_message = '';
+    private string $error_message = '';
 
     /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcher
+     * @var EventDispatcher
      */
     protected $dispatcher;
 
-    /**
-     * @var string
-     */
-    private $type;
+    private ?string $type = null;
 
     public function init(
         Request $request,
@@ -106,7 +105,7 @@ abstract class BaseForm implements FormInterface
         FormFactoryBuilderInterface $formFactoryBuilder,
         ValidatorBuilder $validationBuilder,
         TokenStorageInterface $tokenStorage,
-        string $type = \Symfony\Component\Form\Extension\Core\Type\FormType::class,
+        string $type = FormType::class,
         array $data = [],
         array $options = []
     ): void {
@@ -236,7 +235,7 @@ abstract class BaseForm implements FormInterface
         return $this->request;
     }
 
-    protected function cleanOptions($options)
+    protected function cleanOptions(array $options)
     {
         unset($options['csrf_protection']);
 
@@ -316,14 +315,14 @@ abstract class BaseForm implements FormInterface
     }
 
     /**
-     * @throws \LogicException
+     * @throws LogicException
      *
      * @return FormView
      */
     public function getView()
     {
         if ($this->view === null) {
-            throw new \LogicException('View was not created. Please call BaseForm::createView() first.');
+            throw new LogicException('View was not created. Please call BaseForm::createView() first.');
         }
 
         return $this->view;
@@ -391,7 +390,7 @@ abstract class BaseForm implements FormInterface
      *
      * @return string the name of you form. This name must be unique
      */
-    public static function getName()
+    public static function getName(): string
     {
         $classParts = explode('\\', static::class);
         $nameParts = array_map(function ($classPart, $index) use ($classParts) {

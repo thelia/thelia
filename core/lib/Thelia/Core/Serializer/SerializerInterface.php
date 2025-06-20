@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,10 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Serializer;
 
-use Symfony\Component\HttpFoundation\File\File;
+use SplFileObject;
 
 /**
  * Interface SerializerInterface.
@@ -52,9 +53,9 @@ interface SerializerInterface
     /**
      * Prepare file to receive serialized data.
      *
-     * @param \SplFileObject $fileObject A file object
+     * @param SplFileObject $fileObject A file object
      */
-    public function prepareFile(\SplFileObject $fileObject);
+    public function prepareFile(SplFileObject $fileObject);
 
     /**
      * Serialize data.
@@ -75,16 +76,16 @@ interface SerializerInterface
     /**
      * Finalize file with serialized data.
      *
-     * @param \SplFileObject $fileObject A file object
+     * @param SplFileObject $fileObject A file object
      */
-    public function finalizeFile(\SplFileObject $fileObject);
+    public function finalizeFile(SplFileObject $fileObject);
 
     /**
      * Unserialize data.
      *
-     * @param \SplFileObject $fileObject A file object
+     * @param SplFileObject $fileObject A file object
      *
      * @return array Unserialized data
      */
-    public function unserialize(\SplFileObject $fileObject);
+    public function unserialize(SplFileObject $fileObject);
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -30,7 +31,7 @@ class TaxRuleCreationForm extends BaseForm
         $this->addStandardDescFields(['postscriptum', 'chapo', 'locale']);
     }
 
-    public static function getName()
+    public static function getName(): string
     {
         return 'thelia_tax_rule_creation';
     }

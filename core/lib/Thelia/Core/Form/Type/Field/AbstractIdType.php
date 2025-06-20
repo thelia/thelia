@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Form\Type\Field;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -39,7 +41,7 @@ abstract class AbstractIdType extends AbstractType
         ]);
     }
 
-    public function getParent()
+    public function getParent(): ?string
     {
         return IntegerType::class;
     }
@@ -71,7 +73,7 @@ abstract class AbstractIdType extends AbstractType
     abstract public function getName();
 
     /**
-     * @return \Propel\Runtime\ActiveQuery\ModelCriteria
+     * @return ModelCriteria
      *
      * Get the model query to check
      */

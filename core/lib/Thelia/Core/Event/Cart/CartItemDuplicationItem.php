@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Cart;
 
 use Thelia\Core\Event\ActionEvent;
@@ -22,34 +23,16 @@ use Thelia\Model\CartItem;
  */
 class CartItemDuplicationItem extends ActionEvent
 {
-    /**
-     * @var \Thelia\Model\CartItem
-     */
-    protected $oldItem;
-
-    /**
-     * @var \Thelia\Model\CartItem
-     */
-    protected $newItem;
-
-    public function __construct(CartItem $newItem, CartItem $oldItem)
+    public function __construct(protected CartItem $newItem, protected CartItem $oldItem)
     {
-        $this->newItem = $newItem;
-        $this->oldItem = $oldItem;
     }
 
-    /**
-     * @return \Thelia\Model\CartItem
-     */
-    public function getNewItem()
+    public function getNewItem(): CartItem
     {
         return $this->newItem;
     }
 
-    /**
-     * @return \Thelia\Model\CartItem
-     */
-    public function getOldItem()
+    public function getOldItem(): CartItem
     {
         return $this->oldItem;
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Exception;
+use Thelia\Core\HttpFoundation\Response;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
@@ -49,7 +52,7 @@ class AreaController extends AbstractCrudController
         );
     }
 
-    protected function getAreaId()
+    protected function getAreaId(): mixed
     {
         return $this->getRequest()->get('area_id', 0);
     }
@@ -57,7 +60,7 @@ class AreaController extends AbstractCrudController
     /**
      * Return the creation form for this object.
      */
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::AREA_CREATE);
     }
@@ -65,7 +68,7 @@ class AreaController extends AbstractCrudController
     /**
      * Return the update form for this object.
      */
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::AREA_MODIFICATION);
     }
@@ -74,10 +77,8 @@ class AreaController extends AbstractCrudController
      * Hydrate the update form for this object, before passing it to the update template.
      *
      * @param Area $object
-     *
-     * @return BaseForm
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
     {
         $data = [
             'area_id' => $object->getId(),
@@ -92,7 +93,7 @@ class AreaController extends AbstractCrudController
      *
      * @param array $formData
      */
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent($formData): AreaEvent
     {
         $area = new Area();
         $event = new AreaEvent($area);
@@ -115,7 +116,7 @@ class AreaController extends AbstractCrudController
         return $event;
     }
 
-    private function hydrateEvent(AreaEvent $event, $formData): AreaEvent
+    private function hydrateEvent(AreaEvent $event, array $formData): AreaEvent
     {
         $event->getModel()->setName($formData['name']);
 
@@ -143,7 +144,7 @@ class AreaController extends AbstractCrudController
     /**
      * Returns the object label form the object event (name, title, etc.).
      *
-     * @param \Thelia\Model\Area $object
+     * @param Area $object
      *
      * @return string
      */
@@ -155,7 +156,7 @@ class AreaController extends AbstractCrudController
     /**
      * Returns the object ID from the object.
      *
-     * @param \Thelia\Model\Area $object
+     * @param Area $object
      *
      * @return int
      */
@@ -167,7 +168,7 @@ class AreaController extends AbstractCrudController
     /**
      * Render the main list template.
      *
-     * @return \Thelia\Core\HttpFoundation\Response
+     * @return Response
      */
     protected function renderListTemplate($currentOrder)
     {
@@ -250,7 +251,7 @@ class AreaController extends AbstractCrudController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -293,7 +294,7 @@ class AreaController extends AbstractCrudController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }

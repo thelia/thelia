@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Coupon\Type;
 
+use InvalidArgumentException;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\CartItem;
 
@@ -25,27 +27,22 @@ use Thelia\Model\CartItem;
  */
 trait AmountCouponTrait
 {
-    // The amount is already defined in CouponAbstract, and should not be redefined here.
-    // protected $amount = 0;
-
     /**
      * Should return the amount field name, defined in the parent class.
-     *
-     * @return string the percentage field name
      */
-    abstract protected function getAmountFieldName();
+    abstract protected function getAmountFieldName(): string;
 
-    public function setFieldsValue($effects): void
+    public function setFieldsValue(array $effects): void
     {
         $this->amount = $effects[$this->getAmountFieldName()];
     }
 
-    public function getCartItemDiscount(CartItem $cartItem)
+    public function getCartItemDiscount(CartItem $cartItem): float
     {
         return $cartItem->getQuantity() * $this->amount;
     }
 
-    public function callDrawBackOfficeInputs($templateName)
+    public function callDrawBackOfficeInputs($templateName): string
     {
         return $this->drawBaseBackOfficeInputs($templateName, [
                 'amount_field_name' => $this->makeCouponFieldName($this->getAmountFieldName()),
@@ -53,24 +50,22 @@ trait AmountCouponTrait
             ]);
     }
 
-    protected function getFieldList()
+    protected function getFieldList(): array
     {
         return $this->getBaseFieldList([$this->getAmountFieldName()]);
     }
 
-    protected function checkCouponFieldValue($fieldName, $fieldValue)
+    protected function checkCouponFieldValue(string $fieldName, string $fieldValue): string
     {
         $this->checkBaseCouponFieldValue($fieldName, $fieldValue);
 
-        if ($fieldName === $this->getAmountFieldName()) {
-            if ((float) $fieldValue < 0) {
-                throw new \InvalidArgumentException(
-                    Translator::getInstance()->trans(
-                        'Value %val for Discount Amount is invalid. Please enter a positive value.',
-                        ['%val' => $fieldValue]
-                    )
-                );
-            }
+        if ($fieldName === $this->getAmountFieldName() && (float) $fieldValue < 0) {
+            throw new InvalidArgumentException(
+                Translator::getInstance()->trans(
+                    'Value %val for Discount Amount is invalid. Please enter a positive value.',
+                    ['%val' => $fieldValue]
+                )
+            );
         }
 
         return $fieldValue;

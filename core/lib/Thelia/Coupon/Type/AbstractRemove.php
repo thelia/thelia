@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Coupon\Type;
+
 
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\CartItem;
@@ -24,10 +26,8 @@ abstract class AbstractRemove extends CouponAbstract implements AmountAndPercent
 {
     /**
      * Set the value of specific coupon fields.
-     *
-     * @param array $effects the Coupon effects params
      */
-    abstract public function setFieldsValue($effects);
+    abstract public function setFieldsValue(array $effects);
 
     /**
      * Get the discount for a specific cart item.
@@ -36,7 +36,7 @@ abstract class AbstractRemove extends CouponAbstract implements AmountAndPercent
      *
      * @return float the discount value
      */
-    abstract public function getCartItemDiscount(CartItem $cartItem);
+    abstract public function getCartItemDiscount(CartItem $cartItem): float;
 
     public function set(
         FacadeInterface $facade,
@@ -50,11 +50,11 @@ abstract class AbstractRemove extends CouponAbstract implements AmountAndPercent
         $isAvailableOnSpecialOffers,
         $isEnabled,
         $maxUsage,
-        \DateTime $expirationDate,
+        DateTime $expirationDate,
         $freeShippingForCountries,
         $freeShippingForModules,
         $perCustomerUsageCount
-    ) {
+    ): static {
         parent::set(
             $facade,
             $code,
@@ -78,17 +78,17 @@ abstract class AbstractRemove extends CouponAbstract implements AmountAndPercent
         return $this;
     }
 
-    public function drawBaseBackOfficeInputs($templateName, $otherFields)
+    public function drawBaseBackOfficeInputs(string $templateName, array $otherFields): string
     {
         return $this->facade->getParser()->render($templateName, $otherFields);
     }
 
-    public function getBaseFieldList($otherFields)
+    public function getBaseFieldList($otherFields): array
     {
         return array_merge($otherFields);
     }
 
-    public function checkBaseCouponFieldValue($fieldName, $fieldValue)
+    public function checkBaseCouponFieldValue(string $fieldName, string $fieldValue): string
     {
         return $fieldValue;
     }

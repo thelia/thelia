@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
+use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\Base\CategoryQuery as BaseCategoryQuery;
 
@@ -43,7 +45,7 @@ class CategoryQuery extends BaseCategoryQuery
      * @param int       $depth      max depth you want to search
      * @param int       $currentPos don't change this param, it is used for recursion
      *
-     * @return \Thelia\Model\Category[]
+     * @return Category[]
      */
     public static function findAllChild($categoryId, $depth = 0, $currentPos = 0)
     {
@@ -80,7 +82,7 @@ class CategoryQuery extends BaseCategoryQuery
      * @param int       $depth
      * @param int       $currentPos
      *
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
      * @return array
      */
@@ -94,29 +96,25 @@ class CategoryQuery extends BaseCategoryQuery
             foreach ($categoryId as $categorySingleId) {
                 $result = array_merge($result, self::findAllChildId($categorySingleId, $depth, $currentPos));
             }
-        } else {
-            if (!isset($cache[$categoryId])) {
-                ++$currentPos;
-
-                if ($depth == $currentPos && $depth != 0) {
-                    return [];
-                }
-
-                $subCategories = self::create()
-                    ->filterByParent($categoryId)
-                    ->select(['id'])
-                    ->find()
-                    ->getData();
-
-                foreach ($subCategories as $subCategoryId) {
-                    $result[] = $subCategoryId;
-                    $result = array_merge($result, self::findAllChildId($subCategoryId, $depth, $currentPos));
-                }
-
-                $cache[$categoryId] = $result;
-            } else {
-                $result = $cache[$categoryId];
+        } elseif (!isset($cache[$categoryId])) {
+            ++$currentPos;
+            if ($depth == $currentPos && $depth != 0) {
+                return [];
             }
+
+            $subCategories = self::create()
+                ->filterByParent($categoryId)
+                ->select(['id'])
+                ->find()
+                ->getData();
+            foreach ($subCategories as $subCategoryId) {
+                $result[] = $subCategoryId;
+                $result = array_merge($result, self::findAllChildId($subCategoryId, $depth, $currentPos));
+            }
+
+            $cache[$categoryId] = $result;
+        } else {
+            $result = $cache[$categoryId];
         }
 
         return $result;
@@ -177,4 +175,5 @@ class CategoryQuery extends BaseCategoryQuery
         return $path;
     }
 }
+
 // CategoryQuery

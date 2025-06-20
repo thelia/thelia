@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Product;
 
 use Thelia\Model\Product;
@@ -17,14 +18,23 @@ use Thelia\Model\Product;
 class ProductCombinationGenerationEvent extends ProductEvent
 {
     protected $reference;
+
     protected $price;
+
     protected $currency_id;
+
     protected $weight;
+
     protected $quantity;
+
     protected $sale_price;
+
     protected $onsale;
+
     protected $isnew;
+
     protected $ean_code;
+
     protected $combinations;
 
     public function __construct(Product $product, $currency_id, $combinations)
@@ -40,7 +50,7 @@ class ProductCombinationGenerationEvent extends ProductEvent
         return $this->currency_id;
     }
 
-    public function setCurrencyId($currency_id)
+    public function setCurrencyId($currency_id): static
     {
         $this->currency_id = $currency_id;
 
@@ -52,7 +62,7 @@ class ProductCombinationGenerationEvent extends ProductEvent
         return $this->reference;
     }
 
-    public function setReference($reference)
+    public function setReference($reference): static
     {
         $this->reference = $reference;
 
@@ -64,7 +74,7 @@ class ProductCombinationGenerationEvent extends ProductEvent
         return $this->price;
     }
 
-    public function setPrice($price)
+    public function setPrice($price): static
     {
         $this->price = $price;
 
@@ -76,7 +86,7 @@ class ProductCombinationGenerationEvent extends ProductEvent
         return $this->weight;
     }
 
-    public function setWeight($weight)
+    public function setWeight($weight): static
     {
         $this->weight = $weight;
 
@@ -88,7 +98,7 @@ class ProductCombinationGenerationEvent extends ProductEvent
         return $this->quantity;
     }
 
-    public function setQuantity($quantity)
+    public function setQuantity($quantity): static
     {
         $this->quantity = $quantity;
 
@@ -100,7 +110,7 @@ class ProductCombinationGenerationEvent extends ProductEvent
         return $this->sale_price;
     }
 
-    public function setSalePrice($sale_price)
+    public function setSalePrice($sale_price): static
     {
         $this->sale_price = $sale_price;
 
@@ -112,7 +122,7 @@ class ProductCombinationGenerationEvent extends ProductEvent
         return $this->onsale;
     }
 
-    public function setOnsale($onsale)
+    public function setOnsale($onsale): static
     {
         $this->onsale = $onsale;
 
@@ -124,7 +134,7 @@ class ProductCombinationGenerationEvent extends ProductEvent
         return $this->isnew;
     }
 
-    public function setIsnew($isnew)
+    public function setIsnew($isnew): static
     {
         $this->isnew = $isnew;
 
@@ -136,7 +146,7 @@ class ProductCombinationGenerationEvent extends ProductEvent
         return $this->ean_code;
     }
 
-    public function setEanCode($ean_code)
+    public function setEanCode($ean_code): static
     {
         $this->ean_code = $ean_code;
 
@@ -148,7 +158,7 @@ class ProductCombinationGenerationEvent extends ProductEvent
         return $this->combinations;
     }
 
-    public function setCombinations($combinations)
+    public function setCombinations($combinations): static
     {
         $this->combinations = $combinations;
 

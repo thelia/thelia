@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,19 +11,24 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Service\Composer;
+
+use InvalidArgumentException;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
+use JsonException;
+use SplFileInfo;
 
 class ComposerHelper
 {
     /**
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function getComposerPackagesFromPath(string $path): array
     {
         $composerJsonPath = rtrim($path, '/').'/composer.json';
         if (!file_exists($composerJsonPath)) {
-            throw new \InvalidArgumentException("No composer.json find in '$path'");
+            throw new InvalidArgumentException(sprintf("No composer.json find in '%s'", $path));
         }
 
         return json_decode(file_get_contents($composerJsonPath), true, 512, \JSON_THROW_ON_ERROR);
@@ -31,23 +38,25 @@ class ComposerHelper
     {
         $bundlesPath = THELIA_ROOT.'config/bundles.php';
         if (!file($bundlesPath)) {
-            throw new \InvalidArgumentException("No bundles.php file found in '$bundlesPath'");
+            throw new InvalidArgumentException(sprintf("No bundles.php file found in '%s'", $bundlesPath));
         }
+
         $bundles = require $bundlesPath;
         if (!isset($bundles[$namespace])) {
             $bundles[$namespace] = $environnement;
             ksort($bundles);
         }
+
         file_put_contents($bundlesPath, $this->dumpBundlesPhp($bundles));
     }
 
     public function findFirstClassBundle(string $directory): ?string
     {
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($directory)
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($directory)
         );
 
-        /** @var \SplFileInfo $file */
+        /** @var SplFileInfo $file */
         foreach ($iterator as $file) {
             if (!$file->isFile() || $file->getExtension() !== 'php') {
                 continue;
@@ -80,7 +89,7 @@ class ComposerHelper
         $composerJsonPath = THELIA_ROOT . 'composer.json';
 
         if (!file_exists($composerJsonPath)) {
-            throw new \InvalidArgumentException("No composer.json found at '$composerJsonPath'");
+            throw new InvalidArgumentException(sprintf("No composer.json found at '%s'", $composerJsonPath));
         }
 
         try {
@@ -101,8 +110,8 @@ class ComposerHelper
                     json_encode($composerData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n"
                 );
             }
-        } catch (\JsonException $e) {
-            throw new \InvalidArgumentException("Invalid JSON in composer.json: " . $e->getMessage());
+        } catch (JsonException $jsonException) {
+            throw new InvalidArgumentException("Invalid JSON in composer.json: " . $jsonException->getMessage(), $jsonException->getCode(), $jsonException);
         }
     }
 
@@ -114,10 +123,10 @@ class ComposerHelper
         foreach ($bundles as $fqcn => $envs) {
             $envParts = [];
             foreach ($envs as $env => $enabled) {
-                $envParts[] = "'$env' => " . ($enabled ? 'true' : 'false');
+                $envParts[] = sprintf("'%s' => ", $env) . ($enabled ? 'true' : 'false');
             }
 
-            $line = "    $fqcn::class => [" . implode(', ', $envParts) . "],\n";
+            $line = sprintf('    %s::class => [', $fqcn) . implode(', ', $envParts) . "],\n";
             $lines[] = $line;
         }
 

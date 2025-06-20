@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Thelia\Form\BaseForm;
+use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Currency\CurrencyCreateEvent;
@@ -49,17 +52,17 @@ class CurrencyController extends AbstractCrudController
         );
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::CURRENCY_CREATION);
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::CURRENCY_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent($formData): CurrencyCreateEvent
     {
         $createEvent = new CurrencyCreateEvent();
 
@@ -75,7 +78,7 @@ class CurrencyController extends AbstractCrudController
         return $createEvent;
     }
 
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent($formData): CurrencyUpdateEvent
     {
         $changeEvent = new CurrencyUpdateEvent($formData['id']);
 
@@ -91,7 +94,7 @@ class CurrencyController extends AbstractCrudController
         return $changeEvent;
     }
 
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
             $this->getRequest()->get('currency_id', null),
@@ -100,7 +103,7 @@ class CurrencyController extends AbstractCrudController
         );
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): CurrencyDeleteEvent
     {
         return new CurrencyDeleteEvent($this->getRequest()->get('currency_id'));
     }
@@ -110,7 +113,7 @@ class CurrencyController extends AbstractCrudController
         return $event->hasCurrency();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
     {
         // Prepare the data that will hydrate the form
         $data = [
@@ -209,9 +212,9 @@ class CurrencyController extends AbstractCrudController
                     'undefined_rates' => $event->getUndefinedRates(),
                 ]);
             }
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             // Any error
-            return $this->errorPage($ex);
+            return $this->errorPage($exception);
         }
 
         return $this->redirectToListTemplate();
@@ -234,9 +237,9 @@ class CurrencyController extends AbstractCrudController
 
         try {
             $eventDispatcher->dispatch($changeEvent, TheliaEvents::CURRENCY_SET_DEFAULT);
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             // Any error
-            return $this->errorPage($ex);
+            return $this->errorPage($exception);
         }
 
         return $this->redirectToListTemplate();
@@ -259,9 +262,9 @@ class CurrencyController extends AbstractCrudController
 
         try {
             $eventDispatcher->dispatch($changeEvent, TheliaEvents::CURRENCY_SET_VISIBLE);
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             // Any error
-            return $this->errorPage($ex);
+            return $this->errorPage($exception);
         }
 
         return $this->redirectToListTemplate();

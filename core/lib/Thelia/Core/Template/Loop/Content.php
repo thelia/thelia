@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Type\EnumListType;
+use InvalidArgumentException;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -26,7 +29,6 @@ use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Map\ContentTableMap;
-use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\TypeCollection;
 
@@ -55,12 +57,10 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     use StandardI18nFieldsSearchTrait;
 
     protected $timestampable = true;
+
     protected $versionable = true;
 
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
@@ -75,7 +75,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(
+                    new EnumListType(
                         [
                             'id', 'id_reverse',
                             'alpha', 'alpha-reverse', 'alpha_reverse',
@@ -164,7 +164,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
 
         $search->withColumn(
-            'CAST(CASE WHEN ISNULL(`FolderSelect`.POSITION) THEN \''.\PHP_INT_MAX.'\' ELSE `FolderSelect`.POSITION END AS SIGNED)',
+            "CAST(CASE WHEN ISNULL(`FolderSelect`.POSITION) THEN '".\PHP_INT_MAX."' ELSE `FolderSelect`.POSITION END AS SIGNED)",
             'position_delegate'
         );
         $search->withColumn('`FolderSelect`.FOLDER_ID', 'default_folder_id');
@@ -236,25 +236,29 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     break;
                 case 'manual':
                     if (!$manualOrderAllowed) {
-                        throw new \InvalidArgumentException('Manual order cannot be set without single folder argument');
+                        throw new InvalidArgumentException('Manual order cannot be set without single folder argument');
                     }
+
                     $search->addAscendingOrderByColumn('position_delegate');
                     break;
                 case 'manual_reverse':
                     if (!$manualOrderAllowed) {
-                        throw new \InvalidArgumentException('Manual order cannot be set without single folder argument');
+                        throw new InvalidArgumentException('Manual order cannot be set without single folder argument');
                     }
+
                     $search->addDescendingOrderByColumn('position_delegate');
                     break;
                 case 'given_id':
                     if (null === $id) {
-                        throw new \InvalidArgumentException('Given_id order cannot be set without `id` argument');
+                        throw new InvalidArgumentException('Given_id order cannot be set without `id` argument');
                     }
+
                     foreach ($id as $singleId) {
                         $givenIdMatched = 'given_id_matched_'.$singleId;
-                        $search->withColumn(ContentTableMap::COL_ID."='$singleId'", $givenIdMatched);
+                        $search->withColumn(ContentTableMap::COL_ID.sprintf("='%d'", $singleId), $givenIdMatched);
                         $search->orderBy($givenIdMatched, Criteria::DESC);
                     }
+
                     break;
                 case 'visible':
                     $search->orderByVisible(Criteria::ASC);
@@ -292,7 +296,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         return $search;
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var ContentModel $content */
         foreach ($loopResult->getResultDataCollection() as $content) {

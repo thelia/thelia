@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
+use InvalidArgumentException;
+use Exception;
+use Propel\Runtime\Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -50,33 +54,14 @@ use Thelia\Model\OrderCouponQuery;
  */
 class Coupon extends BaseAction implements EventSubscriberInterface
 {
-    /** @var RequestStack */
-    protected $requestStack;
-
-    /** @var CouponFactory */
-    protected $couponFactory;
-
-    /** @var CouponManager */
-    protected $couponManager;
-
-    /** @var ConditionInterface */
-    protected $noConditionRule;
-
-    /** @var ConditionFactory */
-    protected $conditionFactory;
-
     public function __construct(
-        RequestStack $requestStack,
-        CouponFactory $couponFactory,
-        CouponManager $couponManager,
-        MatchForEveryone $noConditionRule,
-        ConditionFactory $conditionFactory
-    ) {
-        $this->requestStack = $requestStack;
-        $this->couponFactory = $couponFactory;
-        $this->couponManager = $couponManager;
-        $this->noConditionRule = $noConditionRule;
-        $this->conditionFactory = $conditionFactory;
+        protected RequestStack $requestStack,
+        protected CouponFactory $couponFactory,
+        protected CouponManager $couponManager,
+        protected MatchForEveryone $noConditionRule,
+        protected ConditionFactory $conditionFactory
+    )
+    {
     }
 
     /**
@@ -107,8 +92,8 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     {
         $coupon = $event->getCoupon();
 
-        if (null === $coupon) {
-            throw new \InvalidArgumentException(
+        if (!$coupon instanceof CouponModel) {
+            throw new InvalidArgumentException(
                 'The coupon should not be null'
             );
         }
@@ -276,14 +261,14 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Exception if something goes wrong
+     * @throws Exception if something goes wrong
      */
     public function afterOrder(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         /** @var CouponInterface[] $consumedCoupons */
         $consumedCoupons = $this->couponManager->getCouponsKept();
 
-        if (\is_array($consumedCoupons) && \count($consumedCoupons) > 0) {
+        if (\is_array($consumedCoupons) && $consumedCoupons !== []) {
             $con = Propel::getWriteConnection(OrderCouponTableMap::DATABASE_NAME);
             $con->beginTransaction();
 
@@ -344,7 +329,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                 }
 
                 $con->commit();
-            } catch (\Exception  $ex) {
+            } catch (Exception  $ex) {
                 $con->rollBack();
 
                 throw $ex;
@@ -361,8 +346,8 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      *
      * @param string $eventName
      *
-     * @throws \Exception
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws Exception
+     * @throws PropelException
      */
     public function orderStatusChange(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -429,7 +414,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     /**
      * Returns the session from the current request.
      *
-     * @return \Thelia\Core\HttpFoundation\Session\Session
+     * @return Session
      */
     protected function getSession()
     {

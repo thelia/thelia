@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,16 +11,17 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
 
-class I18nCollection implements \IteratorAggregate
+use IteratorAggregate;
+use ArrayIterator;
+
+class I18nCollection implements IteratorAggregate
 {
-    public array $i18ns;
+    public array $i18ns = [];
 
     public function __construct()
     {
-        $this->i18ns = [];
     }
 
     public function add(I18n $i18n, string $locale): self
@@ -28,8 +31,8 @@ class I18nCollection implements \IteratorAggregate
         return $this;
     }
 
-    public function getIterator(): \ArrayIterator
+    public function getIterator(): ArrayIterator
     {
-        return new \ArrayIterator($this->i18ns);
+        return new ArrayIterator($this->i18ns);
     }
 }

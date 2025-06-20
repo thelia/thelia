@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,11 +11,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Routing\Attribute\Route;
+use Thelia\Form\BaseForm;
+use LogicException;
+use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Tax\TaxRuleEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -61,17 +65,17 @@ class TaxRuleController extends AbstractCrudController
         return parent::defaultAction();
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::TAX_RULE_CREATION);
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::TAX_RULE_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent($formData): TaxRuleEvent
     {
         $event = new TaxRuleEvent();
 
@@ -82,7 +86,7 @@ class TaxRuleController extends AbstractCrudController
         return $event;
     }
 
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent($formData): TaxRuleEvent
     {
         $event = new TaxRuleEvent();
 
@@ -94,7 +98,7 @@ class TaxRuleController extends AbstractCrudController
         return $event;
     }
 
-    protected function getUpdateTaxListEvent($formData)
+    protected function getUpdateTaxListEvent(array $formData): TaxRuleEvent
     {
         $event = new TaxRuleEvent();
 
@@ -106,7 +110,7 @@ class TaxRuleController extends AbstractCrudController
         return $event;
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): TaxRuleEvent
     {
         $event = new TaxRuleEvent();
 
@@ -122,7 +126,7 @@ class TaxRuleController extends AbstractCrudController
         return $event->hasTaxRule();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -137,10 +141,8 @@ class TaxRuleController extends AbstractCrudController
 
     /**
      * @param TaxRule $object
-     *
-     * @return \Thelia\Form\BaseForm
      */
-    protected function hydrateTaxUpdateForm($object)
+    protected function hydrateTaxUpdateForm($object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -187,7 +189,7 @@ class TaxRuleController extends AbstractCrudController
         return $object->getId();
     }
 
-    protected function getViewArguments($country = null, $tab = null, $state = null)
+    protected function getViewArguments($country = null, $tab = null, $state = null): array
     {
         return [
             'tab' => $tab ?? $this->getRequest()->get('tab', 'data'),
@@ -196,7 +198,7 @@ class TaxRuleController extends AbstractCrudController
         ];
     }
 
-    protected function getRouteArguments($tax_rule_id = null)
+    protected function getRouteArguments($tax_rule_id = null): array
     {
         return [
             'tax_rule_id' => $tax_rule_id ?? $this->getRequest()->get('tax_rule_id'),
@@ -317,7 +319,7 @@ class TaxRuleController extends AbstractCrudController
             $eventDispatcher->dispatch($changeEvent, TheliaEvents::TAX_RULE_TAXES_UPDATE);
 
             if (!$this->eventContainsObject($changeEvent)) {
-                throw new \LogicException(
+                throw new LogicException(
                     $this->getTranslator()->trans('No %obj was updated.', ['%obj', $this->objectName])
                 );
             }
@@ -346,7 +348,7 @@ class TaxRuleController extends AbstractCrudController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -369,7 +371,7 @@ class TaxRuleController extends AbstractCrudController
         return $this->jsonResponse(json_encode($data));
     }
 
-    protected function getSpecification($taxRuleId)
+    protected function getSpecification($taxRuleId): array
     {
         $taxRuleCountries = TaxRuleCountryQuery::create()
             ->filterByTaxRuleId($taxRuleId)
@@ -391,7 +393,7 @@ class TaxRuleController extends AbstractCrudController
             while (true) {
                 $hasChanged = $taxRuleCountry === null
                     || $taxRuleCountry->getCountryId() != $currentCountryId
-                    || (int) $taxRuleCountry->getStateId() != $currentStateId
+                    || (int) $taxRuleCountry->getStateId() !== $currentStateId
                 ;
 
                 if ($hasChanged) {

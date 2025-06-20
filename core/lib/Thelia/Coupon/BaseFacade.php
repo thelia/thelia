@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Coupon;
 
+use Exception;
+use LogicException;
+use Thelia\Model\Cart;
+use Thelia\Model\Address;
+use Thelia\Model\Customer;
+use Propel\Runtime\Exception\PropelException;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -33,64 +41,38 @@ use Thelia\TaxEngine\TaxEngine;
  */
 class BaseFacade implements FacadeInterface
 {
-    /**
-     * @var SecurityContext
-     */
-    protected $securityContext;
-    /**
-     * @var TaxEngine
-     */
-    protected $taxEngine;
+
+
     /**
      * @var CouponFactory
      */
     protected $couponFactory;
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-    /**
-     * @var ParserInterface
-     */
-    protected $parser;
-    /**
-     * @var Request
-     */
-    protected $request;
-    /**
-     * @var ConditionEvaluator
-     */
-    protected $conditionEvaluator;
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $eventDispatcher;
+
+
+
+    protected ?\Symfony\Component\HttpFoundation\Request $request;
+
+
 
     /**
      * Constructor.
      */
     public function __construct(
-        SecurityContext $securityContext,
-        TaxEngine $taxEngine,
-        TranslatorInterface $translator,
-        ParserInterface $parser,
+        protected SecurityContext $securityContext,
+        protected TaxEngine $taxEngine,
+        protected TranslatorInterface $translator,
+        protected ParserInterface $parser,
         RequestStack $requestStack,
-        ConditionEvaluator $conditionEvaluator,
-        EventDispatcherInterface $eventDispatcher
+        protected ConditionEvaluator $conditionEvaluator,
+        protected EventDispatcherInterface $eventDispatcher
     ) {
-        $this->securityContext = $securityContext;
-        $this->taxEngine = $taxEngine;
-        $this->translator = $translator;
-        $this->parser = $parser;
         $this->request = $requestStack->getCurrentRequest();
-        $this->conditionEvaluator = $conditionEvaluator;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
      * Return a Cart a CouponManager can process.
      *
-     * @return \Thelia\Model\Cart
+     * @return Cart
      */
     public function getCart()
     {
@@ -100,7 +82,7 @@ class BaseFacade implements FacadeInterface
     /**
      * Return an Address a CouponManager can process.
      *
-     * @return \Thelia\Model\Address
+     * @return Address
      */
     public function getDeliveryAddress()
     {
@@ -108,17 +90,17 @@ class BaseFacade implements FacadeInterface
             return AddressQuery::create()->findPk(
                 $this->getRequest()->getSession()->getOrder()->getChoosenDeliveryAddress()
             );
-        } catch (\Exception $ex) {
-            throw new \LogicException('Failed to get delivery address ('.$ex->getMessage().')');
+        } catch (Exception $exception) {
+            throw new LogicException('Failed to get delivery address ('.$exception->getMessage().')', $exception->getCode(), $exception);
         }
     }
 
     /**
      * Return an Customer a CouponManager can process.
      *
-     * @return \Thelia\Model\Customer
+     * @return Customer
      */
-    public function getCustomer()
+    public function getCustomer(): mixed
     {
         return $this->securityContext->getCustomerUser();
     }
@@ -150,7 +132,7 @@ class BaseFacade implements FacadeInterface
      *
      * @return float
      */
-    public function getCartTotalPrice($withItemsInPromo = true)
+    public function getCartTotalPrice($withItemsInPromo = true): int|float
     {
         $total = 0;
 
@@ -168,11 +150,9 @@ class BaseFacade implements FacadeInterface
     /**
      * @param bool $withItemsInPromo
      *
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
-     * @return float|int
+     * @throws PropelException
      */
-    public function getCartTotalTaxPrice($withItemsInPromo = true)
+    public function getCartTotalTaxPrice($withItemsInPromo = true): int|float
     {
         $taxCountry = $this->taxEngine->getDeliveryCountry();
         $cartItems = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems();
@@ -191,7 +171,7 @@ class BaseFacade implements FacadeInterface
     /**
      * @return Country the delivery country
      */
-    public function getDeliveryCountry()
+    public function getDeliveryCountry(): Country
     {
         return $this->taxEngine->getDeliveryCountry();
     }
@@ -208,15 +188,13 @@ class BaseFacade implements FacadeInterface
 
     /**
      * Return the number of Products in the Cart.
-     *
-     * @return int
      */
-    public function getNbArticlesInCart()
+    public function getNbArticlesInCart(): int
     {
         return \count($this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems());
     }
 
-    public function getNbArticlesInCartIncludeQuantity()
+    public function getNbArticlesInCartIncludeQuantity(): int|float
     {
         $cartItems = $this->getCart()->getCartItems();
         $quantity = 0;
@@ -244,22 +222,18 @@ class BaseFacade implements FacadeInterface
 
     /**
      * Return platform TranslatorInterface.
-     *
-     * @return TranslatorInterface
      */
-    public function getTranslator()
+    public function getTranslator(): TranslatorInterface
     {
         return $this->translator;
     }
 
     /**
      * Return platform Parser.
-     *
-     * @return ParserInterface
      */
-    public function getParser()
+    public function getParser(): ParserInterface
     {
-        if ($this->parser !== null) {
+        if ($this->parser instanceof ParserInterface) {
             // Define the current back-office template that should be used
             $this->parser->setTemplateDefinition(
                 $this->parser->getTemplateHelper()->getActiveAdminTemplate()
@@ -285,17 +259,15 @@ class BaseFacade implements FacadeInterface
      *
      * @return Request
      */
-    public function getRequest()
+    public function getRequest(): ?\Symfony\Component\HttpFoundation\Request
     {
         return $this->request;
     }
 
     /**
      * Return Constraint Validator.
-     *
-     * @return ConditionEvaluator
      */
-    public function getConditionEvaluator()
+    public function getConditionEvaluator(): ConditionEvaluator
     {
         return $this->conditionEvaluator;
     }
@@ -315,19 +287,17 @@ class BaseFacade implements FacadeInterface
     /**
      * Return the event dispatcher,.
      *
-     * @return \Symfony\Component\EventDispatcher\EventDispatcher
+     * @return EventDispatcher
      */
-    public function getDispatcher()
+    public function getDispatcher(): EventDispatcherInterface
     {
         return $this->eventDispatcher;
     }
 
     /**
      * Add a coupon in session.
-     *
-     * @return mixed|void
      */
-    public function pushCouponInSession($couponCode)
+    public function pushCouponInSession($couponCode): void
     {
         $consumedCoupons = $this->getRequest()->getSession()->getConsumedCoupons();
 

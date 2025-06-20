@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
 use Thelia\Log\Tlog;
@@ -37,7 +38,7 @@ class FeatureProduct extends BaseFeatureProduct
     {
         $bt = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 1);
         Tlog::getInstance()->warning(sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
-        $this->setIsFreeText($v ? true : false);
+        $this->setIsFreeText((bool) $v);
 
         return parent::setFreeTextValue($v);
     }

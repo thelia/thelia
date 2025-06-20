@@ -229,7 +229,7 @@ class SaleModificationForm extends SaleCreationForm
         }
     }
 
-    public static function getName()
+    public static function getName(): string
     {
         return 'thelia_sale_modification';
     }

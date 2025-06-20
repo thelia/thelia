@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Parser;
 
+use Exception;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
@@ -31,13 +33,14 @@ class ParserResolver
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function getParser(string $pathTemplate, ?string $templateName): ParserInterface
     {
         if ('' === (string) $templateName || '/' === $templateName) {
             $templateName = 'index';
         }
+
         /** @var ParserInterface $parser */
         foreach ($this->parsers as $parser) {
             if ($parser->supportTemplateRender($pathTemplate, $templateName)) {
@@ -47,24 +50,26 @@ class ParserResolver
             }
         }
 
-        throw new \Exception(sprintf('Parser for template %s not found', $templateName));
+        throw new Exception(sprintf('Parser for template %s not found', $templateName));
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function getAssetResolver(ParserInterface $parser): AssetResolverInterface
     {
-        if (null === self::$currentParser) {
-            throw new \Exception('Parser not found');
+        if (!self::$currentParser instanceof ParserInterface) {
+            throw new Exception('Parser not found');
         }
+
         /* @var AssetResolverInterface $parserAsset */
         foreach ($this->assetResolvers as $assetResolvers) {
             if ($assetResolvers->supportParser($parser)) {
                 return $assetResolvers;
             }
         }
-        throw new \Exception('Assets parser not found');
+
+        throw new Exception('Assets parser not found');
     }
 
     public function getParsers(): iterable
@@ -89,8 +94,9 @@ class ParserResolver
                 $defaultParser = $parser;
             }
         }
+
         if (null === $defaultParser) {
-            throw new \Exception('No parser found.');
+            throw new Exception('No parser found.');
         }
 
         return $defaultParser;

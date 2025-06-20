@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Form\Type\Field;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Model\ProductSaleElementsQuery;
 
 /**
@@ -22,11 +24,11 @@ use Thelia\Model\ProductSaleElementsQuery;
 class ProductSaleElementsIdType extends AbstractIdType
 {
     /**
-     * @return \Propel\Runtime\ActiveQuery\ModelCriteria
+     * @return ModelCriteria
      *
      * Get the model query to check
      */
-    protected function getQuery()
+    protected function getQuery(): ProductSaleElementsQuery
     {
         return new ProductSaleElementsQuery();
     }
@@ -36,7 +38,7 @@ class ProductSaleElementsIdType extends AbstractIdType
      *
      * @return string The name of this type
      */
-    public function getName()
+    public function getName(): string
     {
         return 'product_sale_elements_id';
     }

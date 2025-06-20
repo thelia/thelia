@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,16 +11,20 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Currency;
 
 class CurrencyCreateEvent extends CurrencyEvent
 {
     protected $currency_name;
+
     protected $locale;
+
     protected $symbol;
+
     protected $format;
+
     protected $code;
+
     protected $rate;
 
     // Use currency_name to prevent conflict with Event::name property.
@@ -27,7 +33,7 @@ class CurrencyCreateEvent extends CurrencyEvent
         return $this->currency_name;
     }
 
-    public function setCurrencyName($currency_name)
+    public function setCurrencyName($currency_name): static
     {
         $this->currency_name = $currency_name;
 
@@ -39,7 +45,7 @@ class CurrencyCreateEvent extends CurrencyEvent
         return $this->locale;
     }
 
-    public function setLocale($locale)
+    public function setLocale($locale): static
     {
         $this->locale = $locale;
 
@@ -51,7 +57,7 @@ class CurrencyCreateEvent extends CurrencyEvent
         return $this->symbol;
     }
 
-    public function setSymbol($symbol)
+    public function setSymbol($symbol): static
     {
         $this->symbol = $symbol;
 
@@ -63,7 +69,7 @@ class CurrencyCreateEvent extends CurrencyEvent
         return $this->format;
     }
 
-    public function setFormat($format)
+    public function setFormat($format): static
     {
         $this->format = $format;
 
@@ -75,7 +81,7 @@ class CurrencyCreateEvent extends CurrencyEvent
         return $this->code;
     }
 
-    public function setCode($code)
+    public function setCode($code): static
     {
         $this->code = $code;
 
@@ -87,7 +93,7 @@ class CurrencyCreateEvent extends CurrencyEvent
         return $this->rate;
     }
 
-    public function setRate($rate)
+    public function setRate($rate): static
     {
         $this->rate = $rate;
 

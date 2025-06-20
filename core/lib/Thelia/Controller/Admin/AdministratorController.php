@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Thelia\Form\BaseForm;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Administrator\AdministratorEvent;
@@ -55,17 +57,17 @@ class AdministratorController extends AbstractCrudController
         );
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::ADMINISTRATOR_CREATION);
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::ADMINISTRATOR_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent($formData): AdministratorEvent
     {
         $event = new AdministratorEvent();
 
@@ -80,7 +82,7 @@ class AdministratorController extends AbstractCrudController
         return $event;
     }
 
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent($formData): AdministratorEvent
     {
         $event = new AdministratorEvent();
 
@@ -96,7 +98,7 @@ class AdministratorController extends AbstractCrudController
         return $event;
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): AdministratorEvent
     {
         $event = new AdministratorEvent();
 
@@ -114,10 +116,8 @@ class AdministratorController extends AbstractCrudController
 
     /**
      * @param Admin $object
-     *
-     * @return \Thelia\Form\BaseForm
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),

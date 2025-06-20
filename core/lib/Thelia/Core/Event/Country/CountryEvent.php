@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Country;
 
 use Thelia\Core\Event\ActionEvent;
@@ -24,39 +25,27 @@ use Thelia\Model\Country;
  */
 class CountryEvent extends ActionEvent
 {
-    /*
-     * @var \Thelia\Model\Country
-     */
-    protected $country;
-
-    public function __construct(Country $country = null)
+    public function __construct(protected ?Country $country = null)
     {
-        $this->country = $country;
     }
 
     /**
      * @param mixed $country
      */
-    public function setCountry(Country $country)
+    public function setCountry(Country $country): static
     {
         $this->country = $country;
 
         return $this;
     }
 
-    /**
-     * @return \Thelia\Model\Country|null
-     */
-    public function getCountry()
+    public function getCountry(): ?Country
     {
         return $this->country;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasCountry()
+    public function hasCountry(): bool
     {
-        return null !== $this->country;
+        return $this->country instanceof Country;
     }
 }

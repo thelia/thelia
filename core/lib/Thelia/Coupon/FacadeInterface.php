@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Coupon;
 
+use Thelia\Model\Cart;
+use Thelia\Model\Address;
+use Thelia\Model\Customer;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -46,14 +51,14 @@ interface FacadeInterface
     /**
      * Return a Cart a CouponManager can process.
      *
-     * @return \Thelia\Model\Cart
+     * @return Cart
      */
     public function getCart();
 
     /**
      * Return an Address a CouponManager can process.
      *
-     * @return \Thelia\Model\Address
+     * @return Address
      */
     public function getDeliveryAddress();
 
@@ -65,7 +70,7 @@ interface FacadeInterface
     /**
      * Return an Customer a CouponManager can process.
      *
-     * @return \Thelia\Model\Customer
+     * @return Customer
      */
     public function getCustomer();
 
@@ -178,7 +183,7 @@ interface FacadeInterface
     /**
      * Return the event dispatcher,.
      *
-     * @return \Symfony\Component\EventDispatcher\EventDispatcher
+     * @return EventDispatcher
      */
     public function getDispatcher();
 

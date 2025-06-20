@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
+
 
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
@@ -101,10 +103,13 @@ use Thelia\Model\Map\FolderDocumentTableMap;
 class FolderDocument extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     public const GROUP_ADMIN_READ = 'admin:folder_document:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:folder_document:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:folder_document:write';
 
     public const GROUP_ADMIN_WRITE_FILE = 'admin:folder_document:write_file';
+
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:folder_document:write_update';
 
     #[Groups([self::GROUP_ADMIN_READ])]
@@ -130,10 +135,10 @@ class FolderDocument extends AbstractTranslatableResource implements ItemFileRes
     public ?int $position = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $createdAt = null;
+    public ?DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $updatedAt = null;
+    public ?DateTime $updatedAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
@@ -192,24 +197,24 @@ class FolderDocument extends AbstractTranslatableResource implements ItemFileRes
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): self
+    public function setCreatedAt(?DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): self
+    public function setUpdatedAt(?DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 

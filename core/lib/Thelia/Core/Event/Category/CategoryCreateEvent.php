@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,14 +11,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Category;
 
 class CategoryCreateEvent extends CategoryEvent
 {
     protected $title;
+
     protected $parent;
+
     protected $locale;
+
     protected $visible;
 
     public function getTitle()
@@ -24,7 +28,7 @@ class CategoryCreateEvent extends CategoryEvent
         return $this->title;
     }
 
-    public function setTitle($title)
+    public function setTitle($title): static
     {
         $this->title = $title;
 
@@ -36,7 +40,7 @@ class CategoryCreateEvent extends CategoryEvent
         return $this->parent;
     }
 
-    public function setParent($parent)
+    public function setParent($parent): static
     {
         $this->parent = $parent;
 
@@ -48,7 +52,7 @@ class CategoryCreateEvent extends CategoryEvent
         return $this->locale;
     }
 
-    public function setLocale($locale)
+    public function setLocale($locale): static
     {
         $this->locale = $locale;
 
@@ -60,7 +64,7 @@ class CategoryCreateEvent extends CategoryEvent
         return $this->visible;
     }
 
-    public function setVisible($visible)
+    public function setVisible($visible): static
     {
         $this->visible = $visible;
 

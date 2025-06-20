@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,10 +11,18 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop\Argument;
 
-use Thelia\Type;
+use Thelia\Type\AnyType;
+use Thelia\Type\IntType;
+use Thelia\Type\FloatType;
+use Thelia\Type\BooleanType;
+use Thelia\Type\BooleanOrBothType;
+use Thelia\Type\IntListType;
+use Thelia\Type\AnyListType;
+use Thelia\Type\EnumListType;
+use Thelia\Type\AlphaNumStringType;
+use Thelia\Type\AlphaNumStringListType;
 use Thelia\Type\TypeCollection;
 
 /**
@@ -20,15 +30,22 @@ use Thelia\Type\TypeCollection;
  */
 class Argument
 {
+    /**
+     * @var TypeCollection
+     */
     public $type;
+
+    /**
+     * @var bool
+     */
     public $mandatory;
 
-    private $value;
+    private null|int|string $value = null;
 
     public function __construct(public $name, TypeCollection $type, public $default = null, $mandatory = false, public $empty = true, $value = null)
     {
         $this->type = $type;
-        $this->mandatory = $mandatory ? true : false;
+        $this->mandatory = (bool) $mandatory;
 
         $this->setValue($value);
     }
@@ -38,7 +55,7 @@ class Argument
         return $this->type->getFormattedValue($this->value);
     }
 
-    public function getRawValue()
+    public function getRawValue(): int|string|null
     {
         return $this->value;
     }
@@ -47,24 +64,22 @@ class Argument
     {
         if ($value === null) {
             $this->value = null;
+        } elseif (false === $value) {
+            /* (string) $value = "" */
+            $this->value = 0;
+        } elseif (\is_array($value)) {
+            $this->value = implode(',', $value);
         } else {
-            if (false === $value) {
-                /* (string) $value = "" */
-                $this->value = 0;
-            } elseif (\is_array($value)) {
-                $this->value = implode(',', $value);
-            } else {
-                $this->value = (string) $value;
-            }
+            $this->value = (string) $value;
         }
     }
 
-    public static function createAnyTypeArgument($name, $default = null, $mandatory = false, $empty = true)
+    public static function createAnyTypeArgument($name, $default = null, $mandatory = false, $empty = true): self
     {
         return new self(
             $name,
             new TypeCollection(
-                new Type\AnyType()
+                new AnyType()
             ),
             $default,
             $mandatory,
@@ -72,12 +87,12 @@ class Argument
         );
     }
 
-    public static function createIntTypeArgument($name, $default = null, $mandatory = false, $empty = true)
+    public static function createIntTypeArgument($name, $default = null, $mandatory = false, $empty = true): self
     {
         return new self(
             $name,
             new TypeCollection(
-                new Type\IntType()
+                new IntType()
             ),
             $default,
             $mandatory,
@@ -85,12 +100,12 @@ class Argument
         );
     }
 
-    public static function createFloatTypeArgument($name, $default = null, $mandatory = false, $empty = true)
+    public static function createFloatTypeArgument($name, $default = null, $mandatory = false, $empty = true): self
     {
         return new self(
             $name,
             new TypeCollection(
-                new Type\FloatType()
+                new FloatType()
             ),
             $default,
             $mandatory,
@@ -98,12 +113,12 @@ class Argument
         );
     }
 
-    public static function createBooleanTypeArgument($name, $default = null, $mandatory = false, $empty = true)
+    public static function createBooleanTypeArgument($name, $default = null, $mandatory = false, $empty = true): self
     {
         return new self(
             $name,
             new TypeCollection(
-                new Type\BooleanType()
+                new BooleanType()
             ),
             $default,
             $mandatory,
@@ -111,12 +126,12 @@ class Argument
         );
     }
 
-    public static function createBooleanOrBothTypeArgument($name, $default = null, $mandatory = false, $empty = true)
+    public static function createBooleanOrBothTypeArgument($name, $default = null, $mandatory = false, $empty = true): self
     {
         return new self(
             $name,
             new TypeCollection(
-                new Type\BooleanOrBothType()
+                new BooleanOrBothType()
             ),
             $default,
             $mandatory,
@@ -124,12 +139,12 @@ class Argument
         );
     }
 
-    public static function createIntListTypeArgument($name, $default = null, $mandatory = false, $empty = true)
+    public static function createIntListTypeArgument($name, $default = null, $mandatory = false, $empty = true): self
     {
         return new self(
             $name,
             new TypeCollection(
-                new Type\IntListType()
+                new IntListType()
             ),
             $default,
             $mandatory,
@@ -142,16 +157,15 @@ class Argument
      * @param bool $mandatory
      * @param bool $empty
      *
-     * @return Argument
      *
      * @since 2.2
      */
-    public static function createAnyListTypeArgument($name, $default = null, $mandatory = false, $empty = true)
+    public static function createAnyListTypeArgument($name, $default = null, $mandatory = false, $empty = true): self
     {
         return new self(
             $name,
             new TypeCollection(
-                new Type\AnyListType()
+                new AnyListType()
             ),
             $default,
             $mandatory,
@@ -159,34 +173,12 @@ class Argument
         );
     }
 
-    public static function createEnumListTypeArgument($name, array $entries, $default = null, $mandatory = false, $empty = true)
+    public static function createEnumListTypeArgument($name, array $entries, $default = null, $mandatory = false, $empty = true): self
     {
         return new self(
             $name,
             new TypeCollection(
-                new Type\EnumListType($entries)
-            ),
-            $default,
-            $mandatory,
-            $empty
-        );
-    }
-
-    /**
-     * @param null $default
-     * @param bool $mandatory
-     * @param bool $empty
-     *
-     * @return Argument
-     *
-     * @since 2.4.0
-     */
-    public static function createAlphaNumStringTypeArgument($name, $default = null, $mandatory = false, $empty = true)
-    {
-        return new self(
-            $name,
-            new TypeCollection(
-                new Type\AlphaNumStringType()
+                new EnumListType($entries)
             ),
             $default,
             $mandatory,
@@ -199,16 +191,36 @@ class Argument
      * @param bool $mandatory
      * @param bool $empty
      *
-     * @return Argument
      *
      * @since 2.4.0
      */
-    public static function createAlphaNumStringListTypeArgument($name, $default = null, $mandatory = false, $empty = true)
+    public static function createAlphaNumStringTypeArgument($name, $default = null, $mandatory = false, $empty = true): self
     {
         return new self(
             $name,
             new TypeCollection(
-                new Type\AlphaNumStringListType()
+                new AlphaNumStringType()
+            ),
+            $default,
+            $mandatory,
+            $empty
+        );
+    }
+
+    /**
+     * @param null $default
+     * @param bool $mandatory
+     * @param bool $empty
+     *
+     *
+     * @since 2.4.0
+     */
+    public static function createAlphaNumStringListTypeArgument($name, $default = null, $mandatory = false, $empty = true): self
+    {
+        return new self(
+            $name,
+            new TypeCollection(
+                new AlphaNumStringListType()
             ),
             $default,
             $mandatory,

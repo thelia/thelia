@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -28,16 +29,8 @@ use Thelia\Model\NewsletterQuery;
  */
 class Newsletter extends BaseAction implements EventSubscriberInterface
 {
-    /** @var MailerFactory */
-    protected $mailer;
-
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
-
-    public function __construct(MailerFactory $mailer, EventDispatcherInterface $dispatcher)
+    public function __construct(protected MailerFactory $mailer, protected EventDispatcherInterface $dispatcher)
     {
-        $this->mailer = $mailer;
-        $this->dispatcher = $dispatcher;
     }
 
     public function subscribe(NewsletterEvent $event): void

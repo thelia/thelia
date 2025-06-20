@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,19 +11,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Security\Authentication;
 
+use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Security\Exception\TokenAuthenticationException;
 use Thelia\Core\Security\UserProvider\TokenUserProvider;
 
 class TokenAuthenticator implements AuthenticatorInterface
 {
-    protected $userProvider;
-
-    public function __construct(protected $key, TokenUserProvider $userProvider)
+    public function __construct(protected $key, protected TokenUserProvider $userProvider)
     {
-        $this->userProvider = $userProvider;
     }
 
     /**
@@ -33,7 +32,7 @@ class TokenAuthenticator implements AuthenticatorInterface
 
         $user = $this->userProvider->getUser($keyData);
 
-        if ($user === null) {
+        if (!$user instanceof UserInterface) {
             throw new TokenAuthenticationException('No user matches the provided token');
         }
 

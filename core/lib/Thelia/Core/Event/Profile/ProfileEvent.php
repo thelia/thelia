@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Profile;
 
 use Thelia\Core\Event\ActionEvent;
@@ -17,40 +18,47 @@ use Thelia\Model\Profile;
 
 class ProfileEvent extends ActionEvent
 {
-    protected $profile;
+
     protected $id;
+
     protected $locale;
+
     protected $code;
+
     protected $title;
+
     protected $chapo;
+
     protected $description;
+
     protected $postscriptum;
+
     protected $resourceAccess;
+
     protected $moduleAccess;
 
-    public function __construct(Profile $profile = null)
+    public function __construct(protected ?Profile $profile = null)
     {
-        $this->profile = $profile;
     }
 
-    public function hasProfile()
+    public function hasProfile(): bool
     {
-        return null !== $this->profile;
+        return $this->profile instanceof Profile;
     }
 
-    public function getProfile()
+    public function getProfile(): ?Profile
     {
         return $this->profile;
     }
 
-    public function setProfile(Profile $profile)
+    public function setProfile(Profile $profile): static
     {
         $this->profile = $profile;
 
         return $this;
     }
 
-    public function setId($id)
+    public function setId($id): static
     {
         $this->id = $id;
 
@@ -62,7 +70,7 @@ class ProfileEvent extends ActionEvent
         return $this->id;
     }
 
-    public function setCode($code)
+    public function setCode($code): static
     {
         $this->code = $code;
 
@@ -74,7 +82,7 @@ class ProfileEvent extends ActionEvent
         return $this->code;
     }
 
-    public function setChapo($chapo)
+    public function setChapo($chapo): static
     {
         $this->chapo = $chapo;
 
@@ -86,7 +94,7 @@ class ProfileEvent extends ActionEvent
         return $this->chapo;
     }
 
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->description = $description;
 
@@ -98,7 +106,7 @@ class ProfileEvent extends ActionEvent
         return $this->description;
     }
 
-    public function setLocale($locale)
+    public function setLocale($locale): static
     {
         $this->locale = $locale;
 
@@ -110,7 +118,7 @@ class ProfileEvent extends ActionEvent
         return $this->locale;
     }
 
-    public function setPostscriptum($postscriptum)
+    public function setPostscriptum($postscriptum): static
     {
         $this->postscriptum = $postscriptum;
 
@@ -122,7 +130,7 @@ class ProfileEvent extends ActionEvent
         return $this->postscriptum;
     }
 
-    public function setTitle($title)
+    public function setTitle($title): static
     {
         $this->title = $title;
 
@@ -134,7 +142,7 @@ class ProfileEvent extends ActionEvent
         return $this->title;
     }
 
-    public function setResourceAccess($resourceAccess)
+    public function setResourceAccess($resourceAccess): static
     {
         $this->resourceAccess = $resourceAccess;
 
@@ -146,7 +154,7 @@ class ProfileEvent extends ActionEvent
         return $this->resourceAccess;
     }
 
-    public function setModuleAccess($moduleAccess)
+    public function setModuleAccess($moduleAccess): static
     {
         $this->moduleAccess = $moduleAccess;
 

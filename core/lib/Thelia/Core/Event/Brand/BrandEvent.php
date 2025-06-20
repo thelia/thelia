@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Brand;
 
 use Thelia\Core\Event\ActionEvent;
@@ -24,20 +25,11 @@ use Thelia\Model\Brand;
  */
 class BrandEvent extends ActionEvent
 {
-    /**
-     * @var \Thelia\Model\Brand
-     */
-    protected $brand;
-
-    public function __construct(Brand $brand = null)
+    public function __construct(protected ?Brand $brand = null)
     {
-        $this->brand = $brand;
     }
 
-    /**
-     * @return BrandEvent
-     */
-    public function setBrand(Brand $brand)
+    public function setBrand(Brand $brand): static
     {
         $this->brand = $brand;
 
@@ -45,20 +37,18 @@ class BrandEvent extends ActionEvent
     }
 
     /**
-     * @return \Thelia\Model\Brand
+     * @return Brand
      */
-    public function getBrand()
+    public function getBrand(): ?Brand
     {
         return $this->brand;
     }
 
     /**
      * check if brand exists.
-     *
-     * @return bool
      */
-    public function hasBrand()
+    public function hasBrand(): bool
     {
-        return null !== $this->brand;
+        return $this->brand instanceof Brand;
     }
 }

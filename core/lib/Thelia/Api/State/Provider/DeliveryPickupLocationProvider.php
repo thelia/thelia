@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\State\Provider;
 
+use RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -32,8 +34,9 @@ readonly class DeliveryPickupLocationProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         if (!isset($uriVariables['city'], $uriVariables['zipcode'])) {
-            throw new \RuntimeException('City and zipcode are required');
+            throw new RuntimeException('City and zipcode are required');
         }
+
         $stateId = $this->request->get('stateId');
         $state = $stateId
             ? (StateQuery::create())->filterById($stateId)->findOne()

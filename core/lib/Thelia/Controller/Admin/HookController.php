@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Exception;
+use Symfony\Component\HttpFoundation\Response;
+use Thelia\Form\BaseForm;
+use Thelia\Form\HookModificationForm;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -103,8 +108,8 @@ class HookController extends AbstractCrudController
             ];
 
             $response = new JsonResponse($json_data);
-        } catch (\Exception $e) {
-            $response = new JsonResponse(['error' => $e->getMessage()], 500);
+        } catch (Exception $exception) {
+            $response = new JsonResponse(['error' => $exception->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return $response;
@@ -156,8 +161,8 @@ class HookController extends AbstractCrudController
             'success' => true,
         ];
 
-        if (\count($errors)) {
-            $response = new JsonResponse(['error' => $errors], 500);
+        if ($errors !== []) {
+            $response = new JsonResponse(['error' => $errors], Response::HTTP_INTERNAL_SERVER_ERROR);
         } else {
             $response = new JsonResponse($json_data);
         }
@@ -165,7 +170,7 @@ class HookController extends AbstractCrudController
         return $response;
     }
 
-    protected function getDiscoverCreationEvent($data, $type)
+    protected function getDiscoverCreationEvent(array $data, $type): HookCreateAllEvent
     {
         $event = new HookCreateAllEvent();
 
@@ -184,7 +189,7 @@ class HookController extends AbstractCrudController
         return $event;
     }
 
-    protected function getDeactivationEvent($code, $type)
+    protected function getDeactivationEvent($code, $type): ?HookDeactivationEvent
     {
         $event = null;
 
@@ -202,7 +207,10 @@ class HookController extends AbstractCrudController
         return $event;
     }
 
-    protected function getAllHooks($templateType)
+    /**
+     * @return array{id: mixed, code: mixed, native: mixed, activate: mixed, title: mixed}[]
+     */
+    protected function getAllHooks($templateType): array
     {
         // get the all hooks
         $hooks = HookQuery::create()
@@ -227,7 +235,7 @@ class HookController extends AbstractCrudController
     /**
      * Return the creation form for this object.
      */
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::HOOK_CREATION);
     }
@@ -235,7 +243,7 @@ class HookController extends AbstractCrudController
     /**
      * Return the update form for this object.
      */
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::HOOK_MODIFICATION);
     }
@@ -243,11 +251,11 @@ class HookController extends AbstractCrudController
     /**
      * Hydrate the update form for this object, before passing it to the update template.
      *
-     * @param \Thelia\Model\Hook $object
+     * @param Hook $object
      *
-     * @return \Thelia\Form\HookModificationForm
+     * @return HookModificationForm
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -290,7 +298,7 @@ class HookController extends AbstractCrudController
         return $this->hydrateEvent($event, $formData, true);
     }
 
-    protected function hydrateEvent($event, $formData, $update = false)
+    protected function hydrateEvent($event, array $formData, $update = false)
     {
         $event
             ->setLocale($formData['locale'])
@@ -313,7 +321,7 @@ class HookController extends AbstractCrudController
     /**
      * Creates the delete event with the provided form data.
      */
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): HookDeleteEvent
     {
         return new HookDeleteEvent($this->getRequest()->get('hook_id'));
     }
@@ -358,7 +366,7 @@ class HookController extends AbstractCrudController
     /**
      * Returns the object label form the object event (name, title, etc.).
      *
-     * @param \Thelia\Model\Hook $object
+     * @param Hook $object
      *
      * @return string
      */
@@ -370,7 +378,7 @@ class HookController extends AbstractCrudController
     /**
      * Returns the object ID from the object.
      *
-     * @param \Thelia\Model\Hook $object
+     * @param Hook $object
      *
      * @return int
      */
@@ -397,7 +405,7 @@ class HookController extends AbstractCrudController
         return $this->render('hook-edit', $this->getEditionArgument());
     }
 
-    protected function getEditionArgument()
+    protected function getEditionArgument(): array
     {
         return [
             'hook_id' => $this->getRequest()->get('hook_id', 0),
@@ -441,9 +449,9 @@ class HookController extends AbstractCrudController
                 if ($toggleDefaultEvent->hasHook()) {
                     return $this->nullResponse();
                 }
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 $content = $ex->getMessage();
-                Tlog::getInstance()->debug(sprintf('%s', $content));
+                Tlog::getInstance()->debug($content);
             }
         }
 
@@ -465,9 +473,9 @@ class HookController extends AbstractCrudController
                 if ($toggleDefaultEvent->hasHook()) {
                     return $this->nullResponse();
                 }
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 $content = $ex->getMessage();
-                Tlog::getInstance()->debug(sprintf('%s', $content));
+                Tlog::getInstance()->debug($content);
             }
         }
 

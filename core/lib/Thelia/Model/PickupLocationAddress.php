@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
 class PickupLocationAddress
@@ -72,10 +73,8 @@ class PickupLocationAddress
 
     /**
      * @param int $id
-     *
-     * @return PickupLocationAddress
      */
-    public function setId($id)
+    public function setId($id): static
     {
         $this->id = $id;
 
@@ -92,10 +91,8 @@ class PickupLocationAddress
 
     /**
      * @param bool $isDefault
-     *
-     * @return PickupLocationAddress
      */
-    public function setIsDefault($isDefault)
+    public function setIsDefault($isDefault): static
     {
         $this->isDefault = $isDefault;
 
@@ -112,10 +109,8 @@ class PickupLocationAddress
 
     /**
      * @param string $label
-     *
-     * @return PickupLocationAddress
      */
-    public function setLabel($label)
+    public function setLabel($label): static
     {
         $this->label = $label;
 
@@ -132,10 +127,8 @@ class PickupLocationAddress
 
     /**
      * @param string $title
-     *
-     * @return PickupLocationAddress
      */
-    public function setTitle($title)
+    public function setTitle($title): static
     {
         $this->title = $title;
 
@@ -152,10 +145,8 @@ class PickupLocationAddress
 
     /**
      * @param string $firstName
-     *
-     * @return PickupLocationAddress
      */
-    public function setFirstName($firstName)
+    public function setFirstName($firstName): static
     {
         $this->firstName = $firstName;
 
@@ -172,10 +163,8 @@ class PickupLocationAddress
 
     /**
      * @param string $lastName
-     *
-     * @return PickupLocationAddress
      */
-    public function setLastName($lastName)
+    public function setLastName($lastName): static
     {
         $this->lastName = $lastName;
 
@@ -192,10 +181,8 @@ class PickupLocationAddress
 
     /**
      * @param string $cellphoneNumber
-     *
-     * @return PickupLocationAddress
      */
-    public function setCellphoneNumber($cellphoneNumber)
+    public function setCellphoneNumber($cellphoneNumber): static
     {
         $this->cellphoneNumber = $cellphoneNumber;
 
@@ -212,10 +199,8 @@ class PickupLocationAddress
 
     /**
      * @param string $phoneNumber
-     *
-     * @return PickupLocationAddress
      */
-    public function setPhoneNumber($phoneNumber)
+    public function setPhoneNumber($phoneNumber): static
     {
         $this->phoneNumber = $phoneNumber;
 
@@ -232,10 +217,8 @@ class PickupLocationAddress
 
     /**
      * @param string $company
-     *
-     * @return PickupLocationAddress
      */
-    public function setCompany($company)
+    public function setCompany($company): static
     {
         $this->company = $company;
 
@@ -252,10 +235,8 @@ class PickupLocationAddress
 
     /**
      * @param string $address1
-     *
-     * @return PickupLocationAddress
      */
-    public function setAddress1($address1)
+    public function setAddress1($address1): static
     {
         $this->address1 = $address1;
 
@@ -272,10 +253,8 @@ class PickupLocationAddress
 
     /**
      * @param string $address2
-     *
-     * @return PickupLocationAddress
      */
-    public function setAddress2($address2)
+    public function setAddress2($address2): static
     {
         $this->address2 = $address2;
 
@@ -292,10 +271,8 @@ class PickupLocationAddress
 
     /**
      * @param string $address3
-     *
-     * @return PickupLocationAddress
      */
-    public function setAddress3($address3)
+    public function setAddress3($address3): static
     {
         $this->address3 = $address3;
 
@@ -312,10 +289,8 @@ class PickupLocationAddress
 
     /**
      * @param string $zipCode
-     *
-     * @return PickupLocationAddress
      */
-    public function setZipCode($zipCode)
+    public function setZipCode($zipCode): static
     {
         $this->zipCode = $zipCode;
 
@@ -332,10 +307,8 @@ class PickupLocationAddress
 
     /**
      * @param string $city
-     *
-     * @return PickupLocationAddress
      */
-    public function setCity($city)
+    public function setCity($city): static
     {
         $this->city = $city;
 
@@ -352,10 +325,8 @@ class PickupLocationAddress
 
     /**
      * @param string $countryCode
-     *
-     * @return PickupLocationAddress
      */
-    public function setCountryCode($countryCode)
+    public function setCountryCode($countryCode): static
     {
         $this->countryCode = $countryCode;
 
@@ -372,10 +343,8 @@ class PickupLocationAddress
 
     /**
      * @param array $additionalData
-     *
-     * @return PickupLocationAddress
      */
-    public function setAdditionalData($additionalData)
+    public function setAdditionalData($additionalData): static
     {
         $this->additionalData = $additionalData;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
 use Thelia\Model\Base\ConfigQuery as BaseConfigQuery;
@@ -24,6 +25,7 @@ use Thelia\Model\Base\ConfigQuery as BaseConfigQuery;
 class ConfigQuery extends BaseConfigQuery
 {
     protected static $booted = false;
+
     protected static $cache = [];
 
     /**
@@ -69,6 +71,7 @@ class ConfigQuery extends BaseConfigQuery
         if ($secured !== null) {
             $config->setSecured($secured ? 1 : 0);
         }
+
         if ($hidden !== null) {
             $config->setHidden($hidden ? 1 : 0);
         }
@@ -336,4 +339,5 @@ class ConfigQuery extends BaseConfigQuery
         return self::read('minimum_admin_password_length', 4);
     }
 }
+
 // ConfigQuery

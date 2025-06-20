@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Thelia\Form\BaseForm;
+use LogicException;
 use Thelia\Core\Event\Attribute\AttributeAvCreateEvent;
 use Thelia\Core\Event\Attribute\AttributeAvDeleteEvent;
 use Thelia\Core\Event\Attribute\AttributeAvUpdateEvent;
@@ -45,17 +48,17 @@ class AttributeAvController extends AbstractCrudController
         );
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::ATTRIBUTE_AV_CREATION);
     }
 
     protected function getUpdateForm(): void
     {
-        throw new \LogicException('Attribute Av. modification is not yet implemented');
+        throw new LogicException('Attribute Av. modification is not yet implemented');
     }
 
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent($formData): AttributeAvCreateEvent
     {
         $createEvent = new AttributeAvCreateEvent();
 
@@ -68,7 +71,7 @@ class AttributeAvController extends AbstractCrudController
         return $createEvent;
     }
 
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent($formData): AttributeAvUpdateEvent
     {
         $changeEvent = new AttributeAvUpdateEvent($formData['id']);
 
@@ -84,7 +87,7 @@ class AttributeAvController extends AbstractCrudController
         return $changeEvent;
     }
 
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
             $this->getRequest()->get('attributeav_id', null),
@@ -93,7 +96,7 @@ class AttributeAvController extends AbstractCrudController
         );
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): AttributeAvDeleteEvent
     {
         return new AttributeAvDeleteEvent($this->getRequest()->get('attributeav_id'));
     }
@@ -105,7 +108,7 @@ class AttributeAvController extends AbstractCrudController
 
     protected function hydrateObjectForm(ParserContext $parserContext, $object): void
     {
-        throw new \LogicException('Attribute Av. modification is not yet implemented');
+        throw new LogicException('Attribute Av. modification is not yet implemented');
     }
 
     protected function getObjectFromEvent($event)
@@ -145,7 +148,7 @@ class AttributeAvController extends AbstractCrudController
         return $object->getId();
     }
 
-    protected function getViewArguments()
+    protected function getViewArguments(): array
     {
         return [
             'attribute_id' => $this->getRequest()->get('attribute_id'),

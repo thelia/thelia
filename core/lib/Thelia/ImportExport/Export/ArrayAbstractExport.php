@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,15 +11,17 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\ImportExport\Export;
+
+use DomainException;
+use LogicException;
 
 abstract class ArrayAbstractExport extends AbstractExport
 {
     /**
      * @var array Data to export
      */
-    private $data;
+    private ?array $data = null;
 
     public function current()
     {
@@ -46,12 +50,12 @@ abstract class ArrayAbstractExport extends AbstractExport
                 return;
             }
 
-            throw new \DomainException(
+            throw new DomainException(
                 'Data must be an array.'
             );
         }
 
-        throw new \LogicException('Export data can\'t be rewinded');
+        throw new LogicException("Export data can't be rewinded");
     }
 
     public function valid(): bool

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
+use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Log\Tlog;
@@ -40,9 +42,9 @@ class AdminLog extends BaseAdminLog
         $log = new self();
 
         $log
-            ->setAdminLogin($adminUser !== null ? $adminUser->getUsername() : '<no login>')
-            ->setAdminFirstname($adminUser !== null && $adminUser instanceof Admin ? $adminUser->getFirstname() : '<no first name>')
-            ->setAdminLastname($adminUser !== null && $adminUser instanceof Admin ? $adminUser->getLastname() : '<no last name>')
+            ->setAdminLogin($adminUser instanceof UserInterface ? $adminUser->getUsername() : '<no login>')
+            ->setAdminFirstname($adminUser instanceof UserInterface && $adminUser instanceof Admin ? $adminUser->getFirstname() : '<no first name>')
+            ->setAdminLastname($adminUser instanceof UserInterface && $adminUser instanceof Admin ? $adminUser->getLastname() : '<no last name>')
             ->setResource($resource)
             ->setResourceId($resourceId)
             ->setAction($action)
@@ -51,8 +53,8 @@ class AdminLog extends BaseAdminLog
 
         try {
             $log->save();
-        } catch (\Exception $ex) {
-            Tlog::getInstance()->err('Failed to insert new entry in AdminLog: {ex}', ['ex' => $ex]);
+        } catch (Exception $exception) {
+            Tlog::getInstance()->err('Failed to insert new entry in AdminLog: {ex}', ['ex' => $exception]);
         }
     }
 }

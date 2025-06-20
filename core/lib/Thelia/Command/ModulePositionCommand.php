@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+use InvalidArgumentException;
+use RuntimeException;
+use Thelia\Model\Module;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -29,12 +34,10 @@ use Thelia\Model\ModuleQuery;
  *
  * @author  Jérôme Billiras <jerome.billiras+github@gmail.com>
  */
+#[AsCommand(name: 'module:position', description: 'Set module(s) position')]
 class ModulePositionCommand extends ContainerAwareCommand
 {
-    /**
-     * @var \Thelia\Model\ModuleQuery
-     */
-    protected $moduleQuery;
+    protected ModuleQuery $moduleQuery;
 
     /**
      * @var array Modules list
@@ -46,7 +49,7 @@ class ModulePositionCommand extends ContainerAwareCommand
      */
     protected $positionsList = [];
 
-    public function __construct($name = null)
+    public function __construct(?string $name = null)
     {
         parent::__construct($name);
 
@@ -56,8 +59,6 @@ class ModulePositionCommand extends ContainerAwareCommand
     protected function configure(): void
     {
         $this
-            ->setName('module:position')
-            ->setDescription('Set module(s) position')
             ->addArgument(
                 'modules',
                 InputArgument::REQUIRED | InputArgument::IS_ARRAY,
@@ -123,13 +124,13 @@ class ModulePositionCommand extends ContainerAwareCommand
      *
      * @param string $paramValue
      *
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
      */
     protected function checkModuleArgument($paramValue): void
     {
         if (!preg_match('#^([a-z0-9]+):([\+-]?[0-9]+|up|down)$#i', $paramValue, $matches)) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'Arguments must be in format moduleName:[+|-]position where position is an integer or up or down.'
             );
         }
@@ -137,7 +138,7 @@ class ModulePositionCommand extends ContainerAwareCommand
         $this->moduleQuery->clear();
         $module = $this->moduleQuery->findOneByCode($matches[1]);
         if ($module === null) {
-            throw new \RuntimeException(sprintf('%s module does not exists. Try to refresh first.', $matches[1]));
+            throw new RuntimeException(sprintf('%s module does not exists. Try to refresh first.', $matches[1]));
         }
 
         $this->modulesList[] = $matches[1];
@@ -149,14 +150,14 @@ class ModulePositionCommand extends ContainerAwareCommand
      *
      * @return array Maximum position by type
      */
-    protected function cleanPosition()
+    protected function cleanPosition(): array
     {
         $modulesType = [];
 
         $this->moduleQuery->clear();
         $modules = $this->moduleQuery->orderByPosition(Criteria::ASC);
 
-        /** @var \Thelia\Model\Module $module */
+        /** @var Module $module */
         foreach ($modules as $module) {
             if (!isset($modulesType[$module->getType()])) {
                 $modulesType[$module->getType()] = 0;
@@ -178,7 +179,7 @@ class ModulePositionCommand extends ContainerAwareCommand
      * @param OutputInterface $output     An OutputInterface instance
      * @param bool            $isAbsolute Set to true or false according to position values
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      *
      * @return bool Continue or stop command
      */
@@ -190,7 +191,7 @@ class ModulePositionCommand extends ContainerAwareCommand
                 $isAbsolute = true;
 
                 if ($count > 1) {
-                    throw new \InvalidArgumentException('Two (or more) absolute positions are identical.');
+                    throw new InvalidArgumentException('Two (or more) absolute positions are identical.');
                 }
             } else {
                 $isRelative = true;

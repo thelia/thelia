@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller;
 
+use Exception;
+use Symfony\Component\HttpFoundation\Request;
+use InvalidArgumentException;
+use Thelia\Core\Template\ParserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -111,7 +116,7 @@ abstract class BaseController implements ControllerInterface
      *
      * @param int $status
      *
-     * @return \Thelia\Core\HttpFoundation\Response
+     * @return Response
      */
     protected function nullResponse($status = 200)
     {
@@ -158,7 +163,7 @@ abstract class BaseController implements ControllerInterface
      */
     protected function dispatch(string $eventName, Event $event = null): void
     {
-        throw new \Exception('Since Thelia 2.5 this->dispatch() function is not allowed in controllers, use autowiring instead');
+        throw new Exception('Since Thelia 2.5 this->dispatch() function is not allowed in controllers, use autowiring instead');
     }
 
     /**
@@ -170,7 +175,7 @@ abstract class BaseController implements ControllerInterface
      */
     public function getDispatcher()
     {
-        throw new \Exception('Since Thelia 2.5 this->getDispatcher() function is not allowed in controllers, use autowiring instead');
+        throw new Exception('Since Thelia 2.5 this->getDispatcher() function is not allowed in controllers, use autowiring instead');
     }
 
     public function getTranslator(): TranslatorInterface
@@ -188,7 +193,7 @@ abstract class BaseController implements ControllerInterface
         return $this->securityContext;
     }
 
-    protected function getRequest(): \Symfony\Component\HttpFoundation\Request
+    protected function getRequest(): Request
     {
         return $this->requestStack->getCurrentRequest();
     }
@@ -226,7 +231,7 @@ abstract class BaseController implements ControllerInterface
      *
      * @throws FormValidationException is the form contains error, or the method is not the right one
      *
-     * @return \Symfony\Component\Form\Form Form the symfony form object
+     * @return Form Form the symfony form object
      */
     protected function validateForm(BaseForm $aBaseForm, $expectedMethod = null)
     {
@@ -277,12 +282,12 @@ abstract class BaseController implements ControllerInterface
             if ($pdfEvent->hasPdf()) {
                 return $this->pdfResponse($pdfEvent->getPdf(), $order->getRef(), 200, $browser);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $exception) {
             Tlog::getInstance()->error(
                 sprintf(
                     'error during generating invoice pdf for order id : %d with message "%s"',
                     $order_id,
-                    $e->getMessage()
+                    $exception->getMessage()
                 )
             );
         }
@@ -321,7 +326,7 @@ abstract class BaseController implements ControllerInterface
     {
         $url = null;
 
-        if ($form !== null) {
+        if ($form instanceof BaseForm) {
             $url = $form->getFormDefinedUrl($parameterName);
         } else {
             $url = $this->requestStack->getCurrentRequest()?->get($parameterName);
@@ -331,15 +336,13 @@ abstract class BaseController implements ControllerInterface
     }
 
     /**
-     * @param int $referenceType
-     *
      * @return string
      */
     protected function retrieveUrlFromRouteId(
-        $routeId,
+        string $routeId,
         array $urlParameters = [],
         array $routeParameters = [],
-        $referenceType = Router::ABSOLUTE_PATH
+        int $referenceType = Router::ABSOLUTE_PATH
     ) {
         return URL::getInstance()->absoluteUrl(
             $this->getRoute(
@@ -394,15 +397,14 @@ abstract class BaseController implements ControllerInterface
     /**
      * create an instance of RedriectResponse for a given route id.
      *
-     * @param int $referenceType
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function generateRedirectFromRoute(
-        $routeId,
+        string $routeId,
         array $urlParameters = [],
         array $routeParameters = [],
-        $referenceType = Router::ABSOLUTE_PATH
+        int $referenceType = Router::ABSOLUTE_PATH
     ) {
         return $this->generateRedirect(
             $this->retrieveUrlFromRouteId($routeId, $urlParameters, $routeParameters, $referenceType)
@@ -420,13 +422,13 @@ abstract class BaseController implements ControllerInterface
      * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
      * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
      *                                             it does not match the requirement
-     * @throws \InvalidArgumentException           When the router doesn't exist
+     * @throws InvalidArgumentException When the router doesn't exist
      *
      * @return string The generated URL
      *
      * @see \Thelia\Controller\BaseController::getRouteFromRouter()
      */
-    protected function getRoute($routeId, $parameters = [], $referenceType = Router::ABSOLUTE_URL)
+    protected function getRoute(string $routeId, array $parameters = [], int $referenceType = Router::ABSOLUTE_URL)
     {
         return $this->getRouteFromRouter(
             $this->getCurrentRouter(),
@@ -448,27 +450,27 @@ abstract class BaseController implements ControllerInterface
      * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
      * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
      *                                             it does not match the requirement
-     * @throws \InvalidArgumentException           When the router doesn't exist
+     * @throws InvalidArgumentException When the router doesn't exist
      *
      * @return string The generated URL
      */
     protected function getRouteFromRouter(
-        $routerName,
-        $routeId,
-        $parameters = [],
-        $referenceType = Router::ABSOLUTE_URL
+        string $routerName,
+        string $routeId,
+        array $parameters = [],
+        int $referenceType = Router::ABSOLUTE_URL
     ) {
         /** @var Router $router */
         $router = $this->getRouter($routerName);
 
         if ($router == null) {
-            throw new \InvalidArgumentException(sprintf("Router '%s' does not exists.", $routerName));
+            throw new InvalidArgumentException(sprintf("Router '%s' does not exists.", $routerName));
         }
 
         return $router->generate($routeId, $parameters, $referenceType);
     }
 
-    protected function getRouter($routerName): ?object
+    protected function getRouter(string $routerName): ?object
     {
         return $this->container->get($routerName);
     }
@@ -516,7 +518,7 @@ abstract class BaseController implements ControllerInterface
         return $this->currentRouter;
     }
 
-    protected function setCurrentRouter($routerId): void
+    protected function setCurrentRouter(string $routerId): void
     {
         $this->currentRouter = $routerId;
     }
@@ -526,7 +528,7 @@ abstract class BaseController implements ControllerInterface
      *
      * This method builds a thelia form with its name
      */
-    public function createForm($name, $type = FormType::class, array $data = [], array $options = []): BaseForm
+    public function createForm($name, string $type = FormType::class, array $data = [], array $options = []): BaseForm
     {
         if (empty($name)) {
             $name = static::EMPTY_FORM_NAME;
@@ -553,7 +555,7 @@ abstract class BaseController implements ControllerInterface
     /**
      * @param mixed|null $template
      *
-     * @return \Thelia\Core\Template\ParserInterface instance parser
+     * @return ParserInterface instance parser
      */
     abstract protected function getParser($template = null);
 
@@ -564,7 +566,7 @@ abstract class BaseController implements ControllerInterface
      * @param array  $args         the template arguments
      * @param int    $status       http code status
      *
-     * @return \Thelia\Core\HttpFoundation\Response
+     * @return Response
      */
     abstract protected function render($templateName, $args = [], $status = 200);
 

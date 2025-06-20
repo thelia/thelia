@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Country\CountryCreateEvent;
@@ -56,7 +58,7 @@ class CountryController extends AbstractCrudController
     /**
      * Return the creation form for this object.
      */
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::COUNTRY_CREATION);
     }
@@ -64,7 +66,7 @@ class CountryController extends AbstractCrudController
     /**
      * Return the update form for this object.
      */
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::COUNTRY_MODIFICATION);
     }
@@ -72,16 +74,14 @@ class CountryController extends AbstractCrudController
     /**
      * Hydrate the update form for this object, before passing it to the update template.
      *
-     * @param \Thelia\Model\Country $object
-     *
-     * @return BaseForm
+     * @param Country $object
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
             'locale' => $object->getLocale(),
-            'visible' => $object->getVisible() ? true : false,
+            'visible' => (bool) $object->getVisible(),
             'title' => $object->getTitle(),
             'chapo' => $object->getChapo(),
             'description' => $object->getDescription(),
@@ -89,8 +89,8 @@ class CountryController extends AbstractCrudController
             'isocode' => $object->getIsocode(),
             'isoalpha2' => $object->getIsoalpha2(),
             'isoalpha3' => $object->getIsoalpha3(),
-            'has_states' => $object->getHasStates() ? true : false,
-            'need_zip_code' => $object->getNeedZipCode() ? true : false,
+            'has_states' => (bool) $object->getHasStates(),
+            'need_zip_code' => (bool) $object->getNeedZipCode(),
             'zip_code_format' => $object->getZipCodeFormat(),
         ];
 
@@ -135,7 +135,7 @@ class CountryController extends AbstractCrudController
         return $event;
     }
 
-    protected function hydrateEvent($event, $formData)
+    protected function hydrateEvent($event, array $formData)
     {
         $event
             ->setLocale($formData['locale'])
@@ -153,7 +153,7 @@ class CountryController extends AbstractCrudController
     /**
      * Creates the delete event with the provided form data.
      */
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): CountryDeleteEvent
     {
         return new CountryDeleteEvent($this->getRequest()->get('country_id'));
     }
@@ -196,7 +196,7 @@ class CountryController extends AbstractCrudController
     /**
      * Returns the object label form the object event (name, title, etc.).
      *
-     * @param \Thelia\Model\Country $object
+     * @param Country $object
      *
      * @return string
      */
@@ -208,7 +208,7 @@ class CountryController extends AbstractCrudController
     /**
      * Returns the object ID from the object.
      *
-     * @param \Thelia\Model\Country $object
+     * @param Country $object
      *
      * @return int
      */
@@ -235,7 +235,7 @@ class CountryController extends AbstractCrudController
         return $this->render('country-edit', $this->getEditionArgument());
     }
 
-    protected function getEditionArgument()
+    protected function getEditionArgument(): array
     {
         return [
             'country_id' => $this->getRequest()->get('country_id', 0),
@@ -278,7 +278,7 @@ class CountryController extends AbstractCrudController
                 if ($toogleDefaultEvent->hasCountry()) {
                     return $this->nullResponse();
                 }
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 Tlog::getInstance()->error($ex->getMessage());
             }
         }
@@ -289,7 +289,7 @@ class CountryController extends AbstractCrudController
     /**
      * @return CountryToggleVisibilityEvent|void
      */
-    protected function createToggleVisibilityEvent()
+    protected function createToggleVisibilityEvent(): CountryToggleVisibilityEvent
     {
         return new CountryToggleVisibilityEvent($this->getExistingObject());
     }

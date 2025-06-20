@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Newsletter;
 
+use Thelia\Model\Newsletter;
 use Thelia\Core\Event\ActionEvent;
 
 /**
@@ -37,7 +39,7 @@ class NewsletterEvent extends ActionEvent
     protected $lastname;
 
     /**
-     * @var \Thelia\Model\Newsletter
+     * @var Newsletter
      */
     protected $newsletter;
 
@@ -59,9 +61,9 @@ class NewsletterEvent extends ActionEvent
     }
 
     /**
-     * @param \Thelia\Model\Newsletter $newsletter
+     * @param Newsletter $newsletter
      */
-    public function setNewsletter($newsletter)
+    public function setNewsletter($newsletter): static
     {
         $this->newsletter = $newsletter;
 
@@ -69,7 +71,7 @@ class NewsletterEvent extends ActionEvent
     }
 
     /**
-     * @return \Thelia\Model\Newsletter
+     * @return Newsletter
      */
     public function getNewsletter()
     {
@@ -81,7 +83,7 @@ class NewsletterEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setEmail($email)
+    public function setEmail($email): static
     {
         $this->email = $email;
 
@@ -101,7 +103,7 @@ class NewsletterEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setFirstname($firstname)
+    public function setFirstname($firstname): static
     {
         $this->firstname = $firstname;
 
@@ -121,7 +123,7 @@ class NewsletterEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setLastname($lastname)
+    public function setLastname($lastname): static
     {
         $this->lastname = $lastname;
 
@@ -141,7 +143,7 @@ class NewsletterEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setLocale($locale)
+    public function setLocale($locale): static
     {
         $this->locale = $locale;
 
@@ -159,7 +161,7 @@ class NewsletterEvent extends ActionEvent
     /**
      * @param string $id
      */
-    public function setId($id)
+    public function setId($id): static
     {
         $this->id = $id;
 

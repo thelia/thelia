@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\EventListener;
 
+use Throwable;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -32,29 +34,11 @@ use Thelia\Model\ConfigQuery;
  */
 class ErrorListener implements EventSubscriberInterface
 {
-    /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
-
-    /** @var ParserInterface */
-    protected $parser;
-
-    /** @var SecurityContext */
-    protected $securityContext;
-
     /**
      * @param string $kernelEnvironment
      */
-    public function __construct(
-        protected $env,
-        ParserInterface $parser,
-        SecurityContext $securityContext,
-        EventDispatcherInterface $eventDispatcher
-    ) {
-        $this->parser = $parser;
-
-        $this->securityContext = $securityContext;
-
-        $this->eventDispatcher = $eventDispatcher;
+    public function __construct(protected $env, protected ParserInterface $parser, protected SecurityContext $securityContext, protected EventDispatcherInterface $eventDispatcher)
+    {
     }
 
     public function defaultErrorFallback(ExceptionEvent $event): void
@@ -72,7 +56,7 @@ class ErrorListener implements EventSubscriberInterface
 
         $response = new Response(
             $this->parser->render(ConfigQuery::getErrorMessagePageName()),
-            500
+            \Symfony\Component\HttpFoundation\Response::HTTP_INTERNAL_SERVER_ERROR
         );
 
         $event->setResponse($response);
@@ -83,6 +67,7 @@ class ErrorListener implements EventSubscriberInterface
         if ($event->getRequest()->get('_api_operation_name', false)) {
             return;
         }
+
         if ('prod' === $this->env && ConfigQuery::isShowingErrorMessage()) {
             $this->eventDispatcher
                 ->dispatch(
@@ -102,12 +87,12 @@ class ErrorListener implements EventSubscriberInterface
 
         do {
             $logMessage .=
-                ($logMessage ? \PHP_EOL.'Caused by' : 'Uncaught exception')
+                ($logMessage !== '' && $logMessage !== '0' ? \PHP_EOL.'Caused by' : 'Uncaught exception')
                 .$exception->getMessage()
                 .\PHP_EOL
                 .'Stack Trace: '.$exception->getTraceAsString()
             ;
-        } while (null !== $exception = $exception->getPrevious());
+        } while (($exception = $exception->getPrevious()) instanceof Throwable);
 
         Tlog::getInstance()->error($logMessage);
         if ($exception !== null) {

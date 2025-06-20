@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
+use Exception;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -21,11 +23,17 @@ class PickupLocation
 {
     /** OPENING HOURS ARRAY KEYS */
     public const MONDAY_OPENING_HOURS_KEY = '0';
+
     public const TUESDAY_OPENING_HOURS_KEY = '1';
+
     public const WEDNESDAY_OPENING_HOURS_KEY = '2';
+
     public const THURSDAY_OPENING_HOURS_KEY = '3';
+
     public const FRIDAY_OPENING_HOURS_KEY = '4';
+
     public const SATURDAY_OPENING_HOURS_KEY = '5';
+
     public const SUNDAY_OPENING_HOURS_KEY = '6';
 
     /** @var string */
@@ -46,8 +54,7 @@ class PickupLocation
     /** @var string */
     protected $moduleOptionCode;
 
-    /** @var Serializer */
-    protected $serializer;
+    protected Serializer $serializer;
 
     /** @var array */
     protected $openingHours = [
@@ -80,10 +87,8 @@ class PickupLocation
 
     /**
      * @param string $id
-     *
-     * @return PickupLocation
      */
-    public function setId($id)
+    public function setId($id): static
     {
         $this->id = $id;
 
@@ -99,7 +104,7 @@ class PickupLocation
     /** @param float
      * @return $this
      * */
-    public function setLatitude($latitude)
+    public function setLatitude($latitude): static
     {
         $this->latitude = $latitude;
 
@@ -113,9 +118,8 @@ class PickupLocation
     }
 
     /** @param float
-     * @return $this|PickupLocation
      * */
-    public function setLongitude($longitude)
+    public function setLongitude($longitude): static
     {
         $this->longitude = $longitude;
 
@@ -129,9 +133,8 @@ class PickupLocation
     }
 
     /** @param string
-     * @return $this|PickupLocation
      * */
-    public function setTitle($title)
+    public function setTitle($title): static
     {
         $this->title = $title;
 
@@ -148,10 +151,8 @@ class PickupLocation
 
     /**
      * @param PickupLocationAddress $address
-     *
-     * @return PickupLocation
      */
-    public function setAddress($address)
+    public function setAddress($address): static
     {
         $this->address = $address;
 
@@ -166,10 +167,7 @@ class PickupLocation
         return $this->moduleId;
     }
 
-    /**
-     * @return PickupLocation
-     */
-    public function setModuleOptionCode($moduleOptionCode)
+    public function setModuleOptionCode($moduleOptionCode): static
     {
         $this->moduleOptionCode = $moduleOptionCode;
 
@@ -186,10 +184,8 @@ class PickupLocation
 
     /**
      * @param int $moduleId
-     *
-     * @return PickupLocation
      */
-    public function setModuleId($moduleId)
+    public function setModuleId($moduleId): static
     {
         $this->moduleId = $moduleId;
 
@@ -208,14 +204,14 @@ class PickupLocation
      * @param int    $day
      * @param string $hours
      *
-     * @throws \Exception
+     * @throws Exception
      *
      * @return $this
      */
-    public function setOpeningHours($day, $hours)
+    public function setOpeningHours($day, $hours): static
     {
         if (!\array_key_exists($day, $this->openingHours)) {
-            throw new \Exception(Translator::getInstance()->trans('Tried to set the opening hours for a non existant day in the array. Please use the constants defined in the PickupLocation class.'));
+            throw new Exception(Translator::getInstance()->trans('Tried to set the opening hours for a non existant day in the array. Please use the constants defined in the PickupLocation class.'));
         }
 
         $this->openingHours[$day] = $hours;
@@ -226,7 +222,7 @@ class PickupLocation
     /**
      * @return array
      * */
-    public function toArray()
+    public function toArray(): mixed
     {
         return json_decode($this->serializer->serialize($this, 'json'), true);
     }

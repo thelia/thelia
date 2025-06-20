@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Config;
 
 use Thelia\Core\Event\ActionEvent;
@@ -20,24 +21,21 @@ use Thelia\Model\Config;
  */
 class ConfigEvent extends ActionEvent
 {
-    protected $config;
-
-    public function __construct(Config $config = null)
+    public function __construct(protected ?Config $config = null)
     {
-        $this->config = $config;
     }
 
-    public function hasConfig()
+    public function hasConfig(): bool
     {
-        return null !== $this->config;
+        return $this->config instanceof Config;
     }
 
-    public function getConfig()
+    public function getConfig(): ?Config
     {
         return $this->config;
     }
 
-    public function setConfig($config)
+    public function setConfig(?Config $config): static
     {
         $this->config = $config;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Cart;
 
 use Thelia\Core\Event\ActionEvent;
@@ -22,26 +23,16 @@ use Thelia\Model\Cart;
  */
 class CartPersistEvent extends ActionEvent
 {
-    /** @var Cart */
-    protected $cart;
-
-    public function __construct(Cart $cart)
+    public function __construct(protected Cart $cart)
     {
-        $this->cart = $cart;
     }
 
-    /**
-     * @return Cart
-     */
-    public function getCart()
+    public function getCart(): Cart
     {
         return $this->cart;
     }
 
-    /**
-     * @param Cart $cart
-     */
-    public function setCart($cart)
+    public function setCart(Cart $cart): static
     {
         $this->cart = $cart;
 
@@ -50,11 +41,9 @@ class CartPersistEvent extends ActionEvent
 
     /**
      * check if cart exists.
-     *
-     * @return bool
      */
-    public function hasCart()
+    public function hasCart(): bool
     {
-        return null !== $this->cart;
+        return $this->cart instanceof Cart;
     }
 }

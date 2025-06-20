@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Serializer\Serializer;
 
+use SplFileObject;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Thelia\Core\Serializer\AbstractSerializer;
 
@@ -23,19 +25,19 @@ use Thelia\Core\Serializer\AbstractSerializer;
 class XMLSerializer extends AbstractSerializer
 {
     /**
-     * @var \Symfony\Component\Serializer\Encoder\XmlEncoder An xml encoder instance
+     * @var XmlEncoder An xml encoder instance
      */
-    private $xmlEncoder;
+    private readonly XmlEncoder $xmlEncoder;
 
     /**
      * @var int Position of data start
      */
-    private $xmlDataStart;
+    private null|int|bool $xmlDataStart = null;
 
     /**
      * @var string Root node name
      */
-    private $rootNodeName = 'root';
+    private string $rootNodeName = 'root';
 
     /**
      * @var string Data node name
@@ -54,22 +56,22 @@ class XMLSerializer extends AbstractSerializer
         );
     }
 
-    public function getId()
+    public function getId(): string
     {
         return 'thelia.xml';
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'XML';
     }
 
-    public function getExtension()
+    public function getExtension(): string
     {
         return 'xml';
     }
 
-    public function getMimeType()
+    public function getMimeType(): string
     {
         return 'application/xml';
     }
@@ -98,7 +100,7 @@ class XMLSerializer extends AbstractSerializer
         return $this;
     }
 
-    public function prepareFile(\SplFileObject $fileObject): void
+    public function prepareFile(SplFileObject $fileObject): void
     {
         $this->xmlDataStart = null;
 
@@ -107,7 +109,7 @@ class XMLSerializer extends AbstractSerializer
         );
     }
 
-    public function serialize($data)
+    public function serialize($data): string
     {
         $xml = $this->xmlEncoder->encode($data, 'array');
 
@@ -118,17 +120,17 @@ class XMLSerializer extends AbstractSerializer
         return substr($xml, $this->xmlDataStart, -1);
     }
 
-    public function separator()
+    public function separator(): string
     {
         return \PHP_EOL;
     }
 
-    public function finalizeFile(\SplFileObject $fileObject): void
+    public function finalizeFile(SplFileObject $fileObject): void
     {
         $fileObject->fwrite(\PHP_EOL.'</'.$this->rootNodeName.'>');
     }
 
-    public function unserialize(\SplFileObject $fileObject)
+    public function unserialize(SplFileObject $fileObject): mixed
     {
         $unserializedXml = $this->xmlEncoder->decode(file_get_contents($fileObject->getPathname()), 'null');
 

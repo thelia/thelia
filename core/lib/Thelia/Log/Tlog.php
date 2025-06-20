@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Log;
 
+use Exception;
+use UnexpectedValueException;
 use Psr\Log\LoggerInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
@@ -30,21 +33,34 @@ class Tlog implements LoggerInterface
 {
     // Nom des variables de configuration
     public const VAR_LEVEL = 'tlog_level';
+
     public const VAR_DESTINATIONS = 'tlog_destinations';
+
     public const VAR_PREFIXE = 'tlog_prefix';
+
     public const VAR_FILES = 'tlog_files';
+
     public const VAR_IP = 'tlog_ip';
+
     public const VAR_SHOW_REDIRECT = 'tlog_show_redirect';
 
     // all level of trace
     public const DEBUG = 100;
+
     public const INFO = 200;
+
     public const NOTICE = 300;
+
     public const WARNING = 400;
+
     public const ERROR = 500;
+
     public const CRITICAL = 600;
+
     public const ALERT = 700;
+
     public const EMERGENCY = 800;
+
     public const MUET = \PHP_INT_MAX;
 
     protected $levels = [
@@ -60,10 +76,15 @@ class Tlog implements LoggerInterface
 
     // default values
     public const DEFAULT_LEVEL = self::ERROR;
+
     public const DEFAUT_DESTINATIONS = "Thelia\Log\Destination\TlogDestinationRotatingFile";
+
     public const DEFAUT_PREFIXE = '#INDEX: #LEVEL [#FILE:#FUNCTION()] {#LINE} #DATE #HOUR: ';
+
     public const DEFAUT_FILES = '*';
+
     public const DEFAUT_IP = '';
+
     public const DEFAUT_SHOW_REDIRECT = 0;
 
     /**
@@ -77,13 +98,18 @@ class Tlog implements LoggerInterface
     protected $destinations = [];
 
     protected $mode_back_office = false;
+
     protected $level = self::ERROR;
+
     protected $prefix = '';
+
     protected $files = [];
+
     protected $all_files = false;
+
     protected $show_redirect = false;
 
-    private $linecount = 0;
+    private int $linecount = 0;
 
     protected $done = false;
 
@@ -116,7 +142,7 @@ class Tlog implements LoggerInterface
      *
      * @return Tlog a new Tlog instance
      */
-    public static function getNewInstance()
+    public static function getNewInstance(): self
     {
         $instance = new self();
 
@@ -150,9 +176,9 @@ class Tlog implements LoggerInterface
     // Configuration
     // -------------
 
-    public function setDestinations(string $destinations)
+    public function setDestinations(string $destinations): static
     {
-        if (!empty($destinations)) {
+        if ($destinations !== '' && $destinations !== '0') {
             $this->destinations = [];
 
             $classes_destinations = explode(';', $destinations);
@@ -178,21 +204,21 @@ class Tlog implements LoggerInterface
      *
      * @param int $level
      */
-    public function setLevel($level)
+    public function setLevel($level): static
     {
         $this->level = $level;
 
         return $this;
     }
 
-    public function setPrefix($prefix)
+    public function setPrefix($prefix): static
     {
         $this->prefix = $prefix;
 
         return $this;
     }
 
-    public function setFiles($files)
+    public function setFiles($files): static
     {
         $this->files = explode(';', (string) $files);
 
@@ -201,7 +227,7 @@ class Tlog implements LoggerInterface
         return $this;
     }
 
-    public function setIp($ips)
+    public function setIp($ips): static
     {
         // isset($_SERVER['REMOTE_ADDR']) if we are in cli mode
         if (!empty($ips) && isset($_SERVER['REMOTE_ADDR']) && !\in_array($_SERVER['REMOTE_ADDR'], explode(';', (string) $ips))) {
@@ -211,7 +237,7 @@ class Tlog implements LoggerInterface
         return $this;
     }
 
-    public function setShowRedirect($bool)
+    public function setShowRedirect($bool): static
     {
         $this->show_redirect = $bool;
 
@@ -219,7 +245,7 @@ class Tlog implements LoggerInterface
     }
 
     // Configuration d'une destination
-    public function setConfig($destination, $param, $valeur)
+    public function setConfig($destination, $param, $valeur): static
     {
         if (isset($this->destinations[$destination])) {
             $this->destinations[$destination]->setConfig($param, $valeur);
@@ -240,15 +266,12 @@ class Tlog implements LoggerInterface
 
     // Methodes d'accès aux traces
     // ---------------------------
-
     /**
      * Detailed debug information.
      *
      * @param string $message
-     *
-     * @return null
      */
-    public function debug($message, array $context = [])
+    public function debug($message, array $context = []): void
     {
         $this->log(self::DEBUG, $message, $context);
     }
@@ -258,10 +281,8 @@ class Tlog implements LoggerInterface
      *
      * ex : Tlog::getInstance()->addDebug($arg1, $arg2, $arg3);
      */
-    public function addDebug(): void
+    public function addDebug(...$args): void
     {
-        $args = \func_get_args();
-
         foreach ($args as $arg) {
             $this->log(self::DEBUG, $arg);
         }
@@ -273,10 +294,8 @@ class Tlog implements LoggerInterface
      * Example: User logs in, SQL logs.
      *
      * @param string $message
-     *
-     * @return null
      */
-    public function info($message, array $context = [])
+    public function info($message, array $context = []): void
     {
         $this->log(self::INFO, $message, $context);
     }
@@ -286,10 +305,8 @@ class Tlog implements LoggerInterface
      *
      * ex : Tlog::getInstance()->addInfo($arg1, $arg2, $arg3);
      */
-    public function addInfo(): void
+    public function addInfo(...$args): void
     {
-        $args = \func_get_args();
-
         foreach ($args as $arg) {
             $this->log(self::INFO, $arg);
         }
@@ -299,10 +316,8 @@ class Tlog implements LoggerInterface
      * Normal but significant events.
      *
      * @param string $message
-     *
-     * @return null
      */
-    public function notice($message, array $context = [])
+    public function notice($message, array $context = []): void
     {
         $this->log(self::NOTICE, $message, $context);
     }
@@ -312,10 +327,8 @@ class Tlog implements LoggerInterface
      *
      * ex : Tlog::getInstance()->addNotice($arg1, $arg2, $arg3);
      */
-    public function addNotice(): void
+    public function addNotice(...$args): void
     {
-        $args = \func_get_args();
-
         foreach ($args as $arg) {
             $this->log(self::NOTICE, $arg);
         }
@@ -328,10 +341,8 @@ class Tlog implements LoggerInterface
      * that are not necessarily wrong.
      *
      * @param string $message
-     *
-     * @return null
      */
-    public function warning($message, array $context = [])
+    public function warning($message, array $context = []): void
     {
         $this->log(self::WARNING, $message, $context);
     }
@@ -341,10 +352,8 @@ class Tlog implements LoggerInterface
      *
      * ex : Tlog::getInstance()->addWarning($arg1, $arg2, $arg3);
      */
-    public function addWarning(): void
+    public function addWarning(...$args): void
     {
-        $args = \func_get_args();
-
         foreach ($args as $arg) {
             $this->log(self::WARNING, $arg);
         }
@@ -355,10 +364,8 @@ class Tlog implements LoggerInterface
      * be logged and monitored.
      *
      * @param string $message
-     *
-     * @return null
      */
-    public function error($message, array $context = [])
+    public function error($message, array $context = []): void
     {
         $this->log(self::ERROR, $message, $context);
     }
@@ -368,10 +375,8 @@ class Tlog implements LoggerInterface
      *
      * ex : Tlog::getInstance()->addError($arg1, $arg2, $arg3);
      */
-    public function addError(): void
+    public function addError(...$args): void
     {
-        $args = \func_get_args();
-
         foreach ($args as $arg) {
             $this->log(self::ERROR, $arg);
         }
@@ -391,10 +396,8 @@ class Tlog implements LoggerInterface
      * Example: Application component unavailable, unexpected exception.
      *
      * @param string $message
-     *
-     * @return null
      */
-    public function critical($message, array $context = [])
+    public function critical($message, array $context = []): void
     {
         $this->log(self::CRITICAL, $message, $context);
     }
@@ -404,10 +407,8 @@ class Tlog implements LoggerInterface
      *
      * ex : Tlog::getInstance()->addCritical($arg1, $arg2, $arg3);
      */
-    public function addCritical(): void
+    public function addCritical(...$args): void
     {
-        $args = \func_get_args();
-
         foreach ($args as $arg) {
             $this->log(self::CRITICAL, $arg);
         }
@@ -428,10 +429,8 @@ class Tlog implements LoggerInterface
      * trigger the SMS alerts and wake you up.
      *
      * @param string $message
-     *
-     * @return null
      */
-    public function alert($message, array $context = [])
+    public function alert($message, array $context = []): void
     {
         $this->log(self::ALERT, $message, $context);
     }
@@ -441,10 +440,8 @@ class Tlog implements LoggerInterface
      *
      * ex : Tlog::getInstance()->addAlert($arg1, $arg2, $arg3);
      */
-    public function addAlert(): void
+    public function addAlert(...$args): void
     {
-        $args = \func_get_args();
-
         foreach ($args as $arg) {
             $this->log(self::ALERT, $arg);
         }
@@ -454,10 +451,8 @@ class Tlog implements LoggerInterface
      * System is unusable.
      *
      * @param string $message
-     *
-     * @return null
      */
-    public function emergency($message, array $context = [])
+    public function emergency($message, array $context = []): void
     {
         $this->log(self::EMERGENCY, $message, $context);
     }
@@ -467,10 +462,8 @@ class Tlog implements LoggerInterface
      *
      * ex : Tlog::getInstance()->addEmergency($arg1, $arg2, $arg3);
      */
-    public function addEmergency(): void
+    public function addEmergency(...$args): void
     {
-        $args = \func_get_args();
-
         foreach ($args as $arg) {
             $this->log(self::EMERGENCY, $arg);
         }
@@ -480,10 +473,8 @@ class Tlog implements LoggerInterface
      * Logs with an arbitrary level.
      *
      * @param string $message
-     *
-     * @return null
      */
-    public function log($level, $message, array $context = [])
+    public function log($level, $message, array $context = []): void
     {
         if ($this->level > $level || \array_key_exists($level, $this->levels) === false) {
             return;
@@ -526,14 +517,14 @@ class Tlog implements LoggerInterface
         }
     }
 
-    public function showRedirect($url)
+    public function showRedirect($url): bool
     {
         if ($this->level != self::MUET && $this->show_redirect) {
             echo '
 <html>
 <head><title>'.Translator::getInstance()->trans('Redirecting ...')."</title></head>
 <body>
-<a href=\"$url\">".Translator::getInstance()->trans('Redirecting to %url', ['%url' => $url]).'</a>
+<a href=\"{$url}\">".Translator::getInstance()->trans('Redirecting to %url', ['%url' => $url]).'</a>
 </body>
 </html>
 ';
@@ -548,10 +539,8 @@ class Tlog implements LoggerInterface
      * check if level is activated and control if current file is activated.
      *
      * @param int $level
-     *
-     * @return bool
      */
-    public function isActivated($level)
+    public function isActivated($level): bool
     {
         if ($this->level <= $level) {
             $origin = $this->findOrigin();
@@ -569,18 +558,17 @@ class Tlog implements LoggerInterface
     /**
      * check if $file is in authorized files.
      *
-     * @param string $file
-     *
-     * @return bool
      */
-    public function isActivedFile($file)
+    public function isActivedFile(string $file): bool
     {
-        return ($this->all_files || \in_array($file, $this->files)) && !\in_array("!$file", $this->files);
+        return ($this->all_files || \in_array($file, $this->files)) && !\in_array('!' . $file, $this->files);
     }
 
     /* -- Methodes privees ---------------------------------------- */
-
-    private function findOrigin()
+    /**
+     * @return mixed[]
+     */
+    private function findOrigin(): array
     {
         $origin = [];
 
@@ -595,12 +583,13 @@ class Tlog implements LoggerInterface
                     // we are sometimes in functions = no class available: avoid php warning here
                     $className = $hop['class'];
 
-                    if (!empty($className) && ($className == ltrim(self::class, '\\') || strtolower(get_parent_class($className)) == ltrim(self::class, '\\'))) {
+                    if (!empty($className) && ($className == ltrim(self::class, '\\') || strtolower(get_parent_class($className)) === ltrim(self::class, '\\'))) {
                         $origin['line'] = $hop['line'];
                         $origin['file'] = $hop['file'];
                         break;
                     }
                 }
+
                 $prevHop = $hop;
                 $hop = array_pop($trace);
             }
@@ -621,7 +610,7 @@ class Tlog implements LoggerInterface
         return $origin;
     }
 
-    protected function interpolate($message, array $context = [])
+    protected function interpolate($message, array $context = []): string
     {
         // build a replacement array with braces around the context keys
         $replace = [];
@@ -637,7 +626,7 @@ class Tlog implements LoggerInterface
     {
         $text = '';
 
-        if ($message instanceof \Exception) {
+        if ($message instanceof Exception) {
             $text = $message->getMessage()."\n".$message->getTraceAsString();
         } elseif (\is_scalar($message) === false) {
             $text = print_r($message, 1);
@@ -675,14 +664,14 @@ class Tlog implements LoggerInterface
      * @param type  $destinations
      * @param array $actives      array containing classes instanceof AbstractTlogDestination
      */
-    protected function loadDestinations(&$destinations, array $actives = null): void
+    protected function loadDestinations(array &$destinations, array $actives = null): void
     {
         foreach ($actives as $active) {
             if (class_exists($active)) {
                 $class = new $active();
 
                 if (!$class instanceof AbstractTlogDestination) {
-                    throw new \UnexpectedValueException($active." must extends Thelia\Tlog\AbstractTlogDestination");
+                    throw new UnexpectedValueException($active." must extends Thelia\Tlog\AbstractTlogDestination");
                 }
 
                 $destinations[$active] = $class;

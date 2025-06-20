@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\FeatureProduct;
 
 class FeatureProductDeleteEvent extends FeatureProductEvent
@@ -30,7 +31,7 @@ class FeatureProductDeleteEvent extends FeatureProductEvent
         return $this->product_id;
     }
 
-    public function setProductId($product_id)
+    public function setProductId($product_id): static
     {
         $this->product_id = $product_id;
 
@@ -42,7 +43,7 @@ class FeatureProductDeleteEvent extends FeatureProductEvent
         return $this->feature_id;
     }
 
-    public function setFeatureId($feature_id)
+    public function setFeatureId($feature_id): static
     {
         $this->feature_id = $feature_id;
 

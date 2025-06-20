@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\EventListener;
 
 use Symfony\Cmf\Component\Routing\ChainRouterInterface;
@@ -40,6 +41,7 @@ use Thelia\Exception\OrderException;
 class ViewListener implements EventSubscriberInterface
 {
     protected readonly Request $request;
+
     public const IGNORE_THELIA_VIEW = 'ignore_thelia_view';
 
     /**
@@ -94,10 +96,12 @@ class ViewListener implements EventSubscriberInterface
                     $response = new RedirectResponse($this->chainRouter->generate($e->orderDeliveryRoute, $e->arguments, Router::ABSOLUTE_URL));
                     break;
             }
-            if (null === $response) {
+
+            if (!$response instanceof RedirectResponse) {
                 throw $e;
             }
         }
+
         $event->setResponse($response);
     }
 
@@ -130,7 +134,7 @@ class ViewListener implements EventSubscriberInterface
         return $view;
     }
 
-    public function findViewId(Request $request, $view)
+    public function findViewId(Request $request, string $view)
     {
         if (!$viewId = $request->query->get($view.'_id')) {
             $viewId = 0;

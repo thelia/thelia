@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Image;
 
 use Imagine\Image\ImageInterface;
@@ -86,16 +87,16 @@ class ImageEvent extends CachedFileEvent
     /**
      * @return bool true if the required image is the original image (resize_mode and background_color are not significant)
      */
-    public function isOriginalImage()
+    public function isOriginalImage(): bool
     {
         return empty($this->width) && empty($this->height) /* && empty($this->resize_mode) && empty($this->background_color) not significant */
-        && empty($this->effects) && empty($this->rotation) && empty($this->quality);
+        && $this->effects === [] && empty($this->rotation) && empty($this->quality);
     }
 
     /**
      * @return string a hash identifiying the processing options
      */
-    public function getOptionsHash()
+    public function getOptionsHash(): string
     {
         return md5(
             $this->width.$this->height.$this->resize_mode.$this->background_color.implode(',', $this->effects)
@@ -108,7 +109,7 @@ class ImageEvent extends CachedFileEvent
         return $this->category;
     }
 
-    public function setCategory($category)
+    public function setCategory($category): static
     {
         $this->category = $category;
 
@@ -120,7 +121,7 @@ class ImageEvent extends CachedFileEvent
         return $this->width;
     }
 
-    public function setWidth($width)
+    public function setWidth($width): static
     {
         $this->width = $width;
 
@@ -132,7 +133,7 @@ class ImageEvent extends CachedFileEvent
         return $this->height;
     }
 
-    public function setHeight($height)
+    public function setHeight($height): static
     {
         $this->height = $height;
 
@@ -144,7 +145,7 @@ class ImageEvent extends CachedFileEvent
         return $this->resize_mode;
     }
 
-    public function setResizeMode($resize_mode)
+    public function setResizeMode($resize_mode): static
     {
         $this->resize_mode = $resize_mode;
 
@@ -156,7 +157,7 @@ class ImageEvent extends CachedFileEvent
         return $this->background_color;
     }
 
-    public function setBackgroundColor($background_color)
+    public function setBackgroundColor($background_color): static
     {
         $this->background_color = $background_color;
 
@@ -168,7 +169,7 @@ class ImageEvent extends CachedFileEvent
         return $this->effects;
     }
 
-    public function setEffects(array $effects)
+    public function setEffects(array $effects): static
     {
         $this->effects = $effects;
 
@@ -180,7 +181,7 @@ class ImageEvent extends CachedFileEvent
         return $this->rotation;
     }
 
-    public function setRotation($rotation)
+    public function setRotation($rotation): static
     {
         $this->rotation = $rotation;
 
@@ -192,7 +193,7 @@ class ImageEvent extends CachedFileEvent
         return $this->quality;
     }
 
-    public function setQuality($quality)
+    public function setQuality($quality): static
     {
         $this->quality = $quality;
 
@@ -204,7 +205,7 @@ class ImageEvent extends CachedFileEvent
         return $this->original_file_url;
     }
 
-    public function setOriginalFileUrl($original_file_url)
+    public function setOriginalFileUrl($original_file_url): static
     {
         $this->original_file_url = $original_file_url;
 
@@ -216,7 +217,7 @@ class ImageEvent extends CachedFileEvent
         return $this->cache_original_filepath;
     }
 
-    public function setCacheOriginalFilepath($cache_original_filepath)
+    public function setCacheOriginalFilepath($cache_original_filepath): static
     {
         $this->cache_original_filepath = $cache_original_filepath;
 
