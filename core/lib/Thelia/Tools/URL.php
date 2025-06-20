@@ -172,21 +172,21 @@ class URL
         if (null !== $parameters) {
             foreach ($parameters as $name => $value) {
                 // Remove this parameter from base URL to prevent duplicate parameters
-                $base = preg_replace('`([?&])'.preg_quote($name, '`').'=(?:[^&]*)(?:&|$)`', '$1', $base);
+                $base = preg_replace('`([?&])'.preg_quote($name, '`').'=(?:[^&]*)(?:&|$)`', '$1', (string) $base);
 
-                $queryString .= sprintf('%s=%s&', urlencode($name), urlencode($value));
+                $queryString .= sprintf('%s=%s&', urlencode($name), urlencode((string) $value));
             }
         }
 
         if ('' !== $queryString = rtrim($queryString, '&')) {
             // url could contain anchor
-            $pos = strrpos($base, '#');
+            $pos = strrpos((string) $base, '#');
             if ($pos !== false) {
-                $anchor = substr($base, $pos);
-                $base = substr($base, 0, $pos);
+                $anchor = substr((string) $base, $pos);
+                $base = substr((string) $base, 0, $pos);
             }
 
-            $base = rtrim($base, '?&');
+            $base = rtrim((string) $base, '?&');
 
             $sepChar = !str_contains($base, '?') ? '?' : '&';
 
@@ -307,16 +307,16 @@ class URL
                  '}', '\\', '|', ';', ':', '"', "'", '&#8216;', '&#8217;', '&#8220;', '&#8221;', '&#8211;', '&#8212;',
                  'â€”', 'â€“', ',', '<', '.', '>', '/', '?', ];
 
-        $clean = trim(str_replace($strip, '', strip_tags($string)));
+        $clean = trim(str_replace($strip, '', strip_tags((string) $string)));
 
         $clean = preg_replace('/\s+/', '-', $clean);
 
-        $clean = ($alphabetic_only) ? preg_replace('/[^a-zA-Z0-9]/', '', $clean) : $clean;
+        $clean = ($alphabetic_only) ? preg_replace('/[^a-zA-Z0-9]/', '', (string) $clean) : $clean;
 
         return ($force_lowercase) ?
              (\function_exists('mb_strtolower')) ?
-                 mb_strtolower($clean, 'UTF-8') :
-             strtolower($clean) :
+                 mb_strtolower((string) $clean, 'UTF-8') :
+             strtolower((string) $clean) :
              $clean;
     }
 
@@ -324,7 +324,7 @@ class URL
     {
         $pattern = sprintf(UrlValidator::PATTERN, implode('|', $protocols));
 
-        return (bool) preg_match($pattern, $url);
+        return (bool) preg_match($pattern, (string) $url);
     }
 
     /**

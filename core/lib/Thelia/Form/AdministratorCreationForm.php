@@ -34,7 +34,7 @@ class AdministratorCreationForm extends BaseForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                        [$this, 'verifyExistingLogin']),
+                        $this->verifyExistingLogin(...)),
                 ],
                 'label' => $this->translator->trans('Login name'),
                 'label_attr' => [
@@ -47,7 +47,7 @@ class AdministratorCreationForm extends BaseForm
                     new Constraints\NotBlank(),
                     new Constraints\Email(),
                     new Constraints\Callback(
-                        [$this, 'verifyExistingEmail']
+                        $this->verifyExistingEmail(...)
                     ),
                 ],
                 'label' => $this->translator->trans('Email address'),
@@ -86,7 +86,7 @@ class AdministratorCreationForm extends BaseForm
             ])
             ->add('password_confirm', PasswordType::class, [
                 'constraints' => [
-                    new Constraints\Callback([$this, 'verifyPasswordField']),
+                    new Constraints\Callback($this->verifyPasswordField(...)),
                 ],
                 'label' => $this->translator->trans('Password confirmation'),
                 'label_attr' => [
@@ -151,7 +151,7 @@ class AdministratorCreationForm extends BaseForm
 
         $minLength = ConfigQuery::getMinimuAdminPasswordLength();
 
-        if (\strlen($data['password']) < $minLength) {
+        if (\strlen((string) $data['password']) < $minLength) {
             $context->addViolation("password must be composed of at least $minLength characters");
         }
     }

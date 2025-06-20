@@ -29,7 +29,7 @@ trait CountryListValidationTrait
         $countryList = \is_array($value) ? $value : [$value];
 
         foreach ($countryList as $countryItem) {
-            $item = explode('-', $countryItem);
+            $item = explode('-', (string) $countryItem);
 
             if (\count($item) == 2) {
                 $country = CountryQuery::create()->findPk($item[0]);

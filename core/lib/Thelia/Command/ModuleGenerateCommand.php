@@ -104,7 +104,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
 
             $configContent = str_replace('%%CLASSNAME%%', $this->module, $configContent);
             $configContent = str_replace('%%NAMESPACE%%', $this->module, $configContent);
-            $configContent = str_replace('%%NAMESPACE_LOWER%%', strtolower($this->module), $configContent);
+            $configContent = str_replace('%%NAMESPACE_LOWER%%', strtolower((string) $this->module), $configContent);
 
             file_put_contents(
                 $filename,
@@ -132,7 +132,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                 $readmeContent = file_get_contents($skeletonDir.'Readme.md');
 
                 // generate title for readme
-                preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $this->module, $readmeTitle);
+                preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', (string) $this->module, $readmeTitle);
                 $composerFinalName = strtolower(implode('-', $readmeTitle[0]));
 
                 $readmeContent = str_replace('%%MODULENAME%%', $this->module, $readmeContent);
@@ -148,7 +148,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                 $composerContent = file_get_contents($skeletonDir.'composer.json');
 
                 // generate composer module name
-                preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $this->module, $composerName);
+                preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', (string) $this->module, $composerName);
 
                 $composerContent = str_replace('%%MODULENAME%%', $this->module, $composerContent);
                 $composerContent = str_replace('%%COMPOSERNAME%%', strtolower(implode('-', $composerName[0])), $composerContent);
@@ -174,7 +174,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
 
                 $classContent = str_replace('%%CLASSNAME%%', $this->module, $classContent);
                 $classContent = str_replace('%%NAMESPACE%%', $this->module, $classContent);
-                $classContent = str_replace('%%DOMAINNAME%%', strtolower($this->module), $classContent);
+                $classContent = str_replace('%%DOMAINNAME%%', strtolower((string) $this->module), $classContent);
 
                 file_put_contents($filename, $classContent);
             }
@@ -212,7 +212,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                 $routingContent = file_get_contents($skeletonDir.'routing.xml');
 
                 $routingContent = str_replace('%%NAMESPACE%%', $this->module, $routingContent);
-                $routingContent = str_replace('%%CLASSNAME_LOWER%%', strtolower($this->module), $routingContent);
+                $routingContent = str_replace('%%CLASSNAME_LOWER%%', strtolower((string) $this->module), $routingContent);
 
                 file_put_contents($filename, $routingContent);
             }

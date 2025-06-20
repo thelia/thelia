@@ -447,7 +447,7 @@ abstract class CouponAbstract implements CouponInterface
      */
     protected function getCouponFieldValue($fieldName, $data, $defaultValue = null)
     {
-        $couponSpecificData = json_decode($data[self::COUPON_DATASET_NAME], true);
+        $couponSpecificData = json_decode((string) $data[self::COUPON_DATASET_NAME], true);
         if (isset($couponSpecificData[$fieldName])) {
             return $this->checkCouponFieldValue(
                 $fieldName,

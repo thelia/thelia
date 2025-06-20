@@ -49,12 +49,12 @@ class IntToCombinedIntsListType extends BaseType
         if ($this->isValid($values)) {
             $return = [];
 
-            $values = preg_replace('#[\s]#', '', $values);
+            $values = preg_replace('#[\s]#', '', (string) $values);
             foreach (explode(',', $values) as $intToCombinedInts) {
                 $parts = explode(':', $intToCombinedInts);
 
                 $return[trim($parts[0])] = [
-                    'values' => preg_split("#(&|\|)#", preg_replace('#[\(\)]#', '', $parts[1])),
+                    'values' => preg_split("#(&|\|)#", (string) preg_replace('#[\(\)]#', '', $parts[1])),
                     'expression' => $parts[1],
                 ];
             }
@@ -68,7 +68,7 @@ class IntToCombinedIntsListType extends BaseType
     protected function checkLogicalFormat($string)
     {
         /* delete  all spaces and parentheses */
-        $noSpaceString = preg_replace('#[\s]#', '', $string);
+        $noSpaceString = preg_replace('#[\s]#', '', (string) $string);
         $noParentheseString = preg_replace('#[\(\)]#', '', $noSpaceString);
 
         if (!preg_match('#^([0-9]+([\&\|][0-9]+)*|\*)$#', $noParentheseString)) {

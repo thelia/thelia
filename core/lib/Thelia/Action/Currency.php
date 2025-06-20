@@ -54,7 +54,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
             ->setSymbol($event->getSymbol())
             ->setFormat($event->getFormat())
             ->setRate($event->getRate())
-            ->setCode(strtoupper($event->getCode()))
+            ->setCode(strtoupper((string) $event->getCode()))
             ->setByDefault($isDefault)
             ->save()
         ;
@@ -75,7 +75,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
                 ->setSymbol($event->getSymbol())
                 ->setFormat($event->getFormat())
                 ->setRate($event->getRate())
-                ->setCode(strtoupper($event->getCode()))
+                ->setCode(strtoupper((string) $event->getCode()))
 
                 ->save();
 

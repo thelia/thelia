@@ -30,7 +30,7 @@ class TaxRuleModificationForm extends TaxRuleCreationForm
                     'constraints' => [
                         new Constraints\NotBlank(),
                         new Constraints\Callback(
-                            [$this, 'verifyTaxRuleId']
+                            $this->verifyTaxRuleId(...)
                         ),
                     ],
             ])

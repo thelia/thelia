@@ -93,7 +93,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $subdir = $event->getCacheSubdirectory();
         $sourceFile = $event->getSourceFilepath();
 
-        $imageExt = pathinfo($sourceFile, \PATHINFO_EXTENSION);
+        $imageExt = pathinfo((string) $sourceFile, \PATHINFO_EXTENSION);
 
         if (null == $subdir || null == $sourceFile) {
             throw new \InvalidArgumentException('Cache sub-directory and source file path cannot be null');
@@ -127,12 +127,12 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
                 if ($mode == 'symlink') {
                     if (false === symlink($sourceFile, $originalImagePathInCache)) {
-                        throw new ImageException(sprintf('Failed to create symbolic link for %s in %s image cache directory', basename($sourceFile), $subdir));
+                        throw new ImageException(sprintf('Failed to create symbolic link for %s in %s image cache directory', basename((string) $sourceFile), $subdir));
                     }
                 } else {
                     // mode = 'copy'
                     if (false === @copy($sourceFile, $originalImagePathInCache)) {
-                        throw new ImageException(sprintf('Failed to copy %s in %s image cache directory', basename($sourceFile), $subdir));
+                        throw new ImageException(sprintf('Failed to copy %s in %s image cache directory', basename((string) $sourceFile), $subdir));
                     }
                 }
             }
@@ -197,7 +197,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $image = $imagine->open($sourceFile);
 
         if (!$image) {
-            throw new ImageException(sprintf('Source file %s cannot be opened.', basename($sourceFile)));
+            throw new ImageException(sprintf('Source file %s cannot be opened.', basename((string) $sourceFile)));
         }
 
         if (\function_exists('exif_read_data')) {
@@ -258,7 +258,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         // Flip
         // Process each effects
         foreach ($event->getEffects() as $effect) {
-            $effect = trim(strtolower($effect));
+            $effect = trim(strtolower((string) $effect));
 
             $params = explode(':', $effect);
 

@@ -90,7 +90,7 @@ class OrderFilter extends AbstractFilter
             // fallback to default direction
             $value = $defaultDirection;
         }
-        $value = strtoupper($value);
+        $value = strtoupper((string) $value);
         if (!\in_array($value, [self::DIRECTION_ASC, self::DIRECTION_DESC], true)) {
             return null;
         }

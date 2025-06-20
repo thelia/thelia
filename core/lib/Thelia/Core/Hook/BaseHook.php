@@ -106,7 +106,7 @@ abstract class BaseHook implements BaseHookInterface
     public function insertTemplate(HookRenderEvent $event, $code): void
     {
         if (\array_key_exists($code, $this->templates)) {
-            $templates = explode(';', $this->templates[$code]);
+            $templates = explode(';', (string) $this->templates[$code]);
 
             // Concatenate arguments and template variables,
             // giving the precedence to arguments.
@@ -434,7 +434,7 @@ abstract class BaseHook implements BaseHookInterface
      */
     protected function getTemplateParams($template)
     {
-        $templateParams = explode(':', $template);
+        $templateParams = explode(':', (string) $template);
 
         if (\count($templateParams) > 1) {
             $type = $templateParams[0];

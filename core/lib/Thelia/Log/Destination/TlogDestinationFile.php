@@ -39,7 +39,7 @@ class TlogDestinationFile extends AbstractTlogDestination
     {
         $filePath = $this->getConfig(self::VAR_PATH_FILE);
 
-        if (preg_match('/^[a-z]:\\\|^\//i', $filePath) === 0) {
+        if (preg_match('/^[a-z]:\\\|^\//i', (string) $filePath) === 0) {
             $filePath = THELIA_ROOT.$filePath;
         }
 
@@ -48,7 +48,7 @@ class TlogDestinationFile extends AbstractTlogDestination
 
     protected function getOpenMode()
     {
-        return strtolower($this->getConfig(self::VAR_MODE, self::VALEUR_MODE_DEFAULT)) == 'a' ? 'a' : 'w';
+        return strtolower((string) $this->getConfig(self::VAR_MODE, self::VALEUR_MODE_DEFAULT)) == 'a' ? 'a' : 'w';
     }
 
     public function configure(): void
@@ -65,7 +65,7 @@ class TlogDestinationFile extends AbstractTlogDestination
     {
         if (!empty($filePath)) {
             if (!is_file($filePath)) {
-                $dir = \dirname($filePath);
+                $dir = \dirname((string) $filePath);
                 if (!is_dir($dir)) {
                     mkdir($dir, 0777, true);
                 }

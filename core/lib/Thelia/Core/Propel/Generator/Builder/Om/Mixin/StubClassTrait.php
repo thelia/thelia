@@ -47,6 +47,6 @@ trait StubClassTrait
             );
         }
 
-        return rtrim($path, '/');
+        return rtrim((string) $path, '/');
     }
 }

@@ -42,7 +42,7 @@ class ImportForm extends BaseForm
                 'required' => true,
                 'constraints' => [
                     new Assert\Callback(
-                        [$this, 'checkLanguage']
+                        $this->checkLanguage(...)
                     ),
                 ],
             ])

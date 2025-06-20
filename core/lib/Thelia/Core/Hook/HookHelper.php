@@ -161,11 +161,11 @@ class HookHelper
             $ret['block'] = ($hook['name'] !== 'hook');
 
             $ret['code'] = $attributes['name'];
-            $params = explode('.', $attributes['name']);
+            $params = explode('.', (string) $attributes['name']);
 
             if (\count($params) != 2) {
                 // the hook does not respect the convention
-                if (!str_contains($attributes['name'], '$')) {
+                if (!str_contains((string) $attributes['name'], '$')) {
                     $ret['context'] = $attributes['name'];
                     $ret['type'] = '';
                 } else {

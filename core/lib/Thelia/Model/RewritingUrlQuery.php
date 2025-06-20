@@ -109,7 +109,7 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
 
     protected function retrieveLocale($viewLocale)
     {
-        if (\strlen($viewLocale) == 2) {
+        if (\strlen((string) $viewLocale) == 2) {
             if (null !== $lang = LangQuery::create()->findOneByCode($viewLocale)) {
                 $viewLocale = $lang->getLocale();
             }

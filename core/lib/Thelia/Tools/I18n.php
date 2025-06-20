@@ -72,7 +72,7 @@ class I18n
             foreach ($needed as $need) {
                 $method = sprintf('set%s', $need);
                 if (method_exists($i18n, $method)) {
-                    $i18n->$method('DEFAULT '.strtoupper($need));
+                    $i18n->$method('DEFAULT '.strtoupper((string) $need));
                 }
                 // @todo throw sg ?
             }
@@ -117,7 +117,7 @@ class I18n
      */
     public static function realEscape($str)
     {
-        $str = trim($str, "\"'");
+        $str = trim((string) $str, "\"'");
 
         $return = 'CONCAT(';
         $len = \strlen($str);

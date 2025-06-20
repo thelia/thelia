@@ -32,7 +32,7 @@ use Thelia\Model\MessageQuery;
  */
 class MailerFactory
 {
-    public function __construct(private ParserInterface $parser, private MailerInterface $mailer)
+    public function __construct(private readonly ParserInterface $parser, private readonly MailerInterface $mailer)
     {
     }
 

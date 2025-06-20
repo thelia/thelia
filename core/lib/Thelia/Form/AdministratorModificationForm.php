@@ -30,7 +30,7 @@ class AdministratorModificationForm extends AdministratorCreationForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                        [$this, 'verifyAdministratorId']
+                        $this->verifyAdministratorId(...)
                     ),
                 ],
                 'attr' => [
@@ -92,7 +92,7 @@ class AdministratorModificationForm extends AdministratorCreationForm
                 $context->addViolation(Translator::getInstance()->trans('password confirmation is not the same as password field'));
             }
 
-            if ($data['password'] !== '' && \strlen($data['password']) < 4) {
+            if ($data['password'] !== '' && \strlen((string) $data['password']) < 4) {
                 $context->addViolation(Translator::getInstance()->trans('password must be composed of at least 4 characters'));
             }
         }

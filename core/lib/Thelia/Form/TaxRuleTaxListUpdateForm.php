@@ -35,7 +35,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
                     'constraints' => [
                         new Constraints\NotBlank(),
                         new Constraints\Callback(
-                            [$this, 'verifyTaxRuleId']
+                            $this->verifyTaxRuleId(...)
                         ),
                     ],
                 ]
@@ -50,7 +50,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
                     ],
                     'constraints' => [
                         new Constraints\Callback(
-                            [$this, 'verifyTaxList']
+                            $this->verifyTaxList(...)
                         ),
                     ],
                 ]
@@ -65,7 +65,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
                     ],
                     'constraints' => [
                         new Constraints\Callback(
-                            [$this, 'verifyCountryList']
+                            $this->verifyCountryList(...)
                         ),
                     ],
                 ]
@@ -80,7 +80,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
                     ],
                     'constraints' => [
                         new Constraints\Callback(
-                            [$this, 'verifyCountryList']
+                            $this->verifyCountryList(...)
                         ),
                     ],
                 ]
@@ -111,7 +111,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
             $context->addViolation(Translator::getInstance()->trans('Tax list is not valid JSON'));
         }
 
-        $taxList = json_decode($value, true);
+        $taxList = json_decode((string) $value, true);
 
         /* check we have 2 level max */
 
@@ -144,7 +144,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
             $context->addViolation(Translator::getInstance()->trans('Country list is not valid JSON'));
         }
 
-        $countryList = json_decode($value, true);
+        $countryList = json_decode((string) $value, true);
 
         foreach ($countryList as $countryItem) {
             if (\is_array($countryItem)) {

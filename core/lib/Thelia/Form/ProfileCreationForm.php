@@ -38,7 +38,7 @@ class ProfileCreationForm extends BaseForm
                 'constraints' => [
                     new NotBlank(),
                     new Constraints\Callback(
-                        [$this, 'verifyCode']
+                        $this->verifyCode(...)
                     ),
                 ],
                 'label' => Translator::getInstance()->trans('Profile Code'),

@@ -264,7 +264,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     $price,
                     $taxState
                 );
-            } catch (TaxEngineException $e) {
+            } catch (TaxEngineException) {
                 $taxedPrice = null;
             }
             $promoPrice = $product->getVirtualColumn('promo_price');
@@ -482,7 +482,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 if ($sqlWhereString == '*') {
                     $sqlWhereString = 'NOT ISNULL(`fa_'.$feature.'`.ID)';
                 } else {
-                    $sqlWhereString = preg_replace('#([0-9]+)#', 'NOT ISNULL(`fa_'.$feature.'_\1`.ID)', $sqlWhereString);
+                    $sqlWhereString = preg_replace('#([0-9]+)#', 'NOT ISNULL(`fa_'.$feature.'_\1`.ID)', (string) $sqlWhereString);
                     $sqlWhereString = str_replace('&', ' AND ', $sqlWhereString);
                     $sqlWhereString = str_replace('|', ' OR ', $sqlWhereString);
                 }
@@ -508,7 +508,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     $featureAlias = 'fv_'.$feature;
                     if ($feature_value != '*') {
                         // Generate a unique alias for this value
-                        $featureAlias .= '_'.hash('crc32', $feature_value).'_'.preg_replace('/[^[:alnum:]_]/', '_', $feature_value);
+                        $featureAlias .= '_'.hash('crc32', (string) $feature_value).'_'.preg_replace('/[^[:alnum:]_]/', '_', (string) $feature_value);
                     }
 
                     $search->joinFeatureProduct($featureAlias, Criteria::LEFT_JOIN)

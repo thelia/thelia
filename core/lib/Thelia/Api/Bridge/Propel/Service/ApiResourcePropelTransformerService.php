@@ -225,9 +225,9 @@ readonly class ApiResourcePropelTransformerService
             foreach ($compositeIdentifiers as $compositeIdentifier) {
                 if ($previousPropelModel) {
                     $reflectorPreviousPropelModel = new \ReflectionClass($previousPropelModel::class);
-                    if (ucfirst($compositeIdentifier) === $reflectorPreviousPropelModel->getShortName()) {
+                    if (ucfirst((string) $compositeIdentifier) === $reflectorPreviousPropelModel->getShortName()) {
                         $id = $previousPropelModel->getId();
-                        $setter = 'set'.ucfirst($compositeIdentifier).'Id';
+                        $setter = 'set'.ucfirst((string) $compositeIdentifier).'Id';
                         $propelModel->$setter($id);
 
                         // This is a fix related to Propel. It enables database persistence of my entity in its child collections.
@@ -652,7 +652,7 @@ readonly class ApiResourcePropelTransformerService
             $uriVariables = [];
             foreach ($compositeIdentifiers as $compositeIdentifier) {
                 if ($reflector->hasProperty($compositeIdentifier) && $reflector->getProperty($compositeIdentifier)->isInitialized($data)) {
-                    $getter = 'get'.ucfirst($compositeIdentifier);
+                    $getter = 'get'.ucfirst((string) $compositeIdentifier);
                     if (method_exists($data, $getter)) {
                         $getterId = 'getId';
                         $uriVariables[$compositeIdentifier] = $data->$getter()->$getterId();
@@ -660,7 +660,7 @@ readonly class ApiResourcePropelTransformerService
                 }
                 if ($previousPropelModel) {
                     $previousPropelModelRefector = new \ReflectionClass($previousPropelModel::class);
-                    if (ucfirst($compositeIdentifier) === $previousPropelModelRefector->getShortName()) {
+                    if (ucfirst((string) $compositeIdentifier) === $previousPropelModelRefector->getShortName()) {
                         if (method_exists($previousPropelModel, 'getId')) {
                             $uriVariables[$compositeIdentifier] = $previousPropelModel->getId();
                         }
@@ -688,12 +688,12 @@ readonly class ApiResourcePropelTransformerService
                 $value = $uriVariables[$field];
             }
 
-            $filterName = 'filterBy'.ucfirst($field).'Id';
+            $filterName = 'filterBy'.ucfirst((string) $field).'Id';
             if (null === $filterMethod && method_exists($query, $filterName)) {
                 $filterMethod = $filterName;
             }
 
-            $filterName = 'filterBy'.ucfirst($field);
+            $filterName = 'filterBy'.ucfirst((string) $field);
             if (null === $filterMethod && method_exists($query, $filterName)) {
                 $filterMethod = $filterName;
             }

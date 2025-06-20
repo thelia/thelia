@@ -77,7 +77,7 @@ class ConfigStoreForm extends BaseForm
                     'constraints' => [
                         new Constraints\NotBlank(),
                         new Constraints\Callback(
-                            [$this, 'checkEmailList']
+                            $this->checkEmailList(...)
                         ),
                     ],
                     'label' => $tr->trans('Email addresses of notification recipients'),
@@ -253,7 +253,7 @@ class ConfigStoreForm extends BaseForm
 
     public function checkEmailList($value, ExecutionContextInterface $context): void
     {
-        $list = preg_split('/[,;]/', $value);
+        $list = preg_split('/[,;]/', (string) $value);
 
         $emailValidator = new Constraints\Email();
 

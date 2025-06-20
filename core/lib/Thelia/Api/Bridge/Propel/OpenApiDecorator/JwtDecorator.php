@@ -25,7 +25,7 @@ class JwtDecorator implements OpenApiFactoryInterface
 {
     public function __construct(
         #[AutowireDecorated]
-        private OpenApiFactoryInterface $decorated
+        private readonly OpenApiFactoryInterface $decorated
     ) {
     }
 

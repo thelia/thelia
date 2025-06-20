@@ -31,8 +31,8 @@ use Thelia\Module\Exception\DeliveryException;
 class DeliveryModuleApiService
 {
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private ContainerInterface $container
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly ContainerInterface $container
     ) {
     }
 

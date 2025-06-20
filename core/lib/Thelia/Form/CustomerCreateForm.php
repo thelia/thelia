@@ -46,7 +46,7 @@ class CustomerCreateForm extends AddressCreateForm
                     new Constraints\NotBlank(),
                     new Constraints\Email(),
                     new Constraints\Callback(
-                        [$this, 'verifyExistingEmail']
+                        $this->verifyExistingEmail(...)
                     ),
                 ],
                 'label' => Translator::getInstance()->trans('Email Address'),
@@ -69,7 +69,7 @@ class CustomerCreateForm extends AddressCreateForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Length(['min' => ConfigQuery::read('password.length', 4)]),
-                    new Constraints\Callback([$this, 'verifyPasswordField']),
+                    new Constraints\Callback($this->verifyPasswordField(...)),
                 ],
                 'label' => Translator::getInstance()->trans('Password confirmation'),
                 'label_attr' => [
@@ -99,7 +99,7 @@ class CustomerCreateForm extends AddressCreateForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Email(),
-                    new Constraints\Callback([$this, 'verifyEmailField']),
+                    new Constraints\Callback($this->verifyEmailField(...)),
                 ],
                 'label' => Translator::getInstance()->trans('Confirm Email Address'),
                 'label_attr' => [

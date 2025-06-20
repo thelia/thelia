@@ -60,7 +60,7 @@ class IntToCombinedStringsListType extends BaseType
         if ($this->isValid($values)) {
             $return = [];
 
-            foreach (preg_split('/(?<!\\\),/', $values) as $intToCombinedStrings) {
+            foreach (preg_split('/(?<!\\\),/', (string) $values) as $intToCombinedStrings) {
                 $parts = preg_split('/(?<!\\\):/', $intToCombinedStrings);
 
                 $return[trim($parts[0])] = [
@@ -68,7 +68,7 @@ class IntToCombinedStringsListType extends BaseType
                         fn($item) => trim(self::unescape($item)),
                         preg_split(
                             '#(?<!\\\)[&|]#',
-                            preg_replace(
+                            (string) preg_replace(
                                 '#(?<!\\\)[\(\)]#',
                                 '',
                                 $parts[1]
@@ -93,7 +93,7 @@ class IntToCombinedStringsListType extends BaseType
      */
     public static function escape($string)
     {
-        return preg_replace('/([,\:\(\)\|\&])/', '\\\$1', $string);
+        return preg_replace('/([,\:\(\)\|\&])/', '\\\$1', (string) $string);
     }
 
     /**
@@ -103,13 +103,13 @@ class IntToCombinedStringsListType extends BaseType
      */
     public static function unescape($string)
     {
-        return preg_replace('/\\\([,\:\(\)\|\&])/', '\1', $string);
+        return preg_replace('/\\\([,\:\(\)\|\&])/', '\1', (string) $string);
     }
 
     protected function checkLogicalFormat($string)
     {
         // Delete escaped characters
-        $string = preg_replace('/\\\[,\:\(\)\|\&]/', '', $string);
+        $string = preg_replace('/\\\[,\:\(\)\|\&]/', '', (string) $string);
 
         /* delete  all spaces and parentheses */
         $noSpaceString = preg_replace('#[\s]#', '', $string);

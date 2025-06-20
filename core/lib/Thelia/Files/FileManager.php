@@ -207,7 +207,7 @@ class FileManager
      */
     public function sanitizeFileName($string)
     {
-        return strtolower(preg_replace('/[^a-zA-Z0-9-_\.]/', '', $string));
+        return strtolower((string) preg_replace('/[^a-zA-Z0-9-_\.]/', '', $string));
     }
 
     /**

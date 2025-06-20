@@ -25,7 +25,7 @@ use Thelia\Core\Template\TemplateDefinition;
 #[AutoconfigureTag('thelia.parser.asset')]
 class ParserAssetResolverFallback implements AssetResolverInterface
 {
-    private ParserInterface $parser;
+    private readonly ParserInterface $parser;
 
     /**
      * Generate an asset URL.
@@ -67,7 +67,7 @@ class ParserAssetResolverFallback implements AssetResolverInterface
      *
      * @return mixed the path to directory containing the file, or null if the file doesn't exists
      */
-    public function resolveAssetSourcePath($source, $templateName, $fileName, ParserInterface $parserInterface)
+    public function resolveAssetSourcePath($source, $templateName, $fileName, ParserInterface $parserInterface): never
     {
         throw new \RuntimeException('if you want to use a parser, please register one');
     }
@@ -95,7 +95,7 @@ class ParserAssetResolverFallback implements AssetResolverInterface
         $fileName,
         ParserInterface $parserInterface,
         TemplateDefinition &$templateDefinition
-    ) {
+    ): never {
         throw new \RuntimeException('if you want to use a parser, please register one');
     }
 

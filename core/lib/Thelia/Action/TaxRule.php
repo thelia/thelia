@@ -112,7 +112,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
         } else {
             $obj = \is_array($obj)
                 ? $obj
-                : json_decode($obj, true);
+                : json_decode((string) $obj, true);
         }
 
         return $obj;

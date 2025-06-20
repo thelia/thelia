@@ -27,7 +27,7 @@ class ConfigCreationForm extends BaseForm
             ->add('name', TextType::class, [
                 'constraints' => [
                     new Constraints\NotBlank(),
-                    new Constraints\Callback([$this, 'checkDuplicateName']),
+                    new Constraints\Callback($this->checkDuplicateName(...)),
                 ],
                 'label' => Translator::getInstance()->trans('Name *'),
                 'label_attr' => [

@@ -237,7 +237,7 @@ class AreaController extends AbstractCrudController
                     AccessManager::UPDATE,
                     sprintf(
                         '%s %s (ID %s) modified, new country added',
-                        ucfirst($this->objectName),
+                        ucfirst((string) $this->objectName),
                         $this->getObjectLabel($changedObject),
                         $this->getObjectId($changedObject)
                     ),
@@ -284,7 +284,7 @@ class AreaController extends AbstractCrudController
             $area = $this->findAreaOrFail($form->get('area_id')->getData());
 
             foreach ($data['country_id'] as $countryId) {
-                $country = explode('-', $countryId);
+                $country = explode('-', (string) $countryId);
                 $this->removeOneCountryFromArea($eventDispatcher, $area, $country[0], $country[1]);
             }
 
@@ -324,7 +324,7 @@ class AreaController extends AbstractCrudController
                 AccessManager::UPDATE,
                 sprintf(
                     '%s %s (ID %s) removed country ID %s from shipping zone ID %s',
-                    ucfirst($this->objectName),
+                    ucfirst((string) $this->objectName),
                     $this->getObjectLabel($changedObject),
                     $this->getObjectId($changedObject),
                     $countryId,

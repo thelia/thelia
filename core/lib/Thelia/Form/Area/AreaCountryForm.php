@@ -51,7 +51,7 @@ class AreaCountryForm extends BaseForm
                     'required' => true,
                     'constraints' => [
                         new NotBlank(),
-                        new Callback([$this, 'verifyCountryList']),
+                        new Callback($this->verifyCountryList(...)),
                     ],
                     'allow_add' => true,
                     'allow_delete' => true,

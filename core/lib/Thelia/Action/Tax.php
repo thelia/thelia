@@ -23,7 +23,7 @@ use Thelia\Model\TaxQuery;
 
 class Tax extends BaseAction implements EventSubscriberInterface
 {
-    private ServiceLocator $taxTypeLocator;
+    private readonly ServiceLocator $taxTypeLocator;
 
     public function __construct(
         #[TaggedLocator('thelia.taxType')] ServiceLocator $taxTypeLocator

@@ -56,7 +56,7 @@ return static function (ContainerConfigurator $configurator): void {
             $dsn = 'smtp://';
 
             if (ConfigQuery::getSmtpUsername()) {
-                $dsn .= urlencode(ConfigQuery::getSmtpUsername()).':'.urlencode(ConfigQuery::getSmtpPassword()).'@';
+                $dsn .= urlencode((string) ConfigQuery::getSmtpUsername()).':'.urlencode((string) ConfigQuery::getSmtpPassword()).'@';
             }
 
             // Escape "%" added by urlencode

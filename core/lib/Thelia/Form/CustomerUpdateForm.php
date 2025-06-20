@@ -77,7 +77,7 @@ class CustomerUpdateForm extends BaseForm
             ->add('email_confirm', EmailType::class, [
                 'constraints' => [
                     new Constraints\Email(),
-                    new Constraints\Callback([$this, 'verifyEmailField']),
+                    new Constraints\Callback($this->verifyEmailField(...)),
                 ],
                 'label' => Translator::getInstance()->trans('Confirm Email address'),
                 'label_attr' => [
@@ -133,7 +133,7 @@ class CustomerUpdateForm extends BaseForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                        [$this, 'verifyZipCode']),
+                        $this->verifyZipCode(...)),
                 ],
                 'label' => Translator::getInstance()->trans('Zip code'),
                 'label_attr' => [
@@ -162,7 +162,7 @@ class CustomerUpdateForm extends BaseForm
                 'required' => false,
                 'constraints' => [
                     new Constraints\Callback(
-                        [$this, 'verifyState']
+                        $this->verifyState(...)
                     ),
                 ],
                 'label' => Translator::getInstance()->trans('State *'),

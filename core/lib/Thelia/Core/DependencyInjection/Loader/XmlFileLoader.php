@@ -622,7 +622,7 @@ class XmlFileLoader extends FileLoader
     protected function parseFile($file)
     {
         try {
-            $dom = XmlUtils::loadFile($file, [$this, 'validateSchema']);
+            $dom = XmlUtils::loadFile($file, $this->validateSchema(...));
         } catch (\InvalidArgumentException $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
@@ -712,7 +712,7 @@ EOF
 
             // parameter keys are case insensitive
             if ('parameter' == $name && $lowercase) {
-                $key = strtolower($key);
+                $key = strtolower((string) $key);
             }
 
             // this is used by DefinitionDecorator to overwrite a specific

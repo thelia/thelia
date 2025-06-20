@@ -73,7 +73,7 @@ readonly class FilterService
         $tfilters = $request->get('tfilters', []);
         $categoryDepth = $request->get(CategoryFilter::CATEGORY_DEPTH_NAME, null);
         $pathInfo = $request->getPathInfo();
-        $segments = explode('/', $pathInfo);
+        $segments = explode('/', (string) $pathInfo);
         $resource = end($segments);
 
         return $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, query: $query, categoryDepth: $categoryDepth);
@@ -84,7 +84,7 @@ readonly class FilterService
         $tfilters = $context['filters']['tfilters'] ?? [];
         $categoryDepth = $context['filters'][CategoryFilter::CATEGORY_DEPTH_NAME] ?? null;
         $pathInfo = $context['path_info'];
-        $segments = explode('/', $pathInfo);
+        $segments = explode('/', (string) $pathInfo);
         $resource = end($segments);
 
         return $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, query: $query, categoryDepth: $categoryDepth);

@@ -56,7 +56,7 @@ class CartAdd extends BaseForm
             ->add('product', TextType::class, [
                 'constraints' => [
                     new Constraints\NotBlank(),
-                    new Constraints\Callback([$this, 'checkProduct']),
+                    new Constraints\Callback($this->checkProduct(...)),
                 ],
                 'label' => 'product',
                 'label_attr' => [
@@ -66,14 +66,14 @@ class CartAdd extends BaseForm
             ->add('product_sale_elements_id', TextType::class, [
                 'constraints' => [
                     new Constraints\NotBlank(),
-                    new Constraints\Callback([$this, 'checkStockAvailability']),
+                    new Constraints\Callback($this->checkStockAvailability(...)),
                 ],
                 'required' => true,
             ])
             ->add('quantity', NumberType::class, [
                 'constraints' => [
                     new Constraints\NotBlank(),
-                    new Constraints\Callback([$this, 'checkStock']),
+                    new Constraints\Callback($this->checkStock(...)),
                     new Constraints\GreaterThanOrEqual([
                         'value' => 0,
                     ]),

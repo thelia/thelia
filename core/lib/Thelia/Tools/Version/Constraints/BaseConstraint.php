@@ -39,9 +39,9 @@ abstract class BaseConstraint implements ConstraintInterface
 
     protected function normalizePrecision($version, $changeExpression = true)
     {
-        $expressionElements = preg_split('/[\.\-]/', $this->expression);
+        $expressionElements = preg_split('/[\.\-]/', (string) $this->expression);
         // cleaning alpha RC beta
-        $version = preg_replace('/\-.*$/', '', $version);
+        $version = preg_replace('/\-.*$/', '', (string) $version);
         $versionElements = preg_split('/\./', $version);
 
         if (\count($expressionElements) < \count($versionElements)) {

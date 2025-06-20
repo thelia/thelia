@@ -34,10 +34,10 @@ use Thelia\TaxEngine\TaxEngine;
 class CartNormalizer extends AbstractItemNormalizer
 {
     public function __construct(
-        private TaxEngine $taxEngine,
-        private Session $session,
-        private RequestStack $requestStack,
-        private CartService $cartService,
+        private readonly TaxEngine $taxEngine,
+        private readonly Session $session,
+        private readonly RequestStack $requestStack,
+        private readonly CartService $cartService,
         PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, LegacyIriConverterInterface|IriConverterInterface $iriConverter, LegacyResourceClassResolverInterface|ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker);

@@ -115,7 +115,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
             $baseUrl = $lang->getUrl();
         }
 
-        $baseUrl = trim($baseUrl);
+        $baseUrl = trim((string) $baseUrl);
 
         if (empty($baseUrl)) {
             $baseUrl = ConfigQuery::read('url_site');

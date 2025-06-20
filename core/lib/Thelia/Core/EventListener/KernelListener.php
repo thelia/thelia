@@ -77,7 +77,7 @@ class KernelListener implements EventSubscriberInterface
         $domainUrl = $request->getSession()->getLang()->getUrl();
 
         // if lang domain is different from current domain, redirect to the proper one
-        if (!empty($domainUrl) && rtrim($domainUrl, '/') !== $request->getSchemeAndHttpHost()) {
+        if (!empty($domainUrl) && rtrim((string) $domainUrl, '/') !== $request->getSchemeAndHttpHost()) {
             $langs = LangQuery::create()
                 ->filterByActive(true)
                 ->filterByVisible(true)
@@ -85,7 +85,7 @@ class KernelListener implements EventSubscriberInterface
 
             foreach ($langs as $lang) {
                 $domainUrl = $lang->getUrl();
-                if (rtrim($domainUrl, '/') === $request->getSchemeAndHttpHost()) {
+                if (rtrim((string) $domainUrl, '/') === $request->getSchemeAndHttpHost()) {
                     $request->getSession()->setLang($lang);
                     break;
                 }
@@ -174,7 +174,7 @@ class KernelListener implements EventSubscriberInterface
 
                 if (!empty($domainUrl)) {
                     // if lang domain is different from current domain, redirect to the proper one
-                    if (rtrim($domainUrl, '/') != $request->getSchemeAndHttpHost()) {
+                    if (rtrim((string) $domainUrl, '/') != $request->getSchemeAndHttpHost()) {
                         return new RedirectResponse($domainUrl, 301);
                     }
 

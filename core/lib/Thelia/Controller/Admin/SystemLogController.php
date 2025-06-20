@@ -36,7 +36,7 @@ class SystemLogController extends BaseAdminController
             $this->loadDefinedDestinations($dir, $destinations);
         }
 
-        $active_destinations = explode(';', ConfigQuery::read(Tlog::VAR_DESTINATIONS, Tlog::DEFAUT_DESTINATIONS));
+        $active_destinations = explode(';', (string) ConfigQuery::read(Tlog::VAR_DESTINATIONS, Tlog::DEFAUT_DESTINATIONS));
 
         return $this->render(
             'system-logs',

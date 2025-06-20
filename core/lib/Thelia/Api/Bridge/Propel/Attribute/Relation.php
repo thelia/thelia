@@ -16,9 +16,9 @@ namespace Thelia\Api\Bridge\Propel\Attribute;
 class Relation
 {
     public function __construct(
-        private string $targetResource,
-        private ?string $relationAlias = null,
-        private ?array $propertyGroups = []
+        private readonly string $targetResource,
+        private readonly ?string $relationAlias = null,
+        private readonly ?array $propertyGroups = []
     ) {
     }
 }

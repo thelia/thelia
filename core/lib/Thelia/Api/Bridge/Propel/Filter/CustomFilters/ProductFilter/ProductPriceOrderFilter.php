@@ -31,7 +31,7 @@ class ProductPriceOrderFilter extends AbstractFilter
             return;
         }
         $priceOrder = $value;
-        $priceOrder = strtoupper($priceOrder);
+        $priceOrder = strtoupper((string) $priceOrder);
         if (!$query instanceof ProductQuery || !\in_array($priceOrder, [Criteria::DESC, Criteria::ASC], true)) {
             return;
         }

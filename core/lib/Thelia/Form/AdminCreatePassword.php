@@ -36,7 +36,7 @@ class AdminCreatePassword extends BruteforceForm
             ->add('password_confirm', PasswordType::class, [
                 'constraints' => [
                     new Callback(
-                        [$this, 'verifyPasswordField']
+                        $this->verifyPasswordField(...)
                     ),
                 ],
                 'label' => $this->translator->trans('Password confirmation'),
@@ -64,7 +64,7 @@ class AdminCreatePassword extends BruteforceForm
 
         $minLength = ConfigQuery::getMinimuAdminPasswordLength();
 
-        if (\strlen($data['password']) < $minLength) {
+        if (\strlen((string) $data['password']) < $minLength) {
             $context->addViolation("password must be composed of at least $minLength characters");
         }
     }

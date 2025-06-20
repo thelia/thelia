@@ -36,7 +36,7 @@ class OrderPayment extends FirewallForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                        [$this, 'verifyInvoiceAddress']
+                        $this->verifyInvoiceAddress(...)
                     ),
                 ],
             ])
@@ -45,7 +45,7 @@ class OrderPayment extends FirewallForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                        [$this, 'verifyPaymentModule']
+                        $this->verifyPaymentModule(...)
                     ),
                 ],
             ])

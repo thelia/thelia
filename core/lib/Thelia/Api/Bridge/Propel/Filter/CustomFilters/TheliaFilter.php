@@ -19,7 +19,7 @@ use Thelia\Api\Bridge\Propel\Filter\AbstractFilter;
 
 class TheliaFilter extends AbstractFilter
 {
-    public function __construct(private readonly FilterService $filterService, private RequestStack $requestStack)
+    public function __construct(private readonly FilterService $filterService, private readonly RequestStack $requestStack)
     {
         parent::__construct();
     }

@@ -52,7 +52,7 @@ class AreaDeleteCountryForm extends BaseForm
                     'entry_type' => TextType::class,
                     'constraints' => [
                         new NotBlank(),
-                        new Callback([$this, 'verifyCountryList']),
+                        new Callback($this->verifyCountryList(...)),
                     ],
                     'allow_add' => true,
                     'allow_delete' => true,

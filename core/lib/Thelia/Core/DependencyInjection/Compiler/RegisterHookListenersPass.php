@@ -89,7 +89,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
                 $moduleProperty = $properties['module'];
                 if ($moduleProperty instanceof Definition) {
-                    $moduleCode = explode('\\', $moduleProperty->getClass())[1];
+                    $moduleCode = explode('\\', (string) $moduleProperty->getClass())[1];
                 }
                 if ($moduleProperty instanceof Reference) {
                     $moduleCode = explode('.', $moduleProperty)[1];
@@ -423,14 +423,14 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
                 return $event;
             }
-            $callback = (fn($matches) => strtoupper($matches[0]));
+            $callback = (fn($matches) => strtoupper((string) $matches[0]));
             $event['method'] = 'on'.preg_replace_callback(
                 [
                     '/(?<=\b)[a-z]/i',
                     '/[^a-z0-9]/i',
                 ],
                 $callback,
-                $event['event']
+                (string) $event['event']
             );
             $event['method'] = preg_replace('/[^a-z0-9]/i', '', $event['method']);
 

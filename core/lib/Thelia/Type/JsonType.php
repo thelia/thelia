@@ -24,14 +24,14 @@ class JsonType extends BaseType
 
     public function isValid($value)
     {
-        json_decode($value, true);
+        json_decode((string) $value, true);
 
         return json_last_error() == \JSON_ERROR_NONE;
     }
 
     public function getFormattedValue($value)
     {
-        return $this->isValid($value) ? json_decode($value, true) : null;
+        return $this->isValid($value) ? json_decode((string) $value, true) : null;
     }
 
     public function getFormOptions()

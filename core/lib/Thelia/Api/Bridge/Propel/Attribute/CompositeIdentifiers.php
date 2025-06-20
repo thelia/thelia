@@ -16,7 +16,7 @@ namespace Thelia\Api\Bridge\Propel\Attribute;
 class CompositeIdentifiers
 {
     public function __construct(
-        private array $keys
+        private readonly array $keys
     ) {
     }
 }

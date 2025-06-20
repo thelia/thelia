@@ -707,7 +707,7 @@ class CouponController extends BaseAdminController
     {
         // Get the form field values
         $data = $form->getData();
-        $serviceId = urldecode($data['type']);
+        $serviceId = urldecode((string) $data['type']);
 
         /** @var CouponInterface $coupon */
         $coupon = $this->container->get($serviceId);

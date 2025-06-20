@@ -32,7 +32,7 @@ trait AddressCountryValidationTrait
             if ($country->getNeedZipCode()) {
                 $zipCodeRegExp = $country->getZipCodeRE();
                 if (null !== $zipCodeRegExp) {
-                    if (!preg_match($zipCodeRegExp, $data['zipcode'])) {
+                    if (!preg_match($zipCodeRegExp, (string) $data['zipcode'])) {
                         $context->addViolation(
                             Translator::getInstance()->trans(
                                 'This zip code should respect the following format : %format.',
@@ -76,7 +76,7 @@ trait AddressCountryValidationTrait
 
         $re = '/\D+/';
 
-        if (!preg_match($re, $data['city'], $matches, \PREG_OFFSET_CAPTURE, 0)) {
+        if (!preg_match($re, (string) $data['city'], $matches, \PREG_OFFSET_CAPTURE, 0)) {
             $context->addViolation(
                 Translator::getInstance()->trans(
                     'Your city can only contains letters.'

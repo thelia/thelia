@@ -169,7 +169,7 @@ class ConfigQuery extends BaseConfigQuery
     {
         $contactEmail = self::getStoreEmail();
 
-        $list = preg_split('/[,;]/', self::read('store_notification_emails', $contactEmail));
+        $list = preg_split('/[,;]/', (string) self::read('store_notification_emails', $contactEmail));
 
         $arr = [];
 

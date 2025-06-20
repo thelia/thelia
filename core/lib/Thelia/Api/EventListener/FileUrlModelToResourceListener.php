@@ -24,7 +24,7 @@ use Thelia\Model\ConfigQuery;
 class FileUrlModelToResourceListener implements EventSubscriberInterface
 {
     public function __construct(
-        private EventDispatcherInterface $eventDispatcher
+        private readonly EventDispatcherInterface $eventDispatcher
     ) {
     }
 

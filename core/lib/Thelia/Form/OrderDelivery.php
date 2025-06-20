@@ -35,7 +35,7 @@ class OrderDelivery extends BaseForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                        [$this, 'verifyDeliveryAddress']
+                        $this->verifyDeliveryAddress(...)
                     ),
                 ],
             ])
@@ -44,7 +44,7 @@ class OrderDelivery extends BaseForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                        [$this, 'verifyDeliveryModule']
+                        $this->verifyDeliveryModule(...)
                     ),
                 ],
             ]);

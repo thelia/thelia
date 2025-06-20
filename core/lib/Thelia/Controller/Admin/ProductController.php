@@ -980,7 +980,7 @@ class ProductController extends AbstractSeoCrudController
                 ->findPk($attributeAv->getAttributeId());
 
             // Check if this attribute is not already present
-            $combinationArray = explode(',', $combination);
+            $combinationArray = explode(',', (string) $combination);
 
             foreach ($combinationArray as $id) {
                 $attrAv = AttributeAvQuery::create()->joinWithI18n($this->getCurrentEditionLocale())->findPk($id);
@@ -1251,7 +1251,7 @@ class ProductController extends AbstractSeoCrudController
             $combinations = $attributes_av_list = $tmp = [];
 
             foreach ($data['attribute_av'] as $item) {
-                [$attribute_id, $attribute_av_id] = explode(':', $item);
+                [$attribute_id, $attribute_av_id] = explode(':', (string) $item);
 
                 if (!isset($attributes_av_list[$attribute_id])) {
                     $attributes_av_list[$attribute_id] = [];

@@ -37,7 +37,7 @@ class ModuleActivateCommand extends BaseModuleGenerate
 {
     protected $eventDispatcher;
 
-    public function __construct(EventDispatcherInterface $eventDispatcher, private \Thelia\Command\Install $install)
+    public function __construct(EventDispatcherInterface $eventDispatcher, private readonly \Thelia\Command\Install $install)
     {
         $this->eventDispatcher = $eventDispatcher;
 

@@ -24,7 +24,7 @@ class AlphaNumStringType extends BaseType
 
     public function isValid($value)
     {
-        return preg_match('#^[a-zA-Z0-9\-_\.]+$#', $value) ? true : false;
+        return preg_match('#^[a-zA-Z0-9\-_\.]+$#', (string) $value) ? true : false;
     }
 
     public function getFormattedValue($value)

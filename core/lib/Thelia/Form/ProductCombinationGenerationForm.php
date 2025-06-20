@@ -75,7 +75,7 @@ class ProductCombinationGenerationForm extends BaseForm
                 'allow_add' => true,
                 'allow_delete' => true,
                 'constraints' => [
-                    new Callback([$this, 'checkAttributeAv']),
+                    new Callback($this->checkAttributeAv(...)),
                 ],
         ])
         ;

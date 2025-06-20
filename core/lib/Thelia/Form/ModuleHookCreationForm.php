@@ -108,7 +108,7 @@ class ModuleHookCreationForm extends BaseForm
                     'label' => $this->trans('Automatic rendered templates'),
                     'constraints' => [
                         new Callback(
-                            [$this, 'verifyTemplates']
+                            $this->verifyTemplates(...)
                         ),
                     ],
                     'label_attr' => [

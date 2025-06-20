@@ -60,16 +60,16 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
 
     protected function formatModuleName($name)
     {
-        if (\in_array(strtolower($name), $this->reservedKeyWords)) {
+        if (\in_array(strtolower((string) $name), $this->reservedKeyWords)) {
             throw new \RuntimeException(sprintf('%s module name is a reserved keyword', $name));
         }
 
-        return ucfirst($name);
+        return ucfirst((string) $name);
     }
 
     protected function validModuleName($name): void
     {
-        if (!preg_match('#^[A-Z]([A-Za-z\d])+$#', $name)) {
+        if (!preg_match('#^[A-Z]([A-Za-z\d])+$#', (string) $name)) {
             throw new \RuntimeException(
                 sprintf('%s module name is not a valid name, it must be in CamelCase. (ex: MyModuleName)', $name)
             );

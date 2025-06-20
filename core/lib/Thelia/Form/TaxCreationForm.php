@@ -82,7 +82,7 @@ class TaxCreationForm extends BaseForm
 
                 $options = array_merge([
                     'constraints' => [
-                        new Constraints\Callback([$this, 'checkRequirementField']),
+                        new Constraints\Callback($this->checkRequirementField(...)),
                     ],
                     'attr' => [
                         'tag' => 'requirements',
@@ -115,7 +115,7 @@ class TaxCreationForm extends BaseForm
         $data = $context->getRoot()->getData();
         $type = $data['type'];
 
-        if (str_contains($context->getPropertyPath(), $type)) {
+        if (str_contains($context->getPropertyPath(), (string) $type)) {
             // extract requirement type
             if (preg_match('@\:(.+)\]@', $context->getPropertyPath(), $matches)) {
                 $requirementType = $matches[1];

@@ -41,7 +41,7 @@ class CouponCode extends BaseForm
                     'required' => true,
                     'constraints' => [
                         new Constraints\NotBlank(),
-                        new Constraints\Callback([$this, 'verifyExistingCode']),
+                        new Constraints\Callback($this->verifyExistingCode(...)),
                     ],
                 ]
             )

@@ -40,7 +40,7 @@ class AdminResources
      */
     public static function retrieve($name)
     {
-        $constantName = strtoupper($name);
+        $constantName = strtoupper((string) $name);
         if (null === self::$selfReflection) {
             self::$selfReflection = new \ReflectionClass(self::class);
         }

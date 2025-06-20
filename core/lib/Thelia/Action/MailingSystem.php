@@ -22,7 +22,7 @@ use Thelia\Service\ConfigCacheService;
 
 class MailingSystem extends BaseAction implements EventSubscriberInterface
 {
-    public function __construct(private ConfigCacheService $configCache, private EventDispatcherInterface $dispatcher, private $kernelCacheDir)
+    public function __construct(private readonly ConfigCacheService $configCache, private readonly EventDispatcherInterface $dispatcher, private $kernelCacheDir)
     {
     }
 

@@ -115,7 +115,7 @@ class TranslationsController extends BaseAdminController
                     } elseif (!empty($modulePart)) {
                         // Front, back, pdf or email office template,
                         // form of $module_part is [bo|fo|pdf|email].subdir-name
-                        [$type, $subdir] = explode('.', $modulePart);
+                        [$type, $subdir] = explode('.', (string) $modulePart);
 
                         switch ($type) {
                             case 'bo':

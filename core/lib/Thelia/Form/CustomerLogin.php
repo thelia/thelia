@@ -36,7 +36,7 @@ class CustomerLogin extends BruteforceForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Email(),
-                    new Constraints\Callback([$this, 'verifyExistingEmail']),
+                    new Constraints\Callback($this->verifyExistingEmail(...)),
                 ],
                 'label' => Translator::getInstance()->trans('Please enter your email address'),
                 'label_attr' => [
@@ -46,7 +46,7 @@ class CustomerLogin extends BruteforceForm
             ->add('account', ChoiceType::class, [
                 'constraints' => [
                     new Constraints\Callback(
-                        [$this, 'verifyAccount']),
+                        $this->verifyAccount(...)),
                     ],
                 'choices' => [
                     Translator::getInstance()->trans('No, I am a new customer.') => 0,

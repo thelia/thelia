@@ -38,7 +38,7 @@ class IntListType extends BaseType
 
     public function getFormattedValue($values)
     {
-        return $this->isValid($values) ? explode(',', $values) : null;
+        return $this->isValid($values) ? explode(',', (string) $values) : null;
     }
 
     public function getFormOptions()

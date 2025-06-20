@@ -55,7 +55,7 @@ class NewsletterForm extends BaseForm
                     new NotBlank(),
                     new Email(),
                     new Callback(
-                        [$this, 'verifyExistingEmail']
+                        $this->verifyExistingEmail(...)
                     ),
                 ],
                 'label' => Translator::getInstance()->trans('Email address'),

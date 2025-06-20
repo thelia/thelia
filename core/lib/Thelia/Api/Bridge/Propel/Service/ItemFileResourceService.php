@@ -48,7 +48,7 @@ readonly class ItemFileResourceService
             ->setVisible(filter_var($request->get('visible'), \FILTER_VALIDATE_BOOLEAN))
             ->setPosition($request->get('position'));
 
-        $i18ns = json_decode($request->get('i18ns'), true);
+        $i18ns = json_decode((string) $request->get('i18ns'), true);
 
         foreach ($i18ns as $locale => $i18n) {
             $fileModel->setLocale($locale)

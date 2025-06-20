@@ -121,7 +121,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
         // limit to only some locale(s)
         $localesToKeep = $input->getOption('locales');
         if (!empty($localesToKeep)) {
-            $localesToKeep = explode(',', $localesToKeep);
+            $localesToKeep = explode(',', (string) $localesToKeep);
         } else {
             $localesToKeep = null;
         }
@@ -162,7 +162,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
     protected function initParser(): void
     {
         $this->parser->unregisterPlugin('function', 'intl');
-        $this->parser->registerPlugin('function', 'intl', [$this, 'translate']);
+        $this->parser->registerPlugin('function', 'intl', $this->translate(...));
         $this->parser->assign('locales', $this->locales);
     }
 

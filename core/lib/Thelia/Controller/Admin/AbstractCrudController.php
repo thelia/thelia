@@ -360,7 +360,7 @@ abstract class AbstractCrudController extends BaseAdminController
                     AccessManager::CREATE,
                     sprintf(
                         '%s %s (ID %s) created',
-                        ucfirst($this->objectName),
+                        ucfirst((string) $this->objectName),
                         $this->getObjectLabel($createdObject),
                         $this->getObjectId($createdObject)
                     ),
@@ -478,7 +478,7 @@ abstract class AbstractCrudController extends BaseAdminController
                     AccessManager::UPDATE,
                     sprintf(
                         '%s %s (ID %s) modified',
-                        ucfirst($this->objectName),
+                        ucfirst((string) $this->objectName),
                         $this->getObjectLabel($changedObject),
                         $this->getObjectId($changedObject)
                     ),
@@ -660,7 +660,7 @@ abstract class AbstractCrudController extends BaseAdminController
                     AccessManager::DELETE,
                     sprintf(
                         '%s %s (ID %s) deleted',
-                        ucfirst($this->objectName),
+                        ucfirst((string) $this->objectName),
                         $this->getObjectLabel($deletedObject),
                         $this->getObjectId($deletedObject)
                     ),

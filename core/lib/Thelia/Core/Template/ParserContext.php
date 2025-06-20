@@ -36,9 +36,9 @@ class ParserContext implements \IteratorAggregate
     private $store = [];
 
     public function __construct(
-        private RequestStack $requestStack,
-        private TheliaFormFactory $formFactory,
-        private TheliaFormValidator $formValidator
+        private readonly RequestStack $requestStack,
+        private readonly TheliaFormFactory $formFactory,
+        private readonly TheliaFormValidator $formValidator
     ) {
         // Setup basic variables
         $this->set('THELIA_VERSION', Thelia::THELIA_VERSION);

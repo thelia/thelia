@@ -34,7 +34,7 @@ class CustomerPasswordUpdateForm extends BaseForm
             ->add('password_old', PasswordType::class, [
                 'constraints' => [
                     new Constraints\NotBlank(),
-                    new Constraints\Callback([$this, 'verifyCurrentPasswordField']),
+                    new Constraints\Callback($this->verifyCurrentPasswordField(...)),
                 ],
                 'label' => Translator::getInstance()->trans('Current Password'),
                 'label_attr' => [
@@ -58,7 +58,7 @@ class CustomerPasswordUpdateForm extends BaseForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Length(['min' => ConfigQuery::read('password.length', 4)]),
-                    new Constraints\Callback([$this, 'verifyPasswordField']),
+                    new Constraints\Callback($this->verifyPasswordField(...)),
                 ],
                 'label' => Translator::getInstance()->trans('Password confirmation'),
                 'label_attr' => [
@@ -76,7 +76,7 @@ class CustomerPasswordUpdateForm extends BaseForm
         $user = CustomerQuery::create()->findPk($userId);
 
         // Check if value of the old password match the password of the current user
-        if (!password_verify($value, $user->getPassword())) {
+        if (!password_verify((string) $value, (string) $user->getPassword())) {
             $context->addViolation(Translator::getInstance()->trans('Your current password does not match.'));
         }
     }

@@ -290,11 +290,11 @@ class ProfileController extends AbstractCrudController
     {
         $requirements = [];
         foreach ($formData as $data => $value) {
-            if (!strstr($data, ':')) {
+            if (!strstr((string) $data, ':')) {
                 continue;
             }
 
-            $explosion = explode(':', $data);
+            $explosion = explode(':', (string) $data);
 
             $prefix = array_shift($explosion);
 
@@ -312,11 +312,11 @@ class ProfileController extends AbstractCrudController
     {
         $requirements = [];
         foreach ($formData as $data => $value) {
-            if (!strstr($data, ':')) {
+            if (!strstr((string) $data, ':')) {
                 continue;
             }
 
-            $explosion = explode(':', $data);
+            $explosion = explode(':', (string) $data);
 
             $prefix = array_shift($explosion);
 
@@ -364,7 +364,7 @@ class ProfileController extends AbstractCrudController
                     AccessManager::UPDATE,
                     sprintf(
                         '%s %s (ID %s) modified',
-                        ucfirst($this->objectName),
+                        ucfirst((string) $this->objectName),
                         $this->getObjectLabel($changedObject),
                         $this->getObjectId($changedObject)
                     ),
@@ -425,7 +425,7 @@ class ProfileController extends AbstractCrudController
                     AccessManager::UPDATE,
                     sprintf(
                         '%s %s (ID %s) modified',
-                        ucfirst($this->objectName),
+                        ucfirst((string) $this->objectName),
                         $this->getObjectLabel($changedObject),
                         $this->getObjectId($changedObject)
                     ),

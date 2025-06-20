@@ -77,7 +77,7 @@ class MoneyFormat extends NumberFormat
 
         $currency = $currencyId !== null ? CurrencyQuery::create()->findPk($currencyId) : $this->request->getSession()->getCurrency();
 
-        if ($currency !== null && str_contains($currency->getFormat(), '%n')) {
+        if ($currency !== null && str_contains((string) $currency->getFormat(), '%n')) {
             return str_replace(
                 ['%n', '%s', '%c'],
                 [$number, $currency->getSymbol(), $currency->getCode()],
@@ -103,7 +103,7 @@ class MoneyFormat extends NumberFormat
         $thousandsSep = null,
         $removeZeroDecimal = false
     ) {
-        $number = preg_replace('/\s+/', '', $number);
+        $number = preg_replace('/\s+/', '', (string) $number);
 
         if ($removeZeroDecimal) {
             if (null === $decimals) {

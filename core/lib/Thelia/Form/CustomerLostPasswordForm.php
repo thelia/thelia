@@ -54,7 +54,7 @@ class CustomerLostPasswordForm extends FirewallForm
                     new NotBlank(),
                     new Email(),
                     new Callback(
-                        [$this, 'verifyExistingEmail']
+                        $this->verifyExistingEmail(...)
                     ),
                 ],
                 'label' => Translator::getInstance()->trans('Please enter your email address'),

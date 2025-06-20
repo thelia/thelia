@@ -26,7 +26,7 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
     public function __construct(
         #[AutowireDecorated]
         private readonly PropertyMetadataFactoryInterface $decorated,
-        private ApiResourcePropelTransformerService $apiResourcePropelTransformerService
+        private readonly ApiResourcePropelTransformerService $apiResourcePropelTransformerService
     ) {
     }
 

@@ -34,7 +34,7 @@ class NewsletterUnsubscribeForm extends BaseForm
                 'constraints' => [
                     new NotBlank(),
                     new Email(),
-                    new Callback([$this, 'verifyExistingEmail']),
+                    new Callback($this->verifyExistingEmail(...)),
                 ],
                 'label' => Translator::getInstance()->trans('Email address'),
                 'label_attr' => [

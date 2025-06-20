@@ -473,7 +473,7 @@ abstract class AbstractExport implements \Iterator
             }
 
             if ($this->dataIsJSONFile) {
-                $fieldName = substr($fieldName, strripos($fieldName, '.'));
+                $fieldName = substr((string) $fieldName, strripos((string) $fieldName, '.'));
                 $fieldName = str_replace('.', '', $fieldName);
                 $fieldName = strtolower($fieldName);
             }

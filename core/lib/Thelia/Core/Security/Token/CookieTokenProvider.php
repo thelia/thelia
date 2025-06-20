@@ -33,7 +33,7 @@ class CookieTokenProvider
 
         $key = $tokenProvider->encodeKey($user);
 
-        setcookie($cookieName, $key, ['expires' => time() + $cookieExpires, 'path' => '/']);
+        setcookie($cookieName, (string) $key, ['expires' => time() + $cookieExpires, 'path' => '/']);
     }
 
     public function clearCookie($cookieName): void

@@ -85,12 +85,12 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
 
             if ($mode == 'symlink') {
                 if (false === symlink($sourceFile, $originalDocumentPathInCache)) {
-                    throw new DocumentException(sprintf('Failed to create symbolic link for %s in %s document cache directory', basename($sourceFile), $subdir));
+                    throw new DocumentException(sprintf('Failed to create symbolic link for %s in %s document cache directory', basename((string) $sourceFile), $subdir));
                 }
             } else {
                 // mode = 'copy'
                 if (false === @copy($sourceFile, $originalDocumentPathInCache)) {
-                    throw new DocumentException(sprintf('Failed to copy %s in %s document cache directory', basename($sourceFile), $subdir));
+                    throw new DocumentException(sprintf('Failed to copy %s in %s document cache directory', basename((string) $sourceFile), $subdir));
                 }
             }
         }

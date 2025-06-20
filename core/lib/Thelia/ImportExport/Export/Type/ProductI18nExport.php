@@ -63,7 +63,7 @@ class ProductI18nExport extends JsonFileAbstractExport
     {
         foreach ($data as $idx => &$value) {
             if (\in_array($idx, $this->idxStripHtml) && !empty($value)) {
-                $value = strip_tags($value);
+                $value = strip_tags((string) $value);
 
                 $value = html_entity_decode($value, \ENT_QUOTES, 'UTF-8');
             }

@@ -120,7 +120,7 @@ class AddressCreateForm extends FirewallForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                        [$this, 'verifyCity']
+                        $this->verifyCity(...)
                     ),
                 ],
                 'label' => Translator::getInstance()->trans('City'),
@@ -132,7 +132,7 @@ class AddressCreateForm extends FirewallForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                        [$this, 'verifyZipCode']
+                        $this->verifyZipCode(...)
                     ),
                 ],
                 'label' => Translator::getInstance()->trans('Zip code'),
@@ -157,7 +157,7 @@ class AddressCreateForm extends FirewallForm
                 'required' => false,
                 'constraints' => [
                     new Constraints\Callback(
-                        [$this, 'verifyState']
+                        $this->verifyState(...)
                     ),
                 ],
                 'choices' => $this->getStatesChoices(),

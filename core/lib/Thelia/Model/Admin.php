@@ -62,7 +62,7 @@ class Admin extends BaseAdmin implements UserInterface, SecurityUserInterface, P
 
     public function checkPassword($password)
     {
-        return password_verify($password, $this->password);
+        return password_verify((string) $password, $this->password);
     }
 
     public function getUsername()

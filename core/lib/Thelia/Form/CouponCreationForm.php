@@ -78,13 +78,13 @@ class CouponCreationForm extends BaseForm
                         new NotBlank(),
                         new Callback(
                             [
-                                'callback' => [$this, 'checkDuplicateCouponCode'],
+                                'callback' => $this->checkDuplicateCouponCode(...),
                                 'groups' => 'creation',
                             ]
                         ),
                         new Callback(
                             [
-                                'callback' => [$this, 'checkCouponCodeChangedAndDoesntExists'],
+                                'callback' => $this->checkCouponCodeChangedAndDoesntExists(...),
                                 'groups' => 'update',
                             ]
                         ),
@@ -133,7 +133,7 @@ class CouponCreationForm extends BaseForm
                 [
                     'constraints' => [
                         new Callback(
-                            [$this, 'checkLocalizedDate']
+                            $this->checkLocalizedDate(...)
                         ),
                     ],
                 ]
@@ -144,8 +144,8 @@ class CouponCreationForm extends BaseForm
                 [
                     'constraints' => [
                         new NotBlank(),
-                        new Callback([$this, 'checkLocalizedDate']),
-                        new Callback([$this, 'checkConsistencyDates']),
+                        new Callback($this->checkLocalizedDate(...)),
+                        new Callback($this->checkConsistencyDates(...)),
                     ],
                 ]
             )

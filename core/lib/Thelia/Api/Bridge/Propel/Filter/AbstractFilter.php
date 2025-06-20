@@ -151,7 +151,7 @@ abstract class AbstractFilter implements FilterInterface
 
         // Transform php field to DB column name
         $field = strtok('');
-        $column = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $field));
+        $column = strtolower((string) preg_replace('/(?<!^)[A-Z]/', '_$0', $field));
 
         return strtolower($tableAlias.'.'.$column);
     }

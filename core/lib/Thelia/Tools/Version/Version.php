@@ -62,7 +62,7 @@ class Version
     {
         $constraintsList = [];
 
-        foreach (explode(' ', $constraints) as $expression) {
+        foreach (explode(' ', (string) $constraints) as $expression) {
             if (1 === preg_match('/^[0-9]/', $expression)) {
                 $expression = $defaultComparison.$expression;
             }

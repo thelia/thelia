@@ -245,13 +245,13 @@ class Thelia extends Kernel
             $result = $con->query('SELECT VERSION() as version, @@SESSION.sql_mode as session_sql_mode');
 
             if ($result && $data = $result->fetch(\PDO::FETCH_ASSOC)) {
-                $sessionSqlMode = explode(',', $data['session_sql_mode']);
+                $sessionSqlMode = explode(',', (string) $data['session_sql_mode']);
                 if (empty($sessionSqlMode[0])) {
                     unset($sessionSqlMode[0]);
                 }
 
                 // MariaDB is not impacted by this problem
-                if (!str_contains($data['version'], 'MariaDB')) {
+                if (!str_contains((string) $data['version'], 'MariaDB')) {
                     // MySQL 5.6+ compatibility
                     if (version_compare($data['version'], '5.6.0', '>=')) {
                         // add NO_ENGINE_SUBSTITUTION
@@ -722,7 +722,7 @@ class Thelia extends Kernel
         }
 
         if ($container->hasParameter('kernel.trusted_proxies') && $container->hasParameter('kernel.trusted_headers') && $trustedProxies = $container->getParameter('kernel.trusted_proxies')) {
-            Request::setTrustedProxies(\is_array($trustedProxies) ? $trustedProxies : array_map('trim', explode(',', $trustedProxies)), $container->getParameter('kernel.trusted_headers'));
+            Request::setTrustedProxies(\is_array($trustedProxies) ? $trustedProxies : array_map('trim', explode(',', (string) $trustedProxies)), $container->getParameter('kernel.trusted_headers'));
         }
 
         return $container;

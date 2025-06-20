@@ -68,7 +68,7 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
                 continue;
             }
 
-            $filterMethod = 'filterBy'.str_replace('_', '', ucwords($filter, '_'));
+            $filterMethod = 'filterBy'.str_replace('_', '', ucwords((string) $filter, '_'));
 
             if (!method_exists($query, $filterMethod)) {
                 continue;
@@ -94,7 +94,7 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
         $orders = $this->getParsedParams($this->getOrders());
 
         foreach ($orders as $order => $direction) {
-            $orderByMethod = 'orderBy'.str_replace('_', '', ucwords($order, '_'));
+            $orderByMethod = 'orderBy'.str_replace('_', '', ucwords((string) $order, '_'));
             if (!\is_callable([$query, $orderByMethod])) {
                 continue;
             }
@@ -119,7 +119,7 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
             foreach (TableMap::getFieldnamesForClass($tableMap->getClassName(), TableMap::TYPE_FIELDNAME) as $columnIndex => $columnName) {
                 $getter = 'get'.$columnPhpNames[$columnIndex];
                 if (method_exists($item, $getter)) {
-                    $loopResultRow->set(strtoupper($columnName), $item->$getter());
+                    $loopResultRow->set(strtoupper((string) $columnName), $item->$getter());
                 }
             }
 
@@ -127,7 +127,7 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
             if (null !== $i18nTableMapClass) {
                 $i18nTableMap = new $i18nTableMapClass();
                 foreach (TableMap::getFieldnamesForClass($i18nTableMap->getClassName(), TableMap::TYPE_PHPNAME) as $columnName) {
-                    $loopResultRow->set(strtoupper($columnName), $item->getVirtualColumn($columnName));
+                    $loopResultRow->set(strtoupper((string) $columnName), $item->getVirtualColumn($columnName));
                 }
             }
 
@@ -141,7 +141,7 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
 
     protected function getParsedParams($params)
     {
-        $rawParams = explode('|', $params);
+        $rawParams = explode('|', (string) $params);
         $params = [];
 
         foreach ($rawParams as $rawParam) {

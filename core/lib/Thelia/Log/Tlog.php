@@ -194,7 +194,7 @@ class Tlog implements LoggerInterface
 
     public function setFiles($files)
     {
-        $this->files = explode(';', $files);
+        $this->files = explode(';', (string) $files);
 
         $this->all_files = \in_array('*', $this->files);
 
@@ -204,7 +204,7 @@ class Tlog implements LoggerInterface
     public function setIp($ips)
     {
         // isset($_SERVER['REMOTE_ADDR']) if we are in cli mode
-        if (!empty($ips) && isset($_SERVER['REMOTE_ADDR']) && !\in_array($_SERVER['REMOTE_ADDR'], explode(';', $ips))) {
+        if (!empty($ips) && isset($_SERVER['REMOTE_ADDR']) && !\in_array($_SERVER['REMOTE_ADDR'], explode(';', (string) $ips))) {
             $this->level = self::MUET;
         }
 
@@ -556,7 +556,7 @@ class Tlog implements LoggerInterface
         if ($this->level <= $level) {
             $origin = $this->findOrigin();
 
-            $file = basename($origin['file']);
+            $file = basename((string) $origin['file']);
 
             if ($this->isActivedFile($file)) {
                 return true;
@@ -649,7 +649,7 @@ class Tlog implements LoggerInterface
 
         $origin = $this->findOrigin();
 
-        $file = basename($origin['file']);
+        $file = basename((string) $origin['file']);
 
         if ($this->isActivedFile($file)) {
             $function = $origin['function'];

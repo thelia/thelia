@@ -207,11 +207,11 @@ class TaxController extends AbstractCrudController
     {
         $requirements = [];
         foreach ($formData as $data => $value) {
-            if (!strstr($data, ':')) {
+            if (!strstr((string) $data, ':')) {
                 continue;
             }
 
-            $couple = explode(':', $data);
+            $couple = explode(':', (string) $data);
 
             if (\count($couple) == 2 && $couple[0] == $type) {
                 $requirements[$couple[1]] = $value;

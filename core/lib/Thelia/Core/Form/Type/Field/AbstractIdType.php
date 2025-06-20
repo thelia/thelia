@@ -33,7 +33,7 @@ abstract class AbstractIdType extends AbstractType
             'required' => true,
             'constraints' => [
                 new NotBlank(),
-                new Callback([$this, 'checkId']),
+                new Callback($this->checkId(...)),
             ],
             'cascade_validation' => true,
         ]);
@@ -61,7 +61,7 @@ abstract class AbstractIdType extends AbstractType
 
     protected function getObjName()
     {
-        if (preg_match('#^(.+)_id$#i', $this->getName(), $match)) {
+        if (preg_match('#^(.+)_id$#i', (string) $this->getName(), $match)) {
             return $match[1];
         }
 

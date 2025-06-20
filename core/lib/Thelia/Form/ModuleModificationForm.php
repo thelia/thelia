@@ -32,7 +32,7 @@ class ModuleModificationForm extends BaseForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                        [$this, 'verifyModuleId']
+                        $this->verifyModuleId(...)
                     ),
                 ],
                 'attr' => [

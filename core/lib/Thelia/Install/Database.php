@@ -180,7 +180,7 @@ class Database
         $data[] = "\n\n";
 
         foreach ($tables as $table) {
-            if (!preg_match("/^[\w_\-]+$/", $table)) {
+            if (!preg_match("/^[\w_\-]+$/", (string) $table)) {
                 Tlog::getInstance()->alert(
                     sprintf(
                         "Attempt to backup the db with this invalid table name: '%s'",
@@ -209,7 +209,7 @@ class Database
                 while ($row = $result->fetch(\PDO::FETCH_NUM)) {
                     $data[] = 'INSERT INTO `'.$table.'` VALUES(';
                     for ($j = 0; $j < $fieldCount; ++$j) {
-                        $row[$j] = addslashes($row[$j]);
+                        $row[$j] = addslashes((string) $row[$j]);
                         $row[$j] = str_replace("\n", '\\n', $row[$j]);
                         if (isset($row[$j])) {
                             $data[] = '"'.$row[$j].'"';

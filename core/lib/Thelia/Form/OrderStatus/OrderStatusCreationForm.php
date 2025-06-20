@@ -61,9 +61,9 @@ class OrderStatusCreationForm extends BaseForm
                 TextType::class,
                 [
                     'constraints' => [
-                        new Callback([$this, 'checkUniqueCode']),
-                        new Callback([$this, 'checkFormatCode']),
-                        new Callback([$this, 'checkIsRequiredCode']),
+                        new Callback($this->checkUniqueCode(...)),
+                        new Callback($this->checkFormatCode(...)),
+                        new Callback($this->checkIsRequiredCode(...)),
                     ],
                     'required' => true,
                     'label' => Translator::getInstance()->trans('Order status code'),
@@ -82,7 +82,7 @@ class OrderStatusCreationForm extends BaseForm
                 [
                     'constraints' => [
                         new NotBlank(),
-                        new Callback([$this, 'checkColor']),
+                        new Callback($this->checkColor(...)),
                     ],
                     'required' => false,
                     'label' => Translator::getInstance()->trans('Order status color'),
@@ -106,7 +106,7 @@ class OrderStatusCreationForm extends BaseForm
 
     public function checkColor($value, ExecutionContextInterface $context): void
     {
-        if (!preg_match('/^#[0-9a-fA-F]{6}$/', $value)) {
+        if (!preg_match('/^#[0-9a-fA-F]{6}$/', (string) $value)) {
             $context->addViolation(
                 Translator::getInstance()->trans('This is not a hexadecimal color.')
             );
@@ -131,7 +131,7 @@ class OrderStatusCreationForm extends BaseForm
 
     public function checkFormatCode($value, ExecutionContextInterface $context): void
     {
-        if (!empty($value) && !preg_match('/^\w+$/', $value)) {
+        if (!empty($value) && !preg_match('/^\w+$/', (string) $value)) {
             $context->addViolation(
                 Translator::getInstance()->trans('This is not a valid code.')
             );

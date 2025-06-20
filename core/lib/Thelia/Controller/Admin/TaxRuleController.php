@@ -329,7 +329,7 @@ class TaxRuleController extends AbstractCrudController
                     AccessManager::UPDATE,
                     sprintf(
                         '%s %s (ID %s) modified',
-                        ucfirst($this->objectName),
+                        ucfirst((string) $this->objectName),
                         $this->getObjectLabel($changedObject),
                         $this->getObjectId($changedObject)
                     ),

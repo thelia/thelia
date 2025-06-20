@@ -61,9 +61,9 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
             $finder = new Finder();
 
             $files = $finder
-                ->in(\dirname($filePath))
+                ->in(\dirname((string) $filePath))
                 ->files()
-                ->name(basename($filePath).'.*')
+                ->name(basename((string) $filePath).'.*')
                 ->sortByModifiedTime();
 
             $deleteCount = 1 + $files->count() - $maxCount;

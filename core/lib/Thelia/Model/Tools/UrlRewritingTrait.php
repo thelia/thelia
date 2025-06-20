@@ -83,7 +83,7 @@ trait UrlRewritingTrait
             throw new \RuntimeException('Impossible to create an url if title is null');
         }
         // Replace all weird characters with dashes
-        $string = preg_replace('/[^\w\-~_\.]+/u', '-', $title);
+        $string = preg_replace('/[^\w\-~_\.]+/u', '-', (string) $title);
 
         // Only allow one dash separator at a time (and make string lowercase)
         $cleanString = mb_strtolower(preg_replace('/--+/u', '-', $string), 'UTF-8');

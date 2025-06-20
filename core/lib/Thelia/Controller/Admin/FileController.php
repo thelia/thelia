@@ -771,7 +771,7 @@ class FileController extends BaseAdminController
         if (null === $message) {
             $message = $this->getTranslator()->trans(
                 '%type% position updated',
-                ['%type%' => ucfirst($objectType)]
+                ['%type%' => ucfirst((string) $objectType)]
             );
         }
 
@@ -856,7 +856,7 @@ class FileController extends BaseAdminController
         if (null === $message) {
             $message = $this->getTranslator()->trans(
                 '%type% visibility updated',
-                ['%type%' => ucfirst($objectType)]
+                ['%type%' => ucfirst((string) $objectType)]
             );
         }
 

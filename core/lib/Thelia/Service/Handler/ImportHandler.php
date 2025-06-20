@@ -170,7 +170,7 @@ class ImportHandler
     {
         /** @var AbstractSerializer $serializer */
         foreach ($this->serializerManager->getSerializers() as $serializer) {
-            if (stripos($fileName, '.'.$serializer->getExtension()) !== false) {
+            if (stripos((string) $fileName, '.'.$serializer->getExtension()) !== false) {
                 return $serializer;
             }
         }

@@ -36,7 +36,7 @@ use Thelia\Api\Resource\PropelResourceInterface;
 
 final class PropelResourceCollectionMetadataFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    public function __construct(private ResourceMetadataCollectionFactoryInterface $decorated)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $decorated)
     {
     }
 

@@ -25,7 +25,7 @@ use Thelia\Model\Customer;
  */
 class SecurityContext
 {
-    public function __construct(private RequestStack $requestStack)
+    public function __construct(private readonly RequestStack $requestStack)
     {
     }
 
@@ -140,7 +140,7 @@ class SecurityContext
                 continue;
             }
 
-            $resource = strtolower($resource);
+            $resource = strtolower((string) $resource);
 
             if (!\array_key_exists($resource, $userPermissions)) {
                 return false;
@@ -162,7 +162,7 @@ class SecurityContext
                 return false;
             }
 
-            $module = strtolower($module);
+            $module = strtolower((string) $module);
 
             if (!\array_key_exists($module, $userPermissions['module'])) {
                 return false;

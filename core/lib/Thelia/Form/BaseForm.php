@@ -399,7 +399,7 @@ abstract class BaseForm implements FormInterface
                 return strtolower($classPart);
             }
 
-            return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $classPart));
+            return strtolower((string) preg_replace('/(?<!^)[A-Z]/', '_$0', $classPart));
         }, $classParts, array_keys($classParts));
 
         return implode('_', $nameParts);

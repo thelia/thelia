@@ -158,7 +158,7 @@ class SaleController extends AbstractCrudController
 
         foreach ($formData['product_attributes'] as $productId => $attributeAvIdList) {
             if (!empty($attributeAvIdList)) {
-                $productAttributes[$productId] = explode(',', $attributeAvIdList);
+                $productAttributes[$productId] = explode(',', (string) $attributeAvIdList);
             }
         }
 
@@ -359,7 +359,7 @@ class SaleController extends AbstractCrudController
             return $response;
         }
 
-        $selectedAttributesAvId = explode(',', $this->getRequest()->get('selected_attributes_av_id', []));
+        $selectedAttributesAvId = explode(',', (string) $this->getRequest()->get('selected_attributes_av_id', []));
 
         $productId = $this->getRequest()->get('product_id');
 

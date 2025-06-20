@@ -285,7 +285,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
 
     public function setEmail($email, $force = false)
     {
-        $email = trim($email);
+        $email = trim((string) $email);
 
         if (($this->isNew() || $force === true) && ($email === null || $email == '')) {
             throw new InvalidArgumentException('customer email is mandatory');
@@ -310,7 +310,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
 
     public function checkPassword($password)
     {
-        return password_verify($password, $this->password);
+        return password_verify((string) $password, $this->password);
     }
 
     public function eraseCredentials(): void
