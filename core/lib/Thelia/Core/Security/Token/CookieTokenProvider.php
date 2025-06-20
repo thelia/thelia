@@ -33,11 +33,11 @@ class CookieTokenProvider
 
         $key = $tokenProvider->encodeKey($user);
 
-        setcookie($cookieName, $key, time() + $cookieExpires, '/');
+        setcookie($cookieName, $key, ['expires' => time() + $cookieExpires, 'path' => '/']);
     }
 
     public function clearCookie($cookieName): void
     {
-        setcookie($cookieName, '', time() - 3600, '/');
+        setcookie($cookieName, '', ['expires' => time() - 3600, 'path' => '/']);
     }
 }
