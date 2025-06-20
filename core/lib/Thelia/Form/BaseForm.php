@@ -106,7 +106,7 @@ abstract class BaseForm implements FormInterface
         FormFactoryBuilderInterface $formFactoryBuilder,
         ValidatorBuilder $validationBuilder,
         TokenStorageInterface $tokenStorage,
-        string $type = "Symfony\Component\Form\Extension\Core\Type\FormType",
+        string $type = \Symfony\Component\Form\Extension\Core\Type\FormType::class,
         array $data = [],
         array $options = []
     ): void {

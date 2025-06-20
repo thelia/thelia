@@ -236,8 +236,8 @@ class Module extends BaseModule
     {
         $moduleReflection = new \ReflectionClass($this->getFullNamespace());
 
-        return $moduleReflection->implementsInterface("Thelia\Module\DeliveryModuleInterface")
-            || $moduleReflection->implementsInterface("Thelia\Module\DeliveryModuleWithStateInterface");
+        return $moduleReflection->implementsInterface(\Thelia\Module\DeliveryModuleInterface::class)
+            || $moduleReflection->implementsInterface(\Thelia\Module\DeliveryModuleWithStateInterface::class);
     }
 
     /**
@@ -247,7 +247,7 @@ class Module extends BaseModule
     {
         $moduleReflection = new \ReflectionClass($this->getFullNamespace());
 
-        return $moduleReflection->implementsInterface("Thelia\Module\PaymentModuleInterface");
+        return $moduleReflection->implementsInterface(\Thelia\Module\PaymentModuleInterface::class);
     }
 
     /**
@@ -288,8 +288,8 @@ class Module extends BaseModule
         $instance = $this->getModuleInstance($container);
 
         if (
-            !\in_array("Thelia\Module\DeliveryModuleInterface", class_implements($instance))
-            && !\in_array("Thelia\Module\DeliveryModuleWithStateInterface", class_implements($instance))
+            !\in_array(\Thelia\Module\DeliveryModuleInterface::class, class_implements($instance))
+            && !\in_array(\Thelia\Module\DeliveryModuleWithStateInterface::class, class_implements($instance))
         ) {
             throw new \InvalidArgumentException(sprintf('Module "%s" is not a delivery module', $this->getCode()));
         }

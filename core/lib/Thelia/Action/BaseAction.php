@@ -30,7 +30,7 @@ class BaseAction
     protected function genericUpdatePosition(ModelCriteria $query, UpdatePositionEvent $event, EventDispatcherInterface $dispatcher = null)
     {
         if (null !== $object = $query->findPk($event->getObjectId())) {
-            if (!isset(class_uses($object)['Thelia\Model\Tools\PositionManagementTrait'])) {
+            if (!isset(class_uses($object)[\Thelia\Model\Tools\PositionManagementTrait::class])) {
                 throw new \InvalidArgumentException('Your model does not implement the PositionManagementTrait trait');
             }
 
@@ -52,7 +52,7 @@ class BaseAction
     protected function genericUpdateDelegatePosition(ModelCriteria $query, UpdatePositionEvent $event, EventDispatcherInterface $dispatcher = null): void
     {
         if (null !== $object = $query->findOne()) {
-            if (!isset(class_uses($object)['Thelia\Model\Tools\PositionManagementTrait'])) {
+            if (!isset(class_uses($object)[\Thelia\Model\Tools\PositionManagementTrait::class])) {
                 throw new \InvalidArgumentException('Your model does not implement the PositionManagementTrait trait');
             }
 

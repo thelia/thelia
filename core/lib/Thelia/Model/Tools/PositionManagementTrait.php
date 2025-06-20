@@ -24,7 +24,7 @@ trait PositionManagementTrait
      */
     private function createQuery()
     {
-        return PropelQuery::from(__CLASS__);
+        return PropelQuery::from(self::class);
     }
 
     /**

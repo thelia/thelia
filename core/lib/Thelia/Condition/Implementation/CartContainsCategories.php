@@ -64,7 +64,7 @@ class CartContainsCategories extends ConditionAbstract
         // Check that at least one category is selected
         if (empty($values[self::CATEGORIES_LIST])) {
             throw new InvalidConditionValueException(
-                __CLASS__,
+                self::class,
                 self::CATEGORIES_LIST
             );
         }

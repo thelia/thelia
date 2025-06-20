@@ -70,7 +70,7 @@ class Application extends BaseApplication
             $command = $container->get($commandId);
             $r = new \ReflectionClass($command);
 
-            if (!$r->isSubclassOf('Symfony\\Component\\Console\\Command\\Command')) {
+            if (!$r->isSubclassOf(\Symfony\Component\Console\Command\Command::class)) {
                 continue;
             }
 

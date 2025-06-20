@@ -29,7 +29,7 @@ class LoopResultRow
 
     public function set($key, $value)
     {
-        $this->substitution[$key] = $value === null ? '' : $value;
+        $this->substitution[$key] = $value ?? '';
 
         return $this;
     }

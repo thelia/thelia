@@ -57,7 +57,7 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
             $data[$needConvertProperty->getName()] = $this->transformData($data, $needConvertProperty);
         }
 
-        return $this->denormalizer->denormalize($data, $type, $format, $context + [__CLASS__ => true]);
+        return $this->denormalizer->denormalize($data, $type, $format, $context + [self::class => true]);
     }
 
     private function transformData(mixed $data, \ReflectionProperty $property)

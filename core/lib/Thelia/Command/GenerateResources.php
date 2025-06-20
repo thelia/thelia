@@ -42,7 +42,7 @@ class GenerateResources extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $class = new \ReflectionClass('Thelia\Core\Security\Resource\AdminResources');
+        $class = new \ReflectionClass(\Thelia\Core\Security\Resource\AdminResources::class);
 
         $constants = $class->getConstants();
 

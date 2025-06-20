@@ -332,7 +332,7 @@ class ModuleHookController extends AbstractCrudController
     protected function getRouteArguments($module_hook_id = null)
     {
         return [
-            'module_hook_id' => $module_hook_id === null ? $this->getRequest()->get('module_hook_id') : $module_hook_id,
+            'module_hook_id' => $module_hook_id ?? $this->getRequest()->get('module_hook_id'),
         ];
     }
 

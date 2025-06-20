@@ -31,7 +31,7 @@ class Fragment
 
     public function set($key, $value)
     {
-        $this->data[$key] = $value === null ? '' : $value;
+        $this->data[$key] = $value ?? '';
 
         return $this;
     }

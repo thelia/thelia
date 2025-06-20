@@ -101,7 +101,7 @@ class DatabaseConfiguration implements ConfigurationInterface
             ->cannotBeEmpty();
 
         $connectionNodeBuilder->scalarNode('classname')
-            ->defaultValue('\Propel\Runtime\Connection\ConnectionWrapper');
+            ->defaultValue(\Propel\Runtime\Connection\ConnectionWrapper::class);
 
         return $connectionNode;
     }

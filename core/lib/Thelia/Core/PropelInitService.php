@@ -138,19 +138,19 @@ class PropelInitService
 
         $propelConfig['propel']['paths']['phpDir'] = THELIA_ROOT;
         $propelConfig['propel']['generator']['objectModel']['builders'] = [
-            'object' => '\Thelia\Core\Propel\Generator\Builder\Om\ObjectBuilder',
-            'objectstub' => '\Thelia\Core\Propel\Generator\Builder\Om\ExtensionObjectBuilder',
-            'objectmultiextend' => '\Thelia\Core\Propel\Generator\Builder\Om\MultiExtendObjectBuilder',
-            'query' => '\Thelia\Core\Propel\Generator\Builder\Om\QueryBuilder',
-            'querystub' => '\Thelia\Core\Propel\Generator\Builder\Om\ExtensionQueryBuilder',
-            'queryinheritance' => '\Thelia\Core\Propel\Generator\Builder\Om\QueryInheritanceBuilder',
-            'queryinheritancestub' => '\Thelia\Core\Propel\Generator\Builder\Om\ExtensionQueryInheritanceBuilder',
-            'tablemap' => '\Thelia\Core\Propel\Generator\Builder\Om\TableMapBuilder',
-            'event' => '\Thelia\Core\Propel\Generator\Builder\Om\EventBuilder',
+            'object' => \Thelia\Core\Propel\Generator\Builder\Om\ObjectBuilder::class,
+            'objectstub' => \Thelia\Core\Propel\Generator\Builder\Om\ExtensionObjectBuilder::class,
+            'objectmultiextend' => \Thelia\Core\Propel\Generator\Builder\Om\MultiExtendObjectBuilder::class,
+            'query' => \Thelia\Core\Propel\Generator\Builder\Om\QueryBuilder::class,
+            'querystub' => \Thelia\Core\Propel\Generator\Builder\Om\ExtensionQueryBuilder::class,
+            'queryinheritance' => \Thelia\Core\Propel\Generator\Builder\Om\QueryInheritanceBuilder::class,
+            'queryinheritancestub' => \Thelia\Core\Propel\Generator\Builder\Om\ExtensionQueryInheritanceBuilder::class,
+            'tablemap' => \Thelia\Core\Propel\Generator\Builder\Om\TableMapBuilder::class,
+            'event' => \Thelia\Core\Propel\Generator\Builder\Om\EventBuilder::class,
         ];
 
         $propelConfig['propel']['generator']['builders'] = [
-            'resolver' => '\Thelia\Core\Propel\Generator\Builder\ResolverBuilder',
+            'resolver' => \Thelia\Core\Propel\Generator\Builder\ResolverBuilder::class,
         ];
 
         $configOptions['propel']['paths']['migrationDir'] = $this->getPropelConfigDir();

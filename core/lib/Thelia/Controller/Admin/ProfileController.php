@@ -195,7 +195,7 @@ class ProfileController extends AbstractCrudController
     protected function getRouteArguments($profile_id = null)
     {
         return [
-            'profile_id' => $profile_id === null ? $this->getRequest()->get('profile_id') : $profile_id,
+            'profile_id' => $profile_id ?? $this->getRequest()->get('profile_id'),
         ];
     }
 

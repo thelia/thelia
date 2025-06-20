@@ -196,12 +196,12 @@ class ModuleManagement
     private function getModuleType(\ReflectionClass $reflected): int
     {
         if (
-            $reflected->implementsInterface('Thelia\Module\DeliveryModuleInterface')
-            || $reflected->implementsInterface('Thelia\Module\DeliveryModuleWithStateInterface')
+            $reflected->implementsInterface(\Thelia\Module\DeliveryModuleInterface::class)
+            || $reflected->implementsInterface(\Thelia\Module\DeliveryModuleWithStateInterface::class)
         ) {
             return BaseModule::DELIVERY_MODULE_TYPE;
         }
-        if ($reflected->implementsInterface('Thelia\Module\PaymentModuleInterface')) {
+        if ($reflected->implementsInterface(\Thelia\Module\PaymentModuleInterface::class)) {
             return BaseModule::PAYMENT_MODULE_TYPE;
         }
 

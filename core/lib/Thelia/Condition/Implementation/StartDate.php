@@ -57,7 +57,7 @@ class StartDate extends ConditionAbstract
             // Check that the date is valid
             if (false === $date) {
                 throw new InvalidConditionValueException(
-                    __CLASS__,
+                    self::class,
                     self::START_DATE
                 );
             }

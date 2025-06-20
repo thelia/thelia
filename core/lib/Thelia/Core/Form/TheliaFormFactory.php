@@ -79,7 +79,7 @@ class TheliaFormFactory
 
     public function createForm(
         string $name,
-        $type = "Symfony\Component\Form\Extension\Core\Type\FormType",
+        $type = \Symfony\Component\Form\Extension\Core\Type\FormType::class,
         array $data = [],
         array $options = []
     ): BaseForm {

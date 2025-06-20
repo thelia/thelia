@@ -174,7 +174,7 @@ class ModuleController extends AbstractCrudController
         $request = $this->getRequest();
 
         return [
-            'module_id' => $module_id === null ? $request->get('module_id') : $module_id,
+            'module_id' => $module_id ?? $request->get('module_id'),
             'current_tab' => $request->get('current_tab', 'general'),
         ];
     }

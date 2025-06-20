@@ -88,6 +88,6 @@ class RewritingRetriever
 
     public function toString()
     {
-        return $this->rewrittenUrl === null ? $this->url : $this->rewrittenUrl;
+        return $this->rewrittenUrl ?? $this->url;
     }
 }

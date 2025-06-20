@@ -36,7 +36,7 @@ trait I18nTimestampableTrait
      */
     protected function getBaseQueryObject()
     {
-        $parentClass = preg_replace("#^([\w\_\\\\]+)I18n$#", '$1Query', __CLASS__);
+        $parentClass = preg_replace("#^([\w\_\\\\]+)I18n$#", '$1Query', self::class);
 
         return new $parentClass();
     }

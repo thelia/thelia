@@ -36,9 +36,9 @@ class FallbackParserPass implements CompilerPassInterface
 
         $container->addDefinitions(
             [
-                'thelia.parser' => new Definition('Thelia\\Core\\Template\\Parser\\ParserFallback'),
-                'thelia.parser.helper' => new Definition('Thelia\\Core\\Template\\Parser\\ParserHelperFallback'),
-                'thelia.parser.asset.resolver' => new Definition('Thelia\\Core\\Template\\Parser\\ParserHelperFallback'),
+                'thelia.parser' => new Definition(\Thelia\Core\Template\Parser\ParserFallback::class),
+                'thelia.parser.helper' => new Definition(\Thelia\Core\Template\Parser\ParserHelperFallback::class),
+                'thelia.parser.asset.resolver' => new Definition(\Thelia\Core\Template\Parser\ParserHelperFallback::class),
             ]
         );
     }

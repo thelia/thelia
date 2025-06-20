@@ -184,7 +184,7 @@ class Coupon extends BaseCoupon
     public function getAmount()
     {
         // Amount is now optional
-        $amount = isset($this->getEffects()['amount']) ? $this->getEffects()['amount'] : 0;
+        $amount = $this->getEffects()['amount'] ?? 0;
 
         return (float) $amount;
     }

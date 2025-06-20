@@ -560,8 +560,6 @@ class Order extends BaseOrder
             )
         );
 
-        return (null !== $event->getManageStock())
-            ? $event->getManageStock()
-            : $paymentModule->manageStockOnCreation();
+        return $event->getManageStock() ?? $paymentModule->manageStockOnCreation();
     }
 }

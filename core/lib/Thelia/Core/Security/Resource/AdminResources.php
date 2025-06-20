@@ -42,7 +42,7 @@ class AdminResources
     {
         $constantName = strtoupper($name);
         if (null === self::$selfReflection) {
-            self::$selfReflection = new \ReflectionClass(__CLASS__);
+            self::$selfReflection = new \ReflectionClass(self::class);
         }
         if (self::$selfReflection->hasConstant($constantName)) {
             return self::$selfReflection->getConstant($constantName);

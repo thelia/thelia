@@ -63,7 +63,7 @@ class Export extends BaseExport
                     'The class "%class" must extend %baseClass',
                     [
                         '%class' => $class,
-                        '%baseClass' => 'Thelia\\ImportExport\\Export\\AbstractExport',
+                        '%baseClass' => \Thelia\ImportExport\Export\AbstractExport::class,
                     ]
                 )
             );

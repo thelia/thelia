@@ -52,7 +52,7 @@ class MatchForXArticles extends ConditionAbstract
 
         if ((int) $values[self::CART_QUANTITY] <= 0) {
             throw new InvalidConditionValueException(
-                __CLASS__,
+                self::class,
                 'quantity'
             );
         }

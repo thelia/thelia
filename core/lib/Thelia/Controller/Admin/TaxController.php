@@ -155,7 +155,7 @@ class TaxController extends AbstractCrudController
     protected function getRouteArguments($tax_id = null)
     {
         return [
-            'tax_id' => $tax_id === null ? $this->getRequest()->get('tax_id') : $tax_id,
+            'tax_id' => $tax_id ?? $this->getRequest()->get('tax_id'),
         ];
     }
 

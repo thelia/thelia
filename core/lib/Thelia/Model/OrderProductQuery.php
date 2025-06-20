@@ -73,7 +73,7 @@ class OrderProductQuery extends BaseOrderProductQuery
 
         $count = $query->findOne();
 
-        return null === $count ? 0 : $count;
+        return $count ?? 0;
     }
 }
 // OrderProductQuery

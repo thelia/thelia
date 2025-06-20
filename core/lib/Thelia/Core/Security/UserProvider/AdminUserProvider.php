@@ -81,10 +81,6 @@ class AdminUserProvider implements PayloadAwareUserProviderInterface
             throw new UnsupportedUserException(sprintf('User "%s" is not supported on this route.', $userIdentifier));
         }
 
-        if (isset($this->cache[$userIdentifier])) {
-            return $this->cache[$userIdentifier];
-        }
-
-        return $this->cache[$userIdentifier] = $this->loadUserByIdentifier($userIdentifier);
+        return $this->cache[$userIdentifier] ?? $this->cache[$userIdentifier] = $this->loadUserByIdentifier($userIdentifier);
     }
 }

@@ -52,8 +52,8 @@ abstract class BasePaymentModuleController extends BaseFrontController
             $logFilePath = $this->getLogFilePath();
 
             $this->log->setPrefix('#LEVEL: #DATE #HOUR: ');
-            $this->log->setDestinations('\\Thelia\\Log\\Destination\\TlogDestinationFile');
-            $this->log->setConfig('\\Thelia\\Log\\Destination\\TlogDestinationFile', 0, $logFilePath);
+            $this->log->setDestinations(\Thelia\Log\Destination\TlogDestinationFile::class);
+            $this->log->setConfig(\Thelia\Log\Destination\TlogDestinationFile::class, 0, $logFilePath);
             $this->log->setLevel(Tlog::INFO);
         }
 

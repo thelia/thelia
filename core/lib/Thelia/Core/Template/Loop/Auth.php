@@ -80,9 +80,9 @@ class Auth extends BaseLoop implements ArraySearchLoopInterface
         try {
             if (true === $this->securityContext->isGranted(
                 $roles,
-                $resource === null ? [] : $resource,
-                $module === null ? [] : $module,
-                $access === null ? [] : $access
+                $resource ?? [],
+                $module ?? [],
+                $access ?? []
             )
             ) {
                 // Create an empty row: loop is no longer empty :)

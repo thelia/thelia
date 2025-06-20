@@ -190,8 +190,8 @@ class TaxRuleController extends AbstractCrudController
     protected function getViewArguments($country = null, $tab = null, $state = null)
     {
         return [
-            'tab' => $tab === null ? $this->getRequest()->get('tab', 'data') : $tab,
-            'country' => $country === null ? $this->getRequest()->get('country', CountryQuery::create()->findOneByByDefault(1)->getId()) : $country,
+            'tab' => $tab ?? $this->getRequest()->get('tab', 'data'),
+            'country' => $country ?? $this->getRequest()->get('country', CountryQuery::create()->findOneByByDefault(1)->getId()),
             'state' => $state,
         ];
     }
@@ -199,7 +199,7 @@ class TaxRuleController extends AbstractCrudController
     protected function getRouteArguments($tax_rule_id = null)
     {
         return [
-            'tax_rule_id' => $tax_rule_id === null ? $this->getRequest()->get('tax_rule_id') : $tax_rule_id,
+            'tax_rule_id' => $tax_rule_id ?? $this->getRequest()->get('tax_rule_id'),
         ];
     }
 
