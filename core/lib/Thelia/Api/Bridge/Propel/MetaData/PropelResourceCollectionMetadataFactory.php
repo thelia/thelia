@@ -34,9 +34,9 @@ use Thelia\Api\Bridge\Propel\State\PropelPersistProcessor;
 use Thelia\Api\Bridge\Propel\State\PropelRemoveProcessor;
 use Thelia\Api\Resource\PropelResourceInterface;
 
-final class PropelResourceCollectionMetadataFactory implements ResourceMetadataCollectionFactoryInterface
+final readonly class PropelResourceCollectionMetadataFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $decorated)
+    public function __construct(private ResourceMetadataCollectionFactoryInterface $decorated)
     {
     }
 

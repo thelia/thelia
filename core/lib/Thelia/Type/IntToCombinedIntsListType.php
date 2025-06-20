@@ -50,7 +50,7 @@ class IntToCombinedIntsListType extends BaseType
             $return = [];
 
             $values = preg_replace('#[\s]#', '', (string) $values);
-            foreach (explode(',', $values) as $intToCombinedInts) {
+            foreach (explode(',', (string) $values) as $intToCombinedInts) {
                 $parts = explode(':', $intToCombinedInts);
 
                 $return[trim($parts[0])] = [
@@ -69,9 +69,9 @@ class IntToCombinedIntsListType extends BaseType
     {
         /* delete  all spaces and parentheses */
         $noSpaceString = preg_replace('#[\s]#', '', (string) $string);
-        $noParentheseString = preg_replace('#[\(\)]#', '', $noSpaceString);
+        $noParentheseString = preg_replace('#[\(\)]#', '', (string) $noSpaceString);
 
-        if (!preg_match('#^([0-9]+([\&\|][0-9]+)*|\*)$#', $noParentheseString)) {
+        if (!preg_match('#^([0-9]+([\&\|][0-9]+)*|\*)$#', (string) $noParentheseString)) {
             return false;
         }
 
@@ -79,7 +79,7 @@ class IntToCombinedIntsListType extends BaseType
         $openingParenthesesCount = 0;
         $closingParenthesesCount = 0;
 
-        $length = \strlen($noSpaceString);
+        $length = \strlen((string) $noSpaceString);
         for ($i = 0; $i < $length; ++$i) {
             $char = $noSpaceString[$i];
             if ($char == '(') {

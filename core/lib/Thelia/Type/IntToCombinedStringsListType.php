@@ -112,10 +112,10 @@ class IntToCombinedStringsListType extends BaseType
         $string = preg_replace('/\\\[,\:\(\)\|\&]/', '', (string) $string);
 
         /* delete  all spaces and parentheses */
-        $noSpaceString = preg_replace('#[\s]#', '', $string);
-        $noParentheseString = preg_replace('#[\(\)]#', '', $noSpaceString);
+        $noSpaceString = preg_replace('#[\s]#', '', (string) $string);
+        $noParentheseString = preg_replace('#[\(\)]#', '', (string) $noSpaceString);
 
-        if (!preg_match('#^([a-zA-Z0-9_\-]+([\&\|][a-zA-Z0-9_\-]+)*|\*)$#', $noParentheseString)) {
+        if (!preg_match('#^([a-zA-Z0-9_\-]+([\&\|][a-zA-Z0-9_\-]+)*|\*)$#', (string) $noParentheseString)) {
             return false;
         }
 
@@ -123,7 +123,7 @@ class IntToCombinedStringsListType extends BaseType
         $openingParenthesesCount = 0;
         $closingParenthesesCount = 0;
 
-        $length = \strlen($noSpaceString);
+        $length = \strlen((string) $noSpaceString);
         for ($i = 0; $i < $length; ++$i) {
             $char = $noSpaceString[$i];
             if ($char == '(') {

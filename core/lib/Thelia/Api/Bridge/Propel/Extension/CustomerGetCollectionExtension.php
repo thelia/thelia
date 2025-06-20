@@ -20,13 +20,13 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Http\AccessMapInterface;
 use Thelia\Model\Customer;
 
-final class CustomerGetCollectionExtension implements QueryCollectionExtensionInterface
+final readonly class CustomerGetCollectionExtension implements QueryCollectionExtensionInterface
 {
     public function __construct(
-        private readonly TokenStorageInterface $token,
-        private readonly RequestStack $requestStack,
+        private TokenStorageInterface $token,
+        private RequestStack $requestStack,
         #[Autowire(service: 'security.access_map')]
-        private readonly AccessMapInterface $accessMap,
+        private AccessMapInterface $accessMap,
     ) {
     }
 

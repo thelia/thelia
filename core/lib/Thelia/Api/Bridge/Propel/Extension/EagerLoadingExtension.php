@@ -23,10 +23,10 @@ use Thelia\Api\Resource\I18n;
 use Thelia\Api\Resource\TranslatableResourceInterface;
 use Thelia\Model\LangQuery;
 
-final class EagerLoadingExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
+final readonly class EagerLoadingExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
     public function __construct(
-        private readonly int $maxJoins = 30
+        private int $maxJoins = 30
     ) {
     }
 

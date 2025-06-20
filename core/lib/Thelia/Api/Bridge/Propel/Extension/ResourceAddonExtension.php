@@ -16,10 +16,10 @@ use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 
-final class ResourceAddonExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
+final readonly class ResourceAddonExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
     public function __construct(
-        private readonly ApiResourcePropelTransformerService $apiResourcePropelTransformerService
+        private ApiResourcePropelTransformerService $apiResourcePropelTransformerService
     ) {
     }
 

@@ -42,7 +42,7 @@ abstract class BaseConstraint implements ConstraintInterface
         $expressionElements = preg_split('/[\.\-]/', (string) $this->expression);
         // cleaning alpha RC beta
         $version = preg_replace('/\-.*$/', '', (string) $version);
-        $versionElements = preg_split('/\./', $version);
+        $versionElements = preg_split('/\./', (string) $version);
 
         if (\count($expressionElements) < \count($versionElements)) {
             if (true === $changeExpression) {

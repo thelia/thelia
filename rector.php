@@ -10,5 +10,5 @@ return RectorConfig::configure()
         ]
     )
     ->withPhpSets(
-        php81: true
+        php82: true
     );
