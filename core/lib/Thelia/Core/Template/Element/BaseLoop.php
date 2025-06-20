@@ -50,6 +50,7 @@ use Thelia\Type\TypeCollection;
  * @method bool          getReturnUrl()       false for disable the generation of urls
  * @method ModelCriteria buildModelCriteria()
  * @method array         buildArray()
+ * @deprecated prefer to use the the resources from API
  */
 abstract class BaseLoop implements LoopInterface
 {

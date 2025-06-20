@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace Thelia\Core\Hook;
 
 use InvalidArgumentException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Template\ParserInterface;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 use Thelia\Core\Event\Hook\HookRenderEvent;
@@ -49,35 +50,19 @@ abstract class BaseHook implements BaseHookInterface
 {
     public const INJECT_TEMPLATE_METHOD_NAME = 'insertTemplate';
 
-    /** @var BaseModule */
-    public $module;
+    public ?BaseModule $module;
 
-    /** @var array list of templates automatically injected */
-    protected $templates = [];
+    protected array $templates = [];
 
-    /** @var TranslatorInterface */
-    public $translator;
+    public TranslatorInterface $translator;
 
-    /** @var Request */
-    protected $request;
-
-    /** @var Session */
-    protected $session;
-
-    /** @var Customer */
-    protected $customer;
-
-    /** @var Cart */
-    protected $cart;
-
-    /** @var Order */
-    protected $order;
-
-    /** @var Lang */
-    protected $lang;
-
-    /** @var Currency */
-    protected $currency;
+    protected Request $request;
+    protected Session $session;
+    protected Customer $customer;
+    protected Cart $cart;
+    protected Order $order;
+    protected Lang $lang;
+    protected Currency $currency;
 
     #[Required]
     public ContainerInterface $container;

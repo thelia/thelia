@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-// config/packages/api_platform.php
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 return static function (ContainerConfigurator $container): void {

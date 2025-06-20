@@ -44,7 +44,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -85,6 +84,7 @@ use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\ModuleManagement;
 use Thelia\TaxEngine\TaxTypeInterface;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 class Thelia extends Kernel
 {
@@ -93,15 +93,10 @@ class Thelia extends Kernel
     public const THELIA_VERSION = '2.5.5';
 
     protected SchemaLocator $propelSchemaLocator;
-
     protected PropelInitService $propelInitService;
-
     protected ParserResolver $parserResolver;
-
     protected ConnectionInterface $theliaDatabaseConnection;
-
     protected bool $cacheRefresh = false;
-
     protected bool $propelConnectionAvailable;
 
     public function __construct(string $environment, bool $debug)
@@ -181,40 +176,37 @@ class Thelia extends Kernel
         return parent::handle($request, $type, $catch);
     }
 
-    /**
-     * Configures the container.
-     *
-     * You can register extensions:
-     *
-     *     $c->extension('framework', [
-     *         'secret' => '%secret%'
-     *     ]);
-     *
-     * Or services:
-     *
-     *     $c->services()->set('halloween', 'FooBundle\HalloweenProvider');
-     *
-     * Or parameters:
-     *
-     *     $c->parameters()->set('halloween', 'lot of fun');
-     */
     protected function configureContainer(ContainerConfigurator $container): void
     {
-        $container->parameters()->set('thelia_front_template', ConfigQuery::read(TemplateDefinition::FRONT_OFFICE_CONFIG_NAME, 'default'));
-        $container->parameters()->set('thelia_admin_template', ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME, 'default'));
+        $container->parameters()->set(
+            'thelia_front_template',
+            ConfigQuery::read(TemplateDefinition::FRONT_OFFICE_CONFIG_NAME, 'default')
+        );
+        $container->parameters()->set(
+            'thelia_admin_template',
+            ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME, 'default')
+        );
 
-        $container->import(__DIR__.'/../Config/Resources/*.yaml');
-        $container->import(__DIR__.'/../Config/Resources/{packages}/*.yaml');
-        $container->import(__DIR__.'/../Config/Resources/{packages}/'.$this->environment.'/*.yaml');
+        $container->import(__DIR__.'/../Config/Resources/*.php');
+
+        $container->import(__DIR__.'/../Config/Resources/packages/*.php');
+        $container->import(__DIR__.'/../Config/Resources/parameters/*.php');
+        $container->import(__DIR__.'/../Config/Resources/services/*.php');
+        $container->import(__DIR__.'/../Config/Resources/services/core/*.php');
+        $container->import(__DIR__.'/../Config/Resources/services/handlers/*.php');
+        $container->import(__DIR__.'/../Config/Resources/services/integrations/*.php');
+        $container->import(__DIR__.'/../Config/Resources/services/providers/*.php');
+        $container->import(__DIR__.'/../Config/Resources/services/utilities/*.php');
+
     }
 
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
-        $routes->import(__DIR__.'/../Config/Resources/routing/*.yaml');
+        $routes->import(__DIR__.'/../Config/Resources/routing/*.php');
 
         $envRouteDir = __DIR__.'/../Config/Resources/routing/'.$this->environment;
         if (is_dir($envRouteDir)) {
-            $routes->import($envRouteDir.'/*.yaml');
+            $routes->import($envRouteDir.'/*.php');
         }
     }
 
@@ -330,11 +322,6 @@ class Thelia extends Kernel
         }
     }
 
-    /**
-     * Gets the container's base class.
-     *
-     * All names except Container must be fully qualified.
-     */
     protected function getContainerBaseClass(): string
     {
         return TheliaContainer::class;
@@ -351,8 +338,6 @@ class Thelia extends Kernel
     }
 
     /**
-     * Gets the cache directory.
-     *
      * @api
      */
     public function getCacheDir(): string
@@ -365,8 +350,6 @@ class Thelia extends Kernel
     }
 
     /**
-     * Gets the log directory.
-     *
      * @api
      */
     public function getLogDir(): string
@@ -379,11 +362,7 @@ class Thelia extends Kernel
     }
 
     /**
-     * Builds the service container.
-     *
      * @throws Exception
-     *
-     * @return ContainerBuilder The compiled service container
      */
     protected function buildContainer(): ContainerBuilder
     {
@@ -408,7 +387,7 @@ class Thelia extends Kernel
         return array_merge($parameters, [
             'kernel.runtime_environment' => $this->environment,
             'thelia.root_dir' => THELIA_ROOT,
-            'thelia.core_dir' => \dirname(__DIR__), // This class is in core/lib/Thelia/Core.
+            'thelia.core_dir' => \dirname(__DIR__),
             'thelia.module_dir' => THELIA_MODULE_DIR,
             'thelia.local_module_dir' => THELIA_LOCAL_MODULE_DIR,
             'thelia.database_host' => $_SERVER['DATABASE_HOST'] ?? null,
@@ -470,7 +449,7 @@ class Thelia extends Kernel
     }
 
     /**
-     * @throws \Exceptionœ
+     * @throws \Exception
      */
     private function loadService(ContainerBuilder $container): void
     {
@@ -497,9 +476,12 @@ class Thelia extends Kernel
                 \call_user_func([$module->getFullNamespace(), 'loadConfiguration'], $container);
 
                 $definition = new Definition();
-                $definition->setClass($module->getFullNamespace());
-                $definition->addMethodCall('setContainer', [new Reference('service_container')]);
-                $definition->setPublic(true);
+                $definition->setClass($module->getFullNamespace())
+                    ->addMethodCall(
+                        'setContainer',
+                        [ContainerInterface::class]
+                    )
+                    ->setPublic(true);
 
                 $container->setDefinition(
                     'module.'.$module->getCode(),

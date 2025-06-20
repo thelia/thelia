@@ -4,15 +4,6 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
-    <parameters>
-        <parameter key="router.request_context.class">Symfony\Component\Routing\RequestContext</parameter>
-        <parameter key="router.null_generator.class">Thelia\Routing\NullUrlGenerator</parameter>
-        <parameter key="router.dynamicRouter.class">Symfony\Cmf\Component\Routing\DynamicRouter</parameter>
-        <parameter key="router.chainRouter.class">Symfony\Cmf\Component\Routing\ChainRouter</parameter>
-        <parameter key="router.class">Symfony\Component\Routing\Router</parameter>
-        <parameter key="router.xmlFileName">routing.xml</parameter>
-    </parameters>
-
     <services>
         <service id="Thelia\Core\EventListener\ViewListener">
             <argument type="service" id="thelia.parser.resolver"/>
@@ -78,7 +69,7 @@
           <tag name="routing.loader" priority="252" />
         </service>
 
-        <service id="router.chainRequest" class="%router.chainrouter.class%">
+        <service id="router.chainRequest" class="%router.chainRouter.class%">
             <call method="setContext">
                 <argument type="service" id="request.context"/>
             </call>

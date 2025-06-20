@@ -15,8 +15,8 @@ use Thelia\Service\ConfigCacheService;
 return static function (ContainerConfigurator $configurator): void {
     // Import service configurations
     $configurator->import('packages/*');
-    $configurator->import('services/*');
     $configurator->import('parameters/*');
+    $configurator->import('services/*');
 
 
     $serviceConfigurator = $configurator->services();
