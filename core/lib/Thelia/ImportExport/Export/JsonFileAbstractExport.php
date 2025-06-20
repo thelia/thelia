@@ -56,7 +56,7 @@ abstract class JsonFileAbstractExport extends AbstractExport
 
             // Check if $data is a path to a json file
             if (\is_string($data)
-                && '.json' === substr($data, -5)
+                && str_ends_with($data, '.json')
                 && file_exists($data)
             ) {
                 $this->data = new \SplFileObject($data, 'r');

@@ -186,7 +186,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
                                                 false,
                                                 false
                                             ),
-                                            'dollar' => strstr($match, '$') !== false,
+                                            'dollar' => str_contains($match, '$'),
                                         ];
                                     }
 

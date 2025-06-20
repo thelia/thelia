@@ -645,9 +645,7 @@ class BaseModule implements BaseModuleInterface
 
             unset($titles[$defaultLocale]);
         } else {
-            reset($titles);
-
-            $locale = key($titles);
+            $locale = array_key_first($titles);
             $title = array_shift($titles);
         }
 

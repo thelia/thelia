@@ -225,7 +225,7 @@ abstract class BaseLoop implements LoopInterface
      */
     public function __call($name, $arguments)
     {
-        if (substr($name, 0, 3) == 'get') {
+        if (str_starts_with($name, 'get')) {
             // camelCase to underscore: getNotEmpty -> not_empty
             $argName = strtolower(preg_replace('/([^A-Z])([A-Z])/', '$1_$2', substr($name, 3)));
 

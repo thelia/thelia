@@ -134,7 +134,7 @@ class URL
     public function absoluteUrl($path, array $parameters = null, $path_only = self::WITH_INDEX_PAGE, $alternateBaseUrl = null)
     {
         // Already absolute ?
-        if (substr($path, 0, 4) != 'http') {
+        if (!str_starts_with($path, 'http')) {
             if (empty($alternateBaseUrl)) {
                 // Prevent duplication of the subdirectory name when Thelia is installed in a subdirectory.
                 // This happens when $path was calculated with Router::generate(), which returns an absolute URL,
@@ -153,7 +153,7 @@ class URL
 
             // If only a path is requested, be sure to remove the script name (index.php or index_dev.php), if any.
             if ($path_only == self::PATH_TO_FILE) {
-                if (substr($base_url, -3) == 'php') {
+                if (str_ends_with($base_url, 'php')) {
                     $base_url = \dirname($base_url);
                 }
             }
@@ -188,7 +188,7 @@ class URL
 
             $base = rtrim($base, '?&');
 
-            $sepChar = strstr($base, '?') === false ? '?' : '&';
+            $sepChar = !str_contains($base, '?') ? '?' : '&';
 
             $queryString = $sepChar.$queryString;
         }
