@@ -189,8 +189,8 @@ class GenerateSQLCommand extends ContainerAwareCommand
         if (empty($params['locale'])) {
             throw new RuntimeException('Translation Error. Locale is empty.');
         }
-        $inString = (0 !== (int) $params['in_string']);
-        $useDefault = (0 !== (int) $params['use_default']);
+        $inString = (0 !== (int) ($params['in_string'] ?? ''));
+        $useDefault = (0 !== (int) ($params['use_default'] ?? ''));
 
         $translation = $this->translator->trans(
             $params['l'],
