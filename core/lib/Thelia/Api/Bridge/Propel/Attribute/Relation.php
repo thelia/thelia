@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -21,6 +19,8 @@ class Relation
         private readonly string $targetResource,
         private readonly ?string $relationAlias = null,
         private readonly ?array $propertyGroups = [],
+        private readonly ?bool $forceJoin = null,
+        private readonly ?array $excludedGroups = [],
     ) {
     }
 }
