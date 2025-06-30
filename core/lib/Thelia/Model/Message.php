@@ -13,7 +13,6 @@ declare(strict_types=1);
  */
 namespace Thelia\Model;
 
-use SmartyException;
 use Symfony\Component\Mime\Email;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserInterface;
@@ -29,7 +28,6 @@ class Message extends BaseMessage
      * @param string          $message
      * @param bool            $compressOutput
      *
-     * @throws SmartyException
      *
      * @return bool|string
      */
@@ -66,7 +64,6 @@ class Message extends BaseMessage
     /**
      * Get the HTML message body.
      *
-     * @throws SmartyException
      *
      * @return bool|string
      */
@@ -81,7 +78,6 @@ class Message extends BaseMessage
     }
 
     /**
-     * @throws SmartyException
      *
      * @return string|string[]|null
      */
@@ -109,7 +105,6 @@ class Message extends BaseMessage
      *                                  `templates/email/default/' directory is used if
      *                                  `$useFallbackTemplate` is set to `true`
      *
-     * @throws SmartyException
      *
      * @return Email
      */

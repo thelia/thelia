@@ -16,7 +16,7 @@ namespace Thelia\Controller\Admin;
 use Symfony\Component\HttpFoundation\Response;
 use Exception;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Thelia\Service\Handler\Exporthandler;
+use Thelia\Service\DataTransfer\Exporthandler;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Core\Archiver\ArchiverManager;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;

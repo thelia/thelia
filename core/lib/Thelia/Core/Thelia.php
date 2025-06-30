@@ -21,6 +21,8 @@ namespace Thelia\Core;
  *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
+
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Bundle\TheliaBundle;
 use Symfony\Component\HttpFoundation\Response;
 use PDO;
@@ -45,7 +47,6 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\ErrorHandler\Debug;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\FormExtensionInterface;
@@ -122,19 +123,27 @@ class Thelia extends Kernel
     {
         parent::boot();
 
-        if ($this->cacheRefresh) {
-            $moduleManagement = new ModuleManagement($this->getContainer());
-            $moduleManagement->updateModules($this->getContainer());
-        }
-
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = $this->getContainer()->get('event_dispatcher');
+
+        if ($this->cacheRefresh) {
+            $container = $this->getContainer();
+            $moduleManagement = new ModuleManagement(
+                $container,
+                $eventDispatcher,
+                null,
+                $container->getParameter('kernel.cache_dir')
+            );
+            $moduleManagement->updateModules($this->getContainer());
+        }
 
         if ($this->propelConnectionAvailable) {
             $this->theliaDatabaseConnection->setEventDispatcher($eventDispatcher);
         }
 
         $this->addModuleTemplateToParsers();
+
+
 
         if (self::isInstalled()) {
             $eventDispatcher->dispatch(new Event(), TheliaEvents::BOOT);
@@ -197,7 +206,6 @@ class Thelia extends Kernel
         $container->import(__DIR__.'/../Config/Resources/services/integrations/*.php');
         $container->import(__DIR__.'/../Config/Resources/services/providers/*.php');
         $container->import(__DIR__.'/../Config/Resources/services/utilities/*.php');
-
     }
 
     protected function configureRoutes(RoutingConfigurator $routes): void
@@ -758,9 +766,15 @@ class Thelia extends Kernel
     private function addModuleTemplateToParsers(): void
     {
         $parserResolver = $this->container->get('thelia.parser.resolver');
+        $parsers = $parserResolver->getParsers();
+        if (empty($parsers)) {
+            return;
+        }
         $modules = ModuleQuery::getActivated();
-
-        foreach ($parserResolver->getParsers() as $parser) {
+        foreach ($parsers as $parser) {
+            if (!is_object($parser)) {
+                continue;
+            }
             foreach ($modules as $module) {
                 $this->addTemplatesFromModule($parser, $module);
             }
@@ -782,7 +796,7 @@ class Thelia extends Kernel
         }
     }
 
-    private function addTemplatesFromDirectory(ParserInterface $parser, Module $module, string $templateType, string $templateDirectory): void
+    private function addTemplatesFromDirectory(ParserInterface $parser, Module $module, int $templateType, string $templateDirectory): void
     {
         $code = ucfirst($module->getCode());
         $templateDirBrowser = new DirectoryIterator($templateDirectory);

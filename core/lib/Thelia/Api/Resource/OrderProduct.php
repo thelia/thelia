@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Thelia\Api\Resource;
 
 
+use DateTime;
 use Thelia\Model\AttributeCombination;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;

@@ -15,7 +15,7 @@ namespace Thelia\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use RuntimeException;
-use Thelia\Service\Handler\ExportHandler;
+use Thelia\Service\DataTransfer\ExportHandler;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

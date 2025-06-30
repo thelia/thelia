@@ -13,6 +13,8 @@ declare(strict_types=1);
  */
 namespace Thelia\Tools;
 
+use Random\RandomException;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -25,38 +27,18 @@ use Thelia\Core\Security\Exception\TokenAuthenticationException;
  */
 class TokenProvider
 {
-    /**
-     * @var string The stored token for this page
-     */
-    protected $token;
-
+    protected ?string $token = null;
     protected ?SessionInterface $session = null;
 
-    /**
-     * @param string $tokenName
-     */
-    public function __construct(protected RequestStack $requestStack, /**
-     * @var TranslatorInterface The translator
-     */
-    protected TranslatorInterface $translator, /**
-     * @var string the current name of the token
-     */
-    protected $tokenName)
+
+    public function __construct(
+        protected RequestStack $requestStack,
+        protected TranslatorInterface $translator,
+        #[Autowire('%thelia.token_id%')]
+        protected string $tokenName
+    )
     {
         $this->assignTokenFromSession();
-    }
-
-    private function setSessionFromRequest(): void
-    {
-        $currentRequest = $this->requestStack->getCurrentRequest();
-        if ($currentRequest && $currentRequest->hasSession()) {
-            $session = $this->requestStack->getSession();
-            $this->session = $session->isStarted() ? $session : null;
-
-            return;
-        }
-
-        $this->session = null;
     }
 
     private function assignTokenFromSession(): void
@@ -72,9 +54,9 @@ class TokenProvider
     }
 
     /**
-     * @return string
+     * @throws RandomException
      */
-    public function assignToken()
+    public function assignToken(): ?string
     {
         if (null === $this->token) {
             $this->token = $this->getToken();
@@ -88,11 +70,9 @@ class TokenProvider
     }
 
     /**
-     * @param string $entryValue
-     *
      * @throws TokenAuthenticationException
      */
-    public function checkToken($entryValue): bool
+    public function checkToken(string $entryValue): bool
     {
         $this->assignTokenFromSession();
         if (null === $this->token) {
@@ -110,21 +90,26 @@ class TokenProvider
         return true;
     }
 
+    /**
+     * @throws RandomException
+     */
     protected function refreshToken(): void
     {
         $this->token = null;
         $this->assignToken();
     }
 
+    /**
+     * @throws RandomException
+     */
     public function getToken(): string
     {
         return self::generateToken();
     }
 
     /**
-     * Same method as getToken but can be called statically.
-     *
      * @alias getToken
+     * @throws RandomException
      */
     public static function generateToken(): string
     {

@@ -19,7 +19,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\ImportCategoryQuery;
 use Thelia\Model\ImportQuery;
-use Thelia\Service\Handler\ImportHandler;
+use Thelia\Service\DataTransfer\ImportHandler;
 
 /**
  * Class Import.

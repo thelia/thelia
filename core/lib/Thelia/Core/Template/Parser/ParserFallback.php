@@ -16,7 +16,6 @@ namespace Thelia\Core\Template\Parser;
 use RuntimeException;
 use InvalidArgumentException;
 use Thelia\Core\Template\TemplateHelperInterface;
-use SmartyException;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 
@@ -139,7 +138,6 @@ class ParserFallback implements ParserInterface
      *
      * @param bool $fallbackToDefaultTemplate if true, resources will be also searched in the "default" template
      *
-     * @throws SmartyException
      */
     public function pushTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false): void
     {
@@ -149,7 +147,6 @@ class ParserFallback implements ParserInterface
     /**
      * Restore the previous stored template definition, if one exists.
      *
-     * @throws SmartyException
      */
     public function popTemplateDefinition(): void
     {

@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Thelia\Core\Template;
 
 use Exception;
-use SmartyException;
 use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Thelia\Core\HttpFoundation\Request;
@@ -39,7 +38,6 @@ interface ParserInterface
      *
      * @throws ResourceNotFoundException if the template cannot be found
      * @throws Exception
-     * @throws SmartyException
      *
      * @return string the rendered template text
      */
@@ -53,7 +51,6 @@ interface ParserInterface
      * @param bool   $compressOutput if true, te output is compressed using trimWhitespaces. If false, no compression occurs
      *
      * @throws Exception
-     * @throws SmartyException
      *
      * @return string the rendered template text
      */
@@ -83,14 +80,12 @@ interface ParserInterface
      *
      * @param bool $fallbackToDefaultTemplate if true, resources will be also searched in the "default" template
      *
-     * @throws SmartyException
      */
     public function pushTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false);
 
     /**
      * Restore the previous stored template definition, if one exists.
      *
-     * @throws SmartyException
      */
     public function popTemplateDefinition();
 

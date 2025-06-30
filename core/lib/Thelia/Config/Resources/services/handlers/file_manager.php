@@ -14,6 +14,11 @@ declare(strict_types=1);
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Thelia\Files\FileManager;
+use Thelia\Files\Service\FileDeleteService;
+use Thelia\Files\Service\FilePositionService;
+use Thelia\Files\Service\FileProcessorService;
+use Thelia\Files\Service\FileUpdateService;
+use Thelia\Files\Service\FileVisibilityService;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductImage;
 use Thelia\Model\CategoryDocument;
@@ -30,11 +35,6 @@ return static function (ContainerConfigurator $configurator): void {
     $services = $configurator->services();
     $parameters = $configurator->parameters();
 
-    $services->set(FileManager::class)
-        ->args([param('file_model.classes')]);
-
-    $services->alias('thelia.file_manager', FileManager::class);
-
     // Liste des classes de modèles qui supportent la gestion d'images ou de documents
     $parameters->set('file_model.classes', [
         'document.product' => ProductDocument::class,
@@ -49,4 +49,53 @@ return static function (ContainerConfigurator $configurator): void {
         'image.brand' => BrandImage::class,
         'image.module' => ModuleImage::class,
     ]);
+
+
+    // Register file services
+    $services->set(FileProcessorService::class)
+        ->args([
+            service('thelia.file_manager'),
+            service('translator'),
+            service('thelia.admin.resources'),
+        ])
+        ->public();
+
+    $services->set(FileUpdateService::class)
+        ->factory([service('request_stack'), 'getCurrentRequest'])
+        ->args([
+            service('thelia.file_manager'),
+            service('translator'),
+        ])
+        ->public();
+
+    $services->set(FileDeleteService::class)
+        ->args([
+            service('thelia.file_manager'),
+            service('translator'),
+            service('thelia.admin.resources'),
+        ])
+        ->public();
+
+    $services->set(FilePositionService::class)
+        ->args([
+            service('thelia.file_manager'),
+            service('translator'),
+            service('thelia.admin.resources'),
+        ])
+        ->public();
+
+    $services->set(FileVisibilityService::class)
+        ->args([
+            service('thelia.file_manager'),
+            service('translator'),
+            service('thelia.admin.resources'),
+        ])
+        ->public();
+
+    // Create aliases for services
+    $services->alias('thelia.file.processor', FileProcessorService::class);
+    $services->alias('thelia.file.update', FileUpdateService::class);
+    $services->alias('thelia.file.delete', FileDeleteService::class);
+    $services->alias('thelia.file.position', FilePositionService::class);
+    $services->alias('thelia.file.visibility', FileVisibilityService::class);
 };

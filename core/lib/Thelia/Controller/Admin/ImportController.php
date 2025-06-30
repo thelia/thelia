@@ -13,7 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Thelia\Service\Handler\Importhandler;
+use Thelia\Service\DataTransfer\Importhandler;
 
 use Exception;
 use Thelia\Core\HttpFoundation\Response;

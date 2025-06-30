@@ -15,6 +15,7 @@ namespace Thelia\Api\Bridge\Propel\Service;
 
 use ReflectionClass;
 use ReflectionMethod;
+use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionProperty;
 use ReflectionAttribute;
@@ -27,6 +28,7 @@ use ApiPlatform\Validator\ValidatorInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
+use ReflectionType;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -46,6 +48,7 @@ readonly class ApiResourcePropelTransformerService
         private array $apiResourceAddons,
         private ValidatorInterface $validator,
         private EventDispatcherInterface $eventDispatcher,
+        private TypeCasterService $typeCasterService
     ) {
     }
 
@@ -514,7 +517,8 @@ readonly class ApiResourcePropelTransformerService
                 );
             }
 
-            $apiResource->$resourceSetter($value);
+            $castedValue = $this->typeCasterService->castValueForSetter($apiResource, $resourceSetter, $value);
+            $apiResource->$resourceSetter($castedValue);
         }
     }
 
@@ -729,4 +733,6 @@ readonly class ApiResourcePropelTransformerService
             }
         }
     }
+
+
 }

@@ -25,13 +25,13 @@ use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TheliaTemplateHelper;
-use Thelia\Service\Module\ModuleManager;
+use Thelia\Module\ModuleManagement;
 
 #[AsCommand(name: 'template:set', description: 'set template')]
 class SetTemplate extends ContainerAwareCommand
 {
     public function __construct(
-        private readonly ModuleManager $moduleManager,
+        private readonly ModuleManagement $moduleManager,
         private readonly TheliaTemplateHelper $theliaTemplateHelper,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly string $kernelCacheDir,

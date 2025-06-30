@@ -19,7 +19,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\ExportCategoryQuery;
 use Thelia\Model\ExportQuery;
-use Thelia\Service\Handler\ExportHandler;
+use Thelia\Service\DataTransfer\ExportHandler;
 
 /**
  * Class Export.

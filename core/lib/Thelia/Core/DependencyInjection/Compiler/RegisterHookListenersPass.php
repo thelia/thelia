@@ -41,7 +41,7 @@ use Thelia\Model\ModuleQuery;
  */
 class RegisterHookListenersPass implements CompilerPassInterface
 {
-    protected $debugEnabled;
+    protected bool $debugEnabled = false;
 
     public function process(ContainerBuilder $container): void
     {
@@ -62,13 +62,9 @@ class RegisterHookListenersPass implements CompilerPassInterface
         $this->processHook($container, $definition);
     }
 
-    protected function logAlertMessage($message, $failSafe = false): void
+    protected function logAlertMessage($message): void
     {
         Tlog::getInstance()->addAlert($message);
-
-        if (!$failSafe && $this->debugEnabled) {
-            // throw new \InvalidArgumentException($message);
-        }
     }
 
     protected function processHook(ContainerBuilder $container, Definition $definition): void
@@ -98,7 +94,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
                 }
 
                 if ($moduleProperty instanceof Reference) {
-                    $moduleCode = explode('.', $moduleProperty)[1];
+                    $moduleCode = explode('.', $moduleProperty->__toString())[1];
                 }
 
                 if (null === $moduleCode) {
@@ -136,13 +132,6 @@ class RegisterHookListenersPass implements CompilerPassInterface
     }
 
     /**
-     * Create a new hook if the hook definition is valid.
-     *
-     * @param string               $class      the namespace of the class
-     * @param Module $module the module
-     * @param string               $id         the service (hook) id
-     * @param array                $attributes the hook attributes
-     *
      * @throws InvalidArgumentException
      */
     protected function registerHook(string $class, Module $module, string $id, array $attributes): void
@@ -151,100 +140,60 @@ class RegisterHookListenersPass implements CompilerPassInterface
             throw new InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "hook.event_listener" tags.', $id));
         }
 
-        $active = isset($attributes['active']) ? (int) ($attributes['active']) : 1;
-        $attributes['active'] = (1 === $active);
-        $attributes['templates'] = isset($attributes['templates']) ? (string) ($attributes['templates']) : '';
-        $attributes['type'] = (isset($attributes['type'])) ? $this->getHookType($attributes['type']) : TemplateDefinition::FRONT_OFFICE;
+        $active = (int) ($attributes['active'] ?? 1) === 1;
+        $type = $this->getHookType($attributes['type'] ?? TemplateDefinition::FRONT_OFFICE);
+        $templates = (string) ($attributes['templates'] ?? '');
+        $method = $this->getMethodName($attributes)['method'];
 
-        if (null === $hook = $this->getHook($attributes['event'], $attributes['type'])) {
+        $hook = $this->getHook($attributes['event'], $type);
+        if (!$hook) {
             return;
         }
 
-        $attributes = $this->getMethodName($attributes);
-
-        // test if method exists
-        $validMethod = true;
-        if (!$this->isValidHookMethod($class, $attributes['method'], $hook->getBlock())) {
-            $validMethod = false;
-        }
-
-        // test if hook is already registered in ModuleHook
+        $isValidMethod = $this->isValidHookMethod($class, $method, $hook->getBlock());
         $moduleHook = ModuleHookQuery::create()
             ->filterByModuleId($module->getId())
             ->filterByHook($hook)
-            ->filterByMethod($attributes['method'])
+            ->filterByMethod($method)
             ->findOne();
 
-        if (null === $moduleHook) {
-            if (!$validMethod) {
-                $this->logAlertMessage(
-                    sprintf(
-                        'Module [%s] could not be registered hook [%s], method [%s] is not reachable.',
-                        $module->getCode(),
-                        $attributes['event'],
-                        $attributes['method']
-                    )
-                );
-
+        if (!$moduleHook) {
+            if (!$isValidMethod) {
+                $this->logAlertMessage(sprintf(
+                    'Module [%s] could not be registered to hook [%s], method [%s] is not reachable.',
+                    $module->getCode(),
+                    $attributes['event'],
+                    $method
+                ));
                 return;
             }
 
-            // Assign the module to the hook only if it has not been "deleted"
-            $ignoreCount = IgnoredModuleHookQuery::create()
-                ->filterByHook($hook)
-                ->filterByModuleId($module->getId())
-                ->count();
-            if (0 === $ignoreCount) {
-                // hook for module doesn't exist, we add it with default registered values
-                $moduleHook = new ModuleHook();
-
-                $moduleHook->setHook($hook)
+            if (!IgnoredModuleHookQuery::create()->filterByHook($hook)->filterByModuleId($module->getId())->exists()) {
+                (new ModuleHook())
+                    ->setHook($hook)
                     ->setModuleId($module->getId())
                     ->setClassname($id)
-                    ->setMethod($attributes['method'])
+                    ->setMethod($method)
                     ->setActive($active)
                     ->setHookActive(true)
                     ->setModuleActive(true)
-                    ->setPosition(ModuleHook::MAX_POSITION);
-
-                if (isset($attributes['templates'])) {
-                    $moduleHook->setTemplates($attributes['templates']);
-                }
-
-                $moduleHook->save();
+                    ->setPosition(ModuleHook::MAX_POSITION)
+                    ->setTemplates($templates)
+                    ->save();
             }
-        } elseif (!$validMethod) {
-            $this->logAlertMessage(
-                sprintf(
-                    'Module [%s] could not use hook [%s], method [%s] is not reachable anymore.',
-                    $module->getCode(),
-                    $attributes['event'],
-                    $attributes['method']
-                )
-            );
-            $moduleHook
-                ->setHookActive(false)
-                ->save();
-        } else {
-            // $moduleHook->setTemplates($attributes['templates']);
-
-            // Update hook if id was changed in the definition
-            if ($moduleHook->getClassname() != $id) {
-                $moduleHook
-                    ->setClassname($id);
-            }
-
-            $moduleHook->save();
+        } elseif (!$isValidMethod) {
+            $this->logAlertMessage(sprintf(
+                'Module [%s] could not use hook [%s], method [%s] is not reachable anymore.',
+                $module->getCode(),
+                $attributes['event'],
+                $method
+            ));
+            $moduleHook->setHookActive(false)->save();
+        } elseif ($moduleHook->getClassname() !== $id) {
+            $moduleHook->setClassname($id)->save();
         }
     }
 
-    /**
-     * First the new hooks are positioning next to the last module hook.
-     * Next, if the module, hook and module hook is active, a new listener is
-     * added to the service definition.
-     *
-     * @param Definition $definition The service definition
-     */
     protected function addHooksMethodCall(ContainerBuilder $container, Definition $definition): void
     {
         $moduleHooks = ModuleHookQuery::create()
@@ -316,7 +265,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
                     if (true === $moduleHook->getHook()->getByModule()) {
                         $moduleHookEventName .= '.'.$moduleHook->getModuleId();
                     }
-                    
+
                     $container
                         ->getDefinition($moduleHook->getClassname())
                         ->addMethodCall(
@@ -332,35 +281,19 @@ class RegisterHookListenersPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * get the hook type according to the type attribute of the hook tag.
-     *
-     * @return int the hook type
-     */
     protected function getHookType(string $name): int
     {
-        $type = TemplateDefinition::FRONT_OFFICE;
+        $name = preg_replace('[^a-z]', '', strtolower(trim($name)));
 
-        if (null !== $name && \is_string($name)) {
-            $name = preg_replace('[^a-z]', '', strtolower(trim($name)));
-            if (\in_array($name, ['bo', 'back', 'backoffice'])) {
-                $type = TemplateDefinition::BACK_OFFICE;
-            } elseif ($name == 'email') {
-                $type = TemplateDefinition::EMAIL;
-            } elseif ($name == 'pdf') {
-                $type = TemplateDefinition::PDF;
-            }
-        }
-
-        return $type;
+        return match ($name) {
+            'bo', 'back', 'backoffice' => TemplateDefinition::BACK_OFFICE,
+            'email' => TemplateDefinition::EMAIL,
+            'pdf' => TemplateDefinition::PDF,
+            default => TemplateDefinition::FRONT_OFFICE,
+        };
     }
 
-    /**
-     * G<et a hook for a hook name (code) and a hook type. The hook should exists and be activated.
-     *
-     * @return Hook|null
-     */
-    protected function getHook(string $hookName, int $hookType)
+    protected function getHook(string $hookName, int $hookType): ?Hook
     {
         $hook = HookQuery::create()
             ->filterByCode($hookName)
@@ -374,19 +307,12 @@ class RegisterHookListenersPass implements CompilerPassInterface
         }
 
         if (!$hook->getActivate()) {
-            $this->logAlertMessage(sprintf('Hook %s is not activated.', $hookName), true);
+            $this->logAlertMessage(sprintf('Hook %s is not activated.', $hookName));
         }
 
         return $hook;
     }
 
-    /**
-     * Test if the method that will handled the hook is valid.
-     *
-     * @param string $className  the namespace of the class
-     * @param string $methodName the method name
-     * @param bool   $block      tell if the hook is a block or a function
-     */
     protected function isValidHookMethod(string $className, string $methodName, bool $block, bool $failSafe = false): bool
     {
         try {
@@ -398,15 +324,14 @@ class RegisterHookListenersPass implements CompilerPassInterface
                 HookDefinition::RENDER_BLOCK_EVENT :
                 HookDefinition::RENDER_FUNCTION_EVENT;
 
-            if ($parameters[0]->getType() != $eventType && !is_subclass_of($parameters[0]->getType(), $eventType)) {
+            if ($parameters[0]->getType() !== $eventType && !is_subclass_of($parameters[0]->getType(), $eventType)) {
                 $this->logAlertMessage(sprintf('Method %s should use an event of type %s. found: %s', $methodName, $eventType, $parameters[0]->getType()));
 
                 return false;
             }
         } catch (ReflectionException $reflectionException) {
             $this->logAlertMessage(
-                sprintf('Method %s does not exist in %s : %s', $methodName, $className, $reflectionException),
-                $failSafe
+                sprintf('Method %s does not exist in %s : %s', $methodName, $className, $reflectionException)
             );
 
             return false;
@@ -424,7 +349,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
                 return $event;
             }
 
-            $callback = (fn($matches) => strtoupper((string) $matches[0]));
+            $callback = (static fn($matches) => strtoupper((string) $matches[0]));
             $event['method'] = 'on'.preg_replace_callback(
                 [
                     '/(?<=\b)[a-z]/i',

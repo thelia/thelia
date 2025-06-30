@@ -15,7 +15,6 @@ namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use LogicException;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
@@ -25,7 +24,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryBuilderInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 use Symfony\Component\Validator\Validation;
@@ -34,6 +32,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\TheliaFormEvent;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
@@ -47,55 +46,16 @@ use Thelia\Tools\URL;
  */
 abstract class BaseForm implements FormInterface
 {
-    /**
-     * @var FormBuilderInterface
-     */
-    protected $formBuilder;
-
-    /**
-     * @var FormFactoryBuilderInterface
-     */
-    protected $formFactoryBuilder;
-
-    /**
-     * @var Form
-     */
-    protected $form;
-
-    /**
-     * @var Request
-     */
-    protected $request;
-
-    /**
-     * @var ValidatorBuilder
-     */
-    protected $validatorBuilder;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    private $view;
-
-    /**
-     * true if the form has an error, false otherwise.
-     *
-     * @var bool
-     */
-    private $has_error = false;
-
-    /**
-     * The form error message.
-     */
-    private string $error_message = '';
-
-    /**
-     * @var EventDispatcher
-     */
-    protected $dispatcher;
-
+    protected FormBuilderInterface $formBuilder;
+    protected FormFactoryBuilderInterface $formFactoryBuilder;
+    protected FormInterface $form;
+    protected Request $request;
+    protected ValidatorBuilder $validatorBuilder;
+    protected ?TranslatorInterface $translator = null;
+    private FormView $view;
+    private bool $hasError = false;
+    private string $errorMessage = '';
+    protected EventDispatcherInterface $dispatcher;
     private ?string $type = null;
 
     public function init(
@@ -217,14 +177,14 @@ abstract class BaseForm implements FormInterface
      *
      * @return bool
      */
-    public function isTemplateDefinedHiddenField(FormView $fieldView)
+    public function isTemplateDefinedHiddenField(FormView $fieldView): bool
     {
         return $this->isTemplateDefinedHiddenFieldName($fieldView->vars['name']);
     }
 
-    public function isTemplateDefinedHiddenFieldName($fieldName)
+    public function isTemplateDefinedHiddenFieldName($fieldName): bool
     {
-        return $fieldName == 'success_url' || $fieldName == 'error_url' || $fieldName == 'error_message';
+        return $fieldName === 'success_url' || $fieldName === 'error_url' || $fieldName === 'error_message';
     }
 
     /**
@@ -339,7 +299,7 @@ abstract class BaseForm implements FormInterface
      */
     public function setError($has_error = true): self
     {
-        $this->has_error = $has_error;
+        $this->hasError = $has_error;
 
         return $this;
     }
@@ -351,7 +311,7 @@ abstract class BaseForm implements FormInterface
      */
     public function hasError()
     {
-        return $this->has_error;
+        return $this->hasError;
     }
 
     /**
@@ -362,7 +322,7 @@ abstract class BaseForm implements FormInterface
     public function setErrorMessage(string $message): self
     {
         $this->setError(true);
-        $this->error_message = $message;
+        $this->errorMessage = $message;
 
         return $this;
     }
@@ -374,7 +334,7 @@ abstract class BaseForm implements FormInterface
      */
     public function getErrorMessage()
     {
-        return $this->error_message;
+        return $this->errorMessage;
     }
 
     /**

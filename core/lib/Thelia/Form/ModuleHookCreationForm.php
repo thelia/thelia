@@ -19,6 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Hook\BaseHook;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Base\ModuleHookQuery;
@@ -35,9 +36,6 @@ use Thelia\Model\ModuleQuery;
  */
 class ModuleHookCreationForm extends BaseForm
 {
-    /** @var Translator */
-    protected $translator;
-
     protected function buildForm(): void
     {
         $this->formBuilder

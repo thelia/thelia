@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Files;
 
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
@@ -26,37 +27,23 @@ use Thelia\Exception\ImageException;
  */
 class FileManager
 {
-    /**
-     * Create a new FileManager instance.
-     *
-     * @param array $supportedFileModels The key should have form type.parent, where type is the file type (document or image) and parent is the parent object of the file, form example product, brand, folder, etc.
-     */
-    public function __construct(protected $supportedFileModels)
+
+    public function __construct(
+        #[Autowire('%file_model.classes%')]
+        protected array $supportedFileModels
+    )
     {
     }
 
-    /**
-     * Create the file type identifier, to access the related class in the supportedFileModels table.
-     *
-     * @param string $fileType   the file type, e.g. document or image.
-     * @param string $parentType the parent object type, e.g. product, folder, brand, etc.
-     */
-    protected function getFileTypeIdentifier($fileType, $parentType): string
+    protected function getFileTypeIdentifier(string $fileType, string $parentType): string
     {
         return strtolower(sprintf('%s.%s', $fileType, $parentType));
     }
 
     /**
-     * Create a new FileModelInterface instance, from the supportedFileModels table.
-     *
-     * @param string $fileType   the file type, such as document, image, etc
-     * @param string $parentType the parent type, such as product, category, etc
-     *
      * @throws FileException if the file type is not supported, or if the class does not implements FileModelInterface
-     *
-     * @return FileModelInterface a file model interface instance
      */
-    public function getModelInstance($fileType, $parentType)
+    public function getModelInstance(string $fileType, string $parentType): FileModelInterface
     {
         if (!isset($this->supportedFileModels[$this->getFileTypeIdentifier($fileType, $parentType)])) {
             throw new FileException(
@@ -82,24 +69,12 @@ class FileManager
         return $instance;
     }
 
-    /**
-     * A a new FileModelInterface class name to the supported class list.
-     *
-     * @param string $fileType                the file type, such as document, image, etc
-     * @param string $parentType              the parent type, such as Product, Category, etc
-     * @param string $fullyQualifiedClassName the fully qualified class name
-     */
-    public function addFileModel($fileType, $parentType, $fullyQualifiedClassName): void
+    public function addFileModel(string $fileType, string $parentType, string $fullyQualifiedClassName): void
     {
         $this->supportedFileModels[$this->getFileTypeIdentifier($fileType, $parentType)] = $fullyQualifiedClassName;
     }
 
     /**
-     * Copy UploadedFile into the server storage directory.
-     *
-     * @param FileModelInterface $model        Model saved
-     * @param UploadedFile       $uploadedFile Ready to be uploaded file
-     *
      * @throws ImageException
      */
     public function copyUploadedFile(FileModelInterface $model, UploadedFile $uploadedFile): UploadedFile
@@ -135,16 +110,9 @@ class FileManager
     }
 
     /**
-     * Save file into the database.
-     *
-     * @param int                $parentId  the parent object ID
-     * @param FileModelInterface $fileModel the file model object (image or document) to save
-     *
      * @throws ImageException
-     *
-     * @return int number of modified rows in database
      */
-    protected function saveFile($parentId, FileModelInterface $fileModel)
+    protected function saveFile(int $parentId, FileModelInterface $fileModel): int
     {
         $nbModifiedLines = 0;
 
@@ -165,54 +133,21 @@ class FileManager
 
         return $nbModifiedLines;
     }
-
-    /**
-     * Save file into the database.
-     *
-     * @param FileCreateOrUpdateEvent $event      the event
-     * @param FileModelInterface      $imageModel the file model object (image or document) to save
-     *
-     * @return int number of modified rows in database
-     */
-    public function saveImage(FileCreateOrUpdateEvent $event, FileModelInterface $imageModel)
+    public function saveImage(FileCreateOrUpdateEvent $event, FileModelInterface $imageModel): int
     {
         return $this->saveFile($event->getParentId(), $imageModel);
     }
 
-    /**
-     * Save file into the database.
-     *
-     * @param FileCreateOrUpdateEvent $event         the event
-     * @param FileModelInterface      $documentModel the file model object (image or document) to save
-     *
-     * @return int number of modified rows in database
-     */
-    public function saveDocument(FileCreateOrUpdateEvent $event, FileModelInterface $documentModel)
+    public function saveDocument(FileCreateOrUpdateEvent $event, FileModelInterface $documentModel): int
     {
         return $this->saveFile($event->getParentId(), $documentModel);
     }
 
-    /**
-     * Sanitizes a filename replacing whitespace with dashes.
-     *
-     * Removes special characters that are illegal in filenames on certain
-     * operating systems and special characters requiring special escaping
-     * to manipulate at the command line.
-     *
-     * @param string $string The filename to be sanitized
-     *
-     * @return string The sanitized filename
-     */
-    public function sanitizeFileName($string): string
+    public function sanitizeFileName(string $string): string
     {
         return strtolower((string) preg_replace('/[^a-zA-Z0-9-_\.]/', '', $string));
     }
 
-    /**
-     * Delete image from file storage and database.
-     *
-     * @param FileModelInterface $model File being deleted
-     */
     public function deleteFile(FileModelInterface $model): void
     {
         $url = $model->getUploadDir().DS.$model->getFile();
@@ -222,39 +157,23 @@ class FileManager
         $model->delete();
     }
 
-    /**
-     * Rename file with image model id.
-     *
-     * @param int          $modelId      Model id
-     * @param UploadedFile $uploadedFile File being saved
-     */
-    public function renameFile($modelId, UploadedFile $uploadedFile): string
+    public function renameFile(int $modelId, UploadedFile $uploadedFile): string
     {
         $extension = $uploadedFile->getClientOriginalExtension();
         if ($extension !== '' && $extension !== '0') {
             $extension = '.'.strtolower($extension);
         }
 
-        $fileName = $this->sanitizeFileName(
+        return $this->sanitizeFileName(
             str_replace(
                 $extension,
                 '',
                 $uploadedFile->getClientOriginalName()
             ).'-'.$modelId.$extension
         );
-
-        return $fileName;
     }
 
-    /**
-     * Check if a file is an image
-     * Check based on mime type.
-     *
-     * @param string $mimeType File mime type
-     *
-     * @return bool
-     */
-    public function isImage($mimeType)
+    public function isImage(string $mimeType): bool
     {
         $isValid = false;
 
