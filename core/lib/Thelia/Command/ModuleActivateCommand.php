@@ -40,7 +40,9 @@ use Thelia\Module\Validator\ModuleValidator;
 #[AsCommand(name: 'module:activate', description: 'Activates a module')]
 class ModuleActivateCommand extends BaseModuleGenerate
 {
-    public function __construct(protected EventDispatcherInterface $eventDispatcher, private readonly Install $install)
+    public function __construct(
+        protected EventDispatcherInterface $eventDispatcher
+    )
     {
         parent::__construct();
     }

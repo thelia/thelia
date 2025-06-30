@@ -95,11 +95,12 @@ abstract class AbstractFilter implements FilterInterface
 
         $classProperties = array_reduce(
             (new ReflectionClass($class))->getProperties(),
-            function (array $carry, ReflectionProperty $property) {
+            static function (array $carry, ReflectionProperty $property) {
                 $carry[$property->getName()] = $property;
 
                 return $carry;
             },
+            []
         );
 
         if (\count($propertyParts) > 1) {

@@ -149,10 +149,10 @@ class Folder extends AbstractTranslatableResource
 
     public function isParent(): bool
     {
-        return $this->parent;
+        return $this->parent !== 0;
     }
 
-    public function setParent(bool $parent): self
+    public function setParent(int $parent): self
     {
         $this->parent = $parent;
 

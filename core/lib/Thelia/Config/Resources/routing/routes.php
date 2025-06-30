@@ -13,15 +13,8 @@ return static function (RoutingConfigurator $routes): void {
 
     $routes->add('api_admin_login_check', '/api/admin/login');
 
-    $routes->import('.', 'module_attribute')
-        ->namePrefix('module_attribute_controllers');
-
-    $routes->import('.', 'template_attribute')
-        ->namePrefix('template_attribute_controllers');
-
-    $routes->import('.', 'module_annotation')
-        ->namePrefix('module_annotation_controllers');
-
-    $routes->import('.', 'module_xml')
-        ->namePrefix('module_xml_controllers');
+    $routes->import('.', 'module_attribute');
+    $routes->import('.', 'template_attribute');
+    $routes->import('.', 'module_annotation');
+    $routes->import('.', 'module_xml');
 };

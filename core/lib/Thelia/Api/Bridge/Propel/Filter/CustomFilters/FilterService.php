@@ -300,7 +300,6 @@ readonly class FilterService
         if (!$this->hasFilter(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters)) {
             return;
         }
-
         $categoryId = $this->retrieveFilterValue(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters);
         $category = CategoryQuery::create()->findPk(key: $categoryId);
         $choiceFiltersCategory = ChoiceFilterQuery::findChoiceFilterByCategory(category: $category, templateId: $templateIdFind)->getData();
@@ -343,7 +342,8 @@ readonly class FilterService
 
     private function hasFilter(array $theliaFilterNames, array $tfilters): bool
     {
-        return !in_array($this->retrieveFilterValue($theliaFilterNames, $tfilters), ['', '0'], true) && $this->retrieveFilterValue($theliaFilterNames, $tfilters) !== [];
+        return !in_array($this->retrieveFilterValue($theliaFilterNames, $tfilters), ['', '0', null], true)
+            && $this->retrieveFilterValue($theliaFilterNames, $tfilters) !== [];
     }
 
     public function getCategoriesRecursively($categoryId, int $maxDepth, array $categoriesFound = [], int $depth = 1): array

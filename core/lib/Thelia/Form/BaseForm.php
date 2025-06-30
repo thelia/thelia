@@ -36,6 +36,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
+use \Symfony\Component\Form\FormInterface as SymfonyFormInterface;
 
 /**
  * Base form class for creating form objects.
@@ -48,7 +49,7 @@ abstract class BaseForm implements FormInterface
 {
     protected FormBuilderInterface $formBuilder;
     protected FormFactoryBuilderInterface $formFactoryBuilder;
-    protected FormInterface $form;
+    protected SymfonyFormInterface $form;
     protected Request $request;
     protected ValidatorBuilder $validatorBuilder;
     protected ?TranslatorInterface $translator = null;

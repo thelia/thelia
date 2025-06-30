@@ -338,7 +338,7 @@ class Module extends BaseAction implements EventSubscriberInterface
             // delete
             $modulePath = $oldModule->getAbsoluteBaseDir();
 
-            $deleteEvent = new ModuleDeleteEvent($oldModule);
+            $deleteEvent = new ModuleDeleteEvent($oldModule->getId());
 
             try {
                 $dispatcher->dispatch($deleteEvent, TheliaEvents::MODULE_DELETE);
@@ -363,7 +363,8 @@ class Module extends BaseAction implements EventSubscriberInterface
 
         // Update the module
         $moduleDescriptorFile = sprintf('%s%s%s%s%s', $modulePath, DS, 'Config', DS, 'module.xml');
-        $moduleManagement = new ModuleManagement($this->container);
+        $eventDispatcher = $this->container->get('event_dispatcher');
+        $moduleManagement = new ModuleManagement($this->container, $eventDispatcher);
         $file = new SplFileInfo($moduleDescriptorFile);
         $module = $moduleManagement->updateModule($file, $this->container);
 

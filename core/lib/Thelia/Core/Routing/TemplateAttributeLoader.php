@@ -28,7 +28,7 @@ class TemplateAttributeLoader extends Loader
     public function load(mixed $resource, string $type = null): RouteCollection
     {
         if ($this->isLoaded) {
-            throw new RuntimeException('Do not add the "module_attribute" loader twice');
+            throw new RuntimeException('Do not add the "template_attribute" loader twice');
         }
 
         $fileLocator = new FileLocator();
@@ -46,14 +46,10 @@ class TemplateAttributeLoader extends Loader
             }
 
             $templateRoutes = $loader->load($templateControllerPath, 'attribute');
+
             if (!$templateRoutes instanceof RouteCollection) {
                 continue;
             }
-
-            foreach ($templateRoutes->all() as $templateRoute) {
-                $templateRoute->setPath($templateRoute->getPath());
-            }
-
             $routes->addCollection($templateRoutes);
         }
 
