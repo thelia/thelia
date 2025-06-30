@@ -41,12 +41,13 @@ return RectorConfig::configure()
         AddParamTypeDeclarationRector::class,
         AddReturnTypeDeclarationRector::class,
         AddPropertyTypeDeclarationRector::class,
+        AddParamBasedOnParentClassMethodRector::class,
 
         RemoveUselessParamTagRector::class,
         RemoveUselessReturnTagRector::class,
         RemoveUselessVarTagRector::class,
         RemoveUnusedPrivatePropertyRector::class,
         RemoveUselessReadOnlyTagRector::class,
-        AddParamBasedOnParentClassMethodRector::class
+
     ]);
 

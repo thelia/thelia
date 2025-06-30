@@ -17,7 +17,6 @@ use Exception;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\File\FileToggleVisibilityEvent;
-use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Files\FileManager;
 use Thelia\Files\FileModelInterface;
 

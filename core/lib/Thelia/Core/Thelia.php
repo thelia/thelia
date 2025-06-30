@@ -85,7 +85,6 @@ use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\ModuleManagement;
 use Thelia\TaxEngine\TaxTypeInterface;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 class Thelia extends Kernel
 {
@@ -94,10 +93,15 @@ class Thelia extends Kernel
     public const THELIA_VERSION = '2.5.5';
 
     protected SchemaLocator $propelSchemaLocator;
+
     protected PropelInitService $propelInitService;
+
     protected ParserResolver $parserResolver;
+
     protected ConnectionInterface $theliaDatabaseConnection;
+
     protected bool $cacheRefresh = false;
+
     protected bool $propelConnectionAvailable;
 
     public function __construct(string $environment, bool $debug)
@@ -770,11 +774,13 @@ class Thelia extends Kernel
         if (empty($parsers)) {
             return;
         }
+
         $modules = ModuleQuery::getActivated();
         foreach ($parsers as $parser) {
             if (!is_object($parser)) {
                 continue;
             }
+
             foreach ($modules as $module) {
                 $this->addTemplatesFromModule($parser, $module);
             }

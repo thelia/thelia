@@ -13,6 +13,8 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\ActionEvent;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Form\BaseForm;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -59,7 +61,7 @@ class CustomerController extends AbstractCrudController
         return $this->createForm(AdminForm::CUSTOMER_UPDATE);
     }
 
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $event = $this->createEventInstance($formData);
 
@@ -72,7 +74,7 @@ class CustomerController extends AbstractCrudController
         return $event;
     }
 
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $event = $this->createEventInstance($formData);
 
@@ -84,12 +86,12 @@ class CustomerController extends AbstractCrudController
         return $event;
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): ActionEvent
     {
         return new CustomerEvent($this->getExistingObject());
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         if (method_exists($event, 'hasCustomer')) {
             return $event->hasCustomer();
@@ -105,7 +107,7 @@ class CustomerController extends AbstractCrudController
     /**
      * @param Customer $object
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         // Get default adress of the customer
         $address = $object->getDefaultAddress();
@@ -138,7 +140,7 @@ class CustomerController extends AbstractCrudController
         return $this->createForm(AdminForm::CUSTOMER_UPDATE, FormType::class, $data);
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         if (method_exists($event, 'hasCustomer') && $event->hasCustomer()) {
             return $event->getCustomer();
@@ -184,7 +186,7 @@ class CustomerController extends AbstractCrudController
         return $customerCreateEvent;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         return CustomerQuery::create()->findPk($this->getRequest()->get('customer_id', 0));
     }
@@ -202,7 +204,7 @@ class CustomerController extends AbstractCrudController
      *
      * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -216,7 +218,7 @@ class CustomerController extends AbstractCrudController
         ];
     }
 
-    protected function renderListTemplate($currentOrder, $customParams = [])
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render(
             'customers',
@@ -227,7 +229,7 @@ class CustomerController extends AbstractCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.customers',
@@ -237,12 +239,12 @@ class CustomerController extends AbstractCrudController
         );
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('customer-edit', $this->getEditionArguments());
     }
 
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.customer.update.view',
@@ -255,7 +257,7 @@ class CustomerController extends AbstractCrudController
         TokenProvider $tokenProvider,
         EventDispatcherInterface $eventDispatcher,
         ParserContext $parserContext
-    ) {
+    ): Response {
         $errorMsg = 'No error.';
         $removalError = false;
 

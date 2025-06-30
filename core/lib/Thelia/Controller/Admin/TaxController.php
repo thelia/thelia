@@ -40,7 +40,7 @@ class TaxController extends AbstractCrudController
         );
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         $form = $this->createForm(AdminForm::TAX_CREATION);
 
@@ -52,7 +52,7 @@ class TaxController extends AbstractCrudController
         return $this->createForm(AdminForm::TAX_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData): TaxEvent
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $event = new TaxEvent();
 
@@ -65,7 +65,7 @@ class TaxController extends AbstractCrudController
         return $event;
     }
 
-    protected function getUpdateEvent($formData): TaxEvent
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $event = new TaxEvent();
 
@@ -90,12 +90,12 @@ class TaxController extends AbstractCrudController
         return $event;
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasTax();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -113,12 +113,12 @@ class TaxController extends AbstractCrudController
         );
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasTax() ? $event->getTax() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $tax = TaxQuery::create()
             ->findOneById($this->getRequest()->get('tax_id', 0));
@@ -135,8 +135,7 @@ class TaxController extends AbstractCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
@@ -145,7 +144,7 @@ class TaxController extends AbstractCrudController
      *
      * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -162,7 +161,7 @@ class TaxController extends AbstractCrudController
         ];
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render(
             'taxes-rules',
@@ -170,13 +169,13 @@ class TaxController extends AbstractCrudController
         );
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         // We always return to the feature edition form
         return $this->render('tax-edit', array_merge($this->getViewArguments(), $this->getRouteArguments()));
     }
 
-    protected function redirectToEditionTemplate($request = null, $country = null)
+    protected function redirectToEditionTemplate($request = null, $country = null): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.taxes.update',
@@ -192,7 +191,7 @@ class TaxController extends AbstractCrudController
      *
      * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalCreateAction(ActionEvent $createEvent)
+    protected function performAdditionalCreateAction(ActionEvent $createEvent): ?\Symfony\Component\HttpFoundation\Response
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.taxes.update',
@@ -201,7 +200,7 @@ class TaxController extends AbstractCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.configuration.taxes-rules.list');
     }

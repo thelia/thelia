@@ -50,7 +50,7 @@ class TaxRuleController extends AbstractCrudController
         );
     }
 
-    public function defaultAction()
+    public function defaultAction(): \Symfony\Component\HttpFoundation\Response
     {
         // In the tax rule template we use the TaxCreationForm.
         //
@@ -76,7 +76,7 @@ class TaxRuleController extends AbstractCrudController
         return $this->createForm(AdminForm::TAX_RULE_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData): TaxRuleEvent
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $event = new TaxRuleEvent();
 
@@ -87,7 +87,7 @@ class TaxRuleController extends AbstractCrudController
         return $event;
     }
 
-    protected function getUpdateEvent($formData): TaxRuleEvent
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $event = new TaxRuleEvent();
 
@@ -122,12 +122,12 @@ class TaxRuleController extends AbstractCrudController
         return $event;
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasTaxRule();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -153,12 +153,12 @@ class TaxRuleController extends AbstractCrudController
         return $this->createForm(AdminForm::TAX_RULE_TAX_LIST_UPDATE, FormType::class, $data);
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasTaxRule() ? $event->getTaxRule() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $taxRule = TaxRuleQuery::create()
             ->findOneById($this->getRequest()->get('tax_rule_id'));
@@ -175,8 +175,7 @@ class TaxRuleController extends AbstractCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
@@ -185,7 +184,7 @@ class TaxRuleController extends AbstractCrudController
      *
      * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -206,7 +205,7 @@ class TaxRuleController extends AbstractCrudController
         ];
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         // We always return to the feature edition form
         return $this->render(
@@ -217,13 +216,13 @@ class TaxRuleController extends AbstractCrudController
         );
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         // We always return to the feature edition form
         return $this->render('tax-rule-edit', array_merge($this->getViewArguments(), $this->getRouteArguments()));
     }
 
-    protected function redirectToEditionTemplate($request = null, $country = null, $state = null)
+    protected function redirectToEditionTemplate($request = null, $country = null, $state = null): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.taxes-rules.update',
@@ -239,7 +238,7 @@ class TaxRuleController extends AbstractCrudController
      *
      * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalCreateAction(ActionEvent $createEvent)
+    protected function performAdditionalCreateAction(ActionEvent $createEvent): ?\Symfony\Component\HttpFoundation\Response
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.taxes-rules.update',
@@ -248,12 +247,12 @@ class TaxRuleController extends AbstractCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.configuration.taxes-rules.list');
     }
 
-    public function updateAction(ParserContext $parserContext)
+    public function updateAction(ParserContext $parserContext): \Symfony\Component\HttpFoundation\Response
     {
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;

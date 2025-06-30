@@ -138,7 +138,7 @@ class ShippingZoneController extends BaseAdminController
     /**
      * Render the edition template.
      */
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render(
             'shipping-zones-edit',

@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Form\BaseForm;
 use Exception;
@@ -64,7 +65,7 @@ class FeatureController extends AbstractCrudController
         return $this->createForm(AdminForm::FEATURE_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData): FeatureCreateEvent
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $createEvent = new FeatureCreateEvent();
 
@@ -77,7 +78,7 @@ class FeatureController extends AbstractCrudController
         return $createEvent;
     }
 
-    protected function getUpdateEvent($formData): FeatureUpdateEvent
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $changeEvent = new FeatureUpdateEvent($formData['id']);
 
@@ -130,12 +131,12 @@ class FeatureController extends AbstractCrudController
         return new FeatureDeleteEvent($this->getRequest()->get('feature_id'));
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasFeature();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -150,12 +151,12 @@ class FeatureController extends AbstractCrudController
         return $this->createForm(AdminForm::FEATURE_MODIFICATION, FormType::class, $data);
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasFeature() ? $event->getFeature() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $feature = FeatureQuery::create()
         ->findOneById($this->getRequest()->get('feature_id', 0));
@@ -172,8 +173,7 @@ class FeatureController extends AbstractCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
@@ -182,17 +182,17 @@ class FeatureController extends AbstractCrudController
      *
      * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render('features', ['order' => $currentOrder]);
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render(
             'feature-edit',
@@ -203,7 +203,7 @@ class FeatureController extends AbstractCrudController
         );
     }
 
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.features.update',
@@ -214,7 +214,7 @@ class FeatureController extends AbstractCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.configuration.features.default');
     }

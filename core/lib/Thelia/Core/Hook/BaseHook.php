@@ -57,11 +57,17 @@ abstract class BaseHook implements BaseHookInterface
     public TranslatorInterface $translator;
 
     protected Request $request;
+
     protected Session $session;
+
     protected Customer $customer;
+
     protected Cart $cart;
+
     protected Order $order;
+
     protected Lang $lang;
+
     protected Currency $currency;
 
     #[Required]
@@ -244,7 +250,7 @@ abstract class BaseHook implements BaseHookInterface
     /**
      * @param BaseModule $module
      */
-    public function setModule($module): void
+    public function setModule(?BaseModule $module): void
     {
         $this->module = $module;
     }
@@ -277,7 +283,7 @@ abstract class BaseHook implements BaseHookInterface
      *
      * @api
      */
-    protected function trans($id, array $parameters = [], $domain = null, $locale = null)
+    protected function trans(string $id, array $parameters = [], ?string $domain = null, ?string $locale = null)
     {
         return $this->translator->trans($id, $parameters, $domain, $locale);
     }
@@ -289,7 +295,7 @@ abstract class BaseHook implements BaseHookInterface
      */
     protected function getRequest()
     {
-        if (null === $this->request) {
+        if (!$this->request instanceof Request) {
             $this->request = $this->getParser()->getRequest();
         }
 
@@ -303,7 +309,7 @@ abstract class BaseHook implements BaseHookInterface
      */
     protected function getSession()
     {
-        if (null === $this->session && null !== $this->getRequest()) {
+        if (!$this->session instanceof Session && null !== $this->getRequest()) {
             $this->session = $this->request->getSession();
         }
 
@@ -334,7 +340,7 @@ abstract class BaseHook implements BaseHookInterface
      */
     protected function getCart()
     {
-        if (null === $this->cart) {
+        if (!$this->cart instanceof Cart) {
             $this->cart = $this->getSession() ? $this->getSession()->getSessionCart($this->dispatcher) : null;
         }
 
@@ -348,7 +354,7 @@ abstract class BaseHook implements BaseHookInterface
      */
     protected function getOrder()
     {
-        if (null === $this->order) {
+        if (!$this->order instanceof Order) {
             $this->order = $this->getSession() ? $this->getSession()->getOrder() : null;
         }
 
@@ -362,7 +368,7 @@ abstract class BaseHook implements BaseHookInterface
      */
     protected function getCurrency()
     {
-        if (null === $this->currency) {
+        if (!$this->currency instanceof Currency) {
             $this->currency = $this->getSession() ? $this->getSession()->getCurrency(true) : Currency::getDefaultCurrency();
         }
 
@@ -376,7 +382,7 @@ abstract class BaseHook implements BaseHookInterface
      */
     protected function getCustomer()
     {
-        if (null === $this->customer) {
+        if (!$this->customer instanceof Customer) {
             $this->customer = $this->getSession() ? $this->getSession()->getCustomerUser() : null;
         }
 
@@ -390,7 +396,7 @@ abstract class BaseHook implements BaseHookInterface
      */
     protected function getLang()
     {
-        if (null === $this->lang) {
+        if (!$this->lang instanceof Lang) {
             $this->lang = $this->getSession() ? $this->getSession()->getLang(true) : $this->lang = Lang::getDefaultLanguage();
         }
 

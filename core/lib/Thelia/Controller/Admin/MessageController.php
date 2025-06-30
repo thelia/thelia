@@ -68,7 +68,7 @@ class MessageController extends AbstractCrudController
         return $this->createForm(AdminForm::MESSAGE_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData): MessageCreateEvent
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $createEvent = new MessageCreateEvent();
 
@@ -82,7 +82,7 @@ class MessageController extends AbstractCrudController
         return $createEvent;
     }
 
-    protected function getUpdateEvent($formData): MessageUpdateEvent
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $changeEvent = new MessageUpdateEvent($formData['id']);
 
@@ -109,12 +109,12 @@ class MessageController extends AbstractCrudController
         return new MessageDeleteEvent($this->getRequest()->get('message_id'));
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasMessage();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         // Prepare the data that will hydrate the form
         $data = [
@@ -137,12 +137,12 @@ class MessageController extends AbstractCrudController
         return $this->createForm(AdminForm::MESSAGE_MODIFICATION, FormType::class, $data);
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasMessage() ? $event->getMessage() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $message = MessageQuery::create()
             ->findOneById($this->getRequest()->get('message_id', 0));
@@ -159,8 +159,7 @@ class MessageController extends AbstractCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getName();
     }
 
@@ -169,12 +168,12 @@ class MessageController extends AbstractCrudController
      *
      * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render('messages');
     }
@@ -229,7 +228,7 @@ class MessageController extends AbstractCrudController
         return $list;
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('message-edit', [
             'message_id' => $this->getRequest()->get('message_id'),
@@ -239,7 +238,7 @@ class MessageController extends AbstractCrudController
         ]);
     }
 
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.messages.update',
@@ -249,7 +248,7 @@ class MessageController extends AbstractCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.configuration.messages.default');
     }

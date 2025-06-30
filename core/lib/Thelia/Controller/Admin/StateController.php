@@ -13,6 +13,8 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\ActionEvent;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Form\BaseForm;
 use Thelia\Model\State;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -68,7 +70,7 @@ class StateController extends AbstractCrudController
      *
      * @param State $object
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -87,7 +89,7 @@ class StateController extends AbstractCrudController
      *
      * @param unknown $formData
      */
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $event = new StateCreateEvent();
 
@@ -99,7 +101,7 @@ class StateController extends AbstractCrudController
      *
      * @param unknown $formData
      */
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $event = new StateUpdateEvent($formData['id']);
 
@@ -132,7 +134,7 @@ class StateController extends AbstractCrudController
      *
      * @param unknown $event
      */
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasState();
     }
@@ -140,7 +142,7 @@ class StateController extends AbstractCrudController
     /**
      * Get the created object from an event.
      */
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->getState();
     }
@@ -148,7 +150,7 @@ class StateController extends AbstractCrudController
     /**
      * Load an existing object from the database.
      */
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $state = StateQuery::create()
             ->findPk($this->getRequest()->get('state_id', 0))
@@ -166,8 +168,7 @@ class StateController extends AbstractCrudController
      *
      * @param State $object
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
@@ -176,7 +177,7 @@ class StateController extends AbstractCrudController
      *
      * @param State $object
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -186,7 +187,7 @@ class StateController extends AbstractCrudController
      *
      * @param unknown $currentOrder , if any, null otherwise
      */
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render(
             'states',
@@ -201,7 +202,7 @@ class StateController extends AbstractCrudController
     /**
      * Render the edition template.
      */
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('state-edit', $this->getEditionArgument());
     }
@@ -218,7 +219,7 @@ class StateController extends AbstractCrudController
     /**
      * Redirect to the edition template.
      */
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.states.update',
@@ -232,7 +233,7 @@ class StateController extends AbstractCrudController
     /**
      * Redirect to the list template.
      */
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.configuration.states.default');
     }

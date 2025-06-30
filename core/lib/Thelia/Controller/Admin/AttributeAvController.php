@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Form\BaseForm;
 use LogicException;
 use Thelia\Core\Event\Attribute\AttributeAvCreateEvent;
@@ -53,12 +54,12 @@ class AttributeAvController extends AbstractCrudController
         return $this->createForm(AdminForm::ATTRIBUTE_AV_CREATION);
     }
 
-    protected function getUpdateForm(): void
+    protected function getUpdateForm(): null
     {
-        throw new LogicException('Attribute Av. modification is not yet implemented');
+        return null;
     }
 
-    protected function getCreationEvent($formData): AttributeAvCreateEvent
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $createEvent = new AttributeAvCreateEvent();
 
@@ -71,7 +72,7 @@ class AttributeAvController extends AbstractCrudController
         return $createEvent;
     }
 
-    protected function getUpdateEvent($formData): AttributeAvUpdateEvent
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $changeEvent = new AttributeAvUpdateEvent($formData['id']);
 
@@ -101,22 +102,22 @@ class AttributeAvController extends AbstractCrudController
         return new AttributeAvDeleteEvent($this->getRequest()->get('attributeav_id'));
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasAttributeAv();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): void
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         throw new LogicException('Attribute Av. modification is not yet implemented');
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasAttributeAv() ? $event->getAttributeAv() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $attributeAv = AttributeAvQuery::create()
         ->findOneById($this->getRequest()->get('attributeav_id', 0));
@@ -133,8 +134,7 @@ class AttributeAvController extends AbstractCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
@@ -143,7 +143,7 @@ class AttributeAvController extends AbstractCrudController
      *
      * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -156,7 +156,7 @@ class AttributeAvController extends AbstractCrudController
         ];
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         // We always return to the attribute edition form
         return $this->render(
@@ -165,13 +165,13 @@ class AttributeAvController extends AbstractCrudController
         );
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         // We always return to the attribute edition form
         return $this->render('attribute-edit', $this->getViewArguments());
     }
 
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.attributes.update',
@@ -179,7 +179,7 @@ class AttributeAvController extends AbstractCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.attributes.update',

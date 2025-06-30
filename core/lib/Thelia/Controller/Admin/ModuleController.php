@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Form\BaseForm;
 use InvalidArgumentException;
 use LogicException;
@@ -78,12 +79,12 @@ class ModuleController extends AbstractCrudController
         return $this->createForm(AdminForm::MODULE_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData): null
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         return null;
     }
 
-    protected function getUpdateEvent($formData): ModuleEvent
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $event = new ModuleEvent();
 
@@ -111,12 +112,12 @@ class ModuleController extends AbstractCrudController
         );
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasModule();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $object->setLocale($this->getCurrentEditionLocale());
         $data = [
@@ -132,12 +133,12 @@ class ModuleController extends AbstractCrudController
         return $this->createForm(AdminForm::MODULE_MODIFICATION, FormType::class, $data);
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasModule() ? $event->getModule() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $module = ModuleQuery::create()
             ->findOneById($this->getRequest()->get('module_id', 0));
@@ -154,8 +155,7 @@ class ModuleController extends AbstractCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
@@ -164,7 +164,7 @@ class ModuleController extends AbstractCrudController
      *
      * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -184,7 +184,7 @@ class ModuleController extends AbstractCrudController
         ];
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         // We always return to the feature edition form
         return $this->render(
@@ -196,13 +196,13 @@ class ModuleController extends AbstractCrudController
         );
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         // We always return to the feature edition form
         return $this->render('module-edit', array_merge($this->getViewArguments(), $this->getRouteArguments()));
     }
 
-    protected function redirectToEditionTemplate($request = null, $country = null)
+    protected function redirectToEditionTemplate($request = null, $country = null): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.module.update',
@@ -211,7 +211,7 @@ class ModuleController extends AbstractCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.module');
     }
@@ -292,7 +292,7 @@ class ModuleController extends AbstractCrudController
         TokenProvider $tokenProvider,
         EventDispatcherInterface $eventDispatcher,
         ParserContext $parserContext
-    ) {
+    ): Response {
         if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::DELETE)) {
             return $response;
         }

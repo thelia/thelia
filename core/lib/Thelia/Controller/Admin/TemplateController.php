@@ -70,7 +70,7 @@ class TemplateController extends AbstractCrudController
         return $this->createForm(AdminForm::TEMPLATE_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData): TemplateCreateEvent
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $createEvent = new TemplateCreateEvent();
 
@@ -82,7 +82,7 @@ class TemplateController extends AbstractCrudController
         return $createEvent;
     }
 
-    protected function getUpdateEvent($formData): TemplateUpdateEvent
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $changeEvent = new TemplateUpdateEvent($formData['id']);
 
@@ -101,12 +101,12 @@ class TemplateController extends AbstractCrudController
         return new TemplateDeleteEvent($this->getRequest()->get('template_id'));
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasTemplate();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -118,12 +118,12 @@ class TemplateController extends AbstractCrudController
         return $this->createForm(AdminForm::TEMPLATE_MODIFICATION, FormType::class, $data);
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasTemplate() ? $event->getTemplate() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $template = TemplateQuery::create()
             ->findOneById($this->getRequest()->get('template_id', 0));
@@ -140,8 +140,7 @@ class TemplateController extends AbstractCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getName();
     }
 
@@ -150,17 +149,17 @@ class TemplateController extends AbstractCrudController
      *
      * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render('templates', ['order' => $currentOrder]);
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render(
             'template-edit',
@@ -173,10 +172,8 @@ class TemplateController extends AbstractCrudController
     /**
      * @param Request $request
      * @param int     $id
-     *
-     * @return Response
      */
-    protected function redirectToEditionTemplate($request = null, $id = null)
+    protected function redirectToEditionTemplate($request = null, $id = null): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.templates.update',
@@ -186,7 +183,7 @@ class TemplateController extends AbstractCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.configuration.templates.default');
     }
@@ -194,11 +191,10 @@ class TemplateController extends AbstractCrudController
     /**
      * Process delete failure, which may occurs if template is in use.
      *
-     * @param ActionEvent $deleteEvent
      *
      * @return \Thelia\Core\HttpFoundation\Response|null
      */
-    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent)
+    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent): ?Response
     {
         if ($deleteEvent->getProductCount() > 0) {
             $this->getParserContext()->setGeneralError(

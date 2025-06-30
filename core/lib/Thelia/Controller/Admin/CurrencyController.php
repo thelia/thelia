@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Form\BaseForm;
 use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -62,7 +63,7 @@ class CurrencyController extends AbstractCrudController
         return $this->createForm(AdminForm::CURRENCY_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData): CurrencyCreateEvent
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $createEvent = new CurrencyCreateEvent();
 
@@ -78,7 +79,7 @@ class CurrencyController extends AbstractCrudController
         return $createEvent;
     }
 
-    protected function getUpdateEvent($formData): CurrencyUpdateEvent
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $changeEvent = new CurrencyUpdateEvent($formData['id']);
 
@@ -108,12 +109,12 @@ class CurrencyController extends AbstractCrudController
         return new CurrencyDeleteEvent($this->getRequest()->get('currency_id'));
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasCurrency();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         // Prepare the data that will hydrate the form
         $data = [
@@ -130,12 +131,12 @@ class CurrencyController extends AbstractCrudController
         return $this->createForm(AdminForm::CURRENCY_MODIFICATION, FormType::class, $data);
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasCurrency() ? $event->getCurrency() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $currency = CurrencyQuery::create()
         ->findOneById($this->getRequest()->get('currency_id'));
@@ -152,8 +153,7 @@ class CurrencyController extends AbstractCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getName();
     }
 
@@ -162,22 +162,22 @@ class CurrencyController extends AbstractCrudController
      *
      * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render('currencies', ['order' => $currentOrder]);
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('currency-edit', ['currency_id' => $this->getRequest()->get('currency_id')]);
     }
 
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.currencies.update',
@@ -187,7 +187,7 @@ class CurrencyController extends AbstractCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.configuration.currencies.default');
     }

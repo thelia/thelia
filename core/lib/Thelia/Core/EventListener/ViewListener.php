@@ -17,7 +17,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -108,6 +107,7 @@ class ViewListener implements EventSubscriberInterface
         if ($request->attributes->has(self::IGNORE_THELIA_VIEW)) {
             return;
         }
+
         $view = $request->attributes->get('_view', $this->findView($request));
         $request->attributes->set('_view', $view);
 

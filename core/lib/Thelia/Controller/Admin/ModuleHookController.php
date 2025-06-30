@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\ActionEvent;
 use Exception;
 use Thelia\Form\BaseForm;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -125,7 +126,7 @@ class ModuleHookController extends AbstractCrudController
      *
      * @return ModuleHookModificationForm
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -147,7 +148,7 @@ class ModuleHookController extends AbstractCrudController
      *
      * @return ModuleHookCreateEvent
      */
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $event = new ModuleHookCreateEvent();
 
@@ -161,7 +162,7 @@ class ModuleHookController extends AbstractCrudController
      *
      * @return ModuleHookUpdateEvent
      */
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $event = new ModuleHookUpdateEvent();
 
@@ -214,7 +215,7 @@ class ModuleHookController extends AbstractCrudController
      *
      * @return ModuleHook|null
      */
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->getModuleHook();
     }
@@ -224,7 +225,7 @@ class ModuleHookController extends AbstractCrudController
      *
      * @return ModuleHook|null
      */
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $moduleHook = ModuleHookQuery::create()
             ->findPK($this->getRequest()->get('module_hook_id', 0));
@@ -257,7 +258,7 @@ class ModuleHookController extends AbstractCrudController
      *
      * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -269,7 +270,7 @@ class ModuleHookController extends AbstractCrudController
      *
      * @return Response
      */
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render(
             'module-hooks',
@@ -282,7 +283,7 @@ class ModuleHookController extends AbstractCrudController
      *
      * @return Response
      */
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('module-hook-edit', $this->getEditionArgument());
     }
@@ -299,7 +300,7 @@ class ModuleHookController extends AbstractCrudController
      *
      * @return Response
      */
-    protected function redirectToEditionTemplate($request = null, $country = null)
+    protected function redirectToEditionTemplate($request = null, $country = null): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.module-hook.update',
@@ -311,7 +312,7 @@ class ModuleHookController extends AbstractCrudController
     /**
      * Redirect to the list template.
      */
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.module-hook');
     }

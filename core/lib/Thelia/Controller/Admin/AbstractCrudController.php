@@ -15,6 +15,7 @@ namespace Thelia\Controller\Admin;
 
 use Exception;
 use LogicException;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Propel\Runtime\Event\ActiveRecordEvent;
 use Symfony\Component\DependencyInjection\Container;
@@ -54,12 +55,32 @@ abstract class AbstractCrudController extends BaseAdminController
     {
     }
 
-    abstract protected function getCreationForm(): BaseForm;
-    abstract protected function getUpdateForm(): BaseForm;
-    abstract protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm;
-    abstract protected function getCreationEvent($formData): ActionEvent;
-    abstract protected function getUpdateEvent($formData): ActionEvent;
-    abstract protected function getDeleteEvent(): ActionEvent;
+    abstract protected function getCreationForm(): ?BaseForm;
+
+    abstract protected function getUpdateForm(): ?BaseForm;
+
+    abstract protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm;
+
+    abstract protected function getCreationEvent(array $formData): ActionEvent;
+
+    abstract protected function getUpdateEvent(array $formData): ActionEvent;
+
+    abstract protected function getDeleteEvent(): ?ActionEvent;
+
+    abstract protected function getExistingObject(): ?ActiveRecordInterface;
+
+    abstract protected function getObjectLabel(ActiveRecordInterface $object): ?string;
+
+    abstract protected function getObjectId(ActiveRecordInterface $object): int;
+
+    abstract protected function renderListTemplate($currentOrder): Response;
+
+    abstract protected function renderEditionTemplate(): Response;
+
+    abstract protected function redirectToEditionTemplate(): Response|RedirectResponse;
+
+    abstract protected function redirectToListTemplate(): Response|RedirectResponse;
+
     protected function eventContainsObject($event): bool
     {
         if (method_exists($event, 'getModel')) {
@@ -70,6 +91,9 @@ abstract class AbstractCrudController extends BaseAdminController
         return false;
     }
 
+    /**
+     * @throws Exception
+     */
     protected function getObjectFromEvent($event): mixed
     {
         if (method_exists($event, 'getModel')) {
@@ -79,13 +103,6 @@ abstract class AbstractCrudController extends BaseAdminController
         throw new Exception("If your event doesn't have  \"getModel\" method you must override \"getObjectFromEvent\" function.");
     }
 
-    abstract protected function getExistingObject();
-    abstract protected function getObjectLabel(?string $object);
-    abstract protected function getObjectId(?int $object);
-    abstract protected function renderListTemplate($currentOrder): Response;
-    abstract protected function renderEditionTemplate(): Response;
-    abstract protected function redirectToEditionTemplate(): Response|RedirectResponse;
-    abstract protected function redirectToListTemplate(): Response|RedirectResponse;
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue): ActionEvent
     {
         throw new LogicException('Position Update is not supported for this object');
@@ -95,6 +112,7 @@ abstract class AbstractCrudController extends BaseAdminController
     {
         throw new LogicException('Toggle Visibility is not supported for this object');
     }
+
     protected function performAdditionalCreateAction(ActionEvent $createEvent): ?Response
     {
         return null;
@@ -109,6 +127,7 @@ abstract class AbstractCrudController extends BaseAdminController
     {
         return null;
     }
+
     protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent): ?Response
     {
         return null;
@@ -150,7 +169,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function createAction(
         EventDispatcherInterface $eventDispatcher,
         TranslatorInterface $translator
-    ): RedirectResponse|\Symfony\Component\HttpFoundation\Response
+    ): RedirectResponse|Response
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::CREATE)) {
@@ -196,16 +215,16 @@ abstract class AbstractCrudController extends BaseAdminController
                         $this->getObjectLabel($createdObject),
                         $this->getObjectId($createdObject)
                     ),
-                    $this->getObjectId($createdObject)
+                    (string) $this->getObjectId($createdObject)
                 );
             }
 
             // Execute additional Action
             $response = $this->performAdditionalCreateAction($createEvent);
 
-            if ($response === null) {
+            if (!$response instanceof Response) {
                 // Substitute _ID_ in the URL with the ID of the created object
-                $successUrl = str_replace('_ID_', $this->getObjectId($createdObject), $creationForm->getSuccessUrl());
+                $successUrl = str_replace('_ID_', (string) $this->getObjectId($createdObject), $creationForm->getSuccessUrl());
 
                 // Redirect to the success URL
                 return $this->generateRedirect($successUrl);
@@ -306,14 +325,14 @@ abstract class AbstractCrudController extends BaseAdminController
                         $this->getObjectLabel($changedObject),
                         $this->getObjectId($changedObject)
                     ),
-                    $this->getObjectId($changedObject)
+                    (string) $this->getObjectId($changedObject)
                 );
             }
 
             // Execute additional Action
             $response = $this->performAdditionalUpdateAction($eventDispatcher, $changeEvent);
 
-            if ($response == null) {
+            if ($response === null) {
                 // If we have to stay on the same page, do not redirect to the successUrl,
                 // just redirect to the edit page again.
                 if ($request->get('save_mode') === 'stay') {
@@ -380,7 +399,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
         $response = $this->performAdditionalUpdatePositionAction($event);
 
-        if ($response === null) {
+        if (!$response instanceof Response) {
             return $this->redirectToListTemplate();
         }
 
@@ -483,7 +502,7 @@ abstract class AbstractCrudController extends BaseAdminController
                         $this->getObjectLabel($deletedObject),
                         $this->getObjectId($deletedObject)
                     ),
-                    $this->getObjectId($deletedObject)
+                    (string) $this->getObjectId($deletedObject)
                 );
             }
 
@@ -491,7 +510,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
             return $response ?? $this->redirectToListTemplate();
         } catch (Exception $exception) {
-            return $this->renderAfterDeleteError($parserContext, $exception)->setStatusCode(\Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
+            return $this->renderAfterDeleteError($parserContext, $exception)->setStatusCode(Response::HTTP_BAD_REQUEST);
         }
     }
 

@@ -56,7 +56,7 @@ class ConfigController extends AbstractCrudController
      *
      * @return Response the response
      */
-    public function defaultAction(ConfigCacheService $configCacheService = null)
+    public function defaultAction(ConfigCacheService $configCacheService = null): \Symfony\Component\HttpFoundation\Response
     {
         // Force reinit config cache
         if ($configCacheService instanceof ConfigCacheService) {
@@ -76,7 +76,7 @@ class ConfigController extends AbstractCrudController
         return $this->createForm(AdminForm::CONFIG_MODIFICATION);
     }
 
-    protected function getCreationEvent($data): ConfigCreateEvent
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $createEvent = new ConfigCreateEvent();
 
@@ -92,7 +92,7 @@ class ConfigController extends AbstractCrudController
         return $createEvent;
     }
 
-    protected function getUpdateEvent($data): ConfigUpdateEvent
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $changeEvent = new ConfigUpdateEvent($data['id']);
 
@@ -116,12 +116,12 @@ class ConfigController extends AbstractCrudController
         return new ConfigDeleteEvent($this->getRequest()->get('variable_id'));
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasConfig();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         // Prepare the data that will hydrate the form
         $data = [
@@ -141,12 +141,12 @@ class ConfigController extends AbstractCrudController
         return $this->createForm(AdminForm::CONFIG_MODIFICATION, FormType::class, $data);
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasConfig() ? $event->getConfig() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $config = ConfigQuery::create()
         ->findOneById($this->getRequest()->get('variable_id'));
@@ -163,8 +163,7 @@ class ConfigController extends AbstractCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getName();
     }
 
@@ -173,22 +172,22 @@ class ConfigController extends AbstractCrudController
      *
      * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render('variables', ['order' => $currentOrder]);
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('variable-edit', ['variable_id' => $this->getRequest()->get('variable_id')]);
     }
 
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.variables.update',
@@ -196,7 +195,7 @@ class ConfigController extends AbstractCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.configuration.variables.default');
     }

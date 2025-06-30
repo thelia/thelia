@@ -142,7 +142,7 @@ class ContentController extends AbstractSeoCrudController
      *
      * @return ContentModificationForm
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         // Hydrate the "SEO" tab form
         $this->hydrateSeoForm($parserContext, $object);
@@ -167,7 +167,7 @@ class ContentController extends AbstractSeoCrudController
      *
      * @param array $formData
      */
-    protected function getCreationEvent($formData): ContentCreateEvent
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $contentCreateEvent = new ContentCreateEvent();
 
@@ -186,7 +186,7 @@ class ContentController extends AbstractSeoCrudController
      *
      * @param array $formData
      */
-    protected function getUpdateEvent($formData): ContentUpdateEvent
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $contentUpdateEvent = new ContentUpdateEvent($formData['id']);
 
@@ -227,7 +227,7 @@ class ContentController extends AbstractSeoCrudController
      *
      * @return Content|null
      */
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->getContent();
     }
@@ -237,7 +237,7 @@ class ContentController extends AbstractSeoCrudController
      *
      * @return Content
      */
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $content = ContentQuery::create()
             ->findOneById($this->getRequest()->get('content_id', 0));
@@ -256,8 +256,7 @@ class ContentController extends AbstractSeoCrudController
      *
      * @return string content title
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
@@ -268,7 +267,7 @@ class ContentController extends AbstractSeoCrudController
      *
      * @return int content id
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -295,7 +294,7 @@ class ContentController extends AbstractSeoCrudController
      *
      * @return Response
      */
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         $this->getListOrderFromSession('content', 'content_order', 'manual');
 
@@ -320,7 +319,7 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Render the edition template.
      */
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('content-edit', $this->getEditionArguments());
     }
@@ -328,7 +327,7 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Redirect to the edition template.
      */
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.content.update',
@@ -340,7 +339,7 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Redirect to the list template.
      */
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.content.default',
@@ -349,11 +348,9 @@ class ContentController extends AbstractSeoCrudController
     }
 
     /**
-     * @param ActionEvent $updateEvent
-     *
      * @return Response|void
      */
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): ?\Symfony\Component\HttpFoundation\Response
     {
         if ($this->getRequest()->get('save_mode') != 'stay') {
             return $this->generateRedirectFromRoute(
@@ -372,7 +369,7 @@ class ContentController extends AbstractSeoCrudController
      *
      * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent)
+    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent): ?\Symfony\Component\HttpFoundation\Response
     {
         return $this->generateRedirectFromRoute(
             'admin.folders.default',
@@ -385,7 +382,7 @@ class ContentController extends AbstractSeoCrudController
      *
      * @return Response|null
      */
-    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent)
+    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent): ?\Symfony\Component\HttpFoundation\Response
     {
         if (null !== $content = ContentQuery::create()->findPk($positionChangeEvent->getObjectId())) {
             // Redirect to parent category list

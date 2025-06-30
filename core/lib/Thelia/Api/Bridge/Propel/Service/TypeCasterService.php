@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Thelia\Api\Bridge\Propel\Service;
 
 use ReflectionException;

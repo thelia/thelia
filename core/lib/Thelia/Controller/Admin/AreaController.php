@@ -13,9 +13,9 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\Response;
 use Exception;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Thelia\Core\HttpFoundation\Response;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
@@ -79,7 +79,7 @@ class AreaController extends AbstractCrudController
      *
      * @param Area $object
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $data = [
             'area_id' => $object->getId(),
@@ -94,7 +94,7 @@ class AreaController extends AbstractCrudController
      *
      * @param array $formData
      */
-    protected function getCreationEvent($formData): AreaEvent
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $area = new Area();
         $event = new AreaEvent($area);
@@ -107,7 +107,7 @@ class AreaController extends AbstractCrudController
      *
      * @param array $formData
      */
-    protected function getUpdateEvent($formData): AreaEvent
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $area = $this->findAreaOrFail($formData['area_id']);
         $event = new AreaEvent($area);
@@ -137,7 +137,7 @@ class AreaController extends AbstractCrudController
     /**
      * Load an existing object from the database.
      */
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         return AreaQuery::create()->findPk($this->getAreaId());
     }
@@ -149,19 +149,15 @@ class AreaController extends AbstractCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getName();
     }
 
     /**
      * Returns the object ID from the object.
-     *
-     * @param Area $object
-     *
      * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -170,7 +166,7 @@ class AreaController extends AbstractCrudController
      * Render the main list template.
      *
      */
-    protected function renderListTemplate($currentOrder): \Symfony\Component\HttpFoundation\Response
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render('shipping-configuration');
     }
@@ -178,7 +174,7 @@ class AreaController extends AbstractCrudController
     /**
      * Render the edition template.
      */
-    protected function renderEditionTemplate(): \Symfony\Component\HttpFoundation\Response
+    protected function renderEditionTemplate(): Response
     {
         return $this->render(
             'shipping-configuration-edit',
@@ -191,7 +187,7 @@ class AreaController extends AbstractCrudController
     /**
      * Redirect to the edition template.
      */
-    protected function redirectToEditionTemplate(): \Symfony\Component\HttpFoundation\Response|RedirectResponse
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.shipping-configuration.update.view',
@@ -205,7 +201,7 @@ class AreaController extends AbstractCrudController
     /**
      * Redirect to the list template.
      */
-    protected function redirectToListTemplate(): \Symfony\Component\HttpFoundation\Response
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.configuration.shipping-configuration.default');
     }

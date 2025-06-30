@@ -13,7 +13,6 @@ declare(strict_types=1);
  */
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Thelia\Files\FileManager;
 use Thelia\Files\Service\FileDeleteService;
 use Thelia\Files\Service\FilePositionService;
 use Thelia\Files\Service\FileProcessorService;

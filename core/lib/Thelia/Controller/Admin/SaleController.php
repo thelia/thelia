@@ -78,7 +78,7 @@ class SaleController extends AbstractCrudController
      *
      * @return SaleModificationForm
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $sale): BaseForm
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         // Find all categories of the selected products
         $saleProducts = $sale->getSaleProductList();
@@ -132,7 +132,7 @@ class SaleController extends AbstractCrudController
      *
      * @param array $formData
      */
-    protected function getCreationEvent($formData): SaleCreateEvent
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $saleCreateEvent = new SaleCreateEvent();
 
@@ -150,7 +150,7 @@ class SaleController extends AbstractCrudController
      *
      * @param array $formData
      */
-    protected function getUpdateEvent($formData): SaleUpdateEvent
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         // Build the product attributes array
         $productAttributes = [];
@@ -208,7 +208,7 @@ class SaleController extends AbstractCrudController
      *
      * @return Sale|null
      */
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->getSale();
     }
@@ -218,7 +218,7 @@ class SaleController extends AbstractCrudController
      *
      * @return Sale
      */
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $sale = SaleQuery::create()
             ->findOneById($this->getRequest()->get('sale_id', 0));
@@ -237,8 +237,7 @@ class SaleController extends AbstractCrudController
      *
      * @return string sale title
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
@@ -249,7 +248,7 @@ class SaleController extends AbstractCrudController
      *
      * @return int sale id
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -259,7 +258,7 @@ class SaleController extends AbstractCrudController
      *
      * @return Response
      */
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         $this->getListOrderFromSession('sale', 'order', 'start-date');
 
@@ -278,7 +277,7 @@ class SaleController extends AbstractCrudController
     /**
      * Render the edition template.
      */
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('sale-edit', $this->getEditionArguments());
     }
@@ -286,7 +285,7 @@ class SaleController extends AbstractCrudController
     /**
      * Redirect to the edition template.
      */
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.sale.update', [], $this->getEditionArguments());
     }
@@ -294,7 +293,7 @@ class SaleController extends AbstractCrudController
     /**
      * Redirect to the list template.
      */
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.sale.default');
     }

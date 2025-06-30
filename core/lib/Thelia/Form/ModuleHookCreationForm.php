@@ -125,7 +125,7 @@ class ModuleHookCreationForm extends BaseForm
 
     protected function trans(?string $id, array $parameters = []): string
     {
-        if (null === $this->translator) {
+        if (!$this->translator instanceof TranslatorInterface) {
             $this->translator = Translator::getInstance();
         }
 

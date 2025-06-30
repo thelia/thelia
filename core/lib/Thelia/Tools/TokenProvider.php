@@ -28,13 +28,14 @@ use Thelia\Core\Security\Exception\TokenAuthenticationException;
 class TokenProvider
 {
     protected ?string $token = null;
+
     protected ?SessionInterface $session = null;
 
 
     public function __construct(
         protected RequestStack $requestStack,
         protected TranslatorInterface $translator,
-        #[Autowire('%thelia.token_id%')]
+        #[Autowire(param: 'thelia.token_id')]
         protected string $tokenName
     )
     {

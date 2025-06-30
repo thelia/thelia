@@ -13,7 +13,6 @@ declare(strict_types=1);
  */
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 
@@ -21,7 +20,7 @@ return static function (ContainerConfigurator $configurator): void {
     $services = $configurator->services();
 
     $services->set(ControllerResolver::class)
-        ->args([service(ContainerInterface::class)]);
+        ->args([service('service_container')]);
 
     $services->alias('controller_resolver', ControllerResolver::class);
 

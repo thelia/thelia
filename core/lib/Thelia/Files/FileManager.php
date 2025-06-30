@@ -29,7 +29,7 @@ class FileManager
 {
 
     public function __construct(
-        #[Autowire('%file_model.classes%')]
+        #[Autowire(param: 'file_model.classes')]
         protected array $supportedFileModels
     )
     {
@@ -133,6 +133,7 @@ class FileManager
 
         return $nbModifiedLines;
     }
+
     public function saveImage(FileCreateOrUpdateEvent $event, FileModelInterface $imageModel): int
     {
         return $this->saveFile($event->getParentId(), $imageModel);

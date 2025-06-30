@@ -156,7 +156,7 @@ class ProductController extends AbstractSeoCrudController
         return $this->createForm(AdminForm::PRODUCT_MODIFICATION, FormType::class, [], []);
     }
 
-    protected function getCreationEvent($formData): ProductCreateEvent
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $createEvent = new ProductCreateEvent();
 
@@ -178,7 +178,7 @@ class ProductController extends AbstractSeoCrudController
         return $createEvent;
     }
 
-    protected function getUpdateEvent($formData): ProductUpdateEvent
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $changeEvent = new ProductUpdateEvent($formData['id']);
 
@@ -260,7 +260,7 @@ class ProductController extends AbstractSeoCrudController
      *
      * @return ProductModificationForm
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         // Find product's sale elements
         $saleElements = ProductSaleElementsQuery::create()
@@ -388,12 +388,12 @@ class ProductController extends AbstractSeoCrudController
      *
      * @return null
      */
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasProduct() ? $event->getProduct() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $product = ProductQuery::create()
             ->findOneById($this->getRequest()->get('product_id', 0));
@@ -408,15 +408,14 @@ class ProductController extends AbstractSeoCrudController
     /**
      * @param Product $object
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
     /**
      * @param Product $object
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -449,7 +448,7 @@ class ProductController extends AbstractSeoCrudController
         return $category_id != null ? $category_id : 0;
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         $this->getListOrderFromSession('product', 'product_order', 'manual');
 
@@ -463,7 +462,7 @@ class ProductController extends AbstractSeoCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.products.default',
@@ -474,12 +473,12 @@ class ProductController extends AbstractSeoCrudController
         );
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('product-edit', $this->getEditionArguments());
     }
 
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.products.update', $this->getEditionArguments());
     }
@@ -508,7 +507,7 @@ class ProductController extends AbstractSeoCrudController
         return $this->nullResponse();
     }
 
-    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent)
+    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent): ?\Symfony\Component\HttpFoundation\Response
     {
         return $this->generateRedirectFromRoute(
             'admin.products.default',
@@ -516,7 +515,7 @@ class ProductController extends AbstractSeoCrudController
         );
     }
 
-    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent)
+    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent): ?\Symfony\Component\HttpFoundation\Response
     {
         return $this->generateRedirectFromRoute(
             'admin.categories.default',
@@ -525,8 +524,6 @@ class ProductController extends AbstractSeoCrudController
     }
 
     /**
-     * @param ActionEvent $updateEvent
-     *
      * @return Response
      */
     protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): null

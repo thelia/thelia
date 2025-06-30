@@ -7,16 +7,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\EventListener\RequestListener;
 use Thelia\Core\Translation\Translator;
-use Symfony\Component\Translation\Loader\CsvFileLoader;
-use Symfony\Component\Translation\Loader\IcuDatFileLoader;
-use Symfony\Component\Translation\Loader\IcuResFileLoader;
-use Symfony\Component\Translation\Loader\IniFileLoader;
-use Symfony\Component\Translation\Loader\MoFileLoader;
-use Symfony\Component\Translation\Loader\PhpFileLoader;
-use Symfony\Component\Translation\Loader\PoFileLoader;
-use Symfony\Component\Translation\Loader\QtFileLoader;
-use Symfony\Component\Translation\Loader\XliffFileLoader;
-use Symfony\Component\Translation\Loader\YamlFileLoader;
 
 
 return static function (ContainerConfigurator $container): void {

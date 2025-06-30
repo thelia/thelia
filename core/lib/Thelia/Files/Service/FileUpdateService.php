@@ -18,7 +18,6 @@ use InvalidArgumentException;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Files\FileManager;
 use Thelia\Files\FileModelInterface;
@@ -115,7 +114,7 @@ readonly class FileUpdateService
         /** @var FileModelInterface $file */
         $file = $fileModelInstance->getQueryInstance()->findPk($fileId);
 
-        if (!empty($title)) {
+        if ($title !== '' && $title !== '0') {
             $file->setLocale($locale);
             $file->setTitle($title);
             $file->save();

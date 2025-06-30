@@ -71,7 +71,7 @@ class CategoryController extends AbstractSeoCrudController
         return $this->createForm(AdminForm::CATEGORY_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData): CategoryCreateEvent
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $createEvent = new CategoryCreateEvent();
 
@@ -85,7 +85,7 @@ class CategoryController extends AbstractSeoCrudController
         return $createEvent;
     }
 
-    protected function getUpdateEvent($formData): CategoryUpdateEvent
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $changeEvent = new CategoryUpdateEvent($formData['id']);
 
@@ -118,7 +118,7 @@ class CategoryController extends AbstractSeoCrudController
         return new CategoryDeleteEvent($this->getRequest()->get('category_id', 0));
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasCategory();
     }
@@ -126,7 +126,7 @@ class CategoryController extends AbstractSeoCrudController
     /**
      * @param Category $object
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         // Hydrate the "SEO" tab form
         $this->hydrateSeoForm($parserContext, $object);
@@ -148,12 +148,12 @@ class CategoryController extends AbstractSeoCrudController
         return $this->createForm(AdminForm::CATEGORY_MODIFICATION, FormType::class, $data);
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasCategory() ? $event->getCategory() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $category = CategoryQuery::create()
             ->findOneById($this->getRequest()->get('category_id', 0));
@@ -176,7 +176,7 @@ class CategoryController extends AbstractSeoCrudController
     /**
      * @param Category $object
      */
-    protected function getObjectId($object): int
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -191,7 +191,7 @@ class CategoryController extends AbstractSeoCrudController
         ];
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         // Get product order
         $product_order = $this->getListOrderFromSession('product', 'product_order', 'manual');
@@ -207,7 +207,7 @@ class CategoryController extends AbstractSeoCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.categories.default',
@@ -233,12 +233,12 @@ class CategoryController extends AbstractSeoCrudController
         return $response;
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('category-edit', $this->getEditionArguments());
     }
 
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.categories.update',
@@ -270,12 +270,7 @@ class CategoryController extends AbstractSeoCrudController
         return $this->nullResponse();
     }
 
-    /**
-     * @param ActionEvent $deleteEvent
-     *
-     * @return Response|null
-     */
-    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent)
+    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent): ?Response
     {
         // Redirect to parent category list
         $category_id = $deleteEvent->getCategory()->getParent();
@@ -283,12 +278,7 @@ class CategoryController extends AbstractSeoCrudController
         return $this->redirectToListTemplateWithId($category_id);
     }
 
-    /**
-     * @param ActionEvent $updateEvent
-     *
-     * @return Response|null
-     */
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): ?Response
     {
         $response = null;
         if ($this->getRequest()->get('save_mode') != 'stay') {
@@ -300,12 +290,7 @@ class CategoryController extends AbstractSeoCrudController
         return $response;
     }
 
-    /**
-     * @param ActionEvent $positionChangeEvent
-     *
-     * @return Response|null
-     */
-    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent)
+    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent): ?Response
     {
         $category = CategoryQuery::create()->findPk($positionChangeEvent->getObjectId());
         $response = null;

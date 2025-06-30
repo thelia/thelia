@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Form\BaseForm;
 use LogicException;
 use Thelia\Core\Event\Feature\FeatureAvCreateEvent;
@@ -53,12 +54,12 @@ class FeatureAvController extends AbstractCrudController
         return $this->createForm(AdminForm::FEATURE_AV_CREATION);
     }
 
-    protected function getUpdateForm(): void
+    protected function getUpdateForm(): null
     {
-        throw new LogicException('Featiure Av. modification is not yet implemented');
+        return null;
     }
 
-    protected function getCreationEvent($formData): FeatureAvCreateEvent
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $createEvent = new FeatureAvCreateEvent();
 
@@ -71,7 +72,7 @@ class FeatureAvController extends AbstractCrudController
         return $createEvent;
     }
 
-    protected function getUpdateEvent($formData): FeatureAvUpdateEvent
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $changeEvent = new FeatureAvUpdateEvent($formData['id']);
 
@@ -100,22 +101,22 @@ class FeatureAvController extends AbstractCrudController
         return new FeatureAvDeleteEvent($this->getRequest()->get('featureav_id'));
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasFeatureAv();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): void
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         throw new LogicException('Feature Av. modification is not yet implemented');
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasFeatureAv() ? $event->getFeatureAv() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $featureAv = FeatureAvQuery::create()
         ->findOneById($this->getRequest()->get('featureav_id', 0));
@@ -132,8 +133,7 @@ class FeatureAvController extends AbstractCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
@@ -142,7 +142,7 @@ class FeatureAvController extends AbstractCrudController
      *
      * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -155,7 +155,7 @@ class FeatureAvController extends AbstractCrudController
         ];
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         // We always return to the feature edition form
         return $this->render(
@@ -164,13 +164,13 @@ class FeatureAvController extends AbstractCrudController
         );
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         // We always return to the feature edition form
         return $this->render('feature-edit', $this->getViewArguments());
     }
 
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         // We always return to the feature edition form
         return $this->generateRedirectFromRoute(
@@ -179,7 +179,7 @@ class FeatureAvController extends AbstractCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.features.update',

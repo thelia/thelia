@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Form\BaseForm;
 use Exception;
@@ -64,7 +65,7 @@ class AttributeController extends AbstractCrudController
         return $this->createForm(AdminForm::ATTRIBUTE_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData): AttributeCreateEvent
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $createEvent = new AttributeCreateEvent();
 
@@ -77,7 +78,7 @@ class AttributeController extends AbstractCrudController
         return $createEvent;
     }
 
-    protected function getUpdateEvent($formData): AttributeUpdateEvent
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $changeEvent = new AttributeUpdateEvent($formData['id']);
 
@@ -129,12 +130,12 @@ class AttributeController extends AbstractCrudController
         return new AttributeDeleteEvent($this->getRequest()->get('attribute_id'));
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasAttribute();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -149,12 +150,12 @@ class AttributeController extends AbstractCrudController
         return $this->createForm(AdminForm::ATTRIBUTE_MODIFICATION, FormType::class, $data);
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasAttribute() ? $event->getAttribute() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $attribute = AttributeQuery::create()
         ->findOneById($this->getRequest()->get('attribute_id', 0));
@@ -171,8 +172,7 @@ class AttributeController extends AbstractCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
@@ -181,17 +181,17 @@ class AttributeController extends AbstractCrudController
      *
      * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render('attributes', ['order' => $currentOrder]);
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render(
             'attribute-edit',
@@ -202,7 +202,7 @@ class AttributeController extends AbstractCrudController
         );
     }
 
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.attributes.update',
@@ -213,7 +213,7 @@ class AttributeController extends AbstractCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.configuration.attributes.default');
     }

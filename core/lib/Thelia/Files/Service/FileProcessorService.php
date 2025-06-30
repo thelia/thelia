@@ -18,7 +18,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Files\Exception\ProcessFileException;
 use Thelia\Files\FileManager;
 use Thelia\Model\Lang;
@@ -58,7 +57,7 @@ readonly class FileProcessorService
         $message = null;
         $realFileName = $fileBeingUploaded->getClientOriginalName();
 
-        if (!empty($validMimeTypes)) {
+        if ($validMimeTypes !== []) {
             $mimeType = $fileBeingUploaded->getMimeType();
 
             if (!isset($validMimeTypes[$mimeType])) {
@@ -81,7 +80,7 @@ readonly class FileProcessorService
             }
         }
 
-        if (!empty($extBlackList)) {
+        if ($extBlackList !== []) {
             $regex = "#^(.+)\.(".implode('|', $extBlackList).')$#i';
 
             if (preg_match($regex, $realFileName)) {

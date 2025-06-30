@@ -89,26 +89,22 @@ return static function (ContainerConfigurator $container): void {
     $services->set('router.rewrite', RewritingRouter::class);
 
     // Template attribute loader
-    $services->set('thelia.loader.template_attributes', TemplateAttributeLoader::class)
-        ->public(false)
+    $services->set('thelia.loader.template_attributes', TemplateAttributeLoader::class)->public()
         ->tag('routing.loader', ['priority' => 254]);
 
     // Module attribute loader
-    $services->set('thelia.loader.module_attributes', ModuleAttributeLoader::class)
-        ->public(false)
+    $services->set('thelia.loader.module_attributes', ModuleAttributeLoader::class)->public()
         ->tag('routing.loader', ['priority' => 254]);
 
     // Module annotation loader
-    $services->set('thelia.loader.module_annotations', ModuleAnnotationLoader::class)
-        ->public(false)
+    $services->set('thelia.loader.module_annotations', ModuleAnnotationLoader::class)->public()
         ->tag('routing.loader', ['priority' => 253]);
 
     // Module XML loader
     $services->set('thelia.loader.module_xml', ModuleXmlLoader::class)
         ->args([
             env('APP_ENV'),
-        ])
-        ->public(false)
+        ])->public()
         ->tag('routing.loader', ['priority' => 252]);
 
     // Chain request router

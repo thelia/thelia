@@ -291,6 +291,7 @@ class FileController extends BaseAdminController
             'formId' => $fileModelInstance->getUpdateFormId(),
         ]);
     }
+
     public function updateDocumentAction(
         EventDispatcherInterface $eventDispatcher,
         FileUpdateService $fileUpdateService,
@@ -384,7 +385,7 @@ class FileController extends BaseAdminController
                 AccessManager::UPDATE,
                 $message
             );
-        } catch (Exception $e) {
+        } catch (Exception) {
             return $this->pageNotFound();
         }
 
@@ -414,7 +415,7 @@ class FileController extends BaseAdminController
                 AccessManager::UPDATE,
                 $message
             );
-        } catch (Exception $e) {
+        } catch (Exception) {
             return $this->pageNotFound();
         }
 
@@ -441,7 +442,7 @@ class FileController extends BaseAdminController
                 TheliaEvents::IMAGE_UPDATE_POSITION,
                 $position
             );
-        } catch (Exception $e) {
+        } catch (Exception) {
             return $this->pageNotFound();
         }
 
@@ -468,7 +469,7 @@ class FileController extends BaseAdminController
                 TheliaEvents::DOCUMENT_UPDATE_POSITION,
                 $position
             );
-        } catch (Exception $e) {
+        } catch (Exception) {
             return $this->pageNotFound();
         }
 
@@ -492,7 +493,7 @@ class FileController extends BaseAdminController
                 'image',
                 TheliaEvents::IMAGE_TOGGLE_VISIBILITY
             );
-        } catch (Exception $e) {
+        } catch (Exception) {
             return $this->pageNotFound();
         }
 
@@ -516,7 +517,7 @@ class FileController extends BaseAdminController
                 'document',
                 TheliaEvents::DOCUMENT_TOGGLE_VISIBILITY
             );
-        } catch (Exception $e) {
+        } catch (Exception) {
             return $this->pageNotFound();
         }
 

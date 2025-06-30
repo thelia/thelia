@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\ActionEvent;
 use Exception;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Form\BaseForm;
@@ -255,7 +256,7 @@ class HookController extends AbstractCrudController
      *
      * @return HookModificationForm
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -279,7 +280,7 @@ class HookController extends AbstractCrudController
      *
      * @param unknown $formData
      */
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $event = new HookCreateEvent();
 
@@ -291,7 +292,7 @@ class HookController extends AbstractCrudController
      *
      * @param unknown $formData
      */
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $event = new HookUpdateEvent($formData['id']);
 
@@ -331,7 +332,7 @@ class HookController extends AbstractCrudController
      *
      * @param unknown $event
      */
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasHook();
     }
@@ -343,7 +344,7 @@ class HookController extends AbstractCrudController
      *
      * @internal param \Thelia\Controller\Admin\unknown $createEvent
      */
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->getHook();
     }
@@ -351,7 +352,7 @@ class HookController extends AbstractCrudController
     /**
      * Load an existing object from the database.
      */
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $hook = HookQuery::create()
             ->findPk($this->getRequest()->get('hook_id', 0));
@@ -370,8 +371,7 @@ class HookController extends AbstractCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
@@ -382,7 +382,7 @@ class HookController extends AbstractCrudController
      *
      * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -392,7 +392,7 @@ class HookController extends AbstractCrudController
      *
      * @param unknown $currentOrder , if any, null otherwise
      */
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render('hooks', ['order' => $currentOrder]);
     }
@@ -400,7 +400,7 @@ class HookController extends AbstractCrudController
     /**
      * Render the edition template.
      */
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('hook-edit', $this->getEditionArgument());
     }
@@ -415,7 +415,7 @@ class HookController extends AbstractCrudController
     /**
      * Redirect to the edition template.
      */
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.hook.update',
@@ -429,7 +429,7 @@ class HookController extends AbstractCrudController
     /**
      * Redirect to the list template.
      */
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.hook');
     }

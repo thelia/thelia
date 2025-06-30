@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\ActionEvent;
 use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -76,7 +77,7 @@ class CountryController extends AbstractCrudController
      *
      * @param Country $object
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -104,7 +105,7 @@ class CountryController extends AbstractCrudController
      *
      * @return CountryCreateEvent
      */
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $event = new CountryCreateEvent();
 
@@ -118,7 +119,7 @@ class CountryController extends AbstractCrudController
      *
      * @return CountryUpdateEvent
      */
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $event = new CountryUpdateEvent($formData['id']);
 
@@ -163,7 +164,7 @@ class CountryController extends AbstractCrudController
      *
      * @param unknown $event
      */
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasCountry();
     }
@@ -173,7 +174,7 @@ class CountryController extends AbstractCrudController
      *
      * @return Country
      */
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->getCountry();
     }
@@ -181,7 +182,7 @@ class CountryController extends AbstractCrudController
     /**
      * Load an existing object from the database.
      */
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $country = CountryQuery::create()
             ->findPk($this->getRequest()->get('country_id', 0));
@@ -200,8 +201,7 @@ class CountryController extends AbstractCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
@@ -212,7 +212,7 @@ class CountryController extends AbstractCrudController
      *
      * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -222,7 +222,7 @@ class CountryController extends AbstractCrudController
      *
      * @return Response
      */
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render('countries', ['display_country' => 20]);
     }
@@ -230,7 +230,7 @@ class CountryController extends AbstractCrudController
     /**
      * Render the edition template.
      */
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('country-edit', $this->getEditionArgument());
     }
@@ -245,7 +245,7 @@ class CountryController extends AbstractCrudController
     /**
      * Redirect to the edition template.
      */
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.countries.update',
@@ -259,7 +259,7 @@ class CountryController extends AbstractCrudController
     /**
      * Redirect to the list template.
      */
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.configuration.countries.default');
     }

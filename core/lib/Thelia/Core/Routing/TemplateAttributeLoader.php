@@ -50,6 +50,7 @@ class TemplateAttributeLoader extends Loader
             if (!$templateRoutes instanceof RouteCollection) {
                 continue;
             }
+
             $routes->addCollection($templateRoutes);
         }
 

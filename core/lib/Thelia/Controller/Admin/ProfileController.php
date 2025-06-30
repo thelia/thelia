@@ -57,7 +57,7 @@ class ProfileController extends AbstractCrudController
         return $this->createForm(AdminForm::PROFILE_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData): ProfileEvent
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $event = new ProfileEvent();
 
@@ -71,7 +71,7 @@ class ProfileController extends AbstractCrudController
         return $event;
     }
 
-    protected function getUpdateEvent($formData): ProfileEvent
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $event = new ProfileEvent();
 
@@ -107,7 +107,7 @@ class ProfileController extends AbstractCrudController
     /**
      * @param Profile $object
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -147,12 +147,12 @@ class ProfileController extends AbstractCrudController
         return $this->createForm(AdminForm::PROFILE_UPDATE_MODULE_ACCESS, FormType::class, $data);
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasProfile() ? $event->getProfile() : null;
     }
 
-    protected function getExistingObject(): ?Profile
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $profile = ProfileQuery::create()
             ->findOneById($this->getRequest()->get('profile_id', 0));
@@ -164,7 +164,7 @@ class ProfileController extends AbstractCrudController
         return $profile;
     }
 
-    protected function getObjectLabel(?string $object): string
+    protected function getObjectLabel(?ActiveRecordInterface $object): string
     {
         if ($object instanceof Profile) {
             return $object->getTitle();
@@ -173,7 +173,7 @@ class ProfileController extends AbstractCrudController
         return (string) $object;
     }
 
-    protected function getObjectId(?int $object): string
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         if ($object instanceof Profile) {
             return (string) $object->getId();
@@ -194,7 +194,7 @@ class ProfileController extends AbstractCrudController
         ];
     }
 
-    protected function renderListTemplate($currentOrder): \Symfony\Component\HttpFoundation\Response
+    protected function renderListTemplate($currentOrder): Response
     {
         // We always return to the feature edition form
         return $this->render(
@@ -203,13 +203,13 @@ class ProfileController extends AbstractCrudController
         );
     }
 
-    protected function renderEditionTemplate(): \Symfony\Component\HttpFoundation\Response
+    protected function renderEditionTemplate(): Response
     {
         // We always return to the feature edition form
         return $this->render('profile-edit', array_merge($this->getViewArguments(), $this->getRouteArguments()));
     }
 
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         // We always return to the feature edition form
         return $this->generateRedirectFromRoute(
@@ -226,7 +226,7 @@ class ProfileController extends AbstractCrudController
      *
      * @return \Symfony\Component\HttpFoundation\Response|Response
      */
-    protected function performAdditionalCreateAction(ActionEvent $createEvent)
+    protected function performAdditionalCreateAction(ActionEvent $createEvent): ?\Symfony\Component\HttpFoundation\Response
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.profiles.update',
@@ -235,12 +235,12 @@ class ProfileController extends AbstractCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.configuration.profiles.list');
     }
 
-    public function updateAction(ParserContext $parserContext)
+    public function updateAction(ParserContext $parserContext): \Symfony\Component\HttpFoundation\Response
     {
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;

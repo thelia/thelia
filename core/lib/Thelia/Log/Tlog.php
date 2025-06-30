@@ -16,20 +16,33 @@ use Thelia\Model\ConfigQuery;
 class Tlog implements LoggerInterface
 {
     public const VAR_LEVEL = 'tlog_level';
+
     public const VAR_DESTINATIONS = 'tlog_destinations';
+
     public const VAR_PREFIXE = 'tlog_prefix';
+
     public const VAR_FILES = 'tlog_files';
+
     public const VAR_IP = 'tlog_ip';
+
     public const VAR_SHOW_REDIRECT = 'tlog_show_redirect';
 
     public const DEBUG = 100;
+
     public const INFO = 200;
+
     public const NOTICE = 300;
+
     public const WARNING = 400;
+
     public const ERROR = 500;
+
     public const CRITICAL = 600;
+
     public const ALERT = 700;
+
     public const EMERGENCY = 800;
+
     public const MUET = \PHP_INT_MAX;
 
     protected array $levels = [
@@ -44,22 +57,37 @@ class Tlog implements LoggerInterface
     ];
 
     public const DEFAULT_LEVEL = self::ERROR;
+
     public const DEFAUT_DESTINATIONS = "Thelia\Log\Destination\TlogDestinationRotatingFile";
+
     public const DEFAUT_PREFIXE = '#INDEX: #LEVEL [#FILE:#FUNCTION()] {#LINE} #DATE #HOUR: ';
+
     public const DEFAUT_FILES = '*';
+
     public const DEFAUT_IP = '';
+
     public const DEFAUT_SHOW_REDIRECT = false;
 
     private static ?self $instance = null;
+
     protected array $destinations = [];
+
     protected bool $mode_back_office = false;
+
     protected int $level = self::ERROR;
+
     protected string $prefix = '';
+
     protected array $files = [];
+
     protected bool $all_files = false;
+
     protected bool $show_redirect = false;
+
     private int $linecount = 0;
+
     protected bool $done = false;
+
     public array $dir_destinations = [];
 
     private function __construct()
@@ -68,7 +96,7 @@ class Tlog implements LoggerInterface
 
     public static function getInstance(): self
     {
-        if (self::$instance === null) {
+        if (!self::$instance instanceof \Thelia\Log\Tlog) {
             self::$instance = new self();
             self::$instance->init();
         }
@@ -142,7 +170,7 @@ class Tlog implements LoggerInterface
 
     public function setIp(string $ips): static
     {
-        if (!empty($ips) && isset($_SERVER['REMOTE_ADDR']) && !\in_array($_SERVER['REMOTE_ADDR'], explode(';', $ips))) {
+        if ($ips !== '' && $ips !== '0' && isset($_SERVER['REMOTE_ADDR']) && !\in_array($_SERVER['REMOTE_ADDR'], explode(';', $ips))) {
             $this->level = self::MUET;
         }
 

@@ -15,12 +15,12 @@ namespace Thelia\Controller\Admin;
 
 use InvalidArgumentException;
 use Exception;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Log\Tlog;
 use Thelia\Form\BaseForm;
-use Thelia\Model\Address;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
@@ -30,6 +30,7 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Form\AddressCreateForm;
 use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Event\AddressEvent;
@@ -131,12 +132,12 @@ class AddressController extends AbstractCrudController
         ];
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         return $this->createForm(AdminForm::ADDRESS_UPDATE, FormType::class, $this->createFormDataArray($object));
     }
 
-    protected function getCreationEvent($formData): AddressCreateOrUpdateEvent
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $event = $this->getCreateOrUpdateEvent($formData);
 
@@ -147,7 +148,7 @@ class AddressController extends AbstractCrudController
         return $event;
     }
 
-    protected function getUpdateEvent($formData): AddressCreateOrUpdateEvent
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $event = $this->getCreateOrUpdateEvent($formData);
 
@@ -209,18 +210,17 @@ class AddressController extends AbstractCrudController
         return null;
     }
 
-
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         return AddressQuery::create()->findPk($this->getRequest()->get('address_id'));
     }
 
-    protected function getObjectLabel($object)
+    protected function getObjectLabel($object): string
     {
         return $object->getLabel();
     }
 
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -252,7 +252,7 @@ class AddressController extends AbstractCrudController
         );
     }
 
-    protected function redirectToListTemplate(): RedirectResponse
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.home',

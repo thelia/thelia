@@ -98,6 +98,7 @@ class AssetManager implements AssetManagerInterface
                 if ($fs->exists($destinationFile)) {
                     $fs->remove($destinationFile);
                 }
+
                 $fs->copy($item->getPathname(), $destinationFile);
             }
         }

@@ -76,7 +76,7 @@ class BrandController extends AbstractSeoCrudController
      *
      * @return BrandModificationForm $object
      */
-    protected function hydrateObjectForm(
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
         ParserContext $parserContext,
         $object
     ): BaseForm {
@@ -104,7 +104,7 @@ class BrandController extends AbstractSeoCrudController
      *
      * @param array $formData
      */
-    protected function getCreationEvent($formData): BrandCreateEvent
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $brandCreateEvent = new BrandCreateEvent();
 
@@ -122,7 +122,7 @@ class BrandController extends AbstractSeoCrudController
      *
      * @param array $formData
      */
-    protected function getUpdateEvent($formData): BrandUpdateEvent
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $brandUpdateEvent = new BrandUpdateEvent($formData['id']);
 
@@ -164,7 +164,7 @@ class BrandController extends AbstractSeoCrudController
      *
      * @return Brand|null
      */
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->getBrand();
     }
@@ -174,7 +174,7 @@ class BrandController extends AbstractSeoCrudController
      *
      * @return Brand
      */
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $brand = BrandQuery::create()
             ->findOneById($this->getRequest()->get('brand_id', 0));
@@ -193,8 +193,7 @@ class BrandController extends AbstractSeoCrudController
      *
      * @return string brand title
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
@@ -205,7 +204,7 @@ class BrandController extends AbstractSeoCrudController
      *
      * @return int brand id
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -215,7 +214,7 @@ class BrandController extends AbstractSeoCrudController
      *
      * @return Response
      */
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         $this->getListOrderFromSession('brand', 'order', 'manual');
 
@@ -235,7 +234,7 @@ class BrandController extends AbstractSeoCrudController
     /**
      * Render the edition template.
      */
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('brand-edit', $this->getEditionArguments());
     }
@@ -243,7 +242,7 @@ class BrandController extends AbstractSeoCrudController
     /**
      * Redirect to the edition template.
      */
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.brand.update',
@@ -255,7 +254,7 @@ class BrandController extends AbstractSeoCrudController
     /**
      * Redirect to the list template.
      */
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.brand.default');
     }

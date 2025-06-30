@@ -15,7 +15,6 @@ namespace Thelia\Api\Bridge\Propel\Service;
 
 use ReflectionClass;
 use ReflectionMethod;
-use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionProperty;
 use ReflectionAttribute;
@@ -28,7 +27,6 @@ use ApiPlatform\Validator\ValidatorInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
-use ReflectionType;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;

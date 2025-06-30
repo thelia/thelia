@@ -146,7 +146,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
         $method = $this->getMethodName($attributes)['method'];
 
         $hook = $this->getHook($attributes['event'], $type);
-        if (!$hook) {
+        if (!$hook instanceof Hook) {
             return;
         }
 

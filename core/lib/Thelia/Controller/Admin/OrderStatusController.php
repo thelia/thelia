@@ -78,7 +78,7 @@ class OrderStatusController extends AbstractCrudController
      *
      * @return OrderStatusModificationForm $object
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         // Prepare the data that will hydrate the form
         $data = [
@@ -103,7 +103,7 @@ class OrderStatusController extends AbstractCrudController
      *
      * @param array $formData
      */
-    protected function getCreationEvent($formData): OrderStatusCreateEvent
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $orderStatusCreateEvent = new OrderStatusCreateEvent();
 
@@ -122,7 +122,7 @@ class OrderStatusController extends AbstractCrudController
      *
      * @param array $formData
      */
-    protected function getUpdateEvent($formData): OrderStatusUpdateEvent
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $orderStatusUpdateEvent = new OrderStatusUpdateEvent($formData['id']);
 
@@ -166,7 +166,7 @@ class OrderStatusController extends AbstractCrudController
      *
      * @return OrderStatus|null
      */
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->getOrderStatus();
     }
@@ -176,7 +176,7 @@ class OrderStatusController extends AbstractCrudController
      *
      * @return OrderStatus
      */
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $orderStatus = OrderStatusQuery::create()
             ->findOneById($this->getRequest()->get('order_status_id', 0));
@@ -195,8 +195,7 @@ class OrderStatusController extends AbstractCrudController
      *
      * @return string order status title
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
@@ -207,7 +206,7 @@ class OrderStatusController extends AbstractCrudController
      *
      * @return int order status id
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -219,7 +218,7 @@ class OrderStatusController extends AbstractCrudController
      *
      * @return Response
      */
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         $this->getListOrderFromSession('orderstatus', 'order', 'manual');
 
@@ -239,7 +238,7 @@ class OrderStatusController extends AbstractCrudController
     /**
      * Render the edition template.
      */
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('order-status-edit', $this->getEditionArguments());
     }
@@ -247,7 +246,7 @@ class OrderStatusController extends AbstractCrudController
     /**
      * Redirect to the edition template.
      */
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.order-status.update',
@@ -259,7 +258,7 @@ class OrderStatusController extends AbstractCrudController
     /**
      * Redirect to the list template.
      */
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.order-status.default');
     }
@@ -281,7 +280,7 @@ class OrderStatusController extends AbstractCrudController
      *
      * @return Response|null
      */
-    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent)
+    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent): ?\Symfony\Component\HttpFoundation\Response
     {
         $folder = OrderStatusQuery::create()->findPk($positionChangeEvent->getObjectId());
 

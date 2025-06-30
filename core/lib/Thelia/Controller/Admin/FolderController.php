@@ -76,7 +76,7 @@ class FolderController extends AbstractSeoCrudController
      *
      * @param Folder $object
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object): BaseForm
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         // Hydrate the "SEO" tab form
         $this->hydrateSeoForm($parserContext, $object);
@@ -102,7 +102,7 @@ class FolderController extends AbstractSeoCrudController
      *
      * @param array $formData
      */
-    protected function getCreationEvent($formData): FolderCreateEvent
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $creationEvent = new FolderCreateEvent();
 
@@ -120,7 +120,7 @@ class FolderController extends AbstractSeoCrudController
      *
      * @param array $formData
      */
-    protected function getUpdateEvent($formData): FolderUpdateEvent
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $updateEvent = new FolderUpdateEvent($formData['id']);
 
@@ -182,7 +182,7 @@ class FolderController extends AbstractSeoCrudController
      *
      * @return Folder|null
      */
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasFolder() ? $event->getFolder() : null;
     }
@@ -190,7 +190,7 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Load an existing object from the database.
      */
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $folder = FolderQuery::create()
             ->findOneById($this->getRequest()->get('folder_id', 0));
@@ -209,8 +209,7 @@ class FolderController extends AbstractSeoCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
@@ -221,7 +220,7 @@ class FolderController extends AbstractSeoCrudController
      *
      * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -231,7 +230,7 @@ class FolderController extends AbstractSeoCrudController
      *
      * @return Response
      */
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         // Get content order
         $content_order = $this->getListOrderFromSession('content', 'content_order', 'manual');
@@ -249,7 +248,7 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Render the edition template.
      */
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('folder-edit', $this->getEditionArguments());
     }
@@ -267,11 +266,9 @@ class FolderController extends AbstractSeoCrudController
     }
 
     /**
-     * @param ActionEvent $updateEvent
-     *
      * @return Response|void
      */
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): ?\Symfony\Component\HttpFoundation\Response
     {
         if ($this->getRequest()->get('save_mode') != 'stay') {
             return $this->generateRedirectFromRoute(
@@ -290,7 +287,7 @@ class FolderController extends AbstractSeoCrudController
      *
      * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent)
+    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent): ?\Symfony\Component\HttpFoundation\Response
     {
         return $this->generateRedirectFromRoute(
             'admin.folders.default',
@@ -303,7 +300,7 @@ class FolderController extends AbstractSeoCrudController
      *
      * @return Response|null
      */
-    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent)
+    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent): ?\Symfony\Component\HttpFoundation\Response
     {
         $folder = FolderQuery::create()->findPk($positionChangeEvent->getObjectId());
 
@@ -322,7 +319,7 @@ class FolderController extends AbstractSeoCrudController
      *
      * @return Response
      */
-    protected function redirectToEditionTemplate(Request $request = null)
+    protected function redirectToEditionTemplate(Request $request = null): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.folders.update', [], $this->getEditionArguments($request));
     }
@@ -330,7 +327,7 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Redirect to the list template.
      */
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.folders.default',
