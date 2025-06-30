@@ -18,7 +18,6 @@ use Thelia\Controller\BaseController;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Template\ParserInterface;
-use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ModuleQuery;
 

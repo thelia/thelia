@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Symfony\Component\Routing\RouterInterface;
-use Thelia\Core\Routing\ModuleAttributeLoader;
 use Thelia\Type\AlphaNumStringListType;
 use Thelia\Type\EnumListType;
 use Thelia\Type\BooleanOrBothType;

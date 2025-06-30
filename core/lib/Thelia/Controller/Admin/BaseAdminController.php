@@ -21,7 +21,6 @@ use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Core\Template\ParserInterface;
-use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;

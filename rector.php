@@ -7,6 +7,7 @@ use Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector;
 use Rector\DeadCode\Rector\Property\RemoveUselessReadOnlyTagRector;
 use Rector\DeadCode\Rector\Property\RemoveUselessVarTagRector;
 use Rector\Php80\Rector\ClassMethod\AddParamBasedOnParentClassMethodRector;
+use Rector\Symfony\DependencyInjection\Rector\Class_\GetBySymfonyStringToConstructorInjectionRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeDeclarationRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddReturnTypeDeclarationRector;
 use Rector\TypeDeclaration\Rector\Property\AddPropertyTypeDeclarationRector;
@@ -28,26 +29,8 @@ return RectorConfig::configure()
     ->withPhpSets(
         php83: true
     )
-    ->withPreparedSets(
-        codeQuality: true,
-        codingStyle: true,
-        typeDeclarations: true,
-        privatization: true,
-        rectorPreset: true,
-        symfonyCodeQuality: true
-    )
     ->withComposerBased(symfony: true)
     ->withRules([
-        AddParamTypeDeclarationRector::class,
-        AddReturnTypeDeclarationRector::class,
-        AddPropertyTypeDeclarationRector::class,
-        AddParamBasedOnParentClassMethodRector::class,
-
-        RemoveUselessParamTagRector::class,
-        RemoveUselessReturnTagRector::class,
-        RemoveUselessVarTagRector::class,
-        RemoveUnusedPrivatePropertyRector::class,
-        RemoveUselessReadOnlyTagRector::class,
-
+        GetBySymfonyStringToConstructorInjectionRector::class
     ]);
 

@@ -557,7 +557,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                         $sqlWhereString = str_replace($value, 'NOT ISNULL(`'.$alias.'`.ID)', $sqlWhereString);
                     }
 
-                    $sqlWhereString = str_replace(array('&', '|'), array(' AND ', ' OR '), $sqlWhereString);
+                    $sqlWhereString = str_replace(['&', '|'], [' AND ', ' OR '], $sqlWhereString);
                 }
 
                 $search->where('('.$sqlWhereString.')');

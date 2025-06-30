@@ -40,7 +40,7 @@ class TheliaFormFactory
         protected FormFactoryBuilderInterface $formFactoryBuilder,
         protected ValidatorBuilder $validatorBuilder,
         protected TokenStorageInterface $tokenStorage,
-        #[Autowire('%Thelia.parser.forms%')]
+        #[Autowire(param: 'Thelia.parser.forms')]
         protected array $formDefinition
     )
     {

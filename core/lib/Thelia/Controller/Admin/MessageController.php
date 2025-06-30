@@ -314,9 +314,7 @@ class MessageController extends AbstractCrudController
 
                 $data = $form->getData();
 
-                $messageParameters = array_map(static function ($value) {
-                    return $value;
-                }, $this->getRequest()->request->all());
+                $messageParameters = array_map(static fn($value) => $value, $this->getRequest()->request->all());
 
                 $this->getMailer()->sendEmailMessage(
                     $message->getName(),
