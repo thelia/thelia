@@ -209,10 +209,10 @@ class TemplateController extends AbstractCrudController
         return null;
     }
 
-    public function duplicateAction(EventDispatcherInterface $eventDispatcher)
+    public function duplicateAction(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::CREATE)) {
+        if (($response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::CREATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -236,7 +236,7 @@ class TemplateController extends AbstractCrudController
         return $this->redirectToEditionTemplate(null, $template_id);
     }
 
-    public function getAjaxFeaturesAction()
+    public function getAjaxFeaturesAction(): \Thelia\Core\HttpFoundation\Response
     {
         return $this->render(
             'ajax/template-feature-list',
@@ -244,7 +244,7 @@ class TemplateController extends AbstractCrudController
         );
     }
 
-    public function getAjaxAttributesAction()
+    public function getAjaxAttributesAction(): \Thelia\Core\HttpFoundation\Response
     {
         return $this->render(
             'ajax/template-attribute-list',
@@ -252,10 +252,10 @@ class TemplateController extends AbstractCrudController
         );
     }
 
-    public function addAttributeAction(EventDispatcherInterface $eventDispatcher)
+    public function addAttributeAction(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -278,10 +278,10 @@ class TemplateController extends AbstractCrudController
         return $this->redirectToEditionTemplate();
     }
 
-    public function deleteAttributeAction(EventDispatcherInterface $eventDispatcher)
+    public function deleteAttributeAction(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -319,10 +319,10 @@ class TemplateController extends AbstractCrudController
         );
     }
 
-    public function addFeatureAction(EventDispatcherInterface $eventDispatcher)
+    public function addFeatureAction(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -345,10 +345,10 @@ class TemplateController extends AbstractCrudController
         return $this->redirectToEditionTemplate();
     }
 
-    public function deleteFeatureAction(EventDispatcherInterface $eventDispatcher)
+    public function deleteFeatureAction(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 

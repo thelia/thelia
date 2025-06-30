@@ -13,18 +13,20 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Exception;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CustomerTitleQuery;
 
 class TranslationsCustomerTitleController extends BaseAdminController
 {
-    public function defaultAction()
+    public function defaultAction(): Response
     {
         return $this->render('translations-customer-title');
     }
 
-    public function updateAction()
+    public function updateAction(): RedirectResponse
     {
         $request = $this->getRequest();
 

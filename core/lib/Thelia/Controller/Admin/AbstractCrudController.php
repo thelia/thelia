@@ -160,7 +160,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function defaultAction(): Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::VIEW)) {
+        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::VIEW)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -173,7 +173,7 @@ abstract class AbstractCrudController extends BaseAdminController
     ): RedirectResponse|Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::CREATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::CREATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -259,7 +259,7 @@ abstract class AbstractCrudController extends BaseAdminController
     ): Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -283,7 +283,7 @@ abstract class AbstractCrudController extends BaseAdminController
     ): Response|RedirectResponse
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -373,7 +373,7 @@ abstract class AbstractCrudController extends BaseAdminController
     ): mixed
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -416,7 +416,7 @@ abstract class AbstractCrudController extends BaseAdminController
     )
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -454,7 +454,7 @@ abstract class AbstractCrudController extends BaseAdminController
         EventDispatcherInterface $eventDispatcher
     ) {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -478,7 +478,7 @@ abstract class AbstractCrudController extends BaseAdminController
     ): Response|RedirectResponse
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::DELETE)) {
+        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::DELETE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 

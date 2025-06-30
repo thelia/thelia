@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 
@@ -25,7 +26,7 @@ class LanguageController extends BaseAdminController
 {
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 

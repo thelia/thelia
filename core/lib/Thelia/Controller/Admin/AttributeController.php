@@ -224,7 +224,7 @@ class AttributeController extends AbstractCrudController
      *
      * @return string the current list order
      */
-    protected function getAttributeAvListOrder()
+    protected function getAttributeAvListOrder(): ?string
     {
         return $this->getListOrderFromSession(
             'attributeav',
@@ -236,10 +236,10 @@ class AttributeController extends AbstractCrudController
     /**
      * Add or Remove from all product templates.
      */
-    protected function addRemoveFromAllTemplates(EventDispatcherInterface $eventDispatcher, ?string $eventType)
+    protected function addRemoveFromAllTemplates(EventDispatcherInterface $eventDispatcher, ?string $eventType): \Thelia\Core\HttpFoundation\Response|Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 

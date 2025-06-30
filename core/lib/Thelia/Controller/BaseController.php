@@ -211,7 +211,7 @@ abstract class BaseController implements ControllerInterface
         string $fileName,
         bool $checkOrderStatus = true,
         bool $checkAdminUser = true,
-        $browser = false
+        bool $browser = false
     ): Response {
         $order = OrderQuery::create()->findPk($order_id);
 

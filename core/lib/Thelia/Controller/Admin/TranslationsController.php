@@ -13,6 +13,8 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Thelia\Core\HttpFoundation\Response;
 use DirectoryIterator;
 use InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
@@ -73,7 +75,7 @@ class TranslationsController extends BaseAdminController
         TemplateHelperInterface $templateHelper,
         EventDispatcherInterface $eventDispatcher,
         TranslatorInterface $translator
-    ) {
+    ): RedirectResponse|Response {
         // Get related strings, if all input data are here
         $itemToTranslate = $request->get('item_to_translate');
 
@@ -333,7 +335,7 @@ class TranslationsController extends BaseAdminController
         EventDispatcherInterface $eventDispatcher,
         TranslatorInterface $translator
     ) {
-        if (null !== $response = $this->checkAuth(AdminResources::TRANSLATIONS, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::TRANSLATIONS, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -346,7 +348,7 @@ class TranslationsController extends BaseAdminController
         EventDispatcherInterface $eventDispatcher,
         TranslatorInterface $translator
     ) {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 

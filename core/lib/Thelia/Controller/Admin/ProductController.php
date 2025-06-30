@@ -123,7 +123,7 @@ class ProductController extends AbstractSeoCrudController
     /**
      * Attributes ajax tab loading.
      */
-    public function loadAttributesAjaxTabAction()
+    public function loadAttributesAjaxTabAction(): Response
     {
         return $this->render(
             'ajax/product-attributes-tab',
@@ -136,7 +136,7 @@ class ProductController extends AbstractSeoCrudController
     /**
      * Related information ajax tab loading.
      */
-    public function loadRelatedAjaxTabAction()
+    public function loadRelatedAjaxTabAction(): Response
     {
         return $this->render(
             'ajax/product-related-tab',
@@ -490,9 +490,9 @@ class ProductController extends AbstractSeoCrudController
      */
     public function setToggleVisibilityAction(
         EventDispatcherInterface $eventDispatcher
-    ) {
+    ): Response|\Symfony\Component\HttpFoundation\Response {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -559,7 +559,7 @@ class ProductController extends AbstractSeoCrudController
      *
      * @return Response
      */
-    public function getVirtualDocumentListAjaxAction($productId, $pseId)
+    public function getVirtualDocumentListAjaxAction($productId, $pseId): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::VIEW);
         $this->checkXmlHttpRequest();
@@ -592,7 +592,7 @@ class ProductController extends AbstractSeoCrudController
 
     // -- Related content management -------------------------------------------
 
-    public function getAvailableRelatedContentAction($productId, $folderId)
+    public function getAvailableRelatedContentAction($productId, $folderId): \Symfony\Component\HttpFoundation\Response
     {
         $result = [];
 
@@ -616,10 +616,10 @@ class ProductController extends AbstractSeoCrudController
         return $this->jsonResponse(json_encode($result));
     }
 
-    public function addRelatedContentAction(EventDispatcherInterface $eventDispatcher)
+    public function addRelatedContentAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -642,10 +642,10 @@ class ProductController extends AbstractSeoCrudController
         return $this->redirectToEditionTemplate();
     }
 
-    public function deleteRelatedContentAction(EventDispatcherInterface $eventDispatcher)
+    public function deleteRelatedContentAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -670,7 +670,7 @@ class ProductController extends AbstractSeoCrudController
 
     // -- Accessories management ----------------------------------------------
 
-    public function getAvailableAccessoriesAction($productId, $categoryId)
+    public function getAvailableAccessoriesAction($productId, $categoryId): \Symfony\Component\HttpFoundation\Response
     {
         $result = [];
 
@@ -694,10 +694,10 @@ class ProductController extends AbstractSeoCrudController
         return $this->jsonResponse(json_encode($result));
     }
 
-    public function addAccessoryAction(EventDispatcherInterface $eventDispatcher)
+    public function addAccessoryAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -720,10 +720,10 @@ class ProductController extends AbstractSeoCrudController
         return $this->redirectToEditionTemplate();
     }
 
-    public function deleteAccessoryAction(EventDispatcherInterface $eventDispatcher)
+    public function deleteAccessoryAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -787,10 +787,10 @@ class ProductController extends AbstractSeoCrudController
      *
      * @return mixed|\Symfony\Component\HttpFoundation\Response
      */
-    public function setProductTemplateAction(EventDispatcherInterface $eventDispatcher, $productId)
+    public function setProductTemplateAction(EventDispatcherInterface $eventDispatcher, $productId): Response|RedirectResponse
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -896,10 +896,10 @@ class ProductController extends AbstractSeoCrudController
         return $this->redirectToListTemplate();
     }
 
-    public function addAdditionalCategoryAction(EventDispatcherInterface $eventDispatcher)
+    public function addAdditionalCategoryAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -922,10 +922,10 @@ class ProductController extends AbstractSeoCrudController
         return $this->redirectToEditionTemplate();
     }
 
-    public function deleteAdditionalCategoryAction(EventDispatcherInterface $eventDispatcher)
+    public function deleteAdditionalCategoryAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -950,7 +950,7 @@ class ProductController extends AbstractSeoCrudController
 
     // -- Product combination management ---------------------------------------
 
-    public function getAttributeValuesAction(/* @noinspection PhpUnusedParameterInspection */ $productId, $attributeId)
+    public function getAttributeValuesAction(/* @noinspection PhpUnusedParameterInspection */ $productId, $attributeId): \Symfony\Component\HttpFoundation\Response
     {
         $result = [];
 
@@ -974,7 +974,7 @@ class ProductController extends AbstractSeoCrudController
         return $this->jsonResponse(json_encode($result));
     }
 
-    public function addAttributeValueToCombinationAction(/* @noinspection PhpUnusedParameterInspection */ $productId, $attributeAvId, $combination)
+    public function addAttributeValueToCombinationAction(/* @noinspection PhpUnusedParameterInspection */ $productId, $attributeAvId, $combination): \Symfony\Component\HttpFoundation\Response
     {
         $result = [];
 
@@ -1023,10 +1023,10 @@ class ProductController extends AbstractSeoCrudController
     /**
      * A a new combination to a product.
      */
-    public function addProductSaleElementAction(EventDispatcherInterface $eventDispatcher)
+    public function addProductSaleElementAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -1049,10 +1049,10 @@ class ProductController extends AbstractSeoCrudController
     /**
      * A a new combination to a product.
      */
-    public function deleteProductSaleElementAction(EventDispatcherInterface $eventDispatcher)
+    public function deleteProductSaleElementAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -1122,10 +1122,10 @@ class ProductController extends AbstractSeoCrudController
      *
      * @return mixed|RedirectResponse|\Symfony\Component\HttpFoundation\Response|Response|null
      */
-    protected function processProductSaleElementUpdate(EventDispatcherInterface $eventDispatcher, ?BaseForm $changeForm)
+    protected function processProductSaleElementUpdate(EventDispatcherInterface $eventDispatcher, ?BaseForm $changeForm): Response|RedirectResponse|null
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -1236,10 +1236,10 @@ class ProductController extends AbstractSeoCrudController
     /**
      * Build combinations from the combination output builder.
      */
-    public function buildCombinationsAction(EventDispatcherInterface $eventDispatcher)
+    public function buildCombinationsAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse|null
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -1473,12 +1473,12 @@ class ProductController extends AbstractSeoCrudController
      *
      * @return mixed|Response
      */
-    public function productSaleElementsProductImageDocumentAssociation(EventDispatcherInterface $eventDispatcher, $pseId, $type, $typeId)
+    public function productSaleElementsProductImageDocumentAssociation(EventDispatcherInterface $eventDispatcher, $pseId, $type, $typeId): Response|JsonResponse
     {
         /*
          * Check user's auth
          */
-        if (null !== $response = $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -1640,9 +1640,9 @@ class ProductController extends AbstractSeoCrudController
         return null;
     }
 
-    public function getAjaxProductSaleElementsImagesDocuments(EventDispatcherInterface $eventDispatcher, $id, $type)
+    public function getAjaxProductSaleElementsImagesDocuments(EventDispatcherInterface $eventDispatcher, $id, $type): JsonResponse|Response
     {
-        if (null !== $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::VIEW)) {
+        if ($this->checkAuth(AdminResources::PRODUCT, [], AccessManager::VIEW) instanceof Response) {
             return JsonResponse::createAuthError(AccessManager::VIEW);
         }
 
@@ -1885,9 +1885,9 @@ class ProductController extends AbstractSeoCrudController
      *
      * @return mixed|\Symfony\Component\HttpFoundation\Response
      */
-    public function cloneAction(EventDispatcherInterface $eventDispatcher)
+    public function cloneAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), [AccessManager::CREATE, AccessManager::UPDATE])) {
+        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), [AccessManager::CREATE, AccessManager::UPDATE])) instanceof Response) {
             return $response;
         }
 
@@ -1956,7 +1956,7 @@ class ProductController extends AbstractSeoCrudController
      *
      * @return mixed|Response
      */
-    public function searchProductAction()
+    public function searchProductAction(): \Symfony\Component\HttpFoundation\Response
     {
         $search = '%'.$this->getRequest()->query->get('q').'%';
 

@@ -67,10 +67,10 @@ class ContentController extends AbstractSeoCrudController
      *
      * @return mixed|Response
      */
-    public function addAdditionalFolderAction(EventDispatcherInterface $eventDispatcher)
+    public function addAdditionalFolderAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -97,10 +97,10 @@ class ContentController extends AbstractSeoCrudController
      *
      * @return mixed|Response
      */
-    public function removeAdditionalFolderAction(EventDispatcherInterface $eventDispatcher)
+    public function removeAdditionalFolderAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 

@@ -205,10 +205,10 @@ class ConfigController extends AbstractCrudController
      *
      * @return Response the response
      */
-    public function changeValuesAction(EventDispatcherInterface $dispatcher)
+    public function changeValuesAction(EventDispatcherInterface $dispatcher): Response|RedirectResponse
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 

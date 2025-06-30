@@ -301,9 +301,9 @@ class SaleController extends AbstractCrudController
      *
      * @return Response
      */
-    public function toggleActivity(EventDispatcherInterface $eventDispatcher)
+    public function toggleActivity(EventDispatcherInterface $eventDispatcher): Response|\Symfony\Component\HttpFoundation\Response
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -324,7 +324,7 @@ class SaleController extends AbstractCrudController
 
     public function updateProductList()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -347,7 +347,7 @@ class SaleController extends AbstractCrudController
 
     public function updateProductAttributes()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -364,10 +364,10 @@ class SaleController extends AbstractCrudController
         );
     }
 
-    public function resetSaleStatus(EventDispatcherInterface $eventDispatcher)
+    public function resetSaleStatus(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -384,7 +384,7 @@ class SaleController extends AbstractCrudController
         return $this->redirectToListTemplate();
     }
 
-    public function checkSalesActivationStatus(EventDispatcherInterface $eventDispatcher)
+    public function checkSalesActivationStatus(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         // We do not check auth, as the related route may be invoked from a cron
         try {

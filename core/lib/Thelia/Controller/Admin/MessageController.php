@@ -255,7 +255,7 @@ class MessageController extends AbstractCrudController
 
     public function previewAction($messageId, $html = true)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MESSAGE, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::MESSAGE, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -301,7 +301,7 @@ class MessageController extends AbstractCrudController
 
     public function sendSampleByEmailAction($messageId)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MESSAGE, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::MESSAGE, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 

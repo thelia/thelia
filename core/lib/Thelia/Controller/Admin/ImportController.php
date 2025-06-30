@@ -45,10 +45,10 @@ class ImportController extends BaseAdminController
      *
      * @return Response
      */
-    public function indexAction($_view = 'import')
+    public function indexAction(string $_view = 'import')
     {
         $authResponse = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::VIEW]);
-        if ($authResponse !== null) {
+        if ($authResponse instanceof Response) {
             return $authResponse;
         }
 
@@ -62,13 +62,11 @@ class ImportController extends BaseAdminController
 
     /**
      * Handle import position change action.
-     *
-     * @return Response|RedirectResponse
      */
-    public function changeImportPositionAction(EventDispatcherInterface $eventDispatcher)
+    public function changeImportPositionAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         $authResponse = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::UPDATE]);
-        if ($authResponse !== null) {
+        if ($authResponse instanceof Response) {
             return $authResponse;
         }
 
@@ -88,13 +86,11 @@ class ImportController extends BaseAdminController
 
     /**
      * Handle import category position change action.
-     *
-     * @return Response|RedirectResponse
      */
-    public function changeCategoryPositionAction(EventDispatcherInterface $eventDispatcher)
+    public function changeCategoryPositionAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         $authResponse = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::UPDATE]);
-        if ($authResponse !== null) {
+        if ($authResponse instanceof Response) {
             return $authResponse;
         }
 
@@ -136,10 +132,8 @@ class ImportController extends BaseAdminController
      * Display import configuration view.
      *
      * @param int $id An import identifier
-     *
-     * @return Response
      */
-    public function configureAction(int $id)
+    public function configureAction(int $id): Response
     {
         /** @var ImportHandler $importHandler */
         $importHandler = $this->container->get('thelia.import.handler');

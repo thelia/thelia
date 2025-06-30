@@ -261,9 +261,9 @@ class CountryController extends AbstractCrudController
         return $this->generateRedirectFromRoute('admin.configuration.countries.default');
     }
 
-    public function toggleDefaultAction(EventDispatcherInterface $eventDispatcher)
+    public function toggleDefaultAction(EventDispatcherInterface $eventDispatcher): Response|\Symfony\Component\HttpFoundation\Response
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -291,10 +291,10 @@ class CountryController extends AbstractCrudController
         return new CountryToggleVisibilityEvent($this->getExistingObject());
     }
 
-    public function getDataAction($visible = true, $locale = null)
+    public function getDataAction($visible = true, $locale = null): Response|\Symfony\Component\HttpFoundation\Response
     {
         $response = $this->checkAuth($this->resourceCode, [], AccessManager::VIEW);
-        if (null !== $response) {
+        if ($response instanceof Response) {
             return $response;
         }
 

@@ -63,18 +63,18 @@ class ModuleHookController extends AbstractCrudController
         );
     }
 
-    public function indexAction()
+    public function indexAction(): Response|\Symfony\Component\HttpFoundation\Response
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
         return $this->renderList();
     }
 
-    public function toggleActivationAction(EventDispatcherInterface $eventDispatcher, $module_hook_id)
+    public function toggleActivationAction(EventDispatcherInterface $eventDispatcher, $module_hook_id): Response|\Symfony\Component\HttpFoundation\Response
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -322,9 +322,9 @@ class ModuleHookController extends AbstractCrudController
         ];
     }
 
-    public function getModuleHookClassnames($moduleId)
+    public function getModuleHookClassnames($moduleId): Response|JsonResponse
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -358,9 +358,9 @@ class ModuleHookController extends AbstractCrudController
         return new JsonResponse($result);
     }
 
-    public function getModuleHookMethods($moduleId, $className)
+    public function getModuleHookMethods($moduleId, $className): Response|JsonResponse
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 

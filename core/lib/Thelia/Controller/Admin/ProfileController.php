@@ -245,7 +245,7 @@ class ProfileController extends AbstractCrudController
 
     public function updateAction(ParserContext $parserContext): \Symfony\Component\HttpFoundation\Response
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -337,7 +337,7 @@ class ProfileController extends AbstractCrudController
     public function processUpdateResourceAccess(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -398,7 +398,7 @@ class ProfileController extends AbstractCrudController
     public function processUpdateModuleAccess(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 

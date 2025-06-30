@@ -103,8 +103,6 @@ class BrandController extends AbstractSeoCrudController
 
     /**
      * Creates the creation event with the provided form data.
-     *
-     * @param array $formData
      */
     protected function getCreationEvent(array $formData): ActionEvent
     {
@@ -121,8 +119,6 @@ class BrandController extends AbstractSeoCrudController
 
     /**
      * Creates the update event with the provided form data.
-     *
-     * @param array $formData
      */
     protected function getUpdateEvent(array $formData): ActionEvent
     {
@@ -213,8 +209,6 @@ class BrandController extends AbstractSeoCrudController
 
     /**
      * Render the main list template.
-     *
-     * @return Response
      */
     protected function renderListTemplate($currentOrder): Response
     {

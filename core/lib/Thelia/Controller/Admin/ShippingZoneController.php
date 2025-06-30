@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Exception;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ShippingZone\ShippingZoneAddAreaEvent;
@@ -35,7 +36,7 @@ class ShippingZoneController extends BaseAdminController
 
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -44,7 +45,7 @@ class ShippingZoneController extends BaseAdminController
 
     public function updateAction($delivery_module_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -57,9 +58,9 @@ class ShippingZoneController extends BaseAdminController
     /**
      * @return mixed|Response
      */
-    public function addArea(EventDispatcherInterface $eventDispatcher)
+    public function addArea(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse|null
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -96,9 +97,9 @@ class ShippingZoneController extends BaseAdminController
         return $this->renderEditionTemplate();
     }
 
-    public function removeArea(EventDispatcherInterface $eventDispatcher)
+    public function removeArea(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse|null
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 

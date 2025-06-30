@@ -207,10 +207,10 @@ class AreaController extends AbstractCrudController
     /**
      * add a country to a define area.
      */
-    public function addCountry(EventDispatcherInterface $eventDispatcher)
+    public function addCountry(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|RedirectResponse|null|Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -263,10 +263,10 @@ class AreaController extends AbstractCrudController
     /**
      * delete several countries from a shipping zone.
      */
-    public function removeCountries(EventDispatcherInterface $eventDispatcher)
+    public function removeCountries(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|RedirectResponse|null|Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -330,10 +330,10 @@ class AreaController extends AbstractCrudController
         }
     }
 
-    public function removeCountry(EventDispatcherInterface $eventDispatcher)
+    public function removeCountry(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 

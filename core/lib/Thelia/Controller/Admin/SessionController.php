@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\HttpFoundation\Response;
 use Exception;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -52,7 +53,7 @@ class SessionController extends BaseAdminController
         return null;
     }
 
-    protected function checkPasswordRecoveryEnabled()
+    protected function checkPasswordRecoveryEnabled(): ?Response
     {
         // Check if user is already authenticate
         if (!ConfigQuery::read('enable_lost_admin_password_recovery', false)) {
@@ -70,7 +71,7 @@ class SessionController extends BaseAdminController
         return null;
     }
 
-    public function showLoginAction()
+    public function showLoginAction(): RedirectResponse|Response
     {
         if (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse) {
             return $response;
@@ -214,7 +215,7 @@ class SessionController extends BaseAdminController
         return $this->render('create-password-success');
     }
 
-    public function checkLogoutAction(EventDispatcherInterface $eventDispatcher)
+    public function checkLogoutAction(EventDispatcherInterface $eventDispatcher): RedirectResponse
     {
         $eventDispatcher->dispatch(new DefaultActionEvent(), TheliaEvents::ADMIN_LOGOUT);
 
@@ -227,7 +228,7 @@ class SessionController extends BaseAdminController
         return $this->generateRedirectFromRoute('admin.login');
     }
 
-    public function checkLoginAction(EventDispatcherInterface $eventDispatcher)
+    public function checkLoginAction(EventDispatcherInterface $eventDispatcher): RedirectResponse|null|Response
     {
         $request = $this->getRequest();
 

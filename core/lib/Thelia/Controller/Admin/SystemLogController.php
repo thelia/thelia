@@ -31,7 +31,7 @@ use UnexpectedValueException;
  */
 class SystemLogController extends BaseAdminController
 {
-    protected function renderTemplate()
+    protected function renderTemplate(): Response
     {
         $destinations = [];
 
@@ -83,7 +83,7 @@ class SystemLogController extends BaseAdminController
      */
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SYSTEM_LOG, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::SYSTEM_LOG, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -103,7 +103,7 @@ class SystemLogController extends BaseAdminController
 
     public function saveAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SYSTEM_LOG, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::SYSTEM_LOG, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 

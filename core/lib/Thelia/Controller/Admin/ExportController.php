@@ -46,10 +46,10 @@ class ExportController extends BaseAdminController
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
-    public function indexAction($_view = 'export')
+    public function indexAction(string $_view = 'export')
     {
         $authResponse = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::VIEW]);
-        if ($authResponse !== null) {
+        if ($authResponse instanceof \Thelia\Core\HttpFoundation\Response) {
             return $authResponse;
         }
 
@@ -63,13 +63,11 @@ class ExportController extends BaseAdminController
 
     /**
      * Handle export position change action.
-     *
-     * @return \Thelia\Core\HttpFoundation\Response|RedirectResponse
      */
-    public function changeExportPositionAction(EventDispatcherInterface $eventDispatcher)
+    public function changeExportPositionAction(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|RedirectResponse
     {
         $authResponse = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE]);
-        if ($authResponse !== null) {
+        if ($authResponse instanceof \Thelia\Core\HttpFoundation\Response) {
             return $authResponse;
         }
 
@@ -89,13 +87,11 @@ class ExportController extends BaseAdminController
 
     /**
      * Handle export category position change action.
-     *
-     * @return \Thelia\Core\HttpFoundation\Response|RedirectResponse
      */
-    public function changeCategoryPositionAction(EventDispatcherInterface $eventDispatcher)
+    public function changeCategoryPositionAction(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|RedirectResponse
     {
         $authResponse = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE]);
-        if ($authResponse !== null) {
+        if ($authResponse instanceof \Thelia\Core\HttpFoundation\Response) {
             return $authResponse;
         }
 
@@ -137,10 +133,8 @@ class ExportController extends BaseAdminController
      * Display export configuration view.
      *
      * @param int $id An export identifier
-     *
-     * @return \Thelia\Core\HttpFoundation\Response
      */
-    public function configureAction(int $id)
+    public function configureAction(int $id): \Thelia\Core\HttpFoundation\Response
     {
         /** @var Exporthandler $exportHandler */
         $exportHandler = $this->container->get('thelia.export.handler');

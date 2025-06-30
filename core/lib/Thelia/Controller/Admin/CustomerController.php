@@ -221,10 +221,7 @@ class CustomerController extends AbstractCrudController
     {
         return $this->render(
             'customers',
-            array_merge([
-                'customer_order' => $currentOrder,
-                'page' => $this->getRequest()->get('page', 1),
-            ])
+            ['customer_order' => $currentOrder, 'page' => $this->getRequest()->get('page', 1)]
         );
     }
 

@@ -50,7 +50,7 @@ class FileController extends BaseAdminController
         array $validMimeTypes = [],
         array $extBlackList = [],
     ): Response {
-        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -171,7 +171,7 @@ class FileController extends BaseAdminController
         string $parentType,
         FileManager $fileManager
     ): Response {
-        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -199,7 +199,7 @@ class FileController extends BaseAdminController
         string $parentType,
         FileManager $fileManager
     ): Response {
-        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -230,7 +230,7 @@ class FileController extends BaseAdminController
         FileManager $fileManager
     ): RedirectResponse|Response
     {
-        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -300,7 +300,7 @@ class FileController extends BaseAdminController
         FileManager $fileManager
     ): RedirectResponse|Response
     {
-        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -529,7 +529,7 @@ class FileController extends BaseAdminController
         int $imageId,
         string $parentType
     ): RedirectResponse {
-        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 

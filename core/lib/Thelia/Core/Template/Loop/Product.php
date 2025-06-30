@@ -381,7 +381,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
      *
      * @throws PropelException
      */
-    private function associateValues(LoopResultRow $loopResultRow, $product, $defaultCategoryId): LoopResultRow
+    private function associateValues(LoopResultRow $loopResultRow, $product, ?int $defaultCategoryId): LoopResultRow
     {
         $display_initial_price = $product->getVirtualColumn('display_initial_price');
 
@@ -948,7 +948,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             /* if we don't have any join yet, let's make a global one */
             if ($isProductPriceFirstLeftJoin === []) {
-                if (\count($isPSELeftJoinList) === 0) {
+                if ($isPSELeftJoinList === []) {
                     $joiningTable = 'global';
                     $isPSELeftJoinList[] = $joiningTable;
                     $search->joinProductSaleElements('global', Criteria::LEFT_JOIN);

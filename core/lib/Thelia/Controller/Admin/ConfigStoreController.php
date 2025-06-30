@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\HttpFoundation\Response;
 use Exception;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Security\AccessManager;
@@ -27,14 +28,14 @@ use Thelia\Model\ConfigQuery;
  */
 class ConfigStoreController extends BaseAdminController
 {
-    protected function renderTemplate()
+    protected function renderTemplate(): Response
     {
         return $this->render('config-store');
     }
 
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::STORE, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::STORE, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -71,7 +72,7 @@ class ConfigStoreController extends BaseAdminController
 
     public function saveAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::STORE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::STORE, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 

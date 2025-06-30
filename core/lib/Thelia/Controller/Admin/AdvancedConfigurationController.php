@@ -13,6 +13,8 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Exception;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cache\CacheEvent;
@@ -32,16 +34,16 @@ class AdvancedConfigurationController extends BaseAdminController
 {
     public function defaultAction()
     {
-        if (null !== $result = $this->checkAuth(AdminResources::ADVANCED_CONFIGURATION, [], AccessManager::VIEW)) {
+        if (($result = $this->checkAuth(AdminResources::ADVANCED_CONFIGURATION, [], AccessManager::VIEW)) instanceof Response) {
             return $result;
         }
 
         return $this->render('advanced-configuration');
     }
 
-    public function flushCacheAction(EventDispatcherInterface $eventDispatcher)
+    public function flushCacheAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
-        if (null !== $result = $this->checkAuth(AdminResources::ADVANCED_CONFIGURATION, [], AccessManager::UPDATE)) {
+        if (($result = $this->checkAuth(AdminResources::ADVANCED_CONFIGURATION, [], AccessManager::UPDATE)) instanceof Response) {
             return $result;
         }
 
@@ -58,9 +60,9 @@ class AdvancedConfigurationController extends BaseAdminController
         return $this->generateRedirectFromRoute('admin.configuration.advanced');
     }
 
-    public function flushAssetsAction(EventDispatcherInterface $eventDispatcher)
+    public function flushAssetsAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
-        if (null !== $result = $this->checkAuth(AdminResources::ADVANCED_CONFIGURATION, [], AccessManager::UPDATE)) {
+        if (($result = $this->checkAuth(AdminResources::ADVANCED_CONFIGURATION, [], AccessManager::UPDATE)) instanceof Response) {
             return $result;
         }
 
@@ -77,9 +79,9 @@ class AdvancedConfigurationController extends BaseAdminController
         return $this->generateRedirectFromRoute('admin.configuration.advanced');
     }
 
-    public function flushImagesAndDocumentsAction(EventDispatcherInterface $eventDispatcher)
+    public function flushImagesAndDocumentsAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
-        if (null !== $result = $this->checkAuth(AdminResources::ADVANCED_CONFIGURATION, [], AccessManager::UPDATE)) {
+        if (($result = $this->checkAuth(AdminResources::ADVANCED_CONFIGURATION, [], AccessManager::UPDATE)) instanceof Response) {
             return $result;
         }
 

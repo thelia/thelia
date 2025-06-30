@@ -57,7 +57,7 @@ class CouponController extends BaseAdminController
      */
     public function browseAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -71,9 +71,9 @@ class CouponController extends BaseAdminController
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
-    public function createAction(EventDispatcherInterface $eventDispatcher)
+    public function createAction(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|RedirectResponse
     {
-        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::CREATE)) {
+        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::CREATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -122,9 +122,9 @@ class CouponController extends BaseAdminController
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
-    public function updateAction(EventDispatcherInterface $eventDispatcher, $couponId)
+    public function updateAction(EventDispatcherInterface $eventDispatcher, $couponId): \Thelia\Core\HttpFoundation\Response|RedirectResponse
     {
-        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -268,9 +268,9 @@ class CouponController extends BaseAdminController
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
-    public function getConditionEmptyInputAjaxAction($conditionId)
+    public function getConditionEmptyInputAjaxAction($conditionId): \Thelia\Core\HttpFoundation\Response|false
     {
-        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -319,7 +319,7 @@ class CouponController extends BaseAdminController
      */
     public function getConditionToUpdateInputAjaxAction($couponId, $conditionIndex)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -373,9 +373,9 @@ class CouponController extends BaseAdminController
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
-    public function saveConditionsAction(EventDispatcherInterface $eventDispatcher, $couponId)
+    public function saveConditionsAction(EventDispatcherInterface $eventDispatcher, $couponId): \Thelia\Core\HttpFoundation\Response|Response
     {
-        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -423,9 +423,9 @@ class CouponController extends BaseAdminController
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
-    public function deleteConditionsAction(EventDispatcherInterface $eventDispatcher, $couponId, $conditionIndex)
+    public function deleteConditionsAction(EventDispatcherInterface $eventDispatcher, $couponId, $conditionIndex): \Thelia\Core\HttpFoundation\Response|Response
     {
-        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -626,9 +626,9 @@ class CouponController extends BaseAdminController
      *
      * @return ResponseRest
      */
-    public function getBackOfficeInputsAjaxAction($couponServiceId)
+    public function getBackOfficeInputsAjaxAction($couponServiceId): \Thelia\Core\HttpFoundation\Response|ResponseRest
     {
-        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -662,7 +662,7 @@ class CouponController extends BaseAdminController
      */
     public function getBackOfficeConditionSummariesAjaxAction($couponId)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -829,7 +829,7 @@ class CouponController extends BaseAdminController
     public function deleteAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::DELETE)) {
+        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::DELETE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 

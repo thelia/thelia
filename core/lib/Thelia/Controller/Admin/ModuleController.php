@@ -220,9 +220,9 @@ class ModuleController extends AbstractCrudController
         return $this->generateRedirectFromRoute('admin.module');
     }
 
-    public function indexAction()
+    public function indexAction(): \Thelia\Core\HttpFoundation\Response|Response
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -245,7 +245,7 @@ class ModuleController extends AbstractCrudController
             throw new InvalidArgumentException(sprintf('Module `%s` does not exists', $module_code));
         }
 
-        if (null !== $response = $this->checkAuth([], $module_code, AccessManager::VIEW)) {
+        if (($response = $this->checkAuth([], $module_code, AccessManager::VIEW)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -257,9 +257,9 @@ class ModuleController extends AbstractCrudController
         );
     }
 
-    public function toggleActivationAction(EventDispatcherInterface $eventDispatcher, $module_id)
+    public function toggleActivationAction(EventDispatcherInterface $eventDispatcher, $module_id): \Thelia\Core\HttpFoundation\Response|Response
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -296,7 +296,7 @@ class ModuleController extends AbstractCrudController
         EventDispatcherInterface $eventDispatcher,
         ParserContext $parserContext
     ): Response {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::DELETE)) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::DELETE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -337,9 +337,9 @@ class ModuleController extends AbstractCrudController
         return $response;
     }
 
-    public function installAction(EventDispatcherInterface $eventDispatcher)
+    public function installAction(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|RedirectResponse
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::CREATE)) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::CREATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -396,9 +396,9 @@ class ModuleController extends AbstractCrudController
         return $this->render('modules');
     }
 
-    public function informationAction($module_id)
+    public function informationAction($module_id): \Thelia\Core\HttpFoundation\Response|JsonResponse
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -436,9 +436,9 @@ class ModuleController extends AbstractCrudController
         return new JsonResponse(['title' => $title, 'body' => $content], $status);
     }
 
-    public function documentationAction($module_id)
+    public function documentationAction($module_id): \Thelia\Core\HttpFoundation\Response|JsonResponse
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) instanceof \Thelia\Core\HttpFoundation\Response) {
             return $response;
         }
 
@@ -463,7 +463,7 @@ class ModuleController extends AbstractCrudController
             }
 
             // Fallback to readme.md (if any)
-            if ($finder === null || $finder->count() === 0) {
+            if (!$finder instanceof Finder || $finder->count() === 0) {
                 $finder = Finder::create()->files()->in($module->getAbsoluteBaseDir())->name('/readme\.md/i');
             }
 

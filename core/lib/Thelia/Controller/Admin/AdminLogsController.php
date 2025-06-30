@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Model\AdminLog;
@@ -22,7 +23,7 @@ class AdminLogsController extends BaseAdminController
 {
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ADMIN_LOG, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::ADMIN_LOG, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -30,7 +31,7 @@ class AdminLogsController extends BaseAdminController
         return $this->render('admin-logs');
     }
 
-    public function loadLoggerAjaxAction()
+    public function loadLoggerAjaxAction(): Response
     {
         $entries = [];
 

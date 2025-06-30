@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Exception;
 use InvalidArgumentException;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -37,7 +38,7 @@ class OrderController extends BaseAdminController
 {
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::ORDER, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -47,16 +48,16 @@ class OrderController extends BaseAdminController
             ]);
     }
 
-    public function viewAction($order_id)
+    public function viewAction($order_id): Response
     {
         return $this->render('order-edit', [
             'order_id' => $order_id,
         ]);
     }
 
-    public function updateStatus(EventDispatcherInterface $eventDispatcher, $order_id = null)
+    public function updateStatus(EventDispatcherInterface $eventDispatcher, $order_id = null): Response|RedirectResponse
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::ORDER, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -114,9 +115,9 @@ class OrderController extends BaseAdminController
         return $response;
     }
 
-    public function updateDeliveryRef(EventDispatcherInterface $eventDispatcher, $order_id)
+    public function updateDeliveryRef(EventDispatcherInterface $eventDispatcher, $order_id): Response|RedirectResponse
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::ORDER, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -154,9 +155,9 @@ class OrderController extends BaseAdminController
         );
     }
 
-    public function updateAddress(EventDispatcherInterface $eventDispatcher, $order_id)
+    public function updateAddress(EventDispatcherInterface $eventDispatcher, $order_id): Response|RedirectResponse
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::ORDER, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -219,7 +220,7 @@ class OrderController extends BaseAdminController
 
     public function generateInvoicePdf(EventDispatcherInterface $eventDispatcher, $order_id, $browser)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::ORDER, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -228,14 +229,14 @@ class OrderController extends BaseAdminController
 
     public function generateDeliveryPdf(EventDispatcherInterface $eventDispatcher, $order_id, $browser)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::ORDER, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
         return $this->generateBackOfficeOrderPdf($eventDispatcher, $order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'), $browser == 0);
     }
 
-    private function generateBackOfficeOrderPdf(EventDispatcherInterface $eventDispatcher, $order_id, $fileName, bool $browser)
+    private function generateBackOfficeOrderPdf(EventDispatcherInterface $eventDispatcher, $order_id, $fileName, bool $browser): RedirectResponse|Response
     {
         if (!($response = $this->generateOrderPdf($eventDispatcher, $order_id, $fileName, true, true, $browser == 0)) instanceof Response) {
             return $this->generateRedirectFromRoute(

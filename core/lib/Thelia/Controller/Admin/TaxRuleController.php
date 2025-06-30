@@ -255,7 +255,7 @@ class TaxRuleController extends AbstractCrudController
 
     public function updateAction(ParserContext $parserContext): \Symfony\Component\HttpFoundation\Response
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -272,9 +272,9 @@ class TaxRuleController extends AbstractCrudController
         return parent::updateAction($parserContext);
     }
 
-    public function setDefaultAction(EventDispatcherInterface $eventDispatcher)
+    public function setDefaultAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -291,10 +291,10 @@ class TaxRuleController extends AbstractCrudController
         return $this->redirectToListTemplate();
     }
 
-    public function processUpdateTaxesAction(EventDispatcherInterface $eventDispatcher)
+    public function processUpdateTaxesAction(EventDispatcherInterface $eventDispatcher): Response|\Symfony\Component\HttpFoundation\Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -365,7 +365,7 @@ class TaxRuleController extends AbstractCrudController
     /**
      * @return Response
      */
-    public function specsAction($taxRuleId)
+    public function specsAction($taxRuleId): \Symfony\Component\HttpFoundation\Response
     {
         $data = $this->getSpecification($taxRuleId);
 
@@ -436,9 +436,9 @@ class TaxRuleController extends AbstractCrudController
         name: 'admin.configuration.tax-rule.delivery.modules.update',
         methods: ['POST']
     )]
-    public function updateDeliveryModulesTaxRule()
+    public function updateDeliveryModulesTaxRule(): Response|RedirectResponse
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 

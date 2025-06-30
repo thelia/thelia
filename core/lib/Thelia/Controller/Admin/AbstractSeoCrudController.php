@@ -148,7 +148,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
         EventDispatcherInterface $eventDispatcher
     ) {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 

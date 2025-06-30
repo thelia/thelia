@@ -13,6 +13,8 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -33,7 +35,7 @@ class MailingSystemController extends BaseAdminController
 
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(self::RESOURCE_CODE, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -60,10 +62,10 @@ class MailingSystemController extends BaseAdminController
         return $this->render('mailing-system', ['editDisabled' => ConfigQuery::isSmtpInEnv()]);
     }
 
-    public function updateAction(EventDispatcherInterface $eventDispatcher)
+    public function updateAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse|null
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(self::RESOURCE_CODE, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -116,11 +118,11 @@ class MailingSystemController extends BaseAdminController
         return $response;
     }
 
-    public function testAction(Request $request, MailerFactory $mailer)
+    public function testAction(Request $request, MailerFactory $mailer): Response|JsonResponse
     {
         $translator = Translator::getInstance();
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(self::RESOURCE_CODE, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 

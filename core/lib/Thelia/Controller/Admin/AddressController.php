@@ -55,9 +55,9 @@ class AddressController extends AbstractCrudController
         );
     }
 
-    public function useAddressAction(EventDispatcherInterface $eventDispatcher)
+    public function useAddressAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
