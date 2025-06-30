@@ -50,6 +50,13 @@ use Thelia\Tools\URL;
  */
 class CouponController extends BaseAdminController
 {
+
+    public function __construct(
+        protected CouponManager $couponManager,
+    )
+    {
+    }
+
     /**
      * Manage Coupons list display.
      *
@@ -577,9 +584,7 @@ class CouponController extends BaseAdminController
      */
     protected function getAvailableCoupons(): array
     {
-        /** @var CouponManager $couponManager */
-        $couponManager = $this->container->get('thelia.coupon.manager');
-        $availableCoupons = $couponManager->getAvailableCoupons();
+        $availableCoupons = $this->couponManager->getAvailableCoupons();
         $cleanedCoupons = [];
         /** @var CouponInterface $availableCoupon */
         foreach ($availableCoupons as $availableCoupon) {

@@ -29,8 +29,27 @@ return RectorConfig::configure()
     ->withPhpSets(
         php83: true
     )
+    ->withPreparedSets(
+        codeQuality: true,
+        codingStyle: true,
+        typeDeclarations: true,
+        privatization: true,
+        rectorPreset: true,
+        symfonyCodeQuality: true
+    )
     ->withComposerBased(symfony: true)
     ->withRules([
+        AddParamTypeDeclarationRector::class,
+        AddReturnTypeDeclarationRector::class,
+        AddPropertyTypeDeclarationRector::class,
+        AddParamBasedOnParentClassMethodRector::class,
+
+        RemoveUselessParamTagRector::class,
+        RemoveUselessReturnTagRector::class,
+        RemoveUselessVarTagRector::class,
+        RemoveUnusedPrivatePropertyRector::class,
+        RemoveUselessReadOnlyTagRector::class,
         GetBySymfonyStringToConstructorInjectionRector::class
+
     ]);
 
