@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Form\BaseForm;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -109,7 +110,7 @@ class AdministratorController extends AbstractCrudController
         return $event;
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasAdministrator();
     }
@@ -133,38 +134,36 @@ class AdministratorController extends AbstractCrudController
         return $this->createForm(AdminForm::ADMINISTRATOR_MODIFICATION, FormType::class, $data);
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): ?Admin
     {
         return $event->hasAdministrator() ? $event->getAdministrator() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?Admin
     {
         return AdminQuery::create()
             ->findOneById($this->getRequest()->get('administrator_id'));
     }
 
-    /**
-     * @param Admin $object
-     *
-     * @return string
-     */
-    protected function getObjectLabel($object)
+    protected function getObjectLabel(?string $object): string
     {
-        return $object->getLogin();
+        if ($object instanceof Admin) {
+            return $object->getLogin();
+        }
+
+        return (string) $object;
     }
 
-    /**
-     * @param Admin $object
-     *
-     * @return int
-     */
-    protected function getObjectId($object)
+    protected function getObjectId(?int $object): string
     {
-        return $object->getId();
+        if ($object instanceof Admin) {
+            return (string) $object->getId();
+        }
+
+        return (string) $object;
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): \Symfony\Component\HttpFoundation\Response
     {
         // We always return to the feature edition form
         return $this->render(
@@ -173,31 +172,31 @@ class AdministratorController extends AbstractCrudController
         );
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): \Symfony\Component\HttpFoundation\Response
     {
         // We always return to the feature edition form
         return $this->render('administrators');
     }
 
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): \Symfony\Component\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
     {
         // We always return to the feature edition form
         return $this->redirectToListTemplate();
     }
 
-    protected function performAdditionalCreateAction($updateEvent)
+    protected function performAdditionalCreateAction(ActionEvent $createEvent): ?\Symfony\Component\HttpFoundation\Response
     {
         // We always return to the feature edition form
         return $this->redirectToListTemplate();
     }
 
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, $updateEvent)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): ?\Symfony\Component\HttpFoundation\Response
     {
         // We always return to the feature edition form
         return $this->redirectToListTemplate();
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): \Symfony\Component\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.administrators.view'

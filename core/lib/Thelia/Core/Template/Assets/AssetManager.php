@@ -23,15 +23,13 @@ use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 
 /**
- * This class is a simple helper for generating assets using Assetic.
- *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
 class AssetManager implements AssetManagerInterface
 {
-    protected $source_file_extensions = ['less', 'js', 'coffee', 'html', 'tpl', 'htm', 'xml'];
+    protected array $source_file_extensions = ['less', 'js', 'coffee', 'html', 'tpl', 'htm', 'xml'];
 
-    protected $assetFilters = [];
+    protected array $assetFilters = [];
 
     public function __construct(protected $debugMode)
     {
@@ -44,7 +42,7 @@ class AssetManager implements AssetManagerInterface
      *
      * @return string the stamp of this directory
      */
-    protected function getStamp($directory): string
+    protected function getStamp(string $directory): string
     {
         $stamp = '';
 
@@ -65,51 +63,42 @@ class AssetManager implements AssetManagerInterface
      */
     protected function isSourceFile(SplFileInfo $fileInfo): bool
     {
-        return \in_array($fileInfo->getExtension(), $this->source_file_extensions);
+        return \in_array($fileInfo->getExtension(), $this->source_file_extensions, true);
     }
 
     /**
-     * Recursively copy assets from the source directory to the destination
-     * directory in the web space, omitting source files.
-     *
-     * @param string $from_directory the source
-     * @param string $to_directory   the destination
-     *
      * @throws RuntimeException if a problem occurs
      */
-    protected function copyAssets(Filesystem $fs, $from_directory, string|iterable $to_directory): void
+    protected function copyAssets(Filesystem $fs, string $fromDirectory, string|iterable $toDirectory): void
     {
-        Tlog::getInstance()->addDebug(sprintf('Copying assets from %s to %s', $from_directory, $to_directory));
+        Tlog::getInstance()->addDebug(sprintf('Copying assets from %s to %s', $fromDirectory, $toDirectory));
 
         $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($from_directory, RecursiveDirectoryIterator::SKIP_DOTS),
+            new RecursiveDirectoryIterator($fromDirectory, RecursiveDirectoryIterator::SKIP_DOTS),
             RecursiveIteratorIterator::SELF_FIRST
         );
 
-        $fs->mkdir($to_directory, 0777);
+        $fs->mkdir($toDirectory, 0777);
 
         /** @var RecursiveDirectoryIterator $iterator */
         foreach ($iterator as $item) {
             if ($item->isDir()) {
-                $dest_dir = $to_directory.DS.$iterator->getSubPathName();
+                $destinationDir = $toDirectory.DS.$iterator->getSubPathName();
 
-                if (!is_dir($dest_dir)) {
-                    if ($fs->exists($dest_dir)) {
-                        $fs->remove($dest_dir);
+                if (!is_dir($destinationDir)) {
+                    if ($fs->exists($destinationDir)) {
+                        $fs->remove($destinationDir);
                     }
 
-                    $fs->mkdir($dest_dir, 0777);
+                    $fs->mkdir($destinationDir, 0777);
                 }
             } elseif (!$this->isSourceFile($item)) {
-                // We don't copy source files
+                $destinationFile = $toDirectory.DS.$iterator->getSubPathName();
 
-                $dest_file = $to_directory.DS.$iterator->getSubPathName();
-
-                if ($fs->exists($dest_file)) {
-                    $fs->remove($dest_file);
+                if ($fs->exists($destinationFile)) {
+                    $fs->remove($destinationFile);
                 }
-
-                $fs->copy($item, $dest_file);
+                $fs->copy($item->getPathname(), $destinationFile);
             }
         }
     }
@@ -118,15 +107,13 @@ class AssetManager implements AssetManagerInterface
      * Compute the destination directory path, from the source directory and the
      * base directory of the web assets.
      *
-     * @param string $webAssetsDirectoryBase Base base directory of the web assets
-     * @param string $webAssetsTemplate      The template directory, relative to '<thelia_root>/templates'
-     * @param string $webAssetsKey           the assets key : module name or 0 for template assets
-     *
      * @internal param string $source_assets_directory the source directory
-     *
-     * @return string the full path of the destination directory
      */
-    protected function getDestinationDirectory(string $webAssetsDirectoryBase, string $webAssetsTemplate, string $webAssetsKey): string
+    protected function getDestinationDirectory(
+        string $webAssetsDirectoryBase,
+        string $webAssetsTemplate,
+        string $webAssetsKey
+    ): string
     {
         // Compute the absolute path of the output directory
         return $webAssetsDirectoryBase.DS.$webAssetsTemplate.DS.$webAssetsKey;

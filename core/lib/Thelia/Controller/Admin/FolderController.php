@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Folder\FolderEvent;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -266,11 +267,11 @@ class FolderController extends AbstractSeoCrudController
     }
 
     /**
-     * @param FolderUpdateEvent $updateEvent
+     * @param ActionEvent $updateEvent
      *
      * @return Response|void
      */
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, $updateEvent)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent)
     {
         if ($this->getRequest()->get('save_mode') != 'stay') {
             return $this->generateRedirectFromRoute(
@@ -285,11 +286,11 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Put in this method post object delete processing if required.
      *
-     * @param FolderDeleteEvent $deleteEvent the delete event
+     * @param ActionEvent $deleteEvent the delete event
      *
      * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalDeleteAction($deleteEvent)
+    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent)
     {
         return $this->generateRedirectFromRoute(
             'admin.folders.default',
@@ -298,13 +299,13 @@ class FolderController extends AbstractSeoCrudController
     }
 
     /**
-     * @param $event \Thelia\Core\Event\UpdatePositionEvent
+     * @param $positionChangeEvent ActionEvent
      *
      * @return Response|null
      */
-    protected function performAdditionalUpdatePositionAction($event)
+    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent)
     {
-        $folder = FolderQuery::create()->findPk($event->getObjectId());
+        $folder = FolderQuery::create()->findPk($positionChangeEvent->getObjectId());
 
         if ($folder != null) {
             return $this->generateRedirectFromRoute(

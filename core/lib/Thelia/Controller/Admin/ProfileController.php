@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Form\BaseForm;
 use LogicException;
 use Exception;
@@ -151,7 +152,7 @@ class ProfileController extends AbstractCrudController
         return $event->hasProfile() ? $event->getProfile() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?Profile
     {
         $profile = ProfileQuery::create()
             ->findOneById($this->getRequest()->get('profile_id', 0));
@@ -163,24 +164,22 @@ class ProfileController extends AbstractCrudController
         return $profile;
     }
 
-    /**
-     * @param Profile $object
-     *
-     * @return string
-     */
-    protected function getObjectLabel($object)
+    protected function getObjectLabel(?string $object): string
     {
-        return $object->getTitle();
+        if ($object instanceof Profile) {
+            return $object->getTitle();
+        }
+
+        return (string) $object;
     }
 
-    /**
-     * @param Profile $object
-     *
-     * @return int
-     */
-    protected function getObjectId($object)
+    protected function getObjectId(?int $object): string
     {
-        return $object->getId();
+        if ($object instanceof Profile) {
+            return (string) $object->getId();
+        }
+
+        return (string) $object;
     }
 
     protected function getViewArguments(): array
@@ -195,7 +194,7 @@ class ProfileController extends AbstractCrudController
         ];
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): \Symfony\Component\HttpFoundation\Response
     {
         // We always return to the feature edition form
         return $this->render(
@@ -204,7 +203,7 @@ class ProfileController extends AbstractCrudController
         );
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): \Symfony\Component\HttpFoundation\Response
     {
         // We always return to the feature edition form
         return $this->render('profile-edit', array_merge($this->getViewArguments(), $this->getRouteArguments()));
@@ -223,11 +222,11 @@ class ProfileController extends AbstractCrudController
     /**
      * Put in this method post object creation processing if required.
      *
-     * @param ProfileEvent $createEvent the create event
+     * @param ActionEvent $createEvent the create event
      *
      * @return \Symfony\Component\HttpFoundation\Response|Response
      */
-    protected function performAdditionalCreateAction($createEvent)
+    protected function performAdditionalCreateAction(ActionEvent $createEvent)
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.profiles.update',

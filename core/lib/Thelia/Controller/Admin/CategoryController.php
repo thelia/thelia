@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Form\BaseForm;
 use Exception;
 use Symfony\Component\HttpFoundation\Response;
@@ -270,11 +271,11 @@ class CategoryController extends AbstractSeoCrudController
     }
 
     /**
-     * @param CategoryDeleteEvent $deleteEvent
+     * @param ActionEvent $deleteEvent
      *
      * @return Response|null
      */
-    protected function performAdditionalDeleteAction($deleteEvent)
+    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent)
     {
         // Redirect to parent category list
         $category_id = $deleteEvent->getCategory()->getParent();
@@ -283,11 +284,11 @@ class CategoryController extends AbstractSeoCrudController
     }
 
     /**
-     * @param CategoryUpdateEvent $updateEvent
+     * @param ActionEvent $updateEvent
      *
      * @return Response|null
      */
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, $updateEvent)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent)
     {
         $response = null;
         if ($this->getRequest()->get('save_mode') != 'stay') {
@@ -300,13 +301,13 @@ class CategoryController extends AbstractSeoCrudController
     }
 
     /**
-     * @param UpdatePositionEvent $event
+     * @param ActionEvent $positionChangeEvent
      *
      * @return Response|null
      */
-    protected function performAdditionalUpdatePositionAction($event)
+    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent)
     {
-        $category = CategoryQuery::create()->findPk($event->getObjectId());
+        $category = CategoryQuery::create()->findPk($positionChangeEvent->getObjectId());
         $response = null;
         if ($category != null) {
             // Redirect to parent category list

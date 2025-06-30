@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Form\BaseForm;
 use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -96,7 +97,7 @@ class AttributeController extends AbstractCrudController
      *
      * @see \Thelia\Controller\Admin\AbstractCrudController::performAdditionalUpdateAction()
      */
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, $updateEvent): null
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): null
     {
         $attr_values = $this->getRequest()->get('attribute_values', null);
 

@@ -46,12 +46,8 @@ class BaseAdminController extends BaseController
 
     /**
      * This method process the rendering of view called from an admin page.
-     *
-     * @param string $template the template name
-     *
-     * @return Response the response which contains the rendered view
      */
-    public function processTemplateAction(string $template)
+    public function processTemplateAction(string $template): Response|RedirectResponse|string|\Symfony\Component\HttpFoundation\Response
     {
         try {
             if ($template !== '' && $template !== '0') {

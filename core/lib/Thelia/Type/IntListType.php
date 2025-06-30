@@ -29,7 +29,7 @@ class IntListType extends BaseType
             return false;
         }
 
-        foreach (explode(',', $values) as $value) {
+        foreach (explode(',', (string) $values) as $value) {
             if (filter_var($value, \FILTER_VALIDATE_INT) === false) {
                 return false;
             }

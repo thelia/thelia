@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Form\BaseForm;
 use Exception;
 use Symfony\Component\HttpFoundation\Response;
@@ -193,11 +194,11 @@ class TemplateController extends AbstractCrudController
     /**
      * Process delete failure, which may occurs if template is in use.
      *
-     * @param TemplateDeleteEvent $deleteEvent
+     * @param ActionEvent $deleteEvent
      *
      * @return \Thelia\Core\HttpFoundation\Response|null
      */
-    protected function performAdditionalDeleteAction($deleteEvent)
+    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent)
     {
         if ($deleteEvent->getProductCount() > 0) {
             $this->getParserContext()->setGeneralError(

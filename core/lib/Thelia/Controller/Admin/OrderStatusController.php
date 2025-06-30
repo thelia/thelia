@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Form\BaseForm;
 use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -276,13 +277,13 @@ class OrderStatusController extends AbstractCrudController
     }
 
     /**
-     * @param $event \Thelia\Core\Event\UpdatePositionEvent
+     * @param $positionChangeEvent ActionEvent
      *
      * @return Response|null
      */
-    protected function performAdditionalUpdatePositionAction($event)
+    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent)
     {
-        $folder = OrderStatusQuery::create()->findPk($event->getObjectId());
+        $folder = OrderStatusQuery::create()->findPk($positionChangeEvent->getObjectId());
 
         if ($folder != null) {
             return $this->generateRedirectFromRoute(

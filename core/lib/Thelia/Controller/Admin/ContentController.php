@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Thelia\Controller\Admin;
 
 use Exception;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Form\BaseForm;
 use Thelia\Form\ContentModificationForm;
 use Thelia\Core\Event\Content\ContentEvent;
@@ -348,11 +349,11 @@ class ContentController extends AbstractSeoCrudController
     }
 
     /**
-     * @param ContentUpdateEvent $updateEvent
+     * @param ActionEvent $updateEvent
      *
      * @return Response|void
      */
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, $updateEvent)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent)
     {
         if ($this->getRequest()->get('save_mode') != 'stay') {
             return $this->generateRedirectFromRoute(
@@ -367,11 +368,11 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Put in this method post object delete processing if required.
      *
-     * @param ContentDeleteEvent $deleteEvent the delete event
+     * @param ActionEvent $deleteEvent the delete event
      *
      * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalDeleteAction($deleteEvent)
+    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent)
     {
         return $this->generateRedirectFromRoute(
             'admin.folders.default',
@@ -380,17 +381,17 @@ class ContentController extends AbstractSeoCrudController
     }
 
     /**
-     * @param $event \Thelia\Core\Event\UpdatePositionEvent
+     * @param $positionChangeEvent ActionEvent
      *
      * @return Response|null
      */
-    protected function performAdditionalUpdatePositionAction($event)
+    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent)
     {
-        if (null !== $content = ContentQuery::create()->findPk($event->getObjectId())) {
+        if (null !== $content = ContentQuery::create()->findPk($positionChangeEvent->getObjectId())) {
             // Redirect to parent category list
             return $this->generateRedirectFromRoute(
                 'admin.folders.default',
-                ['parent' => $event->getReferrerId()]
+                ['parent' => $positionChangeEvent->getReferrerId()]
             );
         }
 

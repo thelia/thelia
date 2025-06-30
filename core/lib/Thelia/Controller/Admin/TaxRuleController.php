@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Routing\Attribute\Route;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Form\BaseForm;
 use LogicException;
 use Exception;
@@ -234,11 +235,11 @@ class TaxRuleController extends AbstractCrudController
     /**
      * Put in this method post object creation processing if required.
      *
-     * @param TaxRuleEvent $createEvent the create event
+     * @param ActionEvent $createEvent the create event
      *
      * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalCreateAction($createEvent)
+    protected function performAdditionalCreateAction(ActionEvent $createEvent)
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.taxes-rules.update',
