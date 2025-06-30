@@ -13,11 +13,14 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Symfony\Component\HttpFoundation\Response;
-use Thelia\Form\BaseForm;
+
 use Exception;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Currency\CurrencyCreateEvent;
 use Thelia\Core\Event\Currency\CurrencyDeleteEvent;
 use Thelia\Core\Event\Currency\CurrencyUpdateEvent;
@@ -27,6 +30,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
@@ -98,7 +102,7 @@ class CurrencyController extends AbstractCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('currency_id', null),
+            $this->getRequest()->get('currency_id'),
             $positionChangeMode,
             $positionValue
         );
@@ -159,8 +163,6 @@ class CurrencyController extends AbstractCrudController
 
     /**
      * @param Currency $object
-     *
-     * @return int
      */
     protected function getObjectId(ActiveRecordInterface $object): int
     {

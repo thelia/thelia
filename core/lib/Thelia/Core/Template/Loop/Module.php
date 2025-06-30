@@ -13,6 +13,8 @@ declare(strict_types=1);
  */
 namespace Thelia\Core\Template\Loop;
 
+use Symfony\Component\Routing\RouterInterface;
+use Thelia\Core\Routing\ModuleAttributeLoader;
 use Thelia\Type\AlphaNumStringListType;
 use Thelia\Type\EnumListType;
 use Thelia\Type\BooleanOrBothType;
@@ -57,6 +59,12 @@ use Thelia\Type\TypeCollection;
 class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $timestampable = true;
+
+    public function __construct(
+        protected RouterInterface $router,
+    )
+    {
+    }
 
     protected function getArgDefinitions(): ArgumentCollection
     {
@@ -327,25 +335,22 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
             }
         }
 
-        if ($this->container->has('thelia.loader.module_attributes')) {
-            try {
-                if ($this->container->get('thelia.loader.module_attributes')->match('/admin/module/'.$module->getCode())) {
-                    return true;
-                }
-            } catch (Exception) {
-                /* Keep searching */
+        try {
+            if ($this->router->match('/admin/module/'.$module->getCode())) {
+                return true;
             }
+        } catch (Exception) {
+            /* Keep searching */
         }
 
-        if ($this->container->has('thelia.loader.module_annotations')) {
-            try {
-                if ($this->container->get('thelia.loader.module_annotations')->match('/admin/module/'.$module->getCode())) {
-                    return true;
-                }
-            } catch (Exception) {
-                /* Keep searching */
+        try {
+            if ($this->router->match('/admin/module/'.$module->getCode())) {
+                return true;
             }
+        } catch (Exception) {
+            /* Keep searching */
         }
+
 
         // Make a quick and dirty test on the module's config.xml file
         $configContent = @file_get_contents($module->getAbsoluteConfigPath().DS.'config.xml');

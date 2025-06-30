@@ -13,9 +13,12 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Symfony\Component\HttpFoundation\Response;
-use Thelia\Form\BaseForm;
+
 use LogicException;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Attribute\AttributeAvCreateEvent;
 use Thelia\Core\Event\Attribute\AttributeAvDeleteEvent;
 use Thelia\Core\Event\Attribute\AttributeAvUpdateEvent;
@@ -23,6 +26,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\AttributeAv;
 use Thelia\Model\AttributeAvQuery;
@@ -91,7 +95,7 @@ class AttributeAvController extends AbstractCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('attributeav_id', null),
+            $this->getRequest()->get('attributeav_id'),
             $positionChangeMode,
             $positionValue
         );
@@ -140,8 +144,6 @@ class AttributeAvController extends AbstractCrudController
 
     /**
      * @param AttributeAv $object
-     *
-     * @return int
      */
     protected function getObjectId(ActiveRecordInterface $object): int
     {

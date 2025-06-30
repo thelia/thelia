@@ -13,15 +13,15 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+
 use Exception;
-use Propel\Runtime\Exception\PropelException;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Thelia\Core\Event\ActionEvent;
-use Thelia\Model\CategoryI18n;
-use Thelia\Model\ProductI18n;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
 use Thelia\Core\Event\FeatureProduct\FeatureProductUpdateEvent;
 use Thelia\Core\Event\MetaData\MetaDataCreateOrUpdateEvent;
@@ -61,6 +61,7 @@ use Thelia\Model\AccessoryQuery;
 use Thelia\Model\AttributeAv;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\AttributeQuery;
+use Thelia\Model\CategoryI18n;
 use Thelia\Model\CategoryI18nQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Content;
@@ -79,6 +80,7 @@ use Thelia\Model\Product;
 use Thelia\Model\ProductAssociatedContentQuery;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductDocumentQuery;
+use Thelia\Model\ProductI18n;
 use Thelia\Model\ProductI18nQuery;
 use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductPrice;
@@ -153,7 +155,7 @@ class ProductController extends AbstractSeoCrudController
 
     protected function getUpdateForm(): BaseForm
     {
-        return $this->createForm(AdminForm::PRODUCT_MODIFICATION, FormType::class, [], []);
+        return $this->createForm(AdminForm::PRODUCT_MODIFICATION);
     }
 
     protected function getCreationEvent(array $formData): ActionEvent
@@ -203,10 +205,10 @@ class ProductController extends AbstractSeoCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('product_id', null),
+            $this->getRequest()->get('product_id'),
             $positionChangeMode,
             $positionValue,
-            $this->getRequest()->get('category_id', null)
+            $this->getRequest()->get('category_id')
         );
     }
 
@@ -300,7 +302,7 @@ class ProductController extends AbstractSeoCrudController
             }
 
             // Caclulate prices if we have to use the rate * default currency price
-            if ($productPrice->getFromDefaultCurrency() == true) {
+            if ($productPrice->getFromDefaultCurrency()) {
                 $this->updatePriceFromDefaultCurrency($productPrice, $saleElement, $defaultCurrency, $currentCurrency);
             }
 
@@ -380,7 +382,7 @@ class ProductController extends AbstractSeoCrudController
         }
 
         // Setup the object form
-        return $this->createForm(AdminForm::PRODUCT_MODIFICATION, FormType::class, $data, []);
+        return $this->createForm(AdminForm::PRODUCT_MODIFICATION, FormType::class, $data);
     }
 
     /**
@@ -435,12 +437,12 @@ class ProductController extends AbstractSeoCrudController
     protected function getCategoryId()
     {
         // Trouver le category_id, soit depuis la reques, souit depuis le produit courant
-        $category_id = $this->getRequest()->get('category_id', null);
+        $category_id = $this->getRequest()->get('category_id');
 
         if ($category_id == null) {
             $product = $this->getExistingObject();
 
-            if ($product !== null) {
+            if ($product instanceof ActiveRecordInterface) {
                 $category_id = $product->getDefaultCategoryId();
             }
         }
@@ -751,7 +753,7 @@ class ProductController extends AbstractSeoCrudController
         Request $request,
         EventDispatcherInterface $eventDispatcher
     ) {
-        $accessory = AccessoryQuery::create()->findPk($request->get('accessory_id', null));
+        $accessory = AccessoryQuery::create()->findPk($request->get('accessory_id'));
 
         return $this->genericUpdatePositionAction(
             $request,
@@ -768,7 +770,7 @@ class ProductController extends AbstractSeoCrudController
         Request $request,
         EventDispatcherInterface $eventDispatcher
     ) {
-        $content = ProductAssociatedContentQuery::create()->findPk($request->get('content_id', null));
+        $content = ProductAssociatedContentQuery::create()->findPk($request->get('content_id'));
 
         return $this->genericUpdatePositionAction(
             $request,
@@ -815,7 +817,7 @@ class ProductController extends AbstractSeoCrudController
      *
      * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function updateAttributesAndFeaturesAction(EventDispatcherInterface $eventDispatcher, $productId)
+    public function updateAttributesAndFeaturesAction(EventDispatcherInterface $eventDispatcher, $productId): Response|RedirectResponse
     {
         $product = ProductQuery::create()->findPk($productId);
 
@@ -1859,7 +1861,7 @@ class ProductController extends AbstractSeoCrudController
         $status = false;
         $countEntries = \count($entries);
 
-        foreach ($data as &$line) {
+        foreach ($data as $line) {
             $localMatch = 0;
 
             foreach ($entries as $key => $entry) {
@@ -1924,20 +1926,15 @@ class ProductController extends AbstractSeoCrudController
         }
     }
 
-    /**
-     * @param string $price
-     */
-    protected function formatPrice($price): float
+    protected function formatPrice(string|float $price): float
     {
-        return (float) number_format($price, 6, '.', '');
+        return (float) number_format((float) $price, 6, '.', '');
     }
 
     /**
      * @throws PropelException
-     *
-     * @return mixed|Response
      */
-    public function searchCategoryAction()
+    public function searchCategoryAction(): Response
     {
         $search = '%'.$this->getRequest()->query->get('q').'%';
 

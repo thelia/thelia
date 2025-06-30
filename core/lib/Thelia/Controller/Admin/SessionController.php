@@ -13,7 +13,6 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Thelia\Tools\RememberMeTrait;
 use Exception;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -33,6 +32,7 @@ use Thelia\Model\AdminQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
+use Thelia\Tools\RememberMeTrait;
 use Thelia\Tools\URL;
 
 class SessionController extends BaseAdminController
@@ -55,7 +55,7 @@ class SessionController extends BaseAdminController
     protected function checkPasswordRecoveryEnabled()
     {
         // Check if user is already authenticate
-        if (!(bool) ConfigQuery::read('enable_lost_admin_password_recovery', false)) {
+        if (!ConfigQuery::read('enable_lost_admin_password_recovery', false)) {
             AdminLog::append(
                 'admin',
                 'ADMIN_CREATE_PASSWORD',

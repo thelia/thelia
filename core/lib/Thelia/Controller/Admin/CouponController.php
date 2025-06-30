@@ -15,12 +15,10 @@ namespace Thelia\Controller\Admin;
 
 
 use Exception;
-use Thelia\Form\BaseForm;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Router;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionFactory;
@@ -33,6 +31,7 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Coupon\CouponFactory;
 use Thelia\Coupon\CouponManager;
 use Thelia\Coupon\Type\CouponInterface;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
@@ -103,8 +102,7 @@ class CouponController extends BaseAdminController
         $args['availableCoupons'] = $this->getAvailableCoupons();
         $args['urlAjaxAdminCouponDrawInputs'] = $this->getRoute(
             'admin.coupon.draw.inputs.ajax',
-            ['couponServiceId' => 'couponServiceId'],
-            Router::ABSOLUTE_URL
+            ['couponServiceId' => 'couponServiceId']
         );
         $args['formAction'] = 'admin/coupon/create';
 
@@ -223,41 +221,35 @@ class CouponController extends BaseAdminController
         $args['couponInputsHtml'] = $couponManager->drawBackOfficeInputs();
         $args['urlAjaxAdminCouponDrawInputs'] = $this->getRoute(
             'admin.coupon.draw.inputs.ajax',
-            ['couponServiceId' => 'couponServiceId'],
-            Router::ABSOLUTE_URL
+            ['couponServiceId' => 'couponServiceId']
         );
         $args['availableConditions'] = $this->getAvailableConditions();
         $args['urlAjaxGetConditionInputFromServiceId'] = $this->getRoute(
             'admin.coupon.draw.condition.read.inputs.ajax',
-            ['conditionId' => 'conditionId'],
-            Router::ABSOLUTE_URL
+            ['conditionId' => 'conditionId']
         );
         $args['urlAjaxGetConditionInputFromConditionInterface'] = $this->getRoute(
             'admin.coupon.draw.condition.update.inputs.ajax',
             [
                 'couponId' => $couponId,
                 'conditionIndex' => 8888888,
-            ],
-            Router::ABSOLUTE_URL
+            ]
         );
 
         $args['urlAjaxSaveConditions'] = $this->getRoute(
             'admin.coupon.condition.save',
-            ['couponId' => $couponId],
-            Router::ABSOLUTE_URL
+            ['couponId' => $couponId]
         );
         $args['urlAjaxDeleteConditions'] = $this->getRoute(
             'admin.coupon.condition.delete',
             [
                 'couponId' => $couponId,
                 'conditionIndex' => 8888888,
-            ],
-            Router::ABSOLUTE_URL
+            ]
         );
         $args['urlAjaxGetConditionSummaries'] = $this->getRoute(
             'admin.coupon.draw.condition.summaries.ajax',
-            ['couponId' => $couponId],
-            Router::ABSOLUTE_URL
+            ['couponId' => $couponId]
         );
 
         $args['formAction'] = 'admin/coupon/update/'.$couponId;
@@ -760,9 +752,7 @@ class CouponController extends BaseAdminController
 
         /** @var ConditionFactory $conditionFactory */
         $conditionFactory = $this->container->get('thelia.condition.factory');
-        $conditionToSave = $conditionFactory->build($serviceId, $operators, $values);
-
-        return $conditionToSave;
+        return $conditionFactory->build($serviceId, $operators, $values);
     }
 
     /**

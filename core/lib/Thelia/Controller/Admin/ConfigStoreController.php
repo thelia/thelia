@@ -13,8 +13,8 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Symfony\Component\Filesystem\Filesystem;
 use Exception;
+use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
@@ -80,6 +80,7 @@ class ConfigStoreController extends BaseAdminController
         $response = null;
         $configStoreForm = $this->createForm(AdminForm::CONFIG_STORE);
 
+        $exception = null;
         try {
             $form = $this->validateForm($configStoreForm);
 

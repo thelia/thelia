@@ -13,8 +13,8 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use InvalidArgumentException;
 use DirectoryIterator;
+use InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -101,18 +101,19 @@ class TranslationsController extends BaseAdminController
 
         // Find the i18n directory, and the directory to examine.
 
-        if (!empty($itemName) || $itemToTranslate == 'co' || $itemToTranslate == 'in' || $itemToTranslate == 'wi') {
+        $domain = '';
+        if (!empty($itemName) || $itemToTranslate === 'co' || $itemToTranslate === 'in' || $itemToTranslate === 'wi') {
             switch ($itemToTranslate) {
                 // Module core
                 case 'mo':
                     $module = $this->getModule($translator, $itemName);
 
-                    if ($modulePart == 'core') {
+                    if ($modulePart === 'core') {
                         $directory = $module->getAbsoluteBaseDir();
                         $domain = $module->getTranslationDomain();
                         $i18nDirectory = $module->getAbsoluteI18nPath();
                         $walkMode = TranslationEvent::WALK_MODE_PHP;
-                    } elseif ($modulePart == 'admin-includes') {
+                    } elseif ($modulePart === 'admin-includes') {
                         $directory = $module->getAbsoluteAdminIncludesPath();
                         $domain = $module->getAdminIncludesTranslationDomain();
                         $i18nDirectory = $module->getAbsoluteAdminIncludesI18nPath();

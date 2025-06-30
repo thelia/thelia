@@ -42,8 +42,8 @@ class BaseFrontController extends BaseController
 
     protected function checkCartNotEmpty(EventDispatcherInterface $eventDispatcher): void
     {
-        $cart = $this->getSession()->getSessionCart($eventDispatcher);
-        if ($cart === null || $cart->countCartItems() == 0) {
+        $cart = $this->getSession()?->getSessionCart($eventDispatcher);
+        if ($cart === null || $cart->countCartItems() === 0) {
             throw new RedirectException($this->retrieveUrlFromRouteId('cart.view'));
         }
     }
@@ -72,12 +72,8 @@ class BaseFrontController extends BaseController
         }
     }
 
-    /**
-     * @param TemplateDefinition $template the template to process, or null for using the front template
-     *
-     * @return ParserInterface the Thelia parser²
-     */
-    protected function getParser($template = null)
+
+    protected function getParser(?string $template = null): ParserInterface
     {
         $path = $this->getTemplateHelper()->getActiveFrontTemplate()->getAbsolutePath();
         $parser = $this->parserResolver->getParser($path, $template);
@@ -91,28 +87,12 @@ class BaseFrontController extends BaseController
         return $parser;
     }
 
-    /**
-     * Render the given template, and returns the result as an Http Response.
-     *
-     * @param string $templateName the complete template name, with extension
-     * @param array  $args         the template arguments
-     * @param int    $status       http code status
-     */
-    protected function render($templateName, $args = [], $status = 200): Response
+    protected function render(string $templateName, array $args = [], int $status = 200): Response
     {
         return new Response($this->renderRaw($templateName, $args), $status);
     }
 
-    /**
-     * Render the given template, and returns the result as a string.
-     *
-     * @param string $templateName the complete template name, with extension
-     * @param array  $args         the template arguments
-     * @param string $templateDir
-     *
-     * @return string
-     */
-    protected function renderRaw($templateName, $args = [], $templateDir = null)
+    protected function renderRaw(string $templateName, array $args = [], $templateDir = null): string
     {
         // Render the template.
         return $this->getParser()->render($templateName, $args);

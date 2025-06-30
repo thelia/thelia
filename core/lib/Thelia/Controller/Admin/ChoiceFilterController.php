@@ -13,11 +13,11 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Symfony\Component\Routing\Attribute\Route;
-use RuntimeException;
 use Propel\Runtime\Exception\PropelException;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ChoiceFilter;
 use Thelia\Model\ChoiceFilterQuery;

@@ -13,13 +13,16 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Thelia\Form\BaseForm;
-use InvalidArgumentException;
+
 use ErrorException;
 use Exception;
+use InvalidArgumentException;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Message\MessageCreateEvent;
 use Thelia\Core\Event\Message\MessageDeleteEvent;
 use Thelia\Core\Event\Message\MessageUpdateEvent;
@@ -29,6 +32,7 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\TemplateDefinition;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Message;
@@ -52,9 +56,7 @@ class MessageController extends AbstractCrudController
             AdminResources::MESSAGE,
             TheliaEvents::MESSAGE_CREATE,
             TheliaEvents::MESSAGE_UPDATE,
-            TheliaEvents::MESSAGE_DELETE,
-            null, // No visibility toggle
-            null  // No position update
+            TheliaEvents::MESSAGE_DELETE  // No position update
         );
     }
 
@@ -165,8 +167,6 @@ class MessageController extends AbstractCrudController
 
     /**
      * @param Message $object
-     *
-     * @return int
      */
     protected function getObjectId(ActiveRecordInterface $object): int
     {
@@ -314,11 +314,9 @@ class MessageController extends AbstractCrudController
 
                 $data = $form->getData();
 
-                $messageParameters = [];
-
-                foreach ($this->getRequest()->request->all() as $key => $value) {
-                    $messageParameters[$key] = $value;
-                }
+                $messageParameters = array_map(static function ($value) {
+                    return $value;
+                }, $this->getRequest()->request->all());
 
                 $this->getMailer()->sendEmailMessage(
                     $message->getName(),

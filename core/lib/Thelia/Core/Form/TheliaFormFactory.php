@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Core\Form;
 
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use OutOfBoundsException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -31,7 +32,17 @@ use Thelia\Form\BaseForm;
  */
 class TheliaFormFactory
 {
-    public function __construct(protected ContainerInterface $container, protected RequestStack $requestStack, protected EventDispatcherInterface $eventDispatcher, protected TranslatorInterface $translator, protected FormFactoryBuilderInterface $formFactoryBuilder, protected ValidatorBuilder $validatorBuilder, protected TokenStorageInterface $tokenStorage, protected array $formDefinition)
+    public function __construct(
+        protected ContainerInterface $container,
+        protected RequestStack $requestStack,
+        protected EventDispatcherInterface $eventDispatcher,
+        protected TranslatorInterface $translator,
+        protected FormFactoryBuilderInterface $formFactoryBuilder,
+        protected ValidatorBuilder $validatorBuilder,
+        protected TokenStorageInterface $tokenStorage,
+        #[Autowire('%Thelia.parser.forms%')]
+        protected array $formDefinition
+    )
     {
     }
 
@@ -41,10 +52,7 @@ class TheliaFormFactory
         array $data = [],
         array $options = []
     ): BaseForm {
-        $formId = null;
-        if (isset($this->formDefinition[$name])) {
-            $formId = $this->formDefinition[$name];
-        }
+        $formId = $this->formDefinition[$name] ?? null;
 
         if (in_array($name, $this->formDefinition, true)) {
             $formId = $name;

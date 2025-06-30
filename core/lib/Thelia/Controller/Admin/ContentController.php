@@ -13,16 +13,17 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+
 use Exception;
-use Thelia\Core\Event\ActionEvent;
-use Thelia\Form\BaseForm;
-use Thelia\Form\ContentModificationForm;
-use Thelia\Core\Event\Content\ContentEvent;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Content\ContentAddFolderEvent;
 use Thelia\Core\Event\Content\ContentCreateEvent;
 use Thelia\Core\Event\Content\ContentDeleteEvent;
+use Thelia\Core\Event\Content\ContentEvent;
 use Thelia\Core\Event\Content\ContentRemoveFolderEvent;
 use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
@@ -32,6 +33,8 @@ use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
+use Thelia\Form\ContentModificationForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Content;
 use Thelia\Model\ContentQuery;
@@ -164,8 +167,6 @@ class ContentController extends AbstractSeoCrudController
 
     /**
      * Creates the creation event with the provided form data.
-     *
-     * @param array $formData
      */
     protected function getCreationEvent(array $formData): ActionEvent
     {
@@ -183,8 +184,6 @@ class ContentController extends AbstractSeoCrudController
 
     /**
      * Creates the update event with the provided form data.
-     *
-     * @param array $formData
      */
     protected function getUpdateEvent(array $formData): ActionEvent
     {
@@ -274,12 +273,12 @@ class ContentController extends AbstractSeoCrudController
 
     protected function getFolderId()
     {
-        $folderId = $this->getRequest()->get('folder_id', null);
+        $folderId = $this->getRequest()->get('folder_id');
 
         if (null === $folderId) {
             $content = $this->getExistingObject();
 
-            if ($content) {
+            if ($content instanceof ActiveRecordInterface) {
                 $folderId = $content->getDefaultFolderId();
             }
         }
@@ -291,8 +290,6 @@ class ContentController extends AbstractSeoCrudController
      * Render the main list template.
      *
      * @param int $currentOrder , if any, null otherwise
-     *
-     * @return Response
      */
     protected function renderListTemplate($currentOrder): Response
     {
@@ -401,10 +398,10 @@ class ContentController extends AbstractSeoCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('content_id', null),
+            $this->getRequest()->get('content_id'),
             $positionChangeMode,
             $positionValue,
-            $this->getRequest()->get('folder_id', null)
+            $this->getRequest()->get('folder_id')
         );
     }
 

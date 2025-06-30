@@ -21,6 +21,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Exception\AdminAccessDenied;
 use Thelia\Model\ConfigQuery;
 
@@ -36,6 +37,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
 
     public function __construct(
         protected ParserResolver $parserResolver,
+        protected TemplateHelperInterface $templateHelper
     ) {
         $this->parser = $this->parserResolver->getDefaultParser();
     }
@@ -62,16 +64,20 @@ class HttpException extends BaseAction implements EventSubscriberInterface
 
     protected function displayAdminGeneralError(ExceptionEvent $event): void
     {
-        // Define the template thant shoud be used
+        $activeAdminTemplate = $this->templateHelper->getActiveAdminTemplate();
+        $this->parser = $this->parserResolver->getParser(
+            $activeAdminTemplate->getAbsolutePath(),
+            'general_error'
+        );
         $this->parser->setTemplateDefinition(
-            $this->parser->getTemplateHelper()->getActiveAdminTemplate()
+            $activeAdminTemplate,
         );
 
         $message = $event->getThrowable()->getMessage();
 
         $response = new Response(
             $this->parser->render(
-                'general_error.html',
+                'general_error',
                 [
                     'error_message' => $message,
                 ]

@@ -13,10 +13,13 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\ActionEvent;
+
 use Exception;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Country\CountryCreateEvent;
 use Thelia\Core\Event\Country\CountryDeleteEvent;
 use Thelia\Core\Event\Country\CountryToggleDefaultEvent;
@@ -101,7 +104,6 @@ class CountryController extends AbstractCrudController
     /**
      * Creates the creation event with the provided form data.
      *
-     * @param array $formData
      *
      * @return CountryCreateEvent
      */
@@ -115,7 +117,6 @@ class CountryController extends AbstractCrudController
     /**
      * Creates the update event with the provided form data.
      *
-     * @param array $formData
      *
      * @return CountryUpdateEvent
      */
@@ -209,8 +210,6 @@ class CountryController extends AbstractCrudController
      * Returns the object ID from the object.
      *
      * @param Country $object
-     *
-     * @return int
      */
     protected function getObjectId(ActiveRecordInterface $object): int
     {
@@ -219,8 +218,6 @@ class CountryController extends AbstractCrudController
 
     /**
      * Render the main list template.
-     *
-     * @return Response
      */
     protected function renderListTemplate($currentOrder): Response
     {

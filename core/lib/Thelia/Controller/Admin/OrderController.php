@@ -13,13 +13,13 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use InvalidArgumentException;
 use Exception;
-use Thelia\Core\HttpFoundation\Response;
+use InvalidArgumentException;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\OrderUpdateAddress;

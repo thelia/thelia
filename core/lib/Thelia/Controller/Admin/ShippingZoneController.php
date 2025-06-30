@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace Thelia\Controller\Admin;
 
 use Exception;
-use Thelia\Core\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ShippingZone\ShippingZoneAddAreaEvent;
 use Thelia\Core\Event\ShippingZone\ShippingZoneRemoveAreaEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Exception\FormValidationException;

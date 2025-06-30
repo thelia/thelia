@@ -13,13 +13,15 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\ActionEvent;
-use Thelia\Form\BaseForm;
+
 use Exception;
-use Symfony\Component\HttpFoundation\Response;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Category\CategoryAddContentEvent;
 use Thelia\Core\Event\Category\CategoryCreateEvent;
 use Thelia\Core\Event\Category\CategoryDeleteContentEvent;
@@ -31,6 +33,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Category;
 use Thelia\Model\CategoryAssociatedContentQuery;
@@ -107,7 +110,7 @@ class CategoryController extends AbstractSeoCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('category_id', null),
+            $this->getRequest()->get('category_id'),
             $positionChangeMode,
             $positionValue
         );

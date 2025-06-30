@@ -13,12 +13,14 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Symfony\Component\HttpFoundation\Response;
-use Thelia\Core\Event\ActionEvent;
-use Thelia\Form\BaseForm;
+
 use Exception;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Attribute\AttributeAvUpdateEvent;
 use Thelia\Core\Event\Attribute\AttributeCreateEvent;
 use Thelia\Core\Event\Attribute\AttributeDeleteEvent;
@@ -29,6 +31,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Attribute;
 use Thelia\Model\AttributeQuery;
@@ -100,7 +103,7 @@ class AttributeController extends AbstractCrudController
      */
     protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): null
     {
-        $attr_values = $this->getRequest()->get('attribute_values', null);
+        $attr_values = $this->getRequest()->get('attribute_values');
 
         if ($attr_values !== null) {
             foreach ($attr_values as $id => $value) {
@@ -119,7 +122,7 @@ class AttributeController extends AbstractCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('attribute_id', null),
+            $this->getRequest()->get('attribute_id'),
             $positionChangeMode,
             $positionValue
         );
@@ -178,8 +181,6 @@ class AttributeController extends AbstractCrudController
 
     /**
      * @param Attribute $object
-     *
-     * @return int
      */
     protected function getObjectId(ActiveRecordInterface $object): int
     {
@@ -243,7 +244,7 @@ class AttributeController extends AbstractCrudController
         }
 
         try {
-            if (null !== $object = $this->getExistingObject()) {
+            if (($object = $this->getExistingObject()) instanceof ActiveRecordInterface) {
                 $event = new AttributeEvent($object);
 
                 $eventDispatcher->dispatch($event, $eventType);

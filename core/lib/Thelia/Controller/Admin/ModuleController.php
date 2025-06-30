@@ -13,16 +13,19 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Symfony\Component\HttpFoundation\Response;
-use Thelia\Form\BaseForm;
+
+use DirectoryIterator;
 use InvalidArgumentException;
 use LogicException;
-use DirectoryIterator;
 use Michelf\MarkdownExtra;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleEvent;
 use Thelia\Core\Event\Module\ModuleInstallEvent;
@@ -36,6 +39,7 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\InvalidModuleException;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\ModuleInstallForm;
@@ -54,7 +58,9 @@ class ModuleController extends AbstractCrudController
 {
     protected $moduleErrors = [];
 
-    public function __construct()
+    public function __construct(
+        protected ModuleManagement $moduleManagement,
+    )
     {
         parent::__construct(
             'module',
@@ -79,7 +85,7 @@ class ModuleController extends AbstractCrudController
         return $this->createForm(AdminForm::MODULE_MODIFICATION);
     }
 
-    protected function getCreationEvent(array $formData): ActionEvent
+    protected function getCreationEvent(array $formData): ?ActionEvent
     {
         return null;
     }
@@ -106,7 +112,7 @@ class ModuleController extends AbstractCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('module_id', null),
+            $this->getRequest()->get('module_id'),
             $positionChangeMode,
             $positionValue
         );
@@ -161,8 +167,6 @@ class ModuleController extends AbstractCrudController
 
     /**
      * @param Module $object
-     *
-     * @return int
      */
     protected function getObjectId(ActiveRecordInterface $object): int
     {
@@ -223,8 +227,7 @@ class ModuleController extends AbstractCrudController
         }
 
         try {
-            $moduleManagement = new ModuleManagement($this->getContainer());
-            $moduleManagement->updateModules($this->getContainer());
+            $this->moduleManagement->updateModules($this->getContainer());
         } catch (InvalidModuleException $ex) {
             $this->moduleErrors = $ex->getErrors();
         } catch (Exception $ex) {
@@ -407,9 +410,9 @@ class ModuleController extends AbstractCrudController
             // Get the module descriptor
             $moduleDescriptor = $module->getAbsoluteConfigPath().DS.'module.xml';
 
-            if (false !== $xmlData = @simplexml_load_file($moduleDescriptor)) {
+            if (false !== $xmlData = @simplexml_load_string(file_get_contents($moduleDescriptor))) {
                 // Transform the pseudo-array into a real array
-                $arrayData = json_decode(json_encode((array) $xmlData), 1);
+                $arrayData = json_decode(json_encode((array)$xmlData, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
 
                 $content = $this->renderRaw('ajax/module-information', [
                     'moduleId' => $module_id,
@@ -451,7 +454,7 @@ class ModuleController extends AbstractCrudController
             // Check if the module has declared a documentation
             $moduleDescriptor = $module->getAbsoluteConfigPath().DS.'module.xml';
 
-            if (false !== $xmlData = @simplexml_load_file($moduleDescriptor)) {
+            if (false !== $xmlData = @simplexml_load_string(file_get_contents($moduleDescriptor))) {
                 $documentationDirectory = (string) $xmlData->documentation;
 
                 if ($documentationDirectory !== '' && $documentationDirectory !== '0') {
@@ -460,18 +463,18 @@ class ModuleController extends AbstractCrudController
             }
 
             // Fallback to readme.md (if any)
-            if ($finder == null || $finder->count() == 0) {
+            if ($finder === null || $finder->count() === 0) {
                 $finder = Finder::create()->files()->in($module->getAbsoluteBaseDir())->name('/readme\.md/i');
             }
 
             // Merge all MD files
-            if ($finder && $finder->count() > 0) {
+            if ($finder->count() > 0) {
                 $finder->sortByName();
 
                 /** @var DirectoryIterator $file */
                 foreach ($finder as $file) {
                     if (false !== $mdDocumentation = @file_get_contents($file->getPathname())) {
-                        if ($content == null) {
+                        if ($content === null) {
                             $content = '';
                         }
 

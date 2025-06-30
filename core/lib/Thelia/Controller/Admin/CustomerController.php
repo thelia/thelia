@@ -13,17 +13,20 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\ActionEvent;
-use Symfony\Component\HttpFoundation\Response;
-use Thelia\Form\BaseForm;
+
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Exception\CustomerException;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
@@ -66,7 +69,7 @@ class CustomerController extends AbstractCrudController
         $event = $this->createEventInstance($formData);
 
         // Create a secure password
-        $event->setPassword(Password::generateRandom(8));
+        $event->setPassword(Password::generateRandom());
 
         // We will notify the customer of account creation
         $event->setNotifyCustomerOfAccountCreation(true);
@@ -153,14 +156,14 @@ class CustomerController extends AbstractCrudController
         return null;
     }
 
-    private function createEventInstance($data): CustomerCreateOrUpdateEvent
+    private function createEventInstance(array $data): CustomerCreateOrUpdateEvent
     {
         // Use current language if it is not defined in the form
         if (empty($data['lang_id'])) {
             $data['lang_id'] = $this->getSession()->getLang()->getId();
         }
 
-        $customerCreateEvent = new CustomerCreateOrUpdateEvent(
+        return new CustomerCreateOrUpdateEvent(
             $data['title'] ?? null,
             $data['firstname'],
             $data['lastname'],
@@ -182,8 +185,6 @@ class CustomerController extends AbstractCrudController
             null,
             $data['state']
         );
-
-        return $customerCreateEvent;
     }
 
     protected function getExistingObject(): ?ActiveRecordInterface
@@ -201,8 +202,6 @@ class CustomerController extends AbstractCrudController
 
     /**
      * @param Customer $object
-     *
-     * @return int
      */
     protected function getObjectId(ActiveRecordInterface $object): int
     {
@@ -225,7 +224,7 @@ class CustomerController extends AbstractCrudController
             array_merge([
                 'customer_order' => $currentOrder,
                 'page' => $this->getRequest()->get('page', 1),
-            ], $customParams)
+            ])
         );
     }
 
@@ -274,9 +273,6 @@ class CustomerController extends AbstractCrudController
             $removalError = true;
         }
 
-        return $this->renderListTemplate($this->getCurrentListOrder(), [
-            'removal_error' => $removalError,
-            'error_message' => $errorMsg,
-        ]);
+        return $this->renderListTemplate($this->getCurrentListOrder());
     }
 }

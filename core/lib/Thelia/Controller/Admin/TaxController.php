@@ -13,14 +13,17 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\ActionEvent;
-use Thelia\Form\BaseForm;
+
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Tax\TaxEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Tax;
 use Thelia\Model\TaxQuery;
@@ -42,9 +45,7 @@ class TaxController extends AbstractCrudController
 
     protected function getCreationForm(): BaseForm
     {
-        $form = $this->createForm(AdminForm::TAX_CREATION);
-
-        return $form;
+        return $this->createForm(AdminForm::TAX_CREATION);
     }
 
     protected function getUpdateForm(): BaseForm
@@ -141,8 +142,6 @@ class TaxController extends AbstractCrudController
 
     /**
      * @param Tax $object
-     *
-     * @return int
      */
     protected function getObjectId(ActiveRecordInterface $object): int
     {
@@ -164,8 +163,7 @@ class TaxController extends AbstractCrudController
     protected function renderListTemplate($currentOrder): Response
     {
         return $this->render(
-            'taxes-rules',
-            []
+            'taxes-rules'
         );
     }
 

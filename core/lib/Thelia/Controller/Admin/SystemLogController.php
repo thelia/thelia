@@ -14,15 +14,15 @@ declare(strict_types=1);
 namespace Thelia\Controller\Admin;
 
 use DirectoryIterator;
-use UnexpectedValueException;
 use Exception;
-use Thelia\Core\HttpFoundation\Response;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
+use UnexpectedValueException;
 
 /**
  * Class LangController.

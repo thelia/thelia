@@ -13,8 +13,8 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use LogicException;
 use Exception;
+use LogicException;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;

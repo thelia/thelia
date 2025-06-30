@@ -13,12 +13,14 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\ActionEvent;
-use Thelia\Form\BaseForm;
+
 use Exception;
-use Symfony\Component\HttpFoundation\Response;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Template\TemplateAddAttributeEvent;
 use Thelia\Core\Event\Template\TemplateAddFeatureEvent;
 use Thelia\Core\Event\Template\TemplateCreateEvent;
@@ -32,6 +34,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\AttributeTemplateQuery;
 use Thelia\Model\FeatureTemplateQuery;
@@ -54,9 +57,7 @@ class TemplateController extends AbstractCrudController
             AdminResources::TEMPLATE,
             TheliaEvents::TEMPLATE_CREATE,
             TheliaEvents::TEMPLATE_UPDATE,
-            TheliaEvents::TEMPLATE_DELETE,
-            null, // No visibility toggle
-            null // No position update
+            TheliaEvents::TEMPLATE_DELETE // No position update
         );
     }
 
@@ -146,8 +147,6 @@ class TemplateController extends AbstractCrudController
 
     /**
      * @param Template $object
-     *
-     * @return int
      */
     protected function getObjectId(ActiveRecordInterface $object): int
     {
@@ -307,8 +306,8 @@ class TemplateController extends AbstractCrudController
     ) {
         // Find attribute_template
         $attributeTemplate = AttributeTemplateQuery::create()
-            ->filterByTemplateId($request->get('template_id', null))
-            ->filterByAttributeId($request->get('attribute_id', null))
+            ->filterByTemplateId($request->get('template_id'))
+            ->filterByAttributeId($request->get('attribute_id'))
             ->findOne()
         ;
 
@@ -374,8 +373,8 @@ class TemplateController extends AbstractCrudController
     ) {
         // Find feature_template
         $featureTemplate = FeatureTemplateQuery::create()
-            ->filterByTemplateId($request->get('template_id', null))
-            ->filterByFeatureId($request->get('feature_id', null))
+            ->filterByTemplateId($request->get('template_id'))
+            ->filterByFeatureId($request->get('feature_id'))
             ->findOne()
         ;
 

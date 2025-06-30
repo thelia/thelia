@@ -13,19 +13,22 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Symfony\Component\Routing\Attribute\Route;
-use Thelia\Core\Event\ActionEvent;
-use Thelia\Form\BaseForm;
-use LogicException;
+
 use Exception;
+use LogicException;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Tax\TaxRuleEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\ConfigQuery;
@@ -181,8 +184,6 @@ class TaxRuleController extends AbstractCrudController
 
     /**
      * @param TaxRule $object
-     *
-     * @return int
      */
     protected function getObjectId(ActiveRecordInterface $object): int
     {
@@ -424,12 +425,10 @@ class TaxRuleController extends AbstractCrudController
             }
         }
 
-        $data = [
+        return [
             'taxRules' => $taxRules,
             'specifications' => $specifications,
         ];
-
-        return $data;
     }
 
     #[Route(

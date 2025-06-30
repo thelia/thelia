@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\TaxEngine\TaxEngine;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\IntToCombinedIntsListType;
 use Thelia\Type\EnumListType;
@@ -57,6 +58,12 @@ use Thelia\Type\TypeCollection;
 class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
     protected $timestampable = true;
+
+    public function __construct(
+        protected readonly TaxEngine $taxEngine,
+    )
+    {
+    }
 
     protected function getArgDefinitions(): ArgumentCollection
     {
@@ -237,7 +244,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
 
     public function parseResults(LoopResult $loopResult): LoopResult
     {
-        $taxCountry = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
+        $taxCountry = $this->taxEngine->getDeliveryCountry();
         /** @var SecurityContext $securityContext */
         $securityContext = $this->container->get('thelia.securityContext');
         $discount = 0;

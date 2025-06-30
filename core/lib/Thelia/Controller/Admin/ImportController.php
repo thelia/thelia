@@ -13,24 +13,23 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Thelia\Service\DataTransfer\Importhandler;
-
 use Exception;
-use Thelia\Core\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Thelia\Core\Serializer\AbstractSerializer;
-use Thelia\Core\Archiver\AbstractArchiver;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Archiver\AbstractArchiver;
 use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Serializer\AbstractSerializer;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\LangQuery;
+use Thelia\Service\DataTransfer\Importhandler;
 
 /**
  * Class ImportController.

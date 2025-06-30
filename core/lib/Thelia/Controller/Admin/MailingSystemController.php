@@ -103,7 +103,7 @@ class MailingSystemController extends BaseAdminController
 
         if (false !== $error_msg) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans('mailing system modification', []),
+                $this->getTranslator()->trans('mailing system modification'),
                 $error_msg,
                 $form,
                 $ex
@@ -156,8 +156,6 @@ class MailingSystemController extends BaseAdminController
             $json_data['message'] = $translator->trans('You have to configure your store email first !');
         }
 
-        $response = new JsonResponse($json_data);
-
-        return $response;
+        return new JsonResponse($json_data);
     }
 }

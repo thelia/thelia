@@ -13,6 +13,8 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\UpdateSeoEvent;
@@ -193,7 +195,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
         }
 
         // Load object if exist
-        if (null !== $object = $this->getExistingObject()) {
+        if (($object = $this->getExistingObject()) instanceof ActiveRecordInterface) {
             // Hydrate the form abd pass it to the parser
             $changeForm = $this->hydrateObjectForm($parserContext, $object);
 

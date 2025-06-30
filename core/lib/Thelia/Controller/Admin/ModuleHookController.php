@@ -13,12 +13,14 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\ActionEvent;
+
 use Exception;
-use Thelia\Form\BaseForm;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Hook\ModuleHookCreateEvent;
 use Thelia\Core\Event\Hook\ModuleHookDeleteEvent;
 use Thelia\Core\Event\Hook\ModuleHookEvent;
@@ -31,6 +33,7 @@ use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\ModuleHookModificationForm;
 use Thelia\Model\IgnoredModuleHook;
@@ -97,7 +100,7 @@ class ModuleHookController extends AbstractCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('module_hook_id', null),
+            $this->getRequest()->get('module_hook_id'),
             $positionChangeMode,
             $positionValue
         );
@@ -144,7 +147,6 @@ class ModuleHookController extends AbstractCrudController
     /**
      * Creates the creation event with the provided form data.
      *
-     * @param array $formData
      *
      * @return ModuleHookCreateEvent
      */
@@ -158,7 +160,6 @@ class ModuleHookController extends AbstractCrudController
     /**
      * Creates the update event with the provided form data.
      *
-     * @param array $formData
      *
      * @return ModuleHookUpdateEvent
      */
@@ -227,10 +228,8 @@ class ModuleHookController extends AbstractCrudController
      */
     protected function getExistingObject(): ?ActiveRecordInterface
     {
-        $moduleHook = ModuleHookQuery::create()
+        return ModuleHookQuery::create()
             ->findPK($this->getRequest()->get('module_hook_id', 0));
-
-        return $moduleHook;
     }
 
     /**
@@ -255,8 +254,6 @@ class ModuleHookController extends AbstractCrudController
      * Returns the object ID from the object.
      *
      * @param ModuleHook $object
-     *
-     * @return int
      */
     protected function getObjectId(ActiveRecordInterface $object): int
     {
@@ -267,8 +264,6 @@ class ModuleHookController extends AbstractCrudController
      * Render the main list template.
      *
      * @param string $currentOrder , if any, null otherwise
-     *
-     * @return Response
      */
     protected function renderListTemplate($currentOrder): Response
     {
@@ -280,8 +275,6 @@ class ModuleHookController extends AbstractCrudController
 
     /**
      * Render the edition template.
-     *
-     * @return Response
      */
     protected function renderEditionTemplate(): Response
     {

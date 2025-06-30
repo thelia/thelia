@@ -13,24 +13,24 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use InvalidArgumentException;
+
 use Exception;
+use InvalidArgumentException;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Thelia\Core\Event\ActionEvent;
-use Thelia\Core\HttpFoundation\Response;
-use Thelia\Log\Tlog;
-use Thelia\Form\BaseForm;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Form\AddressCreateForm;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
-use Thelia\Model\Address;
+use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Event\AddressEvent;
@@ -280,7 +280,7 @@ class AddressController extends AbstractCrudController
 
     protected function getCustomerId()
     {
-        if (null !== $address = $this->getExistingObject()) {
+        if (($address = $this->getExistingObject()) instanceof ActiveRecordInterface) {
             return $address->getCustomerId();
         }
 

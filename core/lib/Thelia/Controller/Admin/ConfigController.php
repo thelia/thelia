@@ -13,17 +13,21 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Thelia\Form\BaseForm;
-use Thelia\Core\HttpFoundation\Response;
+
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Config\ConfigCreateEvent;
 use Thelia\Core\Event\Config\ConfigDeleteEvent;
 use Thelia\Core\Event\Config\ConfigUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Config;
 use Thelia\Model\ConfigQuery;
@@ -45,9 +49,7 @@ class ConfigController extends AbstractCrudController
             AdminResources::CONFIG,
             TheliaEvents::CONFIG_CREATE,
             TheliaEvents::CONFIG_UPDATE,
-            TheliaEvents::CONFIG_DELETE,
-            null, // No visibility toggle
-            null // no position change
+            TheliaEvents::CONFIG_DELETE // no position change
         );
     }
 
@@ -81,12 +83,12 @@ class ConfigController extends AbstractCrudController
         $createEvent = new ConfigCreateEvent();
 
         $createEvent
-            ->setEventName($data['name'])
-            ->setValue($data['value'])
-            ->setLocale($data['locale'])
-            ->setTitle($data['title'])
-            ->setHidden($data['hidden'])
-            ->setSecured($data['secured'])
+            ->setEventName($formData['name'])
+            ->setValue($formData['value'])
+            ->setLocale($formData['locale'])
+            ->setTitle($formData['title'])
+            ->setHidden($formData['hidden'])
+            ->setSecured($formData['secured'])
         ;
 
         return $createEvent;
@@ -94,18 +96,18 @@ class ConfigController extends AbstractCrudController
 
     protected function getUpdateEvent(array $formData): ActionEvent
     {
-        $changeEvent = new ConfigUpdateEvent($data['id']);
+        $changeEvent = new ConfigUpdateEvent($formData['id']);
 
         $changeEvent
-            ->setEventName($data['name'])
-            ->setValue($data['value'])
-            ->setHidden($data['hidden'])
-            ->setSecured($data['secured'])
-            ->setLocale($data['locale'])
-            ->setTitle($data['title'])
-            ->setChapo($data['chapo'])
-            ->setDescription($data['description'])
-            ->setPostscriptum($data['postscriptum'])
+            ->setEventName($formData['name'])
+            ->setValue($formData['value'])
+            ->setHidden($formData['hidden'])
+            ->setSecured($formData['secured'])
+            ->setLocale($formData['locale'])
+            ->setTitle($formData['title'])
+            ->setChapo($formData['chapo'])
+            ->setDescription($formData['description'])
+            ->setPostscriptum($formData['postscriptum'])
         ;
 
         return $changeEvent;
@@ -169,8 +171,6 @@ class ConfigController extends AbstractCrudController
 
     /**
      * @param Config $object
-     *
-     * @return int
      */
     protected function getObjectId(ActiveRecordInterface $object): int
     {

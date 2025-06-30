@@ -13,8 +13,11 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Thelia\Form\BaseForm;
+
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Brand\BrandCreateEvent;
 use Thelia\Core\Event\Brand\BrandDeleteEvent;
 use Thelia\Core\Event\Brand\BrandEvent;
@@ -25,6 +28,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Brand\BrandModificationForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Brand;
@@ -77,9 +81,7 @@ class BrandController extends AbstractSeoCrudController
      * @return BrandModificationForm $object
      */
     protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
-        ParserContext $parserContext,
-        $object
-    ): BaseForm {
+    {
         // Hydrate the "SEO" tab form
         $this->hydrateSeoForm($parserContext, $object);
 
@@ -270,7 +272,7 @@ class BrandController extends AbstractSeoCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('brand_id', null),
+            $this->getRequest()->get('brand_id'),
             $positionChangeMode,
             $positionValue
         );

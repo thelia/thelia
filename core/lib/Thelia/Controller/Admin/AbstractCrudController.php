@@ -13,13 +13,14 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+
 use Exception;
 use LogicException;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Propel\Runtime\Event\ActiveRecordEvent;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -61,11 +62,11 @@ abstract class AbstractCrudController extends BaseAdminController
 
     abstract protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm;
 
-    abstract protected function getCreationEvent(array $formData): ActionEvent;
+    abstract protected function getCreationEvent(array $formData): ?ActionEvent;
 
-    abstract protected function getUpdateEvent(array $formData): ActionEvent;
+    abstract protected function getUpdateEvent(array $formData): ?ActionEvent;
 
-    abstract protected function getDeleteEvent(): ?ActionEvent;
+    abstract protected function getDeleteEvent(): ActiveRecordEvent|ActionEvent|null;
 
     abstract protected function getExistingObject(): ?ActiveRecordInterface;
 
@@ -263,7 +264,7 @@ abstract class AbstractCrudController extends BaseAdminController
         }
 
         // Load object if exist
-        if (null !== $object = $this->getExistingObject()) {
+        if (($object = $this->getExistingObject()) instanceof ActiveRecordInterface) {
             // Hydrate the form abd pass it to the parser
             $changeForm = $this->hydrateObjectForm($parserContext, $object);
 
@@ -332,7 +333,7 @@ abstract class AbstractCrudController extends BaseAdminController
             // Execute additional Action
             $response = $this->performAdditionalUpdateAction($eventDispatcher, $changeEvent);
 
-            if ($response === null) {
+            if (!$response instanceof Response) {
                 // If we have to stay on the same page, do not redirect to the successUrl,
                 // just redirect to the edit page again.
                 if ($request->get('save_mode') === 'stay') {
@@ -377,7 +378,7 @@ abstract class AbstractCrudController extends BaseAdminController
         }
 
         try {
-            $mode = $request->get('mode', null);
+            $mode = $request->get('mode');
 
             if ($mode === 'up') {
                 $mode = UpdatePositionEvent::POSITION_UP;
@@ -387,7 +388,7 @@ abstract class AbstractCrudController extends BaseAdminController
                 $mode = UpdatePositionEvent::POSITION_ABSOLUTE;
             }
 
-            $position = $request->get('position', null);
+            $position = $request->get('position');
 
             $event = $this->createUpdatePositionEvent($mode, $position);
 
@@ -421,7 +422,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
         if ($object !== null) {
             try {
-                $mode = $request->get('mode', null);
+                $mode = $request->get('mode');
 
                 if ($mode === 'up') {
                     $mode = UpdatePositionEvent::POSITION_UP;
@@ -431,7 +432,7 @@ abstract class AbstractCrudController extends BaseAdminController
                     $mode = UpdatePositionEvent::POSITION_ABSOLUTE;
                 }
 
-                $position = $request->get('position', null);
+                $position = $request->get('position');
 
                 $event = new UpdatePositionEvent($object->getId(), $mode, $position);
 

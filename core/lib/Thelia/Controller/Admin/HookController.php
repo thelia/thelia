@@ -13,15 +13,16 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\ActionEvent;
+
 use Exception;
-use Symfony\Component\HttpFoundation\Response;
-use Thelia\Form\BaseForm;
-use Thelia\Form\HookModificationForm;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Hook\HookCreateAllEvent;
 use Thelia\Core\Event\Hook\HookCreateEvent;
 use Thelia\Core\Event\Hook\HookDeactivationEvent;
@@ -35,7 +36,9 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Translation\Translator;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
+use Thelia\Form\HookModificationForm;
 use Thelia\Log\Tlog;
 use Thelia\Model\Hook;
 use Thelia\Model\HookQuery;
@@ -127,7 +130,7 @@ class HookController extends AbstractCrudController
         $templateType = $this->getRequest()->request->get('templateType');
 
         // new hooks in the template
-        if (null !== $newHooks = $this->getRequest()->request->get('new', null)) {
+        if (null !== $newHooks = $this->getRequest()->request->get('new')) {
             foreach ($newHooks as $hook) {
                 $event = $this->getDiscoverCreationEvent($hook, $templateType);
 
@@ -379,8 +382,6 @@ class HookController extends AbstractCrudController
      * Returns the object ID from the object.
      *
      * @param Hook $object
-     *
-     * @return int
      */
     protected function getObjectId(ActiveRecordInterface $object): int
     {

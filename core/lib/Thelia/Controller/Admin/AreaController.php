@@ -13,11 +13,14 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Symfony\Component\HttpFoundation\Response;
+
 use Exception;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
 use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -91,8 +94,6 @@ class AreaController extends AbstractCrudController
 
     /**
      * Creates the creation event with the provided form data.
-     *
-     * @param array $formData
      */
     protected function getCreationEvent(array $formData): ActionEvent
     {
@@ -104,8 +105,6 @@ class AreaController extends AbstractCrudController
 
     /**
      * Creates the update event with the provided form data.
-     *
-     * @param array $formData
      */
     protected function getUpdateEvent(array $formData): ActionEvent
     {
@@ -155,7 +154,6 @@ class AreaController extends AbstractCrudController
 
     /**
      * Returns the object ID from the object.
-     * @return int
      */
     protected function getObjectId(ActiveRecordInterface $object): int
     {
@@ -343,7 +341,7 @@ class AreaController extends AbstractCrudController
             $eventDispatcher,
             $this->getRequest()->get('area_id', 0),
             $this->getRequest()->get('country_id', 0),
-            $this->getRequest()->get('state_id', null)
+            $this->getRequest()->get('state_id')
         );
 
         return $this->redirectToEditionTemplate();

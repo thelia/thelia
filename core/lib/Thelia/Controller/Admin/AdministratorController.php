@@ -13,17 +13,18 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Thelia\Core\Event\ActionEvent;
-use Thelia\Form\BaseForm;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Administrator\AdministratorEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Admin;
 use Thelia\Model\AdminQuery;
@@ -170,8 +171,7 @@ class AdministratorController extends AbstractCrudController
     {
         // We always return to the feature edition form
         return $this->render(
-            'administrators',
-            []
+            'administrators'
         );
     }
 

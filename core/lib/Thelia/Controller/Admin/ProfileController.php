@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection PhpRedundantOptionalArgumentInspection */
+/** @noinspection PhpRedundantOptionalArgumentInspection */
 
 declare(strict_types=1);
 
@@ -13,18 +14,21 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\ActionEvent;
-use Thelia\Form\BaseForm;
-use LogicException;
+
 use Exception;
+use LogicException;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Profile\ProfileEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\ProfileUpdateModuleAccessForm;
@@ -198,8 +202,7 @@ class ProfileController extends AbstractCrudController
     {
         // We always return to the feature edition form
         return $this->render(
-            'profiles',
-            []
+            'profiles'
         );
     }
 

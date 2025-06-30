@@ -13,10 +13,13 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Thelia\Form\BaseForm;
+
 use Exception;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Sale\SaleActiveStatusCheckEvent;
 use Thelia\Core\Event\Sale\SaleClearStatusEvent;
 use Thelia\Core\Event\Sale\SaleCreateEvent;
@@ -29,6 +32,7 @@ use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Sale\SaleModificationForm;
 use Thelia\Model\Sale;
@@ -81,7 +85,7 @@ class SaleController extends AbstractCrudController
     protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         // Find all categories of the selected products
-        $saleProducts = $sale->getSaleProductList();
+        $saleProducts = $object->getSaleProductList();
         $categories = [];
         $products = [];
 
@@ -129,8 +133,6 @@ class SaleController extends AbstractCrudController
 
     /**
      * Creates the creation event with the provided form data.
-     *
-     * @param array $formData
      */
     protected function getCreationEvent(array $formData): ActionEvent
     {
@@ -147,8 +149,6 @@ class SaleController extends AbstractCrudController
 
     /**
      * Creates the update event with the provided form data.
-     *
-     * @param array $formData
      */
     protected function getUpdateEvent(array $formData): ActionEvent
     {
@@ -255,8 +255,6 @@ class SaleController extends AbstractCrudController
 
     /**
      * Render the main list template.
-     *
-     * @return Response
      */
     protected function renderListTemplate($currentOrder): Response
     {

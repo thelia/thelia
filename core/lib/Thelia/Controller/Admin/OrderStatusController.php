@@ -13,10 +13,12 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\ActionEvent;
-use Thelia\Form\BaseForm;
+
 use Exception;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\OrderStatus\OrderStatusCreateEvent;
 use Thelia\Core\Event\OrderStatus\OrderStatusDeleteEvent;
 use Thelia\Core\Event\OrderStatus\OrderStatusEvent;
@@ -26,6 +28,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\OrderStatus\OrderStatusModificationForm;
 use Thelia\Model\OrderStatus;
@@ -92,16 +95,12 @@ class OrderStatusController extends AbstractCrudController
             'code' => $object->getCode(),
         ];
 
-        $form = $this->createForm(AdminForm::ORDER_STATUS_MODIFICATION, FormType::class, $data);
-
         // Setup the object form
-        return $form;
+        return $this->createForm(AdminForm::ORDER_STATUS_MODIFICATION, FormType::class, $data);
     }
 
     /**
      * Creates the creation event with the provided form data.
-     *
-     * @param array $formData
      */
     protected function getCreationEvent(array $formData): ActionEvent
     {
@@ -119,8 +118,6 @@ class OrderStatusController extends AbstractCrudController
 
     /**
      * Creates the update event with the provided form data.
-     *
-     * @param array $formData
      */
     protected function getUpdateEvent(array $formData): ActionEvent
     {
@@ -215,8 +212,6 @@ class OrderStatusController extends AbstractCrudController
      * Render the main list template.
      *
      * @param string $currentOrder , if any, null otherwise
-     *
-     * @return Response
      */
     protected function renderListTemplate($currentOrder): Response
     {
@@ -269,7 +264,7 @@ class OrderStatusController extends AbstractCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('order_status_id', null),
+            $this->getRequest()->get('order_status_id'),
             $positionChangeMode,
             $positionValue
         );

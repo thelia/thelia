@@ -13,12 +13,15 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\ActionEvent;
-use Thelia\Core\Event\Folder\FolderEvent;
+
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Folder\FolderCreateEvent;
 use Thelia\Core\Event\Folder\FolderDeleteEvent;
+use Thelia\Core\Event\Folder\FolderEvent;
 use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
 use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -99,8 +102,6 @@ class FolderController extends AbstractSeoCrudController
 
     /**
      * Creates the creation event with the provided form data.
-     *
-     * @param array $formData
      */
     protected function getCreationEvent(array $formData): ActionEvent
     {
@@ -117,8 +118,6 @@ class FolderController extends AbstractSeoCrudController
 
     /**
      * Creates the update event with the provided form data.
-     *
-     * @param array $formData
      */
     protected function getUpdateEvent(array $formData): ActionEvent
     {
@@ -159,7 +158,7 @@ class FolderController extends AbstractSeoCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('folder_id', null),
+            $this->getRequest()->get('folder_id'),
             $positionChangeMode,
             $positionValue
         );
@@ -217,8 +216,6 @@ class FolderController extends AbstractSeoCrudController
      * Returns the object ID from the object.
      *
      * @param Folder $object
-     *
-     * @return int
      */
     protected function getObjectId(ActiveRecordInterface $object): int
     {
@@ -227,8 +224,6 @@ class FolderController extends AbstractSeoCrudController
 
     /**
      * Render the main list template.
-     *
-     * @return Response
      */
     protected function renderListTemplate($currentOrder): Response
     {

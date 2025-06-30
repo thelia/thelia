@@ -13,11 +13,12 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\ActionEvent;
-use Symfony\Component\HttpFoundation\Response;
-use Thelia\Form\BaseForm;
-use Thelia\Model\State;
+
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\State\StateCreateEvent;
 use Thelia\Core\Event\State\StateDeleteEvent;
 use Thelia\Core\Event\State\StateToggleVisibilityEvent;
@@ -25,7 +26,9 @@ use Thelia\Core\Event\State\StateUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\State;
 use Thelia\Model\StateQuery;
 
 /**
