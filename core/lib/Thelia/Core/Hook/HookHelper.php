@@ -19,6 +19,7 @@ use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
+use TheliaSmarty\Template\SmartyHelper;
 
 /**
  * Class HookHelper.
@@ -35,7 +36,7 @@ class HookHelper
      */
     protected $parserHelper;
 
-    public function __construct(ParserHelperInterface $parserHelper)
+    public function __construct(SmartyHelper $parserHelper)
     {
         $this->parserHelper = $parserHelper;
     }
@@ -200,7 +201,7 @@ class HookHelper
             // get a title
             $contextTitle = $this->trans('context', $ret['context']) ?: $ret['context'];
             $typeTitle = $this->trans('type', $ret['type']) ?: $ret['type'];
-            $ret['title'] = sprintf('%s - %s', $contextTitle, $typeTitle);
+            $ret['title'] = \sprintf('%s - %s', $contextTitle, $typeTitle);
             $ret['file'] = $hook['file'];
             $ret['attributes'] = $attributes;
         } else {
