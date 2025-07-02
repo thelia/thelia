@@ -31,16 +31,11 @@ use Thelia\Model\LangQuery;
 use Thelia\Model\Order;
 use Thelia\Tools\URL;
 
-/**
- * extends mfony\Component\HttpFoundation\Session\Session for adding some helpers.
- *
- * Class Session
- */
 class Session extends BaseSession
 {
     protected static ?Cart $transientCart;
 
-    public function getLang(bool $forceDefault = true): Lang
+    public function getLang(bool $forceDefault = true): ?Lang
     {
         if (Request::$isAdminEnv) {
             return $this->getAdminLang();

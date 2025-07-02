@@ -117,12 +117,13 @@ class Request extends BaseRequest
         return $this->controllerType === BaseFrontController::CONTROLLER_TYPE;
     }
 
-    public function getSession(): SessionInterface
+    public function getSession(): Session
     {
         if (!$this->hasSession()) {
             $this->setSession(new Session());
         }
-
-        return parent::getSession();
+        /** @var Session $session */
+        $session = $this->session;
+        return $session;
     }
 }
