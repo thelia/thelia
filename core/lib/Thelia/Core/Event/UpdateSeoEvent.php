@@ -17,13 +17,6 @@ class UpdateSeoEvent extends ActionEvent
 {
     protected $object;
 
-    /**
-     * @param null $locale
-     * @param null $url
-     * @param null $meta_title
-     * @param null $meta_description
-     * @param null $meta_keywords
-     */
     public function __construct(protected $object_id, protected $locale = null, protected $url = null, protected $meta_title = null, protected $meta_description = null, protected $meta_keywords = null)
     {
     }
@@ -43,9 +36,6 @@ class UpdateSeoEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     * @return null
-     */
     public function getLocale()
     {
         return $this->locale;
@@ -61,9 +51,6 @@ class UpdateSeoEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     * @return null
-     */
     public function getUrl()
     {
         return $this->url;
@@ -79,9 +66,6 @@ class UpdateSeoEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     * @return null
-     */
     public function getMetaTitle()
     {
         return $this->meta_title;
@@ -97,9 +81,6 @@ class UpdateSeoEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     * @return null
-     */
     public function getMetaDescription()
     {
         return $this->meta_description;
@@ -115,9 +96,6 @@ class UpdateSeoEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     * @return null
-     */
     public function getMetaKeywords()
     {
         return $this->meta_keywords;

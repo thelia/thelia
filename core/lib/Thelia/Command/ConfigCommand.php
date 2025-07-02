@@ -80,7 +80,7 @@ class ConfigCommand extends ContainerAwareCommand
 
         switch ($command) {
             case 'list':
-                return $this->listConfig($input, $output);
+                return $this->listConfig($output);
             case 'get':
                 return $this->getConfig($input, $output);
             case 'set':
@@ -94,7 +94,7 @@ class ConfigCommand extends ContainerAwareCommand
         }
     }
 
-    private function listConfig(InputInterface $input, OutputInterface $output): int
+    private function listConfig(OutputInterface $output): int
     {
         $output->writeln([
             '',

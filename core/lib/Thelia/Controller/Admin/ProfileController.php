@@ -24,7 +24,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Profile\ProfileEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
@@ -227,7 +227,7 @@ class ProfileController extends AbstractCrudController
      *
      * @param ActionEvent $createEvent the create event
      *
-     * @return \Symfony\Component\HttpFoundation\Response|Response
+     * @return Response
      */
     protected function performAdditionalCreateAction(ActionEvent $createEvent): ?\Symfony\Component\HttpFoundation\Response
     {
@@ -334,7 +334,7 @@ class ProfileController extends AbstractCrudController
         return $requirements;
     }
 
-    public function processUpdateResourceAccess(EventDispatcherInterface $eventDispatcher)
+    public function processUpdateResourceAccess(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         // Check current user authorization
         if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
@@ -368,7 +368,7 @@ class ProfileController extends AbstractCrudController
                     AccessManager::UPDATE,
                     sprintf(
                         '%s %s (ID %s) modified',
-                        ucfirst((string) $this->objectName),
+                        ucfirst($this->objectName),
                         $this->getObjectLabel($changedObject),
                         $this->getObjectId($changedObject)
                     ),
@@ -376,11 +376,7 @@ class ProfileController extends AbstractCrudController
                 );
             }
 
-            if ($response === null) {
-                return $this->redirectToEditionTemplate();
-            }
-
-            return $response;
+            return $this->redirectToEditionTemplate();
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
@@ -395,7 +391,7 @@ class ProfileController extends AbstractCrudController
         return $this->renderEditionTemplate();
     }
 
-    public function processUpdateModuleAccess(EventDispatcherInterface $eventDispatcher)
+    public function processUpdateModuleAccess(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         // Check current user authorization
         if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
@@ -429,7 +425,7 @@ class ProfileController extends AbstractCrudController
                     AccessManager::UPDATE,
                     sprintf(
                         '%s %s (ID %s) modified',
-                        ucfirst((string) $this->objectName),
+                        ucfirst($this->objectName),
                         $this->getObjectLabel($changedObject),
                         $this->getObjectId($changedObject)
                     ),
@@ -437,11 +433,7 @@ class ProfileController extends AbstractCrudController
                 );
             }
 
-            if ($response === null) {
-                return $this->redirectToEditionTemplate();
-            }
-
-            return $response;
+            return $this->redirectToEditionTemplate();
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);

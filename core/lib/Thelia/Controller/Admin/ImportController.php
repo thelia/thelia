@@ -22,7 +22,7 @@ use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Serializer\AbstractSerializer;
@@ -179,9 +179,9 @@ class ImportController extends BaseAdminController
      *
      * @param int $id An import identifier
      *
-     * @return Response|\Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
-    public function importAction(int $id)
+    public function importAction(int $id): Response|RedirectResponse
     {
         /** @var Importhandler $importHandler */
         $importHandler = $this->container->get('thelia.import.handler');

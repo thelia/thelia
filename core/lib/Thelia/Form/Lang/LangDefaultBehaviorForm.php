@@ -41,8 +41,6 @@ class LangDefaultBehaviorForm extends BaseForm
      *       )
      *   )
      *   ->add('age', IntegerType::class);
-     *
-     * @return null
      */
     protected function buildForm()
     {

@@ -56,7 +56,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
         $plainPassword = $event->getPassword();
 
-        $this->createOrUpdateCustomer($customer, $event, $dispatcher);
+        $this->createOrUpdateCustomer($customer, $event);
 
         if ($event->getNotifyCustomerOfAccountCreation()) {
             $this->mailer->sendEmailToCustomer(
@@ -99,7 +99,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
         $emailChanged = $customer->getEmail() !== $event->getEmail();
 
-        $this->createOrUpdateCustomer($customer, $event, $dispatcher);
+        $this->createOrUpdateCustomer($customer, $event);
 
         if ($event->getNotifyCustomerOfAccountModification() && ($plainPassword !== null && $plainPassword !== '' && $plainPassword !== '0' || $emailChanged)) {
             $this->mailer->sendEmailToCustomer('customer_account_changed', $customer, ['password' => $plainPassword]);
@@ -176,8 +176,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
      */
     private function createOrUpdateCustomer(
         CustomerModel $customer,
-        CustomerCreateOrUpdateEvent $event,
-        EventDispatcherInterface $dispatcher
+        CustomerCreateOrUpdateEvent $event
     ): void {
         $customer->createOrUpdate(
             $event->getTitle() ?? $this->customerService->getDefaultCustomerTitle()->getId(),

@@ -28,7 +28,7 @@ use Thelia\Core\Event\Sale\SaleEvent;
 use Thelia\Core\Event\Sale\SaleToggleActivityEvent;
 use Thelia\Core\Event\Sale\SaleUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
@@ -301,7 +301,7 @@ class SaleController extends AbstractCrudController
      *
      * @return Response
      */
-    public function toggleActivity(EventDispatcherInterface $eventDispatcher): Response|\Symfony\Component\HttpFoundation\Response
+    public function toggleActivity(EventDispatcherInterface $eventDispatcher): Response
     {
         if (($response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;

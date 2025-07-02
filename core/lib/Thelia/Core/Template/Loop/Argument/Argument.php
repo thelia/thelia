@@ -153,10 +153,8 @@ class Argument
     }
 
     /**
-     * @param null $default
      * @param bool $mandatory
      * @param bool $empty
-     *
      *
      * @since 2.2
      */
@@ -187,10 +185,8 @@ class Argument
     }
 
     /**
-     * @param null $default
      * @param bool $mandatory
      * @param bool $empty
-     *
      *
      * @since 2.4.0
      */
@@ -208,10 +204,8 @@ class Argument
     }
 
     /**
-     * @param null $default
      * @param bool $mandatory
      * @param bool $empty
-     *
      *
      * @since 2.4.0
      */

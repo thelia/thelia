@@ -71,12 +71,11 @@ class MatchForXArticles extends ConditionAbstract
 
     public function isMatching()
     {
-        $condition1 = $this->conditionValidator->variableOpComparison(
+        return $this->conditionValidator->variableOpComparison(
             $this->facade->getNbArticlesInCart(),
             $this->operators[self::CART_QUANTITY],
             $this->values[self::CART_QUANTITY]
         );
-        return $condition1;
     }
 
     public function getName(): string
@@ -87,32 +86,28 @@ class MatchForXArticles extends ConditionAbstract
         );
     }
 
-    public function getToolTip()
+    public function getToolTip(): string
     {
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'The cart item count should match the condition',
             []
         );
-
-        return $toolTip;
     }
 
-    public function getSummary()
+    public function getSummary(): string
     {
         $i18nOperator = Operators::getI18n(
             $this->translator,
             $this->operators[self::CART_QUANTITY]
         );
 
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'If cart item count is <strong>%operator%</strong> %quantity%',
             [
                 '%operator%' => $i18nOperator,
                 '%quantity%' => $this->values[self::CART_QUANTITY],
             ]
         );
-
-        return $toolTip;
     }
 
     protected function generateInputs(): array
@@ -132,9 +127,7 @@ class MatchForXArticles extends ConditionAbstract
             ->getTranslator()
             ->trans('Cart item count is');
 
-        $html = $this->drawBackOfficeBaseInputsText($labelQuantity, self::CART_QUANTITY);
-
-        return $html;
+        return $this->drawBackOfficeBaseInputsText($labelQuantity, self::CART_QUANTITY);
     }
 
     protected function drawBackOfficeBaseInputsText($label, $inputKey)

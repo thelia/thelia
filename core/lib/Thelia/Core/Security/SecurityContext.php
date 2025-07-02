@@ -13,8 +13,6 @@ declare(strict_types=1);
  */
 namespace Thelia\Core\Security;
 
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use LogicException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\Resource\AdminResources;
@@ -37,13 +35,7 @@ class SecurityContext
      */
     private function getSession()
     {
-        $session = $this->requestStack->getCurrentRequest()->getSession();
-
-        if (!$session instanceof SessionInterface) {
-            throw new LogicException('No session found.');
-        }
-
-        return $session;
+        return $this->requestStack->getCurrentRequest()->getSession();
     }
 
     /**

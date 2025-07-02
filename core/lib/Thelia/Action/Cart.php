@@ -136,9 +136,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     public function clear(CartEvent $event): void
     {
-        if (($cart = $event->getCart()) instanceof CartModel) {
-            $cart->delete();
-        }
+        $cart = $event->getCart();
+        $cart->delete();
     }
 
     /**

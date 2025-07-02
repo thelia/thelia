@@ -53,14 +53,12 @@ class MatchBillingCountries extends AbstractMatchCountries
         );
     }
 
-    public function getToolTip()
+    public function getToolTip(): string
     {
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'The coupon applies to the selected billing countries',
             []
         );
-
-        return $toolTip;
     }
 
     protected function getSummaryLabel($cntryStrList, $i18nOperator): string

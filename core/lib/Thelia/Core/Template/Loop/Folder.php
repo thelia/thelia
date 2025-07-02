@@ -199,7 +199,6 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                     $search->clearOrderByColumns();
                     $search->addAscendingOrderByColumn('RAND()');
                     break 2;
-                    break;
                 case 'created':
                     $search->addAscendingOrderByColumn('created_at');
                     break;

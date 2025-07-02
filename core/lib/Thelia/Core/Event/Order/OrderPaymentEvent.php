@@ -25,7 +25,7 @@ use Thelia\Model\Order;
 class OrderPaymentEvent extends ActionEvent
 {
     /**
-     * @var \Thelia\Core\HttpFoundation\Response
+     * @var \Symfony\Component\HttpFoundation\Response
      */
     protected $response;
 
@@ -49,7 +49,7 @@ class OrderPaymentEvent extends ActionEvent
     }
 
     /**
-     * @return \Thelia\Core\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getResponse()
     {

@@ -293,7 +293,7 @@ abstract class CouponAbstract implements CouponInterface
      */
     public function getServiceId(): string
     {
-        return $this->serviceId ?? (string) static::class;
+        return $this->serviceId ?? static::class;
     }
 
     /**

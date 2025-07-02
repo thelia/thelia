@@ -50,24 +50,14 @@ class TypeCasterService
             $typeName = $type->getName();
 
             // Types primitifs
-            switch ($typeName) {
-                case 'string':
-                    return (string) $value;
-                case 'int':
-                    return (int) $value;
-                case 'float':
-                    return (float) $value;
-                case 'bool':
-                    return (bool) $value;
-                case 'array':
-                    return is_array($value) ? $value : [$value];
-                default:
-                    if (is_object($value) && ($value instanceof $typeName || is_subclass_of($value, $typeName))) {
-                        return $value;
-                    }
-
-                    return $value;
-            }
+            return match ($typeName) {
+                'string' => (string) $value,
+                'int' => (int) $value,
+                'float' => (float) $value,
+                'bool' => (bool) $value,
+                'array' => is_array($value) ? $value : [$value],
+                default => $value,
+            };
         }
 
         return $value;

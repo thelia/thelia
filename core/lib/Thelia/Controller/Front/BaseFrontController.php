@@ -15,7 +15,7 @@ namespace Thelia\Controller\Front;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Controller\BaseController;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Model\AddressQuery;

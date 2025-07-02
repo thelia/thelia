@@ -92,32 +92,28 @@ class StartDate extends ConditionAbstract
         );
     }
 
-    public function getToolTip()
+    public function getToolTip(): string
     {
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'The coupon is valid after a given date',
             []
         );
-
-        return $toolTip;
     }
 
-    public function getSummary()
+    public function getSummary(): string
     {
         $date = new \DateTime();
         $date->setTimestamp($this->values[self::START_DATE]);
 
         $strDate = $date->format($this->getDateFormat());
 
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'Valid only from %date% to the coupon expiration date',
             [
                 '%date%' => $strDate,
             ],
             'condition'
         );
-
-        return $toolTip;
     }
 
     private function getDateFormat()

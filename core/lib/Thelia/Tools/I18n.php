@@ -132,8 +132,6 @@ class I18n
 
         $return = $i > 0 ? substr($return, 0, -1) : '""';
 
-        $return .= ')';
-
-        return $return;
+        return $return . ')';
     }
 }

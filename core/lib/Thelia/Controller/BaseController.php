@@ -135,7 +135,7 @@ abstract class BaseController implements ControllerInterface
                 'Content-type' => 'application/pdf',
                 'Content-Disposition' => sprintf(
                     '%s; filename=%s.pdf',
-                    (bool) $browser === false ? 'attachment' : 'inline',
+                    $browser === false ? 'attachment' : 'inline',
                     $fileName
                 ),
             ]

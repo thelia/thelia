@@ -31,7 +31,6 @@ class ModelCriteriaTools
 {
     /**
      * @param array  $columns
-     * @param null   $foreignTable
      * @param string $foreignKey
      * @param bool   $forceReturn
      * @param string $forceReturn

@@ -29,10 +29,6 @@ class AssetsManager
         }
     }
 
-    protected function __clone()
-    {
-    }
-
     public static function getInstance($entrypointsPath): \Thelia\Tools\AssetsManager
     {
         if (!self::$instance instanceof \Thelia\Tools\AssetsManager) {

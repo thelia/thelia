@@ -254,7 +254,6 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
                     $search->clearOrderByColumns();
                     $search->addAscendingOrderByColumn('RAND()');
                     break 2;
-                    break;
             }
         }
 

@@ -202,9 +202,7 @@ class Coupon extends BaseCoupon
      */
     public function getEffects()
     {
-        $effects = $this->unserializeEffects($this->getSerializedEffects());
-
-        return $effects;
+        return $this->unserializeEffects($this->getSerializedEffects());
     }
 
     /**
@@ -232,9 +230,7 @@ class Coupon extends BaseCoupon
      */
     public function unserializeEffects($serializedEffects)
     {
-        $effects = json_decode($serializedEffects, true);
-
-        return $effects;
+        return json_decode($serializedEffects, true);
     }
 
     /**
@@ -246,9 +242,7 @@ class Coupon extends BaseCoupon
      */
     public function serializeEffects(array $unserializedEffects)
     {
-        $effects = json_encode($unserializedEffects);
-
-        return $effects;
+        return json_encode($unserializedEffects);
     }
 
     /**

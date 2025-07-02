@@ -392,7 +392,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         $session = $this->getSession();
 
         $order = $event->getOrder();
-        $paymentModule = ModuleQuery::create()->findPk($order->getPaymentModuleId());
+        ModuleQuery::create()->findPk($order->getPaymentModuleId());
 
         $placedOrder = $this->createOrder(
             $dispatcher,

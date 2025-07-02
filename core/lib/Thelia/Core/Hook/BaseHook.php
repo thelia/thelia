@@ -29,6 +29,7 @@ use Thelia\Model\Cart;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
 use Thelia\Model\Lang;
+use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 use Thelia\Module\BaseModule;
@@ -50,7 +51,7 @@ abstract class BaseHook implements BaseHookInterface
 {
     public const INJECT_TEMPLATE_METHOD_NAME = 'insertTemplate';
 
-    public ?BaseModule $module;
+    public ?BaseModule $module = null;
 
     protected array $templates = [];
 
@@ -90,8 +91,14 @@ abstract class BaseHook implements BaseHookInterface
         }
 
         $moduleCode = explode('\\', static::class)[0];
-        $module = ModuleQuery::create()->findOneByCode($moduleCode);
-        $this->module = $module;
+
+        $moduleDatabase = ModuleQuery::create()
+            ->findOneByCode($moduleCode);
+
+        if ($moduleDatabase instanceof Module) {
+            $moduleClass = $moduleDatabase->getFullNamespace();
+            $this->module = new $moduleClass();
+        }
 
         $this->translator = Translator::getInstance();
     }
@@ -247,18 +254,12 @@ abstract class BaseHook implements BaseHookInterface
         return $tag;
     }
 
-    /**
-     * @param BaseModule $module
-     */
     public function setModule(?BaseModule $module): void
     {
         $this->module = $module;
     }
 
-    /**
-     * @return BaseModule
-     */
-    public function getModule()
+    public function getModule(): ?BaseModule
     {
         return $this->module;
     }

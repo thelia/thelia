@@ -290,10 +290,6 @@ abstract class BaseForm implements FormInterface
      */
     public function getView()
     {
-        if (!$this->view instanceof FormView) {
-            throw new LogicException('View was not created. Please call BaseForm::createView() first.');
-        }
-
         return $this->view;
     }
 
@@ -387,8 +383,6 @@ abstract class BaseForm implements FormInterface
      *       )
      *   )
      *   ->add('age', IntegerType::class);
-     *
-     * @return null
      */
     abstract protected function buildForm();
 }

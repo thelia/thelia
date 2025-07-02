@@ -36,16 +36,14 @@ class RemoveAmountOnCategories extends AbstractRemoveOnCategories
             ->trans('Fixed amount discount for selected categories', []);
     }
 
-    public function getToolTip()
+    public function getToolTip(): string
     {
-        $toolTip = $this->facade
+        return $this->facade
             ->getTranslator()
             ->trans(
                 'This coupon subtracts the specified amount from the order total for each product which belongs to the selected categories. If the discount is greater than the total order, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.',
                 []
             );
-
-        return $toolTip;
     }
 
     public function drawBackOfficeInputs(): string

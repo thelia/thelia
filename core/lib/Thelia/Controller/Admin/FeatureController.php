@@ -237,10 +237,10 @@ class FeatureController extends AbstractCrudController
     /**
      * Add or Remove from all product templates.
      */
-    protected function addRemoveFromAllTemplates(EventDispatcherInterface $eventDispatcher, object $eventType): \Thelia\Core\HttpFoundation\Response|Response
+    protected function addRemoveFromAllTemplates(EventDispatcherInterface $eventDispatcher, object $eventType): Response
     {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -261,7 +261,7 @@ class FeatureController extends AbstractCrudController
     /**
      * Remove from all product templates.
      */
-    public function removeFromAllTemplates(EventDispatcherInterface $eventDispatcher)
+    public function removeFromAllTemplates(EventDispatcherInterface $eventDispatcher): Response
     {
         return $this->addRemoveFromAllTemplates($eventDispatcher, TheliaEvents::FEATURE_REMOVE_FROM_ALL_TEMPLATES);
     }
@@ -269,7 +269,7 @@ class FeatureController extends AbstractCrudController
     /**
      * Add to all product templates.
      */
-    public function addToAllTemplates(EventDispatcherInterface $eventDispatcher)
+    public function addToAllTemplates(EventDispatcherInterface $eventDispatcher): Response
     {
         return $this->addRemoveFromAllTemplates($eventDispatcher, TheliaEvents::FEATURE_ADD_TO_ALL_TEMPLATES);
     }

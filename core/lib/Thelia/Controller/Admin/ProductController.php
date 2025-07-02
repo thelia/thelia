@@ -47,7 +47,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Document;
@@ -387,8 +387,6 @@ class ProductController extends AbstractSeoCrudController
 
     /**
      * @param ProductEvent $event
-     *
-     * @return null
      */
     protected function getObjectFromEvent($event): mixed
     {
@@ -490,7 +488,7 @@ class ProductController extends AbstractSeoCrudController
      */
     public function setToggleVisibilityAction(
         EventDispatcherInterface $eventDispatcher
-    ): Response|\Symfony\Component\HttpFoundation\Response {
+    ): Response {
         // Check current user authorization
         if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
@@ -785,7 +783,7 @@ class ProductController extends AbstractSeoCrudController
      *
      * @param int $productId
      *
-     * @return mixed|\Symfony\Component\HttpFoundation\Response
+     * @return mixed
      */
     public function setProductTemplateAction(EventDispatcherInterface $eventDispatcher, $productId): Response|RedirectResponse
     {
@@ -815,7 +813,7 @@ class ProductController extends AbstractSeoCrudController
      *
      * @throws PropelException
      *
-     * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return RedirectResponse
      */
     public function updateAttributesAndFeaturesAction(EventDispatcherInterface $eventDispatcher, $productId): Response|RedirectResponse
     {
@@ -1120,7 +1118,7 @@ class ProductController extends AbstractSeoCrudController
      *
      * @param BaseForm $changeForm
      *
-     * @return mixed|RedirectResponse|\Symfony\Component\HttpFoundation\Response|Response|null
+     * @return mixed|RedirectResponse|Response|null
      */
     protected function processProductSaleElementUpdate(EventDispatcherInterface $eventDispatcher, ?BaseForm $changeForm): Response|RedirectResponse|null
     {
@@ -1194,7 +1192,7 @@ class ProductController extends AbstractSeoCrudController
     /**
      * Process the change of product's PSE list.
      */
-    public function updateProductSaleElementsAction(EventDispatcherInterface $eventDispatcher)
+    public function updateProductSaleElementsAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse|null
     {
         return $this->processProductSaleElementUpdate(
             $eventDispatcher,
@@ -1205,7 +1203,7 @@ class ProductController extends AbstractSeoCrudController
     /**
      * Update default product sale element (not attached to any combination).
      */
-    public function updateProductDefaultSaleElementAction(EventDispatcherInterface $eventDispatcher)
+    public function updateProductDefaultSaleElementAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse|null
     {
         return $this->processProductSaleElementUpdate(
             $eventDispatcher,
@@ -1371,7 +1369,7 @@ class ProductController extends AbstractSeoCrudController
 
         $taxRule = TaxRuleQuery::create()->findPk($tax_rule_id);
 
-        if (null !== $price && null !== $taxRule) {
+        if (null !== $taxRule) {
             $calculator = new Calculator();
 
             $calculator->loadTaxRuleWithoutProduct(
@@ -1883,7 +1881,7 @@ class ProductController extends AbstractSeoCrudController
     /**
      * @throws Exception
      *
-     * @return mixed|\Symfony\Component\HttpFoundation\Response
+     * @return mixed
      */
     public function cloneAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {

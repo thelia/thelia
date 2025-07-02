@@ -27,10 +27,6 @@ class FlashMessage implements Iterator
 
     protected $collection = [];
 
-    public function __construct()
-    {
-    }
-
     public function add($type, $messages): void
     {
         foreach ($messages as $message) {

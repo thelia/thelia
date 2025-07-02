@@ -44,8 +44,6 @@ class AreaPostageForm extends BaseForm
      *       )
      *   )
      *   ->add('age', IntegerType::class);
-     *
-     * @return null
      */
     protected function buildForm()
     {

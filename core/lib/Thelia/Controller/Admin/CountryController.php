@@ -26,7 +26,7 @@ use Thelia\Core\Event\Country\CountryToggleDefaultEvent;
 use Thelia\Core\Event\Country\CountryToggleVisibilityEvent;
 use Thelia\Core\Event\Country\CountryUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
@@ -261,7 +261,7 @@ class CountryController extends AbstractCrudController
         return $this->generateRedirectFromRoute('admin.configuration.countries.default');
     }
 
-    public function toggleDefaultAction(EventDispatcherInterface $eventDispatcher): Response|\Symfony\Component\HttpFoundation\Response
+    public function toggleDefaultAction(EventDispatcherInterface $eventDispatcher): Response
     {
         if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
@@ -291,7 +291,7 @@ class CountryController extends AbstractCrudController
         return new CountryToggleVisibilityEvent($this->getExistingObject());
     }
 
-    public function getDataAction($visible = true, $locale = null): Response|\Symfony\Component\HttpFoundation\Response
+    public function getDataAction($visible = true, $locale = null): Response
     {
         $response = $this->checkAuth($this->resourceCode, [], AccessManager::VIEW);
         if ($response instanceof Response) {
@@ -304,7 +304,6 @@ class CountryController extends AbstractCrudController
 
         $responseData = [];
 
-        /** @var CountryQuery $search */
         $countries = CountryQuery::create()
             ->_if($visible)
                 ->filterByVisible(true)

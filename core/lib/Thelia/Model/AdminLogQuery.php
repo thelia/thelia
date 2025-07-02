@@ -29,11 +29,6 @@ use Thelia\Model\Base\AdminLogQuery as BaseAdminLogQuery;
 class AdminLogQuery extends BaseAdminLogQuery
 {
     /**
-     * @param null $login
-     * @param null $minDate
-     * @param null $maxDate
-     * @param null $resources
-     * @param null $actions
      *
      * @return array|mixed|ObjectCollection
      */

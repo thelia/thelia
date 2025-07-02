@@ -30,9 +30,7 @@ class Payment extends BaseSpecificModule implements PropelSearchLoopInterface
 {
     protected function getArgDefinitions()
     {
-        $collection = parent::getArgDefinitions();
-
-        return $collection;
+        return parent::getArgDefinitions();
     }
 
     public function parseResults(LoopResult $loopResult): LoopResult

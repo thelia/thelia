@@ -324,10 +324,6 @@ class Order implements PropelResourceInterface
         return round($orderPropelModel->getPostage(), 2);
     }
 
-    public function __construct()
-    {
-    }
-
     public function getId(): ?int
     {
         return $this->id;

@@ -50,8 +50,6 @@ class CartAdd extends BaseForm
      *       )
      *   )
      *   ->add('age', IntegerType::class);
-     *
-     * @return null
      */
     protected function buildForm()
     {

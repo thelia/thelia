@@ -15,7 +15,6 @@ namespace Thelia\Api\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Api\Bridge\Propel\Event\ItemProviderQueryEvent;
-use Thelia\Model\StateQuery;
 
 class StateByIsoProviderListener implements EventSubscriberInterface
 {
@@ -29,18 +28,7 @@ class StateByIsoProviderListener implements EventSubscriberInterface
             return;
         }
 
-        $query = $event->getQuery();
-
-        if (!$query instanceof StateQuery) {
-            return;
-        }
-
-        $query->filterByIsocode($event->getUriVariables()['stateIso'])
-            ->useCountryQuery()
-                ->filterByIsoalpha3($event->getUriVariables()['countryIso3'])
-            ->endUse();
-
-        $event->stopPropagation();
+        $event->getQuery();
     }
 
     public static function getSubscribedEvents(): array

@@ -220,10 +220,6 @@ class Customer implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
     public array $addresses = [];
 
-    public function __construct()
-    {
-    }
-
     public function getId(): ?int
     {
         return $this->id;

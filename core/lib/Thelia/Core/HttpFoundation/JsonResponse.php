@@ -29,7 +29,7 @@ final class JsonResponse extends BaseJsonResponse
         return new self(['error' => $errorMessage], $statusCode);
     }
 
-    public static function createAuthError($access): \Thelia\Core\HttpFoundation\JsonResponse
+    public static function createAuthError($access): self
     {
         $errorMessage = match ($access) {
             AccessManager::VIEW => "You don't have the right to view this content",
@@ -44,7 +44,7 @@ final class JsonResponse extends BaseJsonResponse
         return self::createError($errorMessage);
     }
 
-    public static function createNotFoundError($resource): \Thelia\Core\HttpFoundation\JsonResponse
+    public static function createNotFoundError($resource): self
     {
         $errorMessage = Translator::getInstance()
             ->trans('The resource %res has not been found', ['%res' => $resource])

@@ -186,11 +186,9 @@ class Cart extends BaseCart
      * Return the VAT of all items.
      *
      * @param Country $taxCountry
-     * @param null    $taxState
      * @param bool    $withDiscount
      *
      * @throws PropelException
-     *
      * @return float|int|string
      */
     public function getTotalVAT($taxCountry, $taxState = null, $withDiscount = true)
@@ -199,10 +197,8 @@ class Cart extends BaseCart
     }
 
     /**
-     * @param null $taxState
      *
      * @throws PropelException
-     *
      * @return float
      */
     public function getDiscountVAT($taxCountry, $taxState = null)

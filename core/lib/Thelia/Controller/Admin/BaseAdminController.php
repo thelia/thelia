@@ -17,7 +17,7 @@ use Exception;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Controller\BaseController;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Core\Template\ParserInterface;
@@ -38,7 +38,7 @@ class BaseAdminController extends BaseController
 
     protected string $currentRouter = 'router.admin';
 
-    public function processTemplateAction(string $template): Response|RedirectResponse|string|\Symfony\Component\HttpFoundation\Response
+    public function processTemplateAction(string $template): Response|RedirectResponse|string
     {
         try {
             if ($template !== '' && $template !== '0') {
@@ -250,11 +250,7 @@ class BaseAdminController extends BaseController
     {
         $response = $this->renderRaw($templateName, $args);
 
-        if (!$response instanceof \Symfony\Component\HttpFoundation\Response) {
-            $response = new Response($response, $status);
-        }
-
-        return $response;
+        return new Response($response, $status);
     }
 
     protected function renderRaw(string $templateName, array $args = [], $templateDir = null): string

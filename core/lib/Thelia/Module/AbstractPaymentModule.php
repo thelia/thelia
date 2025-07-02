@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Thelia\Module;
 
 use Symfony\Component\Routing\Router;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Model\Order;
 use Thelia\Tools\URL;

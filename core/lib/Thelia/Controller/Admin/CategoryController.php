@@ -254,9 +254,9 @@ class CategoryController extends AbstractSeoCrudController
      */
     public function setToggleVisibilityAction(
         EventDispatcherInterface $eventDispatcher
-    ): \Thelia\Core\HttpFoundation\Response|Response {
+    ): Response {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -332,10 +332,10 @@ class CategoryController extends AbstractSeoCrudController
         return $this->jsonResponse(json_encode($result));
     }
 
-    public function addRelatedContentAction(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|Response
+    public function addRelatedContentAction(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -361,22 +361,22 @@ class CategoryController extends AbstractSeoCrudController
     /**
      * Add category pictures.
      *
-     * @return \Thelia\Core\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function addRelatedPictureAction(): \Thelia\Core\HttpFoundation\Response|Response
+    public function addRelatedPictureAction(): Response
     {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
         return $this->redirectToEditionTemplate();
     }
 
-    public function deleteRelatedContentAction(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|Response
+    public function deleteRelatedContentAction(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 

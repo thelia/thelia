@@ -191,7 +191,7 @@ class TemplateController extends AbstractCrudController
      * Process delete failure, which may occurs if template is in use.
      *
      *
-     * @return \Thelia\Core\HttpFoundation\Response|null
+     * @return \Symfony\Component\HttpFoundation\Response|null
      */
     protected function performAdditionalDeleteAction(ActionEvent $deleteEvent): ?Response
     {
@@ -209,10 +209,10 @@ class TemplateController extends AbstractCrudController
         return null;
     }
 
-    public function duplicateAction(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|Response
+    public function duplicateAction(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (($response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::CREATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::CREATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -236,7 +236,7 @@ class TemplateController extends AbstractCrudController
         return $this->redirectToEditionTemplate(null, $template_id);
     }
 
-    public function getAjaxFeaturesAction(): \Thelia\Core\HttpFoundation\Response
+    public function getAjaxFeaturesAction(): \Symfony\Component\HttpFoundation\Response
     {
         return $this->render(
             'ajax/template-feature-list',
@@ -244,7 +244,7 @@ class TemplateController extends AbstractCrudController
         );
     }
 
-    public function getAjaxAttributesAction(): \Thelia\Core\HttpFoundation\Response
+    public function getAjaxAttributesAction(): \Symfony\Component\HttpFoundation\Response
     {
         return $this->render(
             'ajax/template-attribute-list',
@@ -252,10 +252,10 @@ class TemplateController extends AbstractCrudController
         );
     }
 
-    public function addAttributeAction(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|Response
+    public function addAttributeAction(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (($response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -278,10 +278,10 @@ class TemplateController extends AbstractCrudController
         return $this->redirectToEditionTemplate();
     }
 
-    public function deleteAttributeAction(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|Response
+    public function deleteAttributeAction(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (($response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -319,10 +319,10 @@ class TemplateController extends AbstractCrudController
         );
     }
 
-    public function addFeatureAction(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|Response
+    public function addFeatureAction(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (($response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -345,10 +345,10 @@ class TemplateController extends AbstractCrudController
         return $this->redirectToEditionTemplate();
     }
 
-    public function deleteFeatureAction(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|Response
+    public function deleteFeatureAction(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (($response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 

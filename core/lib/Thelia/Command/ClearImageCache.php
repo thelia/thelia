@@ -34,7 +34,7 @@ class ClearImageCache extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $request = new Request();
+        new Request();
 
         try {
             $event = new ImageEvent();

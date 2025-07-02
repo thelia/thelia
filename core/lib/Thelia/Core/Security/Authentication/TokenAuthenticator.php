@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Thelia\Core\Security\Authentication;
 
 use Thelia\Core\Security\User\UserInterface;
-use Thelia\Core\Security\Exception\TokenAuthenticationException;
 use Thelia\Core\Security\UserProvider\TokenUserProvider;
 
 class TokenAuthenticator implements AuthenticatorInterface
@@ -26,16 +25,10 @@ class TokenAuthenticator implements AuthenticatorInterface
     /**
      * @see \Thelia\Core\Security\Authentication\AuthenticatorInterface::getAuthentifiedUser()
      */
-    public function getAuthentifiedUser()
+    public function getAuthentifiedUser(): UserInterface
     {
         $keyData = $this->userProvider->decodeKey($this->key);
 
-        $user = $this->userProvider->getUser($keyData);
-
-        if (!$user instanceof UserInterface) {
-            throw new TokenAuthenticationException('No user matches the provided token');
-        }
-
-        return $user;
+        return $this->userProvider->getUser($keyData);
     }
 }

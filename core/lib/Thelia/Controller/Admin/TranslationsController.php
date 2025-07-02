@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use DirectoryIterator;
 use InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
@@ -334,7 +334,7 @@ class TranslationsController extends BaseAdminController
         TemplateHelperInterface $templateHelper,
         EventDispatcherInterface $eventDispatcher,
         TranslatorInterface $translator
-    ) {
+    ): Response|RedirectResponse {
         if (($response = $this->checkAuth(AdminResources::TRANSLATIONS, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
@@ -347,7 +347,7 @@ class TranslationsController extends BaseAdminController
         TemplateHelperInterface $templateHelper,
         EventDispatcherInterface $eventDispatcher,
         TranslatorInterface $translator
-    ) {
+    ): Response|RedirectResponse {
         if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }

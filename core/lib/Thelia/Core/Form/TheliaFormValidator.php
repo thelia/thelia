@@ -100,7 +100,7 @@ class TheliaFormValidator
     {
         $errors = '';
 
-        foreach ($form->getErrors() as $key => $error) {
+        foreach ($form->getErrors() as $error) {
             $errors .= $error->getMessage().', ';
         }
 

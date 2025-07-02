@@ -79,6 +79,5 @@ trait PropelResourceTrait
 
     public function afterModelToResource(array $context): void
     {
-        return;
     }
 }

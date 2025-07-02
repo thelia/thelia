@@ -29,7 +29,7 @@ use Thelia\Core\Event\Hook\ModuleHookUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Hook\BaseHook;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
@@ -63,7 +63,7 @@ class ModuleHookController extends AbstractCrudController
         );
     }
 
-    public function indexAction(): Response|\Symfony\Component\HttpFoundation\Response
+    public function indexAction(): Response
     {
         if (($response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
@@ -72,7 +72,7 @@ class ModuleHookController extends AbstractCrudController
         return $this->renderList();
     }
 
-    public function toggleActivationAction(EventDispatcherInterface $eventDispatcher, $module_hook_id): Response|\Symfony\Component\HttpFoundation\Response
+    public function toggleActivationAction(EventDispatcherInterface $eventDispatcher, $module_hook_id): Response
     {
         if (($response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;

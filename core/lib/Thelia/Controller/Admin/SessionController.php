@@ -13,7 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Exception;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -80,18 +80,18 @@ class SessionController extends BaseAdminController
         return $this->render('login');
     }
 
-    public function showLostPasswordAction()
+    public function showLostPasswordAction(): Response|RedirectResponse
     {
-        if ((null !== $response = $this->checkPasswordRecoveryEnabled()) || (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse)) {
+        if ((($response = $this->checkPasswordRecoveryEnabled()) instanceof Response) || (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse)) {
             return $response;
         }
 
         return $this->render('lost-password');
     }
 
-    public function passwordCreateRequestAction(EventDispatcherInterface $eventDispatcher)
+    public function passwordCreateRequestAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse|null
     {
-        if ((null !== $response = $this->checkPasswordRecoveryEnabled()) || (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse)) {
+        if ((($response = $this->checkPasswordRecoveryEnabled()) instanceof Response) || (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse)) {
             return $response;
         }
 
@@ -136,18 +136,18 @@ class SessionController extends BaseAdminController
         return $this->render('lost-password');
     }
 
-    public function passwordCreateRequestSuccessAction()
+    public function passwordCreateRequestSuccessAction(): Response|RedirectResponse
     {
-        if ((null !== $response = $this->checkPasswordRecoveryEnabled()) || (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse)) {
+        if ((($response = $this->checkPasswordRecoveryEnabled()) instanceof Response) || (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse)) {
             return $response;
         }
 
         return $this->render('lost-password', ['create_request_success' => true]);
     }
 
-    public function displayCreateFormAction($token)
+    public function displayCreateFormAction($token): Response|RedirectResponse
     {
-        if ((null !== $response = $this->checkPasswordRecoveryEnabled()) || (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse)) {
+        if ((($response = $this->checkPasswordRecoveryEnabled()) instanceof Response) || (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse)) {
             return $response;
         }
 
@@ -164,9 +164,9 @@ class SessionController extends BaseAdminController
         return $this->render('create-password');
     }
 
-    public function passwordCreatedAction(EventDispatcherInterface $eventDispatcher)
+    public function passwordCreatedAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse|null
     {
-        if ((null !== $response = $this->checkPasswordRecoveryEnabled()) || (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse)) {
+        if ((($response = $this->checkPasswordRecoveryEnabled()) instanceof Response) || (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse)) {
             return $response;
         }
 
@@ -206,9 +206,9 @@ class SessionController extends BaseAdminController
         return $this->render('create-password');
     }
 
-    public function passwordCreatedSuccessAction()
+    public function passwordCreatedSuccessAction(): Response|RedirectResponse
     {
-        if ((null !== $response = $this->checkPasswordRecoveryEnabled()) || (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse)) {
+        if ((($response = $this->checkPasswordRecoveryEnabled()) instanceof Response) || (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse)) {
             return $response;
         }
 

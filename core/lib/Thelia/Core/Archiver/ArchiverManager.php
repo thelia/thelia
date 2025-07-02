@@ -43,7 +43,7 @@ class ArchiverManager
 
         /** @var ArchiverInterface $archiver */
         foreach ($this->archivers as $archiver) {
-            if ($archiver->isAvailable() === (bool) $isAvailable) {
+            if ($archiver->isAvailable() === $isAvailable) {
                 $filteredArchivers[] = $archiver;
             }
         }
@@ -80,7 +80,7 @@ class ArchiverManager
             return $this->archivers[$archiverId];
         }
 
-        if ($this->archivers[$archiverId]->isAvailable() === (bool) $isAvailable) {
+        if ($this->archivers[$archiverId]->isAvailable() === $isAvailable) {
             return $this->archivers[$archiverId];
         }
 

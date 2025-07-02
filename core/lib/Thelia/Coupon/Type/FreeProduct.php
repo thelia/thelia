@@ -260,16 +260,14 @@ class FreeProduct extends AbstractRemoveOnProducts
             ->trans('Free product when buying one or more selected products', []);
     }
 
-    public function getToolTip()
+    public function getToolTip(): string
     {
-        $toolTip = $this->facade
+        return $this->facade
             ->getTranslator()
             ->trans(
                 'This coupon adds a free product to the cart if one of the selected products is in the cart.',
                 []
             );
-
-        return $toolTip;
     }
 
     public function drawBackOfficeInputs(): string

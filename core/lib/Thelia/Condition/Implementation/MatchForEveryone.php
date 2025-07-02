@@ -56,24 +56,20 @@ class MatchForEveryone extends ConditionAbstract
         );
     }
 
-    public function getToolTip()
+    public function getToolTip(): string
     {
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'This condition is always true',
             []
         );
-
-        return $toolTip;
     }
 
-    public function getSummary()
+    public function getSummary(): string
     {
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'Unconditionnal usage',
             []
         );
-
-        return $toolTip;
     }
 
     protected function generateInputs(): array

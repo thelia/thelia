@@ -44,12 +44,12 @@ class ExportController extends BaseAdminController
      *
      * @param string $_view View to render
      *
-     * @return \Thelia\Core\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction(string $_view = 'export')
     {
         $authResponse = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::VIEW]);
-        if ($authResponse instanceof \Thelia\Core\HttpFoundation\Response) {
+        if ($authResponse instanceof \Symfony\Component\HttpFoundation\Response) {
             return $authResponse;
         }
 
@@ -64,10 +64,10 @@ class ExportController extends BaseAdminController
     /**
      * Handle export position change action.
      */
-    public function changeExportPositionAction(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|RedirectResponse
+    public function changeExportPositionAction(EventDispatcherInterface $eventDispatcher): \Symfony\Component\HttpFoundation\Response|RedirectResponse
     {
         $authResponse = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE]);
-        if ($authResponse instanceof \Thelia\Core\HttpFoundation\Response) {
+        if ($authResponse instanceof \Symfony\Component\HttpFoundation\Response) {
             return $authResponse;
         }
 
@@ -88,10 +88,10 @@ class ExportController extends BaseAdminController
     /**
      * Handle export category position change action.
      */
-    public function changeCategoryPositionAction(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|RedirectResponse
+    public function changeCategoryPositionAction(EventDispatcherInterface $eventDispatcher): \Symfony\Component\HttpFoundation\Response|RedirectResponse
     {
         $authResponse = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE]);
-        if ($authResponse instanceof \Thelia\Core\HttpFoundation\Response) {
+        if ($authResponse instanceof \Symfony\Component\HttpFoundation\Response) {
             return $authResponse;
         }
 
@@ -134,7 +134,7 @@ class ExportController extends BaseAdminController
      *
      * @param int $id An export identifier
      */
-    public function configureAction(int $id): \Thelia\Core\HttpFoundation\Response
+    public function configureAction(int $id): \Symfony\Component\HttpFoundation\Response
     {
         /** @var Exporthandler $exportHandler */
         $exportHandler = $this->container->get('thelia.export.handler');
@@ -165,10 +165,8 @@ class ExportController extends BaseAdminController
      * Handle export action.
      *
      * @param int $id An export identifier
-     *
-     * @return \Thelia\Core\HttpFoundation\Response|BinaryFileResponse
      */
-    public function exportAction(int $id)
+    public function exportAction(int $id): \Symfony\Component\HttpFoundation\Response|BinaryFileResponse
     {
         /** @var Exporthandler $exportHandler */
         $exportHandler = $this->container->get('thelia.export.handler');

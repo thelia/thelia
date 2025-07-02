@@ -196,8 +196,7 @@ readonly class FilterService
                 filter: $filter,
                 values: $values,
                 isVisible: $isVisible,
-                position: $position,
-                id: $id
+                position: $position
             );
 
             $hasMainResource = (isset($values[0]['mainId'], $values[0]['mainTitle']));
@@ -295,7 +294,7 @@ readonly class FilterService
         return $ids;
     }
 
-    private function choiceFiltersManagement(array $tfilters, TheliaFilterInterface $filter, array &$values, bool &$isVisible, ?int &$position, ?int &$id): void
+    private function choiceFiltersManagement(array $tfilters, TheliaFilterInterface $filter, array &$values, bool &$isVisible, ?int &$position): void
     {
         if (!$this->hasFilter(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters)) {
             return;

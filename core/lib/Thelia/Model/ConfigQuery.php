@@ -43,8 +43,6 @@ class ConfigQuery extends BaseConfigQuery
      * Find a config variable and return the value or default value if not founded.
      *
      * Use this method for better performance, a cache is created for each variable already searched
-     *
-     * @param null $default
      */
     public static function read(string $search, $default = null, bool $ignoreCache = false)
     {

@@ -29,10 +29,7 @@ use Thelia\Command\Install;
  */
 class Application extends BaseApplication
 {
-    /**
-     * @var KernelInterface
-     */
-    public $kernel;
+    public KernelInterface $kernel;
 
     public function __construct(KernelInterface $kernel)
     {
@@ -46,7 +43,7 @@ class Application extends BaseApplication
         $this->getDefinition()->addOption(new InputOption('--no-debug', null, InputOption::VALUE_NONE, 'Switches off debug mode.'));
     }
 
-    public function getKernel()
+    public function getKernel(): KernelInterface
     {
         return $this->kernel;
     }
@@ -56,6 +53,9 @@ class Application extends BaseApplication
         return $this->kernel->getContainer();
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function doRun(InputInterface $input, OutputInterface $output): int
     {
         $this->registerCommands();
@@ -87,6 +87,10 @@ class Application extends BaseApplication
 
             if (!$r->hasMethod('configure')) {
                 continue;
+            }
+
+            if (!$command instanceof Command) {
+                throw new \LogicException(sprintf('The command "%s" must be an instance of "%s".', $commandId, Command::class));
             }
 
             $this->add($command);

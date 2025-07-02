@@ -117,8 +117,6 @@ trait UrlRewritingTrait
      * return the rewritten URL for the given locale.
      *
      * @param string $locale a valid locale (e.g. en_US)
-     *
-     * @return null
      */
     public function getRewrittenUrl(string $locale)
     {
@@ -130,9 +128,7 @@ trait UrlRewritingTrait
             ->findOne()
         ;
 
-        $url = $rewritingUrl ? $rewritingUrl->getUrl() : null;
-
-        return $url;
+        return $rewritingUrl ? $rewritingUrl->getUrl() : null;
     }
 
     /**

@@ -19,10 +19,6 @@ class UpdateFilePositionEvent extends UpdatePositionEvent
 {
     protected $query;
 
-    /**
-     * @param null $mode
-     * @param null $position
-     */
     public function __construct(ModelCriteria $query, $object_id, $mode, $position = null)
     {
         parent::__construct($object_id, $mode, $position);

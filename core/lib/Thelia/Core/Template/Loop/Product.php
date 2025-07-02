@@ -419,7 +419,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     /**
      * @param int $defaultCategoryId
      */
-    private function findNextPrev(LoopResultRow $loopResultRow, ProductModel $product, $defaultCategoryId): void
+    private function findNextPrev(LoopResultRow $loopResultRow, ProductModel $product, ?int $defaultCategoryId): void
     {
         if ($this->getWithPrevNextInfo()) {
             $currentPosition = ProductCategoryQuery::create()

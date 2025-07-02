@@ -123,7 +123,6 @@ class State extends BaseI18nLoop implements PropelSearchLoopInterface
                     $search->clearOrderByColumns();
                     $search->addAscendingOrderByColumn('RAND()');
                     break 2;
-                    break;
             }
         }
 

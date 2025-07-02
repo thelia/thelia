@@ -119,7 +119,6 @@ abstract class AbstractExport implements Iterator
     public function current()
     {
         if ($this->dataIsJSONFile) {
-            /** @var resource $file */
             $result = json_decode($this->data->current(), true);
 
             if ($result !== null) {
@@ -505,7 +504,7 @@ abstract class AbstractExport implements Iterator
      */
     public function beforeSerialize(array $data)
     {
-        foreach ($data as $idx => &$value) {
+        foreach ($data as &$value) {
             if ($value instanceof DateTime) {
                 $value = $value->format('Y-m-d H:i:s');
             }

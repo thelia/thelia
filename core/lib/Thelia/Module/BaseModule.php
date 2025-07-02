@@ -16,8 +16,8 @@ namespace Thelia\Module;
 use Exception;
 use RuntimeException;
 use DirectoryIterator;
-use UnexpectedValueException;
 use Propel\Runtime\Propel\Runtime\Exception\PropelException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Throwable;
 use Thelia\Model\Hook;
 use Propel\Runtime\Connection\ConnectionInterface;
@@ -161,7 +161,7 @@ class BaseModule implements BaseModuleInterface
         return null !== $this->container;
     }
 
-    public function getContainer()
+    public function getContainer(): ContainerInterface
     {
         if ($this->hasContainer() === false) {
             throw new RuntimeException('Sorry, container is not available in this context');
@@ -182,14 +182,12 @@ class BaseModule implements BaseModuleInterface
 
     /**
      * @throws RuntimeException
-     *
-     * @return \Thelia\Core\HttpFoundation\Request the request
      */
-    public function getRequest()
+    public function getRequest(): Request
     {
         if ($this->hasRequest() === false) {
             // Try to get request from container.
-            $this->setRequest($this->getContainer()->get('request_stack')->getCurrentRequest());
+            $this->setRequest($this->getContainer()->get('request_stack')?->getCurrentRequest());
         }
 
         if ($this->hasRequest() === false) {
@@ -266,11 +264,7 @@ class BaseModule implements BaseModuleInterface
 
     public function deployImageFolder(Module $module, $folderPath, ConnectionInterface $con = null): void
     {
-        try {
-            $directoryBrowser = new DirectoryIterator($folderPath);
-        } catch (UnexpectedValueException $unexpectedValueException) {
-            throw $unexpectedValueException;
-        }
+        $directoryBrowser = new DirectoryIterator($folderPath);
 
         if (!$con instanceof ConnectionInterface) {
             $con = Propel::getConnection(
@@ -313,7 +307,7 @@ class BaseModule implements BaseModuleInterface
 
                     $imagePath = sprintf('%s/%s', $imageDirectory, $imageFileName);
 
-                    if (!is_dir($imageDirectory) && !@mkdir($imageDirectory, 0777, true)) {
+                    if (!is_dir($imageDirectory) && !mkdir($imageDirectory, 0777, true) && !is_dir($imageDirectory)) {
                         $con->rollBack();
                         throw new ModuleException(
                             sprintf('Cannot create directory : %s', $imageDirectory),
@@ -571,7 +565,7 @@ class BaseModule implements BaseModuleInterface
     {
         $moduleHooks = $this->getHooks();
 
-        if (\is_array($moduleHooks) && $moduleHooks !== []) {
+        if ($moduleHooks !== []) {
             $allowedTypes = (array) TemplateDefinition::getStandardTemplatesSubdirsIterator();
             $defaultLang = Lang::getDefaultLanguage();
             $defaultLocale = $defaultLang->getLocale();

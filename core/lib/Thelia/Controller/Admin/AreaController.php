@@ -207,10 +207,10 @@ class AreaController extends AbstractCrudController
     /**
      * add a country to a define area.
      */
-    public function addCountry(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|RedirectResponse|null|Response
+    public function addCountry(EventDispatcherInterface $eventDispatcher): RedirectResponse|null|Response
     {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -232,7 +232,7 @@ class AreaController extends AbstractCrudController
                     AccessManager::UPDATE,
                     sprintf(
                         '%s %s (ID %s) modified, new country added',
-                        ucfirst((string) $this->objectName),
+                        ucfirst($this->objectName),
                         $this->getObjectLabel($changedObject),
                         $this->getObjectId($changedObject)
                     ),
@@ -263,10 +263,10 @@ class AreaController extends AbstractCrudController
     /**
      * delete several countries from a shipping zone.
      */
-    public function removeCountries(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|RedirectResponse|null|Response
+    public function removeCountries(EventDispatcherInterface $eventDispatcher): RedirectResponse|null|Response
     {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -319,7 +319,7 @@ class AreaController extends AbstractCrudController
                 AccessManager::UPDATE,
                 sprintf(
                     '%s %s (ID %s) removed country ID %s from shipping zone ID %s',
-                    ucfirst((string) $this->objectName),
+                    ucfirst($this->objectName),
                     $this->getObjectLabel($changedObject),
                     $this->getObjectId($changedObject),
                     $countryId,
@@ -330,10 +330,10 @@ class AreaController extends AbstractCrudController
         }
     }
 
-    public function removeCountry(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|Response
+    public function removeCountry(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 

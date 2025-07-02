@@ -88,9 +88,6 @@ class MoneyFormat extends NumberFormat
     }
 
     /**
-     * @param null $decimals
-     * @param null $decPoint
-     * @param null $thousandsSep
      * @param bool $removeZeroDecimal
      */
     protected function preFormat(
@@ -109,7 +106,7 @@ class MoneyFormat extends NumberFormat
 
             $number = round($number, $decimals);
 
-            $asFloat = (float) $number;
+            $asFloat = $number;
             $asInt = (int) $asFloat;
 
             if (($asFloat - $asInt) === 0.0) {

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Thelia\Model;
 
 
+use DateTime;
 use Exception;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\ActiveQuery\Criteria;

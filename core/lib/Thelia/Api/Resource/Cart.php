@@ -149,10 +149,6 @@ class Cart implements PropelResourceInterface
     #[Groups([self::GROUP_FRONT_READ_SINGLE])]
     public ?bool $virtual = null;
 
-    public function __construct()
-    {
-    }
-
     public function getId(): ?int
     {
         return $this->id;

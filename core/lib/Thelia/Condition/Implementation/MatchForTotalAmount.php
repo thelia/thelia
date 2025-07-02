@@ -112,24 +112,22 @@ class MatchForTotalAmount extends ConditionAbstract
         );
     }
 
-    public function getToolTip()
+    public function getToolTip(): string
     {
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'Check the total Cart amount in the given currency',
             []
         );
-
-        return $toolTip;
     }
 
-    public function getSummary()
+    public function getSummary(): string
     {
         $i18nOperator = Operators::getI18n(
             $this->translator,
             $this->operators[self::CART_TOTAL]
         );
 
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'If cart total amount is <strong>%operator%</strong> %amount% %currency%',
             [
                 '%operator%' => $i18nOperator,
@@ -137,8 +135,6 @@ class MatchForTotalAmount extends ConditionAbstract
                 '%currency%' => $this->values[self::CART_CURRENCY],
             ]
         );
-
-        return $toolTip;
     }
 
     protected function generateInputs(): array
@@ -174,9 +170,7 @@ class MatchForTotalAmount extends ConditionAbstract
             ->getTranslator()
             ->trans('Cart total amount is', []);
 
-        $html = $this->drawBackOfficeBaseInputsText($labelPrice, self::CART_TOTAL);
-
-        return $html;
+        return $this->drawBackOfficeBaseInputsText($labelPrice, self::CART_TOTAL);
     }
 
     protected function drawBackOfficeBaseInputsText($label, $inputKey)

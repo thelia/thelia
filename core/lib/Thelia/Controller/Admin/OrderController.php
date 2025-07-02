@@ -20,7 +20,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\OrderUpdateAddress;
@@ -218,7 +218,7 @@ class OrderController extends BaseAdminController
         );
     }
 
-    public function generateInvoicePdf(EventDispatcherInterface $eventDispatcher, $order_id, $browser)
+    public function generateInvoicePdf(EventDispatcherInterface $eventDispatcher, $order_id, $browser): Response|RedirectResponse
     {
         if (($response = $this->checkAuth(AdminResources::ORDER, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
@@ -227,7 +227,7 @@ class OrderController extends BaseAdminController
         return $this->generateBackOfficeOrderPdf($eventDispatcher, $order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'), $browser == 0);
     }
 
-    public function generateDeliveryPdf(EventDispatcherInterface $eventDispatcher, $order_id, $browser)
+    public function generateDeliveryPdf(EventDispatcherInterface $eventDispatcher, $order_id, $browser): Response|RedirectResponse
     {
         if (($response = $this->checkAuth(AdminResources::ORDER, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;

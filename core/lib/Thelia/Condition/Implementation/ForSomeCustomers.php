@@ -96,17 +96,15 @@ class ForSomeCustomers extends ConditionAbstract
         );
     }
 
-    public function getToolTip()
+    public function getToolTip(): string
     {
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'The coupon applies to some customers only',
             []
         );
-
-        return $toolTip;
     }
 
-    public function getSummary()
+    public function getSummary(): string
     {
         $i18nOperator = Operators::getI18n(
             $this->translator,
@@ -126,15 +124,13 @@ class ForSomeCustomers extends ConditionAbstract
             $custStrList = rtrim($custStrList, ', ');
         }
 
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'Customer is %op% <strong>%customer_list%</strong>',
             [
                 '%customer_list%' => $custStrList,
                 '%op%' => $i18nOperator,
             ]
         );
-
-        return $toolTip;
     }
 
     protected function generateInputs(): array

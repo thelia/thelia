@@ -41,9 +41,7 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess, Stringabl
     #[ReturnTypeWillChange]
     public function current()
     {
-        $var = current($this->conditions);
-
-        return $var;
+        return current($this->conditions);
     }
 
     /**

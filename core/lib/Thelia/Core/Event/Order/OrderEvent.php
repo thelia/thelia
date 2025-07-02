@@ -325,17 +325,12 @@ class OrderEvent extends ActionEvent
         return null !== $this->response;
     }
 
-    /**
-     * @return null
-     */
     public function getPostageTax()
     {
         return $this->postageTax;
     }
 
     /**
-     * @param null $postageTax
-     *
      * @return $this
      */
     public function setPostageTax($postageTax): self
@@ -345,17 +340,12 @@ class OrderEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     * @return null
-     */
     public function getPostageTaxRuleTitle()
     {
         return $this->postageTaxRuleTitle;
     }
 
     /**
-     * @param null $postageTaxRuleTitle
-     *
      * @return $this
      */
     public function setPostageTaxRuleTitle($postageTaxRuleTitle): self

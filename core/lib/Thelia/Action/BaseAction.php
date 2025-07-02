@@ -27,8 +27,6 @@ class BaseAction
 {
     /**
      * Changes object position, selecting absolute ou relative change.
-     *
-     * @return null
      */
     protected function genericUpdatePosition(ModelCriteria $query, UpdatePositionEvent $event, EventDispatcherInterface $dispatcher = null)
     {

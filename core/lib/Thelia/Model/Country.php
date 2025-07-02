@@ -56,9 +56,7 @@ class Country extends BaseCountry
             ' ' => ' +',
         ];
 
-        $zipCodeRE = '#^'.strtr($zipCodeRE, $trans).'$#';
-
-        return $zipCodeRE;
+        return '#^'.strtr($zipCodeRE, $trans).'$#';
     }
 
     /**

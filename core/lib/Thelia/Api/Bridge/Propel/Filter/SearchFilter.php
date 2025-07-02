@@ -176,7 +176,7 @@ final class SearchFilter extends AbstractFilter
                     'type' => $this->getType($reflectionProperty->getType()),
                     'required' => false,
                     'strategy' => $strategy,
-                    'is_collection' => str_ends_with((string) $filterParameterName, '[]'),
+                    'is_collection' => str_ends_with($filterParameterName, '[]'),
                 ];
                 if ($isLocalized) {
                     $description['locale'] = [

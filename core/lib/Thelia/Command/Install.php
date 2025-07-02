@@ -156,7 +156,7 @@ class Install extends ContainerAwareCommand
         $permissions = new CheckPermission();
         $isValid = $permissions->exec();
 
-        foreach ($permissions->getValidationMessages() as $item => $data) {
+        foreach ($permissions->getValidationMessages() as $data) {
             if ($data['status']) {
                 $output->writeln(
                     [

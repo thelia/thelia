@@ -216,8 +216,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
             if (!$this->isValidHookMethod(
                 $container->getDefinition($moduleHook->getClassname())->getClass(),
                 $moduleHook->getMethod(),
-                $hook->getBlock(),
-                true
+                $hook->getBlock()
             )
             ) {
                 $moduleHook->delete();
@@ -313,7 +312,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
         return $hook;
     }
 
-    protected function isValidHookMethod(string $className, string $methodName, bool $block, bool $failSafe = false): bool
+    protected function isValidHookMethod(string $className, string $methodName, bool $block): bool
     {
         try {
             $method = new ReflectionMethod($className, $methodName);
@@ -323,8 +322,8 @@ class RegisterHookListenersPass implements CompilerPassInterface
             $eventType = ($block) ?
                 HookDefinition::RENDER_BLOCK_EVENT :
                 HookDefinition::RENDER_FUNCTION_EVENT;
-
-            if ($parameters[0]->getType() !== $eventType && !is_subclass_of($parameters[0]->getType(), $eventType)) {
+            $parameterType = $parameters[0]->getType()?->getName();
+            if ($parameterType !== $eventType && !is_subclass_of($parameterType, $eventType)) {
                 $this->logAlertMessage(sprintf('Method %s should use an event of type %s. found: %s', $methodName, $eventType, $parameters[0]->getType()));
 
                 return false;

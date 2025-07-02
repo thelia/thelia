@@ -301,10 +301,6 @@ class OrderProduct implements PropelResourceInterface
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public array $orderProductTaxes = [];
 
-    public function __construct()
-    {
-    }
-
     #[Groups([
         Order::GROUP_FRONT_READ_SINGLE,
         self::GROUP_FRONT_READ,
@@ -329,10 +325,8 @@ class OrderProduct implements PropelResourceInterface
             return null;
         }
 
-        $attributesAvs = array_map(
+        return array_map(
             fn(AttributeCombination $attributeCombination) => [$attributeCombination->getAttribute()->getTitle() => $attributeCombination->getAttributeAv()->getTitle()], AttributeCombinationQuery::create()->filterByProductSaleElementsId($pseId)->find()->getData());
-
-        return $attributesAvs;
     }
 
     public function getId(): ?int

@@ -13,10 +13,11 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use DirectoryIterator;
 use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
@@ -101,7 +102,7 @@ class SystemLogController extends BaseAdminController
         return $this->renderTemplate();
     }
 
-    public function saveAction()
+    public function saveAction(): Response|RedirectResponse
     {
         if (($response = $this->checkAuth(AdminResources::SYSTEM_LOG, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;

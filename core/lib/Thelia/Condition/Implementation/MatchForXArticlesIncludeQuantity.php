@@ -48,21 +48,19 @@ class MatchForXArticlesIncludeQuantity extends MatchForXArticles
         return $this->drawBackOfficeBaseInputsText($labelQuantity, self::CART_QUANTITY);
     }
 
-    public function getSummary()
+    public function getSummary(): string
     {
         $i18nOperator = Operators::getI18n(
             $this->translator,
             $this->operators[self::CART_QUANTITY]
         );
 
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'If cart item (include quantity) count is <strong>%operator%</strong> %quantity%',
             [
                 '%operator%' => $i18nOperator,
                 '%quantity%' => $this->values[self::CART_QUANTITY],
             ]
         );
-
-        return $toolTip;
     }
 }

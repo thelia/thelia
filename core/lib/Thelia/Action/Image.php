@@ -487,13 +487,11 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     {
         $driver = ConfigQuery::read('imagine_graphic_driver', 'gd');
 
-        $image = match ($driver) {
+        return match ($driver) {
             'imagick' => new ImagickImagine(),
             'gmagick' => new GmagickImagine(),
             default => new Imagine(),
         };
-
-        return $image;
     }
 
     public static function getSubscribedEvents(): array

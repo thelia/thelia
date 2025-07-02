@@ -42,14 +42,12 @@ class RemovePercentageOnProducts extends AbstractRemoveOnProducts
 
     public function getToolTip(): string
     {
-        $toolTip = $this->facade
+        return $this->facade
             ->getTranslator()
             ->trans(
                 'This coupon subtracts from the order total the specified percentage of each selected product price. If the discount is greater than the total order, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.',
                 []
             );
-
-        return $toolTip;
     }
 
     public function drawBackOfficeInputs(): string

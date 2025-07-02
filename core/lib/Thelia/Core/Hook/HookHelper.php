@@ -31,19 +31,16 @@ use Thelia\Model\Lang;
  */
 class HookHelper
 {
-    /** @var array messages used to build title for hooks */
-    protected $messages = [];
+    protected array $messages = [];
 
     public function __construct(protected ParserHelperInterface $parserHelper)
     {
     }
 
     /**
-     * @param int $templateType
-     *
      * @throws Exception
      */
-    public function parseActiveTemplate($templateType = TemplateDefinition::FRONT_OFFICE): array
+    public function parseActiveTemplate(int $templateType = TemplateDefinition::FRONT_OFFICE): array
     {
         $tplVar = match ($templateType) {
             TemplateDefinition::FRONT_OFFICE => 'active-front-template',
@@ -57,14 +54,9 @@ class HookHelper
     }
 
     /**
-     * @param int    $templateType
-     * @param string $template
-     *
      * @throws Exception
-     *
-     * @return array an array of hooks descriptors
      */
-    public function parseTemplate($templateType, $template): array
+    public function parseTemplate(int $templateType, string $template): array
     {
         $templateDefinition = new TemplateDefinition($template, $templateType);
 
@@ -102,15 +94,13 @@ class HookHelper
      * 'translation' => the text translation, or an empty string if none available.
      * 'dollar'  => true if the translatable text contains a $
      *
-     * @param string $directory the path to the directory to examine
-     *
      * @internal param string $walkMode type of file scanning: WALK_MODE_PHP or WALK_MODE_TEMPLATE
      * @internal param \Thelia\Core\Translation\Translator $translator the current translator
      * @internal param string $currentLocale the current locale
      * @internal param string $domain the translation domain (fontoffice, backoffice, module, etc...)
      * @internal param array $strings the list of strings
      */
-    public function walkDir($directory, &$hooks): void
+    public function walkDir(string $directory, array &$hooks): void
     {
         $allowed_exts = ['html', 'tpl', 'xml', 'txt'];
 
@@ -156,7 +146,7 @@ class HookHelper
             $ret['code'] = $attributes['name'];
             $params = explode('.', (string) $attributes['name']);
 
-            if (\count($params) != 2) {
+            if (\count($params) !== 2) {
                 // the hook does not respect the convention
                 if (!str_contains((string) $attributes['name'], '$')) {
                     $ret['context'] = $attributes['name'];
@@ -198,21 +188,12 @@ class HookHelper
 
     protected function normalizePath($path): string
     {
-        $path = str_replace(
-            str_replace('\\', '/', THELIA_ROOT),
-            '',
-            str_replace('\\', '/', realpath($path))
-        );
+        $path = str_replace(array('\\', str_replace('\\', '/', THELIA_ROOT)), array('/', ''), realpath($path));
 
         return ltrim($path, '/');
     }
 
-    /**
-     * Translate Hook labels.
-     *
-     * @return string
-     */
-    protected function trans($context, $key)
+    protected function trans($context, $key): string
     {
         $message = '';
 
@@ -348,7 +329,6 @@ class HookHelper
         $this->messages['context']['features-value'] = $t->trans('Features value', [], 'core', $locale);
         $this->messages['context']['folder'] = $t->trans('Folder', [], 'core', $locale);
         $this->messages['context']['folders'] = $t->trans('Folder', [], 'core', $locale);
-        $this->messages['context']['home'] = $t->trans('Home', [], 'core', $locale);
         $this->messages['context']['hook'] = $t->trans('Hook', [], 'core', $locale);
         $this->messages['context']['hooks'] = $t->trans('Hooks', [], 'core', $locale);
         $this->messages['context']['image'] = $t->trans('Image', [], 'core', $locale);
@@ -356,7 +336,6 @@ class HookHelper
         $this->messages['context']['language'] = $t->trans('Language', [], 'core', $locale);
         $this->messages['context']['languages'] = $t->trans('Languages', [], 'core', $locale);
         $this->messages['context']['mailing-system'] = $t->trans('Mailing system', [], 'core', $locale);
-        $this->messages['context']['main'] = $t->trans('Layout', [], 'core', $locale);
         $this->messages['context']['message'] = $t->trans('Message', [], 'core', $locale);
         $this->messages['context']['messages'] = $t->trans('Messages', [], 'core', $locale);
         $this->messages['context']['module'] = $t->trans('Module', [], 'core', $locale);
@@ -389,14 +368,6 @@ class HookHelper
         $this->messages['context']['home'] = $t->trans('Home', [], 'core', $locale);
         $this->messages['context']['main'] = $t->trans('Layout', [], 'core', $locale);
         $this->messages['type']['block'] = $t->trans('block', [], 'core', $locale);
-        $this->messages['type']['bottom'] = $t->trans('bottom', [], 'core', $locale);
-        $this->messages['type']['create-form'] = $t->trans('create form', [], 'core', $locale);
-        $this->messages['type']['delete-form'] = $t->trans('delete form', [], 'core', $locale);
-        $this->messages['type']['edit-js'] = $t->trans('Edit JavaScript', [], 'core', $locale);
-        $this->messages['type']['js'] = $t->trans('JavaScript', [], 'core', $locale);
-        $this->messages['type']['table-header'] = $t->trans('table header', [], 'core', $locale);
-        $this->messages['type']['table-row'] = $t->trans('table row', [], 'core', $locale);
-        $this->messages['type']['top'] = $t->trans('at the top', [], 'core', $locale);
         $this->messages['type']['top-menu-catalog'] = $t->trans('in the menu catalog', [], 'core', $locale);
         $this->messages['type']['top-menu-configuration'] = $t->trans('in the menu configuration', [], 'core', $locale);
         $this->messages['type']['top-menu-content'] = $t->trans('in the menu folders', [], 'core', $locale);

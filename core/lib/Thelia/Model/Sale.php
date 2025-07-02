@@ -66,9 +66,7 @@ class Sale extends BaseSale
      */
     public function getSaleProductList()
     {
-        $saleProducts = SaleProductQuery::create()->filterBySaleId($this->getId())->groupByProductId()->find();
-
-        return $saleProducts;
+        return SaleProductQuery::create()->filterBySaleId($this->getId())->groupByProductId()->find();
     }
 
     /**

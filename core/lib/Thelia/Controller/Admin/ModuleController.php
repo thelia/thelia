@@ -220,9 +220,9 @@ class ModuleController extends AbstractCrudController
         return $this->generateRedirectFromRoute('admin.module');
     }
 
-    public function indexAction(): \Thelia\Core\HttpFoundation\Response|Response
+    public function indexAction(): Response
     {
-        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -245,7 +245,7 @@ class ModuleController extends AbstractCrudController
             throw new InvalidArgumentException(sprintf('Module `%s` does not exists', $module_code));
         }
 
-        if (($response = $this->checkAuth([], $module_code, AccessManager::VIEW)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth([], $module_code, AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -257,9 +257,9 @@ class ModuleController extends AbstractCrudController
         );
     }
 
-    public function toggleActivationAction(EventDispatcherInterface $eventDispatcher, $module_id): \Thelia\Core\HttpFoundation\Response|Response
+    public function toggleActivationAction(EventDispatcherInterface $eventDispatcher, $module_id): Response
     {
-        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -296,7 +296,7 @@ class ModuleController extends AbstractCrudController
         EventDispatcherInterface $eventDispatcher,
         ParserContext $parserContext
     ): Response {
-        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::DELETE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::DELETE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -337,9 +337,9 @@ class ModuleController extends AbstractCrudController
         return $response;
     }
 
-    public function installAction(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|RedirectResponse
+    public function installAction(EventDispatcherInterface $eventDispatcher): \Symfony\Component\HttpFoundation\Response|RedirectResponse
     {
-        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::CREATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::CREATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -364,21 +364,15 @@ class ModuleController extends AbstractCrudController
 
             $newModule = $moduleInstallEvent->getModule();
 
-            if ($newModule instanceof Module) {
-                $this->getSession()->getFlashBag()->add(
-                    'module-installed',
-                    $this->getTranslator()->trans(
-                        'The module %module has been installed successfully.',
-                        ['%module' => $moduleDefinition->getCode()]
-                    )
-                );
-
-                return $this->generateRedirectFromRoute('admin.module');
-            }
-
-            $message = $this->getTranslator()->trans(
-                'Sorry, an error occured.'
+            $this->getSession()->getFlashBag()->add(
+                'module-installed',
+                $this->getTranslator()->trans(
+                    'The module %module has been installed successfully.',
+                    ['%module' => $moduleDefinition->getCode()]
+                )
             );
+
+            return $this->generateRedirectFromRoute('admin.module');
         } catch (FormValidationException $e) {
             $message = $e->getMessage();
         } catch (\Exception $e) {
@@ -396,9 +390,9 @@ class ModuleController extends AbstractCrudController
         return $this->render('modules');
     }
 
-    public function informationAction($module_id): \Thelia\Core\HttpFoundation\Response|JsonResponse
+    public function informationAction($module_id): \Symfony\Component\HttpFoundation\Response|JsonResponse
     {
-        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -436,9 +430,9 @@ class ModuleController extends AbstractCrudController
         return new JsonResponse(['title' => $title, 'body' => $content], $status);
     }
 
-    public function documentationAction($module_id): \Thelia\Core\HttpFoundation\Response|JsonResponse
+    public function documentationAction($module_id): \Symfony\Component\HttpFoundation\Response|JsonResponse
     {
-        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 

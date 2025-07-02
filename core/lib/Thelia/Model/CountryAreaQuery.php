@@ -26,8 +26,6 @@ class CountryAreaQuery extends BaseCountryAreaQuery
 {
     public static function findByCountryAndState(Country $country, State $state = null)
     {
-        $response = null;
-
         if ($state instanceof State) {
             $countryAreaList = self::create()
                 ->filterByCountryId($country->getId())
@@ -39,12 +37,9 @@ class CountryAreaQuery extends BaseCountryAreaQuery
             }
         }
 
-        $countryAreaList = self::create()
+        return self::create()
             ->filterByCountryId($country->getId())
             ->filterByStateId(null)
-            ->find()
-        ;
-
-        return $countryAreaList;
+            ->find();
     }
 }

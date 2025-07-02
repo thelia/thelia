@@ -50,14 +50,14 @@ class LangController extends BaseAdminController
 {
     public function defaultAction()
     {
-        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::VIEW)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
         return $this->renderDefault();
     }
 
-    public function renderDefault(array $param = [], int $status = 200): \Thelia\Core\HttpFoundation\Response
+    public function renderDefault(array $param = [], int $status = 200): \Symfony\Component\HttpFoundation\Response
     {
         $data = [];
         foreach (LangQuery::create()->find() as $lang) {
@@ -75,7 +75,7 @@ class LangController extends BaseAdminController
 
     public function updateAction($lang_id)
     {
-        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -103,9 +103,9 @@ class LangController extends BaseAdminController
         ]);
     }
 
-    public function processUpdateAction(EventDispatcherInterface $eventDispatcher, $lang_id)
+    public function processUpdateAction(EventDispatcherInterface $eventDispatcher, $lang_id): \Symfony\Component\HttpFoundation\Response|RedirectResponse|null
     {
-        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -172,7 +172,7 @@ class LangController extends BaseAdminController
         ;
     }
 
-    public function toggleDefaultAction(EventDispatcherInterface $eventDispatcher, $lang_id)
+    public function toggleDefaultAction(EventDispatcherInterface $eventDispatcher, $lang_id): \Symfony\Component\HttpFoundation\Response|JsonResponse|RedirectResponse
     {
         return $this->toggleLangDispatch(
             $eventDispatcher,
@@ -181,7 +181,7 @@ class LangController extends BaseAdminController
         );
     }
 
-    public function toggleActiveAction(EventDispatcherInterface $eventDispatcher, $lang_id)
+    public function toggleActiveAction(EventDispatcherInterface $eventDispatcher, $lang_id): \Symfony\Component\HttpFoundation\Response|JsonResponse|RedirectResponse
     {
         return $this->toggleLangDispatch(
             $eventDispatcher,
@@ -190,7 +190,7 @@ class LangController extends BaseAdminController
         );
     }
 
-    public function toggleVisibleAction(EventDispatcherInterface $eventDispatcher, $lang_id)
+    public function toggleVisibleAction(EventDispatcherInterface $eventDispatcher, $lang_id): \Symfony\Component\HttpFoundation\Response|JsonResponse|RedirectResponse
     {
         return $this->toggleLangDispatch(
             $eventDispatcher,
@@ -199,9 +199,9 @@ class LangController extends BaseAdminController
         );
     }
 
-    public function addAction(EventDispatcherInterface $eventDispatcher)
+    public function addAction(EventDispatcherInterface $eventDispatcher): \Symfony\Component\HttpFoundation\Response|RedirectResponse|null
     {
-        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::CREATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::CREATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -262,9 +262,9 @@ class LangController extends BaseAdminController
         return $response;
     }
 
-    public function deleteAction(EventDispatcherInterface $eventDispatcher)
+    public function deleteAction(EventDispatcherInterface $eventDispatcher): \Symfony\Component\HttpFoundation\Response|RedirectResponse|null
     {
-        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::DELETE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::DELETE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -294,9 +294,9 @@ class LangController extends BaseAdminController
         return $response;
     }
 
-    public function defaultBehaviorAction(EventDispatcherInterface $eventDispatcher)
+    public function defaultBehaviorAction(EventDispatcherInterface $eventDispatcher): \Symfony\Component\HttpFoundation\Response|RedirectResponse|null
     {
-        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -336,9 +336,9 @@ class LangController extends BaseAdminController
         return $response;
     }
 
-    public function domainAction(EventDispatcherInterface $eventDispatcher)
+    public function domainAction(EventDispatcherInterface $eventDispatcher): \Symfony\Component\HttpFoundation\Response|RedirectResponse|null
     {
-        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -383,19 +383,19 @@ class LangController extends BaseAdminController
         return $response;
     }
 
-    public function activateDomainAction()
+    public function activateDomainAction(): \Symfony\Component\HttpFoundation\Response|RedirectResponse
     {
         return $this->domainActivation(1);
     }
 
-    public function deactivateDomainAction()
+    public function deactivateDomainAction(): \Symfony\Component\HttpFoundation\Response|RedirectResponse
     {
         return $this->domainActivation(0);
     }
 
-    private function domainActivation(int $activate): \Thelia\Core\HttpFoundation\Response|RedirectResponse
+    private function domainActivation(int $activate): \Symfony\Component\HttpFoundation\Response|RedirectResponse
     {
-        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -412,9 +412,9 @@ class LangController extends BaseAdminController
      *
      * @return Response
      */
-    protected function toggleLangDispatch(EventDispatcherInterface $eventDispatcher, ?string $eventName, $event)
+    protected function toggleLangDispatch(EventDispatcherInterface $eventDispatcher, ?string $eventName, $event): \Symfony\Component\HttpFoundation\Response|JsonResponse|RedirectResponse
     {
-        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 

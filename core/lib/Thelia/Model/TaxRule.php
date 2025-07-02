@@ -20,8 +20,6 @@ use Thelia\TaxEngine\OrderProductTaxCollection;
 class TaxRule extends BaseTaxRule
 {
     /**
-     * @param null $askedLocale
-     *
      * @return OrderProductTaxCollection
      */
     public function getTaxDetail(Product $product, Country $country, $untaxedAmount, $untaxedPromoAmount, $askedLocale = null)

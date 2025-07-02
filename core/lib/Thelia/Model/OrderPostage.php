@@ -36,9 +36,7 @@ class OrderPostage
      */
     public static function loadFromPostage($postage): self
     {
-        $orderPostage = $postage instanceof self ? $postage : new self($postage);
-
-        return $orderPostage;
+        return $postage instanceof self ? $postage : new self($postage);
     }
 
     /**

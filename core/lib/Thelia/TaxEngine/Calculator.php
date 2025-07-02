@@ -257,10 +257,8 @@ class Calculator
     }
 
     /**
-     * @param null $taxCollection
      *
      * @throws PropelException
-     *
      * @return float
      */
     public function getTaxAmountFromUntaxedPrice($untaxedPrice, &$taxCollection = null): int|float
@@ -337,9 +335,7 @@ class Calculator
             }
         }
 
-        $taxedPrice += $currentTax;
-
-        return $taxedPrice;
+        return $taxedPrice + $currentTax;
     }
 
     /**
@@ -389,8 +385,7 @@ class Calculator
         } while ($taxRule = $this->taxRulesCollection->getPrevious());
 
         $untaxedPrice -= $currentFixTax;
-        $untaxedPrice /= (1 + $currentTaxFactor);
 
-        return $untaxedPrice;
+        return $untaxedPrice / (1 + $currentTaxFactor);
     }
 }

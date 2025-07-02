@@ -23,6 +23,7 @@ namespace Thelia\Core;
  */
 
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\DependencyInjection\Reference;
 use Thelia\Core\Bundle\TheliaBundle;
 use Symfony\Component\HttpFoundation\Response;
 use PDO;
@@ -491,7 +492,7 @@ class Thelia extends Kernel
                 $definition->setClass($module->getFullNamespace())
                     ->addMethodCall(
                         'setContainer',
-                        [ContainerInterface::class]
+                        [new Reference('service_container')]
                     )
                     ->setPublic(true);
 

@@ -64,18 +64,18 @@ class HookController extends AbstractCrudController
         );
     }
 
-    public function indexAction(): \Thelia\Core\HttpFoundation\Response|Response
+    public function indexAction(): Response
     {
-        if (($response = $this->checkAuth(AdminResources::HOOK, [], AccessManager::VIEW)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::HOOK, [], AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
         return $this->renderList();
     }
 
-    public function discoverAction(): \Thelia\Core\HttpFoundation\Response|JsonResponse
+    public function discoverAction(): \Symfony\Component\HttpFoundation\Response|JsonResponse
     {
-        if (($response = $this->checkAuth(AdminResources::HOOK, [], AccessManager::VIEW)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::HOOK, [], AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -119,9 +119,9 @@ class HookController extends AbstractCrudController
         return $response;
     }
 
-    public function discoverSaveAction(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|JsonResponse
+    public function discoverSaveAction(EventDispatcherInterface $eventDispatcher): \Symfony\Component\HttpFoundation\Response|JsonResponse
     {
-        if (($response = $this->checkAuth(AdminResources::HOOK, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::HOOK, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -435,9 +435,9 @@ class HookController extends AbstractCrudController
         return $this->generateRedirectFromRoute('admin.hook');
     }
 
-    public function toggleNativeAction(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|Response
+    public function toggleNativeAction(EventDispatcherInterface $eventDispatcher): Response
     {
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -459,9 +459,9 @@ class HookController extends AbstractCrudController
         return $this->nullResponse(500);
     }
 
-    public function toggleActivationAction(EventDispatcherInterface $eventDispatcher): \Thelia\Core\HttpFoundation\Response|Response
+    public function toggleActivationAction(EventDispatcherInterface $eventDispatcher): Response
     {
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 

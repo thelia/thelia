@@ -102,17 +102,15 @@ class CartContainsProducts extends ConditionAbstract
         );
     }
 
-    public function getToolTip()
+    public function getToolTip(): string
     {
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'The coupon applies if the cart contains at least one product of the specified product list',
             []
         );
-
-        return $toolTip;
     }
 
-    public function getSummary()
+    public function getSummary(): string
     {
         $i18nOperator = Operators::getI18n(
             $this->translator,
@@ -132,15 +130,13 @@ class CartContainsProducts extends ConditionAbstract
             $prodStrList = rtrim($prodStrList, ', ');
         }
 
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'Cart contains at least a product %op% <strong>%products_list%</strong>',
             [
                 '%products_list%' => $prodStrList,
                 '%op%' => $i18nOperator,
             ]
         );
-
-        return $toolTip;
     }
 
     protected function generateInputs(): array

@@ -71,7 +71,6 @@ class Sale extends BaseAction implements EventSubscriberInterface
                 ;
             }
 
-            /** @var SaleOffsetCurrency $offsetByCurrency */
             foreach ($saleOffsetByCurrency as $currencyId => $offset) {
                 $productPrice = ProductPriceQuery::create()
                     ->filterByProductSaleElementsId($pse->getId())

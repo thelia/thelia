@@ -368,7 +368,7 @@ class ModuleValidator
             }
 
             if ($recursive) {
-                $recursiveModuleValidator = new self(THELIA_MODULE_DIR.'/'.(string) $dependency);
+                $recursiveModuleValidator = new self(THELIA_MODULE_DIR.'/'.$dependency);
                 array_merge(
                     $dependencies,
                     $recursiveModuleValidator->getCurrentModuleDependencies(true)

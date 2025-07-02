@@ -44,13 +44,13 @@ class AdministratorController extends AbstractCrudController
         );
     }
 
-    public function viewAction(): \Thelia\Core\HttpFoundation\Response
+    public function viewAction(): \Symfony\Component\HttpFoundation\Response
     {
         // Open the update dialog for the current administrator
         return $this->render('administrators', ['show_update_dialog' => true]);
     }
 
-    public function setEmailAction(): \Thelia\Core\HttpFoundation\Response
+    public function setEmailAction(): \Symfony\Component\HttpFoundation\Response
     {
         // Open the update dialog for the current administrator, and display the "set email address" notice.
         return $this->render(

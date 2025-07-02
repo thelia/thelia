@@ -13,7 +13,8 @@ declare(strict_types=1);
  */
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Exception;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Security\AccessManager;
@@ -70,14 +71,13 @@ class ConfigStoreController extends BaseAdminController
         }
     }
 
-    public function saveAction()
+    public function saveAction(): Response|RedirectResponse|null
     {
         if (($response = $this->checkAuth(AdminResources::STORE, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
         $error_msg = false;
-        $ex = false;
         $response = null;
         $configStoreForm = $this->createForm(AdminForm::CONFIG_STORE);
 

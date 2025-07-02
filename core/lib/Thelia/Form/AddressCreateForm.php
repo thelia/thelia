@@ -54,8 +54,6 @@ class AddressCreateForm extends FirewallForm
      *       )
      *   )
      *   ->add('age', IntegerType::class);
-     *
-     * @return null
      */
     protected function buildForm()
     {

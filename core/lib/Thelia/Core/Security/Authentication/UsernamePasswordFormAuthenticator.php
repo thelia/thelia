@@ -13,13 +13,11 @@ declare(strict_types=1);
  */
 namespace Thelia\Core\Security\Authentication;
 
-use Symfony\Component\Security\Core\User\UserInterface;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Thelia\Core\Security\Exception\CustomerNotConfirmedException;
-use Thelia\Core\Security\Exception\UsernameNotFoundException;
 use Thelia\Core\Security\Exception\WrongPasswordException;
 use Thelia\Form\BaseForm;
 use Thelia\Model\ConfigQuery;
@@ -69,10 +67,6 @@ class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
             $password = $this->loginForm->get($this->options['password_field_name'])->getData();
 
             $user = $this->userProvider->loadUserByIdentifier($username);
-
-            if (!$user instanceof UserInterface) {
-                throw new UsernameNotFoundException(sprintf("Username '%s' was not found.", $username));
-            }
 
             // Check user password
             $authOk = $user->checkPassword($password) === true;

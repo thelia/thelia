@@ -35,7 +35,6 @@ abstract class JsonFileAbstractExport extends AbstractExport
 
     public function current()
     {
-        /** @var resource $file */
         $result = json_decode($this->data->current(), true);
 
         if ($result !== null) {

@@ -112,13 +112,11 @@ abstract class ConditionAbstract implements ConditionInterface
             $translatedInputs[$key] = $validator;
         }
 
-        $validators = [
+        return [
             'inputs' => $translatedInputs,
             'setOperators' => $this->operators,
             'setValues' => $this->values,
         ];
-
-        return $validators;
     }
 
     /**

@@ -150,10 +150,8 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @param null $locale
      *
      * @throws PropelException
-     *
      * @return Product
      */
     public function getProduct(ConnectionInterface $con = null, $locale = null)

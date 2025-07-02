@@ -120,13 +120,8 @@ class Module extends BaseAction implements EventSubscriberInterface
      */
     private function checkActivation($module): bool
     {
-        try {
-            $moduleValidator = new ModuleValidator($module->getAbsoluteBaseDir());
-            $moduleValidator->validate(false);
-        } catch (Exception $exception) {
-            throw $exception;
-        }
-
+        $moduleValidator = new ModuleValidator($module->getAbsoluteBaseDir());
+        $moduleValidator->validate(false);
         return true;
     }
 

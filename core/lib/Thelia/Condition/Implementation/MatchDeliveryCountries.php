@@ -53,14 +53,12 @@ class MatchDeliveryCountries extends AbstractMatchCountries
         );
     }
 
-    public function getToolTip()
+    public function getToolTip(): string
     {
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'The coupon applies to the selected delivery countries',
             []
         );
-
-        return $toolTip;
     }
 
     protected function getSummaryLabel($cntryStrList, $i18nOperator): string

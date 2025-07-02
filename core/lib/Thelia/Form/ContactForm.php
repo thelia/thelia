@@ -43,8 +43,6 @@ class ContactForm extends FirewallForm
      *       )
      *   )
      *   ->add('age', IntegerType::class);
-     *
-     * @return null
      */
     protected function buildForm()
     {

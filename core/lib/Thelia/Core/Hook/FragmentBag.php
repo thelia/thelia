@@ -28,10 +28,6 @@ class FragmentBag implements Iterator
     /** @var array */
     protected $fragments = [];
 
-    public function __construct()
-    {
-    }
-
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
      * Return the current element.

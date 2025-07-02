@@ -28,12 +28,10 @@ trait ImplementationClassTrait
      */
     public function getClassFilePath(): string
     {
-        $path = rtrim((new Filesystem())->makePathRelative(
+        return rtrim((new Filesystem())->makePathRelative(
             THELIA_CACHE_DIR.$_SERVER['APP_ENV'].DS.'propel'.DS.'model'.DS
             .parent::getClassFilePath(),
             THELIA_ROOT
         ), '/');
-
-        return $path;
     }
 }

@@ -24,7 +24,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Tax\TaxRuleEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
@@ -291,7 +291,7 @@ class TaxRuleController extends AbstractCrudController
         return $this->redirectToListTemplate();
     }
 
-    public function processUpdateTaxesAction(EventDispatcherInterface $eventDispatcher): Response|\Symfony\Component\HttpFoundation\Response
+    public function processUpdateTaxesAction(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
         if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
@@ -332,7 +332,7 @@ class TaxRuleController extends AbstractCrudController
                     AccessManager::UPDATE,
                     sprintf(
                         '%s %s (ID %s) modified',
-                        ucfirst((string) $this->objectName),
+                        ucfirst($this->objectName),
                         $this->getObjectLabel($changedObject),
                         $this->getObjectId($changedObject)
                     ),

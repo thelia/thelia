@@ -35,16 +35,14 @@ class RemoveXPercent extends AbstractRemove
             ->trans('Remove X percent to total cart', []);
     }
 
-    public function getToolTip()
+    public function getToolTip(): string
     {
-        $toolTip = $this->facade
+        return $this->facade
             ->getTranslator()
             ->trans(
                 "This coupon will offert a flat percentage off a shopper's entire order (not applied to shipping costs or tax rates). If the discount is greater than the total order corst, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.",
                 []
             );
-
-        return $toolTip;
     }
 
     public function exec(): int|float

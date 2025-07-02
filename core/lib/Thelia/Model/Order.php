@@ -331,9 +331,7 @@ class Order extends BaseOrder
      */
     public function getUntaxedPostage()
     {
-        $untaxedPostage = 0 < $this->getPostageTax() ? $this->getPostage() - $this->getPostageTax() : $this->getPostage();
-
-        return $untaxedPostage;
+        return 0 < $this->getPostageTax() ? $this->getPostage() - $this->getPostageTax() : $this->getPostage();
     }
 
     /**

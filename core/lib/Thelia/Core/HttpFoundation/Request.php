@@ -29,31 +29,9 @@ use Thelia\Model\ConfigQuery;
  */
 class Request extends BaseRequest
 {
-    /** @var string Path info without trailing slash */
     private ?string $resolvedPathInfo = null;
-
-    /** @var string */
-    protected $controllerType;
-
-    public static $isAdminEnv = false;
-
-    /**
-     * @
-     * {@inheritdoc} Including Thelia request properties
-     */
-    public function initialize(
-        array $query = [],
-        array $request = [],
-        array $attributes = [],
-        array $cookies = [],
-        array $files = [],
-        array $server = [],
-        $content = null
-    ): void {
-        parent::initialize($query, $request, $attributes, $cookies, $files, $server, $content);
-
-        $this->resolvedPathInfo = null;
-    }
+    protected ?string $controllerType = null;
+    public static bool $isAdminEnv = false;
 
     /**
      * Filter PathInfo to allow slash ending uri.
@@ -67,7 +45,7 @@ class Request extends BaseRequest
         $pathLength = \strlen($pathInfo);
 
         if ($pathInfo !== '/' && $pathInfo[$pathLength - 1] === '/'
-            && (bool) ConfigQuery::read('allow_slash_ended_uri', false)
+            && true === (bool) ConfigQuery::read('allow_slash_ended_uri', false)
         ) {
             if (null === $this->resolvedPathInfo) {
                 $this->resolvedPathInfo = substr($pathInfo, 0, $pathLength - 1); // Remove the slash
@@ -99,7 +77,7 @@ class Request extends BaseRequest
             $additionalQs .= sprintf('&%s=%s', $key, $value);
         }
 
-        if ('' == $this->getQueryString()) {
+        if ('' === $this->getQueryString()) {
             $additionalQs = '?'.ltrim($additionalQs, '&');
         }
 
@@ -119,47 +97,26 @@ class Request extends BaseRequest
         return $string;
     }
 
-    /**
-     * @param string $controllerType
-     */
-    public function setControllerType($controllerType): void
+    public function setControllerType(?string $controllerType): void
     {
         $this->controllerType = $controllerType;
     }
 
-    /**
-     * Detects where does the request.
-     *
-     * <code>
-     * if ($request->fromControllerType(BaseFrontController::CONTROLLER_TYPE)) {...}
-     * </code>
-     */
-    public function fromControllerType($controllerType): bool
+    public function isControllerType(?string $controllerType): bool
     {
         return $this->controllerType === $controllerType;
     }
 
-    /**
-     * Detect if the request comes from the admin.
-     */
     public function fromAdmin(): bool
     {
         return $this->controllerType === BaseAdminController::CONTROLLER_TYPE;
     }
 
-    /**
-     * Detect if the request comes from the front.
-     */
     public function fromFront(): bool
     {
         return $this->controllerType === BaseFrontController::CONTROLLER_TYPE;
     }
 
-    /**
-     * From a Thelia request, we always return a Thelia Session object.
-     *
-     * @return Session|null
-     */
     public function getSession(): SessionInterface
     {
         if (!$this->hasSession()) {

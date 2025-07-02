@@ -87,8 +87,6 @@ class Update
             $this->logs = [];
         }
 
-        $dbConfig = null;
-
         try {
             $this->connection = Propel::getConnection(
                 ProductTableMap::DATABASE_NAME
@@ -397,8 +395,6 @@ class Update
 
     public function setCurrentVersion($version): void
     {
-        $currentVersion = null;
-
         if (null !== $this->connection) {
             try {
                 $stmt = $this->connection->prepare('UPDATE config set value = ? where name = ?');
