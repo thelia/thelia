@@ -58,7 +58,7 @@ use Thelia\Tools\Image;
 
 class BaseModule implements BaseModuleInterface
 {
-    use ContainerAwareTrait;
+    protected ?ContainerInterface $container = null;
 
     public const CLASSIC_MODULE_TYPE = 1;
 
@@ -829,5 +829,12 @@ class BaseModule implements BaseModuleInterface
         return is_dir(THELIA_MODULE_DIR.$this->getCode())
             ? THELIA_MODULE_DIR.$this->getCode()
             : THELIA_LOCAL_MODULE_DIR.$this->getCode();
+    }
+
+    public function setContainer(?ContainerInterface $container = null): static
+    {
+        $this->container = $container;
+
+        return $this;
     }
 }

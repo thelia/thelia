@@ -33,7 +33,7 @@ use Thelia\Tools\URL;
 
 class Session extends BaseSession
 {
-    protected static ?Cart $transientCart;
+    protected static ?Cart $transientCart = null;
 
     public function getLang(bool $forceDefault = true): ?Lang
     {

@@ -9,6 +9,9 @@ return static function (ContainerConfigurator $container): void {
         'title' => 'API Thelia',
         'version' => '1.0.0',
         'show_webby' => false,
+        'serializer' => [
+            'hydra_prefix' => true
+        ],
         'defaults' => [
             'pagination_client_items_per_page' => true,
         ],
