@@ -16,8 +16,11 @@ namespace Thelia\Core\Template\Parser;
 use Exception;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Template\TemplateHelperInterface;
 
 #[AsAlias(id: 'thelia.parser.resolver', public: true)]
 class ParserResolver
@@ -28,7 +31,9 @@ class ParserResolver
         #[TaggedIterator('thelia.parser.template', exclude: [ParserFallback::class])]
         private readonly iterable $parsers,
         #[TaggedIterator('thelia.parser.asset', exclude: [ParserAssetResolverFallback::class])]
-        private readonly iterable $assetResolvers
+        private readonly iterable $assetResolvers,
+        private readonly RequestStack $requestStack,
+        private readonly TemplateHelperInterface $templateHelper,
     ) {
     }
 
@@ -46,11 +51,36 @@ class ParserResolver
             if ($parser->supportTemplateRender($pathTemplate, $templateName)) {
                 self::$currentParser = $parser;
 
-                return $parser;
+                return self::$currentParser;
             }
         }
 
         throw new Exception(sprintf('Parser for template %s not found', $templateName));
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getParserByCurrentRequest(): ?ParserInterface
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (!$request instanceof Request) {
+            return null;
+        }
+
+        $view = $request->attributes->get('_view');
+        $templateDefinition = $request->fromAdmin()
+            ? $this->templateHelper->getActiveAdminTemplate()
+            : $this->templateHelper->getActiveFrontTemplate();
+
+        $templatePath = $templateDefinition->getAbsolutePath();
+
+        $parser = $this->getParser($templatePath, $view);
+        $parser->setTemplateDefinition($templateDefinition, true);
+
+        self::$currentParser = $parser;
+        return $parser;
     }
 
     /**

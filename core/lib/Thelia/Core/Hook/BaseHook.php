@@ -239,7 +239,7 @@ abstract class BaseHook implements BaseHookInterface
         return $this->translator->trans($id, $parameters, $domain, $locale);
     }
 
-    protected function getRequest(): Request
+    protected function getRequest(): ?Request
     {
         if (!$this->request instanceof Request) {
             $this->request = $this->getParser()->getRequest();
@@ -250,8 +250,8 @@ abstract class BaseHook implements BaseHookInterface
 
     protected function getSession(): Session
     {
-        if (!$this->session instanceof Session && null !== $this->request) {
-            $this->session = $this->request->getSession();
+        if (!$this->session instanceof Session && null !== $this->getRequest()) {
+            $this->session = $this->getRequest()?->getSession();
         }
 
         return $this->session;
