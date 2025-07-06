@@ -22,12 +22,9 @@ namespace Thelia\Install\Exception;
 class UpdateException extends \RuntimeException
 {
     /** @var string the version that has failed */
-    protected $version;
+    protected string $version;
 
-    /**
-     * @return string
-     */
-    public function getVersion()
+    public function getVersion(): string
     {
         return $this->version;
     }

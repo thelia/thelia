@@ -21,20 +21,15 @@ namespace Thelia\Core\Event\Country;
  */
 class CountryUpdateEvent extends CountryCreateEvent
 {
-    /** @var bool */
-    protected $needZipCode;
+    protected bool $needZipCode;
 
-    /** @var string */
-    protected $zipCodeFormat;
+    protected string $zipCodeFormat;
 
-    /** @var string */
-    protected $chapo;
+    protected string $chapo;
 
-    /** @var string */
-    protected $description;
+    protected string $description;
 
-    /** @var string */
-    protected $postscriptum;
+    protected string $postscriptum;
 
     public function __construct(protected int $country_id)
     {
@@ -47,10 +42,7 @@ class CountryUpdateEvent extends CountryCreateEvent
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getChapo()
+    public function getChapo(): string
     {
         return $this->chapo;
     }
@@ -94,40 +86,30 @@ class CountryUpdateEvent extends CountryCreateEvent
         return $this->country_id;
     }
 
-    /**
-     * @return string
-     */
-    public function isNeedZipCode()
+    public function isNeedZipCode(): string
     {
         return $this->needZipCode;
     }
 
     /**
-     * @param bool $needZipCode
-     *
      * @return $this
      */
-    public function setNeedZipCode($needZipCode): static
+    public function setNeedZipCode(bool $needZipCode): static
     {
         $this->needZipCode = $needZipCode;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getZipCodeFormat()
+    public function getZipCodeFormat(): string
     {
         return $this->zipCodeFormat;
     }
 
     /**
-     * @param string $zipCodeFormat
-     *
      * @return $this
      */
-    public function setZipCodeFormat($zipCodeFormat): static
+    public function setZipCodeFormat(string $zipCodeFormat): static
     {
         $this->zipCodeFormat = $zipCodeFormat;
 

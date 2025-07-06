@@ -34,7 +34,7 @@ trait PercentageCouponTrait
      *
      * @return string the percentage field name
      */
-    abstract protected function getPercentageFieldName();
+    abstract protected function getPercentageFieldName(): string;
 
     public function setFieldsValue(array $effects): void
     {
@@ -67,12 +67,7 @@ trait PercentageCouponTrait
             $pcent = (float) $fieldValue;
 
             if ($pcent <= 0 || $pcent > 100) {
-                throw new \InvalidArgumentException(
-                    Translator::getInstance()->trans(
-                        'Value %val for Percent Discount is invalid. Please enter a positive value between 1 and 100.',
-                        ['%val' => $fieldValue]
-                    )
-                );
+                throw new \InvalidArgumentException(Translator::getInstance()->trans('Value %val for Percent Discount is invalid. Please enter a positive value between 1 and 100.', ['%val' => $fieldValue]));
             }
         }
 

@@ -59,7 +59,7 @@ return static function (ContainerConfigurator $container): void {
     // Router file locator
     $services->set('router.fileLocator', FileLocator::class)
         ->args([
-            param('thelia.core_dir').'/Config/Resources/routing',
+            param('thelia.core_dir') . '/Config/Resources/routing',
         ])
         ->public();
 

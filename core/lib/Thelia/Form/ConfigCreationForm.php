@@ -60,8 +60,7 @@ class ConfigCreationForm extends BaseForm
             ->add('hidden', HiddenType::class, [])
             ->add('secured', HiddenType::class, [
                 'label' => Translator::getInstance()->trans('Prevent variable modification or deletion, except for super-admin'),
-            ])
-        ;
+            ]);
     }
 
     public static function getName(): string

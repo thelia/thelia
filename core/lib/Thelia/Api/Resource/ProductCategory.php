@@ -26,7 +26,7 @@ use Thelia\Model\Map\ProductCategoryTableMap;
     operations: [
         new Get(
             uriTemplate: '/admin/product_categories/{product}/categories/{category}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
@@ -36,7 +36,7 @@ use Thelia\Model\Map\ProductCategoryTableMap;
     operations: [
         new Get(
             uriTemplate: '/front/product_categories/{product}/categories/{category}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -47,13 +47,9 @@ class ProductCategory implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:product_categories:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:product_categories:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:product_categories:write';
-
     public const GROUP_FRONT_READ = 'front:product_categories:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:product_categories:read:single';
 
     #[Relation(targetResource: Category::class)]

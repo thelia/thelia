@@ -22,7 +22,7 @@ class StateByIsoProviderListener implements EventSubscriberInterface
     public function stateByIsoProvider(ItemProviderQueryEvent $event): void
     {
         if (
-            $event->getOperation()->getName() !== 'state_by_iso'
+            'state_by_iso' !== $event->getOperation()->getName()
             || !isset($event->getUriVariables()['stateIso'])
             || !isset($event->getUriVariables()['countryIso3'])
         ) {

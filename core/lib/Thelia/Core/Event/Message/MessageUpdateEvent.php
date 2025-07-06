@@ -16,27 +16,17 @@ namespace Thelia\Core\Event\Message;
 
 class MessageUpdateEvent extends MessageCreateEvent
 {
-    /** @var int */
-    protected $message_id;
+    protected int $message_id;
 
     protected $html_layout_file_name;
-
     protected $html_template_file_name;
-
     protected $text_layout_file_name;
-
     protected $text_template_file_name;
-
     protected $text_message;
-
     protected $html_message;
-
     protected $subject;
 
-    /**
-     * @param int $message_id
-     */
-    public function __construct($message_id)
+    public function __construct(int $message_id)
     {
         $this->setMessageId($message_id);
     }

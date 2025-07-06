@@ -37,21 +37,21 @@ class TranslationsCustomerTitleForm extends BaseForm
         foreach ($allTitle as $aTitle) {
             $id = $aTitle->getId();
             $this->formBuilder
-                ->add('title_id_'.$id, HiddenType::class, [
+                ->add('title_id_' . $id, HiddenType::class, [
                     'required' => true,
                     'constraints' => [
                         new GreaterThan(['value' => 0]),
                     ],
                     'data' => $id,
                 ])
-                ->add('short_title_'.$id, TextType::class, [
+                ->add('short_title_' . $id, TextType::class, [
                     'label' => Translator::getInstance()->trans('Change short title for'),
                     'required' => true,
                     'constraints' => [
                         new NotBlank(),
                     ],
                 ])
-                ->add('long_title_'.$id, TextType::class, [
+                ->add('long_title_' . $id, TextType::class, [
                     'label' => Translator::getInstance()->trans('Change long title for'),
                     'required' => true,
                     'constraints' => [

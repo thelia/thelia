@@ -32,7 +32,7 @@ abstract class BaseI18nLoop extends BaseLoop
      *
      * @return Argument[]
      */
-    protected function getDefaultArgs()
+    protected function getDefaultArgs(): array
     {
         $args = parent::getDefaultArgs();
 
@@ -57,7 +57,7 @@ abstract class BaseI18nLoop extends BaseLoop
         ?string $foreignTable = null,
         string $foreignKey = 'ID',
         bool $forceReturn = false,
-    ) {
+    ): mixed {
         /* manage translations */
 
         $this->locale = ModelCriteriaTools::getI18n(
@@ -68,7 +68,7 @@ abstract class BaseI18nLoop extends BaseLoop
             $columns,
             $foreignTable,
             $foreignKey,
-            $this->getForceReturn()
+            $this->getForceReturn(),
         );
     }
 
@@ -87,15 +87,15 @@ abstract class BaseI18nLoop extends BaseLoop
                 "CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID)
                         THEN `requested_locale_i18n`.`{$columnName}`
                         ELSE `default_locale_i18n`.`{$columnName}`
-                        END ".$searchCriteria.' ?',
+                        END " . $searchCriteria . ' ?',
                 $searchTerm,
-                \PDO::PARAM_STR
+                \PDO::PARAM_STR,
             );
         } else {
             $search->where(
                 \sprintf('`requested_locale_i18n`.`%s` %s ?', $columnName, $searchCriteria),
                 $searchTerm,
-                \PDO::PARAM_STR
+                \PDO::PARAM_STR,
             );
         }
     }

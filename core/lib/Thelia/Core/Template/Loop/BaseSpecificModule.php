@@ -36,10 +36,7 @@ abstract class BaseSpecificModule extends BaseI18nLoop implements PropelSearchLo
 {
     protected $timestampable = true;
 
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('id'),
@@ -57,15 +54,15 @@ abstract class BaseSpecificModule extends BaseI18nLoop implements PropelSearchLo
                             'alpha_reverse',
                             'manual',
                             'manual_reverse',
-                        ]
-                    )
+                        ],
+                    ),
                 ),
-                'manual'
-            )
+                'manual',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $search = ModuleQuery::create();
 

@@ -52,13 +52,12 @@ class CouponFactory
      * @throws CouponExpiredException
      * @throws CouponNoUsageLeftException
      * @throws CouponNotReleaseException
-     *
-     * @return CouponInterface
      */
-    public function buildCouponFromCode(string $couponCode)
+    public function buildCouponFromCode(string $couponCode): CouponInterface
     {
         $couponModel = $this->facade->findOneCouponByCode($couponCode);
-        if ($couponModel === null) {
+
+        if (null === $couponModel) {
             return false;
         }
 
@@ -70,7 +69,7 @@ class CouponFactory
         $nowDateTime = new \DateTime();
 
         // Check coupon start date
-        if ($couponModel->getStartDate() !== null && $couponModel->getStartDate() > $nowDateTime) {
+        if (null !== $couponModel->getStartDate() && $couponModel->getStartDate() > $nowDateTime) {
             throw new CouponNotReleaseException($couponCode);
         }
 
@@ -93,10 +92,8 @@ class CouponFactory
         /** @var CouponInterface $couponInterface */
         $couponInterface = $this->buildCouponFromModel($couponModel);
 
-        if ($couponInterface && $couponInterface->getConditions()->count() == 0) {
-            throw new InvalidConditionException(
-                $couponInterface::class
-            );
+        if ($couponInterface && 0 === $couponInterface->getConditions()->count()) {
+            throw new InvalidConditionException($couponInterface::class);
         }
 
         return $couponInterface;
@@ -109,10 +106,10 @@ class CouponFactory
      *
      * @return CouponInterface ready to use CouponInterface object instance
      */
-    public function buildCouponFromModel(Coupon $model)
+    public function buildCouponFromModel(Coupon $model): CouponInterface
     {
-        $isCumulative = $model->getIsCumulative() == 1;
-        $isRemovingPostage = $model->getIsRemovingPostage() == 1;
+        $isCumulative = 1 === $model->getIsCumulative();
+        $isRemovingPostage = 1 === $model->getIsRemovingPostage();
 
         if (!$this->container->has($model->getType())) {
             return false;
@@ -135,11 +132,11 @@ class CouponFactory
             $model->getExpirationDate(),
             $model->getFreeShippingForCountries(),
             $model->getFreeShippingForModules(),
-            $model->getPerCustomerUsageCount()
+            $model->getPerCustomerUsageCount(),
         );
 
         $conditions = $this->conditionFactory->unserializeConditionCollection(
-            $model->getSerializedConditions()
+            $model->getSerializedConditions(),
         );
 
         $couponManager->setConditions($conditions);

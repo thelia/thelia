@@ -19,11 +19,9 @@ use Thelia\Model\Product;
 
 class ProductCloneEvent extends ActionEvent
 {
-    /** @var Product */
-    protected $clonedProduct;
+    protected Product $clonedProduct;
 
-    /** @var array */
-    protected $types = ['images', 'documents'];
+    protected array $types = ['images', 'documents'];
 
     /**
      * ProductCloneEvent constructor.
@@ -70,26 +68,17 @@ class ProductCloneEvent extends ActionEvent
         $this->originalProduct = $originalProduct;
     }
 
-    /**
-     * @return Product
-     */
-    public function getClonedProduct()
+    public function getClonedProduct(): Product
     {
         return $this->clonedProduct;
     }
 
-    /**
-     * @param Product $clonedProduct
-     */
-    public function setClonedProduct($clonedProduct): void
+    public function setClonedProduct(Product $clonedProduct): void
     {
         $this->clonedProduct = $clonedProduct;
     }
 
-    /**
-     * @return array
-     */
-    public function getTypes()
+    public function getTypes(): array
     {
         return $this->types;
     }

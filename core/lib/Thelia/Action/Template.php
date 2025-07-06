@@ -52,8 +52,7 @@ class Template extends BaseAction implements EventSubscriberInterface
             ->setLocale($event->getLocale())
             ->setName($event->getTemplateName())
 
-            ->save()
-        ;
+            ->save();
 
         $event->setTemplate($template);
     }
@@ -72,7 +71,7 @@ class Template extends BaseAction implements EventSubscriberInterface
             $createEvent
                 ->setLocale($event->getLocale())
                 ->setTemplateName(
-                    Translator::getInstance()->trans('Copy of %tpl', ['%tpl' => $source->getName()])
+                    Translator::getInstance()->trans('Copy of %tpl', ['%tpl' => $source->getName()]),
                 );
 
             $dispatcher->dispatch($createEvent, TheliaEvents::TEMPLATE_CREATE);
@@ -85,7 +84,7 @@ class Template extends BaseAction implements EventSubscriberInterface
             foreach ($attrList as $feat) {
                 $dispatcher->dispatch(
                     new TemplateAddAttributeEvent($clone, $feat->getAttributeId()),
-                    TheliaEvents::TEMPLATE_ADD_ATTRIBUTE
+                    TheliaEvents::TEMPLATE_ADD_ATTRIBUTE,
                 );
             }
 
@@ -95,7 +94,7 @@ class Template extends BaseAction implements EventSubscriberInterface
             foreach ($featList as $feat) {
                 $dispatcher->dispatch(
                     new TemplateAddFeatureEvent($clone, $feat->getFeatureId()),
-                    TheliaEvents::TEMPLATE_ADD_FEATURE
+                    TheliaEvents::TEMPLATE_ADD_FEATURE,
                 );
             }
 
@@ -163,16 +162,15 @@ class Template extends BaseAction implements EventSubscriberInterface
     public function addAttribute(TemplateAddAttributeEvent $event): void
     {
         if (null === AttributeTemplateQuery::create()
-                ->filterByAttributeId($event->getAttributeId())
-                ->filterByTemplate($event->getTemplate())
-                ->findOne()) {
+            ->filterByAttributeId($event->getAttributeId())
+            ->filterByTemplate($event->getTemplate())
+            ->findOne()) {
             $attributeTemplate = new AttributeTemplate();
 
             $attributeTemplate
                 ->setAttributeId($event->getAttributeId())
                 ->setTemplate($event->getTemplate())
-                ->save()
-            ;
+                ->save();
         }
     }
 
@@ -196,10 +194,9 @@ class Template extends BaseAction implements EventSubscriberInterface
     {
         $attributeTemplate = AttributeTemplateQuery::create()
             ->filterByAttributeId($event->getAttributeId())
-            ->filterByTemplate($event->getTemplate())->findOne()
-        ;
+            ->filterByTemplate($event->getTemplate())->findOne();
 
-        if ($attributeTemplate !== null) {
+        if (null !== $attributeTemplate) {
             $attributeTemplate
 
                 ->delete();
@@ -212,17 +209,16 @@ class Template extends BaseAction implements EventSubscriberInterface
     public function addFeature(TemplateAddFeatureEvent $event): void
     {
         if (null === FeatureTemplateQuery::create()
-                ->filterByFeatureId($event->getFeatureId())
-                ->filterByTemplate($event->getTemplate())
-                ->findOne()
+            ->filterByFeatureId($event->getFeatureId())
+            ->filterByTemplate($event->getTemplate())
+            ->findOne()
         ) {
             $featureTemplate = new FeatureTemplate();
 
             $featureTemplate
                 ->setFeatureId($event->getFeatureId())
                 ->setTemplate($event->getTemplate())
-                ->save()
-            ;
+                ->save();
         }
     }
 
@@ -230,10 +226,9 @@ class Template extends BaseAction implements EventSubscriberInterface
     {
         $featureTemplate = FeatureTemplateQuery::create()
             ->filterByFeatureId($event->getFeatureId())
-            ->filterByTemplate($event->getTemplate())->findOne()
-        ;
+            ->filterByTemplate($event->getTemplate())->findOne();
 
-        if ($featureTemplate !== null) {
+        if (null !== $featureTemplate) {
             $featureTemplate
 
                 ->delete();

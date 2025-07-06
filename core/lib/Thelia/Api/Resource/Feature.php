@@ -33,75 +33,71 @@ use Thelia\Model\Map\FeatureTableMap;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/features'
+            uriTemplate: '/admin/features',
         ),
         new GetCollection(
-            uriTemplate: '/admin/features'
+            uriTemplate: '/admin/features',
         ),
         new Get(
             uriTemplate: '/admin/features/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/features/{id}'
+            uriTemplate: '/admin/features/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/features/{id}'
+            uriTemplate: '/admin/features/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/features/{id}'
+            uriTemplate: '/admin/features/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/front/features'
+            uriTemplate: '/front/features',
         ),
         new Get(
             uriTemplate: '/front/features/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]]
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
         'position',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
         'visible',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
         'id',
         'title',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: NotInFilter::class,
     properties: [
         'id',
-    ]
+    ],
 )]
 class Feature extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:feature:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:feature:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:feature:write';
-
     public const GROUP_FRONT_READ = 'front:feature:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:feature:read:single';
 
     #[Groups([

@@ -43,12 +43,12 @@ class TranslationsCustomerTitleController extends BaseAdminController
 
             foreach ($myCustomersTitle as $aCustomerTitle) {
                 $aCustomerTitle->setLocale($local)
-                    ->setShort($data['short_title_'.$aCustomerTitle->getId()])
-                    ->setLong($data['long_title_'.$aCustomerTitle->getId()])
+                    ->setShort($data['short_title_' . $aCustomerTitle->getId()])
+                    ->setLong($data['long_title_' . $aCustomerTitle->getId()])
                     ->save();
             }
 
-            if ($request->get('save_mode') === 'close') {
+            if ('close' === $request->get('save_mode')) {
                 return $this->generateRedirectFromRoute('admin.configuration.index');
             }
 
@@ -65,7 +65,7 @@ class TranslationsCustomerTitleController extends BaseAdminController
             'customer title i18n',
             $errorMessage,
             $translationForm,
-            $ex
+            $ex,
         );
 
         return $this->generateRedirectFromRoute('admin.configuration.translations-customers-title');

@@ -27,18 +27,12 @@ class TemplateDuplicateEvent extends TemplateEvent
         parent::__construct();
     }
 
-    /**
-     * @return int
-     */
-    public function getSourceTemplateId()
+    public function getSourceTemplateId(): int
     {
         return $this->sourceTemplateId;
     }
 
-    /**
-     * @return string
-     */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->locale;
     }

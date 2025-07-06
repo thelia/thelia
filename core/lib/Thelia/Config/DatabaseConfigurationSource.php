@@ -29,10 +29,8 @@ class DatabaseConfigurationSource
 {
     /**
      * Map of [connection name => connection ParameterBag].
-     *
-     * @var array
      */
-    protected $connections;
+    protected array $connections;
 
     /**
      * @param array $envParameters environment parameters
@@ -55,7 +53,7 @@ class DatabaseConfigurationSource
                     'dsn' => \sprintf('mysql:host=%s;dbname=%s;port=%s', $envParameters['thelia.database_host'], $envParameters['thelia.database_name'], $envParameters['thelia.database_port']),
                     'classname' => ConnectionWrapper::class,
                 ],
-                $envParameters
+                $envParameters,
             );
 
             return;
@@ -63,9 +61,10 @@ class DatabaseConfigurationSource
 
         $fs = new Filesystem();
 
-        $databaseConfigFile = THELIA_CONF_DIR.'database_'.$envParameters['kernel.environment'].'.yml';
+        $databaseConfigFile = THELIA_CONF_DIR . 'database_' . $envParameters['kernel.environment'] . '.yml';
+
         if (!$fs->exists($databaseConfigFile)) {
-            $databaseConfigFile = THELIA_CONF_DIR.'database.yml';
+            $databaseConfigFile = THELIA_CONF_DIR . 'database.yml';
         }
 
         if (!$fs->exists($databaseConfigFile)) {
@@ -77,7 +76,7 @@ class DatabaseConfigurationSource
         $configurationProcessor = new Processor();
         $configuration = $configurationProcessor->processConfiguration(
             new DatabaseConfiguration(),
-            $theliaDatabaseConfiguration
+            $theliaDatabaseConfiguration,
         );
 
         // single connection format
@@ -85,7 +84,7 @@ class DatabaseConfigurationSource
             $this->addConnection(
                 DatabaseConfiguration::THELIA_CONNECTION_NAME,
                 $configuration['connection'],
-                $envParameters
+                $envParameters,
             );
 
             return;
@@ -97,17 +96,14 @@ class DatabaseConfigurationSource
                 $this->addConnection(
                     $connectionName,
                     $connectionParameters,
-                    $envParameters
+                    $envParameters,
                 );
             }
 
             return;
         }
 
-        throw new \LogicException(
-            'Connection configuration not found'
-                .' This is checked at configuration validation, and should not happen.'
-        );
+        throw new \LogicException('Connection configuration not found This is checked at configuration validation, and should not happen.');
     }
 
     /**
@@ -118,7 +114,7 @@ class DatabaseConfigurationSource
      * @param array  $parameters    connection parameters
      * @param array  $envParameters environment parameters
      */
-    protected function addConnection($name, array $parameters = [], array $envParameters = []): void
+    protected function addConnection(string $name, array $parameters = [], array $envParameters = []): void
     {
         $connectionParameterBag = new ParameterBag($envParameters);
         $connectionParameterBag->add($parameters);
@@ -131,6 +127,7 @@ class DatabaseConfigurationSource
     public function getPropelConnectionsConfiguration(): array
     {
         $propelConnections = [];
+
         /**
          * @var string       $connectionName
          * @var ParameterBag $connectionParameterBag
@@ -158,9 +155,9 @@ class DatabaseConfigurationSource
     }
 
     /**
-     * @throws \PDOException
-     *
      * @return \PDO thelia database connection
+     *
+     * @throws \PDOException
      */
     public function getTheliaConnectionPDO(): \PDO
     {
@@ -173,7 +170,7 @@ class DatabaseConfigurationSource
             $theliaConnectionParameterBag->get('password'),
             [
                 \PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'UTF8'",
-            ]
+            ],
         );
     }
 }

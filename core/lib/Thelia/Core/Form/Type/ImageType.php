@@ -31,8 +31,7 @@ class ImageType extends AbstractTheliaType
                 'allow_add' => true,
                 'allow_delete' => true,
                 'cascade_validation' => true,
-            ])
-        ;
+            ]);
     }
 
     /**

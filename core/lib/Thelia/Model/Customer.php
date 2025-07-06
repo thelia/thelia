@@ -299,19 +299,19 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         return parent::setEmail($email);
     }
 
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->getEmail();
     }
 
-    public function getPassword(): ?string
+    public function getPassword(): string
     {
-        return $this->password;
+        return $this->password ?? '';
     }
 
-    public function checkPassword($password)
+    public function checkPassword(string $password): bool
     {
-        return password_verify((string) $password, $this->password);
+        return password_verify($password, $this->password);
     }
 
     public function eraseCredentials(): void
@@ -325,7 +325,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         return ['ROLE_CUSTOMER', 'CUSTOMER'];
     }
 
-    public function getToken()
+    public function getToken(): string
     {
         return $this->getRememberMeToken();
     }
@@ -335,17 +335,15 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         $this->setRememberMeToken($token)->save();
     }
 
-    public function getSerial()
+    public function getSerial(): string
     {
         return $this->getRememberMeSerial();
     }
 
     /**
      * @throws PropelException
-     *
-     * @return string
      */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->getLangModel()->getLocale();
     }
@@ -381,5 +379,10 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
     public function getUserIdentifier(): string
     {
         return $this->getEmail();
+    }
+
+    public function getId(): int
+    {
+        return parent::getId();
     }
 }

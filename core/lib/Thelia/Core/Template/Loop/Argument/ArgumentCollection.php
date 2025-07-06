@@ -33,17 +33,14 @@ class ArgumentCollection implements \Iterator
         return isset($this->arguments[$key]);
     }
 
-    /**
-     * @return Argument|null
-     */
-    public function get($key)
+    public function get($key): ?Argument
     {
         return $this->hasKey($key) ? $this->arguments[$key] : null;
     }
 
     public function isEmpty(): bool
     {
-        return \count($this->arguments) == 0;
+        return 0 === \count($this->arguments);
     }
 
     public function addArguments(array $argumentList, $force = true): static
@@ -118,8 +115,6 @@ class ArgumentCollection implements \Iterator
      * Move forward to next element.
      *
      * @see http://php.net/manual/en/iterator.next.php
-     *
-     * @return void any returned value is ignored
      */
     public function next(): void
     {
@@ -151,7 +146,7 @@ class ArgumentCollection implements \Iterator
      */
     public function valid(): bool
     {
-        return $this->key() !== null;
+        return null !== $this->key();
     }
 
     /**
@@ -159,8 +154,6 @@ class ArgumentCollection implements \Iterator
      * Rewind the Iterator to the first element.
      *
      * @see http://php.net/manual/en/iterator.rewind.php
-     *
-     * @return void any returned value is ignored
      */
     public function rewind(): void
     {
@@ -176,8 +169,9 @@ class ArgumentCollection implements \Iterator
         }
 
         $string = '';
+
         foreach ($arguments as $key => $argument) {
-            $string .= $key.'='.$argument->getRawValue();
+            $string .= $key . '=' . $argument->getRawValue();
         }
 
         return md5($string);

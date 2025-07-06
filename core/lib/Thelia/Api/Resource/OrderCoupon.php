@@ -32,27 +32,27 @@ use Thelia\Model\Map\OrderCouponTableMap;
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/admin/order_coupons'
+            uriTemplate: '/admin/order_coupons',
         ),
         new Post(
-            uriTemplate: '/admin/order_coupons'
+            uriTemplate: '/admin/order_coupons',
         ),
         new Get(
             uriTemplate: '/admin/order_coupons/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/order_coupons/{id}'
+            uriTemplate: '/admin/order_coupons/{id}',
         ),
         new Patch(
             uriTemplate: '/admin/order_coupons/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/order_coupons/{id}'
+            uriTemplate: '/admin/order_coupons/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -63,16 +63,14 @@ use Thelia\Model\Map\OrderCouponTableMap;
             'strategy' => 'exact',
             'fieldPath' => 'order_coupon.order_id',
         ],
-    ]
+    ],
 )]
 class OrderCoupon implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:order_coupon:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order_coupon:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:order_coupon:write';
 
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, Order::GROUP_FRONT_READ_SINGLE])]

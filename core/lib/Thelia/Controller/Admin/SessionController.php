@@ -61,7 +61,7 @@ class SessionController extends BaseAdminController
                 'admin',
                 'ADMIN_CREATE_PASSWORD',
                 'Lost password recovery function invoked',
-                $this->getRequest()
+                $this->getRequest(),
             );
 
             // Redirect to the error page
@@ -152,10 +152,10 @@ class SessionController extends BaseAdminController
         }
 
         // Check the token
-        if (null == $admin = AdminQuery::create()->findOneByPasswordRenewToken($token)) {
+        if (null === $admin = AdminQuery::create()->findOneByPasswordRenewToken($token)) {
             return $this->render(
                 'lost-password',
-                ['token_error' => true]
+                ['token_error' => true],
             );
         }
 
@@ -259,7 +259,7 @@ class SessionController extends BaseAdminController
                 $this->createRememberMeCookie(
                     $user,
                     $this->getRememberMeCookieName(),
-                    $this->getRememberMeCookieExpiration()
+                    $this->getRememberMeCookieExpiration(),
                 );
             }
 
@@ -288,7 +288,7 @@ class SessionController extends BaseAdminController
 
             $message = $this->getTranslator()->trans(
                 'Unable to process your request. Please try again (%err).',
-                ['%err' => $ex->getMessage()]
+                ['%err' => $ex->getMessage()],
             );
         }
 

@@ -51,10 +51,8 @@ class BaseHookRenderEvent extends Event
 
     /**
      * Get the code of the hook.
-     *
-     * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }
@@ -108,7 +106,7 @@ class BaseHookRenderEvent extends Event
      *
      * @return mixed|null the value of the argument or `$default` if it not exists
      */
-    public function getArgument(string $key, ?string $default = null)
+    public function getArgument(string $key, ?string $default = null): mixed
     {
         return \array_key_exists($key, $this->arguments) ? $this->arguments[$key] : $default;
     }
@@ -128,11 +126,11 @@ class BaseHookRenderEvent extends Event
      *
      * @param string $templateVariableName the variable name
      *
-     * @throws \InvalidArgumentException if the variable is not defined
-     *
      * @return mixed the variable value
+     *
+     * @throws \InvalidArgumentException if the variable is not defined
      */
-    public function getTemplateVar(string $templateVariableName)
+    public function getTemplateVar(string $templateVariableName): mixed
     {
         if (!isset($this->templateVars[$templateVariableName])) {
             throw new \InvalidArgumentException(\sprintf("Template variable '%s' is not defined.", $templateVariableName));

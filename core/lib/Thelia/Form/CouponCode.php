@@ -46,9 +46,8 @@ class CouponCode extends BaseForm
                         new NotBlank(),
                         new Callback($this->verifyExistingCode(...)),
                     ],
-                ]
-            )
-        ;
+                ],
+            );
     }
 
     public function verifyExistingCode($value, ExecutionContextInterface $context): void

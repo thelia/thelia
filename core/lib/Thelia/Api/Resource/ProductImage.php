@@ -45,14 +45,14 @@ use Thelia\Model\Map\ProductImageTableMap;
             controller: PostItemFileController::class,
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
             denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_FILE]],
-            deserialize: false
+            deserialize: false,
         ),
         new GetCollection(
-            uriTemplate: '/admin/product_images'
+            uriTemplate: '/admin/product_images',
         ),
         new Get(
             uriTemplate: '/admin/product_images/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Get(
             uriTemplate: '/admin/product_images/{id}/file',
@@ -62,8 +62,8 @@ use Thelia\Model\Map\ProductImageTableMap;
                     '200' => [
                         'description' => 'The binary file',
                     ],
-                ]
-            )
+                ],
+            ),
         ),
         new Put(
             uriTemplate: '/admin/product_images/{id}',
@@ -71,23 +71,23 @@ use Thelia\Model\Map\ProductImageTableMap;
         ),
         new Patch(
             uriTemplate: '/admin/product_images/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
         ),
         new Delete(
-            uriTemplate: '/admin/product_images/{id}'
+            uriTemplate: '/admin/product_images/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/front/product_images'
+            uriTemplate: '/front/product_images',
         ),
         new Get(
             uriTemplate: '/front/product_images/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
         new Get(
             uriTemplate: '/front/product_images/{id}/file',
@@ -97,8 +97,8 @@ use Thelia\Model\Map\ProductImageTableMap;
                     '200' => [
                         'description' => 'The binary file',
                     ],
-                ]
-            )
+                ],
+            ),
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -110,19 +110,19 @@ use Thelia\Model\Map\ProductImageTableMap;
             'strategy' => 'exact',
             'fieldPath' => 'productimage_product.id',
         ],
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
         'position',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
         'visible',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -132,30 +132,24 @@ use Thelia\Model\Map\ProductImageTableMap;
             'strategy' => 'exact',
             'fieldPath' => 'product_image.product_id',
         ],
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: NotInFilter::class,
     properties: [
         'id',
-    ]
+    ],
 )]
 class ProductImage extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:product_image:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:product_image:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:product_image:write';
-
     public const GROUP_ADMIN_WRITE_FILE = 'admin:product_image:write_file';
-
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:product_image:write_update';
-
     public const GROUP_FRONT_READ = 'front:product_image:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:product_image:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
@@ -170,7 +164,7 @@ class ProductImage extends AbstractTranslatableResource implements ItemFileResou
         openapiContext: [
             'type' => 'string',
             'format' => 'binary',
-        ]
+        ],
     )]
     #[Assert\Image(
         mimeTypes: [

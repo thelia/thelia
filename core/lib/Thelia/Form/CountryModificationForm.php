@@ -38,7 +38,7 @@ class CountryModificationForm extends CountryCreationForm
                     'label_attr' => [
                         'for' => 'need_zip_code',
                     ],
-                ]
+                ],
             )
             ->add(
                 'zip_code_format',
@@ -49,12 +49,11 @@ class CountryModificationForm extends CountryCreationForm
                     'label' => $this->translator->trans('The zip code format'),
                     'label_attr' => [
                         'help' => $this->translator->trans(
-                            'Use a N for a number, L for Letter, C for an iso code for the state.'
+                            'Use a N for a number, L for Letter, C for an iso code for the state.',
                         ),
                     ],
-                ]
-            )
-        ;
+                ],
+            );
 
         // Add standard description fields, excluding title and locale, which a re defined in parent class
         $this->addStandardDescFields(['title', 'locale']);

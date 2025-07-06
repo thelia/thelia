@@ -41,8 +41,7 @@ class Profile extends BaseAction implements EventSubscriberInterface
             ->setTitle($event->getTitle())
             ->setChapo($event->getChapo())
             ->setDescription($event->getDescription())
-            ->setPostscriptum($event->getPostscriptum())
-        ;
+            ->setPostscriptum($event->getPostscriptum());
 
         $profile->save();
 
@@ -58,8 +57,7 @@ class Profile extends BaseAction implements EventSubscriberInterface
                 ->setTitle($event->getTitle())
                 ->setChapo($event->getChapo())
                 ->setDescription($event->getDescription())
-                ->setPostscriptum($event->getPostscriptum())
-            ;
+                ->setPostscriptum($event->getPostscriptum());
 
             $profile->save();
 
@@ -71,6 +69,7 @@ class Profile extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $profile = ProfileQuery::create()->findPk($event->getId())) {
             ProfileResourceQuery::create()->filterByProfileId($event->getId())->delete();
+
             foreach ($event->getResourceAccess() as $resourceCode => $accesses) {
                 $manager = new AccessManager(0);
                 $manager->build($accesses);
@@ -91,6 +90,7 @@ class Profile extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $profile = ProfileQuery::create()->findPk($event->getId())) {
             ProfileModuleQuery::create()->filterByProfileId($event->getId())->delete();
+
             foreach ($event->getModuleAccess() as $moduleCode => $accesses) {
                 $manager = new AccessManager(0);
                 $manager->build($accesses);
@@ -111,8 +111,7 @@ class Profile extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $profile = ProfileQuery::create()->findPk($event->getId())) {
             $profile
-                ->delete()
-            ;
+                ->delete();
 
             $event->setProfile($profile);
         }

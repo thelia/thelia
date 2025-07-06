@@ -69,15 +69,12 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
         return $this;
     }
 
-    public function getParentId()
+    public function getParentId(): int
     {
         return $this->getBrandId();
     }
 
-    /**
-     * @return FileModelParentInterface the parent file model
-     */
-    public function getParentFileModel()
+    public function getParentFileModel(): FileModelParentInterface
     {
         return new Brand();
     }
@@ -85,9 +82,8 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
     /**
      * Get the ID of the form used to change this object information.
      *
-     * @return BaseForm the form
      */
-    public function getUpdateFormId()
+    public function getUpdateFormId(): string
     {
         return AdminForm::BRAND_DOCUMENT_MODIFICATION;
     }
@@ -95,7 +91,7 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
     /**
      * @return string the path to the upload directory where files are stored, without final slash
      */
-    public function getUploadDir()
+    public function getUploadDir(): string
     {
         $uploadDir = ConfigQuery::read('documents_library_path');
         $uploadDir = $uploadDir === null ? THELIA_LOCAL_DIR.'media'.DS.'documents' : THELIA_ROOT.$uploadDir;
@@ -103,10 +99,7 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
         return $uploadDir.DS.'brand';
     }
 
-    /**
-     * @return string the URL to redirect to after update from the back-office
-     */
-    public function getRedirectionUrl()
+    public function getRedirectionUrl(): string
     {
         return '/admin/brand/update/'.$this->getBrandId();
     }
@@ -116,8 +109,23 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
      *
      * @return ModelCriteria
      */
-    public function getQueryInstance()
+    public function getQueryInstance(): ModelCriteria
     {
         return BrandDocumentQuery::create();
+    }
+
+    public function getFile(): string
+    {
+        return parent::getFile();
+    }
+
+    public function getId(): int
+    {
+        return parent::getId();
+    }
+
+    public function getTitle(): string
+    {
+        return parent::getTitle();
     }
 }

@@ -26,28 +26,28 @@ interface SerializerInterface
      *
      * @return string The serializer identifier
      */
-    public function getId();
+    public function getId(): string;
 
     /**
      * Get serializer name.
      *
      * @return string The serializer name
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Get serializer extension.
      *
      * @return string The serializer extension
      */
-    public function getExtension();
+    public function getExtension(): string;
 
     /**
      * Get serializer mime type.
      *
      * @return string The serializer mime type
      */
-    public function getMimeType();
+    public function getMimeType(): string;
 
     /**
      * Prepare file to receive serialized data.
@@ -63,14 +63,14 @@ interface SerializerInterface
      *
      * @return string Serialized data
      */
-    public function serialize($data);
+    public function serialize(mixed $data): string;
 
     /**
      * Get string that separate serialized data.
      *
      * @return string|null Wrap separator string
      */
-    public function separator();
+    public function separator(): ?string;
 
     /**
      * Finalize file with serialized data.
@@ -86,5 +86,5 @@ interface SerializerInterface
      *
      * @return array Unserialized data
      */
-    public function unserialize(\SplFileObject $fileObject);
+    public function unserialize(\SplFileObject $fileObject): array;
 }

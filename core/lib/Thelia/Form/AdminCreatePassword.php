@@ -38,7 +38,7 @@ class AdminCreatePassword extends BruteforceForm
             ->add('password_confirm', PasswordType::class, [
                 'constraints' => [
                     new Callback(
-                        $this->verifyPasswordField(...)
+                        $this->verifyPasswordField(...),
                     ),
                 ],
                 'label' => $this->translator->trans('Password confirmation'),
@@ -48,19 +48,18 @@ class AdminCreatePassword extends BruteforceForm
                 'attr' => [
                     'placeholder' => Translator::getInstance()->trans('Enter the new password again'),
                 ],
-            ])
-        ;
+            ]);
     }
 
     public function verifyPasswordField($value, ExecutionContextInterface $context): void
     {
         $data = $context->getRoot()->getData();
 
-        if ($data['password'] === '' && $data['password_confirm'] === '') {
+        if ('' === $data['password'] && '' === $data['password_confirm']) {
             $context->addViolation("password can't be empty");
         }
 
-        if ($data['password'] != $data['password_confirm']) {
+        if ($data['password'] !== $data['password_confirm']) {
             $context->addViolation('password confirmation is not the same as password field');
         }
 

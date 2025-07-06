@@ -29,7 +29,6 @@ use Thelia\Core\Security\Exception\TokenAuthenticationException;
 class TokenProvider
 {
     protected ?string $token = null;
-
     protected ?SessionInterface $session = null;
 
     public function __construct(
@@ -48,6 +47,7 @@ class TokenProvider
         }
 
         $session = $this->requestStack->getCurrentRequest()?->getSession();
+
         if ($session instanceof SessionInterface) {
             $this->token = $session->get($this->tokenName);
         }
@@ -61,6 +61,7 @@ class TokenProvider
         if (null === $this->token) {
             $this->token = $this->getToken();
             $session = $this->requestStack->getCurrentRequest()?->getSession();
+
             if ($session instanceof SessionInterface) {
                 $session->set($this->tokenName, $this->token);
             }
@@ -75,16 +76,13 @@ class TokenProvider
     public function checkToken(string $entryValue): bool
     {
         $this->assignTokenFromSession();
+
         if (null === $this->token) {
-            throw new TokenAuthenticationException(
-                'Tried to check a token without assigning it before'
-            );
+            throw new TokenAuthenticationException('Tried to check a token without assigning it before');
         }
 
         if ($this->token !== $entryValue) {
-            throw new TokenAuthenticationException(
-                'Tried to validate an invalid token'
-            );
+            throw new TokenAuthenticationException('Tried to validate an invalid token');
         }
 
         return true;

@@ -53,7 +53,7 @@ class OrderStatusController extends AbstractCrudController
             TheliaEvents::ORDER_STATUS_UPDATE,
             TheliaEvents::ORDER_STATUS_DELETE,
             null,
-            TheliaEvents::ORDER_STATUS_UPDATE_POSITION
+            TheliaEvents::ORDER_STATUS_UPDATE_POSITION,
         );
     }
 
@@ -109,8 +109,7 @@ class OrderStatusController extends AbstractCrudController
             ->setLocale($formData['locale'])
             ->setTitle($formData['title'])
             ->setCode($formData['code'])
-            ->setColor($formData['color'])
-        ;
+            ->setColor($formData['color']);
 
         return $orderStatusCreateEvent;
     }
@@ -129,8 +128,7 @@ class OrderStatusController extends AbstractCrudController
             ->setDescription($formData['description'])
             ->setPostscriptum($formData['postscriptum'])
             ->setCode($formData['code'])
-            ->setColor($formData['color'])
-        ;
+            ->setColor($formData['color']);
 
         return $orderStatusUpdateEvent;
     }
@@ -147,10 +145,8 @@ class OrderStatusController extends AbstractCrudController
 
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
-     *
-     * @param OrderStatusEvent $event
      */
-    protected function eventContainsObject($event): bool
+    protected function eventContainsObject(\Symfony\Contracts\EventDispatcher\Event $event): bool
     {
         return $event->hasOrderStatus();
     }
@@ -213,7 +209,7 @@ class OrderStatusController extends AbstractCrudController
      *
      * @param string $currentOrder , if any, null otherwise
      */
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         $this->getListOrderFromSession('orderstatus', 'order', 'manual');
 
@@ -246,7 +242,7 @@ class OrderStatusController extends AbstractCrudController
         return $this->generateRedirectFromRoute(
             'admin.order-status.update',
             [],
-            $this->getEditionArguments()
+            $this->getEditionArguments(),
         );
     }
 
@@ -266,7 +262,7 @@ class OrderStatusController extends AbstractCrudController
         return new UpdatePositionEvent(
             $this->getRequest()->get('order_status_id'),
             $positionChangeMode,
-            $positionValue
+            $positionValue,
         );
     }
 
@@ -277,9 +273,9 @@ class OrderStatusController extends AbstractCrudController
     {
         $folder = OrderStatusQuery::create()->findPk($positionChangeEvent->getObjectId());
 
-        if ($folder != null) {
+        if (null !== $folder) {
             return $this->generateRedirectFromRoute(
-                'admin.order-status.default'
+                'admin.order-status.default',
             );
         }
 

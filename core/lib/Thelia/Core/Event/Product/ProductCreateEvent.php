@@ -17,27 +17,16 @@ namespace Thelia\Core\Event\Product;
 class ProductCreateEvent extends ProductEvent
 {
     protected $ref;
-
     protected $title;
-
     protected $locale;
-
     protected $default_category;
-
     protected $visible;
-
     protected $virtual;
-
     protected $basePrice;
-
     protected $baseWeight;
-
     protected $taxRuleId;
-
     protected $currencyId;
-
     protected $baseQuantity;
-
     protected $templateId;
 
     public function getRef()
@@ -169,7 +158,7 @@ class ProductCreateEvent extends ProductEvent
      *
      * @see setBasePrice
      */
-    public function setPrice($price): static
+    public function setPrice(float $price): static
     {
         return $this->setBasePrice($price);
     }
@@ -177,13 +166,11 @@ class ProductCreateEvent extends ProductEvent
     /**
      * This method is an alias of setBaseWeight and used by the event when binding a form.
      *
-     * @param float $weight
-     *
      * @return $this
      *
      * @see setBaseWeight
      */
-    public function setWeight($weight): static
+    public function setWeight(float $weight): static
     {
         return $this->setBaseWeight($weight);
     }
@@ -212,20 +199,15 @@ class ProductCreateEvent extends ProductEvent
         return $this->setTaxRuleId($taxRuleId);
     }
 
-    /**
-     * @return int
-     */
-    public function getBaseQuantity()
+    public function getBaseQuantity(): int
     {
         return $this->baseQuantity;
     }
 
     /**
-     * @param int $baseQuantity
-     *
      * @return $this
      */
-    public function setBaseQuantity($baseQuantity): static
+    public function setBaseQuantity(int $baseQuantity): static
     {
         $this->baseQuantity = $baseQuantity;
 
@@ -241,25 +223,20 @@ class ProductCreateEvent extends ProductEvent
      *
      * @see setBaseQuantity
      */
-    public function setQuantity($quantity): static
+    public function setQuantity(int $quantity): static
     {
         return $this->setBaseQuantity($quantity);
     }
 
-    /**
-     * @return int
-     */
-    public function getTemplateId()
+    public function getTemplateId(): int
     {
         return $this->templateId;
     }
 
     /**
-     * @param int $templateId
-     *
      * @return $this
      */
-    public function setTemplateId($templateId): static
+    public function setTemplateId(int $templateId): static
     {
         $this->templateId = $templateId;
 

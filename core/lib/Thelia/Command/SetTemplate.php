@@ -45,12 +45,12 @@ class SetTemplate extends ContainerAwareCommand
             ->addArgument(
                 'type',
                 InputArgument::REQUIRED,
-                'template type : '.implode(', ', array_keys(TemplateDefinition::CONFIG_NAMES))
+                'template type : ' . implode(', ', array_keys(TemplateDefinition::CONFIG_NAMES)),
             )
             ->addArgument(
                 'name',
                 InputArgument::REQUIRED,
-                'template name'
+                'template name',
             );
     }
 
@@ -68,9 +68,11 @@ class SetTemplate extends ContainerAwareCommand
             return self::FAILURE;
         }
 
-        $path = THELIA_TEMPLATE_DIR.$type.DS.$name;
+        $path = THELIA_TEMPLATE_DIR . $type . DS . $name;
+
         if (!is_dir($path)) {
-            $pathVendor = THELIA_VENDOR_ROOT.$name;
+            $pathVendor = THELIA_VENDOR_ROOT . $name;
+
             if (!is_dir($pathVendor)) {
                 $output->writeln(\sprintf('<error>Template %s not found.</error>', $pathVendor));
 
@@ -78,7 +80,7 @@ class SetTemplate extends ContainerAwareCommand
             }
 
             // copy directory vendor to template
-            if (!is_dir($path) && !mkdir($path, 0777, true) && !is_dir($path)) {
+            if (!is_dir($path) && !mkdir($path, 0o777, true) && !is_dir($path)) {
                 throw new \RuntimeException(\sprintf('Directory "%s" was not created', $path));
             }
 
@@ -105,12 +107,12 @@ class SetTemplate extends ContainerAwareCommand
     private function execDumpAutoload(
         OutputInterface $output,
     ): ?int {
-        $command = THELIA_VENDOR.'bin'.DS.'composer dump-autoload 2>&1';
+        $command = THELIA_VENDOR . 'bin' . DS . 'composer dump-autoload 2>&1';
         $returnCode = 0;
 
         exec($command, $outputExec, $returnCode);
 
-        if ($returnCode !== 0) {
+        if (0 !== $returnCode) {
             $errors = implode("\n", $outputExec);
             $output->writeln(\sprintf('<error>Composer dump-autoload failed: %s</error>', $errors));
 

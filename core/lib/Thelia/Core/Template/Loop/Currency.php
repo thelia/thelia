@@ -62,15 +62,15 @@ class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
                             'rate', 'rate_reverse',
                             'visible', 'visible_reverse',
                             'is_default', 'is_default_reverse',
-                            'manual', 'manual_reverse', ]
-                    )
+                            'manual', 'manual_reverse', ],
+                    ),
                 ),
-                'manual'
-            )
+                'manual',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $search = CurrencyQuery::create();
 
@@ -85,7 +85,7 @@ class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        if ($this->getDefaultOnly() === true) {
+        if (true === $this->getDefaultOnly()) {
             $search->filterByByDefault(true);
         }
 
@@ -167,8 +167,7 @@ class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('RATE', $currency->getRate())
                 ->set('VISIBLE', $currency->getVisible())
                 ->set('POSITION', $currency->getPosition())
-                ->set('IS_DEFAULT', $currency->getByDefault())
-            ;
+                ->set('IS_DEFAULT', $currency->getByDefault());
             $this->addOutputFields($loopResultRow, $currency);
 
             $loopResult->addRow($loopResultRow);

@@ -21,37 +21,25 @@ use Thelia\Model\CartItem;
 class CartEvent extends ActionEvent
 {
     protected $quantity;
-
     protected $append;
-
     protected $newness;
-
     protected $productSaleElementsId;
-
     protected $product;
-
     protected $cartItem;
-
     protected $cartItemId;
 
     public function __construct(protected Cart $cart)
     {
     }
 
-    /**
-     * @param bool $append
-     */
-    public function setAppend($append): static
+    public function setAppend(bool $append): static
     {
         $this->append = $append;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function getAppend()
+    public function getAppend(): bool
     {
         return $this->append;
     }
@@ -73,10 +61,7 @@ class CartEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     * @return CartItem
-     */
-    public function getCartItem()
+    public function getCartItem(): CartItem
     {
         return $this->cartItem;
     }
@@ -96,20 +81,14 @@ class CartEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     * @param bool $newness
-     */
-    public function setNewness($newness): static
+    public function setNewness(bool $newness): static
     {
         $this->newness = $newness;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function getNewness()
+    public function getNewness(): bool
     {
         return $this->newness;
     }
@@ -117,7 +96,7 @@ class CartEvent extends ActionEvent
     /**
      * @param int $product the product ID
      */
-    public function setProduct($product): static
+    public function setProduct(int $product): static
     {
         $this->product = $product;
 
@@ -127,43 +106,31 @@ class CartEvent extends ActionEvent
     /**
      * @return int the product ID
      */
-    public function getProduct()
+    public function getProduct(): int
     {
         return $this->product;
     }
 
-    /**
-     * @param int $productSaleElementsId
-     */
-    public function setProductSaleElementsId($productSaleElementsId): static
+    public function setProductSaleElementsId(int $productSaleElementsId): static
     {
         $this->productSaleElementsId = $productSaleElementsId;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getProductSaleElementsId()
+    public function getProductSaleElementsId(): int
     {
         return $this->productSaleElementsId;
     }
 
-    /**
-     * @param int $quantity
-     */
-    public function setQuantity($quantity): static
+    public function setQuantity(int $quantity): static
     {
         $this->quantity = $quantity;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getQuantity()
+    public function getQuantity(): int
     {
         return $this->quantity;
     }

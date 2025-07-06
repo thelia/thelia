@@ -43,10 +43,10 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumListType(['normal', 'reverse'])
+                    new EnumListType(['normal', 'reverse']),
                 ),
-                'normal'
-            )
+                'normal',
+            ),
         );
     }
 
@@ -67,7 +67,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
         $orders = $this->getOrder();
 
         foreach ($orders as $order) {
-            if ($order === 'reverse') {
+            if ('reverse' === $order) {
                 $returnArray = array_reverse($returnArray, false);
             }
         }
@@ -98,7 +98,8 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             $loopResultRow->set('QUANTITY', $cartItem->getQuantity());
             $loopResultRow->set('PRODUCT_ID', $product->getId());
             $loopResultRow->set('PRODUCT_URL', $product->getUrl($this->getCurrentRequest()->getSession()->getLang()->getLocale()));
-            if (!$checkAvailability || $product->getVirtual() === 1) {
+
+            if (!$checkAvailability || 1 === $product->getVirtual()) {
                 $loopResultRow->set('STOCK', $defaultAvailability);
             } else {
                 $loopResultRow->set('STOCK', $productSaleElement->getQuantity());
@@ -109,22 +110,19 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
                 ->set('PROMO_PRICE', $cartItem->getPromoPrice())
                 ->set('TAXED_PRICE', $cartItem->getTaxedPrice($taxCountry))
                 ->set('PROMO_TAXED_PRICE', $cartItem->getTaxedPromoPrice($taxCountry))
-                ->set('IS_PROMO', $cartItem->getPromo() === 1 ? 1 : 0)
-            ;
+                ->set('IS_PROMO', 1 === $cartItem->getPromo() ? 1 : 0);
 
             $loopResultRow
                 ->set('TOTAL_PRICE', $cartItem->getTotalPrice())
                 ->set('TOTAL_PROMO_PRICE', $cartItem->getTotalPromoPrice())
                 ->set('TOTAL_TAXED_PRICE', $cartItem->getTotalTaxedPrice($taxCountry))
-                ->set('TOTAL_PROMO_TAXED_PRICE', $cartItem->getTotalTaxedPromoPrice($taxCountry))
-            ;
+                ->set('TOTAL_PROMO_TAXED_PRICE', $cartItem->getTotalTaxedPromoPrice($taxCountry));
 
             $loopResultRow
                 ->set('REAL_PRICE', $cartItem->getRealPrice())
                 ->set('REAL_TAXED_PRICE', $cartItem->getRealTaxedPrice($taxCountry))
                 ->set('REAL_TOTAL_PRICE', $cartItem->getTotalRealPrice())
-                ->set('REAL_TOTAL_TAXED_PRICE', $cartItem->getTotalRealTaxedPrice($taxCountry))
-            ;
+                ->set('REAL_TOTAL_TAXED_PRICE', $cartItem->getTotalRealTaxedPrice($taxCountry));
 
             $loopResultRow->set('PRODUCT_SALE_ELEMENTS_ID', $productSaleElement->getId());
             $loopResultRow->set('PRODUCT_SALE_ELEMENTS_REF', $productSaleElement->getRef());
@@ -137,10 +135,8 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
 
     /**
      * Return the event dispatcher,.
-     *
-     * @return EventDispatcher
      */
-    public function getDispatcher()
+    public function getDispatcher(): EventDispatcher
     {
         return $this->dispatcher;
     }

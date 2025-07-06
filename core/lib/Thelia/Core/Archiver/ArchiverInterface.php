@@ -26,42 +26,40 @@ interface ArchiverInterface
      *
      * @return string The archiver identifier
      */
-    public function getId();
+    public function getId(): string;
 
     /**
      * Get archiver name.
      *
      * @return string The archiver name
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Get archiver extension.
      *
      * @return string The archiver extension
      */
-    public function getExtension();
+    public function getExtension(): string;
 
     /**
      * Get archiver mime type.
      *
      * @return string The archiver mime type
      */
-    public function getMimeType();
+    public function getMimeType(): string;
 
     /**
      * Get archiver availability.
      *
      * @return bool Archiver availability
      */
-    public function isAvailable();
+    public function isAvailable(): bool;
 
     /**
      * Get archive path.
-     *
-     * @return string
      */
-    public function getArchivePath();
+    public function getArchivePath(): string;
 
     /**
      * Set archive path.

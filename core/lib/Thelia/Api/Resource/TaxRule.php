@@ -30,36 +30,36 @@ use Thelia\Model\Map\TaxRuleTableMap;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/tax_rules'
+            uriTemplate: '/admin/tax_rules',
         ),
         new GetCollection(
-            uriTemplate: '/admin/tax_rules'
+            uriTemplate: '/admin/tax_rules',
         ),
         new Get(
             uriTemplate: '/admin/tax_rules/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/tax_rules/{id}'
+            uriTemplate: '/admin/tax_rules/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/tax_rules/{id}'
+            uriTemplate: '/admin/tax_rules/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/tax_rules/{id}'
+            uriTemplate: '/admin/tax_rules/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/front/tax_rules'
+            uriTemplate: '/front/tax_rules',
         ),
         new Get(
             uriTemplate: '/front/tax_rules/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -68,18 +68,14 @@ use Thelia\Model\Map\TaxRuleTableMap;
     filterClass: BooleanFilter::class,
     properties: [
         'isDefault',
-    ]
+    ],
 )]
 class TaxRule extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:tax_rule:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:tax_rule:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:tax_rule:write';
-
     public const GROUP_FRONT_READ = 'front:tax_rule:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:tax_rule:read:single';
 
     #[Groups([

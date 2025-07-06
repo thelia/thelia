@@ -27,25 +27,25 @@ use Thelia\Model\Map\FeatureProductTableMap;
     operations: [
         new Get(
             uriTemplate: '/admin/feature_products/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Get(
             uriTemplate: '/admin/feature_products/{product}/features/{feature}/feature_avs/{featureAv}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new Get(
             uriTemplate: '/front/feature_products/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
         new Get(
             uriTemplate: '/front/feature_products/{product}/features/{feature}/feature_avs/{featureAv}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -54,20 +54,16 @@ use Thelia\Model\Map\FeatureProductTableMap;
     filterClass: OrderFilter::class,
     properties: [
         'position',
-    ]
+    ],
 )]
 class FeatureProduct implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:feature_product:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:feature_product:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:feature_product:write';
-
     public const GROUP_FRONT_READ = 'front:feature_product:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:feature_product:read:single';
 
     #[Groups([

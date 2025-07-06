@@ -60,8 +60,7 @@ class ShippingZoneAddArea extends BaseForm
                     new NotBlank(),
                     new GreaterThan(['value' => 0]),
                 ],
-            ])
-        ;
+            ]);
     }
 
     /**

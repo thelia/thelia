@@ -77,8 +77,8 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             new Argument(
                 'attribute_availability',
                 new TypeCollection(
-                    new IntToCombinedIntsListType()
-                )
+                    new IntToCombinedIntsListType(),
+                ),
             ),
             new Argument(
                 'order',
@@ -94,15 +94,15 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                             'created', 'created_reverse',
                             'updated', 'updated_reverse',
                             'random',
-                        ]
-                    )
+                        ],
+                    ),
                 ),
-                'random'
-            )
+                'random',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $search = ProductSaleElementsQuery::create();
 
@@ -139,7 +139,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         if (BooleanOrBothType::ANY !== $visible) {
             $search->useProductQuery()
                 ->filterByVisible($visible)
-            ->endUse();
+                ->endUse();
         }
 
         $default = $this->getDefault();
@@ -208,10 +208,12 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         }
 
         $currencyId = $this->getCurrency();
+
         if (null !== $currencyId) {
             $currency = CurrencyQuery::create()->findPk($currencyId);
+
             if (null === $currency) {
-                throw new \InvalidArgumentException('Cannot found currency id: `'.$currency.'` in product_sale_elements loop');
+                throw new \InvalidArgumentException('Cannot found currency id: `' . $currency . '` in product_sale_elements loop');
             }
         } else {
             $currency = $this->getCurrentRequest()->getSession()->getCurrency();
@@ -223,17 +225,17 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         $search->joinProductPrice('price', Criteria::LEFT_JOIN)
             ->addJoinCondition('price', '`price`.`currency_id` = ?', $currency->getId(), null, \PDO::PARAM_INT);
 
-        $search->joinProductPrice('price'.$defaultCurrencySuffix, Criteria::LEFT_JOIN)
-            ->addJoinCondition('price_default_currency', '`price'.$defaultCurrencySuffix.'`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
+        $search->joinProductPrice('price' . $defaultCurrencySuffix, Criteria::LEFT_JOIN)
+            ->addJoinCondition('price_default_currency', '`price' . $defaultCurrencySuffix . '`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
 
         /**
          * rate value is checked as a float in overloaded getRate method.
          */
-        $priceSelectorAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PRICE * '.$currency->getRate().' ELSE `price`.PRICE END';
-        $promoPriceSelectorAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PROMO_PRICE  * '.$currency->getRate().' ELSE `price`.PROMO_PRICE END';
+        $priceSelectorAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PRICE * ' . $currency->getRate() . ' ELSE `price`.PRICE END';
+        $promoPriceSelectorAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PROMO_PRICE  * ' . $currency->getRate() . ' ELSE `price`.PROMO_PRICE END';
         $search->withColumn($priceSelectorAsSQL, 'price_PRICE')
             ->withColumn($promoPriceSelectorAsSQL, 'price_PROMO_PRICE')
-            ->withColumn('CASE WHEN '.ProductSaleElementsTableMap::COL_PROMO.' = 1 THEN '.$promoPriceSelectorAsSQL.' ELSE '.$priceSelectorAsSQL.' END', 'price_FINAL_PRICE');
+            ->withColumn('CASE WHEN ' . ProductSaleElementsTableMap::COL_PROMO . ' = 1 THEN ' . $promoPriceSelectorAsSQL . ' ELSE ' . $priceSelectorAsSQL . ' END', 'price_FINAL_PRICE');
 
         $search->groupById();
 
@@ -256,22 +258,24 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             $loopResultRow = new LoopResultRow($PSEValue);
 
             $price = $PSEValue->getPrice('price_PRICE', $discount);
+
             try {
                 $taxedPrice = $PSEValue->getTaxedPrice(
                     $taxCountry,
                     'price_PRICE',
-                    $discount
+                    $discount,
                 );
             } catch (TaxEngineException) {
                 $taxedPrice = null;
             }
 
             $promoPrice = $PSEValue->getPromoPrice('price_PROMO_PRICE', $discount);
+
             try {
                 $taxedPromoPrice = $PSEValue->getTaxedPromoPrice(
                     $taxCountry,
                     'price_PROMO_PRICE',
-                    $discount
+                    $discount,
                 );
             } catch (TaxEngineException) {
                 $taxedPromoPrice = null;
@@ -280,8 +284,8 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             $loopResultRow
                 ->set('ID', $PSEValue->getId())
                 ->set('QUANTITY', $PSEValue->getQuantity())
-                ->set('IS_PROMO', $PSEValue->getPromo() === 1 ? 1 : 0)
-                ->set('IS_NEW', $PSEValue->getNewness() === 1 ? 1 : 0)
+                ->set('IS_PROMO', 1 === $PSEValue->getPromo() ? 1 : 0)
+                ->set('IS_NEW', 1 === $PSEValue->getNewness() ? 1 : 0)
                 ->set('IS_DEFAULT', $PSEValue->getIsDefault() ? 1 : 0)
                 ->set('WEIGHT', $PSEValue->getWeight())
                 ->set('REF', $PSEValue->getRef())
@@ -312,10 +316,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         ];
     }
 
-    /**
-     * @param ProductSaleElementsQuery $search
-     */
-    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria): void
+    public function doSearch(\Propel\Runtime\ActiveQuery\ModelCriteria $search, $searchTerm, $searchIn, $searchCriteria): void
     {
         $search->_and();
 

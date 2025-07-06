@@ -19,10 +19,7 @@ use Thelia\Model\ProductSaleElements;
 
 class ProductSaleElementEvent extends ActionEvent
 {
-    /**
-     * @var ProductSaleElements|null
-     */
-    public $product_sale_element;
+    public ?ProductSaleElements $product_sale_element;
 
     public function __construct(?ProductSaleElements $product_sale_element = null)
     {

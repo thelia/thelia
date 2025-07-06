@@ -52,8 +52,7 @@ class ProductModificationForm extends ProductCreationForm
             ->add('virtual_document_id', IntegerType::class, [
                 'label' => Translator::getInstance()->trans('Virtual document'),
                 'label_attr' => ['for' => 'virtual_document_id_field'],
-            ])
-        ;
+            ]);
 
         // Add standard description fields, excluding title and locale, which a re defined in parent class
         $this->addStandardDescFields(['title', 'locale']);
@@ -64,15 +63,15 @@ class ProductModificationForm extends ProductCreationForm
         $data = $context->getRoot()->getData();
 
         $count = ProductQuery::create()
-                ->filterById($data['id'], Criteria::NOT_EQUAL)
-                ->filterByRef($value)->count();
+            ->filterById($data['id'], Criteria::NOT_EQUAL)
+            ->filterByRef($value)->count();
 
         if ($count > 0) {
             $context->addViolation(
                 Translator::getInstance()->trans(
                     'A product with reference %ref already exists. Please choose another reference.',
-                    ['%ref' => $value]
-                )
+                    ['%ref' => $value],
+                ),
             );
         }
     }

@@ -25,11 +25,8 @@ use Symfony\Contracts\Service\Attribute\Required;
 trait ParserTemplateTrait
 {
     protected array $tplStack = [];
-
     protected ?TemplateDefinition $templateDefinition = null;
-
     protected bool $fallbackToDefaultTemplate = false;
-
     protected int $status = 200;
 
     #[Required]
@@ -78,8 +75,7 @@ trait ParserTemplateTrait
         if (true === $unshift && isset($this->templateDirectories[$templateType][$templateName])) {
             // When using array_merge, the key was set to 0. Use + instead.
             $this->templateDirectories[$templateType][$templateName] =
-                [$key => $templateDirectory] + $this->templateDirectories[$templateType][$templateName]
-            ;
+                [$key => $templateDirectory] + $this->templateDirectories[$templateType][$templateName];
         } else {
             $this->templateDirectories[$templateType][$templateName][$key] = $templateDirectory;
         }
@@ -92,7 +88,7 @@ trait ParserTemplateTrait
 
     public function hasTemplateDefinition(): bool
     {
-        return $this->templateDefinition !== null;
+        return null !== $this->templateDefinition;
     }
 
     public function getFallbackToDefaultTemplate(): bool

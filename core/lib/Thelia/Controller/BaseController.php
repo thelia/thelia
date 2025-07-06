@@ -135,10 +135,10 @@ abstract class BaseController implements ControllerInterface
                 'Content-type' => 'application/pdf',
                 'Content-Disposition' => \sprintf(
                     '%s; filename=%s.pdf',
-                    $browser === false ? 'attachment' : 'inline',
-                    $fileName
+                    false === $browser ? 'attachment' : 'inline',
+                    $fileName,
                 ),
-            ]
+            ],
         );
     }
 
@@ -225,7 +225,7 @@ abstract class BaseController implements ControllerInterface
             [
                 'order_id' => $order_id,
             ],
-            $this->getTemplateHelper()->getActivePdfTemplate()
+            $this->getTemplateHelper()->getActivePdfTemplate(),
         );
 
         try {
@@ -244,16 +244,12 @@ abstract class BaseController implements ControllerInterface
                 \sprintf(
                     'error during generating invoice pdf for order id : %d with message "%s"',
                     $order_id,
-                    $exception->getMessage()
-                )
+                    $exception->getMessage(),
+                ),
             );
         }
 
-        throw new TheliaProcessException(
-            $this->getTranslator()->trans(
-                "We're sorry, this PDF invoice is not available at the moment."
-            )
-        );
+        throw new TheliaProcessException($this->getTranslator()->trans("We're sorry, this PDF invoice is not available at the moment."));
     }
 
     protected function retrieveSuccessUrl(?BaseForm $form = null): mixed
@@ -289,9 +285,9 @@ abstract class BaseController implements ControllerInterface
             $this->getRoute(
                 $routeId,
                 $routeParameters,
-                $referenceType
+                $referenceType,
             ),
-            $urlParameters
+            $urlParameters,
         );
     }
 
@@ -325,7 +321,7 @@ abstract class BaseController implements ControllerInterface
         int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH,
     ): RedirectResponse {
         return $this->generateRedirect(
-            $this->retrieveUrlFromRouteId($routeId, $urlParameters, $routeParameters, $referenceType)
+            $this->retrieveUrlFromRouteId($routeId, $urlParameters, $routeParameters, $referenceType),
         );
     }
 
@@ -344,7 +340,7 @@ abstract class BaseController implements ControllerInterface
             $this->getCurrentRouter(),
             $routeId,
             $parameters,
-            $referenceType
+            $referenceType,
         );
     }
 
@@ -364,7 +360,7 @@ abstract class BaseController implements ControllerInterface
         /** @var Router $router */
         $router = $this->getRouter($routerName);
 
-        if ($router === null) {
+        if (null === $router) {
             throw new \InvalidArgumentException(\sprintf("Router '%s' does not exists.", $routerName));
         }
 

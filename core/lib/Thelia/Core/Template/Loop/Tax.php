@@ -56,14 +56,14 @@ class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumListType(['id', 'id_reverse', 'alpha', 'alpha_reverse'])
+                    new EnumListType(['id', 'id_reverse', 'alpha', 'alpha_reverse']),
                 ),
-                'alpha'
-            )
+                'alpha',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $search = TaxQuery::create();
 
@@ -85,22 +85,25 @@ class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
         $country = $this->getCountry();
 
         $taxRule = $this->getTaxRule();
+
         if (null !== $taxRule && null !== $country) {
             $search->filterByTaxRuleCountry(
                 TaxRuleCountryQuery::create()
                     ->filterByCountryId($country, Criteria::EQUAL)
                     ->filterByTaxRuleId($taxRule, Criteria::IN)
                     ->find(),
-                Criteria::IN
+                Criteria::IN,
             );
         }
 
         $excludeTaxRule = $this->getExcludeTaxRule();
+
         if (null !== $excludeTaxRule && null !== $country) {
             $excludedTaxes = TaxRuleCountryQuery::create()
                 ->filterByCountryId($country, Criteria::EQUAL)
                 ->filterByTaxRuleId($excludeTaxRule, Criteria::IN)
                 ->find();
+
             /*DOES NOT WORK
              * $search->filterByTaxRuleCountry(
                 $excludedTaxes,
@@ -147,8 +150,7 @@ class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('IS_TRANSLATED', $tax->getVirtualColumn('IS_TRANSLATED'))
                 ->set('LOCALE', $this->locale)
                 ->set('TITLE', $tax->getVirtualColumn('i18n_TITLE'))
-                ->set('DESCRIPTION', $tax->getVirtualColumn('i18n_DESCRIPTION'))
-            ;
+                ->set('DESCRIPTION', $tax->getVirtualColumn('i18n_DESCRIPTION'));
             $this->addOutputFields($loopResultRow, $tax);
 
             $loopResult->addRow($loopResultRow);

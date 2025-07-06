@@ -53,7 +53,7 @@ class MatchForEveryone extends ConditionAbstract
     {
         return $this->translator->trans(
             'Unconditional usage',
-            []
+            [],
         );
     }
 
@@ -61,7 +61,7 @@ class MatchForEveryone extends ConditionAbstract
     {
         return $this->translator->trans(
             'This condition is always true',
-            []
+            [],
         );
     }
 
@@ -69,7 +69,7 @@ class MatchForEveryone extends ConditionAbstract
     {
         return $this->translator->trans(
             'Unconditionnal usage',
-            []
+            [],
         );
     }
 

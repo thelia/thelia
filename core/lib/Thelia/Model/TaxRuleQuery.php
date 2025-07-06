@@ -32,14 +32,12 @@ class TaxRuleQuery extends BaseTaxRuleQuery
 {
     public const ALIAS_FOR_TAX_RULE_COUNTRY_POSITION = 'taxRuleCountryPosition';
 
-    protected static $caches = [];
+    protected static array $caches = [];
 
     /**
      * @throws PropelException
-     *
-     * @return array|mixed|ActiveRecordInterface[]|ObjectCollection|Tax[]
      */
-    public function getTaxCalculatorCollection(TaxRule $taxRule, ?Country $country = null, ?State $state = null)
+    public function getTaxCalculatorCollection(TaxRule $taxRule, ?Country $country = null, ?State $state = null): mixed
     {
         $key = \sprintf(
             '%s-%s-%s',

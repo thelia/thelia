@@ -25,10 +25,7 @@ abstract class AbstractSerializer implements SerializerInterface
     {
     }
 
-    /**
-     * @return string
-     */
-    public function separator()
+    public function separator(): string
     {
         return '';
     }

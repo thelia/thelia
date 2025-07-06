@@ -52,7 +52,6 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
     use StandardI18nFieldsSearchTrait;
 
     protected $timestampable = true;
-
     protected $versionable = true;
 
     protected function getArgDefinitions(): ArgumentCollection
@@ -79,45 +78,39 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                             'random',
                             'created', 'created_reverse',
                             'updated', 'updated_reverse',
-                        ]
-                    )
+                        ],
+                    ),
                 ),
-                'manual'
+                'manual',
             ),
             Argument::createIntListTypeArgument('exclude'),
             Argument::createBooleanTypeArgument('with_prev_next_info', false),
-            Argument::createBooleanOrBothTypeArgument('content_count_visible', true)
+            Argument::createBooleanOrBothTypeArgument('content_count_visible', true),
         );
     }
 
     /**
      * @return array of available field to search in
      */
-    public function getSearchIn()
+    public function getSearchIn(): array
     {
         return $this->getStandardI18nSearchFields();
     }
 
-    /**
-     * @param FolderQuery $search
-     * @param string      $searchTerm
-     * @param array       $searchIn
-     * @param string      $searchCriteria
-     */
-    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria): void
+    public function doSearch(\Propel\Runtime\ActiveQuery\ModelCriteria $search, string $searchTerm, array $searchIn, string $searchCriteria): void
     {
         $search->_and();
         $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria, $searchIn);
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $search = FolderQuery::create();
 
         /* manage translations */
         $this->configureI18nProcessing(
             $search,
-            ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM', 'META_TITLE', 'META_DESCRIPTION', 'META_KEYWORDS']
+            ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM', 'META_TITLE', 'META_DESCRIPTION', 'META_KEYWORDS'],
         );
 
         $id = $this->getId();
@@ -134,9 +127,9 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
 
         $current = $this->getCurrent();
 
-        if ($current === true) {
+        if (true === $current) {
             $search->filterById($this->getCurrentRequest()->get('folder_id'));
-        } elseif ($current === false) {
+        } elseif (false === $current) {
             $search->filterById($this->getCurrentRequest()->get('folder_id'), Criteria::NOT_IN);
         }
 
@@ -159,12 +152,12 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
         $title = $this->getTitle();
 
         if (null !== $title) {
-            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, '%'.$title.'%');
+            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, '%' . $title . '%');
         }
 
         $visible = $this->getVisible();
 
-        if ($visible !== BooleanOrBothType::ANY) {
+        if (BooleanOrBothType::ANY !== $visible) {
             $search->filterByVisible($visible ? 1 : 0);
         }
 
@@ -225,7 +218,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
 
         $contentCountVisiblility = $this->getContentCountVisible();
 
-        if ($contentCountVisiblility !== BooleanOrBothType::ANY) {
+        if (BooleanOrBothType::ANY !== $contentCountVisiblility) {
             $contentCountVisiblility = $contentCountVisiblility ? 1 : 0;
         }
 
@@ -287,10 +280,10 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                     ->findOne();
 
                 $loopResultRow
-                    ->set('HAS_PREVIOUS', $previous != null ? 1 : 0)
-                    ->set('HAS_NEXT', $next != null ? 1 : 0)
-                    ->set('PREVIOUS', $previous != null ? $previous->getId() : -1)
-                    ->set('NEXT', $next != null ? $next->getId() : -1);
+                    ->set('HAS_PREVIOUS', null !== $previous ? 1 : 0)
+                    ->set('HAS_NEXT', null !== $next ? 1 : 0)
+                    ->set('PREVIOUS', null !== $previous ? $previous->getId() : -1)
+                    ->set('NEXT', null !== $next ? $next->getId() : -1);
             }
 
             $this->addOutputFields($loopResultRow, $folder);

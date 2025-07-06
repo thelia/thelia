@@ -28,7 +28,8 @@ class Tax extends BaseAction implements EventSubscriberInterface
     private readonly ServiceLocator $taxTypeLocator;
 
     public function __construct(
-        #[TaggedLocator('thelia.taxType')] ServiceLocator $taxTypeLocator,
+        #[TaggedLocator('thelia.taxType')]
+        ServiceLocator $taxTypeLocator,
     ) {
         $this->taxTypeLocator = $taxTypeLocator;
     }
@@ -43,8 +44,7 @@ class Tax extends BaseAction implements EventSubscriberInterface
             ->setType($event->getType())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
-            ->setDescription($event->getDescription())
-        ;
+            ->setDescription($event->getDescription());
 
         $tax->save();
 
@@ -60,8 +60,7 @@ class Tax extends BaseAction implements EventSubscriberInterface
                 ->setType($event->getType())
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
-                ->setDescription($event->getDescription())
-            ;
+                ->setDescription($event->getDescription());
 
             $tax->save();
 
@@ -73,8 +72,7 @@ class Tax extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $tax = TaxQuery::create()->findPk($event->getId())) {
             $tax
-                ->delete()
-            ;
+                ->delete();
 
             $event->setTax($tax);
         }
@@ -83,6 +81,7 @@ class Tax extends BaseAction implements EventSubscriberInterface
     public function getTaxTypeService(TaxEvent $event): void
     {
         $tax = $event->getTax();
+
         if ($this->taxTypeLocator->has($tax->getType())) {
             $event->setTaxTypeService($this->taxTypeLocator->get($tax->getType()));
         }

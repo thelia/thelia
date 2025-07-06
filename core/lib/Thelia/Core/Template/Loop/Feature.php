@@ -54,7 +54,6 @@ use Thelia\Type\TypeCollection;
 class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $useFeaturePosition;
-
     protected $timestampable = true;
 
     protected function getArgDefinitions(): ArgumentCollection
@@ -69,20 +68,18 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumListType(['id', 'id_reverse', 'alpha', 'alpha-reverse', 'manual', 'manual_reverse'])
+                    new EnumListType(['id', 'id_reverse', 'alpha', 'alpha-reverse', 'manual', 'manual_reverse']),
                 ),
-                'manual'
+                'manual',
             ),
-            Argument::createAnyTypeArgument('title')
+            Argument::createAnyTypeArgument('title'),
         );
     }
 
     /**
      * @throws PropelException
-     *
-     * @return ModelCriteria|FeatureQuery
      */
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria|FeatureQuery
     {
         $search = FeatureQuery::create();
 
@@ -103,7 +100,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $visible = $this->getVisible();
 
-        if ($visible != BooleanOrBothType::ANY) {
+        if (BooleanOrBothType::ANY !== $visible) {
             $search->filterByVisible($visible);
         }
 
@@ -127,8 +124,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
                     $search
                         ->useFeatureProductQuery()
                         ->filterByProduct($product)
-                        ->endUse()
-                    ;
+                        ->endUse();
                 }
 
                 $tplId = $product->getTemplateId();
@@ -141,7 +137,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
             // franck@cqfdev.fr - 05/12/2013 : if the given product has no template
             // or if the product cannot be found, do not return anything.
             if (empty($template)) {
-                return null;
+                return $search;
             }
         }
 
@@ -149,10 +145,10 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
         if (\count($template) > 0 && \count(array_diff(['manual_reverse', 'manual'], $this->getOrder())) < 2) {
             $search
                 ->useFeatureTemplateQuery()
-                    ->filterByTemplate(
-                        TemplateQuery::create()->filterById($template, Criteria::IN)->find(),
-                        Criteria::IN
-                    )
+                ->filterByTemplate(
+                    TemplateQuery::create()->filterById($template, Criteria::IN)->find(),
+                    Criteria::IN,
+                )
                 ->endUse()
                 ->withColumn(FeatureTemplateTableMap::COL_POSITION, 'position');
             $this->useFeaturePosition = false;
@@ -162,9 +158,8 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
             $search
                 ->filterById(
                     FeatureTemplateQuery::create()->filterByTemplateId($excludeTemplate)->select('feature_id')->find(),
-                    Criteria::NOT_IN
-                )
-            ;
+                    Criteria::NOT_IN,
+                );
         }
 
         $title = $this->getTitle();
@@ -179,7 +174,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
             if ($features) {
                 $search->filterById(
                     $features,
-                    Criteria::IN
+                    Criteria::IN,
                 );
             }
         }
@@ -237,8 +232,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('CHAPO', $feature->getVirtualColumn('i18n_CHAPO'))
                 ->set('DESCRIPTION', $feature->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set('POSTSCRIPTUM', $feature->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set('POSITION', $this->useFeaturePosition ? $feature->getPosition() : $feature->getVirtualColumn('position'))
-            ;
+                ->set('POSITION', $this->useFeaturePosition ? $feature->getPosition() : $feature->getVirtualColumn('position'));
             $this->addOutputFields($loopResultRow, $feature);
 
             $loopResult->addRow($loopResultRow);

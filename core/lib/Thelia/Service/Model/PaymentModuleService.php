@@ -61,7 +61,7 @@ readonly class PaymentModuleService
         return
             array_map(
                 fn ($module): PaymentModule => $this->getPaymentModule($dispatcher, $module, $cart, $lang),
-                iterator_to_array($modules)
+                iterator_to_array($modules),
             );
     }
 
@@ -80,7 +80,7 @@ readonly class PaymentModuleService
         $isValidPaymentEvent = new IsValidPaymentEvent($moduleInstance, $cart);
         $dispatcher->dispatch(
             $isValidPaymentEvent,
-            TheliaEvents::MODULE_PAYMENT_IS_VALID
+            TheliaEvents::MODULE_PAYMENT_IS_VALID,
         );
 
         /** @var PaymentModule $paymentModule */
@@ -98,7 +98,7 @@ readonly class PaymentModuleService
 
             $dispatcher->dispatch(
                 $paymentModuleOptionEvent,
-                OpenApiEvents::MODULE_PAYMENT_GET_OPTIONS
+                OpenApiEvents::MODULE_PAYMENT_GET_OPTIONS,
             );
 
             $paymentModuleApi

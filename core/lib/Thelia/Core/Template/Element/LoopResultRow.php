@@ -19,7 +19,6 @@ use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 class LoopResultRow
 {
     protected $substitution = [];
-
     public $model;
 
     public function __construct($model = null)

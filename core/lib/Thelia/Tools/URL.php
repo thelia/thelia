@@ -26,14 +26,11 @@ use Thelia\Service\Rewriting\RewritingRetriever;
 class URL
 {
     protected RewritingResolver $resolver;
-
     protected RewritingRetriever $retriever;
 
-    /** @var RequestContext */
-    protected $requestContext;
+    protected RequestContext $requestContext;
 
     public const PATH_TO_FILE = true;
-
     public const WITH_INDEX_PAGE = false;
 
     protected static self $instance;
@@ -67,9 +64,9 @@ class URL
     /**
      * Return this class instance, only once instanciated.
      *
-     * @throws \RuntimeException if the class has not been instanciated
-     *
      * @return URL the instance
+     *
+     * @throws \RuntimeException if the class has not been instanciated
      */
     public static function getInstance(): self
     {
@@ -88,7 +85,7 @@ class URL
      *
      * @return string the base URL, with a trailing '/'
      */
-    public function getBaseUrl($scheme_only = false): string
+    public function getBaseUrl(bool $scheme_only = false): string
     {
         if (null === $this->baseUrlScheme) {
             $scheme = 'http';
@@ -99,17 +96,17 @@ class URL
 
                 $port = '';
 
-                if ('http' === $scheme && 80 != $this->requestContext->getHttpPort()) {
-                    $port = ':'.$this->requestContext->getHttpPort();
-                } elseif ('https' === $scheme && 443 != $this->requestContext->getHttpsPort()) {
-                    $port = ':'.$this->requestContext->getHttpsPort();
+                if ('http' === $scheme && 80 !== $this->requestContext->getHttpPort()) {
+                    $port = ':' . $this->requestContext->getHttpPort();
+                } elseif ('https' === $scheme && 443 !== $this->requestContext->getHttpsPort()) {
+                    $port = ':' . $this->requestContext->getHttpsPort();
                 }
             }
 
             $this->baseUrlScheme = \sprintf('%s://%s%s', $scheme, $host, $port);
         }
 
-        return $scheme_only ? $this->baseUrlScheme : $this->baseUrlScheme.$this->requestContext->getBaseUrl();
+        return $scheme_only ? $this->baseUrlScheme : $this->baseUrlScheme . $this->requestContext->getBaseUrl();
     }
 
     /**
@@ -133,7 +130,7 @@ class URL
      *
      * @return string The generated URL
      */
-    public function absoluteUrl($path, ?array $parameters = null, $path_only = self::WITH_INDEX_PAGE, $alternateBaseUrl = null): string
+    public function absoluteUrl(string $path, ?array $parameters = null, bool $path_only = self::WITH_INDEX_PAGE, ?string $alternateBaseUrl = null): string
     {
         // Already absolute ?
         if (!str_starts_with($path, 'http')) {
@@ -154,12 +151,12 @@ class URL
             }
 
             // If only a path is requested, be sure to remove the script name (index.php or index_dev.php), if any.
-            if ($path_only == self::PATH_TO_FILE && str_ends_with($base_url, 'php')) {
+            if (self::PATH_TO_FILE === $path_only && str_ends_with($base_url, 'php')) {
                 $base_url = \dirname($base_url);
             }
 
             // Normalize the given path
-            $base = rtrim($base_url, '/').'/'.ltrim($path, '/');
+            $base = rtrim($base_url, '/') . '/' . ltrim($path, '/');
         } else {
             $base = $path;
         }
@@ -172,7 +169,7 @@ class URL
         if (null !== $parameters) {
             foreach ($parameters as $name => $value) {
                 // Remove this parameter from base URL to prevent duplicate parameters
-                $base = preg_replace('`([?&])'.preg_quote($name, '`').'=(?:[^&]*)(?:&|$)`', '$1', (string) $base);
+                $base = preg_replace('`([?&])' . preg_quote($name, '`') . '=(?:[^&]*)(?:&|$)`', '$1', (string) $base);
 
                 $queryString .= \sprintf('%s=%s&', urlencode($name), urlencode((string) $value));
             }
@@ -181,7 +178,8 @@ class URL
         if ('' !== $queryString = rtrim($queryString, '&')) {
             // url could contain anchor
             $pos = strrpos((string) $base, '#');
-            if ($pos !== false) {
+
+            if (false !== $pos) {
                 $anchor = substr((string) $base, $pos);
                 $base = substr((string) $base, 0, $pos);
             }
@@ -190,10 +188,10 @@ class URL
 
             $sepChar = str_contains($base, '?') ? '&' : '?';
 
-            $queryString = $sepChar.$queryString;
+            $queryString = $sepChar . $queryString;
         }
 
-        return $base.$queryString.$anchor;
+        return $base . $queryString . $anchor;
     }
 
     /**
@@ -204,7 +202,7 @@ class URL
      *
      * @return string The generated URL
      */
-    public function adminViewUrl($viewName, array $parameters = []): string
+    public function adminViewUrl(string $viewName, array $parameters = []): string
     {
         $path = \sprintf('%s/admin/%s', $this->getIndexPage(), $viewName);
 
@@ -219,7 +217,7 @@ class URL
      *
      * @return string The generated URL
      */
-    public function viewUrl($viewName, array $parameters = []): string
+    public function viewUrl(string $viewName, array $parameters = []): string
     {
         $path = \sprintf('?view=%s', $viewName);
 
@@ -238,8 +236,9 @@ class URL
         } else {
             $allParametersWithoutView = [];
             $allParametersWithoutView['lang'] = $viewLocale;
+
             if (null !== $viewId) {
-                $allParametersWithoutView[$view.'_id'] = $viewId;
+                $allParametersWithoutView[$view . '_id'] = $viewId;
             }
 
             $this->retriever->rewrittenUrl = null;
@@ -263,16 +262,17 @@ class URL
 
             $viewLocale = $this->getViewLocale($request);
 
-            $viewId = $view === null ? null : $request->query->get($view.'_id', null);
+            $viewId = null === $view ? null : $request->query->get($view . '_id', null);
 
-            if ($view !== null) {
+            if (null !== $view) {
                 unset($allOtherParameters['view']);
-                if ($viewId !== null) {
-                    unset($allOtherParameters[$view.'_id']);
+
+                if (null !== $viewId) {
+                    unset($allOtherParameters[$view . '_id']);
                 }
             }
 
-            if ($viewLocale !== null) {
+            if (null !== $viewLocale) {
                 unset($allOtherParameters['lang']);
                 unset($allOtherParameters['locale']);
             }
@@ -281,6 +281,7 @@ class URL
         } else {
             $allParametersWithoutView = $request->query->all();
             $view = $request->attributes->get('_view');
+
             if (isset($allOtherParameters['view'])) {
                 unset($allOtherParameters['view']);
             }
@@ -330,12 +331,11 @@ class URL
 
     /**
      * Get the locale code from the lang attribute in URL.
-     *
-     * @return string|null
      */
-    private function getViewLocale(Request $request)
+    private function getViewLocale(Request $request): ?string
     {
         $viewLocale = $request->query->get('lang', null);
+
         if (null === $viewLocale) {
             // fallback for old parameter
             $viewLocale = $request->query->get('locale', null);

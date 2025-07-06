@@ -34,7 +34,7 @@ class AdminUserProvider implements PayloadAwareUserProviderInterface
             ->findOne();
 
         // Try with email address
-        if (null == $admin && ($identifier !== '' && $identifier !== '0')) {
+        if (null === $admin && ('' !== $identifier && '0' !== $identifier)) {
             $admin = AdminQuery::create()
                 ->filterByEmail($identifier, Criteria::EQUAL)
                 ->findOne();
@@ -79,7 +79,7 @@ class AdminUserProvider implements PayloadAwareUserProviderInterface
 
     public function loadUserByIdentifierAndPayload(string $userIdentifier, array $payload): UserInterface
     {
-        if (!isset($payload['type']) || $payload['type'] !== Admin::class) {
+        if (!isset($payload['type']) || Admin::class !== $payload['type']) {
             throw new UnsupportedUserException(\sprintf('User "%s" is not supported on this route.', $userIdentifier));
         }
 

@@ -22,15 +22,13 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 interface SearchLoopInterface
 {
     public const MODE_ANY_WORD = 'any_word';
-
     public const MODE_SENTENCE = 'sentence';
-
     public const MODE_STRICT_SENTENCE = 'strict_sentence';
 
     /**
      * @return array of available field to search in
      */
-    public function getSearchIn();
+    public function getSearchIn(): array;
 
     /**
      * @param ModelCriteria $search         a query
@@ -38,5 +36,5 @@ interface SearchLoopInterface
      * @param array         $searchIn       available field to search in
      * @param string        $searchCriteria the search criteria, such as Criterial::LIKE, Criteria::EQUAL, etc
      */
-    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria);
+    public function doSearch(ModelCriteria $search, string $searchTerm, array $searchIn, string $searchCriteria);
 }

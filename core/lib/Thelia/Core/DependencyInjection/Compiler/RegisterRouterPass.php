@@ -30,8 +30,6 @@ class RegisterRouterPass implements CompilerPassInterface
 {
     /**
      * You can modify the container here before it is dumped to PHP code.
-     *
-     * @api
      */
     public function process(ContainerBuilder $container): void
     {
@@ -47,7 +45,7 @@ class RegisterRouterPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds('router.register') as $id => $attributes) {
             $priority = $attributes[0]['priority'] ?? 0;
             $router = $container->getDefinition($id);
-            $router->addMethodCall('setOption', ['cache_dir', THELIA_CACHE_DIR.$container->getParameter('kernel.environment').DS.'routing'.DS.$id]);
+            $router->addMethodCall('setOption', ['cache_dir', THELIA_CACHE_DIR . $container->getParameter('kernel.environment') . DS . 'routing' . DS . $id]);
 
             $chainRouter->addMethodCall('add', [new Reference($id), $priority]);
         }

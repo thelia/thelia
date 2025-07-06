@@ -24,10 +24,7 @@ use Thelia\Model\Hook;
  */
 class HookEvent extends ActionEvent
 {
-    /**
-     * @var Hook|null
-     */
-    public $hook;
+    public ?Hook $hook;
 
     public function __construct(?Hook $hook = null)
     {

@@ -30,18 +30,12 @@ class OrderStatusUpdateEvent extends OrderStatusEvent
     {
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @param int $id
-     */
-    public function setId($id): static
+    public function setId(int $id): static
     {
         $this->id = $id;
 

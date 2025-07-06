@@ -23,26 +23,21 @@ abstract class AbstractDeliveryModule extends BaseModule implements DeliveryModu
     // This class is the base class for delivery modules
     // It may contains common methods in the future.
 
-    /**
-     * @return bool
-     */
-    public function handleVirtualProductDelivery()
+    public function handleVirtualProductDelivery(): bool
     {
         return false;
     }
 
     /**
      * Return the first area that matches the given  country for the given module.
-     *
-     * @return Area|null
      */
-    public function getAreaForCountry(Country $country)
+    public function getAreaForCountry(Country $country): ?Area
     {
         $area = null;
 
         if (null !== $areaDeliveryModule = AreaDeliveryModuleQuery::create()->findByCountryAndModule(
             $country,
-            $this->getModuleModel()
+            $this->getModuleModel(),
         )) {
             $area = $areaDeliveryModule->getArea();
         }

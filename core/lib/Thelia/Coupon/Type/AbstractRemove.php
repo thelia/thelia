@@ -70,7 +70,7 @@ abstract class AbstractRemove extends CouponAbstract implements AmountAndPercent
             $expirationDate,
             $freeShippingForCountries,
             $freeShippingForModules,
-            $perCustomerUsageCount
+            $perCustomerUsageCount,
         );
 
         $this->setFieldsValue($effects);

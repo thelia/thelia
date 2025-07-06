@@ -29,21 +29,16 @@ class SaleDeleteEvent extends SaleEvent
     }
 
     /**
-     * @param int $saleId
-     *
      * @return SaleDeleteEvent $this
      */
-    public function setSaleId($saleId): static
+    public function setSaleId(int $saleId): static
     {
         $this->saleId = $saleId;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getSaleId()
+    public function getSaleId(): int
     {
         return $this->saleId;
     }

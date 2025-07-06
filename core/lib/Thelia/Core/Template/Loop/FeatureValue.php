@@ -58,15 +58,15 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumListType(['alpha', 'alpha_reverse', 'manual', 'manual_reverse'])
+                    new EnumListType(['alpha', 'alpha_reverse', 'manual', 'manual_reverse']),
                 ),
-                'manual'
+                'manual',
             ),
-            Argument::createBooleanTypeArgument('force_return', true)
+            Argument::createBooleanTypeArgument('force_return', true),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $search = FeatureProductQuery::create();
 
@@ -76,12 +76,12 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
             ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'],
             FeatureAvTableMap::TABLE_NAME,
             'FEATURE_AV_ID',
-            true
+            true,
         );
 
         $search
             ->useFeatureAvQuery('feature_av')
-                ->withColumn(FeatureAvTableMap::COL_POSITION, 'feature_av_position')
+            ->withColumn(FeatureAvTableMap::COL_POSITION, 'feature_av_position')
             ->endUse();
 
         $feature = $this->getFeature();
@@ -113,10 +113,10 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
         foreach ($orders as $order) {
             switch ($order) {
                 case 'alpha':
-                    $search->addAscendingOrderByColumn(FeatureAvTableMap::TABLE_NAME.'_i18n_TITLE');
+                    $search->addAscendingOrderByColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE');
                     break;
                 case 'alpha_reverse':
-                    $search->addDescendingOrderByColumn(FeatureAvTableMap::TABLE_NAME.'_i18n_TITLE');
+                    $search->addDescendingOrderByColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE');
                     break;
                 case 'manual':
                     $search->orderBy('feature_av_position', Criteria::ASC);
@@ -145,12 +145,11 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('IS_FREE_TEXT', null === $featureValue->getFeatureAvId() ? 1 : 0)
                 ->set('IS_FEATURE_AV', null === $featureValue->getFeatureAvId() ? 0 : 1)
                 ->set('LOCALE', $this->locale)
-                ->set('TITLE', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME.'_i18n_TITLE'))
-                ->set('CHAPO', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME.'_i18n_CHAPO'))
-                ->set('DESCRIPTION', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME.'_i18n_DESCRIPTION'))
-                ->set('POSTSCRIPTUM', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME.'_i18n_POSTSCRIPTUM'))
-                ->set('POSITION', $featureValue->getPosition())
-            ;
+                ->set('TITLE', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE'))
+                ->set('CHAPO', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_CHAPO'))
+                ->set('DESCRIPTION', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
+                ->set('POSTSCRIPTUM', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'))
+                ->set('POSITION', $featureValue->getPosition());
             $this->addOutputFields($loopResultRow, $featureValue);
 
             $loopResult->addRow($loopResultRow);

@@ -36,14 +36,14 @@ use Thelia\Model\ProductSaleElementsQuery;
             uriTemplate: '/admin/product_sale_elements_product_image',
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
             denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_FILE]],
-            deserialize: false
+            deserialize: false,
         ),
         new GetCollection(
-            uriTemplate: '/admin/product_sale_elements_product_image'
+            uriTemplate: '/admin/product_sale_elements_product_image',
         ),
         new Get(
             uriTemplate: '/admin/product_sale_elements_product_image/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
             uriTemplate: '/admin/product_sale_elements_product_image/{id}',
@@ -51,23 +51,23 @@ use Thelia\Model\ProductSaleElementsQuery;
         ),
         new Patch(
             uriTemplate: '/admin/product_sale_elements_product_image/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
         ),
         new Delete(
-            uriTemplate: '/admin/product_sale_elements_product_image/{id}'
+            uriTemplate: '/admin/product_sale_elements_product_image/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/front/product_sale_elements_product_image'
+            uriTemplate: '/front/product_sale_elements_product_image',
         ),
         new Get(
             uriTemplate: '/front/product_sale_elements_product_image/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -76,7 +76,7 @@ use Thelia\Model\ProductSaleElementsQuery;
     filterClass: OrderFilter::class,
     properties: [
         'id',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -87,24 +87,18 @@ use Thelia\Model\ProductSaleElementsQuery;
         ],
         'productSaleElementsId' => 'exact',
         'productImageId' => 'exact',
-    ]
+    ],
 )]
 class ProductSaleElementsProductImage implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:product_sale_elements_product_image:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:product_sale_elements_product_image:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:product_sale_elements_product_image:write';
-
     public const GROUP_ADMIN_WRITE_FILE = 'admin:product_sale_elements_product_image:write_file';
-
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:product_sale_elements_product_image:write_update';
-
     public const GROUP_FRONT_READ = 'front:product_sale_elements_product_image:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:product_sale_elements_product_image:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
@@ -125,7 +119,7 @@ class ProductSaleElementsProductImage implements PropelResourceInterface
 
     public function getProductId(): ?int
     {
-        if ($this->productSaleElementsId !== null) {
+        if (null !== $this->productSaleElementsId) {
             $pse = ProductSaleElementsQuery::create()->findPk($this->productSaleElementsId);
 
             return $pse ? $pse->getProductId() : null;

@@ -108,7 +108,7 @@ class MailingSystemController extends BaseAdminController
                 $this->getTranslator()->trans('mailing system modification'),
                 $error_msg,
                 $form,
-                $ex
+                $ex,
             );
 
             // At this point, the form has errors, and should be redisplayed.
@@ -121,6 +121,7 @@ class MailingSystemController extends BaseAdminController
     public function testAction(Request $request, MailerFactory $mailer): Response|JsonResponse
     {
         $translator = Translator::getInstance();
+
         // Check current user authorization
         if (($response = $this->checkAuth(self::RESOURCE_CODE, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
@@ -147,7 +148,7 @@ class MailingSystemController extends BaseAdminController
                     [$emailTest => $storeName],
                     $message,
                     $message,
-                    $htmlMessage
+                    $htmlMessage,
                 );
                 $json_data['success'] = true;
                 $json_data['message'] = $translator->trans('Your configuration seems to be ok. Checked out your mailbox : %email%', ['%email%' => $emailTest]);

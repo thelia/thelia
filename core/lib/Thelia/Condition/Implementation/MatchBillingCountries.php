@@ -29,7 +29,7 @@ class MatchBillingCountries extends AbstractMatchCountries
         return 'thelia.condition.match_billing_countries';
     }
 
-    public function isMatching()
+    public function isMatching(): bool
     {
         if (null === $customer = $this->facade->getCustomer()) {
             throw new UnmatchableConditionException(UnmatchableConditionException::getMissingCustomerMessage());
@@ -42,7 +42,7 @@ class MatchBillingCountries extends AbstractMatchCountries
         return $this->conditionValidator->variableOpComparison(
             $billingAddress->getCountryId(),
             $this->operators[self::COUNTRIES_LIST],
-            $this->values[self::COUNTRIES_LIST]
+            $this->values[self::COUNTRIES_LIST],
         );
     }
 
@@ -50,7 +50,7 @@ class MatchBillingCountries extends AbstractMatchCountries
     {
         return $this->translator->trans(
             'Billing country',
-            []
+            [],
         );
     }
 
@@ -58,7 +58,7 @@ class MatchBillingCountries extends AbstractMatchCountries
     {
         return $this->translator->trans(
             'The coupon applies to the selected billing countries',
-            []
+            [],
         );
     }
 
@@ -69,7 +69,7 @@ class MatchBillingCountries extends AbstractMatchCountries
             [
                 '%countries_list%' => $cntryStrList,
                 '%op%' => $i18nOperator,
-            ]
+            ],
         );
     }
 
@@ -77,7 +77,7 @@ class MatchBillingCountries extends AbstractMatchCountries
     {
         return $this->translator->trans(
             'Billing country is',
-            []
+            [],
         );
     }
 }

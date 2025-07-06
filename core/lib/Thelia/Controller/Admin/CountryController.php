@@ -18,6 +18,7 @@ use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Country\CountryCreateEvent;
@@ -54,7 +55,7 @@ class CountryController extends AbstractCrudController
             TheliaEvents::COUNTRY_CREATE,
             TheliaEvents::COUNTRY_UPDATE,
             TheliaEvents::COUNTRY_DELETE,
-            TheliaEvents::COUNTRY_TOGGLE_VISIBILITY
+            TheliaEvents::COUNTRY_TOGGLE_VISIBILITY,
         );
     }
 
@@ -128,8 +129,7 @@ class CountryController extends AbstractCrudController
             ->setDescription($formData['description'])
             ->setPostscriptum($formData['postscriptum'])
             ->setNeedZipCode($formData['need_zip_code'])
-            ->setZipCodeFormat($formData['zip_code_format'])
-        ;
+            ->setZipCodeFormat($formData['zip_code_format']);
 
         return $event;
     }
@@ -143,8 +143,7 @@ class CountryController extends AbstractCrudController
             ->setIsocode($formData['isocode'])
             ->setIsoAlpha2($formData['isoalpha2'])
             ->setIsoAlpha3($formData['isoalpha3'])
-            ->setHasStates($formData['has_states'])
-        ;
+            ->setHasStates($formData['has_states']);
 
         return $event;
     }
@@ -159,10 +158,8 @@ class CountryController extends AbstractCrudController
 
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
-     *
-     * @param unknown $event
      */
-    protected function eventContainsObject($event): bool
+    protected function eventContainsObject(Event $event): bool
     {
         return $event->hasCountry();
     }
@@ -215,7 +212,7 @@ class CountryController extends AbstractCrudController
     /**
      * Render the main list template.
      */
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         return $this->render('countries', ['display_country' => 20]);
     }
@@ -245,7 +242,7 @@ class CountryController extends AbstractCrudController
             [],
             [
                 'country_id' => $this->getRequest()->get('country_id', 0),
-            ]
+            ],
         );
     }
 
@@ -265,6 +262,7 @@ class CountryController extends AbstractCrudController
 
         if (null !== $country_id = $this->getRequest()->get('country_id')) {
             $toogleDefaultEvent = new CountryToggleDefaultEvent($country_id);
+
             try {
                 $eventDispatcher->dispatch($toogleDefaultEvent, TheliaEvents::COUNTRY_TOGGLE_DEFAULT);
 
@@ -290,6 +288,7 @@ class CountryController extends AbstractCrudController
     public function getDataAction($visible = true, $locale = null): Response
     {
         $response = $this->checkAuth($this->resourceCode, [], AccessManager::VIEW);
+
         if ($response instanceof Response) {
             return $response;
         }
@@ -302,10 +301,9 @@ class CountryController extends AbstractCrudController
 
         $countries = CountryQuery::create()
             ->_if($visible)
-                ->filterByVisible(true)
+            ->filterByVisible(true)
             ->_endif()
-            ->joinWithI18n($locale)
-        ;
+            ->joinWithI18n($locale);
 
         /** @var Country $country */
         foreach ($countries as $country) {
@@ -320,10 +318,9 @@ class CountryController extends AbstractCrudController
                 $states = StateQuery::create()
                     ->filterByCountryId($country->getId())
                     ->_if($visible)
-                        ->filterByVisible(true)
+                    ->filterByVisible(true)
                     ->_endif()
-                    ->joinWithI18n($locale)
-                ;
+                    ->joinWithI18n($locale);
 
                 /** @var State $state */
                 foreach ($states as $state) {

@@ -21,29 +21,17 @@ use Thelia\Core\Template\Validator\TemplateValidator;
 class TemplateDefinition
 {
     public const FRONT_OFFICE = 1;
-
     public const BACK_OFFICE = 2;
-
     public const PDF = 3;
-
     public const EMAIL = 4;
-
     public const FRONT_OFFICE_SUBDIR = 'frontOffice';
-
     public const BACK_OFFICE_SUBDIR = 'backOffice';
-
     public const PDF_SUBDIR = 'pdf';
-
     public const EMAIL_SUBDIR = 'email';
-
     public const FRONT_OFFICE_CONFIG_NAME = 'active-front-template';
-
     public const BACK_OFFICE_CONFIG_NAME = 'active-admin-template';
-
     public const PDF_CONFIG_NAME = 'active-pdf-template';
-
     public const EMAIL_CONFIG_NAME = 'active-email-template';
-
     public const CONFIG_NAMES = [
         self::FRONT_OFFICE_SUBDIR => self::FRONT_OFFICE_CONFIG_NAME,
         self::BACK_OFFICE_SUBDIR => self::BACK_OFFICE_CONFIG_NAME,
@@ -52,18 +40,14 @@ class TemplateDefinition
     ];
 
     protected ?string $path = null;
-
     protected ?TemplateDescriptor $templateDescriptor = null;
-
     protected ?string $translationDomainPrefix = null;
-
     public static array $standardTemplatesSubdirs = [
         self::FRONT_OFFICE => self::FRONT_OFFICE_SUBDIR,
         self::BACK_OFFICE => self::BACK_OFFICE_SUBDIR,
         self::PDF => self::PDF_SUBDIR,
         self::EMAIL => self::EMAIL_SUBDIR,
     ];
-
     protected ?array $parentList = null;
 
     /**
@@ -76,19 +60,19 @@ class TemplateDefinition
     {
         switch ($type) {
             case self::FRONT_OFFICE:
-                $this->path = self::FRONT_OFFICE_SUBDIR.DS.$name;
+                $this->path = self::FRONT_OFFICE_SUBDIR . DS . $name;
                 $this->translationDomainPrefix = 'fo.';
                 break;
             case self::BACK_OFFICE:
-                $this->path = self::BACK_OFFICE_SUBDIR.DS.$name;
+                $this->path = self::BACK_OFFICE_SUBDIR . DS . $name;
                 $this->translationDomainPrefix = 'bo.';
                 break;
             case self::PDF:
-                $this->path = self::PDF_SUBDIR.DS.$name;
+                $this->path = self::PDF_SUBDIR . DS . $name;
                 $this->translationDomainPrefix = 'pdf.';
                 break;
             case self::EMAIL:
-                $this->path = self::EMAIL_SUBDIR.DS.$name;
+                $this->path = self::EMAIL_SUBDIR . DS . $name;
                 $this->translationDomainPrefix = 'email.';
                 break;
             default:
@@ -108,7 +92,7 @@ class TemplateDefinition
             $parent = $this->getDescriptor()?->getParent();
 
             for ($index = 1; null !== $parent; ++$index) {
-                $this->parentList[$parent->getName().'-'] = $parent;
+                $this->parentList[$parent->getName() . '-'] = $parent;
 
                 $parent = $parent->getDescriptor()?->getParent();
             }
@@ -121,7 +105,7 @@ class TemplateDefinition
     {
         $templateList = array_merge(
             [$this],
-            $this->getParentList()
+            $this->getParentList(),
         );
 
         /** @var TemplateDefinition $templateDefinition */
@@ -130,7 +114,7 @@ class TemplateDefinition
                 '%s%s/%s',
                 THELIA_TEMPLATE_DIR,
                 $templateDefinition->getPath(),
-                $templateName
+                $templateName,
             );
 
             if (file_exists($templateFilePath)) {
@@ -138,7 +122,7 @@ class TemplateDefinition
             }
         }
 
-        throw new TemplateException('Template file not found: '.$templateName);
+        throw new TemplateException('Template file not found: ' . $templateName);
     }
 
     public function getAssetsPath(): string
@@ -148,19 +132,19 @@ class TemplateDefinition
 
     public function setAssetsPath($assets): static
     {
-        $this->$this->templateDescriptor->setAssets($assets);
+        $this->{$this}->templateDescriptor->setAssets($assets);
 
         return $this;
     }
 
     public function getAbsoluteAssetsPath(): string
     {
-        return $this->getAbsolutePath().DS.$this->templateDescriptor->getAssets();
+        return $this->getAbsolutePath() . DS . $this->templateDescriptor->getAssets();
     }
 
     public function getTranslationDomain(): string
     {
-        return $this->translationDomainPrefix.strtolower($this->getName());
+        return $this->translationDomainPrefix . strtolower($this->getName());
     }
 
     public function getName(): string
@@ -177,12 +161,12 @@ class TemplateDefinition
 
     public function getI18nPath(): string
     {
-        return $this->getPath().DS.'I18n';
+        return $this->getPath() . DS . 'I18n';
     }
 
     public function getAbsoluteI18nPath(): string
     {
-        return THELIA_TEMPLATE_DIR.$this->getI18nPath();
+        return THELIA_TEMPLATE_DIR . $this->getI18nPath();
     }
 
     public function getPath(): ?string
@@ -192,17 +176,17 @@ class TemplateDefinition
 
     public function getAbsolutePath(): string
     {
-        return THELIA_TEMPLATE_DIR.$this->getPath();
+        return THELIA_TEMPLATE_DIR . $this->getPath();
     }
 
     public function getConfigPath(): string
     {
-        return $this->getPath().DS.'configs';
+        return $this->getPath() . DS . 'configs';
     }
 
     public function getAbsoluteConfigPath(): string
     {
-        return THELIA_TEMPLATE_DIR.$this->getConfigPath();
+        return THELIA_TEMPLATE_DIR . $this->getConfigPath();
     }
 
     public function setPath(?string $path): static
@@ -219,7 +203,7 @@ class TemplateDefinition
 
     public function setType($type): static
     {
-        $this->$this->templateDescriptor->setType($type);
+        $this->{$this}->templateDescriptor->setType($type);
 
         return $this;
     }

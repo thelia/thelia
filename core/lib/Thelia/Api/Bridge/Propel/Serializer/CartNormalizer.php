@@ -40,8 +40,17 @@ class CartNormalizer extends AbstractItemNormalizer
         private readonly Session $session,
         private readonly RequestStack $requestStack,
         private readonly CartService $cartService,
-        PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, LegacyIriConverterInterface|IriConverterInterface $iriConverter, LegacyResourceClassResolverInterface|ResourceClassResolverInterface $resourceClassResolver, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ?ResourceAccessCheckerInterface $resourceAccessChecker = null)
-    {
+        PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        LegacyIriConverterInterface|IriConverterInterface $iriConverter,
+        LegacyResourceClassResolverInterface|ResourceClassResolverInterface $resourceClassResolver,
+        ?PropertyAccessorInterface $propertyAccessor = null,
+        ?NameConverterInterface $nameConverter = null,
+        ?ClassMetadataFactoryInterface $classMetadataFactory = null,
+        array $defaultContext = [],
+        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        ?ResourceAccessCheckerInterface $resourceAccessChecker = null,
+    ) {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker);
     }
 
@@ -64,7 +73,7 @@ class CartNormalizer extends AbstractItemNormalizer
         $postageInfo = $this->cartService->getEstimatedPostageForCountry(
             cart: $propelCart,
             country: $country,
-            state: $state
+            state: $state,
         );
         $estimatedPostage = $postageInfo['postage'];
         $postageTax = $postageInfo['tax'];

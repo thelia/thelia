@@ -22,10 +22,7 @@ use Thelia\Model\Product;
  */
 class ProductEvent extends ActionEvent
 {
-    /**
-     * @var Product|null
-     */
-    public $product;
+    public ?Product $product;
 
     public function __construct(?Product $product = null)
     {

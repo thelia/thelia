@@ -16,25 +16,17 @@ namespace Thelia\Core\Event;
 
 class CachedFileEvent extends ActionEvent
 {
-    /**
-     * @var string The complete file name (with path) of the source file
-     */
-    protected $source_filepath;
+    /** @var string The complete file name (with path) of the source file */
+    protected string $source_filepath;
 
-    /**
-     * @var string The target subdirectory in the cache
-     */
-    protected $cache_subdirectory;
+    /** @var string The target subdirectory in the cache */
+    protected string $cache_subdirectory;
 
-    /**
-     * @var string The absolute URL of the cached file (in the web space)
-     */
-    protected $file_url;
+    /** @var string The absolute URL of the cached file (in the web space) */
+    protected string $file_url;
 
-    /**
-     * @var string The absolute path of the cached file
-     */
-    protected $cache_filepath;
+    /** @var string The absolute path of the cached file */
+    protected string $cache_filepath;
 
     public function getFileUrl()
     {

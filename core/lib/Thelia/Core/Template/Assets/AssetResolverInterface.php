@@ -39,7 +39,7 @@ interface AssetResolverInterface
      * @param string          $declaredAssetsDirectory if not null, this is the assets directory declared in the {declare_assets} function of a template
      * @param mixed           $sourceTemplateName      A template name, of false. If provided, the assets will be searched in this template directory instead of the current one.
      */
-    public function resolveAssetURL($source, $file, $type, ParserInterface $parserInterface, $filters = [], $debug = false, $declaredAssetsDirectory = null, $sourceTemplateName = false);
+    public function resolveAssetURL(string $source, string $file, string $type, ParserInterface $parserInterface, array $filters = [], bool $debug = false, ?string $declaredAssetsDirectory = null, mixed $sourceTemplateName = false);
 
     /**
      * Return an asset source file path.
@@ -56,7 +56,7 @@ interface AssetResolverInterface
      *
      * @return mixed the path to directory containing the file, or null if the file doesn't exists
      */
-    public function resolveAssetSourcePath($source, $templateName, $fileName, ParserInterface $parserInterface);
+    public function resolveAssetSourcePath(string $source, string $templateName, string $fileName, ParserInterface $parserInterface): mixed;
 
     /**
      * Return an asset source file path, and the template in which it was found.
@@ -76,12 +76,12 @@ interface AssetResolverInterface
      * @return mixed the path to directory containing the file, or null if the file doesn't exists
      */
     public function resolveAssetSourcePathAndTemplate(
-        $source,
-        $templateName,
-        $fileName,
+        string $source,
+        string $templateName,
+        string $fileName,
         ParserInterface $parserInterface,
         TemplateDefinition &$templateDefinition,
-    );
+    ): mixed;
 
     public function supportParser(ParserInterface $parser): bool;
 }

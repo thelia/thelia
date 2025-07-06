@@ -22,8 +22,7 @@ use Thelia\Model\Customer;
  */
 class CustomerEvent extends ActionEvent
 {
-    /** @var Customer|null */
-    public $customer;
+    public ?Customer $customer;
 
     public function __construct(?Customer $customer = null)
     {
@@ -40,16 +39,13 @@ class CustomerEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     * @return Customer|null
-     */
-    public function getCustomer()
+    public function getCustomer(): ?Customer
     {
         return $this->customer;
     }
 
     public function hasCustomer(): bool
     {
-        return $this->customer != null;
+        return null !== $this->customer;
     }
 }

@@ -69,7 +69,7 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
         return $this;
     }
 
-    public function getParentId()
+    public function getParentId(): int
     {
         return $this->getBrandId();
     }
@@ -77,7 +77,7 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
     /**
      * @return FileModelParentInterface the parent file model
      */
-    public function getParentFileModel()
+    public function getParentFileModel(): FileModelParentInterface
     {
         return new Brand();
     }
@@ -87,7 +87,7 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
      *
      * @return BaseForm the form
      */
-    public function getUpdateFormId()
+    public function getUpdateFormId(): string
     {
         return AdminForm::BRAND_IMAGE_MODIFICATION;
     }
@@ -95,7 +95,7 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
     /**
      * @return string the path to the upload directory where files are stored, without final slash
      */
-    public function getUploadDir()
+    public function getUploadDir(): string
     {
         $uploadDir = ConfigQuery::read('images_library_path');
         $uploadDir = $uploadDir === null ? THELIA_LOCAL_DIR.'media'.DS.'images' : THELIA_ROOT.$uploadDir;
@@ -106,7 +106,7 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
     /**
      * @return string the URL to redirect to after update from the back-office
      */
-    public function getRedirectionUrl()
+    public function getRedirectionUrl(): string
     {
         return '/admin/brand/update/'.$this->getBrandId();
     }
@@ -116,8 +116,13 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
      *
      * @return ModelCriteria
      */
-    public function getQueryInstance()
+    public function getQueryInstance(): ModelCriteria
     {
         return BrandImageQuery::create();
+    }
+
+    public function getFile(): string
+    {
+        return parent::getFile();
     }
 }

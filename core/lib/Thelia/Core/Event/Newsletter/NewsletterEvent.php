@@ -24,25 +24,16 @@ use Thelia\Model\Newsletter;
  */
 class NewsletterEvent extends ActionEvent
 {
-    /**
-     * @var string email to save
-     */
-    protected $id;
+    /** @var string email to save */
+    protected string $id;
 
-    /**
-     * @var string first name subscriber
-     */
-    protected $firstname;
+    /** @var string first name subscriber */
+    protected string $firstname;
 
-    /**
-     * @var string last name subscriber
-     */
-    protected $lastname;
+    /** @var string last name subscriber */
+    protected string $lastname;
 
-    /**
-     * @var Newsletter
-     */
-    protected $newsletter;
+    protected Newsletter $newsletter;
 
     /**
      * @param string $email
@@ -60,118 +51,86 @@ class NewsletterEvent extends ActionEvent
     ) {
     }
 
-    /**
-     * @param Newsletter $newsletter
-     */
-    public function setNewsletter($newsletter): static
+    public function setNewsletter(Newsletter $newsletter): static
     {
         $this->newsletter = $newsletter;
 
         return $this;
     }
 
-    /**
-     * @return Newsletter
-     */
-    public function getNewsletter()
+    public function getNewsletter(): Newsletter
     {
         return $this->newsletter;
     }
 
     /**
-     * @param string $email
-     *
      * @return $this
      */
-    public function setEmail($email): static
+    public function setEmail(string $email): static
     {
         $this->email = $email;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
 
     /**
-     * @param string $firstname
-     *
      * @return $this
      */
-    public function setFirstname($firstname): static
+    public function setFirstname(string $firstname): static
     {
         $this->firstname = $firstname;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getFirstname()
+    public function getFirstname(): string
     {
         return $this->firstname;
     }
 
     /**
-     * @param string $lastname
-     *
      * @return $this
      */
-    public function setLastname($lastname): static
+    public function setLastname(string $lastname): static
     {
         $this->lastname = $lastname;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLastname()
+    public function getLastname(): string
     {
         return $this->lastname;
     }
 
     /**
-     * @param string $locale
-     *
      * @return $this
      */
-    public function setLocale($locale): static
+    public function setLocale(string $locale): static
     {
         $this->locale = $locale;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->locale;
     }
 
-    /**
-     * @param string $id
-     */
-    public function setId($id): static
+    public function setId(string $id): static
     {
         $this->id = $id;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }

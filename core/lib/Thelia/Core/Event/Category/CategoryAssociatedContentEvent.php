@@ -22,10 +22,7 @@ use Thelia\Model\CategoryAssociatedContent;
  */
 class CategoryAssociatedContentEvent extends ActionEvent
 {
-    /**
-     * @var CategoryAssociatedContent|null
-     */
-    public $content;
+    public ?CategoryAssociatedContent $content;
 
     public function __construct(?CategoryAssociatedContent $content = null)
     {

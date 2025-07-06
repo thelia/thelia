@@ -63,7 +63,7 @@ class OrderController extends BaseAdminController
         $message = null;
 
         try {
-            if ($order_id === null) {
+            if (null === $order_id) {
                 $order_id = $this->getRequest()->get('order_id');
             }
 
@@ -150,7 +150,7 @@ class OrderController extends BaseAdminController
         return $this->generateRedirectFromRoute(
             'admin.order.update.view',
             $params,
-            ['order_id' => $order_id]
+            ['order_id' => $order_id],
         );
     }
 
@@ -192,7 +192,7 @@ class OrderController extends BaseAdminController
                 $form->get('phone')->getData(),
                 $form->get('company')->getData(),
                 $form->get('cellphone')->getData(),
-                $form->get('state')->getData()
+                $form->get('state')->getData(),
             );
             $event->setOrderAddress($orderAddress);
             $event->setOrder($order);
@@ -213,7 +213,7 @@ class OrderController extends BaseAdminController
         return $this->generateRedirectFromRoute(
             'admin.order.update.view',
             $params,
-            ['order_id' => $order_id]
+            ['order_id' => $order_id],
         );
     }
 
@@ -223,7 +223,7 @@ class OrderController extends BaseAdminController
             return $response;
         }
 
-        return $this->generateBackOfficeOrderPdf($eventDispatcher, $order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'), $browser == 0);
+        return $this->generateBackOfficeOrderPdf($eventDispatcher, $order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'), 0 === $browser);
     }
 
     public function generateDeliveryPdf(EventDispatcherInterface $eventDispatcher, $order_id, $browser): Response|RedirectResponse
@@ -232,16 +232,16 @@ class OrderController extends BaseAdminController
             return $response;
         }
 
-        return $this->generateBackOfficeOrderPdf($eventDispatcher, $order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'), $browser == 0);
+        return $this->generateBackOfficeOrderPdf($eventDispatcher, $order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'), 0 === $browser);
     }
 
     private function generateBackOfficeOrderPdf(EventDispatcherInterface $eventDispatcher, $order_id, $fileName, bool $browser): RedirectResponse|Response
     {
-        if (!($response = $this->generateOrderPdf($eventDispatcher, $order_id, $fileName, true, true, $browser == 0)) instanceof Response) {
+        if (!($response = $this->generateOrderPdf($eventDispatcher, $order_id, $fileName, true, true, 0 === $browser)) instanceof Response) {
             return $this->generateRedirectFromRoute(
                 'admin.order.update.view',
                 [],
-                ['order_id' => $order_id]
+                ['order_id' => $order_id],
             );
         }
 

@@ -19,71 +19,44 @@ use Thelia\Core\Event\CachedFileEvent;
 
 class ImageEvent extends CachedFileEvent
 {
-    /**
-     * @var string The absolute path of the cached image file
-     */
-    protected $cache_filepath;
+    /** @var string The absolute path of the cached image file */
+    protected string $cache_filepath;
 
-    /**
-     * @var string The absolute URL of the cached version of the original image (in the web space)
-     */
-    protected $original_file_url;
+    /** @var string The absolute URL of the cached version of the original image (in the web space) */
+    protected string $original_file_url;
 
-    /**
-     * @var string The absolute path of the cached version of the original image file
-     */
-    protected $cache_original_filepath;
+    /** @var string The absolute path of the cached version of the original image file */
+    protected string $cache_original_filepath;
 
-    /**
-     * @var string The image category (i.e. the subdirectory in image cache)
-     */
-    protected $category;
+    /** @var string The image category (i.e. the subdirectory in image cache) */
+    protected string $category;
 
-    /**
-     * @var int the required image width
-     */
-    protected $width;
+    /** @var int the required image width */
+    protected int $width;
 
-    /**
-     * @var int the required image height
-     */
-    protected $height;
+    /** @var int the required image height */
+    protected int $height;
 
-    /**
-     * @var string the resize mode, either crop, bands, none
-     */
-    protected $resize_mode;
+    /** @var string the resize mode, either crop, bands, none */
+    protected string $resize_mode;
 
-    /**
-     * @var string the background color in RGB format (eg. #ff8000)
-     */
-    protected $background_color;
+    /** @var string the background color in RGB format (eg. #ff8000) */
+    protected string $background_color;
 
-    /**
-     * @var array a list of effects (grayscale, negative, mirror...), applied in the specified order.
-     */
-    protected $effects = [];
+    /** @var array a list of effects (grayscale, negative, mirror...), applied in the specified order. */
+    protected array $effects = [];
 
-    /**
-     * @var int the rotation angle in degrees, none if zero or null
-     */
-    protected $rotation;
+    /** @var int the rotation angle in degrees, none if zero or null */
+    protected int $rotation;
 
-    /**
-     * @var int the quality of the result image, from 0 (!) to 100
-     */
-    protected $quality;
+    /** @var int the quality of the result image, from 0 (!) to 100 */
+    protected int $quality;
 
-    /**
-     * @var ImageInterface
-     */
-    protected $imageObject;
+    protected ImageInterface $imageObject;
 
-    /** @var bool */
-    protected $allowZoom;
+    protected bool $allowZoom;
 
-    /** @var string */
-    protected $format;
+    protected string $format;
 
     /**
      * @return bool true if the required image is the original image (resize_mode and background_color are not significant)
@@ -91,7 +64,7 @@ class ImageEvent extends CachedFileEvent
     public function isOriginalImage(): bool
     {
         return empty($this->width) && empty($this->height) /* && empty($this->resize_mode) && empty($this->background_color) not significant */
-        && $this->effects === [] && empty($this->rotation) && empty($this->quality);
+        && [] === $this->effects && empty($this->rotation) && empty($this->quality);
     }
 
     /**
@@ -100,8 +73,8 @@ class ImageEvent extends CachedFileEvent
     public function getOptionsHash(): string
     {
         return md5(
-            $this->width.$this->height.$this->resize_mode.$this->background_color.implode(',', $this->effects)
-            .$this->rotation.$this->allowZoom
+            $this->width . $this->height . $this->resize_mode . $this->background_color . implode(',', $this->effects)
+            . $this->rotation . $this->allowZoom,
         );
     }
 
@@ -232,18 +205,12 @@ class ImageEvent extends CachedFileEvent
         return $this;
     }
 
-    /**
-     * @return ImageInterface
-     */
-    public function getImageObject()
+    public function getImageObject(): ImageInterface
     {
         return $this->imageObject;
     }
 
-    /**
-     * @return bool
-     */
-    public function getAllowZoom()
+    public function getAllowZoom(): bool
     {
         return $this->allowZoom;
     }
@@ -255,10 +222,7 @@ class ImageEvent extends CachedFileEvent
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getFormat()
+    public function getFormat(): string
     {
         return $this->format;
     }

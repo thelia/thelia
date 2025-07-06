@@ -40,17 +40,18 @@ class ModuleAttributeLoader extends Loader
             ->filterByActivate(true)
             ->find();
 
-        $coreControllerPath = THELIA_LIB.'Controller';
+        $coreControllerPath = THELIA_LIB . 'Controller';
         $routes->addCollection($loader->load($coreControllerPath, 'attribute'));
 
         foreach ($modules as $module) {
-            $moduleControllerPath = $module->getAbsoluteBaseDir().\DIRECTORY_SEPARATOR.'Controller';
+            $moduleControllerPath = $module->getAbsoluteBaseDir() . \DIRECTORY_SEPARATOR . 'Controller';
 
             if (!is_dir($moduleControllerPath)) {
                 continue;
             }
 
             $moduleRoutes = $loader->load($moduleControllerPath, 'attribute');
+
             if (!$moduleRoutes instanceof RouteCollection) {
                 continue;
             }
@@ -58,14 +59,14 @@ class ModuleAttributeLoader extends Loader
             $moduleRoutePrefix = \call_user_func([$module->getFullNamespace(), 'getRoutePrefix']);
 
             foreach ($moduleRoutes->all() as $moduleRoute) {
-                $moduleRoute->setPath($moduleRoutePrefix.$moduleRoute->getPath());
+                $moduleRoute->setPath($moduleRoutePrefix . $moduleRoute->getPath());
             }
 
             $routes->addCollection($moduleRoutes);
         }
 
         foreach ($routes as $route) {
-            $route->setPath('/'.$route->getPath());
+            $route->setPath('/' . $route->getPath());
         }
 
         $this->isLoaded = true;

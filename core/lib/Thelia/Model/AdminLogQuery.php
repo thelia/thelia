@@ -27,10 +27,7 @@ use Thelia\Model\Base\AdminLogQuery as BaseAdminLogQuery;
  */
 class AdminLogQuery extends BaseAdminLogQuery
 {
-    /**
-     * @return array|mixed|ObjectCollection
-     */
-    public static function getEntries($login = null, $minDate = null, $maxDate = null, $resources = null, $actions = null)
+    public static function getEntries($login = null, $minDate = null, $maxDate = null, $resources = null, $actions = null): mixed
     {
         $search = self::create();
 

@@ -56,17 +56,11 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
         $orderStatus = $this->getOrderStatus($event);
 
         if ($orderStatus->getProtectedStatus()) {
-            throw new \Exception(
-                Translator::getInstance()->trans('This status is protected.')
-                .' '.Translator::getInstance()->trans('You can not delete it.')
-            );
+            throw new \Exception(Translator::getInstance()->trans('This status is protected.') . ' ' . Translator::getInstance()->trans('You can not delete it.'));
         }
 
         if (null !== OrderQuery::create()->findOneByStatusId($orderStatus->getId())) {
-            throw new \Exception(
-                Translator::getInstance()->trans('Some commands use this status.')
-                .' '.Translator::getInstance()->trans('You can not delete it.')
-            );
+            throw new \Exception(Translator::getInstance()->trans('Some commands use this status.') . ' ' . Translator::getInstance()->trans('You can not delete it.'));
         }
 
         $orderStatus->delete();
@@ -96,9 +90,9 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
             ->setPostscriptum($event->getPostscriptum())
             ->setChapo($event->getChapo());
 
-        if ($orderStatus->getId() === null) {
+        if (null === $orderStatus->getId()) {
             $orderStatus->setPosition(
-                OrderStatusQuery::create()->orderByPosition(Criteria::DESC)->findOne()->getPosition() + 1
+                OrderStatusQuery::create()->orderByPosition(Criteria::DESC)->findOne()->getPosition() + 1,
             );
         }
 
@@ -115,15 +109,10 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
         $this->genericUpdatePosition(OrderStatusQuery::create(), $event, $dispatcher);
     }
 
-    /**
-     * @return OrderStatusModel
-     */
-    protected function getOrderStatus(OrderStatusUpdateEvent $event)
+    protected function getOrderStatus(OrderStatusUpdateEvent $event): OrderStatusModel
     {
         if (null === $orderStatus = OrderStatusQuery::create()->findOneById($event->getId())) {
-            throw new \LogicException(
-                'Order status not found'
-            );
+            throw new \LogicException('Order status not found');
         }
 
         return $orderStatus;

@@ -33,12 +33,12 @@ class HttpCache extends BaseHttpCache implements HttpKernelInterface
     {
         parent::__construct(
             $kernel,
-            new Store($kernel->getCacheDir().'/http_cache'),
+            new Store($kernel->getCacheDir() . '/http_cache'),
             new Esi(),
             array_merge(
                 ['debug' => $kernel->isDebug()],
-                $options
-            )
+                $options,
+            ),
         );
     }
 
@@ -48,11 +48,11 @@ class HttpCache extends BaseHttpCache implements HttpKernelInterface
             $request = TheliaRequest::create(
                 $request->getUri(),
                 $request->getMethod(),
-                $request->getMethod() === 'GET' ? $request->query->all() : $request->request->all(),
+                'GET' === $request->getMethod() ? $request->query->all() : $request->request->all(),
                 $request->cookies->all(),
                 $request->files->all(),
                 $request->server->all(),
-                $request->getContent()
+                $request->getContent(),
             );
         }
 

@@ -25,16 +25,16 @@ class Kernel extends Thelia
         parent::configureContainer($container);
 
         $container->import('../config/{packages}/*.yaml');
-        $container->import('../config/{packages}/'.$this->environment.'/*.yaml');
+        $container->import('../config/{packages}/' . $this->environment . '/*.yaml');
 
-        if (is_file(\dirname(__DIR__).'/config/services.yaml')) {
+        if (is_file(\dirname(__DIR__) . '/config/services.yaml')) {
             $container->import('../config/services.yaml');
-            $container->import('../config/{services}_'.$this->environment.'.yaml');
+            $container->import('../config/{services}_' . $this->environment . '.yaml');
 
             return;
         }
 
-        $path = \dirname(__DIR__).'/config/services.php';
+        $path = \dirname(__DIR__) . '/config/services.php';
 
         if (is_file($path)) {
             (require $path)($container->withPath($path), $this);
@@ -45,16 +45,16 @@ class Kernel extends Thelia
     {
         parent::configureRoutes($routes);
 
-        $routes->import('../config/{routes}/'.$this->environment.'/*.yaml');
+        $routes->import('../config/{routes}/' . $this->environment . '/*.yaml');
         $routes->import('../config/{routes}/*.yaml');
 
-        if (is_file(\dirname(__DIR__).'/config/routes.yaml')) {
+        if (is_file(\dirname(__DIR__) . '/config/routes.yaml')) {
             $routes->import('../config/routes.yaml');
 
             return;
         }
 
-        $path = \dirname(__DIR__).'/config/routes.php';
+        $path = \dirname(__DIR__) . '/config/routes.php';
 
         if (is_file($path)) {
             (require $path)($routes->withPath($path), $this);

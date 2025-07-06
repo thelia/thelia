@@ -25,7 +25,7 @@ use Thelia\Model\ProductSaleElementsQuery;
  */
 class ProductStockImport extends AbstractImport
 {
-    protected $mandatoryColumns = [
+    protected array $mandatoryColumns = [
         'id',
         'stock',
     ];
@@ -34,12 +34,12 @@ class ProductStockImport extends AbstractImport
     {
         $pse = ProductSaleElementsQuery::create()->findPk($data['id']);
 
-        if ($pse === null) {
+        if (null === $pse) {
             return Translator::getInstance()->trans(
                 "The product sale element id %id doesn't exist",
                 [
                     '%id' => $data['id'],
-                ]
+                ],
             );
         }
 

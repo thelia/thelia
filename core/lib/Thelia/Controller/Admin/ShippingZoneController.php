@@ -51,7 +51,7 @@ class ShippingZoneController extends BaseAdminController
 
         return $this->render(
             'shipping-zones-edit',
-            ['delivery_module_id' => $delivery_module_id]
+            ['delivery_module_id' => $delivery_module_id],
         );
     }
 
@@ -72,7 +72,7 @@ class ShippingZoneController extends BaseAdminController
 
             $event = new ShippingZoneAddAreaEvent(
                 $form->get('area_id')->getData(),
-                $form->get('shipping_zone_id')->getData()
+                $form->get('shipping_zone_id')->getData(),
             );
 
             $eventDispatcher->dispatch($event, TheliaEvents::SHIPPING_ZONE_ADD_AREA);
@@ -90,7 +90,7 @@ class ShippingZoneController extends BaseAdminController
         $this->setupFormErrorContext(
             $this->getTranslator()->trans('%obj modification', ['%obj' => $this->objectName]),
             $error_msg,
-            $shippingAreaForm
+            $shippingAreaForm,
         );
 
         // At this point, the form has errors, and should be redisplayed.
@@ -111,7 +111,7 @@ class ShippingZoneController extends BaseAdminController
 
             $event = new ShippingZoneRemoveAreaEvent(
                 $form->get('area_id')->getData(),
-                $form->get('shipping_zone_id')->getData()
+                $form->get('shipping_zone_id')->getData(),
             );
 
             $eventDispatcher->dispatch($event, TheliaEvents::SHIPPING_ZONE_REMOVE_AREA);
@@ -129,7 +129,7 @@ class ShippingZoneController extends BaseAdminController
         $this->setupFormErrorContext(
             $this->getTranslator()->trans('%obj modification', ['%obj' => $this->objectName]),
             $error_msg,
-            $shippingAreaForm
+            $shippingAreaForm,
         );
 
         // At this point, the form has errors, and should be redisplayed.
@@ -143,7 +143,7 @@ class ShippingZoneController extends BaseAdminController
     {
         return $this->render(
             'shipping-zones-edit',
-            ['delivery_module_id' => $this->getDeliveryModuleId()]
+            ['delivery_module_id' => $this->getDeliveryModuleId()],
         );
     }
 

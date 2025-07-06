@@ -40,7 +40,7 @@ class OrderPayment extends FirewallForm
                 'constraints' => [
                     new NotBlank(),
                     new Callback(
-                        $this->verifyInvoiceAddress(...)
+                        $this->verifyInvoiceAddress(...),
                     ),
                 ],
             ])
@@ -49,7 +49,7 @@ class OrderPayment extends FirewallForm
                 'constraints' => [
                     new NotBlank(),
                     new Callback(
-                        $this->verifyPaymentModule(...)
+                        $this->verifyPaymentModule(...),
                     ),
                 ],
             ])
@@ -85,7 +85,7 @@ class OrderPayment extends FirewallForm
             $context->addViolation(Translator::getInstance()->trans('Payment module ID not found'));
         } elseif (!$module->isPayementModule()) {
             $context->addViolation(
-                \sprintf(Translator::getInstance()->trans("payment module %s is not a Thelia\Module\PaymentModuleInterface"), $module->getCode())
+                \sprintf(Translator::getInstance()->trans('payment module %s is not a Thelia\\Module\\PaymentModuleInterface'), $module->getCode()),
             );
         }
     }

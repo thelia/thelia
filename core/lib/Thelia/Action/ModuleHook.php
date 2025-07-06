@@ -52,7 +52,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
             ModuleHookQuery::create()
                 ->filterByModuleId($module->getId())
-                ->update(['ModuleActive' => ($module->getActivate() == BaseModule::IS_ACTIVATED)]);
+                ->update(['ModuleActive' => (BaseModule::IS_ACTIVATED === $module->getActivate())]);
         }
 
         return $event;
@@ -60,7 +60,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
 
     public function deleteModule(ModuleDeleteEvent $event): ModuleDeleteEvent
     {
-        if ($event->getModuleId() !== 0) {
+        if (0 !== $event->getModuleId()) {
             ModuleHookQuery::create()
                 ->filterByModuleId($event->getModuleId())
                 ->delete();

@@ -21,8 +21,7 @@ namespace Thelia\Core\Event\Content;
  */
 class ContentDeleteEvent extends ContentEvent
 {
-    /** @var int */
-    protected $folder_id;
+    protected int $folder_id;
 
     /**
      * @param int $content_id

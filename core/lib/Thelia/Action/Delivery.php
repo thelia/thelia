@@ -41,8 +41,8 @@ class Delivery implements EventSubscriberInterface
             $event,
             TheliaEvents::getModuleEvent(
                 TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
-                $module->getCode()
-            )
+                $module->getCode(),
+            ),
         );
 
         if ($event->isPropagationStopped()) {

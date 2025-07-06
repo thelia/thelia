@@ -40,21 +40,20 @@ class CacheClear extends ContainerAwareCommand
                 'without-assets',
                 null,
                 InputOption::VALUE_NONE,
-                'do not clear the assets cache in the web space'
+                'do not clear the assets cache in the web space',
             )
             ->addOption(
                 'with-images',
                 null,
                 InputOption::VALUE_NONE,
-                'clear images generated in `image_cache_dir_from_web_root` or web/cache/images directory'
+                'clear images generated in `image_cache_dir_from_web_root` or web/cache/images directory',
             )
             ->addOption(
                 'with-documents',
                 null,
                 InputOption::VALUE_NONE,
-                'clear documents generated in `document_cache_dir_from_web_root` or web/cache/documents directory'
-            )
-        ;
+                'clear documents generated in `document_cache_dir_from_web_root` or web/cache/documents directory',
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -64,26 +63,26 @@ class CacheClear extends ContainerAwareCommand
         $this->clearCache($cacheDir, $output);
 
         if (!$input->getOption('without-assets')) {
-            $this->clearCache(THELIA_WEB_DIR.ConfigQuery::read('asset_dir_from_web_root', 'assets'), $output);
+            $this->clearCache(THELIA_WEB_DIR . ConfigQuery::read('asset_dir_from_web_root', 'assets'), $output);
         }
 
         if ($input->getOption('with-images')) {
             $this->clearCache(
-                THELIA_WEB_DIR.ConfigQuery::read(
+                THELIA_WEB_DIR . ConfigQuery::read(
                     'image_cache_dir_from_web_root',
-                    'cache'.DS.'images'
+                    'cache' . DS . 'images',
                 ),
-                $output
+                $output,
             );
         }
 
         if ($input->getOption('with-documents')) {
             $this->clearCache(
-                THELIA_WEB_DIR.ConfigQuery::read(
+                THELIA_WEB_DIR . ConfigQuery::read(
                     'document_cache_dir_from_web_root',
-                    'cache'.DS.'documents'
+                    'cache' . DS . 'documents',
                 ),
-                $output
+                $output,
             );
         }
 

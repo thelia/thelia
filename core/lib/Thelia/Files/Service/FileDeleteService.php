@@ -42,7 +42,7 @@ readonly class FileDeleteService
         $modelInstance = $this->fileManager->getModelInstance($objectType, $parentType);
         $model = $modelInstance->getQueryInstance()->findPk($fileId);
 
-        if ($model === null) {
+        if (null === $model) {
             throw new \Exception('File not found');
         }
 
@@ -56,7 +56,7 @@ readonly class FileDeleteService
             $message = $this->translator->trans(
                 '%obj%s deleted successfully',
                 ['%obj%' => ucfirst($objectType)],
-                'image'
+                'image',
             );
         } catch (\Exception $exception) {
             $message = $this->translator->trans(
@@ -66,7 +66,7 @@ readonly class FileDeleteService
                     '%id%' => $fileDeleteEvent->getFileToDelete()->getId(),
                     '%parentId%' => $fileDeleteEvent->getFileToDelete()->getParentId(),
                     '%e%' => $exception->getMessage(),
-                ]
+                ],
             );
 
             throw new \Exception($message, 0, $exception);

@@ -26,10 +26,8 @@ class ProductSaleElements extends BaseProductSaleElements
      * @param int    $discount
      *
      * @throws PropelException
-     *
-     * @return float|int|mixed
      */
-    public function getPrice($virtualColumnName = 'price_PRICE', $discount = 0)
+    public function getPrice($virtualColumnName = 'price_PRICE', $discount = 0): mixed
     {
         try {
             $amount = $this->getVirtualColumn($virtualColumnName);
@@ -49,10 +47,8 @@ class ProductSaleElements extends BaseProductSaleElements
      * @param int    $discount
      *
      * @throws PropelException
-     *
-     * @return float|int|mixed
      */
-    public function getPromoPrice($virtualColumnName = 'price_PROMO_PRICE', $discount = 0)
+    public function getPromoPrice($virtualColumnName = 'price_PROMO_PRICE', $discount = 0): mixed
     {
         try {
             $amount = $this->getVirtualColumn($virtualColumnName);

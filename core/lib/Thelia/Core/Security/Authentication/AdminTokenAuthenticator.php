@@ -22,7 +22,7 @@ class AdminTokenAuthenticator extends TokenAuthenticator
     {
         parent::__construct(
             $key,
-            new AdminTokenUserProvider()
+            new AdminTokenUserProvider(),
         );
     }
 }

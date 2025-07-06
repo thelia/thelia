@@ -30,37 +30,37 @@ use Thelia\Model\Map\CartTableMap;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/carts'
+            uriTemplate: '/admin/carts',
         ),
         new GetCollection(
-            uriTemplate: '/admin/carts'
+            uriTemplate: '/admin/carts',
         ),
         new Get(
             uriTemplate: '/admin/carts/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/carts/{id}'
+            uriTemplate: '/admin/carts/{id}',
         ),
         new Patch(
             uriTemplate: '/admin/carts/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/carts/{id}'
+            uriTemplate: '/admin/carts/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/front/carts'
+            uriTemplate: '/front/carts',
         ),
         new Get(
             uriTemplate: '/front/carts/{id}',
             normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
-            security: 'is_granted("ROLE_CUSTOMER") and object.customer.getId() == user.getId()'
+            security: 'is_granted("ROLE_CUSTOMER") and object.customer.getId() == user.getId()',
         ),
         new Get(
             uriTemplate: '/front/cart',
@@ -69,30 +69,25 @@ use Thelia\Model\Map\CartTableMap;
         ),
         new Put(
             uriTemplate: '/front/carts/{id}',
-            security: 'is_granted("ROLE_CUSTOMER") and object.customer.getId() == user.getId()'
+            security: 'is_granted("ROLE_CUSTOMER") and object.customer.getId() == user.getId()',
         ),
         new Delete(
             uriTemplate: '/front/carts/{id}',
-            security: 'is_granted("ROLE_CUSTOMER") and object.customer.getId() == user.getId()'
+            security: 'is_granted("ROLE_CUSTOMER") and object.customer.getId() == user.getId()',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_FRONT_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_FRONT_WRITE]],
 )]
 class Cart implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:cart:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:cart:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:cart:write';
-
     public const GROUP_FRONT_READ = 'front:cart:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:cart:read:single';
-
     public const GROUP_FRONT_WRITE = 'front:cart:write';
 
     #[Groups([self::GROUP_ADMIN_READ, CartItem::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]

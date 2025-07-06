@@ -26,7 +26,8 @@ class FilterExtension implements QueryCollectionExtensionInterface
     private $filterLocator;
 
     public function __construct(
-        #[TaggedLocator('thelia.api.propel.filter')] ServiceLocator $filterLocator,
+        #[TaggedLocator('thelia.api.propel.filter')]
+        ServiceLocator $filterLocator,
     ) {
         $this->filterLocator = $filterLocator;
     }
@@ -35,7 +36,7 @@ class FilterExtension implements QueryCollectionExtensionInterface
     {
         $resourceFilters = $operation?->getFilters();
 
-        if ($resourceFilters === null || $resourceFilters === []) {
+        if (null === $resourceFilters || [] === $resourceFilters) {
             return;
         }
 

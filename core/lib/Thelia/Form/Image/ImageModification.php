@@ -54,7 +54,7 @@ abstract class ImageModification extends BaseForm
                     'label_attr' => [
                         'for' => 'file',
                     ],
-                ]
+                ],
             )
             // Is this image online ?
             ->add(
@@ -67,9 +67,8 @@ abstract class ImageModification extends BaseForm
                     'label_attr' => [
                         'for' => 'visible_create',
                     ],
-                ]
-            )
-        ;
+                ],
+            );
 
         // Add standard description fields
         $this->addStandardDescFields();

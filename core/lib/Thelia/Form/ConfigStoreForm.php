@@ -42,7 +42,7 @@ class ConfigStoreForm extends BaseForm
                     'attr' => [
                         'placeholder' => $tr->trans('Used in your store front'),
                     ],
-                ]
+                ],
             )
             ->add(
                 'store_description',
@@ -54,7 +54,7 @@ class ConfigStoreForm extends BaseForm
                     'attr' => [
                         'placeholder' => $tr->trans('Used in your store front'),
                     ],
-                ]
+                ],
             )
             ->add(
                 'store_email',
@@ -72,7 +72,7 @@ class ConfigStoreForm extends BaseForm
                     'label_attr' => [
                         'help' => $tr->trans('This is the contact email address, and the sender email of all e-mails sent by your store.'),
                     ],
-                ]
+                ],
             )
             ->add(
                 'store_notification_emails',
@@ -82,7 +82,7 @@ class ConfigStoreForm extends BaseForm
                     'constraints' => [
                         new NotBlank(),
                         new Callback(
-                            $this->checkEmailList(...)
+                            $this->checkEmailList(...),
                         ),
                     ],
                     'label' => $tr->trans('Email addresses of notification recipients'),
@@ -92,7 +92,7 @@ class ConfigStoreForm extends BaseForm
                     'label_attr' => [
                         'help' => $tr->trans('This is a comma separated list of email addresses where store notifications (such as order placed) are sent.'),
                     ],
-                ]
+                ],
             )
             ->add(
                 'store_business_id',
@@ -104,7 +104,7 @@ class ConfigStoreForm extends BaseForm
                     'attr' => [
                         'placeholder' => $tr->trans('Store Business Identification Number (SIRET, etc).'),
                     ],
-                ]
+                ],
             )
             ->add(
                 'store_phone',
@@ -116,7 +116,7 @@ class ConfigStoreForm extends BaseForm
                     'attr' => [
                         'placeholder' => $tr->trans('The store phone number.'),
                     ],
-                ]
+                ],
             )
             ->add(
                 'store_fax',
@@ -128,7 +128,7 @@ class ConfigStoreForm extends BaseForm
                     'attr' => [
                         'placeholder' => $tr->trans('The store fax number.'),
                     ],
-                ]
+                ],
             )
             ->add(
                 'store_address1',
@@ -142,7 +142,7 @@ class ConfigStoreForm extends BaseForm
                     'attr' => [
                         'placeholder' => $tr->trans('Address.'),
                     ],
-                ]
+                ],
             )
             ->add(
                 'store_address2',
@@ -153,7 +153,7 @@ class ConfigStoreForm extends BaseForm
                     'attr' => [
                         'placeholder' => $tr->trans('Additional address information'),
                     ],
-                ]
+                ],
             )
             ->add(
                 'store_address3',
@@ -164,7 +164,7 @@ class ConfigStoreForm extends BaseForm
                     'attr' => [
                         'placeholder' => $tr->trans('Additional address information'),
                     ],
-                ]
+                ],
             )
             ->add(
                 'store_zipcode',
@@ -178,7 +178,7 @@ class ConfigStoreForm extends BaseForm
                     'attr' => [
                         'placeholder' => $tr->trans('Zip code'),
                     ],
-                ]
+                ],
             )
             ->add(
                 'store_city',
@@ -192,7 +192,7 @@ class ConfigStoreForm extends BaseForm
                     'attr' => [
                         'placeholder' => $tr->trans('City'),
                     ],
-                ]
+                ],
             )
             ->add(
                 'store_country',
@@ -206,7 +206,7 @@ class ConfigStoreForm extends BaseForm
                     'attr' => [
                         'placeholder' => $tr->trans('Country'),
                     ],
-                ]
+                ],
             )
             ->add(
                 'favicon_file',
@@ -223,7 +223,7 @@ class ConfigStoreForm extends BaseForm
                         'for' => 'favicon_file',
                         'help' => $tr->trans('Icon of the website. Only PNG and ICO files are allowed.'),
                     ],
-                ]
+                ],
             )
             ->add(
                 'logo_file',
@@ -237,7 +237,7 @@ class ConfigStoreForm extends BaseForm
                     'label_attr' => [
                         'for' => 'logo_file',
                     ],
-                ]
+                ],
             )
             ->add(
                 'banner_file',
@@ -252,7 +252,7 @@ class ConfigStoreForm extends BaseForm
                         'for' => 'banner_file',
                         'help' => $tr->trans('Banner of the website. Used in the e-mails send to the customers.'),
                     ],
-                ]
+                ],
             );
     }
 

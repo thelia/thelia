@@ -47,7 +47,7 @@ readonly class ItemFileResourceService
         }
 
         $fileModel->setParentId($parentId)
-            ->setVisible(filter_var($request->get('visible'), \FILTER_VALIDATE_BOOLEAN))
+            ->setVisible(filter_var($request->get('visible'), FILTER_VALIDATE_BOOLEAN))
             ->setPosition($request->get('position'));
 
         $i18ns = json_decode((string) $request->get('i18ns'), true);
@@ -66,27 +66,28 @@ readonly class ItemFileResourceService
 
         $file = $this->eventDispatcher->dispatch(
             $fileEvent,
-            TheliaEvents::DOCUMENT_SAVE
+            TheliaEvents::DOCUMENT_SAVE,
         );
 
-        if ($fileType !== 'image') {
+        if ('image' !== $fileType) {
             return;
         }
 
         $event = new ImageEvent();
 
         $baseSourceFilePath = ConfigQuery::read('images_library_path');
-        if ($baseSourceFilePath === null) {
-            $baseSourceFilePath = THELIA_LOCAL_DIR.'media'.DS.'images';
+
+        if (null === $baseSourceFilePath) {
+            $baseSourceFilePath = THELIA_LOCAL_DIR . 'media' . DS . 'images';
         } else {
-            $baseSourceFilePath = THELIA_ROOT.$baseSourceFilePath;
+            $baseSourceFilePath = THELIA_ROOT . $baseSourceFilePath;
         }
 
         $sourceFilePath = \sprintf(
             '%s/%s/%s',
             $baseSourceFilePath,
             $itemType,
-            basename($file->getUploadedFile()->getFilename())
+            basename($file->getUploadedFile()->getFilename()),
         );
 
         $event->setSourceFilepath($sourceFilePath);
@@ -107,16 +108,19 @@ readonly class ItemFileResourceService
         $constraints = [];
 
         $reflectionClass = new \ReflectionClass($className);
+
         if ($reflectionClass->hasProperty($propertyName)) {
             $property = $reflectionClass->getProperty($propertyName);
 
             $attributes = $property->getAttributes(Assert\File::class);
+
             foreach ($attributes as $attribute) {
                 $constraintInstance = $attribute->newInstance();
                 $constraints[] = $constraintInstance;
             }
 
             $attributes = $property->getAttributes(Assert\Image::class);
+
             foreach ($attributes as $attribute) {
                 $constraintInstance = $attribute->newInstance();
                 $constraints[] = $constraintInstance;

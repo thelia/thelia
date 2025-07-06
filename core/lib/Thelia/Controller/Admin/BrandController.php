@@ -18,6 +18,7 @@ use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Brand\BrandCreateEvent;
 use Thelia\Core\Event\Brand\BrandDeleteEvent;
@@ -53,7 +54,7 @@ class BrandController extends AbstractSeoCrudController
             TheliaEvents::BRAND_DELETE,
             TheliaEvents::BRAND_TOGGLE_VISIBILITY,
             TheliaEvents::BRAND_UPDATE_POSITION,
-            TheliaEvents::BRAND_UPDATE_SEO
+            TheliaEvents::BRAND_UPDATE_SEO,
         );
     }
 
@@ -111,8 +112,7 @@ class BrandController extends AbstractSeoCrudController
         $brandCreateEvent
             ->setLocale($formData['locale'])
             ->setTitle($formData['title'])
-            ->setVisible($formData['visible'])
-        ;
+            ->setVisible($formData['visible']);
 
         return $brandCreateEvent;
     }
@@ -131,8 +131,7 @@ class BrandController extends AbstractSeoCrudController
             ->setTitle($formData['title'])
             ->setChapo($formData['chapo'])
             ->setDescription($formData['description'])
-            ->setPostscriptum($formData['postscriptum'])
-        ;
+            ->setPostscriptum($formData['postscriptum']);
 
         return $brandUpdateEvent;
     }
@@ -147,10 +146,8 @@ class BrandController extends AbstractSeoCrudController
 
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
-     *
-     * @param BrandEvent $event
      */
-    protected function eventContainsObject($event): bool
+    protected function eventContainsObject(\Symfony\Contracts\EventDispatcher\Event $event): bool
     {
         return $event->hasBrand();
     }
@@ -160,9 +157,9 @@ class BrandController extends AbstractSeoCrudController
      *
      * @param $event \Thelia\Core\Event\Brand\BrandEvent
      *
-     * @return Brand|null
+     * @return \Brand|null
      */
-    protected function getObjectFromEvent($event): mixed
+    protected function getObjectFromEvent($event): ?Brand
     {
         return $event->getBrand();
     }
@@ -211,7 +208,7 @@ class BrandController extends AbstractSeoCrudController
     /**
      * Render the main list template.
      */
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         $this->getListOrderFromSession('brand', 'order', 'manual');
 
@@ -244,7 +241,7 @@ class BrandController extends AbstractSeoCrudController
         return $this->generateRedirectFromRoute(
             'admin.brand.update',
             [],
-            $this->getEditionArguments()
+            $this->getEditionArguments(),
         );
     }
 
@@ -269,7 +266,7 @@ class BrandController extends AbstractSeoCrudController
         return new UpdatePositionEvent(
             $this->getRequest()->get('brand_id'),
             $positionChangeMode,
-            $positionValue
+            $positionValue,
         );
     }
 }

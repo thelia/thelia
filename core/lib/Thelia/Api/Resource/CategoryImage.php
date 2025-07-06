@@ -44,14 +44,14 @@ use Thelia\Model\Map\CategoryImageTableMap;
             controller: PostItemFileController::class,
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
             denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_FILE]],
-            deserialize: false
+            deserialize: false,
         ),
         new GetCollection(
-            uriTemplate: '/admin/category_images'
+            uriTemplate: '/admin/category_images',
         ),
         new Get(
             uriTemplate: '/admin/category_images/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Get(
             uriTemplate: '/admin/category_images/{id}/file',
@@ -61,32 +61,32 @@ use Thelia\Model\Map\CategoryImageTableMap;
                     '200' => [
                         'description' => 'The binary file',
                     ],
-                ]
-            )
+                ],
+            ),
         ),
         new Put(
             uriTemplate: '/admin/category_images/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
         ),
         new Patch(
             uriTemplate: '/admin/category_images/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
         ),
         new Delete(
-            uriTemplate: '/admin/category_images/{id}'
+            uriTemplate: '/admin/category_images/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/front/category_images'
+            uriTemplate: '/front/category_images',
         ),
         new Get(
             uriTemplate: '/front/category_images/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
         new Get(
             uriTemplate: '/front/category_images/{id}/file',
@@ -96,8 +96,8 @@ use Thelia\Model\Map\CategoryImageTableMap;
                     '200' => [
                         'description' => 'The binary file',
                     ],
-                ]
-            )
+                ],
+            ),
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -106,7 +106,7 @@ use Thelia\Model\Map\CategoryImageTableMap;
     filterClass: OrderFilter::class,
     properties: [
         'position',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -115,28 +115,22 @@ use Thelia\Model\Map\CategoryImageTableMap;
             'strategy' => 'exact',
             'fieldPath' => 'category_image.category_id',
         ],
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
         'visible',
-    ]
+    ],
 )]
 class CategoryImage extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     public const GROUP_ADMIN_READ = 'admin:category_image:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:category_image:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:category_image:write';
-
     public const GROUP_ADMIN_WRITE_FILE = 'admin:category_image:write_file';
-
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:category_image:write_update';
-
     public const GROUP_FRONT_READ = 'front:category_image:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:category_image:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
@@ -151,7 +145,7 @@ class CategoryImage extends AbstractTranslatableResource implements ItemFileReso
         openapiContext: [
             'type' => 'string',
             'format' => 'binary',
-        ]
+        ],
     )]
     #[Assert\Image(
         mimeTypes: [

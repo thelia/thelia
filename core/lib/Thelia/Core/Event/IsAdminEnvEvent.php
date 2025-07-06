@@ -18,10 +18,7 @@ use Thelia\Core\HttpFoundation\Request;
 
 class IsAdminEnvEvent extends ActionEvent
 {
-    /**
-     * @var bool
-     */
-    private $isAdminEnv = false;
+    private bool $isAdminEnv = false;
 
     public function __construct(protected Request $request)
     {
@@ -30,18 +27,12 @@ class IsAdminEnvEvent extends ActionEvent
         }
     }
 
-    /**
-     * @param bool $isAdminEnv
-     */
-    public function setIsAdminEnv($isAdminEnv): void
+    public function setIsAdminEnv(bool $isAdminEnv): void
     {
         $this->isAdminEnv = $isAdminEnv;
     }
 
-    /**
-     * @return bool
-     */
-    public function isAdminEnv()
+    public function isAdminEnv(): bool
     {
         return $this->isAdminEnv;
     }

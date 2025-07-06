@@ -16,17 +16,14 @@ namespace Thelia\ImportExport\Export;
 
 abstract class ArrayAbstractExport extends AbstractExport
 {
-    /**
-     * @var array Data to export
-     */
     private ?array $data = null;
 
-    public function current()
+    public function current(): mixed
     {
         return current($this->data);
     }
 
-    public function key()
+    public function key(): mixed
     {
         return key($this->data);
     }
@@ -38,7 +35,7 @@ abstract class ArrayAbstractExport extends AbstractExport
 
     public function rewind(): void
     {
-        if ($this->data === null) {
+        if (null === $this->data) {
             $data = $this->getData();
 
             if (\is_array($data)) {
@@ -48,9 +45,7 @@ abstract class ArrayAbstractExport extends AbstractExport
                 return;
             }
 
-            throw new \DomainException(
-                'Data must be an array.'
-            );
+            throw new \DomainException('Data must be an array.');
         }
 
         throw new \LogicException("Export data can't be rewinded");
@@ -58,6 +53,6 @@ abstract class ArrayAbstractExport extends AbstractExport
 
     public function valid(): bool
     {
-        return key($this->data) !== null;
+        return null !== key($this->data);
     }
 }

@@ -51,14 +51,14 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumListType(['id', 'id_reverse', 'alpha', 'alpha-reverse', 'alpha_reverse', 'manual', 'manual_reverse'])
+                    new EnumListType(['id', 'id_reverse', 'alpha', 'alpha-reverse', 'alpha_reverse', 'manual', 'manual_reverse']),
                 ),
-                'manual'
-            )
+                'manual',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $search = FeatureAvQuery::create();
 
@@ -112,11 +112,10 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
         // Search only non-freetext feature values.
         $search
             ->useFeatureProductQuery()
-                ->filterByIsFreeText(false)
-                ->_or()
-                ->filterByIsFreeText(null) // does not belong to any product
-            ->endUse()
-        ;
+            ->filterByIsFreeText(false)
+            ->_or()
+            ->filterByIsFreeText(null) // does not belong to any product
+            ->endUse();
 
         // Joining with FeatureProduct may result in multiple occurences of the same FeatureAv. Juste get one.
         $search->distinct();

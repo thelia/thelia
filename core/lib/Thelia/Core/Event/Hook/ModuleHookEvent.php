@@ -24,10 +24,7 @@ use Thelia\Model\ModuleHook;
  */
 class ModuleHookEvent extends ActionEvent
 {
-    /**
-     * @var ModuleHook|null
-     */
-    public $moduleHook;
+    public ?ModuleHook $moduleHook;
 
     public function __construct(?ModuleHook $moduleModuleHook = null)
     {

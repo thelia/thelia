@@ -31,15 +31,9 @@ use Thelia\Type\TypeCollection;
  */
 class Argument
 {
-    /**
-     * @var TypeCollection
-     */
-    public $type;
+    public TypeCollection $type;
 
-    /**
-     * @var bool
-     */
-    public $mandatory;
+    public bool $mandatory;
 
     private int|string|null $value = null;
 
@@ -63,7 +57,7 @@ class Argument
 
     public function setValue($value): void
     {
-        if ($value === null) {
+        if (null === $value) {
             $this->value = null;
         } elseif (false === $value) {
             /* (string) $value = "" */
@@ -80,11 +74,11 @@ class Argument
         return new self(
             $name,
             new TypeCollection(
-                new AnyType()
+                new AnyType(),
             ),
             $default,
             $mandatory,
-            $empty
+            $empty,
         );
     }
 
@@ -93,11 +87,11 @@ class Argument
         return new self(
             $name,
             new TypeCollection(
-                new IntType()
+                new IntType(),
             ),
             $default,
             $mandatory,
-            $empty
+            $empty,
         );
     }
 
@@ -106,11 +100,11 @@ class Argument
         return new self(
             $name,
             new TypeCollection(
-                new FloatType()
+                new FloatType(),
             ),
             $default,
             $mandatory,
-            $empty
+            $empty,
         );
     }
 
@@ -119,11 +113,11 @@ class Argument
         return new self(
             $name,
             new TypeCollection(
-                new BooleanType()
+                new BooleanType(),
             ),
             $default,
             $mandatory,
-            $empty
+            $empty,
         );
     }
 
@@ -132,11 +126,11 @@ class Argument
         return new self(
             $name,
             new TypeCollection(
-                new BooleanOrBothType()
+                new BooleanOrBothType(),
             ),
             $default,
             $mandatory,
-            $empty
+            $empty,
         );
     }
 
@@ -145,30 +139,27 @@ class Argument
         return new self(
             $name,
             new TypeCollection(
-                new IntListType()
+                new IntListType(),
             ),
             $default,
             $mandatory,
-            $empty
+            $empty,
         );
     }
 
     /**
-     * @param bool $mandatory
-     * @param bool $empty
-     *
      * @since 2.2
      */
-    public static function createAnyListTypeArgument($name, $default = null, $mandatory = false, $empty = true): self
+    public static function createAnyListTypeArgument($name, $default = null, bool $mandatory = false, bool $empty = true): self
     {
         return new self(
             $name,
             new TypeCollection(
-                new AnyListType()
+                new AnyListType(),
             ),
             $default,
             $mandatory,
-            $empty
+            $empty,
         );
     }
 
@@ -177,49 +168,43 @@ class Argument
         return new self(
             $name,
             new TypeCollection(
-                new EnumListType($entries)
+                new EnumListType($entries),
             ),
             $default,
             $mandatory,
-            $empty
+            $empty,
         );
     }
 
     /**
-     * @param bool $mandatory
-     * @param bool $empty
-     *
      * @since 2.4.0
      */
-    public static function createAlphaNumStringTypeArgument($name, $default = null, $mandatory = false, $empty = true): self
+    public static function createAlphaNumStringTypeArgument($name, $default = null, bool $mandatory = false, bool $empty = true): self
     {
         return new self(
             $name,
             new TypeCollection(
-                new AlphaNumStringType()
+                new AlphaNumStringType(),
             ),
             $default,
             $mandatory,
-            $empty
+            $empty,
         );
     }
 
     /**
-     * @param bool $mandatory
-     * @param bool $empty
-     *
      * @since 2.4.0
      */
-    public static function createAlphaNumStringListTypeArgument($name, $default = null, $mandatory = false, $empty = true): self
+    public static function createAlphaNumStringListTypeArgument($name, $default = null, bool $mandatory = false, bool $empty = true): self
     {
         return new self(
             $name,
             new TypeCollection(
-                new AlphaNumStringListType()
+                new AlphaNumStringListType(),
             ),
             $default,
             $mandatory,
-            $empty
+            $empty,
         );
     }
 }

@@ -43,10 +43,8 @@ class LoopExtendsEvent extends ActionEvent
 
     /**
      * Get the loop name.
-     *
-     * @return string|null
      */
-    public function getLoopName()
+    public function getLoopName(): ?string
     {
         return $this->loop->getLoopName();
     }

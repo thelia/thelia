@@ -24,5 +24,5 @@ interface ParserHelperInterface
      *
      * @return array array of functions with 2 index name and attributes an array of name, value
      */
-    public function getFunctionsDefinition($content, array $functions = []);
+    public function getFunctionsDefinition(string $content, array $functions = []): array;
 }

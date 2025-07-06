@@ -34,18 +34,12 @@ class LangDefaultBehaviorEvent extends ActionEvent
     ) {
     }
 
-    /**
-     * @param int $defaultBehavior
-     */
-    public function setDefaultBehavior($defaultBehavior): void
+    public function setDefaultBehavior(int $defaultBehavior): void
     {
         $this->defaultBehavior = $defaultBehavior;
     }
 
-    /**
-     * @return int
-     */
-    public function getDefaultBehavior()
+    public function getDefaultBehavior(): int
     {
         return $this->defaultBehavior;
     }

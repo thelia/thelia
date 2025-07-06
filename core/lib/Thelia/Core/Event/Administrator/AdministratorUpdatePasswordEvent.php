@@ -24,29 +24,21 @@ use Thelia\Model\Admin;
  */
 class AdministratorUpdatePasswordEvent extends ActionEvent
 {
-    /**
-     * @var string new administrator password
-     */
-    protected $password;
+    /** @var string new administrator password */
+    protected string $password;
 
     public function __construct(protected Admin $admin)
     {
     }
 
-    /**
-     * @param string $password
-     */
-    public function setPassword($password): static
+    public function setPassword(string $password): static
     {
         $this->password = $password;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getPassword()
+    public function getPassword(): string
     {
         return $this->password;
     }

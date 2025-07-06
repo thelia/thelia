@@ -22,7 +22,6 @@ class TlogDestinationHtml extends AbstractTlogDestination
     // Nom des variables de configuration
     // ----------------------------------
     public const VAR_STYLE = 'tlog_destinationhtml_style';
-
     public const VALEUR_STYLE_DEFAUT = 'text-align: left; font-size: 12px; font-weight: normal; line-height: 14px; float: none; display:block; color: #000; background-color: #fff; font-family: Courier New, courier,fixed;';
 
     private $style;
@@ -55,7 +54,7 @@ class TlogDestinationHtml extends AbstractTlogDestination
                 'CSS of each log line',
                 'You may also leave this field empty, and define a "tlog-trace" style in your CSS.',
                 self::VALEUR_STYLE_DEFAUT,
-                TlogDestinationConfig::TYPE_TEXTAREA
+                TlogDestinationConfig::TYPE_TEXTAREA,
             ),
         ];
     }

@@ -22,7 +22,6 @@ use Thelia\Core\Event\CachedFileEvent;
 class DocumentEvent extends CachedFileEvent
 {
     protected $documentPath;
-
     protected $documentUrl;
 
     /**
@@ -30,7 +29,7 @@ class DocumentEvent extends CachedFileEvent
      *
      * @return string The document file path
      */
-    public function getDocumentPath()
+    public function getDocumentPath(): string
     {
         return $this->documentPath;
     }
@@ -42,7 +41,7 @@ class DocumentEvent extends CachedFileEvent
      *
      * @return $this
      */
-    public function setDocumentPath($documentPath): static
+    public function setDocumentPath(string $documentPath): static
     {
         $this->documentPath = $documentPath;
 
@@ -54,7 +53,7 @@ class DocumentEvent extends CachedFileEvent
      *
      * @return string The document URL
      */
-    public function getDocumentUrl()
+    public function getDocumentUrl(): string
     {
         return $this->documentUrl;
     }
@@ -66,7 +65,7 @@ class DocumentEvent extends CachedFileEvent
      *
      * @return $this
      */
-    public function setDocumentUrl($documentUrl): static
+    public function setDocumentUrl(string $documentUrl): static
     {
         $this->documentUrl = $documentUrl;
 

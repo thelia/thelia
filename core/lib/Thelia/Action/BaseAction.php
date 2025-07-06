@@ -37,11 +37,11 @@ class BaseAction
 
             $mode = $event->getMode();
 
-            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE) {
+            if (UpdatePositionEvent::POSITION_ABSOLUTE === $mode) {
                 $object->changeAbsolutePosition($event->getPosition());
-            } elseif ($mode == UpdatePositionEvent::POSITION_UP) {
+            } elseif (UpdatePositionEvent::POSITION_UP === $mode) {
                 $object->movePositionUp();
-            } elseif ($mode == UpdatePositionEvent::POSITION_DOWN) {
+            } elseif (UpdatePositionEvent::POSITION_DOWN === $mode) {
                 $object->movePositionDown();
             }
         }
@@ -59,11 +59,11 @@ class BaseAction
 
             $mode = $event->getMode();
 
-            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE) {
+            if (UpdatePositionEvent::POSITION_ABSOLUTE === $mode) {
                 $object->changeAbsolutePosition($event->getPosition());
-            } elseif ($mode == UpdatePositionEvent::POSITION_UP) {
+            } elseif (UpdatePositionEvent::POSITION_UP === $mode) {
                 $object->movePositionUp();
-            } elseif ($mode == UpdatePositionEvent::POSITION_DOWN) {
+            } elseif (UpdatePositionEvent::POSITION_DOWN === $mode) {
                 $object->movePositionDown();
             }
         }
@@ -72,11 +72,11 @@ class BaseAction
     /**
      * Changes SEO Fields for an object.
      *
-     * @throws FormValidationException if a rewritten URL cannot be created
-     *
      * @return mixed an SEOxxx object
+     *
+     * @throws FormValidationException if a rewritten URL cannot be created
      */
-    protected function genericUpdateSeo(ModelCriteria $query, UpdateSeoEvent $event, ?EventDispatcherInterface $dispatcher = null)
+    protected function genericUpdateSeo(ModelCriteria $query, UpdateSeoEvent $event, ?EventDispatcherInterface $dispatcher = null): mixed
     {
         if (null !== $object = $query->findPk($event->getObjectId())) {
             $object
@@ -84,8 +84,7 @@ class BaseAction
                 ->setMetaTitle($event->getMetaTitle())
                 ->setMetaDescription($event->getMetaDescription())
                 ->setMetaKeywords($event->getMetaKeywords())
-                ->save()
-            ;
+                ->save();
 
             // Update the rewritten URL, if required
             try {
@@ -109,8 +108,7 @@ class BaseAction
             $newVisibility = !$object->getVisible();
             $object
                 ->setVisible($newVisibility)
-                ->save()
-            ;
+                ->save();
 
             $event->setObject($object);
         }

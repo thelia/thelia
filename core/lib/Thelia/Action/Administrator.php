@@ -42,8 +42,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
             ->setLogin($event->getLogin())
             ->setPassword($event->getPassword())
             ->setProfileId($event->getProfile())
-            ->setLocale($event->getLocale())
-        ;
+            ->setLocale($event->getLocale());
 
         $administrator->save();
 
@@ -59,8 +58,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
                 ->setLogin($event->getLogin())
                 ->setEmail($event->getEmail())
                 ->setProfileId($event->getProfile())
-                ->setLocale($event->getLocale())
-            ;
+                ->setLocale($event->getLocale());
 
             if ('' !== $event->getPassword()) {
                 $administrator->setPassword($event->getPassword());
@@ -76,8 +74,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $administrator = AdminQuery::create()->findPk($event->getId())) {
             $administrator
-                ->delete()
-            ;
+                ->delete();
 
             $event->setAdministrator($administrator);
         }
@@ -109,11 +106,11 @@ class Administrator extends BaseAction implements EventSubscriberInterface
             $this->mailer->sendEmailMessage(
                 'new_admin_password',
                 [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
-                [$email => $admin->getFirstname().' '.$admin->getLastname()],
+                [$email => $admin->getFirstname() . ' ' . $admin->getLastname()],
                 [
                     'token' => $renewToken,
                     'admin' => $admin,
-                ]
+                ],
             );
         }
     }

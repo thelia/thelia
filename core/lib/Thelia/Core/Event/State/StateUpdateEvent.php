@@ -29,21 +29,16 @@ class StateUpdateEvent extends StateCreateEvent
     }
 
     /**
-     * @param int $state_id
-     *
      * @return $this
      */
-    public function setStateId($state_id): static
+    public function setStateId(int $state_id): static
     {
         $this->state_id = $state_id;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getStateId()
+    public function getStateId(): int
     {
         return $this->state_id;
     }

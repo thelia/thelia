@@ -42,13 +42,12 @@ class Feature extends BaseAction implements EventSubscriberInterface
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
 
-            ->save()
-        ;
+            ->save();
 
         $event->setFeature($feature);
 
         // Add atribute to all product templates if required
-        if ($event->getAddToAllTemplates() != 0) {
+        if (0 !== $event->getAddToAllTemplates()) {
             $this->doAddToAllTemplates($feature);
         }
     }
@@ -81,8 +80,7 @@ class Feature extends BaseAction implements EventSubscriberInterface
         if (null !== ($feature = FeatureQuery::create()->findPk($event->getFeatureId()))) {
             $feature
 
-                ->delete()
-            ;
+                ->delete();
 
             $event->setFeature($feature);
         }
@@ -107,8 +105,7 @@ class Feature extends BaseAction implements EventSubscriberInterface
                 $feature_template
                     ->setFeature($feature)
                     ->setTemplate($template)
-                    ->save()
-                ;
+                    ->save();
             }
         }
     }

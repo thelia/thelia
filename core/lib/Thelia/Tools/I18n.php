@@ -40,7 +40,7 @@ class I18n
      *
      * @return DateTime
      */
-    public function getDateTimeFromForm(Lang $lang, $date): DateTime|false
+    public function getDateTimeFromForm(Lang $lang, string $date): DateTime|false
     {
         $currentDateFormat = $lang->getDateFormat();
 
@@ -56,26 +56,29 @@ class I18n
         $i18n = $i18nQueryClass::create()
             ->filterById($id)
             ->filterByLocale(
-                $askedLocale
+                $askedLocale,
             )->findOne();
+
         /* or default translation */
         if (null === $i18n) {
             $i18n = $i18nQueryClass::create()
                 ->filterById($id)
                 ->filterByLocale(
-                    Lang::getDefaultLanguage()->getLocale()
+                    Lang::getDefaultLanguage()->getLocale(),
                 )->findOne();
         }
 
         if (null === $i18n) {
-            // @todo something else ?
+            /** @todo something else ? */
             $i18n = new $i18nClass();
 
             $i18n->setId($id);
+
             foreach ($needed as $need) {
                 $method = \sprintf('set%s', $need);
+
                 if (method_exists($i18n, $method)) {
-                    $i18n->$method('DEFAULT '.strtoupper((string) $need));
+                    $i18n->{$method}('DEFAULT ' . strtoupper((string) $need));
                 }
 
                 // @todo throw sg ?
@@ -103,15 +106,14 @@ class I18n
         $query
             ->_and()
             ->where(
-                'CASE WHEN '.$tableIdColumn.' IN'.
-                '(SELECT DISTINCT '.$i18nIdColumn.' '.
-                'FROM `'.$i18nTableName.'` '.
-                \sprintf('WHERE locale=%s) ', $locale).
-                'THEN '.$localeColumn.\sprintf(' = %s ', $locale).
-                'ELSE '.$localeColumn.\sprintf(' = %s ', $defaultLocale).
-                'END'
-            )
-        ;
+                'CASE WHEN ' . $tableIdColumn . ' IN' .
+                '(SELECT DISTINCT ' . $i18nIdColumn . ' ' .
+                'FROM `' . $i18nTableName . '` ' .
+                \sprintf('WHERE locale=%s) ', $locale) .
+                'THEN ' . $localeColumn . \sprintf(' = %s ', $locale) .
+                'ELSE ' . $localeColumn . \sprintf(' = %s ', $defaultLocale) .
+                'END',
+            );
     }
 
     /**
@@ -127,11 +129,11 @@ class I18n
         $len = \strlen($str);
 
         for ($i = 0; $i < $len; ++$i) {
-            $return .= 'CHAR('.\ord($str[$i]).'),';
+            $return .= 'CHAR(' . \ord($str[$i]) . '),';
         }
 
         $return = $i > 0 ? substr($return, 0, -1) : '""';
 
-        return $return.')';
+        return $return . ')';
     }
 }

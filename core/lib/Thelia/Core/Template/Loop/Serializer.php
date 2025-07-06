@@ -41,20 +41,20 @@ class Serializer extends BaseLoop implements ArraySearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumType(['alpha', 'alpha_reverse'])
+                    new EnumType(['alpha', 'alpha_reverse']),
                 ),
-                'alpha'
-            )
+                'alpha',
+            ),
         );
     }
 
-    public function buildArray()
+    public function buildArray(): array
     {
         /** @var SerializerManager $serializerManager */
         $serializerManager = $this->container->get(RegisterSerializerPass::MANAGER_SERVICE_ID);
 
         $serializerId = $this->getArgValue('serializer');
-        $serializers = $serializerId === null ? $serializerManager->getSerializers() : [$serializerManager->get($serializerId)];
+        $serializers = null === $serializerId ? $serializerManager->getSerializers() : [$serializerManager->get($serializerId)];
 
         match ($this->getArgValue('order')) {
             'alpha' => ksort($serializers),

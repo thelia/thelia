@@ -39,7 +39,7 @@ class TaxController extends AbstractCrudController
             AdminResources::TAX,
             TheliaEvents::TAX_CREATE,
             TheliaEvents::TAX_UPDATE,
-            TheliaEvents::TAX_DELETE
+            TheliaEvents::TAX_DELETE,
         );
     }
 
@@ -85,7 +85,7 @@ class TaxController extends AbstractCrudController
         $event = new TaxEvent();
 
         $event->setId(
-            $this->getRequest()->get('tax_id', 0)
+            $this->getRequest()->get('tax_id', 0),
         );
 
         return $event;
@@ -110,7 +110,7 @@ class TaxController extends AbstractCrudController
         return $this->createForm(
             AdminForm::TAX_MODIFICATION,
             FormType::class,
-            $data
+            $data,
         );
     }
 
@@ -159,10 +159,10 @@ class TaxController extends AbstractCrudController
         ];
     }
 
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         return $this->render(
-            'taxes-rules'
+            'taxes-rules',
         );
     }
 
@@ -177,7 +177,7 @@ class TaxController extends AbstractCrudController
         return $this->generateRedirectFromRoute(
             'admin.configuration.taxes.update',
             $this->getViewArguments(),
-            $this->getRouteArguments()
+            $this->getRouteArguments(),
         );
     }
 
@@ -193,7 +193,7 @@ class TaxController extends AbstractCrudController
         return $this->generateRedirectFromRoute(
             'admin.configuration.taxes.update',
             $this->getViewArguments(),
-            $this->getRouteArguments($createEvent->getTax()->getId())
+            $this->getRouteArguments($createEvent->getTax()->getId()),
         );
     }
 
@@ -208,6 +208,7 @@ class TaxController extends AbstractCrudController
     protected function getRequirements($type, $formData): array
     {
         $requirements = [];
+
         foreach ($formData as $data => $value) {
             if (!strstr((string) $data, ':')) {
                 continue;
@@ -215,7 +216,7 @@ class TaxController extends AbstractCrudController
 
             $couple = explode(':', (string) $data);
 
-            if (\count($couple) == 2 && $couple[0] == $type) {
+            if (2 === \count($couple) && $couple[0] === $type) {
                 $requirements[$couple[1]] = $value;
             }
         }

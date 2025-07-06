@@ -26,16 +26,13 @@ use Thelia\Exception\FileNotFoundException;
 interface FileDownloaderInterface
 {
     /**
-     * @param string $url
-     * @param string $pathToStore
-     *
      * @throws FileNotFoundException
      * @throws \ErrorException
      * @throws \HttpUrlException
      *
      * Downloads the file $url in $pathToStore
      */
-    public function download($url, $pathToStore);
+    public function download(string $url, string $pathToStore);
 
     public function __construct(LoggerInterface $logger, Translator $translator);
 

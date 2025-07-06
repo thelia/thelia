@@ -35,14 +35,13 @@ class ModuleModificationForm extends BaseForm
                 'constraints' => [
                     new NotBlank(),
                     new Callback(
-                        $this->verifyModuleId(...)
+                        $this->verifyModuleId(...),
                     ),
                 ],
                 'attr' => [
                     'id' => 'module_update_id',
                 ],
-            ])
-        ;
+            ]);
     }
 
     /**

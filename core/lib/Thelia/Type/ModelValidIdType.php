@@ -31,7 +31,7 @@ class ModelValidIdType extends BaseType
      */
     public function __construct(string $expectedModelActiveRecord)
     {
-        $class = '\\Thelia\\Model\\'.$expectedModelActiveRecord.'Query';
+        $class = '\\Thelia\\Model\\' . $expectedModelActiveRecord . 'Query';
 
         if (!class_exists($class) && new $class() instanceof ModelCriteria) {
             throw new TypeException('MODEL NOT FOUND', TypeException::MODEL_NOT_FOUND);
@@ -75,6 +75,7 @@ class ModelValidIdType extends BaseType
         }
 
         $choices = [];
+
         foreach ($query->find() as $item) {
             $label = method_exists($item, 'getTitle') ? $item->getTitle() : $item->getId();
             $choices[$label] = $item->getId();

@@ -24,41 +24,29 @@ use Thelia\Core\Event\ActionEvent;
 class TranslationEvent extends ActionEvent
 {
     public const WALK_MODE_PHP = 'php';
-
     public const WALK_MODE_TEMPLATE = 'tpl';
 
-    /** @var string */
-    protected $directory;
+    protected string $directory;
 
-    /** @var string */
-    protected $mode;
+    protected string $mode;
 
-    /** @var string */
-    protected $locale;
+    protected string $locale;
 
-    /** @var string */
-    protected $domain;
+    protected string $domain;
 
-    /** @var array */
-    protected $translatableStrings;
+    protected array $translatableStrings;
 
-    /** @var array */
-    protected $customFallbackStrings;
+    protected array $customFallbackStrings;
 
-    /** @var array */
-    protected $globalFallbackStrings;
+    protected array $globalFallbackStrings;
 
-    /** @var int */
-    protected $translatableStringCount;
+    protected int $translatableStringCount;
 
-    /** @var string */
-    protected $translationFilePath;
+    protected string $translationFilePath;
 
-    /** @var array */
-    protected $translatedStrings;
+    protected array $translatedStrings;
 
-    /** @var bool */
-    protected $createFileIfNotExists;
+    protected bool $createFileIfNotExists;
 
     public static function createGetStringsEvent($directory, $mode, $locale, $domain): self
     {
@@ -88,216 +76,159 @@ class TranslationEvent extends ActionEvent
         return $event;
     }
 
-    /**
-     * @return string
-     */
-    public function getDirectory()
+    public function getDirectory(): string
     {
         return $this->directory;
     }
 
     /**
-     * @param string $directory
-     *
      * @return $this
      */
-    public function setDirectory($directory): self
+    public function setDirectory(string $directory): self
     {
         $this->directory = $directory;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getMode()
+    public function getMode(): string
     {
         return $this->mode;
     }
 
     /**
-     * @param string $mode
-     *
      * @return $this
      */
-    public function setMode($mode): self
+    public function setMode(string $mode): self
     {
         $this->mode = $mode;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->locale;
     }
 
     /**
-     * @param string $locale
-     *
      * @return $this
      */
-    public function setLocale($locale): self
+    public function setLocale(string $locale): self
     {
         $this->locale = $locale;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getDomain()
+    public function getDomain(): string
     {
         return $this->domain;
     }
 
     /**
-     * @param string $domain
-     *
      * @return $this
      */
-    public function setDomain($domain): self
+    public function setDomain(string $domain): self
     {
         $this->domain = $domain;
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getTranslatableStrings()
+    public function getTranslatableStrings(): array
     {
         return $this->translatableStrings;
     }
 
     /**
-     * @param array $translatableStrings
-     *
      * @return $this
      */
-    public function setTranslatableStrings($translatableStrings): self
+    public function setTranslatableStrings(array $translatableStrings): self
     {
         $this->translatableStrings = $translatableStrings;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getTranslatableStringCount()
+    public function getTranslatableStringCount(): int
     {
         return $this->translatableStringCount;
     }
 
     /**
-     * @param int $translatableStringCount
-     *
      * @return $this
      */
-    public function setTranslatableStringCount($translatableStringCount): self
+    public function setTranslatableStringCount(int $translatableStringCount): self
     {
         $this->translatableStringCount = $translatableStringCount;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getTranslationFilePath()
+    public function getTranslationFilePath(): string
     {
         return $this->translationFilePath;
     }
 
     /**
-     * @param string $translationFilePath
-     *
      * @return $this
      */
-    public function setTranslationFilePath($translationFilePath): self
+    public function setTranslationFilePath(string $translationFilePath): self
     {
         $this->translationFilePath = $translationFilePath;
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getTranslatedStrings()
+    public function getTranslatedStrings(): array
     {
         return $this->translatedStrings;
     }
 
     /**
-     * @param array $translatedStrings
-     *
      * @return $this
      */
-    public function setTranslatedStrings($translatedStrings): self
+    public function setTranslatedStrings(array $translatedStrings): self
     {
         $this->translatedStrings = $translatedStrings;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isCreateFileIfNotExists()
+    public function isCreateFileIfNotExists(): bool
     {
         return $this->createFileIfNotExists;
     }
 
     /**
-     * @param bool $createFileIfNotExists
-     *
      * @return $this
      */
-    public function setCreateFileIfNotExists($createFileIfNotExists): self
+    public function setCreateFileIfNotExists(bool $createFileIfNotExists): self
     {
         $this->createFileIfNotExists = $createFileIfNotExists;
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getCustomFallbackStrings()
+    public function getCustomFallbackStrings(): array
     {
         return $this->customFallbackStrings;
     }
 
-    /**
-     * @param array $customFallbackStrings
-     */
-    public function setCustomFallbackStrings($customFallbackStrings): static
+    public function setCustomFallbackStrings(array $customFallbackStrings): static
     {
         $this->customFallbackStrings = $customFallbackStrings;
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getGlobalFallbackStrings()
+    public function getGlobalFallbackStrings(): array
     {
         return $this->globalFallbackStrings;
     }
 
-    /**
-     * @param array $globalFallbackStrings
-     */
-    public function setGlobalFallbackStrings($globalFallbackStrings): static
+    public function setGlobalFallbackStrings(array $globalFallbackStrings): static
     {
         $this->globalFallbackStrings = $globalFallbackStrings;
 

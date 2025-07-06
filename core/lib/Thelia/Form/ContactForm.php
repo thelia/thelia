@@ -84,8 +84,7 @@ class ContactForm extends FirewallForm
                 'label_attr' => [
                     'for' => 'message_contact',
                 ],
-            ])
-        ;
+            ]);
     }
 
     /**

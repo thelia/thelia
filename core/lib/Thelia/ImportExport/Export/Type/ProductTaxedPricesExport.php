@@ -38,7 +38,7 @@ class ProductTaxedPricesExport extends JsonFileAbstractExport
 
     public const FILE_NAME = 'product_taxed_price';
 
-    protected $orderAndAliases = [
+    protected array $orderAndAliases = [
         'product_sale_elements_id' => 'id',
         'product_sale_elements_product_id' => 'product_id',
         'product_i18n_title' => 'title',
@@ -52,7 +52,7 @@ class ProductTaxedPricesExport extends JsonFileAbstractExport
         'tax_rule_i18n_title' => 'tax_title',
     ];
 
-    protected function getData()
+    protected function getData(): array|string|\Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $locale = $this->language->getLocale();
 
@@ -78,8 +78,7 @@ class ProductTaxedPricesExport extends JsonFileAbstractExport
                     LEFT JOIN product_price ON product_price.product_sale_elements_id = product_sale_elements.id
                     LEFT JOIN currency ON currency.id = product_price.currency_id
                     LEFT JOIN tax_rule_i18n ON tax_rule_i18n.id = product.tax_rule_id AND tax_rule_i18n.locale = :locale
-                    ORDER BY product.id'
-        ;
+                    ORDER BY product.id';
 
         $stmt = $con->prepare($query);
         $stmt->bindValue('locale', $locale);
@@ -88,7 +87,7 @@ class ProductTaxedPricesExport extends JsonFileAbstractExport
         return $this->getDataJsonCache($stmt, 'product_taxed_prices');
     }
 
-    public function current()
+    public function current(): mixed
     {
         $data = parent::current();
 

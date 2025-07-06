@@ -17,13 +17,9 @@ namespace Thelia\Core\Event\Product;
 class ProductUpdateEvent extends ProductCreateEvent
 {
     protected $chapo;
-
     protected $description;
-
     protected $postscriptum;
-
     protected $brand_id;
-
     protected $virtual_document_id;
 
     /**
@@ -82,21 +78,16 @@ class ProductUpdateEvent extends ProductCreateEvent
     }
 
     /**
-     * @param int $brand_id
-     *
      * @return $this
      */
-    public function setBrandId($brand_id): static
+    public function setBrandId(int $brand_id): static
     {
         $this->brand_id = $brand_id;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getBrandId()
+    public function getBrandId(): int
     {
         return $this->brand_id;
     }

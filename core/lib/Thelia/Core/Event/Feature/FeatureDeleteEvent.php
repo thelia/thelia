@@ -16,13 +16,9 @@ namespace Thelia\Core\Event\Feature;
 
 class FeatureDeleteEvent extends FeatureEvent
 {
-    /** @var int */
-    protected $feature_id;
+    protected int $feature_id;
 
-    /**
-     * @param int $feature_id
-     */
-    public function __construct($feature_id)
+    public function __construct(int $feature_id)
     {
         $this->setFeatureId($feature_id);
     }

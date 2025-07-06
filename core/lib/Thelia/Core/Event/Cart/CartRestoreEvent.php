@@ -21,10 +21,7 @@ class CartRestoreEvent extends ActionEvent
 {
     protected $cart;
 
-    /**
-     * @return Cart
-     */
-    public function getCart()
+    public function getCart(): Cart
     {
         return $this->cart;
     }

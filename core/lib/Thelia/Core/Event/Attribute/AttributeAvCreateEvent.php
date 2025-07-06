@@ -17,9 +17,7 @@ namespace Thelia\Core\Event\Attribute;
 class AttributeAvCreateEvent extends AttributeAvEvent
 {
     protected $title;
-
     protected $locale;
-
     protected $attribute_id;
 
     public function getLocale()

@@ -43,11 +43,11 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
     protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
-            Argument::createIntTypeArgument('order', null, true)
+            Argument::createIntTypeArgument('order', null, true),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $search = OrderCouponQuery::create();
 
@@ -55,8 +55,7 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
 
         $search
             ->filterByOrderId($order, Criteria::EQUAL)
-            ->orderById(Criteria::ASC)
-        ;
+            ->orderById(Criteria::ASC);
 
         return $search;
     }
@@ -77,12 +76,14 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
                 $daysLeftBeforeExpiration = floor($datediff / $oneDayInSeconds);
 
                 $freeShippingForCountriesIds = [];
+
                 /** @var OrderCouponCountry $couponCountry */
                 foreach ($orderCoupon->getFreeShippingForCountries() as $couponCountry) {
                     $freeShippingForCountriesIds[] = $couponCountry->getCountryId();
                 }
 
                 $freeShippingForModulesIds = [];
+
                 /** @var OrderCouponModule $couponModule */
                 foreach ($orderCoupon->getFreeShippingForModules() as $couponModule) {
                     $freeShippingForModulesIds[] = $couponModule->getModuleId();
@@ -102,8 +103,7 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
                     ->set('FREE_SHIPPING_FOR_COUNTRIES_LIST', implode(',', $freeShippingForCountriesIds))
                     ->set('FREE_SHIPPING_FOR_MODULES_LIST', implode(',', $freeShippingForModulesIds))
                     ->set('PER_CUSTOMER_USAGE_COUNT', $orderCoupon->getPerCustomerUsageCount())
-                    ->set('IS_USAGE_CANCELED', $orderCoupon->getUsageCanceled())
-                ;
+                    ->set('IS_USAGE_CANCELED', $orderCoupon->getUsageCanceled());
                 $this->addOutputFields($loopResultRow, $orderCoupon);
 
                 $loopResult->addRow($loopResultRow);

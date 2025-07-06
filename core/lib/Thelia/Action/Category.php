@@ -52,8 +52,7 @@ class Category extends BaseAction implements EventSubscriberInterface
             ->setVisible($event->getVisible())
             ->setTitle($event->getTitle())
 
-            ->save()
-        ;
+            ->save();
 
         $event->setCategory($category);
     }
@@ -65,7 +64,7 @@ class Category extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $category = CategoryQuery::create()->findPk($event->getCategoryId())) {
             $category
-                ->setDefaultTemplateId($event->getDefaultTemplateId() == 0 ? null : $event->getDefaultTemplateId())
+                ->setDefaultTemplateId(0 === $event->getDefaultTemplateId() ? null : $event->getDefaultTemplateId())
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setDescription($event->getDescription())
@@ -83,10 +82,8 @@ class Category extends BaseAction implements EventSubscriberInterface
 
     /**
      * Change a Category SEO.
-     *
-     * @return object
      */
-    public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher): object
     {
         return $this->genericUpdateSeo(CategoryQuery::create(), $event, $dispatcher);
     }
@@ -131,6 +128,7 @@ class Category extends BaseAction implements EventSubscriberInterface
                 $con->commit();
             } catch (\Exception $e) {
                 $con->rollback();
+
                 throw $e;
             }
         }
@@ -145,8 +143,7 @@ class Category extends BaseAction implements EventSubscriberInterface
 
         $category
             ->setVisible(!(bool) $category->getVisible())
-            ->save()
-        ;
+            ->save();
 
         $event->setCategory($category);
     }
@@ -163,14 +160,13 @@ class Category extends BaseAction implements EventSubscriberInterface
     {
         if (CategoryAssociatedContentQuery::create()
             ->filterByContentId($event->getContentId())
-             ->filterByCategory($event->getCategory())->count() <= 0) {
+            ->filterByCategory($event->getCategory())->count() <= 0) {
             $content = new CategoryAssociatedContent();
 
             $content
                 ->setCategory($event->getCategory())
                 ->setContentId($event->getContentId())
-                ->save()
-            ;
+                ->save();
         }
     }
 
@@ -178,10 +174,9 @@ class Category extends BaseAction implements EventSubscriberInterface
     {
         $content = CategoryAssociatedContentQuery::create()
             ->filterByContentId($event->getContentId())
-            ->filterByCategory($event->getCategory())->findOne()
-        ;
+            ->filterByCategory($event->getCategory())->findOne();
 
-        if ($content !== null) {
+        if (null !== $content) {
             $content
                 ->delete();
         }
@@ -192,13 +187,13 @@ class Category extends BaseAction implements EventSubscriberInterface
      */
     public function viewCheck(ViewCheckEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if ($event->getView() == 'category') {
+        if ('category' === $event->getView()) {
             $category = CategoryQuery::create()
                 ->filterById($event->getViewId())
                 ->filterByVisible(1)
                 ->count();
 
-            if ($category == 0) {
+            if (0 === $category) {
                 $dispatcher->dispatch($event, TheliaEvents::VIEW_CATEGORY_ID_NOT_VISIBLE);
             }
         }

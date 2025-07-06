@@ -41,15 +41,14 @@ class ProfileUpdateModuleAccessForm extends BaseForm
                 'constraints' => [
                     new NotBlank(),
                     new Callback(
-                        $this->verifyProfileId(...)
+                        $this->verifyProfileId(...),
                     ),
                 ],
-            ])
-        ;
+            ]);
 
         foreach (ModuleQuery::create()->find() as $module) {
             $this->formBuilder->add(
-                self::MODULE_ACCESS_FIELD_PREFIX.':'.str_replace('.', ':', $module->getCode()),
+                self::MODULE_ACCESS_FIELD_PREFIX . ':' . str_replace('.', ':', $module->getCode()),
                 ChoiceType::class,
                 [
                     'choices' => [
@@ -65,7 +64,7 @@ class ProfileUpdateModuleAccessForm extends BaseForm
                     'multiple' => true,
                     'constraints' => [
                     ],
-                ]
+                ],
             );
         }
     }

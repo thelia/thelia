@@ -66,15 +66,15 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
                             'alpha', 'alpha_reverse',
                             'visible', 'visible_reverse',
                             'random',
-                        ]
-                    )
+                        ],
+                    ),
                 ),
-                'id'
-            )
+                'id',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $search = CountryQuery::create();
 
@@ -104,8 +104,7 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
             $countries = CountryAreaQuery::create()
                 ->filterByAreaId($excludeArea, Criteria::IN)
                 ->select(['country_id'])
-                ->find()
-            ;
+                ->find();
 
             $search->filterById($countries->toArray(), Criteria::NOT_IN);
         }
@@ -116,11 +115,11 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
             $search
                 ->distinct()
                 ->joinCountryArea('with_area', Criteria::LEFT_JOIN)
-                ->where('`with_area`.country_id '.Criteria::ISNOTNULL);
+                ->where('`with_area`.country_id ' . Criteria::ISNOTNULL);
         } elseif (false === $withArea) {
             $search
                 ->joinCountryArea('with_area', Criteria::LEFT_JOIN)
-                ->where('`with_area`.country_id '.Criteria::ISNULL);
+                ->where('`with_area`.country_id ' . Criteria::ISNULL);
         }
 
         $exclude = $this->getExclude();
@@ -130,16 +129,19 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         $hasStates = $this->getHasStates();
-        if ($hasStates !== BooleanOrBothType::ANY) {
+
+        if (BooleanOrBothType::ANY !== $hasStates) {
             $search->filterByHasStates($hasStates ? 1 : 0);
         }
 
         $visible = $this->getVisible();
-        if ($visible !== BooleanOrBothType::ANY) {
+
+        if (BooleanOrBothType::ANY !== $visible) {
             $search->filterByVisible($visible ? 1 : 0);
         }
 
         $orders = $this->getOrder();
+
         foreach ($orders as $order) {
             switch ($order) {
                 case 'id':
@@ -191,8 +193,7 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('IS_SHOP_COUNTRY', $country->getShopCountry() ? '1' : '0')
                 ->set('HAS_STATES', $country->getHasStates() ? '1' : '0')
                 ->set('NEED_ZIP_CODE', $country->getNeedZipCode() ? '1' : '0')
-                ->set('ZIP_CODE_FORMAT', $country->getZipCodeFormat())
-            ;
+                ->set('ZIP_CODE_FORMAT', $country->getZipCodeFormat());
 
             $this->addOutputFields($loopResultRow, $country);
 

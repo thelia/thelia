@@ -23,10 +23,7 @@ use Thelia\Model\ExportCategoryQuery;
  */
 class ExportCategory extends ImportExportCategory
 {
-    /**
-     * @return ExportCategoryQuery
-     */
-    protected function getQueryModel()
+    protected function getQueryModel(): ExportCategoryQuery
     {
         return ExportCategoryQuery::create();
     }

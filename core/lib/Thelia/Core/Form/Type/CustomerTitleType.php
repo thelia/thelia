@@ -44,8 +44,7 @@ class CustomerTitleType extends AbstractTheliaType
             ->add('default', 'checkbox')
             ->add('title_id', 'customer_title_id', [
                 'constraints' => $this->getConstraints($this->customerTitleIdType, 'update'),
-            ])
-        ;
+            ]);
     }
 
     /**

@@ -37,7 +37,7 @@ class SessionEvent extends ActionEvent
     /**
      * @return string the current environment
      */
-    public function getEnv()
+    public function getEnv(): string
     {
         return $this->env;
     }
@@ -45,15 +45,12 @@ class SessionEvent extends ActionEvent
     /**
      * @return bool the current debug mode
      */
-    public function getDebug()
+    public function getDebug(): bool
     {
         return $this->debug;
     }
 
-    /**
-     * @return string
-     */
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
         return $this->cacheDir;
     }

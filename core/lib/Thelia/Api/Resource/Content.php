@@ -35,36 +35,36 @@ use Thelia\Model\Tools\UrlRewritingTrait;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/contents'
+            uriTemplate: '/admin/contents',
         ),
         new GetCollection(
-            uriTemplate: '/admin/contents'
+            uriTemplate: '/admin/contents',
         ),
         new Get(
             uriTemplate: '/admin/contents/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/contents/{id}'
+            uriTemplate: '/admin/contents/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/contents/{id}'
+            uriTemplate: '/admin/contents/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/contents/{id}'
+            uriTemplate: '/admin/contents/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/front/contents'
+            uriTemplate: '/front/contents',
         ),
         new Get(
             uriTemplate: '/front/contents/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -81,7 +81,7 @@ use Thelia\Model\Tools\UrlRewritingTrait;
             'strategy' => 'exact',
             'fieldPath' => 'content_folder.content_id',
         ],
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: NotInFilter::class,
@@ -95,33 +95,29 @@ use Thelia\Model\Tools\UrlRewritingTrait;
             'strategy' => 'exact',
             'fieldPath' => 'content_folder.content_id',
         ],
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
         'contentFolders.defaultFolder',
         'visible',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
         'position',
-    ]
+    ],
 )]
 class Content extends AbstractTranslatableResource
 {
     use UrlRewritingTrait;
 
     public const GROUP_ADMIN_READ = 'admin:content:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:content:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:content:write';
-
     public const GROUP_FRONT_READ = 'front:content:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:content:read:single';
 
     #[Groups([

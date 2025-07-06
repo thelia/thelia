@@ -32,12 +32,13 @@ trait AddressCountryValidationTrait
 
         if (null !== ($country = CountryQuery::create()->findPk($data['country'])) && $country->getNeedZipCode()) {
             $zipCodeRegExp = $country->getZipCodeRE();
+
             if (null !== $zipCodeRegExp && !preg_match($zipCodeRegExp, (string) $data['zipcode'])) {
                 $context->addViolation(
                     Translator::getInstance()->trans(
                         'This zip code should respect the following format : %format.',
-                        ['%format' => $country->getZipCodeFormat()]
-                    )
+                        ['%format' => $country->getZipCodeFormat()],
+                    ),
                 );
             }
         }
@@ -52,15 +53,15 @@ trait AddressCountryValidationTrait
                 if ($state->getCountryId() !== $country->getId()) {
                     $context->addViolation(
                         Translator::getInstance()->trans(
-                            "This state doesn't belong to this country."
-                        )
+                            "This state doesn't belong to this country.",
+                        ),
                     );
                 }
             } else {
                 $context->addViolation(
                     Translator::getInstance()->trans(
-                        'You should select a state for this country.'
-                    )
+                        'You should select a state for this country.',
+                    ),
                 );
             }
         }
@@ -72,11 +73,11 @@ trait AddressCountryValidationTrait
 
         $re = '/\D+/';
 
-        if (!preg_match($re, (string) $data['city'], $matches, \PREG_OFFSET_CAPTURE, 0)) {
+        if (!preg_match($re, (string) $data['city'], $matches, PREG_OFFSET_CAPTURE, 0)) {
             $context->addViolation(
                 Translator::getInstance()->trans(
-                    'Your city can only contains letters.'
-                )
+                    'Your city can only contains letters.',
+                ),
             );
         }
     }

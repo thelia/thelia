@@ -33,7 +33,7 @@ class TemplateCreationForm extends BaseForm
                     'label' => Translator::getInstance()->trans('Template Name *'),
                     'label_attr' => [
                         'for' => 'name',
-                    ], ]
+                    ], ],
             )
             ->add(
                 'locale',
@@ -41,9 +41,8 @@ class TemplateCreationForm extends BaseForm
                 [
                     'constraints' => [
                         new NotBlank(),
-                    ], ]
-            )
-        ;
+                    ], ],
+            );
     }
 
     public static function getName(): string

@@ -32,7 +32,7 @@ class BinaryFileController
         }
 
         $propelModel = $resource->getPropelModel();
-        $filePath = $propelModel->getUploadDir().DS.$propelModel->getFile();
+        $filePath = $propelModel->getUploadDir() . DS . $propelModel->getFile();
 
         return new BinaryFileResponse($filePath);
     }

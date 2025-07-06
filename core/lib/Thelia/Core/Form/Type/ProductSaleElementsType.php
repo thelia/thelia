@@ -120,8 +120,7 @@ class ProductSaleElementsType extends AbstractTheliaType
             // Only on update
             ->add('id', ProductSaleElementsIdType::class, [
                 'constraints' => $this->getConstraints($this->pseIdType, 'update'),
-            ])
-        ;
+            ]);
     }
 
     /**

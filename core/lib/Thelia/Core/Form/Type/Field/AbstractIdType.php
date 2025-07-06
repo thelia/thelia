@@ -56,8 +56,8 @@ abstract class AbstractIdType extends AbstractType
                     [
                         '%obj_name' => $this->getObjName(),
                         '%id' => $value,
-                    ]
-                )
+                    ],
+                ),
             );
         }
     }
@@ -78,5 +78,5 @@ abstract class AbstractIdType extends AbstractType
      *
      * Get the model query to check
      */
-    abstract protected function getQuery();
+    abstract protected function getQuery(): ModelCriteria;
 }

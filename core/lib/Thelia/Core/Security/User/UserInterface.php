@@ -23,31 +23,23 @@ interface UserInterface
 {
     /**
      * Return the user unique ID.
-     *
-     * @return int
      */
-    public function getId();
+    public function getId(): int;
 
     /**
      * Return the user unique name.
-     *
-     * @return string
      */
-    public function getUsername();
+    public function getUsername(): string;
 
     /**
      * Return the user encoded password.
-     *
-     * @return string
      */
-    public function getPassword();
+    public function getPassword(): string;
 
     /**
      * Check a string against a the user password.
-     *
-     * @return bool
      */
-    public function checkPassword(string $password);
+    public function checkPassword(string $password): bool;
 
     /**
      * Returns the roles granted to the user.
@@ -71,10 +63,8 @@ interface UserInterface
 
     /**
      * return the user token (used by remember me authnetication system).
-     *
-     * @return string
      */
-    public function getToken();
+    public function getToken(): string;
 
     /**
      * Set a token in the user data (used by remember me authnetication system).
@@ -83,10 +73,8 @@ interface UserInterface
 
     /**
      * return the user serial  (used by remember me authnetication system).
-     *
-     * @return string
      */
-    public function getSerial();
+    public function getSerial(): string;
 
     /**
      * Set a serial number int the user data  (used by remember me authnetication system).
@@ -98,5 +86,5 @@ interface UserInterface
      *
      * @return string the locale
      */
-    public function getLocale();
+    public function getLocale(): string;
 }

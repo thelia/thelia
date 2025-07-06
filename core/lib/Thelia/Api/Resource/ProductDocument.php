@@ -43,14 +43,14 @@ use Thelia\Model\Map\ProductDocumentTableMap;
             controller: PostItemFileController::class,
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
             denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_FILE]],
-            deserialize: false
+            deserialize: false,
         ),
         new GetCollection(
-            uriTemplate: '/admin/product_documents'
+            uriTemplate: '/admin/product_documents',
         ),
         new Get(
             uriTemplate: '/admin/product_documents/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Get(
             uriTemplate: '/admin/product_documents/{id}/file',
@@ -60,8 +60,8 @@ use Thelia\Model\Map\ProductDocumentTableMap;
                     '200' => [
                         'description' => 'The binary file',
                     ],
-                ]
-            )
+                ],
+            ),
         ),
         new Put(
             uriTemplate: '/admin/product_documents/{id}',
@@ -69,23 +69,23 @@ use Thelia\Model\Map\ProductDocumentTableMap;
         ),
         new Patch(
             uriTemplate: '/admin/product_documents/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
         ),
         new Delete(
-            uriTemplate: '/admin/product_documents/{id}'
+            uriTemplate: '/admin/product_documents/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/front/product_documents'
+            uriTemplate: '/front/product_documents',
         ),
         new Get(
             uriTemplate: '/front/product_documents/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
         new Get(
             uriTemplate: '/front/product_documents/{id}/file',
@@ -95,8 +95,8 @@ use Thelia\Model\Map\ProductDocumentTableMap;
                     '200' => [
                         'description' => 'The binary file',
                     ],
-                ]
-            )
+                ],
+            ),
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -105,13 +105,13 @@ use Thelia\Model\Map\ProductDocumentTableMap;
     filterClass: OrderFilter::class,
     properties: [
         'position',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
         'visible',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -121,22 +121,16 @@ use Thelia\Model\Map\ProductDocumentTableMap;
             'strategy' => 'exact',
             'fieldPath' => 'product_document.product_id',
         ],
-    ]
+    ],
 )]
 class ProductDocument extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     public const GROUP_ADMIN_READ = 'admin:product_document:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:product_document:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:product_document:write';
-
     public const GROUP_ADMIN_WRITE_FILE = 'admin:product_document:write_file';
-
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:product_document:write_update';
-
     public const GROUP_FRONT_READ = 'front:product_document:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:product_document:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
@@ -151,7 +145,7 @@ class ProductDocument extends AbstractTranslatableResource implements ItemFileRe
         openapiContext: [
             'type' => 'string',
             'format' => 'binary',
-        ]
+        ],
     )]
     public UploadedFile $fileToUpload;
 

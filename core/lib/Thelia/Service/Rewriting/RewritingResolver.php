@@ -29,26 +29,19 @@ use Thelia\Model\RewritingUrlQuery;
 class RewritingResolver
 {
     protected ?RewritingArgument $search = null;
-
     protected ?RewritingUrlQuery $rewritingUrlQuery = null;
-
     public mixed $view;
-
     public mixed $viewId;
-
     public mixed $locale;
-
     public mixed $otherParameters;
-
     public mixed $redirectedToUrl;
-
     public ?string $rewrittenUrl = null;
 
     public function __construct($url = null)
     {
         $this->rewritingUrlQuery = new RewritingUrlQuery();
 
-        if ($url !== null) {
+        if (null !== $url) {
             $this->load($url);
         }
     }
@@ -87,6 +80,7 @@ class RewritingResolver
         }
 
         $otherParameters = [];
+
         foreach ($this->search as $result) {
             $parameter = $result->getParameter();
             $value = $result->getValue();

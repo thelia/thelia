@@ -25,16 +25,16 @@ use Thelia\Model\Map\ContentFolderTableMap;
 #[ApiResource(
     operations: [
         new Get(
-            uriTemplate: '/admin/content_folders/{content}/folders/{folder}'
+            uriTemplate: '/admin/content_folders/{content}/folders/{folder}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new Get(
-            uriTemplate: '/front/content_folders/{content}/folders/{folder}'
+            uriTemplate: '/front/content_folders/{content}/folders/{folder}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -45,13 +45,9 @@ class ContentFolder implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:content_folder:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:content_folder:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:content_folder:write';
-
     public const GROUP_FRONT_READ = 'front:content_folder:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:content_folder:read:single';
 
     #[Relation(targetResource: Content::class)]

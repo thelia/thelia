@@ -62,15 +62,14 @@ class AdminUpdatePasswordCommand extends ContainerAwareCommand
             ->addArgument(
                 'login',
                 InputArgument::REQUIRED,
-                'Login for administrator you want to change the password'
+                'Login for administrator you want to change the password',
             )
             ->addOption(
                 'password',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Desired password. If this option is omitted, a random password is generated and shown in this prompt after'
-            )
-        ;
+                'Desired password. If this option is omitted, a random password is generated and shown in this prompt after',
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

@@ -39,7 +39,7 @@ class StateCreationForm extends BaseForm
                         new NotBlank(),
                     ],
                     'label' => $this->translator->trans('State title'),
-                ]
+                ],
             )
             ->add('country_id', CountryIdType::class, [
                 'constraints' => [
@@ -57,7 +57,7 @@ class StateCreationForm extends BaseForm
                     'constraints' => [
                         new NotBlank(),
                     ],
-                ]
+                ],
             )
             ->add(
                 'visible',
@@ -68,7 +68,7 @@ class StateCreationForm extends BaseForm
                     'label_attr' => [
                         'for' => 'visible_create',
                     ],
-                ]
+                ],
             )
             ->add(
                 'isocode',
@@ -81,9 +81,8 @@ class StateCreationForm extends BaseForm
                     'label_attr' => [
                         'help' => $this->translator->trans('Iso code for states. It depends of the country.'),
                     ],
-                ]
-            )
-        ;
+                ],
+            );
     }
 
     public static function getName(): string

@@ -48,17 +48,17 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('category', null, true),
-            Argument::createIntTypeArgument('depth', \PHP_INT_MAX),
+            Argument::createIntTypeArgument('depth', PHP_INT_MAX),
             Argument::createBooleanTypeArgument('need_count_child', false),
             Argument::createBooleanOrBothTypeArgument('visible', true, false),
             Argument::createIntListTypeArgument('exclude', []),
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumListType(['position', 'position_reverse', 'id', 'id_reverse', 'alpha', 'alpha_reverse'])
+                    new EnumListType(['position', 'position_reverse', 'id', 'id_reverse', 'alpha', 'alpha_reverse']),
                 ),
-                'position'
-            )
+                'position',
+            ),
         );
     }
 
@@ -74,11 +74,11 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
 
         $search->filterByParent($parent);
 
-        if ($visible !== BooleanOrBothType::ANY) {
+        if (BooleanOrBothType::ANY !== $visible) {
             $search->filterByVisible($visible);
         }
 
-        if ($exclude != null) {
+        if (null !== $exclude) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
@@ -136,6 +136,7 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
     {
         foreach ($loopResult->getResultDataCollection() as $result) {
             $loopResultRow = new LoopResultRow($result);
+
             foreach ($result as $output => $outputValue) {
                 $loopResultRow->set($output, $outputValue);
             }
@@ -147,7 +148,7 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
         return $loopResult;
     }
 
-    public function buildArray()
+    public function buildArray(): array
     {
         $id = $this->getCategory();
         $depth = $this->getDepth();

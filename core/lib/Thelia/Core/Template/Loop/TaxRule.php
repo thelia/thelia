@@ -49,14 +49,14 @@ class TaxRule extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumListType(['id', 'id_reverse', 'alpha', 'alpha_reverse'])
+                    new EnumListType(['id', 'id_reverse', 'alpha', 'alpha_reverse']),
                 ),
-                'alpha'
-            )
+                'alpha',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $search = TaxRuleQuery::create();
 
@@ -109,8 +109,7 @@ class TaxRule extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('LOCALE', $this->locale)
                 ->set('TITLE', $taxRule->getVirtualColumn('i18n_TITLE'))
                 ->set('DESCRIPTION', $taxRule->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set('IS_DEFAULT', $taxRule->getIsDefault() ? '1' : '0')
-            ;
+                ->set('IS_DEFAULT', $taxRule->getIsDefault() ? '1' : '0');
             $this->addOutputFields($loopResultRow, $taxRule);
 
             $loopResult->addRow($loopResultRow);

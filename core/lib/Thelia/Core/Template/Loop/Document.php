@@ -55,15 +55,11 @@ use Thelia\Type\TypeCollection;
 class Document extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $objectType;
-
     protected $objectId;
-
     protected $timestampable = true;
 
-    /**
-     * @var array Possible standard document sources
-     */
-    protected $possible_sources = ['category', 'product', 'folder', 'content', 'brand'];
+    /** @var array Possible standard document sources */
+    protected array $possible_sources = ['category', 'product', 'folder', 'content', 'brand'];
 
     protected function getArgDefinitions(): ArgumentCollection
     {
@@ -74,9 +70,9 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumListType(['alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'])
+                    new EnumListType(['alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random']),
                 ),
-                'manual'
+                'manual',
             ),
             Argument::createIntTypeArgument('lang'),
             Argument::createIntTypeArgument('category'),
@@ -87,7 +83,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createIntTypeArgument('source_id'),
             Argument::createBooleanTypeArgument('force_return', true),
             Argument::createAnyTypeArgument('query_namespace', 'Thelia\\Model'),
-            Argument::createBooleanTypeArgument('with_prev_next_info', false)
+            Argument::createBooleanTypeArgument('with_prev_next_info', false),
         );
 
         // Add possible document sources
@@ -106,14 +102,14 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
      *
      * @return ModelCriteria the propel Query object
      */
-    protected function createSearchQuery($source, $object_id)
+    protected function createSearchQuery(string $source, int $object_id): ModelCriteria
     {
         $object = ucfirst($source);
 
         $ns = $this->getQueryNamespace();
 
         if ('\\' !== $ns[0]) {
-            $ns = '\\'.$ns;
+            $ns = '\\' . $ns;
         }
 
         $queryClass = \sprintf('%s\\%sDocumentQuery', $ns, $object);
@@ -164,7 +160,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
      *
      * @return ModelCriteria the propel Query object
      */
-    protected function getSearchQuery(&$object_type, &$object_id)
+    protected function getSearchQuery(string &$object_type, string &$object_id): ModelCriteria
     {
         $search = null;
 
@@ -199,14 +195,14 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
             }
         }
 
-        if ($search == null) {
+        if (null === $search) {
             throw new \InvalidArgumentException(\sprintf('Unable to find document source. Valid sources are %s', implode(',', $this->possible_sources)));
         }
 
         return $search;
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
     {
         // Select the proper query to use, and get the object type
         $this->objectType = null;
@@ -224,12 +220,14 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         $exclude = $this->getExclude();
+
         if (null !== $exclude) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
         $visible = $this->getVisible();
-        if ($visible !== BooleanOrBothType::ANY) {
+
+        if (BooleanOrBothType::ANY !== $visible) {
             $search->filterByVisible($visible ? 1 : 0);
         }
 
@@ -239,10 +237,11 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
     public function parseResults(LoopResult $loopResult): LoopResult
     {
         $baseSourceFilePath = ConfigQuery::read('documents_library_path');
-        if ($baseSourceFilePath === null) {
-            $baseSourceFilePath = THELIA_LOCAL_DIR.'media'.DS.'documents';
+
+        if (null === $baseSourceFilePath) {
+            $baseSourceFilePath = THELIA_LOCAL_DIR . 'media' . DS . 'documents';
         } else {
-            $baseSourceFilePath = THELIA_ROOT.$baseSourceFilePath;
+            $baseSourceFilePath = THELIA_ROOT . $baseSourceFilePath;
         }
 
         /** @var ProductDocument $result */
@@ -255,7 +254,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                 '%s/%s/%s',
                 $baseSourceFilePath,
                 $this->objectType,
-                $result->getFile()
+                $result->getFile(),
             );
 
             $event->setSourceFilepath($sourceFilePath);
@@ -281,13 +280,14 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set('VISIBLE', $result->getVisible())
                     ->set('POSITION', $result->getPosition())
                     ->set('OBJECT_TYPE', $this->objectType)
-                    ->set('OBJECT_ID', $this->objectId)
-                ;
+                    ->set('OBJECT_ID', $this->objectId);
 
                 $isBackendContext = $this->getBackendContext();
+
                 if ($this->getWithPrevNextInfo()) {
                     $previousQuery = $this->getSearchQuery($this->objectType, $this->objectId)
                         ->filterByPosition($result->getPosition(), Criteria::LESS_THAN);
+
                     if (!$isBackendContext) {
                         $previousQuery->filterByVisible(true);
                     }
@@ -297,6 +297,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                         ->findOne();
                     $nextQuery = $this->getSearchQuery($this->objectType, $this->objectId)
                         ->filterByPosition($result->getPosition(), Criteria::GREATER_THAN);
+
                     if (!$isBackendContext) {
                         $nextQuery->filterByVisible(true);
                     }
@@ -305,10 +306,10 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                         ->orderByPosition(Criteria::ASC)
                         ->findOne();
                     $loopResultRow
-                        ->set('HAS_PREVIOUS', $previous != null ? 1 : 0)
-                        ->set('HAS_NEXT', $next != null ? 1 : 0)
-                        ->set('PREVIOUS', $previous != null ? $previous->getId() : -1)
-                        ->set('NEXT', $next != null ? $next->getId() : -1);
+                        ->set('HAS_PREVIOUS', null !== $previous ? 1 : 0)
+                        ->set('HAS_NEXT', null !== $next ? 1 : 0)
+                        ->set('PREVIOUS', null !== $previous ? $previous->getId() : -1)
+                        ->set('NEXT', null !== $next ? $next->getId() : -1);
                 }
 
                 $this->addOutputFields($loopResultRow, $result);

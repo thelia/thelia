@@ -41,6 +41,7 @@ class Session extends BaseSession
         }
 
         $lang = $this->get('thelia.current.lang');
+
         if (null === $lang && $forceDefault) {
             $lang = Lang::getDefaultLanguage();
         }
@@ -62,6 +63,7 @@ class Session extends BaseSession
         }
 
         $adminUser = $this->getAdminUser();
+
         if (
             $adminUser instanceof Admin
             && $lang = LangQuery::create()->findOneByLocale($adminUser->getLocale())
@@ -223,9 +225,7 @@ class Session extends BaseSession
             // a required parameter.
 
             if (null === $dispatcher) {
-                throw new \InvalidArgumentException(
-                    'In this context (no cart in session), an EventDispatcher should be provided to Session::getSessionCart().'
-                );
+                throw new \InvalidArgumentException('In this context (no cart in session), an EventDispatcher should be provided to Session::getSessionCart().');
             }
 
             $cartEvent = new CartRestoreEvent();
@@ -237,9 +237,7 @@ class Session extends BaseSession
             $dispatcher->dispatch($cartEvent, TheliaEvents::CART_RESTORE_CURRENT);
 
             if (null === $cart = $cartEvent->getCart()) {
-                throw new \LogicException(
-                    'Unable to get a Cart.'
-                );
+                throw new \LogicException('Unable to get a Cart.');
             }
 
             // Store the cart.
@@ -255,9 +253,7 @@ class Session extends BaseSession
 
         $dispatcher->dispatch($event, TheliaEvents::CART_CREATE_NEW);
 
-        throw new \LogicException(
-            'Unable to get a new empty Cart.'
-        );
+        throw new \LogicException('Unable to get a new empty Cart.');
     }
 
     protected function isValidCart(Cart $cart): bool
@@ -265,7 +261,7 @@ class Session extends BaseSession
         $customer = $this->getCustomerUser();
 
         return (null !== $customer && $cart->getCustomerId() === $customer->getId())
-        || (null === $customer && $cart->getCustomerId() === null);
+        || (null === $customer && null === $cart->getCustomerId());
     }
 
     public function setOrder(Order $order): static

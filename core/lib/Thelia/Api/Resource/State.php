@@ -33,56 +33,54 @@ use Thelia\Model\Map\StateTableMap;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/states'
+            uriTemplate: '/admin/states',
         ),
         new GetCollection(
-            uriTemplate: '/admin/states'
+            uriTemplate: '/admin/states',
         ),
         new Get(
             uriTemplate: '/admin/states/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Get(
             uriTemplate: '/admin/states/iso/{countryIso3}/{stateIso}',
             uriVariables: [
                 'countryIso3' => new Link(
                     fromProperty: 'isoalpha3',
-                    fromClass: Country::class
+                    fromClass: Country::class,
                 ),
                 'stateIso' => new Link(
                     fromProperty: 'isocode',
-                    fromClass: State::class
+                    fromClass: State::class,
                 ),
             ],
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
             name: 'state_by_iso',
         ),
         new Put(
-            uriTemplate: '/admin/states/{id}'
+            uriTemplate: '/admin/states/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/states/{id}'
+            uriTemplate: '/admin/states/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/states/{id}'
+            uriTemplate: '/admin/states/{id}',
         ),
     ],
     uriVariables: ['id'],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
         'visible',
-    ]
+    ],
 )]
 class State extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:state:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:state:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:state:write';
 
     #[Groups([

@@ -21,10 +21,7 @@ use Thelia\Model\Accessory;
  */
 class AccessoryEvent extends ActionEvent
 {
-    /**
-     * @var Accessory|null
-     */
-    public $accessory;
+    public ?Accessory $accessory;
 
     public function __construct(?Accessory $accessory = null)
     {

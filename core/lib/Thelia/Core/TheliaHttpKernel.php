@@ -31,7 +31,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class TheliaHttpKernel extends HttpKernel
 {
     protected static $session;
-
     protected ContainerInterface $container;
 
     public function __construct(
@@ -62,11 +61,9 @@ class TheliaHttpKernel extends HttpKernel
      *                         (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
      * @param bool    $catch   Whether to catch exceptions or not
      *
-     * @throws \Exception When an Exception occurs during processing
-     *
      * @return Response A Response instance
      *
-     * @api
+     * @throws \Exception When an Exception occurs during processing
      */
     public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): Response
     {

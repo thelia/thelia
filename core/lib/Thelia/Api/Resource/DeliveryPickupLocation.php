@@ -108,27 +108,21 @@ use Thelia\Core\Translation\Translator;
             provider: DeliveryPickupLocationProvider::class,
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]]
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
 class DeliveryPickupLocation
 {
     public const GROUP_FRONT_READ = 'front:delivery_pickup_location:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:delivery_pickup_location:read:single';
 
     /** OPENING HOURS ARRAY KEYS */
     public const MONDAY_OPENING_HOURS_KEY = '0';
 
     public const TUESDAY_OPENING_HOURS_KEY = '1';
-
     public const WEDNESDAY_OPENING_HOURS_KEY = '2';
-
     public const THURSDAY_OPENING_HOURS_KEY = '3';
-
     public const FRIDAY_OPENING_HOURS_KEY = '4';
-
     public const SATURDAY_OPENING_HOURS_KEY = '5';
-
     public const SUNDAY_OPENING_HOURS_KEY = '6';
 
     #[Groups([

@@ -25,10 +25,7 @@ use Thelia\Model\Order;
  */
 class OrderPaymentEvent extends ActionEvent
 {
-    /**
-     * @var Response
-     */
-    protected $response;
+    protected Response $response;
 
     public function __construct(protected Order $order)
     {
@@ -49,10 +46,7 @@ class OrderPaymentEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     * @return Response
-     */
-    public function getResponse()
+    public function getResponse(): Response
     {
         return $this->response;
     }

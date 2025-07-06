@@ -27,7 +27,7 @@ use Thelia\Model\Map\ProductPriceTableMap;
     operations: [
         new Get(
             uriTemplate: '/admin/product_prices/{productSaleElements}/currencies/{currency}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
@@ -37,7 +37,7 @@ use Thelia\Model\Map\ProductPriceTableMap;
     operations: [
         new Get(
             uriTemplate: '/front/product_prices/{productSaleElements}/currencies/{currency}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -48,13 +48,9 @@ class ProductPrice implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:product_price:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:product_price:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:product_price:write';
-
     public const GROUP_FRONT_READ = 'front:product_price:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:product_price:read:single';
 
     #[Relation(targetResource: ProductSaleElements::class)]

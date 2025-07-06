@@ -56,7 +56,7 @@ return static function (ContainerConfigurator $container): void {
         ],
     ]);
 
-    if ($container->env() === 'prod') {
+    if ('prod' === $container->env()) {
         $container->extension('api_platform', [
             'enable_swagger_ui' => false,
             'enable_docs' => false,

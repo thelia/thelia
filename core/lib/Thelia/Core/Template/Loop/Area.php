@@ -60,14 +60,14 @@ class Area extends BaseI18nLoop implements PropelSearchLoopInterface
                     new EnumListType([
                         'id', 'id_reverse',
                         'alpha', 'name', 'name_reverse',
-                    ])
+                    ]),
                 ),
-                'name'
-            )
+                'name',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $search = AreaQuery::create();
 
@@ -81,15 +81,15 @@ class Area extends BaseI18nLoop implements PropelSearchLoopInterface
 
         if ($withZone) {
             $search->joinAreaDeliveryModule('with_zone')
-                ->where('`with_zone`.delivery_module_id '.Criteria::EQUAL.' ?', $withZone, \PDO::PARAM_INT);
+                ->where('`with_zone`.delivery_module_id ' . Criteria::EQUAL . ' ?', $withZone, \PDO::PARAM_INT);
         }
 
         $withoutZone = $this->getWithoutZone();
 
         if ($withoutZone) {
             $search->joinAreaDeliveryModule('without_zone', Criteria::LEFT_JOIN)
-                ->addJoinCondition('without_zone', 'delivery_module_id '.Criteria::EQUAL.' ?', $withoutZone, null, \PDO::PARAM_INT)
-                ->where('`without_zone`.delivery_module_id '.Criteria::ISNULL);
+                ->addJoinCondition('without_zone', 'delivery_module_id ' . Criteria::EQUAL . ' ?', $withoutZone, null, \PDO::PARAM_INT)
+                ->where('`without_zone`.delivery_module_id ' . Criteria::ISNULL);
         }
 
         $notAssigned = $this->getUnassigned();
@@ -97,7 +97,7 @@ class Area extends BaseI18nLoop implements PropelSearchLoopInterface
         if ($notAssigned) {
             $search
                 ->joinAreaDeliveryModule('unassigned', Criteria::LEFT_JOIN)
-                ->where('`unassigned`.delivery_module_id '.Criteria::ISNULL);
+                ->where('`unassigned`.delivery_module_id ' . Criteria::ISNULL);
         }
 
         $modules = $this->getModuleId();
@@ -159,8 +159,7 @@ class Area extends BaseI18nLoop implements PropelSearchLoopInterface
             $loopResultRow
                 ->set('ID', $area->getId())
                 ->set('NAME', $area->getName())
-                ->set('POSTAGE', $area->getPostage())
-            ;
+                ->set('POSTAGE', $area->getPostage());
             $this->addOutputFields($loopResultRow, $area);
 
             $loopResult->addRow($loopResultRow);

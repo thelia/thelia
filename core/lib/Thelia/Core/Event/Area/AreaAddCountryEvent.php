@@ -25,7 +25,6 @@ use Thelia\Model\Event\AreaEvent;
 class AreaAddCountryEvent extends AreaEvent
 {
     protected $areaId;
-
     protected $countryIds;
 
     public function __construct(Area $area, array $countryIds)

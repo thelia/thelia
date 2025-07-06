@@ -55,14 +55,14 @@ abstract class BaseConstraint implements ConstraintInterface
                         array_fill(
                             \count($expressionElements) - 1,
                             \count($versionElements) - \count($expressionElements),
-                            '0'
-                        )
-                    )
+                            '0',
+                        ),
+                    ),
                 );
             } else {
                 $version = implode(
                     '.',
-                    \array_slice($versionElements, 0, \count($expressionElements))
+                    \array_slice($versionElements, 0, \count($expressionElements)),
                 );
             }
         }

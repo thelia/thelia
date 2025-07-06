@@ -53,7 +53,7 @@ class FeatureController extends AbstractCrudController
             TheliaEvents::FEATURE_UPDATE,
             TheliaEvents::FEATURE_DELETE,
             null, // No visibility toggle
-            TheliaEvents::FEATURE_UPDATE_POSITION
+            TheliaEvents::FEATURE_UPDATE_POSITION,
         );
     }
 
@@ -74,8 +74,7 @@ class FeatureController extends AbstractCrudController
         $createEvent
             ->setTitle($formData['title'])
             ->setLocale($formData['locale'])
-            ->setAddToAllTemplates($formData['add_to_all'])
-        ;
+            ->setAddToAllTemplates($formData['add_to_all']);
 
         return $createEvent;
     }
@@ -90,8 +89,7 @@ class FeatureController extends AbstractCrudController
             ->setTitle($formData['title'])
             ->setChapo($formData['chapo'])
             ->setDescription($formData['description'])
-            ->setPostscriptum($formData['postscriptum'])
-        ;
+            ->setPostscriptum($formData['postscriptum']);
 
         return $changeEvent;
     }
@@ -105,7 +103,7 @@ class FeatureController extends AbstractCrudController
     {
         $attr_values = $this->getRequest()->get('feature_values');
 
-        if ($attr_values !== null) {
+        if (null !== $attr_values) {
             foreach ($attr_values as $id => $value) {
                 $event = new FeatureAvUpdateEvent($id);
 
@@ -124,7 +122,7 @@ class FeatureController extends AbstractCrudController
         return new UpdatePositionEvent(
             $this->getRequest()->get('feature_id'),
             $positionChangeMode,
-            $positionValue
+            $positionValue,
         );
     }
 
@@ -161,7 +159,7 @@ class FeatureController extends AbstractCrudController
     protected function getExistingObject(): ?ActiveRecordInterface
     {
         $feature = FeatureQuery::create()
-        ->findOneById($this->getRequest()->get('feature_id', 0));
+            ->findOneById($this->getRequest()->get('feature_id', 0));
 
         if (null !== $feature) {
             $feature->setLocale($this->getCurrentEditionLocale());
@@ -186,7 +184,7 @@ class FeatureController extends AbstractCrudController
         return $object->getId();
     }
 
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         return $this->render('features', ['order' => $currentOrder]);
     }
@@ -198,7 +196,7 @@ class FeatureController extends AbstractCrudController
             [
                 'feature_id' => $this->getRequest()->get('feature_id'),
                 'featureav_order' => $this->getFeatureAvListOrder(),
-            ]
+            ],
         );
     }
 
@@ -209,7 +207,7 @@ class FeatureController extends AbstractCrudController
             [
                 'feature_id' => $this->getRequest()->get('feature_id'),
                 'featureav_order' => $this->getFeatureAvListOrder(),
-            ]
+            ],
         );
     }
 
@@ -228,7 +226,7 @@ class FeatureController extends AbstractCrudController
         return $this->getListOrderFromSession(
             'featureav',
             'featureav_order',
-            'manual'
+            'manual',
         );
     }
 

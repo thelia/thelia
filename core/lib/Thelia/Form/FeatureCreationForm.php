@@ -34,7 +34,7 @@ class FeatureCreationForm extends BaseForm
                     'label' => Translator::getInstance()->trans('Title *'),
                     'label_attr' => [
                         'for' => 'title',
-                    ], ]
+                    ], ],
             )
             ->add(
                 'locale',
@@ -42,7 +42,7 @@ class FeatureCreationForm extends BaseForm
                 [
                     'constraints' => [
                         new NotBlank(),
-                    ], ]
+                    ], ],
             )
             ->add(
                 'add_to_all',
@@ -51,9 +51,8 @@ class FeatureCreationForm extends BaseForm
                     'label' => Translator::getInstance()->trans('Add to all product templates'),
                     'label_attr' => [
                         'for' => 'add_to_all',
-                    ], ]
-            )
-        ;
+                    ], ],
+            );
     }
 
     public static function getName(): string

@@ -24,25 +24,10 @@ use Thelia\Core\Serializer\AbstractSerializer;
  */
 class XMLSerializer extends AbstractSerializer
 {
-    /**
-     * @var XmlEncoder An xml encoder instance
-     */
     private readonly XmlEncoder $xmlEncoder;
-
-    /**
-     * @var int Position of data start
-     */
     private int|bool|null $xmlDataStart = null;
-
-    /**
-     * @var string Root node name
-     */
     private string $rootNodeName = 'root';
-
-    /**
-     * @var string Data node name
-     */
-    private $dataNodeName = 'data';
+    private string $dataNodeName = 'data';
 
     /**
      * Class constructor.
@@ -52,7 +37,7 @@ class XMLSerializer extends AbstractSerializer
         $this->xmlEncoder = new XmlEncoder(
             [
                 XmlEncoder::ROOT_NODE_NAME => 'data',
-            ]
+            ],
         );
     }
 
@@ -75,25 +60,12 @@ class XMLSerializer extends AbstractSerializer
     {
         return 'application/xml';
     }
-
-    /**
-     * Get data node name.
-     *
-     * @return string Root node name
-     */
-    public function getDataNodeName()
+    public function getDataNodeName(): string
     {
         return $this->dataNodeName;
     }
 
-    /**
-     * Set data node name.
-     *
-     * @param string $dataNodeName Root node name
-     *
-     * @return $this Return $this, allow chaining
-     */
-    public function setDataNodeName($dataNodeName): self
+    public function setDataNodeName(string $dataNodeName): self
     {
         $this->dataNodeName = $dataNodeName;
 
@@ -105,7 +77,7 @@ class XMLSerializer extends AbstractSerializer
         $this->xmlDataStart = null;
 
         $fileObject->fwrite(
-            '<?xml version="1.0" encoding="UTF-8"?>'.\PHP_EOL.'<'.$this->rootNodeName.'>'.\PHP_EOL
+            '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL . '<' . $this->rootNodeName . '>' . PHP_EOL,
         );
     }
 
@@ -113,8 +85,8 @@ class XMLSerializer extends AbstractSerializer
     {
         $xml = $this->xmlEncoder->encode($data, 'array');
 
-        if ($this->xmlDataStart === null) {
-            $this->xmlDataStart = strpos($xml, '<'.$this->dataNodeName.'>');
+        if (null === $this->xmlDataStart) {
+            $this->xmlDataStart = strpos($xml, '<' . $this->dataNodeName . '>');
         }
 
         return substr($xml, $this->xmlDataStart, -1);
@@ -122,15 +94,15 @@ class XMLSerializer extends AbstractSerializer
 
     public function separator(): string
     {
-        return \PHP_EOL;
+        return PHP_EOL;
     }
 
     public function finalizeFile(\SplFileObject $fileObject): void
     {
-        $fileObject->fwrite(\PHP_EOL.'</'.$this->rootNodeName.'>');
+        $fileObject->fwrite(PHP_EOL . '</' . $this->rootNodeName . '>');
     }
 
-    public function unserialize(\SplFileObject $fileObject): mixed
+    public function unserialize(\SplFileObject $fileObject): array
     {
         $unserializedXml = $this->xmlEncoder->decode(file_get_contents($fileObject->getPathname()), 'null');
 

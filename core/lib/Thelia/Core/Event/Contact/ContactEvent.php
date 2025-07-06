@@ -26,17 +26,13 @@ use Thelia\Core\Event\ActionEvent;
  */
 class ContactEvent extends ActionEvent
 {
-    /** @var string */
-    protected $subject;
+    protected string $subject;
 
-    /** @var string */
-    protected $message;
+    protected string $message;
 
-    /** @var string */
-    protected $email;
+    protected string $email;
 
-    /** @var string */
-    protected $name;
+    protected string $name;
 
     public function __construct(protected Form $form)
     {
@@ -46,72 +42,48 @@ class ContactEvent extends ActionEvent
         $this->name = $this->form->get('name')->getData();
     }
 
-    /**
-     * @return string
-     */
-    public function getSubject()
+    public function getSubject(): string
     {
         return $this->subject;
     }
 
-    /**
-     * @param string $subject
-     */
-    public function setSubject($subject): static
+    public function setSubject(string $subject): static
     {
         $this->subject = $subject;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getMessage()
+    public function getMessage(): string
     {
         return $this->message;
     }
 
-    /**
-     * @param string $message
-     */
-    public function setMessage($message): static
+    public function setMessage(string $message): static
     {
         $this->message = $message;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
 
-    /**
-     * @param string $email
-     */
-    public function setEmail($email): static
+    public function setEmail(string $email): static
     {
         $this->email = $email;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name): static
+    public function setName(string $name): static
     {
         $this->name = $name;
 

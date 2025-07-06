@@ -40,7 +40,7 @@ class AdministratorController extends AbstractCrudController
             AdminResources::ADMINISTRATOR,
             TheliaEvents::ADMINISTRATOR_CREATE,
             TheliaEvents::ADMINISTRATOR_UPDATE,
-            TheliaEvents::ADMINISTRATOR_DELETE
+            TheliaEvents::ADMINISTRATOR_DELETE,
         );
     }
 
@@ -58,7 +58,7 @@ class AdministratorController extends AbstractCrudController
             [
                 'show_update_dialog' => true,
                 'show_email_change_notice' => true,
-            ]
+            ],
         );
     }
 
@@ -108,7 +108,7 @@ class AdministratorController extends AbstractCrudController
         $event = new AdministratorEvent();
 
         $event->setId(
-            $this->getRequest()->get('administrator_id', 0)
+            $this->getRequest()->get('administrator_id', 0),
         );
 
         return $event;
@@ -167,11 +167,11 @@ class AdministratorController extends AbstractCrudController
         return (string) $object;
     }
 
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         // We always return to the feature edition form
         return $this->render(
-            'administrators'
+            'administrators',
         );
     }
 
@@ -202,7 +202,7 @@ class AdministratorController extends AbstractCrudController
     protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
-            'admin.configuration.administrators.view'
+            'admin.configuration.administrators.view',
         );
     }
 }

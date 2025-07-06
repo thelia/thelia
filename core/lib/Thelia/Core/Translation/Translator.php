@@ -22,7 +22,6 @@ use Thelia\Core\HttpFoundation\Session\Session;
 class Translator extends BaseTranslator
 {
     public const GLOBAL_FALLBACK_DOMAIN = 'global';
-
     public const GLOBAL_FALLBACK_KEY = '%s.%s';
 
     protected static self $instance;
@@ -39,13 +38,13 @@ class Translator extends BaseTranslator
     /**
      * Return this class instance, only once instanciated.
      *
-     * @throws \RuntimeException if the class has not been instanciated
-     *
      * @return Translator the instance
+     *
+     * @throws \RuntimeException if the class has not been instanciated
      */
     public static function getInstance(): self
     {
-        if (self::$instance == null) {
+        if (null === self::$instance) {
             throw new \RuntimeException('Translator instance is not initialized.');
         }
 
@@ -55,8 +54,10 @@ class Translator extends BaseTranslator
     public function getLocale(): string
     {
         $currentRequest = $this->requestStack->getCurrentRequest();
+
         if ($currentRequest instanceof Request) {
             $session = $currentRequest->getSession();
+
             if ($session instanceof Session) {
                 return $session->getLang()->getLocale();
             }
@@ -74,6 +75,7 @@ class Translator extends BaseTranslator
         $useFallback = true,
     ): string {
         $domain ??= 'core';
+
         if (null === $locale) {
             $locale = $this->getLocale();
         }

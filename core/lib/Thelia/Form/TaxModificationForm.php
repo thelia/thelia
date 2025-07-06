@@ -37,11 +37,10 @@ class TaxModificationForm extends TaxCreationForm
                 'constraints' => [
                     new NotBlank(),
                     new Callback(
-                        $this->verifyTaxId(...)
+                        $this->verifyTaxId(...),
                     ),
                 ],
-            ])
-        ;
+            ]);
     }
 
     public static function getName(): string

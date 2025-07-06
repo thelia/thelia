@@ -48,7 +48,7 @@ class AttributeAvController extends AbstractCrudController
             TheliaEvents::ATTRIBUTE_AV_UPDATE,
             TheliaEvents::ATTRIBUTE_AV_DELETE,
             null, // No visibility toggle
-            TheliaEvents::ATTRIBUTE_AV_UPDATE_POSITION
+            TheliaEvents::ATTRIBUTE_AV_UPDATE_POSITION,
         );
     }
 
@@ -69,8 +69,7 @@ class AttributeAvController extends AbstractCrudController
         $createEvent
             ->setAttributeId($formData['attribute_id'])
             ->setTitle($formData['title'])
-            ->setLocale($formData['locale'])
-        ;
+            ->setLocale($formData['locale']);
 
         return $createEvent;
     }
@@ -85,8 +84,7 @@ class AttributeAvController extends AbstractCrudController
             ->setTitle($formData['title'])
             ->setChapo($formData['chapo'])
             ->setDescription($formData['description'])
-            ->setPostscriptum($formData['postscriptum'])
-        ;
+            ->setPostscriptum($formData['postscriptum']);
 
         return $changeEvent;
     }
@@ -96,7 +94,7 @@ class AttributeAvController extends AbstractCrudController
         return new UpdatePositionEvent(
             $this->getRequest()->get('attributeav_id'),
             $positionChangeMode,
-            $positionValue
+            $positionValue,
         );
     }
 
@@ -123,7 +121,7 @@ class AttributeAvController extends AbstractCrudController
     protected function getExistingObject(): ?ActiveRecordInterface
     {
         $attributeAv = AttributeAvQuery::create()
-        ->findOneById($this->getRequest()->get('attributeav_id', 0));
+            ->findOneById($this->getRequest()->get('attributeav_id', 0));
 
         if (null !== $attributeAv) {
             $attributeAv->setLocale($this->getCurrentEditionLocale());
@@ -156,12 +154,12 @@ class AttributeAvController extends AbstractCrudController
         ];
     }
 
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         // We always return to the attribute edition form
         return $this->render(
             'attribute-edit',
-            $this->getViewArguments()
+            $this->getViewArguments(),
         );
     }
 
@@ -175,7 +173,7 @@ class AttributeAvController extends AbstractCrudController
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.attributes.update',
-            $this->getViewArguments()
+            $this->getViewArguments(),
         );
     }
 
@@ -183,7 +181,7 @@ class AttributeAvController extends AbstractCrudController
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.attributes.update',
-            $this->getViewArguments()
+            $this->getViewArguments(),
         );
     }
 }

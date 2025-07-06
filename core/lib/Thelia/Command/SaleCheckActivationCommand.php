@@ -37,7 +37,7 @@ class SaleCheckActivationCommand extends ContainerAwareCommand
         try {
             $this->getDispatcher()->dispatch(
                 new SaleActiveStatusCheckEvent(),
-                TheliaEvents::CHECK_SALE_ACTIVATION_EVENT
+                TheliaEvents::CHECK_SALE_ACTIVATION_EVENT,
             );
 
             $output->writeln('<info>Sale verification processed successfully</info>');

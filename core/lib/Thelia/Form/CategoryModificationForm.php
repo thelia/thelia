@@ -27,7 +27,7 @@ class CategoryModificationForm extends CategoryCreationForm
     protected function buildForm(): void
     {
         $this->doBuilForm(
-            $this->translator->trans('The category title')
+            $this->translator->trans('The category title'),
         );
 
         // Create countries and shipping modules list
@@ -51,7 +51,7 @@ class CategoryModificationForm extends CategoryCreationForm
                 HiddenType::class,
                 [
                     'constraints' => [new GreaterThan(['value' => 0])],
-                ]
+                ],
             )
             ->add(
                 'default_template_id',
@@ -62,14 +62,13 @@ class CategoryModificationForm extends CategoryCreationForm
                     'label_attr' => [
                         'for' => 'price_offset_type',
                         'help' => $this->translator->trans(
-                            'Select a default template for new products created in this category'
+                            'Select a default template for new products created in this category',
                         ),
                     ],
                     'attr' => [
                     ],
-                ]
-            )
-        ;
+                ],
+            );
 
         // Add standard description fields, excluding title which is defined in parent class
         $this->addStandardDescFields(['title']);

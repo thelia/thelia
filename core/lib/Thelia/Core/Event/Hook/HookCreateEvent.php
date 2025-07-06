@@ -21,40 +21,29 @@ namespace Thelia\Core\Event\Hook;
  */
 class HookCreateEvent extends HookEvent
 {
-    /** @var string */
-    protected $locale;
+    protected string $locale;
 
-    /** @var string */
-    protected $code;
+    protected string $code;
 
-    /** @var int */
-    protected $type;
+    protected int $type;
 
-    /** @var string */
-    protected $title;
+    protected string $title;
 
-    /** @var int */
-    protected $native;
+    protected int $native;
 
-    /** @var int */
-    protected $active;
+    protected int $active;
 
     /**
-     * @param string $locale
-     *
      * @return $this
      */
-    public function setLocale($locale): self
+    public function setLocale(string $locale): self
     {
         $this->locale = $locale;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->locale;
     }

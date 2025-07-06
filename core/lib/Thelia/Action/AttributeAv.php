@@ -38,8 +38,7 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
 
-            ->save()
-        ;
+            ->save();
 
         $event->setAttributeAv($attribute);
     }
@@ -70,8 +69,7 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
     {
         if (null !== ($attribute = AttributeAvQuery::create()->findPk($event->getAttributeAvId()))) {
             $attribute
-                ->delete()
-            ;
+                ->delete();
 
             $event->setAttributeAv($attribute);
         }

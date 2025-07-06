@@ -38,10 +38,7 @@ class FileToggleVisibilityEvent extends ToggleVisibilityEvent
         $this->query = $query;
     }
 
-    /**
-     * @return ModelCriteria|null
-     */
-    public function getQuery()
+    public function getQuery(): ?ModelCriteria
     {
         return $this->query;
     }

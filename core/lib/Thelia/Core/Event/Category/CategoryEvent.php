@@ -22,10 +22,7 @@ use Thelia\Model\Category;
  */
 class CategoryEvent extends ActionEvent
 {
-    /**
-     * @var Category|null
-     */
-    public $category;
+    public ?Category $category;
 
     public function __construct(?Category $category = null)
     {

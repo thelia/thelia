@@ -47,8 +47,7 @@ class CustomerProfileUpdateForm extends CustomerCreateForm
             ->remove('state')
             // Remove Login Information
             ->remove('password')
-            ->remove('password_confirm')
-        ;
+            ->remove('password_confirm');
 
         $customerCanChangeEmail = ConfigQuery::read('customer_change_email');
         $emailConfirmation = ConfigQuery::read('customer_confirm_email');
@@ -69,8 +68,9 @@ class CustomerProfileUpdateForm extends CustomerCreateForm
     public function verifyExistingEmail($value, ExecutionContextInterface $context): void
     {
         $customer = CustomerQuery::getCustomerByEmail($value);
+
         // If there is already a customer for this email address and if the customer is different from the current user, do a violation
-        if ($customer && $customer->getId() != $this->getRequest()->getSession()->getCustomerUser()->getId()) {
+        if ($customer && $customer->getId() !== $this->getRequest()->getSession()->getCustomerUser()->getId()) {
             $context->addViolation(Translator::getInstance()->trans('This email already exists.'));
         }
     }

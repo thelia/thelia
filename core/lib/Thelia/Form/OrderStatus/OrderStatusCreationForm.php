@@ -50,13 +50,13 @@ class OrderStatusCreationForm extends BaseForm
                         'for' => 'title',
                         'help' => Translator::getInstance()->trans(
                             'Enter here the order status name in the default language (%title%)',
-                            ['%title%' => Lang::getDefaultLanguage()->getTitle()]
+                            ['%title%' => Lang::getDefaultLanguage()->getTitle()],
                         ),
                     ],
                     'attr' => [
                         'placeholder' => Translator::getInstance()->trans('The order status name or title'),
                     ],
-                ]
+                ],
             )
             ->add(
                 'code',
@@ -76,7 +76,7 @@ class OrderStatusCreationForm extends BaseForm
                     'attr' => [
                         'placeholder' => Translator::getInstance()->trans('The order status code'),
                     ],
-                ]
+                ],
             )
             ->add(
                 'color',
@@ -95,7 +95,7 @@ class OrderStatusCreationForm extends BaseForm
                     'attr' => [
                         'placeholder' => Translator::getInstance()->trans('#000000'),
                     ],
-                ]
+                ],
             );
 
         $this->addStandardDescFields(['title', 'description', 'chapo', 'postscriptum']);
@@ -110,7 +110,7 @@ class OrderStatusCreationForm extends BaseForm
     {
         if (!preg_match('/^#[0-9a-fA-F]{6}$/', (string) $value)) {
             $context->addViolation(
-                Translator::getInstance()->trans('This is not a hexadecimal color.')
+                Translator::getInstance()->trans('This is not a hexadecimal color.'),
             );
         }
     }
@@ -126,7 +126,7 @@ class OrderStatusCreationForm extends BaseForm
 
         if ($query->findOne()) {
             $context->addViolation(
-                Translator::getInstance()->trans('This code is already used.')
+                Translator::getInstance()->trans('This code is already used.'),
             );
         }
     }
@@ -135,7 +135,7 @@ class OrderStatusCreationForm extends BaseForm
     {
         if (!empty($value) && !preg_match('/^\w+$/', (string) $value)) {
             $context->addViolation(
-                Translator::getInstance()->trans('This is not a valid code.')
+                Translator::getInstance()->trans('This is not a valid code.'),
             );
         }
     }
@@ -144,7 +144,7 @@ class OrderStatusCreationForm extends BaseForm
     {
         if ($this->form->has('id') && null !== ($orderStatus = OrderStatusQuery::create()->findOneById($this->form->get('id')->getData())) && (!$orderStatus->getProtectedStatus() && empty($this->form->get('code')->getData()))) {
             $context->addViolation(
-                Translator::getInstance()->trans('This value should not be blank.')
+                Translator::getInstance()->trans('This value should not be blank.'),
             );
         }
     }

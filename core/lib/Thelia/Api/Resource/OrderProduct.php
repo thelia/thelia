@@ -38,27 +38,27 @@ use Thelia\Model\ProductQuery;
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/admin/order_products'
+            uriTemplate: '/admin/order_products',
         ),
         new Post(
-            uriTemplate: '/admin/order_products'
+            uriTemplate: '/admin/order_products',
         ),
         new Get(
             uriTemplate: '/admin/order_products/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/order_products/{id}'
+            uriTemplate: '/admin/order_products/{id}',
         ),
         new Patch(
             uriTemplate: '/admin/order_products/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/order_products/{id}'
+            uriTemplate: '/admin/order_products/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
@@ -69,7 +69,7 @@ use Thelia\Model\ProductQuery;
         new Get(
             uriTemplate: '/front/account/order_products/{id}',
             normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
-            security: 'object.order.customer.getId() == user.getId()'
+            security: 'object.order.customer.getId() == user.getId()',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -85,26 +85,22 @@ use Thelia\Model\ProductQuery;
             'strategy' => 'exact',
             'fieldPath' => 'order_product.order_id',
         ],
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
         'virtual',
-    ]
+    ],
 )]
 class OrderProduct implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:order_product:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order_product:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:order_product:write';
-
     public const GROUP_FRONT_READ = 'front:order_product:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:order_product:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ,
@@ -320,12 +316,15 @@ class OrderProduct implements PropelResourceInterface
     public function getAttribute(): ?array
     {
         $pseId = $this->getProductSaleElementsId();
+
         if (!$pseId) {
             return null;
         }
 
         return array_map(
-            fn (AttributeCombination $attributeCombination) => [$attributeCombination->getAttribute()->getTitle() => $attributeCombination->getAttributeAv()->getTitle()], AttributeCombinationQuery::create()->filterByProductSaleElementsId($pseId)->find()->getData());
+            static fn (AttributeCombination $attributeCombination) => [$attributeCombination->getAttribute()->getTitle() => $attributeCombination->getAttributeAv()->getTitle()],
+            AttributeCombinationQuery::create()->filterByProductSaleElementsId($pseId)->find()->getData(),
+        );
     }
 
     public function getId(): ?int
@@ -627,11 +626,13 @@ class OrderProduct implements PropelResourceInterface
             // unitTaxedPrice
             $totalTax = 0;
             $totalPromoTax = 0;
-            if ($this->orderProductTaxes !== []) {
+
+            if ([] !== $this->orderProductTaxes) {
                 /** @var OrderProductTax $orderProductTax */
                 foreach ($this->orderProductTaxes as $orderProductTax) {
                     /** @var \Thelia\Model\OrderProductTax $orderProductTax */
                     $propelOrderProductTax = $orderProductTax->getPropelModel();
+
                     if (!$this->getPropelModel()->getWasInPromo()) {
                         $totalTax += (float) $propelOrderProductTax->getAmount();
                     }

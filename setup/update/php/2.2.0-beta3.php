@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -14,13 +16,13 @@ $pdo = $database->getConnection();
 
 // Test if price columns are in float
 $sqlGetFloat = 'SELECT COLUMN_NAME '
-  .'FROM INFORMATION_SCHEMA.COLUMNS '
-  ."WHERE TABLE_SCHEMA LIKE DATABASE() AND TABLE_NAME LIKE 'product_price' AND COLUMN_NAME LIKE 'price' AND COLUMN_TYPE LIKE 'float%'";
+  . 'FROM INFORMATION_SCHEMA.COLUMNS '
+  . "WHERE TABLE_SCHEMA LIKE DATABASE() AND TABLE_NAME LIKE 'product_price' AND COLUMN_NAME LIKE 'price' AND COLUMN_TYPE LIKE 'float%'";
 
 $stmtGetFloat = $pdo->query($sqlGetFloat);
 
 // alter tables to convert float to decimal
-if ($stmtGetFloat->rowCount() !== 0) {
+if (0 !== $stmtGetFloat->rowCount()) {
     $columns = [
         ['product_price', 'price'],
         ['product_price', 'promo_price'],

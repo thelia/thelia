@@ -65,12 +65,12 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
                     'alpha', 'alpha_reverse',
                     'position', 'position_reverse',
                 ],
-                'position'
-            )
+                'position',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $search = LangQuery::create();
 
@@ -154,8 +154,7 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
                 ->set('DECIMAL_SEPARATOR', $result->getDecimalSeparator())
                 ->set('THOUSANDS_SEPARATOR', $result->getThousandsSeparator())
                 ->set('DECIMAL_COUNT', $result->getDecimals())
-                ->set('POSITION', $result->getPosition())
-            ;
+                ->set('POSITION', $result->getPosition());
 
             $this->addOutputFields($loopResultRow, $result);
 

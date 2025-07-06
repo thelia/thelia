@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -14,7 +16,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Thelia\Install\Exception\UpdateException;
 
-if (\PHP_SAPI != 'cli') {
+if (\PHP_SAPI !== 'cli') {
     throw new Exception('this script can only be launched with cli sapi');
 }
 
@@ -25,7 +27,7 @@ $env = 'dev';
 
 // Autoload bootstrap
 foreach ($argv as $arg) {
-    if ($arg === '-b') {
+    if ('-b' === $arg) {
         $bootstrapToggle = true;
 
         continue;
@@ -36,7 +38,7 @@ foreach ($argv as $arg) {
     }
 
     if ($bootstrapToggle) {
-        require __DIR__.\DIRECTORY_SEPARATOR.$arg;
+        require __DIR__ . \DIRECTORY_SEPARATOR . $arg;
 
         $bootstraped = true;
     }
@@ -45,9 +47,9 @@ foreach ($argv as $arg) {
 if (!$bootstraped) {
     if (isset($bootstrapFile)) {
         require $bootstrapFile;
-    } elseif (is_file($file = __DIR__.'/../vendor/autoload.php')) {
+    } elseif (is_file($file = __DIR__ . '/../vendor/autoload.php')) {
         require $file;
-    } elseif (is_file($file = __DIR__.'/../../bootstrap.php')) {
+    } elseif (is_file($file = __DIR__ . '/../../bootstrap.php')) {
         // Here we are on a thelia/thelia-project
         require $file;
     } else {
@@ -56,22 +58,22 @@ if (!$bootstraped) {
     }
 }
 
-if (is_file(dirname(__DIR__)."/.env.$env.local")) {
-    (new Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__)."/.env.$env.local");
-} elseif (is_file(dirname(__DIR__).'/.env')) {
-    (new Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__).'/.env');
-} elseif (is_file($file = __DIR__.'/../../bootstrap.php')) {
+if (is_file(dirname(__DIR__) . "/.env.{$env}.local")) {
+    (new Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__) . "/.env.{$env}.local");
+} elseif (is_file(dirname(__DIR__) . '/.env')) {
+    (new Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__) . '/.env');
+} elseif (is_file($file = __DIR__ . '/../../bootstrap.php')) {
     // Here we are on a thelia/thelia-project
-    (new Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__).'/../.env');
+    (new Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__) . '/../.env');
 }
 
 $thelia = new App\Kernel($_ENV['APP_ENV'], false);
 
 $thelia->boot();
 
-/***************************************************
+/*
  * Load Update class
- ***************************************************/
+ */
 
 try {
     $update = new Thelia\Install\Update(false);
@@ -80,12 +82,12 @@ try {
     exit(2);
 }
 
-/***************************************************
+/*
  * Check if update is needed
- ***************************************************/
+ */
 
 if ($update->isLatestVersion()) {
-    cliOutput('You already have the latest version of Thelia : '.$update->getCurrentVersion(), 'success');
+    cliOutput('You already have the latest version of Thelia : ' . $update->getCurrentVersion(), 'success');
     exit(3);
 }
 
@@ -94,60 +96,67 @@ $files = $update->getLatestVersion();
 $web = $update->getWebVersion();
 
 while (1) {
-    if ($web !== null && $files != $web) {
+    if (null !== $web && $files !== $web) {
         cliOutput(sprintf(
             'Thelia server is reporting the current stable release version is %s ',
-            $web
+            $web,
         ), 'warning');
     }
 
     cliOutput(sprintf(
         'You are going to update Thelia from version %s to version %s.',
         $current,
-        $files
+        $files,
     ), 'info');
 
-    if ($web !== null && $files < $web) {
+    if (null !== $web && $files < $web) {
         cliOutput(sprintf(
             'Your files belongs to version %s, which is not the latest stable release.',
-            $files
+            $files,
         ), 'warning');
         cliOutput(
-            'It is recommended to upgrade your files first then run this script again.'.\PHP_EOL
-            .'The latest version is available at http://thelia.net/#download .', 'warning');
+            'It is recommended to upgrade your files first then run this script again.' . \PHP_EOL
+            . 'The latest version is available at http://thelia.net/#download .',
+            'warning',
+        );
         cliOutput('Continue update process anyway ? (Y/n)');
     } else {
         cliOutput('Continue update process ? (Y/n)');
     }
 
     $rep = readStdin(true);
-    if ($rep == 'y') {
+
+    if ('y' === $rep) {
         break;
     }
-    if ($rep == 'n') {
+
+    if ('n' === $rep) {
         cliOutput('Update aborted', 'warning');
         exit(0);
     }
 }
 
 $backup = false;
+
 while (1) {
     cliOutput('Would you like to backup the current database before proceeding ? (Y/n)');
 
     $rep = readStdin(true);
-    if ($rep == 'y') {
+
+    if ('y' === $rep) {
         $backup = true;
         break;
     }
-    if ($rep == 'n') {
+
+    if ('n' === $rep) {
         $backup = false;
         break;
     }
 }
 
-/***************************************************
+/*
  * Update
- ***************************************************/
+ */
 
 $updateError = null;
 
@@ -158,7 +167,7 @@ try {
             $update->backupDb();
             cliOutput(sprintf('Your database has been backed up. The sql file : %s', $update->getBackupFile()), 'info');
         } catch (Exception $e) {
-            cliOutput('Sorry, your database can\'t be backed up. Reason : '.$e->getMessage(), 'error');
+            cliOutput('Sorry, your database can\'t be backed up. Reason : ' . $e->getMessage(), 'error');
             exit(4);
         }
     }
@@ -174,6 +183,7 @@ foreach ($update->getMessages() as $message) {
 
 if (null === $updateError) {
     cliOutput(sprintf('Thelia as been successfully updated to version %s', $update->getCurrentVersion()), 'success');
+
     if ($update->hasPostInstructions()) {
         cliOutput('===================================');
         cliOutput($update->getPostInstructions());
@@ -181,10 +191,11 @@ if (null === $updateError) {
     }
 } else {
     cliOutput(sprintf('Sorry, an unexpected error has occured : %s', $updateError->getMessage()), 'error');
-    echo $updateError->getTraceAsString().\PHP_EOL;
-    echo 'Trace: '.\PHP_EOL;
+    echo $updateError->getTraceAsString() . \PHP_EOL;
+    echo 'Trace: ' . \PHP_EOL;
+
     foreach ($update->getLogs() as $log) {
-        cliOutput(sprintf('[%s] %s'.\PHP_EOL, $log[0], $log[1]), 'error');
+        cliOutput(sprintf('[%s] %s' . \PHP_EOL, $log[0], $log[1]), 'error');
     }
 
     if (true === $backup) {
@@ -192,29 +203,31 @@ if (null === $updateError) {
             cliOutput('Would you like to restore the backup database ? (Y/n)');
 
             $rep = readStdin(true);
-            if ($rep == 'y') {
+
+            if ('y' === $rep) {
                 cliOutput('Database restore started. Wait, it could take a while...');
 
                 if (false === $update->restoreDb()) {
                     cliOutput(sprintf(
                         'Sorry, your database can\'t be restore. Try to do it manually : %s',
-                        $update->getBackupFile()
+                        $update->getBackupFile(),
                     ), 'error');
                     exit(5);
                 }
                 cliOutput('Database successfully restore.');
                 exit(5);
             }
-            if ($rep == 'n') {
+
+            if ('n' === $rep) {
                 exit(0);
             }
         }
     }
 }
 
-/***************************************************
+/*
  * Try to delete cache
- ***************************************************/
+ */
 
 $finder = new Finder();
 $fs = new Filesystem();
@@ -233,16 +246,16 @@ foreach ($finder as $file) {
 }
 
 if (true === $hasDeleteError) {
-    cliOutput('The cache has not been cleared properly. Try to run the command manually : '.
+    cliOutput('The cache has not been cleared properly. Try to run the command manually : ' .
         '(sudo) php Thelia cache:clear (--env=prod).');
 }
 
 cliOutput('Update process finished.', 'info');
 exit(0);
 
-/***************************************************
+/*
  * Utils
- ***************************************************/
+ */
 
 function readStdin($normalize = false)
 {
@@ -268,8 +281,9 @@ function joinPaths()
     }
 
     $path = implode(\DIRECTORY_SEPARATOR, $paths);
-    if (substr($args[0], 0, 1) === '/') {
-        $path = \DIRECTORY_SEPARATOR.$path;
+
+    if ('/' === substr($args[0], 0, 1)) {
+        $path = \DIRECTORY_SEPARATOR . $path;
     }
 
     return $path;
@@ -294,5 +308,5 @@ function cliOutput($message, $type = null): void
             $color = "\033[0m";
     }
 
-    echo \PHP_EOL.$color.$message."\033[0m".\PHP_EOL;
+    echo \PHP_EOL . $color . $message . "\033[0m" . \PHP_EOL;
 }

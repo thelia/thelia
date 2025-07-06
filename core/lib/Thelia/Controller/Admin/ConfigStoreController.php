@@ -52,20 +52,21 @@ class ConfigStoreController extends BaseAdminController
     {
         $file = $form->get($inputName)->getData();
 
-        if ($file != null) {
+        if (null !== $file) {
             // Delete the old file
             $fs = new Filesystem();
             $oldFileName = ConfigQuery::read($configKey);
 
-            if ($oldFileName !== null) {
-                $oldFilePath = $storeMediaUploadDir.DS.$oldFileName;
+            if (null !== $oldFileName) {
+                $oldFilePath = $storeMediaUploadDir . DS . $oldFileName;
+
                 if ($fs->exists($oldFilePath)) {
                     $fs->remove($oldFilePath);
                 }
             }
 
             // Write the new file
-            $newFileName = uniqid().'-'.$file->getClientOriginalName();
+            $newFileName = uniqid() . '-' . $file->getClientOriginalName();
             $file->move($storeMediaUploadDir, $newFileName);
             ConfigQuery::write($configKey, $newFileName, false);
         }
@@ -82,18 +83,19 @@ class ConfigStoreController extends BaseAdminController
         $configStoreForm = $this->createForm(AdminForm::CONFIG_STORE);
 
         $exception = null;
+
         try {
             $form = $this->validateForm($configStoreForm);
 
             $storeMediaUploadDir = ConfigQuery::read('images_library_path');
 
-            if ($storeMediaUploadDir === null) {
-                $storeMediaUploadDir = THELIA_LOCAL_DIR.'media'.DS.'images';
+            if (null === $storeMediaUploadDir) {
+                $storeMediaUploadDir = THELIA_LOCAL_DIR . 'media' . DS . 'images';
             } else {
-                $storeMediaUploadDir = THELIA_ROOT.$storeMediaUploadDir;
+                $storeMediaUploadDir = THELIA_ROOT . $storeMediaUploadDir;
             }
 
-            $storeMediaUploadDir .= DS.'store';
+            $storeMediaUploadDir .= DS . 'store';
 
             // List of medias that can be uploaded through this form.
             //  [Name of the form input] => [Key in the config table]
@@ -118,7 +120,7 @@ class ConfigStoreController extends BaseAdminController
 
             $this->adminLogAppend(AdminResources::STORE, AccessManager::UPDATE, 'Store configuration changed');
 
-            if ($this->getRequest()->get('save_mode') == 'stay') {
+            if ('stay' === $this->getRequest()->get('save_mode')) {
                 $response = $this->generateRedirectFromRoute('admin.configuration.store.default');
             } else {
                 $response = $this->generateSuccessRedirect($configStoreForm);
@@ -132,7 +134,7 @@ class ConfigStoreController extends BaseAdminController
                 $this->getTranslator()->trans('Store configuration failed.'),
                 $error_msg,
                 $configStoreForm,
-                $exception
+                $exception,
             );
 
             $response = $this->renderTemplate();

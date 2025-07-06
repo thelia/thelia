@@ -35,39 +35,39 @@ use Thelia\Model\Tools\UrlRewritingTrait;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/brands'
+            uriTemplate: '/admin/brands',
         ),
         new GetCollection(
-            uriTemplate: '/admin/brands'
+            uriTemplate: '/admin/brands',
         ),
         new Get(
             uriTemplate: '/admin/brands/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/brands/{id}'
+            uriTemplate: '/admin/brands/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/brands/{id}'
+            uriTemplate: '/admin/brands/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/brands/{id}'
+            uriTemplate: '/admin/brands/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/front/brands'
+            uriTemplate: '/front/brands',
         ),
         new Get(
             uriTemplate: '/front/brands/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]]
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -75,32 +75,28 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         'id',
         'products.id',
         'title',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
         'position',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
         'visible',
-    ]
+    ],
 )]
 class Brand extends AbstractTranslatableResource
 {
     use UrlRewritingTrait;
 
     public const GROUP_ADMIN_READ = 'admin:brand:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:brand:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:brand:write';
-
     public const GROUP_FRONT_READ = 'front:brand:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:brand:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ,
@@ -131,7 +127,7 @@ class Brand extends AbstractTranslatableResource
     public ?int $position = null;
 
     #[ApiProperty(
-        types: 'object'
+        types: 'object',
     )]
     #[Groups([
         self::GROUP_ADMIN_READ,

@@ -43,14 +43,14 @@ use Thelia\Model\Map\FolderDocumentTableMap;
             controller: PostItemFileController::class,
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
             denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_FILE]],
-            deserialize: false
+            deserialize: false,
         ),
         new GetCollection(
-            uriTemplate: '/admin/folder_documents'
+            uriTemplate: '/admin/folder_documents',
         ),
         new Get(
             uriTemplate: '/admin/folder_documents/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Get(
             uriTemplate: '/admin/folder_documents/{id}/file',
@@ -60,8 +60,8 @@ use Thelia\Model\Map\FolderDocumentTableMap;
                     '200' => [
                         'description' => 'The binary file',
                     ],
-                ]
-            )
+                ],
+            ),
         ),
         new Put(
             uriTemplate: '/admin/folder_documents/{id}',
@@ -69,26 +69,26 @@ use Thelia\Model\Map\FolderDocumentTableMap;
         ),
         new Patch(
             uriTemplate: '/admin/folder_documents/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
         ),
         new Delete(
-            uriTemplate: '/admin/folder_documents/{id}'
+            uriTemplate: '/admin/folder_documents/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
         'position',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
         'visible',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -98,18 +98,14 @@ use Thelia\Model\Map\FolderDocumentTableMap;
             'strategy' => 'exact',
             'fieldPath' => 'folder_document.folder_id',
         ],
-    ]
+    ],
 )]
 class FolderDocument extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     public const GROUP_ADMIN_READ = 'admin:folder_document:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:folder_document:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:folder_document:write';
-
     public const GROUP_ADMIN_WRITE_FILE = 'admin:folder_document:write_file';
-
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:folder_document:write_update';
 
     #[Groups([self::GROUP_ADMIN_READ])]
@@ -124,7 +120,7 @@ class FolderDocument extends AbstractTranslatableResource implements ItemFileRes
         openapiContext: [
             'type' => 'string',
             'format' => 'binary',
-        ]
+        ],
     )]
     public UploadedFile $fileToUpload;
 

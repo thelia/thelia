@@ -51,44 +51,45 @@ class Address extends BaseLoop implements PropelSearchLoopInterface
                 'id',
                 new TypeCollection(
                     new IntListType(),
-                    new EnumType(['*', 'any'])
-                )
+                    new EnumType(['*', 'any']),
+                ),
             ),
             new Argument(
                 'customer',
                 new TypeCollection(
                     new IntType(),
-                    new EnumType(['current'])
+                    new EnumType(['current']),
                 ),
-                'current'
+                'current',
             ),
             Argument::createBooleanOrBothTypeArgument('default'),
             new Argument(
                 'exclude',
                 new TypeCollection(
                     new IntListType(),
-                    new EnumType(['none'])
-                )
-            )
+                    new EnumType(['none']),
+                ),
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $search = AddressQuery::create();
 
         $id = $this->getId();
 
-        if (null !== $id && !\in_array($id, ['*', 'any'])) {
+        if (null !== $id && !\in_array($id, ['*', 'any'], true)) {
             $search->filterById($id, Criteria::IN);
         }
 
         $customer = $this->getCustomer();
 
-        if ($customer === 'current') {
+        if ('current' === $customer) {
             $currentCustomer = $this->securityContext->getCustomerUser();
-            if ($currentCustomer === null) {
-                return null;
+
+            if (null === $currentCustomer) {
+                return $search;
             }
 
             $search->filterByCustomerId($currentCustomer->getId(), Criteria::EQUAL);
@@ -98,9 +99,9 @@ class Address extends BaseLoop implements PropelSearchLoopInterface
 
         $default = $this->getDefault();
 
-        if ($default === true) {
+        if (true === $default) {
             $search->filterByIsDefault(1, Criteria::EQUAL);
-        } elseif ($default === false) {
+        } elseif (false === $default) {
             $search->filterByIsDefault(0, Criteria::EQUAL);
         }
 
@@ -135,8 +136,7 @@ class Address extends BaseLoop implements PropelSearchLoopInterface
                 ->set('STATE', $address->getStateId())
                 ->set('PHONE', $address->getPhone())
                 ->set('CELLPHONE', $address->getCellphone())
-                ->set('DEFAULT', $address->getIsDefault())
-            ;
+                ->set('DEFAULT', $address->getIsDefault());
             $this->addOutputFields($loopResultRow, $address);
 
             $loopResult->addRow($loopResultRow);

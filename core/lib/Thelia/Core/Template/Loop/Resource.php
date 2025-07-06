@@ -52,8 +52,8 @@ class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'code',
                 new TypeCollection(
-                    new AlphaNumStringListType()
-                )
+                    new AlphaNumStringListType(),
+                ),
             ),
             new Argument(
                 'order',
@@ -65,19 +65,17 @@ class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
                         'code_reverse',
                         'title',
                         'title_reverse',
-                    ])
+                    ]),
                 ),
-                'id'
-            )
+                'id',
+            ),
         );
     }
 
     /**
      * @throws PropelException
-     *
-     * @return ModelCriteria|ResourceQuery
      */
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria|ResourceQuery
     {
         $search = ResourceQuery::create();
 
@@ -141,8 +139,7 @@ class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('TITLE', $resource->getVirtualColumn('i18n_TITLE'))
                 ->set('CHAPO', $resource->getVirtualColumn('i18n_CHAPO'))
                 ->set('DESCRIPTION', $resource->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set('POSTSCRIPTUM', $resource->getVirtualColumn('i18n_POSTSCRIPTUM'))
-            ;
+                ->set('POSTSCRIPTUM', $resource->getVirtualColumn('i18n_POSTSCRIPTUM'));
 
             if (null !== $this->getProfile()) {
                 $accessValue = $resource->getVirtualColumn('access');

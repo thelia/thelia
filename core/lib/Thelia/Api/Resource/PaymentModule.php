@@ -41,7 +41,7 @@ use Thelia\Model\Map\ModuleTableMap;
             provider: PaymentModuleProvider::class,
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]]
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
 class PaymentModule extends AbstractTranslatableResource
 {

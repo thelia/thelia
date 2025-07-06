@@ -42,8 +42,7 @@ class FeatureAvCreationForm extends BaseForm
                 'constraints' => [
                     new NotBlank(),
                 ],
-            ])
-        ;
+            ]);
     }
 
     public static function getName(): string

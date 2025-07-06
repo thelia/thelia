@@ -43,7 +43,7 @@ class InstallStep3Form extends BaseForm
                     'constraints' => [
                         new NotBlank(),
                     ],
-                ]
+                ],
             )
             ->add(
                 'user',
@@ -52,7 +52,7 @@ class InstallStep3Form extends BaseForm
                     'constraints' => [
                         new NotBlank(),
                     ],
-                ]
+                ],
             )
             ->add(
                 'password',
@@ -61,7 +61,7 @@ class InstallStep3Form extends BaseForm
                     'constraints' => [
                         new NotBlank(),
                     ],
-                ]
+                ],
             )
             ->add(
                 'port',
@@ -72,10 +72,10 @@ class InstallStep3Form extends BaseForm
                         new GreaterThan(
                             [
                                 'value' => 0,
-                            ]
+                            ],
                         ),
                     ],
-                ]
+                ],
             )
             ->add(
                 'locale',
@@ -84,7 +84,7 @@ class InstallStep3Form extends BaseForm
                     'constraints' => [
                         new NotBlank(),
                     ],
-                ]
+                ],
             );
     }
 

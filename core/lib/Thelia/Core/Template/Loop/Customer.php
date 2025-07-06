@@ -60,8 +60,8 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
             new Argument(
                 'ref',
                 new TypeCollection(
-                    new AlphaNumStringListType()
-                )
+                    new AlphaNumStringListType(),
+                ),
             ),
             Argument::createBooleanTypeArgument('reseller'),
             Argument::createIntTypeArgument('sponsor'),
@@ -84,12 +84,12 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
                             'order_amount_reverse',
                             'registration_date',
                             'registration_date_reverse',
-                        ]
-                    )
+                        ],
+                    ),
                 ),
-                'lastname'
+                'lastname',
             ),
-            Argument::createBooleanOrBothTypeArgument('newsletter', BooleanOrBothType::ANY)
+            Argument::createBooleanOrBothTypeArgument('newsletter', BooleanOrBothType::ANY),
         );
     }
 
@@ -103,12 +103,10 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
         ];
     }
 
-    /**
-     * @param CustomerQuery $search
-     */
-    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria): void
+    public function doSearch(\Propel\Runtime\ActiveQuery\ModelCriteria $search, $searchTerm, $searchIn, $searchCriteria): void
     {
         $search->_and();
+
         foreach ($searchIn as $index => $searchInElement) {
             if ($index > 0) {
                 $search->_or();
@@ -131,7 +129,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
         }
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $search = CustomerQuery::create();
 
@@ -142,13 +140,13 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
         $join = new Join(
             CustomerTableMap::COL_EMAIL,
             NewsletterTableMap::COL_EMAIL,
-            true === $newsletter ? Criteria::INNER_JOIN : Criteria::LEFT_JOIN
+            true === $newsletter ? Criteria::INNER_JOIN : Criteria::LEFT_JOIN,
         );
 
         $search
             ->addJoinObject($join, 'newsletter_join')
-            ->addJoinCondition('newsletter_join', NewsletterTableMap::COL_UNSUBSCRIBED.' = ?', false, null, \PDO::PARAM_BOOL)
-            ->withColumn('IF(ISNULL('.NewsletterTableMap::COL_EMAIL.'), 0, 1)', 'is_registered_to_newsletter');
+            ->addJoinCondition('newsletter_join', NewsletterTableMap::COL_UNSUBSCRIBED . ' = ?', false, null, \PDO::PARAM_BOOL)
+            ->withColumn('IF(ISNULL(' . NewsletterTableMap::COL_EMAIL . '), 0, 1)', 'is_registered_to_newsletter');
 
         // If "*" === $newsletter, no filter will be applied, so it won't change anything
         if (false === $newsletter) {
@@ -157,10 +155,11 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
 
         $current = $this->getCurrent();
 
-        if ($current === true) {
+        if (true === $current) {
             $currentCustomer = $this->securityContext->getCustomerUser();
-            if ($currentCustomer === null) {
-                return null;
+
+            if (null === $currentCustomer) {
+                return $search;
             }
 
             $search->filterById($currentCustomer->getId(), Criteria::EQUAL);
@@ -180,15 +179,15 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
 
         $reseller = $this->getReseller();
 
-        if ($reseller === true) {
+        if (true === $reseller) {
             $search->filterByReseller(1, Criteria::EQUAL);
-        } elseif ($reseller === false) {
+        } elseif (false === $reseller) {
             $search->filterByReseller(0, Criteria::EQUAL);
         }
 
         $sponsor = $this->getSponsor();
 
-        if ($sponsor !== null) {
+        if (null !== $sponsor) {
             $search->filterBySponsor($sponsor, Criteria::EQUAL);
         }
 
@@ -249,8 +248,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
                 ->set('SPONSOR', $customer->getSponsor())
                 ->set('DISCOUNT', $customer->getDiscount())
                 ->set('NEWSLETTER', $customer->getVirtualColumn('is_registered_to_newsletter'))
-                ->set('CONFIRMATION_TOKEN', $customer->getConfirmationToken())
-            ;
+                ->set('CONFIRMATION_TOKEN', $customer->getConfirmationToken());
 
             if ($this->getWithPrevNextInfo()) {
                 // Find previous and next category
@@ -265,10 +263,10 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
                     ->orderById(Criteria::ASC)
                     ->findOne();
                 $loopResultRow
-                    ->set('HAS_PREVIOUS', $previous != null ? 1 : 0)
-                    ->set('HAS_NEXT', $next != null ? 1 : 0)
-                    ->set('PREVIOUS', $previous != null ? $previous->getId() : -1)
-                    ->set('NEXT', $next != null ? $next->getId() : -1);
+                    ->set('HAS_PREVIOUS', null !== $previous ? 1 : 0)
+                    ->set('HAS_NEXT', null !== $next ? 1 : 0)
+                    ->set('PREVIOUS', null !== $previous ? $previous->getId() : -1)
+                    ->set('NEXT', null !== $next ? $next->getId() : -1);
             }
 
             $this->addOutputFields($loopResultRow, $customer);

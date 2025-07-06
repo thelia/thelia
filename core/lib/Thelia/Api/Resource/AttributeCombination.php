@@ -26,7 +26,7 @@ use Thelia\Model\Map\AttributeCombinationTableMap;
     operations: [
         new Get(
             uriTemplate: '/admin/attribute_combinations/{productSaleElements}/attribute_av/{attributeAv}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
@@ -36,7 +36,7 @@ use Thelia\Model\Map\AttributeCombinationTableMap;
     operations: [
         new Get(
             uriTemplate: '/front/attribute_combinations/{productSaleElements}/attribute_av/{attributeAv}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -47,13 +47,9 @@ class AttributeCombination implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:attribute_combination:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:attribute_combination:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:attribute_combination:write';
-
     public const GROUP_FRONT_READ = 'front:attribute_combination:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:attribute_combination:read:single';
 
     #[Relation(targetResource: ProductSaleElements::class)]

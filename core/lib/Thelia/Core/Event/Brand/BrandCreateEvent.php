@@ -22,67 +22,50 @@ namespace Thelia\Core\Event\Brand;
 class BrandCreateEvent extends BrandEvent
 {
     protected $title;
-
     protected $locale;
-
     protected $visible;
 
     /**
-     * @param string $locale
-     *
      * @return BrandCreateEvent $this
      */
-    public function setLocale($locale): static
+    public function setLocale(string $locale): static
     {
         $this->locale = $locale;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->locale;
     }
 
     /**
-     * @param string $title
-     *
      * @return BrandCreateEvent $this
      */
-    public function setTitle($title): static
+    public function setTitle(string $title): static
     {
         $this->title = $title;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
 
     /**
-     * @param bool $visible
-     *
      * @return BrandCreateEvent $this
      */
-    public function setVisible($visible): static
+    public function setVisible(bool $visible): static
     {
         $this->visible = $visible;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function getVisible()
+    public function getVisible(): bool
     {
         return $this->visible;
     }

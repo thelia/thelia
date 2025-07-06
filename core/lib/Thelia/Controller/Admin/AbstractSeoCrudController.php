@@ -69,7 +69,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             $deleteEventIdentifier,
             $visibilityToggleEventIdentifier,
             $changePositionEventIdentifier,
-            $moduleCode
+            $moduleCode,
         );
     }
 
@@ -80,9 +80,8 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
      *
      * @return Response|null a response, or null to continue normal processing
      */
-    protected function performAdditionalUpdateSeoAction($updateSeoEvent)
+    protected function performAdditionalUpdateSeoAction(UpdateSeoEvent $updateSeoEvent): ?Response
     {
-        return null;
     }
 
     /**
@@ -95,10 +94,8 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
 
     /**
      * Creates the update SEO event with the provided form data.
-     *
-     * @return UpdateSeoEvent
      */
-    protected function getUpdateSeoEvent(array $formData)
+    protected function getUpdateSeoEvent(array $formData): UpdateSeoEvent
     {
         $updateSeoEvent = new UpdateSeoEvent($formData['id']);
 
@@ -107,8 +104,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             ->setMetaTitle($formData['meta_title'])
             ->setMetaDescription($formData['meta_description'])
             ->setMetaKeywords($formData['meta_keywords'])
-            ->setUrl($formData['url'])
-        ;
+            ->setUrl($formData['url']);
 
         // Create and dispatch the change event
         return $updateSeoEvent;
@@ -146,7 +142,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
         Request $request,
         ParserContext $parserContext,
         EventDispatcherInterface $eventDispatcher,
-    ) {
+    ): Response {
         // Check current user authorization
         if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof Response) {
             return $response;
@@ -159,7 +155,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
         $updateSeoForm = $this->getUpdateSeoForm();
 
         // Pass the object id to the request
-        $request->attributes->set($this->objectName.'_id', $request->get('current_id'));
+        $request->attributes->set($this->objectName . '_id', $request->get('current_id'));
 
         try {
             // Check the form against constraints violations
@@ -177,10 +173,10 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             // Execute additional Action
             $response = $this->performAdditionalUpdateSeoAction($updateSeoEvent);
 
-            if ($response == null) {
+            if (null === $response) {
                 // If we have to stay on the same page, do not redirect to the successUrl,
                 // just redirect to the edit page again.
-                if ($request->get('save_mode') == 'stay') {
+                if ('stay' === $request->get('save_mode')) {
                     return $this->redirectToEditionTemplate();
                 }
 
@@ -207,7 +203,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             Translator::getInstance()->trans('%obj SEO modification', ['%obj' => $this->objectName]),
             $errorMessage,
             $updateSeoForm,
-            $formValidationException
+            $formValidationException,
         );
 
         // At this point, the form has errors, and should be redisplayed.

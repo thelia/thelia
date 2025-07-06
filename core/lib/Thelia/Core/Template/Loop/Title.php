@@ -40,11 +40,11 @@ class Title extends BaseI18nLoop implements PropelSearchLoopInterface
     protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
-            Argument::createIntListTypeArgument('id')
+            Argument::createIntListTypeArgument('id'),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $search = CustomerTitleQuery::create();
 

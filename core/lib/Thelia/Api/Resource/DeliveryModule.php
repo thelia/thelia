@@ -44,19 +44,18 @@ use Thelia\Model\Map\ModuleTableMap;
         ),
         new Get(
             uriTemplate: '/front/delivery_modules/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]]
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
-    properties: ['position']
+    properties: ['position'],
 )]
 class DeliveryModule extends AbstractTranslatableResource
 {
     public const GROUP_FRONT_READ = 'front:delivery_module:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:delivery_module:read:single';
 
     #[Groups([

@@ -45,6 +45,7 @@ trait UserPermissionsTrait
             ->find();
 
         $userPermissions = [];
+
         foreach ($userResourcePermissionsQuery as $userResourcePermission) {
             $userPermissions[$userResourcePermission->getVirtualColumn('code')] = new AccessManager($userResourcePermission->getAccess());
         }

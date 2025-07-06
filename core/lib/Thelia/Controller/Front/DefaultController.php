@@ -52,10 +52,11 @@ class DefaultController extends BaseFrontController
             $request->attributes->set('_view', 'index');
         }
 
-        if (ConfigQuery::isRewritingEnable() && $request->attributes->get('_rewritten', false) === false) {
+        if (ConfigQuery::isRewritingEnable() && false === $request->attributes->get('_rewritten', false)) {
             /* Does the query GET parameters match a rewritten URL ? */
             $rewrittenUrl = URL::getInstance()->retrieveCurrent($request);
-            if ($rewrittenUrl->rewrittenUrl !== null) {
+
+            if (null !== $rewrittenUrl->rewrittenUrl) {
                 /* 301 redirection to rewritten URL */
                 throw new RedirectException($rewrittenUrl->rewrittenUrl, 301);
             }

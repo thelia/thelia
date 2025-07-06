@@ -33,11 +33,11 @@ class TypeCasterService
                 return $value;
             }
 
-            if ($value === null && $parameterType->allowsNull()) {
+            if (null === $value && $parameterType->allowsNull()) {
                 return null;
             }
 
-            if ($value === null && !$parameterType->allowsNull()) {
+            if (null === $value && !$parameterType->allowsNull()) {
                 return $this->getDefaultValueForType($parameterType);
             }
 

@@ -50,6 +50,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
         }
 
         $exception = $event->getThrowable();
+
         if ($exception instanceof NotFoundHttpException) {
             $this->display404($event);
         }
@@ -68,7 +69,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
         $activeAdminTemplate = $this->templateHelper->getActiveAdminTemplate();
         $this->parser = $this->parserResolver->getParser(
             $activeAdminTemplate->getAbsolutePath(),
-            'general_error'
+            'general_error',
         );
         $this->parser->setTemplateDefinition(
             $activeAdminTemplate,
@@ -81,9 +82,9 @@ class HttpException extends BaseAction implements EventSubscriberInterface
                 'general_error',
                 [
                     'error_message' => $message,
-                ]
+                ],
             ),
-            Response::HTTP_FORBIDDEN
+            Response::HTTP_FORBIDDEN,
         );
 
         $event->setResponse($response);
@@ -92,7 +93,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
     protected function display404(ExceptionEvent $event): void
     {
         $this->parser->setTemplateDefinition(
-            $this->parser->getTemplateHelper()->getActiveFrontTemplate()
+            $this->parser->getTemplateHelper()->getActiveFrontTemplate(),
         );
 
         $response = new Response($this->parser->render(ConfigQuery::getPageNotFoundView()), Response::HTTP_NOT_FOUND);
@@ -108,8 +109,8 @@ class HttpException extends BaseAction implements EventSubscriberInterface
             new Response(
                 $exception->getMessage(),
                 $exception->getStatusCode(),
-                $exception->getHeaders()
-            )
+                $exception->getHeaders(),
+            ),
         );
     }
 

@@ -36,20 +36,22 @@ class AttributeAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInte
     {
         $query
             ->useProductSaleElementsQuery()
-                    ->useAttributeCombinationQuery()
-                        ->filterByAttributeAvId($value)
-                ->endUse()
+            ->useAttributeCombinationQuery()
+            ->filterByAttributeAvId($value)
+            ->endUse()
             ->endUse();
     }
 
     public function getValue(ActiveRecordInterface $activeRecord, string $locale, $valueSearched = null, ?int $depth = 1): ?array
     {
         $productSaleElementss = $activeRecord->getProductSaleElementss();
+
         if (empty($productSaleElementss)) {
             return null;
         }
 
         $value = [];
+
         foreach ($productSaleElementss as $productSaleElements) {
             foreach ($productSaleElements->getAttributeCombinationsJoinAttributeAv() as $attributeAv) {
                 $value[] =
@@ -58,8 +60,7 @@ class AttributeAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInte
                         'mainId' => $attributeAv->getAttribute()->getId(),
                         'id' => $attributeAv->getAttributeAvId(),
                         'title' => $attributeAv->getAttributeAv()->setLocale($locale)->getTitle(),
-                    ]
-                ;
+                    ];
             }
         }
 

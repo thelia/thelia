@@ -29,6 +29,7 @@ class TheliaFilter extends AbstractFilter
     protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         $request = $context['request'] ?? null;
+
         if (!$request) {
             $request = $this->requestStack->getCurrentRequest();
         }
@@ -38,6 +39,7 @@ class TheliaFilter extends AbstractFilter
         }
 
         $isApiRoute = $request->get('isApiRoute', false);
+
         if ($isApiRoute) {
             $this->filterService->filterTFilterWithRequest(request: $request, query: $query);
         } else {

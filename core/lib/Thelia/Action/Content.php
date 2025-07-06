@@ -52,8 +52,7 @@ class Content extends BaseAction implements EventSubscriberInterface
             ->setVisible($event->getVisible())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
-            ->create($event->getDefaultFolder())
-        ;
+            ->create($event->getDefaultFolder());
 
         $event->setContent($content);
     }
@@ -69,6 +68,7 @@ class Content extends BaseAction implements EventSubscriberInterface
         if (null !== $content = ContentQuery::create()->findPk($event->getContentId())) {
             $con = Propel::getWriteConnection(ContentTableMap::DATABASE_NAME);
             $con->beginTransaction();
+
             try {
                 $content
                     ->setVisible($event->getVisible())
@@ -77,8 +77,7 @@ class Content extends BaseAction implements EventSubscriberInterface
                     ->setDescription($event->getDescription())
                     ->setChapo($event->getChapo())
                     ->setPostscriptum($event->getPostscriptum())
-                    ->save($con)
-                ;
+                    ->save($con);
 
                 $content->setDefaultFolder($event->getDefaultFolder());
 
@@ -86,6 +85,7 @@ class Content extends BaseAction implements EventSubscriberInterface
                 $con->commit();
             } catch (PropelException $e) {
                 $con->rollBack();
+
                 throw $e;
             }
         }
@@ -93,10 +93,8 @@ class Content extends BaseAction implements EventSubscriberInterface
 
     /**
      * Change Content SEO.
-     *
-     * @return object
      */
-    public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher): object
     {
         return $this->genericUpdateSeo(ContentQuery::create(), $event, $dispatcher);
     }
@@ -108,7 +106,7 @@ class Content extends BaseAction implements EventSubscriberInterface
                 ->filterByContentId($event->getObjectId())
                 ->filterByFolderId($event->getReferrerId()),
             $event,
-            $dispatcher
+            $dispatcher,
         );
     }
 
@@ -162,6 +160,7 @@ class Content extends BaseAction implements EventSubscriberInterface
                 $con->commit();
             } catch (\Exception $e) {
                 $con->rollback();
+
                 throw $e;
             }
         }
@@ -202,18 +201,16 @@ class Content extends BaseAction implements EventSubscriberInterface
 
     /**
      * Check if is a content view and if content_id is visible.
-     *
-     * @param string $eventName
      */
-    public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    public function viewCheck(ViewCheckEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if ($event->getView() == 'content') {
+        if ('content' === $event->getView()) {
             $content = ContentQuery::create()
                 ->filterById($event->getViewId())
                 ->filterByVisible(1)
                 ->count();
 
-            if ($content == 0) {
+            if (0 === $content) {
                 $dispatcher->dispatch($event, TheliaEvents::VIEW_CONTENT_ID_NOT_VISIBLE);
             }
         }

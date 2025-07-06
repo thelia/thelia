@@ -47,8 +47,8 @@ class ResponseListener implements EventSubscriberInterface
                         ConfigQuery::read('cart.cookie_name', 'thelia_cart'),
                         $id,
                         time() + ConfigQuery::read('cart.cookie_lifetime', 60 * 60 * 24 * 365),
-                        '/'
-                    )
+                        '/',
+                    ),
                 );
             }
 

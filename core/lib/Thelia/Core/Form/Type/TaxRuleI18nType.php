@@ -32,7 +32,7 @@ class TaxRuleI18nType extends AbstractTheliaType
      *
      * This is used for compatibility with the StandardDescriptionFieldsTrait
      */
-    protected $formBuilder;
+    protected FormBuilderInterface $formBuilder;
 
     public function configureOptions(OptionsResolver $resolver): void
     {

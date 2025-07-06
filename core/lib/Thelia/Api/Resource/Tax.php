@@ -30,39 +30,39 @@ use Thelia\Model\Map\TaxTableMap;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/taxes'
+            uriTemplate: '/admin/taxes',
         ),
         new GetCollection(
-            uriTemplate: '/admin/taxes'
+            uriTemplate: '/admin/taxes',
         ),
         new Get(
             uriTemplate: '/admin/taxes/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/taxes/{id}'
+            uriTemplate: '/admin/taxes/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/taxes/{id}'
+            uriTemplate: '/admin/taxes/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/taxes/{id}'
+            uriTemplate: '/admin/taxes/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/front/taxes'
+            uriTemplate: '/front/taxes',
         ),
         new Get(
             uriTemplate: '/front/taxes/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]]
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -72,18 +72,14 @@ use Thelia\Model\Map\TaxTableMap;
             'strategy' => 'exact',
             'fieldPath' => 'product_image.product_id',
         ],
-    ]
+    ],
 )]
 class Tax extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:tax:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:tax:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:tax:write';
-
     public const GROUP_FRONT_READ = 'front:tax:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:tax:read:single';
 
     #[Groups([

@@ -33,16 +33,13 @@ use Thelia\Tools\Version\Version;
 #[AsCommand(name: 'generate:sql', description: 'Generate SQL files (insert.sql, update*.sql)')]
 class GenerateSQLCommand extends ContainerAwareCommand
 {
-    /** @var Translator */
-    protected $translator;
+    protected Translator $translator;
 
     protected $parser;
 
-    /** @var \PDO */
-    protected $con;
+    protected \PDO $con;
 
-    /** @var array */
-    protected $locales;
+    protected array $locales;
 
     protected function configure(): void
     {
@@ -51,7 +48,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
                 'locales',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'generate only for only specific locales (separated by a ,) : fr_FR,es_ES or es_ES'
+                'generate only for only specific locales (separated by a ,) : fr_FR,es_ES or es_ES',
             );
     }
 
@@ -60,33 +57,33 @@ class GenerateSQLCommand extends ContainerAwareCommand
         $this->init($input);
 
         // Main insert.sql file
-        $content = file_get_contents(THELIA_SETUP_DIRECTORY.'insert.sql.tpl');
+        $content = file_get_contents(THELIA_SETUP_DIRECTORY . 'insert.sql.tpl');
         $version = Version::parse();
         $content = $this->parser->renderString($content, $version, false);
 
-        if (false === file_put_contents(THELIA_SETUP_DIRECTORY.'insert.sql', $content)) {
-            $output->writeln("Can't write file ".THELIA_SETUP_DIRECTORY.'insert.sql');
+        if (false === file_put_contents(THELIA_SETUP_DIRECTORY . 'insert.sql', $content)) {
+            $output->writeln("Can't write file " . THELIA_SETUP_DIRECTORY . 'insert.sql');
         } else {
-            $output->writeln('File '.THELIA_SETUP_DIRECTORY.'insert.sql generated successfully.');
+            $output->writeln('File ' . THELIA_SETUP_DIRECTORY . 'insert.sql generated successfully.');
         }
 
         // sql update files
         $finder = Finder::create()
             ->name('*.tpl')
             ->depth(0)
-            ->in(THELIA_SETUP_DIRECTORY.'update'.DS.'tpl');
+            ->in(THELIA_SETUP_DIRECTORY . 'update' . DS . 'tpl');
 
         /** @var \SplFileInfo $file */
         foreach ($finder as $file) {
             $content = file_get_contents($file->getRealPath());
             $content = $this->parser->renderString($content, [], false);
 
-            $destination = THELIA_SETUP_DIRECTORY.'update'.DS.'sql'.DS.$file->getBasename('.tpl');
+            $destination = THELIA_SETUP_DIRECTORY . 'update' . DS . 'sql' . DS . $file->getBasename('.tpl');
 
             if (false === file_put_contents($destination, $content)) {
-                $output->writeln("Can't write file ".$destination);
+                $output->writeln("Can't write file " . $destination);
             } else {
-                $output->writeln('File '.$destination.' generated successfully.');
+                $output->writeln('File ' . $destination . ' generated successfully.');
             }
         }
 
@@ -118,7 +115,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
             ->name('*.php')
             ->depth(0)
             ->sortByName()
-            ->in(THELIA_SETUP_DIRECTORY.'I18n');
+            ->in(THELIA_SETUP_DIRECTORY . 'I18n');
 
         // limit to only some locale(s)
         $localesToKeep = $input->getOption('locales');
@@ -129,24 +126,19 @@ class GenerateSQLCommand extends ContainerAwareCommand
             $locale = $file->getBasename('.php');
             $availableLocales[] = $locale;
 
-            if ($localesToKeep === null || $localesToKeep === [] || \in_array($locale, $localesToKeep)) {
+            if (null === $localesToKeep || [] === $localesToKeep || \in_array($locale, $localesToKeep, true)) {
                 $this->locales[] = $locale;
                 $this->translator->addResource(
                     'php',
                     $file->getRealPath(),
                     $locale,
-                    'install'
+                    'install',
                 );
             }
         }
 
-        if ($this->locales === null || $this->locales === []) {
-            throw new \RuntimeException(
-                \sprintf(
-                    'You should at least generate sql for one locale. Available locales : %s',
-                    implode(', ', $availableLocales)
-                )
-            );
+        if (null === $this->locales || [] === $this->locales) {
+            throw new \RuntimeException(\sprintf('You should at least generate sql for one locale. Available locales : %s', implode(', ', $availableLocales)));
         }
     }
 
@@ -172,10 +164,8 @@ class GenerateSQLCommand extends ContainerAwareCommand
      * - `locale`: the locale. eg.: fr_FR
      * - `in_string`: set to 1 not add simple quote around the string. (default = 0)
      * - `use_default`: set to 1 to use the `l` string as a fallback. (default = 0)
-     *
-     * @return string
      */
-    public function translate($params, $smarty)
+    public function translate($params, $smarty): string
     {
         $translation = '';
 
@@ -195,13 +185,14 @@ class GenerateSQLCommand extends ContainerAwareCommand
             [],
             'install',
             $params['locale'],
-            $useDefault
+            $useDefault,
         );
 
         if (empty($translation)) {
             $translation = ($inString) ? '' : 'NULL';
         } else {
             $translation = $this->con->quote($translation);
+
             // remove quote
             if ($inString) {
                 $translation = substr($translation, 1, -1);

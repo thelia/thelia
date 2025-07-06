@@ -48,14 +48,14 @@ class OrderProductAttributeCombination extends BaseI18nLoop implements PropelSea
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumListType(['alpha', 'alpha_reverse'])
+                    new EnumListType(['alpha', 'alpha_reverse']),
                 ),
-                'alpha'
-            )
+                'alpha',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $search = OrderProductAttributeCombinationQuery::create();
 
@@ -95,8 +95,7 @@ class OrderProductAttributeCombination extends BaseI18nLoop implements PropelSea
                 ->set('ATTRIBUTE_AVAILABILITY_TITLE', $orderAttributeCombination->getAttributeAvTitle())
                 ->set('ATTRIBUTE_AVAILABILITY_CHAPO', $orderAttributeCombination->getAttributeAvChapo())
                 ->set('ATTRIBUTE_AVAILABILITY_DESCRIPTION', $orderAttributeCombination->getAttributeAvDescription())
-                ->set('ATTRIBUTE_AVAILABILITY_POSTSCRIPTUM', $orderAttributeCombination->getAttributeAvPostscriptum())
-            ;
+                ->set('ATTRIBUTE_AVAILABILITY_POSTSCRIPTUM', $orderAttributeCombination->getAttributeAvPostscriptum());
             $this->addOutputFields($loopResultRow, $orderAttributeCombination);
 
             $loopResult->addRow($loopResultRow);

@@ -31,42 +31,40 @@ use Thelia\Model\Map\OrderAddressTableMap;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/order_addresses'
+            uriTemplate: '/admin/order_addresses',
         ),
         new GetCollection(
-            uriTemplate: '/admin/order_addresses'
+            uriTemplate: '/admin/order_addresses',
         ),
         new Get(
             uriTemplate: '/admin/order_addresses/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/order_addresses/{id}'
+            uriTemplate: '/admin/order_addresses/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/order_addresses/{id}'
+            uriTemplate: '/admin/order_addresses/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/order_addresses/{id}'
+            uriTemplate: '/admin/order_addresses/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
         'id',
-    ]
+    ],
 )]
 class OrderAddress implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:order_address:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order_address:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:order_address:write';
 
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE])]

@@ -34,18 +34,12 @@ class ContentAddFolderEvent extends ContentEvent
         parent::__construct($content);
     }
 
-    /**
-     * @param int $folderId
-     */
-    public function setFolderId($folderId): void
+    public function setFolderId(int $folderId): void
     {
         $this->folderId = $folderId;
     }
 
-    /**
-     * @return int
-     */
-    public function getFolderId()
+    public function getFolderId(): int
     {
         return $this->folderId;
     }

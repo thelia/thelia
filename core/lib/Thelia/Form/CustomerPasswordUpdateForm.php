@@ -89,7 +89,7 @@ class CustomerPasswordUpdateForm extends BaseForm
     {
         $data = $context->getRoot()->getData();
 
-        if ($data['password'] != $data['password_confirm']) {
+        if ($data['password'] !== $data['password_confirm']) {
             $context->addViolation(Translator::getInstance()->trans('password confirmation is not the same as password field'));
         }
     }

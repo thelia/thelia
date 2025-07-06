@@ -23,13 +23,9 @@ use Thelia\Model\Customer;
  */
 class CustomerNotConfirmedException extends AuthenticationException
 {
-    /** @var Customer */
-    protected $user;
+    protected Customer $user;
 
-    /**
-     * @return Customer
-     */
-    public function getUser()
+    public function getUser(): Customer
     {
         return $this->user;
     }

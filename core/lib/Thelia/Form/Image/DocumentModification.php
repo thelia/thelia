@@ -48,7 +48,7 @@ abstract class DocumentModification extends BaseForm
                     'label_attr' => [
                         'for' => 'file',
                     ],
-                ]
+                ],
             )
             // Is this document online ?
             ->add(
@@ -61,7 +61,7 @@ abstract class DocumentModification extends BaseForm
                     'label_attr' => [
                         'for' => 'visible_create',
                     ],
-                ]
+                ],
             );
 
         // Add standard description fields

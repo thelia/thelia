@@ -35,12 +35,12 @@ abstract class AbstractAdminResourcesCompiler implements CompilerPassInterface
      *               ...
      *               ]
      */
-    abstract public function getResources();
+    abstract public function getResources(): array;
 
     /**
      * @return string ModuleCode
      */
-    abstract public function getModuleCode();
+    abstract public function getModuleCode(): string;
 
     /**
      * Allow module to add resources in AdminResources Service.

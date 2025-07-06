@@ -38,7 +38,7 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
             return false;
         }
 
-        return $this->getNeedConvertProperties($data, $type) !== [];
+        return [] !== $this->getNeedConvertProperties($data, $type);
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
@@ -54,7 +54,7 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
 
         $needConvertProperties = $this->getNeedConvertProperties($data, $type);
 
-        /* @var \ReflectionProperty $needConvertProperty */
+        /** @var \ReflectionProperty $needConvertProperty */
         foreach ($needConvertProperties as $needConvertProperty) {
             $data[$needConvertProperty->getName()] = $this->transformData($data, $needConvertProperty);
         }
@@ -67,16 +67,18 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
         if (\is_string($data[$property->getName()]) || \is_int($data[$property->getName()])) {
             return $this->iriConverter->getIriFromResource(
                 resource: $property->getType()->getName(),
-                context: ['uri_variables' => ['id' => $data[$property->getName()]]]);
+                context: ['uri_variables' => ['id' => $data[$property->getName()]]],
+            );
         }
 
         if (\is_array($data[$property->getName()])) {
             $propelAttributes = array_filter(
                 $property->getAttributes(),
-                fn (\ReflectionAttribute $attribute): bool => $attribute->getName() === Relation::class
+                static fn (\ReflectionAttribute $attribute): bool => Relation::class === $attribute->getName(),
             );
 
             $resource = null;
+
             foreach ($propelAttributes as $propelAttribute) {
                 if (isset($propelAttribute->getArguments()['targetResource'])) {
                     $resource = $propelAttribute->getArguments()['targetResource'];
@@ -87,8 +89,9 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
                 return array_map(
                     fn ($value): ?string => $this->iriConverter->getIriFromResource(
                         resource: $resource,
-                        context: ['uri_variables' => ['id' => $value]]),
-                    $data[$property->getName()]
+                        context: ['uri_variables' => ['id' => $value]],
+                    ),
+                    $data[$property->getName()],
                 );
             }
         }
@@ -108,7 +111,7 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
                 && (
                     (
                         \is_array($data[$property->getName()])
-                        && array_filter($data[$property->getName()], fn ($value): bool => (\is_string($value) || \is_int($value)) && !str_contains($value, '/'))
+                        && array_filter($data[$property->getName()], static fn ($value): bool => (\is_string($value) || \is_int($value)) && !str_contains($value, '/'))
                         && Collection::class === $property->getType()->getName()
                     )
                     || (
@@ -116,7 +119,7 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
                         && !str_contains($data[$property->getName()], '/')
                         && $this->resourceClassResolver->isResourceClass($property->getType()->getName())
                     )
-                )
+                ),
         );
     }
 

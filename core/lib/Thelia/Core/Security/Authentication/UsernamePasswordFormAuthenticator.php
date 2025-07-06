@@ -26,7 +26,6 @@ use Thelia\Model\Customer;
 class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
 {
     protected $loginForm;
-
     protected $options;
 
     public function __construct(protected Request $request, protected BaseForm $baseLoginForm, protected UserProviderInterface $userProvider, array $options = [])
@@ -45,7 +44,7 @@ class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
     /**
      * @return string the username value
      */
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->loginForm->get($this->options['username_field_name'])->getData();
     }
@@ -67,14 +66,14 @@ class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
             $user = $this->userProvider->loadUserByIdentifier($username);
 
             // Check user password
-            $authOk = $user->checkPassword($password) === true;
+            $authOk = true === $user->checkPassword($password);
 
             if (!$authOk) {
                 throw new WrongPasswordException(\sprintf("Wrong password for user '%s'.", $username));
             }
 
             // Customer email confirmation feature is available since Thelia 2.3.4
-            if (ConfigQuery::isCustomerEmailConfirmationEnable() && $user instanceof Customer && ($user->getConfirmationToken() !== null && !$user->getEnable())) {
+            if (ConfigQuery::isCustomerEmailConfirmationEnable() && $user instanceof Customer && (null !== $user->getConfirmationToken() && !$user->getEnable())) {
                 throw (new CustomerNotConfirmedException())->setUser($user);
             }
 

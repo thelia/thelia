@@ -39,8 +39,10 @@ class ModuleAnnotationLoader extends Loader
         $modules = ModuleQuery::create()
             ->filterByActivate(true)
             ->find();
+
         foreach ($modules as $module) {
-            $moduleControllerPath = $module->getAbsoluteBaseDir().\DIRECTORY_SEPARATOR.'Controller';
+            $moduleControllerPath = $module->getAbsoluteBaseDir() . \DIRECTORY_SEPARATOR . 'Controller';
+
             if (!is_dir($moduleControllerPath)) {
                 continue;
             }
@@ -48,6 +50,7 @@ class ModuleAnnotationLoader extends Loader
             $fileLocator = new FileLocator($moduleControllerPath);
             $routeLoader = new AnnotationDirectoryLoader($fileLocator, $loader);
             $moduleRoutes = $routeLoader->load('.', 'annotation');
+
             if (!$moduleRoutes instanceof RouteCollection) {
                 continue;
             }
@@ -55,14 +58,14 @@ class ModuleAnnotationLoader extends Loader
             $moduleRoutePrefix = \call_user_func([$module->getFullNamespace(), 'getAnnotationRoutePrefix']);
 
             foreach ($moduleRoutes->all() as $moduleRoute) {
-                $moduleRoute->setPath($moduleRoutePrefix.$moduleRoute->getPath());
+                $moduleRoute->setPath($moduleRoutePrefix . $moduleRoute->getPath());
             }
 
             $routes->addCollection($moduleRoutes);
         }
 
         foreach ($routes as $route) {
-            $route->setPath('/'.$route->getPath());
+            $route->setPath('/' . $route->getPath());
         }
 
         $this->isLoaded = true;

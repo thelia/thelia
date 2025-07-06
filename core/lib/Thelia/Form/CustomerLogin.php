@@ -50,7 +50,8 @@ class CustomerLogin extends BruteforceForm
             ->add('account', ChoiceType::class, [
                 'constraints' => [
                     new Callback(
-                        $this->verifyAccount(...)),
+                        $this->verifyAccount(...),
+                    ),
                 ],
                 'choices' => [
                     Translator::getInstance()->trans('No, I am a new customer.') => 0,
@@ -79,8 +80,7 @@ class CustomerLogin extends BruteforceForm
                 'label_attr' => [
                     'for' => 'remember_me',
                 ],
-            ])
-        ;
+            ]);
     }
 
     /**
@@ -88,16 +88,17 @@ class CustomerLogin extends BruteforceForm
      */
     public function verifyAccount($value, ExecutionContextInterface $context): void
     {
-        if ($value == 1) {
+        if (1 === $value) {
             $data = $context->getRoot()->getData();
-            if (false === $data['password'] || (empty($data['password']) && '0' != $data['password'])) {
+
+            if (false === $data['password'] || (empty($data['password']) && '0' !== $data['password'])) {
                 $context->getViolations()->add(new ConstraintViolation(
                     Translator::getInstance()->trans('This value should not be blank.'),
                     'account_password',
                     [],
                     $context->getRoot(),
                     'children[password].data',
-                    'propertyPath'
+                    'propertyPath',
                 ));
             }
         }
@@ -109,8 +110,10 @@ class CustomerLogin extends BruteforceForm
     public function verifyExistingEmail($value, ExecutionContextInterface $context): void
     {
         $data = $context->getRoot()->getData();
-        if ($data['account'] == 0) {
+
+        if (0 === $data['account']) {
             $customer = CustomerQuery::create()->findOneByEmail($value);
+
             if ($customer) {
                 $context->addViolation(Translator::getInstance()->trans("A user already exists with this email address. Please login or if you've forgotten your password, go to Reset Your Password."));
             }

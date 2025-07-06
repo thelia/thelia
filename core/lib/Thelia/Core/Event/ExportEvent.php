@@ -26,10 +26,8 @@ use Thelia\ImportExport\Export\AbstractExport;
  */
 class ExportEvent extends Event
 {
-    /**
-     * @var string Path to generated export
-     */
-    protected $filePath;
+    /** @var string Path to generated export */
+    protected string $filePath;
 
     /**
      * Event constructor.
@@ -119,7 +117,7 @@ class ExportEvent extends Event
      *
      * @return string Export file path
      */
-    public function getFilePath()
+    public function getFilePath(): string
     {
         return $this->filePath;
     }
@@ -131,7 +129,7 @@ class ExportEvent extends Event
      *
      * @return $this Return $this, allow chaining
      */
-    public function setFilePath($filePath): static
+    public function setFilePath(string $filePath): static
     {
         $this->filePath = $filePath;
 

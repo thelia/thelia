@@ -36,15 +36,9 @@ use Thelia\Model\LangQuery;
  */
 abstract class ContainerAwareCommand extends Command implements ContainerAwareInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    private ContainerInterface $container;
 
-    /**
-     * @return ContainerInterface
-     */
-    protected function getContainer()
+    protected function getContainer(): ContainerInterface
     {
         if (null === $this->container) {
             /** @var Application $application */
@@ -63,10 +57,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
         $this->container = $container;
     }
 
-    /**
-     * @return EventDispatcherInterface
-     */
-    public function getDispatcher()
+    public function getDispatcher(): EventDispatcherInterface
     {
         $container = $this->getContainer();
 
@@ -102,15 +93,13 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
     }
 
     /**
-     * @return string
-     *
      * @since 2.3
      */
-    protected function getBaseUrl(?Lang $lang = null)
+    protected function getBaseUrl(?Lang $lang = null): string
     {
         $baseUrl = '';
 
-        if ((int) ConfigQuery::read('one_domain_foreach_lang') === 1) {
+        if (1 === (int) ConfigQuery::read('one_domain_foreach_lang')) {
             if (!$lang instanceof Lang) {
                 $lang = LangQuery::create()->findOneByByDefault(true);
             }
@@ -120,7 +109,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
 
         $baseUrl = trim((string) $baseUrl);
 
-        if ($baseUrl === '' || $baseUrl === '0') {
+        if ('' === $baseUrl || '0' === $baseUrl) {
             $baseUrl = ConfigQuery::read('url_site');
         }
 

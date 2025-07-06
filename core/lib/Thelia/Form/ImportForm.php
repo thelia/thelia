@@ -44,11 +44,10 @@ class ImportForm extends BaseForm
                 'required' => true,
                 'constraints' => [
                     new Assert\Callback(
-                        $this->checkLanguage(...)
+                        $this->checkLanguage(...),
                     ),
                 ],
-            ])
-        ;
+            ]);
     }
 
     /**
@@ -67,8 +66,8 @@ class ImportForm extends BaseForm
                     "The language \"%id\" doesn't exist",
                     [
                         '%id' => $value,
-                    ]
-                )
+                    ],
+                ),
             );
         }
     }

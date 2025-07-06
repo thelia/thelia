@@ -31,8 +31,7 @@ use Thelia\Module\Validator\ModuleValidator;
  */
 class ModuleInstallForm extends BaseForm
 {
-    /** @var ModuleDefinition */
-    protected $moduleDefinition;
+    protected ModuleDefinition $moduleDefinition;
 
     protected $modulePath;
 
@@ -51,17 +50,17 @@ class ModuleInstallForm extends BaseForm
                                     'application/zip',
                                 ],
                                 'mimeTypesMessage' => Translator::getInstance()->trans('Please upload a valid Zip file'),
-                            ]
+                            ],
                         ),
                         new Callback(
-                            $this->checkModuleValidity(...)
+                            $this->checkModuleValidity(...),
                         ),
                     ],
                     'label' => Translator::getInstance()->trans('The module zip file'),
                     'label_attr' => [
                         'for' => 'module',
                     ],
-                ]
+                ],
             );
     }
 
@@ -72,16 +71,13 @@ class ModuleInstallForm extends BaseForm
     {
         $modulePath = $this->unzipModule($file);
 
-        if ($modulePath !== false) {
+        if (false !== $modulePath) {
             try {
                 // get the first directory
                 $moduleFiles = $this->getDirContents($modulePath);
-                if (\count($moduleFiles['directories']) !== 1) {
-                    throw new \Exception(
-                        Translator::getInstance()->trans(
-                            'Your zip must contain 1 root directory which is the root folder directory of your module'
-                        )
-                    );
+
+                if (1 !== \count($moduleFiles['directories'])) {
+                    throw new \Exception(Translator::getInstance()->trans('Your zip must contain 1 root directory which is the root folder directory of your module'));
                 }
 
                 $moduleDirectory = $moduleFiles['directories'][0];
@@ -97,8 +93,8 @@ class ModuleInstallForm extends BaseForm
                 $context->addViolation(
                     Translator::getInstance()->trans(
                         'The module is not valid : %message',
-                        ['%message' => $ex->getMessage()]
-                    )
+                        ['%message' => $ex->getMessage()],
+                    ),
                 );
             }
         }
@@ -109,10 +105,7 @@ class ModuleInstallForm extends BaseForm
         return $this->moduleDefinition;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getModulePath()
+    public function getModulePath(): ?string
     {
         return $this->modulePath;
     }
@@ -122,17 +115,18 @@ class ModuleInstallForm extends BaseForm
      *
      * @return string|bool the path where the module has been extracted or false if an error has occured
      */
-    protected function unzipModule(UploadedFile $file)
+    protected function unzipModule(UploadedFile $file): string|bool
     {
         $extractPath = false;
         $zip = new ZipArchiver(true);
+
         if (!$zip->open($file->getRealPath())) {
             throw new \Exception('unable to open zipfile');
         }
 
         $extractPath = $this->tempdir();
 
-        if ($extractPath !== false && $zip->extract($extractPath) === false) {
+        if (false !== $extractPath && false === $zip->extract($extractPath)) {
             $extractPath = false;
         }
 
@@ -146,14 +140,16 @@ class ModuleInstallForm extends BaseForm
      *
      * @return bool|string the directory path or false if it fails
      */
-    protected function tempdir()
+    protected function tempdir(): bool|string
     {
         $tempfile = tempnam(sys_get_temp_dir(), '');
+
         if (file_exists($tempfile)) {
             unlink($tempfile);
         }
 
         mkdir($tempfile);
+
         if (is_dir($tempfile)) {
             return $tempfile;
         }
@@ -171,7 +167,7 @@ class ModuleInstallForm extends BaseForm
         ];
 
         foreach ($paths as $path) {
-            if (is_dir($dir.DS.$path)) {
+            if (is_dir($dir . DS . $path)) {
                 $out['directories'][] = $path;
             } else {
                 $out['files'][] = $path;

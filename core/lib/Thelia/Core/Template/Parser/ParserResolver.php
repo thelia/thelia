@@ -116,6 +116,7 @@ class ParserResolver
     public function getDefaultParser(): ParserInterface
     {
         $defaultParser = null;
+
         /** @var ParserInterface $parser */
         foreach ($this->parsers as $parser) {
             if (

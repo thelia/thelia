@@ -22,16 +22,13 @@ namespace Thelia\Core\Event\State;
 class StateCreateEvent extends StateEvent
 {
     protected $locale;
-
     protected $title;
-
     protected $isocode;
 
     /** @var bool is visible */
-    protected $visible;
+    protected bool $visible;
 
-    /** @var int */
-    protected $country;
+    protected int $country;
 
     public function setIsocode($isocode): static
     {
@@ -69,36 +66,24 @@ class StateCreateEvent extends StateEvent
         return $this->title;
     }
 
-    /**
-     * @return bool
-     */
-    public function isVisible()
+    public function isVisible(): bool
     {
         return $this->visible;
     }
 
-    /**
-     * @param bool $visible
-     */
-    public function setVisible($visible): static
+    public function setVisible(bool $visible): static
     {
         $this->visible = $visible;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getCountry()
+    public function getCountry(): int
     {
         return $this->country;
     }
 
-    /**
-     * @param int $country
-     */
-    public function setCountry($country): static
+    public function setCountry(int $country): static
     {
         $this->country = $country;
 

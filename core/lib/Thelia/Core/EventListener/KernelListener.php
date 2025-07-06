@@ -26,6 +26,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\Event\IsAdminEnvEvent;
 use Thelia\Core\Event\SessionEvent;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\TheliaKernelEvents;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
@@ -35,7 +36,7 @@ use Thelia\Model\LangQuery;
 
 class KernelListener implements EventSubscriberInterface
 {
-    protected static $session;
+    protected static Session $session;
 
     public function __construct(
         protected HttpKernelInterface $app,
@@ -49,7 +50,7 @@ class KernelListener implements EventSubscriberInterface
 
     public function paramInit(RequestEvent $event): ?Response
     {
-        if ($event->getRequestType() === HttpKernelInterface::MAIN_REQUEST) {
+        if (HttpKernelInterface::MAIN_REQUEST === $event->getRequestType()) {
             $request = $event->getRequest();
             $response = $this->initParam($request);
 
@@ -88,6 +89,7 @@ class KernelListener implements EventSubscriberInterface
 
             foreach ($langs as $lang) {
                 $domainUrl = $lang->getUrl();
+
                 if (rtrim((string) $domainUrl, '/') === $request->getSchemeAndHttpHost()) {
                     $request->getSession()->setLang($lang);
                     break;
@@ -99,7 +101,7 @@ class KernelListener implements EventSubscriberInterface
     protected function initParam(TheliaRequest $request)
     {
         if (!$request->hasSession() || !$request->getSession() instanceof SessionInterface) {
-            return null;
+            return;
         }
 
         $event = new IsAdminEnvEvent($request);
@@ -115,7 +117,7 @@ class KernelListener implements EventSubscriberInterface
                 return $lang;
             }
 
-            return null;
+            return;
         }
 
         $lang = $this->detectLang($request);
@@ -127,28 +129,18 @@ class KernelListener implements EventSubscriberInterface
         if ($lang) {
             $request->getSession()->setLang($lang);
         }
-
-        return null;
     }
 
-    /**
-     * @return Lang|null
-     */
-    protected function detectAdminLang(TheliaRequest $request)
+    protected function detectAdminLang(TheliaRequest $request): ?Lang
     {
         $requestedLangCodeOrLocale = $request->query->get('lang');
 
         if (null !== $requestedLangCodeOrLocale) {
             return LangQuery::create()->findOneByCode($requestedLangCodeOrLocale);
         }
-
-        return null;
     }
 
-    /**
-     * @return Lang|null
-     */
-    protected function detectLang(TheliaRequest $request)
+    protected function detectLang(TheliaRequest $request): ?Lang
     {
         // first priority => lang parameter present in request (get or post)
         $requestedLangCodeOrLocale = $request->query->get('lang');
@@ -182,10 +174,10 @@ class KernelListener implements EventSubscriberInterface
                     }
 
                     // the user is currently on the proper domain, nothing to change
-                    return null;
+                    return $lang;
                 }
 
-                Tlog::getInstance()->warning('The domain URL for language '.$lang->getTitle().' (id '.$lang->getId().') is not defined.');
+                Tlog::getInstance()->warning('The domain URL for language ' . $lang->getTitle() . ' (id ' . $lang->getId() . ') is not defined.');
 
                 return Lang::getDefaultLanguage();
             }
@@ -199,7 +191,8 @@ class KernelListener implements EventSubscriberInterface
             if (ConfigQuery::isMultiDomainActivated()) {
                 // find lang with domain
                 $domainLang = LangQuery::create()->filterByUrl($request->getSchemeAndHttpHost(), ModelCriteria::LIKE)->findOne();
-                if ($domainLang !== null) {
+
+                if (null !== $domainLang) {
                     return $domainLang;
                 }
             }
@@ -207,18 +200,18 @@ class KernelListener implements EventSubscriberInterface
             // At this point, set the lang to the default one.
             return Lang::getDefaultLanguage();
         }
-
-        return null;
     }
 
     public function sessionInit(RequestEvent $event): void
     {
         $isApiRoute = preg_match('/^\/api\//', $event->getRequest()->getPathInfo());
+
         if ($isApiRoute) {
             $event->getRequest()->request->set('isApiRoute', $isApiRoute);
         }
 
         $request = $event->getRequest();
+
         if (null === $session = self::$session) {
             $event = new SessionEvent($this->cacheDir, $this->debug, $this->env);
 
@@ -235,8 +228,8 @@ class KernelListener implements EventSubscriberInterface
     {
         return [
             KernelEvents::REQUEST => [
-                ['paramInit', \PHP_INT_MAX - 1],
-                ['sessionInit', \PHP_INT_MAX],
+                ['paramInit', PHP_INT_MAX - 1],
+                ['sessionInit', PHP_INT_MAX],
             ],
         ];
     }

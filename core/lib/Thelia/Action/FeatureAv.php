@@ -39,8 +39,7 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
 
-            ->save()
-        ;
+            ->save();
 
         $event->setFeatureAv($feature);
     }
@@ -73,8 +72,7 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
         if (null !== ($feature = FeatureAvQuery::create()->findPk($event->getFeatureAvId()))) {
             $feature
 
-                ->delete()
-            ;
+                ->delete();
 
             $event->setFeatureAv($feature);
         }

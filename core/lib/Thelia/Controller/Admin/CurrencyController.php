@@ -52,7 +52,7 @@ class CurrencyController extends AbstractCrudController
             TheliaEvents::CURRENCY_UPDATE,
             TheliaEvents::CURRENCY_DELETE,
             null, // No visibility toggle
-            TheliaEvents::CURRENCY_UPDATE_POSITION
+            TheliaEvents::CURRENCY_UPDATE_POSITION,
         );
     }
 
@@ -71,13 +71,12 @@ class CurrencyController extends AbstractCrudController
         $createEvent = new CurrencyCreateEvent();
 
         $createEvent
-        ->setCurrencyName($formData['name'])
-        ->setLocale($formData['locale'])
-        ->setSymbol($formData['symbol'])
-        ->setFormat($formData['format'])
-        ->setCode($formData['code'])
-        ->setRate($formData['rate'])
-        ;
+            ->setCurrencyName($formData['name'])
+            ->setLocale($formData['locale'])
+            ->setSymbol($formData['symbol'])
+            ->setFormat($formData['format'])
+            ->setCode($formData['code'])
+            ->setRate($formData['rate']);
 
         return $createEvent;
     }
@@ -87,13 +86,12 @@ class CurrencyController extends AbstractCrudController
         $changeEvent = new CurrencyUpdateEvent($formData['id']);
 
         $changeEvent
-        ->setCurrencyName($formData['name'])
-        ->setLocale($formData['locale'])
-        ->setSymbol($formData['symbol'])
-        ->setFormat($formData['format'])
-        ->setCode($formData['code'])
-        ->setRate($formData['rate'])
-        ;
+            ->setCurrencyName($formData['name'])
+            ->setLocale($formData['locale'])
+            ->setSymbol($formData['symbol'])
+            ->setFormat($formData['format'])
+            ->setCode($formData['code'])
+            ->setRate($formData['rate']);
 
         return $changeEvent;
     }
@@ -103,7 +101,7 @@ class CurrencyController extends AbstractCrudController
         return new UpdatePositionEvent(
             $this->getRequest()->get('currency_id'),
             $positionChangeMode,
-            $positionValue
+            $positionValue,
         );
     }
 
@@ -142,7 +140,7 @@ class CurrencyController extends AbstractCrudController
     protected function getExistingObject(): ?ActiveRecordInterface
     {
         $currency = CurrencyQuery::create()
-        ->findOneById($this->getRequest()->get('currency_id'));
+            ->findOneById($this->getRequest()->get('currency_id'));
 
         if (null !== $currency) {
             $currency->setLocale($this->getCurrentEditionLocale());
@@ -167,7 +165,7 @@ class CurrencyController extends AbstractCrudController
         return $object->getId();
     }
 
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         return $this->render('currencies', ['order' => $currentOrder]);
     }
@@ -183,7 +181,7 @@ class CurrencyController extends AbstractCrudController
             'admin.configuration.currencies.update',
             [
                 'currency_id' => $this->getRequest()->get('currency_id'),
-            ]
+            ],
         );
     }
 

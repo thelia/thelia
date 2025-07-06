@@ -40,11 +40,12 @@ class Area extends BaseAction implements EventSubscriberInterface
             $countryArea = new CountryArea();
 
             $country = explode('-', (string) $countryId);
-            if (\count($country) === 1) {
+
+            if (1 === \count($country)) {
                 $country[1] = null;
             }
 
-            if ($country[1] == 0) {
+            if (0 === $country[1]) {
                 $country[1] = null;
             }
 
@@ -52,8 +53,7 @@ class Area extends BaseAction implements EventSubscriberInterface
                 ->setAreaId($area->getId())
                 ->setCountryId($country[0])
                 ->setStateId($country[1])
-                ->save()
-            ;
+                ->save();
         }
     }
 
@@ -62,10 +62,10 @@ class Area extends BaseAction implements EventSubscriberInterface
         $area = $event->getModel();
 
         CountryAreaQuery::create()
-                ->filterByCountryId($event->getCountryIds())
-                ->filterByStateId($event->getStateId())
-                ->filterByAreaId($area->getId())
-                ->delete();
+            ->filterByCountryId($event->getCountryIds())
+            ->filterByStateId($event->getStateId())
+            ->filterByAreaId($area->getId())
+            ->delete();
 
         return $area;
     }

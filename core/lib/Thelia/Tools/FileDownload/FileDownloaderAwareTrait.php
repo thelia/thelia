@@ -21,13 +21,9 @@ namespace Thelia\Tools\FileDownload;
  */
 trait FileDownloaderAwareTrait
 {
-    /** @var FileDownloaderInterface */
-    protected $fileDownloader;
+    protected FileDownloaderInterface $fileDownloader;
 
-    /**
-     * @return FileDownloaderInterface
-     */
-    public function getFileDownloader()
+    public function getFileDownloader(): FileDownloaderInterface
     {
         if (!$this->fileDownloader instanceof FileDownloaderInterface) {
             $this->fileDownloader = FileDownloader::getInstance();

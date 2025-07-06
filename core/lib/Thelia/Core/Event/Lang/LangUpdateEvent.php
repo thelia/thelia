@@ -29,21 +29,16 @@ class LangUpdateEvent extends LangCreateEvent
     }
 
     /**
-     * @param int $id
-     *
      * @return $this
      */
-    public function setId($id): static
+    public function setId(int $id): static
     {
         $this->id = $id;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }

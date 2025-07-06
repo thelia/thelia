@@ -33,28 +33,30 @@ trait CountryListValidationTrait
         foreach ($countryList as $countryItem) {
             $item = explode('-', (string) $countryItem);
 
-            if (\count($item) == 2) {
+            if (2 === \count($item)) {
                 $country = CountryQuery::create()->findPk($item[0]);
+
                 if (null === $country) {
                     $context->addViolation(
                         Translator::getInstance()->trans(
                             'Country ID %id not found',
-                            ['%id' => $item[0]]
-                        )
+                            ['%id' => $item[0]],
+                        ),
                     );
                 }
 
-                if ($item[1] == '0') {
+                if ('0' === $item[1]) {
                     continue;
                 }
 
                 $state = StateQuery::create()->findPk($item[1]);
+
                 if (null === $state) {
                     $context->addViolation(
                         Translator::getInstance()->trans(
                             'State ID %id not found',
-                            ['%id' => $item[1]]
-                        )
+                            ['%id' => $item[1]],
+                        ),
                     );
                 }
             } else {

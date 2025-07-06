@@ -39,7 +39,7 @@ class ClassMetaDataFactory implements ClassMetadataFactoryInterface
         $metadata = $this->inner->getMetadataFor(\is_object($value) ? $this->getObjectClass($value) : $this->getRealClassName($value));
         $resourceAddons = $this->apiResourcePropelTransformerService->getResourceAddonDefinitions($metadata->getName());
 
-        if ($resourceAddons === []) {
+        if ([] === $resourceAddons) {
             return $metadata;
         }
 
@@ -47,6 +47,7 @@ class ClassMetaDataFactory implements ClassMetadataFactoryInterface
             $addonMetadata = $this->inner->getMetadataFor($addonClass);
             // Create an attribute with the addon name and set groups of all of his own attributes
             $addonAttributeMetadata = new AttributeMetadata($addonShortName);
+
             foreach ($addonMetadata->getAttributesMetadata() as $attributeMetadata) {
                 foreach ($attributeMetadata->getGroups() as $attributeMetadataGroup) {
                     $addonAttributeMetadata->addGroup($attributeMetadataGroup);

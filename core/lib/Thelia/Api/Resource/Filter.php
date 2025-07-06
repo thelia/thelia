@@ -42,7 +42,7 @@ use Thelia\Model\Map\ChoiceFilterTableMap;
             provider: TFiltersProvider::class,
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]]
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
 class Filter implements PropelResourceInterface
 {

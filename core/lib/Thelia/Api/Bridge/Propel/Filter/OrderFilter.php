@@ -21,7 +21,6 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 class OrderFilter extends AbstractFilter
 {
     public const DIRECTION_ASC = 'ASC';
-
     public const DIRECTION_DESC = 'DESC';
 
     public function apply(ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
@@ -46,6 +45,7 @@ class OrderFilter extends AbstractFilter
         }
 
         $direction = $this->normalizeValue($value, $property);
+
         if (null === $direction) {
             return;
         }
@@ -64,6 +64,7 @@ class OrderFilter extends AbstractFilter
         $description = [];
 
         $filterProperties = $this->getProperties();
+
         if (null === $filterProperties) {
             return [];
         }
@@ -95,6 +96,7 @@ class OrderFilter extends AbstractFilter
         }
 
         $value = strtoupper((string) $value);
+
         if (!\in_array($value, [self::DIRECTION_ASC, self::DIRECTION_DESC], true)) {
             return null;
         }

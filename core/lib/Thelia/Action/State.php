@@ -41,8 +41,7 @@ class State extends BaseAction implements EventSubscriberInterface
             ->setIsocode($event->getIsocode())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
-            ->save()
-        ;
+            ->save();
 
         $event->setState($state);
     }
@@ -56,8 +55,7 @@ class State extends BaseAction implements EventSubscriberInterface
                 ->setIsocode($event->getIsocode())
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
-                ->save()
-            ;
+                ->save();
 
             $event->setState($state);
         }
@@ -82,8 +80,7 @@ class State extends BaseAction implements EventSubscriberInterface
         $state
 
             ->setVisible(!$state->getVisible())
-            ->save()
-        ;
+            ->save();
 
         $event->setState($state);
     }

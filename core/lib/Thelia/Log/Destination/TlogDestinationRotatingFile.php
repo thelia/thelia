@@ -24,9 +24,7 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
     // ----------------------------------
 
     public const VAR_MAX_FILE_SIZE_KB = 'tlog_destinationfile_max_file_size';
-
     public const VAR_MAX_FILE_COUNT = 'tlog_destinationfile_max_file_count';
-
     public const MAX_FILE_SIZE_KB_DEFAULT = 1024;
 
     // 1 Mb
@@ -34,7 +32,7 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
 
     public function __construct($maxFileSize = self::MAX_FILE_SIZE_KB_DEFAULT)
     {
-        $this->path_defaut = THELIA_LOG_DIR.self::TLOG_DEFAULT_NAME;
+        $this->path_defaut = THELIA_LOG_DIR . self::TLOG_DEFAULT_NAME;
 
         $this->setConfig(self::VAR_MAX_FILE_SIZE_KB, $maxFileSize, false);
 
@@ -53,12 +51,12 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
         }
 
         if (filesize($filePath) > 1024 * $this->getConfig(self::VAR_MAX_FILE_SIZE_KB, self::MAX_FILE_SIZE_KB_DEFAULT)) {
-            $backupFile = $filePath.'.'.strftime('%Y-%m-%d_%H-%M-%S');
+            $backupFile = $filePath . '.' . strftime('%Y-%m-%d_%H-%M-%S');
 
             @rename($filePath, $backupFile);
 
             @touch($filePath);
-            @chmod($filePath, 0666);
+            @chmod($filePath, 0o666);
 
             // Keep the number of files below VAR_MAX_FILE_COUNT
             $maxCount = $this->getConfig(self::VAR_MAX_FILE_COUNT, self::MAX_FILE_COUNT_DEFAULT);
@@ -68,7 +66,7 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
             $files = $finder
                 ->in(\dirname((string) $filePath))
                 ->files()
-                ->name(basename((string) $filePath).'.*')
+                ->name(basename((string) $filePath) . '.*')
                 ->sortByModifiedTime();
 
             $deleteCount = 1 + $files->count() - $maxCount;
@@ -107,7 +105,7 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
                 'Maximum log file size, in Kb',
                 'When this size if exeeded, a backup copy of the file is made, and a new log file is opened. As the file size check is performed only at the beginning of a request, the file size may be bigger thant this limit. Note: 1 Mb = 1024 Kb',
                 self::MAX_FILE_SIZE_KB_DEFAULT,
-                TlogDestinationConfig::TYPE_TEXTFIELD
+                TlogDestinationConfig::TYPE_TEXTFIELD,
             );
 
         $arr[] =
@@ -116,7 +114,7 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
                 'Maximum number of files to keep',
                 'When this number if exeeded, the oldest files are deleted.',
                 self::MAX_FILE_COUNT_DEFAULT,
-                TlogDestinationConfig::TYPE_TEXTFIELD
+                TlogDestinationConfig::TYPE_TEXTFIELD,
             );
 
         return $arr;

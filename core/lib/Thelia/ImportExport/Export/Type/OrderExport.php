@@ -26,10 +26,9 @@ use Thelia\ImportExport\Export\JsonFileAbstractExport;
 class OrderExport extends JsonFileAbstractExport
 {
     public const FILE_NAME = 'order';
-
     public const USE_RANGE_DATE = true;
 
-    protected $orderAndAliases = [
+    protected array $orderAndAliases = [
         'order_ref' => 'ref',
         'order_created_at' => 'date',
         'customer_ref' => 'customer_ref',
@@ -73,7 +72,7 @@ class OrderExport extends JsonFileAbstractExport
         'order_product_tax_title' => 'tax',
     ];
 
-    protected function getData()
+    protected function getData(): array|string|\Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $locale = $this->language->getLocale();
 

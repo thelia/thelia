@@ -30,19 +30,16 @@ class TemplateValidator
 {
     protected $templatePath;
 
-    /** @var TemplateDescriptorValidator */
-    protected $templateDescriptor;
+    protected TemplateDescriptorValidator $templateDescriptor;
 
-    /** @var TemplateDefinition */
-    protected $templateDefinition;
+    protected TemplateDefinition $templateDefinition;
 
     protected $templateVersion;
 
     /** @var array array of errors */
-    protected $errors = [];
+    protected array $errors = [];
 
-    /** @var \SimpleXMLElement */
-    protected $xmlDescriptorContent;
+    protected \SimpleXMLElement $xmlDescriptorContent;
 
     /**
      * TemplateValidator constructor.
@@ -51,7 +48,7 @@ class TemplateValidator
      */
     public function __construct(string $templatePath)
     {
-        $templateValidator = new TemplateDescriptorValidator($templatePath.DS.'template.xml');
+        $templateValidator = new TemplateDescriptorValidator($templatePath . DS . 'template.xml');
 
         $this->xmlDescriptorContent = $templateValidator->getDescriptor();
     }
@@ -61,10 +58,7 @@ class TemplateValidator
         return $this->templateVersion;
     }
 
-    /**
-     * @return array
-     */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errors;
     }
@@ -73,9 +67,9 @@ class TemplateValidator
      * @param string $name the template directory name
      * @param int    $type the template type (front, back, etc.)
      *
-     * @throws \Exception
-     *
      * @return TemplateDescriptor the template descriptor
+     *
+     * @throws \Exception
      */
     public function getTemplateDefinition(string $name, int $type): TemplateDescriptor
     {
@@ -83,8 +77,7 @@ class TemplateValidator
 
         $templateDescriptor
             ->setName($name)
-            ->setType($type)
-        ;
+            ->setType($type);
 
         if (!empty($this->xmlDescriptorContent)) {
             $templateDescriptor
@@ -95,8 +88,7 @@ class TemplateValidator
                 ->setTheliaVersion((string) $this->xmlDescriptorContent->thelia)
                 ->setStability((string) $this->xmlDescriptorContent->stability)
                 ->setDocumentation((string) $this->xmlDescriptorContent->documentation)
-                ->setAssets((string) $this->xmlDescriptorContent->assets)
-            ;
+                ->setAssets((string) $this->xmlDescriptorContent->assets);
 
             $this->checkVersion($templateDescriptor);
 
@@ -107,8 +99,8 @@ class TemplateValidator
                     $templateDescriptor->setParent(
                         new TemplateDefinition(
                             (string) $this->xmlDescriptorContent->parent,
-                            $type
-                        )
+                            $type,
+                        ),
                     );
                 } catch (\Exception) {
                     // The Translator could not be initialized, take care of this.
@@ -118,13 +110,13 @@ class TemplateValidator
                             [
                                 '%parent' => $templateDescriptor->getParent()->getName(),
                                 '%name' => $templateDescriptor->getName(),
-                            ]
+                            ],
                         );
                     } catch (\Exception) {
                         $message = \sprintf(
                             'The parent template "%s" of template "%s" could not be found',
                             $templateDescriptor->getParent()->getName(),
-                            $templateDescriptor->getName()
+                            $templateDescriptor->getName(),
                         );
                     }
 
@@ -136,10 +128,7 @@ class TemplateValidator
         return $templateDescriptor;
     }
 
-    /**
-     * @param TemplateDescriptor $templateDescriptor
-     */
-    protected function checkVersion($templateDescriptor): void
+    protected function checkVersion(TemplateDescriptor $templateDescriptor): void
     {
         if ($templateDescriptor->getTheliaVersion() && !Version::test(Thelia::THELIA_VERSION, $templateDescriptor->getTheliaVersion(), false, '>=')) {
             // The Translator could not be initialized, take care of this.
@@ -149,13 +138,13 @@ class TemplateValidator
                     [
                         '%name' => $templateDescriptor->getName(),
                         '%version' => $templateDescriptor->getTheliaVersion(),
-                    ]
+                    ],
                 );
             } catch (\Exception) {
                 $message = \sprintf(
                     'The template "%s" requires Thelia %s or newer',
                     $templateDescriptor->getName(),
-                    $templateDescriptor->getTheliaVersion()
+                    $templateDescriptor->getTheliaVersion(),
                 );
             }
 
@@ -169,6 +158,7 @@ class TemplateValidator
     protected function getTemplateLanguages(): array
     {
         $languages = [];
+
         foreach ($this->xmlDescriptorContent->languages->language as $language) {
             $languages[] = (string) $language;
         }
@@ -182,6 +172,7 @@ class TemplateValidator
     protected function getTemplateDescriptives(): array
     {
         $descriptives = [];
+
         foreach ($this->xmlDescriptorContent->descriptive as $descriptive) {
             $descriptives[(string) $descriptive['locale']] = [
                 'title' => (string) $descriptive->title,

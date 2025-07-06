@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -57,7 +58,6 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     use StandardI18nFieldsSearchTrait;
 
     protected $timestampable = true;
-
     protected $versionable = true;
 
     protected function getArgDefinitions(): ArgumentCollection
@@ -86,38 +86,32 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                             'created', 'created_reverse',
                             'updated', 'updated_reverse',
                             'position', 'position_reverse',
-                        ]
-                    )
+                        ],
+                    ),
                 ),
-                'alpha'
+                'alpha',
             ),
             Argument::createIntListTypeArgument('exclude'),
-            Argument::createIntListTypeArgument('exclude_folder')
+            Argument::createIntListTypeArgument('exclude_folder'),
         );
     }
 
     /**
      * @return array of available field to search in
      */
-    public function getSearchIn()
+    public function getSearchIn(): array
     {
         return $this->getStandardI18nSearchFields();
     }
 
-    /**
-     * @param ContentQuery $search
-     * @param string       $searchTerm
-     * @param array        $searchIn
-     * @param string       $searchCriteria
-     */
-    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria): void
+    public function doSearch(\Propel\Runtime\ActiveQuery\ModelCriteria $search, string $searchTerm, array $searchIn, string $searchCriteria): void
     {
         $search->_and();
 
         $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria, $searchIn);
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $search = ContentQuery::create();
 
@@ -131,17 +125,17 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
 
         $manualOrderAllowed = false;
+
         if (null !== $folderDefault = $this->getFolderDefault()) {
             // Select the contents which have $folderDefault as the default folder.
             $search
                 ->useContentFolderQuery('FolderSelect')
-                    ->filterByDefaultFolder(true)
-                    ->filterByFolderId($folderDefault, Criteria::IN)
-                ->endUse()
-            ;
+                ->filterByDefaultFolder(true)
+                ->filterByFolderId($folderDefault, Criteria::IN)
+                ->endUse();
 
             // We can only sort by position if we have a single folder ID
-            $manualOrderAllowed = (1 == \count($folderDefault));
+            $manualOrderAllowed = (1 === \count($folderDefault));
         } elseif (null !== $folderIdList = $this->getFolder()) {
             // Select all content which have one of the required folders as the default one, or an associated one
             $depth = $this->getDepth();
@@ -150,41 +144,39 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             $search
                 ->useContentFolderQuery('FolderSelect')
-                    ->filterByFolderId($allFolderIDs, Criteria::IN)
-                ->endUse()
-            ;
+                ->filterByFolderId($allFolderIDs, Criteria::IN)
+                ->endUse();
 
             // We can only sort by position if we have a single folder ID, with a depth of 1
-            $manualOrderAllowed = (1 == $depth && 1 == \count($folderIdList));
+            $manualOrderAllowed = (1 === $depth && 1 === \count($folderIdList));
         } else {
             $search
                 ->leftJoinContentFolder('FolderSelect')
-                ->addJoinCondition('FolderSelect', '`FolderSelect`.DEFAULT_FOLDER = 1')
-            ;
+                ->addJoinCondition('FolderSelect', '`FolderSelect`.DEFAULT_FOLDER = 1');
         }
 
         $search->withColumn(
-            "CAST(CASE WHEN ISNULL(`FolderSelect`.POSITION) THEN '".\PHP_INT_MAX."' ELSE `FolderSelect`.POSITION END AS SIGNED)",
-            'position_delegate'
+            "CAST(CASE WHEN ISNULL(`FolderSelect`.POSITION) THEN '" . PHP_INT_MAX . "' ELSE `FolderSelect`.POSITION END AS SIGNED)",
+            'position_delegate',
         );
         $search->withColumn('`FolderSelect`.FOLDER_ID', 'default_folder_id');
         $search->withColumn('`FolderSelect`.DEFAULT_FOLDER', 'is_default_folder');
 
         $current = $this->getCurrent();
 
-        if ($current === true) {
+        if (true === $current) {
             $search->filterById($this->getCurrentRequest()->get('content_id'));
-        } elseif ($current === false) {
+        } elseif (false === $current) {
             $search->filterById($this->getCurrentRequest()->get('content_id'), Criteria::NOT_IN);
         }
 
         $current_folder = $this->getCurrentFolder();
 
-        if ($current_folder === true) {
+        if (true === $current_folder) {
             $current = ContentQuery::create()->findPk($this->getCurrentRequest()->get('content_id'));
 
             $search->filterByFolder($current->getFolders(), Criteria::IN);
-        } elseif ($current_folder === false) {
+        } elseif (false === $current_folder) {
             $current = ContentQuery::create()->findPk($this->getCurrentRequest()->get('content_id'));
 
             $search->filterByFolder($current->getFolders(), Criteria::NOT_IN);
@@ -192,14 +184,14 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         $visible = $this->getVisible();
 
-        if ($visible !== BooleanOrBothType::ANY) {
+        if (BooleanOrBothType::ANY !== $visible) {
             $search->filterByVisible($visible ? 1 : 0);
         }
 
         $title = $this->getTitle();
 
         if (null !== $title) {
-            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, '%'.$title.'%');
+            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, '%' . $title . '%');
         }
 
         $exclude = $this->getExclude();
@@ -213,7 +205,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         if (null !== $exclude_folder) {
             $search->filterByFolder(
                 FolderQuery::create()->filterById($exclude_folder, Criteria::IN)->find(),
-                Criteria::NOT_IN
+                Criteria::NOT_IN,
             );
         }
 
@@ -254,8 +246,8 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     }
 
                     foreach ($id as $singleId) {
-                        $givenIdMatched = 'given_id_matched_'.$singleId;
-                        $search->withColumn(ContentTableMap::COL_ID.\sprintf("='%d'", $singleId), $givenIdMatched);
+                        $givenIdMatched = 'given_id_matched_' . $singleId;
+                        $search->withColumn(ContentTableMap::COL_ID . \sprintf("='%d'", $singleId), $givenIdMatched);
                         $search->orderBy($givenIdMatched, Criteria::DESC);
                     }
 
@@ -332,10 +324,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         return $loopResult;
     }
 
-    /**
-     * @param int $defaultFolderId
-     */
-    private function findNextPrev(LoopResultRow $loopResultRow, ContentModel $content, $defaultFolderId): void
+    private function findNextPrev(LoopResultRow $loopResultRow, ContentModel $content, int $defaultFolderId): void
     {
         if ($this->getWithPrevNextInfo()) {
             $contentFolder = ContentFolderQuery::create()
@@ -343,7 +332,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->filterByContentId($content->getId())
                 ->findOne();
 
-            $currentPosition = $contentFolder !== null ? $contentFolder->getPosition() : 0;
+            $currentPosition = null !== $contentFolder ? $contentFolder->getPosition() : 0;
 
             // Find previous and next content
             $previousQuery = ContentFolderQuery::create()
@@ -373,10 +362,10 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->findOne();
 
             $loopResultRow
-                ->set('HAS_PREVIOUS', $previous != null ? 1 : 0)
-                ->set('HAS_NEXT', $next != null ? 1 : 0)
-                ->set('PREVIOUS', $previous != null ? $previous->getContentId() : -1)
-                ->set('NEXT', $next != null ? $next->getContentId() : -1);
+                ->set('HAS_PREVIOUS', null !== $previous ? 1 : 0)
+                ->set('HAS_NEXT', null !== $next ? 1 : 0)
+                ->set('PREVIOUS', null !== $previous ? $previous->getContentId() : -1)
+                ->set('NEXT', null !== $next ? $next->getContentId() : -1);
         }
     }
 }

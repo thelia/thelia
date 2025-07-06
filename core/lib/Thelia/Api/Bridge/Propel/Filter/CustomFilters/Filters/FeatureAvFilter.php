@@ -52,7 +52,7 @@ class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterf
             ->filterByFeatureAvId($value, Criteria::IN)
             ->endUse()
             ->groupBy(FeatureProductTableMap::COL_PRODUCT_ID)
-            ->having('COUNT(DISTINCT '.FeatureProductTableMap::COL_FEATURE_ID.') = ?', $count);
+            ->having('COUNT(DISTINCT ' . FeatureProductTableMap::COL_FEATURE_ID . ') = ?', $count);
     }
 
     public function getValue(ActiveRecordInterface $activeRecord, string $locale, $valueSearched = null, ?int $depth = 1): ?array
@@ -62,6 +62,7 @@ class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterf
         }
 
         $value = [];
+
         foreach ($activeRecord->getFeatureProductsJoinFeatureAv() as $featureProduct) {
             $value[] =
                 [
@@ -69,8 +70,7 @@ class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterf
                     'mainId' => $featureProduct->getFeature()->getId(),
                     'id' => $featureProduct->getFeatureAv()->getId(),
                     'title' => $featureProduct->getFeatureAv()->setLocale($locale)->getTitle(),
-                ]
-            ;
+                ];
         }
 
         return $value;

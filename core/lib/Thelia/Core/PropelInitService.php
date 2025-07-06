@@ -55,10 +55,8 @@ class PropelInitService
 {
     /**
      * Name of the Propel initialization file.
-     *
-     * @var string
      */
-    protected static $PROPEL_CONFIG_CACHE_FILENAME = 'propel.init.php';
+    protected static string $PROPEL_CONFIG_CACHE_FILENAME = 'propel.init.php';
 
     /**
      * @param string        $environment   application environment
@@ -110,7 +108,7 @@ class PropelInitService
     {
         $propelConfigCache = new ConfigCache(
             $this->getPropelConfigFile(),
-            $this->debug
+            $this->debug,
         );
 
         if ($propelConfigCache->isFresh()) {
@@ -141,7 +139,7 @@ class PropelInitService
         $configOptions['propel']['paths']['migrationDir'] = $this->getPropelConfigDir();
 
         $propelConfigCache->write(
-            Yaml::dump($propelConfig)
+            Yaml::dump($propelConfig),
         );
     }
 
@@ -154,7 +152,7 @@ class PropelInitService
     {
         $propelInitCache = new ConfigCache(
             $this->getPropelInitFile(),
-            $this->debug
+            $this->debug,
         );
 
         if ($propelInitCache->isFresh()) {
@@ -168,14 +166,14 @@ class PropelInitService
                 '--output-dir' => $this->getPropelConfigDir(),
                 '--output-file' => static::$PROPEL_CONFIG_CACHE_FILENAME,
                 '--loader-script-dir' => $this->getPropelLoaderScriptDir(),
-            ]
+            ],
         );
 
         // rewrite the file as a cached file
         $propelInitContent = file_get_contents($this->getPropelInitFile());
         $propelInitCache->write(
             $propelInitContent,
-            [new FileResource($this->getPropelConfigFile())]
+            [new FileResource($this->getPropelConfigFile())],
         );
     }
 
@@ -196,21 +194,21 @@ class PropelInitService
         $fs->mkdir($this->getPropelSchemaDir());
 
         $schemaCombiner = new SchemaCombiner(
-            $this->schemaLocator->findForAllModules()
+            $this->schemaLocator->findForAllModules(),
         );
 
         foreach ($schemaCombiner->getDatabases() as $database) {
             $databaseSchemaCache = new ConfigCache(
                 \sprintf('%s%s.schema.xml', $this->getPropelSchemaDir(), $database),
-                $this->debug
+                $this->debug,
             );
 
             $databaseSchemaCache->write($schemaCombiner->getCombinedDocument($database)->saveXML());
 
-            $hash .= md5(file_get_contents($this->getPropelSchemaDir().$database.'.schema.xml'));
+            $hash .= md5(file_get_contents($this->getPropelSchemaDir() . $database . '.schema.xml'));
         }
 
-        $fs->dumpFile($this->getPropelCacheDir().'hash', $hash);
+        $fs->dumpFile($this->getPropelCacheDir() . 'hash', $hash);
 
         return true;
     }
@@ -225,8 +223,8 @@ class PropelInitService
         $fs = new Filesystem();
 
         // cache testing
-        if ($fs->exists($this->getPropelModelDir().'hash')
-            && file_get_contents($this->getPropelCacheDir().'hash') === file_get_contents($this->getPropelModelDir().'hash')) {
+        if ($fs->exists($this->getPropelModelDir() . 'hash')
+            && file_get_contents($this->getPropelCacheDir() . 'hash') === file_get_contents($this->getPropelModelDir() . 'hash')) {
             return false;
         }
 
@@ -238,11 +236,11 @@ class PropelInitService
                 '--config-dir' => $this->getPropelConfigDir(),
                 '--schema-dir' => $this->getPropelSchemaDir(),
                 '--loader-script-dir' => $this->getPropelLoaderScriptDir(),
-            ]
+            ],
         );
         $fs->copy(
-            $this->getPropelCacheDir().'hash',
-            $this->getPropelModelDir().'hash'
+            $this->getPropelCacheDir() . 'hash',
+            $this->getPropelModelDir() . 'hash',
         );
 
         return true;
@@ -254,8 +252,8 @@ class PropelInitService
             new MigrationUpCommand(),
             [
                 '--config-dir' => $this->getPropelConfigDir(),
-                '--output-dir' => THELIA_CACHE_DIR.'propel-migrations'.DS,
-            ]
+                '--output-dir' => THELIA_CACHE_DIR . 'propel-migrations' . DS,
+            ],
         );
 
         $this->runCommand(
@@ -264,32 +262,31 @@ class PropelInitService
                 '--config-dir' => $this->getPropelConfigDir(),
                 '--schema-dir' => $this->getPropelSchemaDir(),
                 '--skip-removed-table' => true,
-                '--output-dir' => THELIA_CACHE_DIR.'propel-migrations'.DS,
-            ]
+                '--output-dir' => THELIA_CACHE_DIR . 'propel-migrations' . DS,
+            ],
         );
 
         $this->runCommand(
             new MigrationUpCommand(),
             [
                 '--config-dir' => $this->getPropelConfigDir(),
-                '--output-dir' => THELIA_CACHE_DIR.'propel-migrations'.DS,
-            ]
+                '--output-dir' => THELIA_CACHE_DIR . 'propel-migrations' . DS,
+            ],
         );
     }
 
     /**
      * Initialize the Propel environment and connection.
      *
-     * @param bool $force        force cache generation
-     * @param bool $cacheRefresh
-     *
-     * @throws \Throwable
+     * @param bool $force force cache generation
      *
      * @return bool whether a Propel connection is available
      *
+     * @throws \Throwable
+     *
      * @internal
      */
-    public function init($force = false, &$cacheRefresh = false): bool
+    public function init(bool $force = false, bool &$cacheRefresh = false): bool
     {
         $flockFactory = new LockFactory(new FlockStore());
 
@@ -329,8 +326,9 @@ class PropelInitService
             }
         } catch (\Throwable $throwable) {
             $fs = new Filesystem();
-            $fs->remove(THELIA_CACHE_DIR.$this->environment);
+            $fs->remove(THELIA_CACHE_DIR . $this->environment);
             $fs->remove($this->getPropelModelDir());
+
             throw $throwable;
         } finally {
             // Release cache generation lock
@@ -342,46 +340,46 @@ class PropelInitService
 
     public function getPropelCacheDir(): string
     {
-        return THELIA_CACHE_DIR.$this->environment.DS.'propel'.DS;
+        return THELIA_CACHE_DIR . $this->environment . DS . 'propel' . DS;
     }
 
     public function getPropelConfigDir(): string
     {
-        return $this->getPropelCacheDir().'config'.DS;
+        return $this->getPropelCacheDir() . 'config' . DS;
     }
 
     public function getPropelConfigFile(): string
     {
-        return $this->getPropelConfigDir().'propel.yml';
+        return $this->getPropelConfigDir() . 'propel.yml';
     }
 
     public function getPropelInitFile(): string
     {
-        return $this->getPropelConfigDir().static::$PROPEL_CONFIG_CACHE_FILENAME;
+        return $this->getPropelConfigDir() . static::$PROPEL_CONFIG_CACHE_FILENAME;
     }
 
     public function getPropelSchemaDir(): string
     {
-        return $this->getPropelCacheDir().'schema'.DS;
+        return $this->getPropelCacheDir() . 'schema' . DS;
     }
 
     public function getPropelModelDir(): string
     {
-        return $this->getPropelCacheDir().'model'.DS;
+        return $this->getPropelCacheDir() . 'model' . DS;
     }
 
     public function getPropelDatabaseDir(): string
     {
-        return $this->getPropelCacheDir().'database'.DS;
+        return $this->getPropelCacheDir() . 'database' . DS;
     }
 
     public function getPropelMigrationDir(): string
     {
-        return $this->getPropelCacheDir().'migration'.DS;
+        return $this->getPropelCacheDir() . 'migration' . DS;
     }
 
     public function getPropelLoaderScriptDir(): string
     {
-        return $this->getPropelCacheDir().'loader'.DS;
+        return $this->getPropelCacheDir() . 'loader' . DS;
     }
 }

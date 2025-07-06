@@ -17,7 +17,6 @@ namespace Thelia\Core\Event\Template;
 class TemplateCreateEvent extends TemplateEvent
 {
     protected $template_name;
-
     protected $locale;
 
     public function getLocale()

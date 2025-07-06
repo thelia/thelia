@@ -44,7 +44,7 @@ class Request extends BaseRequest
         $pathInfo = parent::getPathInfo();
         $pathLength = \strlen($pathInfo);
 
-        if ($pathInfo !== '/' && $pathInfo[$pathLength - 1] === '/'
+        if ('/' !== $pathInfo && '/' === $pathInfo[$pathLength - 1]
             && true === (bool) ConfigQuery::read('allow_slash_ended_uri', false)
         ) {
             if (null === $this->resolvedPathInfo) {
@@ -78,17 +78,17 @@ class Request extends BaseRequest
         }
 
         if ('' === $this->getQueryString()) {
-            $additionalQs = '?'.ltrim($additionalQs, '&');
+            $additionalQs = '?' . ltrim($additionalQs, '&');
         }
 
-        return $uri.$additionalQs;
+        return $uri . $additionalQs;
     }
 
     public function toString($withContent = true): string
     {
         $string =
             \sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))
-            ."\r\n".$this->headers."\r\n";
+            . "\r\n" . $this->headers . "\r\n";
 
         if (true === $withContent) {
             $string .= $this->getContent();
@@ -109,12 +109,12 @@ class Request extends BaseRequest
 
     public function fromAdmin(): bool
     {
-        return $this->controllerType === BaseAdminController::CONTROLLER_TYPE;
+        return BaseAdminController::CONTROLLER_TYPE === $this->controllerType;
     }
 
     public function fromFront(): bool
     {
-        return $this->controllerType === BaseFrontController::CONTROLLER_TYPE;
+        return BaseFrontController::CONTROLLER_TYPE === $this->controllerType;
     }
 
     public function getSession(): Session
@@ -122,9 +122,8 @@ class Request extends BaseRequest
         if (!$this->hasSession()) {
             $this->setSession(new Session());
         }
-        /** @var Session $session */
-        $session = $this->session;
 
-        return $session;
+        /** @var Session $session */
+        return $this->session;
     }
 }

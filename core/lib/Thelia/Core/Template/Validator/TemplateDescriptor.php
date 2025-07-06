@@ -23,32 +23,23 @@ use Thelia\Core\Template\TemplateDefinition;
  */
 class TemplateDescriptor
 {
-    /** @var array */
-    protected $languages = [];
+    protected array $languages = [];
 
-    /** @var array */
-    protected $descriptives = [];
+    protected array $descriptives = [];
 
-    /** @var string */
-    protected $theliaVersion;
+    protected string $theliaVersion;
 
-    /** @var string */
-    protected $version;
+    protected string $version;
 
-    /** @var TemplateDefinition */
-    protected $parent;
+    protected TemplateDefinition $parent;
 
-    /** @var string */
-    protected $documentation;
+    protected string $documentation;
 
-    /** @var string */
-    protected $stability;
+    protected string $stability;
 
-    /** @var array */
-    protected $authors = [];
+    protected array $authors = [];
 
-    /** @var string */
-    protected $assets = '';
+    protected string $assets = '';
 
     /**
      * TemplateDescriptor constructor.
@@ -91,50 +82,37 @@ class TemplateDescriptor
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getLanguages()
+    public function getLanguages(): array
     {
         return $this->languages;
     }
 
     /**
-     * @param array $languages
-     *
      * @return $this
      */
-    public function setLanguages($languages): self
+    public function setLanguages(array $languages): self
     {
         $this->languages = $languages;
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getDescriptives()
+    public function getDescriptives(): array
     {
         return $this->descriptives;
     }
 
     /**
-     * @param array $descriptives
-     *
      * @return $this
      */
-    public function setDescriptives($descriptives): self
+    public function setDescriptives(array $descriptives): self
     {
         $this->descriptives = $descriptives;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getTheliaVersion()
+    public function getTheliaVersion(): string
     {
         return $this->theliaVersion;
     }
@@ -149,10 +127,7 @@ class TemplateDescriptor
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getVersion()
+    public function getVersion(): string
     {
         return $this->version;
     }
@@ -167,20 +142,15 @@ class TemplateDescriptor
         return $this;
     }
 
-    /**
-     * @return TemplateDefinition
-     */
-    public function getParent()
+    public function getParent(): TemplateDefinition
     {
         return $this->parent;
     }
 
     /**
-     * @param TemplateDefinition $parent
-     *
      * @return $this
      */
-    public function setParent($parent): self
+    public function setParent(TemplateDefinition $parent): self
     {
         $this->parent = $parent;
 
@@ -192,10 +162,7 @@ class TemplateDescriptor
         return null !== $this->parent;
     }
 
-    /**
-     * @return string
-     */
-    public function getDocumentation()
+    public function getDocumentation(): string
     {
         return $this->documentation;
     }
@@ -210,10 +177,7 @@ class TemplateDescriptor
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getStability()
+    public function getStability(): string
     {
         return $this->stability;
     }
@@ -228,30 +192,22 @@ class TemplateDescriptor
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getAuthors()
+    public function getAuthors(): array
     {
         return $this->authors;
     }
 
     /**
-     * @param array $authors
-     *
      * @return $this
      */
-    public function setAuthors($authors): self
+    public function setAuthors(array $authors): self
     {
         $this->authors = $authors;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getAssets()
+    public function getAssets(): string
     {
         return $this->assets;
     }

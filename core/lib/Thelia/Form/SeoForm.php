@@ -41,8 +41,7 @@ class SeoForm extends BaseForm
                 'constraints' => [
                     new NotBlank(),
                 ],
-            ])
-        ;
+            ]);
 
         // Add SEO Fields
         $this->addSeoFields();

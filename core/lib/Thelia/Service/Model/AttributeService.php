@@ -34,23 +34,27 @@ readonly class AttributeService
     public function getAttributesAndValues(int $productId): array
     {
         $product = ProductQuery::create()->findPk($productId);
+
         if (null === $product) {
             return [];
         }
 
         $template = $product->getTemplate();
+
         if (null === $template) {
             return [];
         }
 
         $locale = $this->langService->getLocale();
         $attributesAndValues = [];
+
         foreach ($this->getAttributeInPses($product, $locale) as $attribute) {
             $attributeValues = $this->getAttributeAvInPses($product, $attribute, $locale);
             $values = [];
+
             /** @var AttributeAv $attributeValue */
             foreach ($attributeValues as $attributeValue) {
-                if ($attributeValue === null || isset($values[$attributeValue->getId()])) {
+                if (null === $attributeValue || isset($values[$attributeValue->getId()])) {
                     continue;
                 }
 
@@ -78,9 +82,11 @@ readonly class AttributeService
     {
         $attributes = [];
         $productSaleElements = $product->getProductSaleElementss();
+
         /** @var ProductSaleElements $productSaleElement */
         foreach ($productSaleElements as $productSaleElement) {
             $attributeCombinations = $productSaleElement->getAttributeCombinations();
+
             foreach ($attributeCombinations as $attributeCombination) {
                 $attribute = $attributeCombination->getAttribute();
                 $attributes[$attribute->getId()] = $attribute->setLocale($locale);
@@ -97,9 +103,11 @@ readonly class AttributeService
     {
         $attributeAvs = [];
         $productSaleElements = $product->getProductSaleElementss();
+
         /** @var ProductSaleElements $productSaleElement */
         foreach ($productSaleElements as $productSaleElement) {
             $attributeCombinations = $productSaleElement->getAttributeCombinations();
+
             foreach ($attributeCombinations as $attributeCombination) {
                 if ($attributeCombination->getAttributeId() !== $attribute->getId()) {
                     continue;

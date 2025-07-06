@@ -42,15 +42,10 @@ class Calculator
 {
     protected TaxRuleQuery $taxRuleQuery;
 
-    /**
-     * @var ObjectCollection|null
-     */
-    protected $taxRulesCollection;
+    protected ?ObjectCollection $taxRulesCollection;
 
     protected $product;
-
     protected $country;
-
     protected $state;
 
     public function __construct()
@@ -59,9 +54,9 @@ class Calculator
     }
 
     /**
-     * @throws PropelException
-     *
      * @return float
+     *
+     * @throws PropelException
      */
     public static function getUntaxedCartDiscount(Cart $cart, Country $country, ?State $state = null): int|float
     {
@@ -72,9 +67,9 @@ class Calculator
      * @throws PropelException
      */
     /**
-     * @throws PropelException
-     *
      * @return float
+     *
+     * @throws PropelException
      */
     public static function getUntaxedOrderDiscount(Order $order): int|float
     {
@@ -83,16 +78,14 @@ class Calculator
 
     /**
      * @throws PropelException
-     *
-     * @return float
      */
-    public static function getOrderTaxFactor(Order $order)
+    public static function getOrderTaxFactor(Order $order): float
     {
         // Cache the result in a local variable
         static $orderTaxFactor;
 
         if (null === $orderTaxFactor) {
-            if ((float) $order->getDiscount() === 0.0) {
+            if (0.0 === (float) $order->getDiscount()) {
                 return 1;
             }
 
@@ -119,16 +112,14 @@ class Calculator
 
     /**
      * @throws PropelException
-     *
-     * @return float
      */
-    public static function getCartTaxFactor(Cart $cart, Country $country, ?State $state = null)
+    public static function getCartTaxFactor(Cart $cart, Country $country, ?State $state = null): float
     {
         // Cache the result in a local variable
         static $cartFactor;
 
         if (null === $cartFactor) {
-            if ((float) $cart->getDiscount() === 0.0) {
+            if (0.0 === (float) $cart->getDiscount()) {
                 return 1;
             }
 
@@ -140,6 +131,7 @@ class Calculator
             /** @var CartItem $cartItem */
             foreach ($cartItems as $cartItem) {
                 $taxRulesCollection = TaxRuleQuery::create()->getTaxCalculatorCollection($cartItem->getProduct()->getTaxRule(), $country, $state);
+
                 /** @var TaxRule $taxRule */
                 foreach ($taxRulesCollection as $taxRule) {
                     $cartTaxFactors[] = 1 + $taxRule->getTypeInstance()->pricePercentRetriever();
@@ -153,17 +145,17 @@ class Calculator
     }
 
     /**
-     * @throws PropelException
-     *
      * @return $this
+     *
+     * @throws PropelException
      */
     public function load(Product $product, Country $country, ?State $state = null): static
     {
-        if ($product->getId() === null) {
+        if (null === $product->getId()) {
             throw new TaxEngineException('Product id is empty in Calculator::load', TaxEngineException::UNDEFINED_PRODUCT);
         }
 
-        if ($country->getId() === null) {
+        if (null === $country->getId()) {
             throw new TaxEngineException('Country id is empty in Calculator::load', TaxEngineException::UNDEFINED_COUNTRY);
         }
 
@@ -177,21 +169,21 @@ class Calculator
     }
 
     /**
-     * @throws PropelException
-     *
      * @return $this
+     *
+     * @throws PropelException
      */
     public function loadTaxRule(TaxRule $taxRule, Country $country, Product $product, ?State $state = null): static
     {
-        if ($taxRule->getId() === null) {
+        if (null === $taxRule->getId()) {
             throw new TaxEngineException('TaxRule id is empty in Calculator::loadTaxRule', TaxEngineException::UNDEFINED_TAX_RULE);
         }
 
-        if ($country->getId() === null) {
+        if (null === $country->getId()) {
             throw new TaxEngineException('Country id is empty in Calculator::loadTaxRule', TaxEngineException::UNDEFINED_COUNTRY);
         }
 
-        if ($product->getId() === null) {
+        if (null === $product->getId()) {
             throw new TaxEngineException('Product id is empty in Calculator::load', TaxEngineException::UNDEFINED_PRODUCT);
         }
 
@@ -205,20 +197,20 @@ class Calculator
     }
 
     /**
-     * @throws PropelException
-     *
      * @return $this
+     *
+     * @throws PropelException
      */
     public function loadTaxRuleWithoutCountry(TaxRule $taxRule, Product $product): static
     {
         $this->product = null;
         $this->taxRulesCollection = null;
 
-        if ($taxRule->getId() === null) {
+        if (null === $taxRule->getId()) {
             throw new TaxEngineException('TaxRule id is empty in Calculator::loadTaxRule', TaxEngineException::UNDEFINED_TAX_RULE);
         }
 
-        if ($product->getId() === null) {
+        if (null === $product->getId()) {
             throw new TaxEngineException('Product id is empty in Calculator::load', TaxEngineException::UNDEFINED_PRODUCT);
         }
 
@@ -230,19 +222,19 @@ class Calculator
     }
 
     /**
-     * @throws PropelException
-     *
      * @return $this
+     *
+     * @throws PropelException
      *
      * @since 2.4
      */
     public function loadTaxRuleWithoutProduct(TaxRule $taxRule, Country $country, ?State $state = null): static
     {
-        if ($taxRule->getId() === null) {
+        if (null === $taxRule->getId()) {
             throw new TaxEngineException('TaxRule id is empty in Calculator::loadTaxRule', TaxEngineException::UNDEFINED_TAX_RULE);
         }
 
-        if ($country->getId() === null) {
+        if (null === $country->getId()) {
             throw new TaxEngineException('Country id is empty in Calculator::loadTaxRule', TaxEngineException::UNDEFINED_COUNTRY);
         }
 
@@ -256,9 +248,9 @@ class Calculator
     }
 
     /**
-     * @throws PropelException
-     *
      * @return float
+     *
+     * @throws PropelException
      */
     public function getTaxAmountFromUntaxedPrice($untaxedPrice, &$taxCollection = null): int|float
     {
@@ -274,15 +266,13 @@ class Calculator
     }
 
     /**
-     * @param float                          $untaxedPrice
      * @param OrderProductTaxCollection|null $taxCollection returns OrderProductTaxCollection
-     * @param string|null                    $askedLocale
-     *
-     * @throws PropelException
      *
      * @return float
+     *
+     * @throws PropelException
      */
-    public function getTaxedPrice($untaxedPrice, &$taxCollection = null, $askedLocale = null): int|float
+    public function getTaxedPrice(float $untaxedPrice, ?OrderProductTaxCollection &$taxCollection = null, ?string $askedLocale = null): int|float
     {
         if (null === $this->taxRulesCollection) {
             throw new TaxEngineException('Tax rules collection is empty in Calculator::getTaxedPrice', TaxEngineException::UNDEFINED_TAX_RULES_COLLECTION);
@@ -292,7 +282,7 @@ class Calculator
             throw new TaxEngineException('Product is empty in Calculator::getTaxedPrice', TaxEngineException::UNDEFINED_PRODUCT);
         }
 
-        if (false === filter_var($untaxedPrice, \FILTER_VALIDATE_FLOAT)) {
+        if (false === filter_var($untaxedPrice, FILTER_VALIDATE_FLOAT)) {
             throw new TaxEngineException('BAD AMOUNT FORMAT', TaxEngineException::BAD_AMOUNT_FORMAT);
         }
 
@@ -327,8 +317,7 @@ class Calculator
                 $orderProductTax = (new OrderProductTax())
                     ->setTitle($taxI18n->getTitle())
                     ->setDescription($taxI18n->getDescription())
-                    ->setAmount($taxAmount)
-                ;
+                    ->setAmount($taxAmount);
 
                 $taxCollection->addTax($orderProductTax);
             }
@@ -350,7 +339,7 @@ class Calculator
             throw new TaxEngineException('Product is empty in Calculator::getTaxedPrice', TaxEngineException::UNDEFINED_PRODUCT);
         }
 
-        if (false === filter_var($taxedPrice, \FILTER_VALIDATE_FLOAT)) {
+        if (false === filter_var($taxedPrice, FILTER_VALIDATE_FLOAT)) {
             throw new TaxEngineException('BAD AMOUNT FORMAT', TaxEngineException::BAD_AMOUNT_FORMAT);
         }
 

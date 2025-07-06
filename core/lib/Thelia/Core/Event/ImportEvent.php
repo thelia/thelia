@@ -25,10 +25,8 @@ use Thelia\ImportExport\Import\AbstractImport;
  */
 class ImportEvent extends Event
 {
-    /**
-     * @var array Errors list
-     */
-    protected $errors = [];
+    /** @var array Errors list */
+    protected array $errors = [];
 
     /**
      * Event constructor.
@@ -93,7 +91,7 @@ class ImportEvent extends Event
      *
      * @return array Errors list
      */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errors;
     }

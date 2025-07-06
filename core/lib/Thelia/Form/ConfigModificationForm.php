@@ -30,7 +30,7 @@ class ConfigModificationForm extends BaseForm
             ->add('id', HiddenType::class, [
                 'constraints' => [
                     new GreaterThan(
-                        ['value' => 0]
+                        ['value' => 0],
                     ),
                 ],
             ])
@@ -52,8 +52,7 @@ class ConfigModificationForm extends BaseForm
             ->add('hidden', HiddenType::class, [])
             ->add('secured', HiddenType::class, [
                 'label' => Translator::getInstance()->trans('Prevent variable modification or deletion, except for super-admin'),
-            ])
-        ;
+            ]);
 
         // Add standard description fields
         $this->addStandardDescFields();

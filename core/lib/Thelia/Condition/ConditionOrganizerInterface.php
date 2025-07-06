@@ -28,5 +28,5 @@ interface ConditionOrganizerInterface
      *
      * @return array Array of ConditionInterface sorted
      */
-    public function organize(array $conditions);
+    public function organize(array $conditions): array;
 }

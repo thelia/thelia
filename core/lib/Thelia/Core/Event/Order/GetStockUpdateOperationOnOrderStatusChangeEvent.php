@@ -24,9 +24,7 @@ use Thelia\Model\OrderStatus;
 class GetStockUpdateOperationOnOrderStatusChangeEvent extends ActionEvent
 {
     public const DECREASE_STOCK = -1;
-
     public const INCREASE_STOCK = 1;
-
     public const DO_NOTHING = 0;
 
     protected $operation = self::DO_NOTHING;
@@ -48,10 +46,7 @@ class GetStockUpdateOperationOnOrderStatusChangeEvent extends ActionEvent
         return $this->newOrderStatus;
     }
 
-    /**
-     * @return int
-     */
-    public function getOperation()
+    public function getOperation(): int
     {
         return $this->operation;
     }

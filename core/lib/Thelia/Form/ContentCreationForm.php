@@ -48,8 +48,7 @@ class ContentCreationForm extends BaseForm
             ->add('visible', IntegerType::class, [
                 'label' => Translator::getInstance()->trans('This content is online.'),
                 'label_attr' => ['for' => 'visible_create'],
-            ])
-        ;
+            ]);
     }
 
     public static function getName(): string

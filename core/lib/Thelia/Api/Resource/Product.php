@@ -46,41 +46,41 @@ use Thelia\Model\Tools\UrlRewritingTrait;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/products'
+            uriTemplate: '/admin/products',
         ),
         new GetCollection(
-            uriTemplate: '/admin/products'
+            uriTemplate: '/admin/products',
         ),
         new Get(
             uriTemplate: '/admin/products/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
             uriTemplate: '/admin/products/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
         ),
         new Patch(
             uriTemplate: '/admin/products/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
         ),
         new Delete(
-            uriTemplate: '/admin/products/{id}'
+            uriTemplate: '/admin/products/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/front/products'
+            uriTemplate: '/front/products',
         ),
         new Get(
             uriTemplate: '/front/products/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]]
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -94,7 +94,7 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         'taxRule.id',
         'featureProducts.feature.id',
         'featureProducts.featureAv.id',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
@@ -105,7 +105,7 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         'productSaleElements.isDefault',
         'productSaleElements.promo',
         'productSaleElements.newness',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
@@ -113,7 +113,7 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         'ref',
         'position',
         'productCategories.position',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: TheliaFilter::class,
@@ -125,7 +125,7 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         'ref',
         'productCategories.category.id',
         'taxRule.id',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: ProductPriceOrderFilter::class,
@@ -140,22 +140,17 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         'productSaleElements.productPrices.promoPrice',
         'productSaleElements.weight',
         'productSaleElements.quantity',
-    ]
+    ],
 )]
 class Product extends AbstractTranslatableResource
 {
     use UrlRewritingTrait;
 
     public const GROUP_ADMIN_READ = 'admin:product:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:product:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:product:write';
-
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:product:write:update';
-
     public const GROUP_FRONT_READ = 'front:product:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:product:read:single';
 
     #[Groups(
@@ -173,7 +168,7 @@ class Product extends AbstractTranslatableResource
             ProductImage::GROUP_ADMIN_READ_SINGLE,
             ProductDocument::GROUP_ADMIN_READ_SINGLE,
             CartItem::GROUP_FRONT_READ_SINGLE,
-        ]
+        ],
     )]
     public ?int $id = null;
 
@@ -439,8 +434,10 @@ class Product extends AbstractTranslatableResource
             $context->addViolation(
                 Translator::getInstance()->trans(
                     'A product with reference %ref already exists. Please choose another reference.',
-                    ['%ref' => $resource->ref], null, 'en_US'
-                )
+                    ['%ref' => $resource->ref],
+                    null,
+                    'en_US',
+                ),
             );
         }
     }
@@ -450,17 +447,20 @@ class Product extends AbstractTranslatableResource
     {
         $resource = $context->getRoot();
         $defaultCategory = [];
+
         /** @var ProductCategory $productCategory */
         foreach ($resource->getProductCategories() as $productCategory) {
             $defaultCategory[] = $productCategory->getDefaultCategory();
         }
 
-        if (!\in_array(true, $defaultCategory)) {
+        if (!\in_array(true, $defaultCategory, true)) {
             $context->addViolation(
                 Translator::getInstance()->trans(
                     'There is no default category defined.',
-                    [], null, 'en_US'
-                )
+                    [],
+                    null,
+                    'en_US',
+                ),
             );
         }
     }

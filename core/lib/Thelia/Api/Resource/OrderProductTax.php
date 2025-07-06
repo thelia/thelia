@@ -32,27 +32,27 @@ use Thelia\Model\Map\OrderProductTaxTableMap;
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/admin/order_product_taxes'
+            uriTemplate: '/admin/order_product_taxes',
         ),
         new Post(
-            uriTemplate: '/admin/order_product_taxes'
+            uriTemplate: '/admin/order_product_taxes',
         ),
         new Get(
             uriTemplate: '/admin/order_product_taxes/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/order_product_taxes/{id}'
+            uriTemplate: '/admin/order_product_taxes/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/order_product_taxes/{id}'
+            uriTemplate: '/admin/order_product_taxes/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/order_product_taxes/{id}'
+            uriTemplate: '/admin/order_product_taxes/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -62,16 +62,14 @@ use Thelia\Model\Map\OrderProductTaxTableMap;
             'strategy' => 'exact',
             'fieldPath' => 'order_product_tax.order_product_id',
         ],
-    ]
+    ],
 )]
 class OrderProductTax implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:order_product_tax:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order_product_tax:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:order_product_tax:write';
 
     #[Groups([

@@ -52,7 +52,7 @@ class ZipArchiver extends AbstractArchiver
     {
         $this->archive = new \ZipArchive();
 
-        $this->archivePath = $baseName.'.'.$this->getExtension();
+        $this->archivePath = $baseName . '.' . $this->getExtension();
 
         $this->archive->open($this->archivePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
 

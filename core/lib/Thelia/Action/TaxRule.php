@@ -33,8 +33,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
         $taxRule
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
-            ->setDescription($event->getDescription())
-        ;
+            ->setDescription($event->getDescription());
 
         $taxRule->save();
 
@@ -48,8 +47,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setDescription($event->getDescription())
-                ->save()
-            ;
+                ->save();
 
             $event->setTaxRule($taxRule);
         }
@@ -64,11 +62,12 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
 
             /* clean the current tax rule for the countries/states */
             $deletes = array_merge($countryList, $countryDeletedList);
+
             foreach ($deletes as $item) {
                 TaxRuleCountryQuery::create()
                     ->filterByTaxRule($taxRule)
                     ->filterByCountryId((int) $item[0], Criteria::EQUAL)
-                    ->filterByStateId((int) $item[1] !== 0 ? $item[1] : null, Criteria::EQUAL)
+                    ->filterByStateId(0 !== (int) $item[1] ? $item[1] : null, Criteria::EQUAL)
                     ->delete();
             }
 
@@ -130,17 +129,14 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
      *
      * This method checks the $obj parameter, and create a 2.3.0-alpha1 compatible return value if $obj is expressed using
      * the 2.2.x form.
-     *
-     * @param array $obj
-     *
-     * @return array
      */
-    protected function getArrayFromJson22Compat($obj)
+    protected function getArrayFromJson22Compat(array $obj): array
     {
         $obj = $this->getArrayFromJson($obj);
 
         if (isset($obj[0]) && !\is_array($obj[0])) {
             $objEx = [];
+
             foreach ($obj as $item) {
                 $objEx[] = [$item, 0];
             }
@@ -155,8 +151,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
             $taxRule
-                ->delete()
-            ;
+                ->delete();
 
             $event->setTaxRule($taxRule);
         }

@@ -38,7 +38,7 @@ class OrderDelivery extends BaseForm
                 'constraints' => [
                     new NotBlank(),
                     new Callback(
-                        $this->verifyDeliveryAddress(...)
+                        $this->verifyDeliveryAddress(...),
                     ),
                 ],
             ])
@@ -47,7 +47,7 @@ class OrderDelivery extends BaseForm
                 'constraints' => [
                     new NotBlank(),
                     new Callback(
-                        $this->verifyDeliveryModule(...)
+                        $this->verifyDeliveryModule(...),
                     ),
                 ],
             ]);
@@ -73,7 +73,7 @@ class OrderDelivery extends BaseForm
             $context->addViolation(Translator::getInstance()->trans('Delivery module ID not found'));
         } elseif (!$module->isDeliveryModule()) {
             $context->addViolation(
-                \sprintf(Translator::getInstance()->trans("delivery module %s is not a Thelia\Module\DeliveryModuleInterface"), $module->getCode())
+                \sprintf(Translator::getInstance()->trans('delivery module %s is not a Thelia\\Module\\DeliveryModuleInterface'), $module->getCode()),
             );
         }
     }

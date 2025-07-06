@@ -23,32 +23,20 @@ use Thelia\Core\Translation\Translator;
  */
 abstract class AbstractArchiver implements ArchiverInterface
 {
-    /**
-     * @var mixed The archive resource
-     */
-    protected $archive;
+    /** @var mixed The archive resource */
+    protected mixed $archive;
 
-    /**
-     * @var string Path to archive
-     */
-    protected $archivePath;
+    /** @var string Path to archive */
+    protected string $archivePath;
 
     public function __construct($checkIsAvailable = false)
     {
         if ($checkIsAvailable && !$this->isAvailable()) {
-            throw new \Exception(
-                Translator::getInstance()->trans(
-                    'The archiver :name is not available. Please install the php extension :extension first.',
-                    [
-                        ':name' => $this->getName(),
-                        ':extension' => $this->getExtension(),
-                    ]
-                )
-            );
+            throw new \Exception(Translator::getInstance()->trans('The archiver :name is not available. Please install the php extension :extension first.', [':name' => $this->getName(), ':extension' => $this->getExtension()]));
         }
     }
 
-    public function getArchivePath()
+    public function getArchivePath(): string
     {
         return $this->archivePath;
     }
@@ -63,11 +51,12 @@ abstract class AbstractArchiver implements ArchiverInterface
     public function add(string $path, ?string $pathInArchive = null): self
     {
         $path = realpath($path);
+
         if (!file_exists($path)) {
-            throw new \RuntimeException('File '.$path." doesn't exists");
+            throw new \RuntimeException('File ' . $path . " doesn't exists");
         }
 
-        if ($pathInArchive === null) {
+        if (null === $pathInArchive) {
             $pathInArchive = basename($path);
         }
 
@@ -77,7 +66,7 @@ abstract class AbstractArchiver implements ArchiverInterface
                     continue;
                 }
 
-                $this->add($dirItem->getPathname(), $pathInArchive.DS.$dirItem->getFilename());
+                $this->add($dirItem->getPathname(), $pathInArchive . DS . $dirItem->getFilename());
             }
         } else {
             $this->archive->addFile($path, $pathInArchive);

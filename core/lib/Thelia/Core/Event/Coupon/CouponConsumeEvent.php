@@ -40,20 +40,14 @@ class CouponConsumeEvent extends ActionEvent
     ) {
     }
 
-    /**
-     * @param bool $freeShipping
-     */
-    public function setFreeShipping($freeShipping): static
+    public function setFreeShipping(bool $freeShipping): static
     {
         $this->freeShipping = $freeShipping;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function getFreeShipping()
+    public function getFreeShipping(): bool
     {
         return $this->freeShipping;
     }
@@ -65,7 +59,7 @@ class CouponConsumeEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setCode($code): static
+    public function setCode(string $code): static
     {
         $this->code = $code;
 
@@ -74,10 +68,8 @@ class CouponConsumeEvent extends ActionEvent
 
     /**
      * Get Coupon code.
-     *
-     * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }
@@ -89,7 +81,7 @@ class CouponConsumeEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setDiscount($discount): static
+    public function setDiscount(float $discount): static
     {
         $this->discount = $discount;
 
@@ -98,10 +90,8 @@ class CouponConsumeEvent extends ActionEvent
 
     /**
      * Get total discount given by this coupon.
-     *
-     * @return float
      */
-    public function getDiscount()
+    public function getDiscount(): float
     {
         return $this->discount;
     }
@@ -114,7 +104,7 @@ class CouponConsumeEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setIsValid($isValid): static
+    public function setIsValid(bool $isValid): static
     {
         $this->isValid = $isValid;
 
@@ -123,10 +113,8 @@ class CouponConsumeEvent extends ActionEvent
 
     /**
      * Get if Coupon is valid or if Customer meets coupon conditions.
-     *
-     * @return bool
      */
-    public function getIsValid()
+    public function getIsValid(): bool
     {
         return $this->isValid;
     }

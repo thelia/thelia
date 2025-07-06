@@ -28,7 +28,6 @@ class TemplateDescriptorValidator
     protected static $versions = [
         '1' => 'template-1_0.xsd',
     ];
-
     protected Finder $xsdFinder;
 
     /**
@@ -41,7 +40,7 @@ class TemplateDescriptorValidator
         $this->xsdFinder = new Finder();
         $this->xsdFinder
             ->name('*.xsd')
-            ->in(__DIR__.'/schema/template/');
+            ->in(__DIR__ . '/schema/template/');
     }
 
     /**
@@ -61,25 +60,19 @@ class TemplateDescriptorValidator
             foreach ($this->xsdFinder as $xsdFile) {
                 $xsdVersion = array_search($xsdFile->getBasename(), self::$versions, true);
 
-                if (false === $xsdVersion || (null !== $version && $version != $xsdVersion)) {
+                if (false === $xsdVersion || (null !== $version && $version !== $xsdVersion)) {
                     continue;
                 }
 
                 $errors = $this->schemaValidate($dom, $xsdFile);
 
-                if ($errors === []) {
+                if ([] === $errors) {
                     return $this;
                 }
             }
         }
 
-        throw new InvalidDescriptorException(
-            \sprintf(
-                '%s file is not a valid template descriptor : %s',
-                $this->xmlDescriptorPath,
-                implode(', ', $errors)
-            )
-        );
+        throw new InvalidDescriptorException(\sprintf('%s file is not a valid template descriptor : %s', $this->xmlDescriptorPath, implode(', ', $errors)));
     }
 
     /**
@@ -102,13 +95,13 @@ class TemplateDescriptorValidator
 
                 foreach ($errors as $error) {
                     $errorMessages[] = \sprintf(
-                        'XML error "%s" [%d] (Code %d) in %s on line %d column %d'."\n",
+                        'XML error "%s" [%d] (Code %d) in %s on line %d column %d' . "\n",
                         $error->message,
                         $error->level,
                         $error->code,
                         $error->file,
                         $error->line,
-                        $error->column
+                        $error->column,
                     );
                 }
 

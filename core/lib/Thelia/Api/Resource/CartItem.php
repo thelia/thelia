@@ -29,64 +29,59 @@ use Thelia\Model\Map\CartItemTableMap;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/cart_items'
+            uriTemplate: '/admin/cart_items',
         ),
         new GetCollection(
-            uriTemplate: '/admin/cart_items'
+            uriTemplate: '/admin/cart_items',
         ),
         new Get(
             uriTemplate: '/admin/cart_items/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/cart_items/{id}'
+            uriTemplate: '/admin/cart_items/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/cart_items/{id}'
+            uriTemplate: '/admin/cart_items/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/cart_items/{id}'
+            uriTemplate: '/admin/cart_items/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/front/cart_items'
+            uriTemplate: '/front/cart_items',
         ),
         new GetCollection(
-            uriTemplate: '/front/cart_items'
+            uriTemplate: '/front/cart_items',
         ),
         new Get(
             uriTemplate: '/front/cart_items/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/front/cart_items/{id}'
+            uriTemplate: '/front/cart_items/{id}',
         ),
         new Delete(
-            uriTemplate: '/front/cart_items/{id}'
+            uriTemplate: '/front/cart_items/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_FRONT_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_FRONT_WRITE]],
 )]
 class CartItem implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:cart_item:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:cart_item:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:cart_item:write';
-
     public const GROUP_FRONT_READ = 'front:cart_item:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:cart_item:read:single';
-
     public const GROUP_FRONT_WRITE = 'front:cart_item:write';
 
     #[Groups([self::GROUP_ADMIN_READ, Cart::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Cart::GROUP_FRONT_READ])]

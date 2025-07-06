@@ -43,7 +43,7 @@ class File extends BaseAction implements EventSubscriberInterface
         $clonedProduct = $event->getClonedProduct();
 
         foreach ($event->getTypes() as $type) {
-            if (!\in_array($type, ['images', 'documents'])) {
+            if (!\in_array($type, ['images', 'documents'], true)) {
                 throw new \Exception(Translator::getInstance()->trans('Cloning files of type %type is not allowed.', ['%type' => $type], 'core'));
             }
 
@@ -63,31 +63,32 @@ class File extends BaseAction implements EventSubscriberInterface
             // Set clone's files
             /** @var ProductDocument|ProductImage $originalProductFile */
             foreach ($originalProductFiles as $originalProductFile) {
-                $srcPath = $originalProductFile->getUploadDir().DS.$originalProductFile->getFile();
+                $srcPath = $originalProductFile->getUploadDir() . DS . $originalProductFile->getFile();
 
                 if (file_exists($srcPath)) {
-                    $ext = pathinfo($srcPath, \PATHINFO_EXTENSION);
+                    $ext = pathinfo($srcPath, PATHINFO_EXTENSION);
 
                     $clonedProductFile = [];
                     $fileName = '';
+
                     switch ($type) {
                         case 'images':
-                            $fileName = $clonedProduct->getRef().'.'.$ext;
+                            $fileName = $clonedProduct->getRef() . '.' . $ext;
                             $clonedProductFile = new ProductImage();
                             break;
                         case 'documents':
-                            $fileName = pathinfo($originalProductFile->getFile(), \PATHINFO_FILENAME).'-'.$clonedProduct->getRef().'.'.$ext;
+                            $fileName = pathinfo($originalProductFile->getFile(), PATHINFO_FILENAME) . '-' . $clonedProduct->getRef() . '.' . $ext;
                             $clonedProductFile = new ProductDocument();
                             break;
                     }
 
                     // Copy a temporary file of the source file as it will be deleted by IMAGE_SAVE or DOCUMENT_SAVE event
-                    $srcTmp = $srcPath.'.tmp';
+                    $srcTmp = $srcPath . '.tmp';
                     copy($srcPath, $srcTmp);
 
                     // Get file mimeType
                     $finfo = new \finfo();
-                    $fileMimeType = $finfo->file($srcPath, \FILEINFO_MIME_TYPE);
+                    $fileMimeType = $finfo->file($srcPath, FILEINFO_MIME_TYPE);
 
                     // Get file event's parameters
                     $clonedProductFile
@@ -131,7 +132,7 @@ class File extends BaseAction implements EventSubscriberInterface
                     // Clone file's I18n
                     $this->cloneFileI18n($originalProductFileI18ns, $clonedProductFile, $type, $event, $dispatcher);
                 } else {
-                    Tlog::getInstance()->addWarning('Failed to find media file '.$srcPath);
+                    Tlog::getInstance()->addWarning('Failed to find media file ' . $srcPath);
                 }
             }
         }

@@ -19,17 +19,13 @@ namespace Thelia\Core\Event\Order;
  */
 class OrderPayTotalEvent extends OrderEvent
 {
-    /** @var float|int */
-    protected $tax;
+    protected float|int $tax;
 
-    /** @var bool */
-    protected $includePostage;
+    protected bool $includePostage;
 
-    /** @var bool */
-    protected $includeDiscount;
+    protected bool $includeDiscount;
 
-    /** @var float|int */
-    protected $total;
+    protected float|int $total;
 
     public function isIncludePostage(): bool
     {

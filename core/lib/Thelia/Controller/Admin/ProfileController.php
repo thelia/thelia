@@ -47,7 +47,7 @@ class ProfileController extends AbstractCrudController
             AdminResources::PROFILE,
             TheliaEvents::PROFILE_CREATE,
             TheliaEvents::PROFILE_UPDATE,
-            TheliaEvents::PROFILE_DELETE
+            TheliaEvents::PROFILE_DELETE,
         );
     }
 
@@ -94,16 +94,13 @@ class ProfileController extends AbstractCrudController
         $event = new ProfileEvent();
 
         $event->setId(
-            $this->getRequest()->get('profile_id', 0)
+            $this->getRequest()->get('profile_id', 0),
         );
 
         return $event;
     }
 
-    /**
-     * @param ProfileEvent $event
-     */
-    protected function eventContainsObject($event): bool
+    protected function eventContainsObject(\Symfony\Contracts\EventDispatcher\Event $event): bool
     {
         return $event->hasProfile();
     }
@@ -125,10 +122,7 @@ class ProfileController extends AbstractCrudController
         return $this->createForm(AdminForm::PROFILE_MODIFICATION, FormType::class, $data);
     }
 
-    /**
-     * @param Profile $object
-     */
-    protected function hydrateResourceUpdateForm($object): BaseForm
+    protected function hydrateResourceUpdateForm(Profile $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -138,10 +132,7 @@ class ProfileController extends AbstractCrudController
         return $this->createForm(AdminForm::PROFILE_UPDATE_RESOURCE_ACCESS, FormType::class, $data);
     }
 
-    /**
-     * @param Profile $object
-     */
-    protected function hydrateModuleUpdateForm($object): BaseForm
+    protected function hydrateModuleUpdateForm(Profile $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -198,11 +189,11 @@ class ProfileController extends AbstractCrudController
         ];
     }
 
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         // We always return to the feature edition form
         return $this->render(
-            'profiles'
+            'profiles',
         );
     }
 
@@ -218,7 +209,7 @@ class ProfileController extends AbstractCrudController
         return $this->generateRedirectFromRoute(
             'admin.configuration.profiles.update',
             $this->getViewArguments(),
-            $this->getRouteArguments()
+            $this->getRouteArguments(),
         );
     }
 
@@ -232,7 +223,7 @@ class ProfileController extends AbstractCrudController
         return $this->generateRedirectFromRoute(
             'admin.configuration.profiles.update',
             $this->getViewArguments(),
-            $this->getRouteArguments($createEvent->getProfile()->getId())
+            $this->getRouteArguments($createEvent->getProfile()->getId()),
         );
     }
 
@@ -249,7 +240,7 @@ class ProfileController extends AbstractCrudController
 
         $object = $this->getExistingObject();
 
-        if ($object != null) {
+        if (null !== $object) {
             // Hydrate the form and pass it to the parser
             $resourceAccessForm = $this->hydrateResourceUpdateForm($object);
             $moduleAccessForm = $this->hydrateModuleUpdateForm($object);
@@ -288,6 +279,7 @@ class ProfileController extends AbstractCrudController
     protected function getResourceAccess($formData): array
     {
         $requirements = [];
+
         foreach ($formData as $data => $value) {
             if (!strstr((string) $data, ':')) {
                 continue;
@@ -297,7 +289,7 @@ class ProfileController extends AbstractCrudController
 
             $prefix = array_shift($explosion);
 
-            if ($prefix != ProfileUpdateResourceAccessForm::RESOURCE_ACCESS_FIELD_PREFIX) {
+            if (ProfileUpdateResourceAccessForm::RESOURCE_ACCESS_FIELD_PREFIX !== $prefix) {
                 continue;
             }
 
@@ -313,6 +305,7 @@ class ProfileController extends AbstractCrudController
     protected function getModuleAccess($formData): array
     {
         $requirements = [];
+
         foreach ($formData as $data => $value) {
             if (!strstr((string) $data, ':')) {
                 continue;
@@ -322,7 +315,7 @@ class ProfileController extends AbstractCrudController
 
             $prefix = array_shift($explosion);
 
-            if ($prefix != ProfileUpdateModuleAccessForm::MODULE_ACCESS_FIELD_PREFIX) {
+            if (ProfileUpdateModuleAccessForm::MODULE_ACCESS_FIELD_PREFIX !== $prefix) {
                 continue;
             }
 
@@ -354,9 +347,7 @@ class ProfileController extends AbstractCrudController
             $eventDispatcher->dispatch($changeEvent, TheliaEvents::PROFILE_RESOURCE_ACCESS_UPDATE);
 
             if (!$this->eventContainsObject($changeEvent)) {
-                throw new \LogicException(
-                    $this->getTranslator()->trans('No %obj was updated.', ['%obj', $this->objectName])
-                );
+                throw new \LogicException($this->getTranslator()->trans('No %obj was updated.', ['%obj', $this->objectName]));
             }
 
             // Log object modification
@@ -368,9 +359,9 @@ class ProfileController extends AbstractCrudController
                         '%s %s (ID %s) modified',
                         ucfirst($this->objectName),
                         $this->getObjectLabel($changedObject),
-                        $this->getObjectId($changedObject)
+                        $this->getObjectId($changedObject),
                     ),
-                    $this->getObjectId($changedObject)
+                    $this->getObjectId($changedObject),
                 );
             }
 
@@ -411,9 +402,7 @@ class ProfileController extends AbstractCrudController
             $eventDispatcher->dispatch($changeEvent, TheliaEvents::PROFILE_MODULE_ACCESS_UPDATE);
 
             if (!$this->eventContainsObject($changeEvent)) {
-                throw new \LogicException(
-                    $this->getTranslator()->trans('No %obj was updated.', ['%obj', $this->objectName])
-                );
+                throw new \LogicException($this->getTranslator()->trans('No %obj was updated.', ['%obj', $this->objectName]));
             }
 
             // Log object modification
@@ -425,9 +414,9 @@ class ProfileController extends AbstractCrudController
                         '%s %s (ID %s) modified',
                         ucfirst($this->objectName),
                         $this->getObjectLabel($changedObject),
-                        $this->getObjectId($changedObject)
+                        $this->getObjectId($changedObject),
                     ),
-                    $this->getObjectId($changedObject)
+                    $this->getObjectId($changedObject),
                 );
             }
 

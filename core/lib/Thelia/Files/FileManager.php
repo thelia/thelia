@@ -45,9 +45,7 @@ class FileManager
     public function getModelInstance(string $fileType, string $parentType): FileModelInterface
     {
         if (!isset($this->supportedFileModels[$this->getFileTypeIdentifier($fileType, $parentType)])) {
-            throw new FileException(
-                \sprintf("Unsupported file type '%s' for parent type '%s'", $fileType, $parentType)
-            );
+            throw new FileException(\sprintf("Unsupported file type '%s' for parent type '%s'", $fileType, $parentType));
         }
 
         $className = $this->supportedFileModels[$this->getFileTypeIdentifier($fileType, $parentType)];
@@ -55,14 +53,7 @@ class FileManager
         $instance = new $className();
 
         if (!$instance instanceof FileModelInterface) {
-            throw new FileException(
-                \sprintf(
-                    "Wrong class type for file type '%s', parent type '%s'. Class '%s' should implements FileModelInterface",
-                    $fileType,
-                    $parentType,
-                    $className
-                )
-            );
+            throw new FileException(\sprintf("Wrong class type for file type '%s', parent type '%s'. Class '%s' should implements FileModelInterface", $fileType, $parentType, $className));
         }
 
         return $instance;
@@ -87,22 +78,16 @@ class FileManager
         }
 
         $fileName = $this->renameFile($model->getId(), $uploadedFile);
-        $filePath = $directory.DS.$fileName;
+        $filePath = $directory . DS . $fileName;
 
         $fileSystem->rename($uploadedFile->getPathname(), $filePath);
-        $fileSystem->chmod($filePath, 0660);
+        $fileSystem->chmod($filePath, 0o660);
 
         $newUploadedFile = new UploadedFile($filePath, $fileName);
         $model->setFile($fileName);
 
         if (!$model->save()) {
-            throw new ImageException(
-                \sprintf(
-                    'Failed to update model after copy of uploaded file %s to %s',
-                    $uploadedFile,
-                    $model->getFile()
-                )
-            );
+            throw new ImageException(\sprintf('Failed to update model after copy of uploaded file %s to %s', $uploadedFile, $model->getFile()));
         }
 
         return $newUploadedFile;
@@ -115,18 +100,13 @@ class FileManager
     {
         $nbModifiedLines = 0;
 
-        if ($fileModel->getFile() !== null) {
+        if (null !== $fileModel->getFile()) {
             $fileModel->setParentId($parentId);
 
             $nbModifiedLines = $fileModel->save();
 
             if (!$nbModifiedLines) {
-                throw new ImageException(
-                    \sprintf(
-                        'Failed to update %s file model',
-                        $fileModel->getFile()
-                    )
-                );
+                throw new ImageException(\sprintf('Failed to update %s file model', $fileModel->getFile()));
             }
         }
 
@@ -150,7 +130,7 @@ class FileManager
 
     public function deleteFile(FileModelInterface $model): void
     {
-        $url = $model->getUploadDir().DS.$model->getFile();
+        $url = $model->getUploadDir() . DS . $model->getFile();
 
         @unlink(str_replace('..', '', $url));
 
@@ -160,16 +140,17 @@ class FileManager
     public function renameFile(int $modelId, UploadedFile $uploadedFile): string
     {
         $extension = $uploadedFile->getClientOriginalExtension();
-        if ($extension !== '' && $extension !== '0') {
-            $extension = '.'.strtolower($extension);
+
+        if ('' !== $extension && '0' !== $extension) {
+            $extension = '.' . strtolower($extension);
         }
 
         return $this->sanitizeFileName(
             str_replace(
                 $extension,
                 '',
-                $uploadedFile->getClientOriginalName()
-            ).'-'.$modelId.$extension
+                $uploadedFile->getClientOriginalName(),
+            ) . '-' . $modelId . $extension,
         );
     }
 
@@ -179,7 +160,7 @@ class FileManager
 
         $allowedType = ['image/jpeg', 'image/png', 'image/gif'];
 
-        if (\in_array($mimeType, $allowedType)) {
+        if (\in_array($mimeType, $allowedType, true)) {
             $isValid = true;
         }
 

@@ -247,20 +247,16 @@ class Coupon extends BaseCoupon
 
     /**
      * Return the countries for which free shipping is valid.
-     *
-     * @return array|mixed|ObjectCollection
      */
-    public function getFreeShippingForCountries()
+    public function getFreeShippingForCountries(): mixed
     {
         return CouponCountryQuery::create()->filterByCouponId($this->getId())->find();
     }
 
     /**
      * Return the modules for which free shipping is valid.
-     *
-     * @return array|mixed|ObjectCollection
      */
-    public function getFreeShippingForModules()
+    public function getFreeShippingForModules(): mixed
     {
         return CouponModuleQuery::create()->filterByCouponId($this->getId())->find();
     }

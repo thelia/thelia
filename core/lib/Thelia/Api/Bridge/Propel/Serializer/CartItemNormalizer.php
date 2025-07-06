@@ -38,8 +38,17 @@ class CartItemNormalizer extends AbstractItemNormalizer
         private readonly TaxEngine $taxEngine,
         private readonly Session $session,
         private readonly RequestStack $requestStack,
-        PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, LegacyIriConverterInterface|IriConverterInterface $iriConverter, LegacyResourceClassResolverInterface|ResourceClassResolverInterface $resourceClassResolver, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ?ResourceAccessCheckerInterface $resourceAccessChecker = null)
-    {
+        PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        LegacyIriConverterInterface|IriConverterInterface $iriConverter,
+        LegacyResourceClassResolverInterface|ResourceClassResolverInterface $resourceClassResolver,
+        ?PropertyAccessorInterface $propertyAccessor = null,
+        ?NameConverterInterface $nameConverter = null,
+        ?ClassMetadataFactoryInterface $classMetadataFactory = null,
+        array $defaultContext = [],
+        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        ?ResourceAccessCheckerInterface $resourceAccessChecker = null,
+    ) {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker);
     }
 

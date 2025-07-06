@@ -47,9 +47,7 @@ class TranslationsController extends BaseAdminController
             return $module;
         }
 
-        throw new \InvalidArgumentException(
-            $translator->trans("No module found for code '%item'", ['%item' => $moduleCode])
-        );
+        throw new \InvalidArgumentException($translator->trans("No module found for code '%item'", ['%item' => $moduleCode]));
     }
 
     protected function getModuleTemplateNames(TemplateHelperInterface $templateHelper, Module $module, int $templateType): array
@@ -57,7 +55,7 @@ class TranslationsController extends BaseAdminController
         $templates =
             $templateHelper->getList(
                 $templateType,
-                $module->getAbsoluteTemplateBasePath()
+                $module->getAbsoluteTemplateBasePath(),
             );
 
         $names = [];
@@ -82,7 +80,7 @@ class TranslationsController extends BaseAdminController
 
         $modulePart = false;
 
-        if ($itemToTranslate == 'mo' && !empty($itemName)) {
+        if ('mo' === $itemToTranslate && !empty($itemName)) {
             $modulePart = $request->get('module_part', '');
         }
 
@@ -103,18 +101,19 @@ class TranslationsController extends BaseAdminController
         // Find the i18n directory, and the directory to examine.
 
         $domain = '';
-        if (!empty($itemName) || $itemToTranslate === 'co' || $itemToTranslate === 'in' || $itemToTranslate === 'wi') {
+
+        if (!empty($itemName) || 'co' === $itemToTranslate || 'in' === $itemToTranslate || 'wi' === $itemToTranslate) {
             switch ($itemToTranslate) {
                 // Module core
                 case 'mo':
                     $module = $this->getModule($translator, $itemName);
 
-                    if ($modulePart === 'core') {
+                    if ('core' === $modulePart) {
                         $directory = $module->getAbsoluteBaseDir();
                         $domain = $module->getTranslationDomain();
                         $i18nDirectory = $module->getAbsoluteI18nPath();
                         $walkMode = TranslationEvent::WALK_MODE_PHP;
-                    } elseif ($modulePart === 'admin-includes') {
+                    } elseif ('admin-includes' === $modulePart) {
                         $directory = $module->getAbsoluteAdminIncludesPath();
                         $domain = $module->getAdminIncludesTranslationDomain();
                         $i18nDirectory = $module->getAbsoluteAdminIncludesI18nPath();
@@ -154,7 +153,7 @@ class TranslationsController extends BaseAdminController
 
                     // Modules translations files are in the cache, and are not always
                     // updated. Force a reload of the files to get last changes.
-                    if ($domain !== '' && $domain !== '0') {
+                    if ('' !== $domain && '0' !== $domain) {
                         $this->loadTranslation($i18nDirectory, $domain);
                     }
 
@@ -177,8 +176,7 @@ class TranslationsController extends BaseAdminController
                             ->files()
                             ->depth(0)
                             ->in($module->getAbsoluteAdminIncludesPath())
-                            ->name('/\.html$/i')
-                        ;
+                            ->name('/\.html$/i');
 
                         $hasAdminIncludes = $finder->count() > 0;
                     } catch (\InvalidArgumentException) {
@@ -192,14 +190,14 @@ class TranslationsController extends BaseAdminController
                 case 'co':
                     $directory = THELIA_LIB;
                     $domain = 'core';
-                    $i18nDirectory = THELIA_LIB.'Config'.DS.'I18n';
+                    $i18nDirectory = THELIA_LIB . 'Config' . DS . 'I18n';
                     $walkMode = TranslationEvent::WALK_MODE_PHP;
                     break;
                     // Thelia Install
                 case 'in':
                     $directory = THELIA_SETUP_DIRECTORY;
                     $domain = 'install';
-                    $i18nDirectory = THELIA_SETUP_DIRECTORY.'I18n';
+                    $i18nDirectory = THELIA_SETUP_DIRECTORY . 'I18n';
                     $walkMode = TranslationEvent::WALK_MODE_TEMPLATE;
                     // resources not loaded by default
                     $this->loadTranslation($i18nDirectory, $domain);
@@ -208,7 +206,7 @@ class TranslationsController extends BaseAdminController
                 case 'wi':
                     $directory = THELIA_SETUP_WIZARD_DIRECTORY;
                     $domain = 'wizard';
-                    $i18nDirectory = THELIA_SETUP_WIZARD_DIRECTORY.'I18n';
+                    $i18nDirectory = THELIA_SETUP_WIZARD_DIRECTORY . 'I18n';
                     $walkMode = TranslationEvent::WALK_MODE_PHP;
                     // resources not loaded by default
                     $this->loadTranslation($i18nDirectory, $domain);
@@ -246,20 +244,20 @@ class TranslationsController extends BaseAdminController
             }
 
             // Load strings to translate
-            if ($directory && ($domain !== '' && $domain !== '0')) {
+            if ($directory && ('' !== $domain && '0' !== $domain)) {
                 // Save the string set, if the form was submitted
                 if ($i18nDirectory) {
                     $save_mode = $request->get('save_mode', false);
 
-                    if ($save_mode !== false) {
+                    if (false !== $save_mode) {
                         $texts = $request->get('text', []);
 
                         if (!empty($texts)) {
                             $event = TranslationEvent::createWriteFileEvent(
-                                \sprintf('%s'.DS.'%s.php', $i18nDirectory, $this->getCurrentEditionLocale()),
+                                \sprintf('%s' . DS . '%s.php', $i18nDirectory, $this->getCurrentEditionLocale()),
                                 $texts,
                                 $request->get('translation', []),
-                                true
+                                true,
                             );
 
                             $event
@@ -270,10 +268,10 @@ class TranslationsController extends BaseAdminController
 
                             $eventDispatcher->dispatch($event, TheliaEvents::TRANSLATION_WRITE_FILE);
 
-                            if ($save_mode == 'stay') {
+                            if ('stay' === $save_mode) {
                                 return $this->generateRedirectFromRoute(
                                     'admin.configuration.translations',
-                                    $templateArguments
+                                    $templateArguments,
                                 );
                             }
 
@@ -287,7 +285,7 @@ class TranslationsController extends BaseAdminController
                     $directory,
                     $walkMode,
                     $this->getCurrentEditionLocale(),
-                    $domain
+                    $domain,
                 );
 
                 $eventDispatcher->dispatch($event, TheliaEvents::TRANSLATION_GET_STRINGS);
@@ -303,7 +301,7 @@ class TranslationsController extends BaseAdminController
                     $templateArguments['all_strings'] = $event->getTranslatableStrings();
                 }
 
-                $templateArguments['is_writable'] = $this->checkWritableI18nDirectory(THELIA_LOCAL_DIR.'I18n');
+                $templateArguments['is_writable'] = $this->checkWritableI18nDirectory(THELIA_LOCAL_DIR . 'I18n');
             }
         }
 
@@ -317,7 +315,7 @@ class TranslationsController extends BaseAdminController
      *
      * @return bool return true if the directory is writable otr if the parent dir is writable
      */
-    public function checkWritableI18nDirectory($dir): bool
+    public function checkWritableI18nDirectory(string $dir): bool
     {
         if (file_exists($dir)) {
             return is_writable($dir);

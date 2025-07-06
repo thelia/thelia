@@ -40,11 +40,11 @@ class OrderProductTax extends BaseLoop implements PropelSearchLoopInterface
     protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
-            Argument::createIntTypeArgument('order_product', null, true)
+            Argument::createIntTypeArgument('order_product', null, true),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $search = OrderProductTaxQuery::create();
 
@@ -64,8 +64,7 @@ class OrderProductTax extends BaseLoop implements PropelSearchLoopInterface
                 ->set('TITLE', $orderProductTax->getTitle())
                 ->set('DESCRIPTION', $orderProductTax->getDescription())
                 ->set('AMOUNT', $orderProductTax->getAmount())
-                ->set('PROMO_AMOUNT', $orderProductTax->getPromoAmount())
-            ;
+                ->set('PROMO_AMOUNT', $orderProductTax->getPromoAmount());
             $this->addOutputFields($loopResultRow, $orderProductTax);
 
             $loopResult->addRow($loopResultRow);

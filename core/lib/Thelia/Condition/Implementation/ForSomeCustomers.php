@@ -64,10 +64,7 @@ class ForSomeCustomers extends ConditionAbstract
 
         // Check that at least one product is selected
         if (empty($values[self::CUSTOMERS_LIST])) {
-            throw new InvalidConditionValueException(
-                self::class,
-                self::CUSTOMERS_LIST
-            );
+            throw new InvalidConditionValueException(self::class, self::CUSTOMERS_LIST);
         }
 
         $this->operators = [self::CUSTOMERS_LIST => $operators[self::CUSTOMERS_LIST]];
@@ -76,7 +73,7 @@ class ForSomeCustomers extends ConditionAbstract
         return $this;
     }
 
-    public function isMatching()
+    public function isMatching(): bool
     {
         if (null === $customer = $this->facade->getCustomer()) {
             throw new UnmatchableConditionException(UnmatchableConditionException::getMissingCustomerMessage());
@@ -85,7 +82,7 @@ class ForSomeCustomers extends ConditionAbstract
         return $this->conditionValidator->variableOpComparison(
             $customer->getId(),
             $this->operators[self::CUSTOMERS_LIST],
-            $this->values[self::CUSTOMERS_LIST]
+            $this->values[self::CUSTOMERS_LIST],
         );
     }
 
@@ -93,7 +90,7 @@ class ForSomeCustomers extends ConditionAbstract
     {
         return $this->translator->trans(
             'For one ore more customers',
-            []
+            [],
         );
     }
 
@@ -101,7 +98,7 @@ class ForSomeCustomers extends ConditionAbstract
     {
         return $this->translator->trans(
             'The coupon applies to some customers only',
-            []
+            [],
         );
     }
 
@@ -109,7 +106,7 @@ class ForSomeCustomers extends ConditionAbstract
     {
         $i18nOperator = Operators::getI18n(
             $this->translator,
-            $this->operators[self::CUSTOMERS_LIST]
+            $this->operators[self::CUSTOMERS_LIST],
         );
 
         $custStrList = '';
@@ -119,7 +116,7 @@ class ForSomeCustomers extends ConditionAbstract
         if (null !== $custList = CustomerQuery::create()->findPks($custIds)) {
             /** @var Customer $cust */
             foreach ($custList as $cust) {
-                $custStrList .= $cust->getLastname().' '.$cust->getFirstname().' ('.$cust->getRef().'), ';
+                $custStrList .= $cust->getLastname() . ' ' . $cust->getFirstname() . ' (' . $cust->getRef() . '), ';
             }
 
             $custStrList = rtrim($custStrList, ', ');
@@ -130,7 +127,7 @@ class ForSomeCustomers extends ConditionAbstract
             [
                 '%customer_list%' => $custStrList,
                 '%op%' => $i18nOperator,
-            ]
+            ],
         );
     }
 
@@ -145,7 +142,7 @@ class ForSomeCustomers extends ConditionAbstract
         ];
     }
 
-    public function drawBackOfficeInputs()
+    public function drawBackOfficeInputs(): string
     {
         return $this->facade->getParser()->render(
             'coupon/condition-fragments/customers-condition.html',
@@ -153,7 +150,7 @@ class ForSomeCustomers extends ConditionAbstract
                 'operatorSelectHtml' => $this->drawBackOfficeInputOperators(self::CUSTOMERS_LIST),
                 'customers_field_name' => self::CUSTOMERS_LIST,
                 'values' => $this->values[self::CUSTOMERS_LIST] ?? [],
-            ]
+            ],
         );
     }
 }

@@ -29,7 +29,7 @@ class ModelType extends BaseType
      */
     public function __construct(string $expectedModelActiveRecord)
     {
-        $class = '\\Thelia\\Model\\'.$expectedModelActiveRecord;
+        $class = '\\Thelia\\Model\\' . $expectedModelActiveRecord;
 
         if (!(class_exists($class) && new $class() instanceof ActiveRecordInterface)) {
             throw new TypeException('MODEL NOT FOUND', TypeException::MODEL_NOT_FOUND);

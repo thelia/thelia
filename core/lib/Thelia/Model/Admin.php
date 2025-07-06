@@ -57,17 +57,17 @@ class Admin extends BaseAdmin implements UserInterface, SecurityUserInterface, P
         return $this;
     }
 
-    public function getPassword(): ?string
+    public function getPassword(): string
     {
-        return $this->password;
+        return $this->password ?? '';
     }
 
-    public function checkPassword($password)
+    public function checkPassword($password): bool
     {
-        return password_verify((string) $password, $this->password);
+        return password_verify((string) $password, $this->getPassword());
     }
 
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->getLogin();
     }
@@ -83,7 +83,7 @@ class Admin extends BaseAdmin implements UserInterface, SecurityUserInterface, P
         return ['ADMIN', 'ROLE_ADMIN'];
     }
 
-    public function getToken()
+    public function getToken(): string
     {
         return $this->getRememberMeToken();
     }
@@ -93,7 +93,7 @@ class Admin extends BaseAdmin implements UserInterface, SecurityUserInterface, P
         $this->setRememberMeToken($token)->save();
     }
 
-    public function getSerial()
+    public function getSerial(): string
     {
         return $this->getRememberMeSerial();
     }
@@ -106,5 +106,15 @@ class Admin extends BaseAdmin implements UserInterface, SecurityUserInterface, P
     public function getUserIdentifier(): string
     {
         return $this->getUsername();
+    }
+
+    public function getId(): int
+    {
+        return parent::getId();
+    }
+
+    public function getLocale(): string
+    {
+        return $this->getLangModel()->getLocale();
     }
 }

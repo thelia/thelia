@@ -36,9 +36,8 @@ class AreaModificationForm extends AreaCreateForm
                     'constraints' => [
                         new GreaterThan(['value' => 0]),
                     ],
-                ]
-            )
-        ;
+                ],
+            );
     }
 
     public static function getName(): string

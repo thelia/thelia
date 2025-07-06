@@ -30,10 +30,7 @@ class ModuleQuery extends BaseModuleQuery
 {
     protected static $activated;
 
-    /**
-     * @return array|mixed|\PropelObjectCollection
-     */
-    public static function getActivated()
+    public static function getActivated(): mixed
     {
         if (null === self::$activated) {
             self::$activated = self::create()

@@ -17,15 +17,13 @@ namespace Thelia\Core\Event\FeatureProduct;
 class FeatureProductUpdateEvent extends FeatureProductEvent
 {
     protected $is_text_value;
-
     protected $locale;
 
     /**
-     * @param int  $product_id
-     * @param int  $feature_id
-     * @param bool $is_text_value
+     * @param int $product_id
+     * @param int $feature_id
      */
-    public function __construct(protected $product_id, protected $feature_id, protected $feature_value, $is_text_value = false)
+    public function __construct(protected $product_id, protected $feature_id, protected $feature_value, bool $is_text_value = false)
     {
         $this->setIsTextValue($is_text_value);
     }
@@ -33,7 +31,7 @@ class FeatureProductUpdateEvent extends FeatureProductEvent
     /**
      * @return int the product id
      */
-    public function getProductId()
+    public function getProductId(): int
     {
         return $this->product_id;
     }
@@ -48,10 +46,7 @@ class FeatureProductUpdateEvent extends FeatureProductEvent
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getFeatureId()
+    public function getFeatureId(): int
     {
         return $this->feature_id;
     }

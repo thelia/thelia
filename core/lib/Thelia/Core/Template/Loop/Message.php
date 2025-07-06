@@ -53,11 +53,11 @@ class Message extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createIntListTypeArgument('exclude'),
             Argument::createAnyTypeArgument('variable'),
             Argument::createBooleanOrBothTypeArgument('hidden'),
-            Argument::createBooleanOrBothTypeArgument('secured')
+            Argument::createBooleanOrBothTypeArgument('secured'),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $id = $this->getId();
         $name = $this->getVariable();
@@ -73,7 +73,7 @@ class Message extends BaseI18nLoop implements PropelSearchLoopInterface
                 'SUBJECT',
                 'TEXT_MESSAGE',
                 'HTML_MESSAGE',
-            ]
+            ],
         );
 
         if (null !== $id) {
@@ -88,7 +88,7 @@ class Message extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        if (null !== $secured && $secured != BooleanOrBothType::ANY) {
+        if (null !== $secured && BooleanOrBothType::ANY !== $secured) {
             $search->filterBySecured($secured ? 1 : 0);
         }
 
@@ -112,8 +112,7 @@ class Message extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('SUBJECT', $result->getVirtualColumn('i18n_SUBJECT'))
                 ->set('TEXT_MESSAGE', $result->getVirtualColumn('i18n_TEXT_MESSAGE'))
                 ->set('HTML_MESSAGE', $result->getVirtualColumn('i18n_HTML_MESSAGE'))
-                ->set('SECURED', $result->getSecured())
-            ;
+                ->set('SECURED', $result->getSecured());
             $this->addOutputFields($loopResultRow, $result);
 
             $loopResult->addRow($loopResultRow);

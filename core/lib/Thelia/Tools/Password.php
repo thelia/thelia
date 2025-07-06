@@ -24,6 +24,7 @@ class Password
     private static function randgen(string $letter, $length): string
     {
         $string = '';
+
         do {
             $string .= substr(str_shuffle($letter), 0, 1);
         } while (\strlen($string) < $length);
@@ -33,10 +34,8 @@ class Password
 
     /**
      * generate a Random password with defined length.
-     *
-     * @param int $length
      */
-    public static function generateRandom($length = 8): string
+    public static function generateRandom(int $length = 8): string
     {
         $letter = 'abcdefghijklmnopqrstuvwxyz';
         $letter .= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';

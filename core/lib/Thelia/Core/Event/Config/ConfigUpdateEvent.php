@@ -16,19 +16,13 @@ namespace Thelia\Core\Event\Config;
 
 class ConfigUpdateEvent extends ConfigCreateEvent
 {
-    /** @var int */
-    protected $config_id;
+    protected int $config_id;
 
     protected $description;
-
     protected $chapo;
-
     protected $postscriptum;
 
-    /**
-     * @param int $config_id
-     */
-    public function __construct($config_id)
+    public function __construct(int $config_id)
     {
         $this->setConfigId($config_id);
     }

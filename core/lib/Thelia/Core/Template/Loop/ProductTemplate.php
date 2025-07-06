@@ -42,11 +42,11 @@ class ProductTemplate extends BaseI18nLoop implements PropelSearchLoopInterface
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
-            Argument::createIntListTypeArgument('exclude')
+            Argument::createIntListTypeArgument('exclude'),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $search = TemplateQuery::create();
 
@@ -78,8 +78,7 @@ class ProductTemplate extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('ID', $template->getId())
                 ->set('IS_TRANSLATED', $template->getVirtualColumn('IS_TRANSLATED'))
                 ->set('LOCALE', $this->locale)
-                ->set('NAME', $template->getVirtualColumn('i18n_NAME'))
-            ;
+                ->set('NAME', $template->getVirtualColumn('i18n_NAME'));
             $this->addOutputFields($loopResultRow, $template);
 
             $loopResult->addRow($loopResultRow);

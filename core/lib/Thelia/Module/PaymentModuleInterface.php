@@ -29,26 +29,20 @@ interface PaymentModuleInterface extends BaseModuleInterface
      *  completed, ready to be sent
      *
      * @param Order $order processed order
-     *
-     * @return Response|null
      */
-    public function pay(Order $order);
+    public function pay(Order $order): ?Response;
 
     /**
      * This method is call on Payment loop.
      *
      * If you return true, the payment method will de display
      * If you return false, the payment method will not be display
-     *
-     * @return bool
      */
-    public function isValidPayment();
+    public function isValidPayment(): bool;
 
     /**
      * if you want, you can manage stock in your module instead of order process.
      * Return false to decrease the stock when order status switch to pay.
-     *
-     * @return bool
      */
-    public function manageStockOnCreation();
+    public function manageStockOnCreation(): bool;
 }

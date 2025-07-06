@@ -29,7 +29,7 @@ use Thelia\Model\ProductSaleElementsQuery;
  */
 class ProductPricesImport extends AbstractImport
 {
-    protected $mandatoryColumns = [
+    protected array $mandatoryColumns = [
         'id',
         'price',
     ];
@@ -38,36 +38,35 @@ class ProductPricesImport extends AbstractImport
     {
         $pse = ProductSaleElementsQuery::create()->findPk($data['id']);
 
-        if ($pse === null) {
+        if (null === $pse) {
             return Translator::getInstance()->trans(
                 "The product sale element id %id doesn't exist",
                 [
                     '%id' => $data['id'],
-                ]
+                ],
             );
         }
 
         $currency = null;
+
         if (isset($data['currency'])) {
             $currency = CurrencyQuery::create()->findOneByCode($data['currency']);
         }
 
-        if ($currency === null) {
+        if (null === $currency) {
             $currency = Currency::getDefaultCurrency();
         }
 
         $price = ProductPriceQuery::create()
-                ->filterByProductSaleElementsId($pse->getId())
-                ->findOneByCurrencyId($currency->getId())
-        ;
+            ->filterByProductSaleElementsId($pse->getId())
+            ->findOneByCurrencyId($currency->getId());
 
-        if ($price === null) {
+        if (null === $price) {
             $price = new ProductPrice();
 
             $price
-                    ->setProductSaleElements($pse)
-                    ->setCurrency($currency)
-            ;
+                ->setProductSaleElements($pse)
+                ->setCurrency($currency);
         }
 
         $price->setPrice($data['price']);
@@ -78,10 +77,9 @@ class ProductPricesImport extends AbstractImport
 
         if (isset($data['promo'])) {
             $price
-                    ->getProductSaleElements()
-                    ->setPromo((int) $data['promo'])
-                    ->save()
-            ;
+                ->getProductSaleElements()
+                ->setPromo((int) $data['promo'])
+                ->save();
         }
 
         $price->save();

@@ -17,13 +17,9 @@ namespace Thelia\Core\Event\Category;
 class CategoryUpdateEvent extends CategoryCreateEvent
 {
     protected $chapo;
-
     protected $description;
-
     protected $postscriptum;
-
     protected $parent;
-
     protected $defaultTemplateId;
 
     /**
@@ -93,20 +89,15 @@ class CategoryUpdateEvent extends CategoryCreateEvent
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getDefaultTemplateId()
+    public function getDefaultTemplateId(): int
     {
         return $this->defaultTemplateId;
     }
 
     /**
-     * @param int $defaultTemplateId
-     *
      * @return $this
      */
-    public function setDefaultTemplateId($defaultTemplateId): static
+    public function setDefaultTemplateId(int $defaultTemplateId): static
     {
         $this->defaultTemplateId = $defaultTemplateId;
 

@@ -39,11 +39,13 @@ readonly class CartController
         $request->setSession($session);
 
         $cart = $session->getSessionCart($eventDispatcher);
+
         if (null === $cart) {
             throw new NotFoundHttpException('Cart not found.');
         }
 
         $cart = CartQuery::create()->findOneById($cart->getId());
+
         if (null === $cart) {
             throw new NotFoundHttpException('Cart not found.');
         }

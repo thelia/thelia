@@ -36,11 +36,9 @@ class HookRenderBlockEvent extends BaseHookRenderEvent
     /**
      * Add a new fragment as an array.
      *
-     * @param array $data
-     *
      * @return $this
      */
-    public function add($data): static
+    public function add(array $data): static
     {
         $fragment = new Fragment($data);
 
@@ -56,7 +54,7 @@ class HookRenderBlockEvent extends BaseHookRenderEvent
      */
     public function addFragment(Fragment $fragment): static
     {
-        if ($this->fields !== []) {
+        if ([] !== $this->fields) {
             $fragment->filter($this->fields);
         }
 

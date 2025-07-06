@@ -52,30 +52,20 @@ abstract class BaseHook implements BaseHookInterface
     public const INJECT_TEMPLATE_METHOD_NAME = 'insertTemplate';
 
     public ?BaseModule $module = null;
-
     protected array $templates = [];
-
     public TranslatorInterface $translator;
-
     protected ?Request $request = null;
-
     protected ?Session $session = null;
-
     protected ?Customer $customer = null;
-
     protected ?Cart $cart = null;
-
     protected ?Order $order = null;
-
     protected ?Lang $lang = null;
-
     protected ?Currency $currency = null;
 
     #[Required]
     public ContainerInterface $container;
 
     public ?EventDispatcherInterface $dispatcher = null;
-
     public ?ParserResolver $parserResolver = null;
 
     public function __construct(
@@ -151,7 +141,7 @@ abstract class BaseHook implements BaseHookInterface
 
         if (null !== $templateDir) {
             // retrieve the template
-            $content = $this->getParser()->render($templateDir.DS.$templateName, $parameters);
+            $content = $this->getParser()->render($templateDir . DS . $templateName, $parameters);
         } else {
             $content = \sprintf('ERR: Unknown template %s for module %s', $templateName, $this->module->getCode());
         }
@@ -164,7 +154,8 @@ abstract class BaseHook implements BaseHookInterface
         $fileDir = $this->getAssetsResolver()->resolveAssetSourcePath($this->module->getCode(), false, $fileName, $this->getParser());
 
         if (null !== $fileDir) {
-            $content = file_get_contents($fileDir.DS.$fileName);
+            $content = file_get_contents($fileDir . DS . $fileName);
+
             if (false === $content) {
                 $content = '';
             }
@@ -183,10 +174,11 @@ abstract class BaseHook implements BaseHookInterface
         if ('' !== $url) {
             $tags = [];
             $tags[] = '<link rel="stylesheet" type="text/css" ';
-            $tags[] = ' href="'.$url.'" ';
+            $tags[] = ' href="' . $url . '" ';
+
             foreach ($attributes as $name => $val) {
-                if (\is_string($name) && !\in_array($name, ['href', 'rel', 'type'])) {
-                    $tags[] = $name.'="'.$val.'" ';
+                if (\is_string($name) && !\in_array($name, ['href', 'rel', 'type'], true)) {
+                    $tags[] = $name . '="' . $val . '" ';
                 }
             }
 
@@ -205,10 +197,11 @@ abstract class BaseHook implements BaseHookInterface
         if ('' !== $url) {
             $tags = [];
             $tags[] = '<script';
-            $tags[] = ' src="'.$url.'" ';
+            $tags[] = ' src="' . $url . '" ';
+
             foreach ($attributes as $name => $val) {
-                if (\is_string($name) && !\in_array($name, ['src', 'type'])) {
-                    $tags[] = $name.'="'.$val.'" ';
+                if (\is_string($name) && !\in_array($name, ['src', 'type'], true)) {
+                    $tags[] = $name . '="' . $val . '" ';
                 }
             }
 
@@ -260,6 +253,7 @@ abstract class BaseHook implements BaseHookInterface
     protected function getView(): string
     {
         $ret = '';
+
         if (null !== $this->getRequest()) {
             $ret = $this->getRequest()->attributes->get('_view', '');
         }

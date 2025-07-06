@@ -50,12 +50,12 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
                 [
                     'alpha', 'alpha_reverse', 'manual', 'manual_reverse',
                 ],
-                'alpha'
-            )
+                'alpha',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
     {
         $search = AttributeCombinationQuery::create();
 
@@ -64,7 +64,7 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
             $search,
             ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'],
             AttributeTableMap::TABLE_NAME,
-            'ATTRIBUTE_ID'
+            'ATTRIBUTE_ID',
         );
 
         /* manage attributeAv translations */
@@ -72,7 +72,7 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
             $search,
             ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'],
             AttributeAvTableMap::TABLE_NAME,
-            'ATTRIBUTE_AV_ID'
+            'ATTRIBUTE_AV_ID',
         );
 
         $productSaleElements = $this->getProductSaleElements();
@@ -84,10 +84,10 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
         foreach ($orders as $order) {
             switch ($order) {
                 case 'alpha':
-                    $search->addAscendingOrderByColumn(AttributeTableMap::TABLE_NAME.'_i18n_TITLE');
+                    $search->addAscendingOrderByColumn(AttributeTableMap::TABLE_NAME . '_i18n_TITLE');
                     break;
                 case 'alpha_reverse':
-                    $search->addDescendingOrderByColumn(AttributeTableMap::TABLE_NAME.'_i18n_TITLE');
+                    $search->addDescendingOrderByColumn(AttributeTableMap::TABLE_NAME . '_i18n_TITLE');
                     break;
                 case 'manual':
                     $this->orderByTemplateAttributePosition($search, Criteria::ASC);
@@ -111,16 +111,16 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
                 ->set('LOCALE', $this->locale)
 
                 ->set('ATTRIBUTE_ID', $attributeCombination->getAttributeId())
-                ->set('ATTRIBUTE_TITLE', $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME.'_i18n_TITLE'))
-                ->set('ATTRIBUTE_CHAPO', $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME.'_i18n_CHAPO'))
-                ->set('ATTRIBUTE_DESCRIPTION', $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME.'_i18n_DESCRIPTION'))
-                ->set('ATTRIBUTE_POSTSCRIPTUM', $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME.'_i18n_POSTSCRIPTUM'))
+                ->set('ATTRIBUTE_TITLE', $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_TITLE'))
+                ->set('ATTRIBUTE_CHAPO', $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_CHAPO'))
+                ->set('ATTRIBUTE_DESCRIPTION', $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
+                ->set('ATTRIBUTE_POSTSCRIPTUM', $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'))
 
                 ->set('ATTRIBUTE_AVAILABILITY_ID', $attributeCombination->getAttributeAvId())
-                ->set('ATTRIBUTE_AVAILABILITY_TITLE', $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME.'_i18n_TITLE'))
-                ->set('ATTRIBUTE_AVAILABILITY_CHAPO', $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME.'_i18n_CHAPO'))
-                ->set('ATTRIBUTE_AVAILABILITY_DESCRIPTION', $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME.'_i18n_DESCRIPTION'))
-                ->set('ATTRIBUTE_AVAILABILITY_POSTSCRIPTUM', $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME.'_i18n_POSTSCRIPTUM'));
+                ->set('ATTRIBUTE_AVAILABILITY_TITLE', $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_TITLE'))
+                ->set('ATTRIBUTE_AVAILABILITY_CHAPO', $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_CHAPO'))
+                ->set('ATTRIBUTE_AVAILABILITY_DESCRIPTION', $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
+                ->set('ATTRIBUTE_AVAILABILITY_POSTSCRIPTUM', $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'));
             $this->addOutputFields($loopResultRow, $attributeCombination);
             $loopResult->addRow($loopResultRow);
         }
@@ -131,18 +131,18 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
     /**
      * @param string $order Criteria::ASC|Criteria::DESC
      */
-    protected function orderByTemplateAttributePosition(AttributeCombinationQuery $search, $order): AttributeCombinationQuery
+    protected function orderByTemplateAttributePosition(AttributeCombinationQuery $search, string $order): AttributeCombinationQuery
     {
         $search
             ->useProductSaleElementsQuery()
-                ->joinProduct()
+            ->joinProduct()
             ->endUse()
             ->useAttributeQuery()
-                ->leftJoinAttributeTemplate(AttributeTemplateTableMap::TABLE_NAME)
-                ->addJoinCondition(
-                    AttributeTemplateTableMap::TABLE_NAME,
-                    AttributeTemplateTableMap::COL_TEMPLATE_ID.Criteria::EQUAL.ProductTableMap::COL_TEMPLATE_ID
-                )
+            ->leftJoinAttributeTemplate(AttributeTemplateTableMap::TABLE_NAME)
+            ->addJoinCondition(
+                AttributeTemplateTableMap::TABLE_NAME,
+                AttributeTemplateTableMap::COL_TEMPLATE_ID . Criteria::EQUAL . ProductTableMap::COL_TEMPLATE_ID,
+            )
             ->endUse()
             ->orderBy(AttributeTemplateTableMap::COL_POSITION, $order);
 

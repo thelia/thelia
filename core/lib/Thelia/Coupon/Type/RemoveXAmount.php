@@ -43,11 +43,11 @@ class RemoveXAmount extends AbstractRemove
             ->getTranslator()
             ->trans(
                 'This coupon will subtracts a set amount from the total cost of an order. If the discount is greater than the total order corst, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.',
-                []
+                [],
             );
     }
 
-    public function exec(): float|int
+    public function exec(): float
     {
         $cartTotal = $this->facade->getCartTotalTaxPrice($this->isAvailableOnSpecialOffers());
 
@@ -55,7 +55,7 @@ class RemoveXAmount extends AbstractRemove
             return $cartTotal;
         }
 
-        return $this->amount;
+        return (float) $this->amount;
     }
 
     public function drawBackOfficeInputs(): string

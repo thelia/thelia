@@ -35,10 +35,8 @@ interface ConditionInterface
 
     /**
      * Get Condition Service id.
-     *
-     * @return string
      */
-    public function getServiceId();
+    public function getServiceId(): string;
 
     /**
      * Check validators relevancy and store them.
@@ -46,56 +44,44 @@ interface ConditionInterface
      * @param array $operators an array of operators (greater than, less than, etc.) entered in the condition parameter input form, one for each condition defined by the Condition
      * @param array $values    an array of values entered in in the condition parameter input form, one for each condition defined by the Condition
      *
+     * @return $this
+     *
      * @throws InvalidConditionOperatorException
      * @throws InvalidConditionValueException
-     *
-     * @return $this
      */
     public function setValidatorsFromForm(array $operators, array $values);
 
     /**
      * Test if the current application state matches conditions.
-     *
-     * @return bool
      */
-    public function isMatching();
+    public function isMatching(): bool;
 
     /**
      * Get I18n name.
-     *
-     * @return string
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Get I18n tooltip
      * Explain in detail what the Condition checks.
-     *
-     * @return string
      */
-    public function getToolTip();
+    public function getToolTip(): string;
 
     /**
      * Get I18n summary
      * Explain briefly the condition with given values.
-     *
-     * @return string
      */
-    public function getSummary();
+    public function getSummary(): string;
 
     /**
      * Return all validators.
-     *
-     * @return array
      */
-    public function getValidators();
+    public function getValidators(): array;
 
     /**
      * Return a serializable Condition.
-     *
-     * @return SerializableCondition
      */
-    public function getSerializableCondition();
+    public function getSerializableCondition(): SerializableCondition;
 
     /**
      * Draw the input displayed in the BackOffice
@@ -103,5 +89,5 @@ interface ConditionInterface
      *
      * @return string HTML string
      */
-    public function drawBackOfficeInputs();
+    public function drawBackOfficeInputs(): string;
 }

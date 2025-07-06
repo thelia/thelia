@@ -28,9 +28,9 @@ class TokenProvider
 
     public function decodeKey($key): array
     {
-        $data = explode("\0", base64_decode((string) $key), 3);
+        $data = explode("\0", base64_decode((string) $key, true), 3);
 
-        if (\count($data) !== 3) {
+        if (3 !== \count($data)) {
             $data = ['', '', ''];
         }
 

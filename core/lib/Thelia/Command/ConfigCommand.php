@@ -48,31 +48,30 @@ class ConfigCommand extends ContainerAwareCommand
             ->addArgument(
                 'COMMAND',
                 InputArgument::REQUIRED,
-                'Command : list, get, set, delete'
+                'Command : list, get, set, delete',
             )
             ->addArgument(
                 'name',
                 InputArgument::OPTIONAL,
-                'The variable name'
+                'The variable name',
             )
             ->addArgument(
                 'value',
                 InputArgument::OPTIONAL,
-                'The variable value'
+                'The variable value',
             )
             ->addOption(
                 'secured',
                 null,
                 InputOption::VALUE_NONE,
-                'When setting a new variable tell variable is secured.'
+                'When setting a new variable tell variable is secured.',
             )
             ->addOption(
                 'visible',
                 null,
                 InputOption::VALUE_NONE,
-                'When setting a new variable tell variable is visible.'
-            )
-        ;
+                'When setting a new variable tell variable is visible.',
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -105,8 +104,7 @@ class ConfigCommand extends ContainerAwareCommand
 
         $vars = ConfigQuery::create()
             ->orderByName()
-            ->find()
-        ;
+            ->find();
 
         $rows = [];
 
@@ -115,16 +113,15 @@ class ConfigCommand extends ContainerAwareCommand
             $rows[] = [
                 $var->getName(),
                 $var->getValue(),
-                $var->getSecured() !== 0 ? 'yes' : 'no',
-                $var->getHidden() !== 0 ? 'yes' : 'no',
+                0 !== $var->getSecured() ? 'yes' : 'no',
+                0 !== $var->getHidden() ? 'yes' : 'no',
             ];
         }
 
         $table = new Table($output);
         $table
             ->setHeaders(['Name', 'Value', 'secured', 'hidden'])
-            ->setRows($rows)
-        ;
+            ->setRows($rows);
         $table->render();
 
         return 0;
@@ -136,7 +133,7 @@ class ConfigCommand extends ContainerAwareCommand
 
         if (null === $varName) {
             $output->writeln(
-                "<error>Need argument 'name' for get command</error>"
+                "<error>Need argument 'name' for get command</error>",
             );
 
             return 1;
@@ -149,7 +146,7 @@ class ConfigCommand extends ContainerAwareCommand
         if (null === $var) {
             $out[] = \sprintf(
                 "<error>Unknown variable '%s'</error>",
-                $varName
+                $varName,
             );
         } else {
             $out = [
@@ -174,7 +171,7 @@ class ConfigCommand extends ContainerAwareCommand
 
         if (null === $varName || null === $varValue) {
             $output->writeln(
-                "<error>Need argument 'name' and 'value' for set command</error>"
+                "<error>Need argument 'name' and 'value' for set command</error>",
             );
 
             return 1;
@@ -184,7 +181,7 @@ class ConfigCommand extends ContainerAwareCommand
             $varName,
             $varValue,
             $input->getOption('secured'),
-            !$input->getOption('visible')
+            !$input->getOption('visible'),
         );
 
         $output->writeln('<info>Variable has been set</info>');
@@ -198,7 +195,7 @@ class ConfigCommand extends ContainerAwareCommand
 
         if (null === $varName) {
             $output->writeln(
-                "<error>Need argument 'name' for get command</error>"
+                "<error>Need argument 'name' for get command</error>",
             );
 
             return 1;
@@ -210,16 +207,16 @@ class ConfigCommand extends ContainerAwareCommand
             $output->writeln(
                 \sprintf(
                     "<error>Unknown variable '%s'</error>",
-                    $varName
-                )
+                    $varName,
+                ),
             );
         } else {
             $var->delete();
             $output->writeln(
                 \sprintf(
                     "<info>Variable '%s' has been deleted</info>",
-                    $varName
-                )
+                    $varName,
+                ),
             );
         }
 

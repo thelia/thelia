@@ -21,57 +21,42 @@ namespace Thelia\Core\Event\Hook;
  */
 class ModuleHookCreateEvent extends ModuleHookEvent
 {
-    /** @var int */
-    protected $module_id;
+    protected int $module_id;
 
-    /** @var int */
-    protected $hook_id;
+    protected int $hook_id;
 
-    /** @var string */
-    protected $method;
+    protected string $method;
 
-    /** @var string */
-    protected $classname;
+    protected string $classname;
 
-    /** @var string */
-    protected $templates;
+    protected string $templates;
 
     /**
-     * @param int $hook_id
-     *
      * @return $this
      */
-    public function setHookId($hook_id): static
+    public function setHookId(int $hook_id): static
     {
         $this->hook_id = $hook_id;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getHookId()
+    public function getHookId(): int
     {
         return $this->hook_id;
     }
 
     /**
-     * @param int $module_id
-     *
      * @return $this
      */
-    public function setModuleId($module_id): static
+    public function setModuleId(int $module_id): static
     {
         $this->module_id = $module_id;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getModuleId()
+    public function getModuleId(): int
     {
         return $this->module_id;
     }
@@ -86,10 +71,7 @@ class ModuleHookCreateEvent extends ModuleHookEvent
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getClassname()
+    public function getClassname(): string
     {
         return $this->classname;
     }
@@ -104,18 +86,12 @@ class ModuleHookCreateEvent extends ModuleHookEvent
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
 
-    /**
-     * @return string
-     */
-    public function getTemplates()
+    public function getTemplates(): string
     {
         return $this->templates;
     }

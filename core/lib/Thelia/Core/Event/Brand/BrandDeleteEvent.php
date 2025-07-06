@@ -29,21 +29,16 @@ class BrandDeleteEvent extends BrandEvent
     }
 
     /**
-     * @param int $brand_id
-     *
      * @return BrandDeleteEvent $this
      */
-    public function setBrandId($brand_id): static
+    public function setBrandId(int $brand_id): static
     {
         $this->brand_id = $brand_id;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getBrandId()
+    public function getBrandId(): int
     {
         return $this->brand_id;
     }

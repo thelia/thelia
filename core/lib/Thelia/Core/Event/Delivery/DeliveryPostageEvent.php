@@ -32,24 +32,15 @@ use Thelia\Module\BaseModuleInterface;
  */
 class DeliveryPostageEvent extends ActionEvent
 {
-    /** @var bool */
-    protected $validModule = false;
+    protected bool $validModule = false;
 
-    /** @var OrderPostage|null */
-    protected $postage;
+    protected ?OrderPostage $postage;
 
-    /**
-     * @var DateTime|null
-     */
-    protected $deliveryDate;
+    protected ?DateTime $deliveryDate;
 
-    /**
-     * @var string
-     */
-    protected $deliveryMode;
+    protected string $deliveryMode;
 
-    /** @var array */
-    protected $additionalData = [];
+    protected array $additionalData = [];
 
     /**
      * DeliveryPostageEvent constructor.
@@ -84,72 +75,48 @@ class DeliveryPostageEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     * @return DateTime|null
-     */
-    public function getDeliveryDate()
+    public function getDeliveryDate(): ?DateTime
     {
         return $this->deliveryDate;
     }
 
-    /**
-     * @param DateTime|null $deliveryDate
-     */
-    public function setDeliveryDate($deliveryDate): static
+    public function setDeliveryDate(?DateTime $deliveryDate): static
     {
         $this->deliveryDate = $deliveryDate;
 
         return $this;
     }
 
-    /**
-     * @return AbstractDeliveryModule
-     */
-    public function getModule()
+    public function getModule(): AbstractDeliveryModule
     {
         return $this->module;
     }
 
-    /**
-     * @param AbstractDeliveryModule $module
-     */
-    public function setModule($module): static
+    public function setModule(AbstractDeliveryModule $module): static
     {
         $this->module = $module;
 
         return $this;
     }
 
-    /**
-     * @return OrderPostage|null
-     */
-    public function getPostage()
+    public function getPostage(): ?OrderPostage
     {
         return $this->postage;
     }
 
-    /**
-     * @param float|OrderPostage|null $postage
-     */
-    public function setPostage($postage): static
+    public function setPostage(float|OrderPostage|null $postage): static
     {
         $this->postage = OrderPostage::loadFromPostage($postage);
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isValidModule()
+    public function isValidModule(): bool
     {
         return $this->validModule;
     }
 
-    /**
-     * @param bool $validModule
-     */
-    public function setValidModule($validModule): static
+    public function setValidModule(bool $validModule): static
     {
         $this->validModule = $validModule;
 
@@ -161,18 +128,12 @@ class DeliveryPostageEvent extends ActionEvent
         return \count($this->additionalData) > 0;
     }
 
-    /**
-     * @return array
-     */
-    public function getAdditionalData()
+    public function getAdditionalData(): array
     {
         return $this->additionalData;
     }
 
-    /**
-     * @param array $additionalData
-     */
-    public function setAdditionalData($additionalData): static
+    public function setAdditionalData(array $additionalData): static
     {
         $this->additionalData = $additionalData;
 
@@ -183,7 +144,7 @@ class DeliveryPostageEvent extends ActionEvent
      * @param string $key   the key of the additional data
      * @param mixed  $value the value of the additional data
      */
-    public function addAdditionalData($key, $value): static
+    public function addAdditionalData(string $key, mixed $value): static
     {
         $this->additionalData[$key] = $value;
 
@@ -192,20 +153,16 @@ class DeliveryPostageEvent extends ActionEvent
 
     /**
      * @throws PropelException
-     *
-     * @return Country|null
      */
-    public function getCountry()
+    public function getCountry(): ?Country
     {
         return $this->getAddress() instanceof Address ? $this->getAddress()->getCountry() : $this->country;
     }
 
     /**
      * @throws PropelException
-     *
-     * @return State|null
      */
-    public function getState()
+    public function getState(): ?State
     {
         return $this->getAddress() instanceof Address ? $this->getAddress()->getState() : $this->state;
     }
@@ -220,7 +177,7 @@ class DeliveryPostageEvent extends ActionEvent
      */
     public function setDeliveryMode($deliveryMode): static
     {
-        if (!\in_array($deliveryMode, ['delivery', 'pickup', 'localPickup'])) {
+        if (!\in_array($deliveryMode, ['delivery', 'pickup', 'localPickup'], true)) {
             throw new \Exception(Translator::getInstance()->trans('A delivery module can only be of type "delivery", "pickup" or "localPickup".'));
         }
 

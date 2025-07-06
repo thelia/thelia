@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -22,7 +24,7 @@ $modules = [
 ];
 
 foreach ($modules as $moduleCode) {
-    $path = THELIA_MODULE_DIR.$moduleCode.DS.'AdminIncludes';
+    $path = THELIA_MODULE_DIR . $moduleCode . DS . 'AdminIncludes';
 
     if ($fs->exists($path)) {
         try {
@@ -30,7 +32,7 @@ foreach ($modules as $moduleCode) {
         } catch (Exception $e) {
             $message = sprintf(
                 $this->trans('The update cannot delete the folder : "%s". Please delete this folder manually.'),
-                $path
+                $path,
             );
             $this->log('warning', $message);
             $this->setMessage($message, 'warning');

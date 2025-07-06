@@ -20,6 +20,7 @@ namespace Thelia\Coupon\Type;
 class RemovePercentageOnCategories extends AbstractRemoveOnCategories
 {
     use PercentageCouponTrait;
+
     public const PERCENTAGE = 'percentage';
 
     protected string $serviceId = 'thelia.coupon.type.remove_percentage_on_categories';
@@ -42,7 +43,7 @@ class RemovePercentageOnCategories extends AbstractRemoveOnCategories
             ->getTranslator()
             ->trans(
                 'This coupon subtracts from the order total a percentage of the price of each product which belongs to the selected categories. If the discount is greater than the total order, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.',
-                []
+                [],
             );
     }
 

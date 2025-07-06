@@ -39,7 +39,7 @@ class ReloadDatabaseCommand extends BaseModuleGenerate
                 'force',
                 'f',
                 InputOption::VALUE_NONE,
-                'If defined, it will reload the db without asking'
+                'If defined, it will reload the db without asking',
             );
     }
 

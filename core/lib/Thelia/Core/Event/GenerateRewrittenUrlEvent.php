@@ -22,7 +22,7 @@ namespace Thelia\Core\Event;
 class GenerateRewrittenUrlEvent extends ActionEvent
 {
     /** @var string local */
-    protected $url;
+    protected string $url;
 
     /**
      * GenerateRewrittenUrlEvent constructor.
@@ -36,20 +36,15 @@ class GenerateRewrittenUrlEvent extends ActionEvent
     ) {
     }
 
-    /**
-     * @return string
-     */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->locale;
     }
 
     /**
-     * @param string $locale
-     *
      * @return $this
      */
-    public function setLocale($locale): static
+    public function setLocale(string $locale): static
     {
         $this->locale = $locale;
 
@@ -86,10 +81,7 @@ class GenerateRewrittenUrlEvent extends ActionEvent
         return null !== $this->url;
     }
 
-    /**
-     * @return string
-     */
-    public function getUrl()
+    public function getUrl(): string
     {
         return $this->url;
     }

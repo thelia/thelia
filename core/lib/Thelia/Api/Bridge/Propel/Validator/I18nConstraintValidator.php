@@ -30,12 +30,13 @@ class I18nConstraintValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint): void
     {
         if (!$value instanceof I18nCollection) {
-            throw new \RuntimeException('I18nConstraint attribute should be used on'.I18nCollection::class);
+            throw new \RuntimeException('I18nConstraint attribute should be used on' . I18nCollection::class);
         }
 
         $request = $this->requestStack->getCurrentRequest();
         $method = $request?->getMethod();
-        if (!$method || $method === HttpOperation::METHOD_PATCH) {
+
+        if (!$method || HttpOperation::METHOD_PATCH === $method) {
             return;
         }
 
@@ -43,18 +44,21 @@ class I18nConstraintValidator extends ConstraintValidator
 
         /** @var I18nCollection $i18nData */
         $i18nData = $value;
+
         foreach ($i18nData->i18ns as $i18n) {
-            if ($i18n->getTitle() !== null && !empty($i18n->getTitle())) {
+            if (null !== $i18n->getTitle() && !empty($i18n->getTitle())) {
                 ++$titleAndLocaleCount;
             }
         }
 
-        if ($titleAndLocaleCount === 0) {
+        if (0 === $titleAndLocaleCount) {
             $this->context->buildViolation(
                 $this->translator->trans(
                     'The title and locale must be defined at least once.',
-                    [], null, 'en_US'
-                )
+                    [],
+                    null,
+                    'en_US',
+                ),
             )->addViolation();
         }
     }

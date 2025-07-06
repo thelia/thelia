@@ -22,11 +22,8 @@ namespace Thelia\Core\Security;
 class AccessManager
 {
     public const VIEW = 'VIEW';
-
     public const CREATE = 'CREATE';
-
     public const UPDATE = 'UPDATE';
-
     public const DELETE = 'DELETE';
 
     protected $accessGranted = [
@@ -35,7 +32,6 @@ class AccessManager
         self::UPDATE => false,
         self::DELETE => false,
     ];
-
     protected static $accessPows = [
         self::VIEW => 3,
         self::CREATE => 2,
@@ -65,6 +61,7 @@ class AccessManager
     public function build($accesses): void
     {
         $this->accessValue = 0;
+
         foreach ($accesses as $access) {
             if (\array_key_exists($access, self::$accessPows)) {
                 $this->accessValue += 2 ** self::$accessPows[$access];
@@ -77,8 +74,10 @@ class AccessManager
     protected function fillGrantedAccess(): void
     {
         $accessValue = $this->accessValue;
+
         foreach (self::$accessPows as $type => $value) {
             $pow = 2 ** $value;
+
             if ($accessValue >= $pow) {
                 $accessValue -= $pow;
                 $this->accessGranted[$type] = true;

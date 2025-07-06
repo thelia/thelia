@@ -25,11 +25,9 @@ use Thelia\Module\Validator\ModuleDefinition;
  */
 class ModuleInstallEvent extends ActionEvent
 {
-    /** @var ModuleDefinition */
-    protected $moduleDefinition;
+    protected ModuleDefinition $moduleDefinition;
 
-    /** @var string */
-    protected $modulePath;
+    protected string $modulePath;
 
     public function __construct(protected ?Module $module = null)
     {
@@ -53,41 +51,31 @@ class ModuleInstallEvent extends ActionEvent
     }
 
     /**
-     * @param ModuleDefinition $moduleDefinition
-     *
      * @return $this
      */
-    public function setModuleDefinition($moduleDefinition): self
+    public function setModuleDefinition(ModuleDefinition $moduleDefinition): self
     {
         $this->moduleDefinition = $moduleDefinition;
 
         return $this;
     }
 
-    /**
-     * @return ModuleDefinition
-     */
-    public function getModuleDefinition()
+    public function getModuleDefinition(): ModuleDefinition
     {
         return $this->moduleDefinition;
     }
 
     /**
-     * @param string $modulePath
-     *
      * @return $this
      */
-    public function setModulePath($modulePath): self
+    public function setModulePath(string $modulePath): self
     {
         $this->modulePath = $modulePath;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getModulePath()
+    public function getModulePath(): string
     {
         return $this->modulePath;
     }

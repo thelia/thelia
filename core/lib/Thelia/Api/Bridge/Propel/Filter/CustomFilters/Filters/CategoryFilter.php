@@ -36,6 +36,7 @@ class CategoryFilter implements TheliaFilterInterface
 
         if ($categoryDepth) {
             $categories = $this->filterService->getCategoriesRecursively($value, $categoryDepth);
+
             foreach ($categories as $categoryList) {
                 foreach ($categoryList as $category) {
                     $value[] = $category->getId();
@@ -67,14 +68,17 @@ class CategoryFilter implements TheliaFilterInterface
         }
 
         $value = [];
+
         foreach ($valueSearched as $categoryId) {
             $mainCategory = CategoryQuery::create()->findOneById($categoryId);
+
             if (!$mainCategory) {
                 continue;
             }
 
             $categoriesWithDepth = $this->filterService->getCategoriesRecursively(categoryId: $categoryId, maxDepth: $depth);
-            if ($categoriesWithDepth === []) {
+
+            if ([] === $categoriesWithDepth) {
                 return [];
             }
 
@@ -87,8 +91,7 @@ class CategoryFilter implements TheliaFilterInterface
                             'id' => $category->getId(),
                             'depth' => $depthIndex,
                             'title' => $category->setLocale($locale)->getTitle(),
-                        ]
-                    ;
+                        ];
                 }
             }
         }

@@ -37,8 +37,6 @@ abstract class ActionEvent extends Event
         if (\array_key_exists($name, $this->parameters)) {
             return $this->parameters[$name];
         }
-
-        return null;
     }
 
     public function bindForm(Form $form): void
@@ -48,8 +46,10 @@ abstract class ActionEvent extends Event
         /** @var Form $field */
         foreach ($fields as $field) {
             $functionName = \sprintf('set%s', Container::camelize($field->getName()));
+
             if (method_exists($this, $functionName)) {
                 $getFunctionName = \sprintf('get%s', Container::camelize($field->getName()));
+
                 if (method_exists($this, $getFunctionName)) {
                     if (null === $this->{$getFunctionName}()) {
                         $this->{$functionName}($field->getData());

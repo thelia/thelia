@@ -98,7 +98,7 @@ abstract class AbstractFilter implements FilterInterface
 
                 return $carry;
             },
-            []
+            [],
         );
 
         if (\count($propertyParts) > 1) {
@@ -111,6 +111,7 @@ abstract class AbstractFilter implements FilterInterface
 
             foreach ($relationProperty->getAttributes(Relation::class) as $relationAttribute) {
                 $targetClass = $relationAttribute->getArguments()['targetResource'];
+
                 if (null === $targetClass) {
                     continue;
                 }
@@ -133,18 +134,20 @@ abstract class AbstractFilter implements FilterInterface
         array $context,
     ): string {
         $resourceClass = $context['resource_class'];
+
         // Check if we are on a localized field
         if (!str_contains($property, '.') && !property_exists($resourceClass, $property) && is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
             return $this->getLocalizedPropertyQueryPath($query, $property, $context);
         }
 
-        $fieldPath = $query->getTableMap()->getName().'.'.$property;
+        $fieldPath = $query->getTableMap()->getName() . '.' . $property;
         // Replace all dot by underscore to build relation alias
         $fieldPath = str_replace('.', '_', $fieldPath);
 
         // Replace last underscore by a dot, because after last underscore it's the mysql field
         $lastUnderscorePosition = strrpos($fieldPath, '_');
-        if ($lastUnderscorePosition !== false) {
+
+        if (false !== $lastUnderscorePosition) {
             $fieldPath[$lastUnderscorePosition] = '.';
         }
 
@@ -154,7 +157,7 @@ abstract class AbstractFilter implements FilterInterface
         $field = strtok('');
         $column = strtolower((string) preg_replace('/(?<!^)[A-Z]/', '_$0', $field));
 
-        return strtolower($tableAlias.'.'.$column);
+        return strtolower($tableAlias . '.' . $column);
     }
 
     protected function getLocalizedPropertyQueryPath(
@@ -164,6 +167,6 @@ abstract class AbstractFilter implements FilterInterface
     ) {
         $locale = $context['filters']['locale'] ?? Lang::getDefaultLanguage()->getLocale();
 
-        return str_replace('_', '', $query->getTableMap()->getName()).'_lang_'.$locale.'.'.$property;
+        return str_replace('_', '', $query->getTableMap()->getName()) . '_lang_' . $locale . '.' . $property;
     }
 }

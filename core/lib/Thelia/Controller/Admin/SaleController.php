@@ -54,7 +54,7 @@ class SaleController extends AbstractCrudController
             AdminResources::SALES,
             TheliaEvents::SALE_CREATE,
             TheliaEvents::SALE_UPDATE,
-            TheliaEvents::SALE_DELETE
+            TheliaEvents::SALE_DELETE,
         );
     }
 
@@ -138,8 +138,7 @@ class SaleController extends AbstractCrudController
         $saleCreateEvent
             ->setLocale($formData['locale'])
             ->setTitle($formData['title'])
-            ->setSaleLabel($formData['label'])
-        ;
+            ->setSaleLabel($formData['label']);
 
         return $saleCreateEvent;
     }
@@ -174,8 +173,7 @@ class SaleController extends AbstractCrudController
             ->setSaleLabel($formData['label'])
             ->setChapo($formData['chapo'])
             ->setDescription($formData['description'])
-            ->setPostscriptum($formData['postscriptum'])
-        ;
+            ->setPostscriptum($formData['postscriptum']);
 
         return $saleUpdateEvent;
     }
@@ -190,10 +188,8 @@ class SaleController extends AbstractCrudController
 
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
-     *
-     * @param SaleEvent $event
      */
-    protected function eventContainsObject($event): bool
+    protected function eventContainsObject(\Symfony\Contracts\EventDispatcher\Event $event): bool
     {
         return $event->hasSale();
     }
@@ -254,7 +250,7 @@ class SaleController extends AbstractCrudController
     /**
      * Render the main list template.
      */
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         $this->getListOrderFromSession('sale', 'order', 'start-date');
 
@@ -306,9 +302,9 @@ class SaleController extends AbstractCrudController
         try {
             $eventDispatcher->dispatch(
                 new SaleToggleActivityEvent(
-                    $this->getExistingObject()
+                    $this->getExistingObject(),
                 ),
-                TheliaEvents::SALE_TOGGLE_ACTIVITY
+                TheliaEvents::SALE_TOGGLE_ACTIVITY,
             );
         } catch (\Exception $exception) {
             // Any error
@@ -328,7 +324,7 @@ class SaleController extends AbstractCrudController
         $categories = '';
 
         foreach ($this->getRequest()->get('categories', []) as $category_id) {
-            $categories .= $category_id.',';
+            $categories .= $category_id . ',';
         }
 
         return $this->render(
@@ -337,7 +333,7 @@ class SaleController extends AbstractCrudController
                 'sale_id' => $this->getRequest()->get('sale_id'),
                 'category_list' => rtrim($categories, ','),
                 'product_list' => $this->getRequest()->get('products', []),
-            ]
+            ],
         );
     }
 
@@ -356,7 +352,7 @@ class SaleController extends AbstractCrudController
             [
                 'product_id' => $productId,
                 'selected_attributes_av_id' => $selectedAttributesAvId,
-            ]
+            ],
         );
     }
 
@@ -370,7 +366,7 @@ class SaleController extends AbstractCrudController
         try {
             $eventDispatcher->dispatch(
                 new SaleClearStatusEvent(),
-                TheliaEvents::SALE_CLEAR_SALE_STATUS
+                TheliaEvents::SALE_CLEAR_SALE_STATUS,
             );
         } catch (\Exception $exception) {
             // Any error
@@ -386,7 +382,7 @@ class SaleController extends AbstractCrudController
         try {
             $eventDispatcher->dispatch(
                 new SaleActiveStatusCheckEvent(),
-                TheliaEvents::CHECK_SALE_ACTIVATION_EVENT
+                TheliaEvents::CHECK_SALE_ACTIVATION_EVENT,
             );
         } catch (\Exception $exception) {
             // Any error

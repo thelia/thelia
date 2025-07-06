@@ -46,12 +46,12 @@ class HookCleanCommand extends ContainerAwareCommand
                 'assume-yes',
                 'y',
                 InputOption::VALUE_NONE,
-                'Assume to answer yes to all questions'
+                'Assume to answer yes to all questions',
             )
             ->addArgument(
                 'module',
                 InputArgument::OPTIONAL,
-                'The module code to clean up'
+                'The module code to clean up',
             );
     }
 
@@ -101,7 +101,7 @@ class HookCleanCommand extends ContainerAwareCommand
             $questionText = 'Would you like to delete all hooks ';
             $questionText .= (empty($moduleCode))
                 ? 'of all modules'
-                : 'of module '.$moduleCode;
+                : 'of module ' . $moduleCode;
             $questionText .= ' ? (yes, or no) ';
 
             $question = new ConfirmationQuestion($questionText, false);
@@ -124,9 +124,10 @@ class HookCleanCommand extends ContainerAwareCommand
      * @throws \Exception
      * @throws PropelException
      */
-    protected function deleteHooks($module): void
+    protected function deleteHooks(?Module $module): void
     {
         $query = ModuleHookQuery::create();
+
         if (null !== $module) {
             $query
                 ->filterByModule($module)
@@ -136,6 +137,7 @@ class HookCleanCommand extends ContainerAwareCommand
         }
 
         $query = IgnoredModuleHookQuery::create();
+
         if (null !== $module) {
             $query
                 ->filterByModule($module)
