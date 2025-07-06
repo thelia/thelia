@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Resource;
 
-use Exception;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -266,7 +266,7 @@ class DeliveryPickupLocation
     public function setOpeningHours(int $day, string $hours): static
     {
         if (!\array_key_exists($day, $this->openingHours)) {
-            throw new Exception(Translator::getInstance()->trans('Tried to set the opening hours for a non existant day in the array. Please use the constants defined in the PickupLocation class.'));
+            throw new \Exception(Translator::getInstance()->trans('Tried to set the opening hours for a non existant day in the array. Please use the constants defined in the PickupLocation class.'));
         }
 
         $this->openingHours[$day] = $hours;

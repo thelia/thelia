@@ -11,11 +11,12 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop;
 
-use Thelia\Core\Serializer\SerializerManager;
-use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
+use Thelia\Core\Serializer\SerializerInterface;
+use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;

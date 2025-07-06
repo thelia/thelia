@@ -11,12 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-
-use DirectoryIterator;
-use InvalidArgumentException;
-use LogicException;
 use Michelf\MarkdownExtra;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
@@ -60,8 +57,7 @@ class ModuleController extends AbstractCrudController
 
     public function __construct(
         protected ModuleManagement $moduleManagement,
-    )
-    {
+    ) {
         parent::__construct(
             'module',
             'manual',
@@ -158,10 +154,9 @@ class ModuleController extends AbstractCrudController
 
     /**
      * @param Module $object
-     *
-     * @return string
      */
-    protected function getObjectLabel(activeRecordInterface $object): ?string    {
+    protected function getObjectLabel(ActiveRecordInterface $object): ?string
+    {
         return $object->getTitle();
     }
 
@@ -222,7 +217,7 @@ class ModuleController extends AbstractCrudController
 
     public function indexAction(): Response
     {
-        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -242,10 +237,10 @@ class ModuleController extends AbstractCrudController
         $module = ModuleQuery::create()->findOneByCode($module_code);
 
         if (null === $module) {
-            throw new InvalidArgumentException(sprintf('Module `%s` does not exists', $module_code));
+            throw new \InvalidArgumentException(\sprintf('Module `%s` does not exists', $module_code));
         }
 
-        if (($response = $this->checkAuth([], $module_code, AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth([], $module_code, AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -259,7 +254,7 @@ class ModuleController extends AbstractCrudController
 
     public function toggleActivationAction(EventDispatcherInterface $eventDispatcher, $module_id): Response
     {
-        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -269,7 +264,7 @@ class ModuleController extends AbstractCrudController
             $eventDispatcher->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
 
             if (!$event->getModule() instanceof Module) {
-                throw new LogicException(
+                throw new \LogicException(
                     $this->getTranslator()->trans('No %obj was updated.', ['%obj' => 'Module'])
                 );
             }
@@ -294,9 +289,9 @@ class ModuleController extends AbstractCrudController
         Request $request,
         TokenProvider $tokenProvider,
         EventDispatcherInterface $eventDispatcher,
-        ParserContext $parserContext
+        ParserContext $parserContext,
     ): Response {
-        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::DELETE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::DELETE)) instanceof Response) {
             return $response;
         }
 
@@ -316,7 +311,7 @@ class ModuleController extends AbstractCrudController
             $eventDispatcher->dispatch($deleteEvent, TheliaEvents::MODULE_DELETE);
 
             if ($deleteEvent->hasModule() === false) {
-                throw new LogicException(
+                throw new \LogicException(
                     Translator::getInstance()->trans('No %obj was updated.', ['%obj' => 'Module'])
                 );
             }
@@ -337,9 +332,9 @@ class ModuleController extends AbstractCrudController
         return $response;
     }
 
-    public function installAction(EventDispatcherInterface $eventDispatcher): \Symfony\Component\HttpFoundation\Response|RedirectResponse
+    public function installAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
-        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::CREATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::CREATE)) instanceof Response) {
             return $response;
         }
 
@@ -379,7 +374,7 @@ class ModuleController extends AbstractCrudController
             $message = $this->getTranslator()->trans('Sorry, an error occured: %s', ['%s' => $e->getMessage()]);
         }
 
-        Tlog::getInstance()->error(sprintf('Error during module installation process. Exception was %s', $message));
+        Tlog::getInstance()->error(\sprintf('Error during module installation process. Exception was %s', $message));
 
         $moduleInstall->setErrorMessage($message);
 
@@ -390,9 +385,9 @@ class ModuleController extends AbstractCrudController
         return $this->render('modules');
     }
 
-    public function informationAction($module_id): \Symfony\Component\HttpFoundation\Response|JsonResponse
+    public function informationAction($module_id): Response|JsonResponse
     {
-        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -406,7 +401,7 @@ class ModuleController extends AbstractCrudController
 
             if (false !== $xmlData = @simplexml_load_string(file_get_contents($moduleDescriptor))) {
                 // Transform the pseudo-array into a real array
-                $arrayData = json_decode(json_encode((array)$xmlData, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
+                $arrayData = json_decode(json_encode((array) $xmlData, \JSON_THROW_ON_ERROR), true, 512, \JSON_THROW_ON_ERROR);
 
                 $content = $this->renderRaw('ajax/module-information', [
                     'moduleId' => $module_id,
@@ -430,9 +425,9 @@ class ModuleController extends AbstractCrudController
         return new JsonResponse(['title' => $title, 'body' => $content], $status);
     }
 
-    public function documentationAction($module_id): \Symfony\Component\HttpFoundation\Response|JsonResponse
+    public function documentationAction($module_id): Response|JsonResponse
     {
-        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -465,7 +460,7 @@ class ModuleController extends AbstractCrudController
             if ($finder->count() > 0) {
                 $finder->sortByName();
 
-                /** @var DirectoryIterator $file */
+                /** @var \DirectoryIterator $file */
                 foreach ($finder as $file) {
                     if (false !== $mdDocumentation = @file_get_contents($file->getPathname())) {
                         if ($content === null) {

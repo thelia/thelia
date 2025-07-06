@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event\Customer;
 
 /**
@@ -20,7 +21,6 @@ namespace Thelia\Core\Event\Customer;
  */
 class CustomerCreateOrUpdateEvent extends CustomerEvent
 {
-
     protected bool $emailUpdateAllowed;
     protected bool $notifyCustomerOfAccountCreation;
     protected bool $notifyCustomerOfAccountModification = true;
@@ -45,7 +45,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
         protected ?float $discount = null,
         protected ?string $company = null,
         protected ?string $ref = null,
-        protected ?int $state = null
+        protected ?int $state = null,
     ) {
         parent::__construct();
     }

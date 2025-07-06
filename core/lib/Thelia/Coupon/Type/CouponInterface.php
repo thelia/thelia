@@ -11,14 +11,13 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Coupon\Type;
 
-
-
-use Thelia\Exception\InvalidConditionException;
 use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\FacadeInterface;
+use Thelia\Exception\InvalidConditionException;
 
 /**
  * Represents a Coupon ready to be processed in a Checkout process.
@@ -63,7 +62,7 @@ interface CouponInterface
      *                                                     on special offer price
      * @param bool             $isEnabled                  False if Coupon is disabled by admin
      * @param int              $maxUsage                   How many usage left
-     * @param Datetime $expirationDate When the Code is expiring
+     * @param Datetime         $expirationDate             When the Code is expiring
      * @param ObjectCollection $freeShippingForCountries   list of countries which shipping is free. All if empty
      * @param ObjectCollection $freeShippingForModules     list of modules for which shipping is free. All if empty
      * @param bool             $perCustomerUsageCount      true if usage count is per customer only
@@ -83,7 +82,7 @@ interface CouponInterface
         DateTime $expirationDate,
         $freeShippingForCountries,
         $freeShippingForModules,
-        $perCustomerUsageCount
+        $perCustomerUsageCount,
     );
 
     /**

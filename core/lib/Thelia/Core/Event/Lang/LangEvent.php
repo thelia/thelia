@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event\Lang;
 
 use Thelia\Core\Event\ActionEvent;
@@ -34,9 +35,6 @@ class LangEvent extends ActionEvent
         $this->lang = $lang;
     }
 
-    /**
-     * @return Lang
-     */
     public function getLang(): ?Lang
     {
         return $this->lang;

@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\ProductFilter;
 
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
@@ -22,7 +23,7 @@ class ProductPriceOrderFilter extends AbstractFilter
 {
     private const PRICE_ORDER_NAME = 'untaxed_price_order';
 
-    protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
+    protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
     }
 

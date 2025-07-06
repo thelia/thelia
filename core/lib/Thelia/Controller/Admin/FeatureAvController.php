@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-
-use LogicException;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -112,7 +111,7 @@ class FeatureAvController extends AbstractCrudController
 
     protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
-        throw new LogicException('Feature Av. modification is not yet implemented');
+        throw new \LogicException('Feature Av. modification is not yet implemented');
     }
 
     protected function getObjectFromEvent($event): mixed
@@ -134,10 +133,9 @@ class FeatureAvController extends AbstractCrudController
 
     /**
      * @param FeatureAv $object
-     *
-     * @return string
      */
-    protected function getObjectLabel(activeRecordInterface $object): ?string    {
+    protected function getObjectLabel(ActiveRecordInterface $object): ?string
+    {
         return $object->getTitle();
     }
 

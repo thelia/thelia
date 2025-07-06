@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Action;
 
-use Exception;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -50,7 +50,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
 {
     public function __construct(
         protected Request $request,
-        protected TokenProvider $tokenProvider
+        protected TokenProvider $tokenProvider,
     ) {
     }
 
@@ -207,7 +207,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @param float $quantity
      *
-     * @throws Exception
+     * @throws \Exception
      * @throws PropelException
      */
     protected function updateQuantity(EventDispatcherInterface $dispatcher, CartItem $cartItem, $quantity): CartItem
@@ -231,7 +231,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $productId,
         ProductSaleElements $productSaleElements,
         $quantity,
-        ProductPriceTools $productPrices
+        ProductPriceTools $productPrices,
     ): CartItem {
         $cartItem = new CartItem();
         $cartItem->setDisptacher($dispatcher);
@@ -322,7 +322,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * if needed or create duplicate the current cart if the customer is not the same as customer already present in
      * the cart.
      *
-     * @throws Exception
+     * @throws \Exception
      * @throws PropelException
      *
      * @return CartModel
@@ -343,7 +343,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      * The cart token is saved in a cookie so we try to retrieve it. Then the customer is checked.
      *
-     * @throws Exception
+     * @throws \Exception
      * @throws PropelException
      *
      * @return CartModel
@@ -435,7 +435,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      * Duplicate an existing Cart. If a customer ID is provided the created cart will be attached to this customer.
      */
-    protected function duplicateCart(EventDispatcherInterface $dispatcher, CartModel $cart, CustomerModel $customer = null): CartModel
+    protected function duplicateCart(EventDispatcherInterface $dispatcher, CartModel $cart, ?CustomerModel $customer = null): CartModel
     {
         $newCart = $cart->duplicate(
             $this->generateCartCookieIdentifier(),
@@ -453,8 +453,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      * Generate the cart cookie identifier, or return null if the cart is only managed in the session object,
      * not in a client cookie.
-     *
-     * @return string
      */
     protected function generateCartCookieIdentifier(): ?string
     {

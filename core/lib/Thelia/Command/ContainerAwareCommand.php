@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Command;
 
-use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -58,7 +58,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
     /**
      * @see ContainerAwareInterface::setContainer()
      */
-    public function setContainer(ContainerInterface $container = null): void
+    public function setContainer(?ContainerInterface $container = null): void
     {
         $this->container = $container;
     }
@@ -73,7 +73,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
         // Initialize Thelia translator, if not already done.
         try {
             Translator::getInstance();
-        } catch (Exception) {
+        } catch (\Exception) {
             $this->container->get('thelia.translator');
         }
 
@@ -85,7 +85,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
      *
      * @since 2.3
      */
-    protected function initRequest(Lang $lang = null): void
+    protected function initRequest(?Lang $lang = null): void
     {
         $container = $this->getContainer();
 
@@ -106,7 +106,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
      *
      * @since 2.3
      */
-    protected function getBaseUrl(Lang $lang = null)
+    protected function getBaseUrl(?Lang $lang = null)
     {
         $baseUrl = '';
 

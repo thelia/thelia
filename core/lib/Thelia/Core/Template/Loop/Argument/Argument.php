@@ -11,18 +11,19 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop\Argument;
 
-use Thelia\Type\AnyType;
-use Thelia\Type\IntType;
-use Thelia\Type\FloatType;
-use Thelia\Type\BooleanType;
-use Thelia\Type\BooleanOrBothType;
-use Thelia\Type\IntListType;
-use Thelia\Type\AnyListType;
-use Thelia\Type\EnumListType;
-use Thelia\Type\AlphaNumStringType;
 use Thelia\Type\AlphaNumStringListType;
+use Thelia\Type\AlphaNumStringType;
+use Thelia\Type\AnyListType;
+use Thelia\Type\AnyType;
+use Thelia\Type\BooleanOrBothType;
+use Thelia\Type\BooleanType;
+use Thelia\Type\EnumListType;
+use Thelia\Type\FloatType;
+use Thelia\Type\IntListType;
+use Thelia\Type\IntType;
 use Thelia\Type\TypeCollection;
 
 /**
@@ -40,7 +41,7 @@ class Argument
      */
     public $mandatory;
 
-    private null|int|string $value = null;
+    private int|string|null $value = null;
 
     public function __construct(public $name, TypeCollection $type, public $default = null, $mandatory = false, public $empty = true, $value = null)
     {

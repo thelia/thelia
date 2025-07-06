@@ -11,10 +11,11 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Base\ModuleHook as BaseModuleHook;
+use Thelia\Model\Tools\PositionManagementTrait;
 
 class ModuleHook extends BaseModuleHook
 {

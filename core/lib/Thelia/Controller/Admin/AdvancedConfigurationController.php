@@ -11,11 +11,11 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Exception;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -53,8 +53,8 @@ class AdvancedConfigurationController extends BaseAdminController
 
             $event = new CacheEvent($this->container->getParameter('kernel.cache_dir'));
             $eventDispatcher->dispatch($event, TheliaEvents::CACHE_CLEAR);
-        } catch (Exception $exception) {
-            Tlog::getInstance()->addError(sprintf('Flush cache error: %s', $exception->getMessage()));
+        } catch (\Exception $exception) {
+            Tlog::getInstance()->addError(\sprintf('Flush cache error: %s', $exception->getMessage()));
         }
 
         return $this->generateRedirectFromRoute('admin.configuration.advanced');
@@ -72,8 +72,8 @@ class AdvancedConfigurationController extends BaseAdminController
 
             $event = new CacheEvent(THELIA_WEB_DIR.'assets');
             $eventDispatcher->dispatch($event, TheliaEvents::CACHE_CLEAR);
-        } catch (Exception $exception) {
-            Tlog::getInstance()->addError(sprintf('Flush assets error: %s', $exception->getMessage()));
+        } catch (\Exception $exception) {
+            Tlog::getInstance()->addError(\sprintf('Flush assets error: %s', $exception->getMessage()));
         }
 
         return $this->generateRedirectFromRoute('admin.configuration.advanced');
@@ -104,8 +104,8 @@ class AdvancedConfigurationController extends BaseAdminController
                 )
             );
             $eventDispatcher->dispatch($event, TheliaEvents::CACHE_CLEAR);
-        } catch (Exception $exception) {
-            Tlog::getInstance()->addError(sprintf('Flush images and document error: %s', $exception->getMessage()));
+        } catch (\Exception $exception) {
+            Tlog::getInstance()->addError(\sprintf('Flush images and document error: %s', $exception->getMessage()));
         }
 
         return $this->generateRedirectFromRoute('admin.configuration.advanced');

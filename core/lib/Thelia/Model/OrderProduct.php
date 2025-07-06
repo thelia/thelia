@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
@@ -38,7 +39,7 @@ class OrderProduct extends BaseOrderProduct
         return $this->cartItemId;
     }
 
-    public function preInsert(ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null)
     {
         parent::preInsert($con);
 
@@ -57,7 +58,7 @@ class OrderProduct extends BaseOrderProduct
         return true;
     }
 
-    public function postInsert(ConnectionInterface $con = null): void
+    public function postInsert(?ConnectionInterface $con = null): void
     {
         parent::postInsert($con);
 

@@ -11,13 +11,12 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
-use DirectoryIterator;
-use InvalidArgumentException;
-use Symfony\Component\Finder\Finder;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\TheliaEvents;
@@ -48,7 +47,7 @@ class TranslationsController extends BaseAdminController
             return $module;
         }
 
-        throw new InvalidArgumentException(
+        throw new \InvalidArgumentException(
             $translator->trans("No module found for code '%item'", ['%item' => $moduleCode])
         );
     }
@@ -74,7 +73,7 @@ class TranslationsController extends BaseAdminController
         Request $request,
         TemplateHelperInterface $templateHelper,
         EventDispatcherInterface $eventDispatcher,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
     ): RedirectResponse|Response {
         // Get related strings, if all input data are here
         $itemToTranslate = $request->get('item_to_translate');
@@ -94,11 +93,11 @@ class TranslationsController extends BaseAdminController
         $walkMode = TranslationEvent::WALK_MODE_TEMPLATE;
 
         $templateArguments = [
-                'item_to_translate' => $itemToTranslate,
-                'item_name' => $itemName,
-                'module_part' => $modulePart,
-                'view_missing_traductions_only' => $request->get('view_missing_traductions_only'),
-                'max_input_vars_warning' => false,
+            'item_to_translate' => $itemToTranslate,
+            'item_name' => $itemName,
+            'module_part' => $modulePart,
+            'view_missing_traductions_only' => $request->get('view_missing_traductions_only'),
+            'max_input_vars_warning' => false,
         ];
 
         // Find the i18n directory, and the directory to examine.
@@ -147,7 +146,7 @@ class TranslationsController extends BaseAdminController
                                 $i18nDirectory = $module->getAbsolutePdfI18nTemplatePath($subdir);
                                 break;
                             default:
-                                throw new InvalidArgumentException(sprintf("Undefined module template type: '%s'.", $type));
+                                throw new \InvalidArgumentException(\sprintf("Undefined module template type: '%s'.", $type));
                         }
 
                         $walkMode = TranslationEvent::WALK_MODE_TEMPLATE;
@@ -182,7 +181,7 @@ class TranslationsController extends BaseAdminController
                         ;
 
                         $hasAdminIncludes = $finder->count() > 0;
-                    } catch (InvalidArgumentException) {
+                    } catch (\InvalidArgumentException) {
                         $hasAdminIncludes = false;
                     }
 
@@ -257,7 +256,7 @@ class TranslationsController extends BaseAdminController
 
                         if (!empty($texts)) {
                             $event = TranslationEvent::createWriteFileEvent(
-                                sprintf('%s'.DS.'%s.php', $i18nDirectory, $this->getCurrentEditionLocale()),
+                                \sprintf('%s'.DS.'%s.php', $i18nDirectory, $this->getCurrentEditionLocale()),
                                 $texts,
                                 $request->get('translation', []),
                                 true
@@ -333,7 +332,7 @@ class TranslationsController extends BaseAdminController
         Request $request,
         TemplateHelperInterface $templateHelper,
         EventDispatcherInterface $eventDispatcher,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
     ): Response|RedirectResponse {
         if (($response = $this->checkAuth(AdminResources::TRANSLATIONS, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
@@ -346,7 +345,7 @@ class TranslationsController extends BaseAdminController
         Request $request,
         TemplateHelperInterface $templateHelper,
         EventDispatcherInterface $eventDispatcher,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
     ): Response|RedirectResponse {
         if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
@@ -363,13 +362,13 @@ class TranslationsController extends BaseAdminController
                 ->depth(0)
                 ->in($directory);
 
-            /** @var DirectoryIterator $file */
+            /** @var \DirectoryIterator $file */
             foreach ($finder as $file) {
                 [$locale, $format] = explode('.', $file->getBaseName(), 2);
 
                 Translator::getInstance()->addResource($format, $file->getPathname(), $locale, $domain);
             }
-        } catch (InvalidArgumentException) {
+        } catch (\InvalidArgumentException) {
             // Ignore missing I18n directories
         }
     }

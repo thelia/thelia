@@ -11,8 +11,8 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Api\Resource;
 
+namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
@@ -22,7 +22,6 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use DateTime;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -105,11 +104,11 @@ class OrderCoupon implements PropelResourceInterface
     public ?string $description = null;
 
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ])]
-    public ?DateTime $startDate = null;
+    public ?\DateTime $startDate = null;
 
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
-    public ?DateTime $expirationDate = null;
+    public ?\DateTime $expirationDate = null;
 
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE])]
     public ?bool $isCumulative = null;
@@ -131,10 +130,10 @@ class OrderCoupon implements PropelResourceInterface
     public ?bool $usageCanceled = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?DateTime $createdAt = null;
+    public ?\DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?DateTime $updatedAt = null;
+    public ?\DateTime $updatedAt = null;
 
     public function getId(): ?int
     {
@@ -232,24 +231,24 @@ class OrderCoupon implements PropelResourceInterface
         return $this;
     }
 
-    public function getStartDate(): ?DateTime
+    public function getStartDate(): ?\DateTime
     {
         return $this->startDate;
     }
 
-    public function setStartDate(?DateTime $startDate): self
+    public function setStartDate(?\DateTime $startDate): self
     {
         $this->startDate = $startDate;
 
         return $this;
     }
 
-    public function getExpirationDate(): ?DateTime
+    public function getExpirationDate(): ?\DateTime
     {
         return $this->expirationDate;
     }
 
-    public function setExpirationDate(?DateTime $expirationDate): self
+    public function setExpirationDate(?\DateTime $expirationDate): self
     {
         $this->expirationDate = $expirationDate;
 
@@ -328,24 +327,24 @@ class OrderCoupon implements PropelResourceInterface
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?DateTime $createdAt): self
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?DateTime $updatedAt): self
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 

@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop;
 
-use InvalidArgumentException;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Loop\Argument\Argument;
@@ -64,7 +64,7 @@ class AssociatedContent extends Content
         $category = $this->getCategory();
 
         if ($product === null && $category === null) {
-            throw new InvalidArgumentException('You have to provide either `product` or `category` argument in associated_content loop');
+            throw new \InvalidArgumentException('You have to provide either `product` or `category` argument in associated_content loop');
         }
 
         if ($product !== null) {

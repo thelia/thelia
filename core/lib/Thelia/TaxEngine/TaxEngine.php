@@ -11,11 +11,11 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\TaxEngine;
 
-use LogicException;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
@@ -42,7 +42,6 @@ class TaxEngine
      * First look for a picked delivery address country
      * Then look at the current customer default address country
      * Else look at the default website country.
-     *
      */
     public function getDeliveryCountry(): Country
     {
@@ -72,8 +71,8 @@ class TaxEngine
             $this->taxState = null;
         }
 
-        if(null === $this->taxCountry) {
-            throw new LogicException('No country found for tax calculation.');
+        if (null === $this->taxCountry) {
+            throw new \LogicException('No country found for tax calculation.');
         }
 
         return $this->taxCountry;

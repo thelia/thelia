@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Coupon\Type;
 
-use InvalidArgumentException;
 use Thelia\Model\CartItem;
 
 /**
@@ -25,7 +25,6 @@ interface AmountAndPercentageCouponInterface
 {
     /**
      * Set the value of specific coupon fields.
-     *
      */
     public function setFieldsValue(array $effects);
 
@@ -44,7 +43,8 @@ interface AmountAndPercentageCouponInterface
 
     /**
      * Check the value of a coupon configuration field.
-     * @throws InvalidArgumentException is field value is not valid
+     *
+     * @throws \InvalidArgumentException is field value is not valid
      */
     public function checkBaseCouponFieldValue(string $fieldName, string $fieldValue): string;
 }

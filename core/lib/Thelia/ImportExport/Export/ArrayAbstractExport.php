@@ -11,10 +11,8 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\ImportExport\Export;
 
-use DomainException;
-use LogicException;
+namespace Thelia\ImportExport\Export;
 
 abstract class ArrayAbstractExport extends AbstractExport
 {
@@ -50,12 +48,12 @@ abstract class ArrayAbstractExport extends AbstractExport
                 return;
             }
 
-            throw new DomainException(
+            throw new \DomainException(
                 'Data must be an array.'
             );
         }
 
-        throw new LogicException("Export data can't be rewinded");
+        throw new \LogicException("Export data can't be rewinded");
     }
 
     public function valid(): bool

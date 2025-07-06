@@ -11,17 +11,18 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-use Thelia\Model\Tools\PositionManagementTrait;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Base\Attribute as BaseAttribute;
+use Thelia\Model\Tools\PositionManagementTrait;
 
 class Attribute extends BaseAttribute
 {
     use PositionManagementTrait;
 
-    public function preInsert(ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null)
     {
         // Set the current position for the new object
         $this->setPosition($this->getNextPosition());

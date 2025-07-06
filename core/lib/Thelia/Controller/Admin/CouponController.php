@@ -11,8 +11,8 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Controller\Admin;
 
+namespace Thelia\Controller\Admin;
 
 use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -50,21 +50,19 @@ use Thelia\Tools\URL;
  */
 class CouponController extends BaseAdminController
 {
-
     public function __construct(
         protected CouponManager $couponManager,
-    )
-    {
+    ) {
     }
 
     /**
      * Manage Coupons list display.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function browseAction()
     {
-        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -76,11 +74,11 @@ class CouponController extends BaseAdminController
     /**
      * Manage Coupons creation display.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
-    public function createAction(EventDispatcherInterface $eventDispatcher): \Symfony\Component\HttpFoundation\Response|RedirectResponse
+    public function createAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
-        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::CREATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::CREATE)) instanceof Response) {
             return $response;
         }
 
@@ -127,11 +125,11 @@ class CouponController extends BaseAdminController
      *
      * @param int $couponId Coupon id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
-    public function updateAction(EventDispatcherInterface $eventDispatcher, $couponId): \Symfony\Component\HttpFoundation\Response|RedirectResponse
+    public function updateAction(EventDispatcherInterface $eventDispatcher, $couponId): Response|RedirectResponse
     {
-        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -273,11 +271,11 @@ class CouponController extends BaseAdminController
      *
      * @param string $conditionId Condition service id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
-    public function getConditionEmptyInputAjaxAction($conditionId): \Symfony\Component\HttpFoundation\Response|false
+    public function getConditionEmptyInputAjaxAction($conditionId): Response|false
     {
-        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -322,11 +320,11 @@ class CouponController extends BaseAdminController
      * @param int $couponId       Coupon id being updated
      * @param int $conditionIndex Coupon Condition position in the collection
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getConditionToUpdateInputAjaxAction($couponId, $conditionIndex)
     {
-        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -377,12 +375,10 @@ class CouponController extends BaseAdminController
      * Manage Coupons read display.
      *
      * @param int $couponId Coupon id
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function saveConditionsAction(EventDispatcherInterface $eventDispatcher, $couponId): Response
     {
-        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -427,12 +423,10 @@ class CouponController extends BaseAdminController
      *
      * @param int $couponId       Coupon id
      * @param int $conditionIndex Coupon condition index in the collection
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function deleteConditionsAction(EventDispatcherInterface $eventDispatcher, $couponId, $conditionIndex): Response
     {
-        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -467,14 +461,14 @@ class CouponController extends BaseAdminController
      *
      * @param string     $action  Creation|Update|Delete
      * @param string     $message Message to log
-     * @param Exception $e Exception to log
+     * @param \Exception $e       Exception to log
      *
      * @return $this
      */
     protected function logError(string $action, $message, $e): static
     {
         Tlog::getInstance()->error(
-            sprintf(
+            \sprintf(
                 'Error during Coupon '.$action.' process : %s. Exception was %s',
                 $message,
                 $e->getMessage()
@@ -494,7 +488,7 @@ class CouponController extends BaseAdminController
      *
      * @return $this
      */
-    protected function validateCreateOrUpdateForm(EventDispatcherInterface $eventDispatcher, ?string $eventToDispatch, string $log, $action, Coupon $model = null): ?RedirectResponse
+    protected function validateCreateOrUpdateForm(EventDispatcherInterface $eventDispatcher, ?string $eventToDispatch, string $log, $action, ?Coupon $model = null): ?RedirectResponse
     {
         // Create the form from the request
         $couponForm = $this->getForm($action, $model);
@@ -515,7 +509,7 @@ class CouponController extends BaseAdminController
             $this->adminLogAppend(
                 AdminResources::COUPON,
                 AccessManager::UPDATE,
-                sprintf(
+                \sprintf(
                     'Coupon %s (ID ) '.$log,
                     $couponEvent->getTitle(),
                     $couponEvent->getCouponModel()->getId()
@@ -538,7 +532,7 @@ class CouponController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Invalid data entered
             $message = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $message = $this->getTranslator()->trans('Sorry, an error occurred: %err', ['%err' => $ex->getMessage()]);
 
@@ -628,12 +622,10 @@ class CouponController extends BaseAdminController
      * allowing Admin to set its Coupon effect.
      *
      * @param string $couponServiceId Coupon service id
-     *
-     * @return ResponseRest
      */
     public function getBackOfficeInputsAjaxAction($couponServiceId): ResponseRest
     {
-        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -666,7 +658,7 @@ class CouponController extends BaseAdminController
      */
     public function getBackOfficeConditionSummariesAjaxAction($couponId)
     {
-        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -698,7 +690,7 @@ class CouponController extends BaseAdminController
      * @param Form   $form  Form containing user data
      * @param Coupon $model Model if in update mode
      */
-    protected function feedCouponCreateOrUpdateEvent(Form $form, Coupon $model = null): CouponCreateOrUpdateEvent
+    protected function feedCouponCreateOrUpdateEvent(Form $form, ?Coupon $model = null): CouponCreateOrUpdateEvent
     {
         // Get the form field values
         $data = $form->getData();
@@ -756,6 +748,7 @@ class CouponController extends BaseAdminController
 
         /** @var ConditionFactory $conditionFactory */
         $conditionFactory = $this->container->get('thelia.condition.factory');
+
         return $conditionFactory->build($serviceId, $operators, $values);
     }
 
@@ -799,7 +792,7 @@ class CouponController extends BaseAdminController
         $this->adminLogAppend(
             AdminResources::COUPON,
             AccessManager::UPDATE,
-            sprintf(
+            \sprintf(
                 'Coupon %s (ID %s) conditions updated',
                 $couponEvent->getCouponModel()->getTitle(),
                 $couponEvent->getCouponModel()->getType()
@@ -833,7 +826,7 @@ class CouponController extends BaseAdminController
     public function deleteAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
-        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::DELETE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::DELETE)) instanceof Response) {
             return $response;
         }
 
@@ -855,7 +848,7 @@ class CouponController extends BaseAdminController
                 $this->adminLogAppend(
                     AdminResources::COUPON,
                     AccessManager::DELETE,
-                    sprintf(
+                    \sprintf(
                         'Coupon %s (ID %s) deleted',
                         $deletedObject->getCode(),
                         $deletedObject->getId()
@@ -867,7 +860,7 @@ class CouponController extends BaseAdminController
             return new RedirectResponse(
                 URL::getInstance()->absoluteUrl($this->getRoute('admin.coupon.list'))
             );
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $this->getParserContext()
                 ->setGeneralError($exception->getMessage())
             ;

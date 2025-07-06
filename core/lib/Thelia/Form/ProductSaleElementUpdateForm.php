@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -28,27 +29,27 @@ class ProductSaleElementUpdateForm extends BaseForm
     {
         $this->formBuilder
             ->add('tax_rule', IntegerType::class, [
-                    'constraints' => [new NotBlank()],
-                    'label' => Translator::getInstance()->trans('Tax rule for this product *'),
-                    'label_attr' => ['for' => 'tax_rule_field'],
+                'constraints' => [new NotBlank()],
+                'label' => Translator::getInstance()->trans('Tax rule for this product *'),
+                'label_attr' => ['for' => 'tax_rule_field'],
             ])
             ->add('product_id', IntegerType::class, [
-                    'label' => Translator::getInstance()->trans('Product ID *'),
-                    'label_attr' => ['for' => 'product_id_field'],
-                    'constraints' => [new GreaterThan(['value' => 0])],
+                'label' => Translator::getInstance()->trans('Product ID *'),
+                'label_attr' => ['for' => 'product_id_field'],
+                'constraints' => [new GreaterThan(['value' => 0])],
             ])
             ->add('default_pse', IntegerType::class, [
-                    'label' => Translator::getInstance()->trans('Default product sale element'),
-                    'label_attr' => ['for' => 'default_pse_field'],
+                'label' => Translator::getInstance()->trans('Default product sale element'),
+                'label_attr' => ['for' => 'default_pse_field'],
             ])
             ->add('currency', IntegerType::class, [
-                    'constraints' => [new NotBlank()],
-                    'label' => Translator::getInstance()->trans('Price currency *'),
-                    'label_attr' => ['for' => 'currency_field'],
+                'constraints' => [new NotBlank()],
+                'label' => Translator::getInstance()->trans('Price currency *'),
+                'label_attr' => ['for' => 'currency_field'],
             ])
             ->add('use_exchange_rate', IntegerType::class, [
-                    'label' => Translator::getInstance()->trans('Apply exchange rates on price in %sym', ['%sym' => Currency::getDefaultCurrency()->getSymbol()]),
-                    'label_attr' => ['for' => 'use_exchange_rate_field'],
+                'label' => Translator::getInstance()->trans('Apply exchange rates on price in %sym', ['%sym' => Currency::getDefaultCurrency()->getSymbol()]),
+                'label_attr' => ['for' => 'use_exchange_rate_field'],
             ])
 
             // -- Collections
@@ -98,7 +99,7 @@ class ProductSaleElementUpdateForm extends BaseForm
                 'allow_add' => true,
                 'allow_delete' => true,
                 'entry_options' => [
-                        'constraints' => [new NotBlank()],
+                    'constraints' => [new NotBlank()],
                 ],
             ])
             ->add('sale_price', CollectionType::class, [
@@ -122,7 +123,7 @@ class ProductSaleElementUpdateForm extends BaseForm
                 'allow_delete' => true,
             ])
             ->add('isnew', CollectionType::class, [
-                 'entry_type' => IntegerType::class,
+                'entry_type' => IntegerType::class,
                 'label' => Translator::getInstance()->trans('Advertise this product as new'),
                 'label_attr' => ['for' => 'isnew_field'],
                 'allow_add' => true,
@@ -136,7 +137,7 @@ class ProductSaleElementUpdateForm extends BaseForm
                 'allow_delete' => true,
             ])
             ->add('ean_code', CollectionType::class, [
-                 'entry_type' => TextType::class,
+                'entry_type' => TextType::class,
                 'label' => Translator::getInstance()->trans('EAN Code'),
                 'label_attr' => ['for' => 'ean_code_field'],
                 'allow_add' => true,

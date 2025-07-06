@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -30,9 +31,9 @@ class ImportForm extends BaseForm
     {
         $this->formBuilder
             ->add('file_upload', FileType::class, [
-            'label' => $this->translator->trans('File to upload'),
-            'label_attr' => ['for' => 'file_to_upload'],
-            'required' => true,
+                'label' => $this->translator->trans('File to upload'),
+                'label_attr' => ['for' => 'file_to_upload'],
+                'required' => true,
                 'constraints' => [
                     new Assert\NotNull(),
                 ],

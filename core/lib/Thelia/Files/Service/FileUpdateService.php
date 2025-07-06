@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Files\Service;
 
-use Exception;
-use InvalidArgumentException;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -25,19 +24,18 @@ use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 
-
 readonly class FileUpdateService
 {
     public function __construct(
         private FileManager $fileManager,
-        private Request     $request
+        private Request $request,
     ) {
     }
 
     /**
      * @throws FormValidationException If form validation fails
-     * @throws PropelException If database operation fails
-     * @throws Exception If any other error occurs
+     * @throws PropelException         If database operation fails
+     * @throws \Exception              If any other error occurs
      */
     public function updateFile(
         EventDispatcherInterface $eventDispatcher,
@@ -45,7 +43,7 @@ readonly class FileUpdateService
         string $parentType,
         string $objectType,
         string $eventName,
-        BaseForm $fileUpdateForm
+        BaseForm $fileUpdateForm,
     ): FileModelInterface {
         $fileModelInstance = $this->fileManager->getModelInstance($objectType, $parentType);
 
@@ -53,7 +51,7 @@ readonly class FileUpdateService
         $file = $fileModelInstance->getQueryInstance()->findPk($fileId);
 
         if (null === $file) {
-            throw new InvalidArgumentException(sprintf('%d %s id does not exist', $fileId, $objectType));
+            throw new \InvalidArgumentException(\sprintf('%d %s id does not exist', $fileId, $objectType));
         }
 
         $oldFile = clone $file;
@@ -107,7 +105,7 @@ readonly class FileUpdateService
         string $parentType,
         string $objectType,
         string $title,
-        string $locale
+        string $locale,
     ): void {
         $fileModelInstance = $this->fileManager->getModelInstance($objectType, $parentType);
 
@@ -123,6 +121,6 @@ readonly class FileUpdateService
 
     public function logUpdateError(string $objectType, string $message): void
     {
-        Tlog::getInstance()->error(sprintf('Error during %s editing : %s.', $objectType, $message));
+        Tlog::getInstance()->error(\sprintf('Error during %s editing : %s.', $objectType, $message));
     }
 }

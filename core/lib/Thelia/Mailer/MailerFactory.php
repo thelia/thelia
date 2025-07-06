@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Mailer;
 
-use Exception;
-use RuntimeException;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
@@ -119,16 +118,16 @@ class MailerFactory
                     $instance = $this->createEmailMessage($messageCode, $from, $to, $messageParameters, $locale, $cc, $bcc, $replyTo);
 
                     $this->send($instance);
-                } catch (Exception $ex) {
+                } catch (\Exception $ex) {
                     Tlog::getInstance()->addError(
-                        sprintf('Error while sending email message %s: ', $messageCode).$ex->getMessage()
+                        \sprintf('Error while sending email message %s: ', $messageCode).$ex->getMessage()
                     );
                 }
             } else {
-                Tlog::getInstance()->addWarning(sprintf('Message %s not sent: recipient list is empty.', $messageCode));
+                Tlog::getInstance()->addWarning(\sprintf('Message %s not sent: recipient list is empty.', $messageCode));
             }
         } else {
-            Tlog::getInstance()->addError(sprintf("Can't send email message %s: store email address is not defined.", $messageCode));
+            Tlog::getInstance()->addError(\sprintf("Can't send email message %s: store email address is not defined.", $messageCode));
         }
     }
 
@@ -144,13 +143,13 @@ class MailerFactory
      * @param array  $bcc               Bcc addresses. An array of (email-address => name) [optional]
      * @param array  $replyTo           Reply to addresses. An array of (email-address => name) [optional]
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function createEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null, $cc = [], $bcc = [], $replyTo = []): Email
     {
         $message = MessageQuery::getFromName($messageCode);
         if (null == $message) {
-            throw new RuntimeException(
+            throw new \RuntimeException(
                 Translator::getInstance()->trans(
                     "Failed to load message with code '%code%', propably because it does'nt exists.",
                     ['%code%' => $messageCode]

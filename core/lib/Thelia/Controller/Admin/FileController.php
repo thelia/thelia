@@ -11,14 +11,14 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-use Exception;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\TheliaEvents;
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Files\Exception\ProcessFileException;
 use Thelia\Files\FileConfiguration;
@@ -76,14 +76,14 @@ class FileController extends BaseAdminController
             return new ResponseRest(['status' => true, 'message' => '']);
         }
 
-        return new Response('', \Symfony\Component\HttpFoundation\Response::HTTP_NOT_FOUND);
+        return new Response('', Response::HTTP_NOT_FOUND);
     }
 
     public function saveImageAjaxAction(
         EventDispatcherInterface $eventDispatcher,
         FileProcessorService $fileProcessorService,
         int $parentId,
-        string $parentType
+        string $parentType,
     ): Response {
         $config = FileConfiguration::getImageConfig();
 
@@ -102,7 +102,7 @@ class FileController extends BaseAdminController
         EventDispatcherInterface $eventDispatcher,
         FileProcessorService $fileProcessorService,
         int $parentId,
-        string $parentType
+        string $parentType,
     ): Response {
         $config = FileConfiguration::getDocumentConfig();
 
@@ -169,7 +169,7 @@ class FileController extends BaseAdminController
     public function viewImageAction(
         int $imageId,
         string $parentType,
-        FileManager $fileManager
+        FileManager $fileManager,
     ): Response {
         if (($response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
@@ -197,7 +197,7 @@ class FileController extends BaseAdminController
     public function viewDocumentAction(
         int $documentId,
         string $parentType,
-        FileManager $fileManager
+        FileManager $fileManager,
     ): Response {
         if (($response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
@@ -227,9 +227,8 @@ class FileController extends BaseAdminController
         FileUpdateService $fileUpdateService,
         int $imageId,
         string $parentType,
-        FileManager $fileManager
-    ): RedirectResponse|Response
-    {
+        FileManager $fileManager,
+    ): RedirectResponse|Response {
         if (($response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
@@ -250,7 +249,7 @@ class FileController extends BaseAdminController
             $this->adminLogAppend(
                 $this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT),
                 AccessManager::UPDATE,
-                sprintf(
+                \sprintf(
                     '%s with Ref %s (ID %d) modified',
                     ucfirst('image'),
                     $fileInstance->getTitle(),
@@ -267,15 +266,15 @@ class FileController extends BaseAdminController
 
             return $this->generateSuccessRedirect($fileUpdateForm);
         } catch (FormValidationException $e) {
-            $message = sprintf('Please check your input: %s', $e->getMessage());
+            $message = \sprintf('Please check your input: %s', $e->getMessage());
             $fileUpdateService->logUpdateError('image', $message);
             $fileUpdateForm->setErrorMessage($message);
 
             $this->getParserContext()
                 ->addForm($fileUpdateForm)
                 ->setGeneralError($message);
-        } catch (Exception $e) {
-            $message = sprintf('Sorry, an error occurred: %s', $e->getMessage().' '.$e->getFile());
+        } catch (\Exception $e) {
+            $message = \sprintf('Sorry, an error occurred: %s', $e->getMessage().' '.$e->getFile());
             $fileUpdateService->logUpdateError('image', $message);
             $fileUpdateForm->setErrorMessage($message);
 
@@ -297,9 +296,8 @@ class FileController extends BaseAdminController
         FileUpdateService $fileUpdateService,
         int $documentId,
         string $parentType,
-        FileManager $fileManager
-    ): RedirectResponse|Response
-    {
+        FileManager $fileManager,
+    ): RedirectResponse|Response {
         if (($response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
@@ -320,7 +318,7 @@ class FileController extends BaseAdminController
             $this->adminLogAppend(
                 $this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT),
                 AccessManager::UPDATE,
-                sprintf(
+                \sprintf(
                     '%s with Ref %s (ID %d) modified',
                     ucfirst('document'),
                     $fileInstance->getTitle(),
@@ -337,15 +335,15 @@ class FileController extends BaseAdminController
 
             return $this->generateSuccessRedirect($fileUpdateForm);
         } catch (FormValidationException $e) {
-            $message = sprintf('Please check your input: %s', $e->getMessage());
+            $message = \sprintf('Please check your input: %s', $e->getMessage());
             $fileUpdateService->logUpdateError('document', $message);
             $fileUpdateForm->setErrorMessage($message);
 
             $this->getParserContext()
                 ->addForm($fileUpdateForm)
                 ->setGeneralError($message);
-        } catch (Exception $e) {
-            $message = sprintf('Sorry, an error occurred: %s', $e->getMessage().' '.$e->getFile());
+        } catch (\Exception $e) {
+            $message = \sprintf('Sorry, an error occurred: %s', $e->getMessage().' '.$e->getFile());
             $fileUpdateService->logUpdateError('document', $message);
             $fileUpdateForm->setErrorMessage($message);
 
@@ -366,7 +364,7 @@ class FileController extends BaseAdminController
         EventDispatcherInterface $eventDispatcher,
         FileDeleteService $fileDeleteService,
         int $imageId,
-        string $parentType
+        string $parentType,
     ): Response {
         $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
@@ -385,7 +383,7 @@ class FileController extends BaseAdminController
                 AccessManager::UPDATE,
                 $message
             );
-        } catch (Exception) {
+        } catch (\Exception) {
             return $this->pageNotFound();
         }
 
@@ -396,7 +394,7 @@ class FileController extends BaseAdminController
         EventDispatcherInterface $eventDispatcher,
         FileDeleteService $fileDeleteService,
         int $documentId,
-        string $parentType
+        string $parentType,
     ): Response {
         $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
@@ -415,7 +413,7 @@ class FileController extends BaseAdminController
                 AccessManager::UPDATE,
                 $message
             );
-        } catch (Exception) {
+        } catch (\Exception) {
             return $this->pageNotFound();
         }
 
@@ -425,7 +423,7 @@ class FileController extends BaseAdminController
     public function updateImagePositionAction(
         EventDispatcherInterface $eventDispatcher,
         FilePositionService $filePositionService,
-        string $parentType
+        string $parentType,
     ): Response {
         $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
@@ -442,7 +440,7 @@ class FileController extends BaseAdminController
                 TheliaEvents::IMAGE_UPDATE_POSITION,
                 $position
             );
-        } catch (Exception) {
+        } catch (\Exception) {
             return $this->pageNotFound();
         }
 
@@ -452,7 +450,7 @@ class FileController extends BaseAdminController
     public function updateDocumentPositionAction(
         EventDispatcherInterface $eventDispatcher,
         FilePositionService $filePositionService,
-        string $parentType
+        string $parentType,
     ): Response {
         $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
@@ -469,7 +467,7 @@ class FileController extends BaseAdminController
                 TheliaEvents::DOCUMENT_UPDATE_POSITION,
                 $position
             );
-        } catch (Exception) {
+        } catch (\Exception) {
             return $this->pageNotFound();
         }
 
@@ -480,7 +478,7 @@ class FileController extends BaseAdminController
         EventDispatcherInterface $eventDispatcher,
         FileVisibilityService $fileVisibilityService,
         string $parentType,
-        int $documentId
+        int $documentId,
     ): Response {
         $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
@@ -493,7 +491,7 @@ class FileController extends BaseAdminController
                 'image',
                 TheliaEvents::IMAGE_TOGGLE_VISIBILITY
             );
-        } catch (Exception) {
+        } catch (\Exception) {
             return $this->pageNotFound();
         }
 
@@ -504,7 +502,7 @@ class FileController extends BaseAdminController
         EventDispatcherInterface $eventDispatcher,
         FileVisibilityService $fileVisibilityService,
         string $parentType,
-        int $documentId
+        int $documentId,
     ): Response {
         $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
@@ -517,7 +515,7 @@ class FileController extends BaseAdminController
                 'document',
                 TheliaEvents::DOCUMENT_TOGGLE_VISIBILITY
             );
-        } catch (Exception) {
+        } catch (\Exception) {
             return $this->pageNotFound();
         }
 
@@ -527,7 +525,7 @@ class FileController extends BaseAdminController
     public function updateImageTitleAction(
         FileUpdateService $fileUpdateService,
         int $imageId,
-        string $parentType
+        string $parentType,
     ): RedirectResponse {
         if (($response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) instanceof Response) {
             return $response;

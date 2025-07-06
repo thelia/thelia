@@ -11,11 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Bridge\Propel\MetaData\Property;
 
-use ReflectionProperty;
-use ReflectionType;
-use ReflectionClass;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
@@ -30,7 +28,7 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
     public function __construct(
         #[AutowireDecorated]
         private readonly PropertyMetadataFactoryInterface $decorated,
-        private readonly ApiResourcePropelTransformerService $apiResourcePropelTransformerService
+        private readonly ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
     ) {
     }
 
@@ -39,8 +37,8 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
 
         if (class_exists($resourceClass) && property_exists($resourceClass, $property)) {
-            $reflection = new ReflectionProperty($resourceClass, $property);
-            if ($reflection->getType() instanceof ReflectionType) {
+            $reflection = new \ReflectionProperty($resourceClass, $property);
+            if ($reflection->getType() instanceof \ReflectionType) {
                 $propertyClass = $reflection->getType()->getName();
                 if (class_exists($propertyClass) && \in_array('BackedEnum', class_implements($reflection->getType()->getName()))) {
                     $values = array_column($propertyClass::cases(), 'value');
@@ -66,7 +64,7 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
         }
 
         if ('i18ns' === $property && is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
-            $i18nReflect = new ReflectionClass($resourceClass::getI18nResourceClass());
+            $i18nReflect = new \ReflectionClass($resourceClass::getI18nResourceClass());
 
             // Todo check Groups to better fit example with reality
             $propertyMetadata = $propertyMetadata->withOpenapiContext([
@@ -74,7 +72,7 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
                 'example' => [
                     'en_US' => array_reduce(
                         $i18nReflect->getProperties(),
-                        function (array $carry, ReflectionProperty $property) {
+                        function (array $carry, \ReflectionProperty $property) {
                             if ('id' === $property->getName()) {
                                 return $carry;
                             }
@@ -87,7 +85,7 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
                     ),
                     'fr_FR' => array_reduce(
                         $i18nReflect->getProperties(),
-                        function (array $carry, ReflectionProperty $property) {
+                        function (array $carry, \ReflectionProperty $property) {
                             if ('id' === $property->getName()) {
                                 return $carry;
                             }

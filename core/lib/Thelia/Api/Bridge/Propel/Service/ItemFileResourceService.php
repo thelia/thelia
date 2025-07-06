@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Bridge\Propel\Service;
 
-use ReflectionClass;
-use ReflectionException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -29,7 +28,7 @@ use Thelia\Model\ConfigQuery;
 readonly class ItemFileResourceService
 {
     public function __construct(
-        private EventDispatcherInterface $eventDispatcher
+        private EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -83,7 +82,7 @@ readonly class ItemFileResourceService
             $baseSourceFilePath = THELIA_ROOT.$baseSourceFilePath;
         }
 
-        $sourceFilePath = sprintf(
+        $sourceFilePath = \sprintf(
             '%s/%s/%s',
             $baseSourceFilePath,
             $itemType,
@@ -101,13 +100,13 @@ readonly class ItemFileResourceService
     }
 
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public function getPropertyFileConstraints(string $className, string $propertyName): array
     {
         $constraints = [];
 
-        $reflectionClass = new ReflectionClass($className);
+        $reflectionClass = new \ReflectionClass($className);
         if ($reflectionClass->hasProperty($propertyName)) {
             $property = $reflectionClass->getProperty($propertyName);
 

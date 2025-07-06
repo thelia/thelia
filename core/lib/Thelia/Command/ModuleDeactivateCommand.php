@@ -11,11 +11,10 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
-use RuntimeException;
-use Exception;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -73,11 +72,11 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
         $module = ModuleQuery::create()->findOneByCode($moduleCode);
 
         if (null === $module) {
-            throw new RuntimeException(sprintf('module %s not found', $moduleCode));
+            throw new \RuntimeException(\sprintf('module %s not found', $moduleCode));
         }
 
         if ($module->getActivate() == BaseModule::IS_NOT_ACTIVATED) {
-            throw new RuntimeException(sprintf('module %s is already deactivated', $moduleCode));
+            throw new \RuntimeException(\sprintf('module %s is already deactivated', $moduleCode));
         }
 
         try {
@@ -97,15 +96,15 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
             }
 
             $this->eventDispatcher->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
-        } catch (Exception $exception) {
-            throw new RuntimeException(sprintf('Deactivation fail with Exception : [%d] %s', $exception->getCode(), $exception->getMessage()), $exception->getCode(), $exception);
+        } catch (\Exception $exception) {
+            throw new \RuntimeException(\sprintf('Deactivation fail with Exception : [%d] %s', $exception->getCode(), $exception->getMessage()), $exception->getCode(), $exception);
         }
 
         // impossible to change output class in CommandTester...
         if (method_exists($output, 'renderBlock')) {
             $output->renderBlock([
                 '',
-                sprintf('Deactivation succeed for module %s', $moduleCode),
+                \sprintf('Deactivation succeed for module %s', $moduleCode),
                 '',
             ], 'bg=green;fg=black');
         }

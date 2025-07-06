@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event\Category;
 
 use Thelia\Core\Event\ActionEvent;
@@ -26,7 +27,7 @@ class CategoryAssociatedContentEvent extends ActionEvent
      */
     public $content;
 
-    public function __construct(CategoryAssociatedContent $content = null)
+    public function __construct(?CategoryAssociatedContent $content = null)
     {
         $this->content = $content;
     }

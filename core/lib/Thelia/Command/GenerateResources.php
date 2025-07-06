@@ -11,11 +11,10 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
-use ReflectionClass;
-use RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -45,12 +44,12 @@ class GenerateResources extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $class = new ReflectionClass(AdminResources::class);
+        $class = new \ReflectionClass(AdminResources::class);
 
         $constants = $class->getConstants();
 
         if (\count($constants) == 0) {
-            throw new RuntimeException('No resources found');
+            throw new \RuntimeException('No resources found');
         }
 
         switch ($input->getOption('output')) {
@@ -66,7 +65,7 @@ class GenerateResources extends ContainerAwareCommand
 
                     ++$compteur;
                     $output->writeln(
-                        sprintf("(%d, '%s', NOW(), NOW())", $compteur, $value).($constant === key(\array_slice($constants, -1, 1, true)) ? ';' : ',')
+                        \sprintf("(%d, '%s', NOW(), NOW())", $compteur, $value).($constant === key(\array_slice($constants, -1, 1, true)) ? ';' : ',')
                     );
                 }
 
@@ -86,10 +85,10 @@ class GenerateResources extends ContainerAwareCommand
                     $title = ucwords(str_replace('.', ' / ', str_replace('admin.', '', $value)));
 
                     $output->writeln(
-                        sprintf("(%d, 'en_US', '%s'),", $compteur, $title)
+                        \sprintf("(%d, 'en_US', '%s'),", $compteur, $title)
                     );
                     $output->writeln(
-                        sprintf("(%d, 'fr_FR', '%s')", $compteur, $title).($constant === key(\array_slice($constants, -1, 1, true)) ? ';' : ',')
+                        \sprintf("(%d, 'fr_FR', '%s')", $compteur, $title).($constant === key(\array_slice($constants, -1, 1, true)) ? ';' : ',')
                     );
                 }
 

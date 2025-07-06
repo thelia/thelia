@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event\Address;
 
 use Thelia\Core\Event\ActionEvent;
@@ -35,21 +36,21 @@ class AddressCreateOrUpdateEvent extends ActionEvent
     protected $address;
 
     /**
-     * @param string $label
-     * @param int $title
+     * @param string      $label
+     * @param int         $title
      * @param string|null $company
-     * @param string $firstname
-     * @param string $lastname
-     * @param string $address1
-     * @param string $address2
-     * @param string $address3
-     * @param string $zipcode
-     * @param string $city
-     * @param int $country
-     * @param int $state
-     * @param string $cellphone
-     * @param string $phone
-     * @param int $isDefault
+     * @param string      $firstname
+     * @param string      $lastname
+     * @param string      $address1
+     * @param string      $address2
+     * @param string      $address3
+     * @param string      $zipcode
+     * @param string      $city
+     * @param int         $country
+     * @param int         $state
+     * @param string      $cellphone
+     * @param string      $phone
+     * @param int         $isDefault
      */
     public function __construct(
         /**
@@ -108,9 +109,8 @@ class AddressCreateOrUpdateEvent extends ActionEvent
         /**
          * @var int state id
          */
-        protected $state = null
-    )
-    {
+        protected $state = null,
+    ) {
     }
 
     /**

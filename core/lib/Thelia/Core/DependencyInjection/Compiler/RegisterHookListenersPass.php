@@ -11,12 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\DependencyInjection\Compiler;
 
-use InvalidArgumentException;
-use Thelia\Model\Module;
-use ReflectionMethod;
-use ReflectionException;
 use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -30,6 +27,7 @@ use Thelia\Log\Tlog;
 use Thelia\Model\Base\IgnoredModuleHookQuery;
 use Thelia\Model\Hook;
 use Thelia\Model\HookQuery;
+use Thelia\Model\Module;
 use Thelia\Model\ModuleHook;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleQuery;
@@ -75,7 +73,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
             // the class must extends BaseHook
             $implementClass = HookDefinition::BASE_CLASS;
             if (!is_subclass_of($class, $implementClass)) {
-                throw new InvalidArgumentException(sprintf('Hook class "%s" must extends class "%s".', $class, $implementClass));
+                throw new \InvalidArgumentException(\sprintf('Hook class "%s" must extends class "%s".', $class, $implementClass));
             }
 
             $moduleCode = explode('\\', $class)[0];
@@ -132,12 +130,12 @@ class RegisterHookListenersPass implements CompilerPassInterface
     }
 
     /**
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     protected function registerHook(string $class, Module $module, string $id, array $attributes): void
     {
         if (!isset($attributes['event'])) {
-            throw new InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "hook.event_listener" tags.', $id));
+            throw new \InvalidArgumentException(\sprintf('Service "%s" must define the "event" attribute on "hook.event_listener" tags.', $id));
         }
 
         $active = (int) ($attributes['active'] ?? 1) === 1;
@@ -159,12 +157,13 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
         if (!$moduleHook) {
             if (!$isValidMethod) {
-                $this->logAlertMessage(sprintf(
+                $this->logAlertMessage(\sprintf(
                     'Module [%s] could not be registered to hook [%s], method [%s] is not reachable.',
                     $module->getCode(),
                     $attributes['event'],
                     $method
                 ));
+
                 return;
             }
 
@@ -182,7 +181,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
                     ->save();
             }
         } elseif (!$isValidMethod) {
-            $this->logAlertMessage(sprintf(
+            $this->logAlertMessage(\sprintf(
                 'Module [%s] could not use hook [%s], method [%s] is not reachable anymore.',
                 $module->getCode(),
                 $attributes['event'],
@@ -240,7 +239,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
             // Add the the new listener for active hooks, we have to reverse the priority and the position
             if ($moduleHook->getActive() && $moduleHook->getModuleActive() && $moduleHook->getHookActive()) {
-                $eventName = sprintf('hook.%s.%s', $hook->getType(), $hook->getCode());
+                $eventName = \sprintf('hook.%s.%s', $hook->getType(), $hook->getCode());
 
                 // we a register an event which is relative to a specific module
                 if ($hook->getByModule()) {
@@ -300,13 +299,13 @@ class RegisterHookListenersPass implements CompilerPassInterface
             ->findOne();
 
         if (null === $hook) {
-            $this->logAlertMessage(sprintf('Hook %s is unknown.', $hookName));
+            $this->logAlertMessage(\sprintf('Hook %s is unknown.', $hookName));
 
             return null;
         }
 
         if (!$hook->getActivate()) {
-            $this->logAlertMessage(sprintf('Hook %s is not activated.', $hookName));
+            $this->logAlertMessage(\sprintf('Hook %s is not activated.', $hookName));
         }
 
         return $hook;
@@ -315,7 +314,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
     protected function isValidHookMethod(string $className, string $methodName, bool $block): bool
     {
         try {
-            $method = new ReflectionMethod($className, $methodName);
+            $method = new \ReflectionMethod($className, $methodName);
 
             $parameters = $method->getParameters();
 
@@ -324,13 +323,13 @@ class RegisterHookListenersPass implements CompilerPassInterface
                 HookDefinition::RENDER_FUNCTION_EVENT;
             $parameterType = $parameters[0]->getType()?->getName();
             if ($parameterType !== $eventType && !is_subclass_of($parameterType, $eventType)) {
-                $this->logAlertMessage(sprintf('Method %s should use an event of type %s. found: %s', $methodName, $eventType, $parameters[0]->getType()));
+                $this->logAlertMessage(\sprintf('Method %s should use an event of type %s. found: %s', $methodName, $eventType, $parameters[0]->getType()));
 
                 return false;
             }
-        } catch (ReflectionException $reflectionException) {
+        } catch (\ReflectionException $reflectionException) {
             $this->logAlertMessage(
-                sprintf('Method %s does not exist in %s : %s', $methodName, $className, $reflectionException)
+                \sprintf('Method %s does not exist in %s : %s', $methodName, $className, $reflectionException)
             );
 
             return false;
@@ -348,7 +347,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
                 return $event;
             }
 
-            $callback = (static fn($matches) => strtoupper((string) $matches[0]));
+            $callback = (static fn ($matches) => strtoupper((string) $matches[0]));
             $event['method'] = 'on'.preg_replace_callback(
                 [
                     '/(?<=\b)[a-z]/i',

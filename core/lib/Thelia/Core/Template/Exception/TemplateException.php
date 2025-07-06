@@ -11,15 +11,14 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Core\Template\Exception;
 
-use RuntimeException;
+namespace Thelia\Core\Template\Exception;
 
 /**
  * Class InvalidXmlDocumentException.
  *
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
-class TemplateException extends RuntimeException
+class TemplateException extends \RuntimeException
 {
 }

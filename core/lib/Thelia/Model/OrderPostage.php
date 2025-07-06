@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
 /**
@@ -21,8 +22,8 @@ namespace Thelia\Model;
 class OrderPostage
 {
     /**
-     * @param float $amount
-     * @param float $amountTax
+     * @param float  $amount
+     * @param float  $amountTax
      * @param string $taxRuleTitle
      */
     public function __construct(protected $amount = 0.0, protected $amountTax = 0.0, protected $taxRuleTitle = '')

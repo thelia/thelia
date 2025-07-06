@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Security;
 
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -94,7 +95,7 @@ class SecurityContext
      *
      * @return bool true if the user has the required role, false otherwise
      */
-    final public function hasRequiredRole(UserInterface $user = null, array $roles = []): bool
+    final public function hasRequiredRole(?UserInterface $user = null, array $roles = []): bool
     {
         if ($user != null) {
             // Check if user's roles matches required roles

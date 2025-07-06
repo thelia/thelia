@@ -11,11 +11,10 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
-use RuntimeException;
-use Thelia\Service\DataTransfer\ImportHandler;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,6 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Thelia\Model\ImportQuery;
 use Thelia\Model\LangQuery;
+use Thelia\Service\DataTransfer\ImportHandler;
 
 /**
  * Class ImportCommand.
@@ -74,7 +74,7 @@ class ImportCommand extends ContainerAwareCommand
         $importRef = $input->getArgument('ref');
         $path = $input->getArgument('filePath');
         if ($importRef === null || $path === null) {
-            throw new RuntimeException(
+            throw new \RuntimeException(
                 'Not enough arguments.'.\PHP_EOL.'If no options are provided, ref and filePath arguments are required.'
             );
         }
@@ -84,7 +84,7 @@ class ImportCommand extends ContainerAwareCommand
 
         $import = $importHandler->getImportByRef($importRef);
         if ($import === null) {
-            throw new RuntimeException(
+            throw new \RuntimeException(
                 $importRef." import doesn't exist."
             );
         }

@@ -16,9 +16,9 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Thelia\Form\AddressCreateForm;
 use Thelia\Form\AddressUpdateForm;
+use Thelia\Form\AdminCreatePassword;
 use Thelia\Form\AdministratorCreationForm;
 use Thelia\Form\AdministratorModificationForm;
-use Thelia\Form\AdminCreatePassword;
 use Thelia\Form\AdminLogin;
 use Thelia\Form\AdminLostPassword;
 use Thelia\Form\Area\AreaCountryForm;

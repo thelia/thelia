@@ -11,11 +11,11 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-use Symfony\Component\HttpFoundation\Response;
-use Exception;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Administrator\AdministratorEvent;
 use Thelia\Core\Event\Administrator\AdministratorUpdatePasswordEvent;
@@ -108,13 +108,13 @@ class SessionController extends BaseAdminController
             }
 
             if (null === $admin) {
-                throw new Exception($this->getTranslator()->trans('Invalid username or email.'));
+                throw new \Exception($this->getTranslator()->trans('Invalid username or email.'));
             }
 
             $email = $admin->getEmail();
 
             if (empty($email)) {
-                throw new Exception($this->getTranslator()->trans('Sorry, no email defined for this administrator.'));
+                throw new \Exception($this->getTranslator()->trans('Sorry, no email defined for this administrator.'));
             }
 
             $eventDispatcher->dispatch(new AdministratorEvent($admin), TheliaEvents::ADMINISTRATOR_CREATEPASSWORD);
@@ -124,7 +124,7 @@ class SessionController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Validation problem
             $message = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             // Log failure
             AdminLog::append('admin', 'ADMIN_LOST_PASSWORD', $ex->getMessage(), $this->getRequest());
 
@@ -180,7 +180,7 @@ class SessionController extends BaseAdminController
             $token = $this->getSession()->get(self::ADMIN_TOKEN_SESSION_VAR_NAME);
 
             if (empty($token) || null === $admin = AdminQuery::create()->findOneByPasswordRenewToken($token)) {
-                throw new Exception($this->getTranslator()->trans('An invalid token was provided, your password cannot be changed'));
+                throw new \Exception($this->getTranslator()->trans('An invalid token was provided, your password cannot be changed'));
             }
 
             $event = new AdministratorUpdatePasswordEvent($admin);
@@ -194,7 +194,7 @@ class SessionController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Validation problem
             $message = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             // Log authentication failure
             AdminLog::append('admin', 'ADMIN_CREATE_PASSWORD', $ex->getMessage(), $this->getRequest());
 
@@ -228,7 +228,7 @@ class SessionController extends BaseAdminController
         return $this->generateRedirectFromRoute('admin.login');
     }
 
-    public function checkLoginAction(EventDispatcherInterface $eventDispatcher): RedirectResponse|null|Response
+    public function checkLoginAction(EventDispatcherInterface $eventDispatcher): RedirectResponse|Response|null
     {
         $request = $this->getRequest();
 
@@ -279,12 +279,12 @@ class SessionController extends BaseAdminController
         } catch (AuthenticationException $ex) {
             $username = $authenticator instanceof AdminUsernamePasswordFormAuthenticator ? $authenticator->getUsername() : 'unknown';
             // Log authentication failure
-            AdminLog::append('admin', 'LOGIN', sprintf("Authentication failure for username '%s'", $username), $request);
+            AdminLog::append('admin', 'LOGIN', \sprintf("Authentication failure for username '%s'", $username), $request);
 
             $message = $this->getTranslator()->trans('Login failed. Please check your username and password.');
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             // Log authentication failure
-            AdminLog::append('admin', 'LOGIN', sprintf('Undefined error: %s', $ex->getMessage()), $request);
+            AdminLog::append('admin', 'LOGIN', \sprintf('Undefined error: %s', $ex->getMessage()), $request);
 
             $message = $this->getTranslator()->trans(
                 'Unable to process your request. Please try again (%err).',

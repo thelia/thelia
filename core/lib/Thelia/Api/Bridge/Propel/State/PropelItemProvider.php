@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Bridge\Propel\State;
 
 use ApiPlatform\Metadata\Exception\RuntimeException;
@@ -33,7 +34,7 @@ readonly class PropelItemProvider implements ProviderInterface
         private ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
         private EventDispatcherInterface $eventDispatcher,
         private TFiltersProvider $filtersProvider,
-        private iterable $propelItemExtensions = []
+        private iterable $propelItemExtensions = [],
     ) {
     }
 

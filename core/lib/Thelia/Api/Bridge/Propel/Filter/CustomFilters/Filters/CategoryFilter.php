@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -27,7 +28,7 @@ class CategoryFilter implements TheliaFilterInterface
     {
     }
 
-    public function filter(ModelCriteria $query, $value, int $categoryDepth = null): void
+    public function filter(ModelCriteria $query, $value, ?int $categoryDepth = null): void
     {
         if (!\is_array($value)) {
             $value = [$value];

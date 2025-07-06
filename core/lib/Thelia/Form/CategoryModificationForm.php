@@ -11,12 +11,13 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Form;
 
-use Thelia\Model\Template;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Validator\Constraints\GreaterThan;
+use Thelia\Model\Template;
 use Thelia\Model\TemplateQuery;
 
 class CategoryModificationForm extends CategoryCreationForm

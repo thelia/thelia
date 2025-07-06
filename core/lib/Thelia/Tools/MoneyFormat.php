@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Tools;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -41,7 +42,7 @@ class MoneyFormat extends NumberFormat
         $decPoint = null,
         $thousandsSep = null,
         $symbol = null,
-        $removeZeroDecimal = false
+        $removeZeroDecimal = false,
     ): string {
         $number = $this->preFormat($number, $decimals, $decPoint, $thousandsSep, $removeZeroDecimal);
 
@@ -70,7 +71,7 @@ class MoneyFormat extends NumberFormat
         $decPoint = null,
         $thousandsSep = null,
         $currencyId = null,
-        $removeZeroDecimal = false
+        $removeZeroDecimal = false,
     ) {
         $number = $this->preFormat($number, $decimals, $decPoint, $thousandsSep, $removeZeroDecimal);
 
@@ -95,7 +96,7 @@ class MoneyFormat extends NumberFormat
         $decimals = null,
         $decPoint = null,
         $thousandsSep = null,
-        $removeZeroDecimal = false
+        $removeZeroDecimal = false,
     ): string {
         $number = preg_replace('/\s+/', '', (string) $number);
 

@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Action;
 
-use Exception;
-use finfo;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -45,7 +44,7 @@ class File extends BaseAction implements EventSubscriberInterface
 
         foreach ($event->getTypes() as $type) {
             if (!\in_array($type, ['images', 'documents'])) {
-                throw new Exception(Translator::getInstance()->trans('Cloning files of type %type is not allowed.', ['%type' => $type], 'core'));
+                throw new \Exception(Translator::getInstance()->trans('Cloning files of type %type is not allowed.', ['%type' => $type], 'core'));
             }
 
             $originalProductFiles = [];
@@ -87,7 +86,7 @@ class File extends BaseAction implements EventSubscriberInterface
                     copy($srcPath, $srcTmp);
 
                     // Get file mimeType
-                    $finfo = new finfo();
+                    $finfo = new \finfo();
                     $fileMimeType = $finfo->file($srcPath, \FILEINFO_MIME_TYPE);
 
                     // Get file event's parameters
@@ -132,7 +131,7 @@ class File extends BaseAction implements EventSubscriberInterface
                     // Clone file's I18n
                     $this->cloneFileI18n($originalProductFileI18ns, $clonedProductFile, $type, $event, $dispatcher);
                 } else {
-                    Tlog::getInstance()->addWarning('Failed to find media file ' . $srcPath);
+                    Tlog::getInstance()->addWarning('Failed to find media file '.$srcPath);
                 }
             }
         }

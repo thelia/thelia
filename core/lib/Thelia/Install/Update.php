@@ -11,14 +11,11 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Install;
 
-use PDOException;
-use PDO;
-use Exception;
-use RuntimeException;
-use SplFileInfo;
 use Michelf\Markdown;
+use PDO;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Symfony\Component\Filesystem\Filesystem;
@@ -60,7 +57,7 @@ class Update
     /** @var array */
     protected $updatedVersions = [];
 
-    /** @var PDO */
+    /** @var \PDO */
     protected $connection;
 
     /** @var string|null */
@@ -98,7 +95,7 @@ class Update
             }
         } catch (ParseException $ex) {
             throw new UpdateException('database.yml is not a valid file : '.$ex->getMessage());
-        } catch (PDOException $ex) {
+        } catch (\PDOException $ex) {
             throw new UpdateException('Wrong connection information'.$ex->getMessage());
         }
 
@@ -109,9 +106,9 @@ class Update
      * retrieve the database connection.
      *
      * @throws ParseException
-     * @throws PDOException
+     * @throws \PDOException
      */
-    protected function getDatabasePDO(): PDO
+    protected function getDatabasePDO(): \PDO
     {
         if (!Thelia::isInstalled()) {
             throw new UpdateException('Thelia is not installed yet');
@@ -183,7 +180,7 @@ class Update
             }
 
             $currentVersion = Version::parse();
-            $this->log('debug', sprintf('setting database configuration to %s', $currentVersion['version']));
+            $this->log('debug', \sprintf('setting database configuration to %s', $currentVersion['version']));
             $updateConfigVersion = [
                 'thelia_version' => $currentVersion['version'],
                 'thelia_major_version' => $currentVersion['major'],
@@ -207,12 +204,12 @@ class Update
 
             $this->connection->commit();
             $this->log('debug', 'update successfully');
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             if ($this->connection->inTransaction()) {
                 $this->connection->rollBack();
             }
 
-            $this->log('error', sprintf('error during update process with message : %s', $exception->getMessage()));
+            $this->log('error', \sprintf('error during update process with message : %s', $exception->getMessage()));
 
             $ex = new UpdateException($exception->getMessage(), $exception->getCode(), $exception->getPrevious());
             $ex->setVersion($version);
@@ -227,7 +224,7 @@ class Update
     /**
      * Backup current DB to file local/backup/update.sql.
      *
-     * @throws Exception
+     * @throws \Exception
      *
      * @return bool if it succeeds, false otherwise
      */
@@ -249,7 +246,7 @@ class Update
         $fs = new Filesystem();
 
         try {
-            $this->log('debug', sprintf('Backup database to file : %s', $this->backupFile));
+            $this->log('debug', \sprintf('Backup database to file : %s', $this->backupFile));
 
             // test if backup dir exists
             if (!$fs->exists($backupDir)) {
@@ -257,7 +254,7 @@ class Update
             }
 
             if (!is_writable($backupDir)) {
-                throw new RuntimeException(sprintf('impossible to write in directory : %s', $backupDir));
+                throw new \RuntimeException(\sprintf('impossible to write in directory : %s', $backupDir));
             }
 
             // test if backup file already exists
@@ -267,8 +264,8 @@ class Update
             }
 
             $database->backupDb($this->backupFile);
-        } catch (Exception $exception) {
-            $this->log('error', sprintf('error during backup process with message : %s', $exception->getMessage()));
+        } catch (\Exception $exception) {
+            $this->log('error', \sprintf('error during backup process with message : %s', $exception->getMessage()));
             throw $exception;
         }
     }
@@ -283,15 +280,15 @@ class Update
         $database = new Database($this->connection);
 
         try {
-            $this->log('debug', sprintf('Restore database with file : %s', $this->backupFile));
+            $this->log('debug', \sprintf('Restore database with file : %s', $this->backupFile));
 
             if (!file_exists($this->backupFile)) {
                 return false;
             }
 
             $database->restoreDb($this->backupFile);
-        } catch (Exception $exception) {
-            $this->log('error', sprintf('error during restore process with message : %s', $exception->getMessage()));
+        } catch (\Exception $exception) {
+            $this->log('error', \sprintf('error during restore process with message : %s', $exception->getMessage()));
             echo $exception->getMessage();
 
             return false;
@@ -344,7 +341,7 @@ class Update
     protected function updateToVersion(string $version, Database $database): void
     {
         // sql update
-        $filename = sprintf(
+        $filename = \sprintf(
             '%s%s%s',
             THELIA_SETUP_DIRECTORY,
             str_replace('/', DS, self::SQL_DIR),
@@ -352,13 +349,13 @@ class Update
         );
 
         if (file_exists($filename)) {
-            $this->log('debug', sprintf('inserting file %s', $version.'.sql'));
+            $this->log('debug', \sprintf('inserting file %s', $version.'.sql'));
             $database->insertSql(null, [$filename]);
-            $this->log('debug', sprintf('end inserting file %s', $version.'.sql'));
+            $this->log('debug', \sprintf('end inserting file %s', $version.'.sql'));
         }
 
         // php update
-        $filename = sprintf(
+        $filename = \sprintf(
             '%s%s%s',
             THELIA_SETUP_DIRECTORY,
             str_replace('/', DS, self::PHP_DIR),
@@ -366,13 +363,13 @@ class Update
         );
 
         if (file_exists($filename)) {
-            $this->log('debug', sprintf('executing file %s', $version.'.php'));
+            $this->log('debug', \sprintf('executing file %s', $version.'.php'));
             include_once $filename;
-            $this->log('debug', sprintf('end executing file %s', $version.'.php'));
+            $this->log('debug', \sprintf('end executing file %s', $version.'.php'));
         }
 
         // instructions
-        $filename = sprintf(
+        $filename = \sprintf(
             '%s%s%s',
             THELIA_SETUP_DIRECTORY,
             str_replace('/', DS, self::INSTRUCTION_DIR),
@@ -399,8 +396,8 @@ class Update
             try {
                 $stmt = $this->connection->prepare('UPDATE config set value = ? where name = ?');
                 $stmt->execute([$version, 'thelia_version']);
-            } catch (PDOException $e) {
-                $this->log('error', sprintf('Error setting current version : %s', $e->getMessage()));
+            } catch (\PDOException $e) {
+                $this->log('error', \sprintf('Error setting current version : %s', $e->getMessage()));
 
                 throw $e;
             }
@@ -410,7 +407,7 @@ class Update
     /**
      * Returns the database size in Mo.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function getDataBaseSize(): float
     {
@@ -419,10 +416,10 @@ class Update
         );
 
         if ($stmt->rowCount()) {
-            return (float) $stmt->fetch(PDO::FETCH_OBJ)->size;
+            return (float) $stmt->fetch(\PDO::FETCH_OBJ)->size;
         }
 
-        throw new Exception('Impossible to calculate the database size');
+        throw new \Exception('Impossible to calculate the database size');
     }
 
     /**
@@ -506,9 +503,9 @@ class Update
         ksort($this->postInstructions);
 
         foreach ($this->postInstructions as $version => $instructions) {
-            $content[] = sprintf('## %s', $version);
+            $content[] = \sprintf('## %s', $version);
             foreach ($instructions as $instruction) {
-                $content[] = sprintf('%s', $instruction);
+                $content[] = \sprintf('%s', $instruction);
             }
         }
 
@@ -533,8 +530,8 @@ class Update
     {
         $list = [];
         $finder = new Finder();
-        $path = sprintf('%s%s', THELIA_SETUP_DIRECTORY, str_replace('/', DS, self::SQL_DIR));
-        $sort = function (SplFileInfo $a, SplFileInfo $b): int {
+        $path = \sprintf('%s%s', THELIA_SETUP_DIRECTORY, str_replace('/', DS, self::SQL_DIR));
+        $sort = function (\SplFileInfo $a, \SplFileInfo $b): int {
             $a = strtolower(substr($a->getRelativePathname(), 0, -4));
             $b = strtolower(substr($b->getRelativePathname(), 0, -4));
 
@@ -604,7 +601,7 @@ class Update
             if (Version::parse($res)) {
                 return trim($res);
             }
-        } catch (Exception) {
+        } catch (\Exception) {
             return null;
         }
 

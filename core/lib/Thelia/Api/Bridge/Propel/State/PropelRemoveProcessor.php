@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Bridge\Propel\State;
 
-use Exception;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use Propel\Runtime\Propel;
@@ -45,11 +45,11 @@ readonly class PropelRemoveProcessor implements ProcessorInterface
 
             $propelModel->delete();
             if (!$propelModel->isDeleted()) {
-                throw new Exception('This item cannot be deleted, possibly because it is the default one.');
+                throw new \Exception('This item cannot be deleted, possibly because it is the default one.');
             }
 
             $connection->commit();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $connection->rollBack();
 
             throw $exception;

@@ -11,14 +11,14 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model\Breadcrumb;
 
-use LogicException;
-use Thelia\Model\Product;
-use Thelia\Model\Category;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\Category;
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\Product;
 use Thelia\Tools\URL;
 
 trait CatalogBreadcrumbTrait
@@ -58,8 +58,8 @@ trait CatalogBreadcrumbTrait
                 if ($currentId > 0) {
                     // Prevent circular refererences
                     if (\in_array($currentId, $ids)) {
-                        throw new LogicException(
-                            sprintf(
+                        throw new \LogicException(
+                            \sprintf(
                                 'Circular reference detected in category ID=%d hierarchy (category ID=%d appears more than one times in path)',
                                 $categoryId,
                                 $currentId
@@ -73,7 +73,7 @@ trait CatalogBreadcrumbTrait
         } while ($category != null && $currentId > 0 && --$depth > 0);
 
         foreach ($results as $result) {
-            $breadcrumb[$result['TITLE']] = sprintf('%s?category_id=%d', $catalogUrl, $result['ID']);
+            $breadcrumb[$result['TITLE']] = \sprintf('%s?category_id=%d', $catalogUrl, $result['ID']);
         }
 
         return $breadcrumb;
@@ -92,7 +92,7 @@ trait CatalogBreadcrumbTrait
 
         $product->setLocale($locale);
 
-        $breadcrumb[$product->getTitle()] = sprintf(
+        $breadcrumb[$product->getTitle()] = \sprintf(
             '%s?product_id=%d&current_tab=%s',
             $router->generate('admin.products.update', [], Router::ABSOLUTE_URL),
             $product->getId(),
@@ -114,7 +114,7 @@ trait CatalogBreadcrumbTrait
 
         $category->setLocale($locale);
 
-        $breadcrumb[$category->getTitle()] = sprintf(
+        $breadcrumb[$category->getTitle()] = \sprintf(
             '%s?category_id=%d&current_tab=%s',
             $router->generate(
                 'admin.categories.update',

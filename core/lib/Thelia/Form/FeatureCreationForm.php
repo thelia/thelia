@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -27,30 +28,30 @@ class FeatureCreationForm extends BaseForm
                 'title',
                 TextType::class,
                 [
-                'constraints' => [
-                    new NotBlank(),
-                ],
-                'label' => Translator::getInstance()->trans('Title *'),
-                'label_attr' => [
-                    'for' => 'title',
-                ], ]
+                    'constraints' => [
+                        new NotBlank(),
+                    ],
+                    'label' => Translator::getInstance()->trans('Title *'),
+                    'label_attr' => [
+                        'for' => 'title',
+                    ], ]
             )
             ->add(
                 'locale',
                 TextType::class,
                 [
-                'constraints' => [
-                    new NotBlank(),
-                ], ]
+                    'constraints' => [
+                        new NotBlank(),
+                    ], ]
             )
             ->add(
                 'add_to_all',
                 CheckboxType::class,
                 [
-                'label' => Translator::getInstance()->trans('Add to all product templates'),
-                'label_attr' => [
-                    'for' => 'add_to_all',
-                ], ]
+                    'label' => Translator::getInstance()->trans('Add to all product templates'),
+                    'label_attr' => [
+                        'for' => 'add_to_all',
+                    ], ]
             )
         ;
     }

@@ -11,11 +11,10 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
-use RuntimeException;
-use Exception;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -58,7 +57,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
 
         try {
             $this->verifyExistingModule();
-        } catch (RuntimeException $runtimeException) {
+        } catch (\RuntimeException $runtimeException) {
             if (false === $input->getOption('force')) {
                 throw $runtimeException;
             }
@@ -68,7 +67,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         $this->createFiles();
 
         $formattedLine = $this->getHelper('formatter')->formatBlock(
-            sprintf('module %s create with success', $this->module),
+            \sprintf('module %s create with success', $this->module),
             'fg=black;bg=green',
             true
         );
@@ -236,7 +235,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                     $this->moduleDirectory.\DIRECTORY_SEPARATOR.'I18n'.\DIRECTORY_SEPARATOR.'en_US.php'
                 );
             }
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $fs->remove($this->moduleDirectory);
 
             throw $exception;

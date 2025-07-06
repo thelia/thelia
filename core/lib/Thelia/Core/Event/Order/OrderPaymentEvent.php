@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event\Order;
 
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +26,7 @@ use Thelia\Model\Order;
 class OrderPaymentEvent extends ActionEvent
 {
     /**
-     * @var \Symfony\Component\HttpFoundation\Response
+     * @var Response
      */
     protected $response;
 
@@ -49,7 +50,7 @@ class OrderPaymentEvent extends ActionEvent
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getResponse()
     {

@@ -11,20 +11,18 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-
-use Exception;
-use LogicException;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Tax\TaxRuleEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
@@ -53,7 +51,7 @@ class TaxRuleController extends AbstractCrudController
         );
     }
 
-    public function defaultAction(): \Symfony\Component\HttpFoundation\Response
+    public function defaultAction(): Response
     {
         // In the tax rule template we use the TaxCreationForm.
         //
@@ -175,10 +173,9 @@ class TaxRuleController extends AbstractCrudController
 
     /**
      * @param TaxRule $object
-     *
-     * @return string
      */
-    protected function getObjectLabel(activeRecordInterface $object): ?string    {
+    protected function getObjectLabel(ActiveRecordInterface $object): ?string
+    {
         return $object->getTitle();
     }
 
@@ -239,7 +236,7 @@ class TaxRuleController extends AbstractCrudController
      *
      * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalCreateAction(ActionEvent $createEvent): ?\Symfony\Component\HttpFoundation\Response
+    protected function performAdditionalCreateAction(ActionEvent $createEvent): ?Response
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.taxes-rules.update',
@@ -253,7 +250,7 @@ class TaxRuleController extends AbstractCrudController
         return $this->generateRedirectFromRoute('admin.configuration.taxes-rules.list');
     }
 
-    public function updateAction(ParserContext $parserContext): \Symfony\Component\HttpFoundation\Response
+    public function updateAction(ParserContext $parserContext): Response
     {
         if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
@@ -320,7 +317,7 @@ class TaxRuleController extends AbstractCrudController
             $eventDispatcher->dispatch($changeEvent, TheliaEvents::TAX_RULE_TAXES_UPDATE);
 
             if (!$this->eventContainsObject($changeEvent)) {
-                throw new LogicException(
+                throw new \LogicException(
                     $this->getTranslator()->trans('No %obj was updated.', ['%obj', $this->objectName])
                 );
             }
@@ -330,7 +327,7 @@ class TaxRuleController extends AbstractCrudController
                 $this->adminLogAppend(
                     $this->resourceCode,
                     AccessManager::UPDATE,
-                    sprintf(
+                    \sprintf(
                         '%s %s (ID %s) modified',
                         ucfirst($this->objectName),
                         $this->getObjectLabel($changedObject),
@@ -349,7 +346,7 @@ class TaxRuleController extends AbstractCrudController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -362,10 +359,7 @@ class TaxRuleController extends AbstractCrudController
         return $this->jsonResponse(json_encode($responseData));
     }
 
-    /**
-     * @return Response
-     */
-    public function specsAction($taxRuleId): \Symfony\Component\HttpFoundation\Response
+    public function specsAction($taxRuleId): Response
     {
         $data = $this->getSpecification($taxRuleId);
 

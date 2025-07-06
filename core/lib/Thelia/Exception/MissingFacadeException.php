@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Exception;
 
-use RuntimeException;
 use Thelia\Log\Tlog;
 
 /**
@@ -21,7 +21,7 @@ use Thelia\Log\Tlog;
  *
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  */
-class MissingFacadeException extends RuntimeException
+class MissingFacadeException extends \RuntimeException
 {
     public function __construct($message, $code = null, $previous = null)
     {

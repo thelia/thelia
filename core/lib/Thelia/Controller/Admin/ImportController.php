@@ -11,18 +11,18 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-use Exception;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Archiver\AbstractArchiver;
 use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Serializer\AbstractSerializer;
@@ -135,7 +135,7 @@ class ImportController extends BaseAdminController
      */
     public function configureAction(int $id): Response
     {
-        /** @var ImportHandler $importHandler */
+        /** @var Importhandler $importHandler */
         $importHandler = $this->container->get('thelia.import.handler');
 
         $import = $importHandler->getImport($id);
@@ -232,7 +232,7 @@ class ImportController extends BaseAdminController
             return $this->generateRedirectFromRoute('import.view', [], ['id' => $id]);
         } catch (FormValidationException $e) {
             $form->setErrorMessage($this->createStandardFormValidationErrorMessage($e));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         }
 

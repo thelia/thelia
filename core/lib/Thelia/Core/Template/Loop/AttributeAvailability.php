@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop;
 
-use Thelia\Type\EnumListType;
-use PDO;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseI18nLoop;
@@ -27,6 +26,7 @@ use Thelia\Model\AttributeAv as AttributeAvModel;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\Map\AttributeCombinationTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
+use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
 
 /**
@@ -113,7 +113,7 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
                 ->leftJoinAttributeCombination('attribute_combination')
                 ->groupById()
                 ->addJoinObject($pseJoin)
-                ->where(ProductSaleElementsTableMap::COL_PRODUCT_ID.'=?', $product, PDO::PARAM_INT)
+                ->where(ProductSaleElementsTableMap::COL_PRODUCT_ID.'=?', $product, \PDO::PARAM_INT)
             ;
         }
 

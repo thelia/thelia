@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Coupon\Type;
 
-
-use InvalidArgumentException;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\CartItem;
@@ -59,9 +58,8 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
         DateTime $expirationDate,
         $freeShippingForCountries,
         $freeShippingForModules,
-        $perCustomerUsageCount
-    ): static
-    {
+        $perCustomerUsageCount,
+    ): static {
         parent::set(
             $facade,
             $code,
@@ -130,7 +128,7 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
     {
         if ($fieldName === self::CATEGORY_ID) {
             if ($fieldValue === '' || $fieldValue === '0') {
-                throw new InvalidArgumentException(
+                throw new \InvalidArgumentException(
                     Translator::getInstance()->trans(
                         'Please select a category'
                     )
@@ -138,7 +136,7 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
             }
         } elseif ($fieldName === self::PRODUCTS_LIST) {
             if ($fieldValue === '' || $fieldValue === '0') {
-                throw new InvalidArgumentException(
+                throw new \InvalidArgumentException(
                     Translator::getInstance()->trans(
                         'Please select at least one product'
                     )

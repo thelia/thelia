@@ -11,13 +11,13 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-use Thelia\Model\Tools\PositionManagementTrait;
-use RuntimeException;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Model\Base\Currency as BaseCurrency;
+use Thelia\Model\Tools\PositionManagementTrait;
 
 class Currency extends BaseCurrency
 {
@@ -31,14 +31,14 @@ class Currency extends BaseCurrency
             self::$defaultCurrency = CurrencyQuery::create()->findOneByByDefault(1);
 
             if (null === self::$defaultCurrency) {
-                throw new RuntimeException('No default currency is defined. Please define one.');
+                throw new \RuntimeException('No default currency is defined. Please define one.');
             }
         }
 
         return self::$defaultCurrency;
     }
 
-    public function preInsert(ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null)
     {
         parent::preInsert($con);
 

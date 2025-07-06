@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Bridge\Propel\Routing;
 
-use ReflectionClass;
-use Exception;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
@@ -35,23 +34,23 @@ class IriConverter implements IriConverterInterface
         #[AutowireDecorated]
         private IriConverterInterface $decorated,
         private readonly RouterInterface $router,
-        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
     ) {
     }
 
-    public function getResourceFromIri(string $iri, array $context = [], Operation $operation = null): object
+    public function getResourceFromIri(string $iri, array $context = [], ?Operation $operation = null): object
     {
         return $this->decorated->getResourceFromIri($iri, $context, $operation);
     }
 
-    public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = []): ?string
+    public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = []): ?string
     {
         $resourceClass = $resource;
         if (\is_object($resource)) {
             $resourceClass = $resource::class;
         }
 
-        $reflector = new ReflectionClass($resourceClass);
+        $reflector = new \ReflectionClass($resourceClass);
 
         $compositeIdentifiers = $reflector->getAttributes(CompositeIdentifiers::class);
 
@@ -73,14 +72,14 @@ class IriConverter implements IriConverterInterface
                 );
 
                 return $this->router->generate($operation->getName(), $identifiers, $operation->getUrlGenerationStrategy() ?? $referenceType);
-            } catch (Exception) {
+            } catch (\Exception) {
                 // try with not decorated converter
             }
         }
 
         try {
             return $this->decorated->getIriFromResource($resource, $referenceType, $operation, $context);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             Tlog::getInstance()->warning('Iri convert failure : '.$exception->getMessage());
 
             return 'undefined_iri';

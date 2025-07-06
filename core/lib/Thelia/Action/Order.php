@@ -11,18 +11,15 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Action;
 
-use Exception;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Propel\Runtime\Propel\Runtime\Exception\PropelException;
-use Thelia\Model\Attribute;
-use Thelia\Model\AttributeAv;
-use Thelia\Core\HttpFoundation\Session\Session;
 use Propel\Runtime\Propel;
+use Propel\Runtime\Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Thelia\Core\Event\Order\GetStockUpdateOperationOnOrderStatusChangeEvent;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
@@ -32,12 +29,15 @@ use Thelia\Core\Event\Order\OrderPayTotalEvent;
 use Thelia\Core\Event\Product\VirtualProductOrderHandleEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\Attribute;
+use Thelia\Model\AttributeAv;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency as CurrencyModel;
@@ -131,7 +131,7 @@ class Order extends BaseAction implements EventSubscriberInterface
      * @param bool $unusedArgument           deprecated argument. Will be removed in 2.5
      * @param bool $useOrderDefinedAddresses if true, the delivery and invoice OrderAddresses will be used instead of creating new OrderAdresses using Order::getChoosenXXXAddress()
      *
-     * @throws Exception
+     * @throws \Exception
      * @throws PropelException
      *
      * @return ModelOrder
@@ -144,7 +144,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         CartModel $cart,
         UserInterface $customer,
         $unusedArgument = null,
-        $useOrderDefinedAddresses = false
+        $useOrderDefinedAddresses = false,
     ) {
         $con = Propel::getConnection(
             OrderTableMap::DATABASE_NAME
@@ -361,7 +361,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     /**
      * Create an order outside of the front-office context, e.g. manually from the back-office.
      *
-     * @throws Exception
+     * @throws \Exception
      * @throws PropelException
      */
     public function createManual(OrderManualEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
@@ -384,7 +384,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
     /**
      * @throws TheliaProcessException
-     * @throws Exception
+     * @throws \Exception
      * @throws PropelException
      */
     public function create(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
@@ -441,7 +441,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws Exception if the message cannot be loaded
+     * @throws \Exception if the message cannot be loaded
      */
     public function sendConfirmationEmail(OrderEvent $event): void
     {
@@ -456,7 +456,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws Exception if the message cannot be loaded
+     * @throws \Exception if the message cannot be loaded
      */
     public function sendNotificationEmail(OrderEvent $event): void
     {
@@ -470,7 +470,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      * @throws PropelException
      */
     public function updateStatus(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
@@ -491,7 +491,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             $event->setOrder($order);
 
             $con->commit();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $con->rollBack();
 
             throw $exception;
@@ -558,7 +558,7 @@ class Order extends BaseAction implements EventSubscriberInterface
      *
      * @param int $newStatus the new status ID
      *
-     * @throws Exception
+     * @throws \Exception
      * @throws PropelException
      */
     protected function updateQuantity(ModelOrder $order, $newStatus, EventDispatcherInterface $dispatcher): void

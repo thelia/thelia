@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
@@ -40,20 +40,20 @@ class Product extends BaseProduct implements FileModelParentInterface
         try {
             $amount = $this->getVirtualColumn($virtualColumnName);
         } catch (PropelException) {
-            throw new PropelException(sprintf('Virtual column `%s` does not exist in Product::getRealLowestPrice', $virtualColumnName));
+            throw new PropelException(\sprintf('Virtual column `%s` does not exist in Product::getRealLowestPrice', $virtualColumnName));
         }
 
         return $amount;
     }
 
-    public function getTaxedPrice(Country $country, $price, State $state = null)
+    public function getTaxedPrice(Country $country, $price, ?State $state = null)
     {
         $taxCalculator = new Calculator();
 
         return $taxCalculator->load($this, $country, $state)->getTaxedPrice($price);
     }
 
-    public function getTaxedPromoPrice(Country $country, $price, State $state = null)
+    public function getTaxedPromoPrice(Country $country, $price, ?State $state = null)
     {
         $taxCalculator = new Calculator();
 
@@ -166,7 +166,7 @@ class Product extends BaseProduct implements FileModelParentInterface
      * @param float $baseWeight        base weight in Kg
      * @param int   $baseQuantity      the product quantity (default: 0)
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function create($defaultCategoryId, $basePrice, $priceCurrencyId, $taxRuleId, $baseWeight, $baseQuantity = 0): void
     {
@@ -188,7 +188,7 @@ class Product extends BaseProduct implements FileModelParentInterface
 
             // Store all the stuff !
             $con->commit();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $con->rollback();
 
             throw $exception;
@@ -210,7 +210,7 @@ class Product extends BaseProduct implements FileModelParentInterface
      * @param bool   $ref
      *
      * @throws PropelException
-     * @throws Exception
+     * @throws \Exception
      *
      * @return ProductSaleElements
      */
@@ -267,7 +267,7 @@ class Product extends BaseProduct implements FileModelParentInterface
         }
     }
 
-    public function preDelete(ConnectionInterface $con = null)
+    public function preDelete(?ConnectionInterface $con = null)
     {
         parent::preDelete($con);
 
@@ -291,7 +291,7 @@ class Product extends BaseProduct implements FileModelParentInterface
         return true;
     }
 
-    public function postDelete(ConnectionInterface $con = null): void
+    public function postDelete(?ConnectionInterface $con = null): void
     {
         parent::postDelete($con);
 
@@ -314,7 +314,7 @@ class Product extends BaseProduct implements FileModelParentInterface
         return parent::getPosition();
     }
 
-    public function postSave(ConnectionInterface $con = null): void
+    public function postSave(?ConnectionInterface $con = null): void
     {
         // For BC, will be removed in 2.4
         if (!$this->isNew() && (isset($this->modifiedColumns[ProductTableMap::COL_POSITION]) && $this->modifiedColumns[ProductTableMap::COL_POSITION]) && null !== $productCategory = ProductCategoryQuery::create()

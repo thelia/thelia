@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Security\Token;
 
 use Thelia\Core\Security\User\UserInterface;
@@ -22,7 +23,7 @@ class TokenProvider
         // Always set a new token in the user environment
         $user->setToken(uniqid());
 
-        return base64_encode(sprintf("%s\0%s\0%s", $user->getUsername(), $user->getToken(), $user->getSerial()));
+        return base64_encode(\sprintf("%s\0%s\0%s", $user->getUsername(), $user->getToken(), $user->getSerial()));
     }
 
     public function decodeKey($key): array

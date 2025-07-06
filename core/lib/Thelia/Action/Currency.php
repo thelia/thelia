@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Action;
 
-use RuntimeException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Currency\CurrencyCreateEvent;
@@ -122,7 +122,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
     {
         if (null !== ($currency = CurrencyQuery::create()->findPk($event->getCurrencyId()))) {
             if ($currency->getByDefault()) {
-                throw new RuntimeException(
+                throw new \RuntimeException(
                     Translator::getInstance()->trans('It is not allowed to delete the default currency')
                 );
             }
@@ -139,7 +139,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
     public function updateRates(CurrencyUpdateRateEvent $event): void
     {
         if (null === $defaultCurrency = CurrencyQuery::create()->findOneByByDefault(true)) {
-            throw new RuntimeException('Unable to find a default currency, please define a default currency.');
+            throw new \RuntimeException('Unable to find a default currency, please define a default currency.');
         }
 
         $defaultCurrency->setRate(1)->save();
@@ -147,7 +147,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
         $currencies = CurrencyQuery::create()->filterByByDefault(false);
         $baseValue = new Number('1');
 
-        /** @var \Thelia\Model\Currency $currency */
+        /** @var CurrencyModel $currency */
         foreach ($currencies as $currency) {
             try {
                 $rate = $this->currencyConverter
@@ -158,7 +158,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
                 $currency->setRate($rate->getNumber(-1))->save();
             } catch (CurrencyNotFoundException) {
                 Tlog::getInstance()->addError(
-                    sprintf('Unable to find exchange rate for currency %s, ID %d', $currency->getCode(), $currency->getId())
+                    \sprintf('Unable to find exchange rate for currency %s, ID %d', $currency->getCode(), $currency->getId())
                 );
                 $event->addUndefinedRate($currency->getId());
             }

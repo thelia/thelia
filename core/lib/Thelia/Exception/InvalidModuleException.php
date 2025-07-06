@@ -11,17 +11,15 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Exception;
 
-use RuntimeException;
-use Exception;
+namespace Thelia\Exception;
 
 /**
  * Class InvalidModuleException.
  *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class InvalidModuleException extends RuntimeException
+class InvalidModuleException extends \RuntimeException
 {
     public function __construct(protected array $errors = [])
     {
@@ -37,7 +35,7 @@ class InvalidModuleException extends RuntimeException
     {
         $message = '';
 
-        /** @var Exception $error */
+        /** @var \Exception $error */
         foreach ($this->errors as $error) {
             $message .= $error->getMessage().$separator;
         }
@@ -47,7 +45,7 @@ class InvalidModuleException extends RuntimeException
 
     public function __toString(): string
     {
-        return sprintf(
+        return \sprintf(
             'InvalidModuleException: %s',
             $this->getErrorsAsString()
         );

@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
 use Thelia\Model\Base\CountryAreaQuery as BaseCountryAreaQuery;
@@ -24,7 +25,7 @@ use Thelia\Model\Base\CountryAreaQuery as BaseCountryAreaQuery;
  */
 class CountryAreaQuery extends BaseCountryAreaQuery
 {
-    public static function findByCountryAndState(Country $country, State $state = null)
+    public static function findByCountryAndState(Country $country, ?State $state = null)
     {
         if ($state instanceof State) {
             $countryAreaList = self::create()

@@ -11,13 +11,14 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Thelia\Core\Archiver\ArchiverManager;
-use Thelia\Core\Archiver\Archiver\ZipArchiver;
 use Thelia\Core\Archiver\Archiver\TarArchiver;
-use Thelia\Core\Archiver\Archiver\TarGzArchiver;
 use Thelia\Core\Archiver\Archiver\TarBz2Archiver;
+use Thelia\Core\Archiver\Archiver\TarGzArchiver;
+use Thelia\Core\Archiver\Archiver\ZipArchiver;
+use Thelia\Core\Archiver\ArchiverManager;
 
 return static function (ContainerConfigurator $configurator): void {
     $services = $configurator->services();

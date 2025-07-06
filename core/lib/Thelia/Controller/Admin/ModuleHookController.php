@@ -11,14 +11,14 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-
-use Exception;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Hook\ModuleHookCreateEvent;
@@ -29,7 +29,6 @@ use Thelia\Core\Event\Hook\ModuleHookUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Hook\BaseHook;
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
@@ -84,7 +83,7 @@ class ModuleHookController extends AbstractCrudController
 
         try {
             $eventDispatcher->dispatch($event, TheliaEvents::MODULE_HOOK_TOGGLE_ACTIVATION);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $message = $exception->getMessage();
         }
 
@@ -147,7 +146,6 @@ class ModuleHookController extends AbstractCrudController
     /**
      * Creates the creation event with the provided form data.
      *
-     *
      * @return ModuleHookCreateEvent
      */
     protected function getCreationEvent(array $formData): ActionEvent
@@ -159,7 +157,6 @@ class ModuleHookController extends AbstractCrudController
 
     /**
      * Creates the update event with the provided form data.
-     *
      *
      * @return ModuleHookUpdateEvent
      */
@@ -240,12 +237,12 @@ class ModuleHookController extends AbstractCrudController
     protected function getObjectLabel($object): string
     {
         try {
-            return sprintf(
+            return \sprintf(
                 '%s on %s',
                 $object->getModule()->getTitle(),
                 $object->getHook()->getTitle()
             );
-        } catch (Exception) {
+        } catch (\Exception) {
             return 'Undefined module hook';
         }
     }

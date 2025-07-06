@@ -11,19 +11,17 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use DirectoryIterator;
-use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
-use UnexpectedValueException;
 
 /**
  * Class LangController.
@@ -57,7 +55,7 @@ class SystemLogController extends BaseAdminController
     protected function loadDefinedDestinations($directory, &$destinations): void
     {
         try {
-            foreach (new DirectoryIterator($directory) as $fileInfo) {
+            foreach (new \DirectoryIterator($directory) as $fileInfo) {
                 if ($fileInfo->isDot()) {
                     continue;
                 }
@@ -74,7 +72,7 @@ class SystemLogController extends BaseAdminController
                     }
                 }
             }
-        } catch (UnexpectedValueException) {
+        } catch (\UnexpectedValueException) {
             // Directory does no exists -> Nothing to do
         }
     }
@@ -150,7 +148,7 @@ class SystemLogController extends BaseAdminController
             );
 
             $response = $this->generateRedirectFromRoute('admin.configuration.system-logs.default');
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $error_msg = $exception->getMessage();
 
             $this->setupFormErrorContext(

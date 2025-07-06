@@ -42,7 +42,7 @@ if (!defined('THELIA_LOCAL_DIR')) {
 
 if (!defined('THELIA_CONF_DIR')) {
     $pathConfDir = THELIA_LOCAL_DIR.'config'.DS;
-    if (is_dir($pathConfDir) ) {
+    if (is_dir($pathConfDir)) {
         define('THELIA_CONF_DIR', $pathConfDir);
     } else {
         define('THELIA_CONF_DIR', THELIA_VENDOR.'thelia'.DS.'config'.DS);
@@ -82,9 +82,9 @@ if (!defined('THELIA_TEMPLATE_FRONTOFFICE_DIR')) {
 }
 
 if (!defined('THELIA_SETUP_DIRECTORY')) {
-    if (is_dir(THELIA_VENDOR.'thelia'.DS.'setup'.DS) ) {
+    if (is_dir(THELIA_VENDOR.'thelia'.DS.'setup'.DS)) {
         define('THELIA_SETUP_DIRECTORY', THELIA_VENDOR.'thelia'.DS.'setup'.DS);
-    } elseif(is_dir(THELIA_ROOT.'setup'.DS)) {
+    } elseif (is_dir(THELIA_ROOT.'setup'.DS)) {
         define('THELIA_SETUP_DIRECTORY', THELIA_ROOT.'setup'.DS);
     } else {
         define('THELIA_SETUP_DIRECTORY', THELIA_LOCAL_DIR.'setup'.DS);

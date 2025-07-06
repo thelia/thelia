@@ -2,11 +2,19 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Log;
 
-use Exception;
 use Psr\Log\LoggerInterface;
-use UnexpectedValueException;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 
@@ -96,7 +104,7 @@ class Tlog implements LoggerInterface
 
     public static function getInstance(): self
     {
-        if (!self::$instance instanceof \Thelia\Log\Tlog) {
+        if (!self::$instance instanceof self) {
             self::$instance = new self();
             self::$instance->init();
         }
@@ -373,7 +381,7 @@ class Tlog implements LoggerInterface
 
     public function isActivedFile(string $file): bool
     {
-        return ($this->all_files || \in_array($file, $this->files, true)) && !\in_array('!' . $file, $this->files, true);
+        return ($this->all_files || \in_array($file, $this->files, true)) && !\in_array('!'.$file, $this->files, true);
     }
 
     private function findOrigin(): array
@@ -432,7 +440,7 @@ class Tlog implements LoggerInterface
 
     private function out(string $level, mixed $message, array $context = []): void
     {
-        if ($message instanceof Exception) {
+        if ($message instanceof \Exception) {
             $text = $message->getMessage()."\n".$message->getTraceAsString();
         } elseif (!\is_scalar($message)) {
             $text = print_r($message, true);
@@ -465,16 +473,16 @@ class Tlog implements LoggerInterface
     }
 
     /**
-     * @throws UnexpectedValueException
+     * @throws \UnexpectedValueException
      */
-    protected function loadDestinations(array &$destinations, array $actives = null): void
+    protected function loadDestinations(array &$destinations, ?array $actives = null): void
     {
         foreach ($actives as $active) {
             if (class_exists($active)) {
                 $class = new $active();
 
                 if (!$class instanceof AbstractTlogDestination) {
-                    throw new UnexpectedValueException($active." must extends Thelia\Tlog\AbstractTlogDestination");
+                    throw new \UnexpectedValueException($active." must extends Thelia\Tlog\AbstractTlogDestination");
                 }
 
                 $destinations[$active] = $class;

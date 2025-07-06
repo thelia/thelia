@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-use RuntimeException;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
@@ -32,7 +32,7 @@ class Lang extends BaseLang
     /**
      * Return the default language object, using a local variable to cache it.
      *
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     public static function getDefaultLanguage(): self
     {
@@ -43,7 +43,7 @@ class Lang extends BaseLang
         self::$defaultLanguage = LangQuery::create()->findOneByByDefault(1);
 
         if (null === self::$defaultLanguage) {
-            throw new RuntimeException('No default language is defined. Please define one.');
+            throw new \RuntimeException('No default language is defined. Please define one.');
         }
 
         return self::$defaultLanguage;
@@ -52,7 +52,7 @@ class Lang extends BaseLang
     public function toggleDefault(): void
     {
         if ($this->getId() === null) {
-            throw new RuntimeException('impossible to just uncheck default language, choose a new one');
+            throw new \RuntimeException('impossible to just uncheck default language, choose a new one');
         }
 
         if ($this->getByDefault()) {
@@ -79,12 +79,12 @@ class Lang extends BaseLang
         }
     }
 
-    public function preSave(ConnectionInterface $con = null): bool
+    public function preSave(?ConnectionInterface $con = null): bool
     {
         // If the date/time format is not specified, generate it.
         $dateTimeFormat = $this->getDateTimeFormat();
         if (empty($dateTimeFormat)) {
-            $this->setDatetimeFormat(sprintf('%s %s', $this->getDateFormat(), $this->getTimeFormat()));
+            $this->setDatetimeFormat(\sprintf('%s %s', $this->getDateFormat(), $this->getTimeFormat()));
         }
 
         return parent::preSave($con);

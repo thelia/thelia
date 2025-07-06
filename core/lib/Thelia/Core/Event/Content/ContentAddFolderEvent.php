@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event\Content;
 
 use Thelia\Model\Content;
@@ -28,7 +29,7 @@ class ContentAddFolderEvent extends ContentEvent
     public function __construct(Content $content, /**
      * @var int folder id
      */
-    protected $folderId)
+        protected $folderId)
     {
         parent::__construct($content);
     }

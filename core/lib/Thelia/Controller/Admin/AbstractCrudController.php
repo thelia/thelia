@@ -11,11 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-
-use Exception;
-use LogicException;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Event\ActiveRecordEvent;
 use Symfony\Component\DependencyInjection\Container;
@@ -40,7 +38,6 @@ use Thelia\Tools\TokenProvider;
  */
 abstract class AbstractCrudController extends BaseAdminController
 {
-
     public function __construct(
         protected string $objectName,
         protected ?string $defaultListOrder,
@@ -51,9 +48,8 @@ abstract class AbstractCrudController extends BaseAdminController
         protected ?string $deleteEventIdentifier,
         protected ?string $visibilityToggleEventIdentifier = null,
         protected ?string $changePositionEventIdentifier = null,
-        protected ?string $moduleCode = null
-    )
-    {
+        protected ?string $moduleCode = null,
+    ) {
     }
 
     abstract protected function getCreationForm(): ?BaseForm;
@@ -93,7 +89,7 @@ abstract class AbstractCrudController extends BaseAdminController
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     protected function getObjectFromEvent($event): mixed
     {
@@ -101,17 +97,17 @@ abstract class AbstractCrudController extends BaseAdminController
             return $event->getModel();
         }
 
-        throw new Exception("If your event doesn't have  \"getModel\" method you must override \"getObjectFromEvent\" function.");
+        throw new \Exception("If your event doesn't have  \"getModel\" method you must override \"getObjectFromEvent\" function.");
     }
 
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue): ActionEvent
     {
-        throw new LogicException('Position Update is not supported for this object');
+        throw new \LogicException('Position Update is not supported for this object');
     }
 
     protected function createToggleVisibilityEvent(): ActionEvent
     {
-        throw new LogicException('Toggle Visibility is not supported for this object');
+        throw new \LogicException('Toggle Visibility is not supported for this object');
     }
 
     protected function performAdditionalCreateAction(ActionEvent $createEvent): ?Response
@@ -160,7 +156,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function defaultAction(): Response
     {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -169,11 +165,10 @@ abstract class AbstractCrudController extends BaseAdminController
 
     public function createAction(
         EventDispatcherInterface $eventDispatcher,
-        TranslatorInterface $translator
-    ): RedirectResponse|Response
-    {
+        TranslatorInterface $translator,
+    ): RedirectResponse|Response {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::CREATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::CREATE)) instanceof Response) {
             return $response;
         }
 
@@ -200,7 +195,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
             // Check if object exist
             if (!$this->eventContainsObject($createEvent)) {
-                throw new LogicException(
+                throw new \LogicException(
                     $translator->trans('No %obj was created.', ['%obj' => $this->objectName])
                 );
             }
@@ -210,7 +205,7 @@ abstract class AbstractCrudController extends BaseAdminController
                 $this->adminLogAppend(
                     $this->resourceCode,
                     AccessManager::CREATE,
-                    sprintf(
+                    \sprintf(
                         '%s %s (ID %s) created',
                         ucfirst($this->objectName),
                         $this->getObjectLabel($createdObject),
@@ -236,7 +231,7 @@ abstract class AbstractCrudController extends BaseAdminController
             // Form cannot be validated
             $errorMessage = $this->createStandardFormValidationErrorMessage($ex);
             $errorCode = 400;
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $errorMessage = $ex->getMessage();
             $errorCode = 500;
@@ -255,11 +250,10 @@ abstract class AbstractCrudController extends BaseAdminController
     }
 
     public function updateAction(
-        ParserContext $parserContext
-    ): Response
-    {
+        ParserContext $parserContext,
+    ): Response {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -279,11 +273,10 @@ abstract class AbstractCrudController extends BaseAdminController
     public function processUpdateAction(
         Request $request,
         EventDispatcherInterface $eventDispatcher,
-        TranslatorInterface $translator
-    ): Response|RedirectResponse
-    {
+        TranslatorInterface $translator,
+    ): Response|RedirectResponse {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -310,7 +303,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
             // Check if object exist
             if (!$this->eventContainsObject($changeEvent)) {
-                throw new LogicException(
+                throw new \LogicException(
                     $translator->trans('No %obj was updated.', ['%obj' => $this->objectName])
                 );
             }
@@ -320,7 +313,7 @@ abstract class AbstractCrudController extends BaseAdminController
                 $this->adminLogAppend(
                     $this->resourceCode,
                     AccessManager::UPDATE,
-                    sprintf(
+                    \sprintf(
                         '%s %s (ID %s) modified',
                         ucfirst($this->objectName),
                         $this->getObjectLabel($changedObject),
@@ -349,7 +342,7 @@ abstract class AbstractCrudController extends BaseAdminController
             // Form cannot be validated
             $errorMessage = $this->createStandardFormValidationErrorMessage($ex);
             $errorCode = 500;
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $errorMessage = $ex->getMessage();
             $errorCode = 400;
@@ -369,11 +362,10 @@ abstract class AbstractCrudController extends BaseAdminController
 
     public function updatePositionAction(
         Request $request,
-        EventDispatcherInterface $eventDispatcher
-    ): mixed
-    {
+        EventDispatcherInterface $eventDispatcher,
+    ): mixed {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -393,7 +385,7 @@ abstract class AbstractCrudController extends BaseAdminController
             $event = $this->createUpdatePositionEvent($mode, $position);
 
             $eventDispatcher->dispatch($event, $this->changePositionEventIdentifier);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             // Any error
             return $this->errorPage($exception);
         }
@@ -412,11 +404,10 @@ abstract class AbstractCrudController extends BaseAdminController
         EventDispatcherInterface $eventDispatcher,
         mixed $object,
         ?string $eventName,
-        $doFinalRedirect = true
-    )
-    {
+        $doFinalRedirect = true,
+    ) {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -437,7 +428,7 @@ abstract class AbstractCrudController extends BaseAdminController
                 $event = new UpdatePositionEvent($object->getId(), $mode, $position);
 
                 $eventDispatcher->dispatch($event, $eventName);
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -451,10 +442,10 @@ abstract class AbstractCrudController extends BaseAdminController
     }
 
     public function setToggleVisibilityAction(
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
     ) {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -462,7 +453,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
         try {
             $eventDispatcher->dispatch($changeEvent, $this->visibilityToggleEventIdentifier);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             // Any error
             return $this->errorPage($exception);
         }
@@ -474,11 +465,10 @@ abstract class AbstractCrudController extends BaseAdminController
         Request $request,
         TokenProvider $tokenProvider,
         EventDispatcherInterface $eventDispatcher,
-        ParserContext $parserContext
-    ): Response|RedirectResponse
-    {
+        ParserContext $parserContext,
+    ): Response|RedirectResponse {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::DELETE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::DELETE)) instanceof Response) {
             return $response;
         }
 
@@ -497,7 +487,7 @@ abstract class AbstractCrudController extends BaseAdminController
                 $this->adminLogAppend(
                     $this->resourceCode,
                     AccessManager::DELETE,
-                    sprintf(
+                    \sprintf(
                         '%s %s (ID %s) deleted',
                         ucfirst($this->objectName),
                         $this->getObjectLabel($deletedObject),
@@ -510,14 +500,14 @@ abstract class AbstractCrudController extends BaseAdminController
             $response = $this->performAdditionalDeleteAction($deleteEvent);
 
             return $response ?? $this->redirectToListTemplate();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             return $this->renderAfterDeleteError($parserContext, $exception)->setStatusCode(Response::HTTP_BAD_REQUEST);
         }
     }
 
-    protected function renderAfterDeleteError(ParserContext $parserContext, Exception $e): Response
+    protected function renderAfterDeleteError(ParserContext $parserContext, \Exception $e): Response
     {
-        $errorMessage = sprintf(
+        $errorMessage = \sprintf(
             "Unable to delete '%s'. Error message: %s",
             $this->objectName,
             $e->getMessage()
@@ -536,9 +526,9 @@ abstract class AbstractCrudController extends BaseAdminController
 
         /** @var Form $field */
         foreach ($fields as $field) {
-            $functionName = sprintf('set%s', Container::camelize($field->getName()));
+            $functionName = \sprintf('set%s', Container::camelize($field->getName()));
             if (method_exists($propelEvent, $functionName)) {
-                $getFunctionName = sprintf('get%s', Container::camelize($field->getName()));
+                $getFunctionName = \sprintf('get%s', Container::camelize($field->getName()));
                 if (method_exists($propelEvent, $getFunctionName)) {
                     if (null === $propelEvent->{$getFunctionName}()) {
                         $propelEvent->{$functionName}($field->getData());

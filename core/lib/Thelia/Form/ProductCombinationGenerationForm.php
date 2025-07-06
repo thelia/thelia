@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -28,56 +29,56 @@ class ProductCombinationGenerationForm extends BaseForm
     {
         $this->formBuilder
         ->add('product_id', IntegerType::class, [
-                'label' => Translator::getInstance()->trans('Product ID'),
-                'label_attr' => ['for' => 'combination_builder_id_field'],
-                'constraints' => [new GreaterThan(['value' => 0])],
+            'label' => Translator::getInstance()->trans('Product ID'),
+            'label_attr' => ['for' => 'combination_builder_id_field'],
+            'constraints' => [new GreaterThan(['value' => 0])],
         ])
         ->add('currency', IntegerType::class, [
-                'label' => Translator::getInstance()->trans('Price currency *'),
-                'label_attr' => ['for' => 'combination_builder_currency_field'],
-                'constraints' => [new GreaterThan(['value' => 0])],
+            'label' => Translator::getInstance()->trans('Price currency *'),
+            'label_attr' => ['for' => 'combination_builder_currency_field'],
+            'constraints' => [new GreaterThan(['value' => 0])],
         ])
         ->add('reference', TextType::class, [
-                'label' => Translator::getInstance()->trans('Reference'),
-                'label_attr' => ['for' => 'combination_builder_reference_field'],
+            'label' => Translator::getInstance()->trans('Reference'),
+            'label_attr' => ['for' => 'combination_builder_reference_field'],
         ])
         ->add('price', NumberType::class, [
-                'label' => Translator::getInstance()->trans('Product price excluding taxes'),
-                'label_attr' => ['for' => 'combination_builder_price_field'],
+            'label' => Translator::getInstance()->trans('Product price excluding taxes'),
+            'label_attr' => ['for' => 'combination_builder_price_field'],
         ])
         ->add('weight', NumberType::class, [
-                'label' => Translator::getInstance()->trans('Weight'),
-                'label_attr' => ['for' => 'combination_builder_weight_field'],
+            'label' => Translator::getInstance()->trans('Weight'),
+            'label_attr' => ['for' => 'combination_builder_weight_field'],
         ])
         ->add('quantity', NumberType::class, [
-                'label' => Translator::getInstance()->trans('Available quantity'),
-                'label_attr' => ['for' => 'combination_builder_quantity_field'],
+            'label' => Translator::getInstance()->trans('Available quantity'),
+            'label_attr' => ['for' => 'combination_builder_quantity_field'],
         ])
         ->add('sale_price', NumberType::class, [
-                'label' => Translator::getInstance()->trans('Sale price excluding taxes'),
-                'label_attr' => ['for' => 'combination_builder_price_with_tax_field'],
+            'label' => Translator::getInstance()->trans('Sale price excluding taxes'),
+            'label_attr' => ['for' => 'combination_builder_price_with_tax_field'],
         ])
         ->add('onsale', IntegerType::class, [
-                'label' => Translator::getInstance()->trans('This product is on sale'),
-                'label_attr' => ['for' => 'combination_builder_onsale_field'],
+            'label' => Translator::getInstance()->trans('This product is on sale'),
+            'label_attr' => ['for' => 'combination_builder_onsale_field'],
         ])
         ->add('isnew', IntegerType::class, [
-                'label' => Translator::getInstance()->trans('Advertise this product as new'),
-                'label_attr' => ['for' => 'combination_builder_isnew_field'],
+            'label' => Translator::getInstance()->trans('Advertise this product as new'),
+            'label_attr' => ['for' => 'combination_builder_isnew_field'],
         ])
         ->add('ean_code', TextType::class, [
-                'label' => Translator::getInstance()->trans('EAN Code'),
-                'label_attr' => ['for' => 'combination_builder_ean_code_field'],
+            'label' => Translator::getInstance()->trans('EAN Code'),
+            'label_attr' => ['for' => 'combination_builder_ean_code_field'],
         ])
         ->add('attribute_av', CollectionType::class, [
-                'entry_type' => TextType::class,
-                'label' => Translator::getInstance()->trans('Attribute ID:Attribute AV ID'),
-                'label_attr' => ['for' => 'combination_builder_attribute_av_id'],
-                'allow_add' => true,
-                'allow_delete' => true,
-                'constraints' => [
-                    new Callback($this->checkAttributeAv(...)),
-                ],
+            'entry_type' => TextType::class,
+            'label' => Translator::getInstance()->trans('Attribute ID:Attribute AV ID'),
+            'label_attr' => ['for' => 'combination_builder_attribute_av_id'],
+            'allow_add' => true,
+            'allow_delete' => true,
+            'constraints' => [
+                new Callback($this->checkAttributeAv(...)),
+            ],
         ])
         ;
     }

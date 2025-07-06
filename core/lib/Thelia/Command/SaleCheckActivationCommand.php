@@ -11,10 +11,10 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
-use Exception;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Core\Event\Sale\SaleActiveStatusCheckEvent;
@@ -41,8 +41,8 @@ class SaleCheckActivationCommand extends ContainerAwareCommand
             );
 
             $output->writeln('<info>Sale verification processed successfully</info>');
-        } catch (Exception $exception) {
-            $output->writeln(sprintf('<error>Error : %s</error>', $exception->getMessage()));
+        } catch (\Exception $exception) {
+            $output->writeln(\sprintf('<error>Error : %s</error>', $exception->getMessage()));
 
             return 1;
         }

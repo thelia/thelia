@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Action;
 
-use Exception;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -122,7 +122,7 @@ class Template extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a product template entry.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function delete(TemplateDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -147,7 +147,7 @@ class Template extends BaseAction implements EventSubscriberInterface
                         ->update(['DefaultTemplateId' => null], $con);
 
                     $con->commit();
-                } catch (Exception $ex) {
+                } catch (\Exception $ex) {
                     $con->rollback();
 
                     throw $ex;

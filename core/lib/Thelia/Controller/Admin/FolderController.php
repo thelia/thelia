@@ -11,12 +11,13 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Controller\Admin;
 
+namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Folder\FolderCreateEvent;
@@ -27,7 +28,6 @@ use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Form\BaseForm;
@@ -205,10 +205,9 @@ class FolderController extends AbstractSeoCrudController
      * Returns the object label form the object event (name, title, etc.).
      *
      * @param Folder $object
-     *
-     * @return string
      */
-    protected function getObjectLabel(activeRecordInterface $object): ?string    {
+    protected function getObjectLabel(ActiveRecordInterface $object): ?string
+    {
         return $object->getTitle();
     }
 
@@ -248,7 +247,7 @@ class FolderController extends AbstractSeoCrudController
         return $this->render('folder-edit', $this->getEditionArguments());
     }
 
-    protected function getEditionArguments(Request $request = null): array
+    protected function getEditionArguments(?Request $request = null): array
     {
         if (!$request instanceof Request) {
             $request = $this->getRequest();
@@ -263,7 +262,7 @@ class FolderController extends AbstractSeoCrudController
     /**
      * @return Response|void
      */
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): ?\Symfony\Component\HttpFoundation\Response
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): ?Response
     {
         if ($this->getRequest()->get('save_mode') != 'stay') {
             return $this->generateRedirectFromRoute(
@@ -282,7 +281,7 @@ class FolderController extends AbstractSeoCrudController
      *
      * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent): ?\Symfony\Component\HttpFoundation\Response
+    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent): ?Response
     {
         return $this->generateRedirectFromRoute(
             'admin.folders.default',
@@ -292,10 +291,8 @@ class FolderController extends AbstractSeoCrudController
 
     /**
      * @param $positionChangeEvent ActionEvent
-     *
-     * @return Response|null
      */
-    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent): ?\Symfony\Component\HttpFoundation\Response
+    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent): ?Response
     {
         $folder = FolderQuery::create()->findPk($positionChangeEvent->getObjectId());
 
@@ -314,7 +311,7 @@ class FolderController extends AbstractSeoCrudController
      *
      * @return Response
      */
-    protected function redirectToEditionTemplate(Request $request = null): Response|RedirectResponse
+    protected function redirectToEditionTemplate(?Request $request = null): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.folders.update', [], $this->getEditionArguments($request));
     }

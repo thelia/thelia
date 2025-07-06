@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\HttpFoundation\Session;
 
-use InvalidArgumentException;
-use LogicException;
 use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartCreateEvent;
@@ -156,7 +155,6 @@ class Session extends BaseSession
         return $this->remove('thelia.customer_user');
     }
 
-
     public function setAdminUser(UserInterface $user): static
     {
         $this->set('thelia.admin_user', $user);
@@ -211,7 +209,7 @@ class Session extends BaseSession
         return $this;
     }
 
-    public function getSessionCart(EventDispatcherInterface $dispatcher = null): ?Cart
+    public function getSessionCart(?EventDispatcherInterface $dispatcher = null): ?Cart
     {
         $cart_id = $this->get('thelia.cart_id', null);
         $cart = null !== $cart_id ? CartQuery::create()->findPk($cart_id) : self::$transientCart;
@@ -225,7 +223,7 @@ class Session extends BaseSession
             // a required parameter.
 
             if (null === $dispatcher) {
-                throw new InvalidArgumentException(
+                throw new \InvalidArgumentException(
                     'In this context (no cart in session), an EventDispatcher should be provided to Session::getSessionCart().'
                 );
             }
@@ -239,7 +237,7 @@ class Session extends BaseSession
             $dispatcher->dispatch($cartEvent, TheliaEvents::CART_RESTORE_CURRENT);
 
             if (null === $cart = $cartEvent->getCart()) {
-                throw new LogicException(
+                throw new \LogicException(
                     'Unable to get a Cart.'
                 );
             }
@@ -257,7 +255,7 @@ class Session extends BaseSession
 
         $dispatcher->dispatch($event, TheliaEvents::CART_CREATE_NEW);
 
-        throw new LogicException(
+        throw new \LogicException(
             'Unable to get a new empty Cart.'
         );
     }
@@ -269,7 +267,6 @@ class Session extends BaseSession
         return (null !== $customer && $cart->getCustomerId() === $customer->getId())
         || (null === $customer && $cart->getCustomerId() === null);
     }
-
 
     public function setOrder(Order $order): static
     {

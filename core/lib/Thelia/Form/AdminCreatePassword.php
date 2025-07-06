@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -66,7 +67,7 @@ class AdminCreatePassword extends BruteforceForm
         $minLength = ConfigQuery::getMinimuAdminPasswordLength();
 
         if (\strlen((string) $data['password']) < $minLength) {
-            $context->addViolation(sprintf('password must be composed of at least %s characters', $minLength));
+            $context->addViolation(\sprintf('password must be composed of at least %s characters', $minLength));
         }
     }
 }

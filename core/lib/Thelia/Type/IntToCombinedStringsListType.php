@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Type;
 
 /**
@@ -67,7 +68,7 @@ class IntToCombinedStringsListType extends BaseType
 
                 $return[trim($parts[0])] = [
                     'values' => array_map(
-                        fn($item): string => trim((string) self::unescape($item)),
+                        fn ($item): string => trim((string) self::unescape($item)),
                         preg_split(
                             '#(?<!\\\)[&|]#',
                             (string) preg_replace(
@@ -90,8 +91,6 @@ class IntToCombinedStringsListType extends BaseType
     /**
      * Escape a string to use it safely in an expression. abc:def => abc\:def.
      * Escapes characters are , : ( ) | &.
-     *
-     * @return string
      */
     public static function escape($string): ?string
     {
@@ -100,8 +99,6 @@ class IntToCombinedStringsListType extends BaseType
 
     /**
      * Unescape a string and remove avai escape symbols. abc\:def => abc:def.
-     *
-     * @return string
      */
     public static function unescape($string): ?string
     {

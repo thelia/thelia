@@ -11,12 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop;
 
-use Thelia\Type\AlphaNumStringListType;
-use Thelia\Type\EnumListType;
-use Thelia\Type\BooleanOrBothType;
-use PDO;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseLoop;
@@ -29,6 +26,9 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Model\Map\NewsletterTableMap;
+use Thelia\Type\AlphaNumStringListType;
+use Thelia\Type\BooleanOrBothType;
+use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
 
 /**
@@ -147,7 +147,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
 
         $search
             ->addJoinObject($join, 'newsletter_join')
-            ->addJoinCondition('newsletter_join', NewsletterTableMap::COL_UNSUBSCRIBED.' = ?', false, null, PDO::PARAM_BOOL)
+            ->addJoinCondition('newsletter_join', NewsletterTableMap::COL_UNSUBSCRIBED.' = ?', false, null, \PDO::PARAM_BOOL)
             ->withColumn('IF(ISNULL('.NewsletterTableMap::COL_EMAIL.'), 0, 1)', 'is_registered_to_newsletter');
 
         // If "*" === $newsletter, no filter will be applied, so it won't change anything

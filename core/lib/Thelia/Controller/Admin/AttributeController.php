@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-
-use Exception;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -172,10 +171,9 @@ class AttributeController extends AbstractCrudController
 
     /**
      * @param Attribute $object
-     *
-     * @return string
      */
-    protected function getObjectLabel(activeRecordInterface $object): ?string    {
+    protected function getObjectLabel(ActiveRecordInterface $object): ?string
+    {
         return $object->getTitle();
     }
 
@@ -239,7 +237,7 @@ class AttributeController extends AbstractCrudController
     protected function addRemoveFromAllTemplates(EventDispatcherInterface $eventDispatcher, ?string $eventType): Response
     {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -249,7 +247,7 @@ class AttributeController extends AbstractCrudController
 
                 $eventDispatcher->dispatch($event, $eventType);
             }
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             // Any error
             return $this->errorPage($exception);
         }

@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event\Module;
 
 /**
@@ -31,7 +32,7 @@ class ModuleToggleActivationEvent extends ModuleEvent
     protected $recursive;
 
     /**
-     * @param int $module_id
+     * @param int  $module_id
      * @param bool $assume_deactivate
      */
     public function __construct(protected $module_id, protected $assume_deactivate = false)

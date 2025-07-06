@@ -11,13 +11,12 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Tools\FileDownload;
 
-use Thelia\Exception\FileNotFoundException;
-use ErrorException;
-use HttpUrlException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Translator;
+use Thelia\Exception\FileNotFoundException;
 
 /**
  * Class FileDownloader.
@@ -31,8 +30,8 @@ interface FileDownloaderInterface
      * @param string $pathToStore
      *
      * @throws FileNotFoundException
-     * @throws ErrorException
-     * @throws HttpUrlException
+     * @throws \ErrorException
+     * @throws \HttpUrlException
      *
      * Downloads the file $url in $pathToStore
      */

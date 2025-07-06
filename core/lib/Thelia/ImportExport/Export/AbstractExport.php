@@ -11,18 +11,12 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\ImportExport\Export;
 
-use Iterator;
-use ReturnTypeWillChange;
-use SplFileObject;
-use DomainException;
-use LogicException;
-
-use Propel\Runtime\Util\PropelModelPager;
-use Exception;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Map\TableMap;
+use Propel\Runtime\Util\PropelModelPager;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Lang;
 
@@ -33,7 +27,7 @@ use Thelia\Model\Lang;
  *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-abstract class AbstractExport implements Iterator
+abstract class AbstractExport implements \Iterator
 {
     /**
      * @var string Default file name
@@ -56,7 +50,7 @@ abstract class AbstractExport implements Iterator
     public const USE_RANGE_DATE = false;
 
     /**
-     * @var SplFileObject|PropelModelPager Data to export
+     * @var \SplFileObject|PropelModelPager Data to export
      */
     private $data;
 
@@ -111,11 +105,11 @@ abstract class AbstractExport implements Iterator
     protected $rangeDate;
 
     /**
-     * @throws Exception
+     * @throws \Exception
      *
      * @return array|false|mixed|string
      */
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function current()
     {
         if ($this->dataIsJSONFile) {
@@ -143,11 +137,11 @@ abstract class AbstractExport implements Iterator
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      *
      * @return bool|float|int|string|null
      */
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function key()
     {
         if ($this->dataIsJSONFile) {
@@ -166,7 +160,7 @@ abstract class AbstractExport implements Iterator
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function next(): void
     {
@@ -184,7 +178,7 @@ abstract class AbstractExport implements Iterator
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function rewind(): void
     {
@@ -199,8 +193,8 @@ abstract class AbstractExport implements Iterator
                 && str_ends_with($data, '.json')
                 && file_exists($data)
             ) {
-                $this->data = new SplFileObject($data, 'r');
-                $this->data->setFlags(SplFileObject::READ_AHEAD);
+                $this->data = new \SplFileObject($data, 'r');
+                $this->data->setFlags(\SplFileObject::READ_AHEAD);
                 $this->dataIsJSONFile = true;
 
                 $this->data->rewind();
@@ -223,16 +217,16 @@ abstract class AbstractExport implements Iterator
                 return;
             }
 
-            throw new DomainException(
+            throw new \DomainException(
                 'Data must an array, an instance of \\Propel\\Runtime\\ActiveQuery\\ModelCriteria or a JSON file ending with.json'
             );
         }
 
-        throw new LogicException("Export data can't be rewinded");
+        throw new \LogicException("Export data can't be rewinded");
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function valid(): bool
     {
@@ -264,7 +258,7 @@ abstract class AbstractExport implements Iterator
      *
      * @return $this Return $this, allow chaining
      */
-    public function setLang(Lang $language = null)
+    public function setLang(?Lang $language = null)
     {
         $this->language = $language;
 
@@ -429,7 +423,7 @@ abstract class AbstractExport implements Iterator
      *
      * @return $this Return $this, allow chaining
      */
-    public function setRangeDate(array $rangeDate = null)
+    public function setRangeDate(?array $rangeDate = null)
     {
         $this->rangeDate = $rangeDate;
 

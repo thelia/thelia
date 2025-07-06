@@ -11,12 +11,12 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
 use Exception;
-
-use Propel\Runtime\Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Propel;
+use Propel\Runtime\Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Model\Base\Coupon as BaseCoupon;
 use Thelia\Model\Map\CouponTableMap;
 
@@ -35,25 +35,25 @@ class Coupon extends BaseCoupon
     /**
      * Create or Update this Coupon.
      *
-     * @param string    $code                       Coupon Code
-     * @param string    $title                      Coupon title
-     * @param array     $effects                    Ready to be serialized in JSON effect params
-     * @param string    $type                       Coupon type
-     * @param bool      $isRemovingPostage          Is removing Postage
-     * @param string    $shortDescription           Coupon short description
-     * @param string    $description                Coupon description
-     * @param bool      $isEnabled                  Enable/Disable
-     * @param DateTime $expirationDate Coupon expiration date
-     * @param bool      $isAvailableOnSpecialOffers Is available on special offers
-     * @param bool      $isCumulative               Is cumulative
-     * @param int       $maxUsage                   Coupon quantity
-     * @param string    $defaultSerializedRule      Serialized default rule added if none found
-     * @param string    $locale                     Coupon Language code ISO (ex: fr_FR)
-     * @param array     $freeShippingForCountries   ID of Countries to which shipping is free
-     * @param array     $freeShippingForMethods     ID of Shipping modules for which shipping is free
-     * @param bool      $perCustomerUsageCount      True if usage coiunt is per customer
+     * @param string   $code                       Coupon Code
+     * @param string   $title                      Coupon title
+     * @param array    $effects                    Ready to be serialized in JSON effect params
+     * @param string   $type                       Coupon type
+     * @param bool     $isRemovingPostage          Is removing Postage
+     * @param string   $shortDescription           Coupon short description
+     * @param string   $description                Coupon description
+     * @param bool     $isEnabled                  Enable/Disable
+     * @param DateTime $expirationDate             Coupon expiration date
+     * @param bool     $isAvailableOnSpecialOffers Is available on special offers
+     * @param bool     $isCumulative               Is cumulative
+     * @param int      $maxUsage                   Coupon quantity
+     * @param string   $defaultSerializedRule      Serialized default rule added if none found
+     * @param string   $locale                     Coupon Language code ISO (ex: fr_FR)
+     * @param array    $freeShippingForCountries   ID of Countries to which shipping is free
+     * @param array    $freeShippingForMethods     ID of Shipping modules for which shipping is free
+     * @param bool     $perCustomerUsageCount      True if usage coiunt is per customer
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function createOrUpdate(
         $code,
@@ -73,7 +73,7 @@ class Coupon extends BaseCoupon
         $freeShippingForCountries,
         $freeShippingForMethods,
         $perCustomerUsageCount,
-        $startDate = null
+        $startDate = null,
     ): void {
         $con = Propel::getWriteConnection(CouponTableMap::DATABASE_NAME);
 
@@ -137,7 +137,7 @@ class Coupon extends BaseCoupon
             }
 
             $con->commit();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $con->rollback();
 
             throw $exception;
@@ -150,7 +150,7 @@ class Coupon extends BaseCoupon
      * @param string $serializableConditions Serialized conditions ready to be saved
      * @param string $locale                 Coupon Language code ISO (ex: fr_FR)
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function createOrUpdateConditions($serializableConditions, $locale): void
     {

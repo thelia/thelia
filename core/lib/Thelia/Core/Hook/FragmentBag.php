@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Hook;
 
-use ReturnTypeWillChange;
 use Iterator;
 
 /**
@@ -21,7 +21,7 @@ use Iterator;
  *
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class FragmentBag implements Iterator
+class FragmentBag implements \Iterator
 {
     private int $position = 0;
 
@@ -36,7 +36,7 @@ class FragmentBag implements Iterator
      *
      * @return mixed can return any type
      */
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return $this->fragments[$this->position];
@@ -63,7 +63,7 @@ class FragmentBag implements Iterator
      *
      * @return mixed scalar on success, or null on failure
      */
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return $this->position;

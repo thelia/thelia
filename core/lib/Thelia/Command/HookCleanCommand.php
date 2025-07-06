@@ -11,12 +11,11 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Command;
 
-use Symfony\Component\Console\Attribute\AsCommand;
-use Exception;
-use RuntimeException;
 use Propel\Runtime\Exception\PropelException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -70,8 +69,8 @@ class HookCleanCommand extends ContainerAwareCommand
             $output->writeln('<info>Hooks have been successfully deleted</info>');
 
             $this->clearCache($output);
-        } catch (Exception $exception) {
-            $output->writeln(sprintf('<error>%s</error>', $exception->getMessage()));
+        } catch (\Exception $exception) {
+            $output->writeln(\sprintf('<error>%s</error>', $exception->getMessage()));
 
             return 1;
         }
@@ -85,7 +84,7 @@ class HookCleanCommand extends ContainerAwareCommand
         $moduleCode = $input->getArgument('module');
 
         if (!empty($moduleCode) && null === $module = ModuleQuery::create()->findOneByCode($moduleCode)) {
-            throw new RuntimeException(sprintf('Module %s does not exist.', $moduleCode));
+            throw new \RuntimeException(\sprintf('Module %s does not exist.', $moduleCode));
         }
 
         return $module;
@@ -122,7 +121,7 @@ class HookCleanCommand extends ContainerAwareCommand
      *
      * @param Module|null $module if specified it will only delete hooks related to this module
      *
-     * @throws Exception
+     * @throws \Exception
      * @throws PropelException
      */
     protected function deleteHooks($module): void
@@ -147,7 +146,7 @@ class HookCleanCommand extends ContainerAwareCommand
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     protected function clearCache(OutputInterface $output): void
     {
@@ -155,8 +154,8 @@ class HookCleanCommand extends ContainerAwareCommand
             $cacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
             $cacheEvent = new CacheEvent($cacheDir);
             $this->getDispatcher()->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
-        } catch (Exception $exception) {
-            throw new Exception(sprintf('Error during clearing of cache : %s', $exception->getMessage()), $exception->getCode(), $exception);
+        } catch (\Exception $exception) {
+            throw new \Exception(\sprintf('Error during clearing of cache : %s', $exception->getMessage()), $exception->getCode(), $exception);
         }
     }
 }

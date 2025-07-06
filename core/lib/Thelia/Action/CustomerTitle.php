@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Action;
 
-use Exception;
-use LogicException;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\CustomerTitle\CustomerTitleEvent;
@@ -52,7 +51,7 @@ class CustomerTitle extends BaseAction implements EventSubscriberInterface
             $event->getCustomerTitle()->delete();
 
             $con->commit();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $con->rollBack();
 
             throw $exception;
@@ -64,7 +63,7 @@ class CustomerTitle extends BaseAction implements EventSubscriberInterface
     protected function checkCustomerTitle(CustomerTitleEvent $event): void
     {
         if (null === $event->getCustomerTitle()) {
-            throw new LogicException(
+            throw new \LogicException(
                 'You must set the customer title before its update'
             );
         }
@@ -91,7 +90,7 @@ class CustomerTitle extends BaseAction implements EventSubscriberInterface
             }
 
             $con->commit();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $con->rollBack();
 
             throw $exception;

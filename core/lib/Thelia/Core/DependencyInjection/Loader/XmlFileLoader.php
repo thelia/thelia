@@ -11,13 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\DependencyInjection\Loader;
 
-use SimpleXMLElement;
-use Exception;
-use ErrorException;
-use DOMDocument;
-use DOMElement;
 use Propel\Runtime\Propel;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Util\XmlUtils;
@@ -57,7 +53,7 @@ class XmlFileLoader extends FileLoader
 {
     public const DEFAULT_HOOK_CLASS = 'Thelia\\Core\\Hook\\DefaultHook';
 
-    public function load(mixed $resource, string $type = null): void
+    public function load(mixed $resource, ?string $type = null): void
     {
         $path = $this->locator->locate($resource);
 
@@ -112,7 +108,7 @@ class XmlFileLoader extends FileLoader
         }
     }
 
-    protected function parseCommands(SimpleXMLElement $xml): void
+    protected function parseCommands(\SimpleXMLElement $xml): void
     {
         if (false === $commands = $xml->xpath('//config:commands/config:command')) {
             return;
@@ -134,7 +130,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses parameters.
      */
-    protected function parseParameters(SimpleXMLElement $xml): void
+    protected function parseParameters(\SimpleXMLElement $xml): void
     {
         if (!$xml->parameters) {
             return;
@@ -146,7 +142,7 @@ class XmlFileLoader extends FileLoader
     /**
      * parse Loops property.
      */
-    protected function parseLoops(SimpleXMLElement $xml): void
+    protected function parseLoops(\SimpleXMLElement $xml): void
     {
         if (false === $loops = $xml->xpath('//config:loops/config:loop')) {
             return;
@@ -164,7 +160,7 @@ class XmlFileLoader extends FileLoader
         $this->container->setParameter('Thelia.parser.loops', $loopConfig);
     }
 
-    protected function parseForms(SimpleXMLElement $xml): void
+    protected function parseForms(\SimpleXMLElement $xml): void
     {
         if (false === $forms = $xml->xpath('//config:forms/config:form')) {
             return;
@@ -186,7 +182,7 @@ class XmlFileLoader extends FileLoader
     /**
      * parse Filters property.
      */
-    protected function parseFilters(SimpleXMLElement $xml): void
+    protected function parseFilters(\SimpleXMLElement $xml): void
     {
         if (false === $filters = $xml->xpath('//config:filters/config:filter')) {
             return;
@@ -208,7 +204,7 @@ class XmlFileLoader extends FileLoader
     /**
      * parse BaseParams property.
      */
-    protected function parseTemplateDirectives(SimpleXMLElement $xml): void
+    protected function parseTemplateDirectives(\SimpleXMLElement $xml): void
     {
         if (false === $baseParams = $xml->xpath('//config:templateDirectives/config:templateDirective')) {
             return;
@@ -232,7 +228,7 @@ class XmlFileLoader extends FileLoader
      *
      * @param string $file
      */
-    protected function parseDefinitions(SimpleXMLElement $xml, $file): void
+    protected function parseDefinitions(\SimpleXMLElement $xml, $file): void
     {
         if (false === $services = $xml->xpath('//config:services/config:service')) {
             return;
@@ -257,7 +253,7 @@ class XmlFileLoader extends FileLoader
      * @param string $file
      * @param string $type
      */
-    protected function parseHooks(SimpleXMLElement $xml, $file, $type): void
+    protected function parseHooks(\SimpleXMLElement $xml, $file, $type): void
     {
         if (false === $hooks = $xml->xpath('//config:hooks/config:hook')) {
             return;
@@ -295,12 +291,12 @@ class XmlFileLoader extends FileLoader
      * Parses an individual Definition.
      *
      * @param string            $id
-     * @param SimpleXMLElement $service
+     * @param \SimpleXMLElement $service
      * @param string            $file
      *
      * @return Definition
      */
-    protected function parseService($id, $service, $file): null|Definition|ChildDefinition
+    protected function parseService($id, $service, $file): Definition|ChildDefinition|null
     {
         if ((string) $service['alias'] !== '' && (string) $service['alias'] !== '0') {
             $public = true;
@@ -375,7 +371,7 @@ class XmlFileLoader extends FileLoader
         return $definition;
     }
 
-    protected function parseExportCategories(SimpleXMLElement $xml): void
+    protected function parseExportCategories(\SimpleXMLElement $xml): void
     {
         if (false === $exportCategories = $xml->xpath('//config:export_categories/config:export_category')) {
             return;
@@ -385,7 +381,7 @@ class XmlFileLoader extends FileLoader
         $con->beginTransaction();
 
         try {
-            /** @var SimpleXMLElement $exportCategory */
+            /** @var \SimpleXMLElement $exportCategory */
             foreach ($exportCategories as $exportCategory) {
                 $id = (string) $this->getAttributeAsPhp($exportCategory, 'id');
 
@@ -399,7 +395,7 @@ class XmlFileLoader extends FileLoader
                     ;
                 }
 
-                /** @var SimpleXMLElement $child */
+                /** @var \SimpleXMLElement $child */
                 foreach ($exportCategory->children() as $child) {
                     $locale = (string) $this->getAttributeAsPhp($child, 'locale');
                     $value = (string) $child;
@@ -412,14 +408,14 @@ class XmlFileLoader extends FileLoader
             }
 
             $con->commit();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $con->rollBack();
 
             Tlog::getInstance()->error($exception->getMessage());
         }
     }
 
-    protected function parseExports(SimpleXMLElement $xml): void
+    protected function parseExports(\SimpleXMLElement $xml): void
     {
         if (false === $exports = $xml->xpath('//config:exports/config:export')) {
             return;
@@ -429,23 +425,23 @@ class XmlFileLoader extends FileLoader
         $con->beginTransaction();
 
         try {
-            /** @var SimpleXMLElement $export */
+            /** @var \SimpleXMLElement $export */
             foreach ($exports as $export) {
                 $id = (string) $this->getAttributeAsPhp($export, 'id');
                 $class = (string) $this->getAttributeAsPhp($export, 'class');
                 $categoryRef = (string) $this->getAttributeAsPhp($export, 'category_id');
 
                 if (!class_exists($class)) {
-                    throw new ErrorException(
-                        sprintf("The class \"%s\" doesn't exist", $class)
+                    throw new \ErrorException(
+                        \sprintf("The class \"%s\" doesn't exist", $class)
                     );
                 }
 
                 $category = ExportCategoryQuery::create()->findOneByRef($categoryRef);
 
                 if (null === $category) {
-                    throw new ErrorException(
-                        sprintf("The export category \"%s\" doesn't exist", $categoryRef)
+                    throw new \ErrorException(
+                        \sprintf("The export category \"%s\" doesn't exist", $categoryRef)
                     );
                 }
 
@@ -464,13 +460,13 @@ class XmlFileLoader extends FileLoader
                     ->save($con)
                 ;
 
-                /** @var SimpleXMLElement $descriptive */
+                /** @var \SimpleXMLElement $descriptive */
                 foreach ($export->children() as $descriptive) {
                     $locale = $this->getAttributeAsPhp($descriptive, 'locale');
                     $title = null;
                     $description = null;
 
-                    /** @var SimpleXMLElement $row */
+                    /** @var \SimpleXMLElement $row */
                     foreach ($descriptive->children() as $row) {
                         switch ($row->getName()) {
                             case 'title':
@@ -492,14 +488,14 @@ class XmlFileLoader extends FileLoader
             }
 
             $con->commit();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $con->rollBack();
 
             Tlog::getInstance()->error($exception->getMessage());
         }
     }
 
-    protected function parseImportCategories(SimpleXMLElement $xml): void
+    protected function parseImportCategories(\SimpleXMLElement $xml): void
     {
         if (false === $importCategories = $xml->xpath('//config:import_categories/config:import_category')) {
             return;
@@ -509,7 +505,7 @@ class XmlFileLoader extends FileLoader
         $con->beginTransaction();
 
         try {
-            /** @var SimpleXMLElement $importCategory */
+            /** @var \SimpleXMLElement $importCategory */
             foreach ($importCategories as $importCategory) {
                 $id = (string) $this->getAttributeAsPhp($importCategory, 'id');
 
@@ -523,7 +519,7 @@ class XmlFileLoader extends FileLoader
                     ;
                 }
 
-                /** @var SimpleXMLElement $child */
+                /** @var \SimpleXMLElement $child */
                 foreach ($importCategory->children() as $child) {
                     $locale = (string) $this->getAttributeAsPhp($child, 'locale');
                     $value = (string) $child;
@@ -536,14 +532,14 @@ class XmlFileLoader extends FileLoader
             }
 
             $con->commit();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $con->rollBack();
 
             Tlog::getInstance()->error($exception->getMessage());
         }
     }
 
-    protected function parseImports(SimpleXMLElement $xml): void
+    protected function parseImports(\SimpleXMLElement $xml): void
     {
         if (false === $imports = $xml->xpath('//config:imports/config:import')) {
             return;
@@ -553,23 +549,23 @@ class XmlFileLoader extends FileLoader
         $con->beginTransaction();
 
         try {
-            /** @var SimpleXMLElement $import */
+            /** @var \SimpleXMLElement $import */
             foreach ($imports as $import) {
                 $id = (string) $this->getAttributeAsPhp($import, 'id');
                 $class = (string) $this->getAttributeAsPhp($import, 'class');
                 $categoryRef = (string) $this->getAttributeAsPhp($import, 'category_id');
 
                 if (!class_exists($class)) {
-                    throw new ErrorException(
-                        sprintf("The class \"%s\" doesn't exist", $class)
+                    throw new \ErrorException(
+                        \sprintf("The class \"%s\" doesn't exist", $class)
                     );
                 }
 
                 $category = ImportCategoryQuery::create()->findOneByRef($categoryRef);
 
                 if (null === $category) {
-                    throw new ErrorException(
-                        sprintf("The import category \"%s\" doesn't exist", $categoryRef)
+                    throw new \ErrorException(
+                        \sprintf("The import category \"%s\" doesn't exist", $categoryRef)
                     );
                 }
 
@@ -588,13 +584,13 @@ class XmlFileLoader extends FileLoader
                     ->save($con)
                 ;
 
-                /** @var SimpleXMLElement $descriptive */
+                /** @var \SimpleXMLElement $descriptive */
                 foreach ($import->children() as $descriptive) {
                     $locale = $this->getAttributeAsPhp($descriptive, 'locale');
                     $title = null;
                     $description = null;
 
-                    /** @var SimpleXMLElement $row */
+                    /** @var \SimpleXMLElement $row */
                     foreach ($descriptive->children() as $row) {
                         switch ($row->getName()) {
                             case 'title':
@@ -616,7 +612,7 @@ class XmlFileLoader extends FileLoader
             }
 
             $con->commit();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $con->rollBack();
 
             Tlog::getInstance()->error($exception->getMessage());
@@ -629,10 +625,8 @@ class XmlFileLoader extends FileLoader
      * @param string $file Path to a file
      *
      * @throws InvalidArgumentException When loading of XML file returns error
-     *
-     * @return SimpleXMLElement
      */
-    protected function parseFile(string $file): ?SimpleXMLElement
+    protected function parseFile(string $file): ?\SimpleXMLElement
     {
         try {
             $dom = XmlUtils::loadFile($file, $this->validateSchema(...));
@@ -650,7 +644,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return bool
      */
-    public function validateSchema(DOMDocument $dom)
+    public function validateSchema(\DOMDocument $dom)
     {
         $schemaLocations = ['http://thelia.net/schema/dic/config' => str_replace('\\', '/', __DIR__.'/schema/dic/config/thelia-1.0.xsd')];
 
@@ -670,7 +664,7 @@ class XmlFileLoader extends FileLoader
             $drive = '\\' === \DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';
             $location = 'file:///'.$drive.implode('/', array_map('rawurlencode', $parts));
 
-            $imports .= sprintf('  <xsd:import namespace="%s" schemaLocation="%s" />'."\n", $namespace, $location);
+            $imports .= \sprintf('  <xsd:import namespace="%s" schemaLocation="%s" />'."\n", $namespace, $location);
         }
 
         $source = <<<EOF
@@ -710,9 +704,8 @@ EOF
 
     /**
      * Returns arguments as valid PHP types.
-     *
      */
-    private function getArgumentsAsPhp(SimpleXMLElement $xml, $name, bool $lowercase = true): array
+    private function getArgumentsAsPhp(\SimpleXMLElement $xml, $name, bool $lowercase = true): array
     {
         $arguments = [];
         foreach ($xml->$name as $arg) {
@@ -786,10 +779,10 @@ EOF
             ];
         }
 
-        throw new ErrorException('You must specify either a class or a service in factory');
+        throw new \ErrorException('You must specify either a class or a service in factory');
     }
 
-    public function getAttributeAsPhp(SimpleXMLElement $xml, $name): mixed
+    public function getAttributeAsPhp(\SimpleXMLElement $xml, $name): mixed
     {
         if (!isset($xml[$name]) || empty($xml[$name])) {
             return null;
@@ -798,11 +791,11 @@ EOF
         return XmlUtils::phpize($xml[$name]);
     }
 
-    private function removeScope(SimpleXMLElement $xml): void
+    private function removeScope(\SimpleXMLElement $xml): void
     {
         $nodes = $xml->xpath('//*[@scope]');
 
-        /** @var DOMElement $node */
+        /** @var \DOMElement $node */
         foreach ($nodes as $node) {
             unset($node['scope']);
         }

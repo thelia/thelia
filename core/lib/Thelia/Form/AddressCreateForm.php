@@ -11,14 +11,15 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Form;
 
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
-use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TelType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Map\StateI18nTableMap;
@@ -35,7 +36,7 @@ class AddressCreateForm extends FirewallForm
     use AddressCountryValidationTrait;
 
     public function __construct(
-        private CountryService $countryService
+        private CountryService $countryService,
     ) {
     }
 
@@ -56,7 +57,7 @@ class AddressCreateForm extends FirewallForm
      *   )
      *   ->add('age', IntegerType::class);
      */
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('label', TextType::class, [

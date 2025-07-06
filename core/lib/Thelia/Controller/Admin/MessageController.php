@@ -11,23 +11,20 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-
-use ErrorException;
-use Exception;
-use InvalidArgumentException;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Message\MessageCreateEvent;
 use Thelia\Core\Event\Message\MessageDeleteEvent;
 use Thelia\Core\Event\Message\MessageUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
@@ -158,10 +155,9 @@ class MessageController extends AbstractCrudController
 
     /**
      * @param Message $object
-     *
-     * @return string
      */
-    protected function getObjectLabel(activeRecordInterface $object): ?string    {
+    protected function getObjectLabel(ActiveRecordInterface $object): ?string
+    {
         return $object->getName();
     }
 
@@ -195,7 +191,7 @@ class MessageController extends AbstractCrudController
             $finder->in($parentTemplate->getAbsolutePath());
         }
 
-        $finder->ignoreDotFiles(true)->sortByName()->name('*.' . $requiredExtension);
+        $finder->ignoreDotFiles(true)->sortByName()->name('*.'.$requiredExtension);
 
         /** @var SplFileInfo $file */
         foreach ($finder as $file) {
@@ -214,7 +210,7 @@ class MessageController extends AbstractCrudController
                     ->in($dir)
                     ->ignoreDotFiles(true)
                     ->sortByName()
-                    ->name('*.' . $requiredExtension);
+                    ->name('*.'.$requiredExtension);
 
                 foreach ($finder as $file) {
                     $fileName = $file->getBasename();
@@ -275,12 +271,12 @@ class MessageController extends AbstractCrudController
             } else {
                 $content = $message->setLocale($this->getCurrentEditionLocale())->getTextMessageBody($parser);
             }
-        } catch (InvalidArgumentException|ErrorException $exception) {
+        } catch (\InvalidArgumentException|\ErrorException $exception) {
             return new Response($this->getTranslator()->trans("You probably didn't inject the missing variable to preview the HTML. Error is : %err",
-                ['%err' => $exception->getMessage()]), \Symfony\Component\HttpFoundation\Response::HTTP_OK);
-        } catch (Exception $exception) {
+                ['%err' => $exception->getMessage()]), Response::HTTP_OK);
+        } catch (\Exception $exception) {
             return new Response($this->getTranslator()->trans('Something goes wrong, error is : %err',
-                ['%err' => $exception->getMessage()]), \Symfony\Component\HttpFoundation\Response::HTTP_OK);
+                ['%err' => $exception->getMessage()]), Response::HTTP_OK);
         }
 
         return new Response($content);
@@ -314,7 +310,7 @@ class MessageController extends AbstractCrudController
 
                 $data = $form->getData();
 
-                $messageParameters = array_map(static fn($value) => $value, $this->getRequest()->request->all());
+                $messageParameters = array_map(static fn ($value) => $value, $this->getRequest()->request->all());
 
                 $this->getMailer()->sendEmailMessage(
                     $message->getName(),
@@ -330,7 +326,7 @@ class MessageController extends AbstractCrudController
                         ['%recipient' => $data['recipient_email']]
                     )
                 );
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 return new Response(
                     $this->getTranslator()->trans(
                         'Something goes wrong, the message was not sent to recipient. Error is : %err',

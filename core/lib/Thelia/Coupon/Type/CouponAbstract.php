@@ -11,17 +11,17 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Coupon\Type;
 
-
 use InvalidArgumentException;
-use Thelia\Exception\InvalidConditionException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\ConditionOrganizerInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
+use Thelia\Exception\InvalidConditionException;
 use Thelia\Form\CouponCreationForm;
 use Thelia\Model\CouponModule;
 
@@ -127,9 +127,8 @@ abstract class CouponAbstract implements CouponInterface
         DateTime $expirationDate,
         $freeShippingForCountries,
         $freeShippingForModules,
-        $perCustomerUsageCount
-    ): static
-    {
+        $perCustomerUsageCount,
+    ): static {
         $this->code = $code;
         $this->title = $title;
         $this->shortDescription = $shortDescription;
@@ -191,7 +190,6 @@ abstract class CouponAbstract implements CouponInterface
      * If Coupon is cumulative or prevent any accumulation
      * If is cumulative you can sum Coupon effects
      * If not cancel all other Coupon and take the last given.
-     *
      */
     public function isCumulative(): bool
     {
@@ -324,11 +322,11 @@ abstract class CouponAbstract implements CouponInterface
     public function drawBackOfficeInputs(): string
     {
         return $this->facade->getParser()->render('coupon/type-fragments/remove-x.html', [
-                'label' => $this->getInputName(),
-                'fieldId' => self::AMOUNT_FIELD_NAME,
-                'fieldName' => $this->makeCouponFieldName(self::AMOUNT_FIELD_NAME),
-                'value' => $this->amount,
-            ]);
+            'label' => $this->getInputName(),
+            'fieldId' => self::AMOUNT_FIELD_NAME,
+            'fieldName' => $this->makeCouponFieldName(self::AMOUNT_FIELD_NAME),
+            'value' => $this->amount,
+        ]);
     }
 
     /**
@@ -336,7 +334,8 @@ abstract class CouponAbstract implements CouponInterface
      * Otherwise, an InvalidArgumentException describing the problem should be thrown.
      *
      * This method should be overriden to be useful.
-     * @throws InvalidArgumentException if the field value is not valid
+     *
+     * @throws \InvalidArgumentException if the field value is not valid
      */
     protected function checkCouponFieldValue(string $fieldName, string $fieldValue): string
     {
@@ -346,7 +345,7 @@ abstract class CouponAbstract implements CouponInterface
     /**
      * A helper to get the value of a standard field name.
      *
-     * @throws InvalidArgumentException if the field is not found, and no default value has been defined
+     * @throws \InvalidArgumentException if the field is not found, and no default value has been defined
      */
     protected function getCouponFieldValue(string $fieldName, array $data, mixed $defaultValue = null): mixed
     {
@@ -362,7 +361,7 @@ abstract class CouponAbstract implements CouponInterface
             return $defaultValue;
         }
 
-        throw new InvalidArgumentException(sprintf('The coupon field name %s was not found in the coupon form', $fieldName));
+        throw new \InvalidArgumentException(\sprintf('The coupon field name %s was not found in the coupon form', $fieldName));
     }
 
     /**
@@ -370,7 +369,7 @@ abstract class CouponAbstract implements CouponInterface
      */
     protected function makeCouponFieldName(string $fieldName): string
     {
-        return sprintf('%s[%s][%s]', CouponCreationForm::COUPON_CREATION_FORM_NAME, self::COUPON_DATASET_NAME, $fieldName);
+        return \sprintf('%s[%s][%s]', CouponCreationForm::COUPON_CREATION_FORM_NAME, self::COUPON_DATASET_NAME, $fieldName);
     }
 
     /**

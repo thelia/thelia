@@ -11,11 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Coupon;
 
-use Thelia\Model\Cart;
-use Thelia\Model\Address;
-use Thelia\Model\Customer;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -24,8 +22,11 @@ use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Model\Address;
+use Thelia\Model\Cart;
 use Thelia\Model\Country;
 use Thelia\Model\Coupon;
+use Thelia\Model\Customer;
 use Thelia\TaxEngine\TaxEngine;
 
 /**
@@ -45,7 +46,7 @@ interface FacadeInterface
         ParserInterface $parser,
         RequestStack $requestStack,
         ConditionEvaluator $conditionEvaluator,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
     );
 
     /**

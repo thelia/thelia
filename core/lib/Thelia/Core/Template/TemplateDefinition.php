@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template;
 
-use ArrayIterator;
-use Exception;
 use Thelia\Core\Template\Exception\TemplateException;
 use Thelia\Core\Template\Validator\TemplateDescriptor;
 use Thelia\Core\Template\Validator\TemplateValidator;
@@ -69,9 +68,9 @@ class TemplateDefinition
 
     /**
      * @param string $name the template name (= directory name)
-     * @param int $type the remplate type (see $standardTemplatesSubdirs)
+     * @param int    $type the remplate type (see $standardTemplatesSubdirs)
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function __construct(string $name, int $type)
     {
@@ -100,7 +99,6 @@ class TemplateDefinition
 
         $this->templateDescriptor = (new TemplateValidator($this->getAbsolutePath()))->getTemplateDefinition($name, $type);
     }
-
 
     public function getParentList(): ?array
     {
@@ -140,7 +138,7 @@ class TemplateDefinition
             }
         }
 
-        throw new TemplateException('Template file not found: ' . $templateName);
+        throw new TemplateException('Template file not found: '.$templateName);
     }
 
     public function getAssetsPath(): string
@@ -159,7 +157,6 @@ class TemplateDefinition
     {
         return $this->getAbsolutePath().DS.$this->templateDescriptor->getAssets();
     }
-
 
     public function getTranslationDomain(): string
     {
@@ -232,8 +229,8 @@ class TemplateDefinition
         return $this->templateDescriptor;
     }
 
-    public static function getStandardTemplatesSubdirsIterator(): ArrayIterator
+    public static function getStandardTemplatesSubdirsIterator(): \ArrayIterator
     {
-        return new ArrayIterator(self::$standardTemplatesSubdirs);
+        return new \ArrayIterator(self::$standardTemplatesSubdirs);
     }
 }

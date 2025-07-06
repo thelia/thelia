@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -37,8 +38,8 @@ class CustomerQuery extends BaseCustomerQuery
         $stats = [];
         for ($day = 1; $day <= $numberOfDay; ++$day) {
             $dayCustomers = self::create()
-                        ->filterByCreatedAt(sprintf('%s-%s-%s 00:00:00', $year, $month, $day), Criteria::GREATER_EQUAL)
-                        ->filterByCreatedAt(sprintf('%s-%s-%s 23:59:59', $year, $month, $day), Criteria::LESS_EQUAL)
+                        ->filterByCreatedAt(\sprintf('%s-%s-%s 00:00:00', $year, $month, $day), Criteria::GREATER_EQUAL)
+                        ->filterByCreatedAt(\sprintf('%s-%s-%s 23:59:59', $year, $month, $day), Criteria::LESS_EQUAL)
                         ->count();
             $stats[] = [$day - 1, $dayCustomers];
         }

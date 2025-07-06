@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Condition\Implementation;
 
-use Thelia\Exception\NotImplementedException;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Operators;
 use Thelia\Condition\SerializableCondition;
@@ -21,6 +21,7 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Exception\InvalidConditionOperatorException;
 use Thelia\Exception\InvalidConditionValueException;
+use Thelia\Exception\NotImplementedException;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Type\FloatType;

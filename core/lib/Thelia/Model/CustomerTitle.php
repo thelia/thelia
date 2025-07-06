@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-use Exception;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Thelia\Model\Base\CustomerTitle as BaseCustomerTitle;
@@ -21,7 +21,7 @@ use Thelia\Model\Map\CustomerTitleTableMap;
 
 class CustomerTitle extends BaseCustomerTitle
 {
-    public function toggleDefault(ConnectionInterface $con = null): void
+    public function toggleDefault(?ConnectionInterface $con = null): void
     {
         if (!$con instanceof ConnectionInterface) {
             $con = Propel::getConnection(CustomerTitleTableMap::DATABASE_NAME);
@@ -37,7 +37,7 @@ class CustomerTitle extends BaseCustomerTitle
             $this->setByDefault(1)->save();
 
             $con->commit();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $con->rollBack();
 
             throw $exception;

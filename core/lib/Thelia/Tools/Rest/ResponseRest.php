@@ -11,14 +11,14 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Tools\Rest;
 
-use InvalidArgumentException;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class ResponseRest Create a serialized Response.
@@ -39,7 +39,7 @@ class ResponseRest extends Response
      * @param int    $status  The response status code
      * @param array  $headers An array of response headers
      *
-     * @throws InvalidArgumentException When the HTTP status code is not valid
+     * @throws \InvalidArgumentException When the HTTP status code is not valid
      *
      * @api
      */

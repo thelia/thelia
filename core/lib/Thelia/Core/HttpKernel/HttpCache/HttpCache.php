@@ -11,15 +11,16 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\HttpKernel\HttpCache;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache as BaseHttpCache;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class HttpCache.
@@ -43,7 +44,7 @@ class HttpCache extends BaseHttpCache implements HttpKernelInterface
 
     public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): Response
     {
-        if (!($request instanceof \Thelia\Core\HttpFoundation\Request)) {
+        if (!($request instanceof TheliaRequest)) {
             $request = TheliaRequest::create(
                 $request->getUri(),
                 $request->getMethod(),

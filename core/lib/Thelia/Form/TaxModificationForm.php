@@ -11,11 +11,12 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Model\TaxQuery;
 
@@ -32,13 +33,13 @@ class TaxModificationForm extends TaxCreationForm
 
         $this->formBuilder
             ->add('id', HiddenType::class, [
-                    'required' => true,
-                    'constraints' => [
-                        new NotBlank(),
-                        new Callback(
-                            $this->verifyTaxId(...)
-                        ),
-                    ],
+                'required' => true,
+                'constraints' => [
+                    new NotBlank(),
+                    new Callback(
+                        $this->verifyTaxId(...)
+                    ),
+                ],
             ])
         ;
     }

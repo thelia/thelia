@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop;
 
-use PDO;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -81,14 +81,14 @@ class Area extends BaseI18nLoop implements PropelSearchLoopInterface
 
         if ($withZone) {
             $search->joinAreaDeliveryModule('with_zone')
-                ->where('`with_zone`.delivery_module_id '.Criteria::EQUAL.' ?', $withZone, PDO::PARAM_INT);
+                ->where('`with_zone`.delivery_module_id '.Criteria::EQUAL.' ?', $withZone, \PDO::PARAM_INT);
         }
 
         $withoutZone = $this->getWithoutZone();
 
         if ($withoutZone) {
             $search->joinAreaDeliveryModule('without_zone', Criteria::LEFT_JOIN)
-                ->addJoinCondition('without_zone', 'delivery_module_id '.Criteria::EQUAL.' ?', $withoutZone, null, PDO::PARAM_INT)
+                ->addJoinCondition('without_zone', 'delivery_module_id '.Criteria::EQUAL.' ?', $withoutZone, null, \PDO::PARAM_INT)
                 ->where('`without_zone`.delivery_module_id '.Criteria::ISNULL);
         }
 

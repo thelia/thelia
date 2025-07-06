@@ -11,16 +11,13 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template;
 
-use IteratorAggregate;
-use Symfony\Component\HttpFoundation\Request;
-use RuntimeException;
 use Exception;
-use Traversable;
-use ArrayIterator;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Form\TheliaFormFactory;
 use Thelia\Core\Form\TheliaFormValidator;
@@ -34,7 +31,7 @@ use Thelia\Form\BaseForm;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class ParserContext implements IteratorAggregate
+class ParserContext implements \IteratorAggregate
 {
     // Lifetime, in seconds, of form error data
     public const FORM_ERROR_LIFETIME_SECONDS = 60;
@@ -46,7 +43,7 @@ class ParserContext implements IteratorAggregate
     public function __construct(
         private readonly RequestStack $requestStack,
         private readonly TheliaFormFactory $formFactory,
-        private readonly TheliaFormValidator $formValidator
+        private readonly TheliaFormValidator $formValidator,
     ) {
         // Setup basic variables
         $this->set('THELIA_VERSION', Thelia::THELIA_VERSION);
@@ -92,7 +89,7 @@ class ParserContext implements IteratorAggregate
         $form = end($this->formStore);
 
         if (false === $form) {
-            throw new RuntimeException(
+            throw new \RuntimeException(
                 'There is currently no defined form'
             );
         }
@@ -205,7 +202,7 @@ class ParserContext implements IteratorAggregate
                 if (true === $formInfo['hasError']) {
                     try {
                         $this->formValidator->validateForm($form, $formInfo['method']);
-                    } catch (Exception) {
+                    } catch (\Exception) {
                         // Ignore the exception.
                     }
 
@@ -323,9 +320,9 @@ class ParserContext implements IteratorAggregate
         return $this->store[$name] ?? $default;
     }
 
-    public function getIterator(): Traversable
+    public function getIterator(): \Traversable
     {
-        return new ArrayIterator($this->store);
+        return new \ArrayIterator($this->store);
     }
 
     /**

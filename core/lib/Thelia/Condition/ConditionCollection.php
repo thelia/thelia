@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Condition;
 
-use Stringable;
-use ReturnTypeWillChange;
 use ArrayAccess;
 use Countable;
 use Iterator;
@@ -25,7 +24,7 @@ use Thelia\Condition\Implementation\ConditionInterface;
  *
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  */
-class ConditionCollection implements Iterator, Countable, ArrayAccess, Stringable
+class ConditionCollection implements \Iterator, \Countable, \ArrayAccess, \Stringable
 {
     /** @var ConditionInterface[] */
     protected $conditions = [];
@@ -38,7 +37,7 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess, Stringabl
      *
      * @return mixed can return any type
      */
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return current($this->conditions);
@@ -63,7 +62,7 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess, Stringabl
      *
      * @see http://php.net/manual/en/iterator.key.php
      */
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function key(): mixed
     {
         return key($this->conditions);
@@ -140,7 +139,7 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess, Stringabl
      *
      * @return mixed can return all value types
      */
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->conditions[$offset] ?? null;

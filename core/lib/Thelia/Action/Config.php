@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -88,15 +89,15 @@ class Config extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-                TheliaEvents::CONFIG_CREATE => [
-                    'create', 128,
-                ], TheliaEvents::CONFIG_SETVALUE => [
-                    'setValue', 128,
-                ], TheliaEvents::CONFIG_UPDATE => [
-                    'modify', 128,
-                ], TheliaEvents::CONFIG_DELETE => [
-                    'delete', 128,
-                ],
+            TheliaEvents::CONFIG_CREATE => [
+                'create', 128,
+            ], TheliaEvents::CONFIG_SETVALUE => [
+                'setValue', 128,
+            ], TheliaEvents::CONFIG_UPDATE => [
+                'modify', 128,
+            ], TheliaEvents::CONFIG_DELETE => [
+                'delete', 128,
+            ],
         ];
     }
 }

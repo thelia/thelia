@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Bridge\Propel\Service\Resource;
 
-use Exception;
 use Propel\Runtime\Exception\PropelException;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -34,20 +34,20 @@ class DeliveryModuleApiService
 {
     public function __construct(
         private readonly EventDispatcherInterface $dispatcher,
-        private readonly ContainerInterface $container
+        private readonly ContainerInterface $container,
     ) {
     }
 
     /**
      * @throws PropelException
-     * @throws Exception
+     * @throws \Exception
      */
     public function getDeliveryModuleResource(
         Module $theliaDeliveryModule,
         Cart $cart,
         ?Address $address,
         Country $country,
-        ?State $state
+        ?State $state,
     ): DeliveryModule {
         $areaDeliveryModule = AreaDeliveryModuleQuery::create()
             ->findByCountryAndModule($country, $theliaDeliveryModule, $state);

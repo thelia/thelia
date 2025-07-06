@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event\Order;
 
 use Thelia\Core\Event\ActionEvent;
@@ -30,19 +31,19 @@ class OrderAddressEvent extends ActionEvent
     protected $order;
 
     /**
-     * @param int $title
+     * @param int         $title
      * @param string|null $company
-     * @param string $firstname
-     * @param string $lastname
-     * @param string $address1
-     * @param string $address2
-     * @param string $address3
-     * @param string $zipcode
-     * @param string $city
-     * @param int $country
-     * @param int|null $state
-     * @param string $phone
-     * @param string $cellphone
+     * @param string      $firstname
+     * @param string      $lastname
+     * @param string      $address1
+     * @param string      $address2
+     * @param string      $address3
+     * @param string      $zipcode
+     * @param string      $city
+     * @param int         $country
+     * @param int|null    $state
+     * @param string      $phone
+     * @param string      $cellphone
      */
     public function __construct(
         /**
@@ -96,9 +97,8 @@ class OrderAddressEvent extends ActionEvent
         /**
          * @var int|null state id
          */
-        protected $state = null
-    )
-    {
+        protected $state = null,
+    ) {
     }
 
     /**

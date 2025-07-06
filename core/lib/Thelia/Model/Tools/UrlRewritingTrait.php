@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model\Tools;
 
-use RuntimeException;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Event\GenerateRewrittenUrlEvent;
@@ -42,7 +42,7 @@ trait UrlRewritingTrait
      *
      * @param string|null $locale a valid locale (e.g. en_US)
      */
-    public function getUrl(string $locale = null)
+    public function getUrl(?string $locale = null)
     {
         if (null === $locale) {
             $locale = $this->getLocale();
@@ -62,7 +62,7 @@ trait UrlRewritingTrait
     public function generateRewrittenUrl(string $locale, ConnectionInterface $con): string
     {
         if ($this->isNew()) {
-            throw new RuntimeException(sprintf('Object %s must be saved before generating url', $this->getRewrittenUrlViewName()));
+            throw new \RuntimeException(\sprintf('Object %s must be saved before generating url', $this->getRewrittenUrlViewName()));
         }
 
         // Borrowed from http://stackoverflow.com/questions/2668854/sanitizing-strings-to-make-them-url-and-filename-safe
@@ -83,7 +83,7 @@ trait UrlRewritingTrait
         $title = $this->getTitle();
 
         if (null == $title) {
-            throw new RuntimeException('Impossible to create an url if title is null');
+            throw new \RuntimeException('Impossible to create an url if title is null');
         }
 
         // Replace all weird characters with dashes
@@ -98,7 +98,7 @@ trait UrlRewritingTrait
             $i = 0;
             while (URL::getInstance()->resolve($urlFilePart)) {
                 ++$i;
-                $urlFilePart = sprintf('%s-%d.html', $cleanString, $i);
+                $urlFilePart = \sprintf('%s-%d.html', $cleanString, $i);
             }
         } catch (UrlRewritingException) {
             $rewritingUrl = new RewritingUrl();

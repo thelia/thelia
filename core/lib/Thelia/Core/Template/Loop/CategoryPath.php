@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop;
 
-use LogicException;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -88,8 +88,8 @@ class CategoryPath extends BaseI18nLoop implements ArraySearchLoopInterface
                 if ($currentId > 0) {
                     // Prevent circular refererences
                     if (\in_array($currentId, $ids)) {
-                        throw new LogicException(
-                            sprintf(
+                        throw new \LogicException(
+                            \sprintf(
                                 'Circular reference detected in category ID=%d hierarchy (category ID=%d appears more than one times in path)',
                                 $originalId,
                                 $currentId

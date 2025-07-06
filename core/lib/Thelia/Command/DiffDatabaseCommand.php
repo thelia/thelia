@@ -11,10 +11,11 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Command;
 
-use Symfony\Component\Console\Attribute\AsCommand;
 use Propel\Generator\Command\MigrationDiffCommand as PropelMigrationDiffCommand;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -88,12 +89,12 @@ class DiffDatabaseCommand extends ContainerAwareCommand
 
         // output the generated SQL
         foreach ($migrationClass->getUpSQL() as $databaseName => $upSQL) {
-            $output->writeln(sprintf('-- DATABASE %s, UP', $databaseName));
+            $output->writeln(\sprintf('-- DATABASE %s, UP', $databaseName));
             $output->writeln($upSQL);
         }
 
         foreach ($migrationClass->getDownSQL() as $databaseName => $downSQL) {
-            $output->writeln(sprintf('-- DATABASE %s, DOWN', $databaseName));
+            $output->writeln(\sprintf('-- DATABASE %s, DOWN', $databaseName));
             $output->writeln($downSQL);
         }
 

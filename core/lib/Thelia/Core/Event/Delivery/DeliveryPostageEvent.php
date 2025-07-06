@@ -11,9 +11,8 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Core\Event\Delivery;
 
-use Exception;
+namespace Thelia\Core\Event\Delivery;
 
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Event\ActionEvent;
@@ -54,6 +53,7 @@ class DeliveryPostageEvent extends ActionEvent
 
     /**
      * DeliveryPostageEvent constructor.
+     *
      * @param BaseModuleInterface $module
      */
     public function __construct(protected $module, protected Cart $cart, protected ?Address $address = null, protected ?Country $country = null, protected ?State $state = null)
@@ -72,17 +72,11 @@ class DeliveryPostageEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     * @return Address
-     */
     public function getAddress(): ?Address
     {
         return $this->address;
     }
 
-    /**
-     * @param Address $address
-     */
     public function setAddress(?Address $address): static
     {
         $this->address = $address;
@@ -222,12 +216,12 @@ class DeliveryPostageEvent extends ActionEvent
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function setDeliveryMode($deliveryMode): static
     {
         if (!\in_array($deliveryMode, ['delivery', 'pickup', 'localPickup'])) {
-            throw new Exception(Translator::getInstance()->trans('A delivery module can only be of type "delivery", "pickup" or "localPickup".'));
+            throw new \Exception(Translator::getInstance()->trans('A delivery module can only be of type "delivery", "pickup" or "localPickup".'));
         }
 
         $this->deliveryMode = $deliveryMode;

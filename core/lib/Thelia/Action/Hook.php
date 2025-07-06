@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -34,12 +35,10 @@ use Thelia\Model\HookQuery;
  */
 class Hook extends BaseAction implements EventSubscriberInterface
 {
-
     public function __construct(
         protected EventDispatcherInterface $dispatcher,
-        protected string $cacheDir
-    )
-    {
+        protected string $cacheDir,
+    ) {
     }
 
     public function create(HookCreateEvent $event): void

@@ -23,10 +23,10 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel\MetaData;
 
-use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Thelia\Api\Bridge\Propel\State\PropelCollectionProvider;

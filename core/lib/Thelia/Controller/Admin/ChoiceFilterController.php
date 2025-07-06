@@ -11,10 +11,10 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\Exception\PropelException;
-use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -67,7 +67,7 @@ class ChoiceFilterController extends BaseAdminController
             ];
             $redirectUrl = '/admin/categories/update?category_id='.$categoryId.'&current_tab=associations#choice-filter';
         } else {
-            throw new RuntimeException('Missing parameter');
+            throw new \RuntimeException('Missing parameter');
         }
 
         foreach ($data['filter'] as $filter) {
@@ -131,7 +131,7 @@ class ChoiceFilterController extends BaseAdminController
             ];
             $redirectUrl = '/admin/categories/update?category_id='.$categoryId.'&current_tab=associations#choice-filter';
         } else {
-            throw new RuntimeException('Missing parameter');
+            throw new \RuntimeException('Missing parameter');
         }
 
         $this->getSession()->getFlashBag()->add('choice-filter-success', Translator::getInstance()->trans('Configuration saved successfully'));

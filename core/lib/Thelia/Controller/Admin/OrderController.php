@@ -11,16 +11,15 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Exception;
-use InvalidArgumentException;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\OrderUpdateAddress;
@@ -43,9 +42,9 @@ class OrderController extends BaseAdminController
         }
 
         return $this->render('orders', [
-                'display_order' => 20,
-                'orders_order' => $this->getListOrderFromSession('orders', 'orders_order', 'create-date-reverse'),
-            ]);
+            'display_order' => 20,
+            'orders_order' => $this->getListOrderFromSession('orders', 'orders_order', 'create-date-reverse'),
+        ]);
     }
 
     public function viewAction($order_id): Response
@@ -74,18 +73,18 @@ class OrderController extends BaseAdminController
             $status = OrderStatusQuery::create()->findPk($statusId);
 
             if (null === $order) {
-                throw new InvalidArgumentException('The order you want to update status does not exist');
+                throw new \InvalidArgumentException('The order you want to update status does not exist');
             }
 
             if (null === $status) {
-                throw new InvalidArgumentException('The status you want to set to the order does not exist');
+                throw new \InvalidArgumentException('The status you want to set to the order does not exist');
             }
 
             $event = new OrderEvent($order);
             $event->setStatus($statusId);
 
             $eventDispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $message = $exception->getMessage();
         }
 
@@ -129,14 +128,14 @@ class OrderController extends BaseAdminController
             $deliveryRef = $this->getRequest()->get('delivery_ref');
 
             if (null === $order) {
-                throw new InvalidArgumentException('The order you want to update status does not exist');
+                throw new \InvalidArgumentException('The order you want to update status does not exist');
             }
 
             $event = new OrderEvent($order);
             $event->setDeliveryRef($deliveryRef);
 
             $eventDispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_DELIVERY_REF);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $message = $exception->getMessage();
         }
 
@@ -169,7 +168,7 @@ class OrderController extends BaseAdminController
             $order = OrderQuery::create()->findPk($order_id);
 
             if (null === $order) {
-                throw new InvalidArgumentException('The order you want to update does not exist');
+                throw new \InvalidArgumentException('The order you want to update does not exist');
             }
 
             $form = $this->validateForm($orderUpdateAddress, 'post');
@@ -177,7 +176,7 @@ class OrderController extends BaseAdminController
             $orderAddress = OrderAddressQuery::create()->findPk($form->get('id')->getData());
 
             if ($orderAddress->getId() !== $order->getInvoiceOrderAddressId() && $orderAddress->getId() !== $order->getDeliveryOrderAddressId()) {
-                throw new InvalidArgumentException('The order address you want to update does not belong to the current order not exist');
+                throw new \InvalidArgumentException('The order address you want to update does not belong to the current order not exist');
             }
 
             $event = new OrderAddressEvent(
@@ -199,7 +198,7 @@ class OrderController extends BaseAdminController
             $event->setOrder($order);
 
             $eventDispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_ADDRESS);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $message = $exception->getMessage();
         }
 

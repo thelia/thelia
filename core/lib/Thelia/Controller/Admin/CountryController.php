@@ -11,13 +11,13 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-
-use Exception;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Country\CountryCreateEvent;
@@ -26,7 +26,6 @@ use Thelia\Core\Event\Country\CountryToggleDefaultEvent;
 use Thelia\Core\Event\Country\CountryToggleVisibilityEvent;
 use Thelia\Core\Event\Country\CountryUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
@@ -104,7 +103,6 @@ class CountryController extends AbstractCrudController
     /**
      * Creates the creation event with the provided form data.
      *
-     *
      * @return CountryCreateEvent
      */
     protected function getCreationEvent(array $formData): ActionEvent
@@ -116,7 +114,6 @@ class CountryController extends AbstractCrudController
 
     /**
      * Creates the update event with the provided form data.
-     *
      *
      * @return CountryUpdateEvent
      */
@@ -199,10 +196,9 @@ class CountryController extends AbstractCrudController
      * Returns the object label form the object event (name, title, etc.).
      *
      * @param Country $object
-     *
-     * @return string
      */
-    protected function getObjectLabel(activeRecordInterface $object): ?string    {
+    protected function getObjectLabel(ActiveRecordInterface $object): ?string
+    {
         return $object->getTitle();
     }
 
@@ -275,7 +271,7 @@ class CountryController extends AbstractCrudController
                 if ($toogleDefaultEvent->hasCountry()) {
                     return $this->nullResponse();
                 }
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 Tlog::getInstance()->error($ex->getMessage());
             }
         }

@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop;
 
-use Thelia\Type\EnumType;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -24,6 +24,7 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\Map\TaxTableMap;
 use Thelia\Model\TaxRuleCountry as TaxRuleCountryModel;
 use Thelia\Model\TaxRuleCountryQuery;
+use Thelia\Type\EnumType;
 use Thelia\Type\TypeCollection;
 
 /**

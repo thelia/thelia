@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
@@ -130,7 +130,7 @@ class Content extends BaseContent implements FileModelParentInterface
      *
      * Here pre and post insert event are fired
      *
-     * @throws Exception
+     * @throws \Exception
      *
      * @return $this Return $this, allow chaining
      */
@@ -146,7 +146,7 @@ class Content extends BaseContent implements FileModelParentInterface
             $this->setDefaultFolder($defaultFolderId)->save($con);
 
             $con->commit();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $con->rollback();
 
             throw $exception;
@@ -155,7 +155,7 @@ class Content extends BaseContent implements FileModelParentInterface
         return $this;
     }
 
-    public function postDelete(ConnectionInterface $con = null): void
+    public function postDelete(?ConnectionInterface $con = null): void
     {
         parent::postDelete($con);
 
@@ -178,7 +178,7 @@ class Content extends BaseContent implements FileModelParentInterface
         return parent::getPosition();
     }
 
-    public function postSave(ConnectionInterface $con = null): void
+    public function postSave(?ConnectionInterface $con = null): void
     {
         // For BC, will be removed in 2.4
         if (!$this->isNew() && (isset($this->modifiedColumns[ContentTableMap::COL_POSITION]) && $this->modifiedColumns[ContentTableMap::COL_POSITION]) && null !== $productCategory = ContentFolderQuery::create()

@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-use Thelia\TaxEngine\TaxTypeInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Thelia\Core\Event\Tax\TaxEvent;
@@ -21,6 +21,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Exception\TaxEngineException;
 use Thelia\Model\Base\Tax as BaseTax;
 use Thelia\Model\Map\TaxTableMap;
+use Thelia\TaxEngine\TaxTypeInterface;
 
 class Tax extends BaseTax
 {

@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
 use Propel\Runtime\Exception\PropelException;
@@ -32,7 +33,7 @@ class AreaDeliveryModuleQuery extends BaseAreaDeliveryModuleQuery
      *
      * @return AreaDeliveryModule|null
      */
-    public function findByCountryAndModule(Country $country, Module $module, State $state = null)
+    public function findByCountryAndModule(Country $country, Module $module, ?State $state = null)
     {
         $response = null;
 

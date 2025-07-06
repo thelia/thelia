@@ -11,13 +11,14 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event\Product;
 
 use Thelia\Model\Product;
 
 class ProductSetTemplateEvent extends ProductEvent
 {
-    public function __construct(Product $product = null, protected $template_id = null, protected $currency_id = null)
+    public function __construct(?Product $product = null, protected $template_id = null, protected $currency_id = null)
     {
         parent::__construct($product);
     }

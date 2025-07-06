@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop;
 
-use Thelia\Type\TypeCollection;
-use Thelia\Type\EnumListType;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
@@ -26,6 +25,8 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\CartItem as CartItemModel;
 use Thelia\Model\ConfigQuery;
+use Thelia\Type\EnumListType;
+use Thelia\Type\TypeCollection;
 
 /**
  * Cart Loop.

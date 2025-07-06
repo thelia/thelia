@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Files\Service;
 
-use Exception;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\UpdateFilePositionEvent;
@@ -23,13 +23,13 @@ use Thelia\Files\FileModelInterface;
 readonly class FilePositionService
 {
     public function __construct(
-        private FileManager         $fileManager,
-        private TranslatorInterface $translator
+        private FileManager $fileManager,
+        private TranslatorInterface $translator,
     ) {
     }
 
     /**
-     * @throws Exception If position update fails
+     * @throws \Exception If position update fails
      */
     public function updateFilePosition(
         EventDispatcherInterface $eventDispatcher,
@@ -38,13 +38,13 @@ readonly class FilePositionService
         string $objectType,
         string $eventName,
         int $position,
-        string $moduleRight = 'thelia'
+        string $moduleRight = 'thelia',
     ): string {
         $modelInstance = $this->fileManager->getModelInstance($objectType, $parentType);
         $model = $modelInstance->getQueryInstance()->findPk($fileId);
 
         if ($model === null) {
-            throw new Exception('File not found');
+            throw new \Exception('File not found');
         }
 
         // Feed event
@@ -62,12 +62,12 @@ readonly class FilePositionService
                 '%type% position updated',
                 ['%type%' => ucfirst($objectType)]
             );
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $message = $this->translator->trans(
                 'Fail to update %type% position: %err%',
                 ['%type%' => $objectType, '%err%' => $exception->getMessage()]
             );
-            throw new Exception($message, 0, $exception);
+            throw new \Exception($message, 0, $exception);
         }
 
         return $message;
@@ -81,6 +81,7 @@ readonly class FilePositionService
     public function getFileById(string $objectType, string $parentType, int $fileId): ?FileModelInterface
     {
         $modelInstance = $this->fileManager->getModelInstance($objectType, $parentType);
+
         return $modelInstance->getQueryInstance()->findPk($fileId);
     }
 }

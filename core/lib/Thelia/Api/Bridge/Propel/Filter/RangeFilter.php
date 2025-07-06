@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Bridge\Propel\Filter;
 
-use ReflectionProperty;
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -28,7 +28,7 @@ class RangeFilter extends AbstractFilter
 
     public const PARAMETER_LESS_THAN_OR_EQUAL = 'lte';
 
-    protected function filterProperty(string $property, $values, ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
+    protected function filterProperty(string $property, $values, ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         if (
             null === $values
@@ -76,7 +76,7 @@ class RangeFilter extends AbstractFilter
             $propertyName = $this->normalizePropertyName($property);
 
             $reflectionProperty = $this->getReflectionProperty($propertyName, $resourceClass);
-            if (!$reflectionProperty instanceof ReflectionProperty) {
+            if (!$reflectionProperty instanceof \ReflectionProperty) {
                 continue;
             }
 
@@ -97,7 +97,7 @@ class RangeFilter extends AbstractFilter
         $propertyName = $this->normalizePropertyName($fieldName);
 
         return [
-            sprintf('%s[%s]', $propertyName, $operator) => [
+            \sprintf('%s[%s]', $propertyName, $operator) => [
                 'property' => $propertyName,
                 'type' => 'string',
                 'required' => false,

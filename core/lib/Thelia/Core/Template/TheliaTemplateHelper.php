@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template;
 
-use DirectoryIterator;
-use Exception;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cache\CacheEvent;
@@ -27,12 +26,12 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
 {
     public function __construct(
         protected string $kernelCacheDir,
-        protected ComposerHelper $composerHelper
+        protected ComposerHelper $composerHelper,
     ) {
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function getActiveMailTemplate(): TemplateDefinition
     {
@@ -70,7 +69,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function getActivePdfTemplate(): TemplateDefinition
     {
@@ -81,7 +80,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function getActiveAdminTemplate(): TemplateDefinition
     {
@@ -92,7 +91,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function getActiveFrontTemplate(): TemplateDefinition
     {
@@ -103,7 +102,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function getStandardTemplateDefinitions(): array
     {
@@ -133,9 +132,9 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
 
             try {
                 // Every subdir of the basedir is supposed to be a template.
-                $di = new DirectoryIterator($baseDir);
+                $di = new \DirectoryIterator($baseDir);
 
-                /** @var DirectoryIterator $file */
+                /** @var \DirectoryIterator $file */
                 foreach ($di as $file) {
                     // Ignore 'dot' elements
                     if ($file->isDot() || !$file->isDir()) {
@@ -149,7 +148,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
 
                     $list[] = new TemplateDefinition($file->getFilename(), $templateType);
                 }
-            } catch (Exception) {
+            } catch (\Exception) {
                 continue;
             }
         }
@@ -186,7 +185,6 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
         $this->composerHelper->addPsr4NamespaceToComposer($bundleName, $path);
     }
 
-
     public function setConfigToTemplate(string $configType, string $name): void
     {
         ConfigQuery::write($configType, $name);
@@ -198,10 +196,11 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
             $envContent = file_get_contents($envFilePath);
         }
 
-        $pattern = '/^' . preg_quote($envName, '/') . '=.*$/m';
+        $pattern = '/^'.preg_quote($envName, '/').'=.*$/m';
         if (preg_match($pattern, $envContent)) {
-            $envContent = preg_replace($pattern, $envName . '=' . $name, $envContent);
+            $envContent = preg_replace($pattern, $envName.'='.$name, $envContent);
             file_put_contents($envFilePath, $envContent);
+
             return;
         }
 
@@ -210,19 +209,19 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
         $sectionEnd = '###< thelia/templates ###';
 
         if (str_contains($envContent, $sectionStart)) {
-            $newVariable = $envName . '=' . $name . "\n";
-            $envContent = str_replace($sectionEnd, $newVariable . $sectionEnd, $envContent);
+            $newVariable = $envName.'='.$name."\n";
+            $envContent = str_replace($sectionEnd, $newVariable.$sectionEnd, $envContent);
             file_put_contents($envFilePath, $envContent);
+
             return;
         }
 
-        $newSection = sprintf(
+        $newSection = \sprintf(
             "\n\n###> thelia/templates ###\n%s=%s\n###< thelia/templates ###\n",
             $envName,
             $name
         );
         file_put_contents($envFilePath, $newSection, \FILE_APPEND);
-
     }
 
     public static function getSubscribedEvents(): array

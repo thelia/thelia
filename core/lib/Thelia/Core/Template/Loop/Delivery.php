@@ -11,21 +11,21 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop;
 
-use InvalidArgumentException;
-use Thelia\Model\Country;
-use Thelia\Model\State;
-use Thelia\Model\Address;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AreaDeliveryModuleQuery;
+use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Module;
+use Thelia\Model\State;
 use Thelia\Model\StateQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Module\DeliveryModuleInterface;
@@ -157,7 +157,7 @@ class Delivery extends BaseSpecificModule
         if (null !== $countryId) {
             $country = CountryQuery::create()->findPk($countryId);
             if (null === $country) {
-                throw new InvalidArgumentException('Cannot found country id: `'.$countryId.'` in delivery loop');
+                throw new \InvalidArgumentException('Cannot found country id: `'.$countryId.'` in delivery loop');
             }
 
             return $country;
@@ -175,7 +175,7 @@ class Delivery extends BaseSpecificModule
         if (null !== $stateId) {
             $state = StateQuery::create()->findPk($stateId);
             if (null === $state) {
-                throw new InvalidArgumentException('Cannot found state id: `'.$stateId.'` in delivery loop');
+                throw new \InvalidArgumentException('Cannot found state id: `'.$stateId.'` in delivery loop');
             }
 
             return $state;

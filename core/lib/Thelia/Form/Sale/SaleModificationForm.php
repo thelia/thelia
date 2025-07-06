@@ -223,9 +223,9 @@ class SaleModificationForm extends SaleCreationForm
 
         if (!empty($value) && false === \DateTime::createFromFormat($format, $value)) {
             $context->addViolation(Translator::getInstance()->trans("Date '%date' is invalid, please enter a valid date using %fmt format", [
-                        '%fmt' => self::MOMENT_JS_DATE_FORMAT,
-                        '%date' => $value,
-                    ]));
+                '%fmt' => self::MOMENT_JS_DATE_FORMAT,
+                '%date' => $value,
+            ]));
         }
     }
 

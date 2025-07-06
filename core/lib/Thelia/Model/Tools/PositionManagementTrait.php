@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model\Tools;
 
-use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\PropelQuery;
@@ -113,7 +113,7 @@ trait PositionManagementTrait
                 $result->setPosition($myPosition)->save($cnx);
 
                 $cnx->commit();
-            } catch (Exception) {
+            } catch (\Exception) {
                 $cnx->rollback();
             }
         }
@@ -177,7 +177,7 @@ trait PositionManagementTrait
                 ;
 
                 $cnx->commit();
-            } catch (Exception) {
+            } catch (\Exception) {
                 $cnx->rollback();
             }
         }
@@ -198,7 +198,7 @@ trait PositionManagementTrait
 
         $data[':position'] = $this->getPosition();
 
-        $sql = sprintf('UPDATE `%s` SET position=(position-1) WHERE '.($whereCriteria !== [] ? implode(' AND ', $whereCriteria) : '1').' AND position>:position', $mapClassName::TABLE_NAME);
+        $sql = \sprintf('UPDATE `%s` SET position=(position-1) WHERE '.($whereCriteria !== [] ? implode(' AND ', $whereCriteria) : '1').' AND position>:position', $mapClassName::TABLE_NAME);
 
         $con = Propel::getConnection($mapClassName::DATABASE_NAME);
         $statement = $con->prepare($sql);

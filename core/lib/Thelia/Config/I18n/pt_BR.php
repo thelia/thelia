@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 return [
     ' content create form' => ' formulário de criação de conteúdo',
     ' note: only non-visible documents can be associated.' => ' nota: somente documentos não visíveis podem ser associados.',

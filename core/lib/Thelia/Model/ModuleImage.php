@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -109,7 +110,7 @@ class ModuleImage extends BaseModuleImage implements FileModelInterface
 
         $module->setLocale($locale);
 
-        $breadcrumb[$module->getTitle()] = sprintf(
+        $breadcrumb[$module->getTitle()] = \sprintf(
             '%s?current_tab=%s',
             $router->generate(
                 'admin.module.update',

@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-
-use Exception;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -145,10 +144,9 @@ class AreaController extends AbstractCrudController
      * Returns the object label form the object event (name, title, etc.).
      *
      * @param Area $object
-     *
-     * @return string
      */
-    protected function getObjectLabel(activeRecordInterface $object): ?string    {
+    protected function getObjectLabel(ActiveRecordInterface $object): ?string
+    {
         return $object->getName();
     }
 
@@ -162,7 +160,6 @@ class AreaController extends AbstractCrudController
 
     /**
      * Render the main list template.
-     *
      */
     protected function renderListTemplate($currentOrder): Response
     {
@@ -177,7 +174,7 @@ class AreaController extends AbstractCrudController
         return $this->render(
             'shipping-configuration-edit',
             [
-            'area_id' => $this->getAreaId(),
+                'area_id' => $this->getAreaId(),
             ]
         );
     }
@@ -207,10 +204,10 @@ class AreaController extends AbstractCrudController
     /**
      * add a country to a define area.
      */
-    public function addCountry(EventDispatcherInterface $eventDispatcher): RedirectResponse|null|Response
+    public function addCountry(EventDispatcherInterface $eventDispatcher): RedirectResponse|Response|null
     {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -230,7 +227,7 @@ class AreaController extends AbstractCrudController
                 $this->adminLogAppend(
                     $this->resourceCode,
                     AccessManager::UPDATE,
-                    sprintf(
+                    \sprintf(
                         '%s %s (ID %s) modified, new country added',
                         ucfirst($this->objectName),
                         $this->getObjectLabel($changedObject),
@@ -245,7 +242,7 @@ class AreaController extends AbstractCrudController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -263,10 +260,10 @@ class AreaController extends AbstractCrudController
     /**
      * delete several countries from a shipping zone.
      */
-    public function removeCountries(EventDispatcherInterface $eventDispatcher): RedirectResponse|null|Response
+    public function removeCountries(EventDispatcherInterface $eventDispatcher): RedirectResponse|Response|null
     {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -288,7 +285,7 @@ class AreaController extends AbstractCrudController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -317,7 +314,7 @@ class AreaController extends AbstractCrudController
             $this->adminLogAppend(
                 $this->resourceCode,
                 AccessManager::UPDATE,
-                sprintf(
+                \sprintf(
                     '%s %s (ID %s) removed country ID %s from shipping zone ID %s',
                     ucfirst($this->objectName),
                     $this->getObjectLabel($changedObject),
@@ -333,7 +330,7 @@ class AreaController extends AbstractCrudController
     public function removeCountry(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 

@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Bridge\Propel\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
@@ -23,7 +24,7 @@ class OrderFilter extends AbstractFilter
 
     public const DIRECTION_DESC = 'DESC';
 
-    public function apply(ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
+    public function apply(ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         if (!isset($context['filters']['order']) || !\is_array($context['filters']['order'])) {
             parent::apply($query, $resourceClass, $operation, $context);
@@ -36,7 +37,7 @@ class OrderFilter extends AbstractFilter
         }
     }
 
-    protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
+    protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         if (
             !$this->isPropertyEnabled($property, $resourceClass)
@@ -69,7 +70,7 @@ class OrderFilter extends AbstractFilter
 
         foreach (array_keys($filterProperties) as $property) {
             $propertyName = $this->normalizePropertyName($property);
-            $description[sprintf('%s[%s]', 'order', $propertyName)] = [
+            $description[\sprintf('%s[%s]', 'order', $propertyName)] = [
                 'property' => $propertyName,
                 'type' => 'string',
                 'required' => false,

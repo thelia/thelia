@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Coupon\Type;
 
-use InvalidArgumentException;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\CartItem;
 
@@ -45,9 +45,9 @@ trait AmountCouponTrait
     public function callDrawBackOfficeInputs($templateName): string
     {
         return $this->drawBaseBackOfficeInputs($templateName, [
-                'amount_field_name' => $this->makeCouponFieldName($this->getAmountFieldName()),
-                'amount_value' => $this->amount,
-            ]);
+            'amount_field_name' => $this->makeCouponFieldName($this->getAmountFieldName()),
+            'amount_value' => $this->amount,
+        ]);
     }
 
     protected function getFieldList(): array
@@ -60,7 +60,7 @@ trait AmountCouponTrait
         $this->checkBaseCouponFieldValue($fieldName, $fieldValue);
 
         if ($fieldName === $this->getAmountFieldName() && (float) $fieldValue < 0) {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 Translator::getInstance()->trans(
                     'Value %val for Discount Amount is invalid. Please enter a positive value.',
                     ['%val' => $fieldValue]

@@ -11,18 +11,18 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Module;
 
-use Thelia\Log\Destination\TlogDestinationFile;
-use Exception;
-use Thelia\Model\Order;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
+use Thelia\Log\Destination\TlogDestinationFile;
 use Thelia\Log\Tlog;
+use Thelia\Model\Order;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatusQuery;
 
@@ -69,7 +69,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
      */
     protected function getLogFilePath()
     {
-        return sprintf(THELIA_LOG_DIR.'%s.log', strtolower($this->getModuleCode()));
+        return \sprintf(THELIA_LOG_DIR.'%s.log', strtolower($this->getModuleCode()));
     }
 
     /**
@@ -78,7 +78,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
      *
      * @param int $orderId the order ID
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function confirmPayment(EventDispatcherInterface $eventDispatcher, $orderId): void
     {
@@ -108,7 +108,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
                     ['%ref' => $order->getRef(), '%id' => $order->getId()]
                 )
             );
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $this->getLog()->addError(
                 $this->getTranslator()->trans(
                     'Error occured while processing order ref. %ref, ID %id: %err',
@@ -130,7 +130,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
      * @param int $orderId        the order ID
      * @param int $transactionRef the transaction reference
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function saveTransactionRef(EventDispatcherInterface $eventDispatcher, $orderId, $transactionRef): void
     {
@@ -157,7 +157,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
                     ]
                 )
             );
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $this->getLog()->addError(
                 $this->getTranslator()->trans(
                     'Error occurred while saving payment transaction %transaction_ref for order ID %id.',
@@ -206,7 +206,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
                     ['%ref' => $order->getRef()]
                 )
             );
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $this->getLog()->addError(
                 $this->getTranslator()->trans(
                     'Error occurred while cancelling order ref. %ref, ID %id: %err',

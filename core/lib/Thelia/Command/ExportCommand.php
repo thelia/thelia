@@ -11,11 +11,10 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
-use RuntimeException;
-use Thelia\Service\DataTransfer\ExportHandler;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,6 +28,7 @@ use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Model\ExportQuery;
 use Thelia\Model\LangQuery;
+use Thelia\Service\DataTransfer\ExportHandler;
 
 /**
  * Class ExportCommand.
@@ -108,7 +108,7 @@ class ExportCommand extends ContainerAwareCommand
         $exportRef = $input->getArgument('ref');
         $serializer = $input->getArgument('serializer');
         if ($exportRef === null || $serializer === null) {
-            throw new RuntimeException(
+            throw new \RuntimeException(
                 'Not enough arguments.'.\PHP_EOL.'If no options are provided, ref and serializer arguments are required.'
             );
         }
@@ -118,7 +118,7 @@ class ExportCommand extends ContainerAwareCommand
 
         $export = $exportHandler->getExportByRef($exportRef);
         if ($export === null) {
-            throw new RuntimeException(
+            throw new \RuntimeException(
                 $exportRef." export doesn't exist."
             );
         }

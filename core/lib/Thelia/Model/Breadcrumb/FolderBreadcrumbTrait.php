@@ -11,13 +11,13 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model\Breadcrumb;
 
-use LogicException;
-use Thelia\Model\Folder;
-use Thelia\Model\Content;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\Content;
+use Thelia\Model\Folder;
 use Thelia\Model\FolderQuery;
 use Thelia\Tools\URL;
 
@@ -58,8 +58,8 @@ trait FolderBreadcrumbTrait
                 if ($currentId > 0) {
                     // Prevent circular refererences
                     if (\in_array($currentId, $ids)) {
-                        throw new LogicException(
-                            sprintf(
+                        throw new \LogicException(
+                            \sprintf(
                                 'Circular reference detected in folder ID=%d hierarchy (folder ID=%d appears more than one times in path)',
                                 $folderId,
                                 $currentId
@@ -73,7 +73,7 @@ trait FolderBreadcrumbTrait
         } while ($folder != null && $currentId > 0 && --$depth > 0);
 
         foreach ($results as $result) {
-            $breadcrumb[$result['TITLE']] = sprintf(
+            $breadcrumb[$result['TITLE']] = \sprintf(
                 '%s?parent=%d',
                 $router->generate(
                     'admin.folders.default',
@@ -99,7 +99,7 @@ trait FolderBreadcrumbTrait
 
         $folder->setLocale($locale);
 
-        $breadcrumb[$folder->getTitle()] = sprintf(
+        $breadcrumb[$folder->getTitle()] = \sprintf(
             '%s?current_tab=%s',
             $router->generate(
                 'admin.folders.update',
@@ -125,7 +125,7 @@ trait FolderBreadcrumbTrait
 
         $content->setLocale($locale);
 
-        $breadcrumb[$content->getTitle()] = sprintf(
+        $breadcrumb[$content->getTitle()] = \sprintf(
             '%s?current_tab=%s',
             $router->generate(
                 'admin.content.update',

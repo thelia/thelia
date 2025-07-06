@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Controller\Admin;
 
-use Exception;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -23,12 +23,12 @@ use Thelia\Api\Resource\ItemFileResourceInterface;
 class BinaryFileController
 {
     public function __invoke(
-        Request $request
+        Request $request,
     ): BinaryFileResponse {
         $resource = $request->get('data');
 
         if (!$resource instanceof ItemFileResourceInterface) {
-            throw new Exception('Resource must implements ItemFileResourceInterface to use the BinaryFileController');
+            throw new \Exception('Resource must implements ItemFileResourceInterface to use the BinaryFileController');
         }
 
         $propelModel = $resource->getPropelModel();

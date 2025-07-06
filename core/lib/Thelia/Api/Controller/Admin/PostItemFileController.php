@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Controller\Admin;
 
-use Exception;
 use ApiPlatform\Metadata\Post;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,7 +37,7 @@ class PostItemFileController
         $resourceClass = $request->get('_api_resource_class');
 
         if (!\in_array(ItemFileResourceInterface::class, class_implements($resourceClass))) {
-            throw new Exception('Resource must implements ItemFileResourceInterface to use the PostItemFileController');
+            throw new \Exception('Resource must implements ItemFileResourceInterface to use the PostItemFileController');
         }
 
         /** @var UploadedFile $file */
@@ -52,7 +52,7 @@ class PostItemFileController
                 $errors[] = $violation->getMessage();
             }
 
-            throw new Exception('Validation error: '.implode(', ', $errors));
+            throw new \Exception('Validation error: '.implode(', ', $errors));
         }
 
         $itemType = $resourceClass::getItemType();

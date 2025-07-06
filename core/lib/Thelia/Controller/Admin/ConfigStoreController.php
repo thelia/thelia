@@ -11,12 +11,12 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Exception;
-use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
@@ -123,7 +123,7 @@ class ConfigStoreController extends BaseAdminController
             } else {
                 $response = $this->generateSuccessRedirect($configStoreForm);
             }
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $error_msg = $exception->getMessage();
         }
 

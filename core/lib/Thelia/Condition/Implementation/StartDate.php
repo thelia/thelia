@@ -11,8 +11,8 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Condition\Implementation;
 
+namespace Thelia\Condition\Implementation;
 
 use Thelia\Condition\Operators;
 use Thelia\Coupon\FacadeInterface;
@@ -145,10 +145,10 @@ class StartDate extends ConditionAbstract
         }
 
         return $this->facade->getParser()->render('coupon/condition-fragments/start-date-condition.html', [
-                'fieldName' => self::START_DATE,
-                'criteria' => Operators::SUPERIOR_OR_EQUAL,
-                'dateFormat' => $this->getDateFormat(),
-                'currentValue' => $strDate,
+            'fieldName' => self::START_DATE,
+            'criteria' => Operators::SUPERIOR_OR_EQUAL,
+            'dateFormat' => $this->getDateFormat(),
+            'currentValue' => $strDate,
         ]);
     }
 }

@@ -11,14 +11,12 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Command;
 
-use Symfony\Component\Console\Attribute\AsCommand;
-use PDO;
-use SplFileInfo;
-use SmartyException;
 use Imagine\Exception\RuntimeException;
 use Propel\Runtime\Propel;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -40,7 +38,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
 
     protected $parser;
 
-    /** @var PDO */
+    /** @var \PDO */
     protected $con;
 
     /** @var array */
@@ -78,7 +76,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
             ->depth(0)
             ->in(THELIA_SETUP_DIRECTORY.'update'.DS.'tpl');
 
-        /** @var SplFileInfo $file */
+        /** @var \SplFileInfo $file */
         foreach ($finder as $file) {
             $content = file_get_contents($file->getRealPath());
             $content = $this->parser->renderString($content, [], false);
@@ -126,7 +124,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
         $localesToKeep = $input->getOption('locales');
         $localesToKeep = empty($localesToKeep) ? null : explode(',', (string) $localesToKeep);
 
-        /** @var SplFileInfo $file */
+        /** @var \SplFileInfo $file */
         foreach ($finder as $file) {
             $locale = $file->getBasename('.php');
             $availableLocales[] = $locale;
@@ -144,7 +142,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
 
         if ($this->locales === null || $this->locales === []) {
             throw new \RuntimeException(
-                sprintf(
+                \sprintf(
                     'You should at least generate sql for one locale. Available locales : %s',
                     implode(', ', $availableLocales)
                 )
@@ -157,7 +155,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
      *
      * The intl function is replaced, and locales are assigned.
      *
-     * @throws SmartyException
+     * @throws \SmartyException
      */
     protected function initParser(): void
     {

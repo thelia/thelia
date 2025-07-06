@@ -11,8 +11,8 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Controller\Admin;
 
+namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -162,6 +162,7 @@ class CustomerController extends AbstractCrudController
         if (empty($data['lang_id'])) {
             $data['lang_id'] = $this->getSession()->getLang()?->getId();
         }
+
         return new CustomerCreateOrUpdateEvent(
             $data['title'] ? (int) $data['title'] : null,
             $data['firstname'],
@@ -179,7 +180,7 @@ class CustomerController extends AbstractCrudController
             $data['lang_id'],
             $data['reseller'] ?? null,
             $data['sponsor'] ?? null,
-            $data['discount'] ? (float) $data['discount'] :  null,
+            $data['discount'] ? (float) $data['discount'] : null,
             $data['company'] ?? null,
             null,
             $data['state']
@@ -251,7 +252,7 @@ class CustomerController extends AbstractCrudController
         Request $request,
         TokenProvider $tokenProvider,
         EventDispatcherInterface $eventDispatcher,
-        ParserContext $parserContext
+        ParserContext $parserContext,
     ): Response {
         $errorMsg = 'No error.';
         $removalError = false;

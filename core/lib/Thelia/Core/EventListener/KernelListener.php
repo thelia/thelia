@@ -11,14 +11,15 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\EventListener;
 
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -34,7 +35,6 @@ use Thelia\Model\LangQuery;
 
 class KernelListener implements EventSubscriberInterface
 {
-
     protected static $session;
 
     public function __construct(
@@ -43,9 +43,8 @@ class KernelListener implements EventSubscriberInterface
         protected EventDispatcherInterface $eventDispatcher,
         protected $cacheDir,
         protected $debug,
-        protected $env
-    )
-    {
+        protected $env,
+    ) {
     }
 
     public function paramInit(RequestEvent $event): ?Response

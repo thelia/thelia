@@ -11,12 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Action;
 
-use InvalidArgumentException;
-use DirectoryIterator;
-use UnexpectedValueException;
-use RuntimeException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -70,7 +67,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
      * @param string $domain        the translation domain (fontoffice, backoffice, module, etc...)
      * @param array  $strings       the list of strings
      *
-     * @throws InvalidArgumentException if $walkMode contains an invalid value
+     * @throws \InvalidArgumentException if $walkMode contains an invalid value
      *
      * @return number the total number of translatable texts
      */
@@ -87,7 +84,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
             $allowedExts = ['html', 'tpl', 'xml', 'txt'];
         } else {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 Translator::getInstance()->trans(
                     'Invalid value for walkMode parameter: %value',
                     ['%value' => $walkMode]
@@ -96,10 +93,10 @@ class Translation extends BaseAction implements EventSubscriberInterface
         }
 
         try {
-            Tlog::getInstance()->debug(sprintf('Walking in %s, in mode %s', $directory, $walkMode));
+            Tlog::getInstance()->debug(\sprintf('Walking in %s, in mode %s', $directory, $walkMode));
 
-            /** @var DirectoryIterator $fileInfo */
-            foreach (new DirectoryIterator($directory) as $fileInfo) {
+            /** @var \DirectoryIterator $fileInfo */
+            foreach (new \DirectoryIterator($directory) as $fileInfo) {
                 if ($fileInfo->isDot()) {
                     continue;
                 }
@@ -119,7 +116,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
                     if (\in_array($ext, $allowedExts) && $content = file_get_contents($fileInfo->getPathName())) {
                         $short_path = $this->normalizePath($fileInfo->getPathName());
-                        Tlog::getInstance()->debug(sprintf('Examining file %s%s', $short_path, PHP_EOL));
+                        Tlog::getInstance()->debug(\sprintf('Examining file %s%s', $short_path, \PHP_EOL));
                         $matches = [];
                         if (preg_match_all(
                             '/'.$prefix.'((?<![\\\\])[\'"])((?:.(?!(?<![\\\\])\1))*.?)*?\1/ms',
@@ -145,7 +142,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
                                     $quote = $matches[1][$idx];
 
-                                    $match = str_replace('\\' . $quote, $quote, $match);
+                                    $match = str_replace('\\'.$quote, $quote, $match);
 
                                     // Ignore empty strings
                                     if (\strlen($match) == 0) {
@@ -164,7 +161,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
                                             false
                                         ),
                                         'custom_fallback' => Translator::getInstance()->trans(
-                                            sprintf(
+                                            \sprintf(
                                                 Translator::GLOBAL_FALLBACK_KEY,
                                                 $domain,
                                                 $match
@@ -193,7 +190,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
                     }
                 }
             }
-        } catch (UnexpectedValueException) {
+        } catch (\UnexpectedValueException) {
             // Directory does not exists => ignore it.
         }
 
@@ -233,7 +230,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
                     $translation = str_replace("'", "\'", $translations[$key]);
 
-                    fwrite($fp, sprintf("    '%s' => '%s',\n", $text, $translation));
+                    fwrite($fp, \sprintf("    '%s' => '%s',\n", $text, $translation));
                 }
             }
 
@@ -241,7 +238,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
             @fclose($fp);
         } else {
-            throw new RuntimeException(
+            throw new \RuntimeException(
                 Translator::getInstance()->trans(
                     'Failed to open translation file %file. Please be sure that this file is writable by your Web server',
                     ['%file' => $file]
@@ -264,7 +261,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
                 $this->cacheClear($dispatcher);
             } else {
-                throw new RuntimeException(
+                throw new \RuntimeException(
                     Translator::getInstance()->trans(
                         'Failed to open translation file %file. Please be sure that this file is writable by your Web server',
                         ['%file' => $file]
@@ -314,19 +311,19 @@ class Translation extends BaseAction implements EventSubscriberInterface
                 if (!empty($translations[$key])) {
                     if (\is_array($translations[$key])) {
                         $key = str_replace("'", "\'", $key);
-                        fwrite($fp, sprintf("    '%s' => [\n", $key));
+                        fwrite($fp, \sprintf("    '%s' => [\n", $key));
                         ksort($translations[$key]);
                         foreach ($translations[$key] as $subKey => $subText) {
                             $subKey = str_replace("'", "\'", $subKey);
                             $translation = str_replace("'", "\'", $subText);
-                            fwrite($fp, sprintf("        '%s' => '%s',\n", $subKey, $translation));
+                            fwrite($fp, \sprintf("        '%s' => '%s',\n", $subKey, $translation));
                         }
 
                         fwrite($fp, "    ],\n");
                     } else {
                         $key = str_replace("'", "\'", $key);
                         $translation = str_replace("'", "\'", $text);
-                        fwrite($fp, sprintf("    '%s' => '%s',\n", $key, $translation));
+                        fwrite($fp, \sprintf("    '%s' => '%s',\n", $key, $translation));
                     }
                 }
             }

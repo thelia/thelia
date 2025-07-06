@@ -11,13 +11,13 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-use Exception;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Controller\BaseController;
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Core\Template\ParserInterface;
@@ -49,7 +49,7 @@ class BaseAdminController extends BaseController
             if (null !== $view = $this->requestStack->getCurrentRequest()?->get('view')) {
                 return $this->render($view);
             }
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             return $this->errorPage($exception->getMessage());
         }
 
@@ -61,7 +61,7 @@ class BaseAdminController extends BaseController
         return self::CONTROLLER_TYPE;
     }
 
-    protected function adminLogAppend(string $resource, string $action, string $message, string $resourceId = null): void
+    protected function adminLogAppend(string $resource, string $action, string $message, ?string $resourceId = null): void
     {
         AdminLog::append(
             $resource,
@@ -76,12 +76,12 @@ class BaseAdminController extends BaseController
 
     protected function pageNotFound(): Response
     {
-        return new Response($this->renderRaw(self::TEMPLATE_404), \Symfony\Component\HttpFoundation\Response::HTTP_NOT_FOUND);
+        return new Response($this->renderRaw(self::TEMPLATE_404), Response::HTTP_NOT_FOUND);
     }
 
-    protected function errorPage(Exception|string $message, int $status = 500): Response
+    protected function errorPage(\Exception|string $message, int $status = 500): Response
     {
-        if ($message instanceof Exception) {
+        if ($message instanceof \Exception) {
             $strMessage = $this->translator->trans(
                 'Sorry, an error occured: %msg',
                 ['%msg' => $message->getMessage()]
@@ -130,7 +130,7 @@ class BaseAdminController extends BaseController
         );
     }
 
-    protected function setupFormErrorContext(string $action, string $error_message, BaseForm $form = null, Exception $exception = null): void
+    protected function setupFormErrorContext(string $action, string $error_message, ?BaseForm $form = null, ?\Exception $exception = null): void
     {
         // Log the error message
         Tlog::getInstance()->error(
@@ -154,7 +154,6 @@ class BaseAdminController extends BaseController
 
         // Pass the error message to the parser.
         $this->getParserContext()->setGeneralError($error_message);
-
     }
 
     protected function getParser(?string $template = null): ParserInterface
@@ -205,7 +204,7 @@ class BaseAdminController extends BaseController
         return $this->getCurrentEditionLang()?->getLocale();
     }
 
-    protected function getUrlLanguage(string $locale = null): ?string
+    protected function getUrlLanguage(?string $locale = null): ?string
     {
         // Check if the functionality is activated
         if (!ConfigQuery::isMultiDomainActivated()) {
@@ -224,10 +223,9 @@ class BaseAdminController extends BaseController
         string $objectName,
         ?string $requestParameterName,
         ?string $defaultListOrder,
-        bool $updateSession = true
-    ): ?string
-    {
-        $orderSessionIdentifier = sprintf('admin.%s.currentListOrder', $objectName);
+        bool $updateSession = true,
+    ): ?string {
+        $orderSessionIdentifier = \sprintf('admin.%s.currentListOrder', $objectName);
 
         if (null === $requestParameterName || null === $defaultListOrder) {
             return null;

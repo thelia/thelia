@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Action;
 
-use Exception;
-use LogicException;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -50,21 +49,21 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function delete(OrderStatusDeleteEvent $event): void
     {
         $orderStatus = $this->getOrderStatus($event);
 
         if ($orderStatus->getProtectedStatus()) {
-            throw new Exception(
+            throw new \Exception(
                 Translator::getInstance()->trans('This status is protected.')
                 .' '.Translator::getInstance()->trans('You can not delete it.')
             );
         }
 
         if (null !== OrderQuery::create()->findOneByStatusId($orderStatus->getId())) {
-            throw new Exception(
+            throw new \Exception(
                 Translator::getInstance()->trans('Some commands use this status.')
                 .' '.Translator::getInstance()->trans('You can not delete it.')
             );
@@ -122,7 +121,7 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
     protected function getOrderStatus(OrderStatusUpdateEvent $event)
     {
         if (null === $orderStatus = OrderStatusQuery::create()->findOneById($event->getId())) {
-            throw new LogicException(
+            throw new \LogicException(
                 'Order status not found'
             );
         }

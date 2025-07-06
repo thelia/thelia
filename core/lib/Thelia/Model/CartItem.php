@@ -11,10 +11,11 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Cart\CartItemEvent;
@@ -35,7 +36,7 @@ class CartItem extends BaseCartItem
     /**
      * @return bool
      */
-    public function preInsert(ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null)
     {
         parent::preInsert($con);
 
@@ -50,7 +51,7 @@ class CartItem extends BaseCartItem
     /**
      * @return bool
      */
-    public function preUpdate(ConnectionInterface $con = null)
+    public function preUpdate(?ConnectionInterface $con = null)
     {
         parent::preUpdate($con);
 
@@ -65,7 +66,7 @@ class CartItem extends BaseCartItem
     /**
      * @throws PropelException
      */
-    public function postInsert(ConnectionInterface $con = null): void
+    public function postInsert(?ConnectionInterface $con = null): void
     {
         parent::postInsert($con);
 
@@ -79,7 +80,7 @@ class CartItem extends BaseCartItem
     /**
      * @throws PropelException
      */
-    public function postUpdate(ConnectionInterface $con = null): void
+    public function postUpdate(?ConnectionInterface $con = null): void
     {
         parent::postUpdate($con);
 
@@ -150,11 +151,11 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     *
      * @throws PropelException
+     *
      * @return Product
      */
-    public function getProduct(ConnectionInterface $con = null, $locale = null)
+    public function getProduct(?ConnectionInterface $con = null, $locale = null)
     {
         $product = parent::getProduct($con);
 
@@ -174,7 +175,7 @@ class CartItem extends BaseCartItem
      *
      * @return float
      */
-    public function getRealTaxedPrice(Country $country, State $state = null)
+    public function getRealTaxedPrice(Country $country, ?State $state = null)
     {
         return (int) $this->getPromo() === 1 ? $this->getTaxedPromoPrice($country, $state) : $this->getTaxedPrice($country, $state);
     }
@@ -184,7 +185,7 @@ class CartItem extends BaseCartItem
      *
      * @return float
      */
-    public function getTaxedPrice(Country $country, State $state = null)
+    public function getTaxedPrice(Country $country, ?State $state = null)
     {
         $taxCalculator = new Calculator();
 
@@ -196,7 +197,7 @@ class CartItem extends BaseCartItem
      *
      * @return float
      */
-    public function getTaxedPromoPrice(Country $country, State $state = null)
+    public function getTaxedPromoPrice(Country $country, ?State $state = null)
     {
         $taxCalculator = new Calculator();
 
@@ -210,7 +211,7 @@ class CartItem extends BaseCartItem
      *
      * @return float
      */
-    public function getTotalRealTaxedPrice(Country $country, State $state = null)
+    public function getTotalRealTaxedPrice(Country $country, ?State $state = null)
     {
         return (int) $this->getPromo() === 1 ? $this->getTotalTaxedPromoPrice($country, $state) : $this->getTotalTaxedPrice($country, $state);
     }
@@ -222,7 +223,7 @@ class CartItem extends BaseCartItem
      *
      * @return float
      */
-    public function getTotalTaxedPrice(Country $country, State $state = null)
+    public function getTotalTaxedPrice(Country $country, ?State $state = null)
     {
         return round($this->getTaxedPrice($country, $state), 2) * $this->getQuantity();
     }
@@ -232,7 +233,7 @@ class CartItem extends BaseCartItem
      *
      * @throws PropelException
      */
-    public function getTotalTaxedPromoPrice(Country $country, State $state = null)
+    public function getTotalTaxedPromoPrice(Country $country, ?State $state = null)
     {
         return round($this->getTaxedPromoPrice($country, $state), 2) * $this->getQuantity();
     }

@@ -11,9 +11,8 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Core\Hook;
 
-use InvalidArgumentException;
+namespace Thelia\Core\Hook;
 
 /**
  * Class Fragment.
@@ -27,7 +26,7 @@ class Fragment
     public function __construct($data = [])
     {
         if (!\is_array($data)) {
-            throw new InvalidArgumentException("'data' argument must be an array");
+            throw new \InvalidArgumentException("'data' argument must be an array");
         }
 
         $this->data = $data;

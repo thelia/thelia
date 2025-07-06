@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-use InvalidArgumentException;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface as SecurityUserInterface;
@@ -32,7 +32,7 @@ class Admin extends BaseAdmin implements UserInterface, SecurityUserInterface, P
 {
     use UserPermissionsTrait;
 
-    public function preInsert(ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null)
     {
         parent::preInsert($con);
 
@@ -45,7 +45,7 @@ class Admin extends BaseAdmin implements UserInterface, SecurityUserInterface, P
     public function setPassword($password)
     {
         if ($this->isNew() && ($password === null || trim($password) === '')) {
-            throw new InvalidArgumentException('customer password is mandatory on creation');
+            throw new \InvalidArgumentException('customer password is mandatory on creation');
         }
 
         if ($password !== null && trim($password) !== '') {

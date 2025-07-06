@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event\Order;
 
-use LogicException;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Order;
@@ -220,14 +220,14 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @throws LogicException if the method is called before payment
+     * @throws \LogicException if the method is called before payment
      *
      * @return Order the placed order, valid only after order payment
      */
     public function getPlacedOrder()
     {
         if (null === $this->placedOrder) {
-            throw new LogicException('The placed order is defined only after dispatching of the ORDER_PAY event');
+            throw new \LogicException('The placed order is defined only after dispatching of the ORDER_PAY event');
         }
 
         return $this->placedOrder;

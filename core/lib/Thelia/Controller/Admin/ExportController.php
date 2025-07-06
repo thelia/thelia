@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-use Exception;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,12 +44,12 @@ class ExportController extends BaseAdminController
      *
      * @param string $_view View to render
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function indexAction(string $_view = 'export')
     {
         $authResponse = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::VIEW]);
-        if ($authResponse instanceof \Symfony\Component\HttpFoundation\Response) {
+        if ($authResponse instanceof Response) {
             return $authResponse;
         }
 
@@ -64,10 +64,10 @@ class ExportController extends BaseAdminController
     /**
      * Handle export position change action.
      */
-    public function changeExportPositionAction(EventDispatcherInterface $eventDispatcher): \Symfony\Component\HttpFoundation\Response|RedirectResponse
+    public function changeExportPositionAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         $authResponse = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE]);
-        if ($authResponse instanceof \Symfony\Component\HttpFoundation\Response) {
+        if ($authResponse instanceof Response) {
             return $authResponse;
         }
 
@@ -88,10 +88,10 @@ class ExportController extends BaseAdminController
     /**
      * Handle export category position change action.
      */
-    public function changeCategoryPositionAction(EventDispatcherInterface $eventDispatcher): \Symfony\Component\HttpFoundation\Response|RedirectResponse
+    public function changeCategoryPositionAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         $authResponse = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE]);
-        if ($authResponse instanceof \Symfony\Component\HttpFoundation\Response) {
+        if ($authResponse instanceof Response) {
             return $authResponse;
         }
 
@@ -134,7 +134,7 @@ class ExportController extends BaseAdminController
      *
      * @param int $id An export identifier
      */
-    public function configureAction(int $id): \Symfony\Component\HttpFoundation\Response
+    public function configureAction(int $id): Response
     {
         /** @var Exporthandler $exportHandler */
         $exportHandler = $this->container->get('thelia.export.handler');
@@ -166,7 +166,7 @@ class ExportController extends BaseAdminController
      *
      * @param int $id An export identifier
      */
-    public function exportAction(int $id): \Symfony\Component\HttpFoundation\Response|BinaryFileResponse
+    public function exportAction(int $id): Response|BinaryFileResponse
     {
         /** @var Exporthandler $exportHandler */
         $exportHandler = $this->container->get('thelia.export.handler');
@@ -226,7 +226,7 @@ class ExportController extends BaseAdminController
 
             $header = [
                 'Content-Type' => $contentType,
-                'Content-Disposition' => sprintf(
+                'Content-Disposition' => \sprintf(
                     '%s; filename="%s.%s"',
                     ResponseHeaderBag::DISPOSITION_ATTACHMENT,
                     $exportEvent->getExport()->getFileName(),
@@ -237,7 +237,7 @@ class ExportController extends BaseAdminController
             return new BinaryFileResponse($exportEvent->getFilePath(), Response::HTTP_OK, $header, false);
         } catch (FormValidationException $e) {
             $form->setErrorMessage($this->createStandardFormValidationErrorMessage($e));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         }
 

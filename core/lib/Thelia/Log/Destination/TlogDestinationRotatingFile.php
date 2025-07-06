@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Log\Destination;
 
 use Symfony\Component\Finder\Finder;
@@ -28,7 +29,7 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
 
     public const MAX_FILE_SIZE_KB_DEFAULT = 1024;
 
-     // 1 Mb
+    // 1 Mb
     public const MAX_FILE_COUNT_DEFAULT = 10;
 
     public function __construct($maxFileSize = self::MAX_FILE_SIZE_KB_DEFAULT)

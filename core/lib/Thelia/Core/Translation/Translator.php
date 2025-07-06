@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Translation;
 
-use RuntimeException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\Translator as BaseTranslator;
 use Thelia\Core\HttpFoundation\Request;
@@ -39,14 +39,14 @@ class Translator extends BaseTranslator
     /**
      * Return this class instance, only once instanciated.
      *
-     * @throws RuntimeException if the class has not been instanciated
+     * @throws \RuntimeException if the class has not been instanciated
      *
-     * @return \Thelia\Core\Translation\Translator the instance
+     * @return Translator the instance
      */
-    public static function getInstance(): \Thelia\Core\Translation\Translator
+    public static function getInstance(): self
     {
         if (self::$instance == null) {
-            throw new RuntimeException('Translator instance is not initialized.');
+            throw new \RuntimeException('Translator instance is not initialized.');
         }
 
         return self::$instance;
@@ -68,10 +68,10 @@ class Translator extends BaseTranslator
     public function trans(
         ?string $id,
         array $parameters = [],
-        string $domain = null,
-        string $locale = null,
+        ?string $domain = null,
+        ?string $locale = null,
         $returnDefaultIfNotAvailable = true,
-        $useFallback = true
+        $useFallback = true,
     ): string {
         $domain ??= 'core';
         if (null === $locale) {
@@ -84,7 +84,7 @@ class Translator extends BaseTranslator
 
         // global translations
         if ($useFallback) {
-            $fallbackId = sprintf(self::GLOBAL_FALLBACK_KEY, $domain, (string) $id);
+            $fallbackId = \sprintf(self::GLOBAL_FALLBACK_KEY, $domain, (string) $id);
 
             if ($this->catalogues[$locale]->has($fallbackId, self::GLOBAL_FALLBACK_DOMAIN)) {
                 return parent::trans($fallbackId, $parameters, self::GLOBAL_FALLBACK_DOMAIN, $locale);

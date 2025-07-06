@@ -11,15 +11,14 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Exception;
 
-use ErrorException;
+namespace Thelia\Exception;
 
 /**
  * Class FileNotFoundException.
  *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class FileNotFoundException extends ErrorException
+class FileNotFoundException extends \ErrorException
 {
 }

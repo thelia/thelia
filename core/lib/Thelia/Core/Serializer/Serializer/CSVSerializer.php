@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Serializer\Serializer;
 
-use SplFileObject;
 use Thelia\Core\Serializer\AbstractSerializer;
 
 /**
@@ -86,7 +86,7 @@ class CSVSerializer extends AbstractSerializer
         return $this;
     }
 
-    public function prepareFile(SplFileObject $fileObject): void
+    public function prepareFile(\SplFileObject $fileObject): void
     {
         $this->headers = null;
     }
@@ -112,7 +112,7 @@ class CSVSerializer extends AbstractSerializer
         return $csvRow;
     }
 
-    public function finalizeFile(SplFileObject $fileObject): void
+    public function finalizeFile(\SplFileObject $fileObject): void
     {
         if ($this->headers !== null) {
             // Create tmp file with header
@@ -141,7 +141,7 @@ class CSVSerializer extends AbstractSerializer
     /**
      * @return list<array>
      */
-    public function unserialize(SplFileObject $fileObject): array
+    public function unserialize(\SplFileObject $fileObject): array
     {
         $data = [];
 

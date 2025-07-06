@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-
-use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -66,16 +65,16 @@ class HookController extends AbstractCrudController
 
     public function indexAction(): Response
     {
-        if (($response = $this->checkAuth(AdminResources::HOOK, [], AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::HOOK, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
         return $this->renderList();
     }
 
-    public function discoverAction(): \Symfony\Component\HttpFoundation\Response|JsonResponse
+    public function discoverAction(): Response|JsonResponse
     {
-        if (($response = $this->checkAuth(AdminResources::HOOK, [], AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::HOOK, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -112,16 +111,16 @@ class HookController extends AbstractCrudController
             ];
 
             $response = new JsonResponse($json_data);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $response = new JsonResponse(['error' => $exception->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return $response;
     }
 
-    public function discoverSaveAction(EventDispatcherInterface $eventDispatcher): \Symfony\Component\HttpFoundation\Response|JsonResponse
+    public function discoverSaveAction(EventDispatcherInterface $eventDispatcher): Response|JsonResponse
     {
-        if (($response = $this->checkAuth(AdminResources::HOOK, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth(AdminResources::HOOK, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -137,7 +136,7 @@ class HookController extends AbstractCrudController
                 $eventDispatcher->dispatch($event, TheliaEvents::HOOK_CREATE_ALL);
 
                 if (!$event->hasHook()) {
-                    $errors[] = sprintf(
+                    $errors[] = \sprintf(
                         Translator::getInstance()->trans('Failed to create new hook %s'),
                         $hook['code']
                     );
@@ -153,7 +152,7 @@ class HookController extends AbstractCrudController
                 $eventDispatcher->dispatch($event, TheliaEvents::HOOK_DEACTIVATION);
 
                 if (!$event->hasHook()) {
-                    $errors[] = sprintf(
+                    $errors[] = \sprintf(
                         Translator::getInstance()->trans('Failed to deactivate hook with id %s'),
                         $hookId
                     );
@@ -371,10 +370,9 @@ class HookController extends AbstractCrudController
      * Returns the object label form the object event (name, title, etc.).
      *
      * @param Hook $object
-     *
-     * @return string
      */
-    protected function getObjectLabel(activeRecordInterface $object): ?string    {
+    protected function getObjectLabel(ActiveRecordInterface $object): ?string
+    {
         return $object->getTitle();
     }
 
@@ -437,7 +435,7 @@ class HookController extends AbstractCrudController
 
     public function toggleNativeAction(EventDispatcherInterface $eventDispatcher): Response
     {
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -450,7 +448,7 @@ class HookController extends AbstractCrudController
                 if ($toggleDefaultEvent->hasHook()) {
                     return $this->nullResponse();
                 }
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 $content = $ex->getMessage();
                 Tlog::getInstance()->debug($content);
             }
@@ -461,7 +459,7 @@ class HookController extends AbstractCrudController
 
     public function toggleActivationAction(EventDispatcherInterface $eventDispatcher): Response
     {
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -474,7 +472,7 @@ class HookController extends AbstractCrudController
                 if ($toggleDefaultEvent->hasHook()) {
                     return $this->nullResponse();
                 }
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 $content = $ex->getMessage();
                 Tlog::getInstance()->debug($content);
             }

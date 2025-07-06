@@ -11,14 +11,15 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException as BaseHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
@@ -37,7 +38,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
 
     public function __construct(
         protected ParserResolver $parserResolver,
-        protected TemplateHelperInterface $templateHelper
+        protected TemplateHelperInterface $templateHelper,
     ) {
         $this->parser = $this->parserResolver->getDefaultParser();
     }
@@ -57,7 +58,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
             $this->displayAdminGeneralError($event);
         }
 
-        if ($exception instanceof BaseHttpException && !$event->getResponse() instanceof \Symfony\Component\HttpFoundation\Response) {
+        if ($exception instanceof BaseHttpException && !$event->getResponse() instanceof Response) {
             $this->displayException($event);
         }
     }
@@ -82,7 +83,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
                     'error_message' => $message,
                 ]
             ),
-            \Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN
+            Response::HTTP_FORBIDDEN
         );
 
         $event->setResponse($response);
@@ -94,14 +95,14 @@ class HttpException extends BaseAction implements EventSubscriberInterface
             $this->parser->getTemplateHelper()->getActiveFrontTemplate()
         );
 
-        $response = new Response($this->parser->render(ConfigQuery::getPageNotFoundView()), \Symfony\Component\HttpFoundation\Response::HTTP_NOT_FOUND);
+        $response = new Response($this->parser->render(ConfigQuery::getPageNotFoundView()), Response::HTTP_NOT_FOUND);
 
         $event->setResponse($response);
     }
 
     protected function displayException(ExceptionEvent $event): void
     {
-        /** @var \Symfony\Component\HttpKernel\Exception\HttpException $exception */
+        /** @var BaseHttpException $exception */
         $exception = $event->getThrowable();
         $event->setResponse(
             new Response(

@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
 use Thelia\Log\Tlog;
@@ -25,7 +26,7 @@ class FeatureProduct extends BaseFeatureProduct
     public function getFreeTextValue()
     {
         $bt = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-        Tlog::getInstance()->warning(sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
+        Tlog::getInstance()->warning(\sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
 
         return parent::getFreeTextValue();
     }
@@ -37,7 +38,7 @@ class FeatureProduct extends BaseFeatureProduct
     public function setFreeTextValue($v)
     {
         $bt = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-        Tlog::getInstance()->warning(sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
+        Tlog::getInstance()->warning(\sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
         $this->setIsFreeText((bool) $v);
 
         return parent::setFreeTextValue($v);

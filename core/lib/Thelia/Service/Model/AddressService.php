@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Service\Model;
 
 use Propel\Runtime\Exception\PropelException;
@@ -32,7 +33,7 @@ readonly class AddressService
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,
-        private Session $session
+        private Session $session,
     ) {
     }
 

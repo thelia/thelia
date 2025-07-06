@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -33,7 +34,7 @@ class ChoiceFilterOtherQuery extends BaseChoiceFilterOtherQuery
         $otherQuery->useChoiceFilterOtherI18nQuery(null, Criteria::LEFT_JOIN)
             ->endUse();
 
-        $locales = array_map(fn($value): string => '"'.$value.'"', $locales);
+        $locales = array_map(fn ($value): string => '"'.$value.'"', $locales);
 
         $otherQuery->addJoinCondition('ChoiceFilterOtherI18n', 'ChoiceFilterOtherI18n.locale IN ('.implode(',', $locales).')');
 

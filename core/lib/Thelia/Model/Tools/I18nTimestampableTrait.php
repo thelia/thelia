@@ -11,8 +11,8 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Model\Tools;
 
+namespace Thelia\Model\Tools;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Connection\ConnectionInterface;
@@ -24,7 +24,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
  */
 trait I18nTimestampableTrait
 {
-    public function postSave(ConnectionInterface $con = null): void
+    public function postSave(?ConnectionInterface $con = null): void
     {
         $this->getBaseQueryObject()
             ->filterById($this->getId())

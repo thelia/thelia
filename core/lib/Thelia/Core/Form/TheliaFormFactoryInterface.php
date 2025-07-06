@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -25,6 +26,6 @@ interface TheliaFormFactoryInterface
         string $name,
         $type = FormType::class,
         array $data = [],
-        array $options = []
+        array $options = [],
     ): BaseForm;
 }

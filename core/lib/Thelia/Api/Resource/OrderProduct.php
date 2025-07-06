@@ -11,11 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Resource;
 
-
-use DateTime;
-use Thelia\Model\AttributeCombination;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -32,6 +30,7 @@ use Symfony\Component\Validator\Constraints\Type;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Model\AttributeCombination;
 use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\ProductQuery;
@@ -285,10 +284,10 @@ class OrderProduct implements PropelResourceInterface
     public ?bool $virtualDocument = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
-    public ?DateTime $createdAt = null;
+    public ?\DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?DateTime $updatedAt = null;
+    public ?\DateTime $updatedAt = null;
 
     #[Relation(targetResource: OrderProductTax::class)]
     #[Groups([
@@ -326,7 +325,7 @@ class OrderProduct implements PropelResourceInterface
         }
 
         return array_map(
-            fn(AttributeCombination $attributeCombination) => [$attributeCombination->getAttribute()->getTitle() => $attributeCombination->getAttributeAv()->getTitle()], AttributeCombinationQuery::create()->filterByProductSaleElementsId($pseId)->find()->getData());
+            fn (AttributeCombination $attributeCombination) => [$attributeCombination->getAttribute()->getTitle() => $attributeCombination->getAttributeAv()->getTitle()], AttributeCombinationQuery::create()->filterByProductSaleElementsId($pseId)->find()->getData());
     }
 
     public function getId(): ?int
@@ -586,24 +585,24 @@ class OrderProduct implements PropelResourceInterface
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?DateTime $createdAt): self
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?DateTime $updatedAt): self
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 

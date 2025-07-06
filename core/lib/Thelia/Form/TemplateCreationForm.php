@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -26,21 +27,21 @@ class TemplateCreationForm extends BaseForm
                 'name',
                 TextType::class,
                 [
-                'constraints' => [
-                    new NotBlank(),
-                ],
-                'label' => Translator::getInstance()->trans('Template Name *'),
-                'label_attr' => [
-                    'for' => 'name',
-                ], ]
+                    'constraints' => [
+                        new NotBlank(),
+                    ],
+                    'label' => Translator::getInstance()->trans('Template Name *'),
+                    'label_attr' => [
+                        'for' => 'name',
+                    ], ]
             )
             ->add(
                 'locale',
                 TextType::class,
                 [
-                'constraints' => [
-                    new NotBlank(),
-                ], ]
+                    'constraints' => [
+                        new NotBlank(),
+                    ], ]
             )
         ;
     }

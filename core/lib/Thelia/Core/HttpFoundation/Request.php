@@ -11,10 +11,10 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Request as BaseRequest;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\HttpFoundation\Session\Session;
@@ -67,14 +67,14 @@ class Request extends BaseRequest
         return $this->get('product_id');
     }
 
-    public function getUriAddingParameters(array $parameters = null): string
+    public function getUriAddingParameters(?array $parameters = null): string
     {
         $uri = $this->getUri();
 
         $additionalQs = '';
 
         foreach ($parameters as $key => $value) {
-            $additionalQs .= sprintf('&%s=%s', $key, $value);
+            $additionalQs .= \sprintf('&%s=%s', $key, $value);
         }
 
         if ('' === $this->getQueryString()) {
@@ -87,7 +87,7 @@ class Request extends BaseRequest
     public function toString($withContent = true): string
     {
         $string =
-            sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))
+            \sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))
             ."\r\n".$this->headers."\r\n";
 
         if (true === $withContent) {
@@ -124,6 +124,7 @@ class Request extends BaseRequest
         }
         /** @var Session $session */
         $session = $this->session;
+
         return $session;
     }
 }

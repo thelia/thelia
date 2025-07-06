@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -59,8 +60,8 @@ class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
         $search = FolderQuery::create();
 
         $this->configureI18nProcessing($search, [
-                    'TITLE',
-                ]);
+            'TITLE',
+        ]);
 
         $search->filterByParent($parent);
 

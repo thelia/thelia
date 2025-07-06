@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Parser;
 
-use Exception;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -38,7 +38,7 @@ class ParserResolver
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function getParser(string $pathTemplate, ?string $templateName): ParserInterface
     {
@@ -55,11 +55,11 @@ class ParserResolver
             }
         }
 
-        throw new Exception(sprintf('Parser for template %s not found', $templateName));
+        throw new \Exception(\sprintf('Parser for template %s not found', $templateName));
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function getParserByCurrentRequest(): ?ParserInterface
     {
@@ -80,16 +80,17 @@ class ParserResolver
         $parser->setTemplateDefinition($templateDefinition, true);
 
         self::$currentParser = $parser;
+
         return $parser;
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function getAssetResolver(ParserInterface $parser): AssetResolverInterface
     {
         if (!self::$currentParser instanceof ParserInterface) {
-            throw new Exception('Parser not found');
+            throw new \Exception('Parser not found');
         }
 
         /* @var AssetResolverInterface $parserAsset */
@@ -99,7 +100,7 @@ class ParserResolver
             }
         }
 
-        throw new Exception('Assets parser not found');
+        throw new \Exception('Assets parser not found');
     }
 
     public function getParsers(): iterable
@@ -126,7 +127,7 @@ class ParserResolver
         }
 
         if (null === $defaultParser) {
-            throw new Exception('No parser found.');
+            throw new \Exception('No parser found.');
         }
 
         return $defaultParser;

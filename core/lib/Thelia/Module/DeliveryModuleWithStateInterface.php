@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Module;
 
 use Thelia\Model\Country;
@@ -31,7 +32,7 @@ interface DeliveryModuleWithStateInterface extends BaseModuleInterface
      *
      * @return bool
      */
-    public function isValidDelivery(Country $country, State $state = null);
+    public function isValidDelivery(Country $country, ?State $state = null);
 
     /**
      * Calculate and return delivery price in the shop's default currency.
@@ -42,7 +43,7 @@ interface DeliveryModuleWithStateInterface extends BaseModuleInterface
      *
      * @return OrderPostage|float the delivery price
      */
-    public function getPostage(Country $country, State $state = null);
+    public function getPostage(Country $country, ?State $state = null);
 
     /**
      * This method return true if your delivery manages virtual product delivery.

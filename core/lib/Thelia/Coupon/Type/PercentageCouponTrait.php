@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Coupon\Type;
 
-use InvalidArgumentException;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\CartItem;
 
@@ -49,9 +49,9 @@ trait PercentageCouponTrait
     public function callDrawBackOfficeInputs($templateName): string
     {
         return $this->drawBaseBackOfficeInputs($templateName, [
-                'percentage_field_name' => $this->makeCouponFieldName($this->getPercentageFieldName()),
-                'percentage_value' => $this->percentage,
-            ]);
+            'percentage_field_name' => $this->makeCouponFieldName($this->getPercentageFieldName()),
+            'percentage_value' => $this->percentage,
+        ]);
     }
 
     protected function getFieldList(): array
@@ -67,7 +67,7 @@ trait PercentageCouponTrait
             $pcent = (float) $fieldValue;
 
             if ($pcent <= 0 || $pcent > 100) {
-                throw new InvalidArgumentException(
+                throw new \InvalidArgumentException(
                     Translator::getInstance()->trans(
                         'Value %val for Percent Discount is invalid. Please enter a positive value between 1 and 100.',
                         ['%val' => $fieldValue]

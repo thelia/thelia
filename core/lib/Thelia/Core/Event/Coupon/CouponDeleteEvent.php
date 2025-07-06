@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event\Coupon;
 
 use Thelia\Core\Event\ActionEvent;
@@ -27,9 +28,6 @@ class CouponDeleteEvent extends ActionEvent
     {
     }
 
-    /**
-     * @return Coupon
-     */
     public function getCoupon(): ?Coupon
     {
         return $this->coupon;
@@ -38,7 +36,7 @@ class CouponDeleteEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setCoupon(Coupon $coupon = null): static
+    public function setCoupon(?Coupon $coupon = null): static
     {
         $this->coupon = $coupon;
 

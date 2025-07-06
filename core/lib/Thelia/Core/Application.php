@@ -11,15 +11,15 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use ReflectionClass;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Thelia\Command\Install;
 
@@ -75,7 +75,7 @@ class Application extends BaseApplication
 
         foreach ($container->getParameter('command.definition') as $commandId) {
             $command = $container->get($commandId);
-            $r = new ReflectionClass($command);
+            $r = new \ReflectionClass($command);
 
             if (!$r->isSubclassOf(Command::class)) {
                 continue;
@@ -90,7 +90,7 @@ class Application extends BaseApplication
             }
 
             if (!$command instanceof Command) {
-                throw new \LogicException(sprintf('The command "%s" must be an instance of "%s".', $commandId, Command::class));
+                throw new \LogicException(\sprintf('The command "%s" must be an instance of "%s".', $commandId, Command::class));
             }
 
             $this->add($command);

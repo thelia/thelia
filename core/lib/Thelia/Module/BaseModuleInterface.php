@@ -11,16 +11,14 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Module;
 
-use LogicException;
-use Thelia\Exception\ModuleException;
-use Exception;
-use UnexpectedValueException;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
+use Thelia\Exception\ModuleException;
 use Thelia\Model\Module;
 
 interface BaseModuleInterface
@@ -28,7 +26,7 @@ interface BaseModuleInterface
     /**
      * This method is called when the plugin is installed for the first time.
      */
-    public function install(ConnectionInterface $con = null);
+    public function install(?ConnectionInterface $con = null);
 
     /**
      * This method is called when a newer version of the plugin is installed.
@@ -36,7 +34,7 @@ interface BaseModuleInterface
      * @param string $currentVersion the current (installed) module version, as defined in the module.xml file
      * @param string $newVersion     the new module version, as defined in the module.xml file
      */
-    public function update($currentVersion, $newVersion, ConnectionInterface $con = null);
+    public function update($currentVersion, $newVersion, ?ConnectionInterface $con = null);
 
     /**
      * This method is called just before the deletion of the module, giving the module an opportunity
@@ -44,7 +42,7 @@ interface BaseModuleInterface
      *
      * @param bool $deleteModuleData if true, the module should remove all its data from the system
      */
-    public function destroy(ConnectionInterface $con = null, $deleteModuleData = false);
+    public function destroy(?ConnectionInterface $con = null, $deleteModuleData = false);
 
     /**
      * This method is called when the module is activated.
@@ -65,24 +63,24 @@ interface BaseModuleInterface
      *
      * @return bool true to continue module activation, false to prevent it
      */
-    public function preActivation(ConnectionInterface $con = null);
+    public function preActivation(?ConnectionInterface $con = null);
 
     /**
      * This method is called just after the module was successfully activated.
      */
-    public function postActivation(ConnectionInterface $con = null);
+    public function postActivation(?ConnectionInterface $con = null);
 
     /**
      * This method is called before the module de-activation, and may prevent it by returning false.
      *
      * @return bool true to continue module de-activation, false to prevent it
      */
-    public function preDeactivation(ConnectionInterface $con = null);
+    public function preDeactivation(?ConnectionInterface $con = null);
 
     /**
      * This method is called just after the module was successfully deactivated.
      */
-    public function postDeactivation(ConnectionInterface $con = null);
+    public function postDeactivation(?ConnectionInterface $con = null);
 
     /**
      * Sets a module titles for various languages.
@@ -111,7 +109,7 @@ interface BaseModuleInterface
      * @param null   $valueLocale       the locale, or null if not required
      * @param bool   $createIfNotExists if true, the variable will be created if not already defined
      *
-     * @throws LogicException if variable does not exists and $createIfNotExists is false
+     * @throws \LogicException if variable does not exists and $createIfNotExists is false
      *
      * @return $this;
      */
@@ -119,7 +117,7 @@ interface BaseModuleInterface
         $variableName,
         $variableValue,
         $valueLocale = null,
-        $createIfNotExists = true
+        $createIfNotExists = true,
     );
 
     /**
@@ -131,10 +129,10 @@ interface BaseModuleInterface
      * @param string $folderPath the image folder path
      *
      * @throws ModuleException
-     * @throws Exception
-     * @throws UnexpectedValueException
+     * @throws \Exception
+     * @throws \UnexpectedValueException
      */
-    public function deployImageFolder(Module $module, $folderPath, ConnectionInterface $con = null);
+    public function deployImageFolder(Module $module, $folderPath, ?ConnectionInterface $con = null);
 
     /**
      * @throws ModuleException

@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event\Customer;
 
 use Thelia\Core\Event\ActionEvent;
@@ -24,7 +25,7 @@ class CustomerEvent extends ActionEvent
     /** @var Customer|null */
     public $customer;
 
-    public function __construct(Customer $customer = null)
+    public function __construct(?Customer $customer = null)
     {
         $this->customer = $customer;
     }

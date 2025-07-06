@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Form\Brand;
 
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -43,14 +44,14 @@ class BrandModificationForm extends BrandCreationForm
             ]
         )
         ->add('logo_image_id', IntegerType::class, [
-                'constraints' => [],
-                'required' => false,
-                'label' => Translator::getInstance()->trans('Select the brand logo'),
-                'label_attr' => [
-                    'for' => 'logo_image_id',
-                    'help' => Translator::getInstance()->trans('Select the brand logo amongst the brand images'),
-                ],
-            ])
+            'constraints' => [],
+            'required' => false,
+            'label' => Translator::getInstance()->trans('Select the brand logo'),
+            'label_attr' => [
+                'for' => 'logo_image_id',
+                'help' => Translator::getInstance()->trans('Select the brand logo amongst the brand images'),
+            ],
+        ])
         ;
 
         // Add standard description fields, excluding title and locale, which are already defined

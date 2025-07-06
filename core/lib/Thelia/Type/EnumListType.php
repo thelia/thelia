@@ -11,10 +11,8 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Type;
 
-use Traversable;
-use InvalidArgumentException;
+namespace Thelia\Type;
 
 /**
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
@@ -38,14 +36,14 @@ class EnumListType extends BaseType
     }
 
     /**
-     * @param array|Traversable $values
+     * @param array|\Traversable $values
      *
      * @since 2.3.0
      */
     public function addValues($values): void
     {
-        if (!\is_array($values) && !$values instanceof Traversable) {
-            throw new InvalidArgumentException('$values must be an array or an instance of \Traversable');
+        if (!\is_array($values) && !$values instanceof \Traversable) {
+            throw new \InvalidArgumentException('$values must be an array or an instance of \Traversable');
         }
 
         foreach ($values as $value) {

@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Bridge\Propel\Loader;
 
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
@@ -29,7 +30,7 @@ class ClassMetaDataFactory implements ClassMetadataFactoryInterface
     public function __construct(
         #[AutowireDecorated]
         private ClassMetadataFactoryInterface $inner,
-        private ApiResourcePropelTransformerService $apiResourcePropelTransformerService
+        private ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
     ) {
     }
 

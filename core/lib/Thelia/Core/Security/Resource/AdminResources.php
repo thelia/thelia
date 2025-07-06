@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Security\Resource;
 
-use ReflectionClass;
-use Exception;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Thelia\Core\Security\Exception\ResourceException;
@@ -32,7 +31,7 @@ class AdminResources
      *
      * @removed 2.5
      */
-    private static ?ReflectionClass $selfReflection = null;
+    private static ?\ReflectionClass $selfReflection = null;
 
     /**
      * @deprecated 2.3
@@ -44,15 +43,15 @@ class AdminResources
     public static function retrieve($name): mixed
     {
         $constantName = strtoupper((string) $name);
-        if (!self::$selfReflection instanceof ReflectionClass) {
-            self::$selfReflection = new ReflectionClass(self::class);
+        if (!self::$selfReflection instanceof \ReflectionClass) {
+            self::$selfReflection = new \ReflectionClass(self::class);
         }
 
         if (self::$selfReflection->hasConstant($constantName)) {
             return self::$selfReflection->getConstant($constantName);
         }
 
-        throw new ResourceException(sprintf('Resource `%s` not found', $constantName), ResourceException::RESOURCE_NOT_FOUND);
+        throw new ResourceException(\sprintf('Resource `%s` not found', $constantName), ResourceException::RESOURCE_NOT_FOUND);
     }
 
     public const SUPERADMINISTRATOR = 'SUPERADMINISTRATOR';
@@ -163,7 +162,7 @@ class AdminResources
      */
     public function __construct(
         #[Autowire(param: 'admin.resources')]
-        array $resources
+        array $resources,
     ) {
         $this->resources = $resources;
     }
@@ -183,30 +182,30 @@ class AdminResources
                 return $this->resources[$module][$constantName];
             }
 
-            throw new ResourceException(sprintf('Resource `%s` not found', $module),
+            throw new ResourceException(\sprintf('Resource `%s` not found', $module),
                 ResourceException::RESOURCE_NOT_FOUND);
         } else {
-            throw new ResourceException(sprintf('Module `%s` not found', $module),
+            throw new ResourceException(\sprintf('Module `%s` not found', $module),
                 ResourceException::RESOURCE_NOT_FOUND);
         }
     }
 
     /**
      * @param $data   with format
-     *                 [
-     *                 "ADDRESS" => "admin.address",
-     *                 ...
-     *                 ]
+     *                [
+     *                "ADDRESS" => "admin.address",
+     *                ...
+     *                ]
      * @param $module string ModuleCode
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function addModuleResources($data, $module = 'thelia'): void
     {
         if (null !== $data && \is_array($data)) {
             $this->resources[$module] = $data;
         } else {
-            throw new Exception('Format pass to addModuleResources method is not valid');
+            throw new \Exception('Format pass to addModuleResources method is not valid');
         }
     }
 

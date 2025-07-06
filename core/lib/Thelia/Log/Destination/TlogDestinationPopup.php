@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Log\Destination;
 
 use Thelia\Log\AbstractTlogDestination;
@@ -84,7 +85,7 @@ class TlogDestinationPopup extends AbstractTlogDestination
         $tpl = str_replace('#LOGTEXT', $content, $tpl);
         $tpl = str_replace(["\r\n", "\r", "\n"], '\\n', $tpl);
 
-        $wop = sprintf(
+        $wop = \sprintf(
             '<script>
                 _thelia_console = window.open("","thelia_console","width=%s,height=%s,resizable,scrollbars=yes");
                 if (_thelia_console == null) {
@@ -100,7 +101,7 @@ class TlogDestinationPopup extends AbstractTlogDestination
         );
 
         if (preg_match('|</body>|i', (string) $res)) {
-            $res = preg_replace('|</body>|i', $wop . '
+            $res = preg_replace('|</body>|i', $wop.'
 </body>', (string) $res);
         } else {
             $res .= $wop;

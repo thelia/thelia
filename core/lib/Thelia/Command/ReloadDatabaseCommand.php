@@ -11,11 +11,12 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Command;
 
-use Symfony\Component\Console\Attribute\AsCommand;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -65,8 +66,8 @@ class ReloadDatabaseCommand extends BaseModuleGenerate
 
         $database = new Database($connection);
         $output->writeln([
-           '',
-           '<info>starting reloaded database, please wait</info>',
+            '',
+            '<info>starting reloaded database, please wait</info>',
         ]);
         $database->insertSql();
         $output->writeln([

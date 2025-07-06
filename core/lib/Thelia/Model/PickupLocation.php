@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-use Exception;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -204,14 +204,14 @@ class PickupLocation
      * @param int    $day
      * @param string $hours
      *
-     * @throws Exception
+     * @throws \Exception
      *
      * @return $this
      */
     public function setOpeningHours($day, $hours): static
     {
         if (!\array_key_exists($day, $this->openingHours)) {
-            throw new Exception(Translator::getInstance()->trans('Tried to set the opening hours for a non existant day in the array. Please use the constants defined in the PickupLocation class.'));
+            throw new \Exception(Translator::getInstance()->trans('Tried to set the opening hours for a non existant day in the array. Please use the constants defined in the PickupLocation class.'));
         }
 
         $this->openingHours[$day] = $hours;

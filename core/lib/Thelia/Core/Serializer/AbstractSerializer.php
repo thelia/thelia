@@ -11,9 +11,8 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Core\Serializer;
 
-use SplFileObject;
+namespace Thelia\Core\Serializer;
 
 /**
  * Class AbstractSerializer.
@@ -22,7 +21,7 @@ use SplFileObject;
  */
 abstract class AbstractSerializer implements SerializerInterface
 {
-    public function prepareFile(SplFileObject $fileObject): void
+    public function prepareFile(\SplFileObject $fileObject): void
     {
     }
 
@@ -34,7 +33,7 @@ abstract class AbstractSerializer implements SerializerInterface
         return '';
     }
 
-    public function finalizeFile(SplFileObject $fileObject): void
+    public function finalizeFile(\SplFileObject $fileObject): void
     {
     }
 }

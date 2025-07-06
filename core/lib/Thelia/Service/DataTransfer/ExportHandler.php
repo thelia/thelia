@@ -11,12 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Service\DataTransfer;
 
-use ErrorException;
-
-use DateInterval;
-use SplFileObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Archiver\ArchiverInterface;
@@ -47,7 +44,7 @@ class ExportHandler
         $export = (new ExportQuery())->findPk($exportId);
 
         if ($export === null && $dispatchException) {
-            throw new ErrorException(
+            throw new \ErrorException(
                 Translator::getInstance()->trans(
                     'There is no id "%id" in the exports',
                     [
@@ -65,7 +62,7 @@ class ExportHandler
         $export = (new ExportQuery())->findOneByRef($exportRef);
 
         if ($export === null && $dispatchException) {
-            throw new ErrorException(
+            throw new \ErrorException(
                 Translator::getInstance()->trans(
                     'There is no ref "%ref" in the exports',
                     [
@@ -83,7 +80,7 @@ class ExportHandler
         $category = (new ExportCategoryQuery())->findPk($exportCategoryId);
 
         if ($category === null && $dispatchException) {
-            throw new ErrorException(
+            throw new \ErrorException(
                 Translator::getInstance()->trans(
                     'There is no id "%id" in the export categories',
                     [
@@ -99,11 +96,11 @@ class ExportHandler
     public function export(
         Export $export,
         SerializerInterface $serializer,
-        ArchiverInterface $archiver = null,
-        Lang $language = null,
+        ?ArchiverInterface $archiver = null,
+        ?Lang $language = null,
         bool $includeImages = false,
         bool $includeDocuments = false,
-        array $rangeDate = null
+        ?array $rangeDate = null,
     ): ExportEvent {
         $exportHandleClass = $export->getHandleClass();
 
@@ -141,8 +138,8 @@ class ExportHandler
 
             if ($rangeDate['end'] instanceof DateTime) {
                 $rangeDate['end']
-                    ->add(new DateInterval('P1M'))
-                    ->sub(new DateInterval('P1D'));
+                    ->add(new \DateInterval('P1M'))
+                    ->sub(new \DateInterval('P1D'));
             }
         }
 
@@ -187,7 +184,7 @@ class ExportHandler
 
     protected function processExport(AbstractExport $export, SerializerInterface $serializer): string
     {
-        $filename = sprintf(
+        $filename = \sprintf(
             '%s-%s-%s.%s',
             (new \DateTime())->format('Ymd'),
             uniqid('', true),
@@ -200,7 +197,7 @@ class ExportHandler
         $fileSystem = new Filesystem();
         $fileSystem->mkdir(\dirname($filePath));
 
-        $file = new SplFileObject($filePath, 'w+b');
+        $file = new \SplFileObject($filePath, 'w+b');
 
         $serializer->prepareFile($file);
 

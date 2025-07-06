@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop;
 
-use SimplePie;
-use SimplePie_Item;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
@@ -47,7 +46,7 @@ class Feed extends BaseLoop implements ArraySearchLoopInterface
         $cacheItem = $cacheAdapter->getItem('feed_'.md5($this->getUrl()));
 
         if (!$cacheItem->isHit()) {
-            $feed = new SimplePie();
+            $feed = new \SimplePie();
             $feed->set_feed_url($this->getUrl());
 
             $feed->init();
@@ -64,7 +63,7 @@ class Feed extends BaseLoop implements ArraySearchLoopInterface
 
     public function parseResults(LoopResult $loopResult): LoopResult
     {
-        /** @var SimplePie_Item $item */
+        /** @var \SimplePie_Item $item */
         foreach ($loopResult->getResultDataCollection() as $item) {
             $loopResultRow = new LoopResultRow();
 

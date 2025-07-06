@@ -11,19 +11,14 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Module;
 
-use Exception;
-use RuntimeException;
-use DirectoryIterator;
-use Propel\Runtime\Propel\Runtime\Exception\PropelException;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Throwable;
-use Thelia\Model\Hook;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Propel\Runtime\Propel\Runtime\Exception\PropelException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -41,6 +36,7 @@ use Thelia\Exception\ModuleException;
 use Thelia\Log\Tlog;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
+use Thelia\Model\Hook;
 use Thelia\Model\HookQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
@@ -93,7 +89,7 @@ class BaseModule implements BaseModuleInterface
      * @param Module $moduleModel
      *
      * @throws PropelException
-     * @throws Throwable
+     * @throws \Throwable
      */
     public function activate($moduleModel = null): void
     {
@@ -107,7 +103,7 @@ class BaseModule implements BaseModuleInterface
 
             try {
                 if (!$this->preActivation($con)) {
-                    throw new Exception('An error occured during the module pre activation.');
+                    throw new \Exception('An error occured during the module pre activation.');
                 }
 
                 $moduleModel->setActivate(self::IS_ACTIVATED);
@@ -121,7 +117,7 @@ class BaseModule implements BaseModuleInterface
 
                 $this->postActivation($con);
                 $con->commit();
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $con->rollBack();
                 $moduleModel->setActivate(self::IS_NOT_ACTIVATED);
                 $moduleModel->save();
@@ -149,7 +145,7 @@ class BaseModule implements BaseModuleInterface
 
                     $con->commit();
                 }
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $con->rollBack();
                 throw $e;
             }
@@ -164,7 +160,7 @@ class BaseModule implements BaseModuleInterface
     public function getContainer(): ContainerInterface
     {
         if ($this->hasContainer() === false) {
-            throw new RuntimeException('Sorry, container is not available in this context');
+            throw new \RuntimeException('Sorry, container is not available in this context');
         }
 
         return $this->container;
@@ -181,7 +177,7 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     public function getRequest(): Request
     {
@@ -191,7 +187,7 @@ class BaseModule implements BaseModuleInterface
         }
 
         if ($this->hasRequest() === false) {
-            throw new RuntimeException('Sorry, the request is not available in this context');
+            throw new \RuntimeException('Sorry, the request is not available in this context');
         }
 
         return $this->request;
@@ -208,7 +204,7 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @throws RuntimeException
+     * @throws \RuntimeException
      *
      * @return EventDispatcherInterface
      */
@@ -220,7 +216,7 @@ class BaseModule implements BaseModuleInterface
         }
 
         if ($this->hasDispatcher() === false) {
-            throw new RuntimeException('Sorry, the dispatcher is not available in this context');
+            throw new \RuntimeException('Sorry, the dispatcher is not available in this context');
         }
 
         return $this->dispatcher;
@@ -262,9 +258,9 @@ class BaseModule implements BaseModuleInterface
             ->setConfigValue(self::getModuleId(), $variableName, $variableValue, $valueLocale, $createIfNotExists);
     }
 
-    public function deployImageFolder(Module $module, $folderPath, ConnectionInterface $con = null): void
+    public function deployImageFolder(Module $module, $folderPath, ?ConnectionInterface $con = null): void
     {
-        $directoryBrowser = new DirectoryIterator($folderPath);
+        $directoryBrowser = new \DirectoryIterator($folderPath);
 
         if (!$con instanceof ConnectionInterface) {
             $con = Propel::getConnection(
@@ -274,7 +270,7 @@ class BaseModule implements BaseModuleInterface
 
         /* browse the directory */
         $imagePosition = 1;
-        /** @var DirectoryIterator $directoryContent */
+        /** @var \DirectoryIterator $directoryContent */
         foreach ($directoryBrowser as $directoryContent) {
             /* is it a file ? */
             if ($directoryContent->isFile()) {
@@ -291,12 +287,12 @@ class BaseModule implements BaseModuleInterface
                     $image->setFile('');
                     $image->save($con);
 
-                    $imageDirectory = sprintf('%s/media/images/module', THELIA_LOCAL_DIR);
-                    $imageFileName = sprintf('%s-%d-%s', $module->getCode(), $image->getId(), $fileName);
+                    $imageDirectory = \sprintf('%s/media/images/module', THELIA_LOCAL_DIR);
+                    $imageFileName = \sprintf('%s-%d-%s', $module->getCode(), $image->getId(), $fileName);
 
                     $increment = 0;
                     while (file_exists($imageDirectory.'/'.$imageFileName)) {
-                        $imageFileName = sprintf(
+                        $imageFileName = \sprintf(
                             '%s-%d-%d-%s',
                             $module->getCode(),
                             $image->getId(),
@@ -306,12 +302,12 @@ class BaseModule implements BaseModuleInterface
                         ++$increment;
                     }
 
-                    $imagePath = sprintf('%s/%s', $imageDirectory, $imageFileName);
+                    $imagePath = \sprintf('%s/%s', $imageDirectory, $imageFileName);
 
                     if (!is_dir($imageDirectory) && !mkdir($imageDirectory, 0777, true) && !is_dir($imageDirectory)) {
                         $con->rollBack();
                         throw new ModuleException(
-                            sprintf('Cannot create directory : %s', $imageDirectory),
+                            \sprintf('Cannot create directory : %s', $imageDirectory),
                             ModuleException::CODE_NOT_FOUND
                         );
                     }
@@ -319,7 +315,7 @@ class BaseModule implements BaseModuleInterface
                     if (!@copy($filePath, $imagePath)) {
                         $con->rollBack();
                         throw new ModuleException(
-                            sprintf('Cannot copy file : %s to : %s', $filePath, $imagePath),
+                            \sprintf('Cannot copy file : %s to : %s', $filePath, $imagePath),
                             ModuleException::CODE_NOT_FOUND
                         );
                     }
@@ -341,7 +337,7 @@ class BaseModule implements BaseModuleInterface
 
             if (null === $this->moduleModel) {
                 throw new ModuleException(
-                    sprintf('Module Code `%s` not found', $this->getCode()),
+                    \sprintf('Module Code `%s` not found', $this->getCode()),
                     ModuleException::CODE_NOT_FOUND
                 );
             }
@@ -365,7 +361,7 @@ class BaseModule implements BaseModuleInterface
         if (!isset(self::$moduleIds[$code])) {
             if (null === $module = ModuleQuery::create()->findOneByCode($code)) {
                 throw new ModuleException(
-                    sprintf('Module Code `%s` not found', $code),
+                    \sprintf('Module Code `%s` not found', $code),
                     ModuleException::CODE_NOT_FOUND
                 );
             }
@@ -427,7 +423,7 @@ class BaseModule implements BaseModuleInterface
         Order $order,
         float|int &$tax = 0,
         bool $includeDiscount = true,
-        bool $includePostage = true
+        bool $includePostage = true,
     ): float|int {
         $orderPayEvent = new OrderPayTotalEvent($order);
         $orderPayEvent
@@ -520,39 +516,39 @@ class BaseModule implements BaseModuleInterface
         return '';
     }
 
-    public function install(ConnectionInterface $con = null): void
+    public function install(?ConnectionInterface $con = null): void
     {
         // Override this method to do something useful.
     }
 
-    public function update($currentVersion, $newVersion, ConnectionInterface $con = null): void
+    public function update($currentVersion, $newVersion, ?ConnectionInterface $con = null): void
     {
         // Override this method to do something useful.
     }
 
-    public function preActivation(ConnectionInterface $con = null): bool
-    {
-        // Override this method to do something useful.
-        return true;
-    }
-
-    public function postActivation(ConnectionInterface $con = null): void
-    {
-        // Override this method to do something useful.
-    }
-
-    public function preDeactivation(ConnectionInterface $con = null): bool
+    public function preActivation(?ConnectionInterface $con = null): bool
     {
         // Override this method to do something useful.
         return true;
     }
 
-    public function postDeactivation(ConnectionInterface $con = null): void
+    public function postActivation(?ConnectionInterface $con = null): void
     {
         // Override this method to do something useful.
     }
 
-    public function destroy(ConnectionInterface $con = null, $deleteModuleData = false): void
+    public function preDeactivation(?ConnectionInterface $con = null): bool
+    {
+        // Override this method to do something useful.
+        return true;
+    }
+
+    public function postDeactivation(?ConnectionInterface $con = null): void
+    {
+        // Override this method to do something useful.
+    }
+
+    public function destroy(?ConnectionInterface $con = null, $deleteModuleData = false): void
     {
         // Override this method to do something useful.
     }
@@ -810,12 +806,12 @@ class BaseModule implements BaseModuleInterface
             $translator = $this->container->get('thelia.translator');
 
             if (null !== $translator) {
-                $i18nPath = sprintf('%s/I18n/', $this->getModuleDir());
+                $i18nPath = \sprintf('%s/I18n/', $this->getModuleDir());
                 $languages = LangQuery::create()->find();
 
                 foreach ($languages as $language) {
                     $locale = $language->getLocale();
-                    $i18nFile = sprintf('%s%s.php', $i18nPath, $locale);
+                    $i18nFile = \sprintf('%s%s.php', $i18nPath, $locale);
 
                     if (is_file($i18nFile) && is_readable($i18nFile)) {
                         $translator->addResource('php', $i18nFile, $locale, strtolower(self::getModuleCode()));

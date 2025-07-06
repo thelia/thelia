@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Module;
 
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -41,7 +42,7 @@ abstract class AbstractDeliveryModuleWithState extends BaseModule implements Del
      *
      * @return Area|null
      */
-    public function getAreaForCountry(Country $country, State $state = null)
+    public function getAreaForCountry(Country $country, ?State $state = null)
     {
         $area = null;
 

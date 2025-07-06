@@ -11,8 +11,8 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Tools;
 
+namespace Thelia\Tools;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Model\Lang;
@@ -49,8 +49,8 @@ class I18n
 
     public static function forceI18nRetrieving($askedLocale, $modelName, $id, $needed = ['Title'])
     {
-        $i18nQueryClass = sprintf('\\Thelia\\Model\\%sI18nQuery', $modelName);
-        $i18nClass = sprintf('\\Thelia\\Model\\%sI18n', $modelName);
+        $i18nQueryClass = \sprintf('\\Thelia\\Model\\%sI18nQuery', $modelName);
+        $i18nClass = \sprintf('\\Thelia\\Model\\%sI18n', $modelName);
 
         /* get customer language translation */
         $i18n = $i18nQueryClass::create()
@@ -73,7 +73,7 @@ class I18n
 
             $i18n->setId($id);
             foreach ($needed as $need) {
-                $method = sprintf('set%s', $need);
+                $method = \sprintf('set%s', $need);
                 if (method_exists($i18n, $method)) {
                     $i18n->$method('DEFAULT '.strtoupper((string) $need));
                 }
@@ -91,7 +91,7 @@ class I18n
         string $tableIdColumn,
         string $i18nIdColumn,
         string $localeColumn,
-        $locale
+        $locale,
     ): void {
         if (null === static::$defaultLocale) {
             static::$defaultLocale = Lang::getDefaultLanguage()->getLocale();
@@ -106,9 +106,9 @@ class I18n
                 'CASE WHEN '.$tableIdColumn.' IN'.
                 '(SELECT DISTINCT '.$i18nIdColumn.' '.
                 'FROM `'.$i18nTableName.'` '.
-                sprintf('WHERE locale=%s) ', $locale).
-                'THEN '.$localeColumn.sprintf(' = %s ', $locale).
-                'ELSE '.$localeColumn.sprintf(' = %s ', $defaultLocale).
+                \sprintf('WHERE locale=%s) ', $locale).
+                'THEN '.$localeColumn.\sprintf(' = %s ', $locale).
+                'ELSE '.$localeColumn.\sprintf(' = %s ', $defaultLocale).
                 'END'
             )
         ;
@@ -132,6 +132,6 @@ class I18n
 
         $return = $i > 0 ? substr($return, 0, -1) : '""';
 
-        return $return . ')';
+        return $return.')';
     }
 }

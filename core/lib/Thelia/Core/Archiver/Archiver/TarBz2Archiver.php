@@ -11,9 +11,8 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Core\Archiver\Archiver;
 
-use Phar;
+namespace Thelia\Core\Archiver\Archiver;
 
 /**
  * Class TarBz2Archiver.
@@ -22,7 +21,7 @@ use Phar;
  */
 class TarBz2Archiver extends TarArchiver
 {
-    public const COMPRESSION_METHOD = Phar::BZ2;
+    public const COMPRESSION_METHOD = \Phar::BZ2;
 
     public function getId(): string
     {

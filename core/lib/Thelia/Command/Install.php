@@ -11,13 +11,10 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
-use RuntimeException;
-use PDO;
-use PDOException;
-use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -160,7 +157,7 @@ class Install extends ContainerAwareCommand
             if ($data['status']) {
                 $output->writeln(
                     [
-                        sprintf(
+                        \sprintf(
                             '<info>%s ...</info> %s',
                             $data['text'],
                             '<info>Ok</info>'
@@ -169,17 +166,17 @@ class Install extends ContainerAwareCommand
                 );
             } else {
                 $output->writeln([
-                    sprintf(
+                    \sprintf(
                         '<error>%s </error>%s',
                         $data['text'],
-                        sprintf('<error>%s</error>', $data['hint'])
+                        \sprintf('<error>%s</error>', $data['hint'])
                     ),
                 ]);
             }
         }
 
         if (false === $isValid) {
-            throw new RuntimeException('Please put correct permissions and reload install process');
+            throw new \RuntimeException('Please put correct permissions and reload install process');
         }
     }
 
@@ -196,7 +193,7 @@ class Install extends ContainerAwareCommand
 
         file_put_contents(
             THELIA_ROOT.'.env.local',
-            sprintf(
+            \sprintf(
                 "\n###> thelia/database-configuration ###\nDATABASE_HOST=%s\nDATABASE_PORT=%s\nDATABASE_NAME=%s\nDATABASE_USER=%s\nDATABASE_PASSWORD=%s\n###< thelia/database-configuration ###",
                 $connectionInfo['host'],
                 $connectionInfo['port'],
@@ -213,7 +210,7 @@ class Install extends ContainerAwareCommand
     /**
      * test database access.
      */
-    protected function tryConnection(array $connectionInfo, OutputInterface $output): false|PDO
+    protected function tryConnection(array $connectionInfo, OutputInterface $output): false|\PDO
     {
         if (null === $connectionInfo['dbName']) {
             return false;
@@ -222,13 +219,13 @@ class Install extends ContainerAwareCommand
         $dsn = 'mysql:host=%s;port=%s';
 
         try {
-            $connection = new PDO(
-                sprintf($dsn, $connectionInfo['host'], $connectionInfo['port']),
+            $connection = new \PDO(
+                \sprintf($dsn, $connectionInfo['host'], $connectionInfo['port']),
                 $connectionInfo['username'],
                 $connectionInfo['password']
             );
             $connection->query("SET NAMES 'UTF8'");
-        } catch (PDOException) {
+        } catch (\PDOException) {
             $output->writeln([
                 '<error>Wrong connection information</error>',
             ]);
@@ -318,7 +315,7 @@ class Install extends ContainerAwareCommand
 
         $question->setValidator(function ($value) use (&$errorMessage, &$beEmpty) {
             if (trim($value) === '' && (null === $value && !$beEmpty)) {
-                throw new Exception($errorMessage);
+                throw new \Exception($errorMessage);
             }
 
             return $value;

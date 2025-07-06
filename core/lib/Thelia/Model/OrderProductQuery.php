@@ -11,8 +11,8 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Model;
 
+namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\Base\OrderProductQuery as BaseOrderProductQuery;
@@ -28,10 +28,10 @@ class OrderProductQuery extends BaseOrderProductQuery
 {
     public static function getSaleStats(
         $productRef,
-        DateTime $startDate = null,
-        DateTime $endDate = null,
+        ?DateTime $startDate = null,
+        ?DateTime $endDate = null,
         $orderStatusIdList = null,
-        $customerId = null
+        $customerId = null,
     ) {
         $query = self::create('op');
 
@@ -48,14 +48,14 @@ class OrderProductQuery extends BaseOrderProductQuery
 
             if ($startDate instanceof DateTime) {
                 $subQuery->filterByCreatedAt(
-                    sprintf('%s 00:00:00', $startDate->format('Y-m-d')),
+                    \sprintf('%s 00:00:00', $startDate->format('Y-m-d')),
                     Criteria::GREATER_EQUAL
                 );
             }
 
             if ($startDate instanceof DateTime) {
                 $subQuery->filterByCreatedAt(
-                    sprintf('%s 23:59:59', $endDate->format('Y-m-d')),
+                    \sprintf('%s 23:59:59', $endDate->format('Y-m-d')),
                     Criteria::LESS_EQUAL
                 );
             }

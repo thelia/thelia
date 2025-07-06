@@ -11,15 +11,16 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Model\AdminQuery;
 use Thelia\Model\ConfigQuery;
@@ -158,7 +159,7 @@ class AdministratorCreationForm extends BaseForm
         $minLength = ConfigQuery::getMinimuAdminPasswordLength();
 
         if (\strlen((string) $data['password']) < $minLength) {
-            $context->addViolation(sprintf('password must be composed of at least %s characters', $minLength));
+            $context->addViolation(\sprintf('password must be composed of at least %s characters', $minLength));
         }
     }
 

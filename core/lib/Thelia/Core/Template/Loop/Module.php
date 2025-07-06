@@ -11,18 +11,12 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop;
 
-use Symfony\Component\Routing\RouterInterface;
-use Thelia\Type\AlphaNumStringListType;
-use Thelia\Type\EnumListType;
-use Thelia\Type\BooleanOrBothType;
-use PDO;
-use ReflectionClass;
-use ReflectionException;
-use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\RouterInterface;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -34,6 +28,9 @@ use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
+use Thelia\Type\AlphaNumStringListType;
+use Thelia\Type\BooleanOrBothType;
+use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
 
 /**
@@ -61,8 +58,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 
     public function __construct(
         protected RouterInterface $router,
-    )
-    {
+    ) {
     }
 
     protected function getArgDefinitions(): ArgumentCollection
@@ -137,7 +133,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 
         if (null !== $profile) {
             $search->leftJoinProfileModule('profile_module')
-                ->addJoinCondition('profile_module', 'profile_module.PROFILE_ID=?', $profile, null, PDO::PARAM_INT)
+                ->addJoinCondition('profile_module', 'profile_module.PROFILE_ID=?', $profile, null, \PDO::PARAM_INT)
                 ->withColumn('profile_module.access', 'access');
         }
 
@@ -243,10 +239,10 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
         /** @var \Thelia\Model\Module $module */
         foreach ($loopResult->getResultDataCollection() as $module) {
             try {
-                new ReflectionClass($module->getFullNamespace());
+                new \ReflectionClass($module->getFullNamespace());
 
                 $exists = true;
-            } catch (ReflectionException) {
+            } catch (\ReflectionException) {
                 $exists = false;
             }
 
@@ -338,7 +334,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
             if ($this->router->match('/admin/module/'.$module->getCode())) {
                 return true;
             }
-        } catch (Exception) {
+        } catch (\Exception) {
             /* Keep searching */
         }
 
@@ -346,10 +342,9 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
             if ($this->router->match('/admin/module/'.$module->getCode())) {
                 return true;
             }
-        } catch (Exception) {
+        } catch (\Exception) {
             /* Keep searching */
         }
-
 
         // Make a quick and dirty test on the module's config.xml file
         $configContent = @file_get_contents($module->getAbsoluteConfigPath().DS.'config.xml');

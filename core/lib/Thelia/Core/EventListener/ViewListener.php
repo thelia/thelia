@@ -11,12 +11,14 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -24,7 +26,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\ViewCheckEvent;
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
@@ -39,17 +40,16 @@ use Thelia\Exception\OrderException;
  */
 class ViewListener implements EventSubscriberInterface
 {
-
     public const IGNORE_THELIA_VIEW = 'ignore_thelia_view';
 
     /**
      * ViewListener constructor.
      */
     public function __construct(
-        protected ParserResolver           $parserResolver,
-        protected TemplateHelperInterface  $templateHelper,
+        protected ParserResolver $parserResolver,
+        protected TemplateHelperInterface $templateHelper,
         protected EventDispatcherInterface $eventDispatcher,
-        protected RouterInterface          $router,
+        protected RouterInterface $router,
     ) {
     }
 
@@ -70,10 +70,10 @@ class ViewListener implements EventSubscriberInterface
             $templatePath = $this->templateHelper->getActiveFrontTemplate()->getAbsolutePath();
             $parser = $this->parserResolver->getParser($templatePath, $view);
             $parser->setTemplateDefinition($this->templateHelper->getActiveFrontTemplate(), true);
-            $viewId = $request->attributes->get($view . '_id');
+            $viewId = $request->attributes->get($view.'_id');
 
             $this->eventDispatcher->dispatch(new ViewCheckEvent($view, $viewId), TheliaEvents::VIEW_CHECK);
-            $content = $parser->render($view . '.' . $parser->getFileExtension());
+            $content = $parser->render($view.'.'.$parser->getFileExtension());
             $response = $content instanceof Response
                 ? $content
                 : new Response($content, $parser->getStatus() ?: 200);
@@ -111,8 +111,8 @@ class ViewListener implements EventSubscriberInterface
         $view = $request->attributes->get('_view', $this->findView($request));
         $request->attributes->set('_view', $view);
 
-        if (!$request->attributes->has($view . '_id')) {
-            $request->attributes->set($view . '_id', $this->findViewId($request, $view));
+        if (!$request->attributes->has($view.'_id')) {
+            $request->attributes->set($view.'_id', $this->findViewId($request, $view));
         }
     }
 
@@ -123,7 +123,7 @@ class ViewListener implements EventSubscriberInterface
 
     public function findViewId(Request $request, string $view): ?int
     {
-        $paramName = $view . '_id';
+        $paramName = $view.'_id';
 
         $viewId = $request->query->getInt($paramName) ?: $request->request->getInt($paramName);
 

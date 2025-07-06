@@ -11,15 +11,15 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Controller\Admin;
 
+namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Core\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Translation\Translator;
@@ -57,7 +57,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
         ?string $visibilityToggleEventIdentifier = null,
         ?string $changePositionEventIdentifier = null,
         protected $updateSeoEventIdentifier = null,
-        ?string $moduleCode = null
+        ?string $moduleCode = null,
     ) {
         parent::__construct(
             $objectName,
@@ -145,7 +145,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
     public function processUpdateSeoAction(
         Request $request,
         ParserContext $parserContext,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
     ) {
         // Check current user authorization
         if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof Response) {

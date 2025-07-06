@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Tools;
 
 use CommerceGuys\Addressing\Address;
@@ -32,13 +33,13 @@ use Thelia\Model\OrderAddress;
  */
 class AddressFormat
 {
-    private static ?\Thelia\Tools\AddressFormat $instance = null;
+    private static ?AddressFormat $instance = null;
 
     private function __construct()
     {
     }
 
-    public static function getInstance(): \Thelia\Tools\AddressFormat
+    public static function getInstance(): self
     {
         if (!isset(self::$instance)) {
             self::$instance = new self();
@@ -53,6 +54,7 @@ class AddressFormat
      * @param bool   $html
      * @param string $htmlTag
      * @param array  $htmlAttributes
+     *
      * @return string
      */
     public function format(
@@ -60,7 +62,7 @@ class AddressFormat
         $locale = null,
         $html = true,
         $htmlTag = 'p',
-        $htmlAttributes = []
+        $htmlAttributes = [],
     ) {
         $locale = $this->normalizeLocale($locale);
 
@@ -82,9 +84,10 @@ class AddressFormat
      * Format a Thelia address (Address or OrderAddress).
      *
      * @param OrderAddress|OrderAddress $address
-     * @param bool                                    $html
-     * @param string                                  $htmlTag
-     * @param array                                   $htmlAttributes
+     * @param bool                      $html
+     * @param string                    $htmlTag
+     * @param array                     $htmlAttributes
+     *
      * @return string
      */
     public function formatTheliaAddress($address, $locale = null, $html = true, $htmlTag = 'p', $htmlAttributes = [])
@@ -134,7 +137,7 @@ class AddressFormat
      * Format a Thelia address (Address or OrderAddress) to a postal label.
      *
      * @param OrderAddress|OrderAddress $address
-     * @param array                                   $options
+     * @param array                     $options
      *
      * @return string
      */
@@ -171,7 +174,7 @@ class AddressFormat
 
         if ($country->getHasStates() && (int) $address->getStateId() !== 0) {
             $addressModel = $addressModel->withAdministrativeArea(
-                sprintf(
+                \sprintf(
                     '%s-%s',
                     $country->getIsoalpha2(),
                     $address->getState()->getIsocode()

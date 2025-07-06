@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
 use Symfony\Component\Mime\Email;
@@ -28,7 +29,6 @@ class Message extends BaseMessage
      * @param string          $message
      * @param bool            $compressOutput
      *
-     *
      * @return bool|string
      */
     protected function getMessageBody($parser, $message, $layout, $template, $compressOutput = true)
@@ -40,7 +40,7 @@ class Message extends BaseMessage
             try {
                 $body = $parser->render($template, [], $compressOutput);
             } catch (ResourceNotFoundException) {
-                Tlog::getInstance()->addError('Failed to get mail message template body ' . $template);
+                Tlog::getInstance()->addError('Failed to get mail message template body '.$template);
             }
         }
 
@@ -64,7 +64,6 @@ class Message extends BaseMessage
     /**
      * Get the HTML message body.
      *
-     *
      * @return bool|string
      */
     public function getHtmlMessageBody(ParserInterface $parser)
@@ -78,7 +77,6 @@ class Message extends BaseMessage
     }
 
     /**
-     *
      * @return string|string[]|null
      */
     public function getTextMessageBody(ParserInterface $parser)
@@ -104,7 +102,6 @@ class Message extends BaseMessage
      *                                  the template file located in the module under
      *                                  `templates/email/default/' directory is used if
      *                                  `$useFallbackTemplate` is set to `true`
-     *
      *
      * @return Email
      */

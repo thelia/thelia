@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Routing;
 
-use Thelia\Controller\Front\DefaultController;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -22,6 +22,7 @@ use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
+use Thelia\Controller\Front\DefaultController;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Exception\UrlRewritingException;
@@ -143,7 +144,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
     private function defaultActionOptions(): array
     {
         return [
-            '_controller' => DefaultController::class . '::noAction',
+            '_controller' => DefaultController::class.'::noAction',
             '_route' => 'rewrite',
             '_rewritten' => true,
         ];
@@ -160,7 +161,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
         if ($lang->getLocale() !== $langSession->getLocale()) {
             if (ConfigQuery::isMultiDomainActivated()) {
                 $this->redirect(
-                    sprintf('%s/%s', $lang->getUrl(), $rewrittenUrlData->rewrittenUrl),
+                    \sprintf('%s/%s', $lang->getUrl(), $rewrittenUrlData->rewrittenUrl),
                     301
                 );
             } else {

@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Action;
 
-use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
@@ -120,7 +120,7 @@ class Product extends BaseAction implements EventSubscriberInterface
      * CLONING PROCESS *
      *******************/
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function cloneProduct(ProductCloneEvent $event): void
     {
@@ -165,7 +165,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             $this->eventDispatcher->dispatch($event, TheliaEvents::PSE_CLONE);
 
             $con->commit();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $con->rollBack();
             throw $exception;
         }
@@ -330,7 +330,7 @@ class Product extends BaseAction implements EventSubscriberInterface
      * Change a product.
      *
      * @throws PropelException
-     * @throws Exception
+     * @throws \Exception
      */
     public function update(ProductUpdateEvent $event): void
     {
@@ -383,7 +383,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a product entry.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function delete(ProductDeleteEvent $event): void
     {
@@ -419,7 +419,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 }
 
                 $con->commit();
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $con->rollBack();
                 throw $e;
             }
@@ -631,7 +631,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             // Store all the stuff !
             $con->commit();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $con->rollBack();
 
             throw $exception;

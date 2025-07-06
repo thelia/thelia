@@ -11,12 +11,10 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Resource;
 
-use IteratorAggregate;
-use ArrayIterator;
-
-class I18nCollection implements IteratorAggregate
+class I18nCollection implements \IteratorAggregate
 {
     public array $i18ns = [];
 
@@ -27,8 +25,8 @@ class I18nCollection implements IteratorAggregate
         return $this;
     }
 
-    public function getIterator(): ArrayIterator
+    public function getIterator(): \ArrayIterator
     {
-        return new ArrayIterator($this->i18ns);
+        return new \ArrayIterator($this->i18ns);
     }
 }

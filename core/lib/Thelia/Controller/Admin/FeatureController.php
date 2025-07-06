@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-
-use Exception;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -173,10 +172,9 @@ class FeatureController extends AbstractCrudController
 
     /**
      * @param Feature $object
-     *
-     * @return string
      */
-    protected function getObjectLabel(activeRecordInterface $object): ?string    {
+    protected function getObjectLabel(ActiveRecordInterface $object): ?string
+    {
         return $object->getTitle();
     }
 
@@ -198,8 +196,8 @@ class FeatureController extends AbstractCrudController
         return $this->render(
             'feature-edit',
             [
-                    'feature_id' => $this->getRequest()->get('feature_id'),
-                    'featureav_order' => $this->getFeatureAvListOrder(),
+                'feature_id' => $this->getRequest()->get('feature_id'),
+                'featureav_order' => $this->getFeatureAvListOrder(),
             ]
         );
     }
@@ -240,7 +238,7 @@ class FeatureController extends AbstractCrudController
     protected function addRemoveFromAllTemplates(EventDispatcherInterface $eventDispatcher, object $eventType): Response
     {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -250,7 +248,7 @@ class FeatureController extends AbstractCrudController
 
                 $eventDispatcher->dispatch($eventType, $event);
             }
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             // Any error
             return $this->errorPage($exception);
         }

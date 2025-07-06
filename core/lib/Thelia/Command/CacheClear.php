@@ -11,10 +11,10 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
-use UnexpectedValueException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -92,24 +92,24 @@ class CacheClear extends ContainerAwareCommand
 
     protected function clearCache($dir, OutputInterface $output): void
     {
-        $output->writeln(sprintf('Clearing cache in <info>%s</info> directory', $dir));
+        $output->writeln(\sprintf('Clearing cache in <info>%s</info> directory', $dir));
 
         try {
             $cacheEvent = new CacheEvent($dir, false);
             $this->getDispatcher()->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
-        } catch (UnexpectedValueException $e) {
+        } catch (\UnexpectedValueException $e) {
             // throws same exception code for does not exist and permission denied ...
             if (!file_exists($dir)) {
-                $output->writeln(sprintf('<info>%s cache dir already cleared</info>', $dir));
+                $output->writeln(\sprintf('<info>%s cache dir already cleared</info>', $dir));
 
                 return;
             }
 
             throw $e;
         } catch (IOException $e) {
-            $output->writeln(sprintf('Error during clearing of cache : %s', $e->getMessage()));
+            $output->writeln(\sprintf('Error during clearing of cache : %s', $e->getMessage()));
         }
 
-        $output->writeln(sprintf('<info>%s cache directory cleared successfully</info>', $dir));
+        $output->writeln(\sprintf('<info>%s cache directory cleared successfully</info>', $dir));
     }
 }

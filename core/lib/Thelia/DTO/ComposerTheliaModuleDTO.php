@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\DTO;
 
 class ComposerTheliaModuleDTO
@@ -22,7 +23,7 @@ class ComposerTheliaModuleDTO
         private string $version,
         private string $path,
         private ?string $description,
-        private array $extra
+        private array $extra,
     ) {
     }
 

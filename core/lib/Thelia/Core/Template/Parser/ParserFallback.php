@@ -11,13 +11,12 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Parser;
 
-use RuntimeException;
-use InvalidArgumentException;
-use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
+use Thelia\Core\Template\TemplateHelperInterface;
 
 /**
  * Class ParserFallback.
@@ -92,7 +91,7 @@ class ParserFallback implements ParserInterface
      *
      * @param int $templateType
      *
-     * @throws InvalidArgumentException if the templateType is not defined
+     * @throws \InvalidArgumentException if the templateType is not defined
      *
      * @return array: an array of defined templates directories for the given template type
      */
@@ -122,7 +121,7 @@ class ParserFallback implements ParserInterface
 
     private function throwException(): void
     {
-        throw new RuntimeException('if you want to use a parser, please register one');
+        throw new \RuntimeException('if you want to use a parser, please register one');
     }
 
     /**
@@ -137,7 +136,6 @@ class ParserFallback implements ParserInterface
      * Set a new template definition, and save the current one.
      *
      * @param bool $fallbackToDefaultTemplate if true, resources will be also searched in the "default" template
-     *
      */
     public function pushTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false): void
     {
@@ -146,7 +144,6 @@ class ParserFallback implements ParserInterface
 
     /**
      * Restore the previous stored template definition, if one exists.
-     *
      */
     public function popTemplateDefinition(): void
     {

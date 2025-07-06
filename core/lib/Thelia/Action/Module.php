@@ -11,13 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Action;
 
-use Exception;
-use LogicException;
-use ReflectionException;
-use SplFileInfo;
-use RuntimeException;
 use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -85,7 +81,7 @@ class Module extends BaseAction implements EventSubscriberInterface
             try {
                 if ($module->getActivate() == BaseModule::IS_ACTIVATED) {
                     if ($module->getMandatory() == BaseModule::IS_MANDATORY && $event->getAssumeDeactivate() === false) {
-                        throw new Exception(
+                        throw new \Exception(
                             Translator::getInstance()->trans("Can't deactivate a secure module")
                         );
                     }
@@ -102,7 +98,7 @@ class Module extends BaseAction implements EventSubscriberInterface
 
                     $this->checkActivation($module);
                 }
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 $event->stopPropagation();
                 throw $ex;
             }
@@ -114,7 +110,7 @@ class Module extends BaseAction implements EventSubscriberInterface
      *
      * @param \Thelia\Model\Module $module
      *
-     * @throws Exception if activation fails
+     * @throws \Exception if activation fails
      *
      * @return bool true if the module can be activated, otherwise false
      */
@@ -122,6 +118,7 @@ class Module extends BaseAction implements EventSubscriberInterface
     {
         $moduleValidator = new ModuleValidator($module->getAbsoluteBaseDir());
         $moduleValidator->validate(false);
+
         return true;
     }
 
@@ -151,7 +148,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                 );
 
             throw new ModuleException(
-                sprintf($message, $moduleList, $moduleValidator->getModuleDefinition()->getCode())
+                \sprintf($message, $moduleList, $moduleValidator->getModuleDefinition()->getCode())
             );
         }
 
@@ -206,7 +203,7 @@ class Module extends BaseAction implements EventSubscriberInterface
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId(), $con)) {
             try {
                 if (null === $module->getFullNamespace()) {
-                    throw new LogicException(
+                    throw new \LogicException(
                         Translator::getInstance()->trans(
                             'Cannot instantiate module "%name%": the namespace is null. Maybe the model is not loaded ?',
                             ['%name%' => $module->getCode()]
@@ -220,7 +217,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                 if (OrderQuery::create()->filterByDeliveryModuleId($module->getId())->count() > 0
                     || OrderQuery::create()->filterByPaymentModuleId($module->getId())->count() > 0
                 ) {
-                    throw new LogicException(
+                    throw new \LogicException(
                         Translator::getInstance()->trans(
                             'The module "%name%" is currently in use by at least one order, and can\'t be deleted.',
                             ['%name%' => $module->getCode()]
@@ -230,7 +227,7 @@ class Module extends BaseAction implements EventSubscriberInterface
 
                 try {
                     if ($module->getMandatory() == BaseModule::IS_MANDATORY && $event->getAssumeDelete() === false) {
-                        throw new Exception(
+                        throw new \Exception(
                             Translator::getInstance()->trans("Can't remove a core module")
                         );
                     }
@@ -252,7 +249,7 @@ class Module extends BaseAction implements EventSubscriberInterface
 
                     $fs = new Filesystem();
                     $fs->remove($path);
-                } catch (ReflectionException) {
+                } catch (\ReflectionException) {
                     // Happens probably because the module directory has been deleted.
                     // Log a warning, and delete the database entry.
                     Tlog::getInstance()->addWarning(
@@ -278,7 +275,7 @@ class Module extends BaseAction implements EventSubscriberInterface
 
                 $event->setModule($module);
                 $this->cacheClear($dispatcher);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $con->rollBack();
                 throw $e;
             }
@@ -303,9 +300,9 @@ class Module extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      * @throws IOException
-     * @throws Exception
+     * @throws \Exception
      */
     public function install(ModuleInstallEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -337,7 +334,7 @@ class Module extends BaseAction implements EventSubscriberInterface
 
             try {
                 $dispatcher->dispatch($deleteEvent, TheliaEvents::MODULE_DELETE);
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 // if module has not been deleted
                 if ($fs->exists($modulePath)) {
                     throw $ex;
@@ -346,7 +343,7 @@ class Module extends BaseAction implements EventSubscriberInterface
         }
 
         // move new module
-        $modulePath = sprintf('%s%s', THELIA_MODULE_DIR, $event->getModuleDefinition()->getCode());
+        $modulePath = \sprintf('%s%s', THELIA_MODULE_DIR, $event->getModuleDefinition()->getCode());
 
         try {
             $fs->mirror($event->getModulePath(), $modulePath);
@@ -357,10 +354,10 @@ class Module extends BaseAction implements EventSubscriberInterface
         }
 
         // Update the module
-        $moduleDescriptorFile = sprintf('%s%s%s%s%s', $modulePath, DS, 'Config', DS, 'module.xml');
+        $moduleDescriptorFile = \sprintf('%s%s%s%s%s', $modulePath, DS, 'Config', DS, 'module.xml');
         $eventDispatcher = $this->container->get('event_dispatcher');
         $moduleManagement = new ModuleManagement($this->container, $eventDispatcher);
-        $file = new SplFileInfo($moduleDescriptorFile);
+        $file = new \SplFileInfo($moduleDescriptorFile);
         $module = $moduleManagement->updateModule($file, $this->container);
 
         // activate if old was activated
@@ -377,7 +374,7 @@ class Module extends BaseAction implements EventSubscriberInterface
     /**
      * Call the payment method of the payment module of the given order.
      *
-     * @throws RuntimeException if no payment module can be found
+     * @throws \RuntimeException if no payment module can be found
      */
     public function pay(OrderPaymentEvent $event): void
     {
@@ -385,7 +382,7 @@ class Module extends BaseAction implements EventSubscriberInterface
 
         /* call pay method */
         if (null === $paymentModule = ModuleQuery::create()->findPk($order->getPaymentModuleId())) {
-            throw new RuntimeException(
+            throw new \RuntimeException(
                 Translator::getInstance()->trans(
                     'Failed to find a payment Module with ID=%mid for order ID=%oid',
                     [

@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event\Hook;
 
 use Thelia\Core\Event\ActionEvent;
@@ -28,7 +29,7 @@ class HookEvent extends ActionEvent
      */
     public $hook;
 
-    public function __construct(Hook $hook = null)
+    public function __construct(?Hook $hook = null)
     {
         $this->hook = $hook;
     }

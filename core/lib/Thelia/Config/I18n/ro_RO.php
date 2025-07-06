@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 return [
     '"%param" parameter cannot be empty in loop type: %type, name: %name' => '"%param" parametrul nu poate fi gol tipul de loop: %type, name: %name',
     '"%param" parameter is missing in loop type: %type, name: %name' => '"%param" parametrul lipseste in tipul de loop : %type, name: %name',

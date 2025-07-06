@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\State\Provider;
 
-use Thelia\Model\Address;
-use RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\Exception\PropelException;
@@ -24,6 +23,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\Address;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Module;
 use Thelia\Model\StateQuery;
@@ -39,13 +39,13 @@ class DeliveryModuleProvider implements ProviderInterface
         private readonly AddressService $addressService,
         private readonly EventDispatcherInterface $dispatcher,
         private readonly DeliveryModuleService $deliveryModuleService,
-        private readonly DeliveryModuleApiService $deliveryModuleApiService
+        private readonly DeliveryModuleApiService $deliveryModuleApiService,
     ) {
     }
 
     /**
      * @throws PropelException
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
@@ -59,7 +59,7 @@ class DeliveryModuleProvider implements ProviderInterface
             ? $deliveryAddress->getCountry()
             : CountryQuery::create()->filterByByDefault(1)->findOne();
         if (null === $country) {
-            throw new RuntimeException(Translator::getInstance()->trans('You must either pass an address id or have a customer connected'));
+            throw new \RuntimeException(Translator::getInstance()->trans('You must either pass an address id or have a customer connected'));
         }
 
         $state = $deliveryAddress instanceof Address

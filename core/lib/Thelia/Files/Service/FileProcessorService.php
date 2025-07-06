@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Files\Service;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -25,8 +26,8 @@ use Thelia\Model\Lang;
 readonly class FileProcessorService
 {
     public function __construct(
-        private FileManager         $fileManager,
-        private TranslatorInterface $translator
+        private FileManager $fileManager,
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -41,7 +42,7 @@ readonly class FileProcessorService
         string $objectType,
         array $validMimeTypes = [],
         array $extBlackList = [],
-        string $moduleRight = 'thelia'
+        string $moduleRight = 'thelia',
     ): FileCreateOrUpdateEvent {
         // Validate if file is too big
         if ($fileBeingUploaded->getError() === 1) {

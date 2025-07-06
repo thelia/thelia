@@ -11,12 +11,12 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Exception;
 
-use RuntimeException;
 use Thelia\Log\Tlog;
 
-class ImageException extends RuntimeException
+class ImageException extends \RuntimeException
 {
     public function __construct($message, $code = null, $previous = null)
     {

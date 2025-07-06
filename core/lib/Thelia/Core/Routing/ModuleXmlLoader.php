@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Routing;
 
-use RuntimeException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\Loader\XmlFileLoader;
@@ -26,15 +26,15 @@ class ModuleXmlLoader extends Loader
     private bool $isLoaded = false;
 
     public function __construct(
-        string $env = null
+        ?string $env = null,
     ) {
         parent::__construct($env);
     }
 
-    public function load(mixed $resource, string $type = null): RouteCollection
+    public function load(mixed $resource, ?string $type = null): RouteCollection
     {
         if ($this->isLoaded) {
-            throw new RuntimeException('Do not add the "module_xml" loader twice');
+            throw new \RuntimeException('Do not add the "module_xml" loader twice');
         }
 
         $routes = new RouteCollection();
@@ -74,7 +74,7 @@ class ModuleXmlLoader extends Loader
         return $routes;
     }
 
-    public function supports(mixed $resource, string $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         return 'module_xml' === $type;
     }

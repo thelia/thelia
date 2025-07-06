@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Log\Destination;
 
 use Thelia\Log\AbstractTlogDestination;
@@ -38,7 +39,7 @@ class TlogDestinationJavascriptConsole extends AbstractTlogDestination
         $content .= '} catch (ex) { alert("Les logs Thelia ne peuvent être affichés dans la console javascript:" + ex); }</script>'."\n";
 
         if (preg_match('|</body>|i', (string) $res)) {
-            $res = preg_replace('|</body>|i', $content . '</html>', (string) $res);
+            $res = preg_replace('|</body>|i', $content.'</html>', (string) $res);
         }
     }
 }

@@ -11,12 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Bridge\Propel\Serializer;
 
-use ReflectionProperty;
-use ReflectionAttribute;
-use ReflectionClass;
-use ReflectionType;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use Propel\Runtime\Collection\Collection;
@@ -31,11 +28,11 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
 
     public function __construct(
         private IriConverterInterface $iriConverter,
-        private ResourceClassResolverInterface $resourceClassResolver
+        private ResourceClassResolverInterface $resourceClassResolver,
     ) {
     }
 
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         if (!\is_array($data) || !\in_array($format, ['json', 'jsonld'], true) || !class_exists($type)) {
             return false;
@@ -44,12 +41,12 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
         return $this->getNeedConvertProperties($data, $type) !== [];
     }
 
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return false;
     }
 
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (!\is_array($data)) {
             $data = [$data];
@@ -65,7 +62,7 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
         return $this->denormalizer->denormalize($data, $type, $format, $context + [self::class => true]);
     }
 
-    private function transformData(mixed $data, ReflectionProperty $property)
+    private function transformData(mixed $data, \ReflectionProperty $property)
     {
         if (\is_string($data[$property->getName()]) || \is_int($data[$property->getName()])) {
             return $this->iriConverter->getIriFromResource(
@@ -76,7 +73,7 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
         if (\is_array($data[$property->getName()])) {
             $propelAttributes = array_filter(
                 $property->getAttributes(),
-                fn(ReflectionAttribute $attribute): bool => $attribute->getName() === Relation::class
+                fn (\ReflectionAttribute $attribute): bool => $attribute->getName() === Relation::class
             );
 
             $resource = null;
@@ -88,7 +85,7 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
 
             if (null !== $resource) {
                 return array_map(
-                    fn($value): ?string => $this->iriConverter->getIriFromResource(
+                    fn ($value): ?string => $this->iriConverter->getIriFromResource(
                         resource: $resource,
                         context: ['uri_variables' => ['id' => $value]]),
                     $data[$property->getName()]
@@ -101,12 +98,12 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
 
     private function getNeedConvertProperties(array $data, string $type): array
     {
-        $resourceReflection = new ReflectionClass($type);
-        $properties = $resourceReflection->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE);
+        $resourceReflection = new \ReflectionClass($type);
+        $properties = $resourceReflection->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED | \ReflectionProperty::IS_PRIVATE);
 
         return array_filter(
             $properties,
-            fn(ReflectionProperty $property): bool => $property->getType() instanceof ReflectionType
+            fn (\ReflectionProperty $property): bool => $property->getType() instanceof \ReflectionType
                 && isset($data[$property->getName()])
                 && (
                     (

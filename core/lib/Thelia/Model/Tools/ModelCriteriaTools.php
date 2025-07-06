@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model\Tools;
 
-use PDO;
-use InvalidArgumentException;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -42,7 +41,7 @@ class ModelCriteriaTools
         $foreignTable,
         $foreignKey,
         $forceReturn = false,
-        $localeAlias = null
+        $localeAlias = null,
     ): void {
         if (!empty($columns)) {
             if ($foreignTable === null) {
@@ -79,7 +78,7 @@ class ModelCriteriaTools
                         '`'.$requestedLocaleI18nAlias.'`.LOCALE = ?',
                         $requestedLocale,
                         null,
-                        PDO::PARAM_STR
+                        \PDO::PARAM_STR
                     )
                 ;
 
@@ -114,7 +113,7 @@ class ModelCriteriaTools
                         '`'.$defaultLocaleI18nAlias.'`.LOCALE = ?',
                         $defaultLocale,
                         null,
-                        PDO::PARAM_STR
+                        \PDO::PARAM_STR
                     )
                 ;
 
@@ -135,7 +134,7 @@ class ModelCriteriaTools
                         '`'.$requestedLocaleI18nAlias.'`.LOCALE = ?',
                         $requestedLocale,
                         null,
-                        PDO::PARAM_STR
+                        \PDO::PARAM_STR
                     )
                 ;
 
@@ -167,7 +166,7 @@ class ModelCriteriaTools
         $columns = ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'],
         $foreignTable = null,
         $foreignKey = 'ID',
-        $localeAlias = null
+        $localeAlias = null,
     ): void {
         if (!empty($columns)) {
             if ($foreignTable === null) {
@@ -200,7 +199,7 @@ class ModelCriteriaTools
                     '`'.$requestedLocaleI18nAlias.'`.LOCALE = ?',
                     $requestedLocale,
                     null,
-                    PDO::PARAM_STR
+                    \PDO::PARAM_STR
                 )
             ;
 
@@ -238,15 +237,15 @@ class ModelCriteriaTools
         $foreignTable,
         $foreignKey,
         $forceReturn = false,
-        $localeAlias = null
+        $localeAlias = null,
     ) {
         // If a lang has been requested, find the related Lang object, and get the locale
         if ($requestedLangId !== null) {
             $localeSearch = LangQuery::create()->findByIdOrLocale($requestedLangId);
 
             if ($localeSearch === null) {
-                throw new InvalidArgumentException(
-                    sprintf(
+                throw new \InvalidArgumentException(
+                    \sprintf(
                         'Incorrect lang argument given : lang %s not found',
                         $requestedLangId
                     )

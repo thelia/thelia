@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Element;
 
-use InvalidArgumentException;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Collection\ObjectCollection;
@@ -50,6 +50,7 @@ use Thelia\Type\TypeCollection;
  * @method bool          getReturnUrl()       false for disable the generation of urls
  * @method ModelCriteria buildModelCriteria()
  * @method array         buildArray()
+ *
  * @deprecated prefer to use the the resources from API
  */
 abstract class BaseLoop implements LoopInterface
@@ -118,7 +119,7 @@ abstract class BaseLoop implements LoopInterface
         SecurityContext $securityContext,
         TranslatorInterface $translator,
         array $theliaParserLoops,
-        $kernelEnvironment
+        $kernelEnvironment,
     ): void {
         $this->translator = $translator;
 
@@ -227,7 +228,7 @@ abstract class BaseLoop implements LoopInterface
      * @param string $name      the method name (only getArgname is supported)
      * @param mixed  $arguments this parameter is ignored
      *
-     * @throws InvalidArgumentException if the parameter is unknown or the method name is not supported
+     * @throws \InvalidArgumentException if the parameter is unknown or the method name is not supported
      *
      * @return mixed the argument value
      */
@@ -240,7 +241,7 @@ abstract class BaseLoop implements LoopInterface
             return $this->getArgValue($argName);
         }
 
-        throw new InvalidArgumentException(
+        throw new \InvalidArgumentException(
             $this->translator->trans('Unsupported magic method %name. only getArgname() is supported.', ['%name' => $name])
         );
     }
@@ -250,7 +251,7 @@ abstract class BaseLoop implements LoopInterface
      *
      * @param array $nameValuePairs a array of name => value pairs. The name is the name of the argument.
      *
-     * @throws InvalidArgumentException if some argument values are missing, or invalid
+     * @throws \InvalidArgumentException if some argument values are missing, or invalid
      */
     public function initializeArgs(array $nameValuePairs): void
     {
@@ -320,9 +321,9 @@ abstract class BaseLoop implements LoopInterface
         }
 
         if ($faultActor !== []) {
-            $complement = sprintf('[%s]', implode(', ', $faultDetails));
+            $complement = \sprintf('[%s]', implode(', ', $faultDetails));
 
-            throw new InvalidArgumentException($complement);
+            throw new \InvalidArgumentException($complement);
         }
     }
 
@@ -331,7 +332,7 @@ abstract class BaseLoop implements LoopInterface
      *
      * @param string $argumentName the argument name
      *
-     * @throws InvalidArgumentException if argument is not found in loop argument list
+     * @throws \InvalidArgumentException if argument is not found in loop argument list
      *
      * @return Argument the loop argument
      */
@@ -340,7 +341,7 @@ abstract class BaseLoop implements LoopInterface
         $arg = $this->args->get($argumentName);
 
         if ($arg === null) {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 $this->translator->trans('Undefined loop argument "%name"', ['%name' => $argumentName])
             );
         }
@@ -353,7 +354,7 @@ abstract class BaseLoop implements LoopInterface
      *
      * @param string $argumentName the argument name
      *
-     * @throws InvalidArgumentException if argument is not found in loop argument list
+     * @throws \InvalidArgumentException if argument is not found in loop argument list
      *
      * @return mixed the loop argument value
      */
@@ -366,7 +367,7 @@ abstract class BaseLoop implements LoopInterface
      * @param ModelCriteria         $search     the search request
      * @param PropelModelPager|null $pagination the pagination part
      *
-     * @throws InvalidArgumentException if the search mode is undefined
+     * @throws \InvalidArgumentException if the search mode is undefined
      *
      * @return array|PropelModelPager|ObjectCollection
      */
@@ -406,7 +407,7 @@ abstract class BaseLoop implements LoopInterface
                         $searchCriteria = Criteria::EQUAL;
                         break;
                     default:
-                        throw new InvalidArgumentException(
+                        throw new \InvalidArgumentException(
                             $this->translator->trans("Undefined search mode '%mode'", ['%mode' => $searchMode])
                         );
                 }
@@ -708,7 +709,7 @@ abstract class BaseLoop implements LoopInterface
      *
      * @return ModelCriteria
      */
-    protected function extendsBuildModelCriteria(ModelCriteria $search = null)
+    protected function extendsBuildModelCriteria(?ModelCriteria $search = null)
     {
         if (!$search instanceof ModelCriteria) {
             return null;
@@ -730,7 +731,7 @@ abstract class BaseLoop implements LoopInterface
      *
      * @return array
      */
-    protected function extendsBuildArray(array $search = null)
+    protected function extendsBuildArray(?array $search = null)
     {
         if (null === $search) {
             return null;

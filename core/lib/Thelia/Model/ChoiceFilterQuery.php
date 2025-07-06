@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -43,7 +44,7 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
         $attributeQuery->useAttributeI18nQuery(null, Criteria::LEFT_JOIN)
             ->endUse();
 
-        $locales = array_map(fn($value): string => '"'.$value.'"', $locales);
+        $locales = array_map(fn ($value): string => '"'.$value.'"', $locales);
 
         $attributeQuery->addJoinCondition('AttributeI18n', 'AttributeI18n.locale IN ('.implode(',', $locales).')');
 
@@ -74,7 +75,7 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
         $featureQuery->useFeatureI18nQuery(null, Criteria::LEFT_JOIN)
             ->endUse();
 
-        $locales = array_map(fn($value): string => '"'.$value.'"', $locales);
+        $locales = array_map(fn ($value): string => '"'.$value.'"', $locales);
 
         $featureQuery->addJoinCondition('FeatureI18n', 'FeatureI18n.locale IN ('.implode(',', $locales).')');
 
@@ -110,7 +111,7 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
     public static function findChoiceFilterByCategory(
         Category $category,
         &$templateId = null,
-        &$categoryId = null
+        &$categoryId = null,
     ): array|ObjectCollection {
         $choiceFilters = self::create()
             ->filterByCategoryId($category->getId())

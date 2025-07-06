@@ -11,11 +11,12 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Tools;
 
 class AssetsManager
 {
-    private static ?\Thelia\Tools\AssetsManager $instance = null;
+    private static ?AssetsManager $instance = null;
 
     protected $processed = [];
 
@@ -29,9 +30,9 @@ class AssetsManager
         }
     }
 
-    public static function getInstance($entrypointsPath): \Thelia\Tools\AssetsManager
+    public static function getInstance($entrypointsPath): self
     {
-        if (!self::$instance instanceof \Thelia\Tools\AssetsManager) {
+        if (!self::$instance instanceof self) {
             self::$instance = new self($entrypointsPath);
         }
 

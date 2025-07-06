@@ -10,7 +10,7 @@
  * file that was distributed with this source code.
  */
 
-$fs = new \Symfony\Component\Filesystem\Filesystem();
+$fs = new Symfony\Component\Filesystem\Filesystem();
 
 $modules = [
     'Carousel',

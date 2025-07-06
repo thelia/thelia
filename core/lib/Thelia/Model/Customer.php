@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
 use Exception;
@@ -55,8 +56,8 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
      * @param bool   $forceEmailUpdate true if the email address could be updated
      * @param int    $stateId          customer state id (from State table)
      *
-     * @throws Exception
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws \Exception
+     * @throws PropelException
      */
     public function createOrUpdate(
         $titleId,
@@ -79,7 +80,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         $company = null,
         $ref = null,
         $forceEmailUpdate = false,
-        $stateId = null
+        $stateId = null,
     ): void {
         $this
             ->setTitleId($titleId)
@@ -217,7 +218,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
             $id = $lastCustomer->getId() + 1;
         }
 
-        return sprintf('CUS%s', str_pad((string) $id, 12, '0', \STR_PAD_LEFT));
+        return \sprintf('CUS%s', str_pad((string) $id, 12, '0', \STR_PAD_LEFT));
     }
 
     /**
@@ -363,7 +364,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         $this->setRememberMeSerial($serial)->save();
     }
 
-    public function preInsert(ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null)
     {
         parent::preInsert($con);
 

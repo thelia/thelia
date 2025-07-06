@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-use Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Log\Tlog;
 use Thelia\Model\Base\ModuleQuery as BaseModuleQuery;
@@ -74,7 +74,7 @@ class ModuleQuery extends BaseModuleQuery
      *
      * @return false|BaseModule[]
      */
-    public function retrieveVirtualProductDelivery(ContainerInterface $container = null)
+    public function retrieveVirtualProductDelivery(?ContainerInterface $container = null)
     {
         $modules = $this
             ->filterByType(BaseModule::DELIVERY_MODULE_TYPE)
@@ -92,7 +92,7 @@ class ModuleQuery extends BaseModuleQuery
                 if (true === $instance->handleVirtualProductDelivery()) {
                     $result[] = $instance;
                 }
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 Tlog::getInstance()->addError('Failed to instantiate module '.$module->getCode(), $ex);
             }
         }

@@ -11,11 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop;
 
-use ReflectionMethod;
-use InvalidArgumentException;
-use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Event\Document\DocumentEvent;
@@ -118,16 +116,16 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
             $ns = '\\'.$ns;
         }
 
-        $queryClass = sprintf('%s\\%sDocumentQuery', $ns, $object);
-        $filterMethod = sprintf('filterBy%sId', $object);
+        $queryClass = \sprintf('%s\\%sDocumentQuery', $ns, $object);
+        $filterMethod = \sprintf('filterBy%sId', $object);
 
         // xxxDocumentQuery::create()
-        $method = new ReflectionMethod($queryClass, 'create');
+        $method = new \ReflectionMethod($queryClass, 'create');
         $search = $method->invoke(null); // Static !
 
         // $query->filterByXXX(id)
         if (null !== $object_id) {
-            $method = new ReflectionMethod($queryClass, $filterMethod);
+            $method = new \ReflectionMethod($queryClass, $filterMethod);
             $method->invoke($search, $object_id);
         }
 
@@ -178,7 +176,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
             $id = $this->getId();
 
             if (null === $source_id && null === $id) {
-                throw new InvalidArgumentException("If 'source' argument is specified, 'id' or 'source_id' argument should be specified");
+                throw new \InvalidArgumentException("If 'source' argument is specified, 'id' or 'source_id' argument should be specified");
             }
 
             $search = $this->createSearchQuery($source, $source_id);
@@ -202,7 +200,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         if ($search == null) {
-            throw new InvalidArgumentException(sprintf('Unable to find document source. Valid sources are %s', implode(',', $this->possible_sources)));
+            throw new \InvalidArgumentException(\sprintf('Unable to find document source. Valid sources are %s', implode(',', $this->possible_sources)));
         }
 
         return $search;
@@ -253,7 +251,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
             $event = new DocumentEvent();
 
             // Put source document file path
-            $sourceFilePath = sprintf(
+            $sourceFilePath = \sprintf(
                 '%s/%s/%s',
                 $baseSourceFilePath,
                 $this->objectType,
@@ -316,9 +314,9 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                 $this->addOutputFields($loopResultRow, $result);
 
                 $loopResult->addRow($loopResultRow);
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 // Ignore the result and log an error
-                Tlog::getInstance()->addError(sprintf('Failed to process document in document loop: %s', $ex->getMessage()));
+                Tlog::getInstance()->addError(\sprintf('Failed to process document in document loop: %s', $ex->getMessage()));
             }
         }
 

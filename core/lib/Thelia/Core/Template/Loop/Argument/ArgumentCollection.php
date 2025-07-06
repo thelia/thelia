@@ -11,15 +11,15 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop\Argument;
 
 use Iterator;
-use ReturnTypeWillChange;
 
 /**
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class ArgumentCollection implements Iterator
+class ArgumentCollection implements \Iterator
 {
     private array $arguments = [];
 
@@ -69,7 +69,6 @@ class ArgumentCollection implements Iterator
     /**
      * @param array $argumentNames array with names of arguments to remove
      *
-     *
      * @since 2.2.0-beta1
      */
     public function removeArguments(array $argumentNames): static
@@ -83,7 +82,6 @@ class ArgumentCollection implements Iterator
 
     /**
      * @param string $argumentName name of the argument to remove
-     *
      *
      * @since 2.2.0-beta1
      */
@@ -109,7 +107,7 @@ class ArgumentCollection implements Iterator
      *
      * @return Argument
      */
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return current($this->arguments);
@@ -136,7 +134,7 @@ class ArgumentCollection implements Iterator
      *
      * @return mixed scalar on success, or null on failure
      */
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return key($this->arguments);

@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Serializer\Serializer;
 
-use SplFileObject;
 use Thelia\Core\Serializer\AbstractSerializer;
 
 /**
@@ -43,7 +43,7 @@ class JSONSerializer extends AbstractSerializer
         return 'application/json';
     }
 
-    public function prepareFile(SplFileObject $fileObject): void
+    public function prepareFile(\SplFileObject $fileObject): void
     {
         $fileObject->fwrite('[');
     }
@@ -58,12 +58,12 @@ class JSONSerializer extends AbstractSerializer
         return ','.\PHP_EOL;
     }
 
-    public function finalizeFile(SplFileObject $fileObject): void
+    public function finalizeFile(\SplFileObject $fileObject): void
     {
         $fileObject->fwrite(']');
     }
 
-    public function unserialize(SplFileObject $fileObject): mixed
+    public function unserialize(\SplFileObject $fileObject): mixed
     {
         return json_decode(file_get_contents($fileObject->getPathname()), true);
     }

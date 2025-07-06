@@ -23,8 +23,6 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel\Filter;
 
-use ReflectionProperty;
-use ReflectionNamedType;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -58,7 +56,7 @@ final class SearchFilter extends AbstractFilter
      */
     public const STRATEGY_WORD_START = 'word_start';
 
-    protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
+    protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         if (
             null === $value
@@ -154,12 +152,12 @@ final class SearchFilter extends AbstractFilter
 
             $reflectionProperty = $this->getReflectionProperty($propertyName, $resourceClass);
 
-            if (!$reflectionProperty instanceof ReflectionProperty && is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
+            if (!$reflectionProperty instanceof \ReflectionProperty && is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
                 $isLocalized = true;
                 $reflectionProperty = $this->getReflectionProperty($propertyName, $resourceClass::getI18nResourceClass());
             }
 
-            if (!$reflectionProperty instanceof ReflectionProperty) {
+            if (!$reflectionProperty instanceof \ReflectionProperty) {
                 continue;
             }
 
@@ -203,7 +201,7 @@ final class SearchFilter extends AbstractFilter
 
         if ($values === []) {
             $this->getLogger()->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('At least one value is required, multiple values should be in "%1$s[]=firstvalue&%1$s[]=secondvalue" format', $property)),
+                'exception' => new InvalidArgumentException(\sprintf('At least one value is required, multiple values should be in "%1$s[]=firstvalue&%1$s[]=secondvalue" format', $property)),
             ]);
 
             return null;
@@ -212,7 +210,7 @@ final class SearchFilter extends AbstractFilter
         return array_values($values);
     }
 
-    private function getType(ReflectionNamedType $type): string
+    private function getType(\ReflectionNamedType $type): string
     {
         if (!$type->isBuiltin()) {
             return 'string';

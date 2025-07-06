@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -45,7 +46,7 @@ class CustomerLostPasswordForm extends FirewallForm
      *   )
      *   ->add('age', IntegerType::class);
      */
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('email', EmailType::class, [

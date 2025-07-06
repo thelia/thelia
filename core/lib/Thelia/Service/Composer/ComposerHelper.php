@@ -11,24 +11,19 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Service\Composer;
 
-use InvalidArgumentException;
-use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
-use JsonException;
-use SplFileInfo;
+namespace Thelia\Service\Composer;
 
 class ComposerHelper
 {
     /**
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function getComposerPackagesFromPath(string $path): array
     {
         $composerJsonPath = rtrim($path, '/').'/composer.json';
         if (!file_exists($composerJsonPath)) {
-            throw new InvalidArgumentException(sprintf("No composer.json find in '%s'", $path));
+            throw new \InvalidArgumentException(\sprintf("No composer.json find in '%s'", $path));
         }
 
         return json_decode(file_get_contents($composerJsonPath), true, 512, \JSON_THROW_ON_ERROR);
@@ -38,7 +33,7 @@ class ComposerHelper
     {
         $bundlesPath = THELIA_ROOT.'config/bundles.php';
         if (!file($bundlesPath)) {
-            throw new InvalidArgumentException(sprintf("No bundles.php file found in '%s'", $bundlesPath));
+            throw new \InvalidArgumentException(\sprintf("No bundles.php file found in '%s'", $bundlesPath));
         }
 
         $bundles = require $bundlesPath;
@@ -52,11 +47,11 @@ class ComposerHelper
 
     public function findFirstClassBundle(string $directory): ?string
     {
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($directory)
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($directory)
         );
 
-        /** @var SplFileInfo $file */
+        /** @var \SplFileInfo $file */
         foreach ($iterator as $file) {
             if (!$file->isFile() || $file->getExtension() !== 'php') {
                 continue;
@@ -75,7 +70,7 @@ class ComposerHelper
                 continue;
             }
 
-            return $nsMatch[1] . '\\' . $classMatch[1];
+            return $nsMatch[1].'\\'.$classMatch[1];
         }
 
         return null;
@@ -83,13 +78,12 @@ class ComposerHelper
 
     public function addPsr4NamespaceToComposer(
         string $bundleNamespace,
-        string $path
-    ): void
-    {
-        $composerJsonPath = THELIA_ROOT . 'composer.json';
+        string $path,
+    ): void {
+        $composerJsonPath = THELIA_ROOT.'composer.json';
 
         if (!file_exists($composerJsonPath)) {
-            throw new InvalidArgumentException(sprintf("No composer.json found at '%s'", $composerJsonPath));
+            throw new \InvalidArgumentException(\sprintf("No composer.json found at '%s'", $composerJsonPath));
         }
 
         try {
@@ -97,24 +91,23 @@ class ComposerHelper
 
             $namespaceParts = explode('\\', $bundleNamespace);
             array_pop($namespaceParts);
-            $baseNamespace = implode('\\', $namespaceParts) . '\\';
+            $baseNamespace = implode('\\', $namespaceParts).'\\';
 
             if (!isset($composerData['autoload']['psr-4'][$baseNamespace])) {
                 $path = str_replace(THELIA_ROOT, '', $path);
-                $composerData['autoload']['psr-4'][$baseNamespace] = $path. DS.'src'.DS;
+                $composerData['autoload']['psr-4'][$baseNamespace] = $path.DS.'src'.DS;
 
                 ksort($composerData['autoload']['psr-4']);
 
                 file_put_contents(
                     $composerJsonPath,
-                    json_encode($composerData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n"
+                    json_encode($composerData, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES)."\n"
                 );
             }
-        } catch (JsonException $jsonException) {
-            throw new InvalidArgumentException("Invalid JSON in composer.json: " . $jsonException->getMessage(), $jsonException->getCode(), $jsonException);
+        } catch (\JsonException $jsonException) {
+            throw new \InvalidArgumentException('Invalid JSON in composer.json: '.$jsonException->getMessage(), $jsonException->getCode(), $jsonException);
         }
     }
-
 
     private function dumpBundlesPhp(array $bundles): string
     {
@@ -123,10 +116,10 @@ class ComposerHelper
         foreach ($bundles as $fqcn => $envs) {
             $envParts = [];
             foreach ($envs as $env => $enabled) {
-                $envParts[] = sprintf("'%s' => ", $env) . ($enabled ? 'true' : 'false');
+                $envParts[] = \sprintf("'%s' => ", $env).($enabled ? 'true' : 'false');
             }
 
-            $line = sprintf('    %s::class => [', $fqcn) . implode(', ', $envParts) . "],\n";
+            $line = \sprintf('    %s::class => [', $fqcn).implode(', ', $envParts)."],\n";
             $lines[] = $line;
         }
 

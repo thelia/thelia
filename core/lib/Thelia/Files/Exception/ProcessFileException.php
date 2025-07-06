@@ -11,15 +11,14 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Files\Exception;
 
-use RuntimeException;
+namespace Thelia\Files\Exception;
 
 /**
  * Class ProcessFileException.
  *
  * @author manuel raynaud <manu@raynaud.io>
  */
-class ProcessFileException extends RuntimeException
+class ProcessFileException extends \RuntimeException
 {
 }

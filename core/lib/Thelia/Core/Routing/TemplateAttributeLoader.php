@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Routing;
 
-use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Routing\AttributeRouteControllerLoader;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
@@ -25,10 +25,10 @@ class TemplateAttributeLoader extends Loader
 {
     private bool $isLoaded = false;
 
-    public function load(mixed $resource, string $type = null): RouteCollection
+    public function load(mixed $resource, ?string $type = null): RouteCollection
     {
         if ($this->isLoaded) {
-            throw new RuntimeException('Do not add the "template_attribute" loader twice');
+            throw new \RuntimeException('Do not add the "template_attribute" loader twice');
         }
 
         $fileLocator = new FileLocator();
@@ -63,7 +63,7 @@ class TemplateAttributeLoader extends Loader
         return $routes;
     }
 
-    public function supports(mixed $resource, string $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         return 'template_attribute' === $type;
     }

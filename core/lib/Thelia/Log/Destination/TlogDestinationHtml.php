@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Log\Destination;
 
 use Thelia\Log\AbstractTlogDestination;
@@ -61,7 +62,7 @@ class TlogDestinationHtml extends AbstractTlogDestination
 
     public function write(&$res): void
     {
-        $block = sprintf('<pre class="tlog-trace" style="%s">%s</pre>', $this->style, htmlspecialchars(implode("\n", $this->logs)));
+        $block = \sprintf('<pre class="tlog-trace" style="%s">%s</pre>', $this->style, htmlspecialchars(implode("\n", $this->logs)));
 
         $this->insertAfterBody($res, $block);
     }

@@ -11,12 +11,13 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-use Propel\Runtime\Exception\PropelException;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\ObjectCollection;
-use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Exception\PropelException;
 use Thelia\Model\Base\TaxRuleQuery as BaseTaxRuleQuery;
 use Thelia\Model\Map\TaxRuleCountryTableMap;
 
@@ -38,9 +39,9 @@ class TaxRuleQuery extends BaseTaxRuleQuery
      *
      * @return array|mixed|ActiveRecordInterface[]|ObjectCollection|Tax[]
      */
-    public function getTaxCalculatorCollection(TaxRule $taxRule, Country $country = null, State $state = null)
+    public function getTaxCalculatorCollection(TaxRule $taxRule, ?Country $country = null, ?State $state = null)
     {
-        $key = sprintf(
+        $key = \sprintf(
             '%s-%s-%s',
             $taxRule->getId(),
             ($country instanceof Country) ? $country->getId() : 0,

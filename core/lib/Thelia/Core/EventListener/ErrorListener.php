@@ -11,15 +11,15 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\EventListener;
 
-use Throwable;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserInterface;
@@ -34,9 +34,6 @@ use Thelia\Model\ConfigQuery;
  */
 class ErrorListener implements EventSubscriberInterface
 {
-    /**
-     * @param string $kernelEnvironment
-     */
     public function __construct(protected $env, protected ParserInterface $parser, protected SecurityContext $securityContext, protected EventDispatcherInterface $eventDispatcher)
     {
     }
@@ -56,7 +53,7 @@ class ErrorListener implements EventSubscriberInterface
 
         $response = new Response(
             $this->parser->render(ConfigQuery::getErrorMessagePageName()),
-            \Symfony\Component\HttpFoundation\Response::HTTP_INTERNAL_SERVER_ERROR
+            Response::HTTP_INTERNAL_SERVER_ERROR
         );
 
         $event->setResponse($response);
@@ -92,7 +89,7 @@ class ErrorListener implements EventSubscriberInterface
                 .\PHP_EOL
                 .'Stack Trace: '.$exception->getTraceAsString()
             ;
-        } while (($exception = $exception->getPrevious()) instanceof Throwable);
+        } while (($exception = $exception->getPrevious()) instanceof \Throwable);
 
         Tlog::getInstance()->error($logMessage);
         if ($exception !== null) {

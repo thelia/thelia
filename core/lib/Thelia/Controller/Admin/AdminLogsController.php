@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\Response;
@@ -40,10 +41,10 @@ class AdminLogsController extends BaseAdminController
             $this->getRequest()->request->get('admins', []),
             $this->getRequest()->request->get('fromDate'),
             $this->getRequest()->request->get('toDate'),
-            array_merge((array)$this->getRequest()->request->get('resources', []), (array)$this->getRequest()->request->get('modules', []))
+            array_merge((array) $this->getRequest()->request->get('resources', []), (array) $this->getRequest()->request->get('modules', []))
         ) as $entry) {
             $entries[] = [
-                'head' => sprintf(
+                'head' => \sprintf(
                     '%s|%s|%s:%s%s',
                     date('Y-m-d H:i:s', $entry->getCreatedAt()->getTimestamp()),
                     $entry->getAdminLogin(),

@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Bridge\Propel\Validator;
 
-use RuntimeException;
 use ApiPlatform\Metadata\HttpOperation;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraint;
@@ -30,7 +30,7 @@ class I18nConstraintValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint): void
     {
         if (!$value instanceof I18nCollection) {
-            throw new RuntimeException('I18nConstraint attribute should be used on'.I18nCollection::class);
+            throw new \RuntimeException('I18nConstraint attribute should be used on'.I18nCollection::class);
         }
 
         $request = $this->requestStack->getCurrentRequest();

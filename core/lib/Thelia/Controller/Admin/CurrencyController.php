@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-
-use Exception;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -122,13 +121,13 @@ class CurrencyController extends AbstractCrudController
     {
         // Prepare the data that will hydrate the form
         $data = [
-                'id' => $object->getId(),
-                'name' => $object->getName(),
-                'locale' => $object->getLocale(),
-                'code' => $object->getCode(),
-                'symbol' => $object->getSymbol(),
-                'format' => $object->getFormat(),
-                'rate' => $object->getRate(),
+            'id' => $object->getId(),
+            'name' => $object->getName(),
+            'locale' => $object->getLocale(),
+            'code' => $object->getCode(),
+            'symbol' => $object->getSymbol(),
+            'format' => $object->getFormat(),
+            'rate' => $object->getRate(),
         ];
 
         // Setup the object form
@@ -154,10 +153,9 @@ class CurrencyController extends AbstractCrudController
 
     /**
      * @param Currency $object
-     *
-     * @return string
      */
-    protected function getObjectLabel(activeRecordInterface $object): ?string    {
+    protected function getObjectLabel(ActiveRecordInterface $object): ?string
+    {
         return $object->getName();
     }
 
@@ -200,7 +198,7 @@ class CurrencyController extends AbstractCrudController
     public function updateRatesAction(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -214,7 +212,7 @@ class CurrencyController extends AbstractCrudController
                     'undefined_rates' => $event->getUndefinedRates(),
                 ]);
             }
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             // Any error
             return $this->errorPage($exception);
         }
@@ -228,7 +226,7 @@ class CurrencyController extends AbstractCrudController
     public function setDefaultAction(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -239,7 +237,7 @@ class CurrencyController extends AbstractCrudController
 
         try {
             $eventDispatcher->dispatch($changeEvent, TheliaEvents::CURRENCY_SET_DEFAULT);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             // Any error
             return $this->errorPage($exception);
         }
@@ -253,7 +251,7 @@ class CurrencyController extends AbstractCrudController
     public function setVisibleAction(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -264,7 +262,7 @@ class CurrencyController extends AbstractCrudController
 
         try {
             $eventDispatcher->dispatch($changeEvent, TheliaEvents::CURRENCY_SET_VISIBLE);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             // Any error
             return $this->errorPage($exception);
         }

@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Install;
 
-use PDO;
-use PDOException;
 use Thelia\Core\Translation\Translator;
 
 /**
@@ -33,7 +32,7 @@ class CheckDatabaseConnection extends BaseInstall
     protected $isValid = true;
 
     /**
-     * @var PDO instance
+     * @var \PDO instance
      */
     protected $connection;
 
@@ -63,12 +62,12 @@ class CheckDatabaseConnection extends BaseInstall
         $dsn = 'mysql:host=%s;port=%s';
 
         try {
-            $this->connection = new PDO(
-                sprintf($dsn, $this->host, $this->port),
+            $this->connection = new \PDO(
+                \sprintf($dsn, $this->host, $this->port),
                 $this->user,
                 $this->password
             );
-        } catch (PDOException) {
+        } catch (\PDOException) {
             $this->validationMessages = 'Wrong connection information';
 
             $this->isValid = false;

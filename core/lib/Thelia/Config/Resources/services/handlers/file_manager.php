@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Thelia\Files\Service\FileDeleteService;
@@ -18,17 +19,17 @@ use Thelia\Files\Service\FilePositionService;
 use Thelia\Files\Service\FileProcessorService;
 use Thelia\Files\Service\FileUpdateService;
 use Thelia\Files\Service\FileVisibilityService;
-use Thelia\Model\ProductDocument;
-use Thelia\Model\ProductImage;
+use Thelia\Model\BrandDocument;
+use Thelia\Model\BrandImage;
 use Thelia\Model\CategoryDocument;
 use Thelia\Model\CategoryImage;
 use Thelia\Model\ContentDocument;
 use Thelia\Model\ContentImage;
 use Thelia\Model\FolderDocument;
 use Thelia\Model\FolderImage;
-use Thelia\Model\BrandDocument;
-use Thelia\Model\BrandImage;
 use Thelia\Model\ModuleImage;
+use Thelia\Model\ProductDocument;
+use Thelia\Model\ProductImage;
 
 return static function (ContainerConfigurator $configurator): void {
     $services = $configurator->services();
@@ -48,7 +49,6 @@ return static function (ContainerConfigurator $configurator): void {
         'image.brand' => BrandImage::class,
         'image.module' => ModuleImage::class,
     ]);
-
 
     // Register file services
     $services->set(FileProcessorService::class)

@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Config;
 
 use Propel\Runtime\Connection\ConnectionWrapper;
@@ -47,7 +48,7 @@ class DatabaseConfiguration implements ConfigurationInterface
         $connectionsNode
             ->validate()
             ->ifTrue(
-                fn($connections): bool => !isset($connections[static::THELIA_CONNECTION_NAME])
+                fn ($connections): bool => !isset($connections[static::THELIA_CONNECTION_NAME])
             )
             ->thenInvalid(
                 "The '".static::THELIA_CONNECTION_NAME."' connection must be defined."
@@ -57,7 +58,7 @@ class DatabaseConfiguration implements ConfigurationInterface
         $databaseNode
             ->validate()
             ->ifTrue(
-                fn($database): bool => !empty($database['connection']) && !empty($database['connections'])
+                fn ($database): bool => !empty($database['connection']) && !empty($database['connections'])
             )
             ->thenInvalid(
                 "The 'database' node must contain either a 'connection' node or a 'connections' node, but not both."

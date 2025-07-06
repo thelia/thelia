@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Security\UserProvider;
 
 use Lexik\Bundle\JWTAuthenticationBundle\Security\User\PayloadAwareUserProviderInterface;
@@ -40,7 +41,7 @@ class AdminUserProvider implements PayloadAwareUserProviderInterface
         }
 
         if (null === $admin) {
-            $e = new UserNotFoundException(sprintf('User "%s" not found.', $identifier));
+            $e = new UserNotFoundException(\sprintf('User "%s" not found.', $identifier));
             $e->setUserIdentifier($identifier);
 
             throw $e;
@@ -52,7 +53,7 @@ class AdminUserProvider implements PayloadAwareUserProviderInterface
     public function refreshUser(UserInterface $user): UserInterface
     {
         if (!$user instanceof Admin) {
-            throw new UnsupportedUserException(sprintf('Invalid user class "%s".', $user::class));
+            throw new UnsupportedUserException(\sprintf('Invalid user class "%s".', $user::class));
         }
 
         $user = AdminQuery::create()
@@ -79,7 +80,7 @@ class AdminUserProvider implements PayloadAwareUserProviderInterface
     public function loadUserByIdentifierAndPayload(string $userIdentifier, array $payload): UserInterface
     {
         if (!isset($payload['type']) || $payload['type'] !== Admin::class) {
-            throw new UnsupportedUserException(sprintf('User "%s" is not supported on this route.', $userIdentifier));
+            throw new UnsupportedUserException(\sprintf('User "%s" is not supported on this route.', $userIdentifier));
         }
 
         return $this->cache[$userIdentifier] ?? $this->cache[$userIdentifier] = $this->loadUserByIdentifier($userIdentifier);

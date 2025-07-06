@@ -11,12 +11,12 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\MailingSystem\MailingSystemEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -98,7 +98,7 @@ class MailingSystemController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -139,7 +139,7 @@ class MailingSystemController extends BaseAdminController
 
             $message = $translator->trans('Email test from : %store%', ['%store%' => $storeName]);
 
-            $htmlMessage = sprintf('<p>%s</p>', $message);
+            $htmlMessage = \sprintf('<p>%s</p>', $message);
 
             try {
                 $mailer->sendSimpleEmailMessage(
@@ -151,7 +151,7 @@ class MailingSystemController extends BaseAdminController
                 );
                 $json_data['success'] = true;
                 $json_data['message'] = $translator->trans('Your configuration seems to be ok. Checked out your mailbox : %email%', ['%email%' => $emailTest]);
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 $json_data['message'] = $ex->getMessage();
             }
         } else {

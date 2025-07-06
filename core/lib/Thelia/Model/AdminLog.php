@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Log\Tlog;
@@ -35,9 +35,9 @@ class AdminLog extends BaseAdminLog
         $action,
         $message,
         Request $request,
-        UserInterface $adminUser = null,
+        ?UserInterface $adminUser = null,
         $withRequestContent = true,
-        $resourceId = null
+        $resourceId = null,
     ): void {
         $log = new self();
 
@@ -53,7 +53,7 @@ class AdminLog extends BaseAdminLog
 
         try {
             $log->save();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             Tlog::getInstance()->err('Failed to insert new entry in AdminLog: {ex}', ['ex' => $exception]);
         }
     }

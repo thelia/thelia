@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Serializer\Serializer;
 
-use SplFileObject;
 use Symfony\Component\Yaml\Yaml;
 use Thelia\Core\Serializer\AbstractSerializer;
 
@@ -49,7 +49,7 @@ class YAMLSerializer extends AbstractSerializer
         return Yaml::dump([$data]);
     }
 
-    public function unserialize(SplFileObject $fileObject): mixed
+    public function unserialize(\SplFileObject $fileObject): mixed
     {
         return Yaml::parse(file_get_contents($fileObject->getPathname()));
     }

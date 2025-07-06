@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Tools;
 
-use RuntimeException;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
@@ -41,7 +41,7 @@ class URL
     /** @var string a cache for the base URL scheme */
     private ?string $baseUrlScheme = null;
 
-    public function __construct(RouterInterface $router = null)
+    public function __construct(?RouterInterface $router = null)
     {
         // Allow singleton style calls once instantiated.
         // For this to work, the URL service has to be instantiated very early. This is done manually
@@ -67,14 +67,14 @@ class URL
     /**
      * Return this class instance, only once instanciated.
      *
-     * @throws RuntimeException if the class has not been instanciated
+     * @throws \RuntimeException if the class has not been instanciated
      *
-     * @return \Thelia\Tools\URL the instance
+     * @return URL the instance
      */
     public static function getInstance(): self
     {
-        if (!self::$instance instanceof \Thelia\Tools\URL) {
-            throw new RuntimeException('URL instance is not initialized.');
+        if (!self::$instance instanceof self) {
+            throw new \RuntimeException('URL instance is not initialized.');
         }
 
         return self::$instance;
@@ -106,7 +106,7 @@ class URL
                 }
             }
 
-            $this->baseUrlScheme = sprintf('%s://%s%s', $scheme, $host, $port);
+            $this->baseUrlScheme = \sprintf('%s://%s%s', $scheme, $host, $port);
         }
 
         return $scheme_only ? $this->baseUrlScheme : $this->baseUrlScheme.$this->requestContext->getBaseUrl();
@@ -133,7 +133,7 @@ class URL
      *
      * @return string The generated URL
      */
-    public function absoluteUrl($path, array $parameters = null, $path_only = self::WITH_INDEX_PAGE, $alternateBaseUrl = null): string
+    public function absoluteUrl($path, ?array $parameters = null, $path_only = self::WITH_INDEX_PAGE, $alternateBaseUrl = null): string
     {
         // Already absolute ?
         if (!str_starts_with($path, 'http')) {
@@ -174,7 +174,7 @@ class URL
                 // Remove this parameter from base URL to prevent duplicate parameters
                 $base = preg_replace('`([?&])'.preg_quote($name, '`').'=(?:[^&]*)(?:&|$)`', '$1', (string) $base);
 
-                $queryString .= sprintf('%s=%s&', urlencode($name), urlencode((string) $value));
+                $queryString .= \sprintf('%s=%s&', urlencode($name), urlencode((string) $value));
             }
         }
 
@@ -206,7 +206,7 @@ class URL
      */
     public function adminViewUrl($viewName, array $parameters = []): string
     {
-        $path = sprintf('%s/admin/%s', $this->getIndexPage(), $viewName);
+        $path = \sprintf('%s/admin/%s', $this->getIndexPage(), $viewName);
 
         return $this->absoluteUrl($path, $parameters);
     }
@@ -221,7 +221,7 @@ class URL
      */
     public function viewUrl($viewName, array $parameters = []): string
     {
-        $path = sprintf('?view=%s', $viewName);
+        $path = \sprintf('?view=%s', $viewName);
 
         return $this->absoluteUrl($path, $parameters);
     }
@@ -305,8 +305,8 @@ class URL
     protected function sanitize($string, $force_lowercase = true, $alphabetic_only = false): string|array|null
     {
         static $strip = ['~', '`', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '=', '+', '[', '{', ']',
-                 '}', '\\', '|', ';', ':', '"', "'", '&#8216;', '&#8217;', '&#8220;', '&#8221;', '&#8211;', '&#8212;',
-                 'â€”', 'â€“', ',', '<', '.', '>', '/', '?', ];
+            '}', '\\', '|', ';', ':', '"', "'", '&#8216;', '&#8217;', '&#8220;', '&#8221;', '&#8211;', '&#8212;',
+            'â€”', 'â€“', ',', '<', '.', '>', '/', '?', ];
 
         $clean = trim(str_replace($strip, '', strip_tags((string) $string)));
 
@@ -323,7 +323,7 @@ class URL
 
     public static function checkUrl($url, array $protocols = ['http', 'https']): bool
     {
-        $pattern = sprintf(UrlValidator::PATTERN, implode('|', $protocols));
+        $pattern = \sprintf(UrlValidator::PATTERN, implode('|', $protocols));
 
         return (bool) preg_match($pattern, (string) $url);
     }

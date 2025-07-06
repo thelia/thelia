@@ -11,18 +11,17 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-use ReflectionClass;
-use Thelia\Module\DeliveryModuleInterface;
-use Thelia\Module\DeliveryModuleWithStateInterface;
-use InvalidArgumentException;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Model\Base\Module as BaseModule;
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Module\BaseModuleInterface;
+use Thelia\Module\DeliveryModuleInterface;
+use Thelia\Module\DeliveryModuleWithStateInterface;
 use Thelia\Module\PaymentModuleInterface;
 
 class Module extends BaseModule
@@ -31,7 +30,7 @@ class Module extends BaseModule
 
     public const ADMIN_INCLUDES_DIRECTORY_NAME = 'AdminIncludes';
 
-    public function postSave(ConnectionInterface $con = null): void
+    public function postSave(?ConnectionInterface $con = null): void
     {
         ModuleQuery::resetActivated();
 
@@ -50,7 +49,7 @@ class Module extends BaseModule
 
     public function getAbsoluteBackOfficeTemplatePath(string $subdir): string
     {
-        return sprintf(
+        return \sprintf(
             '%s'.DS.'%s'.DS.'%s',
             $this->getAbsoluteTemplateBasePath(),
             TemplateDefinition::BACK_OFFICE_SUBDIR,
@@ -60,7 +59,7 @@ class Module extends BaseModule
 
     public function getAbsoluteBackOfficeI18nTemplatePath(string $subdir): string
     {
-        return sprintf(
+        return \sprintf(
             '%s'.DS.'%s'.DS.'%s',
             $this->getAbsoluteI18nPath(),
             TemplateDefinition::BACK_OFFICE_SUBDIR,
@@ -75,7 +74,7 @@ class Module extends BaseModule
 
     public function getAbsoluteFrontOfficeTemplatePath(string $subdir): string
     {
-        return sprintf(
+        return \sprintf(
             '%s'.DS.'%s'.DS.'%s',
             $this->getAbsoluteTemplateBasePath(),
             TemplateDefinition::FRONT_OFFICE_SUBDIR,
@@ -85,7 +84,7 @@ class Module extends BaseModule
 
     public function getAbsoluteFrontOfficeI18nTemplatePath(string $subdir): string
     {
-        return sprintf(
+        return \sprintf(
             '%s'.DS.'%s'.DS.'%s',
             $this->getAbsoluteI18nPath(),
             TemplateDefinition::FRONT_OFFICE_SUBDIR,
@@ -100,7 +99,7 @@ class Module extends BaseModule
 
     public function getAbsolutePdfTemplatePath(string $subdir): string
     {
-        return sprintf(
+        return \sprintf(
             '%s'.DS.'%s'.DS.'%s',
             $this->getAbsoluteTemplateBasePath(),
             TemplateDefinition::PDF_SUBDIR,
@@ -110,7 +109,7 @@ class Module extends BaseModule
 
     public function getAbsolutePdfI18nTemplatePath(string $subdir): string
     {
-        return sprintf(
+        return \sprintf(
             '%s'.DS.'%s'.DS.'%s',
             $this->getAbsoluteI18nPath(),
             TemplateDefinition::PDF_SUBDIR,
@@ -125,7 +124,7 @@ class Module extends BaseModule
 
     public function getAbsoluteEmailTemplatePath(string $subdir): string
     {
-        return sprintf(
+        return \sprintf(
             '%s'.DS.'%s'.DS.'%s',
             $this->getAbsoluteTemplateBasePath(),
             TemplateDefinition::EMAIL_SUBDIR,
@@ -135,7 +134,7 @@ class Module extends BaseModule
 
     public function getAbsoluteEmailI18nTemplatePath(string $subdir): string
     {
-        return sprintf(
+        return \sprintf(
             '%s'.DS.'%s'.DS.'%s',
             $this->getAbsoluteI18nPath(),
             TemplateDefinition::EMAIL_SUBDIR,
@@ -161,7 +160,7 @@ class Module extends BaseModule
      */
     public function getAbsoluteBaseDir(): string
     {
-        return $this->getModuleDir() . $this->getBaseDir();
+        return $this->getModuleDir().$this->getBaseDir();
     }
 
     /**
@@ -177,7 +176,7 @@ class Module extends BaseModule
      */
     public function getAbsoluteConfigPath(): string
     {
-        return $this->getModuleDir() . $this->getConfigPath();
+        return $this->getModuleDir().$this->getConfigPath();
     }
 
     /**
@@ -193,7 +192,7 @@ class Module extends BaseModule
      */
     public function getAbsoluteI18nPath(): string
     {
-        return $this->getModuleDir() . $this->getI18nPath();
+        return $this->getModuleDir().$this->getI18nPath();
     }
 
     /**
@@ -239,7 +238,7 @@ class Module extends BaseModule
      */
     public function isDeliveryModule(): bool
     {
-        $moduleReflection = new ReflectionClass($this->getFullNamespace());
+        $moduleReflection = new \ReflectionClass($this->getFullNamespace());
 
         return $moduleReflection->implementsInterface(DeliveryModuleInterface::class)
             || $moduleReflection->implementsInterface(DeliveryModuleWithStateInterface::class);
@@ -250,7 +249,7 @@ class Module extends BaseModule
      */
     public function isPayementModule(): bool
     {
-        $moduleReflection = new ReflectionClass($this->getFullNamespace());
+        $moduleReflection = new \ReflectionClass($this->getFullNamespace());
 
         return $moduleReflection->implementsInterface(PaymentModuleInterface::class);
     }
@@ -266,16 +265,16 @@ class Module extends BaseModule
     /**
      * @param ContainerInterface $container the Thelia container
      *
-     * @throws InvalidArgumentException if the module could not be found in the container/
+     * @throws \InvalidArgumentException if the module could not be found in the container/
      *
      * @return BaseModuleInterface a module instance
      */
     public function getModuleInstance(ContainerInterface $container): BaseModuleInterface
     {
-        $instance = $container->get(sprintf('module.%s', $this->getCode()));
+        $instance = $container->get(\sprintf('module.%s', $this->getCode()));
 
         if ($instance === null) {
-            throw new InvalidArgumentException(sprintf('Undefined module in container: "%s"', $this->getCode()));
+            throw new \InvalidArgumentException(\sprintf('Undefined module in container: "%s"', $this->getCode()));
         }
 
         return $instance;
@@ -284,7 +283,7 @@ class Module extends BaseModule
     /**
      * @param ContainerInterface $container the Thelia container
      *
-     * @throws InvalidArgumentException if the module could not be found in the container/
+     * @throws \InvalidArgumentException if the module could not be found in the container/
      *
      * @return BaseModuleInterface a module instance
      */
@@ -296,7 +295,7 @@ class Module extends BaseModule
             !\in_array(DeliveryModuleInterface::class, class_implements($instance))
             && !\in_array(DeliveryModuleWithStateInterface::class, class_implements($instance))
         ) {
-            throw new InvalidArgumentException(sprintf('Module "%s" is not a delivery module', $this->getCode()));
+            throw new \InvalidArgumentException(\sprintf('Module "%s" is not a delivery module', $this->getCode()));
         }
 
         return $instance;
@@ -305,7 +304,7 @@ class Module extends BaseModule
     /**
      * @param ContainerInterface $container the Thelia container
      *
-     * @throws InvalidArgumentException if the module is not found or not a payment module
+     * @throws \InvalidArgumentException if the module is not found or not a payment module
      *
      * @return PaymentModuleInterface a payment module instance
      */
@@ -314,7 +313,7 @@ class Module extends BaseModule
         $instance = $this->getModuleInstance($container);
 
         if (!$instance instanceof PaymentModuleInterface) {
-            throw new InvalidArgumentException(sprintf('Module "%s" is not a payment module', $this->getCode()));
+            throw new \InvalidArgumentException(\sprintf('Module "%s" is not a payment module', $this->getCode()));
         }
 
         return $instance;
@@ -325,7 +324,7 @@ class Module extends BaseModule
      */
     public function createInstance(): \Thelia\Module\BaseModule
     {
-        $moduleClass = new ReflectionClass($this->getFullNamespace());
+        $moduleClass = new \ReflectionClass($this->getFullNamespace());
 
         return $moduleClass->newInstance();
     }
@@ -338,7 +337,7 @@ class Module extends BaseModule
         $query->filterByType($this->getType());
     }
 
-    public function preInsert(ConnectionInterface $con = null): true
+    public function preInsert(?ConnectionInterface $con = null): true
     {
         parent::preInsert($con);
 

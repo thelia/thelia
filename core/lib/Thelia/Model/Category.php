@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -109,7 +110,7 @@ class Category extends BaseCategory implements FileModelParentInterface
         $query->filterByParent($this->getParent());
     }
 
-    public function deleteProducts(ConnectionInterface $con = null): void
+    public function deleteProducts(?ConnectionInterface $con = null): void
     {
         $productsCategories = ProductCategoryQuery::create()
             ->filterByCategoryId($this->getId())
@@ -130,7 +131,7 @@ class Category extends BaseCategory implements FileModelParentInterface
         }
     }
 
-    public function preInsert(ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null)
     {
         $this->setPosition($this->getNextPosition());
 
@@ -139,7 +140,7 @@ class Category extends BaseCategory implements FileModelParentInterface
         return true;
     }
 
-    public function preDelete(ConnectionInterface $con = null)
+    public function preDelete(?ConnectionInterface $con = null)
     {
         parent::preDelete($con);
 
@@ -153,7 +154,7 @@ class Category extends BaseCategory implements FileModelParentInterface
         return true;
     }
 
-    public function postDelete(ConnectionInterface $con = null): void
+    public function postDelete(?ConnectionInterface $con = null): void
     {
         parent::postDelete($con);
 

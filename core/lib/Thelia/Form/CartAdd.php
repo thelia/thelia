@@ -11,14 +11,15 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\Exception\ProductNotFoundException;
@@ -51,7 +52,7 @@ class CartAdd extends BaseForm
      *   )
      *   ->add('age', IntegerType::class);
      */
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('product', TextType::class, [
@@ -94,7 +95,7 @@ class CartAdd extends BaseForm
         $product = ProductQuery::create()->findPk($value);
 
         if (null === $product || $product->getVisible() == 0) {
-            throw new ProductNotFoundException(sprintf(Translator::getInstance()->trans('this product id does not exists : %d'), $value));
+            throw new ProductNotFoundException(\sprintf(Translator::getInstance()->trans('this product id does not exists : %d'), $value));
         }
     }
 
@@ -109,7 +110,7 @@ class CartAdd extends BaseForm
                 ->count();
 
             if ($productSaleElements == 0) {
-                throw new StockNotFoundException(sprintf(Translator::getInstance()->trans('This product_sale_elements_id does not exists for this product : %d'), $value));
+                throw new StockNotFoundException(\sprintf(Translator::getInstance()->trans('This product_sale_elements_id does not exists for this product : %d'), $value));
             }
         }
     }

@@ -11,17 +11,15 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Action;
 
-use InvalidArgumentException;
-use DOMDocument;
-use Exception;
-use Imagine\Image\Palette\Color\ColorInterface;
 use Imagine\Gd\Imagine;
 use Imagine\Gmagick\Imagine as GmagickImagine;
 use Imagine\Image\Box;
 use Imagine\Image\ImageInterface;
 use Imagine\Image\ImagineInterface;
+use Imagine\Image\Palette\Color\ColorInterface;
 use Imagine\Image\Palette\RGB;
 use Imagine\Image\Point;
 use Imagine\Imagick\Imagine as ImagickImagine;
@@ -93,7 +91,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      * @param string $eventName
      *
      * @throws ImageException
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function processImage(ImageEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -103,7 +101,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $imageExt = pathinfo((string) $sourceFile, \PATHINFO_EXTENSION);
 
         if (null == $subdir || null == $sourceFile) {
-            throw new InvalidArgumentException('Cache sub-directory and source file path cannot be null');
+            throw new \InvalidArgumentException('Cache sub-directory and source file path cannot be null');
         }
 
         // Find cached file path
@@ -125,7 +123,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
         if (!file_exists($cacheFilePath)) {
             if (!file_exists($sourceFile)) {
-                throw new ImageException(sprintf('Source image file %s does not exists.', $sourceFile));
+                throw new ImageException(\sprintf('Source image file %s does not exists.', $sourceFile));
             }
 
             // Create a cached version of the original image in the web space, if not exists
@@ -135,18 +133,18 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
                 if ($mode == 'symlink') {
                     if (false === symlink($sourceFile, $originalImagePathInCache)) {
-                        throw new ImageException(sprintf('Failed to create symbolic link for %s in %s image cache directory', basename((string) $sourceFile), $subdir));
+                        throw new ImageException(\sprintf('Failed to create symbolic link for %s in %s image cache directory', basename((string) $sourceFile), $subdir));
                     }
                 } elseif (false === @copy($sourceFile, $originalImagePathInCache)) {
                     // mode = 'copy'
-                    throw new ImageException(sprintf('Failed to copy %s in %s image cache directory', basename((string) $sourceFile), $subdir));
+                    throw new ImageException(\sprintf('Failed to copy %s in %s image cache directory', basename((string) $sourceFile), $subdir));
                 }
             }
 
             // Process image only if we have some transformations to do.
             if (!$event->isOriginalImage()) {
                 if ('svg' === $imageExt) {
-                    $dom = new DOMDocument('1.0', 'utf-8');
+                    $dom = new \DOMDocument('1.0', 'utf-8');
                     $dom->load($originalImagePathInCache);
                     $svg = $dom->documentElement;
 
@@ -157,7 +155,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                             && preg_match($pattern, $svg->getAttribute('height'), $height);
 
                         if (!$interpretable || !isset($width) || !isset($height)) {
-                            throw new Exception("can't create viewBox if height and width is not defined in the svg file");
+                            throw new \Exception("can't create viewBox if height and width is not defined in the svg file");
                         }
 
                         $viewBox = implode(' ', [0, 0, $width[0], $height[0]]);
@@ -198,13 +196,13 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $sourceFile,
         ImageEvent $event,
         EventDispatcherInterface $dispatcher,
-        $cacheFilePath
+        $cacheFilePath,
     ): void {
         $imagine = $this->createImagineInstance();
         $image = $imagine->open($sourceFile);
 
         if (!$image) {
-            throw new ImageException(sprintf('Source file %s cannot be opened.', basename((string) $sourceFile)));
+            throw new ImageException(\sprintf('Source file %s cannot be opened.', basename((string) $sourceFile)));
         }
 
         if (\function_exists('exif_read_data')) {
@@ -352,7 +350,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $dest_height,
         $resize_mode,
         ?ColorInterface $bg_color,
-        $allow_zoom = false
+        $allow_zoom = false,
     ) {
         if (!(null === $dest_width && null === $dest_height)) {
             $width_orig = $image->getSize()->getWidth();
@@ -483,7 +481,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      *
      * @return ImagineInterface
      */
-    protected function createImagineInstance(): \Imagine\Imagick\Imagine|\Imagine\Gmagick\Imagine|Imagine
+    protected function createImagineInstance(): ImagickImagine|GmagickImagine|Imagine
     {
         $driver = ConfigQuery::read('imagine_graphic_driver', 'gd');
 

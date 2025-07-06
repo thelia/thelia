@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event\Loop;
 
 use Thelia\Core\Template\Element\BaseLoop;
@@ -26,7 +27,7 @@ class LoopExtendsInitializeArgsEvent extends LoopExtendsEvent
      * LoopExtendsInitializeArgs constructor.
      */
     public function __construct(BaseLoop $loop, /** @var array the loop parameters when called. an array of name => value pairs */
-    protected array $loopParameters)
+        protected array $loopParameters)
     {
         parent::__construct($loop);
     }

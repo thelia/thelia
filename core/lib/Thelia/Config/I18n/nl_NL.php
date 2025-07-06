@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 return [
     'A currency with code "%name" already exists.' => 'Een valuta met de code  "%name" bestaat al.',
     'A message with name "%name" already exists.' => 'Er bestaat al een bericht met de naam "%name".',

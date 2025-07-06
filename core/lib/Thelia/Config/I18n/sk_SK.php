@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 return [
     ' content create form' => ' obsah - fomulár pre tvorbu',
     ' note: only non-visible documents can be associated.' => ' poznámka: len neviditeľné dokumenty môžu byť spojené.',

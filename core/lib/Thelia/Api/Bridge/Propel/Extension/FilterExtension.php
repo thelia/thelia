@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Bridge\Propel\Extension;
 
 use ApiPlatform\Metadata\Operation;
@@ -25,12 +26,12 @@ class FilterExtension implements QueryCollectionExtensionInterface
     private $filterLocator;
 
     public function __construct(
-        #[TaggedLocator('thelia.api.propel.filter')] ServiceLocator $filterLocator
+        #[TaggedLocator('thelia.api.propel.filter')] ServiceLocator $filterLocator,
     ) {
         $this->filterLocator = $filterLocator;
     }
 
-    public function applyToCollection(ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
+    public function applyToCollection(ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         $resourceFilters = $operation?->getFilters();
 

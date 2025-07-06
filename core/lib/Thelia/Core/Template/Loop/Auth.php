@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop;
 
-use Exception;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
@@ -90,7 +90,7 @@ class Auth extends BaseLoop implements ArraySearchLoopInterface
                 // Create an empty row: loop is no longer empty :)
                 $loopResult->addRow(new LoopResultRow());
             }
-        } catch (Exception) {
+        } catch (\Exception) {
             // Not granted, loop is empty
         }
 

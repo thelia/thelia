@@ -11,11 +11,12 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-use Thelia\Model\Tools\PositionManagementTrait;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Base\Accessory as BaseAccessory;
+use Thelia\Model\Tools\PositionManagementTrait;
 
 class Accessory extends BaseAccessory
 {
@@ -29,7 +30,7 @@ class Accessory extends BaseAccessory
         $query->filterByProductId($this->getProductId());
     }
 
-    public function preInsert(ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null)
     {
         $this->setPosition($this->getNextPosition());
 

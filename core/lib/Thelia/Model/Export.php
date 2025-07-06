@@ -11,13 +11,13 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-use ErrorException;
-use Thelia\ImportExport\Export\ExportHandler;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Export\AbstractExport;
+use Thelia\ImportExport\Export\ExportHandler;
 use Thelia\Model\Base\Export as BaseExport;
 use Thelia\Model\Tools\PositionManagementTrait;
 
@@ -31,7 +31,7 @@ class Export extends BaseExport
     protected static $cache;
 
     /**
-     * @throws ErrorException
+     * @throws \ErrorException
      *
      * @return ExportHandler
      */
@@ -46,7 +46,7 @@ class Export extends BaseExport
         if (!class_exists($class)) {
             $this->delete();
 
-            throw new ErrorException(
+            throw new \ErrorException(
                 Translator::getInstance()->trans(
                     'The class "%class" doesn\'t exist',
                     [
@@ -61,7 +61,7 @@ class Export extends BaseExport
         if (!$instance instanceof AbstractExport) {
             $this->delete();
 
-            throw new ErrorException(
+            throw new \ErrorException(
                 Translator::getInstance()->trans(
                     'The class "%class" must extend %baseClass',
                     [
@@ -102,7 +102,7 @@ class Export extends BaseExport
         return static::$cache->useRangeDate();
     }
 
-    public function preInsert(ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null)
     {
         parent::preInsert($con);
 

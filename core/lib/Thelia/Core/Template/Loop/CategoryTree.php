@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop;
 
-use Thelia\Type\EnumListType;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseI18nLoop;
@@ -23,6 +23,7 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\CategoryQuery;
 use Thelia\Type\BooleanOrBothType;
+use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
 
 /**

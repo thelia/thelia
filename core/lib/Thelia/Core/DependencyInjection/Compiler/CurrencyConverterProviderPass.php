@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\DependencyInjection\Compiler;
 
-use LogicException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -50,7 +50,7 @@ class CurrencyConverterProviderPass implements CompilerPassInterface
             $service = array_pop($providers);
             $currencyConverter->addMethodCall('setProvider', [new Reference($service)]);
         } else {
-            throw new LogicException('the currency converter needs a provider, please define one');
+            throw new \LogicException('the currency converter needs a provider, please define one');
         }
     }
 }

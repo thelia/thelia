@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Resource;
 
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
@@ -31,7 +32,7 @@ trait PropelResourceTrait
             return $this->getResourceAddon($property);
         }
 
-        throw new NoSuchPropertyException(sprintf('Can\'t get a way to read the property "%s" in class "%s".', $property, $this::class));
+        throw new NoSuchPropertyException(\sprintf('Can\'t get a way to read the property "%s" in class "%s".', $property, $this::class));
     }
 
     public function __isset(string $property)
@@ -45,10 +46,10 @@ trait PropelResourceTrait
             $this->setResourceAddon($name, $value);
         }
 
-        throw new NoSuchPropertyException(sprintf('Can\'t get a way to write the property "%s" in class "%s".', $name, $this::class));
+        throw new NoSuchPropertyException(\sprintf('Can\'t get a way to write the property "%s" in class "%s".', $name, $this::class));
     }
 
-    public function setPropelModel(ActiveRecordInterface $propelModel = null): PropelResourceInterface
+    public function setPropelModel(?ActiveRecordInterface $propelModel = null): PropelResourceInterface
     {
         $this->propelModel = $propelModel;
 

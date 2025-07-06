@@ -11,16 +11,16 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Controller\Admin;
 
+namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Tax\TaxEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Form\BaseForm;
@@ -133,10 +133,9 @@ class TaxController extends AbstractCrudController
 
     /**
      * @param Tax $object
-     *
-     * @return string
      */
-    protected function getObjectLabel(activeRecordInterface $object): ?string    {
+    protected function getObjectLabel(ActiveRecordInterface $object): ?string
+    {
         return $object->getTitle();
     }
 
@@ -189,7 +188,7 @@ class TaxController extends AbstractCrudController
      *
      * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalCreateAction(ActionEvent $createEvent): ?\Symfony\Component\HttpFoundation\Response
+    protected function performAdditionalCreateAction(ActionEvent $createEvent): ?Response
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.taxes.update',

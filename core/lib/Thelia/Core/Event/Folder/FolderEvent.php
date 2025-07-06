@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event\Folder;
 
 use Thelia\Core\Event\ActionEvent;
@@ -36,9 +37,6 @@ class FolderEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     * @return Folder
-     */
     public function getFolder(): ?Folder
     {
         return $this->folder;

@@ -11,11 +11,11 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Exception;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CustomerTitleQuery;
 
@@ -56,7 +56,7 @@ class TranslationsCustomerTitleController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $errorMessage = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $errorMessage = $ex->getMessage();
         }

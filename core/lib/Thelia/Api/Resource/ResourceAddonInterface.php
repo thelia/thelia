@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\Operation;
@@ -27,7 +28,7 @@ interface ResourceAddonInterface
     #[Ignore]
     public static function getPropelRelatedTableMap(): ?TableMap;
 
-    public static function extendQuery(ModelCriteria $query, Operation $operation = null, array $context = []): void;
+    public static function extendQuery(ModelCriteria $query, ?Operation $operation = null, array $context = []): void;
 
     public function buildFromModel(ActiveRecordInterface $activeRecord, PropelResourceInterface $abstractPropelResource): self;
 

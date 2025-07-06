@@ -11,14 +11,15 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\EventListener;
 
-use Symfony\Component\HttpFoundation\Response;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -68,13 +69,13 @@ class RequestListener implements EventSubscriberInterface
 
         $this->translator->addResource(
             'xlf',
-            sprintf($vendorFormDir.DS.'Resources'.DS.'translations'.DS.'validators.%s.xlf', $lang->getCode()),
+            \sprintf($vendorFormDir.DS.'Resources'.DS.'translations'.DS.'validators.%s.xlf', $lang->getCode()),
             $lang->getLocale(),
             'validators'
         );
         $this->translator->addResource(
             'xlf',
-            sprintf($vendorValidatorDir.DS.'Resources'.DS.'translations'.DS.'validators.%s.xlf', $lang->getCode()),
+            \sprintf($vendorValidatorDir.DS.'Resources'.DS.'translations'.DS.'validators.%s.xlf', $lang->getCode()),
             $lang->getLocale(),
             'validators'
         );
@@ -243,7 +244,7 @@ class RequestListener implements EventSubscriberInterface
                 if (ConfigQuery::isMultiDomainActivated()) {
                     $components = parse_url($referrer);
                     $lang = LangQuery::create()
-                        ->filterByUrl(sprintf('%s://%s', $components['scheme'], $components['host']), ModelCriteria::LIKE)
+                        ->filterByUrl(\sprintf('%s://%s', $components['scheme'], $components['host']), ModelCriteria::LIKE)
                         ->findOne();
                     if (null !== $lang) {
                         $session->setReturnToUrl($referrer);

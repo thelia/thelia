@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Action;
 
 use Propel\Runtime\Exception\PropelException;
@@ -75,7 +76,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     public function customerConfirmationEmail(
         CustomerEvent $event,
         $eventName,
-        EventDispatcherInterface $dispatcher
+        EventDispatcherInterface $dispatcher,
     ): void {
         $customer = $event->getModel();
 
@@ -112,7 +113,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     public function updateProfile(
         CustomerCreateOrUpdateEvent $event,
         $eventName,
-        EventDispatcherInterface $dispatcher
+        EventDispatcherInterface $dispatcher,
     ): void {
         $customer = $event->getCustomer();
 
@@ -176,7 +177,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
      */
     private function createOrUpdateCustomer(
         CustomerModel $customer,
-        CustomerCreateOrUpdateEvent $event
+        CustomerCreateOrUpdateEvent $event,
     ): void {
         $customer->createOrUpdate(
             $event->getTitle() ?? $this->customerService->getDefaultCustomerTitle()->getId(),

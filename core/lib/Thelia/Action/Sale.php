@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Action;
 
-use RuntimeException;
-use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
@@ -103,9 +102,9 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Update the promo status of the sale's selected products and combinations.
      *
-     * @throws RuntimeException
-     * @throws Exception
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws \RuntimeException
+     * @throws \Exception
+     * @throws PropelException
      */
     public function updateProductsSaleStatus(ProductSaleStatusUpdateEvent $event): void
     {
@@ -300,7 +299,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Toggle Sale activity.
      *
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function toggleActivity(SaleToggleActivityEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -333,7 +332,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a sale.
      *
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function delete(SaleDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -369,7 +368,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Clear all sales.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function clearStatus(/* @noinspection PhpUnusedParameterInspection */ SaleClearStatusEvent $event): void
     {
@@ -400,7 +399,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
      * This method check the activation and deactivation dates of sales, and perform
      * the required action depending on the current date.
      *
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function checkSaleActivation(SaleActiveStatusCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {

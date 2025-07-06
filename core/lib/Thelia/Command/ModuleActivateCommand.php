@@ -11,11 +11,10 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
-use RuntimeException;
-use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -41,9 +40,8 @@ use Thelia\Module\Validator\ModuleValidator;
 class ModuleActivateCommand extends BaseModuleGenerate
 {
     public function __construct(
-        protected EventDispatcherInterface $eventDispatcher
-    )
-    {
+        protected EventDispatcherInterface $eventDispatcher,
+    ) {
         parent::__construct();
     }
 
@@ -87,12 +85,12 @@ class ModuleActivateCommand extends BaseModuleGenerate
                 }
 
                 if (!$module instanceof Module) {
-                    throw new RuntimeException(sprintf('module %s not found', $moduleCode));
+                    throw new \RuntimeException(\sprintf('module %s not found', $moduleCode));
                 }
             }
 
             if ($module->getActivate() === BaseModule::IS_ACTIVATED) {
-                $output->writeln(sprintf('<error>module %s is already activated</error>', $moduleCode));
+                $output->writeln(\sprintf('<error>module %s is already activated</error>', $moduleCode));
 
                 return Command::FAILURE;
             }
@@ -104,8 +102,8 @@ class ModuleActivateCommand extends BaseModuleGenerate
                 }
 
                 $this->eventDispatcher->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
-            } catch (Exception $e) {
-                throw new RuntimeException(sprintf(
+            } catch (\Exception $e) {
+                throw new \RuntimeException(\sprintf(
                     'Activation fail with Exception : [%d] %s',
                     $e->getCode(),
                     $e->getMessage()
@@ -116,11 +114,11 @@ class ModuleActivateCommand extends BaseModuleGenerate
             if (method_exists($output, 'renderBlock')) {
                 $output->renderBlock([
                     '',
-                    sprintf('Activation succeed for module %s', $moduleCode),
+                    \sprintf('Activation succeed for module %s', $moduleCode),
                     '',
                 ], 'bg=green;fg=black');
             }
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             if (!$input->getOption('silent')) {
                 throw $exception;
             }

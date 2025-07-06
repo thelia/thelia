@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Serializer;
 
-use InvalidArgumentException;
 use Exception;
 use Thelia\Core\Translation\Translator;
 
@@ -57,7 +57,7 @@ class SerializerManager
      * @param string $serializerId   A serializer identifier
      * @param bool   $throwException Throw exception if serializer doesn't exists or not
      *
-     * @throws InvalidArgumentException if the serializer identifier does not exist
+     * @throws \InvalidArgumentException if the serializer identifier does not exist
      *
      * @return bool True if the serializer exists, false otherwise
      */
@@ -66,7 +66,7 @@ class SerializerManager
         $exists = isset($this->serializers[$serializerId]);
 
         if (!$exists && $throwException) {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 Translator::getInstance()->trans(
                     'The serializer identifier "%serializerId" doesn\’t exist',
                     [
@@ -98,7 +98,7 @@ class SerializerManager
      *
      * @param array $serializers An array of serializer
      *
-     * @throws Exception
+     * @throws \Exception
      *
      * @return $this Return $this, allow chaining
      */
@@ -108,7 +108,7 @@ class SerializerManager
 
         foreach ($serializers as $serializer) {
             if (!($serializer instanceof SerializerInterface)) {
-                throw new Exception('SerializerManager manage only '.__NAMESPACE__.'\\SerializerInterface');
+                throw new \Exception('SerializerManager manage only '.__NAMESPACE__.'\\SerializerInterface');
             }
 
             $this->serializers[$serializer->getId()] = $serializer;

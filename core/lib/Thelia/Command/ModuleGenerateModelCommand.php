@@ -11,11 +11,11 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Command;
 
-use Symfony\Component\Console\Attribute\AsCommand;
-use RuntimeException;
 use Propel\Generator\Command\ModelBuildCommand;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -60,11 +60,11 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
         $fs = new Filesystem();
 
         if ($fs->exists($this->moduleDirectory) === false) {
-            throw new RuntimeException(sprintf('%s module does not exists', $this->module));
+            throw new \RuntimeException(\sprintf('%s module does not exists', $this->module));
         }
 
         if ($fs->exists($this->moduleDirectory.DS.'Config'.DS.'schema.xml') === false) {
-            throw new RuntimeException('schema.xml not found in Config directory. Needed file for generating model');
+            throw new \RuntimeException('schema.xml not found in Config directory. Needed file for generating model');
         }
 
         $this->checkModuleSchema();

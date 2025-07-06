@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event;
 
-use ReflectionClass;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\Form;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -47,9 +47,9 @@ abstract class ActionEvent extends Event
 
         /** @var Form $field */
         foreach ($fields as $field) {
-            $functionName = sprintf('set%s', Container::camelize($field->getName()));
+            $functionName = \sprintf('set%s', Container::camelize($field->getName()));
             if (method_exists($this, $functionName)) {
-                $getFunctionName = sprintf('get%s', Container::camelize($field->getName()));
+                $getFunctionName = \sprintf('get%s', Container::camelize($field->getName()));
                 if (method_exists($this, $getFunctionName)) {
                     if (null === $this->{$getFunctionName}()) {
                         $this->{$functionName}($field->getData());
@@ -65,7 +65,7 @@ abstract class ActionEvent extends Event
 
     public function resetStopPropagation(): void
     {
-        $reflection = new ReflectionClass(Event::class);
+        $reflection = new \ReflectionClass(Event::class);
         $property = $reflection->getProperty('propagationStopped');
         $property->setAccessible(true);
         $property->setValue($this, false);

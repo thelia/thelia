@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -20,7 +21,7 @@ use Thelia\Service\ConfigCacheService;
 readonly class ModelConfigListener implements EventSubscriberInterface
 {
     public function __construct(
-        private ConfigCacheService $configCacheService
+        private ConfigCacheService $configCacheService,
     ) {
     }
 

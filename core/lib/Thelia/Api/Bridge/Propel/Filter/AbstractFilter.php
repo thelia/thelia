@@ -14,8 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel\Filter;
 
-use ReflectionProperty;
-use ReflectionClass;
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Psr\Log\LoggerInterface;
@@ -30,14 +28,14 @@ abstract class AbstractFilter implements FilterInterface
     protected LoggerInterface $logger;
 
     public function __construct(
-        LoggerInterface $logger = null,
+        ?LoggerInterface $logger = null,
         protected ?array $properties = null,
-        protected ?NameConverterInterface $nameConverter = null
+        protected ?NameConverterInterface $nameConverter = null,
     ) {
         $this->logger = $logger ?? new NullLogger();
     }
 
-    public function apply(ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
+    public function apply(ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         foreach ($context['filters'] as $property => $value) {
             $this->filterProperty($this->denormalizePropertyName($property), $value, $query, $resourceClass, $operation, $context);
@@ -47,7 +45,7 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * Passes a property through the filter.
      */
-    abstract protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void;
+    abstract protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void;
 
     protected function getProperties(): ?array
     {
@@ -89,13 +87,13 @@ abstract class AbstractFilter implements FilterInterface
         return implode('.', array_map($this->nameConverter->normalize(...), explode('.', $property)));
     }
 
-    protected function getReflectionProperty(string $propertyName, string $class): ?ReflectionProperty
+    protected function getReflectionProperty(string $propertyName, string $class): ?\ReflectionProperty
     {
         $propertyParts = explode('.', $propertyName);
 
         $classProperties = array_reduce(
-            (new ReflectionClass($class))->getProperties(),
-            static function (array $carry, ReflectionProperty $property) {
+            (new \ReflectionClass($class))->getProperties(),
+            static function (array $carry, \ReflectionProperty $property) {
                 $carry[$property->getName()] = $property;
 
                 return $carry;
@@ -104,7 +102,7 @@ abstract class AbstractFilter implements FilterInterface
         );
 
         if (\count($propertyParts) > 1) {
-            /** @var ReflectionProperty $relationProperty */
+            /** @var \ReflectionProperty $relationProperty */
             $relationProperty = $classProperties[$propertyParts[0]] ?? null;
 
             if (null === $relationProperty) {
@@ -120,7 +118,7 @@ abstract class AbstractFilter implements FilterInterface
                 $subPropertyName = substr($propertyName, strpos($propertyName, '.') + 1);
                 $reflectionProperty = $this->getReflectionProperty($subPropertyName, $targetClass);
 
-                if ($reflectionProperty instanceof ReflectionProperty) {
+                if ($reflectionProperty instanceof \ReflectionProperty) {
                     return $reflectionProperty;
                 }
             }
@@ -132,7 +130,7 @@ abstract class AbstractFilter implements FilterInterface
     protected function getPropertyQueryPath(
         ModelCriteria $query,
         string $property,
-        array $context
+        array $context,
     ): string {
         $resourceClass = $context['resource_class'];
         // Check if we are on a localized field

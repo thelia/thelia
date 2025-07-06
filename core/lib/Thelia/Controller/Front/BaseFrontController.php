@@ -11,11 +11,12 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Front;
 
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Controller\BaseController;
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Model\AddressQuery;
@@ -70,7 +71,6 @@ class BaseFrontController extends BaseController
             throw new RedirectException($this->retrieveUrlFromRouteId('order.invoice'));
         }
     }
-
 
     protected function getParser(?string $template = null): ParserInterface
     {

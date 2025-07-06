@@ -11,13 +11,13 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-
-use Exception;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Sale\SaleActiveStatusCheckEvent;
@@ -28,7 +28,6 @@ use Thelia\Core\Event\Sale\SaleEvent;
 use Thelia\Core\Event\Sale\SaleToggleActivityEvent;
 use Thelia\Core\Event\Sale\SaleUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
@@ -77,8 +76,6 @@ class SaleController extends AbstractCrudController
 
     /**
      * Hydrate the update form for this object, before passing it to the update template.
-     *
-     * @param Sale $sale
      *
      * @return SaleModificationForm
      */
@@ -237,7 +234,8 @@ class SaleController extends AbstractCrudController
      *
      * @return string sale title
      */
-    protected function getObjectLabel(activeRecordInterface $object): ?string    {
+    protected function getObjectLabel(ActiveRecordInterface $object): ?string
+    {
         return $object->getTitle();
     }
 
@@ -261,8 +259,8 @@ class SaleController extends AbstractCrudController
         $this->getListOrderFromSession('sale', 'order', 'start-date');
 
         return $this->render('sales', [
-                'order' => $currentOrder,
-            ]);
+            'order' => $currentOrder,
+        ]);
     }
 
     protected function getEditionArguments(): array
@@ -298,8 +296,6 @@ class SaleController extends AbstractCrudController
 
     /**
      * Toggle activity status of the sale.
-     *
-     * @return Response
      */
     public function toggleActivity(EventDispatcherInterface $eventDispatcher): Response
     {
@@ -314,7 +310,7 @@ class SaleController extends AbstractCrudController
                 ),
                 TheliaEvents::SALE_TOGGLE_ACTIVITY
             );
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             // Any error
             return $this->errorPage($exception);
         }
@@ -358,8 +354,8 @@ class SaleController extends AbstractCrudController
         return $this->render(
             'ajax/sale-edit-product-attributes',
             [
-            'product_id' => $productId,
-            'selected_attributes_av_id' => $selectedAttributesAvId,
+                'product_id' => $productId,
+                'selected_attributes_av_id' => $selectedAttributesAvId,
             ]
         );
     }
@@ -376,7 +372,7 @@ class SaleController extends AbstractCrudController
                 new SaleClearStatusEvent(),
                 TheliaEvents::SALE_CLEAR_SALE_STATUS
             );
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             // Any error
             return $this->errorPage($exception);
         }
@@ -392,7 +388,7 @@ class SaleController extends AbstractCrudController
                 new SaleActiveStatusCheckEvent(),
                 TheliaEvents::CHECK_SALE_ACTIVATION_EVENT
             );
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             // Any error
             return $this->errorPage($exception);
         }

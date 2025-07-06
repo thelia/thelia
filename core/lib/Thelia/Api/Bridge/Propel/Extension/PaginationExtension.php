@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Bridge\Propel\Extension;
 
 use ApiPlatform\Metadata\Operation;
@@ -20,11 +21,11 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 class PaginationExtension implements QueryResultCollectionExtensionInterface
 {
     public function __construct(
-        private readonly ?Pagination $pagination
+        private readonly ?Pagination $pagination,
     ) {
     }
 
-    public function applyToCollection(ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
+    public function applyToCollection(ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
     }
 
@@ -48,12 +49,12 @@ class PaginationExtension implements QueryResultCollectionExtensionInterface
         return $context;
     }
 
-    public function supportsResult(string $resourceClass, Operation $operation = null, array $context = []): bool
+    public function supportsResult(string $resourceClass, ?Operation $operation = null, array $context = []): bool
     {
         return $this->pagination->isEnabled($operation, $context);
     }
 
-    public function getResult(ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = [])
+    public function getResult(ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = [])
     {
         if (null === $pagination = $this->getPagination($query, $operation, $context)) {
             return $query->find();

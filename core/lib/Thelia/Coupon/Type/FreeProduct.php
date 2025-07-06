@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Coupon\Type;
 
-use InvalidArgumentException;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
@@ -231,7 +231,7 @@ class FreeProduct extends AbstractRemoveOnProducts
 
         if ($fieldName === self::OFFERED_PRODUCT_ID) {
             if ((float) $fieldValue < 0) {
-                throw new InvalidArgumentException(
+                throw new \InvalidArgumentException(
                     Translator::getInstance()->trans(
                         'Please select the offered product'
                     )
@@ -239,7 +239,7 @@ class FreeProduct extends AbstractRemoveOnProducts
             }
         } elseif ($fieldName === self::OFFERED_CATEGORY_ID) {
             if ($fieldValue === '' || $fieldValue === '0') {
-                throw new InvalidArgumentException(
+                throw new \InvalidArgumentException(
                     Translator::getInstance()->trans(
                         'Please select the category of the offred product'
                     )
@@ -273,12 +273,12 @@ class FreeProduct extends AbstractRemoveOnProducts
     public function drawBackOfficeInputs(): string
     {
         return $this->drawBaseBackOfficeInputs('coupon/type-fragments/free-product.html', [
-                'offered_category_field_name' => $this->makeCouponFieldName(self::OFFERED_CATEGORY_ID),
-                'offered_category_value' => $this->offeredCategoryId,
+            'offered_category_field_name' => $this->makeCouponFieldName(self::OFFERED_CATEGORY_ID),
+            'offered_category_value' => $this->offeredCategoryId,
 
-                'offered_product_field_name' => $this->makeCouponFieldName(self::OFFERED_PRODUCT_ID),
-                'offered_product_value' => $this->offeredProductId,
-            ]);
+            'offered_product_field_name' => $this->makeCouponFieldName(self::OFFERED_PRODUCT_ID),
+            'offered_product_value' => $this->offeredProductId,
+        ]);
     }
 
     public function clear(): void

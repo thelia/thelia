@@ -11,13 +11,12 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters;
 
-use RuntimeException;
-use Symfony\Component\HttpFoundation\Request;
-use InvalidArgumentException;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\CategoryFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoiceFilterInterface;
@@ -72,7 +71,7 @@ readonly class FilterService
         return $filters;
     }
 
-    public function filterTFilterWithRequest($request, ModelCriteria $query = null): iterable
+    public function filterTFilterWithRequest($request, ?ModelCriteria $query = null): iterable
     {
         $tfilters = $request->get('tfilters', []);
         $categoryDepth = $request->get(CategoryFilter::CATEGORY_DEPTH_NAME, null);
@@ -83,7 +82,7 @@ readonly class FilterService
         return $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, query: $query, categoryDepth: $categoryDepth);
     }
 
-    public function filterTFilterWithContext(array $context = null, ModelCriteria $query = null): iterable
+    public function filterTFilterWithContext(?array $context = null, ?ModelCriteria $query = null): iterable
     {
         $tfilters = $context['filters']['tfilters'] ?? [];
         $categoryDepth = $context['filters'][CategoryFilter::CATEGORY_DEPTH_NAME] ?? null;
@@ -94,7 +93,7 @@ readonly class FilterService
         return $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, query: $query, categoryDepth: $categoryDepth);
     }
 
-    public function filterWithTFilter(array $tfilters, string $resource, ModelCriteria $query = null, int $categoryDepth = null): iterable
+    public function filterWithTFilter(array $tfilters, string $resource, ?ModelCriteria $query = null, ?int $categoryDepth = null): iterable
     {
         $filters = $this->getAvailableFiltersWithTFilter($resource, $tfilters);
         if (!$query instanceof ModelCriteria) {
@@ -104,7 +103,7 @@ readonly class FilterService
             }
 
             if (!class_exists($queryClass)) {
-                throw new RuntimeException('Not found class: '.$queryClass);
+                throw new \RuntimeException('Not found class: '.$queryClass);
             }
 
             $query = $queryClass::create();
@@ -114,7 +113,7 @@ readonly class FilterService
             $filterClass = $filter['filter'];
             $values = $filter['value'];
             if (!$filterClass instanceof TheliaFilterInterface) {
-                throw new RuntimeException(sprintf('The "%s" filter must implements TheliaFilterInterface.', $filterClass::class));
+                throw new \RuntimeException(\sprintf('The "%s" filter must implements TheliaFilterInterface.', $filterClass::class));
             }
 
             if (\is_string($values)) {
@@ -122,7 +121,7 @@ readonly class FilterService
             }
 
             if (\is_array($values)) {
-                $values = array_map(static fn($value): int => (int) $value, $values);
+                $values = array_map(static fn ($value): int => (int) $value, $values);
             }
 
             if ($filterClass instanceof CategoryFilter) {
@@ -139,7 +138,7 @@ readonly class FilterService
     {
         $request = $this->requestStack->getCurrentRequest();
         if (!$request instanceof Request) {
-            throw new InvalidArgumentException('The request is required.');
+            throw new \InvalidArgumentException('The request is required.');
         }
 
         $isApiRoute = $request->get('isApiRoute', false);
@@ -203,7 +202,7 @@ readonly class FilterService
 
             if ($hasMainResource) {
                 $values = array_intersect_key($values, array_unique(array_map(
-                    static fn($item): string => $item['id'].'-'.$item['mainId'],
+                    static fn ($item): string => $item['id'].'-'.$item['mainId'],
                     $values
                 )));
 
@@ -269,13 +268,13 @@ readonly class FilterService
 
         foreach ($filterObjects as $filterObject) {
             if ($filterObject->getPosition() === null) {
-                $allPosition = array_map(static fn($filterObject): ?int => $filterObject->getPosition(), $filterObjects);
+                $allPosition = array_map(static fn ($filterObject): ?int => $filterObject->getPosition(), $filterObjects);
                 $max = max($allPosition);
                 $filterObject->setPosition($max + 1);
             }
         }
 
-        usort($filterObjects, static fn($a, $b): int => $a->getPosition() <=> $b->getPosition());
+        usort($filterObjects, static fn ($a, $b): int => $a->getPosition() <=> $b->getPosition());
 
         return $filterObjects;
     }
@@ -342,7 +341,7 @@ readonly class FilterService
 
     private function hasFilter(array $theliaFilterNames, array $tfilters): bool
     {
-        return !in_array($this->retrieveFilterValue($theliaFilterNames, $tfilters), ['', '0', null], true)
+        return !\in_array($this->retrieveFilterValue($theliaFilterNames, $tfilters), ['', '0', null], true)
             && $this->retrieveFilterValue($theliaFilterNames, $tfilters) !== [];
     }
 

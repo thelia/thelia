@@ -11,15 +11,12 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop;
 
-use Exception;
-use Propel\Runtime\Exception\PropelException;
-use Thelia\Model\Export;
-use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Thelia\Model\ImportQuery;
-use Thelia\Model\ExportQUery;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -27,7 +24,10 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Log\Tlog;
+use Thelia\Model\Export;
+use Thelia\Model\ExportQUery;
 use Thelia\Model\Import as ImportModel;
+use Thelia\Model\ImportQuery;
 use Thelia\Tools\URL;
 use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
@@ -74,7 +74,7 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
                     ->set('POSITION', $type->getPosition())
                     ->set('CATEGORY_ID', $type->getByName($this->getCategoryName()))
                 ;
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 Tlog::getInstance()->error($e->getMessage());
             }
 

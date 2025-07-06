@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event;
 
 use Thelia\Model\Accessory;
@@ -25,7 +26,7 @@ class AccessoryEvent extends ActionEvent
      */
     public $accessory;
 
-    public function __construct(Accessory $accessory = null)
+    public function __construct(?Accessory $accessory = null)
     {
         $this->accessory = $accessory;
     }

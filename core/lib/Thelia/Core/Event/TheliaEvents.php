@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event;
 
 /**
@@ -499,9 +500,9 @@ final class TheliaEvents
      *
      * @return string the event name for the loop
      */
-    public static function getLoopExtendsEvent(string $eventName, string $loopName = null): string
+    public static function getLoopExtendsEvent(string $eventName, ?string $loopName = null): string
     {
-        return sprintf('%s.%s', $eventName, $loopName);
+        return \sprintf('%s.%s', $eventName, $loopName);
     }
 
     // -- Configuration management ---------------------------------------------
@@ -698,7 +699,7 @@ final class TheliaEvents
      */
     public static function getModuleEvent(string $eventName, string $moduleCode): string
     {
-        return sprintf('%s.%s', $eventName, strtolower($moduleCode));
+        return \sprintf('%s.%s', $eventName, strtolower($moduleCode));
     }
 
     /* Payment module */

@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Action;
 
 use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
@@ -27,7 +28,7 @@ class Tax extends BaseAction implements EventSubscriberInterface
     private readonly ServiceLocator $taxTypeLocator;
 
     public function __construct(
-        #[TaggedLocator('thelia.taxType')] ServiceLocator $taxTypeLocator
+        #[TaggedLocator('thelia.taxType')] ServiceLocator $taxTypeLocator,
     ) {
         $this->taxTypeLocator = $taxTypeLocator;
     }

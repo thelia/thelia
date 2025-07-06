@@ -11,9 +11,8 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Exception;
 
-use RuntimeException;
+namespace Thelia\Exception;
 
 /**
  * these exception are non fatal exception, due to thelia process exception
@@ -23,7 +22,7 @@ use RuntimeException;
  *
  * Class TheliaProcessException
  */
-class TheliaProcessException extends RuntimeException
+class TheliaProcessException extends \RuntimeException
 {
     public const UNKNOWN_EXCEPTION = 0;
 

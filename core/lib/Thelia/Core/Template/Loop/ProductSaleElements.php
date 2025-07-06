@@ -11,16 +11,11 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop;
 
-use Thelia\TaxEngine\TaxEngine;
-use Thelia\Type\BooleanOrBothType;
-use Thelia\Type\IntToCombinedIntsListType;
-use Thelia\Type\EnumListType;
-use InvalidArgumentException;
-use PDO;
-use Thelia\Core\Security\SecurityContext;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -33,6 +28,10 @@ use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\TaxEngine\TaxEngine;
+use Thelia\Type\BooleanOrBothType;
+use Thelia\Type\EnumListType;
+use Thelia\Type\IntToCombinedIntsListType;
 use Thelia\Type\TypeCollection;
 
 /**
@@ -61,8 +60,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
 
     public function __construct(
         protected readonly TaxEngine $taxEngine,
-    )
-    {
+    ) {
     }
 
     protected function getArgDefinitions(): ArgumentCollection
@@ -213,7 +211,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         if (null !== $currencyId) {
             $currency = CurrencyQuery::create()->findPk($currencyId);
             if (null === $currency) {
-                throw new InvalidArgumentException('Cannot found currency id: `'.$currency.'` in product_sale_elements loop');
+                throw new \InvalidArgumentException('Cannot found currency id: `'.$currency.'` in product_sale_elements loop');
             }
         } else {
             $currency = $this->getCurrentRequest()->getSession()->getCurrency();
@@ -223,10 +221,10 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         $defaultCurrencySuffix = '_default_currency';
 
         $search->joinProductPrice('price', Criteria::LEFT_JOIN)
-            ->addJoinCondition('price', '`price`.`currency_id` = ?', $currency->getId(), null, PDO::PARAM_INT);
+            ->addJoinCondition('price', '`price`.`currency_id` = ?', $currency->getId(), null, \PDO::PARAM_INT);
 
         $search->joinProductPrice('price'.$defaultCurrencySuffix, Criteria::LEFT_JOIN)
-            ->addJoinCondition('price_default_currency', '`price'.$defaultCurrencySuffix.'`.`currency_id` = ?', $defaultCurrency->getId(), null, PDO::PARAM_INT);
+            ->addJoinCondition('price_default_currency', '`price'.$defaultCurrencySuffix.'`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
 
         /**
          * rate value is checked as a float in overloaded getRate method.

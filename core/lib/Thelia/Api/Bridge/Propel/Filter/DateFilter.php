@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Bridge\Propel\Filter;
 
-use ReflectionProperty;
-use DateTimeInterface;
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -37,7 +36,7 @@ class DateFilter extends AbstractFilter
 
     public const INCLUDE_NULL_BEFORE_AND_AFTER = 'include_null_before_and_after';
 
-    protected function filterProperty(string $property, $values, ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
+    protected function filterProperty(string $property, $values, ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         if (
             null === $values
@@ -103,7 +102,7 @@ class DateFilter extends AbstractFilter
             $propertyName = $this->normalizePropertyName($property);
 
             $reflectionProperty = $this->getReflectionProperty($propertyName, $resourceClass);
-            if (!$reflectionProperty instanceof ReflectionProperty) {
+            if (!$reflectionProperty instanceof \ReflectionProperty) {
                 continue;
             }
 
@@ -124,9 +123,9 @@ class DateFilter extends AbstractFilter
         $propertyName = $this->normalizePropertyName($property);
 
         return [
-            sprintf('%s[%s]', $propertyName, $period) => [
+            \sprintf('%s[%s]', $propertyName, $period) => [
                 'property' => $propertyName,
-                'type' => DateTimeInterface::class,
+                'type' => \DateTimeInterface::class,
                 'required' => false,
             ],
         ];

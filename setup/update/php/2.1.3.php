@@ -10,7 +10,7 @@
  * file that was distributed with this source code.
  */
 
-$secret = \Thelia\Tools\TokenProvider::generateToken();
+$secret = Thelia\Tools\TokenProvider::generateToken();
 
 $sql = "UPDATE `config` SET `value`=? WHERE `name`='form.secret'";
 

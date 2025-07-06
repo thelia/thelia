@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event\Coupon;
 
 use Thelia\Core\Event\ActionEvent;
@@ -28,16 +29,15 @@ class CouponConsumeEvent extends ActionEvent
      * @param string $code         Coupon code
      * @param float  $discount     Total discount given by this coupon
      * @param bool   $freeShipping true if coupon offers free shipping
-     * @param bool $isValid
+     * @param bool   $isValid
      */
     public function __construct(
         protected $code,
         protected $discount = null,
         /** @var bool If Coupon is valid or if Customer meets coupon conditions */
         protected $isValid = null,
-        protected $freeShipping = false
-    )
-    {
+        protected $freeShipping = false,
+    ) {
     }
 
     /**

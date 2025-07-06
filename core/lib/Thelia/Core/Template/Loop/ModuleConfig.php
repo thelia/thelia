@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop;
 
-use InvalidArgumentException;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
@@ -53,7 +53,7 @@ class ModuleConfig extends BaseLoop implements ArraySearchLoopInterface
         $moduleCode = $this->getModule();
 
         if (null === $module = ModuleQuery::create()->filterByCode($moduleCode, Criteria::LIKE)->findOne()) {
-            throw new InvalidArgumentException(sprintf("Module with code '%s' does not exists.", $moduleCode));
+            throw new \InvalidArgumentException(\sprintf("Module with code '%s' does not exists.", $moduleCode));
         }
 
         $configValue = ModuleConfigQuery::create()->getConfigValue(

@@ -11,11 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop;
 
-use ReflectionMethod;
-use InvalidArgumentException;
-use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Event\Image\ImageEvent;
@@ -144,16 +142,16 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             $ns = '\\'.$ns;
         }
 
-        $queryClass = sprintf('%s\\%sImageQuery', $ns, $object);
-        $filterMethod = sprintf('filterBy%sId', $object);
+        $queryClass = \sprintf('%s\\%sImageQuery', $ns, $object);
+        $filterMethod = \sprintf('filterBy%sId', $object);
 
         // xxxImageQuery::create()
-        $method = new ReflectionMethod($queryClass, 'create');
+        $method = new \ReflectionMethod($queryClass, 'create');
         $search = $method->invoke(null); // Static !
 
         // $query->filterByXXX(id)
         if (null !== $object_id) {
-            $method = new ReflectionMethod($queryClass, $filterMethod);
+            $method = new \ReflectionMethod($queryClass, $filterMethod);
             $method->invoke($search, $object_id);
         }
 
@@ -204,7 +202,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             $id = $this->getId();
 
             if (null === $sourceId && null === $id) {
-                throw new InvalidArgumentException(
+                throw new \InvalidArgumentException(
                     "If 'source' argument is specified, 'id' or 'source_id' argument should be specified"
                 );
             }
@@ -232,8 +230,8 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         if ($search == null) {
-            throw new InvalidArgumentException(
-                sprintf('Unable to find image source. Valid sources are %s', implode(',', $this->possible_sources))
+            throw new \InvalidArgumentException(
+                \sprintf('Unable to find image source. Valid sources are %s', implode(',', $this->possible_sources))
             );
         }
 
@@ -336,7 +334,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             }
 
             // Put source image file path
-            $sourceFilePath = sprintf(
+            $sourceFilePath = \sprintf(
                 '%s/%s/%s',
                 $baseSourceFilePath,
                 $this->objectType,
@@ -384,9 +382,9 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 if ($this->getBase64()) {
                     $loopResultRow->set('IMAGE_BASE64', $this->toBase64($event->getCacheFilepath()));
                 }
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 // Ignore the result and log an error
-                Tlog::getInstance()->addError(sprintf('Failed to process image in image loop: %s', $ex->getMessage()));
+                Tlog::getInstance()->addError(\sprintf('Failed to process image in image loop: %s', $ex->getMessage()));
 
                 if ($returnErroredImages) {
                     $loopResultRow

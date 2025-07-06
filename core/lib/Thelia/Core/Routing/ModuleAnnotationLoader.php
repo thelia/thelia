@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Routing;
 
-use RuntimeException;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
 use Symfony\Component\Config\FileLocator;
@@ -26,10 +26,10 @@ class ModuleAnnotationLoader extends Loader
 {
     private bool $isLoaded = false;
 
-    public function load(mixed $resource, string $type = null): RouteCollection
+    public function load(mixed $resource, ?string $type = null): RouteCollection
     {
         if ($this->isLoaded) {
-            throw new RuntimeException('Do not add the "module_annotation" loader twice');
+            throw new \RuntimeException('Do not add the "module_annotation" loader twice');
         }
 
         $annotationReader = new AnnotationReader();
@@ -70,7 +70,7 @@ class ModuleAnnotationLoader extends Loader
         return $routes;
     }
 
-    public function supports(mixed $resource, string $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         return 'module_annotation' === $type;
     }

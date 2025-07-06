@@ -11,15 +11,15 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Type;
 
 use Iterator;
-use ReturnTypeWillChange;
 
 /**
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class TypeCollection implements Iterator
+class TypeCollection implements \Iterator
 {
     private ?int $position = null;
 
@@ -57,7 +57,7 @@ class TypeCollection implements Iterator
      *
      * @return TypeInterface
      */
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return $this->types[$this->position];
@@ -84,7 +84,7 @@ class TypeCollection implements Iterator
      *
      * @return mixed scalar on success, or null on failure
      */
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return $this->position;

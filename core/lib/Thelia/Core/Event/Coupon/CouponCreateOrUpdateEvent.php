@@ -11,13 +11,13 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event\Coupon;
 
-
-use Thelia\Model\Exception\InvalidArgumentException;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Coupon;
+use Thelia\Model\Exception\InvalidArgumentException;
 
 /**
  * Occurring when a Coupon is created or updated.
@@ -41,25 +41,25 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /**
      * Constructor.
      *
-     * @param string    $code                       Coupon Code
-     * @param string    $serviceId                  Coupon Service id
-     * @param string    $title                      Coupon title
-     * @param array     $effects                    Coupon effects ready to be serialized
-     *                                              'amount' key is mandatory and reflects
-     *                                              the amount deduced from the cart
-     * @param string    $shortDescription           Coupon short description
-     * @param string    $description                Coupon description
-     * @param bool      $isEnabled                  Enable/Disable
-     * @param DateTime $expirationDate Coupon expiration date
-     * @param bool      $isAvailableOnSpecialOffers Is available on special offers
-     * @param bool      $isCumulative               Is cumulative
-     * @param bool      $isRemovingPostage          Is removing Postage
-     * @param int       $maxUsage                   Coupon quantity
-     * @param string    $locale                     Coupon Language code ISO (ex: fr_FR)
-     * @param array     $freeShippingForCountries   ID of Countries to which shipping is free
-     * @param array     $freeShippingForMethods     ID of Shipping modules for which shipping is free
-     * @param bool      $perCustomerUsageCount      Usage count is per customer
-     * @param DateTime $startDate Coupon start date
+     * @param string   $code                       Coupon Code
+     * @param string   $serviceId                  Coupon Service id
+     * @param string   $title                      Coupon title
+     * @param array    $effects                    Coupon effects ready to be serialized
+     *                                             'amount' key is mandatory and reflects
+     *                                             the amount deduced from the cart
+     * @param string   $shortDescription           Coupon short description
+     * @param string   $description                Coupon description
+     * @param bool     $isEnabled                  Enable/Disable
+     * @param DateTime $expirationDate             Coupon expiration date
+     * @param bool     $isAvailableOnSpecialOffers Is available on special offers
+     * @param bool     $isCumulative               Is cumulative
+     * @param bool     $isRemovingPostage          Is removing Postage
+     * @param int      $maxUsage                   Coupon quantity
+     * @param string   $locale                     Coupon Language code ISO (ex: fr_FR)
+     * @param array    $freeShippingForCountries   ID of Countries to which shipping is free
+     * @param array    $freeShippingForMethods     ID of Shipping modules for which shipping is free
+     * @param bool     $perCustomerUsageCount      Usage count is per customer
+     * @param DateTime $startDate                  Coupon start date
      */
     public function __construct(
         protected $code,
@@ -78,7 +78,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
         protected $freeShippingForCountries,
         protected $freeShippingForMethods,
         protected $perCustomerUsageCount,
-        protected ?DateTime $startDate = null
+        protected ?DateTime $startDate = null,
     ) {
         $this->setEffects($effects);
     }
@@ -215,8 +215,6 @@ class CouponCreateOrUpdateEvent extends ActionEvent
 
     /**
      * Return Coupon start date.
-     *
-     * @return DateTime
      */
     public function getStartDate(): ?DateTime
     {

@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Security\Authentication;
 
-use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Validator\Exception\ValidatorException;
@@ -25,9 +25,7 @@ use Thelia\Model\Customer;
 
 class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
 {
-
     protected $loginForm;
-
 
     protected $options;
 
@@ -72,7 +70,7 @@ class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
             $authOk = $user->checkPassword($password) === true;
 
             if (!$authOk) {
-                throw new WrongPasswordException(sprintf("Wrong password for user '%s'.", $username));
+                throw new WrongPasswordException(\sprintf("Wrong password for user '%s'.", $username));
             }
 
             // Customer email confirmation feature is available since Thelia 2.3.4
@@ -83,6 +81,6 @@ class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
             return $user;
         }
 
-        throw new RuntimeException('Invalid method.');
+        throw new \RuntimeException('Invalid method.');
     }
 }

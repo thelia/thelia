@@ -11,13 +11,13 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Action;
 
-use Exception;
-use Propel\Runtime\Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
+use Propel\Runtime\Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Product\ProductCloneEvent;
@@ -54,7 +54,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     /**
      * Create a new product sale element, with or without combination.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function create(ProductSaleElementCreateEvent $event): void
     {
@@ -101,7 +101,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
             // Store all the stuff !
             $con->commit();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $con->rollback();
 
             throw $exception;
@@ -111,7 +111,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     /**
      * Update an existing product sale element.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function update(ProductSaleElementUpdateEvent $event): void
     {
@@ -201,7 +201,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
             // Store all the stuff !
             $con->commit();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $con->rollback();
 
             throw $exception;
@@ -211,7 +211,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a product sale element.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function delete(ProductSaleElementDeleteEvent $event): void
     {
@@ -253,7 +253,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
                 // Store all the stuff !
                 $con->commit();
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 $con->rollback();
 
                 throw $ex;
@@ -264,7 +264,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     /**
      * Generate combinations. All existing combinations for the product are deleted.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function generateCombinations(ProductCombinationGenerationEvent $event): void
     {
@@ -302,7 +302,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
             // Store all the stuff !
             $con->commit();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $con->rollback();
 
             throw $exception;
@@ -441,7 +441,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             $originalProductPSEFileId = null;
 
             if (!\in_array($type, ['image', 'document'])) {
-                throw new Exception(Translator::getInstance()->trans('Cloning files of type %type is not allowed.', ['%type' => $type], 'core'));
+                throw new \Exception(Translator::getInstance()->trans('Cloning files of type %type is not allowed.', ['%type' => $type], 'core'));
             }
 
             // Get file's original position

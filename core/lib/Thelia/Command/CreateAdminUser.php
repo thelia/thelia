@@ -11,11 +11,10 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
-use Exception;
-use RuntimeException;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -87,10 +86,10 @@ class CreateAdminUser extends ContainerAwareCommand
         $admin->save();
 
         $output->writeln([
-                '',
-                '<info>User '.$admin->getLogin().' successfully created.</info>',
-                '',
-            ]);
+            '',
+            '<info>User '.$admin->getLogin().' successfully created.</info>',
+            '',
+        ]);
 
         return 0;
     }
@@ -101,7 +100,7 @@ class CreateAdminUser extends ContainerAwareCommand
         OutputInterface $output,
         $label,
         $errorMessage,
-        $hidden = false
+        $hidden = false,
     ): mixed {
         $question = new Question($this->decorateInfo($label));
 
@@ -112,7 +111,7 @@ class CreateAdminUser extends ContainerAwareCommand
 
         $question->setValidator(function ($value) use (&$errorMessage) {
             if (trim($value) === '') {
-                throw new Exception($errorMessage);
+                throw new \Exception($errorMessage);
             }
 
             return $value;
@@ -160,7 +159,7 @@ class CreateAdminUser extends ContainerAwareCommand
 
     protected function decorateInfo($text): string
     {
-        return sprintf('<info>%s</info>', $text);
+        return \sprintf('<info>%s</info>', $text);
     }
 
     protected function enterLogin(QuestionHelper $helper, InputInterface $input, OutputInterface $output): mixed
@@ -170,11 +169,11 @@ class CreateAdminUser extends ContainerAwareCommand
         $question->setValidator(function ($answer): string {
             $answer = trim($answer);
             if ($answer === '' || $answer === '0') {
-                throw new RuntimeException('Please enter a login name.');
+                throw new \RuntimeException('Please enter a login name.');
             }
 
             if (AdminQuery::create()->findOneByLogin($answer)) {
-                throw new RuntimeException('An administrator with this login already exists.');
+                throw new \RuntimeException('An administrator with this login already exists.');
             }
 
             return $answer;
@@ -190,11 +189,11 @@ class CreateAdminUser extends ContainerAwareCommand
         $question->setValidator(function ($answer): string {
             $answer = trim($answer);
             if ($answer !== '' && $answer !== '0' && !filter_var($answer, \FILTER_VALIDATE_EMAIL)) {
-                throw new RuntimeException('Please enter an email or an empty value.');
+                throw new \RuntimeException('Please enter an email or an empty value.');
             }
 
             if (AdminQuery::create()->findOneByEmail($answer)) {
-                throw new RuntimeException('An administrator with this email already exists.');
+                throw new \RuntimeException('An administrator with this email already exists.');
             }
 
             return $answer === '' || $answer === '0' ? uniqid('CHANGE_ME_') : $answer;

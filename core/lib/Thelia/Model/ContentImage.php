@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-use Thelia\Model\Tools\PositionManagementTrait;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\Routing\Router;
@@ -24,6 +24,7 @@ use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\ContentImage as BaseContentImage;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
 use Thelia\Model\Breadcrumb\FolderBreadcrumbTrait;
+use Thelia\Model\Tools\PositionManagementTrait;
 
 class ContentImage extends BaseContentImage implements BreadcrumbInterface, FileModelInterface
 {
@@ -40,7 +41,7 @@ class ContentImage extends BaseContentImage implements BreadcrumbInterface, File
         $query->filterByContent($this->getContent());
     }
 
-    public function preInsert(ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null)
     {
         parent::preInsert($con);
 
@@ -61,7 +62,7 @@ class ContentImage extends BaseContentImage implements BreadcrumbInterface, File
         return $this->getContentId();
     }
 
-    public function preDelete(ConnectionInterface $con = null)
+    public function preDelete(?ConnectionInterface $con = null)
     {
         parent::preDelete($con);
 

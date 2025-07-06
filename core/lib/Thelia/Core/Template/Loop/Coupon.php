@@ -11,10 +11,11 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop;
 
-use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Exception\PropelException;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Core\Template\Element\BaseI18nLoop;
@@ -60,14 +61,14 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 new TypeCollection(
                     new EnumListType(
                         [
-                        'id', 'id-reverse',
-                        'code', 'code-reverse',
-                        'title', 'title-reverse',
-                        'enabled', 'enabled-reverse',
-                        'start-date', 'start-date-reverse',
-                        'expiration-date', 'expiration-date-reverse',
-                        'days-left', 'days-left-reverse',
-                        'usages-left', 'usages-left-reverse',
+                            'id', 'id-reverse',
+                            'code', 'code-reverse',
+                            'title', 'title-reverse',
+                            'enabled', 'enabled-reverse',
+                            'start-date', 'start-date-reverse',
+                            'expiration-date', 'expiration-date-reverse',
+                            'days-left', 'days-left-reverse',
+                            'usages-left', 'usages-left-reverse',
                         ]
                     )
                 ),

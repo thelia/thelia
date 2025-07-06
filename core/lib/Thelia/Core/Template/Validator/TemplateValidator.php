@@ -11,10 +11,10 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Validator;
 
 use Exception;
-use SimpleXMLElement;
 use Thelia\Core\Template\Exception\TemplateException;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Thelia;
@@ -41,13 +41,13 @@ class TemplateValidator
     /** @var array array of errors */
     protected $errors = [];
 
-    /** @var SimpleXMLElement */
+    /** @var \SimpleXMLElement */
     protected $xmlDescriptorContent;
 
     /**
      * TemplateValidator constructor.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function __construct(string $templatePath)
     {
@@ -73,7 +73,7 @@ class TemplateValidator
      * @param string $name the template directory name
      * @param int    $type the template type (front, back, etc.)
      *
-     * @throws Exception
+     * @throws \Exception
      *
      * @return TemplateDescriptor the template descriptor
      */
@@ -110,7 +110,7 @@ class TemplateValidator
                             $type
                         )
                     );
-                } catch (Exception) {
+                } catch (\Exception) {
                     // The Translator could not be initialized, take care of this.
                     try {
                         $message = Translator::getInstance()->trans(
@@ -120,7 +120,7 @@ class TemplateValidator
                                 '%name' => $templateDescriptor->getName(),
                             ]
                         );
-                    } catch (Exception) {
+                    } catch (\Exception) {
                         $message = \sprintf(
                             'The parent template "%s" of template "%s" could not be found',
                             $templateDescriptor->getParent()->getName(),
@@ -151,7 +151,7 @@ class TemplateValidator
                         '%version' => $templateDescriptor->getTheliaVersion(),
                     ]
                 );
-            } catch (Exception) {
+            } catch (\Exception) {
                 $message = \sprintf(
                     'The template "%s" requires Thelia %s or newer',
                     $templateDescriptor->getName(),

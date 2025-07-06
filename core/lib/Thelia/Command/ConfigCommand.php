@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -146,18 +147,18 @@ class ConfigCommand extends ContainerAwareCommand
         $out = [];
 
         if (null === $var) {
-            $out[] = sprintf(
+            $out[] = \sprintf(
                 "<error>Unknown variable '%s'</error>",
                 $varName
             );
         } else {
             $out = [
-                sprintf('%12s: <%3$s>%s</%3$s>', 'Name', $var->getName(), 'info'),
-                sprintf('%12s: <%3$s>%s</%3$s>', 'Value', $var->getValue(), 'info'),
-                sprintf('%12s: <%3$s>%s</%3$s>', 'Secured', $var->getSecured() ? 'yes' : 'no', 'info'),
-                sprintf('%12s: <%3$s>%s</%3$s>', 'Hidden', $var->getHidden() ? 'yes' : 'no', 'info'),
-                sprintf('%12s: <%3$s>%s</%3$s>', 'Title', $var->getTitle(), 'info'),
-                sprintf('%12s: <%3$s>%s</%3$s>', 'Description', $var->getDescription(), 'info'),
+                \sprintf('%12s: <%3$s>%s</%3$s>', 'Name', $var->getName(), 'info'),
+                \sprintf('%12s: <%3$s>%s</%3$s>', 'Value', $var->getValue(), 'info'),
+                \sprintf('%12s: <%3$s>%s</%3$s>', 'Secured', $var->getSecured() ? 'yes' : 'no', 'info'),
+                \sprintf('%12s: <%3$s>%s</%3$s>', 'Hidden', $var->getHidden() ? 'yes' : 'no', 'info'),
+                \sprintf('%12s: <%3$s>%s</%3$s>', 'Title', $var->getTitle(), 'info'),
+                \sprintf('%12s: <%3$s>%s</%3$s>', 'Description', $var->getDescription(), 'info'),
             ];
         }
 
@@ -207,7 +208,7 @@ class ConfigCommand extends ContainerAwareCommand
 
         if (null === $var) {
             $output->writeln(
-                sprintf(
+                \sprintf(
                     "<error>Unknown variable '%s'</error>",
                     $varName
                 )
@@ -215,7 +216,7 @@ class ConfigCommand extends ContainerAwareCommand
         } else {
             $var->delete();
             $output->writeln(
-                sprintf(
+                \sprintf(
                     "<info>Variable '%s' has been deleted</info>",
                     $varName
                 )

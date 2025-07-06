@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Action;
 
-use InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -65,7 +65,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
      * @param DocumentEvent $event Event
      *
      * @throws DocumentException
-     * @throws InvalidArgumentException , DocumentException
+     * @throws \InvalidArgumentException , DocumentException
      */
     public function processDocument(DocumentEvent $event): void
     {
@@ -73,25 +73,25 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
         $sourceFile = $event->getSourceFilepath();
 
         if (null == $subdir || null == $sourceFile) {
-            throw new InvalidArgumentException('Cache sub-directory and source file path cannot be null');
+            throw new \InvalidArgumentException('Cache sub-directory and source file path cannot be null');
         }
 
         $originalDocumentPathInCache = $this->getCacheFilePath($subdir, $sourceFile, true);
 
         if (!file_exists($originalDocumentPathInCache)) {
             if (!file_exists($sourceFile)) {
-                throw new DocumentException(sprintf('Source document file %s does not exists.', $sourceFile));
+                throw new DocumentException(\sprintf('Source document file %s does not exists.', $sourceFile));
             }
 
             $mode = ConfigQuery::read(self::CONFIG_DELIVERY_MODE, 'symlink');
 
             if ($mode == 'symlink') {
                 if (false === symlink($sourceFile, $originalDocumentPathInCache)) {
-                    throw new DocumentException(sprintf('Failed to create symbolic link for %s in %s document cache directory', basename((string) $sourceFile), $subdir));
+                    throw new DocumentException(\sprintf('Failed to create symbolic link for %s in %s document cache directory', basename((string) $sourceFile), $subdir));
                 }
             } elseif (false === @copy($sourceFile, $originalDocumentPathInCache)) {
                 // mode = 'copy'
-                throw new DocumentException(sprintf('Failed to copy %s in %s document cache directory', basename((string) $sourceFile), $subdir));
+                throw new DocumentException(\sprintf('Failed to copy %s in %s document cache directory', basename((string) $sourceFile), $subdir));
             }
         }
 

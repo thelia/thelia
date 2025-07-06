@@ -11,19 +11,17 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-
-use Exception;
-use InvalidArgumentException;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
@@ -67,7 +65,7 @@ class AddressController extends AbstractCrudController
             $address = AddressQuery::create()->findPk($address_id);
 
             if (null === $address) {
-                throw new InvalidArgumentException(sprintf('%d address does not exists', $address_id));
+                throw new \InvalidArgumentException(\sprintf('%d address does not exists', $address_id));
             }
 
             $addressEvent = new AddressEvent($address);
@@ -77,15 +75,15 @@ class AddressController extends AbstractCrudController
             $this->adminLogAppend(
                 $this->resourceCode,
                 AccessManager::UPDATE,
-                sprintf(
+                \sprintf(
                     'address %d for customer %d set as default address',
                     $address_id,
                     $address->getCustomerId()
                 ),
                 $address_id
             );
-        } catch (Exception $exception) {
-            Tlog::getInstance()->error(sprintf('error during address setting as default with message %s',
+        } catch (\Exception $exception) {
+            Tlog::getInstance()->error(\sprintf('error during address setting as default with message %s',
                 $exception->getMessage()));
         }
 
@@ -181,6 +179,7 @@ class AddressController extends AbstractCrudController
     protected function getDeleteEvent(): ActionEvent
     {
         $address = $this->getExistingObject();
+
         return new AddressCreateOrUpdateEvent(
             $address->getLabel(),
             $address->getTitleId(),

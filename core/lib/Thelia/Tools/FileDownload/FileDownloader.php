@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Tools\FileDownload;
 
-use ErrorException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Translator;
 use Thelia\Core\Translation\Translator as TheliaTranslator;
@@ -43,7 +43,7 @@ class FileDownloader implements FileDownloaderInterface
      * @param string $pathToStore
      *
      * @throws FileNotFoundException
-     * @throws ErrorException
+     * @throws \ErrorException
      * @throws \HttpUrlException
      *
      * Downloads the file $url in $pathToStore
@@ -130,7 +130,7 @@ class FileDownloader implements FileDownloaderInterface
             );
 
             $this->logger->error($translatedErrorMessage);
-            throw new ErrorException($translatedErrorMessage);
+            throw new \ErrorException($translatedErrorMessage);
         }
 
         fwrite($file, $response);

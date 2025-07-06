@@ -11,13 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Coupon;
 
-use Exception;
-use LogicException;
-use Thelia\Model\Cart;
-use Thelia\Model\Address;
-use Thelia\Model\Customer;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -27,11 +23,14 @@ use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\Cart;
 use Thelia\Model\Country;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Model\Customer;
 use Thelia\TaxEngine\TaxEngine;
 
 /**
@@ -41,18 +40,12 @@ use Thelia\TaxEngine\TaxEngine;
  */
 class BaseFacade implements FacadeInterface
 {
-
-
     /**
      * @var CouponFactory
      */
     protected $couponFactory;
 
-
-
     protected ?\Symfony\Component\HttpFoundation\Request $request;
-
-
 
     /**
      * Constructor.
@@ -64,7 +57,7 @@ class BaseFacade implements FacadeInterface
         protected ParserInterface $parser,
         RequestStack $requestStack,
         protected ConditionEvaluator $conditionEvaluator,
-        protected EventDispatcherInterface $eventDispatcher
+        protected EventDispatcherInterface $eventDispatcher,
     ) {
         $this->request = $requestStack->getCurrentRequest();
     }
@@ -90,8 +83,8 @@ class BaseFacade implements FacadeInterface
             return AddressQuery::create()->findPk(
                 $this->getRequest()->getSession()->getOrder()->getChoosenDeliveryAddress()
             );
-        } catch (Exception $exception) {
-            throw new LogicException('Failed to get delivery address ('.$exception->getMessage().')', $exception->getCode(), $exception);
+        } catch (\Exception $exception) {
+            throw new \LogicException('Failed to get delivery address ('.$exception->getMessage().')', $exception->getCode(), $exception);
         }
     }
 

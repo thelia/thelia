@@ -11,13 +11,13 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-
-use Exception;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Content\ContentAddFolderEvent;
@@ -29,7 +29,6 @@ use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
@@ -84,7 +83,7 @@ class ContentController extends AbstractSeoCrudController
 
             try {
                 $eventDispatcher->dispatch($event, TheliaEvents::CONTENT_ADD_FOLDER);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 return $this->errorPage($e);
             }
         }
@@ -114,7 +113,7 @@ class ContentController extends AbstractSeoCrudController
 
             try {
                 $eventDispatcher->dispatch($event, TheliaEvents::CONTENT_REMOVE_FOLDER);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 return $this->errorPage($e);
             }
         }
@@ -255,7 +254,8 @@ class ContentController extends AbstractSeoCrudController
      *
      * @return string content title
      */
-    protected function getObjectLabel(activeRecordInterface $object): ?string    {
+    protected function getObjectLabel(ActiveRecordInterface $object): ?string
+    {
         return $object->getTitle();
     }
 
@@ -347,7 +347,7 @@ class ContentController extends AbstractSeoCrudController
     /**
      * @return Response|void
      */
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): ?\Symfony\Component\HttpFoundation\Response
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): ?Response
     {
         if ($this->getRequest()->get('save_mode') != 'stay') {
             return $this->generateRedirectFromRoute(
@@ -366,7 +366,7 @@ class ContentController extends AbstractSeoCrudController
      *
      * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent): ?\Symfony\Component\HttpFoundation\Response
+    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent): ?Response
     {
         return $this->generateRedirectFromRoute(
             'admin.folders.default',
@@ -376,10 +376,8 @@ class ContentController extends AbstractSeoCrudController
 
     /**
      * @param $positionChangeEvent ActionEvent
-     *
-     * @return Response|null
      */
-    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent): ?\Symfony\Component\HttpFoundation\Response
+    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent): ?Response
     {
         if (null !== $content = ContentQuery::create()->findPk($positionChangeEvent->getObjectId())) {
             // Redirect to parent category list

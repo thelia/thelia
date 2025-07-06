@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop;
 
-use Thelia\Type\EnumListType;
-use InvalidArgumentException;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -30,6 +29,7 @@ use Thelia\Model\ContentQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Map\ContentTableMap;
 use Thelia\Type\BooleanOrBothType;
+use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
 
 /**
@@ -236,26 +236,26 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     break;
                 case 'manual':
                     if (!$manualOrderAllowed) {
-                        throw new InvalidArgumentException('Manual order cannot be set without single folder argument');
+                        throw new \InvalidArgumentException('Manual order cannot be set without single folder argument');
                     }
 
                     $search->addAscendingOrderByColumn('position_delegate');
                     break;
                 case 'manual_reverse':
                     if (!$manualOrderAllowed) {
-                        throw new InvalidArgumentException('Manual order cannot be set without single folder argument');
+                        throw new \InvalidArgumentException('Manual order cannot be set without single folder argument');
                     }
 
                     $search->addDescendingOrderByColumn('position_delegate');
                     break;
                 case 'given_id':
                     if (null === $id) {
-                        throw new InvalidArgumentException('Given_id order cannot be set without `id` argument');
+                        throw new \InvalidArgumentException('Given_id order cannot be set without `id` argument');
                     }
 
                     foreach ($id as $singleId) {
                         $givenIdMatched = 'given_id_matched_'.$singleId;
-                        $search->withColumn(ContentTableMap::COL_ID.sprintf("='%d'", $singleId), $givenIdMatched);
+                        $search->withColumn(ContentTableMap::COL_ID.\sprintf("='%d'", $singleId), $givenIdMatched);
                         $search->orderBy($givenIdMatched, Criteria::DESC);
                     }
 

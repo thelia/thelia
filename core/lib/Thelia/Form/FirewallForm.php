@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Form;
 
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -33,7 +34,7 @@ abstract class FirewallForm extends BaseForm
      */
     public const DEFAULT_TIME_TO_WAIT = 60;
 
-     // 1 hour
+    // 1 hour
     public const DEFAULT_ATTEMPTS = 6;
 
     public function isFirewallOk($env)

@@ -2,20 +2,24 @@
 
 declare(strict_types=1);
 
-namespace Thelia\Api\Bridge\Propel\Service;
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
-use ReflectionException;
-use ReflectionMethod;
-use ReflectionNamedType;
-use ReflectionType;
+namespace Thelia\Api\Bridge\Propel\Service;
 
 class TypeCasterService
 {
-
     public function castValueForSetter(object $object, string $setterName, mixed $value): mixed
     {
         try {
-            $reflection = new ReflectionMethod($object, $setterName);
+            $reflection = new \ReflectionMethod($object, $setterName);
             $parameters = $reflection->getParameters();
 
             if (empty($parameters)) {
@@ -25,7 +29,7 @@ class TypeCasterService
             $firstParameter = $parameters[0];
             $parameterType = $firstParameter->getType();
 
-            if (!$parameterType instanceof ReflectionType) {
+            if (!$parameterType instanceof \ReflectionType) {
                 return $value;
             }
 
@@ -38,15 +42,14 @@ class TypeCasterService
             }
 
             return $this->castValueToType($value, $parameterType);
-
-        } catch (ReflectionException) {
+        } catch (\ReflectionException) {
             return $value;
         }
     }
 
-    private function castValueToType(mixed $value, ReflectionType $type): mixed
+    private function castValueToType(mixed $value, \ReflectionType $type): mixed
     {
-        if ($type instanceof ReflectionNamedType) {
+        if ($type instanceof \ReflectionNamedType) {
             $typeName = $type->getName();
 
             // Types primitifs
@@ -55,7 +58,7 @@ class TypeCasterService
                 'int' => (int) $value,
                 'float' => (float) $value,
                 'bool' => (bool) $value,
-                'array' => is_array($value) ? $value : [$value],
+                'array' => \is_array($value) ? $value : [$value],
                 default => $value,
             };
         }
@@ -63,9 +66,9 @@ class TypeCasterService
         return $value;
     }
 
-    private function getDefaultValueForType(ReflectionType $type): mixed
+    private function getDefaultValueForType(\ReflectionType $type): mixed
     {
-        if ($type instanceof ReflectionNamedType) {
+        if ($type instanceof \ReflectionNamedType) {
             return match ($type->getName()) {
                 'string' => '',
                 'int' => 0,

@@ -11,16 +11,16 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\TaxEngine;
 
 use Iterator;
-use ReturnTypeWillChange;
 use Thelia\Model\OrderProductTax;
 
 /**
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class OrderProductTaxCollection implements Iterator
+class OrderProductTaxCollection implements \Iterator
 {
     private ?int $position = null;
 
@@ -58,7 +58,7 @@ class OrderProductTaxCollection implements Iterator
      *
      * @return OrderProductTax
      */
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return $this->taxes[$this->position];
@@ -85,7 +85,7 @@ class OrderProductTaxCollection implements Iterator
      *
      * @return mixed scalar on success, or null on failure
      */
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return $this->position;

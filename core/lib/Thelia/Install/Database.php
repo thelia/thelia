@@ -11,12 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Install;
 
-use InvalidArgumentException;
-use RuntimeException;
-use PDOException;
-use PDOStatement;
 use PDO;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Connection\ConnectionWrapper;
@@ -32,7 +29,7 @@ use Thelia\Log\Tlog;
 class Database
 {
     /**
-     * @var PDO
+     * @var \PDO
      */
     protected $connection;
 
@@ -40,9 +37,9 @@ class Database
      * Create a new instance, using the provided connection information, either none for
      * automatically a connection, a ConnectionWrapper instance (through ConnectionInterface) or a PDO connection.
      *
-     * @param ConnectionInterface|PDO|null $connection the connection object
+     * @param ConnectionInterface|\PDO|null $connection the connection object
      *
-     * @throws InvalidArgumentException if $connection is not of the suitable type
+     * @throws \InvalidArgumentException if $connection is not of the suitable type
      */
     public function __construct($connection = null)
     {
@@ -56,8 +53,8 @@ class Database
             $connection = $connection->getWrappedConnection();
         }
 
-        if (!$connection instanceof PDO && !$connection instanceof ConnectionInterface) {
-            throw new InvalidArgumentException('A PDO connection should be provided');
+        if (!$connection instanceof \PDO && !$connection instanceof ConnectionInterface) {
+            throw new \InvalidArgumentException('A PDO connection should be provided');
         }
 
         $this->connection = $connection;
@@ -70,10 +67,10 @@ class Database
      * @param string $dbName        Database name
      * @param array  $extraSqlFiles SQL Files uri to insert
      */
-    public function insertSql($dbName = null, array $extraSqlFiles = null): void
+    public function insertSql($dbName = null, ?array $extraSqlFiles = null): void
     {
         if ($dbName) {
-            $this->connection->query(sprintf('use `%s`', $dbName));
+            $this->connection->query(\sprintf('use `%s`', $dbName));
         }
 
         $sql = [];
@@ -107,22 +104,22 @@ class Database
      * @param string $sql  SQL query
      * @param array  $args SQL request parameters (PDO style)
      *
-     * @throws RuntimeException|PDOException if something goes wrong
+     * @throws \RuntimeException|\PDOException if something goes wrong
      *
-     * @return PDOStatement
+     * @return \PDOStatement
      */
     public function execute($sql, $args = [])
     {
         $stmt = $this->connection->prepare($sql);
 
         if ($stmt === false) {
-            throw new RuntimeException(sprintf('Failed to prepare statement for %s: ', $sql).print_r($this->connection->errorInfo(), 1));
+            throw new \RuntimeException(\sprintf('Failed to prepare statement for %s: ', $sql).print_r($this->connection->errorInfo(), 1));
         }
 
         $success = $stmt->execute($args);
 
         if ($success === false || $stmt->errorCode() != 0) {
-            throw new RuntimeException(sprintf("Failed to execute SQL '%s', arguments:", $sql).print_r($args, 1).', error:'.print_r($stmt->errorInfo(), 1));
+            throw new \RuntimeException(\sprintf("Failed to execute SQL '%s', arguments:", $sql).print_r($args, 1).', error:'.print_r($stmt->errorInfo(), 1));
         }
 
         return $stmt;
@@ -138,7 +135,7 @@ class Database
         preg_match_all('#DELIMITER (.+?)\n(.+?)DELIMITER ;#s', $sql, $m);
         foreach ($m[0] as $k => $v) {
             if ($m[1][$k] == '|') {
-                throw new RuntimeException('You can not use "|" as delimiter: '.$v);
+                throw new \RuntimeException('You can not use "|" as delimiter: '.$v);
             }
 
             $stored = str_replace(';', '|', $m[2][$k]);
@@ -174,7 +171,7 @@ class Database
             $tables = [];
             $result = $this->connection->prepare('SHOW TABLES');
             $result->execute();
-            while ($row = $result->fetch(PDO::FETCH_NUM)) {
+            while ($row = $result->fetch(\PDO::FETCH_NUM)) {
                 $tables[] = $row[0];
             }
         } else {
@@ -188,7 +185,7 @@ class Database
         foreach ($tables as $table) {
             if (!preg_match("/^[\w_\-]+$/", (string) $table)) {
                 Tlog::getInstance()->alert(
-                    sprintf(
+                    \sprintf(
                         "Attempt to backup the db with this invalid table name: '%s'",
                         $table
                     )
@@ -205,14 +202,14 @@ class Database
 
             $resultStruct = $this->execute('SHOW CREATE TABLE `'.$table.'`');
 
-            $rowStruct = $resultStruct->fetch(PDO::FETCH_NUM);
+            $rowStruct = $resultStruct->fetch(\PDO::FETCH_NUM);
 
             $data[] = "\n\n";
             $data[] = $rowStruct[1];
             $data[] = ";\n\n";
 
             for ($i = 0; $i < $fieldCount; ++$i) {
-                while ($row = $result->fetch(PDO::FETCH_NUM)) {
+                while ($row = $result->fetch(\PDO::FETCH_NUM)) {
                     $data[] = 'INSERT INTO `'.$table.'` VALUES(';
                     for ($j = 0; $j < $fieldCount; ++$j) {
                         $row[$j] = addslashes((string) $row[$j]);
@@ -267,7 +264,7 @@ class Database
     public function createDatabase($dbName): void
     {
         $this->execute(
-            sprintf(
+            \sprintf(
                 'CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET utf8',
                 $dbName
             )
@@ -275,7 +272,7 @@ class Database
     }
 
     /**
-     * @return PDO
+     * @return \PDO
      */
     public function getConnection()
     {

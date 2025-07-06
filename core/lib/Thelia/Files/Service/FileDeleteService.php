@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Files\Service;
 
-use Exception;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\File\FileDeleteEvent;
@@ -23,13 +23,13 @@ use Thelia\Files\FileModelInterface;
 readonly class FileDeleteService
 {
     public function __construct(
-        private FileManager         $fileManager,
+        private FileManager $fileManager,
         private TranslatorInterface $translator,
     ) {
     }
 
     /**
-     * @throws Exception If file deletion fails
+     * @throws \Exception If file deletion fails
      */
     public function deleteFile(
         EventDispatcherInterface $eventDispatcher,
@@ -37,13 +37,13 @@ readonly class FileDeleteService
         string $parentType,
         string $objectType,
         string $eventName,
-        string $moduleRight = 'thelia'
+        string $moduleRight = 'thelia',
     ): string {
         $modelInstance = $this->fileManager->getModelInstance($objectType, $parentType);
         $model = $modelInstance->getQueryInstance()->findPk($fileId);
 
         if ($model === null) {
-            throw new Exception('File not found');
+            throw new \Exception('File not found');
         }
 
         // Feed event
@@ -58,7 +58,7 @@ readonly class FileDeleteService
                 ['%obj%' => ucfirst($objectType)],
                 'image'
             );
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $message = $this->translator->trans(
                 'Fail to delete %obj% for %id% with parent id %parentId% (Exception : %e%)',
                 [
@@ -69,7 +69,7 @@ readonly class FileDeleteService
                 ]
             );
 
-            throw new Exception($message, 0, $exception);
+            throw new \Exception($message, 0, $exception);
         }
 
         return $message;
@@ -83,6 +83,7 @@ readonly class FileDeleteService
     public function getFileById(string $objectType, string $parentType, int $fileId): ?FileModelInterface
     {
         $modelInstance = $this->fileManager->getModelInstance($objectType, $parentType);
+
         return $modelInstance->getQueryInstance()->findPk($fileId);
     }
 }

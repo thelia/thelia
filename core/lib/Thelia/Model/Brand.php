@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
@@ -29,7 +30,7 @@ class Brand extends BaseBrand implements FileModelParentInterface
         return 'brand';
     }
 
-    public function preInsert(ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null)
     {
         parent::preInsert($con);
 
@@ -39,7 +40,7 @@ class Brand extends BaseBrand implements FileModelParentInterface
         return true;
     }
 
-    public function postDelete(ConnectionInterface $con = null): void
+    public function postDelete(?ConnectionInterface $con = null): void
     {
         parent::postDelete($con);
 

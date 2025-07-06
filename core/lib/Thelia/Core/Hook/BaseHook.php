@@ -11,19 +11,19 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Hook;
 
-use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-use Thelia\Core\Template\ParserInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\Attribute\Required;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
 use Thelia\Core\Template\Parser\ParserResolver;
+use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Cart;
 use Thelia\Model\Currency;
@@ -79,8 +79,8 @@ abstract class BaseHook implements BaseHookInterface
     public ?ParserResolver $parserResolver = null;
 
     public function __construct(
-        EventDispatcherInterface $dispatcher = null,
-        ParserResolver $parserResolver = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?ParserResolver $parserResolver = null,
     ) {
         if ($dispatcher instanceof EventDispatcherInterface) {
             $this->dispatcher = $dispatcher;
@@ -153,7 +153,7 @@ abstract class BaseHook implements BaseHookInterface
             // retrieve the template
             $content = $this->getParser()->render($templateDir.DS.$templateName, $parameters);
         } else {
-            $content = sprintf('ERR: Unknown template %s for module %s', $templateName, $this->module->getCode());
+            $content = \sprintf('ERR: Unknown template %s for module %s', $templateName, $this->module->getCode());
         }
 
         return $content;
@@ -169,7 +169,7 @@ abstract class BaseHook implements BaseHookInterface
                 $content = '';
             }
         } else {
-            $content = sprintf('ERR: Unknown file %s for module %s', $fileName, $this->module->getCode());
+            $content = \sprintf('ERR: Unknown file %s for module %s', $fileName, $this->module->getCode());
         }
 
         return $content;
@@ -324,7 +324,7 @@ abstract class BaseHook implements BaseHookInterface
     public function addTemplate(string $hookCode, string $value): void
     {
         if (\array_key_exists($hookCode, $this->templates)) {
-            throw new InvalidArgumentException(sprintf("The hook '%s' is already used in this class.", $hookCode));
+            throw new \InvalidArgumentException(\sprintf("The hook '%s' is already used in this class.", $hookCode));
         }
 
         $this->templates[$hookCode] = $value;
@@ -340,8 +340,9 @@ abstract class BaseHook implements BaseHookInterface
         $templateParams = explode(':', (string) $template);
 
         if (\count($templateParams) > 1) {
-            return$templateParams;
+            return $templateParams;
         }
+
         return ['render', $templateParams[0]];
     }
 
@@ -366,8 +367,6 @@ abstract class BaseHook implements BaseHookInterface
      *      ],
      *      'another.hook' => [[...]]
      *  ]
-     *
-     * @return array
      */
     public static function getSubscribedHooks(): array
     {

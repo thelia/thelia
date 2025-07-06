@@ -11,19 +11,19 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Controller\Admin;
 
+namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Config\ConfigCreateEvent;
 use Thelia\Core\Event\Config\ConfigDeleteEvent;
 use Thelia\Core\Event\Config\ConfigUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
@@ -58,7 +58,7 @@ class ConfigController extends AbstractCrudController
      *
      * @return Response the response
      */
-    public function defaultAction(ConfigCacheService $configCacheService = null): \Symfony\Component\HttpFoundation\Response
+    public function defaultAction(?ConfigCacheService $configCacheService = null): Response
     {
         // Force reinit config cache
         if ($configCacheService instanceof ConfigCacheService) {
@@ -162,10 +162,9 @@ class ConfigController extends AbstractCrudController
 
     /**
      * @param Config $object
-     *
-     * @return string
      */
-    protected function getObjectLabel(activeRecordInterface $object): ?string    {
+    protected function getObjectLabel(ActiveRecordInterface $object): ?string
+    {
         return $object->getName();
     }
 

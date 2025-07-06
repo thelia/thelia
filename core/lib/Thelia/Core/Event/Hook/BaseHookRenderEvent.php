@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event\Hook;
 
-use InvalidArgumentException;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -33,9 +33,8 @@ class BaseHookRenderEvent extends Event
         /** @var array an array of arguments passed to the template engine function */
         protected array $arguments = [],
         /** @var array the variable currently defined in the template */
-        protected array $templateVars = []
-    )
-    {
+        protected array $templateVars = [],
+    ) {
     }
 
     /**
@@ -62,7 +61,6 @@ class BaseHookRenderEvent extends Event
 
     /**
      * Set all arguments.
-     *
      *
      * @return $this
      */
@@ -110,7 +108,7 @@ class BaseHookRenderEvent extends Event
      *
      * @return mixed|null the value of the argument or `$default` if it not exists
      */
-    public function getArgument(string $key, string $default = null)
+    public function getArgument(string $key, ?string $default = null)
     {
         return \array_key_exists($key, $this->arguments) ? $this->arguments[$key] : $default;
     }
@@ -130,14 +128,14 @@ class BaseHookRenderEvent extends Event
      *
      * @param string $templateVariableName the variable name
      *
-     * @throws InvalidArgumentException if the variable is not defined
+     * @throws \InvalidArgumentException if the variable is not defined
      *
      * @return mixed the variable value
      */
     public function getTemplateVar(string $templateVariableName)
     {
         if (!isset($this->templateVars[$templateVariableName])) {
-            throw new InvalidArgumentException(sprintf("Template variable '%s' is not defined.", $templateVariableName));
+            throw new \InvalidArgumentException(\sprintf("Template variable '%s' is not defined.", $templateVariableName));
         }
 
         return $this->templateVars[$templateVariableName];

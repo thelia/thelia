@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters;
 
 use ApiPlatform\Metadata\Operation;
@@ -25,7 +26,7 @@ class TheliaFilter extends AbstractFilter
         parent::__construct();
     }
 
-    protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
+    protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         $request = $context['request'] ?? null;
         if (!$request) {

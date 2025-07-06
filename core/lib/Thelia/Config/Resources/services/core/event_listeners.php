@@ -11,12 +11,13 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Thelia\Core\EventListener\ResponseListener;
-use Thelia\Core\EventListener\SessionListener;
 use Thelia\Core\EventListener\ControllerListener;
 use Thelia\Core\EventListener\ErrorListener;
+use Thelia\Core\EventListener\ResponseListener;
+use Thelia\Core\EventListener\SessionListener;
 
 return static function (ContainerConfigurator $configurator): void {
     $services = $configurator->services();

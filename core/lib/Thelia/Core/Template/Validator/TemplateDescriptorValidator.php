@@ -11,12 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Validator;
 
-use DOMDocument;
-use SplFileInfo;
-use Exception;
-use SimpleXMLElement;
 use Symfony\Component\Finder\Finder;
 use Thelia\Core\Template\Exception\InvalidDescriptorException;
 use Thelia\Log\Tlog;
@@ -54,13 +51,13 @@ class TemplateDescriptorValidator
      *
      * @throw InvalidDescriptorException
      */
-    public function validate(string $version = null): self
+    public function validate(?string $version = null): self
     {
-        $dom = new DOMDocument();
+        $dom = new \DOMDocument();
         $errors = [];
 
         if ($dom->load($this->xmlDescriptorPath)) {
-            /** @var SplFileInfo $xsdFile */
+            /** @var \SplFileInfo $xsdFile */
             foreach ($this->xsdFinder as $xsdFile) {
                 $xsdVersion = array_search($xsdFile->getBasename(), self::$versions, true);
 
@@ -77,7 +74,7 @@ class TemplateDescriptorValidator
         }
 
         throw new InvalidDescriptorException(
-            sprintf(
+            \sprintf(
                 '%s file is not a valid template descriptor : %s',
                 $this->xmlDescriptorPath,
                 implode(', ', $errors)
@@ -88,12 +85,12 @@ class TemplateDescriptorValidator
     /**
      * Validate the schema of a XML file with a given xsd file.
      *
-     * @param DOMDocument $dom The XML document
-     * @param SplFileInfo $xsdFile The XSD file
+     * @param \DOMDocument $dom     The XML document
+     * @param \SplFileInfo $xsdFile The XSD file
      *
      * @return array an array of errors if validation fails, otherwise an empty array
      */
-    protected function schemaValidate(DOMDocument $dom, SplFileInfo $xsdFile): array
+    protected function schemaValidate(\DOMDocument $dom, \SplFileInfo $xsdFile): array
     {
         $errorMessages = [];
 
@@ -104,7 +101,7 @@ class TemplateDescriptorValidator
                 $errors = libxml_get_errors();
 
                 foreach ($errors as $error) {
-                    $errorMessages[] = sprintf(
+                    $errorMessages[] = \sprintf(
                         'XML error "%s" [%d] (Code %d) in %s on line %d column %d'."\n",
                         $error->message,
                         $error->level,
@@ -119,7 +116,7 @@ class TemplateDescriptorValidator
             }
 
             libxml_use_internal_errors(false);
-        } catch (Exception) {
+        } catch (\Exception) {
             libxml_use_internal_errors(false);
         }
 
@@ -129,7 +126,7 @@ class TemplateDescriptorValidator
     /**
      * @return object|null
      */
-    public function getDescriptor(): SimpleXMLElement|false|null
+    public function getDescriptor(): \SimpleXMLElement|false|null
     {
         if (file_exists($this->xmlDescriptorPath)) {
             $this->validate();
@@ -137,7 +134,8 @@ class TemplateDescriptorValidator
             return @simplexml_load_file($this->xmlDescriptorPath);
         }
 
-        Tlog::getInstance()->addWarning(sprintf('Template descriptor %s does not exists.', $this->xmlDescriptorPath));
+        Tlog::getInstance()->addWarning(\sprintf('Template descriptor %s does not exists.', $this->xmlDescriptorPath));
+
         return null;
     }
 }

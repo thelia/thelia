@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Archiver;
 
-use InvalidArgumentException;
-use Exception;
 use Thelia\Core\Translation\Translator;
 
 /**
@@ -33,7 +32,7 @@ class ArchiverManager
         return $this;
     }
 
-    public function getArchivers(bool $isAvailable = null): array
+    public function getArchivers(?bool $isAvailable = null): array
     {
         if ($isAvailable === null) {
             return $this->archivers;
@@ -52,14 +51,14 @@ class ArchiverManager
     }
 
     /**
-     * @throws InvalidArgumentException if the archiver identifier does not exist
+     * @throws \InvalidArgumentException if the archiver identifier does not exist
      */
     public function has(string $archiverId, bool $throwException = false): bool
     {
         $exists = isset($this->archivers[$archiverId]);
 
         if (!$exists && $throwException) {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 Translator::getInstance()->trans(
                     'The archiver identifier "%archiverId" doesn\’t exist',
                     [
@@ -72,7 +71,7 @@ class ArchiverManager
         return $exists;
     }
 
-    public function get(string $archiverId, bool $isAvailable = null): ?ArchiverInterface
+    public function get(string $archiverId, ?bool $isAvailable = null): ?ArchiverInterface
     {
         $this->has($archiverId, true);
 
@@ -93,7 +92,7 @@ class ArchiverManager
 
         foreach ($archivers as $archiver) {
             if (!($archiver instanceof ArchiverInterface)) {
-                throw new Exception('ArchiverManager manage only '.__NAMESPACE__.'\\ArchiverInterface');
+                throw new \Exception('ArchiverManager manage only '.__NAMESPACE__.'\\ArchiverInterface');
             }
 
             $this->archivers[$archiver->getId()] = $archiver;

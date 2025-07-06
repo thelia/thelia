@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Coupon;
 
-use Exception;
-use LogicException;
 use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Exception\UnmatchableConditionException;
@@ -48,9 +47,8 @@ class CouponManager
     public function __construct(
         /** @var FacadeInterface Provides necessary value from Thelia */
         protected FacadeInterface $facade,
-        private readonly CouponFactory $couponFactory
-    )
-    {
+        private readonly CouponFactory $couponFactory,
+    ) {
     }
 
     /**
@@ -103,10 +101,10 @@ class CouponManager
                 if (false !== $couponInterface = $this->couponFactory->buildCouponFromCode($couponCode)) {
                     $coupons[] = $couponInterface;
                 }
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 // Just ignore the coupon and log the problem, just in case someone realize it.
                 Tlog::getInstance()->warning(
-                    sprintf('Coupon %s ignored, exception occurred: %s', $couponCode, $ex->getMessage())
+                    \sprintf('Coupon %s ignored, exception occurred: %s', $couponCode, $ex->getMessage())
                 );
             }
         }
@@ -329,8 +327,8 @@ class CouponManager
      *
      * To call when a coupon is consumed
      *
-     * @param Coupon $coupon Coupon consumed
-     * @param int|null             $customerId the ID of the ordering customer
+     * @param Coupon   $coupon     Coupon consumed
+     * @param int|null $customerId the ID of the ordering customer
      *
      * @return int Usage left after decremental
      */
@@ -347,7 +345,7 @@ class CouponManager
                 // If the coupon usage is per user, add an entry to coupon customer usage count table
                 if ($coupon->getPerCustomerUsageCount()) {
                     if (null == $customerId) {
-                        throw new LogicException('Customer should not be null at this time.');
+                        throw new \LogicException('Customer should not be null at this time.');
                     }
 
                     $ccc = CouponCustomerCountQuery::create()
@@ -381,9 +379,9 @@ class CouponManager
 
                 return $usageLeft;
             }
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             // Just log the problem.
-            Tlog::getInstance()->addError(sprintf('Failed to decrement coupon %s: %s', $coupon->getCode(), $exception->getMessage()));
+            Tlog::getInstance()->addError(\sprintf('Failed to decrement coupon %s: %s', $coupon->getCode(), $exception->getMessage()));
         }
 
         return false;
@@ -406,7 +404,7 @@ class CouponManager
             // If the coupon usage is per user, remove an entry from coupon customer usage count table
             if ($coupon->getPerCustomerUsageCount()) {
                 if (null == $customerId) {
-                    throw new LogicException('Customer should not be null at this time.');
+                    throw new \LogicException('Customer should not be null at this time.');
                 }
 
                 $ccc = CouponCustomerCountQuery::create()
@@ -432,9 +430,9 @@ class CouponManager
 
                 return $usageLeft;
             }
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             // Just log the problem.
-            Tlog::getInstance()->addError(sprintf('Failed to increment coupon %s: %s', $coupon->getCode(), $exception->getMessage()));
+            Tlog::getInstance()->addError(\sprintf('Failed to increment coupon %s: %s', $coupon->getCode(), $exception->getMessage()));
         }
 
         return false;

@@ -11,11 +11,10 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Element\Exception;
 
-use RuntimeException;
-
-class LoopException extends RuntimeException
+class LoopException extends \RuntimeException
 {
     public const UNKNOWN_EXCEPTION = 0;
 

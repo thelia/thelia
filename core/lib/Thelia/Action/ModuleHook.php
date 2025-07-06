@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Action;
 
-use LogicException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cache\CacheEvent;
@@ -43,9 +43,6 @@ use Thelia\Module\BaseModule;
  */
 class ModuleHook extends BaseAction implements EventSubscriberInterface
 {
-    /**
-     * @param string $kernelCacheDir
-     */
     public function __construct(protected $cacheDir, protected EventDispatcherInterface $dispatcher)
     {
     }
@@ -176,7 +173,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
                 $moduleHook->setActive(!$moduleHook->getActive());
                 $moduleHook->save();
             } else {
-                throw new LogicException(Translator::getInstance()->trans('The module has to be activated.'));
+                throw new \LogicException(Translator::getInstance()->trans('The module has to be activated.'));
             }
         }
 

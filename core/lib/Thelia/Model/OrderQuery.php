@@ -11,14 +11,12 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-
-use DateTime;
-use Exception;
-use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
+use Propel\Runtime\Exception\PropelException;
 use Thelia\Model\Base\OrderQuery as BaseOrderQuery;
 use Thelia\Model\Map\OrderTableMap;
 
@@ -32,7 +30,7 @@ use Thelia\Model\Map\OrderTableMap;
 class OrderQuery extends BaseOrderQuery
 {
     /**
-     * @throws Exception
+     * @throws \Exception
      *
      * @return array
      */
@@ -43,8 +41,8 @@ class OrderQuery extends BaseOrderQuery
         $stats = [];
         for ($day = 1; $day <= $numberOfDay; ++$day) {
             $dayAmount = self::getSaleStats(
-                new \DateTime(sprintf('%s-%s-%s', $year, $month, $day)),
-                new \DateTime(sprintf('%s-%s-%s', $year, $month, $day)),
+                new \DateTime(\sprintf('%s-%s-%s', $year, $month, $day)),
+                new \DateTime(\sprintf('%s-%s-%s', $year, $month, $day)),
                 $includeShipping,
                 $withTaxes
             );
@@ -61,8 +59,8 @@ class OrderQuery extends BaseOrderQuery
         $stats = [];
         for ($day = 1; $day <= $numberOfDay; ++$day) {
             $dayOrdersQuery = self::create()
-                ->filterByInvoiceDate(sprintf('%s-%s-%s 00:00:00', $year, $month, $day), Criteria::GREATER_EQUAL)
-                ->filterByInvoiceDate(sprintf('%s-%s-%s 23:59:59', $year, $month, $day), Criteria::LESS_EQUAL);
+                ->filterByInvoiceDate(\sprintf('%s-%s-%s 00:00:00', $year, $month, $day), Criteria::GREATER_EQUAL)
+                ->filterByInvoiceDate(\sprintf('%s-%s-%s 23:59:59', $year, $month, $day), Criteria::LESS_EQUAL);
             if (null !== $status) {
                 $dayOrdersQuery->filterByStatusId($status, Criteria::IN);
             }
@@ -86,8 +84,8 @@ class OrderQuery extends BaseOrderQuery
         $stats = [];
         for ($day = 1; $day <= $numberOfDay; ++$day) {
             $dayOrdersQuery = self::create()
-                ->filterByCreatedAt(sprintf('%s-%s-%s 00:00:00', $year, $month, $day), Criteria::GREATER_EQUAL)
-                ->filterByCreatedAt(sprintf('%s-%s-%s 23:59:59', $year, $month, $day), Criteria::LESS_EQUAL);
+                ->filterByCreatedAt(\sprintf('%s-%s-%s 00:00:00', $year, $month, $day), Criteria::GREATER_EQUAL)
+                ->filterByCreatedAt(\sprintf('%s-%s-%s 23:59:59', $year, $month, $day), Criteria::LESS_EQUAL);
 
             $otherOrderJoin = new Join();
             $otherOrderJoin->addExplicitCondition(OrderTableMap::TABLE_NAME, 'CUSTOMER_ID', null, OrderTableMap::TABLE_NAME, 'CUSTOMER_ID', 'other_order');
@@ -114,7 +112,7 @@ class OrderQuery extends BaseOrderQuery
      *
      * @return float|int
      */
-    public static function getSaleStats(DateTime $startDate, DateTime $endDate, $includeShipping, $withTaxes = true)
+    public static function getSaleStats(\DateTime $startDate, \DateTime $endDate, $includeShipping, $withTaxes = true)
     {
         $amount = (float)
             self::baseSaleStats($startDate, $endDate, 'o')
@@ -161,12 +159,12 @@ class OrderQuery extends BaseOrderQuery
      *
      * @return OrderQuery
      */
-    protected static function baseSaleStats(DateTime $startDate, DateTime $endDate, $modelAlias = null)
+    protected static function baseSaleStats(\DateTime $startDate, \DateTime $endDate, $modelAlias = null)
     {
         // The sales are considered at invoice date, not order creation date
         return self::create($modelAlias)
-            ->filterByInvoiceDate(sprintf('%s 00:00:00', $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
-            ->filterByInvoiceDate(sprintf('%s 23:59:59', $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
+            ->filterByInvoiceDate(\sprintf('%s 00:00:00', $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
+            ->filterByInvoiceDate(\sprintf('%s 23:59:59', $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
             ->filterByStatusId(OrderStatusQuery::getPaidStatusIdList(), Criteria::IN);
     }
 
@@ -175,7 +173,7 @@ class OrderQuery extends BaseOrderQuery
      *
      * @return int
      */
-    public static function getOrderStats(DateTime $startDate, DateTime $endDate, $status = null)
+    public static function getOrderStats(\DateTime $startDate, \DateTime $endDate, $status = null)
     {
         if ($status === null) {
             $status = OrderStatusQuery::getPaidStatusIdList();
@@ -183,8 +181,8 @@ class OrderQuery extends BaseOrderQuery
 
         return self::create()
             ->filterByStatusId($status, Criteria::IN)
-            ->filterByCreatedAt(sprintf('%s 00:00:00', $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
-            ->filterByCreatedAt(sprintf('%s 23:59:59', $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
+            ->filterByCreatedAt(\sprintf('%s 00:00:00', $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
+            ->filterByCreatedAt(\sprintf('%s 23:59:59', $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
             ->count();
     }
 }

@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -40,7 +41,7 @@ class ProductDocument extends BaseProductDocument implements BreadcrumbInterface
         $query->filterByProduct($this->getProduct());
     }
 
-    public function preInsert(ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null)
     {
         parent::preInsert($con);
 
@@ -61,7 +62,7 @@ class ProductDocument extends BaseProductDocument implements BreadcrumbInterface
         return $this->getProductId();
     }
 
-    public function preDelete(ConnectionInterface $con = null)
+    public function preDelete(?ConnectionInterface $con = null)
     {
         parent::preDelete($con);
 

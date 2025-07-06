@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\DependencyInjection\Compiler;
 
-use ReflectionClass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
@@ -33,7 +33,7 @@ class RegisterApiResourceAddonPass implements CompilerPassInterface
          * @var ResourceAddonInterface $class
          */
         foreach (array_keys($container->findTaggedServiceIds('thelia.api.resource.addon')) as $class) {
-            $reflection = new ReflectionClass($class);
+            $reflection = new \ReflectionClass($class);
             $resourceAddons[$class::getResourceParent()][$reflection->getShortName()] = $class;
         }
 

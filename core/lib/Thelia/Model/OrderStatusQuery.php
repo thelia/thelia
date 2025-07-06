@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
 use Thelia\Model\Base\OrderStatusQuery as BaseOrderStatusQuery;
@@ -151,7 +152,7 @@ class OrderStatusQuery extends BaseOrderStatusQuery
                     OrderStatus::CODE_SENT => $status->isSent(false),
                     OrderStatus::CODE_CANCELED => $status->isCancelled(false),
                     OrderStatus::CODE_REFUNDED => $status->isRefunded(false),
-                    default => throw new InvalidArgumentException(sprintf("Status code '%s' is not a valid value.", $statusCode)),
+                    default => throw new InvalidArgumentException(\sprintf("Status code '%s' is not a valid value.", $statusCode)),
                 };
 
                 if ($match) {

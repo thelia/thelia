@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event\Hook;
 
 use Thelia\Core\Hook\Fragment;
@@ -26,7 +27,7 @@ class HookRenderBlockEvent extends BaseHookRenderEvent
     protected FragmentBag $fragmentBag;
 
     public function __construct($code, array $arguments = [], /** @var array fields that can be added, if empty array any fields can be added */
-    protected array $fields = [], array $templateVariables = [])
+        protected array $fields = [], array $templateVariables = [])
     {
         parent::__construct($code, $arguments, $templateVariables);
         $this->fragmentBag = new FragmentBag();

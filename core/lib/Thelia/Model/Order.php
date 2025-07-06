@@ -11,15 +11,13 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-use PDO;
-use Propel\Runtime\Propel\Runtime\Exception\PropelException;
-use Thelia\Module\PaymentModuleInterface;
-use Thelia\Module\BaseModuleInterface;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
+use Propel\Runtime\Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -27,6 +25,8 @@ use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\Base\Order as BaseOrder;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderProductTaxTableMap;
+use Thelia\Module\BaseModuleInterface;
+use Thelia\Module\PaymentModuleInterface;
 use Thelia\TaxEngine\Calculator;
 
 class Order extends BaseOrder
@@ -108,7 +108,7 @@ class Order extends BaseOrder
     /**
      * @throws PropelException
      */
-    public function preSave(ConnectionInterface $con = null)
+    public function preSave(?ConnectionInterface $con = null)
     {
         if ($this->isPaid(false) && null === $this->getInvoiceDate()) {
             $this
@@ -121,7 +121,7 @@ class Order extends BaseOrder
     /**
      * @throws PropelException
      */
-    public function postInsert(ConnectionInterface $con = null): void
+    public function postInsert(?ConnectionInterface $con = null): void
     {
         parent::postInsert($con);
 
@@ -132,7 +132,7 @@ class Order extends BaseOrder
 
     public function generateRef()
     {
-        return sprintf('ORD%s', str_pad($this->getId(), 12, 0, \STR_PAD_LEFT));
+        return \sprintf('ORD%s', str_pad($this->getId(), 12, 0, \STR_PAD_LEFT));
     }
 
     /**
@@ -212,7 +212,7 @@ class Order extends BaseOrder
 
             if (false === $stmt->execute([':order_id' => $this->getId()])) {
                 throw new TheliaProcessException(
-                    sprintf(
+                    \sprintf(
                         'Failed to get order total and order tax: %s (%s)',
                         $stmt->errorInfo(),
                         $stmt->errorCode()
@@ -220,7 +220,7 @@ class Order extends BaseOrder
                 );
             }
 
-            $queryResult[$id] = $stmt->fetch(PDO::FETCH_OBJ);
+            $queryResult[$id] = $stmt->fetch(\PDO::FETCH_OBJ);
         }
 
         $total = (float) $queryResult[$id]->total_taxed_price;

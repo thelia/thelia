@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\HttpKernel\Exception;
 
-use Exception;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as BaseNotFountHttpException;
 
 /**
@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as BaseNotFount
  */
 class NotFountHttpException extends BaseNotFountHttpException
 {
-    public function __construct(string $message = null, Exception $previous = null, int $code = 0, protected $adminContext = false)
+    public function __construct(?string $message = null, ?\Exception $previous = null, int $code = 0, protected $adminContext = false)
     {
         parent::__construct($message, $previous, $code);
     }

@@ -11,15 +11,11 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Loop;
 
-use Thelia\Type\IntType;
-use Thelia\Type\EnumType;
-use Thelia\Type\IntListType;
-use Thelia\Type\AnyListType;
-use Thelia\Type\EnumListType;
-use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -34,6 +30,11 @@ use Thelia\Model\Map\OrderAddressTableMap;
 use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\TaxEngine\Calculator;
+use Thelia\Type\AnyListType;
+use Thelia\Type\EnumListType;
+use Thelia\Type\EnumType;
+use Thelia\Type\IntListType;
+use Thelia\Type\IntType;
 use Thelia\Type\TypeCollection;
 
 /**

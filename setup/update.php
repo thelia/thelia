@@ -15,7 +15,7 @@ use Symfony\Component\Finder\Finder;
 use Thelia\Install\Exception\UpdateException;
 
 if (\PHP_SAPI != 'cli') {
-    throw new \Exception('this script can only be launched with cli sapi');
+    throw new Exception('this script can only be launched with cli sapi');
 }
 
 $bootstrapToggle = false;
@@ -57,12 +57,12 @@ if (!$bootstraped) {
 }
 
 if (is_file(dirname(__DIR__)."/.env.$env.local")) {
-    (new \Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__)."/.env.$env.local");
+    (new Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__)."/.env.$env.local");
 } elseif (is_file(dirname(__DIR__).'/.env')) {
-    (new \Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__).'/.env');
+    (new Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__).'/.env');
 } elseif (is_file($file = __DIR__.'/../../bootstrap.php')) {
     // Here we are on a thelia/thelia-project
-    (new \Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__).'/../.env');
+    (new Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__).'/../.env');
 }
 
 $thelia = new App\Kernel($_ENV['APP_ENV'], false);
@@ -74,7 +74,7 @@ $thelia->boot();
  ***************************************************/
 
 try {
-    $update = new \Thelia\Install\Update(false);
+    $update = new Thelia\Install\Update(false);
 } catch (UpdateException $ex) {
     cliOutput($ex->getMessage(), 'error');
     exit(2);
@@ -157,7 +157,7 @@ try {
         try {
             $update->backupDb();
             cliOutput(sprintf('Your database has been backed up. The sql file : %s', $update->getBackupFile()), 'info');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             cliOutput('Sorry, your database can\'t be backed up. Reason : '.$e->getMessage(), 'error');
             exit(4);
         }
@@ -227,7 +227,7 @@ cliOutput(sprintf('Try to delete cache in : %s', THELIA_CACHE_DIR), 'info');
 foreach ($finder as $file) {
     try {
         $fs->remove($file);
-    } catch (\Symfony\Component\Filesystem\Exception\IOException $ex) {
+    } catch (Symfony\Component\Filesystem\Exception\IOException $ex) {
         $hasDeleteError = true;
     }
 }

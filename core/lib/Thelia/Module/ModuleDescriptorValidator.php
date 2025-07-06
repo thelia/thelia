@@ -11,12 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Module;
 
-use DOMDocument;
-use SplFileInfo;
-use ErrorException;
-use SimpleXMLElement;
 use Symfony\Component\Finder\Finder;
 use Thelia\Module\Exception\InvalidXmlDocumentException;
 
@@ -52,11 +49,11 @@ class ModuleDescriptorValidator
 
     public function validate($xml_file, $version = null): bool
     {
-        $dom = new DOMDocument();
+        $dom = new \DOMDocument();
         $errors = [];
 
         if ($dom->load($xml_file)) {
-            /** @var SplFileInfo $xsdFile */
+            /** @var \SplFileInfo $xsdFile */
             foreach ($this->xsdFinder as $xsdFile) {
                 $xsdVersion = array_search($xsdFile->getBasename(), self::$versions, true);
 
@@ -75,7 +72,7 @@ class ModuleDescriptorValidator
         }
 
         throw new InvalidXmlDocumentException(
-            sprintf(
+            \sprintf(
                 '%s file is not a valid file : %s',
                 $xml_file,
                 implode(', ', $errors)
@@ -86,12 +83,12 @@ class ModuleDescriptorValidator
     /**
      * Validate the schema of a XML file with a given xsd file.
      *
-     * @param DOMDocument $dom The XML document
-     * @param SplFileInfo $xsdFile The XSD file
+     * @param \DOMDocument $dom     The XML document
+     * @param \SplFileInfo $xsdFile The XSD file
      *
      * @return array an array of errors if validation fails, otherwise an empty array
      */
-    protected function schemaValidate(DOMDocument $dom, SplFileInfo $xsdFile): array
+    protected function schemaValidate(\DOMDocument $dom, \SplFileInfo $xsdFile): array
     {
         $errorMessages = [];
 
@@ -102,7 +99,7 @@ class ModuleDescriptorValidator
                 $errors = libxml_get_errors();
 
                 foreach ($errors as $error) {
-                    $errorMessages[] = sprintf(
+                    $errorMessages[] = \sprintf(
                         'XML error "%s" [%d] (Code %d) in %s on line %d column %d'."\n",
                         $error->message,
                         $error->level,
@@ -117,14 +114,14 @@ class ModuleDescriptorValidator
             }
 
             libxml_use_internal_errors(false);
-        } catch (ErrorException) {
+        } catch (\ErrorException) {
             libxml_use_internal_errors(false);
         }
 
         return $errorMessages;
     }
 
-    public function getDescriptor($xml_file): SimpleXMLElement|false
+    public function getDescriptor($xml_file): \SimpleXMLElement|false
     {
         $this->validate($xml_file);
 

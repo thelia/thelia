@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-
-use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -187,10 +186,10 @@ class CategoryController extends AbstractSeoCrudController
     protected function getEditionArguments(): array
     {
         return [
-                'category_id' => $this->getRequest()->get('category_id', 0),
-                'folder_id' => $this->getRequest()->get('folder_id', 0),
-                'current_tab' => $this->getRequest()->get('current_tab', 'general'),
-                'page' => $this->getRequest()->get('page', 1),
+            'category_id' => $this->getRequest()->get('category_id', 0),
+            'folder_id' => $this->getRequest()->get('folder_id', 0),
+            'current_tab' => $this->getRequest()->get('current_tab', 'general'),
+            'page' => $this->getRequest()->get('page', 1),
         ];
     }
 
@@ -253,10 +252,10 @@ class CategoryController extends AbstractSeoCrudController
      * Online status toggle category.
      */
     public function setToggleVisibilityAction(
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
     ): Response {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -264,7 +263,7 @@ class CategoryController extends AbstractSeoCrudController
 
         try {
             $eventDispatcher->dispatch($event, TheliaEvents::CATEGORY_TOGGLE_VISIBILITY);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             // Any error
             return $this->errorPage($exception);
         }
@@ -335,7 +334,7 @@ class CategoryController extends AbstractSeoCrudController
     public function addRelatedContentAction(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -349,7 +348,7 @@ class CategoryController extends AbstractSeoCrudController
 
             try {
                 $eventDispatcher->dispatch($event, TheliaEvents::CATEGORY_ADD_CONTENT);
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -360,13 +359,11 @@ class CategoryController extends AbstractSeoCrudController
 
     /**
      * Add category pictures.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function addRelatedPictureAction(): Response
     {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -376,7 +373,7 @@ class CategoryController extends AbstractSeoCrudController
     public function deleteRelatedContentAction(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -390,7 +387,7 @@ class CategoryController extends AbstractSeoCrudController
 
             try {
                 $eventDispatcher->dispatch($event, TheliaEvents::CATEGORY_REMOVE_CONTENT);
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }

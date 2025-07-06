@@ -11,15 +11,14 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Bridge\Propel\Attribute;
 
-use Attribute;
-
-#[Attribute(Attribute::TARGET_CLASS)]
+#[\Attribute(\Attribute::TARGET_CLASS)]
 class CompositeIdentifiers
 {
     public function __construct(
-        private readonly array $keys
+        private readonly array $keys,
     ) {
     }
 }

@@ -11,19 +11,18 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller;
 
 use Exception;
-use Symfony\Component\HttpFoundation\Request;
-use InvalidArgumentException;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -31,6 +30,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -114,7 +114,7 @@ abstract class BaseController implements ControllerInterface
 
     abstract protected function render(string $templateName, array $args = [], int $status = 200): Response;
 
-    abstract protected function renderRaw(string $templateName, array $args = [], string $templateDir = null): string;
+    abstract protected function renderRaw(string $templateName, array $args = [], ?string $templateDir = null): string;
 
     protected function nullResponse(int $status = 200): Response
     {
@@ -133,7 +133,7 @@ abstract class BaseController implements ControllerInterface
             $status,
             [
                 'Content-type' => 'application/pdf',
-                'Content-Disposition' => sprintf(
+                'Content-Disposition' => \sprintf(
                     '%s; filename=%s.pdf',
                     $browser === false ? 'attachment' : 'inline',
                     $fileName
@@ -211,7 +211,7 @@ abstract class BaseController implements ControllerInterface
         string $fileName,
         bool $checkOrderStatus = true,
         bool $checkAdminUser = true,
-        bool $browser = false
+        bool $browser = false,
     ): Response {
         $order = OrderQuery::create()->findPk($order_id);
 
@@ -239,9 +239,9 @@ abstract class BaseController implements ControllerInterface
             if ($pdfEvent->hasPdf()) {
                 return $this->pdfResponse($pdfEvent->getPdf(), $order->getRef(), 200, $browser);
             }
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             Tlog::getInstance()->error(
-                sprintf(
+                \sprintf(
                     'error during generating invoice pdf for order id : %d with message "%s"',
                     $order_id,
                     $exception->getMessage()
@@ -256,17 +256,17 @@ abstract class BaseController implements ControllerInterface
         );
     }
 
-    protected function retrieveSuccessUrl(BaseForm $form = null): mixed
+    protected function retrieveSuccessUrl(?BaseForm $form = null): mixed
     {
         return $this->retrieveFormBasedUrl('success_url', $form);
     }
 
-    protected function retrieveErrorUrl(BaseForm $form = null): mixed
+    protected function retrieveErrorUrl(?BaseForm $form = null): mixed
     {
         return $this->retrieveFormBasedUrl('error_url', $form);
     }
 
-    protected function retrieveFormBasedUrl(string $parameterName, BaseForm $form = null)
+    protected function retrieveFormBasedUrl(string $parameterName, ?BaseForm $form = null)
     {
         $url = null;
 
@@ -283,9 +283,8 @@ abstract class BaseController implements ControllerInterface
         string $routeId,
         array $urlParameters = [],
         array $routeParameters = [],
-        int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
-    ): string
-    {
+        int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH,
+    ): string {
         return URL::getInstance()->absoluteUrl(
             $this->getRoute(
                 $routeId,
@@ -301,7 +300,7 @@ abstract class BaseController implements ControllerInterface
         return new RedirectResponse($url, $status);
     }
 
-    protected function generateSuccessRedirect(BaseForm $form = null): ?RedirectResponse
+    protected function generateSuccessRedirect(?BaseForm $form = null): ?RedirectResponse
     {
         if (null !== $url = $this->retrieveSuccessUrl($form)) {
             return $this->generateRedirect($url);
@@ -310,7 +309,7 @@ abstract class BaseController implements ControllerInterface
         return null;
     }
 
-    protected function generateErrorRedirect(BaseForm $form = null): ?RedirectResponse
+    protected function generateErrorRedirect(?BaseForm $form = null): ?RedirectResponse
     {
         if (null !== $url = $this->retrieveErrorUrl($form)) {
             return $this->generateRedirect($url);
@@ -323,9 +322,8 @@ abstract class BaseController implements ControllerInterface
         string $routeId,
         array $urlParameters = [],
         array $routeParameters = [],
-        int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
-    ): RedirectResponse
-    {
+        int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH,
+    ): RedirectResponse {
         return $this->generateRedirect(
             $this->retrieveUrlFromRouteId($routeId, $urlParameters, $routeParameters, $referenceType)
         );
@@ -336,7 +334,7 @@ abstract class BaseController implements ControllerInterface
      * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
      * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
      *                                             it does not match the requirement
-     * @throws InvalidArgumentException When the router doesn't exist
+     * @throws \InvalidArgumentException           When the router doesn't exist
      *
      * @see \Thelia\Controller\BaseController::getRouteFromRouter()
      */
@@ -355,21 +353,19 @@ abstract class BaseController implements ControllerInterface
      * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
      * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
      *                                             it does not match the requirement
-     * @throws InvalidArgumentException When the router doesn't exist
-     *
+     * @throws \InvalidArgumentException           When the router doesn't exist
      */
     protected function getRouteFromRouter(
         string $routerName,
         string $routeId,
         array $parameters = [],
-        int $referenceType = UrlGeneratorInterface::ABSOLUTE_URL
-    ): string
-    {
+        int $referenceType = UrlGeneratorInterface::ABSOLUTE_URL,
+    ): string {
         /** @var Router $router */
         $router = $this->getRouter($routerName);
 
         if ($router === null) {
-            throw new InvalidArgumentException(sprintf("Router '%s' does not exists.", $routerName));
+            throw new \InvalidArgumentException(\sprintf("Router '%s' does not exists.", $routerName));
         }
 
         return $router->generate($routeId, $parameters, $referenceType);
@@ -380,7 +376,7 @@ abstract class BaseController implements ControllerInterface
         return $this->container->get($routerName);
     }
 
-    protected function pageNotFound(): Response|null
+    protected function pageNotFound(): ?Response
     {
         throw new NotFoundHttpException();
     }

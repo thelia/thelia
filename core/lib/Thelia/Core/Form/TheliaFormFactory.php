@@ -11,13 +11,13 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Form;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\Form\Extension\Core\Type\FormType;
-use OutOfBoundsException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormFactoryBuilderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
@@ -41,26 +41,25 @@ class TheliaFormFactory
         protected ValidatorBuilder $validatorBuilder,
         protected TokenStorageInterface $tokenStorage,
         #[Autowire(param: 'Thelia.parser.forms')]
-        protected array $formDefinition
-    )
-    {
+        protected array $formDefinition,
+    ) {
     }
 
     public function createForm(
         string $name,
         string $type = FormType::class,
         array $data = [],
-        array $options = []
+        array $options = [],
     ): BaseForm {
         $formId = $this->formDefinition[$name] ?? null;
 
-        if (in_array($name, $this->formDefinition, true)) {
+        if (\in_array($name, $this->formDefinition, true)) {
             $formId = $name;
         }
 
         if (null === $formId) {
-            throw new OutOfBoundsException(
-                sprintf("The form '%s' doesn't exist", $formId)
+            throw new \OutOfBoundsException(
+                \sprintf("The form '%s' doesn't exist", $formId)
             );
         }
 

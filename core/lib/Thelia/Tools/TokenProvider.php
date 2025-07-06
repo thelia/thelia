@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Tools;
 
 use Random\RandomException;
@@ -31,14 +32,12 @@ class TokenProvider
 
     protected ?SessionInterface $session = null;
 
-
     public function __construct(
         protected RequestStack $requestStack,
         protected TranslatorInterface $translator,
         #[Autowire(param: 'thelia.token_id')]
-        protected string $tokenName
-    )
-    {
+        protected string $tokenName,
+    ) {
         $this->assignTokenFromSession();
     }
 
@@ -110,6 +109,7 @@ class TokenProvider
 
     /**
      * @alias getToken
+     *
      * @throws RandomException
      */
     public static function generateToken(): string

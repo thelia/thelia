@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Condition;
 
-use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Coupon\FacadeInterface;
@@ -36,9 +36,8 @@ class ConditionFactory
     public function __construct(
         protected ContainerInterface $container,
         /** @var FacadeInterface Provide necessary value from Thelia */
-        protected FacadeInterface $adapter
-    )
-    {
+        protected FacadeInterface $adapter,
+    ) {
     }
 
     /**
@@ -105,7 +104,7 @@ class ConditionFactory
      * @param array  $operators          Condition Operator (<, >, = )
      * @param array  $values             Values setting this Condition
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      *
      * @return ConditionInterface Ready to use Condition or false
      */

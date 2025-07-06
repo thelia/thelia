@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiFilter;
@@ -82,7 +83,7 @@ use Thelia\Model\ProductSaleElementsQuery;
     properties: [
         'productSaleElements.product.id' => [
             'strategy' => 'exact',
-            'fieldPath' => 'productsaleelementsproductimage_productsaleelements.product_id'
+            'fieldPath' => 'productsaleelementsproductimage_productsaleelements.product_id',
         ],
         'productSaleElementsId' => 'exact',
         'productImageId' => 'exact',
@@ -126,12 +127,12 @@ class ProductSaleElementsProductImage implements PropelResourceInterface
     {
         if ($this->productSaleElementsId !== null) {
             $pse = ProductSaleElementsQuery::create()->findPk($this->productSaleElementsId);
+
             return $pse ? $pse->getProductId() : null;
         }
 
         return null;
     }
-
 
     public function getId(): ?int
     {
@@ -174,7 +175,7 @@ class ProductSaleElementsProductImage implements PropelResourceInterface
         return $this->productSaleElements;
     }
 
-    public function setProductSaleElements(?ProductSaleElements $productSaleElements): ProductSaleElementsProductImage
+    public function setProductSaleElements(?ProductSaleElements $productSaleElements): self
     {
         $this->productSaleElements = $productSaleElements;
 

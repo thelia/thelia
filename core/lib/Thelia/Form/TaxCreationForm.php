@@ -11,12 +11,13 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
@@ -34,9 +35,8 @@ class TaxCreationForm extends BaseForm
     use StandardDescriptionFieldsTrait;
 
     public function __construct(
-        #[TaggedIterator('thelia.taxType')]private iterable $taxTypeIterator
-    )
-    {
+        #[TaggedIterator('thelia.taxType')] private iterable $taxTypeIterator,
+    ) {
     }
 
     protected static $typeList = [];

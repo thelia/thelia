@@ -11,20 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core;
 
-use Thelia\Core\Propel\Generator\Builder\Om\ObjectBuilder;
-use Thelia\Core\Propel\Generator\Builder\Om\ExtensionObjectBuilder;
-use Thelia\Core\Propel\Generator\Builder\Om\MultiExtendObjectBuilder;
-use Thelia\Core\Propel\Generator\Builder\Om\QueryBuilder;
-use Thelia\Core\Propel\Generator\Builder\Om\ExtensionQueryBuilder;
-use Thelia\Core\Propel\Generator\Builder\Om\QueryInheritanceBuilder;
-use Thelia\Core\Propel\Generator\Builder\Om\ExtensionQueryInheritanceBuilder;
-use Thelia\Core\Propel\Generator\Builder\Om\TableMapBuilder;
-use Thelia\Core\Propel\Generator\Builder\Om\EventBuilder;
-use Thelia\Core\Propel\Generator\Builder\ResolverBuilder;
-use Throwable;
-use Exception;
 use Propel\Generator\Command\ConfigConvertCommand;
 use Propel\Generator\Command\MigrationDiffCommand;
 use Propel\Generator\Command\MigrationUpCommand;
@@ -43,6 +32,16 @@ use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Yaml\Yaml;
 use Thelia\Config\DatabaseConfigurationSource;
+use Thelia\Core\Propel\Generator\Builder\Om\EventBuilder;
+use Thelia\Core\Propel\Generator\Builder\Om\ExtensionObjectBuilder;
+use Thelia\Core\Propel\Generator\Builder\Om\ExtensionQueryBuilder;
+use Thelia\Core\Propel\Generator\Builder\Om\ExtensionQueryInheritanceBuilder;
+use Thelia\Core\Propel\Generator\Builder\Om\MultiExtendObjectBuilder;
+use Thelia\Core\Propel\Generator\Builder\Om\ObjectBuilder;
+use Thelia\Core\Propel\Generator\Builder\Om\QueryBuilder;
+use Thelia\Core\Propel\Generator\Builder\Om\QueryInheritanceBuilder;
+use Thelia\Core\Propel\Generator\Builder\Om\TableMapBuilder;
+use Thelia\Core\Propel\Generator\Builder\ResolverBuilder;
 use Thelia\Core\Propel\Schema\SchemaCombiner;
 use Thelia\Core\Propel\Schema\SchemaLocator;
 use Thelia\Log\Tlog;
@@ -77,9 +76,8 @@ class PropelInitService
          */
         protected $debug,
         protected array $envParameters,
-        protected SchemaLocator $schemaLocator
-    )
-    {
+        protected SchemaLocator $schemaLocator,
+    ) {
     }
 
     /**
@@ -89,9 +87,9 @@ class PropelInitService
      * @param array                $parameters command parameters
      * @param OutputInterface|null $output     command output
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function runCommand(Command $command, array $parameters = [], OutputInterface $output = null): int
+    public function runCommand(Command $command, array $parameters = [], ?OutputInterface $output = null): int
     {
         $parameters['command'] = $command->getName();
         $input = new ArrayInput($parameters);
@@ -150,7 +148,7 @@ class PropelInitService
     /**
      * Generate the Propel initialization file.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function buildPropelInitFile(): void
     {
@@ -203,7 +201,7 @@ class PropelInitService
 
         foreach ($schemaCombiner->getDatabases() as $database) {
             $databaseSchemaCache = new ConfigCache(
-                sprintf('%s%s.schema.xml', $this->getPropelSchemaDir(), $database),
+                \sprintf('%s%s.schema.xml', $this->getPropelSchemaDir(), $database),
                 $this->debug
             );
 
@@ -220,7 +218,7 @@ class PropelInitService
     /**
      * Generate the base Propel models.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function buildPropelModels(): bool
     {
@@ -285,7 +283,7 @@ class PropelInitService
      * @param bool $force        force cache generation
      * @param bool $cacheRefresh
      *
-     * @throws Throwable
+     * @throws \Throwable
      *
      * @return bool whether a Propel connection is available
      *
@@ -329,7 +327,7 @@ class PropelInitService
                 Propel::getServiceContainer()->setLogger('defaultLogger', Tlog::getInstance());
                 $theliaDatabaseConnection->useDebug(true);
             }
-        } catch (Throwable $throwable) {
+        } catch (\Throwable $throwable) {
             $fs = new Filesystem();
             $fs->remove(THELIA_CACHE_DIR.$this->environment);
             $fs->remove($this->getPropelModelDir());
@@ -341,7 +339,6 @@ class PropelInitService
 
         return true;
     }
-
 
     public function getPropelCacheDir(): string
     {

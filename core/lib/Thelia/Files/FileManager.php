@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Files;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -27,17 +28,15 @@ use Thelia\Exception\ImageException;
  */
 class FileManager
 {
-
     public function __construct(
         #[Autowire(param: 'file_model.classes')]
-        protected array $supportedFileModels
-    )
-    {
+        protected array $supportedFileModels,
+    ) {
     }
 
     protected function getFileTypeIdentifier(string $fileType, string $parentType): string
     {
-        return strtolower(sprintf('%s.%s', $fileType, $parentType));
+        return strtolower(\sprintf('%s.%s', $fileType, $parentType));
     }
 
     /**
@@ -47,7 +46,7 @@ class FileManager
     {
         if (!isset($this->supportedFileModels[$this->getFileTypeIdentifier($fileType, $parentType)])) {
             throw new FileException(
-                sprintf("Unsupported file type '%s' for parent type '%s'", $fileType, $parentType)
+                \sprintf("Unsupported file type '%s' for parent type '%s'", $fileType, $parentType)
             );
         }
 
@@ -57,7 +56,7 @@ class FileManager
 
         if (!$instance instanceof FileModelInterface) {
             throw new FileException(
-                sprintf(
+                \sprintf(
                     "Wrong class type for file type '%s', parent type '%s'. Class '%s' should implements FileModelInterface",
                     $fileType,
                     $parentType,
@@ -98,7 +97,7 @@ class FileManager
 
         if (!$model->save()) {
             throw new ImageException(
-                sprintf(
+                \sprintf(
                     'Failed to update model after copy of uploaded file %s to %s',
                     $uploadedFile,
                     $model->getFile()
@@ -123,7 +122,7 @@ class FileManager
 
             if (!$nbModifiedLines) {
                 throw new ImageException(
-                    sprintf(
+                    \sprintf(
                         'Failed to update %s file model',
                         $fileModel->getFile()
                     )

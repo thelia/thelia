@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Api\Bridge\Propel\State;
 
-use Exception;
-use ReflectionClass;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
@@ -76,7 +75,7 @@ readonly class PropelPersistProcessor implements ProcessorInterface
             $propelModel->reload();
 
             $data->setId($propelModel->getId());
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $connection->rollBack();
             throw $exception;
         }
@@ -121,12 +120,12 @@ readonly class PropelPersistProcessor implements ProcessorInterface
             }
         }
 
-        $reflector = new ReflectionClass($data);
+        $reflector = new \ReflectionClass($data);
         foreach ($reflector->getProperties() as $property) {
             $propelGetter = 'get'.ucfirst($property->getName());
             foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
                 if (isset($relationAttribute->getArguments()['targetResource'])) {
-                    $reflectorChild = new ReflectionClass($relationAttribute->getArguments()['targetResource']);
+                    $reflectorChild = new \ReflectionClass($relationAttribute->getArguments()['targetResource']);
                     $compositeIdentifiers = $this->apiResourcePropelTransformerService->getResourceCompositeIdentifierValues(reflector: $reflectorChild, param: 'keys');
 
                     if ($compositeIdentifiers === [] || !$propelModel->$propelGetter() instanceof Collection) {
@@ -162,7 +161,7 @@ readonly class PropelPersistProcessor implements ProcessorInterface
 
     private function manageResourceAddons(
         ActiveRecordInterface $propelModel,
-        PropelResourceInterface $data
+        PropelResourceInterface $data,
     ): array {
         $resourceAddons = [];
         $jsonData = json_decode((string) $this->requestStack->getCurrentRequest()?->getContent(), true, 512, \JSON_THROW_ON_ERROR);

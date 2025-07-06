@@ -14,13 +14,12 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel\Filter;
 
-use ReflectionProperty;
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 
 final class BooleanFilter extends AbstractFilter
 {
-    protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
+    protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         if (
             null === $value
@@ -50,7 +49,7 @@ final class BooleanFilter extends AbstractFilter
             $propertyName = $this->normalizePropertyName($property);
 
             $reflectionProperty = $this->getReflectionProperty($propertyName, $resourceClass);
-            if (!$reflectionProperty instanceof ReflectionProperty) {
+            if (!$reflectionProperty instanceof \ReflectionProperty) {
                 continue;
             }
 

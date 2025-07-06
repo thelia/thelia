@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Form;
 
 use Symfony\Component\Form\Form;
@@ -26,9 +27,6 @@ use Thelia\Form\FirewallForm;
  */
 class TheliaFormValidator
 {
-    /**
-     * @param string $kernelEnvironment
-     */
     public function __construct(protected TranslatorInterface $translator, protected $environment)
     {
     }
@@ -69,7 +67,7 @@ class TheliaFormValidator
             if ($form->get('error_message')->getData() != null) {
                 $errorMessage = $form->get('error_message')->getData();
             } else {
-                $errorMessage = sprintf(
+                $errorMessage = \sprintf(
                     $this->translator->trans(
                         'Missing or invalid data: %s'
                     ),
@@ -82,7 +80,7 @@ class TheliaFormValidator
         }
 
         throw new FormValidationException(
-            sprintf(
+            \sprintf(
                 $this->translator->trans(
                     'Wrong form method, %s expected.'
                 ),
@@ -113,7 +111,7 @@ class TheliaFormValidator
                     $fieldName = $child->getName();
                 }
 
-                $errors .= sprintf('[%s] %s, ', $fieldName, $this->getErrorMessages($child));
+                $errors .= \sprintf('[%s] %s, ', $fieldName, $this->getErrorMessages($child));
             }
         }
 

@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -99,7 +100,7 @@ class MessageModificationForm extends BaseForm
             ->add('html_layout_file_name', TextType::class, [
                 'label' => Translator::getInstance()->trans('Name of the HTML layout file'),
                 'label_attr' => [
-                        'for' => 'html_layout_file_name',
+                    'for' => 'html_layout_file_name',
                 ],
                 'required' => false,
             ])
@@ -107,7 +108,7 @@ class MessageModificationForm extends BaseForm
             ->add('html_template_file_name', TextType::class, [
                 'label' => Translator::getInstance()->trans('Name of the HTML template file'),
                 'label_attr' => [
-                        'for' => 'html_template_file_name',
+                    'for' => 'html_template_file_name',
                 ],
                 'required' => false,
             ])
@@ -123,7 +124,7 @@ class MessageModificationForm extends BaseForm
             ->add('text_template_file_name', TextType::class, [
                 'label' => Translator::getInstance()->trans('Name of the text template file'),
                 'label_attr' => [
-                        'for' => 'text_template_file_name',
+                    'for' => 'text_template_file_name',
                 ],
                 'required' => false,
             ])

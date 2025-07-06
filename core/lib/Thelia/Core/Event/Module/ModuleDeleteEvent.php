@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Event\Module;
 
 /**
@@ -20,9 +21,7 @@ namespace Thelia\Core\Event\Module;
  */
 class ModuleDeleteEvent extends ModuleEvent
 {
-
     protected $delete_data;
-
 
     public function __construct(protected int $module_id, protected bool $assume_delete = false)
     {

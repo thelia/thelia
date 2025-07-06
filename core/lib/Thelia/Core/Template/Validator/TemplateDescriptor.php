@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Validator;
 
 use Thelia\Core\Template\TemplateDefinition;
@@ -56,9 +57,8 @@ class TemplateDescriptor
         /** @var string the template directory name (e.g. 'default') */
         protected string $name,
         /** @var int the template type (front, back, pdf) */
-        protected int $type
-    )
-    {
+        protected int $type,
+    ) {
     }
 
     public function getName(): string

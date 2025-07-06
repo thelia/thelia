@@ -11,15 +11,15 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-
-use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
@@ -47,7 +47,6 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Document;
@@ -141,9 +140,9 @@ class ProductController extends AbstractSeoCrudController
         return $this->render(
             'ajax/product-related-tab',
             [
-                    'product_id' => $this->getRequest()->get('product_id', 0),
-                    'folder_id' => $this->getRequest()->get('folder_id', 0),
-                    'accessory_category_id' => $this->getRequest()->get('accessory_category_id', 0),
+                'product_id' => $this->getRequest()->get('product_id', 0),
+                'folder_id' => $this->getRequest()->get('folder_id', 0),
+                'accessory_category_id' => $this->getRequest()->get('accessory_category_id', 0),
             ]
         );
     }
@@ -408,7 +407,8 @@ class ProductController extends AbstractSeoCrudController
     /**
      * @param Product $object
      */
-    protected function getObjectLabel(activeRecordInterface $object): ?string    {
+    protected function getObjectLabel(ActiveRecordInterface $object): ?string
+    {
         return $object->getTitle();
     }
 
@@ -423,12 +423,12 @@ class ProductController extends AbstractSeoCrudController
     protected function getEditionArguments(): array
     {
         return [
-                'category_id' => $this->getCategoryId(),
-                'product_id' => $this->getRequest()->get('product_id', 0),
-                'folder_id' => $this->getRequest()->get('folder_id', 0),
-                'accessory_category_id' => $this->getRequest()->get('accessory_category_id', 0),
-                'current_tab' => $this->getRequest()->get('current_tab', 'general'),
-                'page' => $this->getRequest()->get('page', 1),
+            'category_id' => $this->getCategoryId(),
+            'product_id' => $this->getRequest()->get('product_id', 0),
+            'folder_id' => $this->getRequest()->get('folder_id', 0),
+            'accessory_category_id' => $this->getRequest()->get('accessory_category_id', 0),
+            'current_tab' => $this->getRequest()->get('current_tab', 'general'),
+            'page' => $this->getRequest()->get('page', 1),
         ];
     }
 
@@ -487,7 +487,7 @@ class ProductController extends AbstractSeoCrudController
      * Online status toggle product.
      */
     public function setToggleVisibilityAction(
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
     ): Response {
         // Check current user authorization
         if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
@@ -498,7 +498,7 @@ class ProductController extends AbstractSeoCrudController
 
         try {
             $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_TOGGLE_VISIBILITY);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             // Any error
             return $this->errorPage($exception);
         }
@@ -507,7 +507,7 @@ class ProductController extends AbstractSeoCrudController
         return $this->nullResponse();
     }
 
-    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent): ?\Symfony\Component\HttpFoundation\Response
+    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent): ?Response
     {
         return $this->generateRedirectFromRoute(
             'admin.products.default',
@@ -515,7 +515,7 @@ class ProductController extends AbstractSeoCrudController
         );
     }
 
-    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent): ?\Symfony\Component\HttpFoundation\Response
+    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent): ?Response
     {
         return $this->generateRedirectFromRoute(
             'admin.categories.default',
@@ -554,10 +554,8 @@ class ProductController extends AbstractSeoCrudController
 
     /**
      * return a list of document which will be displayed in AJAX.
-     *
-     * @return Response
      */
-    public function getVirtualDocumentListAjaxAction($productId, $pseId): \Symfony\Component\HttpFoundation\Response
+    public function getVirtualDocumentListAjaxAction($productId, $pseId): Response
     {
         $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::VIEW);
         $this->checkXmlHttpRequest();
@@ -590,7 +588,7 @@ class ProductController extends AbstractSeoCrudController
 
     // -- Related content management -------------------------------------------
 
-    public function getAvailableRelatedContentAction($productId, $folderId): \Symfony\Component\HttpFoundation\Response
+    public function getAvailableRelatedContentAction($productId, $folderId): Response
     {
         $result = [];
 
@@ -631,7 +629,7 @@ class ProductController extends AbstractSeoCrudController
 
             try {
                 $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_ADD_CONTENT);
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -657,7 +655,7 @@ class ProductController extends AbstractSeoCrudController
 
             try {
                 $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_REMOVE_CONTENT);
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -668,7 +666,7 @@ class ProductController extends AbstractSeoCrudController
 
     // -- Accessories management ----------------------------------------------
 
-    public function getAvailableAccessoriesAction($productId, $categoryId): \Symfony\Component\HttpFoundation\Response
+    public function getAvailableAccessoriesAction($productId, $categoryId): Response
     {
         $result = [];
 
@@ -709,7 +707,7 @@ class ProductController extends AbstractSeoCrudController
 
             try {
                 $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_ADD_ACCESSORY);
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -735,7 +733,7 @@ class ProductController extends AbstractSeoCrudController
 
             try {
                 $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_REMOVE_ACCESSORY);
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -749,7 +747,7 @@ class ProductController extends AbstractSeoCrudController
      */
     public function updateAccessoryPositionAction(
         Request $request,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
     ) {
         $accessory = AccessoryQuery::create()->findPk($request->get('accessory_id'));
 
@@ -766,7 +764,7 @@ class ProductController extends AbstractSeoCrudController
      */
     public function updateContentPositionAction(
         Request $request,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
     ) {
         $content = ProductAssociatedContentQuery::create()->findPk($request->get('content_id'));
 
@@ -911,7 +909,7 @@ class ProductController extends AbstractSeoCrudController
 
             try {
                 $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_ADD_CATEGORY);
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -937,7 +935,7 @@ class ProductController extends AbstractSeoCrudController
 
             try {
                 $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_REMOVE_CATEGORY);
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -948,7 +946,7 @@ class ProductController extends AbstractSeoCrudController
 
     // -- Product combination management ---------------------------------------
 
-    public function getAttributeValuesAction(/* @noinspection PhpUnusedParameterInspection */ $productId, $attributeId): \Symfony\Component\HttpFoundation\Response
+    public function getAttributeValuesAction(/* @noinspection PhpUnusedParameterInspection */ $productId, $attributeId): Response
     {
         $result = [];
 
@@ -972,7 +970,7 @@ class ProductController extends AbstractSeoCrudController
         return $this->jsonResponse(json_encode($result));
     }
 
-    public function addAttributeValueToCombinationAction(/* @noinspection PhpUnusedParameterInspection */ $productId, $attributeAvId, $combination): \Symfony\Component\HttpFoundation\Response
+    public function addAttributeValueToCombinationAction(/* @noinspection PhpUnusedParameterInspection */ $productId, $attributeAvId, $combination): Response
     {
         $result = [];
 
@@ -1036,7 +1034,7 @@ class ProductController extends AbstractSeoCrudController
 
         try {
             $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             // Any error
             return $this->errorPage($exception);
         }
@@ -1061,7 +1059,7 @@ class ProductController extends AbstractSeoCrudController
 
         try {
             $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             // Any error
             return $this->errorPage($exception);
         }
@@ -1103,7 +1101,7 @@ class ProductController extends AbstractSeoCrudController
             $this->adminLogAppend(
                 $this->resourceCode,
                 AccessManager::UPDATE,
-                sprintf(
+                \sprintf(
                     'Product Sale Element (ID %s) for product reference %s modified',
                     $changedObject->getId(),
                     $event->getProduct()->getRef()
@@ -1115,8 +1113,6 @@ class ProductController extends AbstractSeoCrudController
 
     /**
      * Change a product sale element.
-     *
-     * @param BaseForm $changeForm
      *
      * @return mixed|RedirectResponse|Response|null
      */
@@ -1173,7 +1169,7 @@ class ProductController extends AbstractSeoCrudController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -1295,7 +1291,7 @@ class ProductController extends AbstractSeoCrudController
             $this->adminLogAppend(
                 $this->resourceCode,
                 AccessManager::CREATE,
-                sprintf(
+                \sprintf(
                     'Combination generation for product reference %s',
                     $event->getProduct()->getRef()
                 ),
@@ -1307,7 +1303,7 @@ class ProductController extends AbstractSeoCrudController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -1489,7 +1485,7 @@ class ProductController extends AbstractSeoCrudController
 
         try {
             $responseData = $this->getAssociationResponseData($eventDispatcher, $pseId, $type, $typeId);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $responseData['error'] = $exception->getMessage();
         }
 
@@ -1504,7 +1500,7 @@ class ProductController extends AbstractSeoCrudController
         $responseData = [];
 
         if (null !== $msg = $this->checkFileType($type)) {
-            throw new Exception($msg);
+            throw new \Exception($msg);
         }
 
         $responseData['product_sale_elements_id'] = $pseId;
@@ -1512,7 +1508,7 @@ class ProductController extends AbstractSeoCrudController
         $pse = ProductSaleElementsQuery::create()->findPk($pseId);
 
         if (null === $pse) {
-            throw new Exception(
+            throw new \Exception(
                 $this->getTranslator()->trans(
                     "The product sale elements id %id doesn't exists",
                     [
@@ -1528,7 +1524,7 @@ class ProductController extends AbstractSeoCrudController
             $image = ProductImageQuery::create()->findPk($typeId);
 
             if (null === $image) {
-                throw new Exception(
+                throw new \Exception(
                     $this->getTranslator()->trans(
                         "The product image id %id doesn't exists",
                         [
@@ -1561,7 +1557,7 @@ class ProductController extends AbstractSeoCrudController
             $image = ProductDocumentQuery::create()->findPk($typeId);
 
             if (null === $image) {
-                throw new Exception(
+                throw new \Exception(
                     $this->getTranslator()->trans(
                         "The product document id %id doesn't exists",
                         [
@@ -1594,7 +1590,7 @@ class ProductController extends AbstractSeoCrudController
             $image = ProductDocumentQuery::create()->findPk($typeId);
 
             if (null === $image) {
-                throw new Exception(
+                throw new \Exception(
                     $this->getTranslator()->trans(
                         "The product document id %id doesn't exists",
                         [
@@ -1879,7 +1875,7 @@ class ProductController extends AbstractSeoCrudController
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      *
      * @return mixed
      */
@@ -1954,7 +1950,7 @@ class ProductController extends AbstractSeoCrudController
      *
      * @return mixed|Response
      */
-    public function searchProductAction(): \Symfony\Component\HttpFoundation\Response
+    public function searchProductAction(): Response
     {
         $search = '%'.$this->getRequest()->query->get('q').'%';
 

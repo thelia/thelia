@@ -11,10 +11,10 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
-use Exception;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -47,9 +47,9 @@ class ClearImageCache extends ContainerAwareCommand
 
             $this->getDispatcher()->dispatch($event, TheliaEvents::IMAGE_CLEAR_CACHE);
 
-            $output->writeln(sprintf('%s image cache successfully cleared.', null === $subdir ? 'Entire' : ucfirst($subdir)));
-        } catch (Exception $exception) {
-            $output->writeln(sprintf('Failed to clear image cache: %s', $exception->getMessage()));
+            $output->writeln(\sprintf('%s image cache successfully cleared.', null === $subdir ? 'Entire' : ucfirst($subdir)));
+        } catch (\Exception $exception) {
+            $output->writeln(\sprintf('Failed to clear image cache: %s', $exception->getMessage()));
 
             return 1;
         }

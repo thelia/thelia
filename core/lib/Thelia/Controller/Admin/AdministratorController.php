@@ -11,8 +11,8 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Thelia\Controller\Admin;
 
+namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -44,13 +44,13 @@ class AdministratorController extends AbstractCrudController
         );
     }
 
-    public function viewAction(): \Symfony\Component\HttpFoundation\Response
+    public function viewAction(): Response
     {
         // Open the update dialog for the current administrator
         return $this->render('administrators', ['show_update_dialog' => true]);
     }
 
-    public function setEmailAction(): \Symfony\Component\HttpFoundation\Response
+    public function setEmailAction(): Response
     {
         // Open the update dialog for the current administrator, and display the "set email address" notice.
         return $this->render(

@@ -11,10 +11,10 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use LogicException;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
@@ -22,6 +22,7 @@ use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryBuilderInterface;
+use Symfony\Component\Form\FormInterface as SymfonyFormInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,7 +37,6 @@ use Thelia\Core\Event\TheliaFormEvent;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
-use \Symfony\Component\Form\FormInterface as SymfonyFormInterface;
 
 /**
  * Base form class for creating form objects.
@@ -78,7 +78,7 @@ abstract class BaseForm implements FormInterface
         TokenStorageInterface $tokenStorage,
         string $type = FormType::class,
         array $data = [],
-        array $options = []
+        array $options = [],
     ): void {
         $this->request = $request;
         $this->type = $type;
@@ -219,7 +219,7 @@ abstract class BaseForm implements FormInterface
      *
      * @return string an absolute URL
      */
-    public function getErrorUrl(string $default = null)
+    public function getErrorUrl(?string $default = null)
     {
         return $this->getFormDefinedUrl('error_url', $default);
     }
@@ -240,7 +240,7 @@ abstract class BaseForm implements FormInterface
      *
      * @return string an absolute URL
      */
-    public function getSuccessUrl(string $default = null)
+    public function getSuccessUrl(?string $default = null)
     {
         return $this->getFormDefinedUrl('success_url', $default);
     }
@@ -261,7 +261,7 @@ abstract class BaseForm implements FormInterface
      *
      * @return string an absolute URL
      */
-    public function getFormDefinedUrl(string $parameterName, string $default = null): string
+    public function getFormDefinedUrl(string $parameterName, ?string $default = null): string
     {
         $formDefinedUrl = $this->form->get($parameterName)->getData();
 
@@ -284,7 +284,7 @@ abstract class BaseForm implements FormInterface
     }
 
     /**
-     * @throws LogicException
+     * @throws \LogicException
      *
      * @return FormView
      */
@@ -296,7 +296,6 @@ abstract class BaseForm implements FormInterface
     // -- Error and errro message ----------------------------------------------
     /**
      * Set the error status of the form.
-     *
      *
      * @return $this
      */

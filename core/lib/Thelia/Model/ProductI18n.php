@@ -11,10 +11,11 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Exception\PropelException;
 use Thelia\Model\Base\ProductI18n as BaseProductI18n;
 use Thelia\Model\Tools\I18nTimestampableTrait;
 
@@ -25,7 +26,7 @@ class ProductI18n extends BaseProductI18n
     /**
      * @throws PropelException
      */
-    public function postInsert(ConnectionInterface $con = null): void
+    public function postInsert(?ConnectionInterface $con = null): void
     {
         parent::postInsert($con);
 

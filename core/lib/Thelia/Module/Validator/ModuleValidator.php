@@ -11,11 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Module\Validator;
 
-use SimpleXMLElement;
-use RuntimeException;
-use Exception;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Thelia;
 use Thelia\Core\Translation\Translator;
@@ -34,7 +32,7 @@ use Thelia\Tools\Version\Version;
  */
 class ModuleValidator
 {
-    protected ?SimpleXMLElement $moduleDescriptor = null;
+    protected ?\SimpleXMLElement $moduleDescriptor = null;
 
     protected ?ModuleDefinition $moduleDefinition = null;
 
@@ -45,15 +43,15 @@ class ModuleValidator
     protected ?string $moduleDirName = null;
 
     /**
-     * @param string|null $modulePath the path of the module directory
+     * @param string|null     $modulePath the path of the module directory
      * @param Translator|null $translator FOR UNIT TEST PURPOSE ONLY
+     *
      * @throws FileNotFoundException
      */
     public function __construct(
         protected ?string $modulePath = null,
-        protected ?Translator $translator = null
-    )
-    {
+        protected ?Translator $translator = null,
+    ) {
         $this->moduleDirName = basename((string) $this->modulePath);
         $this->checkDirectoryStructure();
         $this->loadModuleDescriptor();
@@ -65,7 +63,7 @@ class ModuleValidator
         if (!$this->translator instanceof Translator) {
             try {
                 $this->translator = Translator::getInstance();
-            } catch (RuntimeException) {
+            } catch (\RuntimeException) {
                 return strtr($id, $parameters);
             }
         }
@@ -81,12 +79,13 @@ class ModuleValidator
      *
      * @param bool $checkCurrentVersion if true it will also check if the module is
      *                                  already installed (not activated - present in module list)
-     * @throws Exception
+     *
+     * @throws \Exception
      */
     public function validate(bool $checkCurrentVersion = true): void
     {
-        if (!$this->moduleDescriptor instanceof SimpleXMLElement) {
-            throw new Exception(
+        if (!$this->moduleDescriptor instanceof \SimpleXMLElement) {
+            throw new \Exception(
                 $this->trans(
                     'The %name module definition has not been initialized.',
                     ['%name' => $this->moduleDirName]
@@ -118,7 +117,7 @@ class ModuleValidator
             );
         }
 
-        $path = sprintf('%s/Config/module.xml', $this->modulePath);
+        $path = \sprintf('%s/Config/module.xml', $this->modulePath);
         if (false === file_exists($path)) {
             throw new FileNotFoundException(
                 $this->trans(
@@ -128,7 +127,7 @@ class ModuleValidator
             );
         }
 
-        $path = sprintf('%s/Config/config.xml', $this->modulePath);
+        $path = \sprintf('%s/Config/config.xml', $this->modulePath);
         if (false === file_exists($path)) {
             throw new FileNotFoundException(
                 $this->trans(
@@ -141,7 +140,7 @@ class ModuleValidator
 
     protected function loadModuleDescriptor(): void
     {
-        $path = sprintf('%s/Config/module.xml', $this->modulePath);
+        $path = \sprintf('%s/Config/module.xml', $this->modulePath);
 
         $descriptorValidator = new ModuleDescriptorValidator();
 
@@ -151,12 +150,12 @@ class ModuleValidator
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function loadModuleDefinition(): void
     {
-        if (!$this->moduleDescriptor instanceof SimpleXMLElement) {
-            throw new Exception(
+        if (!$this->moduleDescriptor instanceof \SimpleXMLElement) {
+            throw new \Exception(
                 $this->trans(
                     'The %name module descriptor has not been initialized.',
                     ['%name' => $this->moduleDirName]
@@ -226,8 +225,7 @@ class ModuleValidator
     protected function checkVersion(): void
     {
         if ($this->moduleDefinition->getTheliaVersion()
-            && !Version::test(Thelia::THELIA_VERSION, $this->moduleDefinition->getTheliaVersion(), false, '>='))
-        {
+            && !Version::test(Thelia::THELIA_VERSION, $this->moduleDefinition->getTheliaVersion(), false, '>=')) {
             throw new ModuleException(
                 $this->trans(
                     'The module %name requires Thelia %version or newer',
@@ -279,7 +277,7 @@ class ModuleValidator
                         ]
                     );
                 } else {
-                    $errors[] = sprintf('%s', $dependency[0]);
+                    $errors[] = \sprintf('%s', $dependency[0]);
                 }
             }
         }
@@ -336,7 +334,7 @@ class ModuleValidator
                         }
                     }
                 }
-            } catch (Exception) {
+            } catch (\Exception) {
             }
         }
 
@@ -348,8 +346,9 @@ class ModuleValidator
      *
      * @param bool $recursive Whether to also get the dependencies of dependencies, their dependencies, and so on...
      *
-     * @return array Array of dependencies as ["code" => ..., "version" => ...]. No check for duplicates is made.
      * @throws FileNotFoundException
+     *
+     * @return array Array of dependencies as ["code" => ..., "version" => ...]. No check for duplicates is made.
      */
     public function getCurrentModuleDependencies(bool $recursive = false): array
     {
@@ -463,7 +462,6 @@ class ModuleValidator
         return $authors;
     }
 
-
     public function setModulePath(?string $modulePath): void
     {
         $this->modulePath = $modulePath;
@@ -474,7 +472,7 @@ class ModuleValidator
         return $this->modulePath;
     }
 
-    public function getModuleDescriptor(): SimpleXMLElement|ModuleDescriptorValidator|null
+    public function getModuleDescriptor(): \SimpleXMLElement|ModuleDescriptorValidator|null
     {
         return $this->moduleDescriptor;
     }

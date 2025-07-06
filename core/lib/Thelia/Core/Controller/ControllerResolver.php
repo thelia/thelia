@@ -11,11 +11,10 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Controller;
 
 use Psr\Container\ContainerInterface;
-use LogicException;
-use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
 
@@ -34,7 +33,7 @@ class ControllerResolver extends ContainerControllerResolver
     {
         if ($controller instanceof AbstractController) {
             if (!($previousContainer = $controller->setContainer($this->container)) instanceof ContainerInterface) {
-                throw new LogicException(sprintf('"%s" has no container set, did you forget to define it as a service subscriber?', $class));
+                throw new \LogicException(\sprintf('"%s" has no container set, did you forget to define it as a service subscriber?', $class));
             }
 
             $controller->setContainer($previousContainer);
@@ -46,8 +45,8 @@ class ControllerResolver extends ContainerControllerResolver
     /**
      * Returns a callable for the given controller.
      *
-     * @throws LogicException When the name could not be parsed
-     * @throws InvalidArgumentException When the controller class does not exist
+     * @throws \LogicException           When the name could not be parsed
+     * @throws \InvalidArgumentException When the controller class does not exist
      *
      * @return mixed A PHP callable
      */

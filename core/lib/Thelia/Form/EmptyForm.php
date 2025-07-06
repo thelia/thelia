@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Form;
 
 /**
@@ -37,7 +38,7 @@ class EmptyForm extends BaseForm
      *   )
      *   ->add('age', IntegerType::class);
      */
-    protected function buildForm()
+    protected function buildForm(): void
     {
     }
 

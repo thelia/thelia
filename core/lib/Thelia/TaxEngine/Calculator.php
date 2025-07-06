@@ -11,16 +11,17 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\TaxEngine;
 
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Model\OrderProduct;
 use Thelia\Exception\TaxEngineException;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
 use Thelia\Model\Country;
 use Thelia\Model\Order;
+use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductTax;
 use Thelia\Model\Product;
 use Thelia\Model\State;
@@ -62,15 +63,13 @@ class Calculator
      *
      * @return float
      */
-    public static function getUntaxedCartDiscount(Cart $cart, Country $country, State $state = null): int|float
+    public static function getUntaxedCartDiscount(Cart $cart, Country $country, ?State $state = null): int|float
     {
         return $cart->getDiscount() / self::getCartTaxFactor($cart, $country, $state);
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
-     * @return float|int
+     * @throws PropelException
      */
     /**
      * @throws PropelException
@@ -123,7 +122,7 @@ class Calculator
      *
      * @return float
      */
-    public static function getCartTaxFactor(Cart $cart, Country $country, State $state = null)
+    public static function getCartTaxFactor(Cart $cart, Country $country, ?State $state = null)
     {
         // Cache the result in a local variable
         static $cartFactor;
@@ -158,7 +157,7 @@ class Calculator
      *
      * @return $this
      */
-    public function load(Product $product, Country $country, State $state = null): static
+    public function load(Product $product, Country $country, ?State $state = null): static
     {
         if ($product->getId() === null) {
             throw new TaxEngineException('Product id is empty in Calculator::load', TaxEngineException::UNDEFINED_PRODUCT);
@@ -182,7 +181,7 @@ class Calculator
      *
      * @return $this
      */
-    public function loadTaxRule(TaxRule $taxRule, Country $country, Product $product, State $state = null): static
+    public function loadTaxRule(TaxRule $taxRule, Country $country, Product $product, ?State $state = null): static
     {
         if ($taxRule->getId() === null) {
             throw new TaxEngineException('TaxRule id is empty in Calculator::loadTaxRule', TaxEngineException::UNDEFINED_TAX_RULE);
@@ -237,7 +236,7 @@ class Calculator
      *
      * @since 2.4
      */
-    public function loadTaxRuleWithoutProduct(TaxRule $taxRule, Country $country, State $state = null): static
+    public function loadTaxRuleWithoutProduct(TaxRule $taxRule, Country $country, ?State $state = null): static
     {
         if ($taxRule->getId() === null) {
             throw new TaxEngineException('TaxRule id is empty in Calculator::loadTaxRule', TaxEngineException::UNDEFINED_TAX_RULE);
@@ -257,8 +256,8 @@ class Calculator
     }
 
     /**
-     *
      * @throws PropelException
+     *
      * @return float
      */
     public function getTaxAmountFromUntaxedPrice($untaxedPrice, &$taxCollection = null): int|float

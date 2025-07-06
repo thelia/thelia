@@ -11,12 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Propel\Schema;
 
-use Exception;
-use DOMDocument;
-use InvalidArgumentException;
-use DOMElement;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
@@ -37,8 +34,7 @@ class SchemaLocator
         protected string $theliaConfDir,
         protected string $theliaModuleDir,
         protected string $theliaLocalModuleDir,
-    )
-    {
+    ) {
     }
 
     /**
@@ -48,7 +44,7 @@ class SchemaLocator
     {
         $finder = new Finder();
         $filesystem = new Filesystem();
-        $modulesPath =[
+        $modulesPath = [
             THELIA_MODULE_DIR => THELIA_MODULE_DIR.'*'.DS.'Config',
             THELIA_LOCAL_MODULE_DIR => THELIA_LOCAL_MODULE_DIR.'*'.DS.'Config',
         ];
@@ -56,14 +52,14 @@ class SchemaLocator
         foreach ($modulesPath as $rootPath => $modulePath) {
             try {
                 if (!$filesystem->exists($rootPath)) {
-                    throw new DirectoryNotFoundException(sprintf('The directory "%s" does not exist.', $rootPath));
+                    throw new DirectoryNotFoundException(\sprintf('The directory "%s" does not exist.', $rootPath));
                 }
 
                 $finder->name('module.xml')->in($modulePath);
 
-                $codes = array_map(static fn($file): string => basename(\dirname((string) $file, 2)), iterator_to_array($finder));
+                $codes = array_map(static fn ($file): string => basename(\dirname((string) $file, 2)), iterator_to_array($finder));
                 $modules = array_merge($this->findForModules($codes), $modules);
-            } catch (Exception) {
+            } catch (\Exception) {
                 continue;
             }
         }
@@ -75,11 +71,11 @@ class SchemaLocator
      * Get schema documents for specific modules and their dependencies (including Thelia), as well as included
      * external schemas.
      *
-     * @param string[] $modulesCodes          Codes of the modules to fetch schemas for. 'Thelia' can be used to include Thelia core
+     * @param string[] $modulesCodes     Codes of the modules to fetch schemas for. 'Thelia' can be used to include Thelia core
      *                                   schemas.
-     * @param bool $withDependencies whether to also return schemas for the specified modules dependencies
+     * @param bool     $withDependencies whether to also return schemas for the specified modules dependencies
      *
-     * @return DOMDocument[] schema documents
+     * @return \DOMDocument[] schema documents
      */
     public function findForModules(array $modulesCodes = [], bool $withDependencies = true): array
     {
@@ -98,7 +94,7 @@ class SchemaLocator
             $schemaDocuments = [];
             /** @var SplFileInfo $schemaFile */
             foreach ($moduleSchemas as $schemaFile) {
-                $schemaDocument = new DOMDocument();
+                $schemaDocument = new \DOMDocument();
                 $isValid = $schemaDocument->load($schemaFile->getRealPath());
                 if ($isValid) {
                     $schemaDocuments[] = $schemaDocument;
@@ -136,9 +132,9 @@ class SchemaLocator
                 continue;
             }
 
-            $modulePath = is_dir(sprintf('%s/%s', $this->theliaModuleDir, $module))
-                ? sprintf('%s/%s', $this->theliaModuleDir, $module)
-                : sprintf('%s/%s', $this->theliaLocalModuleDir, $module);
+            $modulePath = is_dir(\sprintf('%s/%s', $this->theliaModuleDir, $module))
+                ? \sprintf('%s/%s', $this->theliaModuleDir, $module)
+                : \sprintf('%s/%s', $this->theliaLocalModuleDir, $module);
 
             $moduleValidator = new ModuleValidator($modulePath);
             $dependencies = $moduleValidator->getCurrentModuleDependencies(true);
@@ -171,11 +167,11 @@ class SchemaLocator
             ->depth(0);
 
         try {
-            $modulePath = is_dir(sprintf('%s/%s', $this->theliaModuleDir, $module))
-                ? sprintf('%s%s/Config', $this->theliaModuleDir, $module)
-                : sprintf('%s/%s/Config', $this->theliaLocalModuleDir, $module);
+            $modulePath = is_dir(\sprintf('%s/%s', $this->theliaModuleDir, $module))
+                ? \sprintf('%s%s/Config', $this->theliaModuleDir, $module)
+                : \sprintf('%s/%s/Config', $this->theliaLocalModuleDir, $module);
             $moduleSchemas->in($modulePath);
-        } catch (InvalidArgumentException) {
+        } catch (\InvalidArgumentException) {
             // just continue if the module has no Config directory
         }
 
@@ -192,7 +188,7 @@ class SchemaLocator
         $externalSchemaDocuments = [];
 
         foreach ($schemaDocuments as $schemaDocument) {
-            /** @var DOMElement $externalSchemaElement */
+            /** @var \DOMElement $externalSchemaElement */
             foreach ($schemaDocument->getElementsByTagName('external-schema') as $externalSchemaElement) {
                 if (!$externalSchemaElement->hasAttribute('filename')) {
                     continue;
@@ -204,7 +200,7 @@ class SchemaLocator
                     continue;
                 }
 
-                $externalSchemaDocument = new DOMDocument();
+                $externalSchemaDocument = new \DOMDocument();
                 if (!$externalSchemaDocument->load($externalSchemaPath)) {
                     continue;
                 }
@@ -217,9 +213,9 @@ class SchemaLocator
     }
 
     /**
-     * @param DOMDocument[][] $documentArrays
+     * @param \DOMDocument[][] $documentArrays
      *
-     * @return DOMDocument[]
+     * @return \DOMDocument[]
      */
     protected function mergeDOMDocumentsArrays(array $documentArrays): array
     {

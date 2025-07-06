@@ -11,17 +11,13 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Module;
 
-use Exception;
-use JsonException;
-use Propel\Runtime\Exception\PropelException;
-use Psr\EventDispatcher\EventDispatcherInterface;
-use ReflectionClass;
-use SimpleXMLElement;
-use SplFileInfo;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
@@ -51,15 +47,13 @@ class ModuleManagement
         protected ?ComposerHelper $composerHelper = null,
         #[Autowire(param: 'kernel.cache_dir')]
         protected ?string $kernelCacheDir = null,
-    )
-    {
+    ) {
     }
-
 
     public function updateModules(ContainerInterface $container): void
     {
         $directories = [THELIA_LOCAL_MODULE_DIR, THELIA_MODULE_DIR];
-        foreach($directories as $directory) {
+        foreach ($directories as $directory) {
             $this->fetchDirModuleForUpdate($directory, $container);
         }
     }
@@ -81,7 +75,7 @@ class ModuleManagement
                 try {
                     $filePath = $file->getRealPath();
                     $modulesUpdated[] = $this->updateModule($file, $container);
-                } catch (Exception $ex) {
+                } catch (\Exception $ex) {
                     // Guess module code
                     $moduleCode = basename(\dirname($filePath, 2));
 
@@ -105,15 +99,15 @@ class ModuleManagement
      * Update module information, and invoke install() for new modules (e.g. modules
      * just discovered), or update() modules for which version number ha changed.
      *
-     * @throws Exception
+     * @throws \Exception
      * @throws PropelException
      */
-    public function updateModule(SplFileInfo $file, ContainerInterface $container): Module
+    public function updateModule(\SplFileInfo $file, ContainerInterface $container): Module
     {
         $descriptorValidator = $this->getDescriptorValidator();
 
         $content = $descriptorValidator->getDescriptor($file->getRealPath());
-        $reflected = new ReflectionClass((string) $content->fullnamespace);
+        $reflected = new \ReflectionClass((string) $content->fullnamespace);
         $code = basename(\dirname($reflected->getFileName()));
         $version = (string) $content->version;
         $currentVersion = $version;
@@ -178,7 +172,7 @@ class ModuleManagement
             }
 
             $con->commit();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             Tlog::getInstance()->addError('Failed to update module '.$module->getCode(), $exception);
 
             $con->rollBack();
@@ -203,7 +197,7 @@ class ModuleManagement
         $this->eventDispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
     }
 
-    private function getModuleType(ReflectionClass $reflected): int
+    private function getModuleType(\ReflectionClass $reflected): int
     {
         if (
             $reflected->implementsInterface(DeliveryModuleInterface::class)
@@ -219,7 +213,7 @@ class ModuleManagement
         return BaseModule::CLASSIC_MODULE_TYPE;
     }
 
-    private function saveDescription(Module $module, SimpleXMLElement $content, ConnectionInterface $con): void
+    private function saveDescription(Module $module, \SimpleXMLElement $content, ConnectionInterface $con): void
     {
         foreach ($content->descriptive as $description) {
             $locale = (string) $description->attributes()->locale;
@@ -260,7 +254,7 @@ class ModuleManagement
     }
 
     /**
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function listModulesFromTemplatePath(string $directory): array
     {
@@ -293,7 +287,7 @@ class ModuleManagement
     }
 
     /**
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function installModulesFromTemplatePath(string $path): array
     {
@@ -318,7 +312,7 @@ class ModuleManagement
 
                 $this->eventDispatcher->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
                 $modulesInstalled[] = $module;
-            } catch (Exception) {
+            } catch (\Exception) {
                 continue;
             }
         }

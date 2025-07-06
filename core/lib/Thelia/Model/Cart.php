@@ -11,11 +11,11 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-use Exception;
-use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartDuplicationEvent;
 use Thelia\Core\Event\Cart\CartItemDuplicationItem;
@@ -30,16 +30,16 @@ class Cart extends BaseCart
      *
      * @param string $token
      *
-     * @throws Exception
+     * @throws \Exception
      * @throws PropelException
      *
      * @return Cart|bool
      */
     public function duplicate(
         $token,
-        Customer $customer = null,
-        Currency $currency = null,
-        EventDispatcherInterface $dispatcher = null
+        ?Customer $customer = null,
+        ?Currency $currency = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         if (!$dispatcher instanceof EventDispatcherInterface) {
             return false;
@@ -101,7 +101,7 @@ class Cart extends BaseCart
 
         try {
             $this->delete();
-        } catch (Exception) {
+        } catch (\Exception) {
             // just fail silently in some cases
         }
 
@@ -135,7 +135,7 @@ class Cart extends BaseCart
      *
      * @return float
      */
-    public function getTaxedAmount(Country $country, $withDiscount = true, State $state = null)
+    public function getTaxedAmount(Country $country, $withDiscount = true, ?State $state = null)
     {
         $total = 0;
 
@@ -163,7 +163,7 @@ class Cart extends BaseCart
      *
      * @see getTaxedAmount same as this method but the amount is without taxes
      */
-    public function getTotalAmount($withDiscount = true, Country $country = null, State $state = null)
+    public function getTotalAmount($withDiscount = true, ?Country $country = null, ?State $state = null)
     {
         $total = 0;
 
@@ -189,6 +189,7 @@ class Cart extends BaseCart
      * @param bool    $withDiscount
      *
      * @throws PropelException
+     *
      * @return float|int|string
      */
     public function getTotalVAT($taxCountry, $taxState = null, $withDiscount = true)
@@ -197,8 +198,8 @@ class Cart extends BaseCart
     }
 
     /**
-     *
      * @throws PropelException
+     *
      * @return float
      */
     public function getDiscountVAT($taxCountry, $taxState = null)
@@ -269,7 +270,7 @@ class Cart extends BaseCart
      *
      * @return float|int|string
      */
-    public function getDiscount($withTaxes = true, Country $country = null, State $state = null)
+    public function getDiscount($withTaxes = true, ?Country $country = null, ?State $state = null)
     {
         if ($withTaxes || !$country instanceof Country) {
             return parent::getDiscount();

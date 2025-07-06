@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model\Breadcrumb;
 
 use Symfony\Component\Routing\Router;
@@ -31,7 +32,7 @@ trait BrandBreadcrumbTrait
         ];
 
         if (null !== $brand = BrandQuery::create()->findPk($this->getBrandId())) {
-            $breadcrumb[$brand->setLocale($locale)->getTitle()] = sprintf(
+            $breadcrumb[$brand->setLocale($locale)->getTitle()] = \sprintf(
                 '%s?current_tab=%s',
                 $router->generate('admin.brand.update', ['brand_id' => $brand->getId()], Router::ABSOLUTE_URL),
                 $tab

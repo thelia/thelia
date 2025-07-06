@@ -11,13 +11,13 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-
-use Exception;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\OrderStatus\OrderStatusCreateEvent;
 use Thelia\Core\Event\OrderStatus\OrderStatusDeleteEvent;
@@ -25,7 +25,6 @@ use Thelia\Core\Event\OrderStatus\OrderStatusEvent;
 use Thelia\Core\Event\OrderStatus\OrderStatusUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Form\BaseForm;
@@ -139,7 +138,7 @@ class OrderStatusController extends AbstractCrudController
     /**
      * Creates the delete event with the provided form data.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     protected function getDeleteEvent(): OrderStatusDeleteEvent
     {
@@ -192,7 +191,8 @@ class OrderStatusController extends AbstractCrudController
      *
      * @return string order status title
      */
-    protected function getObjectLabel(activeRecordInterface $object): ?string    {
+    protected function getObjectLabel(ActiveRecordInterface $object): ?string
+    {
         return $object->getTitle();
     }
 
@@ -272,10 +272,8 @@ class OrderStatusController extends AbstractCrudController
 
     /**
      * @param $positionChangeEvent ActionEvent
-     *
-     * @return Response|null
      */
-    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent): ?\Symfony\Component\HttpFoundation\Response
+    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent): ?Response
     {
         $folder = OrderStatusQuery::create()->findPk($positionChangeEvent->getObjectId());
 

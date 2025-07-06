@@ -11,11 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\ImportExport\Import;
 
-use Iterator;
-use ReturnTypeWillChange;
-use UnexpectedValueException;
 use Symfony\Component\HttpFoundation\File\File;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Lang;
@@ -25,7 +23,7 @@ use Thelia\Model\Lang;
  *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-abstract class AbstractImport implements Iterator
+abstract class AbstractImport implements \Iterator
 {
     private ?array $data = null;
 
@@ -49,14 +47,14 @@ abstract class AbstractImport implements Iterator
      */
     protected $importedRows = 0;
 
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function current(): mixed
     {
         return current($this->data);
     }
 
-    #[ReturnTypeWillChange]
-    public function key(): int|null|string
+    #[\ReturnTypeWillChange]
+    public function key(): int|string|null
     {
         return key($this->data);
     }
@@ -139,7 +137,7 @@ abstract class AbstractImport implements Iterator
      *
      * @return $this Return $this, allow chaining
      */
-    public function setLang(Lang $language = null)
+    public function setLang(?Lang $language = null)
     {
         $this->language = $language;
 
@@ -158,7 +156,7 @@ abstract class AbstractImport implements Iterator
         $diff = array_diff($this->mandatoryColumns, array_keys($data));
 
         if ($diff !== []) {
-            throw new UnexpectedValueException(
+            throw new \UnexpectedValueException(
                 Translator::getInstance()->trans(
                     'The following columns are missing: %columns',
                     [

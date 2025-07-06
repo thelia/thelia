@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Template\Element;
 
-use PDO;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\Tools\ModelCriteriaTools;
@@ -54,9 +54,9 @@ abstract class BaseI18nLoop extends BaseLoop
     protected function configureI18nProcessing(
         ModelCriteria $search,
         array $columns = ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'],
-        string $foreignTable = null,
+        ?string $foreignTable = null,
         string $foreignKey = 'ID',
-        bool $forceReturn = false
+        bool $forceReturn = false,
     ) {
         /* manage translations */
 
@@ -89,13 +89,13 @@ abstract class BaseI18nLoop extends BaseLoop
                         ELSE `default_locale_i18n`.`{$columnName}`
                         END ".$searchCriteria.' ?',
                 $searchTerm,
-                PDO::PARAM_STR
+                \PDO::PARAM_STR
             );
         } else {
             $search->where(
-                sprintf('`requested_locale_i18n`.`%s` %s ?', $columnName, $searchCriteria),
+                \sprintf('`requested_locale_i18n`.`%s` %s ?', $columnName, $searchCriteria),
                 $searchTerm,
-                PDO::PARAM_STR
+                \PDO::PARAM_STR
             );
         }
     }

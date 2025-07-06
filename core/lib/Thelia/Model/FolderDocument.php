@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Model;
 
-use Thelia\Model\Tools\PositionManagementTrait;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\Routing\Router;
@@ -24,6 +24,7 @@ use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\FolderDocument as BaseFolderDocument;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
 use Thelia\Model\Breadcrumb\FolderBreadcrumbTrait;
+use Thelia\Model\Tools\PositionManagementTrait;
 
 class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, FileModelInterface
 {
@@ -40,7 +41,7 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
         $query->filterByFolder($this->getFolder());
     }
 
-    public function preInsert(ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null)
     {
         parent::preInsert($con);
 
@@ -61,7 +62,7 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
         return $this->getFolderId();
     }
 
-    public function preDelete(ConnectionInterface $con = null)
+    public function preDelete(?ConnectionInterface $con = null)
     {
         parent::preDelete($con);
 

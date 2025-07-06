@@ -11,13 +11,11 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Command;
 
-use Symfony\Component\Console\Attribute\AsCommand;
-use InvalidArgumentException;
-use RuntimeException;
-use Thelia\Model\Module;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
@@ -26,6 +24,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 
 /**
@@ -124,13 +123,13 @@ class ModulePositionCommand extends ContainerAwareCommand
      *
      * @param string $paramValue
      *
-     * @throws InvalidArgumentException
-     * @throws RuntimeException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     protected function checkModuleArgument($paramValue): void
     {
         if (!preg_match('#^([a-z0-9]+):([\+-]?[0-9]+|up|down)$#i', $paramValue, $matches)) {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 'Arguments must be in format moduleName:[+|-]position where position is an integer or up or down.'
             );
         }
@@ -138,7 +137,7 @@ class ModulePositionCommand extends ContainerAwareCommand
         $this->moduleQuery->clear();
         $module = $this->moduleQuery->findOneByCode($matches[1]);
         if ($module === null) {
-            throw new RuntimeException(sprintf('%s module does not exists. Try to refresh first.', $matches[1]));
+            throw new \RuntimeException(\sprintf('%s module does not exists. Try to refresh first.', $matches[1]));
         }
 
         $this->modulesList[] = $matches[1];
@@ -179,7 +178,7 @@ class ModulePositionCommand extends ContainerAwareCommand
      * @param OutputInterface $output     An OutputInterface instance
      * @param bool            $isAbsolute Set to true or false according to position values
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      *
      * @return bool Continue or stop command
      */
@@ -191,7 +190,7 @@ class ModulePositionCommand extends ContainerAwareCommand
                 $isAbsolute = true;
 
                 if ($count > 1) {
-                    throw new InvalidArgumentException('Two (or more) absolute positions are identical.');
+                    throw new \InvalidArgumentException('Two (or more) absolute positions are identical.');
                 }
             } else {
                 $isRelative = true;

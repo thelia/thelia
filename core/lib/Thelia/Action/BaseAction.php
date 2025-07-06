@@ -11,10 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Action;
 
-use Thelia\Model\Tools\PositionManagementTrait;
-use InvalidArgumentException;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ToggleVisibilityEvent;
@@ -22,17 +21,18 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Model\Tools\PositionManagementTrait;
 
 class BaseAction
 {
     /**
      * Changes object position, selecting absolute ou relative change.
      */
-    protected function genericUpdatePosition(ModelCriteria $query, UpdatePositionEvent $event, EventDispatcherInterface $dispatcher = null)
+    protected function genericUpdatePosition(ModelCriteria $query, UpdatePositionEvent $event, ?EventDispatcherInterface $dispatcher = null): void
     {
         if (null !== $object = $query->findPk($event->getObjectId())) {
             if (!isset(class_uses($object)[PositionManagementTrait::class])) {
-                throw new InvalidArgumentException('Your model does not implement the PositionManagementTrait trait');
+                throw new \InvalidArgumentException('Your model does not implement the PositionManagementTrait trait');
             }
 
             $mode = $event->getMode();
@@ -50,11 +50,11 @@ class BaseAction
     /**
      * @since 2.3
      */
-    protected function genericUpdateDelegatePosition(ModelCriteria $query, UpdatePositionEvent $event, EventDispatcherInterface $dispatcher = null): void
+    protected function genericUpdateDelegatePosition(ModelCriteria $query, UpdatePositionEvent $event, ?EventDispatcherInterface $dispatcher = null): void
     {
         if (null !== $object = $query->findOne()) {
             if (!isset(class_uses($object)[PositionManagementTrait::class])) {
-                throw new InvalidArgumentException('Your model does not implement the PositionManagementTrait trait');
+                throw new \InvalidArgumentException('Your model does not implement the PositionManagementTrait trait');
             }
 
             $mode = $event->getMode();
@@ -76,7 +76,7 @@ class BaseAction
      *
      * @return mixed an SEOxxx object
      */
-    protected function genericUpdateSeo(ModelCriteria $query, UpdateSeoEvent $event, EventDispatcherInterface $dispatcher = null)
+    protected function genericUpdateSeo(ModelCriteria $query, UpdateSeoEvent $event, ?EventDispatcherInterface $dispatcher = null)
     {
         if (null !== $object = $query->findPk($event->getObjectId())) {
             $object
@@ -103,7 +103,7 @@ class BaseAction
     /**
      * Toggle visibility for an object.
      */
-    public function genericToggleVisibility(ModelCriteria $query, ToggleVisibilityEvent $event, EventDispatcherInterface $dispatcher = null)
+    public function genericToggleVisibility(ModelCriteria $query, ToggleVisibilityEvent $event, ?EventDispatcherInterface $dispatcher = null)
     {
         if (null !== $object = $query->findPk($event->getObjectId())) {
             $newVisibility = !$object->getVisible();

@@ -11,11 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Core\Hook;
 
-use UnexpectedValueException;
-use DirectoryIterator;
-use Exception;
 use Thelia\Core\Template\ParserHelperInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Translation\Translator;
@@ -38,7 +36,7 @@ class HookHelper
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function parseActiveTemplate(int $templateType = TemplateDefinition::FRONT_OFFICE): array
     {
@@ -47,14 +45,14 @@ class HookHelper
             TemplateDefinition::BACK_OFFICE => 'active-admin-template',
             TemplateDefinition::PDF => 'active-pdf-template',
             TemplateDefinition::EMAIL => 'active-mail-template',
-            default => throw new TheliaProcessException('Unknown template type: ' . $templateType),
+            default => throw new TheliaProcessException('Unknown template type: '.$templateType),
         };
 
         return $this->parseTemplate($templateType, ConfigQuery::read($tplVar, 'default'));
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function parseTemplate(int $templateType, string $template): array
     {
@@ -77,7 +75,7 @@ class HookHelper
         foreach ($hooks as $hook) {
             try {
                 $ret[] = $this->prepareHook($hook);
-            } catch (UnexpectedValueException $ex) {
+            } catch (\UnexpectedValueException $ex) {
                 Tlog::getInstance()->warning($ex->getMessage());
             }
         }
@@ -105,8 +103,8 @@ class HookHelper
         $allowed_exts = ['html', 'tpl', 'xml', 'txt'];
 
         try {
-            /** @var DirectoryIterator $fileInfo */
-            foreach (new DirectoryIterator($directory) as $fileInfo) {
+            /** @var \DirectoryIterator $fileInfo */
+            foreach (new \DirectoryIterator($directory) as $fileInfo) {
                 if ($fileInfo->isDot()) {
                     continue;
                 }
@@ -126,7 +124,7 @@ class HookHelper
                     }
                 }
             }
-        } catch (UnexpectedValueException) {
+        } catch (\UnexpectedValueException) {
             // Directory does not exists => ignore/
         }
     }
@@ -135,7 +133,7 @@ class HookHelper
     {
         $ret = [];
         if (!\array_key_exists('attributes', $hook)) {
-            throw new UnexpectedValueException('The hook should have attributes.');
+            throw new \UnexpectedValueException('The hook should have attributes.');
         }
 
         $attributes = $hook['attributes'];
@@ -152,7 +150,7 @@ class HookHelper
                     $ret['context'] = $attributes['name'];
                     $ret['type'] = '';
                 } else {
-                    throw new UnexpectedValueException('skipping hook as name contains variable : '.$attributes['name']);
+                    throw new \UnexpectedValueException('skipping hook as name contains variable : '.$attributes['name']);
                 }
             } else {
                 $ret['context'] = $params[0];
@@ -176,11 +174,11 @@ class HookHelper
             // get a title
             $contextTitle = $this->trans('context', $ret['context']) ?: $ret['context'];
             $typeTitle = $this->trans('type', $ret['type']) ?: $ret['type'];
-            $ret['title'] = sprintf('%s - %s', $contextTitle, $typeTitle);
+            $ret['title'] = \sprintf('%s - %s', $contextTitle, $typeTitle);
             $ret['file'] = $hook['file'];
             $ret['attributes'] = $attributes;
         } else {
-            throw new UnexpectedValueException('The hook should have a name attribute.');
+            throw new \UnexpectedValueException('The hook should have a name attribute.');
         }
 
         return $ret;
@@ -188,7 +186,7 @@ class HookHelper
 
     protected function normalizePath($path): string
     {
-        $path = str_replace(array('\\', str_replace('\\', '/', THELIA_ROOT)), array('/', ''), realpath($path));
+        $path = str_replace(['\\', str_replace('\\', '/', THELIA_ROOT)], ['/', ''], realpath($path));
 
         return ltrim($path, '/');
     }

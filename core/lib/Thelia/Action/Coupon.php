@@ -11,12 +11,11 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Action;
 
-use InvalidArgumentException;
-use Exception;
-use Propel\Runtime\Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
+use Propel\Runtime\Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -59,9 +58,8 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         protected CouponFactory $couponFactory,
         protected CouponManager $couponManager,
         protected MatchForEveryone $noConditionRule,
-        protected ConditionFactory $conditionFactory
-    )
-    {
+        protected ConditionFactory $conditionFactory,
+    ) {
     }
 
     /**
@@ -93,7 +91,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $coupon = $event->getCoupon();
 
         if (!$coupon instanceof CouponModel) {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 'The coupon should not be null'
             );
         }
@@ -261,7 +259,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws Exception if something goes wrong
+     * @throws \Exception if something goes wrong
      */
     public function afterOrder(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -329,7 +327,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                 }
 
                 $con->commit();
-            } catch (Exception  $ex) {
+            } catch (\Exception  $ex) {
                 $con->rollBack();
 
                 throw $ex;
@@ -346,7 +344,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      *
      * @param string $eventName
      *
-     * @throws Exception
+     * @throws \Exception
      * @throws PropelException
      */
     public function orderStatusChange(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void

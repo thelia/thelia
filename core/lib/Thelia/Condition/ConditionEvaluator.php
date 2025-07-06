@@ -11,9 +11,9 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Condition;
 
-use Exception;
 use Thelia\Condition\Implementation\ConditionInterface;
 
 /**
@@ -50,7 +50,7 @@ class ConditionEvaluator
      * @param string $o  Operator ex : Operators::DIFFERENT
      * @param mixed  $v2 Variable 2
      *
-     * @throws Exception
+     * @throws \Exception
      *
      * @return bool
      */
@@ -73,7 +73,7 @@ class ConditionEvaluator
             Operators::IN => \in_array($v1, $v2),
             // not in
             Operators::OUT => !\in_array($v1, $v2),
-            default => throw new Exception('Unrecognized operator '.$o),
+            default => throw new \Exception('Unrecognized operator '.$o),
         };
     }
 }

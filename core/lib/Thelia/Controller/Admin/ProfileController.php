@@ -1,5 +1,7 @@
-<?php /** @noinspection PhpRedundantOptionalArgumentInspection */
+<?php
+
 /** @noinspection PhpRedundantOptionalArgumentInspection */
+/* @noinspection PhpRedundantOptionalArgumentInspection */
 
 declare(strict_types=1);
 
@@ -12,19 +14,17 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Controller\Admin;
 
-
-use Exception;
-use LogicException;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Profile\ProfileEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
@@ -226,10 +226,8 @@ class ProfileController extends AbstractCrudController
      * Put in this method post object creation processing if required.
      *
      * @param ActionEvent $createEvent the create event
-     *
-     * @return Response
      */
-    protected function performAdditionalCreateAction(ActionEvent $createEvent): ?\Symfony\Component\HttpFoundation\Response
+    protected function performAdditionalCreateAction(ActionEvent $createEvent): ?Response
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.profiles.update',
@@ -243,7 +241,7 @@ class ProfileController extends AbstractCrudController
         return $this->generateRedirectFromRoute('admin.configuration.profiles.list');
     }
 
-    public function updateAction(ParserContext $parserContext): \Symfony\Component\HttpFoundation\Response
+    public function updateAction(ParserContext $parserContext): Response
     {
         if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
@@ -356,7 +354,7 @@ class ProfileController extends AbstractCrudController
             $eventDispatcher->dispatch($changeEvent, TheliaEvents::PROFILE_RESOURCE_ACCESS_UPDATE);
 
             if (!$this->eventContainsObject($changeEvent)) {
-                throw new LogicException(
+                throw new \LogicException(
                     $this->getTranslator()->trans('No %obj was updated.', ['%obj', $this->objectName])
                 );
             }
@@ -366,7 +364,7 @@ class ProfileController extends AbstractCrudController
                 $this->adminLogAppend(
                     $this->resourceCode,
                     AccessManager::UPDATE,
-                    sprintf(
+                    \sprintf(
                         '%s %s (ID %s) modified',
                         ucfirst($this->objectName),
                         $this->getObjectLabel($changedObject),
@@ -380,7 +378,7 @@ class ProfileController extends AbstractCrudController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -413,7 +411,7 @@ class ProfileController extends AbstractCrudController
             $eventDispatcher->dispatch($changeEvent, TheliaEvents::PROFILE_MODULE_ACCESS_UPDATE);
 
             if (!$this->eventContainsObject($changeEvent)) {
-                throw new LogicException(
+                throw new \LogicException(
                     $this->getTranslator()->trans('No %obj was updated.', ['%obj', $this->objectName])
                 );
             }
@@ -423,7 +421,7 @@ class ProfileController extends AbstractCrudController
                 $this->adminLogAppend(
                     $this->resourceCode,
                     AccessManager::UPDATE,
-                    sprintf(
+                    \sprintf(
                         '%s %s (ID %s) modified',
                         ucfirst($this->objectName),
                         $this->getObjectLabel($changedObject),
@@ -437,7 +435,7 @@ class ProfileController extends AbstractCrudController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }

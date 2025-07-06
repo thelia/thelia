@@ -11,10 +11,11 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Thelia\Core\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
+use Thelia\Core\Controller\ControllerResolver;
 
 return static function (ContainerConfigurator $configurator): void {
     $services = $configurator->services();

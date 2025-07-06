@@ -11,10 +11,10 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Tools\Version;
 
 use Thelia\Core\Thelia;
-use InvalidArgumentException;
 use Thelia\Tools\Version\Constraints\ConstraintEqual;
 use Thelia\Tools\Version\Constraints\ConstraintGreater;
 use Thelia\Tools\Version\Constraints\ConstraintInterface;
@@ -122,8 +122,8 @@ class Version
         )$`x";
 
         if (!preg_match($pattern, $version, $match)) {
-            throw new InvalidArgumentException(
-                sprintf(
+            throw new \InvalidArgumentException(
+                \sprintf(
                     'Invalid version number provided : %s'.\PHP_EOL,
                     $version
                 )

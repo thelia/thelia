@@ -11,6 +11,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Form;
 
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -31,13 +32,13 @@ class ProductModificationForm extends ProductCreationForm
 
         $this->formBuilder
             ->add('id', IntegerType::class, [
-                    'label' => Translator::getInstance()->trans('Prodcut ID *'),
-                    'label_attr' => ['for' => 'product_id_field'],
-                    'constraints' => [new GreaterThan(['value' => 0])],
+                'label' => Translator::getInstance()->trans('Prodcut ID *'),
+                'label_attr' => ['for' => 'product_id_field'],
+                'constraints' => [new GreaterThan(['value' => 0])],
             ])
             ->add('template_id', IntegerType::class, [
-                    'label' => Translator::getInstance()->trans('Product template'),
-                    'label_attr' => ['for' => 'product_template_field'],
+                'label' => Translator::getInstance()->trans('Product template'),
+                'label_attr' => ['for' => 'product_template_field'],
             ])
             ->add('brand_id', IntegerType::class, [
                 'constraints' => [new NotBlank()],
