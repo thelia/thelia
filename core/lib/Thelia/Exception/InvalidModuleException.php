@@ -44,4 +44,12 @@ class InvalidModuleException extends RuntimeException
 
         return rtrim($message, $separator);
     }
+
+    public function __toString(): string
+    {
+        return sprintf(
+            'InvalidModuleException: %s',
+            $this->getErrorsAsString()
+        );
+    }
 }

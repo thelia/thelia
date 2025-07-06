@@ -161,7 +161,6 @@ class XmlFileLoader extends FileLoader
         foreach ($loops as $loop) {
             $loopConfig[$this->getAttributeAsPhp($loop, 'name')] = $this->getAttributeAsPhp($loop, 'class');
         }
-
         $this->container->setParameter('Thelia.parser.loops', $loopConfig);
     }
 

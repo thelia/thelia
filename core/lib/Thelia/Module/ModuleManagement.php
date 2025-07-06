@@ -79,10 +79,11 @@ class ModuleManagement
 
             foreach ($finder as $file) {
                 try {
+                    $filePath = $file->getRealPath();
                     $modulesUpdated[] = $this->updateModule($file, $container);
                 } catch (Exception $ex) {
                     // Guess module code
-                    $moduleCode = basename(\dirname($file, 2));
+                    $moduleCode = basename(\dirname($filePath, 2));
 
                     $errors[$moduleCode] = $ex;
                 }

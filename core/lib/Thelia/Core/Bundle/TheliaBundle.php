@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Core\Bundle;
 
+use Composer\Util\Loop;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -20,6 +21,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueReso
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentLocatorsPass;
 use Thelia\Core\DependencyInjection\Compiler\CurrencyConverterProviderPass;
 use Thelia\Core\DependencyInjection\Compiler\FallbackParserPass;
+use Thelia\Core\DependencyInjection\Compiler\LoopCompilerPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterApiResourceAddonPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterCommandPass;
@@ -54,6 +56,7 @@ class TheliaBundle extends Bundle
         $container
             ->addCompilerPass(new FallbackParserPass())
             ->addCompilerPass(new TranslatorPass())
+            ->addCompilerPass(new LoopCompilerPass())
             ->addCompilerPass(new ControllerArgumentValueResolverPass())
             ->addCompilerPass(new RegisterControllerArgumentLocatorsPass())
             ->addCompilerPass(new RegisterHookListenersPass(), PassConfig::TYPE_AFTER_REMOVING)
