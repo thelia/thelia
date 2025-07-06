@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Condition\Implementation;
 
 use Thelia\Coupon\FacadeInterface;
@@ -29,12 +30,12 @@ class MatchForEveryone extends ConditionAbstract
         parent::__construct($facade);
     }
 
-    public function getServiceId()
+    public function getServiceId(): string
     {
         return 'thelia.condition.match_for_everyone';
     }
 
-    public function setValidatorsFromForm(array $operators, array $values)
+    public function setValidatorsFromForm(array $operators, array $values): static
     {
         $this->operators = [];
         $this->values = [];
@@ -42,12 +43,12 @@ class MatchForEveryone extends ConditionAbstract
         return $this;
     }
 
-    public function isMatching()
+    public function isMatching(): bool
     {
         return true;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->translator->trans(
             'Unconditional usage',
@@ -55,32 +56,28 @@ class MatchForEveryone extends ConditionAbstract
         );
     }
 
-    public function getToolTip()
+    public function getToolTip(): string
     {
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'This condition is always true',
             []
         );
-
-        return $toolTip;
     }
 
-    public function getSummary()
+    public function getSummary(): string
     {
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'Unconditionnal usage',
             []
         );
-
-        return $toolTip;
     }
 
-    protected function generateInputs()
+    protected function generateInputs(): array
     {
         return [];
     }
 
-    public function drawBackOfficeInputs()
+    public function drawBackOfficeInputs(): string
     {
         // No input
         return '';

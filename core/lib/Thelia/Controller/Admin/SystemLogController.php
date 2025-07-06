@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,15 +11,19 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use DirectoryIterator;
+use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
+use UnexpectedValueException;
 
 /**
  * Class LangController.
@@ -26,7 +32,7 @@ use Thelia\Model\ConfigQuery;
  */
 class SystemLogController extends BaseAdminController
 {
-    protected function renderTemplate()
+    protected function renderTemplate(): Response
     {
         $destinations = [];
 
@@ -36,7 +42,7 @@ class SystemLogController extends BaseAdminController
             $this->loadDefinedDestinations($dir, $destinations);
         }
 
-        $active_destinations = explode(';', ConfigQuery::read(Tlog::VAR_DESTINATIONS, Tlog::DEFAUT_DESTINATIONS));
+        $active_destinations = explode(';', (string) ConfigQuery::read(Tlog::VAR_DESTINATIONS, Tlog::DEFAUT_DESTINATIONS));
 
         return $this->render(
             'system-logs',
@@ -51,7 +57,7 @@ class SystemLogController extends BaseAdminController
     protected function loadDefinedDestinations($directory, &$destinations): void
     {
         try {
-            foreach (new \DirectoryIterator($directory) as $fileInfo) {
+            foreach (new DirectoryIterator($directory) as $fileInfo) {
                 if ($fileInfo->isDot()) {
                     continue;
                 }
@@ -68,17 +74,17 @@ class SystemLogController extends BaseAdminController
                     }
                 }
             }
-        } catch (\UnexpectedValueException $ex) {
+        } catch (UnexpectedValueException) {
             // Directory does no exists -> Nothing to do
         }
     }
 
     /**
-     * @return mixed|\Thelia\Core\HttpFoundation\Response
+     * @return mixed|Response
      */
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SYSTEM_LOG, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::SYSTEM_LOG, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -96,9 +102,9 @@ class SystemLogController extends BaseAdminController
         return $this->renderTemplate();
     }
 
-    public function saveAction()
+    public function saveAction(): Response|RedirectResponse
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SYSTEM_LOG, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::SYSTEM_LOG, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -144,14 +150,14 @@ class SystemLogController extends BaseAdminController
             );
 
             $response = $this->generateRedirectFromRoute('admin.configuration.system-logs.default');
-        } catch (\Exception $ex) {
-            $error_msg = $ex->getMessage();
+        } catch (Exception $exception) {
+            $error_msg = $exception->getMessage();
 
             $this->setupFormErrorContext(
                 $this->getTranslator()->trans('System log configuration failed.'),
                 $error_msg,
                 $systemLogForm,
-                $ex
+                $exception
             );
 
             $response = $this->renderTemplate();

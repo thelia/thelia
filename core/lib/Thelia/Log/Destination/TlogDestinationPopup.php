@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Log\Destination;
 
 use Thelia\Log\AbstractTlogDestination;
@@ -20,26 +21,29 @@ class TlogDestinationPopup extends AbstractTlogDestination
     // Nom des variables de configuration
     // ----------------------------------
     public const VAR_POPUP_WIDTH = 'tlog_destinationpopup_width';
+
     public const VALEUR_POPUP_WIDTH_DEFAUT = '600';
 
     public const VAR_POPUP_HEIGHT = 'tlog_destinationpopup_height';
+
     public const VALEUR_POPUP_HEIGHT_DEFAUT = '600';
 
     public const VAR_POPUP_TPL = 'tlog_destinationpopup_template';
+
     // Ce fichier doit se trouver dans le même répertoire que TlogDestinationPopup.class.php
     public const VALEUR_POPUP_TPL_DEFAUT = 'TlogDestinationPopup.tpl';
 
-    public function getTitle()
+    public function getTitle(): string
     {
         return 'Javascript popup window';
     }
 
-    public function getDescription()
+    public function getDescription(): string
     {
         return 'Display logs in a popup window, separate from the main window .';
     }
 
-    public function getConfigs()
+    public function getConfigs(): array
     {
         return [
             new TlogDestinationConfig(
@@ -72,7 +76,7 @@ class TlogDestinationPopup extends AbstractTlogDestination
         $count = 1;
 
         foreach ($this->logs as $line) {
-            $content .= '<div class="'.($count++ % 2 ? 'paire' : 'impaire').'">'.htmlspecialchars($line).'</div>';
+            $content .= '<div class="'.($count++ % 2 !== 0 ? 'paire' : 'impaire').'">'.htmlspecialchars((string) $line).'</div>';
         }
 
         $tpl = $this->getConfig(self::VAR_POPUP_TPL);
@@ -95,8 +99,9 @@ class TlogDestinationPopup extends AbstractTlogDestination
             str_replace('"', '\\"', $tpl)
         );
 
-        if (preg_match('|</body>|i', $res)) {
-            $res = preg_replace('|</body>|i', "$wop\n</body>", $res);
+        if (preg_match('|</body>|i', (string) $res)) {
+            $res = preg_replace('|</body>|i', $wop . '
+</body>', (string) $res);
         } else {
             $res .= $wop;
         }

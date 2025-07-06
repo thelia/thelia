@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+use RuntimeException;
+use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -33,24 +37,19 @@ use Thelia\Module\Validator\ModuleValidator;
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
+#[AsCommand(name: 'module:activate', description: 'Activates a module')]
 class ModuleActivateCommand extends BaseModuleGenerate
 {
-    protected $eventDispatcher;
-    private \Thelia\Command\Install $install;
-
-    public function __construct(EventDispatcherInterface $eventDispatcher, Install $install)
+    public function __construct(
+        protected EventDispatcherInterface $eventDispatcher
+    )
     {
-        $this->eventDispatcher = $eventDispatcher;
-
         parent::__construct();
-        $this->install = $install;
     }
 
     protected function configure(): void
     {
         $this
-            ->setName('module:activate')
-            ->setDescription('Activates a module')
             ->addOption(
                 'with-dependencies',
                 null,
@@ -82,12 +81,13 @@ class ModuleActivateCommand extends BaseModuleGenerate
                 if (is_dir(THELIA_LOCAL_MODULE_DIR.$moduleCode)) {
                     $module = $this->installModule(THELIA_LOCAL_MODULE_DIR.$moduleCode);
                 }
+
                 if (is_dir(THELIA_MODULE_DIR.$moduleCode)) {
                     $module = $this->installModule(THELIA_MODULE_DIR.$moduleCode);
                 }
 
-                if (null === $module) {
-                    throw new \RuntimeException(sprintf('module %s not found', $moduleCode));
+                if (!$module instanceof Module) {
+                    throw new RuntimeException(sprintf('module %s not found', $moduleCode));
                 }
             }
 
@@ -104,14 +104,12 @@ class ModuleActivateCommand extends BaseModuleGenerate
                 }
 
                 $this->eventDispatcher->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
-            } catch (\Exception $e) {
-                throw new \RuntimeException(
-                    sprintf(
-                        'Activation fail with Exception : [%d] %s',
-                        $e->getCode(),
-                        $e->getMessage()
-                    )
-                );
+            } catch (Exception $e) {
+                throw new RuntimeException(sprintf(
+                    'Activation fail with Exception : [%d] %s',
+                    $e->getCode(),
+                    $e->getMessage()
+                ), $e->getCode(), $e);
             }
 
             // impossible to change output class in CommandTester...
@@ -122,9 +120,9 @@ class ModuleActivateCommand extends BaseModuleGenerate
                     '',
                 ], 'bg=green;fg=black');
             }
-        } catch (\Exception $e) {
+        } catch (Exception $exception) {
             if (!$input->getOption('silent')) {
-                throw $e;
+                throw $exception;
             }
         }
 

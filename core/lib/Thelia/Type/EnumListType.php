@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Type;
+
+use Traversable;
+use InvalidArgumentException;
 
 /**
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
@@ -34,14 +38,14 @@ class EnumListType extends BaseType
     }
 
     /**
-     * @param array|\Traversable $values
+     * @param array|Traversable $values
      *
      * @since 2.3.0
      */
     public function addValues($values): void
     {
-        if (!\is_array($values) && !$values instanceof \Traversable) {
-            throw new \InvalidArgumentException('$values must be an array or an instance of \Traversable');
+        if (!\is_array($values) && !$values instanceof Traversable) {
+            throw new InvalidArgumentException('$values must be an array or an instance of \Traversable');
         }
 
         foreach ($values as $value) {
@@ -49,16 +53,17 @@ class EnumListType extends BaseType
         }
     }
 
-    public function getType()
+    public function getType(): string
     {
         return 'Enum list type';
     }
 
-    public function isValid($values)
+    public function isValid($values): bool
     {
         if (null === $values) {
             return false;
         }
+
         foreach (explode(',', $values) as $value) {
             if (!$this->isSingleValueValid($value)) {
                 return false;
@@ -70,15 +75,15 @@ class EnumListType extends BaseType
 
     public function getFormattedValue($values)
     {
-        return $this->isValid($values) ? explode(',', $values) : null;
+        return $this->isValid($values) ? explode(',', (string) $values) : null;
     }
 
-    public function isSingleValueValid($value)
+    public function isSingleValueValid($value): bool
     {
         return \in_array($value, $this->values);
     }
 
-    public function getFormOptions()
+    public function getFormOptions(): array
     {
         return [];
     }

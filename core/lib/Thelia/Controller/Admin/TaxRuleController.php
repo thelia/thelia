@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,18 +11,24 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+
+use Exception;
+use LogicException;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Tax\TaxRuleEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\ConfigQuery;
@@ -45,7 +53,7 @@ class TaxRuleController extends AbstractCrudController
         );
     }
 
-    public function defaultAction()
+    public function defaultAction(): \Symfony\Component\HttpFoundation\Response
     {
         // In the tax rule template we use the TaxCreationForm.
         //
@@ -61,17 +69,17 @@ class TaxRuleController extends AbstractCrudController
         return parent::defaultAction();
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::TAX_RULE_CREATION);
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::TAX_RULE_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $event = new TaxRuleEvent();
 
@@ -82,7 +90,7 @@ class TaxRuleController extends AbstractCrudController
         return $event;
     }
 
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $event = new TaxRuleEvent();
 
@@ -94,7 +102,7 @@ class TaxRuleController extends AbstractCrudController
         return $event;
     }
 
-    protected function getUpdateTaxListEvent($formData)
+    protected function getUpdateTaxListEvent(array $formData): TaxRuleEvent
     {
         $event = new TaxRuleEvent();
 
@@ -106,7 +114,7 @@ class TaxRuleController extends AbstractCrudController
         return $event;
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): TaxRuleEvent
     {
         $event = new TaxRuleEvent();
 
@@ -117,12 +125,12 @@ class TaxRuleController extends AbstractCrudController
         return $event;
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasTaxRule();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -137,10 +145,8 @@ class TaxRuleController extends AbstractCrudController
 
     /**
      * @param TaxRule $object
-     *
-     * @return \Thelia\Form\BaseForm
      */
-    protected function hydrateTaxUpdateForm($object)
+    protected function hydrateTaxUpdateForm($object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -150,12 +156,12 @@ class TaxRuleController extends AbstractCrudController
         return $this->createForm(AdminForm::TAX_RULE_TAX_LIST_UPDATE, FormType::class, $data);
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasTaxRule() ? $event->getTaxRule() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $taxRule = TaxRuleQuery::create()
             ->findOneById($this->getRequest()->get('tax_rule_id'));
@@ -172,38 +178,35 @@ class TaxRuleController extends AbstractCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
     /**
      * @param TaxRule $object
-     *
-     * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
 
-    protected function getViewArguments($country = null, $tab = null, $state = null)
+    protected function getViewArguments($country = null, $tab = null, $state = null): array
     {
         return [
-            'tab' => $tab === null ? $this->getRequest()->get('tab', 'data') : $tab,
-            'country' => $country === null ? $this->getRequest()->get('country', CountryQuery::create()->findOneByByDefault(1)->getId()) : $country,
+            'tab' => $tab ?? $this->getRequest()->get('tab', 'data'),
+            'country' => $country ?? $this->getRequest()->get('country', CountryQuery::create()->findOneByByDefault(1)->getId()),
             'state' => $state,
         ];
     }
 
-    protected function getRouteArguments($tax_rule_id = null)
+    protected function getRouteArguments($tax_rule_id = null): array
     {
         return [
-            'tax_rule_id' => $tax_rule_id === null ? $this->getRequest()->get('tax_rule_id') : $tax_rule_id,
+            'tax_rule_id' => $tax_rule_id ?? $this->getRequest()->get('tax_rule_id'),
         ];
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         // We always return to the feature edition form
         return $this->render(
@@ -214,13 +217,13 @@ class TaxRuleController extends AbstractCrudController
         );
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         // We always return to the feature edition form
         return $this->render('tax-rule-edit', array_merge($this->getViewArguments(), $this->getRouteArguments()));
     }
 
-    protected function redirectToEditionTemplate($request = null, $country = null, $state = null)
+    protected function redirectToEditionTemplate($request = null, $country = null, $state = null): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.taxes-rules.update',
@@ -232,11 +235,11 @@ class TaxRuleController extends AbstractCrudController
     /**
      * Put in this method post object creation processing if required.
      *
-     * @param TaxRuleEvent $createEvent the create event
+     * @param ActionEvent $createEvent the create event
      *
      * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalCreateAction($createEvent)
+    protected function performAdditionalCreateAction(ActionEvent $createEvent): ?\Symfony\Component\HttpFoundation\Response
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.taxes-rules.update',
@@ -245,14 +248,14 @@ class TaxRuleController extends AbstractCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.configuration.taxes-rules.list');
     }
 
-    public function updateAction(ParserContext $parserContext)
+    public function updateAction(ParserContext $parserContext): \Symfony\Component\HttpFoundation\Response
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -269,9 +272,9 @@ class TaxRuleController extends AbstractCrudController
         return parent::updateAction($parserContext);
     }
 
-    public function setDefaultAction(EventDispatcherInterface $eventDispatcher)
+    public function setDefaultAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -288,10 +291,10 @@ class TaxRuleController extends AbstractCrudController
         return $this->redirectToListTemplate();
     }
 
-    public function processUpdateTaxesAction(EventDispatcherInterface $eventDispatcher)
+    public function processUpdateTaxesAction(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -317,7 +320,7 @@ class TaxRuleController extends AbstractCrudController
             $eventDispatcher->dispatch($changeEvent, TheliaEvents::TAX_RULE_TAXES_UPDATE);
 
             if (!$this->eventContainsObject($changeEvent)) {
-                throw new \LogicException(
+                throw new LogicException(
                     $this->getTranslator()->trans('No %obj was updated.', ['%obj', $this->objectName])
                 );
             }
@@ -346,7 +349,7 @@ class TaxRuleController extends AbstractCrudController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -362,14 +365,14 @@ class TaxRuleController extends AbstractCrudController
     /**
      * @return Response
      */
-    public function specsAction($taxRuleId)
+    public function specsAction($taxRuleId): \Symfony\Component\HttpFoundation\Response
     {
         $data = $this->getSpecification($taxRuleId);
 
         return $this->jsonResponse(json_encode($data));
     }
 
-    protected function getSpecification($taxRuleId)
+    protected function getSpecification($taxRuleId): array
     {
         $taxRuleCountries = TaxRuleCountryQuery::create()
             ->filterByTaxRuleId($taxRuleId)
@@ -391,7 +394,7 @@ class TaxRuleController extends AbstractCrudController
             while (true) {
                 $hasChanged = $taxRuleCountry === null
                     || $taxRuleCountry->getCountryId() != $currentCountryId
-                    || (int) $taxRuleCountry->getStateId() != $currentStateId
+                    || (int) $taxRuleCountry->getStateId() !== $currentStateId
                 ;
 
                 if ($hasChanged) {
@@ -422,12 +425,10 @@ class TaxRuleController extends AbstractCrudController
             }
         }
 
-        $data = [
+        return [
             'taxRules' => $taxRules,
             'specifications' => $specifications,
         ];
-
-        return $data;
     }
 
     #[Route(
@@ -435,9 +436,9 @@ class TaxRuleController extends AbstractCrudController
         name: 'admin.configuration.tax-rule.delivery.modules.update',
         methods: ['POST']
     )]
-    public function updateDeliveryModulesTaxRule()
+    public function updateDeliveryModulesTaxRule(): Response|RedirectResponse
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 

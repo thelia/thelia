@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\Response;
+use Exception;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Administrator\AdministratorEvent;
@@ -30,15 +33,16 @@ use Thelia\Model\AdminQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
+use Thelia\Tools\RememberMeTrait;
 use Thelia\Tools\URL;
 
 class SessionController extends BaseAdminController
 {
-    use \Thelia\Tools\RememberMeTrait;
+    use RememberMeTrait;
 
     public const ADMIN_TOKEN_SESSION_VAR_NAME = 'thelia_admin_password_renew_token';
 
-    protected function checkAdminLoggedIn()
+    protected function checkAdminLoggedIn(): ?RedirectResponse
     {
         // Check if user is already authenticate
         if ($this->getSecurityContext()->hasAdminUser()) {
@@ -49,10 +53,10 @@ class SessionController extends BaseAdminController
         return null;
     }
 
-    protected function checkPasswordRecoveryEnabled()
+    protected function checkPasswordRecoveryEnabled(): ?Response
     {
         // Check if user is already authenticate
-        if (!(bool) ConfigQuery::read('enable_lost_admin_password_recovery', false)) {
+        if (!ConfigQuery::read('enable_lost_admin_password_recovery', false)) {
             AdminLog::append(
                 'admin',
                 'ADMIN_CREATE_PASSWORD',
@@ -63,29 +67,31 @@ class SessionController extends BaseAdminController
             // Redirect to the error page
             return $this->errorPage($this->getTranslator()->trans('The lost admin password recovery feature is disabled.'), 403);
         }
+
+        return null;
     }
 
-    public function showLoginAction()
+    public function showLoginAction(): RedirectResponse|Response
     {
-        if (null !== $response = $this->checkAdminLoggedIn()) {
+        if (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse) {
             return $response;
         }
 
         return $this->render('login');
     }
 
-    public function showLostPasswordAction()
+    public function showLostPasswordAction(): Response|RedirectResponse
     {
-        if ((null !== $response = $this->checkPasswordRecoveryEnabled()) || (null !== $response = $this->checkAdminLoggedIn())) {
+        if ((($response = $this->checkPasswordRecoveryEnabled()) instanceof Response) || (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse)) {
             return $response;
         }
 
         return $this->render('lost-password');
     }
 
-    public function passwordCreateRequestAction(EventDispatcherInterface $eventDispatcher)
+    public function passwordCreateRequestAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse|null
     {
-        if ((null !== $response = $this->checkPasswordRecoveryEnabled()) || (null !== $response = $this->checkAdminLoggedIn())) {
+        if ((($response = $this->checkPasswordRecoveryEnabled()) instanceof Response) || (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse)) {
             return $response;
         }
 
@@ -102,13 +108,13 @@ class SessionController extends BaseAdminController
             }
 
             if (null === $admin) {
-                throw new \Exception($this->getTranslator()->trans('Invalid username or email.'));
+                throw new Exception($this->getTranslator()->trans('Invalid username or email.'));
             }
 
             $email = $admin->getEmail();
 
             if (empty($email)) {
-                throw new \Exception($this->getTranslator()->trans('Sorry, no email defined for this administrator.'));
+                throw new Exception($this->getTranslator()->trans('Sorry, no email defined for this administrator.'));
             }
 
             $eventDispatcher->dispatch(new AdministratorEvent($admin), TheliaEvents::ADMINISTRATOR_CREATEPASSWORD);
@@ -118,7 +124,7 @@ class SessionController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Validation problem
             $message = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Log failure
             AdminLog::append('admin', 'ADMIN_LOST_PASSWORD', $ex->getMessage(), $this->getRequest());
 
@@ -130,18 +136,18 @@ class SessionController extends BaseAdminController
         return $this->render('lost-password');
     }
 
-    public function passwordCreateRequestSuccessAction()
+    public function passwordCreateRequestSuccessAction(): Response|RedirectResponse
     {
-        if ((null !== $response = $this->checkPasswordRecoveryEnabled()) || (null !== $response = $this->checkAdminLoggedIn())) {
+        if ((($response = $this->checkPasswordRecoveryEnabled()) instanceof Response) || (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse)) {
             return $response;
         }
 
         return $this->render('lost-password', ['create_request_success' => true]);
     }
 
-    public function displayCreateFormAction($token)
+    public function displayCreateFormAction($token): Response|RedirectResponse
     {
-        if ((null !== $response = $this->checkPasswordRecoveryEnabled()) || (null !== $response = $this->checkAdminLoggedIn())) {
+        if ((($response = $this->checkPasswordRecoveryEnabled()) instanceof Response) || (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse)) {
             return $response;
         }
 
@@ -158,9 +164,9 @@ class SessionController extends BaseAdminController
         return $this->render('create-password');
     }
 
-    public function passwordCreatedAction(EventDispatcherInterface $eventDispatcher)
+    public function passwordCreatedAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse|null
     {
-        if ((null !== $response = $this->checkPasswordRecoveryEnabled()) || (null !== $response = $this->checkAdminLoggedIn())) {
+        if ((($response = $this->checkPasswordRecoveryEnabled()) instanceof Response) || (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse)) {
             return $response;
         }
 
@@ -174,7 +180,7 @@ class SessionController extends BaseAdminController
             $token = $this->getSession()->get(self::ADMIN_TOKEN_SESSION_VAR_NAME);
 
             if (empty($token) || null === $admin = AdminQuery::create()->findOneByPasswordRenewToken($token)) {
-                throw new \Exception($this->getTranslator()->trans('An invalid token was provided, your password cannot be changed'));
+                throw new Exception($this->getTranslator()->trans('An invalid token was provided, your password cannot be changed'));
             }
 
             $event = new AdministratorUpdatePasswordEvent($admin);
@@ -188,7 +194,7 @@ class SessionController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Validation problem
             $message = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Log authentication failure
             AdminLog::append('admin', 'ADMIN_CREATE_PASSWORD', $ex->getMessage(), $this->getRequest());
 
@@ -200,16 +206,16 @@ class SessionController extends BaseAdminController
         return $this->render('create-password');
     }
 
-    public function passwordCreatedSuccessAction()
+    public function passwordCreatedSuccessAction(): Response|RedirectResponse
     {
-        if ((null !== $response = $this->checkPasswordRecoveryEnabled()) || (null !== $response = $this->checkAdminLoggedIn())) {
+        if ((($response = $this->checkPasswordRecoveryEnabled()) instanceof Response) || (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse)) {
             return $response;
         }
 
         return $this->render('create-password-success');
     }
 
-    public function checkLogoutAction(EventDispatcherInterface $eventDispatcher)
+    public function checkLogoutAction(EventDispatcherInterface $eventDispatcher): RedirectResponse
     {
         $eventDispatcher->dispatch(new DefaultActionEvent(), TheliaEvents::ADMIN_LOGOUT);
 
@@ -222,7 +228,7 @@ class SessionController extends BaseAdminController
         return $this->generateRedirectFromRoute('admin.login');
     }
 
-    public function checkLoginAction(EventDispatcherInterface $eventDispatcher)
+    public function checkLoginAction(EventDispatcherInterface $eventDispatcher): RedirectResponse|null|Response
     {
         $request = $this->getRequest();
 
@@ -261,7 +267,7 @@ class SessionController extends BaseAdminController
 
             // Check if we have to ask the user to set its address email.
             // This is the case if Thelia has been updated from a pre 2.3.0 version
-            if (!str_contains($user->getEmail(), '@')) {
+            if (!str_contains((string) $user->getEmail(), '@')) {
                 return $this->generateRedirectFromRoute('admin.set-email-address');
             }
 
@@ -271,12 +277,12 @@ class SessionController extends BaseAdminController
             // Validation problem
             $message = $this->createStandardFormValidationErrorMessage($ex);
         } catch (AuthenticationException $ex) {
-            $username = null !== $authenticator ? $authenticator->getUsername() : 'unknown';
+            $username = $authenticator instanceof AdminUsernamePasswordFormAuthenticator ? $authenticator->getUsername() : 'unknown';
             // Log authentication failure
             AdminLog::append('admin', 'LOGIN', sprintf("Authentication failure for username '%s'", $username), $request);
 
             $message = $this->getTranslator()->trans('Login failed. Please check your username and password.');
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Log authentication failure
             AdminLog::append('admin', 'LOGIN', sprintf('Undefined error: %s', $ex->getMessage()), $request);
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Tools\Version;
 
+use Thelia\Core\Thelia;
+use InvalidArgumentException;
 use Thelia\Tools\Version\Constraints\ConstraintEqual;
 use Thelia\Tools\Version\Constraints\ConstraintGreater;
 use Thelia\Tools\Version\Constraints\ConstraintInterface;
@@ -44,7 +47,7 @@ class Version
      *
      * @return bool true if version matches the constraints
      */
-    public static function test($version, $constraints, $strict = false, $defaultComparison = '=')
+    public static function test($version, $constraints, $strict = false, string $defaultComparison = '='): bool
     {
         $constraints = self::parseConstraints($constraints, $defaultComparison);
 
@@ -58,12 +61,15 @@ class Version
         return true;
     }
 
-    private static function parseConstraints($constraints, $defaultComparison = '=')
+    /**
+     * @return list<(ConstraintEqual|ConstraintGreater|ConstraintLower|ConstraintNearlyEqual)>
+     */
+    private static function parseConstraints($constraints, string $defaultComparison = '='): array
     {
         $constraintsList = [];
 
-        foreach (explode(' ', $constraints) as $expression) {
-            if (1 === preg_match('/^[0-9]/', $expression)) {
+        foreach (explode(' ', (string) $constraints) as $expression) {
+            if (1 === preg_match('/^\d/', $expression)) {
                 $expression = $defaultComparison.$expression;
             }
 
@@ -102,10 +108,10 @@ class Version
      *               'extra' => 'alphanumeric'
      *               ]
      */
-    public static function parse($version = null)
+    public static function parse($version = null): array
     {
         if (null === $version) {
-            $version = \Thelia\Core\Thelia::THELIA_VERSION;
+            $version = Thelia::THELIA_VERSION;
         }
 
         $pattern = "`^(?<version>
@@ -116,7 +122,7 @@ class Version
         )$`x";
 
         if (!preg_match($pattern, $version, $match)) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf(
                     'Invalid version number provided : %s'.\PHP_EOL,
                     $version

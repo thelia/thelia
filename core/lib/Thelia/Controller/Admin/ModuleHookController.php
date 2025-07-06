@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,12 +11,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+
+use Exception;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Hook\ModuleHookCreateEvent;
 use Thelia\Core\Event\Hook\ModuleHookDeleteEvent;
 use Thelia\Core\Event\Hook\ModuleHookEvent;
@@ -23,10 +29,11 @@ use Thelia\Core\Event\Hook\ModuleHookUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Hook\BaseHook;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\ModuleHookModificationForm;
 use Thelia\Model\IgnoredModuleHook;
@@ -56,18 +63,18 @@ class ModuleHookController extends AbstractCrudController
         );
     }
 
-    public function indexAction()
+    public function indexAction(): Response
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
         return $this->renderList();
     }
 
-    public function toggleActivationAction(EventDispatcherInterface $eventDispatcher, $module_hook_id)
+    public function toggleActivationAction(EventDispatcherInterface $eventDispatcher, $module_hook_id): Response
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -77,16 +84,12 @@ class ModuleHookController extends AbstractCrudController
 
         try {
             $eventDispatcher->dispatch($event, TheliaEvents::MODULE_HOOK_TOGGLE_ACTIVATION);
-        } catch (\Exception $ex) {
-            $message = $ex->getMessage();
+        } catch (Exception $exception) {
+            $message = $exception->getMessage();
         }
 
         if ($this->getRequest()->isXmlHttpRequest()) {
-            if ($message) {
-                $response = $this->jsonResponse(json_encode(['error' => $message]), 500);
-            } else {
-                $response = $this->nullResponse();
-            }
+            $response = $message ? $this->jsonResponse(json_encode(['error' => $message]), 500) : $this->nullResponse();
         } else {
             $response = $this->generateRedirectFromRoute('admin.module-hook');
         }
@@ -94,10 +97,10 @@ class ModuleHookController extends AbstractCrudController
         return $response;
     }
 
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('module_hook_id', null),
+            $this->getRequest()->get('module_hook_id'),
             $positionChangeMode,
             $positionValue
         );
@@ -106,7 +109,7 @@ class ModuleHookController extends AbstractCrudController
     /**
      * Return the creation form for this object.
      */
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::MODULE_HOOK_CREATION);
     }
@@ -114,7 +117,7 @@ class ModuleHookController extends AbstractCrudController
     /**
      * Return the update form for this object.
      */
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::MODULE_HOOK_MODIFICATION);
     }
@@ -126,7 +129,7 @@ class ModuleHookController extends AbstractCrudController
      *
      * @return ModuleHookModificationForm
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -144,11 +147,10 @@ class ModuleHookController extends AbstractCrudController
     /**
      * Creates the creation event with the provided form data.
      *
-     * @param array $formData
      *
      * @return ModuleHookCreateEvent
      */
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $event = new ModuleHookCreateEvent();
 
@@ -158,18 +160,17 @@ class ModuleHookController extends AbstractCrudController
     /**
      * Creates the update event with the provided form data.
      *
-     * @param array $formData
      *
      * @return ModuleHookUpdateEvent
      */
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $event = new ModuleHookUpdateEvent();
 
         return $this->hydrateEvent($event, $formData, true);
     }
 
-    protected function hydrateEvent($event, $formData, $update = false)
+    protected function hydrateEvent($event, array $formData, $update = false)
     {
         if (!$update) {
             $event
@@ -193,7 +194,7 @@ class ModuleHookController extends AbstractCrudController
     /**
      * Creates the delete event with the provided form data.
      */
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): ModuleHookDeleteEvent
     {
         return new ModuleHookDeleteEvent($this->getRequest()->get('module_hook_id'));
     }
@@ -202,10 +203,8 @@ class ModuleHookController extends AbstractCrudController
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
      * @param ModuleHookEvent $event
-     *
-     * @return bool
      */
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasModuleHook();
     }
@@ -217,7 +216,7 @@ class ModuleHookController extends AbstractCrudController
      *
      * @return ModuleHook|null
      */
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->getModuleHook();
     }
@@ -227,22 +226,18 @@ class ModuleHookController extends AbstractCrudController
      *
      * @return ModuleHook|null
      */
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
-        $moduleHook = ModuleHookQuery::create()
+        return ModuleHookQuery::create()
             ->findPK($this->getRequest()->get('module_hook_id', 0));
-
-        return $moduleHook;
     }
 
     /**
      * Returns the object label form the object event (name, title, etc.).
      *
      * @param ModuleHook $object
-     *
-     * @return string
      */
-    protected function getObjectLabel($object)
+    protected function getObjectLabel($object): string
     {
         try {
             return sprintf(
@@ -250,7 +245,7 @@ class ModuleHookController extends AbstractCrudController
                 $object->getModule()->getTitle(),
                 $object->getHook()->getTitle()
             );
-        } catch (\Exception $ex) {
+        } catch (Exception) {
             return 'Undefined module hook';
         }
     }
@@ -259,10 +254,8 @@ class ModuleHookController extends AbstractCrudController
      * Returns the object ID from the object.
      *
      * @param ModuleHook $object
-     *
-     * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -271,10 +264,8 @@ class ModuleHookController extends AbstractCrudController
      * Render the main list template.
      *
      * @param string $currentOrder , if any, null otherwise
-     *
-     * @return Response
      */
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render(
             'module-hooks',
@@ -284,18 +275,13 @@ class ModuleHookController extends AbstractCrudController
 
     /**
      * Render the edition template.
-     *
-     * @return Response
      */
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('module-hook-edit', $this->getEditionArgument());
     }
 
-    /**
-     * @return array
-     */
-    protected function getEditionArgument()
+    protected function getEditionArgument(): array
     {
         return [
             'module_hook_id' => $this->getRequest()->get('module_hook_id', 0),
@@ -307,7 +293,7 @@ class ModuleHookController extends AbstractCrudController
      *
      * @return Response
      */
-    protected function redirectToEditionTemplate($request = null, $country = null)
+    protected function redirectToEditionTemplate($request = null, $country = null): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.module-hook.update',
@@ -319,26 +305,26 @@ class ModuleHookController extends AbstractCrudController
     /**
      * Redirect to the list template.
      */
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.module-hook');
     }
 
-    protected function getViewArguments()
+    protected function getViewArguments(): array
     {
         return [];
     }
 
-    protected function getRouteArguments($module_hook_id = null)
+    protected function getRouteArguments($module_hook_id = null): array
     {
         return [
-            'module_hook_id' => $module_hook_id === null ? $this->getRequest()->get('module_hook_id') : $module_hook_id,
+            'module_hook_id' => $module_hook_id ?? $this->getRequest()->get('module_hook_id'),
         ];
     }
 
-    public function getModuleHookClassnames($moduleId)
+    public function getModuleHookClassnames($moduleId): Response|JsonResponse
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -372,9 +358,9 @@ class ModuleHookController extends AbstractCrudController
         return new JsonResponse($result);
     }
 
-    public function getModuleHookMethods($moduleId, $className)
+    public function getModuleHookMethods($moduleId, $className): Response|JsonResponse
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 

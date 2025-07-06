@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Exception;
+use LogicException;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -46,19 +50,20 @@ class LangController extends BaseAdminController
 {
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
         return $this->renderDefault();
     }
 
-    public function renderDefault(array $param = [], $status = 200)
+    public function renderDefault(array $param = [], int $status = 200): \Symfony\Component\HttpFoundation\Response
     {
         $data = [];
         foreach (LangQuery::create()->find() as $lang) {
             $data[LangUrlForm::LANG_PREFIX.$lang->getId()] = $lang->getUrl();
         }
+
         $langUrlForm = $this->createForm(AdminForm::LANG_URL, FormType::class, $data);
         $this->getParserContext()->addForm($langUrlForm);
 
@@ -70,7 +75,7 @@ class LangController extends BaseAdminController
 
     public function updateAction($lang_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -98,9 +103,9 @@ class LangController extends BaseAdminController
         ]);
     }
 
-    public function processUpdateAction(EventDispatcherInterface $eventDispatcher, $lang_id)
+    public function processUpdateAction(EventDispatcherInterface $eventDispatcher, $lang_id): \Symfony\Component\HttpFoundation\Response|RedirectResponse|null
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -117,7 +122,7 @@ class LangController extends BaseAdminController
             $eventDispatcher->dispatch($event, TheliaEvents::LANG_UPDATE);
 
             if (false === $event->hasLang()) {
-                throw new \LogicException(
+                throw new LogicException(
                     $this->getTranslator()->trans('No %obj was updated.', ['%obj', 'Lang'])
                 );
             }
@@ -137,9 +142,9 @@ class LangController extends BaseAdminController
             );
 
             $response = $this->generateRedirectFromRoute('admin.configuration.languages');
-        } catch (\Exception $ex) {
-            $error_msg = $this->getTranslator()->trans('Failed to update language definition: %ex', ['%ex' => $ex->getMessage()]);
-            Tlog::getInstance()->addError('Failed to update language definition', $ex->getMessage());
+        } catch (Exception $exception) {
+            $error_msg = $this->getTranslator()->trans('Failed to update language definition: %ex', ['%ex' => $exception->getMessage()]);
+            Tlog::getInstance()->addError('Failed to update language definition', $exception->getMessage());
         }
 
         if (false !== $error_msg) {
@@ -151,10 +156,8 @@ class LangController extends BaseAdminController
 
     /**
      * @param LangCreateEvent $event
-     *
-     * @return LangCreateEvent
      */
-    protected function hydrateEvent($event, Form $form)
+    protected function hydrateEvent($event, Form $form): LangCreateEvent
     {
         return $event
             ->setTitle($form->get('title')->getData())
@@ -169,7 +172,7 @@ class LangController extends BaseAdminController
         ;
     }
 
-    public function toggleDefaultAction(EventDispatcherInterface $eventDispatcher, $lang_id)
+    public function toggleDefaultAction(EventDispatcherInterface $eventDispatcher, $lang_id): \Symfony\Component\HttpFoundation\Response|JsonResponse|RedirectResponse
     {
         return $this->toggleLangDispatch(
             $eventDispatcher,
@@ -178,7 +181,7 @@ class LangController extends BaseAdminController
         );
     }
 
-    public function toggleActiveAction(EventDispatcherInterface $eventDispatcher, $lang_id)
+    public function toggleActiveAction(EventDispatcherInterface $eventDispatcher, $lang_id): \Symfony\Component\HttpFoundation\Response|JsonResponse|RedirectResponse
     {
         return $this->toggleLangDispatch(
             $eventDispatcher,
@@ -187,7 +190,7 @@ class LangController extends BaseAdminController
         );
     }
 
-    public function toggleVisibleAction(EventDispatcherInterface $eventDispatcher, $lang_id)
+    public function toggleVisibleAction(EventDispatcherInterface $eventDispatcher, $lang_id): \Symfony\Component\HttpFoundation\Response|JsonResponse|RedirectResponse
     {
         return $this->toggleLangDispatch(
             $eventDispatcher,
@@ -196,9 +199,9 @@ class LangController extends BaseAdminController
         );
     }
 
-    public function addAction(EventDispatcherInterface $eventDispatcher)
+    public function addAction(EventDispatcherInterface $eventDispatcher): \Symfony\Component\HttpFoundation\Response|RedirectResponse|null
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::CREATE)) {
+        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::CREATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -216,7 +219,7 @@ class LangController extends BaseAdminController
             $eventDispatcher->dispatch($createEvent, TheliaEvents::LANG_CREATE);
 
             if (false === $createEvent->hasLang()) {
-                throw new \LogicException(
+                throw new LogicException(
                     $this->getTranslator()->trans('No %obj was updated.', ['%obj', 'Lang'])
                 );
             }
@@ -239,7 +242,7 @@ class LangController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -259,9 +262,9 @@ class LangController extends BaseAdminController
         return $response;
     }
 
-    public function deleteAction(EventDispatcherInterface $eventDispatcher)
+    public function deleteAction(EventDispatcherInterface $eventDispatcher): \Symfony\Component\HttpFoundation\Response|RedirectResponse|null
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::DELETE)) {
+        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::DELETE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -277,9 +280,9 @@ class LangController extends BaseAdminController
             $eventDispatcher->dispatch($deleteEvent, TheliaEvents::LANG_DELETE);
 
             $response = $this->generateRedirectFromRoute('admin.configuration.languages');
-        } catch (\Exception $ex) {
-            Tlog::getInstance()->error(sprintf('error during language removal with message : %s', $ex->getMessage()));
-            $error_msg = $ex->getMessage();
+        } catch (Exception $exception) {
+            Tlog::getInstance()->error(sprintf('error during language removal with message : %s', $exception->getMessage()));
+            $error_msg = $exception->getMessage();
         }
 
         if (false !== $error_msg) {
@@ -291,9 +294,9 @@ class LangController extends BaseAdminController
         return $response;
     }
 
-    public function defaultBehaviorAction(EventDispatcherInterface $eventDispatcher)
+    public function defaultBehaviorAction(EventDispatcherInterface $eventDispatcher): \Symfony\Component\HttpFoundation\Response|RedirectResponse|null
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -313,7 +316,7 @@ class LangController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -333,9 +336,9 @@ class LangController extends BaseAdminController
         return $response;
     }
 
-    public function domainAction(EventDispatcherInterface $eventDispatcher)
+    public function domainAction(EventDispatcherInterface $eventDispatcher): \Symfony\Component\HttpFoundation\Response|RedirectResponse|null
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -349,8 +352,8 @@ class LangController extends BaseAdminController
             $data = $form->getData();
             $event = new LangUrlEvent();
             foreach ($data as $key => $value) {
-                if (str_contains($key, LangUrlForm::LANG_PREFIX)) {
-                    $event->addUrl(substr($key, \strlen(LangUrlForm::LANG_PREFIX)), $value);
+                if (str_contains((string) $key, LangUrlForm::LANG_PREFIX)) {
+                    $event->addUrl(substr((string) $key, \strlen(LangUrlForm::LANG_PREFIX)), $value);
                 }
             }
 
@@ -360,7 +363,7 @@ class LangController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -380,19 +383,19 @@ class LangController extends BaseAdminController
         return $response;
     }
 
-    public function activateDomainAction()
+    public function activateDomainAction(): \Symfony\Component\HttpFoundation\Response|RedirectResponse
     {
         return $this->domainActivation(1);
     }
 
-    public function deactivateDomainAction()
+    public function deactivateDomainAction(): \Symfony\Component\HttpFoundation\Response|RedirectResponse
     {
         return $this->domainActivation(0);
     }
 
-    private function domainActivation($activate)
+    private function domainActivation(int $activate): \Symfony\Component\HttpFoundation\Response|RedirectResponse
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -409,9 +412,9 @@ class LangController extends BaseAdminController
      *
      * @return Response
      */
-    protected function toggleLangDispatch(EventDispatcherInterface $eventDispatcher, $eventName, $event)
+    protected function toggleLangDispatch(EventDispatcherInterface $eventDispatcher, ?string $eventName, $event): \Symfony\Component\HttpFoundation\Response|JsonResponse|RedirectResponse
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -425,7 +428,7 @@ class LangController extends BaseAdminController
             $eventDispatcher->dispatch($event, $eventName);
 
             if (false === $event->hasLang()) {
-                throw new \LogicException(
+                throw new LogicException(
                     $this->getTranslator()->trans('No %obj was updated.', ['%obj', 'Lang'])
                 );
             }
@@ -442,9 +445,9 @@ class LangController extends BaseAdminController
                 ),
                 $changedObject->getId()
             );
-        } catch (\Exception $e) {
-            Tlog::getInstance()->error(sprintf('Error on changing languages with message : %s', $e->getMessage()));
-            $errorMessage = $e->getMessage();
+        } catch (Exception $exception) {
+            Tlog::getInstance()->error(sprintf('Error on changing languages with message : %s', $exception->getMessage()));
+            $errorMessage = $exception->getMessage();
         }
 
         if ($this->getRequest()->isXmlHttpRequest()) {

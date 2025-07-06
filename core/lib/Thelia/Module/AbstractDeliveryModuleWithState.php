@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Module;
 
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -60,13 +61,14 @@ abstract class AbstractDeliveryModuleWithState extends BaseModule implements Del
         return 'delivery';
     }
 
-    public function buildOrderPostage($untaxedPostage, $country, $locale, $taxRuleId = null)
+    public function buildOrderPostage($untaxedPostage, Country $country, $locale, $taxRuleId = null)
     {
         $taxRuleQuery = TaxRuleQuery::create();
         $taxRuleId = ($taxRuleId) ?: ConfigQuery::read('taxrule_id_delivery_module');
         if ($taxRuleId) {
             $taxRuleQuery->filterById($taxRuleId);
         }
+
         $taxRule = $taxRuleQuery->orderByIsDefault(Criteria::DESC)->findOne();
 
         $orderPostage = new OrderPostage();

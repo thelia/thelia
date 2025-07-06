@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Bridge\Propel\Validator;
 
+use RuntimeException;
 use ApiPlatform\Metadata\HttpOperation;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraint;
@@ -28,13 +30,15 @@ class I18nConstraintValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint): void
     {
         if (!$value instanceof I18nCollection) {
-            throw new \RuntimeException('I18nConstraint attribute should be used on'.I18nCollection::class);
+            throw new RuntimeException('I18nConstraint attribute should be used on'.I18nCollection::class);
         }
+
         $request = $this->requestStack->getCurrentRequest();
         $method = $request?->getMethod();
         if (!$method || $method === HttpOperation::METHOD_PATCH) {
             return;
         }
+
         $titleAndLocaleCount = 0;
 
         /** @var I18nCollection $i18nData */

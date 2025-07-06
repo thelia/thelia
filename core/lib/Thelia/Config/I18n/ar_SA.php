@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 return [
     ' content create form' => ' content creation form',
     ' note: only non-visible documents can be associated.' => ' ملاحظة: فقط الوثائق غير مرئية يمكن أن يرتبط بها.',
@@ -32,7 +33,7 @@ return [
     'A product with reference %ref already exists. Please choose another reference.' => 'مرجع المنتج % ref متوفر بالفعل ، الرجاء اختيار مرجع آخر .',
     'A short description, used when a summary or an introduction is required' => 'وصف قصير، يستخدم عند طلب ملخص أو مقدمة',
     'A short text, used when an additional or supplemental information is required.' => 'نص قصير، يستخدم عند طلب معلومات إضافية.',
-    'A user already exists with this email address. Please login or if you\'ve forgotten your password, go to Reset Your Password.' => 'هذا المستخدم موجود بالفعل مع عنوان هذا البريد الإلكتروني ، الرجاء تسجيل الدخول أو إذا كنت قد نسيت كلمة المرور الخاصة بك ، انتقل إلى "إعادة تعيين كلمة المرور الخاصة بك" .',
+    "A user already exists with this email address. Please login or if you've forgotten your password, go to Reset Your Password." => 'هذا المستخدم موجود بالفعل مع عنوان هذا البريد الإلكتروني ، الرجاء تسجيل الدخول أو إذا كنت قد نسيت كلمة المرور الخاصة بك ، انتقل إلى "إعادة تعيين كلمة المرور الخاصة بك" .',
     'A value for attribute "%name" is already present in the combination' => 'القيمة للسمة "%name" موجودة بالفعل في المجموع',
     'A variable with name "%name" already exists.' => 'الاسم الظاهر متغير مع اسم "%name" موجود مسبقاً .',
     'Activate logs only for these IP Addresses' => 'تفعيل سجلات لعناوين IP هذه فقط',
@@ -112,7 +113,7 @@ return [
     'Conclusion' => 'استنتاج',
     'Configuration' => 'لوحة التحكم',
     'Constant amount' => 'المبلغ الثابت',
-    'Constant amount found in one of the product\'s feature' => 'المبلغ الثابت موجود في ميزة واحدة من المنتج',
+    "Constant amount found in one of the product's feature" => 'المبلغ الثابت موجود في ميزة واحدة من المنتج',
     'Content title *' => 'عنوان المحتوى *',
     'Countries' => 'البلدان',
     'Country' => 'الدولة',
@@ -126,7 +127,7 @@ return [
     'Customer' => 'العميل',
     'Customers' => 'العملاء',
     'Dashboard' => 'لوحة المعلومات',
-    'Date \'%date\' is invalid, please enter a valid date using %fmt format' => 'التاريخ \'%date\' غير صالح ، الرجاء إدخال تاريخ صحيح باستخدام المنسق %fmt',
+    "Date '%date' is invalid, please enter a valid date using %fmt format" => 'التاريخ \'%date\' غير صالح ، الرجاء إدخال تاريخ صحيح باستخدام المنسق %fmt',
     'Debug' => 'التصحيح',
     'Default folder *' => 'المجلد الافتراضي *',
     'Default product category *' => 'فئة المنتج الافتراضي *',
@@ -218,8 +219,8 @@ return [
     'Login page' => 'صفحة تسجيل الدّخول',
     'Logs' => 'السجلات',
     'Loop cannot implements multiple Search Interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`' => 'لا يمكن أن تقوم بتنفيذ بحث في حلقات متعددة "واجهات البحث":`PropelSearchLoopInterface`, `ArraySearchLoopInterface`',
-    'Loop must implements \'PropelSearchLoopInterface\' to be timestampable' => 'يجب أن تنفذ حلقة \'PropelSearchLoopInterface\' كي تكون متواقته',
-    'Loop must implements \'PropelSearchLoopInterface\' to be versionable' => 'يجب أن تنفذ حلقة \'PropelSearchLoopInterface\' كي يتم نشرها',
+    "Loop must implements 'PropelSearchLoopInterface' to be timestampable" => 'يجب أن تنفذ حلقة \'PropelSearchLoopInterface\' كي تكون متواقته',
+    "Loop must implements 'PropelSearchLoopInterface' to be versionable" => 'يجب أن تنفذ حلقة \'PropelSearchLoopInterface\' كي يتم نشرها',
     'Loop must implements one of the following interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`' => 'يجب تنفيذ حلقة واحدة من الواجهات التالية: `PropelSearchLoopInterface`, `ArraySearchLoopInterface`',
     'Lost password' => 'فقدت كلمة المرور',
     'Mail template name' => 'اسم قالب البريد',
@@ -249,7 +250,7 @@ return [
     'New Password' => 'كلمة المرور الجديدة',
     'No %obj was created.' => 'لا %obj تم عمله.',
     'No %obj was updated.' => 'لم يتم تحديث %obj.',
-    'No module found for code \'%item\'' => 'لا توجد وحدة للتعليمات البرمجية \'%item\'',
+    "No module found for code '%item'" => 'لا توجد وحدة للتعليمات البرمجية \'%item\'',
     'No, I am a new customer.' => 'لا، أنا عميل جديد.',
     'Not in' => 'ليس',
     'Notices' => 'إشعارات',
@@ -319,7 +320,7 @@ return [
     'Select the product brand, or supplier.' => 'حدد المنتج العلامة التجارية، أو المورد.',
     'Select the products covered by this operation' => 'حدد المنتجات التي تشملها هذه العملية',
     'Select the virtual document' => 'حدد المستند الافتراضي',
-    'Sender\'s e-mail address: %email%' => 'عنوان البريد الإلكتروني للمرسل:٪ email٪',
+    "Sender's e-mail address: %email%" => 'عنوان البريد الإلكتروني للمرسل:٪ email٪',
     'Sender name: %name%' => 'اسم المرسل:٪ name٪',
     'Service ID' => 'معرف الخدمة',
     'Shipping zone name' => 'اسم منطقة الشحن',
@@ -332,7 +333,7 @@ return [
     'Sorry, an error occured: %s' => 'عذراً، حدث خطأ: %s',
     'Sorry, an error occurred: %err' => 'عذراً، حدث خطأ: %err',
     'Sorry, you are not allowed to perform this action.' => 'آسف، غير مسموح لك بتنفيذ هذا الإجراء.',
-    'Sorry, you\'re not allowed to perform this action' => 'آسف، غير مسموح لك بتنفيذ هذا الإجراء',
+    "Sorry, you're not allowed to perform this action" => 'آسف، غير مسموح لك بتنفيذ هذا الإجراء',
     'Source IP' => 'مصدر IP',
     'Start date' => 'تاريخ بداية النشر',
     'Start date of sales' => 'تاريخ البدء للمبيعات',
@@ -362,7 +363,7 @@ return [
     'Text Message' => 'رسالة نصية',
     'The %name module definition has not been initialized.' => 'لم تتم تعريف الوحدة النمطية %name.',
     'The %name module descriptor has not been initialized.' => 'لم تتم تعريف وصف الوحدة النمطية %name.',
-    'The %obj_name id \'%id\' doesn\'t exist' => 'معرف %obj_name \'%id\' غير موجود',
+    "The %obj_name id '%id' doesn't exist" => 'معرف %obj_name \'%id\' غير موجود',
     'The HTML TITLE element is the most important element on your web page.' => 'عنصر عنوان HTML هو أهم عنصر على صفحة الويب الخاصة بك.',
     'The brand name or title' => 'اسم العلامة التجارية أو العنوان',
     'The cart item count should match the condition' => 'يجب أن يطابق عدد العناصر في السلة مع الشروط',
@@ -370,7 +371,7 @@ return [
     'This condition is always true' => 'هذا الشرط صحيحاً دائماً',
     'This content is online.' => 'هذا المحتوى مفعل حالياً على الإنترنت.',
     'This coupon does not exists' => 'هذه القسيمة غير موجودة',
-    'This coupon will offert a flat percentage off a shopper\'s entire order (not applied to shipping costs or tax rates). If the discount is greater than the total order corst, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.' => 'هذه القسيمة سوف تعرض نسبة مئوية ثابتة خارج النظام بأكمله للمتسوقين (لا تطبق على أسعار الضريبة أو تكاليف الشحن). إذا كان الخصم أكبر من مجموع الطلب الإجمالي، سيكون فقط على العميل مبلغ قيمة الشحن، أو لا شيء من قيمة الشحن إذا كانت القسيمة توفر شحناً مجانياً.',
+    "This coupon will offert a flat percentage off a shopper's entire order (not applied to shipping costs or tax rates). If the discount is greater than the total order corst, the customer will only pay the shipping, or nothing if the coupon also provides free shipping." => 'هذه القسيمة سوف تعرض نسبة مئوية ثابتة خارج النظام بأكمله للمتسوقين (لا تطبق على أسعار الضريبة أو تكاليف الشحن). إذا كان الخصم أكبر من مجموع الطلب الإجمالي، سيكون فقط على العميل مبلغ قيمة الشحن، أو لا شيء من قيمة الشحن إذا كانت القسيمة توفر شحناً مجانياً.',
     'This coupon will subtracts a set amount from the total cost of an order. If the discount is greater than the total order corst, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.' => 'وسوف تطرح هذه القسيمة كمية محددة من التكلفة الإجمالية للطلب. إذا كان الخصم أكبر من إجمالي قيمة الطلب، سيكون فقط على العميل مبلغ قيمة الشحن، أو لا شيء من قيمة الشحن إذا كانت القسيمة توفر شحناً مجانياً.',
     'This email already exists.' => 'هذا البريد الإلكتروني موجود بالفعل.',
     'This email does not exists' => 'هذا البريد الإلكتروني غير موجود',
@@ -389,7 +390,7 @@ return [
     'Unconditional usage' => 'الاستخدام غير مشروط',
     'Unconditionnal usage' => 'الاستخدام غير مشروط',
     'Undefined loop argument "%name"' => 'الحلقة الوسيطة غير معرفة "%name"',
-    'Undefined search mode \'%mode\'' => 'وضع البحث غير معروف \'%\'',
+    "Undefined search mode '%mode'" => 'وضع البحث غير معروف \'%\'',
     'Unknown order ID:  %id' => 'طلب غير معروف: %id',
     'Unsupported magic method %name. only getArgname() is supported.' => '%name الأسلوب السحري غير معتمد. معتمد فقط من getArgname().',
     'Username' => 'اسم المستخدم',

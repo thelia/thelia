@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Hook;
 
 use Thelia\Core\Hook\Fragment;
@@ -22,17 +23,13 @@ use Thelia\Core\Hook\FragmentBag;
  */
 class HookRenderBlockEvent extends BaseHookRenderEvent
 {
-    /** @var FragmentBag */
-    protected $fragmentBag;
+    protected FragmentBag $fragmentBag;
 
-    /** @var array fields that can be added, if empty array any fields can be added */
-    protected $fields = [];
-
-    public function __construct($code, array $arguments = [], array $fields = [], array $templateVariables = [])
+    public function __construct($code, array $arguments = [], /** @var array fields that can be added, if empty array any fields can be added */
+    protected array $fields = [], array $templateVariables = [])
     {
         parent::__construct($code, $arguments, $templateVariables);
         $this->fragmentBag = new FragmentBag();
-        $this->fields = $fields;
     }
 
     /**
@@ -42,7 +39,7 @@ class HookRenderBlockEvent extends BaseHookRenderEvent
      *
      * @return $this
      */
-    public function add($data)
+    public function add($data): static
     {
         $fragment = new Fragment($data);
 
@@ -56,11 +53,12 @@ class HookRenderBlockEvent extends BaseHookRenderEvent
      *
      * @return $this
      */
-    public function addFragment(Fragment $fragment)
+    public function addFragment(Fragment $fragment): static
     {
-        if (!empty($this->fields)) {
+        if ($this->fields !== []) {
             $fragment->filter($this->fields);
         }
+
         $this->fragmentBag->addFragment($fragment);
 
         return $this;
@@ -68,18 +66,13 @@ class HookRenderBlockEvent extends BaseHookRenderEvent
 
     /**
      * Get all contents.
-     *
-     * @return FragmentBag
      */
-    public function get()
+    public function get(): FragmentBag
     {
         return $this->fragmentBag;
     }
 
-    /**
-     * @return array
-     */
-    public function getFields()
+    public function getFields(): array
     {
         return $this->fields;
     }

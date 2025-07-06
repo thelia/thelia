@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,14 +11,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Form;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
@@ -34,9 +37,9 @@ class CustomerLogin extends BruteforceForm
         $this->formBuilder
             ->add('email', EmailType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Email(),
-                    new Constraints\Callback([$this, 'verifyExistingEmail']),
+                    new NotBlank(),
+                    new Email(),
+                    new Callback($this->verifyExistingEmail(...)),
                 ],
                 'label' => Translator::getInstance()->trans('Please enter your email address'),
                 'label_attr' => [
@@ -45,8 +48,8 @@ class CustomerLogin extends BruteforceForm
             ])
             ->add('account', ChoiceType::class, [
                 'constraints' => [
-                    new Constraints\Callback(
-                        [$this, 'verifyAccount']),
+                    new Callback(
+                        $this->verifyAccount(...)),
                     ],
                 'choices' => [
                     Translator::getInstance()->trans('No, I am a new customer.') => 0,
@@ -59,7 +62,7 @@ class CustomerLogin extends BruteforceForm
             ])
             ->add('password', PasswordType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank([
+                    new NotBlank([
                         'groups' => ['existing_customer'],
                     ]),
                 ],
@@ -113,7 +116,7 @@ class CustomerLogin extends BruteforceForm
         }
     }
 
-    public static function getName()
+    public static function getName(): string
     {
         return 'thelia_customer_login';
     }

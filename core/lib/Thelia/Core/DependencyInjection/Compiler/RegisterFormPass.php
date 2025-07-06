@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -23,11 +24,11 @@ class RegisterFormPass implements CompilerPassInterface
     {
         try {
             $formConfig = $container->getParameter('Thelia.parser.forms');
-        } catch (ParameterNotFoundException $e) {
+        } catch (ParameterNotFoundException) {
             $formConfig = [];
         }
 
-        foreach ($container->findTaggedServiceIds('thelia.form') as $id => $tag) {
+        foreach (array_keys($container->findTaggedServiceIds('thelia.form')) as $id) {
             $formDefinition = $container->getDefinition($id);
             /** @var FormInterface $formClass */
             $formClass = $formDefinition->getClass();

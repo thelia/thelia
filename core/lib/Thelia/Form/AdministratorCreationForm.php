@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,14 +11,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Form;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Model\AdminQuery;
 use Thelia\Model\ConfigQuery;
@@ -32,9 +35,9 @@ class AdministratorCreationForm extends BaseForm
         $this->formBuilder
             ->add('login', TextType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Callback(
-                        [$this, 'verifyExistingLogin']),
+                    new NotBlank(),
+                    new Callback(
+                        $this->verifyExistingLogin(...)),
                 ],
                 'label' => $this->translator->trans('Login name'),
                 'label_attr' => [
@@ -44,10 +47,10 @@ class AdministratorCreationForm extends BaseForm
             ])
             ->add('email', EmailType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Email(),
-                    new Constraints\Callback(
-                        [$this, 'verifyExistingEmail']
+                    new NotBlank(),
+                    new Email(),
+                    new Callback(
+                        $this->verifyExistingEmail(...)
                     ),
                 ],
                 'label' => $this->translator->trans('Email address'),
@@ -61,7 +64,7 @@ class AdministratorCreationForm extends BaseForm
             ])
             ->add('firstname', TextType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
+                    new NotBlank(),
                 ],
                 'label' => $this->translator->trans('First Name'),
                 'label_attr' => [
@@ -70,7 +73,7 @@ class AdministratorCreationForm extends BaseForm
             ])
             ->add('lastname', TextType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
+                    new NotBlank(),
                 ],
                 'label' => $this->translator->trans('Last Name'),
                 'label_attr' => [
@@ -86,7 +89,7 @@ class AdministratorCreationForm extends BaseForm
             ])
             ->add('password_confirm', PasswordType::class, [
                 'constraints' => [
-                    new Constraints\Callback([$this, 'verifyPasswordField']),
+                    new Callback($this->verifyPasswordField(...)),
                 ],
                 'label' => $this->translator->trans('Password confirmation'),
                 'label_attr' => [
@@ -99,7 +102,7 @@ class AdministratorCreationForm extends BaseForm
                 [
                     'choices' => ProfileQuery::getProfileList(),
                     'constraints' => [
-                        new Constraints\NotBlank(),
+                        new NotBlank(),
                     ],
                     'label' => $this->translator->trans('Profile'),
                     'label_attr' => [
@@ -113,7 +116,7 @@ class AdministratorCreationForm extends BaseForm
                 [
                     'choices' => $this->getLocaleList(),
                     'constraints' => [
-                        new Constraints\NotBlank(),
+                        new NotBlank(),
                     ],
                     'label' => $this->translator->trans('Preferred locale'),
                     'label_attr' => [
@@ -124,7 +127,10 @@ class AdministratorCreationForm extends BaseForm
         ;
     }
 
-    protected function getLocaleList()
+    /**
+     * @return mixed[]
+     */
+    protected function getLocaleList(): array
     {
         $locales = [];
 
@@ -151,8 +157,8 @@ class AdministratorCreationForm extends BaseForm
 
         $minLength = ConfigQuery::getMinimuAdminPasswordLength();
 
-        if (\strlen($data['password']) < $minLength) {
-            $context->addViolation("password must be composed of at least $minLength characters");
+        if (\strlen((string) $data['password']) < $minLength) {
+            $context->addViolation(sprintf('password must be composed of at least %s characters', $minLength));
         }
     }
 
@@ -170,7 +176,7 @@ class AdministratorCreationForm extends BaseForm
         }
     }
 
-    public static function getName()
+    public static function getName(): string
     {
         return 'thelia_admin_administrator_creation';
     }

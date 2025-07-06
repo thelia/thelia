@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Tools;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -17,7 +18,7 @@ use Thelia\Model\CurrencyQuery;
 
 class MoneyFormat extends NumberFormat
 {
-    public static function getInstance(Request $request)
+    public static function getInstance(Request $request): self
     {
         return new self($request);
     }
@@ -28,10 +29,8 @@ class MoneyFormat extends NumberFormat
      *
      * @param float  $number   the number
      * @param string $decimals number of decimal figures
-     *
-     * @return string
      */
-    public function formatStandardMoney($number, $decimals = null)
+    public function formatStandardMoney($number, $decimals = null): string
     {
         return parent::formatStandardNumber($number, $decimals);
     }
@@ -43,7 +42,7 @@ class MoneyFormat extends NumberFormat
         $thousandsSep = null,
         $symbol = null,
         $removeZeroDecimal = false
-    ) {
+    ): string {
         $number = $this->preFormat($number, $decimals, $decPoint, $thousandsSep, $removeZeroDecimal);
 
         if ($symbol !== null) {
@@ -77,7 +76,7 @@ class MoneyFormat extends NumberFormat
 
         $currency = $currencyId !== null ? CurrencyQuery::create()->findPk($currencyId) : $this->request->getSession()->getCurrency();
 
-        if ($currency !== null && str_contains($currency->getFormat(), '%n')) {
+        if ($currency !== null && str_contains((string) $currency->getFormat(), '%n')) {
             return str_replace(
                 ['%n', '%s', '%c'],
                 [$number, $currency->getSymbol(), $currency->getCode()],
@@ -89,12 +88,7 @@ class MoneyFormat extends NumberFormat
     }
 
     /**
-     * @param null $decimals
-     * @param null $decPoint
-     * @param null $thousandsSep
      * @param bool $removeZeroDecimal
-     *
-     * @return string
      */
     protected function preFormat(
         $number,
@@ -102,8 +96,8 @@ class MoneyFormat extends NumberFormat
         $decPoint = null,
         $thousandsSep = null,
         $removeZeroDecimal = false
-    ) {
-        $number = preg_replace('/\s+/', '', $number);
+    ): string {
+        $number = preg_replace('/\s+/', '', (string) $number);
 
         if ($removeZeroDecimal) {
             if (null === $decimals) {
@@ -112,7 +106,7 @@ class MoneyFormat extends NumberFormat
 
             $number = round($number, $decimals);
 
-            $asFloat = (float) $number;
+            $asFloat = $number;
             $asInt = (int) $asFloat;
 
             if (($asFloat - $asInt) === 0.0) {

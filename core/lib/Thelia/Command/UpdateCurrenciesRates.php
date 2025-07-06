@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,12 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+use Exception;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Currency\CurrencyUpdateRateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Currency;
@@ -25,14 +27,11 @@ use Thelia\Model\CurrencyQuery;
  *
  * @author Franck Allimant <thelia@cqfdev.fr>
  */
+#[AsCommand(name: 'currency:update-rates', description: 'Update currency rates')]
 class UpdateCurrenciesRates extends ContainerAwareCommand
 {
     protected function configure(): void
     {
-        $this
-            ->setName('currency:update-rates')
-            ->setDescription('Update currency rates')
-        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -59,9 +58,9 @@ class UpdateCurrenciesRates extends ContainerAwareCommand
 
                 return 1;
             }
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             // Any error
-            $output->writeln('<error>Update failed: '.$ex->getMessage().'</error>');
+            $output->writeln('<error>Update failed: '.$exception->getMessage().'</error>');
 
             return 1;
         }

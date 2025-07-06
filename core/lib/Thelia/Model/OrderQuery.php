@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
+
+use DateTime;
+use Exception;
+use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Model\Base\OrderQuery as BaseOrderQuery;
@@ -27,7 +32,7 @@ use Thelia\Model\Map\OrderTableMap;
 class OrderQuery extends BaseOrderQuery
 {
     /**
-     * @throws \Exception
+     * @throws Exception
      *
      * @return array
      */
@@ -61,6 +66,7 @@ class OrderQuery extends BaseOrderQuery
             if (null !== $status) {
                 $dayOrdersQuery->filterByStatusId($status, Criteria::IN);
             }
+
             $dayOrders = $dayOrdersQuery->count();
             $stats[] = [$day - 1, $dayOrders];
         }
@@ -69,7 +75,7 @@ class OrderQuery extends BaseOrderQuery
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
      * @return array
      */
@@ -104,11 +110,11 @@ class OrderQuery extends BaseOrderQuery
      * @param bool $includeShipping
      * @param bool $withTaxes
      *
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
      * @return float|int
      */
-    public static function getSaleStats(\DateTime $startDate, \DateTime $endDate, $includeShipping, $withTaxes = true)
+    public static function getSaleStats(DateTime $startDate, DateTime $endDate, $includeShipping, $withTaxes = true)
     {
         $amount = (float)
             self::baseSaleStats($startDate, $endDate, 'o')
@@ -155,7 +161,7 @@ class OrderQuery extends BaseOrderQuery
      *
      * @return OrderQuery
      */
-    protected static function baseSaleStats(\DateTime $startDate, \DateTime $endDate, $modelAlias = null)
+    protected static function baseSaleStats(DateTime $startDate, DateTime $endDate, $modelAlias = null)
     {
         // The sales are considered at invoice date, not order creation date
         return self::create($modelAlias)
@@ -169,7 +175,7 @@ class OrderQuery extends BaseOrderQuery
      *
      * @return int
      */
-    public static function getOrderStats(\DateTime $startDate, \DateTime $endDate, $status = null)
+    public static function getOrderStats(DateTime $startDate, DateTime $endDate, $status = null)
     {
         if ($status === null) {
             $status = OrderStatusQuery::getPaidStatusIdList();
@@ -182,4 +188,5 @@ class OrderQuery extends BaseOrderQuery
             ->count();
     }
 }
+
 // OrderQuery

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Serializer\Serializer;
 
+use SplFileObject;
 use Thelia\Core\Serializer\AbstractSerializer;
 
 /**
@@ -36,22 +38,22 @@ class CSVSerializer extends AbstractSerializer
      */
     private $headers;
 
-    public function getId()
+    public function getId(): string
     {
         return 'thelia.csv';
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'CSV';
     }
 
-    public function getExtension()
+    public function getExtension(): string
     {
         return 'csv';
     }
 
-    public function getMimeType()
+    public function getMimeType(): string
     {
         return 'text/csv';
     }
@@ -84,12 +86,12 @@ class CSVSerializer extends AbstractSerializer
         return $this;
     }
 
-    public function prepareFile(\SplFileObject $fileObject): void
+    public function prepareFile(SplFileObject $fileObject): void
     {
         $this->headers = null;
     }
 
-    public function serialize($data)
+    public function serialize($data): string|false
     {
         if ($this->headers === null) {
             $this->headers = array_keys($data);
@@ -110,7 +112,7 @@ class CSVSerializer extends AbstractSerializer
         return $csvRow;
     }
 
-    public function finalizeFile(\SplFileObject $fileObject): void
+    public function finalizeFile(SplFileObject $fileObject): void
     {
         if ($this->headers !== null) {
             // Create tmp file with header
@@ -136,7 +138,10 @@ class CSVSerializer extends AbstractSerializer
         clearstatcache(true, $fileObject->getPathname());
     }
 
-    public function unserialize(\SplFileObject $fileObject)
+    /**
+     * @return list<array>
+     */
+    public function unserialize(SplFileObject $fileObject): array
     {
         $data = [];
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -29,11 +30,8 @@ use Thelia\Model\ConfigQuery;
  */
 class SessionListener implements EventSubscriberInterface
 {
-    protected $sessionSavePath;
-
-    public function __construct($sessionSavePath)
+    public function __construct(protected $sessionSavePath)
     {
-        $this->sessionSavePath = $sessionSavePath;
     }
 
     public function prodSession(SessionEvent $event): void
@@ -64,7 +62,7 @@ class SessionListener implements EventSubscriberInterface
         }
     }
 
-    public function getSession(SessionStorageInterface $storage)
+    public function getSession(SessionStorageInterface $storage): Session
     {
         return new Session($storage);
     }

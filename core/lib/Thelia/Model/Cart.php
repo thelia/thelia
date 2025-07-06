@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
+use Exception;
+use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartDuplicationEvent;
@@ -27,8 +30,8 @@ class Cart extends BaseCart
      *
      * @param string $token
      *
-     * @throws \Exception
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws Exception
+     * @throws PropelException
      *
      * @return Cart|bool
      */
@@ -38,7 +41,7 @@ class Cart extends BaseCart
         Currency $currency = null,
         EventDispatcherInterface $dispatcher = null
     ) {
-        if (!$dispatcher) {
+        if (!$dispatcher instanceof EventDispatcherInterface) {
             return false;
         }
 
@@ -48,16 +51,17 @@ class Cart extends BaseCart
         $cart->setAddressDeliveryId($this->getAddressDeliveryId());
         $cart->setAddressInvoiceId($this->getAddressInvoiceId());
         $cart->setToken($token);
+
         $discount = 0;
 
-        if (null === $currency) {
+        if (!$currency instanceof Currency) {
             $currencyQuery = CurrencyQuery::create();
             $currency = $currencyQuery->findPk($this->getCurrencyId()) ?: $currencyQuery->findOneByByDefault(1);
         }
 
         $cart->setCurrency($currency);
 
-        if ($customer) {
+        if ($customer instanceof Customer) {
             $cart->setCustomer($customer);
 
             if ($customer->getDiscount() > 0) {
@@ -97,7 +101,7 @@ class Cart extends BaseCart
 
         try {
             $this->delete();
-        } catch (\Exception $e) {
+        } catch (Exception) {
             // just fail silently in some cases
         }
 
@@ -127,7 +131,7 @@ class Cart extends BaseCart
      *
      * @param bool $withDiscount
      *
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
      * @return float
      */
@@ -153,7 +157,7 @@ class Cart extends BaseCart
     /**
      * @param bool $withDiscount
      *
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
      * @return float
      *
@@ -182,11 +186,9 @@ class Cart extends BaseCart
      * Return the VAT of all items.
      *
      * @param Country $taxCountry
-     * @param null    $taxState
      * @param bool    $withDiscount
      *
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
+     * @throws PropelException
      * @return float|int|string
      */
     public function getTotalVAT($taxCountry, $taxState = null, $withDiscount = true)
@@ -195,10 +197,8 @@ class Cart extends BaseCart
     }
 
     /**
-     * @param null $taxState
      *
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
+     * @throws PropelException
      * @return float
      */
     public function getDiscountVAT($taxCountry, $taxState = null)
@@ -209,7 +209,7 @@ class Cart extends BaseCart
     /**
      * Retrieve the total weight for all products in cart.
      *
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
      * @return float
      */
@@ -230,7 +230,7 @@ class Cart extends BaseCart
     /**
      * Tell if the cart contains only virtual products.
      *
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
      * @return bool
      */
@@ -265,13 +265,13 @@ class Cart extends BaseCart
     /**
      * @param bool $withTaxes
      *
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
      * @return float|int|string
      */
     public function getDiscount($withTaxes = true, Country $country = null, State $state = null)
     {
-        if ($withTaxes || null === $country) {
+        if ($withTaxes || !$country instanceof Country) {
             return parent::getDiscount();
         }
 

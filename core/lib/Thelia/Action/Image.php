@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
+use InvalidArgumentException;
+use DOMDocument;
+use Exception;
+use Imagine\Image\Palette\Color\ColorInterface;
 use Imagine\Gd\Imagine;
 use Imagine\Gmagick\Imagine as GmagickImagine;
 use Imagine\Image\Box;
@@ -63,7 +68,9 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 {
     // Resize mode constants
     public const EXACT_RATIO_WITH_BORDERS = 1;
+
     public const EXACT_RATIO_WITH_CROP = 2;
+
     public const KEEP_IMAGE_RATIO = 3;
 
     /**
@@ -85,18 +92,18 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      *
      * @param string $eventName
      *
-     * @throws \Thelia\Exception\ImageException
-     * @throws \InvalidArgumentException
+     * @throws ImageException
+     * @throws InvalidArgumentException
      */
     public function processImage(ImageEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $subdir = $event->getCacheSubdirectory();
         $sourceFile = $event->getSourceFilepath();
 
-        $imageExt = pathinfo($sourceFile, \PATHINFO_EXTENSION);
+        $imageExt = pathinfo((string) $sourceFile, \PATHINFO_EXTENSION);
 
         if (null == $subdir || null == $sourceFile) {
-            throw new \InvalidArgumentException('Cache sub-directory and source file path cannot be null');
+            throw new InvalidArgumentException('Cache sub-directory and source file path cannot be null');
         }
 
         // Find cached file path
@@ -110,6 +117,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             if ($event->getFormat() === 'webp') {
                 $alternativeImagePath = $cacheFilePath;
             }
+
             $cacheFilePath = str_replace($sourceExtension, $event->getFormat(), $cacheFilePath);
         }
 
@@ -127,20 +135,18 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
                 if ($mode == 'symlink') {
                     if (false === symlink($sourceFile, $originalImagePathInCache)) {
-                        throw new ImageException(sprintf('Failed to create symbolic link for %s in %s image cache directory', basename($sourceFile), $subdir));
+                        throw new ImageException(sprintf('Failed to create symbolic link for %s in %s image cache directory', basename((string) $sourceFile), $subdir));
                     }
-                } else {
+                } elseif (false === @copy($sourceFile, $originalImagePathInCache)) {
                     // mode = 'copy'
-                    if (false === @copy($sourceFile, $originalImagePathInCache)) {
-                        throw new ImageException(sprintf('Failed to copy %s in %s image cache directory', basename($sourceFile), $subdir));
-                    }
+                    throw new ImageException(sprintf('Failed to copy %s in %s image cache directory', basename((string) $sourceFile), $subdir));
                 }
             }
 
             // Process image only if we have some transformations to do.
             if (!$event->isOriginalImage()) {
                 if ('svg' === $imageExt) {
-                    $dom = new \DOMDocument('1.0', 'utf-8');
+                    $dom = new DOMDocument('1.0', 'utf-8');
                     $dom->load($originalImagePathInCache);
                     $svg = $dom->documentElement;
 
@@ -151,12 +157,13 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                             && preg_match($pattern, $svg->getAttribute('height'), $height);
 
                         if (!$interpretable || !isset($width) || !isset($height)) {
-                            throw new \Exception("can't create viewBox if height and width is not defined in the svg file");
+                            throw new Exception("can't create viewBox if height and width is not defined in the svg file");
                         }
 
                         $viewBox = implode(' ', [0, 0, $width[0], $height[0]]);
                         $svg->setAttribute('viewBox', $viewBox);
                     }
+
                     $svg->setAttribute('width', $event->getWidth());
                     $svg->setAttribute('height', $event->getWidth());
                     $dom->save($cacheFilePath);
@@ -189,15 +196,15 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
     private function applyTransformation(
         $sourceFile,
-        $event,
-        $dispatcher,
+        ImageEvent $event,
+        EventDispatcherInterface $dispatcher,
         $cacheFilePath
     ): void {
         $imagine = $this->createImagineInstance();
         $image = $imagine->open($sourceFile);
 
         if (!$image) {
-            throw new ImageException(sprintf('Source file %s cannot be opened.', basename($sourceFile)));
+            throw new ImageException(sprintf('Source file %s cannot be opened.', basename((string) $sourceFile)));
         }
 
         if (\function_exists('exif_read_data')) {
@@ -258,7 +265,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         // Flip
         // Process each effects
         foreach ($event->getEffects() as $effect) {
-            $effect = trim(strtolower($effect));
+            $effect = trim(strtolower((string) $effect));
 
             $params = explode(':', $effect);
 
@@ -285,6 +292,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
                         $image->effects()->gamma($gamma);
                     }
+
                     break;
                 case 'colorize':
                     // Syntax: colorize:couleur. Exemple: colorize:#ff00cc
@@ -293,6 +301,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
                         $image->effects()->colorize($the_color);
                     }
+
                     break;
                 case 'blur':
                     if (isset($params[1])) {
@@ -300,6 +309,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
                         $image->effects()->blur($blur_level);
                     }
+
                     break;
             }
         }
@@ -341,7 +351,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $dest_width,
         $dest_height,
         $resize_mode,
-        $bg_color,
+        ?ColorInterface $bg_color,
         $allow_zoom = false
     ) {
         if (!(null === $dest_width && null === $dest_height)) {
@@ -364,8 +374,10 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
             $width_diff = $dest_width / $width_orig;
             $height_diff = $dest_height / $height_orig;
-
-            $delta_x = $delta_y = $border_width = $border_height = 0;
+            $delta_x = 0;
+            $delta_y = 0;
+            $border_width = 0;
+            $border_height = 0;
 
             if ($width_diff > 1 && $height_diff > 1) {
                 // Set the default final size. If zoom is allowed, we will get the required
@@ -454,6 +466,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                 return $imagine->create($canvas, $bg_color)
                         ->paste($image, new Point($border_width, $border_height));
             }
+
             if ($resize_mode == self::EXACT_RATIO_WITH_CROP) {
                 $image->crop(
                     new Point($delta_x, $delta_y),
@@ -470,23 +483,15 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      *
      * @return ImagineInterface
      */
-    protected function createImagineInstance()
+    protected function createImagineInstance(): \Imagine\Imagick\Imagine|\Imagine\Gmagick\Imagine|Imagine
     {
         $driver = ConfigQuery::read('imagine_graphic_driver', 'gd');
 
-        switch ($driver) {
-            case 'imagick':
-                $image = new ImagickImagine();
-                break;
-            case 'gmagick':
-                $image = new GmagickImagine();
-                break;
-            case 'gd':
-            default:
-                $image = new Imagine();
-        }
-
-        return $image;
+        return match ($driver) {
+            'imagick' => new ImagickImagine(),
+            'gmagick' => new GmagickImagine(),
+            default => new Imagine(),
+        };
     }
 
     public static function getSubscribedEvents(): array

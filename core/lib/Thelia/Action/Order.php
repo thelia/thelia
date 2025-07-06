@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
+use Exception;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Propel\Runtime\Propel\Runtime\Exception\PropelException;
+use Thelia\Model\Attribute;
+use Thelia\Model\AttributeAv;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -60,20 +67,8 @@ use Thelia\Tools\I18n;
  */
 class Order extends BaseAction implements EventSubscriberInterface
 {
-    /** @var RequestStack */
-    protected $requestStack;
-
-    /** @var MailerFactory */
-    protected $mailer;
-
-    /** @var SecurityContext */
-    protected $securityContext;
-
-    public function __construct(RequestStack $requestStack, MailerFactory $mailer, SecurityContext $securityContext)
+    public function __construct(protected RequestStack $requestStack, protected MailerFactory $mailer, protected SecurityContext $securityContext)
     {
-        $this->requestStack = $requestStack;
-        $this->mailer = $mailer;
-        $this->securityContext = $securityContext;
     }
 
     public function setDeliveryAddress(OrderEvent $event): void
@@ -136,8 +131,8 @@ class Order extends BaseAction implements EventSubscriberInterface
      * @param bool $unusedArgument           deprecated argument. Will be removed in 2.5
      * @param bool $useOrderDefinedAddresses if true, the delivery and invoice OrderAddresses will be used instead of creating new OrderAdresses using Order::getChoosenXXXAddress()
      *
-     * @throws \Exception
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws Exception
+     * @throws PropelException
      *
      * @return ModelOrder
      */
@@ -282,6 +277,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                 if ($newStock < 0 && 0 === $allowNegativeStock) {
                     $newStock = 0;
                 }
+
                 $pse->setQuantity(
                     $newStock
                 );
@@ -336,10 +332,10 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             /* fulfill order_attribute_combination and decrease stock */
             foreach ($pse->getAttributeCombinations() as $attributeCombination) {
-                /** @var \Thelia\Model\Attribute $attribute */
+                /** @var Attribute $attribute */
                 $attribute = I18n::forceI18nRetrieving($lang->getLocale(), 'Attribute', $attributeCombination->getAttributeId());
 
-                /** @var \Thelia\Model\AttributeAv $attributeAv */
+                /** @var AttributeAv $attributeAv */
                 $attributeAv = I18n::forceI18nRetrieving($lang->getLocale(), 'AttributeAv', $attributeCombination->getAttributeAvId());
 
                 $orderAttributeCombination = new OrderProductAttributeCombination();
@@ -365,8 +361,8 @@ class Order extends BaseAction implements EventSubscriberInterface
     /**
      * Create an order outside of the front-office context, e.g. manually from the back-office.
      *
-     * @throws \Exception
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws Exception
+     * @throws PropelException
      */
     public function createManual(OrderManualEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -387,16 +383,16 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Thelia\Exception\TheliaProcessException
-     * @throws \Exception
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws TheliaProcessException
+     * @throws Exception
+     * @throws PropelException
      */
     public function create(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $session = $this->getSession();
 
         $order = $event->getOrder();
-        $paymentModule = ModuleQuery::create()->findPk($order->getPaymentModuleId());
+        ModuleQuery::create()->findPk($order->getPaymentModuleId());
 
         $placedOrder = $this->createOrder(
             $dispatcher,
@@ -445,7 +441,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Exception if the message cannot be loaded
+     * @throws Exception if the message cannot be loaded
      */
     public function sendConfirmationEmail(OrderEvent $event): void
     {
@@ -460,7 +456,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Exception if the message cannot be loaded
+     * @throws Exception if the message cannot be loaded
      */
     public function sendNotificationEmail(OrderEvent $event): void
     {
@@ -474,8 +470,8 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Exception
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws Exception
+     * @throws PropelException
      */
     public function updateStatus(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -495,10 +491,10 @@ class Order extends BaseAction implements EventSubscriberInterface
             $event->setOrder($order);
 
             $con->commit();
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             $con->rollBack();
 
-            throw $ex;
+            throw $exception;
         }
     }
 
@@ -506,7 +502,7 @@ class Order extends BaseAction implements EventSubscriberInterface
      * Check if a stock update is required on order products for a given order status change, and compute if
      * the stock should be decreased or increased.
      *
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function getStockUpdateOnOrderStatusChange(GetStockUpdateOperationOnOrderStatusChangeEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -562,48 +558,44 @@ class Order extends BaseAction implements EventSubscriberInterface
      *
      * @param int $newStatus the new status ID
      *
-     * @throws \Exception
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws Exception
+     * @throws PropelException
      */
     protected function updateQuantity(ModelOrder $order, $newStatus, EventDispatcherInterface $dispatcher): void
     {
-        if ($newStatus !== $order->getStatusId()) {
-            if (null !== $newStatusModel = OrderStatusQuery::create()->findPk($newStatus)) {
-                $operationEvent = new GetStockUpdateOperationOnOrderStatusChangeEvent($order, $newStatusModel);
+        if ($newStatus !== $order->getStatusId() && null !== $newStatusModel = OrderStatusQuery::create()->findPk($newStatus)) {
+            $operationEvent = new GetStockUpdateOperationOnOrderStatusChangeEvent($order, $newStatusModel);
+            $dispatcher->dispatch(
+                $operationEvent,
+                TheliaEvents::ORDER_GET_STOCK_UPDATE_OPERATION_ON_ORDER_STATUS_CHANGE
+            );
+            if ($operationEvent->getOperation() !== $operationEvent::DO_NOTHING) {
+                $orderProductList = $order->getOrderProducts();
 
-                $dispatcher->dispatch(
-                    $operationEvent,
-                    TheliaEvents::ORDER_GET_STOCK_UPDATE_OPERATION_ON_ORDER_STATUS_CHANGE
-                );
+                /** @var OrderProduct $orderProduct */
+                foreach ($orderProductList as $orderProduct) {
+                    $productSaleElementsId = $orderProduct->getProductSaleElementsId();
 
-                if ($operationEvent->getOperation() !== $operationEvent::DO_NOTHING) {
-                    $orderProductList = $order->getOrderProducts();
+                    /** @var ProductSaleElements $productSaleElements */
+                    if (null !== $productSaleElements = ProductSaleElementsQuery::create()->findPk($productSaleElementsId)) {
+                        $offset = 0;
 
-                    /** @var OrderProduct $orderProduct */
-                    foreach ($orderProductList as $orderProduct) {
-                        $productSaleElementsId = $orderProduct->getProductSaleElementsId();
-
-                        /** @var ProductSaleElements $productSaleElements */
-                        if (null !== $productSaleElements = ProductSaleElementsQuery::create()->findPk($productSaleElementsId)) {
-                            $offset = 0;
-
-                            if ($operationEvent->getOperation() == $operationEvent::INCREASE_STOCK) {
-                                $offset = $orderProduct->getQuantity();
-                            } elseif ($operationEvent->getOperation() == $operationEvent::DECREASE_STOCK) {
-                                /* Check if we have enough stock */
-                                if ($orderProduct->getQuantity() > $productSaleElements->getQuantity() && true === ConfigQuery::checkAvailableStock()) {
-                                    throw new TheliaProcessException($productSaleElements->getRef().' : Not enough stock 2');
-                                }
-
-                                $offset = -$orderProduct->getQuantity();
+                        if ($operationEvent->getOperation() == $operationEvent::INCREASE_STOCK) {
+                            $offset = $orderProduct->getQuantity();
+                        } elseif ($operationEvent->getOperation() == $operationEvent::DECREASE_STOCK) {
+                            /* Check if we have enough stock */
+                            if ($orderProduct->getQuantity() > $productSaleElements->getQuantity() && true === ConfigQuery::checkAvailableStock()) {
+                                throw new TheliaProcessException($productSaleElements->getRef().' : Not enough stock 2');
                             }
 
-                            Tlog::getInstance()->addError('Product stock: '.$productSaleElements->getQuantity().' -> '.($productSaleElements->getQuantity() + $offset));
-
-                            $productSaleElements
-                                ->setQuantity($productSaleElements->getQuantity() + $offset)
-                                ->save();
+                            $offset = -$orderProduct->getQuantity();
                         }
+
+                        Tlog::getInstance()->addError('Product stock: '.$productSaleElements->getQuantity().' -> '.($productSaleElements->getQuantity() + $offset));
+
+                        $productSaleElements
+                            ->setQuantity($productSaleElements->getQuantity() + $offset)
+                            ->save();
                     }
                 }
             }
@@ -611,7 +603,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function updateDeliveryRef(OrderEvent $event): void
     {
@@ -623,7 +615,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function updateTransactionRef(OrderEvent $event): void
     {
@@ -635,7 +627,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function updateAddress(OrderAddressEvent $event): void
     {
@@ -662,7 +654,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function getOrderPayTotal(OrderPayTotalEvent $event): void
     {
@@ -705,9 +697,9 @@ class Order extends BaseAction implements EventSubscriberInterface
     /**
      * Returns the session from the current request.
      *
-     * @return \Thelia\Core\HttpFoundation\Session\Session
+     * @return Session
      */
-    protected function getSession()
+    protected function getSession(): SessionInterface
     {
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();

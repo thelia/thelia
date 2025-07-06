@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Feature;
 
 use Thelia\Core\Event\ActionEvent;
@@ -20,24 +21,21 @@ use Thelia\Model\FeatureAv;
  */
 class FeatureAvEvent extends ActionEvent
 {
-    protected $featureAv;
-
-    public function __construct(FeatureAv $featureAv = null)
+    public function __construct(protected ?FeatureAv $featureAv = null)
     {
-        $this->featureAv = $featureAv;
     }
 
-    public function hasFeatureAv()
+    public function hasFeatureAv(): bool
     {
-        return null !== $this->featureAv;
+        return $this->featureAv instanceof FeatureAv;
     }
 
-    public function getFeatureAv()
+    public function getFeatureAv(): ?FeatureAv
     {
         return $this->featureAv;
     }
 
-    public function setFeatureAv($featureAv)
+    public function setFeatureAv(?FeatureAv $featureAv): static
     {
         $this->featureAv = $featureAv;
 

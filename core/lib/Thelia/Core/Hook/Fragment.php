@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Hook;
+
+use InvalidArgumentException;
 
 /**
  * Class Fragment.
@@ -24,14 +27,15 @@ class Fragment
     public function __construct($data = [])
     {
         if (!\is_array($data)) {
-            throw new \InvalidArgumentException("'data' argument must be an array");
+            throw new InvalidArgumentException("'data' argument must be an array");
         }
+
         $this->data = $data;
     }
 
-    public function set($key, $value)
+    public function set($key, $value): static
     {
-        $this->data[$key] = $value === null ? '' : $value;
+        $this->data[$key] = $value ?? '';
 
         return $this;
     }
@@ -62,7 +66,7 @@ class Fragment
 
     public function filter(array $fields, $default = null): void
     {
-        if (empty($fields)) {
+        if ($fields === []) {
             return;
         }
 

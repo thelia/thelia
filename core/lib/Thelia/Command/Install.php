@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+use RuntimeException;
+use PDO;
+use PDOException;
+use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -30,6 +36,7 @@ use Thelia\Tools\TokenProvider;
  *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
+#[AsCommand(name: 'thelia:install', description: 'Install thelia using cli tools. For now Thelia only use mysql database')]
 class Install extends ContainerAwareCommand
 {
     /**
@@ -38,8 +45,6 @@ class Install extends ContainerAwareCommand
     protected function configure(): void
     {
         $this
-            ->setName('thelia:install')
-            ->setDescription('Install thelia using cli tools. For now Thelia only use mysql database')
             ->setHelp('The <info>thelia:install</info> command install Thelia database and create config file needed.')
             ->addOption(
                 'database_host',
@@ -151,7 +156,7 @@ class Install extends ContainerAwareCommand
         $permissions = new CheckPermission();
         $isValid = $permissions->exec();
 
-        foreach ($permissions->getValidationMessages() as $item => $data) {
+        foreach ($permissions->getValidationMessages() as $data) {
             if ($data['status']) {
                 $output->writeln(
                     [
@@ -174,16 +179,14 @@ class Install extends ContainerAwareCommand
         }
 
         if (false === $isValid) {
-            throw new \RuntimeException('Please put correct permissions and reload install process');
+            throw new RuntimeException('Please put correct permissions and reload install process');
         }
     }
 
     /**
      * rename database config file and complete it.
-     *
-     * @param array $connectionInfo
      */
-    protected function createConfigFile($connectionInfo): void
+    protected function createConfigFile(array $connectionInfo): void
     {
         $fs = new Filesystem();
 
@@ -209,10 +212,8 @@ class Install extends ContainerAwareCommand
 
     /**
      * test database access.
-     *
-     * @return bool|\PDO
      */
-    protected function tryConnection($connectionInfo, OutputInterface $output)
+    protected function tryConnection(array $connectionInfo, OutputInterface $output): false|PDO
     {
         if (null === $connectionInfo['dbName']) {
             return false;
@@ -221,13 +222,13 @@ class Install extends ContainerAwareCommand
         $dsn = 'mysql:host=%s;port=%s';
 
         try {
-            $connection = new \PDO(
+            $connection = new PDO(
                 sprintf($dsn, $connectionInfo['host'], $connectionInfo['port']),
                 $connectionInfo['username'],
                 $connectionInfo['password']
             );
-            $connection->query('SET NAMES \'UTF8\'');
-        } catch (\PDOException $e) {
+            $connection->query("SET NAMES 'UTF8'");
+        } catch (PDOException) {
             $output->writeln([
                 '<error>Wrong connection information</error>',
             ]);
@@ -240,10 +241,8 @@ class Install extends ContainerAwareCommand
 
     /**
      * Ask to user all needed information.
-     *
-     * @return array
      */
-    protected function getConnectionInfo(InputInterface $input, OutputInterface $output)
+    protected function getConnectionInfo(InputInterface $input, OutputInterface $output): array
     {
         /** @var QuestionHelper $helper */
         $helper = $this->getHelper('question');
@@ -309,7 +308,7 @@ class Install extends ContainerAwareCommand
         $hidden = false,
         $defaultValue = null,
         $beEmpty = false,
-    ) {
+    ): mixed {
         $question = new Question($label, $defaultValue);
 
         if ($hidden) {
@@ -318,10 +317,8 @@ class Install extends ContainerAwareCommand
         }
 
         $question->setValidator(function ($value) use (&$errorMessage, &$beEmpty) {
-            if (trim($value) == '') {
-                if (null === $value && !$beEmpty) {
-                    throw new \Exception($errorMessage);
-                }
+            if (trim($value) === '' && (null === $value && !$beEmpty)) {
+                throw new Exception($errorMessage);
             }
 
             return $value;

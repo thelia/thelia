@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel\MetaData;
 
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
@@ -34,16 +35,10 @@ use Thelia\Api\Bridge\Propel\State\PropelPersistProcessor;
 use Thelia\Api\Bridge\Propel\State\PropelRemoveProcessor;
 use Thelia\Api\Resource\PropelResourceInterface;
 
-final class PropelResourceCollectionMetadataFactory implements ResourceMetadataCollectionFactoryInterface
+final readonly class PropelResourceCollectionMetadataFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    /**
-     * @var ResourceMetadataCollectionFactoryInterface
-     */
-    private $decorated;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated)
+    public function __construct(private ResourceMetadataCollectionFactoryInterface $decorated)
     {
-        $this->decorated = $decorated;
     }
 
     public function create(string $resourceClass): ResourceMetadataCollection
@@ -53,7 +48,7 @@ final class PropelResourceCollectionMetadataFactory implements ResourceMetadataC
         foreach ($resourceMetadataCollection as $i => $resourceMetadata) {
             $operations = $resourceMetadata->getOperations();
 
-            if ($operations) {
+            if ($operations instanceof Operations) {
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
                     if (!is_subclass_of($resourceClass, PropelResourceInterface::class)) {
                         continue;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model\Tools;
 
+use PDO;
+use InvalidArgumentException;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -28,7 +31,6 @@ class ModelCriteriaTools
 {
     /**
      * @param array  $columns
-     * @param null   $foreignTable
      * @param string $foreignKey
      * @param bool   $forceReturn
      * @param string $forceReturn
@@ -77,7 +79,7 @@ class ModelCriteriaTools
                         '`'.$requestedLocaleI18nAlias.'`.LOCALE = ?',
                         $requestedLocale,
                         null,
-                        \PDO::PARAM_STR
+                        PDO::PARAM_STR
                     )
                 ;
 
@@ -112,7 +114,7 @@ class ModelCriteriaTools
                         '`'.$defaultLocaleI18nAlias.'`.LOCALE = ?',
                         $defaultLocale,
                         null,
-                        \PDO::PARAM_STR
+                        PDO::PARAM_STR
                     )
                 ;
 
@@ -133,7 +135,7 @@ class ModelCriteriaTools
                         '`'.$requestedLocaleI18nAlias.'`.LOCALE = ?',
                         $requestedLocale,
                         null,
-                        \PDO::PARAM_STR
+                        PDO::PARAM_STR
                     )
                 ;
 
@@ -198,7 +200,7 @@ class ModelCriteriaTools
                     '`'.$requestedLocaleI18nAlias.'`.LOCALE = ?',
                     $requestedLocale,
                     null,
-                    \PDO::PARAM_STR
+                    PDO::PARAM_STR
                 )
             ;
 
@@ -243,7 +245,7 @@ class ModelCriteriaTools
             $localeSearch = LangQuery::create()->findByIdOrLocale($requestedLangId);
 
             if ($localeSearch === null) {
-                throw new \InvalidArgumentException(
+                throw new InvalidArgumentException(
                     sprintf(
                         'Incorrect lang argument given : lang %s not found',
                         $requestedLangId

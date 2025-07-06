@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Type\EnumListType;
+use Propel\Runtime\Exception\PropelException;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -27,7 +31,6 @@ use Thelia\Model\Map\FeatureTemplateTableMap;
 use Thelia\Model\Product as ProductModel;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\TemplateQuery;
-use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\TypeCollection;
 
@@ -53,10 +56,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 
     protected $timestampable = true;
 
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
@@ -68,7 +68,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(['id', 'id_reverse', 'alpha', 'alpha-reverse', 'manual', 'manual_reverse'])
+                    new EnumListType(['id', 'id_reverse', 'alpha', 'alpha-reverse', 'manual', 'manual_reverse'])
                 ),
                 'manual'
             ),
@@ -77,9 +77,9 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
-     * @return \Propel\Runtime\ActiveQuery\ModelCriteria|FeatureQuery
+     * @return ModelCriteria|FeatureQuery
      */
     public function buildModelCriteria()
     {
@@ -144,20 +144,17 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
             }
         }
 
-        if (\count($template) > 0) {
-            // Join with feature_template table to get position, if a manual order position is required
-            if (\count(array_diff(['manual_reverse', 'manual'], $this->getOrder())) < 2) {
-                $search
-                    ->useFeatureTemplateQuery()
-                        ->filterByTemplate(
-                            TemplateQuery::create()->filterById($template, Criteria::IN)->find(),
-                            Criteria::IN
-                        )
-                    ->endUse()
-                    ->withColumn(FeatureTemplateTableMap::COL_POSITION, 'position');
-
-                $this->useFeaturePosition = false;
-            }
+        // Join with feature_template table to get position, if a manual order position is required
+        if (\count($template) > 0 && \count(array_diff(['manual_reverse', 'manual'], $this->getOrder())) < 2) {
+            $search
+                ->useFeatureTemplateQuery()
+                    ->filterByTemplate(
+                        TemplateQuery::create()->filterById($template, Criteria::IN)->find(),
+                        Criteria::IN
+                    )
+                ->endUse()
+                ->withColumn(FeatureTemplateTableMap::COL_POSITION, 'position');
+            $this->useFeaturePosition = false;
         }
 
         if (null !== $excludeTemplate) {
@@ -208,6 +205,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
                     } else {
                         $search->addAscendingOrderByColumn(FeatureTemplateTableMap::COL_POSITION);
                     }
+
                     break;
                 case 'manual_reverse':
                     if ($this->useFeaturePosition) {
@@ -215,6 +213,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
                     } else {
                         $search->addDescendingOrderByColumn(FeatureTemplateTableMap::COL_POSITION);
                     }
+
                     break;
             }
         }
@@ -223,11 +222,9 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
-     * @return LoopResult
+     * @throws PropelException
      */
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var FeatureModel $feature */
         foreach ($loopResult->getResultDataCollection() as $feature) {

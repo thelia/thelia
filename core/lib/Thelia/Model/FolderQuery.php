@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -43,7 +44,7 @@ class FolderQuery extends BaseFolderQuery
      * @param int $depth           max depth you want to search
      * @param int $currentPosition don't change this param, it is used for recursion
      *
-     * @return \Thelia\Model\Folder[]
+     * @return Folder[]
      */
     public static function findAllChild($folderId, $depth = 0, $currentPosition = 0)
     {
@@ -104,4 +105,5 @@ class FolderQuery extends BaseFolderQuery
         return $result;
     }
 }
+
 // FolderQuery

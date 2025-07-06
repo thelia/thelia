@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Archiver;
 
+use InvalidArgumentException;
+use Exception;
 use Thelia\Core\Translation\Translator;
 
 /**
@@ -21,31 +24,16 @@ use Thelia\Core\Translation\Translator;
  */
 class ArchiverManager
 {
-    /**
-     * @var array List of handled archivers
-     */
-    protected $archivers = [];
+    protected array $archivers = [];
 
-    /**
-     * Reset manager.
-     *
-     * @return $this Return $this, allow chaining
-     */
-    public function reset()
+    public function reset(): static
     {
         $this->archivers = [];
 
         return $this;
     }
 
-    /**
-     * Get all archivers or only those match availability.
-     *
-     * @param bool|null $isAvailable Filter archivers by availability
-     *
-     * @return array All, or filtered by availability, archivers
-     */
-    public function getArchivers($isAvailable = null)
+    public function getArchivers(bool $isAvailable = null): array
     {
         if ($isAvailable === null) {
             return $this->archivers;
@@ -53,9 +41,9 @@ class ArchiverManager
 
         $filteredArchivers = [];
 
-        /** @var \Thelia\Core\Archiver\ArchiverInterface $archiver */
+        /** @var ArchiverInterface $archiver */
         foreach ($this->archivers as $archiver) {
-            if ($archiver->isAvailable() === (bool) $isAvailable) {
+            if ($archiver->isAvailable() === $isAvailable) {
                 $filteredArchivers[] = $archiver;
             }
         }
@@ -64,21 +52,14 @@ class ArchiverManager
     }
 
     /**
-     * Determine if an archiver exists under the given identifier.
-     *
-     * @param string $archiverId     An archiver identifier
-     * @param bool   $throwException Throw exception if archiver doesn't exists or not
-     *
-     * @throws \InvalidArgumentException if the archiver identifier does not exist
-     *
-     * @return bool True if the archiver exists, false otherwise
+     * @throws InvalidArgumentException if the archiver identifier does not exist
      */
-    public function has($archiverId, $throwException = false)
+    public function has(string $archiverId, bool $throwException = false): bool
     {
         $exists = isset($this->archivers[$archiverId]);
 
         if (!$exists && $throwException) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 Translator::getInstance()->trans(
                     'The archiver identifier "%archiverId" doesn\’t exist',
                     [
@@ -91,15 +72,7 @@ class ArchiverManager
         return $exists;
     }
 
-    /**
-     * Get an archiver.
-     *
-     * @param string    $archiverId  An archiver identifier
-     * @param bool|null $isAvailable Filter archiver by availability
-     *
-     * @return \Thelia\Core\Archiver\ArchiverInterface|null Return an archiver or null depends on availability
-     */
-    public function get($archiverId, $isAvailable = null)
+    public function get(string $archiverId, bool $isAvailable = null): ?ArchiverInterface
     {
         $this->has($archiverId, true);
 
@@ -107,29 +80,20 @@ class ArchiverManager
             return $this->archivers[$archiverId];
         }
 
-        if ($this->archivers[$archiverId]->isAvailable() === (bool) $isAvailable) {
+        if ($this->archivers[$archiverId]->isAvailable() === $isAvailable) {
             return $this->archivers[$archiverId];
         }
 
         return null;
     }
 
-    /**
-     * Set archivers.
-     *
-     * @param array $archivers An array of archiver
-     *
-     * @throws \Exception
-     *
-     * @return $this Return $this, allow chaining
-     */
-    public function setArchivers(array $archivers)
+    public function setArchivers(array $archivers): static
     {
         $this->archivers = [];
 
         foreach ($archivers as $archiver) {
             if (!($archiver instanceof ArchiverInterface)) {
-                throw new \Exception('ArchiverManager manage only '.__NAMESPACE__.'\\ArchiverInterface');
+                throw new Exception('ArchiverManager manage only '.__NAMESPACE__.'\\ArchiverInterface');
             }
 
             $this->archivers[$archiver->getId()] = $archiver;
@@ -138,26 +102,14 @@ class ArchiverManager
         return $this;
     }
 
-    /**
-     * Add an archiver.
-     *
-     * @param \Thelia\Core\Archiver\ArchiverInterface $archiver An archiver
-     *
-     * @return $this Return $this, allow chaining
-     */
-    public function add(ArchiverInterface $archiver)
+    public function add(ArchiverInterface $archiver): static
     {
         $this->archivers[$archiver->getId()] = $archiver;
 
         return $this;
     }
 
-    /**
-     * Remove an archiver.
-     *
-     * @param string $archiverId An archiver identifier
-     */
-    public function remove($archiverId): void
+    public function remove(string $archiverId): void
     {
         $this->has($archiverId, true);
 

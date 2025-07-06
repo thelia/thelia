@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Tax;
 
 use Thelia\Core\Event\ActionEvent;
@@ -18,40 +19,42 @@ use Thelia\TaxEngine\TaxTypeInterface;
 
 class TaxEvent extends ActionEvent
 {
-    protected $tax;
-
     protected $locale;
+
     protected $id;
+
     protected $title;
+
     protected $description;
+
     protected $type;
+
     protected $requirements;
 
     protected ?TaxTypeInterface $taxTypeService = null;
 
-    public function __construct(Tax $tax = null)
+    public function __construct(protected ?Tax $tax = null)
     {
-        $this->tax = $tax;
     }
 
-    public function hasTax()
+    public function hasTax(): bool
     {
-        return null !== $this->tax;
+        return $this->tax instanceof Tax;
     }
 
-    public function getTax()
+    public function getTax(): ?Tax
     {
         return $this->tax;
     }
 
-    public function setTax(Tax $tax)
+    public function setTax(Tax $tax): static
     {
         $this->tax = $tax;
 
         return $this;
     }
 
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->description = $description;
 
@@ -63,7 +66,7 @@ class TaxEvent extends ActionEvent
         return $this->description;
     }
 
-    public function setId($id)
+    public function setId($id): static
     {
         $this->id = $id;
 
@@ -75,7 +78,7 @@ class TaxEvent extends ActionEvent
         return $this->id;
     }
 
-    public function setTitle($title)
+    public function setTitle($title): static
     {
         $this->title = $title;
 
@@ -87,7 +90,7 @@ class TaxEvent extends ActionEvent
         return $this->title;
     }
 
-    public function setLocale($locale)
+    public function setLocale($locale): static
     {
         $this->locale = $locale;
 
@@ -99,7 +102,7 @@ class TaxEvent extends ActionEvent
         return $this->locale;
     }
 
-    public function setType($type)
+    public function setType($type): static
     {
         $this->type = $type;
 
@@ -111,7 +114,7 @@ class TaxEvent extends ActionEvent
         return $this->type;
     }
 
-    public function setRequirements($requirements)
+    public function setRequirements($requirements): static
     {
         $this->requirements = $requirements;
 
@@ -128,7 +131,7 @@ class TaxEvent extends ActionEvent
         return $this->taxTypeService;
     }
 
-    public function setTaxTypeService(TaxTypeInterface $taxTypeService)
+    public function setTaxTypeService(TaxTypeInterface $taxTypeService): static
     {
         $this->taxTypeService = $taxTypeService;
 

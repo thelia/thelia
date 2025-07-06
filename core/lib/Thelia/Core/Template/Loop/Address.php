@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Type\IntListType;
+use Thelia\Type\EnumType;
+use Thelia\Type\IntType;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -21,7 +25,6 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\Address as AddressModel;
 use Thelia\Model\AddressQuery;
-use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
@@ -40,24 +43,21 @@ class Address extends BaseLoop implements PropelSearchLoopInterface
 {
     protected $timestampable = true;
 
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             new Argument(
                 'id',
                 new TypeCollection(
-                    new Type\IntListType(),
-                    new Type\EnumType(['*', 'any'])
+                    new IntListType(),
+                    new EnumType(['*', 'any'])
                 )
             ),
             new Argument(
                 'customer',
                 new TypeCollection(
-                    new Type\IntType(),
-                    new Type\EnumType(['current'])
+                    new IntType(),
+                    new EnumType(['current'])
                 ),
                 'current'
             ),
@@ -65,8 +65,8 @@ class Address extends BaseLoop implements PropelSearchLoopInterface
             new Argument(
                 'exclude',
                 new TypeCollection(
-                    new Type\IntListType(),
-                    new Type\EnumType(['none'])
+                    new IntListType(),
+                    new EnumType(['none'])
                 )
             )
         );
@@ -89,6 +89,7 @@ class Address extends BaseLoop implements PropelSearchLoopInterface
             if ($currentCustomer === null) {
                 return null;
             }
+
             $search->filterByCustomerId($currentCustomer->getId(), Criteria::EQUAL);
         } else {
             $search->filterByCustomerId($customer, Criteria::EQUAL);
@@ -111,7 +112,7 @@ class Address extends BaseLoop implements PropelSearchLoopInterface
         return $search;
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var AddressModel $address */
         foreach ($loopResult->getResultDataCollection() as $address) {

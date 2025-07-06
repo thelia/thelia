@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\ImportExport\Import\Type;
 
 use Thelia\Core\Translation\Translator;
@@ -32,22 +33,24 @@ class ProductPricesImport extends AbstractImport
         'price',
     ];
 
-    public function importData(array $data)
+    public function importData(array $data): ?string
     {
         $pse = ProductSaleElementsQuery::create()->findPk($data['id']);
 
         if ($pse === null) {
             return Translator::getInstance()->trans(
-                'The product sale element id %id doesn\'t exist',
+                "The product sale element id %id doesn't exist",
                 [
                     '%id' => $data['id'],
                 ]
             );
         }
+
         $currency = null;
         if (isset($data['currency'])) {
             $currency = CurrencyQuery::create()->findOneByCode($data['currency']);
         }
+
         if ($currency === null) {
             $currency = Currency::getDefaultCurrency();
         }

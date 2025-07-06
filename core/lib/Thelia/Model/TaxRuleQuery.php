@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
+use Propel\Runtime\Exception\PropelException;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\Base\TaxRuleQuery as BaseTaxRuleQuery;
 use Thelia\Model\Map\TaxRuleCountryTableMap;
@@ -30,17 +34,17 @@ class TaxRuleQuery extends BaseTaxRuleQuery
     protected static $caches = [];
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
-     * @return array|mixed|\Propel\Runtime\ActiveRecord\ActiveRecordInterface[]|\Propel\Runtime\Collection\ObjectCollection|Tax[]
+     * @return array|mixed|ActiveRecordInterface[]|ObjectCollection|Tax[]
      */
     public function getTaxCalculatorCollection(TaxRule $taxRule, Country $country = null, State $state = null)
     {
         $key = sprintf(
             '%s-%s-%s',
             $taxRule->getId(),
-            ($country !== null) ? $country->getId() : 0,
-            ($state !== null) ? $state->getId() : 0
+            ($country instanceof Country) ? $country->getId() : 0,
+            ($state instanceof State) ? $state->getId() : 0
         );
 
         if (\array_key_exists($key, self::$caches)) {
@@ -50,7 +54,7 @@ class TaxRuleQuery extends BaseTaxRuleQuery
         $taxRuleQuery = TaxRuleCountryQuery::create()
             ->filterByTaxRuleId($taxRule->getId());
 
-        if (null !== $country) {
+        if ($country instanceof Country) {
             $taxRuleQuery->filterByCountry($country, Criteria::EQUAL);
         }
 
@@ -58,7 +62,7 @@ class TaxRuleQuery extends BaseTaxRuleQuery
 
         $synthetizedSateId = $state;
 
-        if (null !== $state) {
+        if ($state instanceof State) {
             $taxRuleCount = clone $taxRuleQuery;
 
             if (0 === $taxRuleCount->filterByStateId($state->getId(), Criteria::EQUAL)->count()) {
@@ -76,4 +80,5 @@ class TaxRuleQuery extends BaseTaxRuleQuery
         return self::$caches[$key] = $search->find();
     }
 }
+
 // TaxRuleQuery

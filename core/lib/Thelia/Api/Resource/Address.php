@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
+
 
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
@@ -20,6 +22,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use DateTime;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -110,11 +113,15 @@ class Address implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:address:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:address:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:address:write';
 
     public const GROUP_FRONT_READ = 'front:address:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:address:read:single';
+
     public const GROUP_FRONT_WRITE = 'front:address:write';
 
     public const GROUP_ADMIN_COMBINED = [
@@ -166,26 +173,26 @@ class Address implements PropelResourceInterface
     public string $zipcode;
 
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
-    public ?string $company;
+    public ?string $company = null;
 
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
-    public ?string $cellphone;
+    public ?string $cellphone = null;
 
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
-    public ?string $phone;
+    public ?string $phone = null;
 
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_WRITE])]
-    public ?string $city;
+    public ?string $city = null;
 
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
-    public ?bool $isDefault;
+    public ?bool $isDefault = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?\DateTime $createdAt;
+    public ?DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?\DateTime $updatedAt;
+    public ?DateTime $updatedAt = null;
 
     #[Relation(targetResource: Country::class)]
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
@@ -194,7 +201,7 @@ class Address implements PropelResourceInterface
 
     #[Relation(targetResource: State::class)]
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
-    public ?State $state;
+    public ?State $state = null;
 
     #[Relation(targetResource: Customer::class)]
     #[Groups(groups: [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_WRITE])]
@@ -361,24 +368,24 @@ class Address implements PropelResourceInterface
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): self
+    public function setCreatedAt(?DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): self
+    public function setUpdatedAt(?DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 
@@ -443,21 +450,17 @@ class Address implements PropelResourceInterface
     {
         $resource = $context->getRoot();
 
-        if (isset($resource->country) && null !== $country = $resource->getCountry()?->getPropelModel()) {
-            if ($country->getNeedZipCode()) {
-                $zipCodeRegExp = $country->getZipCodeRE();
-                if (null !== $zipCodeRegExp) {
-                    if (!preg_match($zipCodeRegExp, $resource->getZipcode())) {
-                        $context->addViolation(
-                            Translator::getInstance()->trans(
-                                'This zip code should respect the following format : %format.',
-                                ['%format' => $country->getZipCodeFormat()],
-                                null,
-                                'en_US'
-                            )
-                        );
-                    }
-                }
+        if (isset($resource->country) && null !== ($country = $resource->getCountry()?->getPropelModel()) && $country->getNeedZipCode()) {
+            $zipCodeRegExp = $country->getZipCodeRE();
+            if (null !== $zipCodeRegExp && !preg_match($zipCodeRegExp, $resource->getZipcode())) {
+                $context->addViolation(
+                    Translator::getInstance()->trans(
+                        'This zip code should respect the following format : %format.',
+                        ['%format' => $country->getZipCodeFormat()],
+                        null,
+                        'en_US'
+                    )
+                );
             }
         }
     }
@@ -467,29 +470,27 @@ class Address implements PropelResourceInterface
     {
         $resource = $context->getRoot();
 
-        if (isset($resource->country) && null !== $country = $resource->getCountry()->getPropelModel()) {
-            if ($country->getHasStates()) {
-                if (null !== $state = $resource->getState()->getPropelModel()) {
-                    if ($state->getCountryId() !== $country->getId()) {
-                        $context->addViolation(
-                            Translator::getInstance()->trans(
-                                "This state doesn't belong to this country.",
-                                [],
-                                null,
-                                'en_US'
-                            )
-                        );
-                    }
-                } else {
+        if (isset($resource->country) && null !== ($country = $resource->getCountry()->getPropelModel()) && $country->getHasStates()) {
+            if (null !== $state = $resource->getState()->getPropelModel()) {
+                if ($state->getCountryId() !== $country->getId()) {
                     $context->addViolation(
                         Translator::getInstance()->trans(
-                            'You should select a state for this country.',
+                            "This state doesn't belong to this country.",
                             [],
                             null,
                             'en_US'
                         )
                     );
                 }
+            } else {
+                $context->addViolation(
+                    Translator::getInstance()->trans(
+                        'You should select a state for this country.',
+                        [],
+                        null,
+                        'en_US'
+                    )
+                );
             }
         }
     }

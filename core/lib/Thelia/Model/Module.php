@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
+use ReflectionClass;
+use Thelia\Module\DeliveryModuleInterface;
+use Thelia\Module\DeliveryModuleWithStateInterface;
+use InvalidArgumentException;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Template\TemplateDefinition;
@@ -234,10 +239,10 @@ class Module extends BaseModule
      */
     public function isDeliveryModule(): bool
     {
-        $moduleReflection = new \ReflectionClass($this->getFullNamespace());
+        $moduleReflection = new ReflectionClass($this->getFullNamespace());
 
-        return $moduleReflection->implementsInterface("Thelia\Module\DeliveryModuleInterface")
-            || $moduleReflection->implementsInterface("Thelia\Module\DeliveryModuleWithStateInterface");
+        return $moduleReflection->implementsInterface(DeliveryModuleInterface::class)
+            || $moduleReflection->implementsInterface(DeliveryModuleWithStateInterface::class);
     }
 
     /**
@@ -245,9 +250,9 @@ class Module extends BaseModule
      */
     public function isPayementModule(): bool
     {
-        $moduleReflection = new \ReflectionClass($this->getFullNamespace());
+        $moduleReflection = new ReflectionClass($this->getFullNamespace());
 
-        return $moduleReflection->implementsInterface("Thelia\Module\PaymentModuleInterface");
+        return $moduleReflection->implementsInterface(PaymentModuleInterface::class);
     }
 
     /**
@@ -261,7 +266,7 @@ class Module extends BaseModule
     /**
      * @param ContainerInterface $container the Thelia container
      *
-     * @throws \InvalidArgumentException if the module could not be found in the container/
+     * @throws InvalidArgumentException if the module could not be found in the container/
      *
      * @return BaseModuleInterface a module instance
      */
@@ -270,7 +275,7 @@ class Module extends BaseModule
         $instance = $container->get(sprintf('module.%s', $this->getCode()));
 
         if ($instance === null) {
-            throw new \InvalidArgumentException(sprintf('Undefined module in container: "%s"', $this->getCode()));
+            throw new InvalidArgumentException(sprintf('Undefined module in container: "%s"', $this->getCode()));
         }
 
         return $instance;
@@ -279,7 +284,7 @@ class Module extends BaseModule
     /**
      * @param ContainerInterface $container the Thelia container
      *
-     * @throws \InvalidArgumentException if the module could not be found in the container/
+     * @throws InvalidArgumentException if the module could not be found in the container/
      *
      * @return BaseModuleInterface a module instance
      */
@@ -288,10 +293,10 @@ class Module extends BaseModule
         $instance = $this->getModuleInstance($container);
 
         if (
-            !\in_array("Thelia\Module\DeliveryModuleInterface", class_implements($instance))
-            && !\in_array("Thelia\Module\DeliveryModuleWithStateInterface", class_implements($instance))
+            !\in_array(DeliveryModuleInterface::class, class_implements($instance))
+            && !\in_array(DeliveryModuleWithStateInterface::class, class_implements($instance))
         ) {
-            throw new \InvalidArgumentException(sprintf('Module "%s" is not a delivery module', $this->getCode()));
+            throw new InvalidArgumentException(sprintf('Module "%s" is not a delivery module', $this->getCode()));
         }
 
         return $instance;
@@ -300,7 +305,7 @@ class Module extends BaseModule
     /**
      * @param ContainerInterface $container the Thelia container
      *
-     * @throws \InvalidArgumentException if the module is not found or not a payment module
+     * @throws InvalidArgumentException if the module is not found or not a payment module
      *
      * @return PaymentModuleInterface a payment module instance
      */
@@ -309,7 +314,7 @@ class Module extends BaseModule
         $instance = $this->getModuleInstance($container);
 
         if (!$instance instanceof PaymentModuleInterface) {
-            throw new \InvalidArgumentException(sprintf('Module "%s" is not a payment module', $this->getCode()));
+            throw new InvalidArgumentException(sprintf('Module "%s" is not a payment module', $this->getCode()));
         }
 
         return $instance;
@@ -320,15 +325,13 @@ class Module extends BaseModule
      */
     public function createInstance(): \Thelia\Module\BaseModule
     {
-        $moduleClass = new \ReflectionClass($this->getFullNamespace());
+        $moduleClass = new ReflectionClass($this->getFullNamespace());
 
         return $moduleClass->newInstance();
     }
 
     /**
      * Calculate next position relative to module type.
-     *
-     * @param ModuleQuery $query
      */
     protected function addCriteriaToPositionQuery(ModuleQuery $query): void
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Exception;
+use Propel\Runtime\Exception\PropelException;
+use Thelia\Model\Export;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Model\ImportQuery;
+use Thelia\Model\ExportQUery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -42,13 +49,13 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
     protected $timestampable = true;
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
      * @return LoopResult
      */
     public function parseResults(LoopResult $loopResult)
     {
-        /** @var ImportModel|\Thelia\Model\Export $type */
+        /** @var ImportModel|Export $type */
         foreach ($loopResult->getResultDataCollection() as $type) {
             $loopResultRow = new LoopResultRow($type);
 
@@ -67,7 +74,7 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
                     ->set('POSITION', $type->getPosition())
                     ->set('CATEGORY_ID', $type->getByName($this->getCategoryName()))
                 ;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Tlog::getInstance()->error($e->getMessage());
             }
 
@@ -81,11 +88,11 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
     /**
      * this method returns a Propel ModelCriteria.
      *
-     * @return \Propel\Runtime\ActiveQuery\ModelCriteria
+     * @return ModelCriteria
      */
     public function buildModelCriteria()
     {
-        /** @var \Thelia\Model\ImportQuery|\Thelia\Model\ExportQUery $query */
+        /** @var ImportQuery|ExportQUery $query */
         $query = $this->getQueryModel();
 
         $this->configureI18nProcessing($query, ['TITLE', 'DESCRIPTION']);
@@ -158,7 +165,7 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
      *   );
      * }
      *
-     * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
+     * @return ArgumentCollection
      */
     protected function getArgDefinitions()
     {
@@ -187,7 +194,7 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
     abstract protected function getBaseUrl();
 
     /**
-     * @return \Thelia\Model\ImportQuery|\Thelia\Model\ExportQUery
+     * @return ImportQuery|ExportQUery
      */
     abstract protected function getQueryModel();
 

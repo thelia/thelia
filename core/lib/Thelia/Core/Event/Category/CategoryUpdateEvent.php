@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,16 +11,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Category;
 
 class CategoryUpdateEvent extends CategoryCreateEvent
 {
-    /** @var int */
-    protected $category_id;
-
     protected $chapo;
+
     protected $description;
+
     protected $postscriptum;
 
     protected $parent;
@@ -28,9 +28,8 @@ class CategoryUpdateEvent extends CategoryCreateEvent
     /**
      * @param int $category_id
      */
-    public function __construct($category_id)
+    public function __construct(protected $category_id)
     {
-        $this->category_id = $category_id;
     }
 
     public function getCategoryId()
@@ -38,7 +37,7 @@ class CategoryUpdateEvent extends CategoryCreateEvent
         return $this->category_id;
     }
 
-    public function setCategoryId($category_id)
+    public function setCategoryId($category_id): static
     {
         $this->category_id = $category_id;
 
@@ -50,7 +49,7 @@ class CategoryUpdateEvent extends CategoryCreateEvent
         return $this->chapo;
     }
 
-    public function setChapo($chapo)
+    public function setChapo($chapo): static
     {
         $this->chapo = $chapo;
 
@@ -62,7 +61,7 @@ class CategoryUpdateEvent extends CategoryCreateEvent
         return $this->description;
     }
 
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->description = $description;
 
@@ -74,7 +73,7 @@ class CategoryUpdateEvent extends CategoryCreateEvent
         return $this->postscriptum;
     }
 
-    public function setPostscriptum($postscriptum)
+    public function setPostscriptum($postscriptum): static
     {
         $this->postscriptum = $postscriptum;
 
@@ -86,7 +85,7 @@ class CategoryUpdateEvent extends CategoryCreateEvent
         return $this->parent;
     }
 
-    public function setParent($parent)
+    public function setParent($parent): static
     {
         $this->parent = $parent;
 
@@ -106,7 +105,7 @@ class CategoryUpdateEvent extends CategoryCreateEvent
      *
      * @return $this
      */
-    public function setDefaultTemplateId($defaultTemplateId)
+    public function setDefaultTemplateId($defaultTemplateId): static
     {
         $this->defaultTemplateId = $defaultTemplateId;
 

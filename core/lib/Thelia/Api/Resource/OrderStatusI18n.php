@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
 
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -17,16 +18,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class OrderStatusI18n extends I18n
 {
     #[Groups([OrderStatus::GROUP_ADMIN_READ, OrderStatus::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE, Order::GROUP_FRONT_READ])]
-    protected ?string $title;
+    protected ?string $title = null;
 
     #[Groups([OrderStatus::GROUP_ADMIN_READ, OrderStatus::GROUP_ADMIN_WRITE])]
-    protected ?string $description;
+    protected ?string $description = null;
 
     #[Groups([OrderStatus::GROUP_ADMIN_READ, OrderStatus::GROUP_ADMIN_WRITE])]
-    protected ?string $chapo;
+    protected ?string $chapo = null;
 
     #[Groups([OrderStatus::GROUP_ADMIN_READ, OrderStatus::GROUP_ADMIN_WRITE])]
-    protected ?string $postscriptum;
+    protected ?string $postscriptum = null;
 
     public function getTitle(): ?string
     {

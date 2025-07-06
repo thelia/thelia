@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,20 +11,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Product;
 
 class ProductDeleteEvent extends ProductEvent
 {
-    /** @var int */
-    protected $product_id;
-
     /**
      * @param int $product_id
      */
-    public function __construct($product_id)
+    public function __construct(protected $product_id)
     {
-        $this->product_id = $product_id;
     }
 
     /**
@@ -36,7 +33,7 @@ class ProductDeleteEvent extends ProductEvent
     /**
      * @return $this
      */
-    public function setProductId($product_id)
+    public function setProductId($product_id): static
     {
         $this->product_id = $product_id;
 

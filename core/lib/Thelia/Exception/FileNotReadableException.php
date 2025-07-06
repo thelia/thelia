@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,14 +11,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Exception;
+
+use Exception;
 
 /**
  * Class FileNotReadableException.
  *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class FileNotReadableException extends \Exception
+class FileNotReadableException extends Exception
 {
 }

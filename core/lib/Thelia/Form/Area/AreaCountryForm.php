@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Form\Area;
 
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -51,7 +52,7 @@ class AreaCountryForm extends BaseForm
                     'required' => true,
                     'constraints' => [
                         new NotBlank(),
-                        new Callback([$this, 'verifyCountryList']),
+                        new Callback($this->verifyCountryList(...)),
                     ],
                     'allow_add' => true,
                     'allow_delete' => true,
@@ -73,7 +74,7 @@ class AreaCountryForm extends BaseForm
     /**
      * @return string the name of you form. This name must be unique
      */
-    public static function getName()
+    public static function getName(): string
     {
         return 'thelia_area_country';
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
+
 
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
@@ -20,6 +22,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use DateTime;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
@@ -87,10 +90,13 @@ class ProductSaleElements implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:product_sale_elements:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:product_sale_elements:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:product_sale_elements:write';
 
     public const GROUP_FRONT_READ = 'front:product_sale_elements:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:product_sale_elements:read:single';
 
     #[Groups([
@@ -148,7 +154,7 @@ class ProductSaleElements implements PropelResourceInterface
         CartItem::GROUP_FRONT_READ,
         Product::GROUP_FRONT_READ,
     ])]
-    public ?bool $promo;
+    public ?bool $promo = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -161,7 +167,7 @@ class ProductSaleElements implements PropelResourceInterface
         CartItem::GROUP_FRONT_READ,
         Product::GROUP_FRONT_READ,
     ])]
-    public ?bool $newness;
+    public ?bool $newness = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -174,7 +180,7 @@ class ProductSaleElements implements PropelResourceInterface
         CartItem::GROUP_FRONT_READ,
         Product::GROUP_FRONT_READ,
     ])]
-    public ?float $weight;
+    public ?float $weight = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -185,7 +191,7 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_FRONT_READ_SINGLE,
         Product::GROUP_FRONT_READ,
     ])]
-    public ?bool $isDefault;
+    public ?bool $isDefault = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -195,7 +201,7 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?string $eanCode;
+    public ?string $eanCode = null;
 
     #[Relation(targetResource: ProductPrice::class)]
     #[Groups([
@@ -207,7 +213,7 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_FRONT_READ_SINGLE,
         Product::GROUP_FRONT_READ,
     ])]
-    public array $productPrices;
+    public array $productPrices = [];
 
     #[Relation(targetResource: AttributeCombination::class)]
     #[Groups([
@@ -218,19 +224,13 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_FRONT_READ_SINGLE,
         Product::GROUP_ADMIN_WRITE,
     ])]
-    public array $attributeCombinations;
+    public array $attributeCombinations = [];
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?\DateTime $createdAt;
+    public ?DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?\DateTime $updatedAt;
-
-    public function __construct()
-    {
-        $this->productPrices = [];
-        $this->attributeCombinations = [];
-    }
+    public ?DateTime $updatedAt = null;
 
     public function getId(): ?int
     {
@@ -364,24 +364,24 @@ class ProductSaleElements implements PropelResourceInterface
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): self
+    public function setCreatedAt(?DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): self
+    public function setUpdatedAt(?DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 

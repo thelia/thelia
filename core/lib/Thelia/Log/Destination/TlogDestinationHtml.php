@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Log\Destination;
 
 use Thelia\Log\AbstractTlogDestination;
@@ -20,6 +21,7 @@ class TlogDestinationHtml extends AbstractTlogDestination
     // Nom des variables de configuration
     // ----------------------------------
     public const VAR_STYLE = 'tlog_destinationhtml_style';
+
     public const VALEUR_STYLE_DEFAUT = 'text-align: left; font-size: 12px; font-weight: normal; line-height: 14px; float: none; display:block; color: #000; background-color: #fff; font-family: Courier New, courier,fixed;';
 
     private $style;
@@ -29,22 +31,22 @@ class TlogDestinationHtml extends AbstractTlogDestination
         parent::__construct();
     }
 
-    public function configure(): void
+    protected function configure(): void
     {
         $this->style = $this->getConfig(self::VAR_STYLE);
     }
 
-    public function getTitle()
+    public function getTitle(): string
     {
         return 'Direct HTML display';
     }
 
-    public function getDescription()
+    public function getDescription(): string
     {
         return 'Display logs in HTML format, on top of generated pages.';
     }
 
-    public function getConfigs()
+    public function getConfigs(): array
     {
         return [
             new TlogDestinationConfig(

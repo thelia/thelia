@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use LogicException;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -33,10 +35,7 @@ use Thelia\Type\BooleanOrBothType;
  */
 class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
 {
-    /**
-     * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('folder', null, true),
@@ -45,9 +44,10 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
         );
     }
 
-    public function buildArray()
+    public function buildArray(): array
     {
-        $originalId = $currentId = $this->getFolder();
+        $originalId = $this->getFolder();
+        $currentId = $originalId;
         $visible = $this->getVisible();
         $depth = $this->getDepth();
 
@@ -81,7 +81,7 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
                 if ($currentId > 0) {
                     // Prevent circular refererences
                     if (\in_array($currentId, $ids)) {
-                        throw new \LogicException(
+                        throw new LogicException(
                             sprintf(
                                 'Circular reference detected in folder ID=%d hierarchy (folder ID=%d appears more than one times in path)',
                                 $originalId,
@@ -99,7 +99,7 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
         return array_reverse($results);
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         foreach ($loopResult->getResultDataCollection() as $result) {
             $loopResultRow = new LoopResultRow($result);

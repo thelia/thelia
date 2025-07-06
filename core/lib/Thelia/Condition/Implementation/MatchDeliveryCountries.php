@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Condition\Implementation;
 
 use Thelia\Core\Translation\Translator;
@@ -22,7 +23,7 @@ use Thelia\Exception\UnmatchableConditionException;
  */
 class MatchDeliveryCountries extends AbstractMatchCountries
 {
-    public function getServiceId()
+    public function getServiceId(): string
     {
         return 'thelia.condition.match_delivery_countries';
     }
@@ -44,7 +45,7 @@ class MatchDeliveryCountries extends AbstractMatchCountries
         );
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->translator->trans(
             'Delivery country',
@@ -52,17 +53,15 @@ class MatchDeliveryCountries extends AbstractMatchCountries
         );
     }
 
-    public function getToolTip()
+    public function getToolTip(): string
     {
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'The coupon applies to the selected delivery countries',
             []
         );
-
-        return $toolTip;
     }
 
-    protected function getSummaryLabel($cntryStrList, $i18nOperator)
+    protected function getSummaryLabel($cntryStrList, $i18nOperator): string
     {
         return $this->translator->trans(
             'Only if order shipping country is %op% <strong>%countries_list%</strong>',
@@ -73,7 +72,7 @@ class MatchDeliveryCountries extends AbstractMatchCountries
         );
     }
 
-    protected function getFormLabel()
+    protected function getFormLabel(): string
     {
         return $this->translator->trans(
             'Delivery country is',

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
+use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartEvent;
@@ -61,7 +63,7 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function postInsert(ConnectionInterface $con = null): void
     {
@@ -75,7 +77,7 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function postUpdate(ConnectionInterface $con = null): void
     {
@@ -89,7 +91,7 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
      * @return $this
      */
@@ -105,10 +107,8 @@ class CartItem extends BaseCartItem
             $productSaleElements = $this->getProductSaleElements();
             $product = $productSaleElements->getProduct();
 
-            if ($product->getVirtual() === 0) {
-                if ($productSaleElements->getQuantity() < $value) {
-                    $value = $currentQuantity;
-                }
+            if ($product->getVirtual() === 0 && $productSaleElements->getQuantity() < $value) {
+                $value = $currentQuantity;
             }
         }
 
@@ -118,7 +118,7 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
      * @return $this
      */
@@ -131,10 +131,8 @@ class CartItem extends BaseCartItem
             $productSaleElements = $this->getProductSaleElements();
             $product = $productSaleElements->getProduct();
 
-            if ($product->getVirtual() === 0) {
-                if ($productSaleElements->getQuantity() < $newQuantity) {
-                    $newQuantity = $currentQuantity;
-                }
+            if ($product->getVirtual() === 0 && $productSaleElements->getQuantity() < $newQuantity) {
+                $newQuantity = $currentQuantity;
             }
         }
 
@@ -152,10 +150,8 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @param null $locale
      *
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
+     * @throws PropelException
      * @return Product
      */
     public function getProduct(ConnectionInterface $con = null, $locale = null)
@@ -164,10 +160,8 @@ class CartItem extends BaseCartItem
 
         $translation = $product->getTranslation($locale);
 
-        if ($translation->isNew()) {
-            if (ConfigQuery::getDefaultLangWhenNoTranslationAvailable() == Lang::REPLACE_BY_DEFAULT_LANGUAGE) {
-                $locale = Lang::getDefaultLanguage()->getLocale();
-            }
+        if ($translation->isNew() && ConfigQuery::getDefaultLangWhenNoTranslationAvailable() == Lang::REPLACE_BY_DEFAULT_LANGUAGE) {
+            $locale = Lang::getDefaultLanguage()->getLocale();
         }
 
         $product->setLocale($locale);
@@ -176,7 +170,7 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
      * @return float
      */
@@ -186,7 +180,7 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
      * @return float
      */
@@ -198,7 +192,7 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
      * @return float
      */
@@ -212,7 +206,7 @@ class CartItem extends BaseCartItem
     /**
      * @since Version 2.3
      *
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
      * @return float
      */
@@ -224,7 +218,7 @@ class CartItem extends BaseCartItem
     /**
      * @since Version 2.3
      *
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
      * @return float
      */
@@ -236,7 +230,7 @@ class CartItem extends BaseCartItem
     /**
      * @since Version 2.3
      *
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function getTotalTaxedPromoPrice(Country $country, State $state = null)
     {

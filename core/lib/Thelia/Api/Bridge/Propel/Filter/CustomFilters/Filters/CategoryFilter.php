@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -31,6 +32,7 @@ class CategoryFilter implements TheliaFilterInterface
         if (!\is_array($value)) {
             $value = [$value];
         }
+
         if ($categoryDepth) {
             $categories = $this->filterService->getCategoriesRecursively($value, $categoryDepth);
             foreach ($categories as $categoryList) {
@@ -39,6 +41,7 @@ class CategoryFilter implements TheliaFilterInterface
                 }
             }
         }
+
         $query->useProductCategoryQuery()->filterByCategoryId($value)->endUse();
     }
 
@@ -57,19 +60,23 @@ class CategoryFilter implements TheliaFilterInterface
         if (\is_string($valueSearched)) {
             $valueSearched = explode(',', $valueSearched);
         }
+
         if (empty($valueSearched)) {
             return [];
         }
+
         $value = [];
         foreach ($valueSearched as $categoryId) {
             $mainCategory = CategoryQuery::create()->findOneById($categoryId);
             if (!$mainCategory) {
                 continue;
             }
+
             $categoriesWithDepth = $this->filterService->getCategoriesRecursively(categoryId: $categoryId, maxDepth: $depth);
-            if (empty($categoriesWithDepth)) {
+            if ($categoriesWithDepth === []) {
                 return [];
             }
+
             foreach ($categoriesWithDepth as $depthIndex => $categories) {
                 foreach ($categories as $category) {
                     $value[] =

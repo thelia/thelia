@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
+use InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -62,8 +64,8 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
      *
      * @param DocumentEvent $event Event
      *
-     * @throws \Thelia\Exception\DocumentException
-     * @throws \InvalidArgumentException           , DocumentException
+     * @throws DocumentException
+     * @throws InvalidArgumentException , DocumentException
      */
     public function processDocument(DocumentEvent $event): void
     {
@@ -71,7 +73,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
         $sourceFile = $event->getSourceFilepath();
 
         if (null == $subdir || null == $sourceFile) {
-            throw new \InvalidArgumentException('Cache sub-directory and source file path cannot be null');
+            throw new InvalidArgumentException('Cache sub-directory and source file path cannot be null');
         }
 
         $originalDocumentPathInCache = $this->getCacheFilePath($subdir, $sourceFile, true);
@@ -85,13 +87,11 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
 
             if ($mode == 'symlink') {
                 if (false === symlink($sourceFile, $originalDocumentPathInCache)) {
-                    throw new DocumentException(sprintf('Failed to create symbolic link for %s in %s document cache directory', basename($sourceFile), $subdir));
+                    throw new DocumentException(sprintf('Failed to create symbolic link for %s in %s document cache directory', basename((string) $sourceFile), $subdir));
                 }
-            } else {
+            } elseif (false === @copy($sourceFile, $originalDocumentPathInCache)) {
                 // mode = 'copy'
-                if (false === @copy($sourceFile, $originalDocumentPathInCache)) {
-                    throw new DocumentException(sprintf('Failed to copy %s in %s document cache directory', basename($sourceFile), $subdir));
-                }
+                throw new DocumentException(sprintf('Failed to copy %s in %s document cache directory', basename((string) $sourceFile), $subdir));
             }
         }
 

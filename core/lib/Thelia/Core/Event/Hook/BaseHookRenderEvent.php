@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Hook;
 
+use InvalidArgumentException;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -22,20 +24,18 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class BaseHookRenderEvent extends Event
 {
-    /** @var string the code of the hook */
-    protected $code;
-
-    /** @var array an array of arguments passed to the template engine function */
-    protected $arguments = [];
-
-    /** @var array the variable currently defined in the template */
-    protected $templateVars = [];
-
-    public function __construct($code, array $arguments = [], array $templateVars = [])
+    /**
+     * @param string $code
+     */
+    public function __construct(
+        /** @var string the code of the hook */
+        protected $code,
+        /** @var array an array of arguments passed to the template engine function */
+        protected array $arguments = [],
+        /** @var array the variable currently defined in the template */
+        protected array $templateVars = []
+    )
     {
-        $this->code = $code;
-        $this->arguments = $arguments;
-        $this->templateVars = $templateVars;
     }
 
     /**
@@ -43,7 +43,7 @@ class BaseHookRenderEvent extends Event
      *
      * @return $this
      */
-    public function setCode(string $code)
+    public function setCode(string $code): static
     {
         $this->code = $code;
 
@@ -63,11 +63,10 @@ class BaseHookRenderEvent extends Event
     /**
      * Set all arguments.
      *
-     * @param array $arguments
      *
      * @return $this
      */
-    public function setArguments($arguments)
+    public function setArguments(array $arguments): static
     {
         $this->arguments = $arguments;
 
@@ -79,7 +78,7 @@ class BaseHookRenderEvent extends Event
      *
      * @return array all arguments
      */
-    public function getArguments()
+    public function getArguments(): array
     {
         return $this->arguments;
     }
@@ -89,7 +88,7 @@ class BaseHookRenderEvent extends Event
      *
      * @return array all template vars
      */
-    public function getTemplateVars()
+    public function getTemplateVars(): array
     {
         return $this->templateVars;
     }
@@ -99,7 +98,7 @@ class BaseHookRenderEvent extends Event
      *
      * @return $this
      */
-    public function setArgument(string $key, string $value)
+    public function setArgument(string $key, string $value): static
     {
         $this->arguments[$key] = $value;
 
@@ -121,7 +120,7 @@ class BaseHookRenderEvent extends Event
      *
      * @return bool true if it exists, else false
      */
-    public function hasArgument($key)
+    public function hasArgument($key): bool
     {
         return \array_key_exists($key, $this->arguments);
     }
@@ -131,14 +130,14 @@ class BaseHookRenderEvent extends Event
      *
      * @param string $templateVariableName the variable name
      *
-     * @throws \InvalidArgumentException if the variable is not defined
+     * @throws InvalidArgumentException if the variable is not defined
      *
      * @return mixed the variable value
      */
     public function getTemplateVar(string $templateVariableName)
     {
         if (!isset($this->templateVars[$templateVariableName])) {
-            throw new \InvalidArgumentException(sprintf("Template variable '%s' is not defined.", $templateVariableName));
+            throw new InvalidArgumentException(sprintf("Template variable '%s' is not defined.", $templateVariableName));
         }
 
         return $this->templateVars[$templateVariableName];
@@ -149,7 +148,7 @@ class BaseHookRenderEvent extends Event
      *
      * @return bool true if the template variable is defined, false otherwise
      */
-    public function hasTemplateVar($templateVariableName)
+    public function hasTemplateVar($templateVariableName): bool
     {
         return isset($this->templateVars[$templateVariableName]);
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Log;
 
 abstract class AbstractTlogDestination
@@ -71,11 +72,11 @@ abstract class AbstractTlogDestination
         $this->logs[] = $string;
     }
 
-    protected function insertAfterBody(&$res, $logdata): void
+    protected function insertAfterBody(&$res, string $logdata): void
     {
         $match = [];
 
-        if (preg_match('/(<body[^>]*>)/i', $res, $match)) {
+        if (preg_match('/(<body[^>]*>)/i', (string) $res, $match)) {
             $res = str_replace($match[0], $match[0]."\n".$logdata, $res);
         }
     }

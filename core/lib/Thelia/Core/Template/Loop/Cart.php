@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Type\TypeCollection;
+use Thelia\Type\EnumListType;
+use Propel\Runtime\Exception\PropelException;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -21,7 +26,6 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\CartItem as CartItemModel;
 use Thelia\Model\ConfigQuery;
-use Thelia\Type;
 
 /**
  * Cart Loop.
@@ -32,23 +36,23 @@ use Thelia\Type;
  */
 class Cart extends BaseLoop implements ArraySearchLoopInterface
 {
-    /**
-     * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             new Argument(
                 'order',
-                new Type\TypeCollection(
-                    new Type\EnumListType(['normal', 'reverse'])
+                new TypeCollection(
+                    new EnumListType(['normal', 'reverse'])
                 ),
                 'normal'
             )
         );
     }
 
-    public function buildArray()
+    /**
+     * @return mixed[]
+     */
+    public function buildArray(): array
     {
         /** @var CartModel $cart */
         $cart = $this->getCurrentRequest()->getSession()->getSessionCart($this->getDispatcher());
@@ -62,10 +66,8 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
         $orders = $this->getOrder();
 
         foreach ($orders as $order) {
-            switch ($order) {
-                case 'reverse':
-                    $returnArray = array_reverse($returnArray, false);
-                    break;
+            if ($order === 'reverse') {
+                $returnArray = array_reverse($returnArray, false);
             }
         }
 
@@ -73,11 +75,9 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
-     * @return LoopResult
+     * @throws PropelException
      */
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         $taxCountry = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
         $locale = $this->getCurrentRequest()->getSession()->getLang()->getLocale();
@@ -102,6 +102,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             } else {
                 $loopResultRow->set('STOCK', $productSaleElement->getQuantity());
             }
+
             $loopResultRow
                 ->set('PRICE', $cartItem->getPrice())
                 ->set('PROMO_PRICE', $cartItem->getPromoPrice())
@@ -120,7 +121,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             $loopResultRow
                 ->set('REAL_PRICE', $cartItem->getRealPrice())
                 ->set('REAL_TAXED_PRICE', $cartItem->getRealTaxedPrice($taxCountry))
-                ->set('REAL_TOTAL_PRICE', $cartItem->getTotalRealPrice($taxCountry))
+                ->set('REAL_TOTAL_PRICE', $cartItem->getTotalRealPrice())
                 ->set('REAL_TOTAL_TAXED_PRICE', $cartItem->getTotalRealTaxedPrice($taxCountry))
             ;
 
@@ -136,7 +137,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
     /**
      * Return the event dispatcher,.
      *
-     * @return \Symfony\Component\EventDispatcher\EventDispatcher
+     * @return EventDispatcher
      */
     public function getDispatcher()
     {

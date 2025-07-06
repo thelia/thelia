@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+use ReflectionClass;
+use RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -19,6 +23,7 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Model\Map\ResourceI18nTableMap;
 use Thelia\Model\Map\ResourceTableMap;
 
+#[AsCommand(name: 'thelia:generate-resources', description: 'Outputs admin resources')]
 class GenerateResources extends ContainerAwareCommand
 {
     /**
@@ -27,8 +32,6 @@ class GenerateResources extends ContainerAwareCommand
     protected function configure(): void
     {
         $this
-            ->setName('thelia:generate-resources')
-            ->setDescription('Outputs admin resources')
             ->setHelp('The <info>thelia:generate-resources</info> outputs admin resources.')
             ->addOption(
                 'output',
@@ -42,12 +45,12 @@ class GenerateResources extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $class = new \ReflectionClass('Thelia\Core\Security\Resource\AdminResources');
+        $class = new ReflectionClass(AdminResources::class);
 
         $constants = $class->getConstants();
 
         if (\count($constants) == 0) {
-            throw new \RuntimeException('No resources found');
+            throw new RuntimeException('No resources found');
         }
 
         switch ($input->getOption('output')) {
@@ -60,11 +63,13 @@ class GenerateResources extends ContainerAwareCommand
                     if ($constant == AdminResources::SUPERADMINISTRATOR) {
                         continue;
                     }
+
                     ++$compteur;
                     $output->writeln(
-                        "($compteur, '$value', NOW(), NOW())".($constant === key(\array_slice($constants, -1, 1, true)) ? ';' : ',')
+                        sprintf("(%d, '%s', NOW(), NOW())", $compteur, $value).($constant === key(\array_slice($constants, -1, 1, true)) ? ';' : ',')
                     );
                 }
+
                 break;
             case 'sql-i18n':
                 $output->writeln(
@@ -81,20 +86,23 @@ class GenerateResources extends ContainerAwareCommand
                     $title = ucwords(str_replace('.', ' / ', str_replace('admin.', '', $value)));
 
                     $output->writeln(
-                        "($compteur, 'en_US', '$title'),"
+                        sprintf("(%d, 'en_US', '%s'),", $compteur, $title)
                     );
                     $output->writeln(
-                        "($compteur, 'fr_FR', '$title')".($constant === key(\array_slice($constants, -1, 1, true)) ? ';' : ',')
+                        sprintf("(%d, 'fr_FR', '%s')", $compteur, $title).($constant === key(\array_slice($constants, -1, 1, true)) ? ';' : ',')
                     );
                 }
+
                 break;
             default:
                 foreach ($constants as $constant => $value) {
                     if ($constant == AdminResources::SUPERADMINISTRATOR) {
                         continue;
                     }
+
                     $output->writeln('['.$constant.'] => '.$value);
                 }
+
                 break;
         }
 

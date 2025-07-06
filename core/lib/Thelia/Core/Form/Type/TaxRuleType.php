@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
@@ -24,14 +25,8 @@ use Thelia\Core\Form\Type\Field\TaxRuleIdType;
  */
 class TaxRuleType extends AbstractTheliaType
 {
-    /**
-     * @var \Thelia\Core\Form\Type\Field\TaxRuleIdType
-     */
-    protected $taxRuleIdType;
-
-    public function __construct(TaxRuleIdType $taxRuleIdType)
+    public function __construct(protected TaxRuleIdType $taxRuleIdType)
     {
-        $this->taxRuleIdType = $taxRuleIdType;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -83,7 +78,7 @@ class TaxRuleType extends AbstractTheliaType
      *
      * @return string The name of this type
      */
-    public function getName()
+    public function getName(): string
     {
         return 'tax_rule';
     }

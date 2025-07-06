@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Symfony\Component\Routing\RouterInterface;
+use Thelia\Type\AlphaNumStringListType;
+use Thelia\Type\EnumListType;
+use Thelia\Type\BooleanOrBothType;
+use PDO;
+use ReflectionClass;
+use ReflectionException;
+use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Thelia\Core\Security\AccessManager;
@@ -25,7 +34,6 @@ use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
-use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
@@ -51,10 +59,13 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $timestampable = true;
 
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    public function __construct(
+        protected RouterInterface $router,
+    )
+    {
+    }
+
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
@@ -62,14 +73,14 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createIntListTypeArgument('area'),
             new Argument(
                 'code',
-                new Type\TypeCollection(
-                    new Type\AlphaNumStringListType()
+                new TypeCollection(
+                    new AlphaNumStringListType()
                 )
             ),
             new Argument(
                 'module_type',
-                new Type\TypeCollection(
-                    new Type\EnumListType([
+                new TypeCollection(
+                    new EnumListType([
                         BaseModule::CLASSIC_MODULE_TYPE,
                         BaseModule::DELIVERY_MODULE_TYPE,
                         BaseModule::PAYMENT_MODULE_TYPE,
@@ -78,14 +89,14 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
             ),
             new Argument(
                 'module_category',
-                new Type\TypeCollection(
-                    new Type\EnumListType(explode(',', BaseModule::MODULE_CATEGORIES))
+                new TypeCollection(
+                    new EnumListType(explode(',', BaseModule::MODULE_CATEGORIES))
                 )
             ),
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType([
+                    new EnumListType([
                         'id',
                         'id_reverse',
                         'code',
@@ -103,9 +114,9 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 'manual'
             ),
             Argument::createIntListTypeArgument('exclude'),
-            Argument::createBooleanOrBothTypeArgument('active', Type\BooleanOrBothType::ANY),
-            Argument::createBooleanOrBothTypeArgument('hidden', Type\BooleanOrBothType::ANY),
-            Argument::createBooleanOrBothTypeArgument('mandatory', Type\BooleanOrBothType::ANY)
+            Argument::createBooleanOrBothTypeArgument('active', BooleanOrBothType::ANY),
+            Argument::createBooleanOrBothTypeArgument('hidden', BooleanOrBothType::ANY),
+            Argument::createBooleanOrBothTypeArgument('mandatory', BooleanOrBothType::ANY)
         );
     }
 
@@ -126,7 +137,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 
         if (null !== $profile) {
             $search->leftJoinProfileModule('profile_module')
-                ->addJoinCondition('profile_module', 'profile_module.PROFILE_ID=?', $profile, null, \PDO::PARAM_INT)
+                ->addJoinCondition('profile_module', 'profile_module.PROFILE_ID=?', $profile, null, PDO::PARAM_INT)
                 ->withColumn('profile_module.access', 'access');
         }
 
@@ -165,19 +176,19 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $active = $this->getActive();
 
-        if ($active !== Type\BooleanOrBothType::ANY) {
+        if ($active !== BooleanOrBothType::ANY) {
             $search->filterByActivate($active ? 1 : 0, Criteria::EQUAL);
         }
 
         $hidden = $this->getHidden();
 
-        if ($hidden !== Type\BooleanOrBothType::ANY) {
+        if ($hidden !== BooleanOrBothType::ANY) {
             $search->filterByHidden($hidden ? 1 : 0, Criteria::EQUAL);
         }
 
         $mandatory = $this->getMandatory();
 
-        if ($mandatory !== Type\BooleanOrBothType::ANY) {
+        if ($mandatory !== BooleanOrBothType::ANY) {
             $search->filterByMandatory($mandatory ? 1 : 0, Criteria::EQUAL);
         }
 
@@ -227,15 +238,15 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
         return $search;
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var \Thelia\Model\Module $module */
         foreach ($loopResult->getResultDataCollection() as $module) {
             try {
-                new \ReflectionClass($module->getFullNamespace());
+                new ReflectionClass($module->getFullNamespace());
 
                 $exists = true;
-            } catch (\ReflectionException $ex) {
+            } catch (ReflectionException) {
                 $exists = false;
             }
 
@@ -318,30 +329,27 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 if ($this->container->get($routerId)->match('/admin/module/'.$module->getCode())) {
                     return true;
                 }
-            } catch (ResourceNotFoundException $e) {
+            } catch (ResourceNotFoundException) {
                 /* Keep searching */
             }
         }
 
-        if ($this->container->has('thelia.loader.module_attributes')) {
-            try {
-                if ($this->container->get('thelia.loader.module_attributes')->match('/admin/module/'.$module->getCode())) {
-                    return true;
-                }
-            } catch (\Exception $e) {
-                /* Keep searching */
+        try {
+            if ($this->router->match('/admin/module/'.$module->getCode())) {
+                return true;
             }
+        } catch (Exception) {
+            /* Keep searching */
         }
 
-        if ($this->container->has('thelia.loader.module_annotations')) {
-            try {
-                if ($this->container->get('thelia.loader.module_annotations')->match('/admin/module/'.$module->getCode())) {
-                    return true;
-                }
-            } catch (\Exception $e) {
-                /* Keep searching */
+        try {
+            if ($this->router->match('/admin/module/'.$module->getCode())) {
+                return true;
             }
+        } catch (Exception) {
+            /* Keep searching */
         }
+
 
         // Make a quick and dirty test on the module's config.xml file
         $configContent = @file_get_contents($module->getAbsoluteConfigPath().DS.'config.xml');
@@ -355,10 +363,6 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         /* if not ; test if it uses admin inclusion : module_configuration.html */
-        if (file_exists($module->getAbsoluteAdminIncludesPath().DS.'module_configuration.html')) {
-            return true;
-        }
-
-        return false;
+        return file_exists($module->getAbsoluteAdminIncludesPath().DS.'module_configuration.html');
     }
 }

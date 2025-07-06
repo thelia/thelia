@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Sale;
+
 
 use Propel\Runtime\Util\PropelDateTime;
 
@@ -21,26 +23,33 @@ use Propel\Runtime\Util\PropelDateTime;
  */
 class SaleUpdateEvent extends SaleCreateEvent
 {
-    protected $saleId;
-
     protected $chapo;
+
     protected $description;
+
     protected $postscriptum;
+
     protected $active;
+
     protected $startDate;
+
     protected $endDate;
+
     protected $priceOffsetType;
+
     protected $displayInitialPrice;
+
     protected $priceOffsets;
+
     protected $products;
+
     protected $productAttributes;
 
     /**
      * @param int $saleId
      */
-    public function __construct($saleId)
+    public function __construct(protected $saleId)
     {
-        $this->saleId = $saleId;
     }
 
     /**
@@ -48,7 +57,7 @@ class SaleUpdateEvent extends SaleCreateEvent
      *
      * @return SaleUpdateEvent $this
      */
-    public function setSaleId($saleId)
+    public function setSaleId($saleId): static
     {
         $this->saleId = $saleId;
 
@@ -68,7 +77,7 @@ class SaleUpdateEvent extends SaleCreateEvent
      *
      * @return SaleUpdateEvent $this
      */
-    public function setChapo($chapo)
+    public function setChapo($chapo): static
     {
         $this->chapo = $chapo;
 
@@ -88,7 +97,7 @@ class SaleUpdateEvent extends SaleCreateEvent
      *
      * @return SaleUpdateEvent $this
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->description = $description;
 
@@ -108,7 +117,7 @@ class SaleUpdateEvent extends SaleCreateEvent
      *
      * @return SaleUpdateEvent $this
      */
-    public function setPostscriptum($postscriptum)
+    public function setPostscriptum($postscriptum): static
     {
         $this->postscriptum = $postscriptum;
 
@@ -128,7 +137,7 @@ class SaleUpdateEvent extends SaleCreateEvent
      *
      * @return SaleUpdateEvent $this
      */
-    public function setActive($active)
+    public function setActive($active): static
     {
         $this->active = $active;
 
@@ -148,7 +157,7 @@ class SaleUpdateEvent extends SaleCreateEvent
      *
      * @return SaleUpdateEvent $this
      */
-    public function setEndDate($endDate)
+    public function setEndDate($endDate): static
     {
         $this->endDate = PropelDateTime::newInstance($endDate, null, '\DateTime');
 
@@ -156,7 +165,7 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @return \DateTime|null
+     * @return DateTime|null
      */
     public function getEndDate()
     {
@@ -168,7 +177,7 @@ class SaleUpdateEvent extends SaleCreateEvent
      *
      * @return SaleUpdateEvent $this
      */
-    public function setPriceOffsetType($priceOffsetType)
+    public function setPriceOffsetType($priceOffsetType): static
     {
         $this->priceOffsetType = $priceOffsetType;
 
@@ -188,7 +197,7 @@ class SaleUpdateEvent extends SaleCreateEvent
      *
      * @return SaleUpdateEvent $this
      */
-    public function setStartDate($startDate)
+    public function setStartDate($startDate): static
     {
         $this->startDate = PropelDateTime::newInstance($startDate, null, '\DateTime');
 
@@ -196,7 +205,7 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @return \DateTime|null
+     * @return DateTime|null
      */
     public function getStartDate()
     {
@@ -208,7 +217,7 @@ class SaleUpdateEvent extends SaleCreateEvent
      *
      * @return $this
      */
-    public function setDisplayInitialPrice($displayInitialPrice)
+    public function setDisplayInitialPrice($displayInitialPrice): static
     {
         $this->displayInitialPrice = $displayInitialPrice;
 
@@ -228,7 +237,7 @@ class SaleUpdateEvent extends SaleCreateEvent
      *
      * @return $this
      */
-    public function setPriceOffsets($priceOffsets)
+    public function setPriceOffsets($priceOffsets): static
     {
         $this->priceOffsets = $priceOffsets;
 
@@ -248,7 +257,7 @@ class SaleUpdateEvent extends SaleCreateEvent
      *
      * @return $this
      */
-    public function setProducts($products)
+    public function setProducts($products): static
     {
         $this->products = $products;
 
@@ -268,7 +277,7 @@ class SaleUpdateEvent extends SaleCreateEvent
      *
      * @return $this
      */
-    public function setProductAttributes($productAttributes)
+    public function setProductAttributes($productAttributes): static
     {
         $this->productAttributes = $productAttributes;
 

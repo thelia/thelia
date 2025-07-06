@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Type;
 
 /**
@@ -25,16 +26,17 @@ namespace Thelia\Type;
  */
 class IntToCombinedStringsListType extends BaseType
 {
-    public function getType()
+    public function getType(): string
     {
         return 'Int to combined strings list type';
     }
 
-    public function isValid($values)
+    public function isValid($values): bool
     {
         if (null === $values) {
             return false;
         }
+
         // Explode expession parts, ignoring escaped characters, (\, and \:)
         foreach (preg_split('#(?<!\\\),#', $values) as $intToCombinedStrings) {
             $parts = preg_split('#(?<!\\\):#', $intToCombinedStrings);
@@ -55,29 +57,27 @@ class IntToCombinedStringsListType extends BaseType
         return true;
     }
 
-    public function getFormattedValue($values)
+    public function getFormattedValue($values): ?array
     {
         if ($this->isValid($values)) {
             $return = [];
 
-            foreach (preg_split('/(?<!\\\),/', $values) as $intToCombinedStrings) {
+            foreach (preg_split('/(?<!\\\),/', (string) $values) as $intToCombinedStrings) {
                 $parts = preg_split('/(?<!\\\):/', $intToCombinedStrings);
 
                 $return[trim($parts[0])] = [
                     'values' => array_map(
-                        function ($item) {
-                            return trim(self::unescape($item));
-                        },
+                        fn($item): string => trim((string) self::unescape($item)),
                         preg_split(
                             '#(?<!\\\)[&|]#',
-                            preg_replace(
+                            (string) preg_replace(
                                 '#(?<!\\\)[\(\)]#',
                                 '',
                                 $parts[1]
                             )
                         )
                     ),
-                    'expression' => trim(self::unescape($parts[1])),
+                    'expression' => trim((string) self::unescape($parts[1])),
                 ];
             }
 
@@ -93,9 +93,9 @@ class IntToCombinedStringsListType extends BaseType
      *
      * @return string
      */
-    public static function escape($string)
+    public static function escape($string): ?string
     {
-        return preg_replace('/([,\:\(\)\|\&])/', '\\\$1', $string);
+        return preg_replace('/([,\:\(\)\|\&])/', '\\\$1', (string) $string);
     }
 
     /**
@@ -103,21 +103,21 @@ class IntToCombinedStringsListType extends BaseType
      *
      * @return string
      */
-    public static function unescape($string)
+    public static function unescape($string): ?string
     {
-        return preg_replace('/\\\([,\:\(\)\|\&])/', '\1', $string);
+        return preg_replace('/\\\([,\:\(\)\|\&])/', '\1', (string) $string);
     }
 
     protected function checkLogicalFormat($string)
     {
         // Delete escaped characters
-        $string = preg_replace('/\\\[,\:\(\)\|\&]/', '', $string);
+        $string = preg_replace('/\\\[,\:\(\)\|\&]/', '', (string) $string);
 
         /* delete  all spaces and parentheses */
-        $noSpaceString = preg_replace('#[\s]#', '', $string);
-        $noParentheseString = preg_replace('#[\(\)]#', '', $noSpaceString);
+        $noSpaceString = preg_replace('#[\s]#', '', (string) $string);
+        $noParentheseString = preg_replace('#[\(\)]#', '', (string) $noSpaceString);
 
-        if (!preg_match('#^([a-zA-Z0-9_\-]+([\&\|][a-zA-Z0-9_\-]+)*|\*)$#', $noParentheseString)) {
+        if (!preg_match('#^([a-zA-Z0-9_\-]+([\&\|][a-zA-Z0-9_\-]+)*|\*)$#', (string) $noParentheseString)) {
             return false;
         }
 
@@ -125,7 +125,7 @@ class IntToCombinedStringsListType extends BaseType
         $openingParenthesesCount = 0;
         $closingParenthesesCount = 0;
 
-        $length = \strlen($noSpaceString);
+        $length = \strlen((string) $noSpaceString);
         for ($i = 0; $i < $length; ++$i) {
             $char = $noSpaceString[$i];
             if ($char == '(') {
@@ -138,6 +138,7 @@ class IntToCombinedStringsListType extends BaseType
                 if (($i != 0 && !preg_match('#[\(\)\&\|]#', $noSpaceString[$i - 1])) || !isset($noSpaceString[$i + 1]) || !preg_match('#[\(\)a-zA-Z0-9_\-]#', $noSpaceString[$i + 1])) {
                     return false;
                 }
+
                 ++$openingParenthesesCount;
             } elseif ($char == ')') {
                 /* must be :
@@ -150,18 +151,15 @@ class IntToCombinedStringsListType extends BaseType
                 if ($i == 0 || !preg_match('#[\(\)a-zA-Z0-9_\-]#', $noSpaceString[$i - 1]) || (isset($noSpaceString[$i + 1]) && !preg_match('#[\(\)\&\|]#', $noSpaceString[$i + 1])) || $openingParenthesesCount - $closingParenthesesCount == 0) {
                     return false;
                 }
+
                 ++$closingParenthesesCount;
             }
         }
 
-        if ($openingParenthesesCount != $closingParenthesesCount) {
-            return false;
-        }
-
-        return true;
+        return $openingParenthesesCount === $closingParenthesesCount;
     }
 
-    public function getFormOptions()
+    public function getFormOptions(): array
     {
         return [];
     }

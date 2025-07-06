@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,12 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Form;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Lang;
@@ -27,8 +29,8 @@ class MessageCreationForm extends BaseForm
         $this->formBuilder
             ->add('name', TextType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Callback([$this, 'checkDuplicateName']),
+                    new NotBlank(),
+                    new Callback($this->checkDuplicateName(...)),
                 ],
                 'label' => Translator::getInstance()->trans('Name'),
                 'label_attr' => [
@@ -41,7 +43,7 @@ class MessageCreationForm extends BaseForm
             ])
             ->add('title', TextType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
+                    new NotBlank(),
                 ],
                 'label' => Translator::getInstance()->trans('Purpose'),
                 'label_attr' => [
@@ -57,14 +59,14 @@ class MessageCreationForm extends BaseForm
             ])
             ->add('locale', HiddenType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
+                    new NotBlank(),
                 ],
             ])
             ->add('secured', HiddenType::class, [])
         ;
     }
 
-    public static function getName()
+    public static function getName(): string
     {
         return 'thelia_message_creation';
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,12 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Api\Bridge\Propel\Event\ItemProviderQueryEvent;
-use Thelia\Model\StateQuery;
 
 class StateByIsoProviderListener implements EventSubscriberInterface
 {
@@ -28,18 +28,7 @@ class StateByIsoProviderListener implements EventSubscriberInterface
             return;
         }
 
-        $query = $event->getQuery();
-
-        if (!$query instanceof StateQuery) {
-            return;
-        }
-
-        $query->filterByIsocode($event->getUriVariables()['stateIso'])
-            ->useCountryQuery()
-                ->filterByIsoalpha3($event->getUriVariables()['countryIso3'])
-            ->endUse();
-
-        $event->stopPropagation();
+        $event->getQuery();
     }
 
     public static function getSubscribedEvents(): array

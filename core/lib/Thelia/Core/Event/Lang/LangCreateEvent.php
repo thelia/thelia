@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Lang;
 
 /**
@@ -20,23 +21,33 @@ namespace Thelia\Core\Event\Lang;
 class LangCreateEvent extends LangEvent
 {
     protected $title;
+
     protected $code;
+
     protected $locale;
+
     protected $date_time_format;
+
     protected $date_format;
+
     protected $time_format;
+
     protected $decimal_separator;
+
     protected $thousands_separator;
+
     protected $decimals;
+
     /** @var bool */
     protected $active;
+
     /** @var bool */
     protected $visible;
 
     /**
      * @return $this
      */
-    public function setCode($code)
+    public function setCode($code): static
     {
         $this->code = $code;
 
@@ -53,7 +64,7 @@ class LangCreateEvent extends LangEvent
         return $this->date_time_format;
     }
 
-    public function setDateTimeFormat($date_time_format)
+    public function setDateTimeFormat($date_time_format): static
     {
         $this->date_time_format = $date_time_format;
 
@@ -63,7 +74,7 @@ class LangCreateEvent extends LangEvent
     /**
      * @return $this
      */
-    public function setDateFormat($date_format)
+    public function setDateFormat($date_format): static
     {
         $this->date_format = $date_format;
 
@@ -78,7 +89,7 @@ class LangCreateEvent extends LangEvent
     /**
      * @return $this
      */
-    public function setLocale($locale)
+    public function setLocale($locale): static
     {
         $this->locale = $locale;
 
@@ -93,7 +104,7 @@ class LangCreateEvent extends LangEvent
     /**
      * @return $this
      */
-    public function setTimeFormat($time_format)
+    public function setTimeFormat($time_format): static
     {
         $this->time_format = $time_format;
 
@@ -108,7 +119,7 @@ class LangCreateEvent extends LangEvent
     /**
      * @return $this
      */
-    public function setTitle($title)
+    public function setTitle($title): static
     {
         $this->title = $title;
 
@@ -120,7 +131,7 @@ class LangCreateEvent extends LangEvent
         return $this->title;
     }
 
-    public function setDecimalSeparator($decimal_separator)
+    public function setDecimalSeparator($decimal_separator): static
     {
         $this->decimal_separator = $decimal_separator;
 
@@ -132,7 +143,7 @@ class LangCreateEvent extends LangEvent
         return $this->decimal_separator;
     }
 
-    public function setDecimals($decimals)
+    public function setDecimals($decimals): static
     {
         $this->decimals = $decimals;
 
@@ -144,7 +155,7 @@ class LangCreateEvent extends LangEvent
         return $this->decimals;
     }
 
-    public function setThousandsSeparator($thousands_separator)
+    public function setThousandsSeparator($thousands_separator): static
     {
         $this->thousands_separator = $thousands_separator;
 
@@ -161,7 +172,7 @@ class LangCreateEvent extends LangEvent
      *
      * @return $this
      */
-    public function setActive($active)
+    public function setActive($active): static
     {
         $this->active = $active;
 
@@ -181,7 +192,7 @@ class LangCreateEvent extends LangEvent
      *
      * @return $this
      */
-    public function setVisible($visible)
+    public function setVisible($visible): static
     {
         $this->visible = $visible;
 

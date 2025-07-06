@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Bridge\Propel\Routing;
 
+use ReflectionClass;
+use Exception;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
@@ -48,19 +51,19 @@ class IriConverter implements IriConverterInterface
             $resourceClass = $resource::class;
         }
 
-        $reflector = new \ReflectionClass($resourceClass);
+        $reflector = new ReflectionClass($resourceClass);
 
         $compositeIdentifiers = $reflector->getAttributes(CompositeIdentifiers::class);
 
-        if (!$operation) {
+        if (!$operation instanceof Operation) {
             $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(null, false, true);
         }
 
-        if (\is_object($resource) && !empty($compositeIdentifiers) && null !== $operation) {
+        if (\is_object($resource) && $compositeIdentifiers !== [] && $operation instanceof Operation) {
             try {
                 $identifiers = array_reduce(
                     $compositeIdentifiers[0]->getArguments()[0],
-                    function ($carry, $identifier) use ($resource) {
+                    function (array $carry, $identifier) use ($resource) {
                         $getter = 'get'.ucfirst($identifier);
                         $carry[$identifier] = $resource->$getter()->getId();
 
@@ -70,14 +73,15 @@ class IriConverter implements IriConverterInterface
                 );
 
                 return $this->router->generate($operation->getName(), $identifiers, $operation->getUrlGenerationStrategy() ?? $referenceType);
-            } catch (\Exception $e) {
+            } catch (Exception) {
                 // try with not decorated converter
             }
         }
+
         try {
             return $this->decorated->getIriFromResource($resource, $referenceType, $operation, $context);
-        } catch (\Exception $e) {
-            Tlog::getInstance()->warning('Iri convert failure : '.$e->getMessage());
+        } catch (Exception $exception) {
+            Tlog::getInstance()->warning('Iri convert failure : '.$exception->getMessage());
 
             return 'undefined_iri';
         }

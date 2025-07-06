@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 return [
     ' content create form' => ' створення форми контенту',
     ' note: only non-visible documents can be associated.' => ' Примітка: тільки не видимі документи можуть бути пов\'язані.',
@@ -32,7 +33,7 @@ return [
     'A product with reference %ref already exists. Please choose another reference.' => 'Продукт з ідентифікатором %ref вже існує. Будь ласка вкажіть інший ідентифікатор.',
     'A short description, used when a summary or an introduction is required' => 'Короткий опис, використовується, коли потрібне резюме або введення',
     'A short text, used when an additional or supplemental information is required.' => 'Короткий текст, використовується, якщо необхідна додаткова або довідкова інформація.',
-    'A user already exists with this email address. Please login or if you\'ve forgotten your password, go to Reset Your Password.' => 'Користувач вже існує з такою адресою. Будь ласка увійдіть, або якщо ви забули свій пароль, перейдіть до розділу відновлення пароля.',
+    "A user already exists with this email address. Please login or if you've forgotten your password, go to Reset Your Password." => 'Користувач вже існує з такою адресою. Будь ласка увійдіть, або якщо ви забули свій пароль, перейдіть до розділу відновлення пароля.',
     'A value for attribute "%name" is already present in the combination' => 'Значення атрибута "%name" вже присутнє у комбінації',
     'A variable with name "%name" already exists.' => 'Змінна з іменем "%name" вже існує.',
     'Activate logs only for these IP Addresses' => 'Активувати логування лише для цих IP-адрес',
@@ -101,7 +102,7 @@ return [
     'Confirm Email Address' => 'Підтвердіть Вашу адресу електронної пошти',
     'Confirm Email address' => 'Підтвердіть Вашу адресу електронної пошти',
     'Constant amount' => 'Постійний обсяг',
-    'Constant amount found in one of the product\'s feature' => 'Постійний обсяг знайдено в одній з властивостей продукту',
+    "Constant amount found in one of the product's feature" => 'Постійний обсяг знайдено в одній з властивостей продукту',
     'Contact and sender email address' => 'Адреса електронної пошти відправника та для контактів',
     'Contact page' => 'Сторінка контактів',
     'Content' => 'Контент',
@@ -117,7 +118,7 @@ return [
     'Curency selection page' => 'Сторінка вибору валюти',
     'Current Password' => 'Поточний пароль',
     'Customer is %op% <strong>%customer_list%</strong>' => 'Клієнт є %op% <strong>%customer_list%</strong>',
-    'Date \'%date\' is invalid, please enter a valid date using %fmt format' => 'Неприпустима Дата \'%date\', будь-ласка введіть дійсну дату у форматі %fmt',
+    "Date '%date' is invalid, please enter a valid date using %fmt format" => 'Неприпустима Дата \'%date\', будь-ласка введіть дійсну дату у форматі %fmt',
     'Debug' => 'Налагодження',
     'Decimal places' => 'Десяткові розряди',
     'Default folder *' => 'Папка за замовчуванням *',
@@ -137,7 +138,7 @@ return [
     'Display initial product prices on front-office' => 'Відображення вихідної ціни продукту на фронт офісі',
     'Do compress' => 'Стискати',
     'Document' => 'Документ',
-    'Don\'t repeat keywords over and over in a row. Rather, put in keyword phrases.' => 'Не повторюйте ключові слова кілька разів поспіль.',
+    "Don't repeat keywords over and over in a row. Rather, put in keyword phrases." => 'Не повторюйте ключові слова кілька разів поспіль.',
     'Edit JavaScript' => 'Редагувати JavaScript',
     'Email Address' => 'Адреса електронної пошти',
     'Email addresses of notification recipients' => 'Адреси електронної пошти одержувачів повідомлення',
@@ -163,7 +164,7 @@ return [
     'Failed to delete selected countries' => 'Не вдалося видалити вибрані країни',
     'Failed to find a payment Module with ID=%mid for order ID=%oid' => 'Не вдалося знайти модуль оплати з ID = %mid для замовлення ID =%oid',
     'Failed to load descriptor (module.xml) for module ID "%id".' => 'Не вдалося завантажити дескриптор (module.xml) для модуля "%id".',
-    'Failed to load message with code \'%code%\', propably because it does\'nt exists.' => 'Не вдалося завантажити повідомлення з кодом \'%code%\', ймовірно тому, що її не існує.',
+    "Failed to load message with code '%code%', propably because it does'nt exists." => 'Не вдалося завантажити повідомлення з кодом \'%code%\', ймовірно тому, що її не існує.',
     'Failed to open a writing stream on the file: %file' => 'Не вдалося відкрити письмового потоку на файл: %file',
     'Failed to open translation file %file. Please be sure that this file is writable by your Web server' => 'Не вдалося відкрити файл перекладу %file. Будь ласка, переконайтесь, що цей файл доступний для запису веб-сервером',
     'Failed to send message %code. Failed recipients: %failed_addresses' => 'Не вдалося надіслати повідомлення %code. Помилкові отримувачі: %failed_addresses',
@@ -209,6 +210,6 @@ return [
     'If checked, this hook will be used by a hook block. If not, by hook function.' => 'Якщо відмічено, цей хук буде використовуватись хуком блоку. Якщо ні - хуком функції.',
     'Image' => 'Картинка',
     'Message content: %message%' => 'Зміст повідомлення: %message%.',
-    'Sender\'s e-mail address: %email%' => 'Адреса електронної пошти відправника: %email%.',
+    "Sender's e-mail address: %email%" => 'Адреса електронної пошти відправника: %email%.',
     'Sender name: %name%' => 'Ім\'я відправника: %name%.',
 ];

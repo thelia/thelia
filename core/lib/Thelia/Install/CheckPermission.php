@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,11 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Install;
 
 use Symfony\Component\Translation\Translator;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class CheckPermission.
@@ -26,8 +26,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CheckPermission extends BaseInstall
 {
     public const DIR_CONF = 'vendor/thelia/config';
+
     public const DIR_VAR = 'var';
+
     public const DIR_WEB = 'public';
+
     public const DIR_MEDIA = 'local/media';
 
     /** @var array Directory needed to be writable */
@@ -66,19 +69,14 @@ class CheckPermission extends BaseInstall
     /** @var bool If permissions are OK */
     protected $isValid = true;
 
-    /** @var TranslatorInterface Translator Service */
-    protected $translator;
-
     /**
      * Constructor.
      *
      * @param bool            $verifyInstall If verify install
      * @param Translator|null $translator    Translator Service necessary for install wizard
      */
-    public function __construct($verifyInstall = true, Translator $translator = null)
+    public function __construct($verifyInstall = true, protected ?Translator $translator = null)
     {
-        $this->translator = $translator;
-
         $this->validationMessages['php_version'] = [
             'text' => $this->getI18nPhpVersionText(\PHP_VERSION, true),
             'hint' => $this->getI18nPhpVersionHint(),
@@ -92,6 +90,7 @@ class CheckPermission extends BaseInstall
                 'status' => true,
             ];
         }
+
         foreach ($this->minServerConfigurationNecessary as $key => $value) {
             $this->validationMessages[$key] = [
                 'text' => '',
@@ -129,12 +128,10 @@ class CheckPermission extends BaseInstall
         foreach ($this->directoriesToBeWritable as $directory) {
             $fullDirectory = THELIA_ROOT.$directory;
             $this->validationMessages[$directory]['text'] = $this->getI18nDirectoryText($fullDirectory, true);
-            if (is_writable($fullDirectory) === false) {
-                if (!$this->makeDirectoryWritable($fullDirectory)) {
-                    $this->isValid = false;
-                    $this->validationMessages[$directory]['status'] = false;
-                    $this->validationMessages[$directory]['text'] = $this->getI18nDirectoryText($fullDirectory, false);
-                }
+            if (is_writable($fullDirectory) === false && !$this->makeDirectoryWritable($fullDirectory)) {
+                $this->isValid = false;
+                $this->validationMessages[$directory]['status'] = false;
+                $this->validationMessages[$directory]['text'] = $this->getI18nDirectoryText($fullDirectory, false);
             }
         }
 
@@ -173,12 +170,10 @@ class CheckPermission extends BaseInstall
      * Make a directory writable (recursively).
      *
      * @param string $directory path to directory
-     *
-     * @return bool
      */
-    protected function makeDirectoryWritable($directory)
+    protected function makeDirectoryWritable(string $directory): bool
     {
-        return is_writable(THELIA_ROOT.$directory) === true;
+        return is_writable(THELIA_ROOT.$directory);
     }
 
     /**
@@ -186,17 +181,15 @@ class CheckPermission extends BaseInstall
      *
      * @param string $directory Directory being checked
      * @param bool   $isValid   If directory permission is valid
-     *
-     * @return string
      */
-    protected function getI18nDirectoryText($directory, $isValid)
+    protected function getI18nDirectoryText($directory, $isValid): string
     {
         $sentence = $isValid ? 'The directory %directory% is writable' : 'The directory %directory% is not writable';
 
         return $this->formatString($sentence, ['%directory%' => $directory]);
     }
 
-    protected function getI18nExtensionText($extension, $isValid)
+    protected function getI18nExtensionText($extension, $isValid): string
     {
         $sentence = $isValid ? '%extension% php extension is loaded.' : '%extension% php extension is not loaded.';
 
@@ -211,10 +204,8 @@ class CheckPermission extends BaseInstall
      * @param string $expectedValue Expected server value
      * @param string $currentValue  Actual server value
      * @param bool   $isValid       If server configuration is valid
-     *
-     * @return string
      */
-    protected function getI18nConfigText($key, $expectedValue, $currentValue, $isValid)
+    protected function getI18nConfigText($key, $expectedValue, $currentValue, $isValid): string
     {
         $sentence = $isValid ? 'The PHP "%key%" configuration value (currently %currentValue%) is correct (%expectedValue% required).'
             : 'The PHP "%key%" configuration value (currently %currentValue%) is below minimal requirements to run Thelia2 (%expectedValue% required).';
@@ -229,17 +220,15 @@ class CheckPermission extends BaseInstall
         );
     }
 
-    protected function getI18nExtensionHint()
+    protected function getI18nExtensionHint(): string
     {
         return $this->formatString('This PHP extension should be installed and loaded.');
     }
 
     /**
      * Get Translated hint about the config requirement issue.
-     *
-     * @return string
      */
-    protected function getI18nConfigHint()
+    protected function getI18nConfigHint(): string
     {
         return $this->formatString('Change this value in the php.ini configuration file.', []);
     }
@@ -249,10 +238,8 @@ class CheckPermission extends BaseInstall
      *
      * @param string $currentValue
      * @param bool   $isValid
-     *
-     * @return string
      */
-    protected function getI18nPhpVersionText($currentValue, $isValid)
+    protected function getI18nPhpVersionText($currentValue, $isValid): string
     {
         $sentence = $isValid ? 'PHP version %currentValue% matches the version required (>= %minExpectedValue% <= %maxExpectedValue%).'
             : 'The installer detected PHP version %currentValue%, but Thelia 2 requires PHP between %minExpectedValue% and %maxExpectedValue%.';
@@ -269,10 +256,8 @@ class CheckPermission extends BaseInstall
 
     /**
      * Get Translated hint about the config requirement issue.
-     *
-     * @return string
      */
-    protected function getI18nPhpVersionHint()
+    protected function getI18nPhpVersionHint(): string
     {
         return $this->formatString('You should change the installed PHP version to continue Thelia 2 installation.', []);
     }
@@ -303,7 +288,7 @@ class CheckPermission extends BaseInstall
      *
      * @return int
      */
-    protected function returnBytes($val)
+    protected function returnBytes($val): string|int
     {
         $val = trim($val);
         $last = strtolower($val[\strlen($val) - 1]);
@@ -328,10 +313,8 @@ class CheckPermission extends BaseInstall
      *
      * @param int $bytes     bytes
      * @param int $precision conversion precision
-     *
-     * @return string
      */
-    protected function formatBytes($bytes, $precision = 2)
+    protected function formatBytes($bytes, $precision = 2): string
     {
         $base = log($bytes) / log(1024);
         $suffixes = ['', 'k', 'M', 'G', 'T'];
@@ -339,9 +322,9 @@ class CheckPermission extends BaseInstall
         return round(1024 ** ($base - floor($base)), $precision).$suffixes[floor($base)];
     }
 
-    protected function formatString($string, $parameters = [])
+    protected function formatString(string $string, array $parameters = []): string
     {
-        if ($this->translator !== null) {
+        if ($this->translator instanceof Translator) {
             return $this->translator->trans(
                 $string,
                 $parameters,

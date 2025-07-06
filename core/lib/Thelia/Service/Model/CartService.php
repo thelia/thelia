@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Service\Model;
 
+use RuntimeException;
+use Exception;
+use Thelia\Model\Module;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -57,8 +61,9 @@ readonly class CartService
         $message = null;
         try {
             if ($validatedForm && !$form->isValid()) {
-                throw new \RuntimeException('Failed to validate form');
+                throw new RuntimeException('Failed to validate form');
             }
+
             $cartEvent = $this->getCartEvent();
             $cartEvent->bindForm($form);
             $eventDispatcher->dispatch($cartEvent, TheliaEvents::CART_ADDITEM);
@@ -71,8 +76,9 @@ readonly class CartService
         } catch (FormValidationException $e) {
             $message = $e->getMessage();
         }
+
         if ($message) {
-            throw new \RuntimeException($message);
+            throw new RuntimeException($message);
         }
     }
 
@@ -84,9 +90,9 @@ readonly class CartService
         try {
             $eventDispatcher->dispatch($cartEvent, TheliaEvents::CART_DELETEITEM);
             $this->afterModifyCart($eventDispatcher);
-        } catch (\Exception $e) {
-            Tlog::getInstance()->error(sprintf('error during deleting cartItem with message : %s', $e->getMessage()));
-            throw new \RuntimeException('Failed to delete cartItem');
+        } catch (Exception $exception) {
+            Tlog::getInstance()->error(sprintf('error during deleting cartItem with message : %s', $exception->getMessage()));
+            throw new RuntimeException('Failed to delete cartItem', $exception->getCode(), $exception);
         }
     }
 
@@ -99,9 +105,9 @@ readonly class CartService
         try {
             $eventDispatcher->dispatch($cartEvent, TheliaEvents::CART_UPDATEITEM);
             $this->afterModifyCart($eventDispatcher);
-        } catch (\Exception $e) {
-            Tlog::getInstance()->error(sprintf('Failed to change cart item quantity: %s', $e->getMessage()));
-            throw new \RuntimeException('Failed to change cart item quantity');
+        } catch (Exception $exception) {
+            Tlog::getInstance()->error(sprintf('Failed to change cart item quantity: %s', $exception->getMessage()));
+            throw new RuntimeException('Failed to change cart item quantity', $exception->getCode(), $exception);
         }
     }
 
@@ -125,15 +131,18 @@ readonly class CartService
         if (null === $session) {
             return;
         }
+
         $order = $session->getOrder();
         if (null === $order) {
             return;
         }
+
         $deliveryModule = $order->getModuleRelatedByDeliveryModuleId();
         $deliveryAddress = AddressQuery::create()->findPk($order->getChoosenDeliveryAddress());
         if (null === $deliveryModule || null === $deliveryAddress) {
             return;
         }
+
         $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
         $orderEvent = new OrderEvent($order);
         try {
@@ -152,8 +161,9 @@ readonly class CartService
                 $orderEvent->setPostageTax($postage->getAmountTax());
                 $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
             }
+
             $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_POSTAGE);
-        } catch (\Exception) {
+        } catch (Exception) {
             // The postage has been chosen, but changes in the cart causes an exception.
             // Reset the postage data in the order
             $orderEvent->setDeliveryModule(0);
@@ -165,11 +175,12 @@ readonly class CartService
     {
         $session = $this->requestStack->getCurrentRequest()?->getSession();
         if (!$session instanceof Session) {
-            throw new \RuntimeException('Failed to get cart event : no session found.');
+            throw new RuntimeException('Failed to get cart event : no session found.');
         }
+
         $cart = $session->getSessionCart($this->eventDispatcher);
         if (null === $cart) {
-            throw new \RuntimeException('Failed to get cart event : no cart in session.');
+            throw new RuntimeException('Failed to get cart event : no cart in session.');
         }
 
         return new CartEvent($cart);
@@ -178,7 +189,7 @@ readonly class CartService
     /**
      * Return the minimum expected postage for a cart in a given country.
      *
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function getEstimatedPostageForCountry(Cart $cart, Country $country, State $state = null): array
     {
@@ -187,26 +198,30 @@ readonly class CartService
         if ($deliveryModule = ModuleQuery::create()->findPk($orderSession->getDeliveryModuleId())) {
             $deliveryModules[] = $deliveryModule;
         }
-        if (empty($deliveryModules)) {
+
+        if ($deliveryModules === []) {
             $deliveryModules = ModuleQuery::create()
                 ->filterByActivate(1)
                 ->filterByType(BaseModule::DELIVERY_MODULE_TYPE, Criteria::EQUAL)
                 ->find();
         }
+
         $virtual = $cart->isVirtual();
         $postage = null;
         $postageTax = null;
-        /** @var \Thelia\Model\Module $deliveryModule */
+        /** @var Module $deliveryModule */
         foreach ($deliveryModules as $deliveryModule) {
             $areaDeliveryModule = AreaDeliveryModuleQuery::create()
                 ->findByCountryAndModule($country, $deliveryModule, $state);
             if (null === $areaDeliveryModule && false === $virtual) {
                 continue;
             }
+
             $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
             if (true === $virtual && false === $moduleInstance->handleVirtualProductDelivery()) {
                 continue;
             }
+
             try {
                 $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, null, $country, $state);
                 $this->eventDispatcher->dispatch(
@@ -224,6 +239,7 @@ readonly class CartService
                 // Module is not available
             }
         }
+
         if ($this->isCouponRemovingPostage($country->getId(), $deliveryModule->getId())) {
             $postage = 0;
             $postageTax = 0;
@@ -238,14 +254,16 @@ readonly class CartService
     private function isCouponRemovingPostage(int $countryId, int $deliveryModuleId): bool
     {
         $couponsKept = $this->couponManager->getCouponsKept();
-        if (\count($couponsKept) === 0) {
+        if ($couponsKept === []) {
             return false;
         }
+
         /** @var CouponInterface $coupon */
         foreach ($couponsKept as $coupon) {
             if (!$coupon->isRemovingPostage()) {
                 continue;
             }
+
             // Check if delivery country is on the list of countries for which delivery is free
             // If the list is empty, the shipping is free for all countries.
             $couponCountries = $coupon->getFreeShippingForCountries();
@@ -258,10 +276,12 @@ readonly class CartService
                         break;
                     }
                 }
+
                 if (!$countryValid) {
                     continue;
                 }
             }
+
             // Check if shipping method is on the list of methods for which delivery is free
             // If the list is empty, the shipping is free for all methods.
             $couponModules = $coupon->getFreeShippingForModules();
@@ -274,6 +294,7 @@ readonly class CartService
                         break;
                     }
                 }
+
                 if (!$moduleValid) {
                     continue;
                 }

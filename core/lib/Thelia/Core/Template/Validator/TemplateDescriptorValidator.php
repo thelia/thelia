@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Validator;
 
+use DOMDocument;
+use SplFileInfo;
+use Exception;
+use SimpleXMLElement;
 use Symfony\Component\Finder\Finder;
 use Thelia\Core\Template\Exception\InvalidDescriptorException;
 use Thelia\Log\Tlog;
@@ -27,20 +32,15 @@ class TemplateDescriptorValidator
         '1' => 'template-1_0.xsd',
     ];
 
-    /** @var Finder */
-    protected $xsdFinder;
-
-    protected $xmlDescriptorPath;
+    protected Finder $xsdFinder;
 
     /**
      * TemplateDescriptorValidator constructor.
      *
      * @param string $xmlDescriptorPath the path to the template XML descriprot
      */
-    public function __construct(string $xmlDescriptorPath)
+    public function __construct(protected string $xmlDescriptorPath)
     {
-        $this->xmlDescriptorPath = $xmlDescriptorPath;
-
         $this->xsdFinder = new Finder();
         $this->xsdFinder
             ->name('*.xsd')
@@ -56,13 +56,13 @@ class TemplateDescriptorValidator
      */
     public function validate(string $version = null): self
     {
-        $dom = new \DOMDocument();
+        $dom = new DOMDocument();
         $errors = [];
 
         if ($dom->load($this->xmlDescriptorPath)) {
-            /** @var \SplFileInfo $xsdFile */
+            /** @var SplFileInfo $xsdFile */
             foreach ($this->xsdFinder as $xsdFile) {
-                $xsdVersion = array_search($xsdFile->getBasename(), self::$versions);
+                $xsdVersion = array_search($xsdFile->getBasename(), self::$versions, true);
 
                 if (false === $xsdVersion || (null !== $version && $version != $xsdVersion)) {
                     continue;
@@ -70,7 +70,7 @@ class TemplateDescriptorValidator
 
                 $errors = $this->schemaValidate($dom, $xsdFile);
 
-                if (\count($errors) === 0) {
+                if ($errors === []) {
                     return $this;
                 }
             }
@@ -88,12 +88,12 @@ class TemplateDescriptorValidator
     /**
      * Validate the schema of a XML file with a given xsd file.
      *
-     * @param \DOMDocument $dom     The XML document
-     * @param \SplFileInfo $xsdFile The XSD file
+     * @param DOMDocument $dom The XML document
+     * @param SplFileInfo $xsdFile The XSD file
      *
      * @return array an array of errors if validation fails, otherwise an empty array
      */
-    protected function schemaValidate(\DOMDocument $dom, \SplFileInfo $xsdFile)
+    protected function schemaValidate(DOMDocument $dom, SplFileInfo $xsdFile): array
     {
         $errorMessages = [];
 
@@ -119,7 +119,7 @@ class TemplateDescriptorValidator
             }
 
             libxml_use_internal_errors(false);
-        } catch (\Exception $ex) {
+        } catch (Exception) {
             libxml_use_internal_errors(false);
         }
 
@@ -127,9 +127,9 @@ class TemplateDescriptorValidator
     }
 
     /**
-     * @return object|void
+     * @return object|null
      */
-    public function getDescriptor()
+    public function getDescriptor(): SimpleXMLElement|false|null
     {
         if (file_exists($this->xmlDescriptorPath)) {
             $this->validate();
@@ -137,6 +137,7 @@ class TemplateDescriptorValidator
             return @simplexml_load_file($this->xmlDescriptorPath);
         }
 
-        Tlog::getInstance()->addWarning("Template descriptor $this->xmlDescriptorPath does not exists.");
+        Tlog::getInstance()->addWarning(sprintf('Template descriptor %s does not exists.', $this->xmlDescriptorPath));
+        return null;
     }
 }

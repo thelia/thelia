@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,11 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Coupon;
 
+use Exception;
+use LogicException;
 use Thelia\Condition\Implementation\ConditionInterface;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Exception\UnmatchableConditionException;
 use Thelia\Log\Tlog;
@@ -32,33 +34,23 @@ use Thelia\Model\Order;
  */
 class CouponManager
 {
-    /** @var FacadeInterface Provides necessary value from Thelia */
-    protected $facade;
-
     /** @var array Available Coupons (Services) */
     protected $availableCoupons = [];
 
     /** @var array Available Conditions (Services) */
     protected $availableConditions = [];
 
-    /**
-     * @var Request
-     */
-    private $request;
-    /**
-     * @var CouponFactory
-     */
-    private $couponFactory;
-
     /**S
      * Constructor
      *
      * @param FacadeInterface $facade Service container
      */
-    public function __construct(FacadeInterface $facade, CouponFactory $couponFactory)
+    public function __construct(
+        /** @var FacadeInterface Provides necessary value from Thelia */
+        protected FacadeInterface $facade,
+        private readonly CouponFactory $couponFactory
+    )
     {
-        $this->couponFactory = $couponFactory;
-        $this->facade = $facade;
     }
 
     /**
@@ -68,13 +60,13 @@ class CouponManager
      *
      * @return float checkout discount
      */
-    public function getDiscount()
+    public function getDiscount(): float
     {
         $discount = 0.00;
 
         $coupons = $this->getCurrentCoupons();
 
-        if (\count($coupons) > 0) {
+        if ($coupons !== []) {
             $couponsKept = $this->sortCoupons($coupons);
 
             $discount = $this->getEffect($couponsKept);
@@ -95,7 +87,7 @@ class CouponManager
      *
      * @return array Array of CouponInterface
      */
-    public function getCurrentCoupons()
+    public function getCurrentCoupons(): array
     {
         $couponCodes = $this->facade->getRequest()?->getSession()?->getConsumedCoupons();
 
@@ -111,7 +103,7 @@ class CouponManager
                 if (false !== $couponInterface = $this->couponFactory->buildCouponFromCode($couponCode)) {
                     $coupons[] = $couponInterface;
                 }
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 // Just ignore the coupon and log the problem, just in case someone realize it.
                 Tlog::getInstance()->warning(
                     sprintf('Coupon %s ignored, exception occurred: %s', $couponCode, $ex->getMessage())
@@ -122,10 +114,7 @@ class CouponManager
         return $coupons;
     }
 
-    /**
-     * @return mixed|void
-     */
-    public function pushCouponInSession($code)
+    public function pushCouponInSession($code): void
     {
         $this->facade->pushCouponInSession($code);
     }
@@ -134,10 +123,8 @@ class CouponManager
      * Check if there is a Coupon removing Postage.
      *
      * @param Order $order the order for which we have to check if postage is free
-     *
-     * @return bool
      */
-    public function isCouponRemovingPostage(Order $order)
+    public function isCouponRemovingPostage(Order $order): bool
     {
         $coupons = $this->getCurrentCoupons();
 
@@ -206,10 +193,7 @@ class CouponManager
         return false;
     }
 
-    /**
-     * @return array
-     */
-    public function getCouponsKept()
+    public function getCouponsKept(): array
     {
         return $this->sortCoupons($this->getCurrentCoupons());
     }
@@ -222,7 +206,7 @@ class CouponManager
      *
      * @return array Array of CouponInterface sorted
      */
-    protected function sortCoupons(array $coupons)
+    protected function sortCoupons(array $coupons): array
     {
         $couponsKept = [];
 
@@ -260,7 +244,7 @@ class CouponManager
                 if ($coupon->isMatching()) {
                     $couponsKept[] = $coupon;
                 }
-            } catch (UnmatchableConditionException $e) {
+            } catch (UnmatchableConditionException) {
                 // ignore unmatchable coupon
                 continue;
             }
@@ -276,7 +260,7 @@ class CouponManager
      *
      * @return float discount
      */
-    protected function getEffect(array $coupons)
+    protected function getEffect(array $coupons): float
     {
         $discount = 0.00;
         /** @var CouponInterface $coupon */
@@ -345,16 +329,17 @@ class CouponManager
      *
      * To call when a coupon is consumed
      *
-     * @param \Thelia\Model\Coupon $coupon     Coupon consumed
+     * @param Coupon $coupon Coupon consumed
      * @param int|null             $customerId the ID of the ordering customer
      *
      * @return int Usage left after decremental
      */
-    public function decrementQuantity(Coupon $coupon, $customerId = null)
+    public function decrementQuantity(Coupon $coupon, $customerId = null): int|float|bool
     {
         if ($coupon->isUsageUnlimited()) {
             return true;
         }
+
         try {
             $usageLeft = $coupon->getUsagesLeft($customerId);
 
@@ -362,7 +347,7 @@ class CouponManager
                 // If the coupon usage is per user, add an entry to coupon customer usage count table
                 if ($coupon->getPerCustomerUsageCount()) {
                     if (null == $customerId) {
-                        throw new \LogicException('Customer should not be null at this time.');
+                        throw new LogicException('Customer should not be null at this time.');
                     }
 
                     $ccc = CouponCustomerCountQuery::create()
@@ -389,15 +374,16 @@ class CouponManager
 
                     return $usageLeft - $newCount;
                 }
+
                 $coupon->setMaxUsage(--$usageLeft);
 
                 $coupon->save();
 
                 return $usageLeft;
             }
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             // Just log the problem.
-            Tlog::getInstance()->addError(sprintf('Failed to decrement coupon %s: %s', $coupon->getCode(), $ex->getMessage()));
+            Tlog::getInstance()->addError(sprintf('Failed to decrement coupon %s: %s', $coupon->getCode(), $exception->getMessage()));
         }
 
         return false;
@@ -408,18 +394,19 @@ class CouponManager
      *
      * @param int $customerId
      */
-    public function incrementQuantity(Coupon $coupon, $customerId = null)
+    public function incrementQuantity(Coupon $coupon, $customerId = null): int|float|bool
     {
         if ($coupon->isUsageUnlimited()) {
             return true;
         }
+
         try {
             $usageLeft = $coupon->getUsagesLeft($customerId);
 
             // If the coupon usage is per user, remove an entry from coupon customer usage count table
             if ($coupon->getPerCustomerUsageCount()) {
                 if (null == $customerId) {
-                    throw new \LogicException('Customer should not be null at this time.');
+                    throw new LogicException('Customer should not be null at this time.');
                 }
 
                 $ccc = CouponCustomerCountQuery::create()
@@ -445,9 +432,9 @@ class CouponManager
 
                 return $usageLeft;
             }
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             // Just log the problem.
-            Tlog::getInstance()->addError(sprintf('Failed to increment coupon %s: %s', $coupon->getCode(), $ex->getMessage()));
+            Tlog::getInstance()->addError(sprintf('Failed to increment coupon %s: %s', $coupon->getCode(), $exception->getMessage()));
         }
 
         return false;

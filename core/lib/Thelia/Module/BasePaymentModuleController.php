@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Module;
 
+use Thelia\Log\Destination\TlogDestinationFile;
+use Exception;
+use Thelia\Model\Order;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Controller\Front\BaseFrontController;
@@ -52,8 +56,8 @@ abstract class BasePaymentModuleController extends BaseFrontController
             $logFilePath = $this->getLogFilePath();
 
             $this->log->setPrefix('#LEVEL: #DATE #HOUR: ');
-            $this->log->setDestinations('\\Thelia\\Log\\Destination\\TlogDestinationFile');
-            $this->log->setConfig('\\Thelia\\Log\\Destination\\TlogDestinationFile', 0, $logFilePath);
+            $this->log->setDestinations(TlogDestinationFile::class);
+            $this->log->setConfig(TlogDestinationFile::class, 0, $logFilePath);
             $this->log->setLevel(Tlog::INFO);
         }
 
@@ -74,7 +78,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
      *
      * @param int $orderId the order ID
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function confirmPayment(EventDispatcherInterface $eventDispatcher, $orderId): void
     {
@@ -104,19 +108,19 @@ abstract class BasePaymentModuleController extends BaseFrontController
                     ['%ref' => $order->getRef(), '%id' => $order->getId()]
                 )
             );
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             $this->getLog()->addError(
                 $this->getTranslator()->trans(
                     'Error occured while processing order ref. %ref, ID %id: %err',
                     [
-                        '%err' => $ex->getMessage(),
+                        '%err' => $exception->getMessage(),
                         '%ref' => $order->getRef(),
                         '%id' => $order->getId(),
                     ]
                 )
             );
 
-            throw $ex;
+            throw $exception;
         }
     }
 
@@ -126,7 +130,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
      * @param int $orderId        the order ID
      * @param int $transactionRef the transaction reference
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function saveTransactionRef(EventDispatcherInterface $eventDispatcher, $orderId, $transactionRef): void
     {
@@ -153,7 +157,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
                     ]
                 )
             );
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             $this->getLog()->addError(
                 $this->getTranslator()->trans(
                     'Error occurred while saving payment transaction %transaction_ref for order ID %id.',
@@ -164,7 +168,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
                 )
             );
 
-            throw $ex;
+            throw $exception;
         }
     }
 
@@ -202,26 +206,26 @@ abstract class BasePaymentModuleController extends BaseFrontController
                     ['%ref' => $order->getRef()]
                 )
             );
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             $this->getLog()->addError(
                 $this->getTranslator()->trans(
                     'Error occurred while cancelling order ref. %ref, ID %id: %err',
                     [
-                        '%err' => $ex->getMessage(),
+                        '%err' => $exception->getMessage(),
                         '%ref' => $order->getRef(),
                         '%id' => $order->getId(),
                     ]
                 )
             );
 
-            throw $ex;
+            throw $exception;
         }
     }
 
     /**
      * Get an order and issue a log message if not found.
      *
-     * @return \Thelia\Model\Order|null
+     * @return Order|null
      */
     protected function getOrder($orderId)
     {

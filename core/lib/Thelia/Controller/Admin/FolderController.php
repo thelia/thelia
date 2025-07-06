@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,19 +11,23 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Folder\FolderCreateEvent;
 use Thelia\Core\Event\Folder\FolderDeleteEvent;
+use Thelia\Core\Event\Folder\FolderEvent;
 use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
 use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Form\BaseForm;
@@ -55,7 +61,7 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Return the creation form for this object.
      */
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::FOLDER_CREATION);
     }
@@ -63,7 +69,7 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Return the update form for this object.
      */
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::FOLDER_MODIFICATION);
     }
@@ -71,11 +77,9 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Hydrate the update form for this object, before passing it to the update template.
      *
-     * @param \Thelia\Model\Folder $object
-     *
-     * @return BaseForm
+     * @param Folder $object
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         // Hydrate the "SEO" tab form
         $this->hydrateSeoForm($parserContext, $object);
@@ -98,12 +102,8 @@ class FolderController extends AbstractSeoCrudController
 
     /**
      * Creates the creation event with the provided form data.
-     *
-     * @param array $formData
-     *
-     * @return FolderCreateEvent
      */
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $creationEvent = new FolderCreateEvent();
 
@@ -118,12 +118,8 @@ class FolderController extends AbstractSeoCrudController
 
     /**
      * Creates the update event with the provided form data.
-     *
-     * @param array $formData
-     *
-     * @return FolderUpdateEvent
      */
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $updateEvent = new FolderUpdateEvent($formData['id']);
 
@@ -143,15 +139,15 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Creates the delete event with the provided form data.
      */
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): FolderDeleteEvent
     {
         return new FolderDeleteEvent($this->getRequest()->get('folder_id'));
     }
 
     /**
-     * @return \Thelia\Core\Event\Folder\FolderToggleVisibilityEvent|void
+     * @return FolderToggleVisibilityEvent|void
      */
-    protected function createToggleVisibilityEvent()
+    protected function createToggleVisibilityEvent(): FolderToggleVisibilityEvent
     {
         return new FolderToggleVisibilityEvent($this->getExistingObject());
     }
@@ -159,10 +155,10 @@ class FolderController extends AbstractSeoCrudController
     /**
      * @return UpdatePositionEvent|void
      */
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('folder_id', null),
+            $this->getRequest()->get('folder_id'),
             $positionChangeMode,
             $positionValue
         );
@@ -171,11 +167,9 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
-     * @param \Thelia\Core\Event\Folder\FolderEvent $event
-     *
-     * @return bool
+     * @param FolderEvent $event
      */
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasFolder();
     }
@@ -185,9 +179,9 @@ class FolderController extends AbstractSeoCrudController
      *
      * @param $event \Thelia\Core\Event\Folder\FolderEvent $event
      *
-     * @return \Thelia\Model\Folder|null
+     * @return Folder|null
      */
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasFolder() ? $event->getFolder() : null;
     }
@@ -195,7 +189,7 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Load an existing object from the database.
      */
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $folder = FolderQuery::create()
             ->findOneById($this->getRequest()->get('folder_id', 0));
@@ -214,8 +208,7 @@ class FolderController extends AbstractSeoCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
@@ -223,20 +216,16 @@ class FolderController extends AbstractSeoCrudController
      * Returns the object ID from the object.
      *
      * @param Folder $object
-     *
-     * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
 
     /**
      * Render the main list template.
-     *
-     * @return Response
      */
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         // Get content order
         $content_order = $this->getListOrderFromSession('content', 'content_order', 'manual');
@@ -254,14 +243,14 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Render the edition template.
      */
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('folder-edit', $this->getEditionArguments());
     }
 
-    protected function getEditionArguments(Request $request = null)
+    protected function getEditionArguments(Request $request = null): array
     {
-        if (null === $request) {
+        if (!$request instanceof Request) {
             $request = $this->getRequest();
         }
 
@@ -272,11 +261,9 @@ class FolderController extends AbstractSeoCrudController
     }
 
     /**
-     * @param \Thelia\Core\Event\Folder\FolderUpdateEvent $updateEvent
-     *
      * @return Response|void
      */
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, $updateEvent)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): ?\Symfony\Component\HttpFoundation\Response
     {
         if ($this->getRequest()->get('save_mode') != 'stay') {
             return $this->generateRedirectFromRoute(
@@ -291,11 +278,11 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Put in this method post object delete processing if required.
      *
-     * @param \Thelia\Core\Event\Folder\FolderDeleteEvent $deleteEvent the delete event
+     * @param ActionEvent $deleteEvent the delete event
      *
      * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalDeleteAction($deleteEvent)
+    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent): ?\Symfony\Component\HttpFoundation\Response
     {
         return $this->generateRedirectFromRoute(
             'admin.folders.default',
@@ -304,13 +291,13 @@ class FolderController extends AbstractSeoCrudController
     }
 
     /**
-     * @param $event \Thelia\Core\Event\UpdatePositionEvent
+     * @param $positionChangeEvent ActionEvent
      *
      * @return Response|null
      */
-    protected function performAdditionalUpdatePositionAction($event)
+    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent): ?\Symfony\Component\HttpFoundation\Response
     {
-        $folder = FolderQuery::create()->findPk($event->getObjectId());
+        $folder = FolderQuery::create()->findPk($positionChangeEvent->getObjectId());
 
         if ($folder != null) {
             return $this->generateRedirectFromRoute(
@@ -327,7 +314,7 @@ class FolderController extends AbstractSeoCrudController
      *
      * @return Response
      */
-    protected function redirectToEditionTemplate(Request $request = null)
+    protected function redirectToEditionTemplate(Request $request = null): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.folders.update', [], $this->getEditionArguments($request));
     }
@@ -335,7 +322,7 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Redirect to the list template.
      */
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.folders.default',

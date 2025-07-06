@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Sale;
 
 /**
@@ -19,15 +20,11 @@ namespace Thelia\Core\Event\Sale;
  */
 class SaleDeleteEvent extends SaleEvent
 {
-    /** @var int */
-    protected $saleId;
-
     /**
      * @param int $saleId
      */
-    public function __construct($saleId)
+    public function __construct(protected $saleId)
     {
-        $this->saleId = $saleId;
     }
 
     /**
@@ -35,7 +32,7 @@ class SaleDeleteEvent extends SaleEvent
      *
      * @return SaleDeleteEvent $this
      */
-    public function setSaleId($saleId)
+    public function setSaleId($saleId): static
     {
         $this->saleId = $saleId;
 

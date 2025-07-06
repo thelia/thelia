@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Lang;
 
 use Thelia\Core\Event\ActionEvent;
@@ -22,13 +23,15 @@ use Thelia\Core\Event\ActionEvent;
 class LangDefaultBehaviorEvent extends ActionEvent
 {
     /**
-     * @var int default behavior status
+     * @param int $defaultBehavior
      */
-    protected $defaultBehavior;
-
-    public function __construct($defaultBehavior)
+    public function __construct(
+        /**
+         * @var int default behavior status
+         */
+        protected $defaultBehavior
+    )
     {
-        $this->defaultBehavior = $defaultBehavior;
     }
 
     /**

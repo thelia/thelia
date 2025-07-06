@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+use RuntimeException;
+use Exception;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -25,13 +29,12 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
+#[AsCommand(name: 'module:generate', description: 'generate all needed files for creating a new Module')]
 class ModuleGenerateCommand extends BaseModuleGenerate
 {
     protected function configure(): void
     {
         $this
-            ->setName('module:generate')
-            ->setDescription('generate all needed files for creating a new Module')
             ->addArgument(
                 'name',
                 InputArgument::REQUIRED,
@@ -55,9 +58,9 @@ class ModuleGenerateCommand extends BaseModuleGenerate
 
         try {
             $this->verifyExistingModule();
-        } catch (\RuntimeException $ex) {
+        } catch (RuntimeException $runtimeException) {
             if (false === $input->getOption('force')) {
-                throw $ex;
+                throw $runtimeException;
             }
         }
 
@@ -96,7 +99,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         }
     }
 
-    protected function copyConfigFile($filename, $skeletonDir, Filesystem $fs): void
+    protected function copyConfigFile($filename, string $skeletonDir, Filesystem $fs): void
     {
         $filename = $this->moduleDirectory.\DIRECTORY_SEPARATOR.'Config'.\DIRECTORY_SEPARATOR.$filename;
         if (!$fs->exists($filename)) {
@@ -104,7 +107,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
 
             $configContent = str_replace('%%CLASSNAME%%', $this->module, $configContent);
             $configContent = str_replace('%%NAMESPACE%%', $this->module, $configContent);
-            $configContent = str_replace('%%NAMESPACE_LOWER%%', strtolower($this->module), $configContent);
+            $configContent = str_replace('%%NAMESPACE_LOWER%%', strtolower((string) $this->module), $configContent);
 
             file_put_contents(
                 $filename,
@@ -132,7 +135,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                 $readmeContent = file_get_contents($skeletonDir.'Readme.md');
 
                 // generate title for readme
-                preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $this->module, $readmeTitle);
+                preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', (string) $this->module, $readmeTitle);
                 $composerFinalName = strtolower(implode('-', $readmeTitle[0]));
 
                 $readmeContent = str_replace('%%MODULENAME%%', $this->module, $readmeContent);
@@ -148,7 +151,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                 $composerContent = file_get_contents($skeletonDir.'composer.json');
 
                 // generate composer module name
-                preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $this->module, $composerName);
+                preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', (string) $this->module, $composerName);
 
                 $composerContent = str_replace('%%MODULENAME%%', $this->module, $composerContent);
                 $composerContent = str_replace('%%COMPOSERNAME%%', strtolower(implode('-', $composerName[0])), $composerContent);
@@ -174,7 +177,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
 
                 $classContent = str_replace('%%CLASSNAME%%', $this->module, $classContent);
                 $classContent = str_replace('%%NAMESPACE%%', $this->module, $classContent);
-                $classContent = str_replace('%%DOMAINNAME%%', strtolower($this->module), $classContent);
+                $classContent = str_replace('%%DOMAINNAME%%', strtolower((string) $this->module), $classContent);
 
                 file_put_contents($filename, $classContent);
             }
@@ -212,7 +215,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                 $routingContent = file_get_contents($skeletonDir.'routing.xml');
 
                 $routingContent = str_replace('%%NAMESPACE%%', $this->module, $routingContent);
-                $routingContent = str_replace('%%CLASSNAME_LOWER%%', strtolower($this->module), $routingContent);
+                $routingContent = str_replace('%%CLASSNAME_LOWER%%', strtolower((string) $this->module), $routingContent);
 
                 file_put_contents($filename, $routingContent);
             }
@@ -233,10 +236,10 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                     $this->moduleDirectory.\DIRECTORY_SEPARATOR.'I18n'.\DIRECTORY_SEPARATOR.'en_US.php'
                 );
             }
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             $fs->remove($this->moduleDirectory);
 
-            throw $ex;
+            throw $exception;
         }
     }
 }

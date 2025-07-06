@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event;
 
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -21,12 +22,6 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class SessionEvent extends ActionEvent
 {
-    protected $cacheDir;
-
-    protected $env;
-
-    protected $debug;
-
     protected $session;
 
     /**
@@ -34,11 +29,8 @@ class SessionEvent extends ActionEvent
      * @param bool   $debug    debug for the current request
      * @param string $env      environment for the current request
      */
-    public function __construct($cacheDir, $debug, $env)
+    public function __construct(protected $cacheDir, protected $debug, protected $env)
     {
-        $this->cacheDir = $cacheDir;
-        $this->debug = $debug;
-        $this->env = $env;
     }
 
     /**

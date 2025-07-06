@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Hook;
 
+use ReturnTypeWillChange;
 use Iterator;
 
 /**
@@ -19,18 +21,12 @@ use Iterator;
  *
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class FragmentBag implements \Iterator
+class FragmentBag implements Iterator
 {
-    private $position;
+    private int $position = 0;
 
     /** @var array */
-    protected $fragments;
-
-    public function __construct()
-    {
-        $this->position = 0;
-        $this->fragments = [];
-    }
+    protected $fragments = [];
 
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
@@ -40,7 +36,7 @@ class FragmentBag implements \Iterator
      *
      * @return mixed can return any type
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function current()
     {
         return $this->fragments[$this->position];
@@ -67,7 +63,7 @@ class FragmentBag implements \Iterator
      *
      * @return mixed scalar on success, or null on failure
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function key()
     {
         return $this->position;

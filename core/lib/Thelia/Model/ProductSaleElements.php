@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
+use RuntimeException;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Model\Base\ProductSaleElements as BaseProductSaleElements;
 use Thelia\Model\Tools\ProductPriceTools;
@@ -35,8 +37,8 @@ class ProductSaleElements extends BaseProductSaleElements
             if ($discount > 0) {
                 $amount *= (1 - ($discount / 100));
             }
-        } catch (PropelException $e) {
-            throw new PropelException("Virtual column `$virtualColumnName` does not exist in ProductSaleElements::getPrice");
+        } catch (PropelException) {
+            throw new PropelException(sprintf('Virtual column `%s` does not exist in ProductSaleElements::getPrice', $virtualColumnName));
         }
 
         return $amount;
@@ -58,8 +60,8 @@ class ProductSaleElements extends BaseProductSaleElements
             if ($discount > 0) {
                 $amount *= (1 - ($discount / 100));
             }
-        } catch (PropelException $e) {
-            throw new PropelException("Virtual column `$virtualColumnName` does not exist in ProductSaleElements::getPromoPrice");
+        } catch (PropelException) {
+            throw new PropelException(sprintf('Virtual column `%s` does not exist in ProductSaleElements::getPromoPrice', $virtualColumnName));
         }
 
         return $amount;
@@ -105,7 +107,7 @@ class ProductSaleElements extends BaseProductSaleElements
      *
      * @param int $discount
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      * @throws PropelException
      *
      * @return ProductPriceTools
@@ -129,7 +131,7 @@ class ProductSaleElements extends BaseProductSaleElements
                 $price = $productPrice->getPrice() * $currency->getRate() / $defaultCurrency->getRate();
                 $promoPrice = $productPrice->getPromoPrice() * $currency->getRate() / $defaultCurrency->getRate();
             } else {
-                throw new \RuntimeException('Cannot find product prices for currency id: `'.$currency->getId().'`');
+                throw new RuntimeException('Cannot find product prices for currency id: `'.$currency->getId().'`');
             }
         } else {
             $price = $productPrice->getPrice();
@@ -141,8 +143,6 @@ class ProductSaleElements extends BaseProductSaleElements
             $promoPrice *= (1 - ($discount / 100));
         }
 
-        $productPriceTools = new ProductPriceTools($price, $promoPrice);
-
-        return $productPriceTools;
+        return new ProductPriceTools($price, $promoPrice);
     }
 }

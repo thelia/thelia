@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Hook;
 
 /**
@@ -39,7 +40,7 @@ class ModuleHookCreateEvent extends ModuleHookEvent
      *
      * @return $this
      */
-    public function setHookId($hook_id)
+    public function setHookId($hook_id): static
     {
         $this->hook_id = $hook_id;
 
@@ -59,7 +60,7 @@ class ModuleHookCreateEvent extends ModuleHookEvent
      *
      * @return $this
      */
-    public function setModuleId($module_id)
+    public function setModuleId($module_id): static
     {
         $this->module_id = $module_id;
 
@@ -77,7 +78,7 @@ class ModuleHookCreateEvent extends ModuleHookEvent
     /**
      * @return $this
      */
-    public function setClassname(string $classname = '')
+    public function setClassname(string $classname = ''): static
     {
         $this->classname = $classname;
 
@@ -95,7 +96,7 @@ class ModuleHookCreateEvent extends ModuleHookEvent
     /**
      * @return $this
      */
-    public function setMethod(string $method)
+    public function setMethod(string $method): static
     {
         $this->method = $method;
 
@@ -121,7 +122,7 @@ class ModuleHookCreateEvent extends ModuleHookEvent
     /**
      * @return $this
      */
-    public function setTemplates(string $templates)
+    public function setTemplates(string $templates): static
     {
         $this->templates = $templates;
 

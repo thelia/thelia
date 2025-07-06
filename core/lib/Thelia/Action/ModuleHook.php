@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
+use LogicException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cache\CacheEvent;
@@ -41,19 +43,14 @@ use Thelia\Module\BaseModule;
  */
 class ModuleHook extends BaseAction implements EventSubscriberInterface
 {
-    /** @var string */
-    protected $cacheDir;
-
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
-
-    public function __construct($kernelCacheDir, EventDispatcherInterface $dispatcher)
+    /**
+     * @param string $kernelCacheDir
+     */
+    public function __construct(protected $cacheDir, protected EventDispatcherInterface $dispatcher)
     {
-        $this->cacheDir = $kernelCacheDir;
-        $this->dispatcher = $dispatcher;
     }
 
-    public function toggleModuleActivation(ModuleToggleActivationEvent $event)
+    public function toggleModuleActivation(ModuleToggleActivationEvent $event): ModuleToggleActivationEvent
     {
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
             ModuleHookQuery::create()
@@ -64,9 +61,9 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
         return $event;
     }
 
-    public function deleteModule(ModuleDeleteEvent $event)
+    public function deleteModule(ModuleDeleteEvent $event): ModuleDeleteEvent
     {
-        if ($event->getModuleId()) {
+        if ($event->getModuleId() !== 0) {
             ModuleHookQuery::create()
                 ->filterByModuleId($event->getModuleId())
                 ->delete();
@@ -93,7 +90,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
         return false;
     }
 
-    protected function getLastPositionInHook($hook_id)
+    protected function getLastPositionInHook($hook_id): int
     {
         $result = ModuleHookQuery::create()
             ->filterByHookId($hook_id)
@@ -172,16 +169,17 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function toggleModuleHookActivation(ModuleHookToggleActivationEvent $event)
+    public function toggleModuleHookActivation(ModuleHookToggleActivationEvent $event): ModuleHookToggleActivationEvent
     {
         if (null !== $moduleHook = $event->getModuleHook()) {
             if ($moduleHook->getModuleActive()) {
                 $moduleHook->setActive(!$moduleHook->getActive());
                 $moduleHook->save();
             } else {
-                throw new \LogicException(Translator::getInstance()->trans('The module has to be activated.'));
+                throw new LogicException(Translator::getInstance()->trans('The module has to be activated.'));
             }
         }
+
         $this->cacheClear();
 
         return $event;
@@ -192,7 +190,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
      *
      * @return UpdatePositionEvent $event
      */
-    public function updateModuleHookPosition(UpdatePositionEvent $event)
+    public function updateModuleHookPosition(UpdatePositionEvent $event): UpdatePositionEvent
     {
         $this->genericUpdatePosition(ModuleHookQuery::create(), $event);
         $this->cacheClear();

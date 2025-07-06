@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Loop;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -22,22 +23,15 @@ use Thelia\Core\Template\Element\BaseLoop;
  */
 class LoopExtendsBuildModelCriteriaEvent extends LoopExtendsEvent
 {
-    /** @var ModelCriteria */
-    protected $modelCriteria;
-
     /**
      * LoopExtendsBuildModelCriteria constructor.
      */
-    public function __construct(BaseLoop $loop, ModelCriteria $modelCriteria)
+    public function __construct(BaseLoop $loop, protected ModelCriteria $modelCriteria)
     {
         parent::__construct($loop);
-        $this->modelCriteria = $modelCriteria;
     }
 
-    /**
-     * @return ModelCriteria
-     */
-    public function getModelCriteria()
+    public function getModelCriteria(): ModelCriteria
     {
         return $this->modelCriteria;
     }

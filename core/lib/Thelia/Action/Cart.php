@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
+use Exception;
+use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cart\CartCreateEvent;
@@ -133,9 +136,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     public function clear(CartEvent $event): void
     {
-        if (null !== $cart = $event->getCart()) {
-            $cart->delete();
-        }
+        $cart = $event->getCart();
+        $cart->delete();
     }
 
     /**
@@ -205,12 +207,10 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @param float $quantity
      *
-     * @throws \Exception
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
-     * @return CartItem
+     * @throws Exception
+     * @throws PropelException
      */
-    protected function updateQuantity(EventDispatcherInterface $dispatcher, CartItem $cartItem, $quantity)
+    protected function updateQuantity(EventDispatcherInterface $dispatcher, CartItem $cartItem, $quantity): CartItem
     {
         $cartItem->setDisptacher($dispatcher);
         $cartItem->updateQuantity($quantity)
@@ -224,8 +224,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @param int   $productId
      * @param float $quantity
-     *
-     * @return CartItem
      */
     protected function doAddItem(
         EventDispatcherInterface $dispatcher,
@@ -234,7 +232,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         ProductSaleElements $productSaleElements,
         $quantity,
         ProductPriceTools $productPrices
-    ) {
+    ): CartItem {
         $cartItem = new CartItem();
         $cartItem->setDisptacher($dispatcher);
         $cartItem
@@ -311,9 +309,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
         if (null === $cart) {
             $cart = $this->dispatchNewCart($dispatcher);
         }
+
         if ($cart->getCurrency()) {
             $this->getSession()->setCurrency($cart->getCurrency());
         }
+
         $cartRestoreEvent->setCart($cart);
     }
 
@@ -322,8 +322,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * if needed or create duplicate the current cart if the customer is not the same as customer already present in
      * the cart.
      *
-     * @throws \Exception
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws Exception
+     * @throws PropelException
      *
      * @return CartModel
      */
@@ -343,12 +343,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      * The cart token is saved in a cookie so we try to retrieve it. Then the customer is checked.
      *
-     * @throws \Exception
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws Exception
+     * @throws PropelException
      *
      * @return CartModel
      */
-    protected function managePersistentCart(CartRestoreEvent $cartRestoreEvent, $cookieName, EventDispatcherInterface $dispatcher)
+    protected function managePersistentCart(CartRestoreEvent $cartRestoreEvent, string $cookieName, EventDispatcherInterface $dispatcher)
     {
         // The cart cookie exists -> get the cart token
         $token = $this->request->cookies->get($cookieName);
@@ -370,14 +370,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
             $duplicateCart = true;
 
             // A customer is logged in.
-            if (null === $cart->getCustomerId()) {
-                // If the customer has a discount, whe have to duplicate the cart,
-                // so that the discount will be applied to the products in cart.
-
-                if (0 === $customer->getDiscount() || 0 === $cart->countCartItems()) {
-                    // If no discount, or an empty cart, there's no need to duplicate.
-                    $duplicateCart = false;
-                }
+            // If the customer has a discount, whe have to duplicate the cart,
+            // so that the discount will be applied to the products in cart.
+            if (null === $cart->getCustomerId() && (0 === $customer->getDiscount() || 0 === $cart->countCartItems())) {
+                // If no discount, or an empty cart, there's no need to duplicate.
+                $duplicateCart = false;
             }
 
             if ($duplicateCart) {
@@ -401,10 +398,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         return $cart;
     }
 
-    /**
-     * @return CartModel
-     */
-    protected function dispatchNewCart(EventDispatcherInterface $dispatcher)
+    protected function dispatchNewCart(EventDispatcherInterface $dispatcher): CartModel
     {
         $cartCreateEvent = new CartCreateEvent();
 
@@ -440,10 +434,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
     /**
      * Duplicate an existing Cart. If a customer ID is provided the created cart will be attached to this customer.
-     *
-     * @return CartModel
      */
-    protected function duplicateCart(EventDispatcherInterface $dispatcher, CartModel $cart, CustomerModel $customer = null)
+    protected function duplicateCart(EventDispatcherInterface $dispatcher, CartModel $cart, CustomerModel $customer = null): CartModel
     {
         $newCart = $cart->duplicate(
             $this->generateCartCookieIdentifier(),
@@ -464,7 +456,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @return string
      */
-    protected function generateCartCookieIdentifier()
+    protected function generateCartCookieIdentifier(): ?string
     {
         $id = null;
 

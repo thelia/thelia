@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\MailingSystem\MailingSystemEvent;
@@ -31,13 +35,13 @@ class MailingSystemController extends BaseAdminController
 
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(self::RESOURCE_CODE, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
         // Hydrate the form abd pass it to the parser
         $data = [
-            'enabled' => ConfigQuery::isSmtpEnable() ? true : false,
+            'enabled' => (bool) ConfigQuery::isSmtpEnable(),
             'host' => ConfigQuery::getSmtpHost(),
             'port' => ConfigQuery::getSmtpPort(),
             'encryption' => ConfigQuery::getSmtpEncryption(),
@@ -58,10 +62,10 @@ class MailingSystemController extends BaseAdminController
         return $this->render('mailing-system', ['editDisabled' => ConfigQuery::isSmtpInEnv()]);
     }
 
-    public function updateAction(EventDispatcherInterface $eventDispatcher)
+    public function updateAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse|null
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(self::RESOURCE_CODE, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -94,14 +98,14 @@ class MailingSystemController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
 
         if (false !== $error_msg) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans('mailing system modification', []),
+                $this->getTranslator()->trans('mailing system modification'),
                 $error_msg,
                 $form,
                 $ex
@@ -114,11 +118,11 @@ class MailingSystemController extends BaseAdminController
         return $response;
     }
 
-    public function testAction(Request $request, MailerFactory $mailer)
+    public function testAction(Request $request, MailerFactory $mailer): Response|JsonResponse
     {
         $translator = Translator::getInstance();
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(self::RESOURCE_CODE, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -135,7 +139,7 @@ class MailingSystemController extends BaseAdminController
 
             $message = $translator->trans('Email test from : %store%', ['%store%' => $storeName]);
 
-            $htmlMessage = "<p>$message</p>";
+            $htmlMessage = sprintf('<p>%s</p>', $message);
 
             try {
                 $mailer->sendSimpleEmailMessage(
@@ -147,15 +151,13 @@ class MailingSystemController extends BaseAdminController
                 );
                 $json_data['success'] = true;
                 $json_data['message'] = $translator->trans('Your configuration seems to be ok. Checked out your mailbox : %email%', ['%email%' => $emailTest]);
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 $json_data['message'] = $ex->getMessage();
             }
         } else {
             $json_data['message'] = $translator->trans('You have to configure your store email first !');
         }
 
-        $response = new JsonResponse($json_data);
-
-        return $response;
+        return new JsonResponse($json_data);
     }
 }

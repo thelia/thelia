@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,35 +11,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event;
 
 class UpdateSeoEvent extends ActionEvent
 {
-    protected $object_id;
-    protected $locale;
-    protected $url;
-    protected $meta_title;
-    protected $meta_description;
-    protected $meta_keywords;
-
     protected $object;
 
-    /**
-     * @param null $locale
-     * @param null $url
-     * @param null $meta_title
-     * @param null $meta_description
-     * @param null $meta_keywords
-     */
-    public function __construct($object_id, $locale = null, $url = null, $meta_title = null, $meta_description = null, $meta_keywords = null)
+    public function __construct(protected $object_id, protected $locale = null, protected $url = null, protected $meta_title = null, protected $meta_description = null, protected $meta_keywords = null)
     {
-        $this->object_id = $object_id;
-        $this->locale = $locale;
-        $this->url = $url;
-        $this->meta_title = $meta_title;
-        $this->meta_description = $meta_description;
-        $this->meta_keywords = $meta_keywords;
     }
 
     public function getObjectId()
@@ -48,16 +29,13 @@ class UpdateSeoEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setObjectId($object_id)
+    public function setObjectId($object_id): static
     {
         $this->object_id = $object_id;
 
         return $this;
     }
 
-    /**
-     * @return null
-     */
     public function getLocale()
     {
         return $this->locale;
@@ -66,16 +44,13 @@ class UpdateSeoEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setLocale($locale)
+    public function setLocale($locale): static
     {
         $this->locale = $locale;
 
         return $this;
     }
 
-    /**
-     * @return null
-     */
     public function getUrl()
     {
         return $this->url;
@@ -84,16 +59,13 @@ class UpdateSeoEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setUrl($url)
+    public function setUrl($url): static
     {
         $this->url = $url;
 
         return $this;
     }
 
-    /**
-     * @return null
-     */
     public function getMetaTitle()
     {
         return $this->meta_title;
@@ -102,16 +74,13 @@ class UpdateSeoEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setMetaTitle($meta_title)
+    public function setMetaTitle($meta_title): static
     {
         $this->meta_title = $meta_title;
 
         return $this;
     }
 
-    /**
-     * @return null
-     */
     public function getMetaDescription()
     {
         return $this->meta_description;
@@ -120,16 +89,13 @@ class UpdateSeoEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setMetaDescription($meta_description)
+    public function setMetaDescription($meta_description): static
     {
         $this->meta_description = $meta_description;
 
         return $this;
     }
 
-    /**
-     * @return null
-     */
     public function getMetaKeywords()
     {
         return $this->meta_keywords;
@@ -138,14 +104,14 @@ class UpdateSeoEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setMetaKeywords($meta_keywords)
+    public function setMetaKeywords($meta_keywords): static
     {
         $this->meta_keywords = $meta_keywords;
 
         return $this;
     }
 
-    public function setObject($object)
+    public function setObject($object): static
     {
         $this->object = $object;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,18 +11,23 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Config\ConfigCreateEvent;
 use Thelia\Core\Event\Config\ConfigDeleteEvent;
 use Thelia\Core\Event\Config\ConfigUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Config;
 use Thelia\Model\ConfigQuery;
@@ -42,83 +49,81 @@ class ConfigController extends AbstractCrudController
             AdminResources::CONFIG,
             TheliaEvents::CONFIG_CREATE,
             TheliaEvents::CONFIG_UPDATE,
-            TheliaEvents::CONFIG_DELETE,
-            null, // No visibility toggle
-            null // no position change
+            TheliaEvents::CONFIG_DELETE // no position change
         );
     }
 
     /**
      * The default action is displaying the list.
      *
-     * @return \Thelia\Core\HttpFoundation\Response the response
+     * @return Response the response
      */
-    public function defaultAction(ConfigCacheService $configCacheService = null)
+    public function defaultAction(ConfigCacheService $configCacheService = null): \Symfony\Component\HttpFoundation\Response
     {
         // Force reinit config cache
-        if (null !== $configCacheService) {
+        if ($configCacheService instanceof ConfigCacheService) {
             $configCacheService->initCacheConfigs(true);
         }
 
         return parent::defaultAction();
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::CONFIG_CREATION);
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::CONFIG_MODIFICATION);
     }
 
-    protected function getCreationEvent($data)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $createEvent = new ConfigCreateEvent();
 
         $createEvent
-            ->setEventName($data['name'])
-            ->setValue($data['value'])
-            ->setLocale($data['locale'])
-            ->setTitle($data['title'])
-            ->setHidden($data['hidden'])
-            ->setSecured($data['secured'])
+            ->setEventName($formData['name'])
+            ->setValue($formData['value'])
+            ->setLocale($formData['locale'])
+            ->setTitle($formData['title'])
+            ->setHidden($formData['hidden'])
+            ->setSecured($formData['secured'])
         ;
 
         return $createEvent;
     }
 
-    protected function getUpdateEvent($data)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
-        $changeEvent = new ConfigUpdateEvent($data['id']);
+        $changeEvent = new ConfigUpdateEvent($formData['id']);
 
         $changeEvent
-            ->setEventName($data['name'])
-            ->setValue($data['value'])
-            ->setHidden($data['hidden'])
-            ->setSecured($data['secured'])
-            ->setLocale($data['locale'])
-            ->setTitle($data['title'])
-            ->setChapo($data['chapo'])
-            ->setDescription($data['description'])
-            ->setPostscriptum($data['postscriptum'])
+            ->setEventName($formData['name'])
+            ->setValue($formData['value'])
+            ->setHidden($formData['hidden'])
+            ->setSecured($formData['secured'])
+            ->setLocale($formData['locale'])
+            ->setTitle($formData['title'])
+            ->setChapo($formData['chapo'])
+            ->setDescription($formData['description'])
+            ->setPostscriptum($formData['postscriptum'])
         ;
 
         return $changeEvent;
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): ConfigDeleteEvent
     {
         return new ConfigDeleteEvent($this->getRequest()->get('variable_id'));
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasConfig();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         // Prepare the data that will hydrate the form
         $data = [
@@ -138,12 +143,12 @@ class ConfigController extends AbstractCrudController
         return $this->createForm(AdminForm::CONFIG_MODIFICATION, FormType::class, $data);
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasConfig() ? $event->getConfig() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $config = ConfigQuery::create()
         ->findOneById($this->getRequest()->get('variable_id'));
@@ -160,32 +165,29 @@ class ConfigController extends AbstractCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getName();
     }
 
     /**
      * @param Config $object
-     *
-     * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render('variables', ['order' => $currentOrder]);
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('variable-edit', ['variable_id' => $this->getRequest()->get('variable_id')]);
     }
 
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.variables.update',
@@ -193,7 +195,7 @@ class ConfigController extends AbstractCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.configuration.variables.default');
     }
@@ -201,12 +203,12 @@ class ConfigController extends AbstractCrudController
     /**
      * Change values modified directly from the variable list.
      *
-     * @return \Thelia\Core\HttpFoundation\Response the response
+     * @return Response the response
      */
-    public function changeValuesAction(EventDispatcherInterface $dispatcher)
+    public function changeValuesAction(EventDispatcherInterface $dispatcher): Response|RedirectResponse
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 

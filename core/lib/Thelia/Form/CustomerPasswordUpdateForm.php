@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,11 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Form;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
@@ -33,8 +36,8 @@ class CustomerPasswordUpdateForm extends BaseForm
             // Login Information
             ->add('password_old', PasswordType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Callback([$this, 'verifyCurrentPasswordField']),
+                    new NotBlank(),
+                    new Callback($this->verifyCurrentPasswordField(...)),
                 ],
                 'label' => Translator::getInstance()->trans('Current Password'),
                 'label_attr' => [
@@ -43,8 +46,8 @@ class CustomerPasswordUpdateForm extends BaseForm
             ])
             ->add('password', PasswordType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Length(['min' => ConfigQuery::read('password.length', 4)]),
+                    new NotBlank(),
+                    new Length(['min' => ConfigQuery::read('password.length', 4)]),
                 ],
                 'label' => Translator::getInstance()->trans('New Password'),
                 'label_attr' => [
@@ -56,9 +59,9 @@ class CustomerPasswordUpdateForm extends BaseForm
             ])
             ->add('password_confirm', PasswordType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Length(['min' => ConfigQuery::read('password.length', 4)]),
-                    new Constraints\Callback([$this, 'verifyPasswordField']),
+                    new NotBlank(),
+                    new Length(['min' => ConfigQuery::read('password.length', 4)]),
+                    new Callback($this->verifyPasswordField(...)),
                 ],
                 'label' => Translator::getInstance()->trans('Password confirmation'),
                 'label_attr' => [
@@ -76,7 +79,7 @@ class CustomerPasswordUpdateForm extends BaseForm
         $user = CustomerQuery::create()->findPk($userId);
 
         // Check if value of the old password match the password of the current user
-        if (!password_verify($value, $user->getPassword())) {
+        if (!password_verify((string) $value, (string) $user->getPassword())) {
             $context->addViolation(Translator::getInstance()->trans('Your current password does not match.'));
         }
     }
@@ -90,7 +93,7 @@ class CustomerPasswordUpdateForm extends BaseForm
         }
     }
 
-    public static function getName()
+    public static function getName(): string
     {
         return 'thelia_customer_password_update';
     }

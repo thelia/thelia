@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+use PDO;
+use SplFileInfo;
+use SmartyException;
 use Imagine\Exception\RuntimeException;
 use Propel\Runtime\Propel;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,6 +32,7 @@ use Thelia\Tools\Version\Version;
  *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
+#[AsCommand(name: 'generate:sql', description: 'Generate SQL files (insert.sql, update*.sql)')]
 class GenerateSQLCommand extends ContainerAwareCommand
 {
     /** @var Translator */
@@ -34,7 +40,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
 
     protected $parser;
 
-    /** @var \PDO */
+    /** @var PDO */
     protected $con;
 
     /** @var array */
@@ -43,8 +49,6 @@ class GenerateSQLCommand extends ContainerAwareCommand
     protected function configure(): void
     {
         $this
-            ->setName('generate:sql')
-            ->setDescription('Generate SQL files (insert.sql, update*.sql)')
             ->addOption(
                 'locales',
                 null,
@@ -74,7 +78,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
             ->depth(0)
             ->in(THELIA_SETUP_DIRECTORY.'update'.DS.'tpl');
 
-        /** @var \SplFileInfo $file */
+        /** @var SplFileInfo $file */
         foreach ($finder as $file) {
             $content = file_get_contents($file->getRealPath());
             $content = $this->parser->renderString($content, [], false);
@@ -120,18 +124,14 @@ class GenerateSQLCommand extends ContainerAwareCommand
 
         // limit to only some locale(s)
         $localesToKeep = $input->getOption('locales');
-        if (!empty($localesToKeep)) {
-            $localesToKeep = explode(',', $localesToKeep);
-        } else {
-            $localesToKeep = null;
-        }
+        $localesToKeep = empty($localesToKeep) ? null : explode(',', (string) $localesToKeep);
 
-        /** @var \SplFileInfo $file */
+        /** @var SplFileInfo $file */
         foreach ($finder as $file) {
             $locale = $file->getBasename('.php');
             $availableLocales[] = $locale;
 
-            if (empty($localesToKeep) || \in_array($locale, $localesToKeep)) {
+            if ($localesToKeep === null || $localesToKeep === [] || \in_array($locale, $localesToKeep)) {
                 $this->locales[] = $locale;
                 $this->translator->addResource(
                     'php',
@@ -142,7 +142,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
             }
         }
 
-        if (empty($this->locales)) {
+        if ($this->locales === null || $this->locales === []) {
             throw new \RuntimeException(
                 sprintf(
                     'You should at least generate sql for one locale. Available locales : %s',
@@ -157,12 +157,12 @@ class GenerateSQLCommand extends ContainerAwareCommand
      *
      * The intl function is replaced, and locales are assigned.
      *
-     * @throws \SmartyException
+     * @throws SmartyException
      */
     protected function initParser(): void
     {
         $this->parser->unregisterPlugin('function', 'intl');
-        $this->parser->registerPlugin('function', 'intl', [$this, 'translate']);
+        $this->parser->registerPlugin('function', 'intl', $this->translate(...));
         $this->parser->assign('locales', $this->locales);
     }
 
@@ -184,9 +184,11 @@ class GenerateSQLCommand extends ContainerAwareCommand
         if (empty($params['l'])) {
             throw new RuntimeException('Translation Error. Key is empty.');
         }
+
         if (empty($params['locale'])) {
             throw new RuntimeException('Translation Error. Locale is empty.');
         }
+
         $inString = (0 !== (int) $params['in_string']);
         $useDefault = (0 !== (int) $params['use_default']);
 

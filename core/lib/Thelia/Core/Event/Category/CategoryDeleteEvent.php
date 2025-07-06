@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,20 +11,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Category;
 
 class CategoryDeleteEvent extends CategoryEvent
 {
-    /** @var int */
-    protected $categoryId;
-
     /**
      * @param int $categoryId
      */
-    public function __construct($categoryId)
+    public function __construct(protected $categoryId)
     {
-        $this->categoryId = $categoryId;
     }
 
     public function getCategoryId()
@@ -30,7 +27,7 @@ class CategoryDeleteEvent extends CategoryEvent
         return $this->categoryId;
     }
 
-    public function setCategoryId($categoryId)
+    public function setCategoryId($categoryId): static
     {
         $this->categoryId = $categoryId;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,19 +11,25 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Exception;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Archiver\AbstractArchiver;
 use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Serializer\AbstractSerializer;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\LangQuery;
+use Thelia\Service\DataTransfer\Importhandler;
 
 /**
  * Class ImportController.
@@ -35,12 +43,12 @@ class ImportController extends BaseAdminController
      *
      * @param string $_view View to render
      *
-     * @return \Thelia\Core\HttpFoundation\Response
+     * @return Response
      */
-    public function indexAction($_view = 'import')
+    public function indexAction(string $_view = 'import')
     {
         $authResponse = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::VIEW]);
-        if ($authResponse !== null) {
+        if ($authResponse instanceof Response) {
             return $authResponse;
         }
 
@@ -54,13 +62,11 @@ class ImportController extends BaseAdminController
 
     /**
      * Handle import position change action.
-     *
-     * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function changeImportPositionAction(EventDispatcherInterface $eventDispatcher)
+    public function changeImportPositionAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         $authResponse = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::UPDATE]);
-        if ($authResponse !== null) {
+        if ($authResponse instanceof Response) {
             return $authResponse;
         }
 
@@ -80,13 +86,11 @@ class ImportController extends BaseAdminController
 
     /**
      * Handle import category position change action.
-     *
-     * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function changeCategoryPositionAction(EventDispatcherInterface $eventDispatcher)
+    public function changeCategoryPositionAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         $authResponse = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::UPDATE]);
-        if ($authResponse !== null) {
+        if ($authResponse instanceof Response) {
             return $authResponse;
         }
 
@@ -111,7 +115,7 @@ class ImportController extends BaseAdminController
      *
      * @return int Position mode constant value
      */
-    protected function matchPositionMode($mode)
+    protected function matchPositionMode($mode): int
     {
         if ($mode === 'up') {
             return UpdatePositionEvent::POSITION_UP;
@@ -128,12 +132,10 @@ class ImportController extends BaseAdminController
      * Display import configuration view.
      *
      * @param int $id An import identifier
-     *
-     * @return \Thelia\Core\HttpFoundation\Response
      */
-    public function configureAction($id)
+    public function configureAction(int $id): Response
     {
-        /** @var \Thelia\Service\Handler\ImportHandler $importHandler */
+        /** @var ImportHandler $importHandler */
         $importHandler = $this->container->get('thelia.import.handler');
 
         $import = $importHandler->getImport($id);
@@ -144,13 +146,13 @@ class ImportController extends BaseAdminController
         $extensions = [];
         $mimeTypes = [];
 
-        /** @var \Thelia\Core\Serializer\AbstractSerializer $serializer */
+        /** @var AbstractSerializer $serializer */
         foreach ($this->container->get(RegisterSerializerPass::MANAGER_SERVICE_ID)->getSerializers() as $serializer) {
             $extensions[] = $serializer->getExtension();
             $mimeTypes[] = $serializer->getMimeType();
         }
 
-        /** @var \Thelia\Core\Archiver\AbstractArchiver $archiver */
+        /** @var AbstractArchiver $archiver */
         foreach ($this->container->get(RegisterArchiverPass::MANAGER_SERVICE_ID)->getArchivers(true) as $archiver) {
             $extensions[] = $archiver->getExtension();
             $mimeTypes[] = $archiver->getMimeType();
@@ -177,11 +179,11 @@ class ImportController extends BaseAdminController
      *
      * @param int $id An import identifier
      *
-     * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
-    public function importAction($id)
+    public function importAction(int $id): Response|RedirectResponse
     {
-        /** @var \Thelia\Service\Handler\Importhandler $importHandler */
+        /** @var Importhandler $importHandler */
         $importHandler = $this->container->get('thelia.import.handler');
 
         $import = $importHandler->getImport($id);
@@ -194,7 +196,7 @@ class ImportController extends BaseAdminController
         try {
             $validatedForm = $this->validateForm($form);
 
-            /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $file */
+            /** @var UploadedFile $file */
             $file = $validatedForm->get('file_upload')->getData();
             $file = $file->move(
                 THELIA_CACHE_DIR.'import'.DS.(new \DateTime())->format('Ymd'),
@@ -230,7 +232,7 @@ class ImportController extends BaseAdminController
             return $this->generateRedirectFromRoute('import.view', [], ['id' => $id]);
         } catch (FormValidationException $e) {
             $form->setErrorMessage($this->createStandardFormValidationErrorMessage($e));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         }
 

@@ -10,23 +10,16 @@
  * file that was distributed with this source code.
  */
 
-use Symfony\Component\Dotenv\Dotenv;
-use Symfony\Component\ErrorHandler\Debug;
+use App\Kernel;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\Thelia;
 
-require dirname(__DIR__).'/vendor/autoload.php';
+require dirname(__DIR__).'/vendor/autoload_runtime.php';
 
-(new Dotenv())->bootEnv(dirname(__DIR__).'/.env');
-
-if ($_SERVER['APP_DEBUG']) {
-    umask(0000);
-
-    Debug::enable();
-}
-
-$thelia = new App\Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
-$request = Request::createFromGlobals();
-$response = $thelia->handle($request);
-$response->send();
-$thelia->terminate($request, $response);
+return static function (array $context): Kernel {
+    $thelia = new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+    $request = Request::createFromGlobals();
+    $response = $thelia->handle($request);
+    $response->send();
+    $thelia->terminate($request, $response);
+    return $thelia;
+};

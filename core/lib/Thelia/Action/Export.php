@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -18,7 +19,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\ExportCategoryQuery;
 use Thelia\Model\ExportQuery;
-use Thelia\Service\Handler\ExportHandler;
+use Thelia\Service\DataTransfer\ExportHandler;
 
 /**
  * Class Export.
@@ -28,16 +29,10 @@ use Thelia\Service\Handler\ExportHandler;
 class Export extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * @var \Thelia\Service\Handler\ExportHandler The export handler
+     * @param ExportHandler $handler The export handler
      */
-    protected $handler;
-
-    /**
-     * @param \Thelia\Service\Handler\ExportHandler $exportHandler The export handler
-     */
-    public function __construct(ExportHandler $exportHandler)
+    public function __construct(protected ExportHandler $handler)
     {
-        $this->handler = $exportHandler;
     }
 
     public static function getSubscribedEvents(): array

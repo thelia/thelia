@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\File;
 
 use Thelia\Core\Event\ActionEvent;
@@ -22,17 +23,13 @@ use Thelia\Files\FileModelInterface;
  */
 class FileDeleteEvent extends ActionEvent
 {
-    /** @var FileModelInterface Image about to be deleted */
-    protected $fileToDelete;
-
     /**
      * Constructor.
      *
      * @param FileModelInterface $fileToDelete Image about to be deleted
      */
-    public function __construct($fileToDelete)
+    public function __construct(protected $fileToDelete)
     {
-        $this->fileToDelete = $fileToDelete;
     }
 
     /**
@@ -42,7 +39,7 @@ class FileDeleteEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setFileToDelete($fileToDelete)
+    public function setFileToDelete($fileToDelete): static
     {
         $this->fileToDelete = $fileToDelete;
 

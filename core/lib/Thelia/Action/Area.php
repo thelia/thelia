@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -37,10 +38,11 @@ class Area extends BaseAction implements EventSubscriberInterface
         foreach ($countryIds as $countryId) {
             $countryArea = new CountryArea();
 
-            $country = explode('-', $countryId);
+            $country = explode('-', (string) $countryId);
             if (\count($country) === 1) {
                 $country[1] = null;
             }
+
             if ($country[1] == 0) {
                 $country[1] = null;
             }

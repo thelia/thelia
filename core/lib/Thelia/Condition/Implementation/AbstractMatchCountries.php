@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Condition\Implementation;
 
 use Thelia\Condition\Operators;
@@ -62,7 +63,7 @@ abstract class AbstractMatchCountries extends ConditionAbstract
         // Check that at least one category is selected
         if (empty($values[self::COUNTRIES_LIST])) {
             throw new InvalidConditionValueException(
-                __CLASS__,
+                self::class,
                 self::COUNTRIES_LIST
             );
         }

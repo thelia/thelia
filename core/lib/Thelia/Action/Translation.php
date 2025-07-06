@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
+use InvalidArgumentException;
+use DirectoryIterator;
+use UnexpectedValueException;
+use RuntimeException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -29,12 +34,8 @@ use Thelia\Log\Tlog;
  */
 class Translation extends BaseAction implements EventSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
+    public function __construct(protected ContainerInterface $container)
     {
-        $this->container = $container;
     }
 
     public function getTranslatableStrings(TranslationEvent $event): void
@@ -69,24 +70,24 @@ class Translation extends BaseAction implements EventSubscriberInterface
      * @param string $domain        the translation domain (fontoffice, backoffice, module, etc...)
      * @param array  $strings       the list of strings
      *
-     * @throws \InvalidArgumentException if $walkMode contains an invalid value
+     * @throws InvalidArgumentException if $walkMode contains an invalid value
      *
      * @return number the total number of translatable texts
      */
-    protected function walkDir(string $directory, string $walkMode, string $currentLocale, string $domain, array &$strings)
+    protected function walkDir(string $directory, string $walkMode, string $currentLocale, string $domain, array &$strings): int|float
     {
         $numTexts = 0;
 
-        if ($walkMode == TranslationEvent::WALK_MODE_PHP) {
+        if ($walkMode === TranslationEvent::WALK_MODE_PHP) {
             $prefix = '\-\>[\s]*trans[\s]*\([\s]*';
 
             $allowedExts = ['php'];
-        } elseif ($walkMode == TranslationEvent::WALK_MODE_TEMPLATE) {
+        } elseif ($walkMode === TranslationEvent::WALK_MODE_TEMPLATE) {
             $prefix = '\{intl(?:.*?)[\s]l=[\s]*';
 
             $allowedExts = ['html', 'tpl', 'xml', 'txt'];
         } else {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 Translator::getInstance()->trans(
                     'Invalid value for walkMode parameter: %value',
                     ['%value' => $walkMode]
@@ -95,10 +96,10 @@ class Translation extends BaseAction implements EventSubscriberInterface
         }
 
         try {
-            Tlog::getInstance()->debug("Walking in $directory, in mode $walkMode");
+            Tlog::getInstance()->debug(sprintf('Walking in %s, in mode %s', $directory, $walkMode));
 
-            /** @var \DirectoryIterator $fileInfo */
-            foreach (new \DirectoryIterator($directory) as $fileInfo) {
+            /** @var DirectoryIterator $fileInfo */
+            foreach (new DirectoryIterator($directory) as $fileInfo) {
                 if ($fileInfo->isDot()) {
                     continue;
                 }
@@ -116,88 +117,83 @@ class Translation extends BaseAction implements EventSubscriberInterface
                 if ($fileInfo->isFile()) {
                     $ext = $fileInfo->getExtension();
 
-                    if (\in_array($ext, $allowedExts)) {
-                        if ($content = file_get_contents($fileInfo->getPathName())) {
-                            $short_path = $this->normalizePath($fileInfo->getPathName());
+                    if (\in_array($ext, $allowedExts) && $content = file_get_contents($fileInfo->getPathName())) {
+                        $short_path = $this->normalizePath($fileInfo->getPathName());
+                        Tlog::getInstance()->debug(sprintf('Examining file %s%s', $short_path, PHP_EOL));
+                        $matches = [];
+                        if (preg_match_all(
+                            '/'.$prefix.'((?<![\\\\])[\'"])((?:.(?!(?<![\\\\])\1))*.?)*?\1/ms',
+                            $content,
+                            $matches
+                        )) {
+                            Tlog::getInstance()->debug('Strings found: ', $matches[2]);
 
-                            Tlog::getInstance()->debug("Examining file $short_path\n");
+                            $idx = 0;
 
-                            $matches = [];
+                            foreach ($matches[2] as $match) {
+                                $hash = md5($match);
 
-                            if (preg_match_all(
-                                '/'.$prefix.'((?<![\\\\])[\'"])((?:.(?!(?<![\\\\])\1))*.?)*?\1/ms',
-                                $content,
-                                $matches
-                            )) {
-                                Tlog::getInstance()->debug('Strings found: ', $matches[2]);
+                                if (isset($strings[$hash])) {
+                                    if (!\in_array($short_path, $strings[$hash]['files'])) {
+                                        $strings[$hash]['files'][] = $short_path;
+                                    }
+                                } else {
+                                    ++$numTexts;
 
-                                $idx = 0;
+                                    // remove \' (or \"), that will prevent the translator to work properly, as
+                                    // "abc \def\" ghi" will be passed as abc "def" ghi to the translator.
 
-                                foreach ($matches[2] as $match) {
-                                    $hash = md5($match);
+                                    $quote = $matches[1][$idx];
 
-                                    if (isset($strings[$hash])) {
-                                        if (!\in_array($short_path, $strings[$hash]['files'])) {
-                                            $strings[$hash]['files'][] = $short_path;
-                                        }
-                                    } else {
-                                        ++$numTexts;
+                                    $match = str_replace('\\' . $quote, $quote, $match);
 
-                                        // remove \' (or \"), that will prevent the translator to work properly, as
-                                        // "abc \def\" ghi" will be passed as abc "def" ghi to the translator.
-
-                                        $quote = $matches[1][$idx];
-
-                                        $match = str_replace("\\$quote", $quote, $match);
-
-                                        // Ignore empty strings
-                                        if (\strlen($match) == 0) {
-                                            continue;
-                                        }
-
-                                        $strings[$hash] = [
-                                            'files' => [$short_path],
-                                            'text' => $match,
-                                            'translation' => Translator::getInstance()->trans(
-                                                $match,
-                                                [],
-                                                $domain,
-                                                $currentLocale,
-                                                false,
-                                                false
-                                            ),
-                                            'custom_fallback' => Translator::getInstance()->trans(
-                                                sprintf(
-                                                    Translator::GLOBAL_FALLBACK_KEY,
-                                                    $domain,
-                                                    $match
-                                                ),
-                                                [],
-                                                Translator::GLOBAL_FALLBACK_DOMAIN,
-                                                $currentLocale,
-                                                false,
-                                                false
-                                            ),
-                                            'global_fallback' => Translator::getInstance()->trans(
-                                                $match,
-                                                [],
-                                                Translator::GLOBAL_FALLBACK_DOMAIN,
-                                                $currentLocale,
-                                                false,
-                                                false
-                                            ),
-                                            'dollar' => strstr($match, '$') !== false,
-                                        ];
+                                    // Ignore empty strings
+                                    if (\strlen($match) == 0) {
+                                        continue;
                                     }
 
-                                    ++$idx;
+                                    $strings[$hash] = [
+                                        'files' => [$short_path],
+                                        'text' => $match,
+                                        'translation' => Translator::getInstance()->trans(
+                                            $match,
+                                            [],
+                                            $domain,
+                                            $currentLocale,
+                                            false,
+                                            false
+                                        ),
+                                        'custom_fallback' => Translator::getInstance()->trans(
+                                            sprintf(
+                                                Translator::GLOBAL_FALLBACK_KEY,
+                                                $domain,
+                                                $match
+                                            ),
+                                            [],
+                                            Translator::GLOBAL_FALLBACK_DOMAIN,
+                                            $currentLocale,
+                                            false,
+                                            false
+                                        ),
+                                        'global_fallback' => Translator::getInstance()->trans(
+                                            $match,
+                                            [],
+                                            Translator::GLOBAL_FALLBACK_DOMAIN,
+                                            $currentLocale,
+                                            false,
+                                            false
+                                        ),
+                                        'dollar' => str_contains($match, '$'),
+                                    ];
                                 }
+
+                                ++$idx;
                             }
                         }
                     }
                 }
             }
-        } catch (\UnexpectedValueException $ex) {
+        } catch (UnexpectedValueException) {
             // Directory does not exists => ignore it.
         }
 
@@ -245,7 +241,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
             @fclose($fp);
         } else {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 Translator::getInstance()->trans(
                     'Failed to open translation file %file. Please be sure that this file is writable by your Web server',
                     ['%file' => $file]
@@ -268,7 +264,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
                 $this->cacheClear($dispatcher);
             } else {
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     Translator::getInstance()->trans(
                         'Failed to open translation file %file. Please be sure that this file is writable by your Web server',
                         ['%file' => $file]
@@ -325,6 +321,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
                             $translation = str_replace("'", "\'", $subText);
                             fwrite($fp, sprintf("        '%s' => '%s',\n", $subKey, $translation));
                         }
+
                         fwrite($fp, "    ],\n");
                     } else {
                         $key = str_replace("'", "\'", $key);
@@ -340,7 +337,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    protected function normalizePath($path)
+    protected function normalizePath($path): string
     {
         $path = str_replace(
             str_replace('\\', '/', THELIA_ROOT),

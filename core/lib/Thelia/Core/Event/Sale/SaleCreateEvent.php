@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Sale;
 
 /**
@@ -20,7 +21,9 @@ namespace Thelia\Core\Event\Sale;
 class SaleCreateEvent extends SaleEvent
 {
     protected $title;
+
     protected $saleLabel;
+
     protected $locale;
 
     /**
@@ -28,7 +31,7 @@ class SaleCreateEvent extends SaleEvent
      *
      * @return SaleCreateEvent $this
      */
-    public function setLocale($locale)
+    public function setLocale($locale): static
     {
         $this->locale = $locale;
 
@@ -48,7 +51,7 @@ class SaleCreateEvent extends SaleEvent
      *
      * @return $this
      */
-    public function setTitle($title)
+    public function setTitle($title): static
     {
         $this->title = $title;
 
@@ -68,7 +71,7 @@ class SaleCreateEvent extends SaleEvent
      *
      * @return $this
      */
-    public function setSaleLabel($saleLabel)
+    public function setSaleLabel($saleLabel): static
     {
         $this->saleLabel = $saleLabel;
 

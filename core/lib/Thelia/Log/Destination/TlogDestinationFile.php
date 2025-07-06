@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Log\Destination;
 
 use Thelia\Core\Translation\Translator;
@@ -21,12 +22,15 @@ class TlogDestinationFile extends AbstractTlogDestination
     // Nom des variables de configuration
     // ----------------------------------
     public const VAR_PATH_FILE = 'tlog_destinationfile_path';
+
     public const TLOG_DEFAULT_NAME = 'log-thelia.txt';
 
     public const VAR_MODE = 'tlog_destinationfile_mode';
+
     public const VALEUR_MODE_DEFAULT = 'A';
 
-    protected $path_defaut = false;
+    protected string $path_defaut;
+
     protected $fh = false;
 
     public function __construct()
@@ -39,19 +43,19 @@ class TlogDestinationFile extends AbstractTlogDestination
     {
         $filePath = $this->getConfig(self::VAR_PATH_FILE);
 
-        if (preg_match('/^[a-z]:\\\|^\//i', $filePath) === 0) {
+        if (preg_match('/^[a-z]:\\\|^\//i', (string) $filePath) === 0) {
             $filePath = THELIA_ROOT.$filePath;
         }
 
         return $filePath;
     }
 
-    protected function getOpenMode()
+    protected function getOpenMode(): string
     {
-        return strtolower($this->getConfig(self::VAR_MODE, self::VALEUR_MODE_DEFAULT)) == 'a' ? 'a' : 'w';
+        return strtolower((string) $this->getConfig(self::VAR_MODE, self::VALEUR_MODE_DEFAULT)) === 'a' ? 'a' : 'w';
     }
 
-    public function configure(): void
+    protected function configure(): void
     {
         $filePath = $this->getFilePath();
         $mode = $this->getOpenMode();
@@ -61,11 +65,11 @@ class TlogDestinationFile extends AbstractTlogDestination
         }
     }
 
-    protected function resolvePath($filePath, $mode)
+    protected function resolvePath($filePath, $mode): bool
     {
         if (!empty($filePath)) {
             if (!is_file($filePath)) {
-                $dir = \dirname($filePath);
+                $dir = \dirname((string) $filePath);
                 if (!is_dir($dir)) {
                     mkdir($dir, 0777, true);
                 }
@@ -86,17 +90,17 @@ class TlogDestinationFile extends AbstractTlogDestination
         return false;
     }
 
-    public function getTitle()
+    public function getTitle(): string
     {
         return Translator::getInstance()->trans('Text File');
     }
 
-    public function getDescription()
+    public function getDescription(): string
     {
         return Translator::getInstance()->trans('Store logs into text file');
     }
 
-    public function getConfigs()
+    public function getConfigs(): array
     {
         return [
             new TlogDestinationConfig(

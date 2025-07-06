@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Validator;
 
 use Thelia\Core\Template\TemplateDefinition;
@@ -21,12 +22,6 @@ use Thelia\Core\Template\TemplateDefinition;
  */
 class TemplateDescriptor
 {
-    /** @var string the template directory name (e.g. 'default') */
-    protected $name;
-
-    /** @var int the template type (front, back, pdf) */
-    protected $type;
-
     /** @var array */
     protected $languages = [];
 
@@ -57,16 +52,16 @@ class TemplateDescriptor
     /**
      * TemplateDescriptor constructor.
      */
-    public function __construct(string $name, int $type)
+    public function __construct(
+        /** @var string the template directory name (e.g. 'default') */
+        protected string $name,
+        /** @var int the template type (front, back, pdf) */
+        protected int $type
+    )
     {
-        $this->name = $name;
-        $this->type = $type;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -81,20 +76,15 @@ class TemplateDescriptor
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getType()
+    public function getType(): int
     {
         return $this->type;
     }
 
     /**
-     * @param int $type
-     *
      * @return $this
      */
-    public function setType($type): self
+    public function setType(int $type): self
     {
         $this->type = $type;
 
@@ -197,7 +187,7 @@ class TemplateDescriptor
         return $this;
     }
 
-    public function hasParent()
+    public function hasParent(): bool
     {
         return null !== $this->parent;
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template;
 
+use Exception;
+use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
@@ -34,8 +37,7 @@ interface ParserInterface
      * @param bool   $compressOutput   if true, te output is compressed using trimWhitespaces. If false, no compression occurs
      *
      * @throws ResourceNotFoundException if the template cannot be found
-     * @throws \Exception
-     * @throws \SmartyException
+     * @throws Exception
      *
      * @return string the rendered template text
      */
@@ -48,8 +50,7 @@ interface ParserInterface
      * @param array  $parameters     an associative array of names / value pairs
      * @param bool   $compressOutput if true, te output is compressed using trimWhitespaces. If false, no compression occurs
      *
-     * @throws \Exception
-     * @throws \SmartyException
+     * @throws Exception
      *
      * @return string the rendered template text
      */
@@ -79,14 +80,12 @@ interface ParserInterface
      *
      * @param bool $fallbackToDefaultTemplate if true, resources will be also searched in the "default" template
      *
-     * @throws \SmartyException
      */
     public function pushTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false);
 
     /**
      * Restore the previous stored template definition, if one exists.
      *
-     * @throws \SmartyException
      */
     public function popTemplateDefinition();
 
@@ -137,7 +136,7 @@ interface ParserInterface
      *
      * @param int $templateType
      *
-     * @throws \InvalidArgumentException if the templateType is not defined
+     * @throws InvalidArgumentException if the templateType is not defined
      *
      * @return array: an array of defined templates directories for the given template type
      */
@@ -159,7 +158,7 @@ interface ParserInterface
     public function assign($variable, $value = null);
 
     /**
-     * @return \Thelia\Core\Template\TemplateHelperInterface the parser template helper instance
+     * @return TemplateHelperInterface the parser template helper instance
      */
     public function getTemplateHelper();
 

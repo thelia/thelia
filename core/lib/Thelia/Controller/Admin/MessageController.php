@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,21 +11,28 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+
+use ErrorException;
+use Exception;
+use InvalidArgumentException;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Message\MessageCreateEvent;
 use Thelia\Core\Event\Message\MessageDeleteEvent;
 use Thelia\Core\Event\Message\MessageUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\TemplateDefinition;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Message;
@@ -47,23 +56,21 @@ class MessageController extends AbstractCrudController
             AdminResources::MESSAGE,
             TheliaEvents::MESSAGE_CREATE,
             TheliaEvents::MESSAGE_UPDATE,
-            TheliaEvents::MESSAGE_DELETE,
-            null, // No visibility toggle
-            null  // No position update
+            TheliaEvents::MESSAGE_DELETE  // No position update
         );
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::MESSAGE_CREATION);
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::MESSAGE_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $createEvent = new MessageCreateEvent();
 
@@ -71,13 +78,13 @@ class MessageController extends AbstractCrudController
             ->setMessageName($formData['name'])
             ->setLocale($formData['locale'])
             ->setTitle($formData['title'])
-            ->setSecured($formData['secured'] ? true : false)
+            ->setSecured((bool) $formData['secured'])
         ;
 
         return $createEvent;
     }
 
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $changeEvent = new MessageUpdateEvent($formData['id']);
 
@@ -99,23 +106,23 @@ class MessageController extends AbstractCrudController
         return $changeEvent;
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): MessageDeleteEvent
     {
         return new MessageDeleteEvent($this->getRequest()->get('message_id'));
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasMessage();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         // Prepare the data that will hydrate the form
         $data = [
             'id' => $object->getId(),
             'name' => $object->getName(),
-            'secured' => $object->getSecured() ? true : false,
+            'secured' => (bool) $object->getSecured(),
             'locale' => $object->getLocale(),
             'title' => $object->getTitle(),
             'subject' => $object->getSubject(),
@@ -132,12 +139,12 @@ class MessageController extends AbstractCrudController
         return $this->createForm(AdminForm::MESSAGE_MODIFICATION, FormType::class, $data);
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasMessage() ? $event->getMessage() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $message = MessageQuery::create()
             ->findOneById($this->getRequest()->get('message_id', 0));
@@ -154,27 +161,27 @@ class MessageController extends AbstractCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getName();
     }
 
     /**
      * @param Message $object
-     *
-     * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render('messages');
     }
 
-    protected function listDirectoryContent($requiredExtension)
+    /**
+     * @return list
+     */
+    protected function listDirectoryContent(string $requiredExtension): array
     {
         $list = [];
 
@@ -188,7 +195,7 @@ class MessageController extends AbstractCrudController
             $finder->in($parentTemplate->getAbsolutePath());
         }
 
-        $finder->ignoreDotFiles(true)->sortByName()->name("*.$requiredExtension");
+        $finder->ignoreDotFiles(true)->sortByName()->name('*.' . $requiredExtension);
 
         /** @var SplFileInfo $file */
         foreach ($finder as $file) {
@@ -207,7 +214,7 @@ class MessageController extends AbstractCrudController
                     ->in($dir)
                     ->ignoreDotFiles(true)
                     ->sortByName()
-                    ->name("*.$requiredExtension");
+                    ->name('*.' . $requiredExtension);
 
                 foreach ($finder as $file) {
                     $fileName = $file->getBasename();
@@ -221,7 +228,7 @@ class MessageController extends AbstractCrudController
         return $list;
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('message-edit', [
             'message_id' => $this->getRequest()->get('message_id'),
@@ -231,7 +238,7 @@ class MessageController extends AbstractCrudController
         ]);
     }
 
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.messages.update',
@@ -241,14 +248,14 @@ class MessageController extends AbstractCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.configuration.messages.default');
     }
 
     public function previewAction($messageId, $html = true)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MESSAGE, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::MESSAGE, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -268,12 +275,12 @@ class MessageController extends AbstractCrudController
             } else {
                 $content = $message->setLocale($this->getCurrentEditionLocale())->getTextMessageBody($parser);
             }
-        } catch (\InvalidArgumentException|\ErrorException $exception) {
-            return new Response($this->getTranslator()->trans('You probably didn\'t inject the missing variable to preview the HTML. Error is : %err',
-                ['%err' => $exception->getMessage()]), 200);
-        } catch (\Exception $exception) {
+        } catch (InvalidArgumentException|ErrorException $exception) {
+            return new Response($this->getTranslator()->trans("You probably didn't inject the missing variable to preview the HTML. Error is : %err",
+                ['%err' => $exception->getMessage()]), \Symfony\Component\HttpFoundation\Response::HTTP_OK);
+        } catch (Exception $exception) {
             return new Response($this->getTranslator()->trans('Something goes wrong, error is : %err',
-                ['%err' => $exception->getMessage()]), 200);
+                ['%err' => $exception->getMessage()]), \Symfony\Component\HttpFoundation\Response::HTTP_OK);
         }
 
         return new Response($content);
@@ -294,7 +301,7 @@ class MessageController extends AbstractCrudController
 
     public function sendSampleByEmailAction($messageId)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MESSAGE, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::MESSAGE, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -307,11 +314,7 @@ class MessageController extends AbstractCrudController
 
                 $data = $form->getData();
 
-                $messageParameters = [];
-
-                foreach ($this->getRequest()->request->all() as $key => $value) {
-                    $messageParameters[$key] = $value;
-                }
+                $messageParameters = array_map(static fn($value) => $value, $this->getRequest()->request->all());
 
                 $this->getMailer()->sendEmailMessage(
                     $message->getName(),
@@ -327,7 +330,7 @@ class MessageController extends AbstractCrudController
                         ['%recipient' => $data['recipient_email']]
                     )
                 );
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 return new Response(
                     $this->getTranslator()->trans(
                         'Something goes wrong, the message was not sent to recipient. Error is : %err',

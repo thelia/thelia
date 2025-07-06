@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -93,7 +94,7 @@ class PickupLocationAddress
     #[Groups([
         DeliveryPickupLocation::GROUP_FRONT_READ,
     ])]
-    protected ?array $additionalData;
+    protected ?array $additionalData = null;
 
     public function getId(): string
     {

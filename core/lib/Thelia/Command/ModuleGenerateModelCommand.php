@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+use RuntimeException;
 use Propel\Generator\Command\ModelBuildCommand;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -29,13 +32,12 @@ use Thelia\Core\PropelInitService;
  *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
+#[AsCommand(name: 'module:generate:model', description: 'generate model for a specific module')]
 class ModuleGenerateModelCommand extends BaseModuleGenerate
 {
     protected function configure(): void
     {
         $this
-            ->setName('module:generate:model')
-            ->setDescription('generate model for a specific module')
             ->addArgument(
                 'name',
                 InputArgument::REQUIRED,
@@ -50,7 +52,7 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
         ;
     }
 
-    public function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->module = $this->formatModuleName($input->getArgument('name'));
         $this->moduleDirectory = THELIA_LOCAL_MODULE_DIR.$this->module;
@@ -58,11 +60,11 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
         $fs = new Filesystem();
 
         if ($fs->exists($this->moduleDirectory) === false) {
-            throw new \RuntimeException(sprintf('%s module does not exists', $this->module));
+            throw new RuntimeException(sprintf('%s module does not exists', $this->module));
         }
 
         if ($fs->exists($this->moduleDirectory.DS.'Config'.DS.'schema.xml') === false) {
-            throw new \RuntimeException('schema.xml not found in Config directory. Needed file for generating model');
+            throw new RuntimeException('schema.xml not found in Config directory. Needed file for generating model');
         }
 
         $this->checkModuleSchema();

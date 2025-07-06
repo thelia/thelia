@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,10 +11,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Brand\BrandCreateEvent;
 use Thelia\Core\Event\Brand\BrandDeleteEvent;
 use Thelia\Core\Event\Brand\BrandEvent;
@@ -20,9 +25,10 @@ use Thelia\Core\Event\Brand\BrandToggleVisibilityEvent;
 use Thelia\Core\Event\Brand\BrandUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Brand\BrandModificationForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Brand;
@@ -54,7 +60,7 @@ class BrandController extends AbstractSeoCrudController
     /**
      * Return the creation form for this object.
      */
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::BRAND_CREATION);
     }
@@ -62,7 +68,7 @@ class BrandController extends AbstractSeoCrudController
     /**
      * Return the update form for this object.
      */
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::BRAND_MODIFICATION);
     }
@@ -74,10 +80,8 @@ class BrandController extends AbstractSeoCrudController
      *
      * @return BrandModificationForm $object
      */
-    protected function hydrateObjectForm(
-        ParserContext $parserContext,
-        $object
-    ) {
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
+    {
         // Hydrate the "SEO" tab form
         $this->hydrateSeoForm($parserContext, $object);
 
@@ -89,7 +93,7 @@ class BrandController extends AbstractSeoCrudController
             'chapo' => $object->getChapo(),
             'description' => $object->getDescription(),
             'postscriptum' => $object->getPostscriptum(),
-            'visible' => $object->getVisible() ? true : false,
+            'visible' => (bool) $object->getVisible(),
             'logo_image_id' => $object->getLogoImageId(),
         ];
 
@@ -99,12 +103,8 @@ class BrandController extends AbstractSeoCrudController
 
     /**
      * Creates the creation event with the provided form data.
-     *
-     * @param array $formData
-     *
-     * @return BrandCreateEvent
      */
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $brandCreateEvent = new BrandCreateEvent();
 
@@ -119,12 +119,8 @@ class BrandController extends AbstractSeoCrudController
 
     /**
      * Creates the update event with the provided form data.
-     *
-     * @param array $formData
-     *
-     * @return BrandUpdateEvent
      */
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $brandUpdateEvent = new BrandUpdateEvent($formData['id']);
 
@@ -143,10 +139,8 @@ class BrandController extends AbstractSeoCrudController
 
     /**
      * Creates the delete event with the provided form data.
-     *
-     * @return BrandDeleteEvent
      */
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): BrandDeleteEvent
     {
         return new BrandDeleteEvent($this->getRequest()->get('brand_id'));
     }
@@ -155,10 +149,8 @@ class BrandController extends AbstractSeoCrudController
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
      * @param BrandEvent $event
-     *
-     * @return bool
      */
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasBrand();
     }
@@ -168,9 +160,9 @@ class BrandController extends AbstractSeoCrudController
      *
      * @param $event \Thelia\Core\Event\Brand\BrandEvent
      *
-     * @return \Thelia\Model\Brand|null
+     * @return Brand|null
      */
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->getBrand();
     }
@@ -178,9 +170,9 @@ class BrandController extends AbstractSeoCrudController
     /**
      * Load an existing object from the database.
      *
-     * @return \Thelia\Model\Brand
+     * @return Brand
      */
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $brand = BrandQuery::create()
             ->findOneById($this->getRequest()->get('brand_id', 0));
@@ -199,8 +191,7 @@ class BrandController extends AbstractSeoCrudController
      *
      * @return string brand title
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
@@ -211,17 +202,15 @@ class BrandController extends AbstractSeoCrudController
      *
      * @return int brand id
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
 
     /**
      * Render the main list template.
-     *
-     * @return Response
      */
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         $this->getListOrderFromSession('brand', 'order', 'manual');
 
@@ -230,7 +219,7 @@ class BrandController extends AbstractSeoCrudController
         ]);
     }
 
-    protected function getEditionArguments()
+    protected function getEditionArguments(): array
     {
         return [
             'brand_id' => $this->getRequest()->get('brand_id', 0),
@@ -241,7 +230,7 @@ class BrandController extends AbstractSeoCrudController
     /**
      * Render the edition template.
      */
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('brand-edit', $this->getEditionArguments());
     }
@@ -249,7 +238,7 @@ class BrandController extends AbstractSeoCrudController
     /**
      * Redirect to the edition template.
      */
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.brand.update',
@@ -261,7 +250,7 @@ class BrandController extends AbstractSeoCrudController
     /**
      * Redirect to the list template.
      */
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.brand.default');
     }
@@ -269,15 +258,15 @@ class BrandController extends AbstractSeoCrudController
     /**
      * @return BrandToggleVisibilityEvent|void
      */
-    protected function createToggleVisibilityEvent()
+    protected function createToggleVisibilityEvent(): BrandToggleVisibilityEvent
     {
         return new BrandToggleVisibilityEvent($this->getExistingObject());
     }
 
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('brand_id', null),
+            $this->getRequest()->get('brand_id'),
             $positionChangeMode,
             $positionValue
         );

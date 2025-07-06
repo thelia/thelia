@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Form;
 
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -22,7 +23,7 @@ use Thelia\Model\ProductQuery;
 
 class ProductCloneForm extends BaseForm
 {
-    public static function getName()
+    public static function getName(): string
     {
         return 'thelia_product_clone';
     }
@@ -36,7 +37,7 @@ class ProductCloneForm extends BaseForm
             ->add('newRef', TextType::class, [
                 'constraints' => [
                     new NotBlank(),
-                    new Callback([$this, 'checkRefDifferent']),
+                    new Callback($this->checkRefDifferent(...)),
                 ],
                 'label' => $this->translator->trans('Product reference (must be unique)'),
                 'label_attr' => ['for' => 'newRef'],

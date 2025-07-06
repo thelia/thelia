@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Loop;
 
 use Thelia\Core\Event\ActionEvent;
@@ -22,25 +23,19 @@ use Thelia\Core\Template\Element\BaseLoop;
  */
 class LoopExtendsEvent extends ActionEvent
 {
-    /** @var BaseLoop|null */
-    protected $loop;
-
     /**
      * LoopExtendsEvent constructor.
      *
      * @param BaseLoop|null $loop
      */
-    public function __construct(BaseLoop $loop)
+    public function __construct(protected BaseLoop $loop)
     {
-        $this->loop = $loop;
     }
 
     /**
      * Get the loop.
-     *
-     * @return BaseLoop|null
      */
-    public function getLoop()
+    public function getLoop(): BaseLoop
     {
         return $this->loop;
     }

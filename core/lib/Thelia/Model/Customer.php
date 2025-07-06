@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
+use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
@@ -49,14 +51,11 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
      * @param string $plainPassword    customer plain password, hash is made calling setPassword method. Not mandatory parameter but an exception is thrown if customer is new without password
      * @param int    $lang
      * @param int    $reseller
-     * @param null   $sponsor
      * @param int    $discount
-     * @param null   $company
-     * @param null   $ref
      * @param bool   $forceEmailUpdate true if the email address could be updated
      * @param int    $stateId          customer state id (from State table)
      *
-     * @throws \Exception
+     * @throws Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function createOrUpdate(
@@ -147,19 +146,20 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
                     ->save($con)
                 ;
             }
+
             $this->save($con);
 
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (PropelException $propelException) {
             $con->rollBack();
-            throw $e;
+            throw $propelException;
         }
     }
 
     /**
      * Return the customer lang, or the default one if none is defined.
      *
-     * @return \Thelia\Model\Lang Lang model
+     * @return Lang Lang model
      */
     public function getCustomerLang()
     {
@@ -251,11 +251,11 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
      */
     public function setPassword($password)
     {
-        if ($this->isNew() && ($password === null || trim($password) == '')) {
+        if ($this->isNew() && ($password === null || trim($password) === '')) {
             throw new InvalidArgumentException('customer password is mandatory on creation');
         }
 
-        if ($password !== null && trim($password) != '') {
+        if ($password !== null && trim($password) !== '') {
             $this->setAlgo('PASSWORD_BCRYPT');
 
             parent::setPassword(password_hash($password, \PASSWORD_BCRYPT));
@@ -285,9 +285,9 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
 
     public function setEmail($email, $force = false)
     {
-        $email = trim($email);
+        $email = trim((string) $email);
 
-        if (($this->isNew() || $force === true) && ($email === null || $email == '')) {
+        if (($this->isNew() || $force === true) && ($email === null || $email === '')) {
             throw new InvalidArgumentException('customer email is mandatory');
         }
 
@@ -310,7 +310,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
 
     public function checkPassword($password)
     {
-        return password_verify($password, $this->password);
+        return password_verify((string) $password, $this->password);
     }
 
     public function eraseCredentials(): void

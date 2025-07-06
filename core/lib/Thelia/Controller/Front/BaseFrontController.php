@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,15 +11,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Front;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Controller\BaseController;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Template\ParserInterface;
-use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ModuleQuery;
 
@@ -42,7 +42,7 @@ class BaseFrontController extends BaseController
     protected function checkCartNotEmpty(EventDispatcherInterface $eventDispatcher): void
     {
         $cart = $this->getSession()->getSessionCart($eventDispatcher);
-        if ($cart === null || $cart->countCartItems() == 0) {
+        if ($cart === null || $cart->countCartItems() === 0) {
             throw new RedirectException($this->retrieveUrlFromRouteId('cart.view'));
         }
     }
@@ -71,12 +71,8 @@ class BaseFrontController extends BaseController
         }
     }
 
-    /**
-     * @param TemplateDefinition $template the template to process, or null for using the front template
-     *
-     * @return ParserInterface the Thelia parser²
-     */
-    protected function getParser($template = null)
+
+    protected function getParser(?string $template = null): ParserInterface
     {
         $path = $this->getTemplateHelper()->getActiveFrontTemplate()->getAbsolutePath();
         $parser = $this->parserResolver->getParser($path, $template);
@@ -90,30 +86,12 @@ class BaseFrontController extends BaseController
         return $parser;
     }
 
-    /**
-     * Render the given template, and returns the result as an Http Response.
-     *
-     * @param string $templateName the complete template name, with extension
-     * @param array  $args         the template arguments
-     * @param int    $status       http code status
-     *
-     * @return \Thelia\Core\HttpFoundation\Response
-     */
-    protected function render($templateName, $args = [], $status = 200)
+    protected function render(string $templateName, array $args = [], int $status = 200): Response
     {
         return new Response($this->renderRaw($templateName, $args), $status);
     }
 
-    /**
-     * Render the given template, and returns the result as a string.
-     *
-     * @param string $templateName the complete template name, with extension
-     * @param array  $args         the template arguments
-     * @param string $templateDir
-     *
-     * @return string
-     */
-    protected function renderRaw($templateName, $args = [], $templateDir = null)
+    protected function renderRaw(string $templateName, array $args = [], $templateDir = null): string
     {
         // Render the template.
         return $this->getParser()->render($templateName, $args);

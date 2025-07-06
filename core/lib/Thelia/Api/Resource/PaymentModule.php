@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -53,7 +54,7 @@ class PaymentModule extends AbstractTranslatableResource
     #[Groups([
         self::GROUP_FRONT_READ,
     ])]
-    public ?bool $valid;
+    public ?bool $valid = null;
 
     #[Groups([
         self::GROUP_FRONT_READ,
@@ -63,12 +64,12 @@ class PaymentModule extends AbstractTranslatableResource
     #[Groups([
         self::GROUP_FRONT_READ,
     ])]
-    public ?float $minimumAmount;
+    public ?float $minimumAmount = null;
 
     #[Groups([
         self::GROUP_FRONT_READ,
     ])]
-    public ?float $maximumAmount;
+    public ?float $maximumAmount = null;
 
     #[Groups([
         self::GROUP_FRONT_READ,

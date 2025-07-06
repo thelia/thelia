@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,10 +11,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\State\StateCreateEvent;
 use Thelia\Core\Event\State\StateDeleteEvent;
 use Thelia\Core\Event\State\StateToggleVisibilityEvent;
@@ -20,7 +26,9 @@ use Thelia\Core\Event\State\StateUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\State;
 use Thelia\Model\StateQuery;
 
 /**
@@ -47,7 +55,7 @@ class StateController extends AbstractCrudController
     /**
      * Return the creation form for this object.
      */
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::STATE_CREATION);
     }
@@ -55,7 +63,7 @@ class StateController extends AbstractCrudController
     /**
      * Return the update form for this object.
      */
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::STATE_MODIFICATION);
     }
@@ -63,14 +71,14 @@ class StateController extends AbstractCrudController
     /**
      * Hydrate the update form for this object, before passing it to the update template.
      *
-     * @param \Thelia\Model\State $object
+     * @param State $object
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
             'locale' => $object->getLocale(),
-            'visible' => $object->getVisible() ? true : false,
+            'visible' => (bool) $object->getVisible(),
             'country_id' => $object->getCountryId(),
             'title' => $object->getTitle(),
             'isocode' => $object->getIsocode(),
@@ -84,7 +92,7 @@ class StateController extends AbstractCrudController
      *
      * @param unknown $formData
      */
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $event = new StateCreateEvent();
 
@@ -96,14 +104,14 @@ class StateController extends AbstractCrudController
      *
      * @param unknown $formData
      */
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $event = new StateUpdateEvent($formData['id']);
 
         return $this->hydrateEvent($event, $formData);
     }
 
-    protected function hydrateEvent($event, $formData)
+    protected function hydrateEvent($event, array $formData)
     {
         $event
             ->setLocale($formData['locale'])
@@ -119,7 +127,7 @@ class StateController extends AbstractCrudController
     /**
      * Creates the delete event with the provided form data.
      */
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): StateDeleteEvent
     {
         return new StateDeleteEvent($this->getRequest()->get('state_id'));
     }
@@ -129,7 +137,7 @@ class StateController extends AbstractCrudController
      *
      * @param unknown $event
      */
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasState();
     }
@@ -137,7 +145,7 @@ class StateController extends AbstractCrudController
     /**
      * Get the created object from an event.
      */
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->getState();
     }
@@ -145,7 +153,7 @@ class StateController extends AbstractCrudController
     /**
      * Load an existing object from the database.
      */
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $state = StateQuery::create()
             ->findPk($this->getRequest()->get('state_id', 0))
@@ -161,19 +169,18 @@ class StateController extends AbstractCrudController
     /**
      * Returns the object label form the object event (name, title, etc.).
      *
-     * @param \Thelia\Model\State $object
+     * @param State $object
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
     /**
      * Returns the object ID from the object.
      *
-     * @param \Thelia\Model\State $object
+     * @param State $object
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -183,7 +190,7 @@ class StateController extends AbstractCrudController
      *
      * @param unknown $currentOrder , if any, null otherwise
      */
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render(
             'states',
@@ -198,12 +205,12 @@ class StateController extends AbstractCrudController
     /**
      * Render the edition template.
      */
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('state-edit', $this->getEditionArgument());
     }
 
-    protected function getEditionArgument()
+    protected function getEditionArgument(): array
     {
         return [
             'state_id' => $this->getRequest()->get('state_id', 0),
@@ -215,7 +222,7 @@ class StateController extends AbstractCrudController
     /**
      * Redirect to the edition template.
      */
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.states.update',
@@ -229,7 +236,7 @@ class StateController extends AbstractCrudController
     /**
      * Redirect to the list template.
      */
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.configuration.states.default');
     }
@@ -237,7 +244,7 @@ class StateController extends AbstractCrudController
     /**
      * @return StateToggleVisibilityEvent|void
      */
-    protected function createToggleVisibilityEvent()
+    protected function createToggleVisibilityEvent(): StateToggleVisibilityEvent
     {
         return new StateToggleVisibilityEvent($this->getExistingObject());
     }

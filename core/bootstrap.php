@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -91,11 +93,4 @@ if (!defined('THELIA_SETUP_DIRECTORY')) {
 
 if (!defined('THELIA_SETUP_WIZARD_DIRECTORY')) {
     define('THELIA_SETUP_WIZARD_DIRECTORY', THELIA_ROOT.'public'.DS.'install'.DS);
-}
-
-if (PHP_VERSION_ID < 80200) {
-    exit(sprintf(
-        "Thelia needs at least php 8.2, but you are using php %s. Please upgrade before using Thelia.\n",
-        \PHP_VERSION
-    ));
 }

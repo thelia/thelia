@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,12 +11,17 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+
+use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Category\CategoryAddContentEvent;
 use Thelia\Core\Event\Category\CategoryCreateEvent;
 use Thelia\Core\Event\Category\CategoryDeleteContentEvent;
@@ -26,6 +33,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Category;
 use Thelia\Model\CategoryAssociatedContentQuery;
@@ -56,17 +64,17 @@ class CategoryController extends AbstractSeoCrudController
         );
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::CATEGORY_CREATION);
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::CATEGORY_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $createEvent = new CategoryCreateEvent();
 
@@ -80,7 +88,7 @@ class CategoryController extends AbstractSeoCrudController
         return $createEvent;
     }
 
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $changeEvent = new CategoryUpdateEvent($formData['id']);
 
@@ -99,31 +107,29 @@ class CategoryController extends AbstractSeoCrudController
         return $changeEvent;
     }
 
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('category_id', null),
+            $this->getRequest()->get('category_id'),
             $positionChangeMode,
             $positionValue
         );
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): CategoryDeleteEvent
     {
         return new CategoryDeleteEvent($this->getRequest()->get('category_id', 0));
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasCategory();
     }
 
     /**
-     * @param \Thelia\Model\Category $object
-     *
-     * @return \Thelia\Form\BaseForm
+     * @param Category $object
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         // Hydrate the "SEO" tab form
         $this->hydrateSeoForm($parserContext, $object);
@@ -145,12 +151,12 @@ class CategoryController extends AbstractSeoCrudController
         return $this->createForm(AdminForm::CATEGORY_MODIFICATION, FormType::class, $data);
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasCategory() ? $event->getCategory() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $category = CategoryQuery::create()
             ->findOneById($this->getRequest()->get('category_id', 0));
@@ -164,25 +170,21 @@ class CategoryController extends AbstractSeoCrudController
 
     /**
      * @param Category $object
-     *
-     * @return string
      */
-    protected function getObjectLabel($object)
+    protected function getObjectLabel($object): string
     {
         return $object->getTitle();
     }
 
     /**
      * @param Category $object
-     *
-     * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
 
-    protected function getEditionArguments()
+    protected function getEditionArguments(): array
     {
         return [
                 'category_id' => $this->getRequest()->get('category_id', 0),
@@ -192,7 +194,7 @@ class CategoryController extends AbstractSeoCrudController
         ];
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         // Get product order
         $product_order = $this->getListOrderFromSession('product', 'product_order', 'manual');
@@ -208,7 +210,7 @@ class CategoryController extends AbstractSeoCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.categories.default',
@@ -234,12 +236,12 @@ class CategoryController extends AbstractSeoCrudController
         return $response;
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('category-edit', $this->getEditionArguments());
     }
 
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.categories.update',
@@ -252,9 +254,9 @@ class CategoryController extends AbstractSeoCrudController
      */
     public function setToggleVisibilityAction(
         EventDispatcherInterface $eventDispatcher
-    ) {
+    ): Response {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -262,21 +264,16 @@ class CategoryController extends AbstractSeoCrudController
 
         try {
             $eventDispatcher->dispatch($event, TheliaEvents::CATEGORY_TOGGLE_VISIBILITY);
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             // Any error
-            return $this->errorPage($ex);
+            return $this->errorPage($exception);
         }
 
         // Ajax response -> no action
         return $this->nullResponse();
     }
 
-    /**
-     * @param CategoryDeleteEvent $deleteEvent
-     *
-     * @return \Symfony\Component\HttpFoundation\Response|null
-     */
-    protected function performAdditionalDeleteAction($deleteEvent)
+    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent): ?Response
     {
         // Redirect to parent category list
         $category_id = $deleteEvent->getCategory()->getParent();
@@ -284,12 +281,7 @@ class CategoryController extends AbstractSeoCrudController
         return $this->redirectToListTemplateWithId($category_id);
     }
 
-    /**
-     * @param CategoryUpdateEvent $updateEvent
-     *
-     * @return \Symfony\Component\HttpFoundation\Response|null
-     */
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, $updateEvent)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): ?Response
     {
         $response = null;
         if ($this->getRequest()->get('save_mode') != 'stay') {
@@ -301,14 +293,9 @@ class CategoryController extends AbstractSeoCrudController
         return $response;
     }
 
-    /**
-     * @param UpdatePositionEvent $event
-     *
-     * @return \Symfony\Component\HttpFoundation\Response|null
-     */
-    protected function performAdditionalUpdatePositionAction($event)
+    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent): ?Response
     {
-        $category = CategoryQuery::create()->findPk($event->getObjectId());
+        $category = CategoryQuery::create()->findPk($positionChangeEvent->getObjectId());
         $response = null;
         if ($category != null) {
             // Redirect to parent category list
@@ -319,7 +306,7 @@ class CategoryController extends AbstractSeoCrudController
         return $response;
     }
 
-    public function getAvailableRelatedContentAction($categoryId, $folderId)
+    public function getAvailableRelatedContentAction($categoryId, $folderId): Response
     {
         $result = [];
 
@@ -345,10 +332,10 @@ class CategoryController extends AbstractSeoCrudController
         return $this->jsonResponse(json_encode($result));
     }
 
-    public function addRelatedContentAction(EventDispatcherInterface $eventDispatcher)
+    public function addRelatedContentAction(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -362,7 +349,7 @@ class CategoryController extends AbstractSeoCrudController
 
             try {
                 $eventDispatcher->dispatch($event, TheliaEvents::CATEGORY_ADD_CONTENT);
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -374,22 +361,22 @@ class CategoryController extends AbstractSeoCrudController
     /**
      * Add category pictures.
      *
-     * @return \Thelia\Core\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function addRelatedPictureAction()
+    public function addRelatedPictureAction(): Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
         return $this->redirectToEditionTemplate();
     }
 
-    public function deleteRelatedContentAction(EventDispatcherInterface $eventDispatcher)
+    public function deleteRelatedContentAction(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -403,7 +390,7 @@ class CategoryController extends AbstractSeoCrudController
 
             try {
                 $eventDispatcher->dispatch($event, TheliaEvents::CATEGORY_REMOVE_CONTENT);
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }

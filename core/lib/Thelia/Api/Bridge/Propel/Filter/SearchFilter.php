@@ -23,6 +23,8 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel\Filter;
 
+use ReflectionProperty;
+use ReflectionNamedType;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -92,7 +94,7 @@ final class SearchFilter extends AbstractFilter
      *
      * @throws InvalidArgumentException If strategy does not exist
      */
-    protected function addWhereByStrategy(string $strategy, ModelCriteria $query, string $fieldPath, mixed $values): void
+    private function addWhereByStrategy(string $strategy, ModelCriteria $query, string $fieldPath, mixed $values): void
     {
         if (!\is_array($values)) {
             $values = [$values];
@@ -152,12 +154,12 @@ final class SearchFilter extends AbstractFilter
 
             $reflectionProperty = $this->getReflectionProperty($propertyName, $resourceClass);
 
-            if (null === $reflectionProperty && is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
+            if (!$reflectionProperty instanceof ReflectionProperty && is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
                 $isLocalized = true;
                 $reflectionProperty = $this->getReflectionProperty($propertyName, $resourceClass::getI18nResourceClass());
             }
 
-            if (null === $reflectionProperty) {
+            if (!$reflectionProperty instanceof ReflectionProperty) {
                 continue;
             }
 
@@ -174,7 +176,7 @@ final class SearchFilter extends AbstractFilter
                     'type' => $this->getType($reflectionProperty->getType()),
                     'required' => false,
                     'strategy' => $strategy,
-                    'is_collection' => str_ends_with((string) $filterParameterName, '[]'),
+                    'is_collection' => str_ends_with($filterParameterName, '[]'),
                 ];
                 if ($isLocalized) {
                     $description['locale'] = [
@@ -191,15 +193,15 @@ final class SearchFilter extends AbstractFilter
         return $description;
     }
 
-    protected function normalizeValues(array $values, string $property): ?array
+    private function normalizeValues(array $values, string $property): ?array
     {
         foreach ($values as $key => $value) {
-            if (!\is_int($key) || !(\is_string($value) || \is_int($value))) {
+            if (!\is_int($key) || !\is_string($value) && !\is_int($value)) {
                 unset($values[$key]);
             }
         }
 
-        if (empty($values)) {
+        if ($values === []) {
             $this->getLogger()->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('At least one value is required, multiple values should be in "%1$s[]=firstvalue&%1$s[]=secondvalue" format', $property)),
             ]);
@@ -210,7 +212,7 @@ final class SearchFilter extends AbstractFilter
         return array_values($values);
     }
 
-    protected function getType(\ReflectionNamedType $type): string
+    private function getType(ReflectionNamedType $type): string
     {
         if (!$type->isBuiltin()) {
             return 'string';

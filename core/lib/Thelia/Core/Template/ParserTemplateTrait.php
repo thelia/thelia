@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template;
 
 use Imagine\Exception\InvalidArgumentException;
@@ -23,8 +24,11 @@ use Symfony\Contracts\Service\Attribute\Required;
 trait ParserTemplateTrait
 {
     protected array $tplStack = [];
+
     protected ?TemplateDefinition $templateDefinition = null;
+
     protected bool $fallbackToDefaultTemplate = false;
+
     protected int $status = 200;
 
     #[Required]

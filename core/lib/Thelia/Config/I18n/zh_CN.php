@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 return [
     ' content create form' => ' 创建内容表格',
     ' note: only non-visible documents can be associated.' => ' 注：只能关联不可见文档',
@@ -32,7 +33,7 @@ return [
     'A product with reference %ref already exists. Please choose another reference.' => '产品参考码 %ref 已存在，请选择其他参考码',
     'A short description, used when a summary or an introduction is required' => '简短描述，用于概要介绍',
     'A short text, used when an additional or supplemental information is required.' => '简短文本，用于补充额外的信息',
-    'A user already exists with this email address. Please login or if you\'ve forgotten your password, go to Reset Your Password.' => '该电子邮件地址已注册。请登录，如果您忘记了您的密码，请重置您的密码。',
+    "A user already exists with this email address. Please login or if you've forgotten your password, go to Reset Your Password." => '该电子邮件地址已注册。请登录，如果您忘记了您的密码，请重置您的密码。',
     'A value for attribute "%name" is already present in the combination' => '"%name"的属性值在组合中已存在',
     'A variable with name "%name" already exists.' => '变量名称"%name"已存在。',
     'Activate logs only for these IP Addresses' => '只对这些 IP 地址激活日志',
@@ -59,7 +60,7 @@ return [
     'Associate images' => '关联图像',
     'At least one of cart products categories is %op% <strong>%categories_list%</strong>' => '至少一个购物车的产品类别是 %op% <strong>%categories_list%</strong>',
     'Message content: %message%' => '信息内容： %message%',
-    'Sender\'s e-mail address: %email%' => '发件人电子邮件地址： 电子邮件 %email%',
+    "Sender's e-mail address: %email%" => '发件人电子邮件地址： 电子邮件 %email%',
     'Sender name: %name%' => '发件人姓名： %name%',
     'Value *' => '值:*',
     'Value create form' => '值创建表单',
@@ -67,8 +68,8 @@ return [
     'Variables' => '变量',
     'Virtual document' => '虚拟文档',
     'Warnings' => '警告',
-    'We\'re sorry, this PDF invoice is not available at the moment.' => '我们很抱歉，此 PDF 发票目前不可用。',
-    'You\'ve submitted this form too many times. ' => '你已经多次提交这个表格。 ',
+    "We're sorry, this PDF invoice is not available at the moment." => '我们很抱歉，此 PDF 发票目前不可用。',
+    "You've submitted this form too many times. " => '你已经多次提交这个表格。 ',
     'Your Email Address' => '您的电子邮件地址',
     'Your Message' => '您的消息',
     'Your configuration seems to be ok. Checked out your mailbox : %email%' => '您的配置似乎是正确的。请检查您的邮箱: %email%',

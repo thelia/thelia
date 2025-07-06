@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Condition;
 
+use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Coupon\FacadeInterface;
@@ -23,12 +25,6 @@ use Thelia\Coupon\FacadeInterface;
  */
 class ConditionFactory
 {
-    /** @var ContainerInterface Service Container */
-    protected $container;
-
-    /** @var FacadeInterface Provide necessary value from Thelia */
-    protected $adapter;
-
     /** @var array ConditionCollection to process */
     protected $conditions;
 
@@ -38,11 +34,11 @@ class ConditionFactory
      * @param ContainerInterface $container Service container
      */
     public function __construct(
-        ContainerInterface $container,
-        FacadeInterface $facade
-    ) {
-        $this->container = $container;
-        $this->adapter = $facade;
+        protected ContainerInterface $container,
+        /** @var FacadeInterface Provide necessary value from Thelia */
+        protected FacadeInterface $adapter
+    )
+    {
     }
 
     /**
@@ -52,7 +48,7 @@ class ConditionFactory
      *
      * @return string A ready to be stored Condition collection
      */
-    public function serializeConditionCollection(ConditionCollection $collection)
+    public function serializeConditionCollection(ConditionCollection $collection): string
     {
         if ($collection->count() == 0) {
             /** @var ConditionInterface $conditionNone */
@@ -61,6 +57,7 @@ class ConditionFactory
             );
             $collection[] = $conditionNone;
         }
+
         $serializableConditions = [];
         /** @var $condition ConditionInterface */
         foreach ($collection as $condition) {
@@ -77,7 +74,7 @@ class ConditionFactory
      *
      * @return ConditionCollection Conditions ready to be processed
      */
-    public function unserializeConditionCollection(string $serializedConditions)
+    public function unserializeConditionCollection(string $serializedConditions): ConditionCollection
     {
         $unserializedConditions = json_decode(base64_decode($serializedConditions));
 
@@ -108,7 +105,7 @@ class ConditionFactory
      * @param array  $operators          Condition Operator (<, >, = )
      * @param array  $values             Values setting this Condition
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      *
      * @return ConditionInterface Ready to use Condition or false
      */

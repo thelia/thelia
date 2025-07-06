@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Module;
 
+use LogicException;
+use Thelia\Exception\ModuleException;
+use Exception;
+use UnexpectedValueException;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -106,7 +111,7 @@ interface BaseModuleInterface
      * @param null   $valueLocale       the locale, or null if not required
      * @param bool   $createIfNotExists if true, the variable will be created if not already defined
      *
-     * @throws \LogicException if variable does not exists and $createIfNotExists is false
+     * @throws LogicException if variable does not exists and $createIfNotExists is false
      *
      * @return $this;
      */
@@ -125,14 +130,14 @@ interface BaseModuleInterface
      * @param Module $module     the module
      * @param string $folderPath the image folder path
      *
-     * @throws \Thelia\Exception\ModuleException
-     * @throws \Exception
-     * @throws \UnexpectedValueException
+     * @throws ModuleException
+     * @throws Exception
+     * @throws UnexpectedValueException
      */
     public function deployImageFolder(Module $module, $folderPath, ConnectionInterface $con = null);
 
     /**
-     * @throws \Thelia\Exception\ModuleException
+     * @throws ModuleException
      *
      * @return Module
      */

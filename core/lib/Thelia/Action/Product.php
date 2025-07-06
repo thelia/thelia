@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
+use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
@@ -75,12 +77,8 @@ use Thelia\Model\TaxRuleQuery;
 
 class Product extends BaseAction implements EventSubscriberInterface
 {
-    /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
-
-    public function __construct(EventDispatcherInterface $eventDispatcher)
+    public function __construct(protected EventDispatcherInterface $eventDispatcher)
     {
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -121,9 +119,8 @@ class Product extends BaseAction implements EventSubscriberInterface
     /*******************
      * CLONING PROCESS *
      *******************/
-
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function cloneProduct(ProductCloneEvent $event): void
     {
@@ -168,9 +165,9 @@ class Product extends BaseAction implements EventSubscriberInterface
             $this->eventDispatcher->dispatch($event, TheliaEvents::PSE_CLONE);
 
             $con->commit();
-        } catch (\Exception $e) {
+        } catch (Exception $exception) {
             $con->rollBack();
-            throw $e;
+            throw $exception;
         }
     }
 
@@ -329,12 +326,11 @@ class Product extends BaseAction implements EventSubscriberInterface
     /***************
      * END CLONING *
      ***************/
-
     /**
      * Change a product.
      *
      * @throws PropelException
-     * @throws \Exception
+     * @throws Exception
      */
     public function update(ProductUpdateEvent $event): void
     {
@@ -387,7 +383,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a product entry.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function delete(ProductDeleteEvent $event): void
     {
@@ -423,7 +419,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 }
 
                 $con->commit();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $con->rollBack();
                 throw $e;
             }
@@ -438,7 +434,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         $product = $event->getProduct();
 
         $product
-            ->setVisible($product->getVisible() ? false : true)
+            ->setVisible(!(bool) $product->getVisible())
             ->save()
         ;
 
@@ -635,10 +631,10 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             // Store all the stuff !
             $con->commit();
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             $con->rollBack();
 
-            throw $ex;
+            throw $exception;
         }
     }
 
@@ -693,7 +689,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             ;
 
             // If it's a free text value, create a FeatureAv to handle i18n
-            if ($event->getIsTextValue() === true) {
+            if ($event->getIsTextValue()) {
                 $featureProduct->setIsFreeText(true);
 
                 $createFeatureAvEvent = new FeatureAvCreateEvent();
@@ -706,7 +702,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 $featureAvId = $createFeatureAvEvent->getFeatureAv()->getId();
             }
         } // Else if the FeatureProduct exists and is a free text value
-        elseif ($featureProduct !== null && $event->getIsTextValue() === true) {
+        elseif ($featureProduct !== null && $event->getIsTextValue()) {
             // Get the FeatureAv
             $freeTextFeatureAv = FeatureAvQuery::create()
                 ->filterByFeatureProduct($featureProduct)

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
+use LogicException;
 use Thelia\Model\Base\ModuleConfigQuery as BaseModuleConfigQuery;
 
 /**
@@ -50,7 +52,7 @@ class ModuleConfigQuery extends BaseModuleConfigQuery
             $value = $configValue->getValue();
         }
 
-        return $value === null ? $defaultValue : $value;
+        return $value ?? $defaultValue;
     }
 
     /**
@@ -62,7 +64,7 @@ class ModuleConfigQuery extends BaseModuleConfigQuery
      * @param null   $valueLocale       the locale, or null if not required
      * @param bool   $createIfNotExists if true, the variable will be created if not already defined
      *
-     * @throws \LogicException if variable does not exists and $createIfNotExists is false
+     * @throws LogicException if variable does not exists and $createIfNotExists is false
      *
      * @return $this;
      */
@@ -82,7 +84,7 @@ class ModuleConfigQuery extends BaseModuleConfigQuery
                     ->setName($variableName)
                 ;
             } else {
-                throw new \LogicException("Module configuration variable $variableName does not exists. Create it first.");
+                throw new LogicException(sprintf('Module configuration variable %s does not exists. Create it first.', $variableName));
             }
         }
 
@@ -118,4 +120,5 @@ class ModuleConfigQuery extends BaseModuleConfigQuery
         return $this;
     }
 }
+
 // ModuleConfigQuery

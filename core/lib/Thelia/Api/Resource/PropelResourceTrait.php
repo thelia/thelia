@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
 
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
@@ -43,6 +44,7 @@ trait PropelResourceTrait
         if (\array_key_exists($name, $this->resourceAddons)) {
             $this->setResourceAddon($name, $value);
         }
+
         throw new NoSuchPropertyException(sprintf('Can\'t get a way to write the property "%s" in class "%s".', $name, $this::class));
     }
 
@@ -77,6 +79,5 @@ trait PropelResourceTrait
 
     public function afterModelToResource(array $context): void
     {
-        return;
     }
 }

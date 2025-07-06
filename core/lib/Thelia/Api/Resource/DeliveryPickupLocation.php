@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
 
+use Exception;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -111,15 +113,22 @@ use Thelia\Core\Translation\Translator;
 class DeliveryPickupLocation
 {
     public const GROUP_FRONT_READ = 'front:delivery_pickup_location:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:delivery_pickup_location:read:single';
 
     /** OPENING HOURS ARRAY KEYS */
     public const MONDAY_OPENING_HOURS_KEY = '0';
+
     public const TUESDAY_OPENING_HOURS_KEY = '1';
+
     public const WEDNESDAY_OPENING_HOURS_KEY = '2';
+
     public const THURSDAY_OPENING_HOURS_KEY = '3';
+
     public const FRIDAY_OPENING_HOURS_KEY = '4';
+
     public const SATURDAY_OPENING_HOURS_KEY = '5';
+
     public const SUNDAY_OPENING_HOURS_KEY = '6';
 
     #[Groups([
@@ -130,27 +139,27 @@ class DeliveryPickupLocation
     #[Groups([
         self::GROUP_FRONT_READ,
     ])]
-    protected ?float $latitude;
+    protected ?float $latitude = null;
 
     #[Groups([
         self::GROUP_FRONT_READ,
     ])]
-    protected ?float $longitude;
+    protected ?float $longitude = null;
 
     #[Groups([
         self::GROUP_FRONT_READ,
     ])]
-    protected ?string $title;
+    protected ?string $title = null;
 
     #[Groups([
         self::GROUP_FRONT_READ,
     ])]
-    protected ?int $moduleId;
+    protected ?int $moduleId = null;
 
     #[Groups([
         self::GROUP_FRONT_READ,
     ])]
-    protected ?string $moduleOptionCode;
+    protected ?string $moduleOptionCode = null;
 
     #[Groups([
         self::GROUP_FRONT_READ,
@@ -257,7 +266,7 @@ class DeliveryPickupLocation
     public function setOpeningHours(int $day, string $hours): static
     {
         if (!\array_key_exists($day, $this->openingHours)) {
-            throw new \Exception(Translator::getInstance()->trans('Tried to set the opening hours for a non existant day in the array. Please use the constants defined in the PickupLocation class.'));
+            throw new Exception(Translator::getInstance()->trans('Tried to set the opening hours for a non existant day in the array. Please use the constants defined in the PickupLocation class.'));
         }
 
         $this->openingHours[$day] = $hours;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Exception;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
@@ -33,7 +35,7 @@ use Thelia\Type\TypeCollection;
  */
 class Auth extends BaseLoop implements ArraySearchLoopInterface
 {
-    public function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             new Argument(
@@ -65,12 +67,12 @@ class Auth extends BaseLoop implements ArraySearchLoopInterface
         );
     }
 
-    public function buildArray()
+    public function buildArray(): array
     {
         return [];
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         $roles = $this->getRole();
         $resource = $this->getResource();
@@ -80,15 +82,15 @@ class Auth extends BaseLoop implements ArraySearchLoopInterface
         try {
             if (true === $this->securityContext->isGranted(
                 $roles,
-                $resource === null ? [] : $resource,
-                $module === null ? [] : $module,
-                $access === null ? [] : $access
+                $resource ?? [],
+                $module ?? [],
+                $access ?? []
             )
             ) {
                 // Create an empty row: loop is no longer empty :)
                 $loopResult->addRow(new LoopResultRow());
             }
-        } catch (\Exception $ex) {
+        } catch (Exception) {
             // Not granted, loop is empty
         }
 

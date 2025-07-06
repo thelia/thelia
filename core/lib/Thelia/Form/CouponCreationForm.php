@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,14 +11,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Form;
 
+
+use Thelia\Model\Country;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -51,7 +53,7 @@ class CouponCreationForm extends BaseForm
 
         $list = CountryQuery::create()->find();
 
-        /** @var \Thelia\Model\Country $item */
+        /** @var Country $item */
         foreach ($list as $item) {
             $countries[$item->getTitle()] = $item->getId();
         }
@@ -78,13 +80,13 @@ class CouponCreationForm extends BaseForm
                         new NotBlank(),
                         new Callback(
                             [
-                                'callback' => [$this, 'checkDuplicateCouponCode'],
+                                'callback' => $this->checkDuplicateCouponCode(...),
                                 'groups' => 'creation',
                             ]
                         ),
                         new Callback(
                             [
-                                'callback' => [$this, 'checkCouponCodeChangedAndDoesntExists'],
+                                'callback' => $this->checkCouponCodeChangedAndDoesntExists(...),
                                 'groups' => 'update',
                             ]
                         ),
@@ -133,7 +135,7 @@ class CouponCreationForm extends BaseForm
                 [
                     'constraints' => [
                         new Callback(
-                            [$this, 'checkLocalizedDate']
+                            $this->checkLocalizedDate(...)
                         ),
                     ],
                 ]
@@ -144,8 +146,8 @@ class CouponCreationForm extends BaseForm
                 [
                     'constraints' => [
                         new NotBlank(),
-                        new Callback([$this, 'checkLocalizedDate']),
-                        new Callback([$this, 'checkConsistencyDates']),
+                        new Callback($this->checkLocalizedDate(...)),
+                        new Callback($this->checkConsistencyDates(...)),
                     ],
                 ]
             )
@@ -274,7 +276,7 @@ class CouponCreationForm extends BaseForm
     {
         $format = LangQuery::create()->findOneByByDefault(true)->getDatetimeFormat();
 
-        if (false === \DateTime::createFromFormat($format, $value)) {
+        if (false === DateTime::createFromFormat($format, $value)) {
             $context->addViolation(
                 Translator::getInstance()->trans(
                     "Date '%date' is invalid, please enter a valid date using %fmt format",
@@ -295,8 +297,8 @@ class CouponCreationForm extends BaseForm
 
         $format = LangQuery::create()->findOneByByDefault(true)->getDatetimeFormat();
 
-        $startDate = \DateTime::createFromFormat($format, $startDate);
-        $expirationDate = \DateTime::createFromFormat($format, $value);
+        $startDate = DateTime::createFromFormat($format, $startDate);
+        $expirationDate = DateTime::createFromFormat($format, $value);
 
         if ($startDate <= $expirationDate) {
             return;
@@ -309,10 +311,8 @@ class CouponCreationForm extends BaseForm
 
     /**
      * Get form name.
-     *
-     * @return string
      */
-    public static function getName()
+    public static function getName(): string
     {
         return self::COUPON_CREATION_FORM_NAME;
     }

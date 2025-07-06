@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\ShippingZone;
 
 use Thelia\Core\Event\ActionEvent;
@@ -21,13 +22,8 @@ use Thelia\Core\Event\ActionEvent;
  */
 class ShippingZoneAddAreaEvent extends ActionEvent
 {
-    protected $area_id;
-    protected $shipping_zone_id;
-
-    public function __construct($area_id, $shipping_zone_id)
+    public function __construct(protected $area_id, protected $shipping_zone_id)
     {
-        $this->area_id = $area_id;
-        $this->shipping_zone_id = $shipping_zone_id;
     }
 
     /**

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -96,11 +97,7 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
     public function getUploadDir()
     {
         $uploadDir = ConfigQuery::read('images_library_path');
-        if ($uploadDir === null) {
-            $uploadDir = THELIA_LOCAL_DIR.'media'.DS.'images';
-        } else {
-            $uploadDir = THELIA_ROOT.$uploadDir;
-        }
+        $uploadDir = $uploadDir === null ? THELIA_LOCAL_DIR.'media'.DS.'images' : THELIA_ROOT.$uploadDir;
 
         return $uploadDir.DS.'brand';
     }

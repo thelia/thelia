@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Lang;
 
 /**
@@ -20,16 +21,10 @@ namespace Thelia\Core\Event\Lang;
 class LangUpdateEvent extends LangCreateEvent
 {
     /**
-     * @var int lang id
-     */
-    protected $id;
-
-    /**
      * @param int $id
      */
-    public function __construct($id)
+    public function __construct(protected $id)
     {
-        $this->id = $id;
     }
 
     /**
@@ -37,7 +32,7 @@ class LangUpdateEvent extends LangCreateEvent
      *
      * @return $this
      */
-    public function setId($id)
+    public function setId($id): static
     {
         $this->id = $id;
 

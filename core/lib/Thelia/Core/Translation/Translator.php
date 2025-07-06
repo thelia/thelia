@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Translation;
 
+use RuntimeException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\Translator as BaseTranslator;
 use Thelia\Core\HttpFoundation\Request;
@@ -23,32 +25,28 @@ class Translator extends BaseTranslator
 
     public const GLOBAL_FALLBACK_KEY = '%s.%s';
 
-    /** @var RequestStack */
-    protected $requestStack;
+    protected static self $instance;
 
-    protected static $instance;
-
-    public function __construct(RequestStack $requestStack)
+    public function __construct(protected RequestStack $requestStack)
     {
         // Allow singleton style calls once intanciated.
         // For this to work, the Translator service has to be instanciated very early. This is done manually
         // in TheliaHttpKernel, by calling $this->container->get('thelia.translator');
         parent::__construct('');
         self::$instance = $this;
-        $this->requestStack = $requestStack;
     }
 
     /**
      * Return this class instance, only once instanciated.
      *
-     * @throws \RuntimeException if the class has not been instanciated
+     * @throws RuntimeException if the class has not been instanciated
      *
      * @return \Thelia\Core\Translation\Translator the instance
      */
-    public static function getInstance()
+    public static function getInstance(): \Thelia\Core\Translation\Translator
     {
         if (self::$instance == null) {
-            throw new \RuntimeException('Translator instance is not initialized.');
+            throw new RuntimeException('Translator instance is not initialized.');
         }
 
         return self::$instance;
@@ -75,7 +73,7 @@ class Translator extends BaseTranslator
         $returnDefaultIfNotAvailable = true,
         $useFallback = true
     ): string {
-        $domain = $domain ?? 'core';
+        $domain ??= 'core';
         if (null === $locale) {
             $locale = $this->getLocale();
         }

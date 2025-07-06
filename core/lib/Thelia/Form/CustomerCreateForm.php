@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,14 +11,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Form;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
@@ -43,10 +47,10 @@ class CustomerCreateForm extends AddressCreateForm
             // Add Email address
             ->add('email', EmailType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Email(),
-                    new Constraints\Callback(
-                        [$this, 'verifyExistingEmail']
+                    new NotBlank(),
+                    new Email(),
+                    new Callback(
+                        $this->verifyExistingEmail(...)
                     ),
                 ],
                 'label' => Translator::getInstance()->trans('Email Address'),
@@ -57,8 +61,8 @@ class CustomerCreateForm extends AddressCreateForm
             // Add Login Information
             ->add('password', PasswordType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Length(['min' => ConfigQuery::read('password.length', 4)]),
+                    new NotBlank(),
+                    new Length(['min' => ConfigQuery::read('password.length', 4)]),
                 ],
                 'label' => Translator::getInstance()->trans('Password'),
                 'label_attr' => [
@@ -67,9 +71,9 @@ class CustomerCreateForm extends AddressCreateForm
             ])
             ->add('password_confirm', PasswordType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Length(['min' => ConfigQuery::read('password.length', 4)]),
-                    new Constraints\Callback([$this, 'verifyPasswordField']),
+                    new NotBlank(),
+                    new Length(['min' => ConfigQuery::read('password.length', 4)]),
+                    new Callback($this->verifyPasswordField(...)),
                 ],
                 'label' => Translator::getInstance()->trans('Password confirmation'),
                 'label_attr' => [
@@ -94,12 +98,12 @@ class CustomerCreateForm extends AddressCreateForm
         ;
 
         // confirm email
-        if ((int) ConfigQuery::read('customer_confirm_email', 0)) {
+        if ((int) ConfigQuery::read('customer_confirm_email', 0) !== 0) {
             $this->formBuilder->add('email_confirm', EmailType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Email(),
-                    new Constraints\Callback([$this, 'verifyEmailField']),
+                    new NotBlank(),
+                    new Email(),
+                    new Callback($this->verifyEmailField(...)),
                 ],
                 'label' => Translator::getInstance()->trans('Confirm Email Address'),
                 'label_attr' => [
@@ -135,7 +139,7 @@ class CustomerCreateForm extends AddressCreateForm
         }
     }
 
-    public static function getName()
+    public static function getName(): string
     {
         return 'thelia_customer_create';
     }

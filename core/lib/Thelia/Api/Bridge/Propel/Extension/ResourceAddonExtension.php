@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,17 +11,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Bridge\Propel\Extension;
 
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 
-final class ResourceAddonExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
+final readonly class ResourceAddonExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
     public function __construct(
-        private readonly ApiResourcePropelTransformerService $apiResourcePropelTransformerService
+        private ApiResourcePropelTransformerService $apiResourcePropelTransformerService
     ) {
     }
 

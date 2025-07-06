@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Type\AlphaNumStringListType;
+use Thelia\Type\EnumListType;
+use PDO;
+use Propel\Runtime\Exception\PropelException;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Template\Element\BaseI18nLoop;
@@ -22,7 +28,6 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\Resource as ResourceModel;
 use Thelia\Model\ResourceQuery;
-use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
@@ -40,23 +45,20 @@ class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $timestampable = true;
 
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('profile'),
             new Argument(
                 'code',
-                new Type\TypeCollection(
-                    new Type\AlphaNumStringListType()
+                new TypeCollection(
+                    new AlphaNumStringListType()
                 )
             ),
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType([
+                    new EnumListType([
                         'id',
                         'id_reverse',
                         'code',
@@ -71,9 +73,9 @@ class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
-     * @return \Propel\Runtime\ActiveQuery\ModelCriteria|ResourceQuery
+     * @return ModelCriteria|ResourceQuery
      */
     public function buildModelCriteria()
     {
@@ -86,7 +88,7 @@ class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
 
         if (null !== $profile) {
             $search->leftJoinProfileResource('profile_resource')
-                ->addJoinCondition('profile_resource', 'profile_resource.PROFILE_ID=?', $profile, null, \PDO::PARAM_INT)
+                ->addJoinCondition('profile_resource', 'profile_resource.PROFILE_ID=?', $profile, null, PDO::PARAM_INT)
                 ->withColumn('profile_resource.access', 'access');
         }
 
@@ -125,11 +127,9 @@ class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
-     * @return LoopResult
+     * @throws PropelException
      */
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var ResourceModel $resource */
         foreach ($loopResult->getResultDataCollection() as $resource) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Request as BaseRequest;
@@ -28,31 +29,9 @@ use Thelia\Model\ConfigQuery;
  */
 class Request extends BaseRequest
 {
-    /** @var string Path info without trailing slash */
-    private $resolvedPathInfo;
-
-    /** @var string */
-    protected $controllerType;
-
-    public static $isAdminEnv = false;
-
-    /**
-     * @
-     * {@inheritdoc} Including Thelia request properties
-     */
-    public function initialize(
-        array $query = [],
-        array $request = [],
-        array $attributes = [],
-        array $cookies = [],
-        array $files = [],
-        array $server = [],
-        $content = null
-    ): void {
-        parent::initialize($query, $request, $attributes, $cookies, $files, $server, $content);
-
-        $this->resolvedPathInfo = null;
-    }
+    private ?string $resolvedPathInfo = null;
+    protected ?string $controllerType = null;
+    public static bool $isAdminEnv = false;
 
     /**
      * Filter PathInfo to allow slash ending uri.
@@ -66,7 +45,7 @@ class Request extends BaseRequest
         $pathLength = \strlen($pathInfo);
 
         if ($pathInfo !== '/' && $pathInfo[$pathLength - 1] === '/'
-            && (bool) ConfigQuery::read('allow_slash_ended_uri', false)
+            && true === (bool) ConfigQuery::read('allow_slash_ended_uri', false)
         ) {
             if (null === $this->resolvedPathInfo) {
                 $this->resolvedPathInfo = substr($pathInfo, 0, $pathLength - 1); // Remove the slash
@@ -78,17 +57,17 @@ class Request extends BaseRequest
         return $pathInfo;
     }
 
-    public function getRealPathInfo()
+    public function getRealPathInfo(): string
     {
         return parent::getPathInfo();
     }
 
-    public function getProductId()
+    public function getProductId(): mixed
     {
         return $this->get('product_id');
     }
 
-    public function getUriAddingParameters(array $parameters = null)
+    public function getUriAddingParameters(array $parameters = null): string
     {
         $uri = $this->getUri();
 
@@ -98,14 +77,14 @@ class Request extends BaseRequest
             $additionalQs .= sprintf('&%s=%s', $key, $value);
         }
 
-        if ('' == $this->getQueryString()) {
+        if ('' === $this->getQueryString()) {
             $additionalQs = '?'.ltrim($additionalQs, '&');
         }
 
         return $uri.$additionalQs;
     }
 
-    public function toString($withContent = true)
+    public function toString($withContent = true): string
     {
         $string =
             sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))
@@ -118,59 +97,33 @@ class Request extends BaseRequest
         return $string;
     }
 
-    /**
-     * @param string $controllerType
-     */
-    public function setControllerType($controllerType): void
+    public function setControllerType(?string $controllerType): void
     {
         $this->controllerType = $controllerType;
     }
 
-    /**
-     * Detects where does the request.
-     *
-     * <code>
-     * if ($request->fromControllerType(BaseFrontController::CONTROLLER_TYPE)) {...}
-     * </code>
-     *
-     * @return bool
-     */
-    public function fromControllerType($controllerType)
+    public function isControllerType(?string $controllerType): bool
     {
         return $this->controllerType === $controllerType;
     }
 
-    /**
-     * Detect if the request comes from the admin.
-     *
-     * @return bool
-     */
-    public function fromAdmin()
+    public function fromAdmin(): bool
     {
         return $this->controllerType === BaseAdminController::CONTROLLER_TYPE;
     }
 
-    /**
-     * Detect if the request comes from the front.
-     *
-     * @return bool
-     */
-    public function fromFront()
+    public function fromFront(): bool
     {
         return $this->controllerType === BaseFrontController::CONTROLLER_TYPE;
     }
 
-    /**
-     * From a Thelia request, we always return a Thelia Session object.
-     *
-     * @return \Thelia\Core\HttpFoundation\Session\Session|null
-     */
-    public function getSession(): SessionInterface
+    public function getSession(): Session
     {
         if (!$this->hasSession()) {
             $this->setSession(new Session());
         }
-
-        return parent::getSession();
+        /** @var Session $session */
+        $session = $this->session;
+        return $session;
     }
 }

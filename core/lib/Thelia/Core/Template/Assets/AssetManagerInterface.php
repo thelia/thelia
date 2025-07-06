@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Assets;
+
+use RuntimeException;
 
 interface AssetManagerInterface
 {
@@ -23,7 +26,7 @@ interface AssetManagerInterface
      * @param string $webAssetsDirectoryBase the base directory of the web based asset directory
      * @param string $webAssetsKey           the assets key : module name or 0 for base template
      *
-     * @throws \RuntimeException if something goes wrong
+     * @throws RuntimeException if something goes wrong
      *
      * @internal param string $source_assets_directory the full path to the source asstes directory
      * @internal param string $web_assets_directory_base the base directory of the web based asset directory

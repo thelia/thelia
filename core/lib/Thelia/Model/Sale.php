@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
 use Thelia\Model\Base\Sale as BaseSale;
@@ -20,6 +21,7 @@ class Sale extends BaseSale
      * The price offsets types, either amount or percentage.
      */
     public const OFFSET_TYPE_PERCENTAGE = 10;
+
     public const OFFSET_TYPE_AMOUNT = 20;
 
     /**
@@ -64,9 +66,7 @@ class Sale extends BaseSale
      */
     public function getSaleProductList()
     {
-        $saleProducts = SaleProductQuery::create()->filterBySaleId($this->getId())->groupByProductId()->find();
-
-        return $saleProducts;
+        return SaleProductQuery::create()->filterBySaleId($this->getId())->groupByProductId()->find();
     }
 
     /**

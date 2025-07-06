@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Module\Validator;
 
+use SimpleXMLElement;
+use RuntimeException;
+use Exception;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Thelia;
 use Thelia\Core\Translation\Translator;
@@ -20,7 +24,6 @@ use Thelia\Exception\ModuleException;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
-use Thelia\Module\Exception\InvalidXmlDocumentException;
 use Thelia\Module\ModuleDescriptorValidator;
 use Thelia\Tools\Version\Version;
 
@@ -31,10 +34,14 @@ use Thelia\Tools\Version\Version;
  */
 class ModuleValidator
 {
-    protected ?\SimpleXMLElement $moduleDescriptor = null;
+    protected ?SimpleXMLElement $moduleDescriptor = null;
+
     protected ?ModuleDefinition $moduleDefinition = null;
+
     protected ?string $moduleVersion = null;
+
     protected array $errors = [];
+
     protected ?string $moduleDirName = null;
 
     /**
@@ -47,18 +54,18 @@ class ModuleValidator
         protected ?Translator $translator = null
     )
     {
-        $this->moduleDirName = basename($this->modulePath);
+        $this->moduleDirName = basename((string) $this->modulePath);
         $this->checkDirectoryStructure();
         $this->loadModuleDescriptor();
         $this->loadModuleDefinition();
     }
 
-    protected function trans($id, array $parameters = []): string
+    protected function trans(?string $id, array $parameters = []): string
     {
-        if (null === $this->translator) {
+        if (!$this->translator instanceof Translator) {
             try {
                 $this->translator = Translator::getInstance();
-            } catch (\RuntimeException $e) {
+            } catch (RuntimeException) {
                 return strtr($id, $parameters);
             }
         }
@@ -74,12 +81,12 @@ class ModuleValidator
      *
      * @param bool $checkCurrentVersion if true it will also check if the module is
      *                                  already installed (not activated - present in module list)
-     * @throws \Exception
+     * @throws Exception
      */
     public function validate(bool $checkCurrentVersion = true): void
     {
-        if (null === $this->moduleDescriptor) {
-            throw new \Exception(
+        if (!$this->moduleDescriptor instanceof SimpleXMLElement) {
+            throw new Exception(
                 $this->trans(
                     'The %name module definition has not been initialized.',
                     ['%name' => $this->moduleDirName]
@@ -89,7 +96,7 @@ class ModuleValidator
 
         $this->checkVersion();
 
-        if (true === $checkCurrentVersion) {
+        if ($checkCurrentVersion) {
             $this->checkModuleVersion();
         }
 
@@ -140,16 +147,16 @@ class ModuleValidator
 
         // validation with xsd
         $this->moduleDescriptor = $descriptorValidator->getDescriptor($path);
-        $this->moduleVersion = $descriptorValidator->getModuleVersion();
+        $this->moduleVersion = (string) $descriptorValidator->getModuleVersion();
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function loadModuleDefinition(): void
     {
-        if (null === $this->moduleDescriptor) {
-            throw new \Exception(
+        if (!$this->moduleDescriptor instanceof SimpleXMLElement) {
+            throw new Exception(
                 $this->trans(
                     'The %name module descriptor has not been initialized.',
                     ['%name' => $this->moduleDirName]
@@ -209,7 +216,7 @@ class ModuleValidator
             return;
         }
 
-        if (preg_match('/<behavior.*name="versionable".*\/>/s', preg_replace('/<!--(.|\s)*?-->/', '', file_get_contents($schemaFile)))) {
+        if (preg_match('/<behavior.*name="versionable".*\/>/s', (string) preg_replace('/<!--(.|\s)*?-->/', '', file_get_contents($schemaFile)))) {
             throw new ModuleException(
                 'On Thelia version >= 2.4.0 the behavior "versionnable" is not available for modules, please remove this behavior from your module schema.'
             );
@@ -258,10 +265,8 @@ class ModuleValidator
 
             $pass = false;
 
-            if ((null !== $module) && $module->getActivate() === BaseModule::IS_ACTIVATED) {
-                if ('' === $dependency[1] || Version::test($module->getVersion(), $dependency[1], false, '>=')) {
-                    $pass = true;
-                }
+            if (null !== $module && $module->getActivate() === BaseModule::IS_ACTIVATED && ('' === $dependency[1] || Version::test($module->getVersion(), $dependency[1], false, '>='))) {
+                $pass = true;
             }
 
             if (false === $pass) {
@@ -279,7 +284,7 @@ class ModuleValidator
             }
         }
 
-        if (\count($errors) > 0) {
+        if ($errors !== []) {
             $errorsMessage = $this->trans(
                 'To activate module %name, the following modules should be activated first: %modules',
                 ['%name' => $this->moduleDirName, '%modules' => implode(', ', $errors)]
@@ -331,7 +336,7 @@ class ModuleValidator
                         }
                     }
                 }
-            } catch (\Exception $ex) {
+            } catch (Exception) {
             }
         }
 
@@ -363,7 +368,7 @@ class ModuleValidator
             }
 
             if ($recursive) {
-                $recursiveModuleValidator = new self(THELIA_MODULE_DIR.'/'.(string) $dependency);
+                $recursiveModuleValidator = new self(THELIA_MODULE_DIR.'/'.$dependency);
                 array_merge(
                     $dependencies,
                     $recursiveModuleValidator->getCurrentModuleDependencies(true)
@@ -382,6 +387,7 @@ class ModuleValidator
                 $languages[] = (string) $language;
             }
         }
+
         $moduleDefinition->setLanguages($languages);
     }
 
@@ -396,6 +402,7 @@ class ModuleValidator
                 'postscriptum' => (string) $descriptive->postscriptum,
             ];
         }
+
         $moduleDefinition->setDescriptives($descriptives);
     }
 
@@ -410,6 +417,7 @@ class ModuleValidator
                 ];
             }
         }
+
         $moduleDefinition->setDependencies($dependencies);
     }
 
@@ -429,6 +437,7 @@ class ModuleValidator
         } else {
             $authors = $this->getModuleAuthors22($moduleDefinition);
         }
+
         $moduleDefinition->setAuthors($authors);
     }
 
@@ -455,7 +464,7 @@ class ModuleValidator
     }
 
 
-    public function setModulePath($modulePath): void
+    public function setModulePath(?string $modulePath): void
     {
         $this->modulePath = $modulePath;
     }
@@ -465,7 +474,7 @@ class ModuleValidator
         return $this->modulePath;
     }
 
-    public function getModuleDescriptor(): \SimpleXMLElement|ModuleDescriptorValidator|null
+    public function getModuleDescriptor(): SimpleXMLElement|ModuleDescriptorValidator|null
     {
         return $this->moduleDescriptor;
     }

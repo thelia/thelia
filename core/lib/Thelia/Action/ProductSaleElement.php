@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
+use Exception;
+use Propel\Runtime\Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
@@ -44,18 +47,14 @@ use Thelia\Model\ProductSaleElementsQuery;
 
 class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 {
-    /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
-
-    public function __construct(EventDispatcherInterface $eventDispatcher)
+    public function __construct(protected EventDispatcherInterface $eventDispatcher)
     {
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
      * Create a new product sale element, with or without combination.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function create(ProductSaleElementCreateEvent $event): void
     {
@@ -102,17 +101,17 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
             // Store all the stuff !
             $con->commit();
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             $con->rollback();
 
-            throw $ex;
+            throw $exception;
         }
     }
 
     /**
      * Update an existing product sale element.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function update(ProductSaleElementUpdateEvent $event): void
     {
@@ -143,16 +142,14 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                     ->filterById($event->getProductSaleElementId(), Criteria::NOT_EQUAL)
                     ->update(['IsDefault' => false], $con)
                 ;
-            } else {
+            } elseif ($salesElement->getIsDefault() && ProductSaleElementsQuery::create()
+                    ->filterByProduct($event->getProduct())
+                    ->filterByIsDefault(true)
+                    ->filterById($salesElement->getId(), Criteria::NOT_EQUAL)
+                    ->count() === 0) {
                 // We will not allow the default PSE to become non default if no other default PSE exists for this product.
-                if ($salesElement->getIsDefault() && ProductSaleElementsQuery::create()
-                        ->filterByProduct($event->getProduct())
-                        ->filterByIsDefault(true)
-                        ->filterById($salesElement->getId(), Criteria::NOT_EQUAL)
-                        ->count() === 0) {
-                    // Prevent setting the only default PSE to non-default
-                    $defaultStatus = true;
-                }
+                // Prevent setting the only default PSE to non-default
+                $defaultStatus = true;
             }
 
             // Update sale element
@@ -204,17 +201,17 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
             // Store all the stuff !
             $con->commit();
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             $con->rollback();
 
-            throw $ex;
+            throw $exception;
         }
     }
 
     /**
      * Delete a product sale element.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function delete(ProductSaleElementDeleteEvent $event): void
     {
@@ -256,7 +253,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
                 // Store all the stuff !
                 $con->commit();
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 $con->rollback();
 
                 throw $ex;
@@ -267,7 +264,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     /**
      * Generate combinations. All existing combinations for the product are deleted.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function generateCombinations(ProductCombinationGenerationEvent $event): void
     {
@@ -305,10 +302,10 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
             // Store all the stuff !
             $con->commit();
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             $con->rollback();
 
-            throw $ex;
+            throw $exception;
         }
     }
 
@@ -319,7 +316,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      * @param ProductSaleElements $salesElement          the product sale element
      * @param array               $combinationAttributes an array oif attributes av IDs
      *
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     protected function createCombination(ConnectionInterface $con, ProductSaleElements $salesElement, $combinationAttributes): void
     {
@@ -341,11 +338,10 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     /*******************
      * CLONING PROCESS *
      *******************/
-
     /**
      * Clone product's PSEs and associated datas.
      *
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function clonePSE(ProductCloneEvent $event): void
     {
@@ -392,7 +388,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
      * @return int
      */
@@ -435,7 +431,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function clonePSEAssociatedFiles($clonedProductId, $clonedProductPSEId, $originalProductPSEFiles, $type): void
     {
@@ -445,7 +441,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             $originalProductPSEFileId = null;
 
             if (!\in_array($type, ['image', 'document'])) {
-                throw new \Exception(Translator::getInstance()->trans('Cloning files of type %type is not allowed.', ['%type' => $type], 'core'));
+                throw new Exception(Translator::getInstance()->trans('Cloning files of type %type is not allowed.', ['%type' => $type], 'core'));
             }
 
             // Get file's original position
@@ -459,6 +455,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                     $originalProductPSEFileId = $originalProductPSEFile->getProductDocumentId();
                     break;
             }
+
             $originalProductFilePosition = $originalProductFilePositionQuery
                 ->select(['POSITION'])
                 ->findPk($originalProductPSEFileId);
@@ -492,6 +489,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                     $assoc->setProductDocumentId($clonedProductFileIdToLinkToPSE);
                     break;
             }
+
             $assoc
                 ->setProductSaleElementsId($clonedProductPSEId)
                 ->save();

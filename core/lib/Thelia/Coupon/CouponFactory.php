@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Coupon;
+
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\ConditionFactory;
@@ -30,26 +32,17 @@ use Thelia\Model\Coupon;
  */
 class CouponFactory
 {
-    /** @var ContainerInterface Service Container */
-    protected $container;
-
-    /** @var FacadeInterface */
-    protected $facade;
-
-    /** @var ConditionFactory Provide necessary value from Thelia */
-    protected $conditionFactory;
-
     /**
      * Constructor.
      */
     public function __construct(
-        ContainerInterface $container,
-        FacadeInterface $facade,
-        ConditionFactory $conditionFactory
-    ) {
-        $this->container = $container;
-        $this->facade = $facade;
-        $this->conditionFactory = $conditionFactory;
+        /** @var ContainerInterface Service Container */
+        protected ContainerInterface $container,
+        protected FacadeInterface $facade,
+        /** @var ConditionFactory Provide necessary value from Thelia */
+        protected ConditionFactory $conditionFactory
+    )
+    {
     }
 
     /**

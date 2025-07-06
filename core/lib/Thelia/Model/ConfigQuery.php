@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
 use Thelia\Model\Base\ConfigQuery as BaseConfigQuery;
@@ -24,6 +25,7 @@ use Thelia\Model\Base\ConfigQuery as BaseConfigQuery;
 class ConfigQuery extends BaseConfigQuery
 {
     protected static $booted = false;
+
     protected static $cache = [];
 
     /**
@@ -41,8 +43,6 @@ class ConfigQuery extends BaseConfigQuery
      * Find a config variable and return the value or default value if not founded.
      *
      * Use this method for better performance, a cache is created for each variable already searched
-     *
-     * @param null $default
      */
     public static function read(string $search, $default = null, bool $ignoreCache = false)
     {
@@ -69,6 +69,7 @@ class ConfigQuery extends BaseConfigQuery
         if ($secured !== null) {
             $config->setSecured($secured ? 1 : 0);
         }
+
         if ($hidden !== null) {
             $config->setHidden($hidden ? 1 : 0);
         }
@@ -169,7 +170,7 @@ class ConfigQuery extends BaseConfigQuery
     {
         $contactEmail = self::getStoreEmail();
 
-        $list = preg_split('/[,;]/', self::read('store_notification_emails', $contactEmail));
+        $list = preg_split('/[,;]/', (string) self::read('store_notification_emails', $contactEmail));
 
         $arr = [];
 
@@ -336,4 +337,5 @@ class ConfigQuery extends BaseConfigQuery
         return self::read('minimum_admin_password_length', 4);
     }
 }
+
 // ConfigQuery

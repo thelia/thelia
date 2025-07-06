@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,33 +11,47 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Module;
 
+use Exception;
+use JsonException;
+use Propel\Runtime\Exception\PropelException;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use ReflectionClass;
+use SimpleXMLElement;
+use SplFileInfo;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 use Thelia\Core\Event\Cache\CacheEvent;
+use Thelia\Core\Event\Module\ModuleInstallEvent;
+use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\DTO\ComposerTheliaModuleDTO;
 use Thelia\Exception\InvalidModuleException;
 use Thelia\Log\Tlog;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
+use Thelia\Module\Validator\ModuleValidator;
+use Thelia\Service\Composer\ComposerHelper;
 
-/**
- * Class ModuleManagement.
- *
- * @author  Manuel Raynaud <manu@raynaud.io>
- */
 class ModuleManagement
 {
+    public const COMPOSER_TYPE_MODULE = 'thelia-module';
 
     protected ?ModuleDescriptorValidator $descriptorValidator = null;
 
-    public function __construct(protected ContainerInterface $container)
+    public function __construct(
+        protected ContainerInterface $container,
+        protected EventDispatcherInterface $eventDispatcher,
+        protected ?ComposerHelper $composerHelper = null,
+        #[Autowire(param: 'kernel.cache_dir')]
+        protected ?string $kernelCacheDir = null,
+    )
     {
     }
 
@@ -63,8 +79,8 @@ class ModuleManagement
 
             foreach ($finder as $file) {
                 try {
-                    $this->updateModule($file, $container);
-                } catch (\Exception $ex) {
+                    $modulesUpdated[] = $this->updateModule($file, $container);
+                } catch (Exception $ex) {
                     // Guess module code
                     $moduleCode = basename(\dirname($file, 2));
 
@@ -72,14 +88,14 @@ class ModuleManagement
                 }
             }
 
-            if (\count($errors) > 0) {
+            if ($errors !== []) {
                 throw new InvalidModuleException($errors);
             }
 
-            if (\count($modulesUpdated)) {
+            if ($modulesUpdated !== []) {
                 $this->cacheClear();
             }
-        } catch (DirectoryNotFoundException $e) {
+        } catch (DirectoryNotFoundException) {
             // No module installed
         }
     }
@@ -88,19 +104,15 @@ class ModuleManagement
      * Update module information, and invoke install() for new modules (e.g. modules
      * just discovered), or update() modules for which version number ha changed.
      *
-     * @param \SplFileInfo $file      the module.xml file descriptor
-     * @param ContainerInterface $container the container
-     *
-     * @throws \Exception
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
+     * @throws Exception
+     * @throws PropelException
      */
-    public function updateModule(\SplFileInfo $file, ContainerInterface $container): Module
+    public function updateModule(SplFileInfo $file, ContainerInterface $container): Module
     {
         $descriptorValidator = $this->getDescriptorValidator();
 
         $content = $descriptorValidator->getDescriptor($file->getRealPath());
-        $reflected = new \ReflectionClass((string) $content->fullnamespace);
+        $reflected = new ReflectionClass((string) $content->fullnamespace);
         $code = basename(\dirname($reflected->getFileName()));
         $version = (string) $content->version;
         $currentVersion = $version;
@@ -142,7 +154,7 @@ class ModuleManagement
                 $this->saveDescription($module, $content, $con);
 
                 if (isset($content->{'images-folder'}) && !$module->isModuleImageDeployed($con)) {
-                    /** @var \Thelia\Module\BaseModule $moduleInstance */
+                    /** @var BaseModule $moduleInstance */
                     $moduleInstance = $reflected->newInstance();
                     $imagesFolder = $moduleInstance->getModuleDir().DS.$content->{'images-folder'};
                     $moduleInstance->deployImageFolder($module, $imagesFolder, $con);
@@ -165,11 +177,11 @@ class ModuleManagement
             }
 
             $con->commit();
-        } catch (\Exception $ex) {
-            Tlog::getInstance()->addError('Failed to update module '.$module->getCode(), $ex);
+        } catch (Exception $exception) {
+            Tlog::getInstance()->addError('Failed to update module '.$module->getCode(), $exception);
 
             $con->rollBack();
-            throw $ex;
+            throw $exception;
         }
 
         return $module;
@@ -177,7 +189,7 @@ class ModuleManagement
 
     public function getDescriptorValidator(): ModuleDescriptorValidator
     {
-        if (null === $this->descriptorValidator) {
+        if (!$this->descriptorValidator instanceof ModuleDescriptorValidator) {
             $this->descriptorValidator = new ModuleDescriptorValidator();
         }
 
@@ -186,29 +198,27 @@ class ModuleManagement
 
     protected function cacheClear(): void
     {
-        $cacheEvent = new CacheEvent(
-            $this->container->getParameter('kernel.cache_dir')
-        );
-
-        $this->container->get('event_dispatcher')?->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
+        $cacheEvent = new CacheEvent($this->kernelCacheDir);
+        $this->eventDispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
     }
 
-    private function getModuleType(\ReflectionClass $reflected): int
+    private function getModuleType(ReflectionClass $reflected): int
     {
         if (
-            $reflected->implementsInterface('Thelia\Module\DeliveryModuleInterface')
-            || $reflected->implementsInterface('Thelia\Module\DeliveryModuleWithStateInterface')
+            $reflected->implementsInterface(DeliveryModuleInterface::class)
+            || $reflected->implementsInterface(DeliveryModuleWithStateInterface::class)
         ) {
             return BaseModule::DELIVERY_MODULE_TYPE;
         }
-        if ($reflected->implementsInterface('Thelia\Module\PaymentModuleInterface')) {
+
+        if ($reflected->implementsInterface(PaymentModuleInterface::class)) {
             return BaseModule::PAYMENT_MODULE_TYPE;
         }
 
         return BaseModule::CLASSIC_MODULE_TYPE;
     }
 
-    private function saveDescription(Module $module, \SimpleXMLElement $content, ConnectionInterface $con): void
+    private function saveDescription(Module $module, SimpleXMLElement $content, ConnectionInterface $con): void
     {
         foreach ($content->descriptive as $description) {
             $locale = (string) $description->attributes()->locale;
@@ -222,5 +232,96 @@ class ModuleManagement
                 ->save($con)
             ;
         }
+    }
+
+    public function installModule(string $absolutePathToModule): Module
+    {
+        $moduleValidator = new ModuleValidator($absolutePathToModule);
+        $moduleValidator->loadModuleDefinition();
+
+        $checkModule = ModuleQuery::create()->findOneByFullNamespace(
+            $moduleValidator->getModuleDefinition()?->getNamespace() ?? ''
+        );
+        if ($checkModule) {
+            return $checkModule;
+        }
+
+        $moduleDefinition = $moduleValidator->getModuleDefinition();
+
+        $moduleInstallEvent = new ModuleInstallEvent();
+        $moduleInstallEvent
+            ->setModulePath($absolutePathToModule)
+            ->setModuleDefinition($moduleDefinition);
+
+        $this->eventDispatcher->dispatch($moduleInstallEvent, TheliaEvents::MODULE_INSTALL);
+
+        return $moduleInstallEvent->getModule();
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function listModulesFromTemplatePath(string $directory): array
+    {
+        $composerJson = $this->composerHelper?->getComposerPackagesFromPath($directory);
+        $vendorDir = $composerJson['config']['vendor-dir'] ?? THELIA_ROOT.'vendor';
+        $modules = [];
+
+        $installedJsonPath = $vendorDir.'/composer/installed.json';
+        if (!file_exists($installedJsonPath)) {
+            return $modules;
+        }
+
+        $installed = json_decode(file_get_contents($installedJsonPath), true, 512, \JSON_THROW_ON_ERROR);
+
+        $packages = $installed['packages'] ?? $installed;
+
+        foreach ($packages as $package) {
+            if (!isset($package['type'], $composerJson['require'][$package['name']])
+               || $package['type'] !== self::COMPOSER_TYPE_MODULE) {
+                continue;
+            }
+
+            $installPath = str_replace('..', '', $package['install-path']);
+            $packagePath = $vendorDir.$installPath;
+            $package['path'] = $packagePath;
+            $modules[] = ComposerTheliaModuleDTO::fromArray($package);
+        }
+
+        return $modules;
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function installModulesFromTemplatePath(string $path): array
+    {
+        $modulesInstalled = [];
+        if (!file_exists($path.DS.'composer.json')) {
+            return [];
+        }
+
+        $composerModuleDTOS = $this->listModulesFromTemplatePath($path);
+        foreach ($composerModuleDTOS as $composerModuleDTO) {
+            $module = $this->installModule($composerModuleDTO->getPath());
+            $cacheEvent = new CacheEvent($this->kernelCacheDir);
+            $this->eventDispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
+
+            if ($module->getActivate() === BaseModule::IS_ACTIVATED) {
+                continue;
+            }
+
+            try {
+                $event = new ModuleToggleActivationEvent($module->getId());
+                $event->setRecursive(true);
+
+                $this->eventDispatcher->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
+                $modulesInstalled[] = $module;
+            } catch (Exception) {
+                continue;
+            }
+        }
+
+        return $modulesInstalled;
     }
 }

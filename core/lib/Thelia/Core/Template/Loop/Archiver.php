@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Core\Archiver\ArchiverManager;
+use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
@@ -30,7 +33,7 @@ use Thelia\Type\TypeCollection;
  */
 class Archiver extends BaseLoop implements ArraySearchLoopInterface
 {
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createBooleanTypeArgument('available'),
@@ -47,7 +50,7 @@ class Archiver extends BaseLoop implements ArraySearchLoopInterface
 
     public function buildArray()
     {
-        /** @var \Thelia\Core\Archiver\ArchiverManager $archiverManager */
+        /** @var ArchiverManager $archiverManager */
         $archiverManager = $this->container->get(RegisterArchiverPass::MANAGER_SERVICE_ID);
 
         $availability = $this->getArgValue('available');
@@ -63,21 +66,18 @@ class Archiver extends BaseLoop implements ArraySearchLoopInterface
             }
         }
 
-        switch ($this->getArgValue('order')) {
-            case 'alpha':
-                ksort($archivers);
-                break;
-            case 'alpha_reverse':
-                krsort($archivers);
-                break;
-        }
+        match ($this->getArgValue('order')) {
+            'alpha' => ksort($archivers),
+            'alpha_reverse' => krsort($archivers),
+            default => $archivers,
+        };
 
         return $archivers;
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
-        /** @var \Thelia\Core\Archiver\ArchiverInterface $archiver */
+        /** @var ArchiverInterface $archiver */
         foreach ($loopResult->getResultDataCollection() as $archiver) {
             $loopResultRow = new LoopResultRow();
 

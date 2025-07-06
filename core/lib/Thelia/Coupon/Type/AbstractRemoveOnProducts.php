@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Coupon\Type;
 
+
+use InvalidArgumentException;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\CartItem;
@@ -24,26 +27,22 @@ use Thelia\Model\CartItem;
 abstract class AbstractRemoveOnProducts extends CouponAbstract implements AmountAndPercentageCouponInterface
 {
     public const CATEGORY_ID = 'category_id';
+
     public const PRODUCTS_LIST = 'products';
 
-    public $category_id = 0;
-    public $product_list = [];
+    public int $category_id = 0;
+
+    public array $product_list = [];
 
     /**
      * Set the value of specific coupon fields.
-     *
-     * @param array $effects the Coupon effects params
      */
-    abstract public function setFieldsValue($effects);
+    abstract public function setFieldsValue(array $effects);
 
     /**
      * Get the discount for a specific cart item.
-     *
-     * @param CartItem $cartItem the cart item
-     *
-     * @return float the discount value
      */
-    abstract public function getCartItemDiscount(CartItem $cartItem);
+    abstract public function getCartItemDiscount(CartItem $cartItem): float;
 
     public function set(
         FacadeInterface $facade,
@@ -57,11 +56,12 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
         $isAvailableOnSpecialOffers,
         $isEnabled,
         $maxUsage,
-        \DateTime $expirationDate,
+        DateTime $expirationDate,
         $freeShippingForCountries,
         $freeShippingForModules,
         $perCustomerUsageCount
-    ) {
+    ): static
+    {
         parent::set(
             $facade,
             $code,
@@ -82,10 +82,6 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
 
         $this->product_list = $effects[self::PRODUCTS_LIST] ?? [];
 
-        if (!\is_array($this->product_list)) {
-            $this->product_list = [$this->product_list];
-        }
-
         $this->category_id = $effects[self::CATEGORY_ID] ?? 0;
 
         $this->setFieldsValue($effects);
@@ -93,7 +89,7 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
         return $this;
     }
 
-    public function exec()
+    public function exec(): float|int
     {
         // This coupon subtracts the specified amount from the order total
         // for each product of the selected products.
@@ -103,17 +99,15 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
 
         /** @var CartItem $cartItem */
         foreach ($cartItems as $cartItem) {
-            if (\in_array($cartItem->getProduct()->getId(), $this->product_list)) {
-                if (!$cartItem->getPromo() || $this->isAvailableOnSpecialOffers()) {
-                    $discount += $this->getCartItemDiscount($cartItem);
-                }
+            if (\in_array($cartItem->getProduct()->getId(), $this->product_list, true) && (!$cartItem->getPromo() || $this->isAvailableOnSpecialOffers())) {
+                $discount += $this->getCartItemDiscount($cartItem);
             }
         }
 
         return $discount;
     }
 
-    public function drawBaseBackOfficeInputs($templateName, $otherFields)
+    public function drawBaseBackOfficeInputs(string $templateName, array $otherFields): string
     {
         return $this->facade->getParser()->render($templateName, array_merge($otherFields, [
             // The category ID field
@@ -127,24 +121,24 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
         ]));
     }
 
-    public function getBaseFieldList($otherFields)
+    public function getBaseFieldList($otherFields): array
     {
         return array_merge($otherFields, [self::CATEGORY_ID, self::PRODUCTS_LIST]);
     }
 
-    public function checkBaseCouponFieldValue($fieldName, $fieldValue)
+    public function checkBaseCouponFieldValue(string $fieldName, string $fieldValue): string
     {
         if ($fieldName === self::CATEGORY_ID) {
-            if (empty($fieldValue)) {
-                throw new \InvalidArgumentException(
+            if ($fieldValue === '' || $fieldValue === '0') {
+                throw new InvalidArgumentException(
                     Translator::getInstance()->trans(
                         'Please select a category'
                     )
                 );
             }
         } elseif ($fieldName === self::PRODUCTS_LIST) {
-            if (empty($fieldValue)) {
-                throw new \InvalidArgumentException(
+            if ($fieldValue === '' || $fieldValue === '0') {
+                throw new InvalidArgumentException(
                     Translator::getInstance()->trans(
                         'Please select at least one product'
                     )

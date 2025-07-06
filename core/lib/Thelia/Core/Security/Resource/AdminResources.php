@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Security\Resource;
 
+use ReflectionClass;
+use Exception;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Thelia\Core\Security\Exception\ResourceException;
@@ -29,7 +32,7 @@ class AdminResources
      *
      * @removed 2.5
      */
-    private static $selfReflection;
+    private static ?ReflectionClass $selfReflection = null;
 
     /**
      * @deprecated 2.3
@@ -38,15 +41,17 @@ class AdminResources
      *
      * @return string the constant value
      */
-    public static function retrieve($name)
+    public static function retrieve($name): mixed
     {
-        $constantName = strtoupper($name);
-        if (null === self::$selfReflection) {
-            self::$selfReflection = new \ReflectionClass(__CLASS__);
+        $constantName = strtoupper((string) $name);
+        if (!self::$selfReflection instanceof ReflectionClass) {
+            self::$selfReflection = new ReflectionClass(self::class);
         }
+
         if (self::$selfReflection->hasConstant($constantName)) {
             return self::$selfReflection->getConstant($constantName);
         }
+
         throw new ResourceException(sprintf('Resource `%s` not found', $constantName), ResourceException::RESOURCE_NOT_FOUND);
     }
 
@@ -157,7 +162,7 @@ class AdminResources
      * @param array $resources with format module => [ KEY => value ]
      */
     public function __construct(
-        #[Autowire('%admin.resources%')]
+        #[Autowire(param: 'admin.resources')]
         array $resources
     ) {
         $this->resources = $resources;
@@ -177,6 +182,7 @@ class AdminResources
             if (isset($this->resources[$module][$constantName])) {
                 return $this->resources[$module][$constantName];
             }
+
             throw new ResourceException(sprintf('Resource `%s` not found', $module),
                 ResourceException::RESOURCE_NOT_FOUND);
         } else {
@@ -193,14 +199,14 @@ class AdminResources
      *                 ]
      * @param $module string ModuleCode
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function addModuleResources($data, $module = 'thelia'): void
     {
         if (null !== $data && \is_array($data)) {
             $this->resources[$module] = $data;
         } else {
-            throw new \Exception('Format pass to addModuleResources method is not valid');
+            throw new Exception('Format pass to addModuleResources method is not valid');
         }
     }
 
@@ -216,6 +222,7 @@ class AdminResources
             if (!$this->resources[$module]) {
                 $this->resources[$module] = [];
             }
+
             $this->resources[$module][$nameFormated] = $value;
         }
     }

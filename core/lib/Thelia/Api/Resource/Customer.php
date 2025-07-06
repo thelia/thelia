@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
+
 
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
@@ -20,6 +22,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use DateTime;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -108,11 +111,15 @@ class Customer implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:customer:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:customer:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:customer:write';
+
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:customer:write:update';
 
     public const GROUP_FRONT_READ_SINGLE = 'front:customer:read:single';
+
     public const GROUP_FRONT_WRITE = 'front:customer:write';
 
     #[Groups([self::GROUP_ADMIN_READ,
@@ -137,10 +144,10 @@ class Customer implements PropelResourceInterface
 
     #[Relation(targetResource: Lang::class, relationAlias: 'LangModel')]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_WRITE])]
-    public ?Lang $lang;
+    public ?Lang $lang = null;
 
     #[Groups([self::GROUP_ADMIN_READ, Address::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
-    public ?string $ref;
+    public ?string $ref = null;
 
     #[Groups([self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
@@ -171,52 +178,47 @@ class Customer implements PropelResourceInterface
     ])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
     #[Email(groups: [self::GROUP_ADMIN_WRITE])]
-    public ?string $email;
+    public ?string $email = null;
 
     #[Groups([self::GROUP_ADMIN_WRITE])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
-    public ?string $password;
+    public ?string $password = null;
 
-    public ?string $algo;
-
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?bool $reseller;
-
-    #[Groups([self::GROUP_FRONT_READ_SINGLE])]
-    public ?string $sponsor;
+    public ?string $algo = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?float $discount;
-
-    public ?string $rememberMeToken;
-
-    public ?string $rememberMeSerial;
-
-    public ?bool $enable;
+    public ?bool $reseller = null;
 
     #[Groups([self::GROUP_FRONT_READ_SINGLE])]
-    public ?string $confirmationToken;
+    public ?string $sponsor = null;
+
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $discount = null;
+
+    public ?string $rememberMeToken = null;
+
+    public ?string $rememberMeSerial = null;
+
+    public ?bool $enable = null;
+
+    #[Groups([self::GROUP_FRONT_READ_SINGLE])]
+    public ?string $confirmationToken = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $createdAt;
+    public ?DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
-    public ?\DateTime $updatedAt;
+    public ?DateTime $updatedAt = null;
 
-    public ?int $version;
+    public ?int $version = null;
 
-    public ?\DateTime $versionCreatedAt;
+    public ?DateTime $versionCreatedAt = null;
 
-    public ?string $versionCreatedBy;
+    public ?string $versionCreatedBy = null;
 
     #[Relation(targetResource: Address::class)]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
-    public array $addresses;
-
-    public function __construct()
-    {
-        $this->addresses = [];
-    }
+    public array $addresses = [];
 
     public function getId(): ?int
     {
@@ -410,24 +412,24 @@ class Customer implements PropelResourceInterface
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): self
+    public function setCreatedAt(?DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): self
+    public function setUpdatedAt(?DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 
@@ -446,12 +448,12 @@ class Customer implements PropelResourceInterface
         return $this;
     }
 
-    public function getVersionCreatedAt(): ?\DateTime
+    public function getVersionCreatedAt(): ?DateTime
     {
         return $this->versionCreatedAt;
     }
 
-    public function setVersionCreatedAt(?\DateTime $versionCreatedAt): self
+    public function setVersionCreatedAt(?DateTime $versionCreatedAt): self
     {
         $this->versionCreatedAt = $versionCreatedAt;
 

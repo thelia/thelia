@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Country;
 
 /**
@@ -19,8 +20,6 @@ namespace Thelia\Core\Event\Country;
  */
 class CountryUpdateEvent extends CountryCreateEvent
 {
-    protected $country_id;
-
     /** @var bool */
     protected $needZipCode;
 
@@ -36,12 +35,11 @@ class CountryUpdateEvent extends CountryCreateEvent
     /** @var string */
     protected $postscriptum;
 
-    public function __construct(int $country_id)
+    public function __construct(protected int $country_id)
     {
-        $this->country_id = $country_id;
     }
 
-    public function setChapo(?string $chapo)
+    public function setChapo(?string $chapo): static
     {
         $this->chapo = $chapo;
 
@@ -56,7 +54,7 @@ class CountryUpdateEvent extends CountryCreateEvent
         return $this->chapo;
     }
 
-    public function setDescription(?string $description)
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
 
@@ -68,7 +66,7 @@ class CountryUpdateEvent extends CountryCreateEvent
         return $this->description;
     }
 
-    public function setPostscriptum(?string $postscriptum)
+    public function setPostscriptum(?string $postscriptum): static
     {
         $this->postscriptum = $postscriptum;
 
@@ -81,21 +79,16 @@ class CountryUpdateEvent extends CountryCreateEvent
     }
 
     /**
-     * @param int $country_id
-     *
      * @return $this
      */
-    public function setCountryId($country_id)
+    public function setCountryId(int $country_id): static
     {
         $this->country_id = $country_id;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getCountryId()
+    public function getCountryId(): int
     {
         return $this->country_id;
     }
@@ -113,7 +106,7 @@ class CountryUpdateEvent extends CountryCreateEvent
      *
      * @return $this
      */
-    public function setNeedZipCode($needZipCode)
+    public function setNeedZipCode($needZipCode): static
     {
         $this->needZipCode = $needZipCode;
 
@@ -133,7 +126,7 @@ class CountryUpdateEvent extends CountryCreateEvent
      *
      * @return $this
      */
-    public function setZipCodeFormat($zipCodeFormat)
+    public function setZipCodeFormat($zipCodeFormat): static
     {
         $this->zipCodeFormat = $zipCodeFormat;
 

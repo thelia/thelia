@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Condition;
 
+use Stringable;
+use ReturnTypeWillChange;
 use ArrayAccess;
 use Countable;
 use Iterator;
@@ -22,7 +25,7 @@ use Thelia\Condition\Implementation\ConditionInterface;
  *
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  */
-class ConditionCollection implements \Iterator, \Countable, \ArrayAccess
+class ConditionCollection implements Iterator, Countable, ArrayAccess, Stringable
 {
     /** @var ConditionInterface[] */
     protected $conditions = [];
@@ -35,12 +38,10 @@ class ConditionCollection implements \Iterator, \Countable, \ArrayAccess
      *
      * @return mixed can return any type
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function current()
     {
-        $var = current($this->conditions);
-
-        return $var;
+        return current($this->conditions);
     }
 
     /**
@@ -62,7 +63,7 @@ class ConditionCollection implements \Iterator, \Countable, \ArrayAccess
      *
      * @see http://php.net/manual/en/iterator.key.php
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function key(): mixed
     {
         return key($this->conditions);
@@ -139,7 +140,7 @@ class ConditionCollection implements \Iterator, \Countable, \ArrayAccess
      *
      * @return mixed can return all value types
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->conditions[$offset] ?? null;
@@ -184,7 +185,7 @@ class ConditionCollection implements \Iterator, \Countable, \ArrayAccess
      *
      * @return string Jsoned data
      */
-    public function __toString()
+    public function __toString(): string
     {
         $arrayToSerialize = [];
         /** @var ConditionInterface $condition */
@@ -192,6 +193,6 @@ class ConditionCollection implements \Iterator, \Countable, \ArrayAccess
             $arrayToSerialize[] = $condition->getSerializableCondition();
         }
 
-        return json_encode($arrayToSerialize);
+        return (string) json_encode($arrayToSerialize);
     }
 }

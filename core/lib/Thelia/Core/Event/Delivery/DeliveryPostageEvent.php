@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Delivery;
 
+use Exception;
+
+use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Address;
@@ -29,21 +33,6 @@ use Thelia\Module\BaseModuleInterface;
  */
 class DeliveryPostageEvent extends ActionEvent
 {
-    /** @var BaseModuleInterface */
-    protected $module;
-
-    /** @var Cart */
-    protected $cart;
-
-    /** @var Address */
-    protected $address;
-
-    /** @var Country */
-    protected $country;
-
-    /** @var State */
-    protected $state;
-
     /** @var bool */
     protected $validModule = false;
 
@@ -51,7 +40,7 @@ class DeliveryPostageEvent extends ActionEvent
     protected $postage;
 
     /**
-     * @var \DateTime|null
+     * @var DateTime|null
      */
     protected $deliveryDate;
 
@@ -65,35 +54,18 @@ class DeliveryPostageEvent extends ActionEvent
 
     /**
      * DeliveryPostageEvent constructor.
+     * @param BaseModuleInterface $module
      */
-    public function __construct(
-        $module,
-        Cart $cart,
-        Address $address = null,
-        Country $country = null,
-        State $state = null
-    ) {
-        $this->module = $module;
-        $this->cart = $cart;
-        $this->address = $address;
-        $this->country = $country;
-        $this->state = $state;
+    public function __construct(protected $module, protected Cart $cart, protected ?Address $address = null, protected ?Country $country = null, protected ?State $state = null)
+    {
     }
 
-    /**
-     * @return Cart
-     */
-    public function getCart()
+    public function getCart(): Cart
     {
         return $this->cart;
     }
 
-    /**
-     * @param Cart $cart
-     *
-     * @return DeliveryPostageEvent
-     */
-    public function setCart($cart)
+    public function setCart(Cart $cart): static
     {
         $this->cart = $cart;
 
@@ -103,17 +75,15 @@ class DeliveryPostageEvent extends ActionEvent
     /**
      * @return Address
      */
-    public function getAddress()
+    public function getAddress(): ?Address
     {
         return $this->address;
     }
 
     /**
      * @param Address $address
-     *
-     * @return DeliveryPostageEvent
      */
-    public function setAddress($address)
+    public function setAddress(?Address $address): static
     {
         $this->address = $address;
 
@@ -121,7 +91,7 @@ class DeliveryPostageEvent extends ActionEvent
     }
 
     /**
-     * @return \DateTime|null
+     * @return DateTime|null
      */
     public function getDeliveryDate()
     {
@@ -129,11 +99,9 @@ class DeliveryPostageEvent extends ActionEvent
     }
 
     /**
-     * @param \DateTime|null $deliveryDate
-     *
-     * @return DeliveryPostageEvent
+     * @param DateTime|null $deliveryDate
      */
-    public function setDeliveryDate($deliveryDate)
+    public function setDeliveryDate($deliveryDate): static
     {
         $this->deliveryDate = $deliveryDate;
 
@@ -150,10 +118,8 @@ class DeliveryPostageEvent extends ActionEvent
 
     /**
      * @param AbstractDeliveryModule $module
-     *
-     * @return DeliveryPostageEvent
      */
-    public function setModule($module)
+    public function setModule($module): static
     {
         $this->module = $module;
 
@@ -170,10 +136,8 @@ class DeliveryPostageEvent extends ActionEvent
 
     /**
      * @param float|OrderPostage|null $postage
-     *
-     * @return DeliveryPostageEvent
      */
-    public function setPostage($postage)
+    public function setPostage($postage): static
     {
         $this->postage = OrderPostage::loadFromPostage($postage);
 
@@ -190,20 +154,15 @@ class DeliveryPostageEvent extends ActionEvent
 
     /**
      * @param bool $validModule
-     *
-     * @return DeliveryPostageEvent
      */
-    public function setValidModule($validModule)
+    public function setValidModule($validModule): static
     {
         $this->validModule = $validModule;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasAdditionalData()
+    public function hasAdditionalData(): bool
     {
         return \count($this->additionalData) > 0;
     }
@@ -218,10 +177,8 @@ class DeliveryPostageEvent extends ActionEvent
 
     /**
      * @param array $additionalData
-     *
-     * @return DeliveryPostageEvent
      */
-    public function setAdditionalData($additionalData)
+    public function setAdditionalData($additionalData): static
     {
         $this->additionalData = $additionalData;
 
@@ -231,10 +188,8 @@ class DeliveryPostageEvent extends ActionEvent
     /**
      * @param string $key   the key of the additional data
      * @param mixed  $value the value of the additional data
-     *
-     * @return DeliveryPostageEvent
      */
-    public function addAdditionalData($key, $value)
+    public function addAdditionalData($key, $value): static
     {
         $this->additionalData[$key] = $value;
 
@@ -242,23 +197,23 @@ class DeliveryPostageEvent extends ActionEvent
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
      * @return Country|null
      */
     public function getCountry()
     {
-        return $this->getAddress() !== null ? $this->getAddress()->getCountry() : $this->country;
+        return $this->getAddress() instanceof Address ? $this->getAddress()->getCountry() : $this->country;
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      *
      * @return State|null
      */
     public function getState()
     {
-        return $this->getAddress() !== null ? $this->getAddress()->getState() : $this->state;
+        return $this->getAddress() instanceof Address ? $this->getAddress()->getState() : $this->state;
     }
 
     public function getDeliveryMode()
@@ -267,14 +222,12 @@ class DeliveryPostageEvent extends ActionEvent
     }
 
     /**
-     * @throws \Exception
-     *
-     * @return DeliveryPostageEvent
+     * @throws Exception
      */
-    public function setDeliveryMode($deliveryMode)
+    public function setDeliveryMode($deliveryMode): static
     {
         if (!\in_array($deliveryMode, ['delivery', 'pickup', 'localPickup'])) {
-            throw new \Exception(Translator::getInstance()->trans('A delivery module can only be of type "delivery", "pickup" or "localPickup".'));
+            throw new Exception(Translator::getInstance()->trans('A delivery module can only be of type "delivery", "pickup" or "localPickup".'));
         }
 
         $this->deliveryMode = $deliveryMode;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Payment;
 
 use Thelia\Core\Event\ActionEvent;
@@ -23,21 +24,17 @@ use Thelia\Module\PaymentModuleInterface;
  */
 class BasePaymentEvent extends ActionEvent
 {
-    /** @var AbstractPaymentModule */
-    protected $module;
-
     /**
      * BasePaymentEvent constructor.
      */
-    public function __construct(PaymentModuleInterface $module)
+    public function __construct(protected PaymentModuleInterface $module)
     {
-        $this->module = $module;
     }
 
     /**
      * @return AbstractPaymentModule
      */
-    public function getModule()
+    public function getModule(): PaymentModuleInterface
     {
         return $this->module;
     }
@@ -45,7 +42,7 @@ class BasePaymentEvent extends ActionEvent
     /**
      * @param AbstractPaymentModule $module
      */
-    public function setModule($module)
+    public function setModule(PaymentModuleInterface $module): static
     {
         $this->module = $module;
 

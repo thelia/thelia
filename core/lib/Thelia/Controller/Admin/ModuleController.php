@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,14 +11,21 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+
+use DirectoryIterator;
+use InvalidArgumentException;
+use LogicException;
 use Michelf\MarkdownExtra;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleEvent;
 use Thelia\Core\Event\Module\ModuleInstallEvent;
@@ -30,6 +39,7 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\InvalidModuleException;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\ModuleInstallForm;
@@ -48,7 +58,9 @@ class ModuleController extends AbstractCrudController
 {
     protected $moduleErrors = [];
 
-    public function __construct()
+    public function __construct(
+        protected ModuleManagement $moduleManagement,
+    )
     {
         parent::__construct(
             'module',
@@ -63,22 +75,22 @@ class ModuleController extends AbstractCrudController
         );
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): null
     {
         return null;
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::MODULE_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ?ActionEvent
     {
         return null;
     }
 
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $event = new ModuleEvent();
 
@@ -92,26 +104,26 @@ class ModuleController extends AbstractCrudController
         return $event;
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): null
     {
         return null;
     }
 
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('module_id', null),
+            $this->getRequest()->get('module_id'),
             $positionChangeMode,
             $positionValue
         );
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasModule();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $object->setLocale($this->getCurrentEditionLocale());
         $data = [
@@ -127,12 +139,12 @@ class ModuleController extends AbstractCrudController
         return $this->createForm(AdminForm::MODULE_MODIFICATION, FormType::class, $data);
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasModule() ? $event->getModule() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $module = ModuleQuery::create()
             ->findOneById($this->getRequest()->get('module_id', 0));
@@ -149,37 +161,34 @@ class ModuleController extends AbstractCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
     /**
      * @param Module $object
-     *
-     * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
 
-    protected function getViewArguments()
+    protected function getViewArguments(): array
     {
         return [];
     }
 
-    protected function getRouteArguments($module_id = null)
+    protected function getRouteArguments($module_id = null): array
     {
         $request = $this->getRequest();
 
         return [
-            'module_id' => $module_id === null ? $request->get('module_id') : $module_id,
+            'module_id' => $module_id ?? $request->get('module_id'),
             'current_tab' => $request->get('current_tab', 'general'),
         ];
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         // We always return to the feature edition form
         return $this->render(
@@ -191,13 +200,13 @@ class ModuleController extends AbstractCrudController
         );
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         // We always return to the feature edition form
         return $this->render('module-edit', array_merge($this->getViewArguments(), $this->getRouteArguments()));
     }
 
-    protected function redirectToEditionTemplate($request = null, $country = null)
+    protected function redirectToEditionTemplate($request = null, $country = null): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.module.update',
@@ -206,20 +215,19 @@ class ModuleController extends AbstractCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.module');
     }
 
-    public function indexAction()
+    public function indexAction(): Response
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
         try {
-            $moduleManagement = new ModuleManagement($this->getContainer());
-            $moduleManagement->updateModules($this->getContainer());
+            $this->moduleManagement->updateModules($this->getContainer());
         } catch (InvalidModuleException $ex) {
             $this->moduleErrors = $ex->getErrors();
         } catch (Exception $ex) {
@@ -234,10 +242,10 @@ class ModuleController extends AbstractCrudController
         $module = ModuleQuery::create()->findOneByCode($module_code);
 
         if (null === $module) {
-            throw new \InvalidArgumentException(sprintf('Module `%s` does not exists', $module_code));
+            throw new InvalidArgumentException(sprintf('Module `%s` does not exists', $module_code));
         }
 
-        if (null !== $response = $this->checkAuth([], $module_code, AccessManager::VIEW)) {
+        if (($response = $this->checkAuth([], $module_code, AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -249,35 +257,32 @@ class ModuleController extends AbstractCrudController
         );
     }
 
-    public function toggleActivationAction(EventDispatcherInterface $eventDispatcher, $module_id)
+    public function toggleActivationAction(EventDispatcherInterface $eventDispatcher, $module_id): Response
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
+
         $message = null;
         try {
             $event = new ModuleToggleActivationEvent($module_id);
             $eventDispatcher->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
 
-            if (null === $event->getModule()) {
-                throw new \LogicException(
+            if (!$event->getModule() instanceof Module) {
+                throw new LogicException(
                     $this->getTranslator()->trans('No %obj was updated.', ['%obj' => 'Module'])
                 );
             }
-        } catch (\Exception $e) {
-            $message = $e->getMessage();
+        } catch (\Exception $exception) {
+            $message = $exception->getMessage();
 
-            Tlog::getInstance()->addError('Failed to activate/deactivate module:', $e);
+            Tlog::getInstance()->addError('Failed to activate/deactivate module:', $exception);
         }
 
         if ($this->getRequest()->isXmlHttpRequest()) {
-            if ($message) {
-                $response = $this->jsonResponse(json_encode([
-                    'error' => $message,
-                ]), 500);
-            } else {
-                $response = $this->nullResponse();
-            }
+            $response = $message ? $this->jsonResponse(json_encode([
+                'error' => $message,
+            ]), 500) : $this->nullResponse();
         } else {
             $response = $this->generateRedirectFromRoute('admin.module');
         }
@@ -290,8 +295,8 @@ class ModuleController extends AbstractCrudController
         TokenProvider $tokenProvider,
         EventDispatcherInterface $eventDispatcher,
         ParserContext $parserContext
-    ) {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::DELETE)) {
+    ): Response {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::DELETE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -311,14 +316,14 @@ class ModuleController extends AbstractCrudController
             $eventDispatcher->dispatch($deleteEvent, TheliaEvents::MODULE_DELETE);
 
             if ($deleteEvent->hasModule() === false) {
-                throw new \LogicException(
+                throw new LogicException(
                     Translator::getInstance()->trans('No %obj was updated.', ['%obj' => 'Module'])
                 );
             }
-        } catch (\Exception $e) {
-            $message = $e->getMessage();
+        } catch (\Exception $exception) {
+            $message = $exception->getMessage();
 
-            Tlog::getInstance()->addError('Error during module removal', $e);
+            Tlog::getInstance()->addError('Error during module removal', $exception);
         }
 
         if (false !== $message) {
@@ -332,9 +337,9 @@ class ModuleController extends AbstractCrudController
         return $response;
     }
 
-    public function installAction(EventDispatcherInterface $eventDispatcher)
+    public function installAction(EventDispatcherInterface $eventDispatcher): \Symfony\Component\HttpFoundation\Response|RedirectResponse
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::CREATE)) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::CREATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -359,20 +364,15 @@ class ModuleController extends AbstractCrudController
 
             $newModule = $moduleInstallEvent->getModule();
 
-            if (null !== $newModule) {
-                $this->getSession()->getFlashBag()->add(
-                    'module-installed',
-                    $this->getTranslator()->trans(
-                        'The module %module has been installed successfully.',
-                        ['%module' => $moduleDefinition->getCode()]
-                    )
-                );
-
-                return $this->generateRedirectFromRoute('admin.module');
-            }
-            $message = $this->getTranslator()->trans(
-                'Sorry, an error occured.'
+            $this->getSession()->getFlashBag()->add(
+                'module-installed',
+                $this->getTranslator()->trans(
+                    'The module %module has been installed successfully.',
+                    ['%module' => $moduleDefinition->getCode()]
+                )
             );
+
+            return $this->generateRedirectFromRoute('admin.module');
         } catch (FormValidationException $e) {
             $message = $e->getMessage();
         } catch (\Exception $e) {
@@ -390,9 +390,9 @@ class ModuleController extends AbstractCrudController
         return $this->render('modules');
     }
 
-    public function informationAction($module_id)
+    public function informationAction($module_id): \Symfony\Component\HttpFoundation\Response|JsonResponse
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -404,9 +404,9 @@ class ModuleController extends AbstractCrudController
             // Get the module descriptor
             $moduleDescriptor = $module->getAbsoluteConfigPath().DS.'module.xml';
 
-            if (false !== $xmlData = @simplexml_load_file($moduleDescriptor)) {
+            if (false !== $xmlData = @simplexml_load_string(file_get_contents($moduleDescriptor))) {
                 // Transform the pseudo-array into a real array
-                $arrayData = json_decode(json_encode((array) $xmlData), 1);
+                $arrayData = json_decode(json_encode((array)$xmlData, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
 
                 $content = $this->renderRaw('ajax/module-information', [
                     'moduleId' => $module_id,
@@ -430,9 +430,9 @@ class ModuleController extends AbstractCrudController
         return new JsonResponse(['title' => $title, 'body' => $content], $status);
     }
 
-    public function documentationAction($module_id)
+    public function documentationAction($module_id): \Symfony\Component\HttpFoundation\Response|JsonResponse
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -448,29 +448,30 @@ class ModuleController extends AbstractCrudController
             // Check if the module has declared a documentation
             $moduleDescriptor = $module->getAbsoluteConfigPath().DS.'module.xml';
 
-            if (false !== $xmlData = @simplexml_load_file($moduleDescriptor)) {
+            if (false !== $xmlData = @simplexml_load_string(file_get_contents($moduleDescriptor))) {
                 $documentationDirectory = (string) $xmlData->documentation;
 
-                if (!empty($documentationDirectory)) {
+                if ($documentationDirectory !== '' && $documentationDirectory !== '0') {
                     $finder = Finder::create()->files()->in($module->getAbsoluteBaseDir())->name('/.+\.md$/i');
                 }
             }
 
             // Fallback to readme.md (if any)
-            if ($finder == null || $finder->count() == 0) {
+            if (!$finder instanceof Finder || $finder->count() === 0) {
                 $finder = Finder::create()->files()->in($module->getAbsoluteBaseDir())->name('/readme\.md/i');
             }
 
             // Merge all MD files
-            if ($finder && $finder->count() > 0) {
+            if ($finder->count() > 0) {
                 $finder->sortByName();
 
-                /** @var \DirectoryIterator $file */
+                /** @var DirectoryIterator $file */
                 foreach ($finder as $file) {
                     if (false !== $mdDocumentation = @file_get_contents($file->getPathname())) {
-                        if ($content == null) {
+                        if ($content === null) {
                             $content = '';
                         }
+
                         $content .= MarkdownExtra::defaultTransform($mdDocumentation);
                     }
                 }

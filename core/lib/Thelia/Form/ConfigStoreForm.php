@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,13 +11,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Form;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
@@ -32,7 +36,7 @@ class ConfigStoreForm extends BaseForm
                 TextType::class,
                 [
                     'data' => ConfigQuery::getStoreName(),
-                    'constraints' => [new Constraints\NotBlank()],
+                    'constraints' => [new NotBlank()],
                     'label' => $tr->trans('Store name'),
                     'attr' => [
                         'placeholder' => $tr->trans('Used in your store front'),
@@ -57,8 +61,8 @@ class ConfigStoreForm extends BaseForm
                 [
                     'data' => ConfigQuery::getStoreEmail(),
                     'constraints' => [
-                        new Constraints\NotBlank(),
-                        new Constraints\Email(),
+                        new NotBlank(),
+                        new Email(),
                     ],
                     'label' => $tr->trans('Store email address'),
                     'attr' => [
@@ -75,9 +79,9 @@ class ConfigStoreForm extends BaseForm
                 [
                     'data' => ConfigQuery::read('store_notification_emails'),
                     'constraints' => [
-                        new Constraints\NotBlank(),
-                        new Constraints\Callback(
-                            [$this, 'checkEmailList']
+                        new NotBlank(),
+                        new Callback(
+                            $this->checkEmailList(...)
                         ),
                     ],
                     'label' => $tr->trans('Email addresses of notification recipients'),
@@ -131,7 +135,7 @@ class ConfigStoreForm extends BaseForm
                 [
                     'data' => ConfigQuery::read('store_address1'),
                     'constraints' => [
-                        new Constraints\NotBlank(),
+                        new NotBlank(),
                     ],
                     'label' => $tr->trans('Street Address'),
                     'attr' => [
@@ -167,7 +171,7 @@ class ConfigStoreForm extends BaseForm
                 [
                     'data' => ConfigQuery::read('store_zipcode'),
                     'constraints' => [
-                        new Constraints\NotBlank(),
+                        new NotBlank(),
                     ],
                     'label' => $tr->trans('Zip code'),
                     'attr' => [
@@ -181,7 +185,7 @@ class ConfigStoreForm extends BaseForm
                 [
                     'data' => ConfigQuery::read('store_city'),
                     'constraints' => [
-                        new Constraints\NotBlank(),
+                        new NotBlank(),
                     ],
                     'label' => $tr->trans('City'),
                     'attr' => [
@@ -195,7 +199,7 @@ class ConfigStoreForm extends BaseForm
                 [
                     'data' => ConfigQuery::read('store_country'),
                     'constraints' => [
-                        new Constraints\NotBlank(),
+                        new NotBlank(),
                     ],
                     'label' => $tr->trans('Country'),
                     'attr' => [
@@ -209,7 +213,7 @@ class ConfigStoreForm extends BaseForm
                 [
                     'required' => false,
                     'constraints' => [
-                        new Constraints\Image([
+                        new Image([
                             'mimeTypes' => ['image/png', 'image/x-icon'],
                         ]),
                     ],
@@ -226,7 +230,7 @@ class ConfigStoreForm extends BaseForm
                 [
                     'required' => false,
                     'constraints' => [
-                        new Constraints\Image(),
+                        new Image(),
                     ],
                     'label' => $tr->trans('Store logo'),
                     'label_attr' => [
@@ -240,7 +244,7 @@ class ConfigStoreForm extends BaseForm
                 [
                     'required' => false,
                     'constraints' => [
-                        new Constraints\Image(),
+                        new Image(),
                     ],
                     'label' => $tr->trans('Banner'),
                     'label_attr' => [
@@ -253,9 +257,9 @@ class ConfigStoreForm extends BaseForm
 
     public function checkEmailList($value, ExecutionContextInterface $context): void
     {
-        $list = preg_split('/[,;]/', $value);
+        $list = preg_split('/[,;]/', (string) $value);
 
-        $emailValidator = new Constraints\Email();
+        $emailValidator = new Email();
 
         foreach ($list as $email) {
             $email = trim($email);
@@ -264,7 +268,7 @@ class ConfigStoreForm extends BaseForm
         }
     }
 
-    public static function getName()
+    public static function getName(): string
     {
         return 'thelia_configuration_store';
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,11 +11,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+
+use Exception;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Sale\SaleActiveStatusCheckEvent;
 use Thelia\Core\Event\Sale\SaleClearStatusEvent;
 use Thelia\Core\Event\Sale\SaleCreateEvent;
@@ -22,10 +28,11 @@ use Thelia\Core\Event\Sale\SaleEvent;
 use Thelia\Core\Event\Sale\SaleToggleActivityEvent;
 use Thelia\Core\Event\Sale\SaleUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Sale\SaleModificationForm;
 use Thelia\Model\Sale;
@@ -55,7 +62,7 @@ class SaleController extends AbstractCrudController
     /**
      * Return the creation form for this object.
      */
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::SALE_CREATION);
     }
@@ -63,7 +70,7 @@ class SaleController extends AbstractCrudController
     /**
      * Return the update form for this object.
      */
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::SALE_MODIFICATION);
     }
@@ -75,12 +82,12 @@ class SaleController extends AbstractCrudController
      *
      * @return SaleModificationForm
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $sale)
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         // Find all categories of the selected products
-        $saleProducts = $sale->getSaleProductList();
-
-        $categories = $products = [];
+        $saleProducts = $object->getSaleProductList();
+        $categories = [];
+        $products = [];
 
         /** @var SaleProduct $saleProduct */
         foreach ($saleProducts as $saleProduct) {
@@ -126,12 +133,8 @@ class SaleController extends AbstractCrudController
 
     /**
      * Creates the creation event with the provided form data.
-     *
-     * @param array $formData
-     *
-     * @return SaleCreateEvent
      */
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $saleCreateEvent = new SaleCreateEvent();
 
@@ -146,19 +149,15 @@ class SaleController extends AbstractCrudController
 
     /**
      * Creates the update event with the provided form data.
-     *
-     * @param array $formData
-     *
-     * @return SaleUpdateEvent
      */
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         // Build the product attributes array
         $productAttributes = [];
 
         foreach ($formData['product_attributes'] as $productId => $attributeAvIdList) {
             if (!empty($attributeAvIdList)) {
-                $productAttributes[$productId] = explode(',', $attributeAvIdList);
+                $productAttributes[$productId] = explode(',', (string) $attributeAvIdList);
             }
         }
 
@@ -186,10 +185,8 @@ class SaleController extends AbstractCrudController
 
     /**
      * Creates the delete event with the provided form data.
-     *
-     * @return SaleDeleteEvent
      */
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): SaleDeleteEvent
     {
         return new SaleDeleteEvent($this->getRequest()->get('sale_id'));
     }
@@ -198,10 +195,8 @@ class SaleController extends AbstractCrudController
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
      * @param SaleEvent $event
-     *
-     * @return bool
      */
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasSale();
     }
@@ -211,9 +206,9 @@ class SaleController extends AbstractCrudController
      *
      * @param $event \Thelia\Core\Event\Sale\SaleEvent
      *
-     * @return \Thelia\Model\Sale|null
+     * @return Sale|null
      */
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->getSale();
     }
@@ -221,9 +216,9 @@ class SaleController extends AbstractCrudController
     /**
      * Load an existing object from the database.
      *
-     * @return \Thelia\Model\Sale
+     * @return Sale
      */
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $sale = SaleQuery::create()
             ->findOneById($this->getRequest()->get('sale_id', 0));
@@ -242,8 +237,7 @@ class SaleController extends AbstractCrudController
      *
      * @return string sale title
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
@@ -254,17 +248,15 @@ class SaleController extends AbstractCrudController
      *
      * @return int sale id
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
 
     /**
      * Render the main list template.
-     *
-     * @return Response
      */
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         $this->getListOrderFromSession('sale', 'order', 'start-date');
 
@@ -273,7 +265,7 @@ class SaleController extends AbstractCrudController
             ]);
     }
 
-    protected function getEditionArguments()
+    protected function getEditionArguments(): array
     {
         return [
             'sale_id' => $this->getRequest()->get('sale_id', 0),
@@ -283,7 +275,7 @@ class SaleController extends AbstractCrudController
     /**
      * Render the edition template.
      */
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('sale-edit', $this->getEditionArguments());
     }
@@ -291,7 +283,7 @@ class SaleController extends AbstractCrudController
     /**
      * Redirect to the edition template.
      */
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.sale.update', [], $this->getEditionArguments());
     }
@@ -299,7 +291,7 @@ class SaleController extends AbstractCrudController
     /**
      * Redirect to the list template.
      */
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.sale.default');
     }
@@ -309,9 +301,9 @@ class SaleController extends AbstractCrudController
      *
      * @return Response
      */
-    public function toggleActivity(EventDispatcherInterface $eventDispatcher)
+    public function toggleActivity(EventDispatcherInterface $eventDispatcher): Response
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -322,9 +314,9 @@ class SaleController extends AbstractCrudController
                 ),
                 TheliaEvents::SALE_TOGGLE_ACTIVITY
             );
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             // Any error
-            return $this->errorPage($ex);
+            return $this->errorPage($exception);
         }
 
         return $this->nullResponse();
@@ -332,7 +324,7 @@ class SaleController extends AbstractCrudController
 
     public function updateProductList()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -355,11 +347,11 @@ class SaleController extends AbstractCrudController
 
     public function updateProductAttributes()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
-        $selectedAttributesAvId = explode(',', $this->getRequest()->get('selected_attributes_av_id', []));
+        $selectedAttributesAvId = explode(',', (string) $this->getRequest()->get('selected_attributes_av_id', []));
 
         $productId = $this->getRequest()->get('product_id');
 
@@ -372,10 +364,10 @@ class SaleController extends AbstractCrudController
         );
     }
 
-    public function resetSaleStatus(EventDispatcherInterface $eventDispatcher)
+    public function resetSaleStatus(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -384,15 +376,15 @@ class SaleController extends AbstractCrudController
                 new SaleClearStatusEvent(),
                 TheliaEvents::SALE_CLEAR_SALE_STATUS
             );
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             // Any error
-            return $this->errorPage($ex);
+            return $this->errorPage($exception);
         }
 
         return $this->redirectToListTemplate();
     }
 
-    public function checkSalesActivationStatus(EventDispatcherInterface $eventDispatcher)
+    public function checkSalesActivationStatus(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         // We do not check auth, as the related route may be invoked from a cron
         try {
@@ -400,9 +392,9 @@ class SaleController extends AbstractCrudController
                 new SaleActiveStatusCheckEvent(),
                 TheliaEvents::CHECK_SALE_ACTIVATION_EVENT
             );
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             // Any error
-            return $this->errorPage($ex);
+            return $this->errorPage($exception);
         }
 
         return $this->redirectToListTemplate();

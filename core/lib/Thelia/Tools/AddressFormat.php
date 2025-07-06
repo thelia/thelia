@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Tools;
 
 use CommerceGuys\Addressing\Address;
@@ -31,16 +32,13 @@ use Thelia\Model\OrderAddress;
  */
 class AddressFormat
 {
-    private static $instance;
+    private static ?\Thelia\Tools\AddressFormat $instance = null;
 
     private function __construct()
     {
     }
 
-    /**
-     * @return $this
-     */
-    public static function getInstance()
+    public static function getInstance(): \Thelia\Tools\AddressFormat
     {
         if (!isset(self::$instance)) {
             self::$instance = new self();
@@ -52,11 +50,9 @@ class AddressFormat
     /**
      * Format an address.
      *
-     * @param null   $locale
      * @param bool   $html
      * @param string $htmlTag
      * @param array  $htmlAttributes
-     *
      * @return string
      */
     public function format(
@@ -85,12 +81,10 @@ class AddressFormat
     /**
      * Format a Thelia address (Address or OrderAddress).
      *
-     * @param \Thelia\Model\OrderAddress|OrderAddress $address
-     * @param null                                    $locale
+     * @param OrderAddress|OrderAddress $address
      * @param bool                                    $html
      * @param string                                  $htmlTag
      * @param array                                   $htmlAttributes
-     *
      * @return string
      */
     public function formatTheliaAddress($address, $locale = null, $html = true, $htmlTag = 'p', $htmlAttributes = [])
@@ -103,8 +97,6 @@ class AddressFormat
     /**
      * Format an address to a postal label.
      *
-     * @param null  $locale
-     * @param null  $originCountry
      * @param array $options
      *
      * @return string
@@ -141,9 +133,7 @@ class AddressFormat
     /**
      * Format a Thelia address (Address or OrderAddress) to a postal label.
      *
-     * @param \Thelia\Model\OrderAddress|OrderAddress $address
-     * @param null                                    $locale
-     * @param null                                    $originCountry
+     * @param OrderAddress|OrderAddress $address
      * @param array                                   $options
      *
      * @return string
@@ -158,7 +148,7 @@ class AddressFormat
     /**
      * Convert a Thelia address (Address or OrderAddress) to ImmutableAddressInterface.
      *
-     * @param \Thelia\Model\OrderAddress|OrderAddress $address
+     * @param OrderAddress|OrderAddress $address
      */
     protected function mapTheliaAddress($address, $locale = null)
     {
@@ -192,19 +182,10 @@ class AddressFormat
         return $addressModel;
     }
 
-    private function normalizeLocale($locale)
+    private function normalizeLocale($locale): string|array|null
     {
         if (null !== $locale) {
             $locale = str_replace('_', '-', $locale);
-        }
-
-        return $locale;
-    }
-
-    private function denormalizeLocale($locale)
-    {
-        if (null !== $locale) {
-            $locale = str_replace('-', '_', $locale);
         }
 
         return $locale;

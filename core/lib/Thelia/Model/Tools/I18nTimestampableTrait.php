@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model\Tools;
 
+
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 
 /**
@@ -32,16 +35,16 @@ trait I18nTimestampableTrait
     }
 
     /**
-     * @return \Propel\Runtime\ActiveQuery\ModelCriteria
+     * @return ModelCriteria
      */
     protected function getBaseQueryObject()
     {
-        $parentClass = preg_replace("#^([\w\_\\\\]+)I18n$#", '$1Query', __CLASS__);
+        $parentClass = preg_replace("#^([\w\_\\\\]+)I18n$#", '$1Query', self::class);
 
         return new $parentClass();
     }
 
-    protected function getUpdatedAtColumnName()
+    protected function getUpdatedAtColumnName(): string
     {
         return 'UpdatedAt';
     }

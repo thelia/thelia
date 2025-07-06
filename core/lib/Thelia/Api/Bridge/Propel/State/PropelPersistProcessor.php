@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Bridge\Propel\State;
 
+use Exception;
+use ReflectionClass;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
@@ -44,10 +47,12 @@ readonly class PropelPersistProcessor implements ProcessorInterface
         if (isset($uriVariables['id'])) {
             $data->setId($uriVariables['id']);
         }
+
         $propelModel = $this->apiResourcePropelTransformerService->resourceToModel(data: $data, operation: $operation, context: $context);
         if (isset($uriVariables['id'])) {
             $propelModel->setId($uriVariables['id']);
         }
+
         $connection = Propel::getWriteConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME);
         $connection->beginTransaction();
 
@@ -60,16 +65,18 @@ readonly class PropelPersistProcessor implements ProcessorInterface
             if ($implementsItemFileResource) {
                 $propelModel->setNew(false);
             }
+
             $propelModel->save();
             if (!$implementsItemFileResource) {
                 $resourceAddons = $this->manageResourceAddons($propelModel, $data);
             }
+
             $connection->commit();
 
             $propelModel->reload();
 
             $data->setId($propelModel->getId());
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $connection->rollBack();
             throw $exception;
         }
@@ -91,13 +98,14 @@ readonly class PropelPersistProcessor implements ProcessorInterface
         return $data;
     }
 
-    private function beforeSave(mixed $data, Operation $operation, &$propelModel): void
+    private function beforeSave(mixed $data, Operation $operation, ActiveRecordInterface &$propelModel): void
     {
         if (!\in_array($operation::class, [Patch::class, Put::class])) {
             $propelModel->setNew(true);
 
             return;
         }
+
         $propelModel->setNew(false);
         if (is_subclass_of($data, TranslatableResourceInterface::class) && $operation instanceof Put && method_exists($data, 'getI18ns')) {
             $i18nResourceClass = $data::getI18nResourceClass();
@@ -112,12 +120,13 @@ readonly class PropelPersistProcessor implements ProcessorInterface
                 }
             }
         }
-        $reflector = new \ReflectionClass($data);
+
+        $reflector = new ReflectionClass($data);
         foreach ($reflector->getProperties() as $property) {
             $propelGetter = 'get'.ucfirst($property->getName());
             foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
                 if (isset($relationAttribute->getArguments()['targetResource'])) {
-                    $reflectorChild = new \ReflectionClass($relationAttribute->getArguments()['targetResource']);
+                    $reflectorChild = new ReflectionClass($relationAttribute->getArguments()['targetResource']);
                     $compositeIdentifiers = $this->apiResourcePropelTransformerService->getResourceCompositeIdentifierValues(reflector: $reflectorChild, param: 'keys');
 
                     if ($compositeIdentifiers === [] || !$propelModel->$propelGetter() instanceof Collection) {
@@ -132,14 +141,16 @@ readonly class PropelPersistProcessor implements ProcessorInterface
                         $query = $queryClass::create();
 
                         foreach ($compositeIdentifiers as $compositeIdentifier) {
-                            $filter = 'filterBy'.ucfirst($compositeIdentifier).'Id';
-                            $getter = 'get'.ucfirst($compositeIdentifier).'Id';
+                            $filter = 'filterBy'.ucfirst((string) $compositeIdentifier).'Id';
+                            $getter = 'get'.ucfirst((string) $compositeIdentifier).'Id';
                             if (!method_exists($item, $getter) || !method_exists($query, $filter)) {
                                 return;
                             }
+
                             $id = $item->$getter();
                             $query->$filter($id);
                         }
+
                         if ($query->findOne() !== null) {
                             $item->setNew(false);
                         }
@@ -154,7 +165,7 @@ readonly class PropelPersistProcessor implements ProcessorInterface
         PropelResourceInterface $data
     ): array {
         $resourceAddons = [];
-        $jsonData = json_decode($this->requestStack->getCurrentRequest()?->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $jsonData = json_decode((string) $this->requestStack->getCurrentRequest()?->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         $resourceAddonDefinitions = $this->apiResourcePropelTransformerService->getResourceAddonDefinitions($data::class);
         foreach ($resourceAddonDefinitions as $addonShortName => $addonClass) {
             if (!isset($jsonData[$addonShortName])) {

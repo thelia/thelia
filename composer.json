@@ -26,7 +26,9 @@
         "thelia/email-default-template": "dev-twig",
         "thelia/pdf-default-template": "dev-twig",
         "symfony/flex": "^2.4",
-        "thelia/flexy": "dev-twig"
+        "thelia/flexy": "dev-twig",
+        "ext-simplexml": "*",
+        "ext-dom": "*"
     },
     "scripts": {
         "cs-diff": [
@@ -140,5 +142,8 @@
             "symfony/runtime": true,
             "composer/installers": true
         }
+    },
+    "require-dev": {
+        "rector/rector": "^2.0"
     }
 }

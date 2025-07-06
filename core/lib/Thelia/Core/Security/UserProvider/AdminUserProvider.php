@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Security\UserProvider;
 
 use Lexik\Bundle\JWTAuthenticationBundle\Security\User\PayloadAwareUserProviderInterface;
@@ -22,7 +23,7 @@ use Thelia\Model\AdminQuery;
 
 class AdminUserProvider implements PayloadAwareUserProviderInterface
 {
-    private $cache = [];
+    private array $cache = [];
 
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
@@ -32,7 +33,7 @@ class AdminUserProvider implements PayloadAwareUserProviderInterface
             ->findOne();
 
         // Try with email address
-        if (null == $admin && !empty($identifier)) {
+        if (null == $admin && ($identifier !== '' && $identifier !== '0')) {
             $admin = AdminQuery::create()
                 ->filterByEmail($identifier, Criteria::EQUAL)
                 ->findOne();
@@ -48,7 +49,7 @@ class AdminUserProvider implements PayloadAwareUserProviderInterface
         return $admin;
     }
 
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         if (!$user instanceof Admin) {
             throw new UnsupportedUserException(sprintf('Invalid user class "%s".', $user::class));
@@ -65,7 +66,7 @@ class AdminUserProvider implements PayloadAwareUserProviderInterface
         return $user;
     }
 
-    public function supportsClass(string $class)
+    public function supportsClass(string $class): bool
     {
         return Admin::class === $class || is_subclass_of($class, Admin::class);
     }
@@ -81,10 +82,6 @@ class AdminUserProvider implements PayloadAwareUserProviderInterface
             throw new UnsupportedUserException(sprintf('User "%s" is not supported on this route.', $userIdentifier));
         }
 
-        if (isset($this->cache[$userIdentifier])) {
-            return $this->cache[$userIdentifier];
-        }
-
-        return $this->cache[$userIdentifier] = $this->loadUserByIdentifier($userIdentifier);
+        return $this->cache[$userIdentifier] ?? $this->cache[$userIdentifier] = $this->loadUserByIdentifier($userIdentifier);
     }
 }

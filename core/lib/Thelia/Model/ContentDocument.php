@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -102,11 +103,7 @@ class ContentDocument extends BaseContentDocument implements BreadcrumbInterface
     public function getUploadDir()
     {
         $uploadDir = ConfigQuery::read('documents_library_path');
-        if ($uploadDir === null) {
-            $uploadDir = THELIA_LOCAL_DIR.'media'.DS.'documents';
-        } else {
-            $uploadDir = THELIA_ROOT.$uploadDir;
-        }
+        $uploadDir = $uploadDir === null ? THELIA_LOCAL_DIR.'media'.DS.'documents' : THELIA_ROOT.$uploadDir;
 
         return $uploadDir.DS.'content';
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Model\Module;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Element\LoopResult;
@@ -26,18 +28,16 @@ use Thelia\Module\BaseModule;
  */
 class Payment extends BaseSpecificModule implements PropelSearchLoopInterface
 {
-    public function getArgDefinitions()
+    protected function getArgDefinitions()
     {
-        $collection = parent::getArgDefinitions();
-
-        return $collection;
+        return parent::getArgDefinitions();
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         $cart = $this->getCurrentRequest()->getSession()->getSessionCart($this->dispatcher);
 
-        /** @var \Thelia\Model\Module $paymentModule */
+        /** @var Module $paymentModule */
         foreach ($loopResult->getResultDataCollection() as $paymentModule) {
             $loopResultRow = new LoopResultRow($paymentModule);
 
@@ -69,7 +69,7 @@ class Payment extends BaseSpecificModule implements PropelSearchLoopInterface
         return $loopResult;
     }
 
-    protected function getModuleType()
+    protected function getModuleType(): int
     {
         return BaseModule::PAYMENT_MODULE_TYPE;
     }

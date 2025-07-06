@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Delivery;
 
+use Exception;
+use Propel\Runtime\Exception\PropelException;
 use Thelia\Api\Resource\DeliveryPickupLocation;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Address;
@@ -25,45 +28,33 @@ use Thelia\Model\State;
  */
 class PickupLocationEvent extends ActionEvent
 {
-    protected ?string $address;
-    protected ?string $city;
-    protected ?string $zipCode;
-    protected ?State $state;
-    protected ?Country $country;
     protected ?int $radius;
+
     protected ?int $maxRelays;
-    protected ?int $orderWeight;
-    protected ?array $moduleIds;
+
     protected array $locations = [];
 
     /**
      * PickupLocationEvent constructor.
      *
-     * @throws \Propel\Runtime\Exception\PropelException
-     * @throws \Exception
+     * @throws PropelException
+     * @throws Exception
      */
     public function __construct(
         Address $addressModel = null,
         int $radius = null,
         int $maxRelays = null,
-        string $address = null,
-        string $city = null,
-        string $zipCode = null,
-        int $orderWeight = null,
-        State $state = null,
-        Country $country = null,
-        array $moduleIds = null
+        protected ?string $address = null,
+        protected ?string $city = null,
+        protected ?string $zipCode = null,
+        protected ?int $orderWeight = null,
+        protected ?State $state = null,
+        protected ?Country $country = null,
+        protected ?array $moduleIds = null
     ) {
         $this->radius = $radius ?? 20000;
         $this->maxRelays = $maxRelays ?? 15;
-        $this->orderWeight = $orderWeight;
-        $this->address = $address;
-        $this->city = $city;
-        $this->zipCode = $zipCode;
-        $this->state = $state;
-        $this->country = $country;
-        $this->moduleIds = $moduleIds;
-        if (null !== $addressModel) {
+        if ($addressModel instanceof Address) {
             $this->address = $addressModel->getAddress1();
             $this->city = $addressModel->getCity();
             $this->zipCode = $addressModel->getZipcode();
@@ -72,7 +63,7 @@ class PickupLocationEvent extends ActionEvent
         }
 
         if ($this->address === null && $this->city === null && $this->zipCode === null) {
-            throw new \Exception('Not enough informations to retrieve pickup locations');
+            throw new Exception('Not enough informations to retrieve pickup locations');
         }
     }
 

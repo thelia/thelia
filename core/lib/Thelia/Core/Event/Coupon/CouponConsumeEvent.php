@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Coupon;
 
 use Thelia\Core\Event\ActionEvent;
@@ -21,39 +22,28 @@ use Thelia\Core\Event\ActionEvent;
  */
 class CouponConsumeEvent extends ActionEvent
 {
-    /** @var string Coupon code */
-    protected $code;
-
-    /** @var float Total discount given by this coupon */
-    protected $discount = 0;
-
-    /** @var bool If Coupon is valid or if Customer meets coupon conditions */
-    protected $isValid;
-
-    /** @var bool true if coupon offers free shipping */
-    protected $freeShipping = false;
-
     /**
      * Constructor.
      *
      * @param string $code         Coupon code
      * @param float  $discount     Total discount given by this coupon
      * @param bool   $freeShipping true if coupon offers free shipping
+     * @param bool $isValid
      */
-    public function __construct($code, $discount = null, $isValid = null, $freeShipping = false)
+    public function __construct(
+        protected $code,
+        protected $discount = null,
+        /** @var bool If Coupon is valid or if Customer meets coupon conditions */
+        protected $isValid = null,
+        protected $freeShipping = false
+    )
     {
-        $this->code = $code;
-        $this->discount = $discount;
-        $this->discount = $discount;
-        $this->isValid = $isValid;
-
-        $this->freeShipping = $freeShipping;
     }
 
     /**
      * @param bool $freeShipping
      */
-    public function setFreeShipping($freeShipping)
+    public function setFreeShipping($freeShipping): static
     {
         $this->freeShipping = $freeShipping;
 
@@ -75,7 +65,7 @@ class CouponConsumeEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setCode($code)
+    public function setCode($code): static
     {
         $this->code = $code;
 
@@ -99,7 +89,7 @@ class CouponConsumeEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setDiscount($discount)
+    public function setDiscount($discount): static
     {
         $this->discount = $discount;
 
@@ -124,7 +114,7 @@ class CouponConsumeEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setIsValid($isValid)
+    public function setIsValid($isValid): static
     {
         $this->isValid = $isValid;
 

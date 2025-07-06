@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,20 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event;
 
 class ViewCheckEvent extends ActionEvent
 {
-    protected $view;
-
-    protected $view_id;
-
-    public function __construct($view, $view_id)
+    public function __construct(protected $view, protected $view_id)
     {
-        $this->view = $view;
-
-        $this->view_id = $view_id;
     }
 
     public function getView()
@@ -33,7 +27,7 @@ class ViewCheckEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setView($view)
+    public function setView($view): static
     {
         $this->view = $view;
 
@@ -48,7 +42,7 @@ class ViewCheckEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setViewId($view_id)
+    public function setViewId($view_id): static
     {
         $this->view_id = $view_id;
 

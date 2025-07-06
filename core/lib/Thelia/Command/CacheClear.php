@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+use UnexpectedValueException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -27,13 +30,12 @@ use Thelia\Model\ConfigQuery;
  *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
+#[AsCommand(name: 'cache:clear', description: 'Invalidate all caches')]
 class CacheClear extends ContainerAwareCommand
 {
     protected function configure(): void
     {
         $this
-            ->setName('cache:clear')
-            ->setDescription('Invalidate all caches')
             ->addOption(
                 'without-assets',
                 null,
@@ -95,7 +97,7 @@ class CacheClear extends ContainerAwareCommand
         try {
             $cacheEvent = new CacheEvent($dir, false);
             $this->getDispatcher()->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
-        } catch (\UnexpectedValueException $e) {
+        } catch (UnexpectedValueException $e) {
             // throws same exception code for does not exist and permission denied ...
             if (!file_exists($dir)) {
                 $output->writeln(sprintf('<info>%s cache dir already cleared</info>', $dir));

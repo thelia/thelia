@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,18 +11,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event;
 
 class ToggleVisibilityEvent extends ActionEvent
 {
-    protected $object_id;
-
     protected $object;
 
-    public function __construct($object_id)
+    public function __construct(protected $object_id)
     {
-        $this->object_id = $object_id;
     }
 
     public function getObjectId()
@@ -28,7 +26,7 @@ class ToggleVisibilityEvent extends ActionEvent
         return $this->object_id;
     }
 
-    public function setObjectId($object_id)
+    public function setObjectId($object_id): static
     {
         $this->object_id = $object_id;
 
@@ -38,7 +36,7 @@ class ToggleVisibilityEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setObject($object)
+    public function setObject($object): static
     {
         $this->object = $object;
 

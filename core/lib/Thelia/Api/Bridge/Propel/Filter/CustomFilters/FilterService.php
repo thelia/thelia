@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters;
 
+use RuntimeException;
+use Symfony\Component\HttpFoundation\Request;
+use InvalidArgumentException;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -73,7 +77,7 @@ readonly class FilterService
         $tfilters = $request->get('tfilters', []);
         $categoryDepth = $request->get(CategoryFilter::CATEGORY_DEPTH_NAME, null);
         $pathInfo = $request->getPathInfo();
-        $segments = explode('/', $pathInfo);
+        $segments = explode('/', (string) $pathInfo);
         $resource = end($segments);
 
         return $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, query: $query, categoryDepth: $categoryDepth);
@@ -84,7 +88,7 @@ readonly class FilterService
         $tfilters = $context['filters']['tfilters'] ?? [];
         $categoryDepth = $context['filters'][CategoryFilter::CATEGORY_DEPTH_NAME] ?? null;
         $pathInfo = $context['path_info'];
-        $segments = explode('/', $pathInfo);
+        $segments = explode('/', (string) $pathInfo);
         $resource = end($segments);
 
         return $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, query: $query, categoryDepth: $categoryDepth);
@@ -93,30 +97,34 @@ readonly class FilterService
     public function filterWithTFilter(array $tfilters, string $resource, ModelCriteria $query = null, int $categoryDepth = null): iterable
     {
         $filters = $this->getAvailableFiltersWithTFilter($resource, $tfilters);
-        if (!$query) {
+        if (!$query instanceof ModelCriteria) {
             $queryClass = "Thelia\Model\\".ucfirst($resource).'Query';
             if (!class_exists($queryClass)) {
                 $queryClass = "Thelia\Model\\".ucfirst(mb_substr($resource, 0, -1)).'Query';
             }
+
             if (!class_exists($queryClass)) {
-                throw new \RuntimeException('Not found class: '.$queryClass);
+                throw new RuntimeException('Not found class: '.$queryClass);
             }
+
             $query = $queryClass::create();
         }
+
         foreach ($filters as $filter) {
             $filterClass = $filter['filter'];
             $values = $filter['value'];
             if (!$filterClass instanceof TheliaFilterInterface) {
-                throw new \RuntimeException(sprintf('The "%s" filter must implements TheliaFilterInterface.', $filterClass::class));
+                throw new RuntimeException(sprintf('The "%s" filter must implements TheliaFilterInterface.', $filterClass::class));
             }
+
             if (\is_string($values)) {
                 $values = explode(',', $values);
             }
+
             if (\is_array($values)) {
-                $values = array_map(static function ($value) {
-                    return (int) $value;
-                }, $values);
+                $values = array_map(static fn($value): int => (int) $value, $values);
             }
+
             if ($filterClass instanceof CategoryFilter) {
                 $filterClass->filter($query, $values, $categoryDepth);
             } else {
@@ -130,9 +138,10 @@ readonly class FilterService
     public function getFilters(array $context, string $resource): array
     {
         $request = $this->requestStack->getCurrentRequest();
-        if (!$request) {
-            throw new \InvalidArgumentException('The request is required.');
+        if (!$request instanceof Request) {
+            throw new InvalidArgumentException('The request is required.');
         }
+
         $isApiRoute = $request->get('isApiRoute', false);
         if ($isApiRoute) {
             $tfilters = $request->get('tfilters', []);
@@ -144,7 +153,7 @@ readonly class FilterService
 
         $filterObjects = [];
         $locale = $context['filters']['locale'] ?? $request->get('locale');
-        $locale = $locale ?? $this->langService->getLocale();
+        $locale ??= $this->langService->getLocale();
         $objects = $query->find();
         $filters = $this->getAvailableFilters($resource);
         foreach ($filters as $filter) {
@@ -165,6 +174,7 @@ readonly class FilterService
                     );
                     break;
                 }
+
                 $possibleValues = $filter->getValue(
                     activeRecord: $item,
                     locale: $locale
@@ -172,6 +182,7 @@ readonly class FilterService
                 if (!$possibleValues) {
                     continue;
                 }
+
                 foreach ($possibleValues as $value) {
                     $values[] = $value;
                 }
@@ -185,17 +196,14 @@ readonly class FilterService
                 filter: $filter,
                 values: $values,
                 isVisible: $isVisible,
-                position: $position,
-                id: $id
+                position: $position
             );
 
             $hasMainResource = (isset($values[0]['mainId'], $values[0]['mainTitle']));
 
             if ($hasMainResource) {
                 $values = array_intersect_key($values, array_unique(array_map(
-                    static function ($item) {
-                        return $item['id'].'-'.$item['mainId'];
-                    },
+                    static fn($item): string => $item['id'].'-'.$item['mainId'],
                     $values
                 )));
 
@@ -203,23 +211,27 @@ readonly class FilterService
                 foreach ($values as $value) {
                     $splitValues[$value['mainId']][] = $value;
                 }
+
                 foreach ($splitValues as $value) {
                     if (isset($value[0]['visible']) && $value[0]['position']) {
                         $position = $value[0]['position'];
                         $isVisible = $value[0]['visible'];
-                        $value = array_map(static function ($val) {
+                        $value = array_map(static function (array $val): array {
                             unset($val['visible'], $val['position']);
 
                             return $val;
                         }, $value);
                     }
+
                     if (!$isVisible) {
                         continue;
                     }
+
                     $title = $value[0]['mainTitle'] ?? '';
                     if ($filter instanceof CategoryFilter) {
                         $title = $this->translator->trans(id: 'Category', locale: $locale);
                     }
+
                     $filterDto = new Filter();
                     $filterDto
                         ->setId($value[0]['mainId'] ?? null)
@@ -228,7 +240,7 @@ readonly class FilterService
                         ->setInputType('checkbox')
                         ->setPosition($position);
 
-                    $value = array_map(static function ($val) {
+                    $value = array_map(static function (array $val): array {
                         unset($val['mainId'], $val['mainTitle']);
 
                         return $val;
@@ -239,11 +251,12 @@ readonly class FilterService
                 }
             }
 
-            if (!$hasMainResource && !empty($values)) {
+            if (!$hasMainResource && $values !== []) {
                 $values = array_intersect_key($values, array_unique(array_column($values, 'id')));
                 if (!$isVisible) {
                     continue;
                 }
+
                 $filterObjects[] = (new Filter())
                     ->setId($id)
                     ->setTitle($filter::getFilterName()[0] ?? '')
@@ -256,17 +269,13 @@ readonly class FilterService
 
         foreach ($filterObjects as $filterObject) {
             if ($filterObject->getPosition() === null) {
-                $allPosition = array_map(static function ($filterObject) {
-                    return $filterObject->getPosition();
-                }, $filterObjects);
+                $allPosition = array_map(static fn($filterObject): ?int => $filterObject->getPosition(), $filterObjects);
                 $max = max($allPosition);
                 $filterObject->setPosition($max + 1);
             }
         }
 
-        usort($filterObjects, static function ($a, $b) {
-            return $a->getPosition() <=> $b->getPosition();
-        });
+        usort($filterObjects, static fn($a, $b): int => $a->getPosition() <=> $b->getPosition());
 
         return $filterObjects;
     }
@@ -278,17 +287,19 @@ readonly class FilterService
             if (!isset($tfilters[$filterName])) {
                 continue;
             }
+
             $ids = $tfilters[$filterName];
         }
 
         return $ids;
     }
 
-    private function choiceFiltersManagement(array $tfilters, TheliaFilterInterface $filter, array &$values, bool &$isVisible, ?int &$position, ?int &$id): void
+    private function choiceFiltersManagement(array $tfilters, TheliaFilterInterface $filter, array &$values, bool &$isVisible, ?int &$position): void
     {
         if (!$this->hasFilter(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters)) {
             return;
         }
+
         $categoryId = $this->retrieveFilterValue(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters);
         $category = CategoryQuery::create()->findPk(key: $categoryId);
         $choiceFiltersCategory = ChoiceFilterQuery::findChoiceFilterByCategory(category: $category, templateId: $templateIdFind)->getData();
@@ -296,10 +307,12 @@ readonly class FilterService
         if ($templateIdFind) {
             $choiceFiltersTemplate = ChoiceFilterQuery::create()->filterByTemplateId($templateIdFind)->find()->getData();
         }
+
         $choiceFilters = $choiceFiltersCategory;
         if (empty($choiceFilters)) {
             $choiceFilters = $choiceFiltersTemplate;
         }
+
         /** @var ChoiceFilter $choiceFilter */
         foreach ($choiceFilters as $choiceFilter) {
             $otherType = $choiceFilter->getChoiceFilterOther()?->getType();
@@ -309,6 +322,7 @@ readonly class FilterService
 
                 return;
             }
+
             foreach ($values as $index => $value) {
                 if ($filter instanceof TheliaChoiceFilterInterface) {
                     $mainType = $filter->getChoiceFilterType();
@@ -316,6 +330,7 @@ readonly class FilterService
                         $values[$index]['visible'] = (bool) $choiceFilter->isVisible();
                         $values[$index]['position'] = $choiceFilter->getPosition();
                     }
+
                     if ($choiceFilter->getFeature() instanceof $mainType && $choiceFilter->getFeature()->getId() === $value['mainId']) {
                         $values[$index]['visible'] = (bool) $choiceFilter->isVisible();
                         $values[$index]['position'] = $choiceFilter->getPosition();
@@ -327,7 +342,8 @@ readonly class FilterService
 
     private function hasFilter(array $theliaFilterNames, array $tfilters): bool
     {
-        return !empty($this->retrieveFilterValue($theliaFilterNames, $tfilters));
+        return !in_array($this->retrieveFilterValue($theliaFilterNames, $tfilters), ['', '0', null], true)
+            && $this->retrieveFilterValue($theliaFilterNames, $tfilters) !== [];
     }
 
     public function getCategoriesRecursively($categoryId, int $maxDepth, array $categoriesFound = [], int $depth = 1): array
@@ -336,10 +352,12 @@ readonly class FilterService
         if ($depth > $maxDepth) {
             return $categoriesFound;
         }
+
         foreach ($categories as $category) {
             if (!$category->getVisible()) {
                 continue;
             }
+
             $categoriesFound[$depth][] = $category;
             $categoriesFound = $this->getCategoriesRecursively(
                 categoryId: $category->getId(),

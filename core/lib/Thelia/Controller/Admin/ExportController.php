@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,21 +11,26 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Exception;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\LangQuery;
+use Thelia\Service\DataTransfer\Exporthandler;
 
 /**
  * Class ExportController.
@@ -37,12 +44,12 @@ class ExportController extends BaseAdminController
      *
      * @param string $_view View to render
      *
-     * @return \Thelia\Core\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction($_view = 'export')
+    public function indexAction(string $_view = 'export')
     {
         $authResponse = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::VIEW]);
-        if ($authResponse !== null) {
+        if ($authResponse instanceof \Symfony\Component\HttpFoundation\Response) {
             return $authResponse;
         }
 
@@ -56,13 +63,11 @@ class ExportController extends BaseAdminController
 
     /**
      * Handle export position change action.
-     *
-     * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function changeExportPositionAction(EventDispatcherInterface $eventDispatcher)
+    public function changeExportPositionAction(EventDispatcherInterface $eventDispatcher): \Symfony\Component\HttpFoundation\Response|RedirectResponse
     {
         $authResponse = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE]);
-        if ($authResponse !== null) {
+        if ($authResponse instanceof \Symfony\Component\HttpFoundation\Response) {
             return $authResponse;
         }
 
@@ -82,13 +87,11 @@ class ExportController extends BaseAdminController
 
     /**
      * Handle export category position change action.
-     *
-     * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function changeCategoryPositionAction(EventDispatcherInterface $eventDispatcher)
+    public function changeCategoryPositionAction(EventDispatcherInterface $eventDispatcher): \Symfony\Component\HttpFoundation\Response|RedirectResponse
     {
         $authResponse = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE]);
-        if ($authResponse !== null) {
+        if ($authResponse instanceof \Symfony\Component\HttpFoundation\Response) {
             return $authResponse;
         }
 
@@ -113,7 +116,7 @@ class ExportController extends BaseAdminController
      *
      * @return int Position mode constant value
      */
-    protected function matchPositionMode($mode)
+    protected function matchPositionMode($mode): int
     {
         if ($mode === 'up') {
             return UpdatePositionEvent::POSITION_UP;
@@ -130,12 +133,10 @@ class ExportController extends BaseAdminController
      * Display export configuration view.
      *
      * @param int $id An export identifier
-     *
-     * @return \Thelia\Core\HttpFoundation\Response
      */
-    public function configureAction($id)
+    public function configureAction(int $id): \Symfony\Component\HttpFoundation\Response
     {
-        /** @var \Thelia\Service\Handler\Exporthandler $exportHandler */
+        /** @var Exporthandler $exportHandler */
         $exportHandler = $this->container->get('thelia.export.handler');
 
         $export = $exportHandler->getExport($id);
@@ -164,12 +165,10 @@ class ExportController extends BaseAdminController
      * Handle export action.
      *
      * @param int $id An export identifier
-     *
-     * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\BinaryFileResponse
      */
-    public function exportAction($id)
+    public function exportAction(int $id): \Symfony\Component\HttpFoundation\Response|BinaryFileResponse
     {
-        /** @var \Thelia\Service\Handler\Exporthandler $exportHandler */
+        /** @var Exporthandler $exportHandler */
         $exportHandler = $this->container->get('thelia.export.handler');
 
         $export = $exportHandler->getExport($id);
@@ -186,13 +185,13 @@ class ExportController extends BaseAdminController
 
             $lang = (new LangQuery())->findPk($validatedForm->get('language')->getData());
 
-            /** @var \Thelia\Core\Serializer\SerializerManager $serializerManager */
+            /** @var SerializerManager $serializerManager */
             $serializerManager = $this->container->get(RegisterSerializerPass::MANAGER_SERVICE_ID);
             $serializer = $serializerManager->get($validatedForm->get('serializer')->getData());
 
             $archiver = null;
             if ($validatedForm->get('do_compress')->getData()) {
-                /** @var \Thelia\Core\Archiver\ArchiverManager $archiverManager */
+                /** @var ArchiverManager $archiverManager */
                 $archiverManager = $this->container->get(RegisterArchiverPass::MANAGER_SERVICE_ID);
                 $archiver = $archiverManager->get($validatedForm->get('archiver')->getData());
             }
@@ -235,10 +234,10 @@ class ExportController extends BaseAdminController
                 ),
             ];
 
-            return new BinaryFileResponse($exportEvent->getFilePath(), 200, $header, false);
+            return new BinaryFileResponse($exportEvent->getFilePath(), Response::HTTP_OK, $header, false);
         } catch (FormValidationException $e) {
             $form->setErrorMessage($this->createStandardFormValidationErrorMessage($e));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         }
 

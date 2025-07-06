@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+use Exception;
+use RuntimeException;
+use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -32,13 +37,12 @@ use Thelia\Model\ModuleQuery;
  *
  * @author Julien Chanséaume <julien@thelia.net>
  */
+#[AsCommand(name: 'hook:clean', description: 'Clean hooks. It will delete all hooks, then recreate it.')]
 class HookCleanCommand extends ContainerAwareCommand
 {
     protected function configure(): void
     {
         $this
-            ->setName('hook:clean')
-            ->setDescription('Clean hooks. It will delete all hooks, then recreate it.')
             ->addOption(
                 'assume-yes',
                 'y',
@@ -66,8 +70,8 @@ class HookCleanCommand extends ContainerAwareCommand
             $output->writeln('<info>Hooks have been successfully deleted</info>');
 
             $this->clearCache($output);
-        } catch (\Exception $ex) {
-            $output->writeln(sprintf('<error>%s</error>', $ex->getMessage()));
+        } catch (Exception $exception) {
+            $output->writeln(sprintf('<error>%s</error>', $exception->getMessage()));
 
             return 1;
         }
@@ -80,16 +84,14 @@ class HookCleanCommand extends ContainerAwareCommand
         $module = null;
         $moduleCode = $input->getArgument('module');
 
-        if (!empty($moduleCode)) {
-            if (null === $module = ModuleQuery::create()->findOneByCode($moduleCode)) {
-                throw new \RuntimeException(sprintf('Module %s does not exist.', $moduleCode));
-            }
+        if (!empty($moduleCode) && null === $module = ModuleQuery::create()->findOneByCode($moduleCode)) {
+            throw new RuntimeException(sprintf('Module %s does not exist.', $moduleCode));
         }
 
         return $module;
     }
 
-    private function askConfirmation(InputInterface $input, OutputInterface $output)
+    private function askConfirmation(InputInterface $input, OutputInterface $output): bool
     {
         $assumeYes = $input->getOption('assume-yes');
         $moduleCode = $input->getArgument('module');
@@ -120,8 +122,8 @@ class HookCleanCommand extends ContainerAwareCommand
      *
      * @param Module|null $module if specified it will only delete hooks related to this module
      *
-     * @throws \Exception
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws Exception
+     * @throws PropelException
      */
     protected function deleteHooks($module): void
     {
@@ -145,7 +147,7 @@ class HookCleanCommand extends ContainerAwareCommand
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     protected function clearCache(OutputInterface $output): void
     {
@@ -153,8 +155,8 @@ class HookCleanCommand extends ContainerAwareCommand
             $cacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
             $cacheEvent = new CacheEvent($cacheDir);
             $this->getDispatcher()->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
-        } catch (\Exception $ex) {
-            throw new \Exception(sprintf('Error during clearing of cache : %s', $ex->getMessage()));
+        } catch (Exception $exception) {
+            throw new Exception(sprintf('Error during clearing of cache : %s', $exception->getMessage()), $exception->getCode(), $exception);
         }
     }
 }

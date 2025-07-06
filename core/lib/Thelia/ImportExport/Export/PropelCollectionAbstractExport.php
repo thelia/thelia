@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,21 +11,24 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\ImportExport\Export;
 
+use DomainException;
+use LogicException;
+use Propel\Runtime\Util\PropelModelPager;
+use Exception;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Map\TableMap;
 
 abstract class PropelCollectionAbstractExport extends AbstractExport
 {
     /**
-     * @var \Propel\Runtime\Util\PropelModelPager Data to export
+     * @var PropelModelPager Data to export
      */
     private $data;
 
     /**
-     * @throws \Exception
+     * @throws Exception
      *
      * @return array|false|mixed|string
      */
@@ -40,7 +45,7 @@ abstract class PropelCollectionAbstractExport extends AbstractExport
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      *
      * @return bool|float|int|string|null
      */
@@ -54,7 +59,7 @@ abstract class PropelCollectionAbstractExport extends AbstractExport
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function next(): void
     {
@@ -66,7 +71,7 @@ abstract class PropelCollectionAbstractExport extends AbstractExport
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function rewind(): void
     {
@@ -80,16 +85,16 @@ abstract class PropelCollectionAbstractExport extends AbstractExport
                 return;
             }
 
-            throw new \DomainException(
+            throw new DomainException(
                 'Data must be an instance of \\Propel\\Runtime\\ActiveQuery\\ModelCriteria'
             );
         }
 
-        throw new \LogicException('Export data can\'t be rewinded');
+        throw new LogicException("Export data can't be rewinded");
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function valid(): bool
     {

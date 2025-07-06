@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\HttpKernel\Exception;
 
+use Exception;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as BaseNotFountHttpException;
 
 /**
@@ -23,16 +25,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as BaseNotFount
  */
 class NotFountHttpException extends BaseNotFountHttpException
 {
-    protected $adminContext = false;
-
-    public function __construct($message = null, \Exception $previous = null, $code = 0, $adminContext = false)
+    public function __construct(string $message = null, Exception $previous = null, int $code = 0, protected $adminContext = false)
     {
-        $this->adminContext = $adminContext;
-
         parent::__construct($message, $previous, $code);
     }
 
-    public function isAdminContext()
+    public function isAdminContext(): bool
     {
         return $this->adminContext === true;
     }

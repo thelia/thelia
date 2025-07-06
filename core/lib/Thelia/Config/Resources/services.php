@@ -1,17 +1,10 @@
 <?php
 
-/*
- * This file is part of the Thelia package.
- * http://www.thelia.net
- *
- * (c) OpenStudio <info@thelia.net>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Exception;
 use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
@@ -20,14 +13,25 @@ use Thelia\Model\ModuleQuery;
 use Thelia\Service\ConfigCacheService;
 
 return static function (ContainerConfigurator $configurator): void {
+    // Import service configurations
+    $configurator->import('packages/*');
+    $configurator->import('parameters/*');
+    $configurator->import('services/*');
+
+
     $serviceConfigurator = $configurator->services();
 
     $serviceConfigurator->defaults()
         ->autowire(false)
         ->autoconfigure(false)
         ->bind('$kernelCacheDir', '%kernel.cache_dir%')
+        ->bind('$cacheDir', '%kernel.cache_dir%')
         ->bind('$kernelDebug', '%kernel.debug%')
+        ->bind('$debugMode', '%kernel.debug%')
+        ->bind('$debug', '%kernel.debug%')
         ->bind('$kernelEnvironment', '%kernel.environment%')
+        ->bind('$environment', '%kernel.environment%')
+        ->bind('$env', '%kernel.environment%')
         ->bind('$sessionSavePath', '%session.save_path%')
         ->bind('$theliaParserLoops', '%Thelia.parser.loops%')
         ->bind('$formDefinition', '%Thelia.parser.forms%')
@@ -51,7 +55,7 @@ return static function (ContainerConfigurator $configurator): void {
             $dsn = 'smtp://';
 
             if (ConfigQuery::getSmtpUsername()) {
-                $dsn .= urlencode(ConfigQuery::getSmtpUsername()).':'.urlencode(ConfigQuery::getSmtpPassword()).'@';
+                $dsn .= urlencode((string) ConfigQuery::getSmtpUsername()).':'.urlencode((string) ConfigQuery::getSmtpPassword()).'@';
             }
 
             // Escape "%" added by urlencode
@@ -78,16 +82,18 @@ return static function (ContainerConfigurator $configurator): void {
                 if (!class_exists($module->getFullNamespace())) {
                     throw new ClassNotFoundException($module->getFullNamespace());
                 }
+
                 \call_user_func([$module->getFullNamespace(), 'configureContainer'], $configurator);
                 \call_user_func([$module->getFullNamespace(), 'configureServices'], $serviceConfigurator);
                 $apiModulePath = $module->getAbsoluteBaseDir().'/Api/Resource';
                 if (is_dir($apiModulePath)) {
                     $apiResourcePaths[] = $apiModulePath;
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 if ($_SERVER['APP_DEBUG']) {
                     throw $e;
                 }
+
                 Tlog::getInstance()->addError(
                     \sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
                     $e

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\ImportExport\Import;
 
+use Iterator;
+use ReturnTypeWillChange;
+use UnexpectedValueException;
 use Symfony\Component\HttpFoundation\File\File;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Lang;
@@ -21,20 +25,17 @@ use Thelia\Model\Lang;
  *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-abstract class AbstractImport implements \Iterator
+abstract class AbstractImport implements Iterator
 {
-    /**
-     * @var array
-     */
-    private $data;
+    private ?array $data = null;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\File\File
+     * @var File
      */
     protected $file;
 
     /**
-     * @var \Thelia\Model\Lang A language model
+     * @var Lang A language model
      */
     protected $language;
 
@@ -48,13 +49,13 @@ abstract class AbstractImport implements \Iterator
      */
     protected $importedRows = 0;
 
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function current(): mixed
     {
         return current($this->data);
     }
 
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function key(): int|null|string
     {
         return key($this->data);
@@ -102,7 +103,7 @@ abstract class AbstractImport implements \Iterator
     /**
      * Get file.
      *
-     * @return \Symfony\Component\HttpFoundation\File\File
+     * @return File
      */
     public function getFile()
     {
@@ -124,7 +125,7 @@ abstract class AbstractImport implements \Iterator
     /**
      * Get language.
      *
-     * @return \Thelia\Model\Lang A language model
+     * @return Lang A language model
      */
     public function getLang()
     {
@@ -134,7 +135,7 @@ abstract class AbstractImport implements \Iterator
     /**
      * Set language.
      *
-     * @param \Thelia\Model\Lang|null $language A language model
+     * @param Lang|null $language A language model
      *
      * @return $this Return $this, allow chaining
      */
@@ -156,8 +157,8 @@ abstract class AbstractImport implements \Iterator
     {
         $diff = array_diff($this->mandatoryColumns, array_keys($data));
 
-        if (\count($diff) > 0) {
-            throw new \UnexpectedValueException(
+        if ($diff !== []) {
+            throw new UnexpectedValueException(
                 Translator::getInstance()->trans(
                     'The following columns are missing: %columns',
                     [

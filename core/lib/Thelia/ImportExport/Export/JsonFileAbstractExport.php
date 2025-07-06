@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\ImportExport\Export;
 
+use SplFileObject;
+use DomainException;
+use LogicException;
+use Exception;
+use PDO;
 use Propel\Runtime\Connection\StatementInterface;
 use Thelia\Core\Translation\Translator;
 
@@ -23,13 +29,12 @@ use Thelia\Core\Translation\Translator;
 abstract class JsonFileAbstractExport extends AbstractExport
 {
     /**
-     * @var \SplFileObject Data to export
+     * @var SplFileObject Data to export
      */
-    private $data;
+    private ?SplFileObject $data = null;
 
     public function current()
     {
-        /** @var resource $file */
         $result = json_decode($this->data->current(), true);
 
         if ($result !== null) {
@@ -51,28 +56,28 @@ abstract class JsonFileAbstractExport extends AbstractExport
 
     public function rewind(): void
     {
-        if ($this->data === null) {
+        if (!$this->data instanceof SplFileObject) {
             $data = $this->getData();
 
             // Check if $data is a path to a json file
             if (\is_string($data)
-                && '.json' === substr($data, -5)
+                && str_ends_with($data, '.json')
                 && file_exists($data)
             ) {
-                $this->data = new \SplFileObject($data, 'r');
-                $this->data->setFlags(\SplFileObject::READ_AHEAD);
+                $this->data = new SplFileObject($data, 'r');
+                $this->data->setFlags(SplFileObject::READ_AHEAD);
 
                 $this->data->rewind();
 
                 return;
             }
 
-            throw new \DomainException(
+            throw new DomainException(
                 'Data should be a JSON file, ending with .json'
             );
         }
 
-        throw new \LogicException('Export data can\'t be rewinded');
+        throw new LogicException("Export data can't be rewinded");
     }
 
     public function valid(): bool
@@ -113,19 +118,19 @@ abstract class JsonFileAbstractExport extends AbstractExport
         return $processedData;
     }
 
-    protected function getDataJsonCache(StatementInterface $statement, $exportName)
+    protected function getDataJsonCache(StatementInterface $statement, string $exportName)
     {
         $filename = THELIA_CACHE_DIR.'/export/'.$exportName.'.json';
 
         if ($statement->rowCount() === 0) {
-            throw new \Exception(Translator::getInstance()->trans('No data found for your export.'));
+            throw new Exception(Translator::getInstance()->trans('No data found for your export.'));
         }
 
         if (file_exists($filename)) {
             unlink($filename);
         }
 
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             file_put_contents($filename, json_encode($row)."\r\n", \FILE_APPEND);
         }
 

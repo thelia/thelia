@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\ProductSaleElement;
 
 use Thelia\Model\Product;
@@ -305,7 +306,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
      *
      * @return $this
      */
-    public function setProduct($product)
+    public function setProduct($product): static
     {
         $this->product = $product;
 
@@ -325,7 +326,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
      *
      * @return $this
      */
-    public function setTaxRuleId($tax_rule_id)
+    public function setTaxRuleId($tax_rule_id): static
     {
         $this->tax_rule_id = $tax_rule_id;
 
@@ -345,7 +346,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
      *
      * @return $this
      */
-    public function setFromDefaultCurrency($from_default_currency)
+    public function setFromDefaultCurrency($from_default_currency): static
     {
         $this->from_default_currency = $from_default_currency;
 

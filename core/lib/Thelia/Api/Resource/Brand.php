@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiFilter;
@@ -92,10 +93,13 @@ class Brand extends AbstractTranslatableResource
     use UrlRewritingTrait;
 
     public const GROUP_ADMIN_READ = 'admin:brand:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:brand:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:brand:write';
 
     public const GROUP_FRONT_READ = 'front:brand:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:brand:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ,

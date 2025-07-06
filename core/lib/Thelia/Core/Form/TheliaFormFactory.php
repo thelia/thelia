@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Form;
 
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use OutOfBoundsException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryBuilderInterface;
@@ -28,72 +32,34 @@ use Thelia\Form\BaseForm;
  */
 class TheliaFormFactory
 {
-    protected $container;
-
-    /** @var RequestStack */
-    protected $requestStack;
-
-    /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
-
-    /**
-     * @var ValidatorBuilder
-     */
-    protected $validatorBuilder;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @var FormFactoryBuilderInterface
-     */
-    protected $formFactoryBuilder;
-
-    /** @var array */
-    protected $formDefinition;
-
-    /** @var TokenStorageInterface */
-    protected $tokenStorage;
-
     public function __construct(
-        ContainerInterface $container,
-        RequestStack $requestStack,
-        EventDispatcherInterface $eventDispatcher,
-        TranslatorInterface $translator,
-        FormFactoryBuilderInterface $formFactoryBuilder,
-        ValidatorBuilder $validationBuilder,
-        TokenStorageInterface $tokenStorage,
-        array $formDefinition
-    ) {
-        $this->container = $container;
-        $this->requestStack = $requestStack;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->translator = $translator;
-        $this->formFactoryBuilder = $formFactoryBuilder;
-        $this->validatorBuilder = $validationBuilder;
-        $this->formDefinition = $formDefinition;
-        $this->tokenStorage = $tokenStorage;
+        protected ContainerInterface $container,
+        protected RequestStack $requestStack,
+        protected EventDispatcherInterface $eventDispatcher,
+        protected TranslatorInterface $translator,
+        protected FormFactoryBuilderInterface $formFactoryBuilder,
+        protected ValidatorBuilder $validatorBuilder,
+        protected TokenStorageInterface $tokenStorage,
+        #[Autowire(param: 'Thelia.parser.forms')]
+        protected array $formDefinition
+    )
+    {
     }
 
     public function createForm(
         string $name,
-        $type = "Symfony\Component\Form\Extension\Core\Type\FormType",
+        string $type = FormType::class,
         array $data = [],
         array $options = []
     ): BaseForm {
-        $formId = null;
-        if (isset($this->formDefinition[$name])) {
-            $formId = $this->formDefinition[$name];
-        }
+        $formId = $this->formDefinition[$name] ?? null;
 
-        if (false !== array_search($name, $this->formDefinition, true)) {
+        if (in_array($name, $this->formDefinition, true)) {
             $formId = $name;
         }
 
         if (null === $formId) {
-            throw new \OutOfBoundsException(
+            throw new OutOfBoundsException(
                 sprintf("The form '%s' doesn't exist", $formId)
             );
         }

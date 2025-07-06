@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -25,16 +26,8 @@ use Thelia\Tools\TokenProvider;
 
 class Administrator extends BaseAction implements EventSubscriberInterface
 {
-    /** @var MailerFactory */
-    protected $mailer;
-
-    /** @var TokenProvider */
-    protected $tokenProvider;
-
-    public function __construct(MailerFactory $mailer, TokenProvider $tokenProvider)
+    public function __construct(protected MailerFactory $mailer, protected TokenProvider $tokenProvider)
     {
-        $this->mailer = $mailer;
-        $this->tokenProvider = $tokenProvider;
     }
 
     public function create(AdministratorEvent $event, $eventName, EventDispatcherInterface $dispatcher): void

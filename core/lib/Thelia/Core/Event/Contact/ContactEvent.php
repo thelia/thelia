@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Contact;
 
 use Symfony\Component\Form\Form;
@@ -24,9 +25,6 @@ use Thelia\Core\Event\ActionEvent;
  */
 class ContactEvent extends ActionEvent
 {
-    /** @var Form */
-    protected $form;
-
     /** @var string */
     protected $subject;
 
@@ -39,14 +37,12 @@ class ContactEvent extends ActionEvent
     /** @var string */
     protected $name;
 
-    public function __construct(Form $form)
+    public function __construct(protected Form $form)
     {
-        $this->form = $form;
-
-        $this->subject = $form->get('subject')->getData();
-        $this->message = $form->get('message')->getData();
-        $this->email = $form->get('email')->getData();
-        $this->name = $form->get('name')->getData();
+        $this->subject = $this->form->get('subject')->getData();
+        $this->message = $this->form->get('message')->getData();
+        $this->email = $this->form->get('email')->getData();
+        $this->name = $this->form->get('name')->getData();
     }
 
     /**
@@ -59,10 +55,8 @@ class ContactEvent extends ActionEvent
 
     /**
      * @param string $subject
-     *
-     * @return ContactEvent
      */
-    public function setSubject($subject)
+    public function setSubject($subject): static
     {
         $this->subject = $subject;
 
@@ -79,10 +73,8 @@ class ContactEvent extends ActionEvent
 
     /**
      * @param string $message
-     *
-     * @return ContactEvent
      */
-    public function setMessage($message)
+    public function setMessage($message): static
     {
         $this->message = $message;
 
@@ -99,10 +91,8 @@ class ContactEvent extends ActionEvent
 
     /**
      * @param string $email
-     *
-     * @return ContactEvent
      */
-    public function setEmail($email)
+    public function setEmail($email): static
     {
         $this->email = $email;
 
@@ -119,10 +109,8 @@ class ContactEvent extends ActionEvent
 
     /**
      * @param string $name
-     *
-     * @return ContactEvent
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->name = $name;
 

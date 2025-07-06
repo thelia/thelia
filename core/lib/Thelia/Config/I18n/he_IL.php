@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 return [
     ' content create form' => ' יצירת תוכן הטופס',
     ' note: only non-visible documents can be associated.' => ' הערה: רק מסמכים שאינו גלוי יכול להיות משויך.',
@@ -32,7 +33,7 @@ return [
     'A product with reference %ref already exists. Please choose another reference.' => 'מוצר עם הפניה % ref כבר קיים. אנא בחר אחר הפניה אחרת.',
     'A short description, used when a summary or an introduction is required' => 'תיאור קצר, המשמש בעת סיכום או מבוא נדרש',
     'A short text, used when an additional or supplemental information is required.' => 'טקסט קצר, כאשר נדרש מידע נוסף או משלימה.',
-    'A user already exists with this email address. Please login or if you\'ve forgotten your password, go to Reset Your Password.' => 'משתמש קיים כבר עם כתובת הדוא. אנא התחבר או אם תשכח את הסיסמה שלך, ללכת איפוס הסיסמה שלך.',
+    "A user already exists with this email address. Please login or if you've forgotten your password, go to Reset Your Password." => 'משתמש קיים כבר עם כתובת הדוא. אנא התחבר או אם תשכח את הסיסמה שלך, ללכת איפוס הסיסמה שלך.',
     'A value for attribute "%name" is already present in the combination' => 'ערך עבור התכונה "%name" מופיע כבר את הצופן',
     'A variable with name "%name" already exists.' => 'משתנה עם השם "%name" כבר קיים.',
     'Activate logs only for these IP Addresses' => 'הפעלת יומני רק עבור כתובות IP אלה',
@@ -59,6 +60,6 @@ return [
     'Associate images' => 'לקשר תמונות',
     'At least one of cart products categories is %op% <strong>%categories_list%</strong>' => 'לפחות אחת מקטגוריות המוצרים העגלה היא %op% <strong>%categories_list%</strong>',
     'Message content: %message%' => 'תוכן ההודעה: %message%',
-    'Sender\'s e-mail address: %email%' => 'כתובת הדואר האלקטרוני של השולח: %email%',
+    "Sender's e-mail address: %email%" => 'כתובת הדואר האלקטרוני של השולח: %email%',
     'Sender name: %name%' => 'שם השולח: %name%',
 ];

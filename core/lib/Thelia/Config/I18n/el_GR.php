@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 return [
     '"%param" parameter cannot be empty in loop type: %type, name: %name' => 'η παράμετρος "%param" δεν μπορεί να είναι κενή στο βρόχο τύπο: %type, name:%name',
     '"%param" parameter is missing in loop type: %type, name: %name' => 'η παράμετρος "%param" δεν υπάρχει στο βρόχο τύπος: %type, όνομα: %name',
@@ -37,10 +38,10 @@ return [
     'Quantity' => 'Ποσότητα',
     'Register' => 'Καταχώρηση',
     'Search' => 'Αναζήτηση',
-    'Sender\'s email address: %email%' => 'Διεύθυνση email αποστολέα: %email%',
+    "Sender's email address: %email%" => 'Διεύθυνση email αποστολέα: %email%',
     'Sender name: %name%' => 'Όνομα αποστολέα: %name%',
     'Sorry, an error occured: %msg' => 'Sorry, an error occured: %msg',
     'Store logs into text file, up to a certian size, then a new file is created' => 'Store logs into text file, up to a certian size, then a new file is created',
-    'This coupon will offert a flat percentage off a shopper\'s entire order (not applied to shipping costs or tax rates). If the discount is greater than the total order corst, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.' => 'This coupon will offert a flat percentage off a shopper\'s entire order (not applied to shipping costs or tax rates). If the discount is greater than the total order corst, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.',
+    "This coupon will offert a flat percentage off a shopper's entire order (not applied to shipping costs or tax rates). If the discount is greater than the total order corst, the customer will only pay the shipping, or nothing if the coupon also provides free shipping." => "This coupon will offert a flat percentage off a shopper's entire order (not applied to shipping costs or tax rates). If the discount is greater than the total order corst, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.",
     'This coupon will subtracts a set amount from the total cost of an order. If the discount is greater than the total order corst, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.' => 'This coupon will subtracts a set amount from the total cost of an order. If the discount is greater than the total order corst, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.',
 ];

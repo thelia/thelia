@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,18 +11,26 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+
+use Exception;
+use InvalidArgumentException;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Form\AddressCreateForm;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
+use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Event\AddressEvent;
@@ -45,9 +55,9 @@ class AddressController extends AbstractCrudController
         );
     }
 
-    public function useAddressAction(EventDispatcherInterface $eventDispatcher)
+    public function useAddressAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -57,7 +67,7 @@ class AddressController extends AbstractCrudController
             $address = AddressQuery::create()->findPk($address_id);
 
             if (null === $address) {
-                throw new \InvalidArgumentException(sprintf('%d address does not exists', $address_id));
+                throw new InvalidArgumentException(sprintf('%d address does not exists', $address_id));
             }
 
             $addressEvent = new AddressEvent($address);
@@ -74,9 +84,9 @@ class AddressController extends AbstractCrudController
                 ),
                 $address_id
             );
-        } catch (\Exception $e) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf('error during address setting as default with message %s',
-                $e->getMessage()));
+        } catch (Exception $exception) {
+            Tlog::getInstance()->error(sprintf('error during address setting as default with message %s',
+                $exception->getMessage()));
         }
 
         return $this->redirectToEditionTemplate();
@@ -85,7 +95,7 @@ class AddressController extends AbstractCrudController
     /**
      * Return the creation form for this object.
      */
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AddressCreateForm::class);
     }
@@ -93,7 +103,7 @@ class AddressController extends AbstractCrudController
     /**
      * Return the update form for this object.
      */
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::ADDRESS_UPDATE);
     }
@@ -102,10 +112,8 @@ class AddressController extends AbstractCrudController
      * Fills in the form data array.
      *
      * @param unknown $object
-     *
-     * @return array
      */
-    protected function createFormDataArray($object)
+    protected function createFormDataArray($object): array
     {
         return [
             'label' => $object->getLabel(),
@@ -124,22 +132,12 @@ class AddressController extends AbstractCrudController
         ];
     }
 
-    /**
-     * Hydrate the update form for this object, before passing it to the update template.
-     *
-     * @param \Thelia\Model\Address $object
-     */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         return $this->createForm(AdminForm::ADDRESS_UPDATE, FormType::class, $this->createFormDataArray($object));
     }
 
-    /**
-     * Creates the creation event with the provided form data.
-     *
-     * @param unknown $formData
-     */
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $event = $this->getCreateOrUpdateEvent($formData);
 
@@ -150,12 +148,7 @@ class AddressController extends AbstractCrudController
         return $event;
     }
 
-    /**
-     * Creates the update event with the provided form data.
-     *
-     * @param unknown $formData
-     */
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $event = $this->getCreateOrUpdateEvent($formData);
 
@@ -164,9 +157,9 @@ class AddressController extends AbstractCrudController
         return $event;
     }
 
-    protected function getCreateOrUpdateEvent($formData)
+    protected function getCreateOrUpdateEvent($formData): AddressCreateOrUpdateEvent
     {
-        $event = new AddressCreateOrUpdateEvent(
+        return new AddressCreateOrUpdateEvent(
             $formData['label'],
             $formData['title'] ?? null,
             $formData['firstname'],
@@ -183,77 +176,62 @@ class AddressController extends AbstractCrudController
             $formData['is_default'],
             $formData['state']
         );
-
-        return $event;
     }
 
-    /**
-     * Creates the delete event with the provided form data.
-     */
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): ActionEvent
     {
-        return new AddressEvent($this->getExistingObject());
+        $address = $this->getExistingObject();
+        return new AddressCreateOrUpdateEvent(
+            $address->getLabel(),
+            $address->getTitleId(),
+            $address->getFirstname(),
+            $address->getLastname(),
+            $address->getAddress1(),
+            $address->getAddress2(),
+            $address->getAddress3(),
+            $address->getZipcode(),
+            $address->getCity(),
+            $address->getCountryId(),
+            $address->getCellphone(),
+            $address->getPhone(),
+            $address->getCompany(),
+            false, // is_default is not used for delete
+            $address->getStateId()
+        );
     }
 
-    /**
-     * Return true if the event contains the object, e.g. the action has updated the object in the event.
-     *
-     * @param unknown $event
-     */
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return null !== $event->getAddress();
     }
 
-    /**
-     * Get the created object from an event.
-     */
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): null
     {
         return null;
     }
 
-    /**
-     * Load an existing object from the database.
-     */
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         return AddressQuery::create()->findPk($this->getRequest()->get('address_id'));
     }
 
-    /**
-     * Returns the object label form the object event (name, title, etc.).
-     *
-     * @param unknown $object
-     */
-    protected function getObjectLabel($object)
+    protected function getObjectLabel($object): string
     {
         return $object->getLabel();
     }
 
-    /**
-     * Returns the object ID from the object.
-     *
-     * @param unknown $object
-     */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
 
-    /**
-     * Render the main list template.
-     */
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         // We render here the customer edit template.
         return $this->renderEditionTemplate();
     }
 
-    /**
-     * Render the edition template.
-     */
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('customer-edit', [
             'address_id' => $this->getRequest()->get('address_id'),
@@ -262,10 +240,7 @@ class AddressController extends AbstractCrudController
         ]);
     }
 
-    /**
-     * Redirect to the edition template.
-     */
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         // We display here the custromer edition template
         return $this->generateRedirectFromRoute(
@@ -277,46 +252,35 @@ class AddressController extends AbstractCrudController
         );
     }
 
-    /**
-     * Redirect to the list template.
-     */
-    protected function redirectToListTemplate(): void
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
-        // TODO: Implement redirectToListTemplate() method.
+        return $this->generateRedirectFromRoute(
+            'admin.home',
+            [
+                'page' => $this->getRequest()->get('page'),
+                'customer_id' => $this->getCustomerId(),
+            ]
+        );
     }
 
-    /**
-     * Put in this method post object delete processing if required.
-     *
-     * @param AddressEvent $deleteEvent the delete event
-     *
-     * @return Response a response, or null to continue normal processing
-     */
-    protected function performAdditionalDeleteAction($deleteEvent)
+    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent): Response
     {
         return $this->redirectToEditionTemplate();
     }
 
-    /**
-     * Put in this method post object creation processing if required.
-     *
-     * @param AddressCreateOrUpdateEvent $createEvent the create event
-     *
-     * @return Response a response, or null to continue normal processing
-     */
-    protected function performAdditionalCreateAction($createEvent)
+    protected function performAdditionalCreateAction(ActionEvent $createEvent): ?Response
     {
         return $this->redirectToEditionTemplate();
     }
 
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, $event)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): Response
     {
         return $this->redirectToEditionTemplate();
     }
 
     protected function getCustomerId()
     {
-        if (null !== $address = $this->getExistingObject()) {
+        if (($address = $this->getExistingObject()) instanceof ActiveRecordInterface) {
             return $address->getCustomerId();
         }
 

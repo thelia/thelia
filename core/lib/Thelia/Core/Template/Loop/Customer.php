@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Type\AlphaNumStringListType;
+use Thelia\Type\EnumListType;
+use Thelia\Type\BooleanOrBothType;
+use PDO;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseLoop;
@@ -24,7 +29,6 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Model\Map\NewsletterTableMap;
-use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
@@ -47,10 +51,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
 {
     protected $timestampable = true;
 
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createBooleanTypeArgument('current', 1),
@@ -59,7 +60,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
             new Argument(
                 'ref',
                 new TypeCollection(
-                    new Type\AlphaNumStringListType()
+                    new AlphaNumStringListType()
                 )
             ),
             Argument::createBooleanTypeArgument('reseller'),
@@ -67,7 +68,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(
+                    new EnumListType(
                         [
                             'id',
                             'id_reverse',
@@ -88,11 +89,11 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
                 ),
                 'lastname'
             ),
-            Argument::createBooleanOrBothTypeArgument('newsletter', Type\BooleanOrBothType::ANY)
+            Argument::createBooleanOrBothTypeArgument('newsletter', BooleanOrBothType::ANY)
         );
     }
 
-    public function getSearchIn()
+    public function getSearchIn(): array
     {
         return [
             'ref',
@@ -112,6 +113,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
             if ($index > 0) {
                 $search->_or();
             }
+
             switch ($searchInElement) {
                 case 'ref':
                     $search->filterByRef($searchTerm, $searchCriteria);
@@ -145,7 +147,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
 
         $search
             ->addJoinObject($join, 'newsletter_join')
-            ->addJoinCondition('newsletter_join', NewsletterTableMap::COL_UNSUBSCRIBED.' = ?', false, null, \PDO::PARAM_BOOL)
+            ->addJoinCondition('newsletter_join', NewsletterTableMap::COL_UNSUBSCRIBED.' = ?', false, null, PDO::PARAM_BOOL)
             ->withColumn('IF(ISNULL('.NewsletterTableMap::COL_EMAIL.'), 0, 1)', 'is_registered_to_newsletter');
 
         // If "*" === $newsletter, no filter will be applied, so it won't change anything
@@ -160,6 +162,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
             if ($currentCustomer === null) {
                 return null;
             }
+
             $search->filterById($currentCustomer->getId(), Criteria::EQUAL);
         }
 
@@ -229,7 +232,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
         return $search;
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var \Thelia\Model\Customer $customer */
         foreach ($loopResult->getResultDataCollection() as $customer) {

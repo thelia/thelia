@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\ImportExport\Export\Type;
 
 use Propel\Runtime\Propel;
@@ -27,8 +28,7 @@ use Thelia\TaxEngine\Calculator;
  */
 class ProductTaxedPricesExport extends JsonFileAbstractExport
 {
-    /** @var Calculator */
-    protected $calculator;
+    protected Calculator $calculator;
 
     public function __construct()
     {
@@ -51,7 +51,7 @@ class ProductTaxedPricesExport extends JsonFileAbstractExport
         'tax_rule_i18n_title' => 'tax_title',
     ];
 
-    public function getData()
+    protected function getData()
     {
         $locale = $this->language->getLocale();
 

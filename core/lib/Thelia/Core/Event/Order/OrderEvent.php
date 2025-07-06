@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Order;
 
+use LogicException;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Order;
@@ -218,14 +220,14 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @throws \LogicException if the method is called before payment
+     * @throws LogicException if the method is called before payment
      *
      * @return Order the placed order, valid only after order payment
      */
     public function getPlacedOrder()
     {
         if (null === $this->placedOrder) {
-            throw new \LogicException('The placed order is defined only after dispatching of the ORDER_PAY event');
+            throw new LogicException('The placed order is defined only after dispatching of the ORDER_PAY event');
         }
 
         return $this->placedOrder;
@@ -318,22 +320,17 @@ class OrderEvent extends ActionEvent
     /**
      * @return bool true if this event has a payment request response
      */
-    public function hasResponse()
+    public function hasResponse(): bool
     {
         return null !== $this->response;
     }
 
-    /**
-     * @return null
-     */
     public function getPostageTax()
     {
         return $this->postageTax;
     }
 
     /**
-     * @param null $postageTax
-     *
      * @return $this
      */
     public function setPostageTax($postageTax): self
@@ -343,17 +340,12 @@ class OrderEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     * @return null
-     */
     public function getPostageTaxRuleTitle()
     {
         return $this->postageTaxRuleTitle;
     }
 
     /**
-     * @param null $postageTaxRuleTitle
-     *
      * @return $this
      */
     public function setPostageTaxRuleTitle($postageTaxRuleTitle): self

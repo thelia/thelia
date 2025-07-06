@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Tools;
 
+use RuntimeException;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\UrlValidator;
@@ -22,22 +25,21 @@ use Thelia\Service\Rewriting\RewritingRetriever;
 
 class URL
 {
-    /** @var RewritingResolver */
-    protected $resolver;
+    protected RewritingResolver $resolver;
 
-    /** @var RewritingRetriever */
-    protected $retriever;
+    protected RewritingRetriever $retriever;
 
     /** @var RequestContext */
     protected $requestContext;
 
     public const PATH_TO_FILE = true;
+
     public const WITH_INDEX_PAGE = false;
 
-    protected static $instance;
+    protected static self $instance;
 
     /** @var string a cache for the base URL scheme */
-    private $baseUrlScheme;
+    private ?string $baseUrlScheme = null;
 
     public function __construct(RouterInterface $router = null)
     {
@@ -46,7 +48,7 @@ class URL
         // in TheliaHttpKernel, by calling $this->container->get('thelia.url.manager');
         self::$instance = $this;
 
-        if ($router !== null) {
+        if ($router instanceof RouterInterface) {
             $this->requestContext = $router->getContext();
         }
 
@@ -65,14 +67,14 @@ class URL
     /**
      * Return this class instance, only once instanciated.
      *
-     * @throws \RuntimeException if the class has not been instanciated
+     * @throws RuntimeException if the class has not been instanciated
      *
      * @return \Thelia\Tools\URL the instance
      */
     public static function getInstance(): self
     {
-        if (self::$instance === null) {
-            throw new \RuntimeException('URL instance is not initialized.');
+        if (!self::$instance instanceof \Thelia\Tools\URL) {
+            throw new RuntimeException('URL instance is not initialized.');
         }
 
         return self::$instance;
@@ -86,7 +88,7 @@ class URL
      *
      * @return string the base URL, with a trailing '/'
      */
-    public function getBaseUrl($scheme_only = false)
+    public function getBaseUrl($scheme_only = false): string
     {
         if (null === $this->baseUrlScheme) {
             $scheme = 'http';
@@ -104,7 +106,7 @@ class URL
                 }
             }
 
-            $this->baseUrlScheme = "$scheme://$host$port";
+            $this->baseUrlScheme = sprintf('%s://%s%s', $scheme, $host, $port);
         }
 
         return $scheme_only ? $this->baseUrlScheme : $this->baseUrlScheme.$this->requestContext->getBaseUrl();
@@ -113,7 +115,7 @@ class URL
     /**
      * @return string the index page, which is in fact the base URL
      */
-    public function getIndexPage()
+    public function getIndexPage(): string
     {
         // The index page is the base URL :)
         return $this->getBaseUrl();
@@ -131,10 +133,10 @@ class URL
      *
      * @return string The generated URL
      */
-    public function absoluteUrl($path, array $parameters = null, $path_only = self::WITH_INDEX_PAGE, $alternateBaseUrl = null)
+    public function absoluteUrl($path, array $parameters = null, $path_only = self::WITH_INDEX_PAGE, $alternateBaseUrl = null): string
     {
         // Already absolute ?
-        if (substr($path, 0, 4) != 'http') {
+        if (!str_starts_with($path, 'http')) {
             if (empty($alternateBaseUrl)) {
                 // Prevent duplication of the subdirectory name when Thelia is installed in a subdirectory.
                 // This happens when $path was calculated with Router::generate(), which returns an absolute URL,
@@ -152,10 +154,8 @@ class URL
             }
 
             // If only a path is requested, be sure to remove the script name (index.php or index_dev.php), if any.
-            if ($path_only == self::PATH_TO_FILE) {
-                if (substr($base_url, -3) == 'php') {
-                    $base_url = \dirname($base_url);
-                }
+            if ($path_only == self::PATH_TO_FILE && str_ends_with($base_url, 'php')) {
+                $base_url = \dirname($base_url);
             }
 
             // Normalize the given path
@@ -172,23 +172,23 @@ class URL
         if (null !== $parameters) {
             foreach ($parameters as $name => $value) {
                 // Remove this parameter from base URL to prevent duplicate parameters
-                $base = preg_replace('`([?&])'.preg_quote($name, '`').'=(?:[^&]*)(?:&|$)`', '$1', $base);
+                $base = preg_replace('`([?&])'.preg_quote($name, '`').'=(?:[^&]*)(?:&|$)`', '$1', (string) $base);
 
-                $queryString .= sprintf('%s=%s&', urlencode($name), urlencode($value));
+                $queryString .= sprintf('%s=%s&', urlencode($name), urlencode((string) $value));
             }
         }
 
         if ('' !== $queryString = rtrim($queryString, '&')) {
             // url could contain anchor
-            $pos = strrpos($base, '#');
+            $pos = strrpos((string) $base, '#');
             if ($pos !== false) {
-                $anchor = substr($base, $pos);
-                $base = substr($base, 0, $pos);
+                $anchor = substr((string) $base, $pos);
+                $base = substr((string) $base, 0, $pos);
             }
 
-            $base = rtrim($base, '?&');
+            $base = rtrim((string) $base, '?&');
 
-            $sepChar = strstr($base, '?') === false ? '?' : '&';
+            $sepChar = str_contains($base, '?') ? '&' : '?';
 
             $queryString = $sepChar.$queryString;
         }
@@ -204,7 +204,7 @@ class URL
      *
      * @return string The generated URL
      */
-    public function adminViewUrl($viewName, array $parameters = [])
+    public function adminViewUrl($viewName, array $parameters = []): string
     {
         $path = sprintf('%s/admin/%s', $this->getIndexPage(), $viewName);
 
@@ -219,7 +219,7 @@ class URL
      *
      * @return string The generated URL
      */
-    public function viewUrl($viewName, array $parameters = [])
+    public function viewUrl($viewName, array $parameters = []): string
     {
         $path = sprintf('?view=%s', $viewName);
 
@@ -231,7 +231,7 @@ class URL
      *
      * @return RewritingRetriever You can access $url and $rewrittenUrl properties
      */
-    public function retrieve($view, $viewId, $viewLocale)
+    public function retrieve(string $view, $viewId, $viewLocale): RewritingRetriever
     {
         if (ConfigQuery::isRewritingEnable()) {
             $this->retriever->loadViewUrl($view, $viewLocale, $viewId);
@@ -241,6 +241,7 @@ class URL
             if (null !== $viewId) {
                 $allParametersWithoutView[$view.'_id'] = $viewId;
             }
+
             $this->retriever->rewrittenUrl = null;
             $this->retriever->url = self::getInstance()->viewUrl($view, $allParametersWithoutView);
         }
@@ -253,7 +254,7 @@ class URL
      *
      * @return RewritingRetriever You can access $url and $rewrittenUrl properties or use toString method
      */
-    public function retrieveCurrent(Request $request)
+    public function retrieveCurrent(Request $request): RewritingRetriever
     {
         $allOtherParameters = $request->query->all();
 
@@ -270,6 +271,7 @@ class URL
                     unset($allOtherParameters[$view.'_id']);
                 }
             }
+
             if ($viewLocale !== null) {
                 unset($allOtherParameters['lang']);
                 unset($allOtherParameters['locale']);
@@ -282,6 +284,7 @@ class URL
             if (isset($allOtherParameters['view'])) {
                 unset($allOtherParameters['view']);
             }
+
             $this->retriever->rewrittenUrl = null;
             $this->retriever->url = self::getInstance()->viewUrl($view, $allParametersWithoutView);
         }
@@ -291,40 +294,38 @@ class URL
 
     /**
      * Retrieve a rewritten URL from the current GET parameters or use toString method.
-     *
-     * @return RewritingResolver
      */
-    public function resolve($url)
+    public function resolve($url): RewritingResolver
     {
         $this->resolver->load($url);
 
         return $this->resolver;
     }
 
-    protected function sanitize($string, $force_lowercase = true, $alphabetic_only = false)
+    protected function sanitize($string, $force_lowercase = true, $alphabetic_only = false): string|array|null
     {
         static $strip = ['~', '`', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '=', '+', '[', '{', ']',
                  '}', '\\', '|', ';', ':', '"', "'", '&#8216;', '&#8217;', '&#8220;', '&#8221;', '&#8211;', '&#8212;',
                  'â€”', 'â€“', ',', '<', '.', '>', '/', '?', ];
 
-        $clean = trim(str_replace($strip, '', strip_tags($string)));
+        $clean = trim(str_replace($strip, '', strip_tags((string) $string)));
 
         $clean = preg_replace('/\s+/', '-', $clean);
 
-        $clean = ($alphabetic_only) ? preg_replace('/[^a-zA-Z0-9]/', '', $clean) : $clean;
+        $clean = ($alphabetic_only) ? preg_replace('/[^a-zA-Z0-9]/', '', (string) $clean) : $clean;
 
         return ($force_lowercase) ?
              (\function_exists('mb_strtolower')) ?
-                 mb_strtolower($clean, 'UTF-8') :
-             strtolower($clean) :
+                 mb_strtolower((string) $clean, 'UTF-8') :
+             strtolower((string) $clean) :
              $clean;
     }
 
-    public static function checkUrl($url, array $protocols = ['http', 'https'])
+    public static function checkUrl($url, array $protocols = ['http', 'https']): bool
     {
         $pattern = sprintf(UrlValidator::PATTERN, implode('|', $protocols));
 
-        return (bool) preg_match($pattern, $url);
+        return (bool) preg_match($pattern, (string) $url);
     }
 
     /**
@@ -339,7 +340,8 @@ class URL
             // fallback for old parameter
             $viewLocale = $request->query->get('locale', null);
         }
-        if (null === $viewLocale && null !== $request->getSession()) {
+
+        if (null === $viewLocale && $request->getSession() instanceof SessionInterface) {
             // fallback to session or default language
             $viewLocale = $request->getSession()->getLang()->getLocale();
         }

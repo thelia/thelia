@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\ImportExport\Export;
 
+use Iterator;
+use ReturnTypeWillChange;
+use SplFileObject;
+use DomainException;
+use LogicException;
+
+use Propel\Runtime\Util\PropelModelPager;
+use Exception;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Map\TableMap;
 use Thelia\Core\Translation\Translator;
@@ -24,7 +33,7 @@ use Thelia\Model\Lang;
  *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-abstract class AbstractExport implements \Iterator
+abstract class AbstractExport implements Iterator
 {
     /**
      * @var string Default file name
@@ -47,22 +56,22 @@ abstract class AbstractExport implements \Iterator
     public const USE_RANGE_DATE = false;
 
     /**
-     * @var \SplFileObject|\Propel\Runtime\Util\PropelModelPager Data to export
+     * @var SplFileObject|PropelModelPager Data to export
      */
     private $data;
 
     /**
      * @var bool True if data is array, false otherwise
      */
-    private $dataIsArray;
+    private ?bool $dataIsArray = null;
 
     /**
      * @var bool True if data is a path to a JSON file, false otherwise
      */
-    private $dataIsJSONFile;
+    private ?bool $dataIsJSONFile = null;
 
     /**
-     * @var \Thelia\Model\Lang A language model
+     * @var Lang A language model
      */
     protected $language;
 
@@ -102,15 +111,14 @@ abstract class AbstractExport implements \Iterator
     protected $rangeDate;
 
     /**
-     * @throws \Exception
+     * @throws Exception
      *
      * @return array|false|mixed|string
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function current()
     {
         if ($this->dataIsJSONFile) {
-            /** @var resource $file */
             $result = json_decode($this->data->current(), true);
 
             if ($result !== null) {
@@ -135,11 +143,11 @@ abstract class AbstractExport implements \Iterator
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      *
      * @return bool|float|int|string|null
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function key()
     {
         if ($this->dataIsJSONFile) {
@@ -158,7 +166,7 @@ abstract class AbstractExport implements \Iterator
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function next(): void
     {
@@ -176,7 +184,7 @@ abstract class AbstractExport implements \Iterator
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function rewind(): void
     {
@@ -188,11 +196,11 @@ abstract class AbstractExport implements \Iterator
 
             // Check if $data is a path to a json file
             if (\is_string($data)
-                && '.json' === substr($data, -5)
+                && str_ends_with($data, '.json')
                 && file_exists($data)
             ) {
-                $this->data = new \SplFileObject($data, 'r');
-                $this->data->setFlags(\SplFileObject::READ_AHEAD);
+                $this->data = new SplFileObject($data, 'r');
+                $this->data->setFlags(SplFileObject::READ_AHEAD);
                 $this->dataIsJSONFile = true;
 
                 $this->data->rewind();
@@ -215,16 +223,16 @@ abstract class AbstractExport implements \Iterator
                 return;
             }
 
-            throw new \DomainException(
+            throw new DomainException(
                 'Data must an array, an instance of \\Propel\\Runtime\\ActiveQuery\\ModelCriteria or a JSON file ending with.json'
             );
         }
 
-        throw new \LogicException('Export data can\'t be rewinded');
+        throw new LogicException("Export data can't be rewinded");
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function valid(): bool
     {
@@ -242,7 +250,7 @@ abstract class AbstractExport implements \Iterator
     /**
      * Get language.
      *
-     * @return \Thelia\Model\Lang A language model
+     * @return Lang A language model
      */
     public function getLang()
     {
@@ -252,7 +260,7 @@ abstract class AbstractExport implements \Iterator
     /**
      * Set language.
      *
-     * @param \Thelia\Model\Lang|null $language A language model
+     * @param Lang|null $language A language model
      *
      * @return $this Return $this, allow chaining
      */
@@ -264,7 +272,7 @@ abstract class AbstractExport implements \Iterator
             $this->originalOrderAndAliases = $this->orderAndAliases;
         }
 
-        if ($this->language !== null && $this->orderAndAliases !== null) {
+        if ($this->language instanceof Lang && $this->orderAndAliases !== null) {
             $previousLocale = Translator::getInstance()->getLocale();
 
             Translator::getInstance()->setLocale($this->language->getLocale());
@@ -473,7 +481,7 @@ abstract class AbstractExport implements \Iterator
             }
 
             if ($this->dataIsJSONFile) {
-                $fieldName = substr($fieldName, strripos($fieldName, '.'));
+                $fieldName = substr((string) $fieldName, strripos((string) $fieldName, '.'));
                 $fieldName = str_replace('.', '', $fieldName);
                 $fieldName = strtolower($fieldName);
             }
@@ -496,8 +504,8 @@ abstract class AbstractExport implements \Iterator
      */
     public function beforeSerialize(array $data)
     {
-        foreach ($data as $idx => &$value) {
-            if ($value instanceof \DateTime) {
+        foreach ($data as &$value) {
+            if ($value instanceof DateTime) {
                 $value = $value->format('Y-m-d H:i:s');
             }
         }
@@ -520,7 +528,7 @@ abstract class AbstractExport implements \Iterator
     /**
      * Get data to export.
      *
-     * @return string|array|\Propel\Runtime\ActiveQuery\ModelCriteria Data to export
+     * @return string|array|ModelCriteria Data to export
      */
     abstract protected function getData();
 }

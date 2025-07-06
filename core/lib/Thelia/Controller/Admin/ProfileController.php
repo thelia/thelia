@@ -1,4 +1,7 @@
-<?php
+<?php /** @noinspection PhpRedundantOptionalArgumentInspection */
+/** @noinspection PhpRedundantOptionalArgumentInspection */
+
+declare(strict_types=1);
 
 /*
  * This file is part of the Thelia package.
@@ -9,17 +12,23 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+
+use Exception;
+use LogicException;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Profile\ProfileEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\ProfileUpdateModuleAccessForm;
@@ -42,17 +51,17 @@ class ProfileController extends AbstractCrudController
         );
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::PROFILE_CREATION);
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::PROFILE_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $event = new ProfileEvent();
 
@@ -66,7 +75,7 @@ class ProfileController extends AbstractCrudController
         return $event;
     }
 
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $event = new ProfileEvent();
 
@@ -80,7 +89,7 @@ class ProfileController extends AbstractCrudController
         return $event;
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): ProfileEvent
     {
         $event = new ProfileEvent();
 
@@ -93,20 +102,16 @@ class ProfileController extends AbstractCrudController
 
     /**
      * @param ProfileEvent $event
-     *
-     * @return bool
      */
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasProfile();
     }
 
     /**
      * @param Profile $object
-     *
-     * @return \Thelia\Form\BaseForm
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -122,10 +127,8 @@ class ProfileController extends AbstractCrudController
 
     /**
      * @param Profile $object
-     *
-     * @return \Thelia\Form\BaseForm
      */
-    protected function hydrateResourceUpdateForm($object)
+    protected function hydrateResourceUpdateForm($object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -137,10 +140,8 @@ class ProfileController extends AbstractCrudController
 
     /**
      * @param Profile $object
-     *
-     * @return \Thelia\Form\BaseForm
      */
-    protected function hydrateModuleUpdateForm($object)
+    protected function hydrateModuleUpdateForm($object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -150,12 +151,12 @@ class ProfileController extends AbstractCrudController
         return $this->createForm(AdminForm::PROFILE_UPDATE_MODULE_ACCESS, FormType::class, $data);
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasProfile() ? $event->getProfile() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $profile = ProfileQuery::create()
             ->findOneById($this->getRequest()->get('profile_id', 0));
@@ -167,54 +168,51 @@ class ProfileController extends AbstractCrudController
         return $profile;
     }
 
-    /**
-     * @param Profile $object
-     *
-     * @return string
-     */
-    protected function getObjectLabel($object)
+    protected function getObjectLabel(?ActiveRecordInterface $object): string
     {
-        return $object->getTitle();
+        if ($object instanceof Profile) {
+            return $object->getTitle();
+        }
+
+        return (string) $object;
     }
 
-    /**
-     * @param Profile $object
-     *
-     * @return int
-     */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
-        return $object->getId();
+        if ($object instanceof Profile) {
+            return (string) $object->getId();
+        }
+
+        return (string) $object;
     }
 
-    protected function getViewArguments()
+    protected function getViewArguments(): array
     {
         return (null !== $tab = $this->getRequest()->get('tab')) ? ['tab' => $tab] : [];
     }
 
-    protected function getRouteArguments($profile_id = null)
+    protected function getRouteArguments($profile_id = null): array
     {
         return [
-            'profile_id' => $profile_id === null ? $this->getRequest()->get('profile_id') : $profile_id,
+            'profile_id' => $profile_id ?? $this->getRequest()->get('profile_id'),
         ];
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         // We always return to the feature edition form
         return $this->render(
-            'profiles',
-            []
+            'profiles'
         );
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         // We always return to the feature edition form
         return $this->render('profile-edit', array_merge($this->getViewArguments(), $this->getRouteArguments()));
     }
 
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         // We always return to the feature edition form
         return $this->generateRedirectFromRoute(
@@ -227,11 +225,11 @@ class ProfileController extends AbstractCrudController
     /**
      * Put in this method post object creation processing if required.
      *
-     * @param ProfileEvent $createEvent the create event
+     * @param ActionEvent $createEvent the create event
      *
-     * @return \Symfony\Component\HttpFoundation\Response|Response
+     * @return Response
      */
-    protected function performAdditionalCreateAction($createEvent)
+    protected function performAdditionalCreateAction(ActionEvent $createEvent): ?\Symfony\Component\HttpFoundation\Response
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.profiles.update',
@@ -240,14 +238,14 @@ class ProfileController extends AbstractCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.configuration.profiles.list');
     }
 
-    public function updateAction(ParserContext $parserContext)
+    public function updateAction(ParserContext $parserContext): \Symfony\Component\HttpFoundation\Response
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -266,7 +264,7 @@ class ProfileController extends AbstractCrudController
         return parent::updateAction($parserContext);
     }
 
-    protected function getUpdateResourceAccessEvent($formData)
+    protected function getUpdateResourceAccessEvent(array $formData): ProfileEvent
     {
         $event = new ProfileEvent();
 
@@ -276,7 +274,7 @@ class ProfileController extends AbstractCrudController
         return $event;
     }
 
-    protected function getUpdateModuleAccessEvent($formData)
+    protected function getUpdateModuleAccessEvent(array $formData): ProfileEvent
     {
         $event = new ProfileEvent();
 
@@ -286,15 +284,18 @@ class ProfileController extends AbstractCrudController
         return $event;
     }
 
-    protected function getResourceAccess($formData)
+    /**
+     * @return mixed[]
+     */
+    protected function getResourceAccess($formData): array
     {
         $requirements = [];
         foreach ($formData as $data => $value) {
-            if (!strstr($data, ':')) {
+            if (!strstr((string) $data, ':')) {
                 continue;
             }
 
-            $explosion = explode(':', $data);
+            $explosion = explode(':', (string) $data);
 
             $prefix = array_shift($explosion);
 
@@ -308,15 +309,18 @@ class ProfileController extends AbstractCrudController
         return $requirements;
     }
 
-    protected function getModuleAccess($formData)
+    /**
+     * @return mixed[]
+     */
+    protected function getModuleAccess($formData): array
     {
         $requirements = [];
         foreach ($formData as $data => $value) {
-            if (!strstr($data, ':')) {
+            if (!strstr((string) $data, ':')) {
                 continue;
             }
 
-            $explosion = explode(':', $data);
+            $explosion = explode(':', (string) $data);
 
             $prefix = array_shift($explosion);
 
@@ -330,10 +334,10 @@ class ProfileController extends AbstractCrudController
         return $requirements;
     }
 
-    public function processUpdateResourceAccess(EventDispatcherInterface $eventDispatcher)
+    public function processUpdateResourceAccess(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -352,7 +356,7 @@ class ProfileController extends AbstractCrudController
             $eventDispatcher->dispatch($changeEvent, TheliaEvents::PROFILE_RESOURCE_ACCESS_UPDATE);
 
             if (!$this->eventContainsObject($changeEvent)) {
-                throw new \LogicException(
+                throw new LogicException(
                     $this->getTranslator()->trans('No %obj was updated.', ['%obj', $this->objectName])
                 );
             }
@@ -372,15 +376,11 @@ class ProfileController extends AbstractCrudController
                 );
             }
 
-            if ($response == null) {
-                return $this->redirectToEditionTemplate();
-            }
-
-            return $response;
+            return $this->redirectToEditionTemplate();
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -391,10 +391,10 @@ class ProfileController extends AbstractCrudController
         return $this->renderEditionTemplate();
     }
 
-    public function processUpdateModuleAccess(EventDispatcherInterface $eventDispatcher)
+    public function processUpdateModuleAccess(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -413,7 +413,7 @@ class ProfileController extends AbstractCrudController
             $eventDispatcher->dispatch($changeEvent, TheliaEvents::PROFILE_MODULE_ACCESS_UPDATE);
 
             if (!$this->eventContainsObject($changeEvent)) {
-                throw new \LogicException(
+                throw new LogicException(
                     $this->getTranslator()->trans('No %obj was updated.', ['%obj', $this->objectName])
                 );
             }
@@ -433,15 +433,11 @@ class ProfileController extends AbstractCrudController
                 );
             }
 
-            if ($response == null) {
-                return $this->redirectToEditionTemplate();
-            }
-
-            return $response;
+            return $this->redirectToEditionTemplate();
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }

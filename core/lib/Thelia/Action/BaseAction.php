@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
+use Thelia\Model\Tools\PositionManagementTrait;
+use InvalidArgumentException;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ToggleVisibilityEvent;
@@ -24,14 +27,12 @@ class BaseAction
 {
     /**
      * Changes object position, selecting absolute ou relative change.
-     *
-     * @return null
      */
     protected function genericUpdatePosition(ModelCriteria $query, UpdatePositionEvent $event, EventDispatcherInterface $dispatcher = null)
     {
         if (null !== $object = $query->findPk($event->getObjectId())) {
-            if (!isset(class_uses($object)['Thelia\Model\Tools\PositionManagementTrait'])) {
-                throw new \InvalidArgumentException('Your model does not implement the PositionManagementTrait trait');
+            if (!isset(class_uses($object)[PositionManagementTrait::class])) {
+                throw new InvalidArgumentException('Your model does not implement the PositionManagementTrait trait');
             }
 
             $mode = $event->getMode();
@@ -52,8 +53,8 @@ class BaseAction
     protected function genericUpdateDelegatePosition(ModelCriteria $query, UpdatePositionEvent $event, EventDispatcherInterface $dispatcher = null): void
     {
         if (null !== $object = $query->findOne()) {
-            if (!isset(class_uses($object)['Thelia\Model\Tools\PositionManagementTrait'])) {
-                throw new \InvalidArgumentException('Your model does not implement the PositionManagementTrait trait');
+            if (!isset(class_uses($object)[PositionManagementTrait::class])) {
+                throw new InvalidArgumentException('Your model does not implement the PositionManagementTrait trait');
             }
 
             $mode = $event->getMode();

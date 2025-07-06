@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Core\Serializer\SerializerManager;
+use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
@@ -30,7 +33,7 @@ use Thelia\Type\TypeCollection;
  */
 class Serializer extends BaseLoop implements ArraySearchLoopInterface
 {
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createAnyTypeArgument('serializer'),
@@ -46,31 +49,24 @@ class Serializer extends BaseLoop implements ArraySearchLoopInterface
 
     public function buildArray()
     {
-        /** @var \Thelia\Core\Serializer\SerializerManager $serializerManager */
+        /** @var SerializerManager $serializerManager */
         $serializerManager = $this->container->get(RegisterSerializerPass::MANAGER_SERVICE_ID);
 
         $serializerId = $this->getArgValue('serializer');
-        if ($serializerId === null) {
-            $serializers = $serializerManager->getSerializers();
-        } else {
-            $serializers = [$serializerManager->get($serializerId)];
-        }
+        $serializers = $serializerId === null ? $serializerManager->getSerializers() : [$serializerManager->get($serializerId)];
 
-        switch ($this->getArgValue('order')) {
-            case 'alpha':
-                ksort($serializers);
-                break;
-            case 'alpha_reverse':
-                krsort($serializers);
-                break;
-        }
+        match ($this->getArgValue('order')) {
+            'alpha' => ksort($serializers),
+            'alpha_reverse' => krsort($serializers),
+            default => $serializers,
+        };
 
         return $serializers;
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
-        /** @var \Thelia\Core\Serializer\SerializerInterface $serializer */
+        /** @var SerializerInterface $serializer */
         foreach ($loopResult->getResultDataCollection() as $serializer) {
             $loopResultRow = new LoopResultRow();
 

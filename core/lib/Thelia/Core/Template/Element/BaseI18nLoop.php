@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,10 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Element;
 
-use Propel\Runtime\ActiveQuery\Criteria;
+use PDO;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\Tools\ModelCriteriaTools;
@@ -84,17 +85,17 @@ abstract class BaseI18nLoop extends BaseLoop
         if (!$this->getBackendContext()) {
             $search->where(
                 "CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID)
-                        THEN `requested_locale_i18n`.`$columnName`
-                        ELSE `default_locale_i18n`.`$columnName`
+                        THEN `requested_locale_i18n`.`{$columnName}`
+                        ELSE `default_locale_i18n`.`{$columnName}`
                         END ".$searchCriteria.' ?',
                 $searchTerm,
-                \PDO::PARAM_STR
+                PDO::PARAM_STR
             );
         } else {
             $search->where(
-                "`requested_locale_i18n`.`$columnName` $searchCriteria ?",
+                sprintf('`requested_locale_i18n`.`%s` %s ?', $columnName, $searchCriteria),
                 $searchTerm,
-                \PDO::PARAM_STR
+                PDO::PARAM_STR
             );
         }
     }

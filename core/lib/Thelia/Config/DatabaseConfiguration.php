@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Config;
 
+use Propel\Runtime\Connection\ConnectionWrapper;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -32,7 +34,7 @@ class DatabaseConfiguration implements ConfigurationInterface
     /**
      * @return TreeBuilder The tree builder
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('database');
         $databaseNode = $treeBuilder->getRootNode();
@@ -45,9 +47,7 @@ class DatabaseConfiguration implements ConfigurationInterface
         $connectionsNode
             ->validate()
             ->ifTrue(
-                function ($connections) {
-                    return !isset($connections[static::THELIA_CONNECTION_NAME]);
-                }
+                fn($connections): bool => !isset($connections[static::THELIA_CONNECTION_NAME])
             )
             ->thenInvalid(
                 "The '".static::THELIA_CONNECTION_NAME."' connection must be defined."
@@ -57,9 +57,7 @@ class DatabaseConfiguration implements ConfigurationInterface
         $databaseNode
             ->validate()
             ->ifTrue(
-                function ($database) {
-                    return !empty($database['connection']) && !empty($database['connections']);
-                }
+                fn($database): bool => !empty($database['connection']) && !empty($database['connections'])
             )
             ->thenInvalid(
                 "The 'database' node must contain either a 'connection' node or a 'connections' node, but not both."
@@ -101,7 +99,7 @@ class DatabaseConfiguration implements ConfigurationInterface
             ->cannotBeEmpty();
 
         $connectionNodeBuilder->scalarNode('classname')
-            ->defaultValue('\Propel\Runtime\Connection\ConnectionWrapper');
+            ->defaultValue(ConnectionWrapper::class);
 
         return $connectionNode;
     }

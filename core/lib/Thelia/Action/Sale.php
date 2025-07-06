@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
+use RuntimeException;
+use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
@@ -68,7 +71,6 @@ class Sale extends BaseAction implements EventSubscriberInterface
                 ;
             }
 
-            /** @var SaleOffsetCurrency $offsetByCurrency */
             foreach ($saleOffsetByCurrency as $currencyId => $offset) {
                 $productPrice = ProductPriceQuery::create()
                     ->filterByProductSaleElementsId($pse->getId())
@@ -80,16 +82,11 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     $priceWithTax = $taxCalculator->getTaxedPrice($productPrice->getPrice());
 
                     // Remove the price offset to get the taxed promo price
-                    switch ($offsetType) {
-                        case SaleModel::OFFSET_TYPE_AMOUNT:
-                            $promoPrice = max(0, $priceWithTax - $offset);
-                            break;
-                        case SaleModel::OFFSET_TYPE_PERCENTAGE:
-                            $promoPrice = $priceWithTax * (1 - $offset / 100);
-                            break;
-                        default:
-                            $promoPrice = $priceWithTax;
-                    }
+                    $promoPrice = match ($offsetType) {
+                        SaleModel::OFFSET_TYPE_AMOUNT => max(0, $priceWithTax - $offset),
+                        SaleModel::OFFSET_TYPE_PERCENTAGE => $priceWithTax * (1 - $offset / 100),
+                        default => $priceWithTax,
+                    };
 
                     // and then get the untaxed promo price.
                     $promoPrice = $taxCalculator->getUntaxedPrice($promoPrice);
@@ -106,8 +103,8 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Update the promo status of the sale's selected products and combinations.
      *
-     * @throws \RuntimeException
-     * @throws \Exception
+     * @throws RuntimeException
+     * @throws Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function updateProductsSaleStatus(ProductSaleStatusUpdateEvent $event): void
@@ -327,9 +324,9 @@ class Sale extends BaseAction implements EventSubscriberInterface
             $event->setSale($sale);
 
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (PropelException $propelException) {
             $con->rollback();
-            throw $e;
+            throw $propelException;
         }
     }
 
@@ -372,7 +369,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Clear all sales.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function clearStatus(/* @noinspection PhpUnusedParameterInspection */ SaleClearStatusEvent $event): void
     {
@@ -393,9 +390,9 @@ class Sale extends BaseAction implements EventSubscriberInterface
             ;
 
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (PropelException $propelException) {
             $con->rollback();
-            throw $e;
+            throw $propelException;
         }
     }
 
@@ -449,9 +446,9 @@ class Sale extends BaseAction implements EventSubscriberInterface
             }
 
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (PropelException $propelException) {
             $con->rollback();
-            throw $e;
+            throw $propelException;
         }
     }
 

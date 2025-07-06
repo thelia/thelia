@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Area;
 
 use Thelia\Model\Area;
@@ -21,14 +22,12 @@ use Thelia\Model\Area;
  */
 class AreaRemoveCountryEvent extends AreaAddCountryEvent
 {
-    /** @var int|null */
-    protected $stateId;
-
-    public function __construct(Area $area, array $countryIds, $stateId = null)
+    /**
+     * @param int|null $stateId
+     */
+    public function __construct(Area $area, array $countryIds, protected $stateId = null)
     {
         parent::__construct($area, $countryIds);
-
-        $this->stateId = $stateId;
     }
 
     /**

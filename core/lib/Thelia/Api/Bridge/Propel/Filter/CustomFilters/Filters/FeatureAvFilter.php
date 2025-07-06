@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters;
 
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -38,6 +39,7 @@ class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterf
         if (!\is_array($value)) {
             $value = [$value];
         }
+
         $count = FeatureAvQuery::create()
             ->filterById($value, Criteria::IN)
             ->withColumn('COUNT(DISTINCT feature_id)', 'distinct_feature_count')
@@ -57,6 +59,7 @@ class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterf
         if (empty($activeRecord->getFeatureProductsJoinFeatureAv())) {
             return null;
         }
+
         $value = [];
         foreach ($activeRecord->getFeatureProductsJoinFeatureAv() as $featureProduct) {
             $value[] =

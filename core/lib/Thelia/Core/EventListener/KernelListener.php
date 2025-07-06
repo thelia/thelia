@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\EventListener;
 
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -32,40 +34,21 @@ use Thelia\Model\LangQuery;
 
 class KernelListener implements EventSubscriberInterface
 {
-    /**
-     * @var HttpKernelInterface
-     */
-    protected $app;
-
-    /**
-     * @var Translator
-     */
-    protected $translator;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $eventDispatcher;
-
-    protected $cacheDir;
-
-    protected $env;
-
-    protected $debug;
 
     protected static $session;
 
-    public function __construct(HttpKernelInterface $app, Translator $translator, EventDispatcherInterface $eventDispatcher, $kernelCacheDir, $kernelDebug, $kernelEnvironment)
+    public function __construct(
+        protected HttpKernelInterface $app,
+        protected Translator $translator,
+        protected EventDispatcherInterface $eventDispatcher,
+        protected $cacheDir,
+        protected $debug,
+        protected $env
+    )
     {
-        $this->app = $app;
-        $this->translator = $translator;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->cacheDir = $kernelCacheDir;
-        $this->debug = $kernelDebug;
-        $this->env = $kernelEnvironment;
     }
 
-    public function paramInit(RequestEvent $event)
+    public function paramInit(RequestEvent $event): ?Response
     {
         if ($event->getRequestType() === HttpKernelInterface::MAIN_REQUEST) {
             $request = $event->getRequest();
@@ -77,6 +60,8 @@ class KernelListener implements EventSubscriberInterface
 
             $this->checkMultiDomainLang($request);
         }
+
+        return null;
     }
 
     protected function checkMultiDomainLang(TheliaRequest $request): void
@@ -89,14 +74,14 @@ class KernelListener implements EventSubscriberInterface
             return;
         }
 
-        if (null === $request->getSession()) {
+        if (!$request->getSession() instanceof SessionInterface) {
             return;
         }
 
         $domainUrl = $request->getSession()->getLang()->getUrl();
 
         // if lang domain is different from current domain, redirect to the proper one
-        if (!empty($domainUrl) && rtrim($domainUrl, '/') !== $request->getSchemeAndHttpHost()) {
+        if (!empty($domainUrl) && rtrim((string) $domainUrl, '/') !== $request->getSchemeAndHttpHost()) {
             $langs = LangQuery::create()
                 ->filterByActive(true)
                 ->filterByVisible(true)
@@ -104,7 +89,7 @@ class KernelListener implements EventSubscriberInterface
 
             foreach ($langs as $lang) {
                 $domainUrl = $lang->getUrl();
-                if (rtrim($domainUrl, '/') === $request->getSchemeAndHttpHost()) {
+                if (rtrim((string) $domainUrl, '/') === $request->getSchemeAndHttpHost()) {
                     $request->getSession()->setLang($lang);
                     break;
                 }
@@ -114,7 +99,7 @@ class KernelListener implements EventSubscriberInterface
 
     protected function initParam(TheliaRequest $request)
     {
-        if (!$request->hasSession() || null === $request->getSession()) {
+        if (!$request->hasSession() || !$request->getSession() instanceof SessionInterface) {
             return null;
         }
 
@@ -193,8 +178,8 @@ class KernelListener implements EventSubscriberInterface
 
                 if (!empty($domainUrl)) {
                     // if lang domain is different from current domain, redirect to the proper one
-                    if (rtrim($domainUrl, '/') != $request->getSchemeAndHttpHost()) {
-                        return new RedirectResponse($domainUrl, 301);
+                    if (rtrim((string) $domainUrl, '/') !== $request->getSchemeAndHttpHost()) {
+                        return new RedirectResponse($domainUrl, Response::HTTP_MOVED_PERMANENTLY);
                     }
 
                     // the user is currently on the proper domain, nothing to change
@@ -239,8 +224,8 @@ class KernelListener implements EventSubscriberInterface
             $event = new SessionEvent($this->cacheDir, $this->debug, $this->env);
 
             $this->eventDispatcher->dispatch($event, TheliaKernelEvents::SESSION);
-
-            self::$session = $session = $event->getSession();
+            self::$session = $event->getSession();
+            $session = self::$session;
         }
 
         $session->start();

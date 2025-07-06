@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,17 +11,19 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\TaxEngine;
 
+use Iterator;
+use ReturnTypeWillChange;
 use Thelia\Model\OrderProductTax;
 
 /**
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class OrderProductTaxCollection implements \Iterator
+class OrderProductTaxCollection implements Iterator
 {
-    private $position;
+    private ?int $position = null;
+
     protected $taxes = [];
 
     public function __construct()
@@ -29,22 +33,19 @@ class OrderProductTaxCollection implements \Iterator
         }
     }
 
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return \count($this->taxes) == 0;
     }
 
-    /**
-     * @return OrderProductTaxCollection
-     */
-    public function addTax(OrderProductTax $tax)
+    public function addTax(OrderProductTax $tax): static
     {
         $this->taxes[] = $tax;
 
         return $this;
     }
 
-    public function getCount()
+    public function getCount(): int
     {
         return \count($this->taxes);
     }
@@ -57,7 +58,7 @@ class OrderProductTaxCollection implements \Iterator
      *
      * @return OrderProductTax
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function current()
     {
         return $this->taxes[$this->position];
@@ -84,7 +85,7 @@ class OrderProductTaxCollection implements \Iterator
      *
      * @return mixed scalar on success, or null on failure
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function key()
     {
         return $this->position;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,27 +11,28 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Element;
 
+use Iterator;
+use JsonSerializable;
+use ReturnTypeWillChange;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Util\PropelModelPager;
 
-class LoopResult implements \Iterator, \JsonSerializable
+class LoopResult implements Iterator, JsonSerializable
 {
-    private $position;
+    private int $position = 0;
+
     protected $collection = [];
 
-    public $resultsCollection;
-
     protected $versioned = false;
+
     protected $timestamped = false;
+
     protected $countable = false;
 
-    public function __construct($resultsCollection)
+    public function __construct(public $resultsCollection)
     {
-        $this->position = 0;
-        $this->resultsCollection = $resultsCollection;
     }
 
     /**
@@ -56,7 +59,7 @@ class LoopResult implements \Iterator, \JsonSerializable
         $this->versioned = true === $versioned;
     }
 
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return \count($this->collection) == 0;
     }
@@ -68,11 +71,13 @@ class LoopResult implements \Iterator, \JsonSerializable
                 $row->set($output[0], $row->model->{$output[1]}());
             }
         }
+
         if (true === $this->timestamped) {
             foreach ($this->getTimestampOutputs() as $output) {
                 $row->set($output[0], $row->model->{$output[1]}());
             }
         }
+
         if (true === $this->countable) {
             $row->set('LOOP_COUNT', 1 + $this->getCount());
             $row->set('LOOP_TOTAL', $this->getResultDataCollectionCount());
@@ -109,16 +114,17 @@ class LoopResult implements \Iterator, \JsonSerializable
         }
     }
 
-    public function getCount()
+    public function getCount(): int
     {
         return \count($this->collection);
     }
 
-    public function getResultDataCollectionCount()
+    public function getResultDataCollectionCount(): int
     {
         if ($this->resultsCollection instanceof ObjectCollection || $this->resultsCollection instanceof PropelModelPager) {
             return $this->resultsCollection->count();
         }
+
         if (\is_array($this->resultsCollection)) {
             return \count($this->resultsCollection);
         }
@@ -137,9 +143,9 @@ class LoopResult implements \Iterator, \JsonSerializable
      *
      * @see http://php.net/manual/en/iterator.current.php
      *
-     * @return \Thelia\Core\Template\Element\LoopResultRow
+     * @return LoopResultRow
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function current()
     {
         return $this->collection[$this->position];
@@ -166,7 +172,7 @@ class LoopResult implements \Iterator, \JsonSerializable
      *
      * @return mixed scalar on success, or null on failure
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function key()
     {
         return $this->position;
@@ -199,7 +205,7 @@ class LoopResult implements \Iterator, \JsonSerializable
         $this->position = 0;
     }
 
-    protected function getTimestampOutputs()
+    protected function getTimestampOutputs(): array
     {
         return [
             ['CREATE_DATE', 'getCreatedAt'],
@@ -207,7 +213,7 @@ class LoopResult implements \Iterator, \JsonSerializable
         ];
     }
 
-    protected function getVersionOutputs()
+    protected function getVersionOutputs(): array
     {
         return [
             ['VERSION', 'getVersion'],
@@ -216,7 +222,7 @@ class LoopResult implements \Iterator, \JsonSerializable
         ];
     }
 
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function jsonSerialize(): array
     {
         $return = [];

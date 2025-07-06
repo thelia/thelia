@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
+use Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Log\Tlog;
 use Thelia\Model\Base\ModuleQuery as BaseModuleQuery;
@@ -70,7 +72,7 @@ class ModuleQuery extends BaseModuleQuery
      *
      * @param ContainerInterface $container optional
      *
-     * @return false|\Thelia\Module\BaseModule[]
+     * @return false|BaseModule[]
      */
     public function retrieveVirtualProductDelivery(ContainerInterface $container = null)
     {
@@ -82,24 +84,21 @@ class ModuleQuery extends BaseModuleQuery
 
         $result = [];
 
-        /** @var \Thelia\Model\Module $module */
+        /** @var Module $module */
         foreach ($modules as $module) {
             try {
-                if (null !== $container) {
-                    $instance = $module->getDeliveryModuleInstance($container);
-                } else {
-                    $instance = $module->createInstance();
-                }
+                $instance = $container instanceof ContainerInterface ? $module->getDeliveryModuleInstance($container) : $module->createInstance();
 
                 if (true === $instance->handleVirtualProductDelivery()) {
                     $result[] = $instance;
                 }
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 Tlog::getInstance()->addError('Failed to instantiate module '.$module->getCode(), $ex);
             }
         }
 
-        return empty($result) ? false : $result;
+        return $result === [] ? false : $result;
     }
 }
+
 // ModuleQuery

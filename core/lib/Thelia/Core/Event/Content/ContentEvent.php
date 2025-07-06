@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Content;
 
 use Thelia\Core\Event\ActionEvent;
@@ -24,17 +25,11 @@ use Thelia\Model\Content;
  */
 class ContentEvent extends ActionEvent
 {
-    /**
-     * @var \Thelia\Model\Content
-     */
-    protected $content;
-
-    public function __construct(Content $content = null)
+    public function __construct(protected ?Content $content = null)
     {
-        $this->content = $content;
     }
 
-    public function setContent(Content $content)
+    public function setContent(Content $content): static
     {
         $this->content = $content;
 
@@ -42,20 +37,18 @@ class ContentEvent extends ActionEvent
     }
 
     /**
-     * @return \Thelia\Model\Content
+     * @return Content
      */
-    public function getContent()
+    public function getContent(): ?Content
     {
         return $this->content;
     }
 
     /**
      * check if content exists.
-     *
-     * @return bool
      */
-    public function hasContent()
+    public function hasContent(): bool
     {
-        return null !== $this->content;
+        return $this->content instanceof Content;
     }
 }

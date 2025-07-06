@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -43,7 +44,7 @@ class RegisterCouponConditionPass implements CompilerPassInterface
         $couponManager = $container->getDefinition(CouponManager::class);
         $services = $container->findTaggedServiceIds('thelia.coupon.addCondition');
 
-        foreach ($services as $id => $condition) {
+        foreach (array_keys($services) as $id) {
             $couponManager->addMethodCall(
                 'addAvailableCondition',
                 [

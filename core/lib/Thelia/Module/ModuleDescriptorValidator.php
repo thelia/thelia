@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Module;
 
+use DOMDocument;
+use SplFileInfo;
+use ErrorException;
+use SimpleXMLElement;
 use Symfony\Component\Finder\Finder;
 use Thelia\Module\Exception\InvalidXmlDocumentException;
 
@@ -28,8 +33,7 @@ class ModuleDescriptorValidator
         '3' => 'module-2_2.xsd',
     ];
 
-    /** @var Finder */
-    protected $xsdFinder;
+    protected Finder $xsdFinder;
 
     protected $moduleVersion;
 
@@ -46,15 +50,15 @@ class ModuleDescriptorValidator
         return $this->moduleVersion;
     }
 
-    public function validate($xml_file, $version = null)
+    public function validate($xml_file, $version = null): bool
     {
-        $dom = new \DOMDocument();
+        $dom = new DOMDocument();
         $errors = [];
 
         if ($dom->load($xml_file)) {
-            /** @var \SplFileInfo $xsdFile */
+            /** @var SplFileInfo $xsdFile */
             foreach ($this->xsdFinder as $xsdFile) {
-                $xsdVersion = array_search($xsdFile->getBasename(), self::$versions);
+                $xsdVersion = array_search($xsdFile->getBasename(), self::$versions, true);
 
                 if (false === $xsdVersion || (null !== $version && $version != $xsdVersion)) {
                     continue;
@@ -62,7 +66,7 @@ class ModuleDescriptorValidator
 
                 $errors = $this->schemaValidate($dom, $xsdFile);
 
-                if (\count($errors) === 0) {
+                if ($errors === []) {
                     $this->moduleVersion = $xsdVersion;
 
                     return true;
@@ -82,12 +86,12 @@ class ModuleDescriptorValidator
     /**
      * Validate the schema of a XML file with a given xsd file.
      *
-     * @param \DOMDocument $dom     The XML document
-     * @param \SplFileInfo $xsdFile The XSD file
+     * @param DOMDocument $dom The XML document
+     * @param SplFileInfo $xsdFile The XSD file
      *
      * @return array an array of errors if validation fails, otherwise an empty array
      */
-    protected function schemaValidate(\DOMDocument $dom, \SplFileInfo $xsdFile)
+    protected function schemaValidate(DOMDocument $dom, SplFileInfo $xsdFile): array
     {
         $errorMessages = [];
 
@@ -113,14 +117,14 @@ class ModuleDescriptorValidator
             }
 
             libxml_use_internal_errors(false);
-        } catch (\ErrorException $ex) {
+        } catch (ErrorException) {
             libxml_use_internal_errors(false);
         }
 
         return $errorMessages;
     }
 
-    public function getDescriptor($xml_file)
+    public function getDescriptor($xml_file): SimpleXMLElement|false
     {
         $this->validate($xml_file);
 

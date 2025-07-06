@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template;
 
+use IteratorAggregate;
+use Symfony\Component\HttpFoundation\Request;
+use RuntimeException;
+use Exception;
+use Traversable;
+use ArrayIterator;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -27,37 +34,25 @@ use Thelia\Form\BaseForm;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class ParserContext implements \IteratorAggregate
+class ParserContext implements IteratorAggregate
 {
     // Lifetime, in seconds, of form error data
     public const FORM_ERROR_LIFETIME_SECONDS = 60;
 
-    private $formStore = [];
+    private array $formStore = [];
+
     private $store = [];
 
-    /** @var TheliaFormFactory */
-    private $formFactory;
-
-    /** @var TheliaFormValidator */
-    private $formValidator;
-
-    /** @var RequestStack */
-    private $requestStack;
-
     public function __construct(
-        RequestStack $requestStack,
-        TheliaFormFactory $formFactory,
-        TheliaFormValidator $formValidator
+        private readonly RequestStack $requestStack,
+        private readonly TheliaFormFactory $formFactory,
+        private readonly TheliaFormValidator $formValidator
     ) {
         // Setup basic variables
         $this->set('THELIA_VERSION', Thelia::THELIA_VERSION);
 
-        $this->requestStack = $requestStack;
-        $this->formFactory = $formFactory;
-        $this->formValidator = $formValidator;
-
         // Purge outdated error form contexts
-        if (null !== $this->requestStack->getCurrentRequest()) {
+        if ($this->requestStack->getCurrentRequest() instanceof Request) {
             $this->cleanOutdatedFormErrorInformation();
         }
     }
@@ -97,7 +92,7 @@ class ParserContext implements \IteratorAggregate
         $form = end($this->formStore);
 
         if (false === $form) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'There is currently no defined form'
             );
         }
@@ -106,13 +101,10 @@ class ParserContext implements \IteratorAggregate
     }
 
     // -- Error form -----------------------------------------------------------
-
     /**
      * Remove all objects in data, because they are probably not serializable.
-     *
-     * @return array
      */
-    protected function cleanFormData(array $data)
+    protected function cleanFormData(array $data): array
     {
         foreach ($data as $key => $value) {
             if (\is_array($value)) {
@@ -185,7 +177,7 @@ class ParserContext implements \IteratorAggregate
      *
      * @return BaseForm|null null if no error information is available
      */
-    public function getForm($formId, $formClass, $formType)
+    public function getForm(string $formId, string $formClass, string $formType): ?BaseForm
     {
         if (isset($this->store[$formClass.':'.$formType]) && $this->store[$formClass.':'.$formType] instanceof BaseForm) {
             return $this->store[$formClass.':'.$formType];
@@ -213,7 +205,7 @@ class ParserContext implements \IteratorAggregate
                 if (true === $formInfo['hasError']) {
                     try {
                         $this->formValidator->validateForm($form, $formInfo['method']);
-                    } catch (\Exception $ex) {
+                    } catch (Exception) {
                         // Ignore the exception.
                     }
 
@@ -274,7 +266,7 @@ class ParserContext implements \IteratorAggregate
     /**
      * Remove obsolete form error information.
      */
-    protected function cleanOutdatedFormErrorInformation()
+    protected function cleanOutdatedFormErrorInformation(): static
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -303,7 +295,7 @@ class ParserContext implements \IteratorAggregate
         return $this;
     }
 
-    public function setGeneralError($error)
+    public function setGeneralError($error): static
     {
         $this->set('general_error', $error);
 
@@ -312,14 +304,14 @@ class ParserContext implements \IteratorAggregate
 
     // -- Internal table manipulation ------------------------------------------
 
-    public function set($name, $value)
+    public function set($name, $value): static
     {
         $this->store[$name] = $value;
 
         return $this;
     }
 
-    public function remove($name)
+    public function remove($name): static
     {
         unset($this->store[$name]);
 
@@ -331,9 +323,9 @@ class ParserContext implements \IteratorAggregate
         return $this->store[$name] ?? $default;
     }
 
-    public function getIterator(): \Traversable
+    public function getIterator(): Traversable
     {
-        return new \ArrayIterator($this->store);
+        return new ArrayIterator($this->store);
     }
 
     /**

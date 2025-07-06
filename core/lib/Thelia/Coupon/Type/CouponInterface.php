@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Coupon\Type;
 
+
+
+use Thelia\Exception\InvalidConditionException;
 use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\FacadeInterface;
@@ -59,7 +63,7 @@ interface CouponInterface
      *                                                     on special offer price
      * @param bool             $isEnabled                  False if Coupon is disabled by admin
      * @param int              $maxUsage                   How many usage left
-     * @param \Datetime        $expirationDate             When the Code is expiring
+     * @param Datetime $expirationDate When the Code is expiring
      * @param ObjectCollection $freeShippingForCountries   list of countries which shipping is free. All if empty
      * @param ObjectCollection $freeShippingForModules     list of modules for which shipping is free. All if empty
      * @param bool             $perCustomerUsageCount      true if usage count is per customer only
@@ -76,7 +80,7 @@ interface CouponInterface
         $isAvailableOnSpecialOffers,
         $isEnabled,
         $maxUsage,
-        \DateTime $expirationDate,
+        DateTime $expirationDate,
         $freeShippingForCountries,
         $freeShippingForModules,
         $perCustomerUsageCount
@@ -139,7 +143,7 @@ interface CouponInterface
      *
      * @param ConditionCollection $conditions ConditionInterface to add
      *
-     * @throws \Thelia\Exception\InvalidConditionException
+     * @throws InvalidConditionException
      *
      * @return $this
      */
@@ -148,7 +152,7 @@ interface CouponInterface
     /**
      * Return Coupon expiration date.
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getExpirationDate();
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Form;
 
+use Thelia\Model\Template;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Validator\Constraints\GreaterThan;
@@ -35,7 +37,7 @@ class CategoryModificationForm extends CategoryCreationForm
         // Get the current edition locale
         $locale = $this->getRequest()->getSession()->getAdminEditionLang()->getLocale();
 
-        /** @var \Thelia\Model\Template $item */
+        /** @var Template $item */
         foreach ($list as $item) {
             $templateList[$item->setLocale($locale)->getName()] = $item->getId();
         }
@@ -72,7 +74,7 @@ class CategoryModificationForm extends CategoryCreationForm
         $this->addStandardDescFields(['title']);
     }
 
-    public static function getName()
+    public static function getName(): string
     {
         return 'thelia_category_modification';
     }

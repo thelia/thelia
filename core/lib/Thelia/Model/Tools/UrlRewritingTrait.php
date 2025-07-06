@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model\Tools;
 
+use RuntimeException;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Event\GenerateRewrittenUrlEvent;
@@ -60,8 +62,9 @@ trait UrlRewritingTrait
     public function generateRewrittenUrl(string $locale, ConnectionInterface $con): string
     {
         if ($this->isNew()) {
-            throw new \RuntimeException(sprintf('Object %s must be saved before generating url', $this->getRewrittenUrlViewName()));
+            throw new RuntimeException(sprintf('Object %s must be saved before generating url', $this->getRewrittenUrlViewName()));
         }
+
         // Borrowed from http://stackoverflow.com/questions/2668854/sanitizing-strings-to-make-them-url-and-filename-safe
 
         $this->setLocale($locale);
@@ -80,13 +83,14 @@ trait UrlRewritingTrait
         $title = $this->getTitle();
 
         if (null == $title) {
-            throw new \RuntimeException('Impossible to create an url if title is null');
+            throw new RuntimeException('Impossible to create an url if title is null');
         }
+
         // Replace all weird characters with dashes
-        $string = preg_replace('/[^\w\-~_\.]+/u', '-', $title);
+        $string = preg_replace('/[^\w\-~_\.]+/u', '-', (string) $title);
 
         // Only allow one dash separator at a time (and make string lowercase)
-        $cleanString = mb_strtolower(preg_replace('/--+/u', '-', $string), 'UTF-8');
+        $cleanString = mb_strtolower((string) preg_replace('/--+/u', '-', (string) $string), 'UTF-8');
 
         $urlFilePart = rtrim($cleanString, '.-~_').'.html';
 
@@ -96,7 +100,7 @@ trait UrlRewritingTrait
                 ++$i;
                 $urlFilePart = sprintf('%s-%d.html', $cleanString, $i);
             }
-        } catch (UrlRewritingException $e) {
+        } catch (UrlRewritingException) {
             $rewritingUrl = new RewritingUrl();
             $rewritingUrl->setUrl($urlFilePart)
                 ->setView($this->getRewrittenUrlViewName())
@@ -113,8 +117,6 @@ trait UrlRewritingTrait
      * return the rewritten URL for the given locale.
      *
      * @param string $locale a valid locale (e.g. en_US)
-     *
-     * @return null
      */
     public function getRewrittenUrl(string $locale)
     {
@@ -126,13 +128,7 @@ trait UrlRewritingTrait
             ->findOne()
         ;
 
-        if ($rewritingUrl) {
-            $url = $rewritingUrl->getUrl();
-        } else {
-            $url = null;
-        }
-
-        return $url;
+        return $rewritingUrl ? $rewritingUrl->getUrl() : null;
     }
 
     /**
@@ -154,7 +150,7 @@ trait UrlRewritingTrait
      * @param string $locale a valid locale (e.g. en_US)
      *
      * @throws UrlRewritingException
-     * @throws \Thelia\Exception\UrlRewritingException
+     * @throws UrlRewritingException
      *
      * @return $this
      */
@@ -190,15 +186,15 @@ trait UrlRewritingTrait
                     throw new UrlRewritingException(Translator::getInstance()->trans('URL_ALREADY_EXISTS'), UrlRewritingException::URL_ALREADY_EXISTS);
                 }
             }
-        } catch (UrlRewritingException $e) {
+        } catch (UrlRewritingException $urlRewritingException) {
             /* It's all good if URL is not found */
-            if ($e->getCode() !== UrlRewritingException::URL_NOT_FOUND) {
-                throw $e;
+            if ($urlRewritingException->getCode() !== UrlRewritingException::URL_NOT_FOUND) {
+                throw $urlRewritingException;
             }
         }
 
         /* set the new URL */
-        if ($resolver !== null) {
+        if ($resolver instanceof RewritingResolver) {
             /* erase the old one */
             $rewritingUrl = RewritingUrlQuery::create()->findOneByUrl($url);
             $rewritingUrl->setView($this->getRewrittenUrlViewName())

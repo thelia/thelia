@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
@@ -24,16 +25,6 @@ use Thelia\ImportExport\Import\AbstractImport;
 class ImportEvent extends Event
 {
     /**
-     * @var \Thelia\ImportExport\Import\AbstractImport An import
-     */
-    protected $import;
-
-    /**
-     * @var \Thelia\Core\Serializer\SerializerInterface A serializer interface
-     */
-    protected $serializer;
-
-    /**
      * @var array Errors list
      */
     protected $errors = [];
@@ -41,21 +32,19 @@ class ImportEvent extends Event
     /**
      * Event constructor.
      *
-     * @param \Thelia\ImportExport\Import\AbstractImport  $import     An import
-     * @param \Thelia\Core\Serializer\SerializerInterface $serializer A serializer interface
+     * @param AbstractImport $import An import
+     * @param SerializerInterface $serializer A serializer interface
      */
-    public function __construct(AbstractImport $import, SerializerInterface $serializer)
+    public function __construct(protected AbstractImport $import, protected SerializerInterface $serializer)
     {
-        $this->import = $import;
-        $this->serializer = $serializer;
     }
 
     /**
      * Get import.
      *
-     * @return \Thelia\ImportExport\Import\AbstractImport An import
+     * @return AbstractImport An import
      */
-    public function getImport()
+    public function getImport(): AbstractImport
     {
         return $this->import;
     }
@@ -63,11 +52,11 @@ class ImportEvent extends Event
     /**
      * Set import.
      *
-     * @param \Thelia\ImportExport\Import\AbstractImport $import An import
+     * @param AbstractImport $import An import
      *
      * @return $this Return $this, allow chaining
      */
-    public function setImport(AbstractImport $import)
+    public function setImport(AbstractImport $import): static
     {
         $this->import = $import;
 
@@ -77,9 +66,9 @@ class ImportEvent extends Event
     /**
      * Get serializer.
      *
-     * @return \Thelia\Core\Serializer\SerializerInterface A serializer interface
+     * @return SerializerInterface A serializer interface
      */
-    public function getSerializer()
+    public function getSerializer(): SerializerInterface
     {
         return $this->serializer;
     }
@@ -87,11 +76,11 @@ class ImportEvent extends Event
     /**
      * Set serializer.
      *
-     * @param \Thelia\Core\Serializer\SerializerInterface $serializer A serializer interface
+     * @param SerializerInterface $serializer A serializer interface
      *
      * @return $this Return $this, allow chaining
      */
-    public function setSerializer(SerializerInterface $serializer)
+    public function setSerializer(SerializerInterface $serializer): static
     {
         $this->serializer = $serializer;
 
@@ -115,7 +104,7 @@ class ImportEvent extends Event
      *
      * @return $this Return $this, allow chaining
      */
-    public function setErrors(array $errors)
+    public function setErrors(array $errors): static
     {
         $this->errors = $errors;
 

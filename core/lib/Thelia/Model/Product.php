@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
+use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
@@ -37,8 +39,8 @@ class Product extends BaseProduct implements FileModelParentInterface
     {
         try {
             $amount = $this->getVirtualColumn($virtualColumnName);
-        } catch (PropelException $e) {
-            throw new PropelException("Virtual column `$virtualColumnName` does not exist in Product::getRealLowestPrice");
+        } catch (PropelException) {
+            throw new PropelException(sprintf('Virtual column `%s` does not exist in Product::getRealLowestPrice', $virtualColumnName));
         }
 
         return $amount;
@@ -164,7 +166,7 @@ class Product extends BaseProduct implements FileModelParentInterface
      * @param float $baseWeight        base weight in Kg
      * @param int   $baseQuantity      the product quantity (default: 0)
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function create($defaultCategoryId, $basePrice, $priceCurrencyId, $taxRuleId, $baseWeight, $baseQuantity = 0): void
     {
@@ -186,10 +188,10 @@ class Product extends BaseProduct implements FileModelParentInterface
 
             // Store all the stuff !
             $con->commit();
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             $con->rollback();
 
-            throw $ex;
+            throw $exception;
         }
     }
 
@@ -208,7 +210,7 @@ class Product extends BaseProduct implements FileModelParentInterface
      * @param bool   $ref
      *
      * @throws PropelException
-     * @throws \Exception
+     * @throws Exception
      *
      * @return ProductSaleElements
      */
@@ -315,16 +317,11 @@ class Product extends BaseProduct implements FileModelParentInterface
     public function postSave(ConnectionInterface $con = null): void
     {
         // For BC, will be removed in 2.4
-        if (!$this->isNew()) {
-            if (isset($this->modifiedColumns[ProductTableMap::COL_POSITION]) && $this->modifiedColumns[ProductTableMap::COL_POSITION]) {
-                if (null !== $productCategory = ProductCategoryQuery::create()
-                        ->filterByProduct($this)
-                        ->filterByDefaultCategory(true)
-                        ->findOne()
-                ) {
-                    $productCategory->changeAbsolutePosition($this->getPosition());
-                }
-            }
+        if (!$this->isNew() && (isset($this->modifiedColumns[ProductTableMap::COL_POSITION]) && $this->modifiedColumns[ProductTableMap::COL_POSITION]) && null !== $productCategory = ProductCategoryQuery::create()
+                ->filterByProduct($this)
+                ->filterByDefaultCategory(true)
+                ->findOne()) {
+            $productCategory->changeAbsolutePosition($this->getPosition());
         }
 
         parent::postSave();

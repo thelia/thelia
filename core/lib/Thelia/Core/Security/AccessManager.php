@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Security;
 
 /**
@@ -20,8 +21,11 @@ namespace Thelia\Core\Security;
 class AccessManager
 {
     public const VIEW = 'VIEW';
+
     public const CREATE = 'CREATE';
+
     public const UPDATE = 'UPDATE';
+
     public const DELETE = 'DELETE';
 
     protected $accessGranted = [
@@ -38,12 +42,8 @@ class AccessManager
         self::DELETE => 0,
     ];
 
-    protected $accessValue;
-
-    public function __construct($accessValue)
+    public function __construct(protected $accessValue)
     {
-        $this->accessValue = $accessValue;
-
         $this->fillGrantedAccess();
     }
 
@@ -56,7 +56,7 @@ class AccessManager
         return $this->accessGranted[$type];
     }
 
-    public static function getMaxAccessValue()
+    public static function getMaxAccessValue(): int|float
     {
         return 2 ** current(\array_slice(self::$accessPows, -1, 1, true)) - 1;
     }

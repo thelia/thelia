@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Hook;
 
 /**
@@ -22,12 +23,11 @@ namespace Thelia\Core\Event\Hook;
 class HookRenderEvent extends BaseHookRenderEvent
 {
     /** @var array an array of fragments collected during the event dispatch */
-    protected $fragments;
+    protected $fragments = [];
 
     public function __construct($code, array $arguments = [], array $templateVariables = [])
     {
         parent::__construct($code, $arguments, $templateVariables);
-        $this->fragments = [];
     }
 
     /**
@@ -37,7 +37,7 @@ class HookRenderEvent extends BaseHookRenderEvent
      *
      * @return $this
      */
-    public function add($content)
+    public function add($content): static
     {
         $this->fragments[] = $content;
 
@@ -63,7 +63,7 @@ class HookRenderEvent extends BaseHookRenderEvent
      *
      * @return string the concatenate string
      */
-    public function dump($glue = '', $before = '', $after = '')
+    public function dump($glue = '', string $before = '', string $after = ''): string
     {
         $ret = '';
         if (0 !== \count($this->fragments)) {

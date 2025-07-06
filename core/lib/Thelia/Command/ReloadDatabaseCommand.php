@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,13 +28,12 @@ use Thelia\Model\Map\ProductTableMap;
  *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
+#[AsCommand(name: 'thelia:dev:reloadDB', description: 'erase current database and create new one')]
 class ReloadDatabaseCommand extends BaseModuleGenerate
 {
-    public function configure(): void
+    protected function configure(): void
     {
         $this
-            ->setName('thelia:dev:reloadDB')
-            ->setDescription('erase current database and create new one')
             ->addOption(
                 'force',
                 'f',
@@ -41,7 +42,7 @@ class ReloadDatabaseCommand extends BaseModuleGenerate
             );
     }
 
-    public function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (false === $input->getOption('force')) {
             $helper = $this->getHelper('question');

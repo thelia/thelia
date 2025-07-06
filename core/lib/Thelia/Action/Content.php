@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
+use Exception;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -60,7 +62,7 @@ class Content extends BaseAction implements EventSubscriberInterface
      * process update content.
      *
      * @throws PropelException
-     * @throws \Exception
+     * @throws Exception
      */
     public function update(ContentUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -158,7 +160,7 @@ class Content extends BaseAction implements EventSubscriberInterface
                 }
 
                 $con->commit();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $con->rollback();
                 throw $e;
             }

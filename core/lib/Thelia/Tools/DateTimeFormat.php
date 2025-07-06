@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,21 +11,17 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Tools;
 
 use Symfony\Component\HttpFoundation\Request;
 
 class DateTimeFormat
 {
-    protected $request;
-
-    public function __construct(Request $request)
+    public function __construct(protected Request $request)
     {
-        $this->request = $request;
     }
 
-    public static function getInstance(Request $request)
+    public static function getInstance(Request $request): self
     {
         return new self($request);
     }

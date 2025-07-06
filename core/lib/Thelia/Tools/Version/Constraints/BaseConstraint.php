@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Tools\Version\Constraints;
 
 /**
@@ -21,11 +22,8 @@ abstract class BaseConstraint implements ConstraintInterface
 {
     protected $operator = '=';
 
-    protected $expression;
-
-    public function __construct($expression)
+    public function __construct(protected $expression)
     {
-        $this->expression = $expression;
     }
 
     public function test($version, $strict = false)
@@ -42,10 +40,10 @@ abstract class BaseConstraint implements ConstraintInterface
 
     protected function normalizePrecision($version, $changeExpression = true)
     {
-        $expressionElements = preg_split('/[\.\-]/', $this->expression);
+        $expressionElements = preg_split('/[\.\-]/', (string) $this->expression);
         // cleaning alpha RC beta
-        $version = preg_replace('/\-.*$/', '', $version);
-        $versionElements = preg_split('/\./', $version);
+        $version = preg_replace('/\-.*$/', '', (string) $version);
+        $versionElements = preg_split('/\./', (string) $version);
 
         if (\count($expressionElements) < \count($versionElements)) {
             if (true === $changeExpression) {

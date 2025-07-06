@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,12 +11,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Form;
 
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\Callback;
+use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Archiver\Archiver\ZipArchiver;
 use Thelia\Core\Translation\Translator;
@@ -42,7 +45,7 @@ class ModuleInstallForm extends BaseForm
                 [
                     'required' => true,
                     'constraints' => [
-                        new Constraints\File(
+                        new File(
                             [
                                 'mimeTypes' => [
                                     'application/zip',
@@ -50,8 +53,8 @@ class ModuleInstallForm extends BaseForm
                                 'mimeTypesMessage' => Translator::getInstance()->trans('Please upload a valid Zip file'),
                             ]
                         ),
-                        new Constraints\Callback(
-                            [$this, 'checkModuleValidity']
+                        new Callback(
+                            $this->checkModuleValidity(...)
                         ),
                     ],
                     'label' => Translator::getInstance()->trans('The module zip file'),
@@ -74,7 +77,7 @@ class ModuleInstallForm extends BaseForm
                 // get the first directory
                 $moduleFiles = $this->getDirContents($modulePath);
                 if (\count($moduleFiles['directories']) !== 1) {
-                    throw new \Exception(
+                    throw new Exception(
                         Translator::getInstance()->trans(
                             'Your zip must contain 1 root directory which is the root folder directory of your module'
                         )
@@ -90,7 +93,7 @@ class ModuleInstallForm extends BaseForm
                 $moduleValidator->validate();
 
                 $this->moduleDefinition = $moduleValidator->getModuleDefinition();
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 $context->addViolation(
                     Translator::getInstance()->trans(
                         'The module is not valid : %message',
@@ -124,15 +127,13 @@ class ModuleInstallForm extends BaseForm
         $extractPath = false;
         $zip = new ZipArchiver(true);
         if (!$zip->open($file->getRealPath())) {
-            throw new \Exception('unable to open zipfile');
+            throw new Exception('unable to open zipfile');
         }
 
         $extractPath = $this->tempdir();
 
-        if ($extractPath !== false) {
-            if ($zip->extract($extractPath) === false) {
-                $extractPath = false;
-            }
+        if ($extractPath !== false && $zip->extract($extractPath) === false) {
+            $extractPath = false;
         }
 
         $zip->close();
@@ -151,6 +152,7 @@ class ModuleInstallForm extends BaseForm
         if (file_exists($tempfile)) {
             unlink($tempfile);
         }
+
         mkdir($tempfile);
         if (is_dir($tempfile)) {
             return $tempfile;
@@ -159,7 +161,7 @@ class ModuleInstallForm extends BaseForm
         return false;
     }
 
-    protected function getDirContents($dir)
+    protected function getDirContents(string $dir): array
     {
         $paths = array_diff(scandir($dir), ['..', '.']);
 
@@ -179,7 +181,7 @@ class ModuleInstallForm extends BaseForm
         return $out;
     }
 
-    public static function getName()
+    public static function getName(): string
     {
         return 'module_install';
     }

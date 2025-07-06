@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -47,16 +48,22 @@ class Filter implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_FRONT_READ = 'front:filter:read';
+
     #[Groups([self::GROUP_FRONT_READ])]
-    private ?int $id;
+    private ?int $id = null;
+
     #[Groups([self::GROUP_FRONT_READ])]
     private string $title;
+
     #[Groups([self::GROUP_FRONT_READ])]
     private string $type;
+
     #[Groups([self::GROUP_FRONT_READ])]
     private string $inputType;
+
     #[Groups([self::GROUP_FRONT_READ])]
-    private ?int $position;
+    private ?int $position = null;
+
     #[Groups([self::GROUP_FRONT_READ])]
     private array $values;
 

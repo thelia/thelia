@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,11 +11,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+
+use Exception;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
 use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -49,7 +56,7 @@ class AreaController extends AbstractCrudController
         );
     }
 
-    protected function getAreaId()
+    protected function getAreaId(): mixed
     {
         return $this->getRequest()->get('area_id', 0);
     }
@@ -57,7 +64,7 @@ class AreaController extends AbstractCrudController
     /**
      * Return the creation form for this object.
      */
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::AREA_CREATE);
     }
@@ -65,7 +72,7 @@ class AreaController extends AbstractCrudController
     /**
      * Return the update form for this object.
      */
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::AREA_MODIFICATION);
     }
@@ -74,10 +81,8 @@ class AreaController extends AbstractCrudController
      * Hydrate the update form for this object, before passing it to the update template.
      *
      * @param Area $object
-     *
-     * @return BaseForm
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $data = [
             'area_id' => $object->getId(),
@@ -89,10 +94,8 @@ class AreaController extends AbstractCrudController
 
     /**
      * Creates the creation event with the provided form data.
-     *
-     * @param array $formData
      */
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $area = new Area();
         $event = new AreaEvent($area);
@@ -102,10 +105,8 @@ class AreaController extends AbstractCrudController
 
     /**
      * Creates the update event with the provided form data.
-     *
-     * @param array $formData
      */
-    protected function getUpdateEvent($formData): AreaEvent
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $area = $this->findAreaOrFail($formData['area_id']);
         $event = new AreaEvent($area);
@@ -115,7 +116,7 @@ class AreaController extends AbstractCrudController
         return $event;
     }
 
-    private function hydrateEvent(AreaEvent $event, $formData): AreaEvent
+    private function hydrateEvent(AreaEvent $event, array $formData): AreaEvent
     {
         $event->getModel()->setName($formData['name']);
 
@@ -135,7 +136,7 @@ class AreaController extends AbstractCrudController
     /**
      * Load an existing object from the database.
      */
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         return AreaQuery::create()->findPk($this->getAreaId());
     }
@@ -143,23 +144,18 @@ class AreaController extends AbstractCrudController
     /**
      * Returns the object label form the object event (name, title, etc.).
      *
-     * @param \Thelia\Model\Area $object
+     * @param Area $object
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getName();
     }
 
     /**
      * Returns the object ID from the object.
-     *
-     * @param \Thelia\Model\Area $object
-     *
-     * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -167,9 +163,8 @@ class AreaController extends AbstractCrudController
     /**
      * Render the main list template.
      *
-     * @return \Thelia\Core\HttpFoundation\Response
      */
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render('shipping-configuration');
     }
@@ -177,7 +172,7 @@ class AreaController extends AbstractCrudController
     /**
      * Render the edition template.
      */
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render(
             'shipping-configuration-edit',
@@ -190,7 +185,7 @@ class AreaController extends AbstractCrudController
     /**
      * Redirect to the edition template.
      */
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.shipping-configuration.update.view',
@@ -204,7 +199,7 @@ class AreaController extends AbstractCrudController
     /**
      * Redirect to the list template.
      */
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.configuration.shipping-configuration.default');
     }
@@ -212,10 +207,10 @@ class AreaController extends AbstractCrudController
     /**
      * add a country to a define area.
      */
-    public function addCountry(EventDispatcherInterface $eventDispatcher)
+    public function addCountry(EventDispatcherInterface $eventDispatcher): RedirectResponse|null|Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -250,7 +245,7 @@ class AreaController extends AbstractCrudController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -268,10 +263,10 @@ class AreaController extends AbstractCrudController
     /**
      * delete several countries from a shipping zone.
      */
-    public function removeCountries(EventDispatcherInterface $eventDispatcher)
+    public function removeCountries(EventDispatcherInterface $eventDispatcher): RedirectResponse|null|Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -284,7 +279,7 @@ class AreaController extends AbstractCrudController
             $area = $this->findAreaOrFail($form->get('area_id')->getData());
 
             foreach ($data['country_id'] as $countryId) {
-                $country = explode('-', $countryId);
+                $country = explode('-', (string) $countryId);
                 $this->removeOneCountryFromArea($eventDispatcher, $area, $country[0], $country[1]);
             }
 
@@ -293,7 +288,7 @@ class AreaController extends AbstractCrudController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -335,10 +330,10 @@ class AreaController extends AbstractCrudController
         }
     }
 
-    public function removeCountry(EventDispatcherInterface $eventDispatcher)
+    public function removeCountry(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -346,7 +341,7 @@ class AreaController extends AbstractCrudController
             $eventDispatcher,
             $this->getRequest()->get('area_id', 0),
             $this->getRequest()->get('country_id', 0),
-            $this->getRequest()->get('state_id', null)
+            $this->getRequest()->get('state_id')
         );
 
         return $this->redirectToEditionTemplate();

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -36,13 +38,12 @@ use Thelia\Model\ConfigQuery;
  *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
+#[AsCommand(name: 'thelia:config', description: 'Manage configuration variables')]
 class ConfigCommand extends ContainerAwareCommand
 {
     protected function configure(): void
     {
         $this
-            ->setName('thelia:config')
-            ->setDescription('Manage configuration variables')
             ->addArgument(
                 'COMMAND',
                 InputArgument::REQUIRED,
@@ -79,7 +80,7 @@ class ConfigCommand extends ContainerAwareCommand
 
         switch ($command) {
             case 'list':
-                return $this->listConfig($input, $output);
+                return $this->listConfig($output);
             case 'get':
                 return $this->getConfig($input, $output);
             case 'set':
@@ -93,7 +94,7 @@ class ConfigCommand extends ContainerAwareCommand
         }
     }
 
-    private function listConfig(InputInterface $input, OutputInterface $output)
+    private function listConfig(OutputInterface $output): int
     {
         $output->writeln([
             '',
@@ -128,7 +129,7 @@ class ConfigCommand extends ContainerAwareCommand
         return 0;
     }
 
-    private function getConfig(InputInterface $input, OutputInterface $output)
+    private function getConfig(InputInterface $input, OutputInterface $output): int
     {
         $varName = $input->getArgument('name');
 
@@ -165,7 +166,7 @@ class ConfigCommand extends ContainerAwareCommand
         return 0;
     }
 
-    private function setConfig(InputInterface $input, OutputInterface $output)
+    private function setConfig(InputInterface $input, OutputInterface $output): int
     {
         $varName = $input->getArgument('name');
         $varValue = $input->getArgument('value');
@@ -190,7 +191,7 @@ class ConfigCommand extends ContainerAwareCommand
         return 0;
     }
 
-    private function deleteConfig(InputInterface $input, OutputInterface $output)
+    private function deleteConfig(InputInterface $input, OutputInterface $output): int
     {
         $varName = $input->getArgument('name');
 

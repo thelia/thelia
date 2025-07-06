@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -39,10 +40,7 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
 {
     protected $timestampable = true;
 
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('product_sale_elements', null, true),
@@ -102,7 +100,7 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
         return $search;
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var \Thelia\Model\AttributeCombination $attributeCombination */
         foreach ($loopResult->getResultDataCollection() as $attributeCombination) {
@@ -131,10 +129,8 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
 
     /**
      * @param string $order Criteria::ASC|Criteria::DESC
-     *
-     * @return AttributeCombinationQuery
      */
-    protected function orderByTemplateAttributePosition(AttributeCombinationQuery $search, $order)
+    protected function orderByTemplateAttributePosition(AttributeCombinationQuery $search, $order): AttributeCombinationQuery
     {
         $search
             ->useProductSaleElementsQuery()

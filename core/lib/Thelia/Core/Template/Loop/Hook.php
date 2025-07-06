@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Type\AlphaNumStringListType;
+use Thelia\Type\EnumListType;
+use Thelia\Type\BooleanOrBothType;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -21,7 +25,6 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Model\HookQuery;
-use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
@@ -40,20 +43,20 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $timestampable = true;
 
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
             new Argument(
                 'code',
-                new Type\TypeCollection(
-                    new Type\AlphaNumStringListType()
+                new TypeCollection(
+                    new AlphaNumStringListType()
                 )
             ),
             new Argument(
                 'hook_type',
-                new Type\TypeCollection(
-                    new Type\EnumListType([
+                new TypeCollection(
+                    new EnumListType([
                         TemplateDefinition::FRONT_OFFICE,
                         TemplateDefinition::BACK_OFFICE,
                         TemplateDefinition::EMAIL,
@@ -64,13 +67,13 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(['id', 'id_reverse', 'code', 'code_reverse', 'alpha', 'alpha_reverse',
+                    new EnumListType(['id', 'id_reverse', 'code', 'code_reverse', 'alpha', 'alpha_reverse',
                         'manual', 'manual_reverse', 'enabled', 'enabled_reverse', 'native', 'native_reverse', ])
                 ),
                 'id'
             ),
             Argument::createIntListTypeArgument('exclude'),
-            Argument::createBooleanOrBothTypeArgument('active', Type\BooleanOrBothType::ANY)
+            Argument::createBooleanOrBothTypeArgument('active', BooleanOrBothType::ANY)
         );
     }
 
@@ -103,7 +106,7 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         $active = $this->getActive();
-        if ($active !== Type\BooleanOrBothType::ANY) {
+        if ($active !== BooleanOrBothType::ANY) {
             $search->filterByActivate($active ? 1 : 0, Criteria::EQUAL);
         }
 
@@ -153,7 +156,7 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
         return $search;
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var \Thelia\Model\Hook $hook */
         foreach ($loopResult->getResultDataCollection() as $hook) {

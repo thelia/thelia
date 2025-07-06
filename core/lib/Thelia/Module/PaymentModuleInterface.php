@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Module;
 
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Model\Order;
 
 interface PaymentModuleInterface extends BaseModuleInterface
@@ -19,15 +21,15 @@ interface PaymentModuleInterface extends BaseModuleInterface
     /**
      *  Method used by payment gateway.
      *
-     *  If this method return a \Thelia\Core\HttpFoundation\Response instance, this response is send to the
+     *  If this method return a \Symfony\Component\HttpFoundation\Response instance, this response is send to the
      *  browser.
      *
      *  In many cases, it's necessary to send a form to the payment gateway. On your response you can return this form already
      *  completed, ready to be sent
      *
-     * @param \Thelia\Model\Order $order processed order
+     * @param Order $order processed order
      *
-     * @return \Thelia\Core\HttpFoundation\Response|null
+     * @return Response|null
      */
     public function pay(Order $order);
 

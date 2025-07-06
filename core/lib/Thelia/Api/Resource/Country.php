@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
+
 
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
@@ -22,6 +24,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use DateTime;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
@@ -95,10 +98,13 @@ use Thelia\Model\Map\CountryTableMap;
 class Country extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:country:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:country:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:country:write';
 
     public const GROUP_FRONT_READ = 'front:country:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:country:read:single';
 
     #[Groups([
@@ -123,32 +129,32 @@ class Country extends AbstractTranslatableResource
     public string $isocode;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE, Address::GROUP_FRONT_READ])]
-    public ?string $isoalpha2;
+    public ?string $isoalpha2 = null;
 
     #[ApiProperty(identifier: true)]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ,  self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE, Address::GROUP_FRONT_READ])]
-    public ?string $isoalpha3;
+    public ?string $isoalpha3 = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
-    public ?bool $hasStates;
+    public ?bool $hasStates = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
-    public ?bool $needZipCode;
+    public ?bool $needZipCode = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
-    public ?string $zipCodeFormat;
+    public ?string $zipCodeFormat = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
-    public ?bool $byDefault;
+    public ?bool $byDefault = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
-    public ?bool $shopCountry;
+    public ?bool $shopCountry = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $createdAt;
+    public ?DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $updatedAt;
+    public ?DateTime $updatedAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_FRONT_READ_SINGLE, Address::GROUP_FRONT_READ])]
     public I18nCollection $i18ns;
@@ -273,24 +279,24 @@ class Country extends AbstractTranslatableResource
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): self
+    public function setCreatedAt(?DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): self
+    public function setUpdatedAt(?DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 

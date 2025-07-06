@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\TaxEngine\TaxEngine;
+use Thelia\Type\BooleanOrBothType;
+use Thelia\Type\IntToCombinedIntsListType;
+use Thelia\Type\EnumListType;
+use InvalidArgumentException;
+use PDO;
+use Thelia\Core\Security\SecurityContext;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -25,7 +33,6 @@ use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\ProductSaleElementsQuery;
-use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
@@ -52,10 +59,13 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
 {
     protected $timestampable = true;
 
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    public function __construct(
+        protected readonly TaxEngine $taxEngine,
+    )
+    {
+    }
+
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
@@ -64,18 +74,18 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             Argument::createBooleanTypeArgument('promo'),
             Argument::createBooleanTypeArgument('new'),
             Argument::createBooleanTypeArgument('default'),
-            Argument::createBooleanOrBothTypeArgument('visible', Type\BooleanOrBothType::ANY),
+            Argument::createBooleanOrBothTypeArgument('visible', BooleanOrBothType::ANY),
             Argument::createAnyTypeArgument('ref'),
             new Argument(
                 'attribute_availability',
                 new TypeCollection(
-                    new Type\IntToCombinedIntsListType()
+                    new IntToCombinedIntsListType()
                 )
             ),
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(
+                    new EnumListType(
                         [
                             'id', 'id_reverse',
                             'ref', 'ref_reverse',
@@ -128,7 +138,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
 
         $visible = $this->getVisible();
 
-        if (Type\BooleanOrBothType::ANY !== $visible) {
+        if (BooleanOrBothType::ANY !== $visible) {
             $search->useProductQuery()
                 ->filterByVisible($visible)
             ->endUse();
@@ -203,7 +213,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         if (null !== $currencyId) {
             $currency = CurrencyQuery::create()->findPk($currencyId);
             if (null === $currency) {
-                throw new \InvalidArgumentException('Cannot found currency id: `'.$currency.'` in product_sale_elements loop');
+                throw new InvalidArgumentException('Cannot found currency id: `'.$currency.'` in product_sale_elements loop');
             }
         } else {
             $currency = $this->getCurrentRequest()->getSession()->getCurrency();
@@ -213,10 +223,10 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         $defaultCurrencySuffix = '_default_currency';
 
         $search->joinProductPrice('price', Criteria::LEFT_JOIN)
-            ->addJoinCondition('price', '`price`.`currency_id` = ?', $currency->getId(), null, \PDO::PARAM_INT);
+            ->addJoinCondition('price', '`price`.`currency_id` = ?', $currency->getId(), null, PDO::PARAM_INT);
 
         $search->joinProductPrice('price'.$defaultCurrencySuffix, Criteria::LEFT_JOIN)
-            ->addJoinCondition('price_default_currency', '`price'.$defaultCurrencySuffix.'`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
+            ->addJoinCondition('price_default_currency', '`price'.$defaultCurrencySuffix.'`.`currency_id` = ?', $defaultCurrency->getId(), null, PDO::PARAM_INT);
 
         /**
          * rate value is checked as a float in overloaded getRate method.
@@ -232,10 +242,10 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         return $search;
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
-        $taxCountry = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
-        /** @var \Thelia\Core\Security\SecurityContext $securityContext */
+        $taxCountry = $this->taxEngine->getDeliveryCountry();
+        /** @var SecurityContext $securityContext */
         $securityContext = $this->container->get('thelia.securityContext');
         $discount = 0;
 
@@ -254,7 +264,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                     'price_PRICE',
                     $discount
                 );
-            } catch (TaxEngineException $e) {
+            } catch (TaxEngineException) {
                 $taxedPrice = null;
             }
 
@@ -265,7 +275,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                     'price_PROMO_PRICE',
                     $discount
                 );
-            } catch (TaxEngineException $e) {
+            } catch (TaxEngineException) {
                 $taxedPromoPrice = null;
             }
 
@@ -296,7 +306,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
     /**
      * @return array of available field to search in
      */
-    public function getSearchIn()
+    public function getSearchIn(): array
     {
         return [
             'ref',
@@ -315,6 +325,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             if ($index > 0) {
                 $search->_or();
             }
+
             switch ($searchInElement) {
                 case 'ref':
                     $search->filterByRef($searchTerm, $searchCriteria);

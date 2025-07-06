@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template;
 
+use DirectoryIterator;
+use Exception;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cache\CacheEvent;
@@ -29,7 +32,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function getActiveMailTemplate(): TemplateDefinition
     {
@@ -67,7 +70,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function getActivePdfTemplate(): TemplateDefinition
     {
@@ -78,7 +81,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function getActiveAdminTemplate(): TemplateDefinition
     {
@@ -89,7 +92,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function getActiveFrontTemplate(): TemplateDefinition
     {
@@ -100,7 +103,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function getStandardTemplateDefinitions(): array
     {
@@ -117,21 +120,22 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
      */
     public function getList(int $templateType, string $base = THELIA_TEMPLATE_DIR): array
     {
-        $list = $exclude = [];
-
+        $list = [];
+        $exclude = [];
         $tplIterator = TemplateDefinition::getStandardTemplatesSubdirsIterator();
 
         foreach ($tplIterator as $type => $subdir) {
             if ($templateType !== $type) {
                 continue;
             }
+
             $baseDir = rtrim($base, DS).DS.$subdir;
 
             try {
                 // Every subdir of the basedir is supposed to be a template.
-                $di = new \DirectoryIterator($baseDir);
+                $di = new DirectoryIterator($baseDir);
 
-                /** @var \DirectoryIterator $file */
+                /** @var DirectoryIterator $file */
                 foreach ($di as $file) {
                     // Ignore 'dot' elements
                     if ($file->isDot() || !$file->isDir()) {
@@ -145,7 +149,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
 
                     $list[] = new TemplateDefinition($file->getFilename(), $templateType);
                 }
-            } catch (\Exception) {
+            } catch (Exception) {
                 continue;
             }
         }
@@ -177,6 +181,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
         if (null === $bundleName) {
             return;
         }
+
         $this->composerHelper->addNamespaceToBundlesSymfony($bundleName, ['all' => true]);
         $this->composerHelper->addPsr4NamespaceToComposer($bundleName, $path);
     }
@@ -210,6 +215,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
             file_put_contents($envFilePath, $envContent);
             return;
         }
+
         $newSection = sprintf(
             "\n\n###> thelia/templates ###\n%s=%s\n###< thelia/templates ###\n",
             $envName,

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
+
 
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
@@ -22,6 +24,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model\Operation;
+use DateTime;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -124,12 +127,17 @@ use Thelia\Model\Map\BrandImageTableMap;
 class BrandImage extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     public const GROUP_ADMIN_READ = 'admin:brand_image:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:brand_image:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:brand_image:write';
+
     public const GROUP_ADMIN_WRITE_FILE = 'admin:brand_image:write_file';
+
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:brand_image:write_update';
 
     public const GROUP_FRONT_READ = 'front:brand_image:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:brand_image:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ])]
@@ -163,13 +171,13 @@ class BrandImage extends AbstractTranslatableResource implements ItemFileResourc
     public bool $visible;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE_UPDATE])]
-    public ?int $position;
+    public ?int $position = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?\DateTime $createdAt;
+    public ?DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?\DateTime $updatedAt;
+    public ?DateTime $updatedAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
@@ -178,7 +186,7 @@ class BrandImage extends AbstractTranslatableResource implements ItemFileResourc
     public string $file;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?string $fileUrl;
+    public ?string $fileUrl = null;
 
     public function getId(): ?int
     {
@@ -240,24 +248,24 @@ class BrandImage extends AbstractTranslatableResource implements ItemFileResourc
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): self
+    public function setCreatedAt(?DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): self
+    public function setUpdatedAt(?DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 

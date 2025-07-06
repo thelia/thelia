@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Exception;
+use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
@@ -24,14 +29,14 @@ use Thelia\Model\ConfigQuery;
  */
 class ConfigStoreController extends BaseAdminController
 {
-    protected function renderTemplate()
+    protected function renderTemplate(): Response
     {
         return $this->render('config-store');
     }
 
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::STORE, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::STORE, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -43,13 +48,13 @@ class ConfigStoreController extends BaseAdminController
         return $this->renderTemplate();
     }
 
-    protected function getAndWriteStoreMediaFileInConfig($form, $inputName, $configKey, $storeMediaUploadDir): void
+    protected function getAndWriteStoreMediaFileInConfig($form, $inputName, $configKey, string $storeMediaUploadDir): void
     {
         $file = $form->get($inputName)->getData();
 
         if ($file != null) {
             // Delete the old file
-            $fs = new \Symfony\Component\Filesystem\Filesystem();
+            $fs = new Filesystem();
             $oldFileName = ConfigQuery::read($configKey);
 
             if ($oldFileName !== null) {
@@ -66,16 +71,17 @@ class ConfigStoreController extends BaseAdminController
         }
     }
 
-    public function saveAction()
+    public function saveAction(): Response|RedirectResponse|null
     {
-        if (null !== $response = $this->checkAuth(AdminResources::STORE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::STORE, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
-        $error_msg = $ex = false;
+        $error_msg = false;
         $response = null;
         $configStoreForm = $this->createForm(AdminForm::CONFIG_STORE);
 
+        $exception = null;
         try {
             $form = $this->validateForm($configStoreForm);
 
@@ -117,8 +123,8 @@ class ConfigStoreController extends BaseAdminController
             } else {
                 $response = $this->generateSuccessRedirect($configStoreForm);
             }
-        } catch (\Exception $ex) {
-            $error_msg = $ex->getMessage();
+        } catch (Exception $exception) {
+            $error_msg = $exception->getMessage();
         }
 
         if (false !== $error_msg) {
@@ -126,7 +132,7 @@ class ConfigStoreController extends BaseAdminController
                 $this->getTranslator()->trans('Store configuration failed.'),
                 $error_msg,
                 $configStoreForm,
-                $ex
+                $exception
             );
 
             $response = $this->renderTemplate();

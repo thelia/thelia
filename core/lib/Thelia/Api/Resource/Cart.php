@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
+
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -19,6 +21,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use DateTime;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
@@ -82,70 +85,69 @@ class Cart implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:cart:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:cart:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:cart:write';
 
     public const GROUP_FRONT_READ = 'front:cart:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:cart:read:single';
+
     public const GROUP_FRONT_WRITE = 'front:cart:write';
 
     #[Groups([self::GROUP_ADMIN_READ, CartItem::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
-    public ?string $token;
+    public ?string $token = null;
 
     #[Relation(targetResource: Customer::class)]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
-    public ?Customer $customer;
+    public ?Customer $customer = null;
 
     #[Relation(targetResource: Address::class, relationAlias: 'AddressRelatedByAddressDeliveryId')]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?Address $addressDelivery;
+    public ?Address $addressDelivery = null;
 
     #[Relation(targetResource: Address::class, relationAlias: 'AddressRelatedByAddressInvoiceId')]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?Address $addressInvoice;
+    public ?Address $addressInvoice = null;
 
     #[Relation(targetResource: Currency::class)]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?Currency $currency;
+    public ?Currency $currency = null;
 
     #[Relation(targetResource: CartItem::class, )]
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?array $cartItems;
+    public ?array $cartItems = [];
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
-    public ?float $discount;
+    public ?float $discount = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?\DateTime $createdAt;
+    public ?DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?\DateTime $updatedAt;
+    public ?DateTime $updatedAt = null;
 
     #[Groups([self::GROUP_FRONT_READ_SINGLE])]
-    public ?float $totalWithoutTax;
+    public ?float $totalWithoutTax = null;
 
     #[Groups([self::GROUP_FRONT_READ_SINGLE])]
-    public ?float $deliveryTax;
+    public ?float $deliveryTax = null;
 
     #[Groups([self::GROUP_FRONT_READ_SINGLE])]
-    public ?float $taxes;
+    public ?float $taxes = null;
 
     #[Groups([self::GROUP_FRONT_READ_SINGLE])]
-    public ?float $delivery;
+    public ?float $delivery = null;
 
     #[Groups([self::GROUP_FRONT_READ_SINGLE])]
-    public ?float $total;
+    public ?float $total = null;
 
     #[Groups([self::GROUP_FRONT_READ_SINGLE])]
-    public ?bool $virtual;
-
-    public function __construct()
-    {
-        $this->cartItems = [];
-    }
+    public ?bool $virtual = null;
 
     public function getId(): ?int
     {
@@ -243,24 +245,24 @@ class Cart implements PropelResourceInterface
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): self
+    public function setCreatedAt(?DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): self
+    public function setUpdatedAt(?DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 

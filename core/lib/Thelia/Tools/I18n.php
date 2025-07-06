@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Tools;
+
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Model\Lang;
@@ -36,13 +38,13 @@ class I18n
      * @param Lang   $lang Object containing date format
      * @param string $date String to convert
      *
-     * @return \DateTime
+     * @return DateTime
      */
-    public function getDateTimeFromForm(Lang $lang, $date)
+    public function getDateTimeFromForm(Lang $lang, $date): DateTime|false
     {
         $currentDateFormat = $lang->getDateFormat();
 
-        return \DateTime::createFromFormat($currentDateFormat, $date);
+        return DateTime::createFromFormat($currentDateFormat, $date);
     }
 
     public static function forceI18nRetrieving($askedLocale, $modelName, $id, $needed = ['Title'])
@@ -64,6 +66,7 @@ class I18n
                     Lang::getDefaultLanguage()->getLocale()
                 )->findOne();
         }
+
         if (null === $i18n) {
             // @todo something else ?
             $i18n = new $i18nClass();
@@ -72,8 +75,9 @@ class I18n
             foreach ($needed as $need) {
                 $method = sprintf('set%s', $need);
                 if (method_exists($i18n, $method)) {
-                    $i18n->$method('DEFAULT '.strtoupper($need));
+                    $i18n->$method('DEFAULT '.strtoupper((string) $need));
                 }
+
                 // @todo throw sg ?
             }
         }
@@ -83,10 +87,10 @@ class I18n
 
     public static function addI18nCondition(
         ModelCriteria $query,
-        $i18nTableName,
-        $tableIdColumn,
-        $i18nIdColumn,
-        $localeColumn,
+        string $i18nTableName,
+        string $tableIdColumn,
+        string $i18nIdColumn,
+        string $localeColumn,
         $locale
     ): void {
         if (null === static::$defaultLocale) {
@@ -102,9 +106,9 @@ class I18n
                 'CASE WHEN '.$tableIdColumn.' IN'.
                 '(SELECT DISTINCT '.$i18nIdColumn.' '.
                 'FROM `'.$i18nTableName.'` '.
-                "WHERE locale=$locale) ".
-                'THEN '.$localeColumn." = $locale ".
-                'ELSE '.$localeColumn." = $defaultLocale ".
+                sprintf('WHERE locale=%s) ', $locale).
+                'THEN '.$localeColumn.sprintf(' = %s ', $locale).
+                'ELSE '.$localeColumn.sprintf(' = %s ', $defaultLocale).
                 'END'
             )
         ;
@@ -115,9 +119,9 @@ class I18n
      *
      * Really escapes a string for SQL query
      */
-    public static function realEscape($str)
+    public static function realEscape($str): string
     {
-        $str = trim($str, "\"'");
+        $str = trim((string) $str, "\"'");
 
         $return = 'CONCAT(';
         $len = \strlen($str);
@@ -126,13 +130,8 @@ class I18n
             $return .= 'CHAR('.\ord($str[$i]).'),';
         }
 
-        if ($i > 0) {
-            $return = substr($return, 0, -1);
-        } else {
-            $return = '""';
-        }
-        $return .= ')';
+        $return = $i > 0 ? substr($return, 0, -1) : '""';
 
-        return $return;
+        return $return . ')';
     }
 }

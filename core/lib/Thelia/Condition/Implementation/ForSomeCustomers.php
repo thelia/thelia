@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Condition\Implementation;
 
 use Thelia\Condition\Operators;
@@ -40,12 +41,12 @@ class ForSomeCustomers extends ConditionAbstract
         parent::__construct($facade);
     }
 
-    public function getServiceId()
+    public function getServiceId(): string
     {
         return 'thelia.condition.for_some_customers';
     }
 
-    public function setValidatorsFromForm(array $operators, array $values)
+    public function setValidatorsFromForm(array $operators, array $values): static
     {
         $this->checkComparisonOperatorValue($operators, self::CUSTOMERS_LIST);
 
@@ -63,7 +64,7 @@ class ForSomeCustomers extends ConditionAbstract
         // Check that at least one product is selected
         if (empty($values[self::CUSTOMERS_LIST])) {
             throw new InvalidConditionValueException(
-                __CLASS__,
+                self::class,
                 self::CUSTOMERS_LIST
             );
         }
@@ -87,7 +88,7 @@ class ForSomeCustomers extends ConditionAbstract
         );
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->translator->trans(
             'For one ore more customers',
@@ -95,17 +96,15 @@ class ForSomeCustomers extends ConditionAbstract
         );
     }
 
-    public function getToolTip()
+    public function getToolTip(): string
     {
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'The coupon applies to some customers only',
             []
         );
-
-        return $toolTip;
     }
 
-    public function getSummary()
+    public function getSummary(): string
     {
         $i18nOperator = Operators::getI18n(
             $this->translator,
@@ -125,18 +124,16 @@ class ForSomeCustomers extends ConditionAbstract
             $custStrList = rtrim($custStrList, ', ');
         }
 
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'Customer is %op% <strong>%customer_list%</strong>',
             [
                 '%customer_list%' => $custStrList,
                 '%op%' => $i18nOperator,
             ]
         );
-
-        return $toolTip;
     }
 
-    protected function generateInputs()
+    protected function generateInputs(): array
     {
         return [
             self::CUSTOMERS_LIST => [

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
+use RuntimeException;
+use LogicException;
+use Exception;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
@@ -52,9 +56,7 @@ class Country extends BaseCountry
             ' ' => ' +',
         ];
 
-        $zipCodeRE = '#^'.strtr($zipCodeRE, $trans).'$#';
-
-        return $zipCodeRE;
+        return '#^'.strtr($zipCodeRE, $trans).'$#';
     }
 
     /**
@@ -77,14 +79,14 @@ class Country extends BaseCountry
     /**
      * Put the current country as the default one.
      *
-     * @throws \RuntimeException
-     * @throws \Exception
+     * @throws RuntimeException
+     * @throws Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function toggleDefault(): void
     {
         if ($this->getId() === null) {
-            throw new \RuntimeException('impossible to just uncheck default country, choose a new one');
+            throw new RuntimeException('impossible to just uncheck default country, choose a new one');
         }
 
         $con = Propel::getWriteConnection(CountryTableMap::DATABASE_NAME);
@@ -100,27 +102,22 @@ class Country extends BaseCountry
                 ->save($con);
 
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (PropelException $propelException) {
             $con->rollBack();
-            throw $e;
+            throw $propelException;
         }
     }
 
     public function preDelete(ConnectionInterface $con = null)
     {
         parent::preDelete($con);
-
-        if ($this->getByDefault()) {
-            return false;
-        }
-
-        return true;
+        return !$this->getByDefault();
     }
 
     /**
      * Return the default country.
      *
-     * @throws \LogicException if no default country is defined
+     * @throws LogicException if no default country is defined
      */
     public static function getDefaultCountry()
     {
@@ -128,7 +125,7 @@ class Country extends BaseCountry
             self::$defaultCountry = CountryQuery::create()->findOneByByDefault(true);
 
             if (null === self::$defaultCountry) {
-                throw new \LogicException(Translator::getInstance()->trans('Cannot find a default country. Please define one.'));
+                throw new LogicException(Translator::getInstance()->trans('Cannot find a default country. Please define one.'));
             }
         }
 
@@ -138,7 +135,7 @@ class Country extends BaseCountry
     /**
      * Return the shop country.
      *
-     * @throws \LogicException if no shop country is defined
+     * @throws LogicException if no shop country is defined
      */
     public static function getShopLocation()
     {
@@ -151,7 +148,7 @@ class Country extends BaseCountry
 
         $shopCountry = CountryQuery::create()->findPk($countryId);
         if ($shopCountry === null) {
-            throw new \LogicException(Translator::getInstance()->trans('Cannot find the shop country. Please select a shop country.'));
+            throw new LogicException(Translator::getInstance()->trans('Cannot find the shop country. Please select a shop country.'));
         }
 
         return $shopCountry;

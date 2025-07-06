@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -44,8 +45,6 @@ class NewsletterForm extends BaseForm
      *       )
      *   )
      *   ->add('age', IntegerType::class);
-     *
-     * @return null
      */
     protected function buildForm()
     {
@@ -55,7 +54,7 @@ class NewsletterForm extends BaseForm
                     new NotBlank(),
                     new Email(),
                     new Callback(
-                        [$this, 'verifyExistingEmail']
+                        $this->verifyExistingEmail(...)
                     ),
                 ],
                 'label' => Translator::getInstance()->trans('Email address'),
@@ -88,7 +87,7 @@ class NewsletterForm extends BaseForm
     /**
      * @return string the name of you form. This name must be unique
      */
-    public static function getName()
+    public static function getName(): string
     {
         return 'thelia_newsletter';
     }

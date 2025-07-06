@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Module;
 
 /**
@@ -19,11 +20,6 @@ namespace Thelia\Core\Event\Module;
  */
 class ModuleToggleActivationEvent extends ModuleEvent
 {
-    /**
-     * @var int
-     */
-    protected $module_id;
-
     /**
      * @var bool
      */
@@ -35,17 +31,11 @@ class ModuleToggleActivationEvent extends ModuleEvent
     protected $recursive;
 
     /**
-     * @var bool
-     */
-    protected $assume_deactivate;
-
-    /**
      * @param int $module_id
+     * @param bool $assume_deactivate
      */
-    public function __construct($module_id, $assume_deactivate = false)
+    public function __construct(protected $module_id, protected $assume_deactivate = false)
     {
-        $this->module_id = $module_id;
-        $this->assume_deactivate = $assume_deactivate;
     }
 
     /**

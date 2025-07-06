@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,23 +11,30 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+
+use Exception;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Content\ContentAddFolderEvent;
 use Thelia\Core\Event\Content\ContentCreateEvent;
 use Thelia\Core\Event\Content\ContentDeleteEvent;
+use Thelia\Core\Event\Content\ContentEvent;
 use Thelia\Core\Event\Content\ContentRemoveFolderEvent;
 use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
+use Thelia\Form\ContentModificationForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Content;
 use Thelia\Model\ContentQuery;
@@ -56,12 +65,12 @@ class ContentController extends AbstractSeoCrudController
     /**
      * controller adding content to additional folder.
      *
-     * @return mixed|\Thelia\Core\HttpFoundation\Response
+     * @return mixed|Response
      */
-    public function addAdditionalFolderAction(EventDispatcherInterface $eventDispatcher)
+    public function addAdditionalFolderAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -75,7 +84,7 @@ class ContentController extends AbstractSeoCrudController
 
             try {
                 $eventDispatcher->dispatch($event, TheliaEvents::CONTENT_ADD_FOLDER);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 return $this->errorPage($e);
             }
         }
@@ -86,12 +95,12 @@ class ContentController extends AbstractSeoCrudController
     /**
      * controller removing additional folder to a content.
      *
-     * @return mixed|\Thelia\Core\HttpFoundation\Response
+     * @return mixed|Response
      */
-    public function removeAdditionalFolderAction(EventDispatcherInterface $eventDispatcher)
+    public function removeAdditionalFolderAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -105,7 +114,7 @@ class ContentController extends AbstractSeoCrudController
 
             try {
                 $eventDispatcher->dispatch($event, TheliaEvents::CONTENT_REMOVE_FOLDER);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 return $this->errorPage($e);
             }
         }
@@ -116,7 +125,7 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Return the creation form for this object.
      */
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::CONTENT_CREATION);
     }
@@ -124,7 +133,7 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Return the update form for this object.
      */
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::CONTENT_MODIFICATION);
     }
@@ -134,9 +143,9 @@ class ContentController extends AbstractSeoCrudController
      *
      * @param Content $object
      *
-     * @return \Thelia\Form\ContentModificationForm
+     * @return ContentModificationForm
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         // Hydrate the "SEO" tab form
         $this->hydrateSeoForm($parserContext, $object);
@@ -158,12 +167,8 @@ class ContentController extends AbstractSeoCrudController
 
     /**
      * Creates the creation event with the provided form data.
-     *
-     * @param array $formData
-     *
-     * @return \Thelia\Core\Event\Content\ContentCreateEvent
      */
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $contentCreateEvent = new ContentCreateEvent();
 
@@ -179,12 +184,8 @@ class ContentController extends AbstractSeoCrudController
 
     /**
      * Creates the update event with the provided form data.
-     *
-     * @param array $formData
-     *
-     * @return \Thelia\Core\Event\Content\ContentUpdateEvent
      */
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $contentUpdateEvent = new ContentUpdateEvent($formData['id']);
 
@@ -203,7 +204,7 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Creates the delete event with the provided form data.
      */
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): ContentDeleteEvent
     {
         return new ContentDeleteEvent($this->getRequest()->get('content_id'));
     }
@@ -211,11 +212,9 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
-     * @param \Thelia\Core\Event\Content\ContentEvent $event
-     *
-     * @return bool
+     * @param ContentEvent $event
      */
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasContent();
     }
@@ -225,9 +224,9 @@ class ContentController extends AbstractSeoCrudController
      *
      * @param $event \Thelia\Core\Event\Content\ContentEvent
      *
-     * @return \Thelia\Model\Content|null
+     * @return Content|null
      */
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->getContent();
     }
@@ -235,9 +234,9 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Load an existing object from the database.
      *
-     * @return \Thelia\Model\Content
+     * @return Content
      */
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $content = ContentQuery::create()
             ->findOneById($this->getRequest()->get('content_id', 0));
@@ -256,8 +255,7 @@ class ContentController extends AbstractSeoCrudController
      *
      * @return string content title
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
@@ -268,19 +266,19 @@ class ContentController extends AbstractSeoCrudController
      *
      * @return int content id
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
 
     protected function getFolderId()
     {
-        $folderId = $this->getRequest()->get('folder_id', null);
+        $folderId = $this->getRequest()->get('folder_id');
 
         if (null === $folderId) {
             $content = $this->getExistingObject();
 
-            if ($content) {
+            if ($content instanceof ActiveRecordInterface) {
                 $folderId = $content->getDefaultFolderId();
             }
         }
@@ -292,10 +290,8 @@ class ContentController extends AbstractSeoCrudController
      * Render the main list template.
      *
      * @param int $currentOrder , if any, null otherwise
-     *
-     * @return \Thelia\Core\HttpFoundation\Response
      */
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         $this->getListOrderFromSession('content', 'content_order', 'manual');
 
@@ -308,7 +304,7 @@ class ContentController extends AbstractSeoCrudController
         );
     }
 
-    protected function getEditionArguments()
+    protected function getEditionArguments(): array
     {
         return [
             'content_id' => $this->getRequest()->get('content_id', 0),
@@ -320,7 +316,7 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Render the edition template.
      */
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('content-edit', $this->getEditionArguments());
     }
@@ -328,7 +324,7 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Redirect to the edition template.
      */
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.content.update',
@@ -340,7 +336,7 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Redirect to the list template.
      */
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.content.default',
@@ -349,11 +345,9 @@ class ContentController extends AbstractSeoCrudController
     }
 
     /**
-     * @param \Thelia\Core\Event\Content\ContentUpdateEvent $updateEvent
-     *
      * @return Response|void
      */
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, $updateEvent)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): ?\Symfony\Component\HttpFoundation\Response
     {
         if ($this->getRequest()->get('save_mode') != 'stay') {
             return $this->generateRedirectFromRoute(
@@ -368,11 +362,11 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Put in this method post object delete processing if required.
      *
-     * @param \Thelia\Core\Event\Content\ContentDeleteEvent $deleteEvent the delete event
+     * @param ActionEvent $deleteEvent the delete event
      *
      * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalDeleteAction($deleteEvent)
+    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent): ?\Symfony\Component\HttpFoundation\Response
     {
         return $this->generateRedirectFromRoute(
             'admin.folders.default',
@@ -381,17 +375,17 @@ class ContentController extends AbstractSeoCrudController
     }
 
     /**
-     * @param $event \Thelia\Core\Event\UpdatePositionEvent
+     * @param $positionChangeEvent ActionEvent
      *
      * @return Response|null
      */
-    protected function performAdditionalUpdatePositionAction($event)
+    protected function performAdditionalUpdatePositionAction(ActionEvent $positionChangeEvent): ?\Symfony\Component\HttpFoundation\Response
     {
-        if (null !== $content = ContentQuery::create()->findPk($event->getObjectId())) {
+        if (null !== $content = ContentQuery::create()->findPk($positionChangeEvent->getObjectId())) {
             // Redirect to parent category list
             return $this->generateRedirectFromRoute(
                 'admin.folders.default',
-                ['parent' => $event->getReferrerId()]
+                ['parent' => $positionChangeEvent->getReferrerId()]
             );
         }
 
@@ -401,20 +395,20 @@ class ContentController extends AbstractSeoCrudController
     /**
      * @return UpdatePositionEvent|void
      */
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('content_id', null),
+            $this->getRequest()->get('content_id'),
             $positionChangeMode,
             $positionValue,
-            $this->getRequest()->get('folder_id', null)
+            $this->getRequest()->get('folder_id')
         );
     }
 
     /**
      * @return ContentToggleVisibilityEvent|void
      */
-    protected function createToggleVisibilityEvent()
+    protected function createToggleVisibilityEvent(): ContentToggleVisibilityEvent
     {
         return new ContentToggleVisibilityEvent($this->getExistingObject());
     }

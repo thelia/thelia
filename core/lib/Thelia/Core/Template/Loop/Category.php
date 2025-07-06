@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Type\EnumListType;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -24,7 +26,6 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\Category as CategoryModel;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ProductQuery;
-use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\TypeCollection;
 
@@ -66,12 +67,10 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
     use StandardI18nFieldsSearchTrait;
 
     protected $timestampable = true;
+
     protected $versionable = true;
 
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
@@ -91,7 +90,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType([
+                    new EnumListType([
                         'id', 'id_reverse',
                         'alpha', 'alpha_reverse',
                         'manual', 'manual_reverse',
@@ -204,6 +203,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
                 ->endUse()
             ;
         }
+
         $templateIdList = $this->getTemplateId();
 
         if (null !== $templateIdList) {
@@ -254,14 +254,13 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
                     $search->clearOrderByColumns();
                     $search->addAscendingOrderByColumn('RAND()');
                     break 2;
-                    break;
             }
         }
 
         return $search;
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var CategoryModel $category */
         foreach ($loopResult->getResultDataCollection() as $category) {

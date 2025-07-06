@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use InvalidArgumentException;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
@@ -36,10 +38,7 @@ use Thelia\Model\ModuleQuery;
  */
 class ModuleConfig extends BaseLoop implements ArraySearchLoopInterface
 {
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createAnyTypeArgument('module', null, true),
@@ -49,15 +48,12 @@ class ModuleConfig extends BaseLoop implements ArraySearchLoopInterface
         );
     }
 
-    /**
-     * @return LoopResult
-     */
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         $moduleCode = $this->getModule();
 
         if (null === $module = ModuleQuery::create()->filterByCode($moduleCode, Criteria::LIKE)->findOne()) {
-            throw new \InvalidArgumentException("Module with code '$moduleCode' does not exists.");
+            throw new InvalidArgumentException(sprintf("Module with code '%s' does not exists.", $moduleCode));
         }
 
         $configValue = ModuleConfigQuery::create()->getConfigValue(
@@ -81,10 +77,8 @@ class ModuleConfig extends BaseLoop implements ArraySearchLoopInterface
 
     /**
      * this method returns an array.
-     *
-     * @return array
      */
-    public function buildArray()
+    public function buildArray(): array
     {
         // Return an array containing one element, so that parseResults() will be called one time.
         return ['dummy-element'];

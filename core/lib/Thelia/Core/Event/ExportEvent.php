@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
@@ -25,21 +26,6 @@ use Thelia\ImportExport\Export\AbstractExport;
 class ExportEvent extends Event
 {
     /**
-     * @var \Thelia\ImportExport\Export\AbstractExport An export
-     */
-    protected $export;
-
-    /**
-     * @var \Thelia\Core\Serializer\SerializerInterface A serializer interface
-     */
-    protected $serializer;
-
-    /**
-     * @var \Thelia\Core\Archiver\ArchiverInterface|null An archiver interface
-     */
-    protected $archiver;
-
-    /**
      * @var string Path to generated export
      */
     protected $filePath;
@@ -47,26 +33,20 @@ class ExportEvent extends Event
     /**
      * Event constructor.
      *
-     * @param \Thelia\ImportExport\Export\AbstractExport  $export     An export
-     * @param \Thelia\Core\Serializer\SerializerInterface $serializer A serializer interface
-     * @param \Thelia\Core\Archiver\ArchiverInterface     $archiver   An archiver interface
+     * @param AbstractExport $export An export
+     * @param SerializerInterface $serializer A serializer interface
+     * @param ArchiverInterface $archiver An archiver interface
      */
-    public function __construct(
-        AbstractExport $export,
-        SerializerInterface $serializer,
-        ArchiverInterface $archiver = null
-    ) {
-        $this->export = $export;
-        $this->serializer = $serializer;
-        $this->archiver = $archiver;
+    public function __construct(protected AbstractExport $export, protected SerializerInterface $serializer, protected ?ArchiverInterface $archiver = null)
+    {
     }
 
     /**
      * Get export.
      *
-     * @return \Thelia\ImportExport\Export\AbstractExport An export
+     * @return AbstractExport An export
      */
-    public function getExport()
+    public function getExport(): AbstractExport
     {
         return $this->export;
     }
@@ -74,7 +54,7 @@ class ExportEvent extends Event
     /**
      * Set export.
      *
-     * @param \Thelia\ImportExport\Export\AbstractExport $export An export
+     * @param AbstractExport $export An export
      *
      * @return $this Return $this, allow chaining
      */
@@ -88,9 +68,9 @@ class ExportEvent extends Event
     /**
      * Get serializer.
      *
-     * @return \Thelia\Core\Serializer\SerializerInterface A serializer interface
+     * @return SerializerInterface A serializer interface
      */
-    public function getSerializer()
+    public function getSerializer(): SerializerInterface
     {
         return $this->serializer;
     }
@@ -98,11 +78,11 @@ class ExportEvent extends Event
     /**
      * Set serializer.
      *
-     * @param \Thelia\Core\Serializer\SerializerInterface $serializer A serializer interface
+     * @param SerializerInterface $serializer A serializer interface
      *
      * @return $this Return $this, allow chaining
      */
-    public function setSerializer(SerializerInterface $serializer)
+    public function setSerializer(SerializerInterface $serializer): static
     {
         $this->serializer = $serializer;
 
@@ -112,9 +92,9 @@ class ExportEvent extends Event
     /**
      * Get archiver.
      *
-     * @return mixed|\Thelia\Core\Archiver\ArchiverInterface An archiver interface
+     * @return mixed|ArchiverInterface An archiver interface
      */
-    public function getArchiver()
+    public function getArchiver(): ?ArchiverInterface
     {
         return $this->archiver;
     }
@@ -122,11 +102,11 @@ class ExportEvent extends Event
     /**
      * Set archiver.
      *
-     * @param mixed|\Thelia\Core\Archiver\ArchiverInterface $archiver An archiver interface
+     * @param mixed|ArchiverInterface $archiver An archiver interface
      *
      * @return $this Return $this, allow chaining
      */
-    public function setArchiver(ArchiverInterface $archiver = null)
+    public function setArchiver(ArchiverInterface $archiver = null): static
     {
         $this->archiver = $archiver;
 
@@ -150,7 +130,7 @@ class ExportEvent extends Event
      *
      * @return $this Return $this, allow chaining
      */
-    public function setFilePath($filePath)
+    public function setFilePath($filePath): static
     {
         $this->filePath = $filePath;
 

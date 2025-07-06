@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
 
+
+use DateTime;
+use Thelia\Model\AttributeCombination;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -95,10 +99,13 @@ class OrderProduct implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:order_product:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order_product:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:order_product:write';
 
     public const GROUP_FRONT_READ = 'front:order_product:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:order_product:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ,
@@ -111,6 +118,7 @@ class OrderProduct implements PropelResourceInterface
     #[Relation(targetResource: Order::class)]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
     public Order $order;
+
     private $orderId;
 
     #[Groups([
@@ -143,7 +151,7 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?int $productSaleElementsId;
+    public ?int $productSaleElementsId = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -152,24 +160,24 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_FRONT_READ_SINGLE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?string $title;
+    public ?string $title = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?string $chapo;
+    public ?string $chapo = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?string $description;
+    public ?string $description = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?string $postscriptum;
+    public ?string $postscriptum = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -201,10 +209,10 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ,
     ])]
-    public ?float $promoPrice;
+    public ?float $promoPrice = null;
 
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
-    public ?float $unitTaxedPrice;
+    public ?float $unitTaxedPrice = null;
 
     #[Groups([self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
@@ -237,7 +245,7 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?string $weight;
+    public ?string $weight = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -247,7 +255,7 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?string $eanCode;
+    public ?string $eanCode = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -255,13 +263,13 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?string $taxRuleTitle;
+    public ?string $taxRuleTitle = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?string $taxRuleDescription;
+    public ?string $taxRuleDescription = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?int $parent;
+    public ?int $parent = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     #[Type(type: 'bool', groups: [Order::GROUP_ADMIN_WRITE])]
@@ -274,13 +282,13 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?bool $virtualDocument;
+    public ?bool $virtualDocument = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
-    public ?\DateTime $createdAt;
+    public ?DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $updatedAt;
+    public ?DateTime $updatedAt = null;
 
     #[Relation(targetResource: OrderProductTax::class)]
     #[Groups([
@@ -291,12 +299,7 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_FRONT_READ_SINGLE,
     ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
-    public array $orderProductTaxes;
-
-    public function __construct()
-    {
-        $this->orderProductTaxes = [];
-    }
+    public array $orderProductTaxes = [];
 
     #[Groups([
         Order::GROUP_FRONT_READ_SINGLE,
@@ -315,18 +318,15 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_FRONT_READ_SINGLE,
         self::GROUP_FRONT_READ,
     ])]
-    public function getAttribute()
+    public function getAttribute(): ?array
     {
         $pseId = $this->getProductSaleElementsId();
         if (!$pseId) {
             return null;
         }
-        $attributesAvs = array_map(
-            function (\Thelia\Model\AttributeCombination $attributeCombination) {
-                return [$attributeCombination->getAttribute()->getTitle() => $attributeCombination->getAttributeAv()->getTitle()];
-            }, AttributeCombinationQuery::create()->filterByProductSaleElementsId($pseId)->find()->getData());
 
-        return $attributesAvs;
+        return array_map(
+            fn(AttributeCombination $attributeCombination) => [$attributeCombination->getAttribute()->getTitle() => $attributeCombination->getAttributeAv()->getTitle()], AttributeCombinationQuery::create()->filterByProductSaleElementsId($pseId)->find()->getData());
     }
 
     public function getId(): ?int
@@ -586,24 +586,24 @@ class OrderProduct implements PropelResourceInterface
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): self
+    public function setCreatedAt(?DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): self
+    public function setUpdatedAt(?DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 
@@ -624,29 +624,30 @@ class OrderProduct implements PropelResourceInterface
 
     public function afterModelToResource(array $context): void
     {
-        if (isset($context['operation'])) {
-            if ($context['operation'] instanceof Get || $context['operation'] instanceof GetCollection) {
-                // unitTaxedPrice
-                $totalTax = 0;
-                $totalPromoTax = 0;
-                if (!empty($this->orderProductTaxes)) {
-                    /** @var OrderProductTax $orderProductTax */
-                    foreach ($this->orderProductTaxes as $orderProductTax) {
-                        /** @var \Thelia\Model\OrderProductTax $orderProductTax */
-                        $propelOrderProductTax = $orderProductTax->getPropelModel();
-                        if (!$this->getPropelModel()->getWasInPromo()) {
-                            $totalTax += (float) $propelOrderProductTax->getAmount();
-                        }
-                        if ($this->getPropelModel()->getWasInPromo()) {
-                            $totalPromoTax += (float) $propelOrderProductTax->getPromoAmount();
-                        }
-                    }
+        if (isset($context['operation']) && ($context['operation'] instanceof Get || $context['operation'] instanceof GetCollection)) {
+            // unitTaxedPrice
+            $totalTax = 0;
+            $totalPromoTax = 0;
+            if ($this->orderProductTaxes !== []) {
+                /** @var OrderProductTax $orderProductTax */
+                foreach ($this->orderProductTaxes as $orderProductTax) {
+                    /** @var \Thelia\Model\OrderProductTax $orderProductTax */
+                    $propelOrderProductTax = $orderProductTax->getPropelModel();
                     if (!$this->getPropelModel()->getWasInPromo()) {
-                        $this->unitTaxedPrice = $this->getPropelModel()->getPrice() + $totalTax;
+                        $totalTax += (float) $propelOrderProductTax->getAmount();
                     }
+
                     if ($this->getPropelModel()->getWasInPromo()) {
-                        $this->unitTaxedPrice = $this->getPropelModel()->getPrice() + $totalPromoTax;
+                        $totalPromoTax += (float) $propelOrderProductTax->getPromoAmount();
                     }
+                }
+
+                if (!$this->getPropelModel()->getWasInPromo()) {
+                    $this->unitTaxedPrice = $this->getPropelModel()->getPrice() + $totalTax;
+                }
+
+                if ($this->getPropelModel()->getWasInPromo()) {
+                    $this->unitTaxedPrice = $this->getPropelModel()->getPrice() + $totalPromoTax;
                 }
             }
         }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Tax;
 
 use Thelia\Core\Event\ActionEvent;
@@ -17,39 +18,42 @@ use Thelia\Model\TaxRule;
 
 class TaxRuleEvent extends ActionEvent
 {
-    protected $taxRule;
-
     protected $locale;
+
     protected $id;
+
     protected $title;
+
     protected $description;
+
     protected $countryList;
+
     protected $countryDeletedList;
+
     protected $taxList;
 
-    public function __construct(TaxRule $taxRule = null)
+    public function __construct(protected ?TaxRule $taxRule = null)
     {
-        $this->taxRule = $taxRule;
     }
 
-    public function hasTaxRule()
+    public function hasTaxRule(): bool
     {
-        return null !== $this->taxRule;
+        return $this->taxRule instanceof TaxRule;
     }
 
-    public function getTaxRule()
+    public function getTaxRule(): ?TaxRule
     {
         return $this->taxRule;
     }
 
-    public function setTaxRule(TaxRule $taxRule)
+    public function setTaxRule(TaxRule $taxRule): static
     {
         $this->taxRule = $taxRule;
 
         return $this;
     }
 
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->description = $description;
 
@@ -61,7 +65,7 @@ class TaxRuleEvent extends ActionEvent
         return $this->description;
     }
 
-    public function setId($id)
+    public function setId($id): static
     {
         $this->id = $id;
 
@@ -73,7 +77,7 @@ class TaxRuleEvent extends ActionEvent
         return $this->id;
     }
 
-    public function setTitle($title)
+    public function setTitle($title): static
     {
         $this->title = $title;
 
@@ -85,7 +89,7 @@ class TaxRuleEvent extends ActionEvent
         return $this->title;
     }
 
-    public function setLocale($locale)
+    public function setLocale($locale): static
     {
         $this->locale = $locale;
 
@@ -97,7 +101,7 @@ class TaxRuleEvent extends ActionEvent
         return $this->locale;
     }
 
-    public function setCountryList($countryList)
+    public function setCountryList($countryList): static
     {
         $this->countryList = $countryList;
 
@@ -114,14 +118,14 @@ class TaxRuleEvent extends ActionEvent
         return $this->countryDeletedList;
     }
 
-    public function setCountryDeletedList($countryDeletedList)
+    public function setCountryDeletedList($countryDeletedList): static
     {
         $this->countryDeletedList = $countryDeletedList;
 
         return $this;
     }
 
-    public function setTaxList($taxList)
+    public function setTaxList($taxList): static
     {
         $this->taxList = $taxList;
 

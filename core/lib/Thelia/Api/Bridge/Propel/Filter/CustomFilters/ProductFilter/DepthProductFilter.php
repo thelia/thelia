@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\ProductFilter;
 
 use ApiPlatform\Metadata\Operation;
@@ -33,10 +34,12 @@ class DepthProductFilter extends AbstractFilter
         if ($property !== self::DEPTH) {
             return;
         }
+
         $categoryId = $context['filters']['productCategories.category.id'] ?? null;
         if (!$categoryId || !is_numeric($categoryId) || !$value || !is_numeric($value)) {
             return;
         }
+
         $categoriesWithDepth = $this->filterService->getCategoriesRecursively(categoryId: $categoryId, maxDepth: (int) $value);
         $idCategories = [];
         foreach ($categoriesWithDepth as $categories) {
@@ -44,6 +47,7 @@ class DepthProductFilter extends AbstractFilter
                 $idCategories[] = $category->getId();
             }
         }
+
         $query
             ->_or()
             ->useProductCategoryQuery()

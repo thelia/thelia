@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Coupon;
 
+
+use Thelia\Model\Exception\InvalidArgumentException;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Coupon;
@@ -26,62 +29,14 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /** @var ConditionCollection Array of ConditionInterface */
     protected $conditions;
 
-    /** @var string Coupon code (ex: XMAS) */
-    protected $code;
-
-    /** @var string Coupon title (ex: Coupon for XMAS) */
-    protected $title;
-
-    /** @var string Coupon short description */
-    protected $shortDescription;
-
-    /** @var string Coupon description */
-    protected $description;
-
-    /** @var bool if Coupon is enabled */
-    protected $isEnabled = false;
-
-    /** @var \DateTime Coupon start date */
-    protected $startDate;
-
-    /** @var \DateTime Coupon expiration date */
-    protected $expirationDate;
-
-    /** @var bool if Coupon is cumulative */
-    protected $isCumulative = false;
-
-    /** @var bool if Coupon is removing postage */
-    protected $isRemovingPostage = false;
-
     /** @var float Amount that will be removed from the Checkout (Coupon Effect) */
     protected $amount = 0;
 
     /** @var array Effects ready to be serialized */
     protected $effects = [];
 
-    /** @var int Max time a Coupon can be used (-1 = unlimited) */
-    protected $maxUsage = -1;
-
-    /** @var bool if Coupon is available for Products already on special offers */
-    protected $isAvailableOnSpecialOffers = false;
-
     /** @var Coupon Coupon model */
     protected $couponModel;
-
-    /** @var string Coupon Service id */
-    protected $serviceId;
-
-    /** @var string Language code ISO (ex: fr_FR) */
-    protected $locale;
-
-    /** @var array ID of Countries to which shipping is free */
-    protected $freeShippingForCountries;
-
-    /** @var array ID of Shipping modules for which shipping is free */
-    protected $freeShippingForMethods;
-
-    /** @var true if usage count is per customer only */
-    protected $perCustomerUsageCount;
 
     /**
      * Constructor.
@@ -95,7 +50,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      * @param string    $shortDescription           Coupon short description
      * @param string    $description                Coupon description
      * @param bool      $isEnabled                  Enable/Disable
-     * @param \DateTime $expirationDate             Coupon expiration date
+     * @param DateTime $expirationDate Coupon expiration date
      * @param bool      $isAvailableOnSpecialOffers Is available on special offers
      * @param bool      $isCumulative               Is cumulative
      * @param bool      $isRemovingPostage          Is removing Postage
@@ -104,50 +59,34 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      * @param array     $freeShippingForCountries   ID of Countries to which shipping is free
      * @param array     $freeShippingForMethods     ID of Shipping modules for which shipping is free
      * @param bool      $perCustomerUsageCount      Usage count is per customer
-     * @param \DateTime $startDate                  Coupon start date
+     * @param DateTime $startDate Coupon start date
      */
     public function __construct(
-        $code,
-        $serviceId,
-        $title,
+        protected $code,
+        protected $serviceId,
+        protected $title,
         array $effects,
-        $shortDescription,
-        $description,
-        $isEnabled,
-        \DateTime $expirationDate,
-        $isAvailableOnSpecialOffers,
-        $isCumulative,
-        $isRemovingPostage,
-        $maxUsage,
-        $locale,
-        $freeShippingForCountries,
-        $freeShippingForMethods,
-        $perCustomerUsageCount,
-        \DateTime $startDate = null
+        protected $shortDescription,
+        protected $description,
+        protected $isEnabled,
+        protected DateTime $expirationDate,
+        protected $isAvailableOnSpecialOffers,
+        protected $isCumulative,
+        protected $isRemovingPostage,
+        protected $maxUsage,
+        protected $locale,
+        protected $freeShippingForCountries,
+        protected $freeShippingForMethods,
+        protected $perCustomerUsageCount,
+        protected ?DateTime $startDate = null
     ) {
-        $this->code = $code;
-        $this->description = $description;
-        $this->expirationDate = $expirationDate;
-        $this->isAvailableOnSpecialOffers = $isAvailableOnSpecialOffers;
-        $this->isCumulative = $isCumulative;
-        $this->isEnabled = $isEnabled;
-        $this->isRemovingPostage = $isRemovingPostage;
-        $this->maxUsage = $maxUsage;
-        $this->shortDescription = $shortDescription;
-        $this->title = $title;
-        $this->serviceId = $serviceId;
-        $this->locale = $locale;
         $this->setEffects($effects);
-        $this->freeShippingForCountries = $freeShippingForCountries;
-        $this->freeShippingForMethods = $freeShippingForMethods;
-        $this->perCustomerUsageCount = $perCustomerUsageCount;
-        $this->startDate = $startDate;
     }
 
     /**
      * @param true $perCustomerUsageCount
      */
-    public function setPerCustomerUsageCount($perCustomerUsageCount)
+    public function setPerCustomerUsageCount($perCustomerUsageCount): static
     {
         $this->perCustomerUsageCount = $perCustomerUsageCount;
 
@@ -167,7 +106,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setFreeShippingForCountries($freeShippingForCountries)
+    public function setFreeShippingForCountries($freeShippingForCountries): static
     {
         $this->freeShippingForCountries = $freeShippingForCountries;
 
@@ -187,7 +126,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setFreeShippingForMethods($freeShippingForMethods)
+    public function setFreeShippingForMethods($freeShippingForMethods): static
     {
         $this->freeShippingForMethods = $freeShippingForMethods;
 
@@ -277,11 +216,11 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /**
      * Return Coupon start date.
      *
-     * @return \DateTime
+     * @return DateTime
      */
-    public function getStartDate()
+    public function getStartDate(): ?DateTime
     {
-        if ($this->startDate === null) {
+        if (!$this->startDate instanceof DateTime) {
             return null;
         }
 
@@ -291,7 +230,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /**
      * Return Coupon expiration date.
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getExpirationDate()
     {
@@ -356,7 +295,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      *                       Needs at least the key 'amount'
      *                       with the amount removed from the cart
      *
-     * @throws \Thelia\Model\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function setEffects(array $effects): void
     {
@@ -421,7 +360,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setCouponModel(Coupon $couponModel)
+    public function setCouponModel(Coupon $couponModel): static
     {
         $this->couponModel = $couponModel;
 
@@ -431,7 +370,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /**
      * Return Coupon Model.
      *
-     * @return \Thelia\Model\Coupon
+     * @return Coupon
      */
     public function getCouponModel()
     {
@@ -455,7 +394,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setConditions(ConditionCollection $conditions)
+    public function setConditions(ConditionCollection $conditions): static
     {
         $this->conditions = $conditions;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Model\ProductSaleElementsProductDocument;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -33,12 +36,9 @@ use Thelia\Model\ProductSaleElementsProductDocumentQuery;
  */
 class ProductSaleElementsDocument extends BaseLoop implements PropelSearchLoopInterface
 {
-    /**
-     * @return LoopResult
-     */
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
-        /** @var \Thelia\Model\ProductSaleElementsProductDocument $productSaleElementDocument */
+        /** @var ProductSaleElementsProductDocument $productSaleElementDocument */
         foreach ($loopResult->getResultDataCollection() as $productSaleElementDocument) {
             $row = new LoopResultRow($productSaleElementDocument);
 
@@ -76,10 +76,8 @@ class ProductSaleElementsDocument extends BaseLoop implements PropelSearchLoopIn
      *       ...
      *   );
      * }
-     *
-     * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
@@ -99,7 +97,7 @@ class ProductSaleElementsDocument extends BaseLoop implements PropelSearchLoopIn
     /**
      * this method returns a Propel ModelCriteria.
      *
-     * @return \Propel\Runtime\ActiveQuery\ModelCriteria
+     * @return ModelCriteria
      */
     public function buildModelCriteria()
     {

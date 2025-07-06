@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
+use PDO;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Model\Base\RewritingUrlQuery as BaseRewritingUrlQuery;
@@ -41,7 +43,7 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
         return RewritingArgumentQuery::create()
             ->joinRewritingUrl('ru', Criteria::RIGHT_JOIN)
             ->addJoinObject($redirectedJoin)
-            ->where('`ru`.URL = ?', $rewrittenUrl, \PDO::PARAM_STR)
+            ->where('`ru`.URL = ?', $rewrittenUrl, PDO::PARAM_STR)
             ->withColumn('`ru`.URL', 'ru_url')
             ->withColumn('`ru`.VIEW', 'ru_view')
             ->withColumn('`ru`.VIEW_LOCALE', 'ru_locale')
@@ -86,8 +88,8 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
 
             foreach ($viewOtherParameters as $parameter => $value) {
                 $conditionName = 'other_parameter_condition_'.\count($parameterConditions);
-                $urlQuery->condition('parameter_condition', '`ra`.PARAMETER= ?', $parameter, \PDO::PARAM_STR)
-                    ->condition('value_condition', '`ra`.VALUE = ?', $value, \PDO::PARAM_STR)
+                $urlQuery->condition('parameter_condition', '`ra`.PARAMETER= ?', $parameter, PDO::PARAM_STR)
+                    ->condition('value_condition', '`ra`.VALUE = ?', $value, PDO::PARAM_STR)
                     ->combine(['parameter_condition', 'value_condition'], Criteria::LOGICAL_AND, $conditionName);
                 $parameterConditions[] = $conditionName;
             }
@@ -96,7 +98,7 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
 
             $urlQuery->groupBy(RewritingUrlTableMap::COL_ID);
 
-            $urlQuery->condition('count_condition_1', 'COUNT('.RewritingUrlTableMap::COL_ID.') = ?', $otherParametersCount, \PDO::PARAM_INT) // ensure we got all the asked parameters (provided by the query)
+            $urlQuery->condition('count_condition_1', 'COUNT('.RewritingUrlTableMap::COL_ID.') = ?', $otherParametersCount, PDO::PARAM_INT) // ensure we got all the asked parameters (provided by the query)
                 ->condition('count_condition_2', 'COUNT('.RewritingUrlTableMap::COL_ID.') = (SELECT COUNT(*) FROM rewriting_argument WHERE rewriting_argument.REWRITING_URL_ID = ra_REWRITING_URL_ID)'); // ensure we don't miss any parameters (needed to match the rewritten url)
 
             $urlQuery->having(['count_condition_1', 'count_condition_2'], Criteria::LOGICAL_AND);
@@ -109,13 +111,12 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
 
     protected function retrieveLocale($viewLocale)
     {
-        if (\strlen($viewLocale) == 2) {
-            if (null !== $lang = LangQuery::create()->findOneByCode($viewLocale)) {
-                $viewLocale = $lang->getLocale();
-            }
+        if (\strlen((string) $viewLocale) == 2 && null !== $lang = LangQuery::create()->findOneByCode($viewLocale)) {
+            $viewLocale = $lang->getLocale();
         }
 
         return $viewLocale;
     }
 }
+
 // RewritingUrlQuery

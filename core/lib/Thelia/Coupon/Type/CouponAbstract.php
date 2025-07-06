@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,16 +11,18 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Coupon\Type;
 
+
+use InvalidArgumentException;
+use Thelia\Exception\InvalidConditionException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\ConditionOrganizerInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Form\CouponCreationForm;
-use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponModule;
 
 /**
@@ -44,92 +48,64 @@ abstract class CouponAbstract implements CouponInterface
      */
     public const AMOUNT_FIELD_NAME = 'amount';
 
-    /** @var FacadeInterface Provide necessary value from Thelia */
-    protected $facade;
+    protected Translator|TranslatorInterface $translator;
 
-    /** @var Translator Service Translator */
-    protected $translator;
+    protected ConditionOrganizerInterface $organizer;
 
-    /** @var ConditionOrganizerInterface */
-    protected $organizer;
+    protected ConditionCollection $conditions;
 
-    /** @var ConditionCollection Array of ConditionInterface */
-    protected $conditions;
+    protected ConditionEvaluator $conditionEvaluator;
 
-    /** @var ConditionEvaluator Condition validator */
-    protected $conditionEvaluator;
+    protected string $serviceId;
 
-    /** @var string Service Id */
-    protected $serviceId;
+    protected int|float $amount = 0;
 
-    /** @var float Amount that will be removed from the Checkout (Coupon Effect) */
-    protected $amount = 0;
+    protected array $effects = ['amount' => 0];
 
-    /** @var array Get the Coupon effects params */
-    protected $effects = ['amount' => 0];
+    protected string $code;
 
-    /** @var string Coupon code (ex: XMAS) */
-    protected $code;
+    protected string $title;
 
-    /** @var string Coupon title (ex: Coupon for XMAS) */
-    protected $title;
+    protected string $shortDescription;
 
-    /** @var string Coupon short description */
-    protected $shortDescription;
+    protected string $description;
 
-    /** @var string Coupon description */
-    protected $description;
+    protected bool $isEnabled = false;
 
-    /** @var bool if Coupon is enabled */
-    protected $isEnabled = false;
+    protected DateTime $startDate;
 
-    /** @var \DateTime Coupon start date */
-    protected $startDate;
+    protected DateTime $expirationDate;
 
-    /** @var \DateTime Coupon expiration date */
-    protected $expirationDate;
+    protected bool $isCumulative = false;
 
-    /** @var bool if Coupon is cumulative */
-    protected $isCumulative = false;
+    protected bool $isRemovingPostage = false;
 
-    /** @var bool if Coupon is removing postage */
-    protected $isRemovingPostage = false;
+    protected int $maxUsage = -1;
 
-    /** @var int Max time a Coupon can be used (-1 = unlimited) */
-    protected $maxUsage = -1;
+    protected bool $isAvailableOnSpecialOffers = false;
 
-    /** @var bool if Coupon is available for Products already on special offers */
-    protected $isAvailableOnSpecialOffers = false;
+    protected array $freeShippingForCountries = [];
 
-    /** @var CouponCountry[] list of country IDs for which shipping is free. All if empty */
-    protected $freeShippingForCountries = [];
+    /** @var CouponModule[] */
+    protected array $freeShippingForModules = [];
 
-    /** @var CouponModule[] list of shipping module IDs for which shippiog is free. All if empty */
-    protected $freeShippingForModules = [];
-
-    /** @var true if usage count is per customer only */
-    protected $perCustomerUsageCount;
+    protected bool $perCustomerUsageCount;
 
     /**
      * Constructor.
      *
      * @param FacadeInterface $facade Service facade
      */
-    public function __construct(FacadeInterface $facade)
+    public function __construct(protected FacadeInterface $facade)
     {
-        $this->facade = $facade;
-        $this->translator = $facade->getTranslator();
-        $this->conditionEvaluator = $facade->getConditionEvaluator();
+        $this->translator = $this->facade->getTranslator();
+        $this->conditionEvaluator = $this->facade->getConditionEvaluator();
     }
 
     /**
      * Set Condition Organizer.
-     *
-     * @param ConditionOrganizerInterface $organizer Manage Condition groups (&& and ||)
-     *
-     * @return $this
      */
-    public function setOrganizer($organizer)
+    public function setOrganizer(ConditionOrganizerInterface $organizer): static
     {
         $this->organizer = $organizer;
 
@@ -148,11 +124,12 @@ abstract class CouponAbstract implements CouponInterface
         $isAvailableOnSpecialOffers,
         $isEnabled,
         $maxUsage,
-        \DateTime $expirationDate,
+        DateTime $expirationDate,
         $freeShippingForCountries,
         $freeShippingForModules,
         $perCustomerUsageCount
-    ) {
+    ): static
+    {
         $this->code = $code;
         $this->title = $title;
         $this->shortDescription = $shortDescription;
@@ -178,62 +155,34 @@ abstract class CouponAbstract implements CouponInterface
         return $this;
     }
 
-    /**
-     * @param true $perCustomerUsageCount
-     *
-     * @return $this
-     */
-    public function setPerCustomerUsageCount($perCustomerUsageCount)
+    public function setPerCustomerUsageCount(bool $perCustomerUsageCount): static
     {
         $this->perCustomerUsageCount = $perCustomerUsageCount;
 
         return $this;
     }
 
-    /**
-     * @return true
-     */
-    public function getPerCustomerUsageCount()
+    public function getPerCustomerUsageCount(): bool
     {
         return $this->perCustomerUsageCount;
     }
 
-    /**
-     * Return Coupon code (ex: XMAS).
-     *
-     * @return string
-     */
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }
 
-    /**
-     * Return Coupon title (ex: Coupon for XMAS).
-     *
-     * @return string
-     */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
 
-    /**
-     * Return Coupon short description.
-     *
-     * @return string
-     */
-    public function getShortDescription()
+    public function getShortDescription(): string
     {
         return $this->shortDescription;
     }
 
-    /**
-     * Return Coupon description.
-     *
-     * @return string
-     */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -243,50 +192,36 @@ abstract class CouponAbstract implements CouponInterface
      * If is cumulative you can sum Coupon effects
      * If not cancel all other Coupon and take the last given.
      *
-     * @return bool
      */
-    public function isCumulative()
+    public function isCumulative(): bool
     {
         return $this->isCumulative;
     }
 
     /**
      * If Coupon is removing Checkout Postage.
-     *
-     * @return bool
      */
-    public function isRemovingPostage()
+    public function isRemovingPostage(): bool
     {
         return $this->isRemovingPostage;
     }
 
-    /**
-     * @return array list of country IDs for which shipping is free. All if empty
-     */
-    public function getFreeShippingForCountries()
+    public function getFreeShippingForCountries(): array
     {
         return $this->freeShippingForCountries;
     }
 
-    /**
-     * @return array list of module IDs for which shipping is free. All if empty
-     */
-    public function getFreeShippingForModules()
+    public function getFreeShippingForModules(): array
     {
         return $this->freeShippingForModules;
     }
 
-    public function exec()
+    public function exec(): float|int
     {
         return $this->amount;
     }
 
-    /**
-     * Return condition to validate the Coupon or not.
-     *
-     * @return ConditionCollection
-     */
-    public function getConditions()
+    public function getConditions(): ConditionCollection
     {
         return clone $this->conditions;
     }
@@ -295,13 +230,9 @@ abstract class CouponAbstract implements CouponInterface
      * Replace the existing Conditions by those given in parameter
      * If one Condition is badly implemented, no Condition will be added.
      *
-     * @param ConditionCollection $conditions ConditionInterface to add
-     *
-     * @throws \Thelia\Exception\InvalidConditionException
-     *
-     * @return $this
+     * @throws InvalidConditionException
      */
-    public function setConditions(ConditionCollection $conditions)
+    public function setConditions(ConditionCollection $conditions): static
     {
         $this->conditions = $conditions;
 
@@ -310,10 +241,8 @@ abstract class CouponAbstract implements CouponInterface
 
     /**
      * Return Coupon expiration date.
-     *
-     * @return \DateTime
      */
-    public function getExpirationDate()
+    public function getExpirationDate(): DateTime
     {
         return clone $this->expirationDate;
     }
@@ -321,20 +250,16 @@ abstract class CouponAbstract implements CouponInterface
     /**
      * Check if the Coupon can be used against a
      * product already with a special offer price.
-     *
-     * @return bool
      */
-    public function isAvailableOnSpecialOffers()
+    public function isAvailableOnSpecialOffers(): bool
     {
         return $this->isAvailableOnSpecialOffers;
     }
 
     /**
      * Check if Coupon has been disabled by admin.
-     *
-     * @return bool
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return $this->isEnabled;
     }
@@ -342,20 +267,16 @@ abstract class CouponAbstract implements CouponInterface
     /**
      * Return how many time the Coupon can be used again
      * Ex : -1 unlimited.
-     *
-     * @return int
      */
-    public function getMaxUsage()
+    public function getMaxUsage(): int
     {
         return $this->maxUsage;
     }
 
     /**
      * Check if the Coupon is already Expired.
-     *
-     * @return bool
      */
-    public function isExpired()
+    public function isExpired(): bool
     {
         $ret = true;
 
@@ -369,10 +290,8 @@ abstract class CouponAbstract implements CouponInterface
 
     /**
      * Get Coupon Manager service Id.
-     *
-     * @return string
      */
-    public function getServiceId()
+    public function getServiceId(): string
     {
         return $this->serviceId ?? static::class;
     }
@@ -380,10 +299,8 @@ abstract class CouponAbstract implements CouponInterface
     /**
      * Check if the current state of the application is matching this Coupon conditions
      * Thelia variables are given by the FacadeInterface.
-     *
-     * @return bool
      */
-    public function isMatching()
+    public function isMatching(): bool
     {
         return $this->conditionEvaluator->isMatching($this->conditions);
     }
@@ -393,10 +310,8 @@ abstract class CouponAbstract implements CouponInterface
      * This method should be overridden to be useful.
      *
      * For backward compatibility only.
-     *
-     * @return string
      */
-    public function getInputName()
+    public function getInputName(): string
     {
         return 'Please override getInputName() method';
     }
@@ -405,10 +320,8 @@ abstract class CouponAbstract implements CouponInterface
      * Draw the input displayed in the BackOffice
      * allowing Admin to set its Coupon effect
      * Override this method to do something useful.
-     *
-     * @return string HTML string
      */
-    public function drawBackOfficeInputs()
+    public function drawBackOfficeInputs(): string
     {
         return $this->facade->getParser()->render('coupon/type-fragments/remove-x.html', [
                 'label' => $this->getInputName(),
@@ -423,13 +336,9 @@ abstract class CouponAbstract implements CouponInterface
      * Otherwise, an InvalidArgumentException describing the problem should be thrown.
      *
      * This method should be overriden to be useful.
-     *
-     * @param string $fieldName
-     * @param string $fieldValue
-     *
-     * @throws \InvalidArgumentException if the field value is not valid
+     * @throws InvalidArgumentException if the field value is not valid
      */
-    protected function checkCouponFieldValue(/* @noinspection PhpUnusedParameterInspection */ $fieldName, $fieldValue)
+    protected function checkCouponFieldValue(string $fieldName, string $fieldValue): string
     {
         return $fieldValue;
     }
@@ -437,59 +346,45 @@ abstract class CouponAbstract implements CouponInterface
     /**
      * A helper to get the value of a standard field name.
      *
-     * @param string $fieldName    the field name
-     * @param array  $data         the input form data (e.g. $form->getData())
-     * @param mixed  $defaultValue the default value if the field is not found
-     *
-     * @throws \InvalidArgumentException if the field is not found, and no default value has been defined
-     *
-     * @return mixed the input value, or the default one
+     * @throws InvalidArgumentException if the field is not found, and no default value has been defined
      */
-    protected function getCouponFieldValue($fieldName, $data, $defaultValue = null)
+    protected function getCouponFieldValue(string $fieldName, array $data, mixed $defaultValue = null): mixed
     {
-        $couponSpecificData = json_decode($data[self::COUPON_DATASET_NAME], true);
+        $couponSpecificData = json_decode((string) $data[self::COUPON_DATASET_NAME], true);
         if (isset($couponSpecificData[$fieldName])) {
             return $this->checkCouponFieldValue(
                 $fieldName,
                 $couponSpecificData[$fieldName]
             );
         }
+
         if (null !== $defaultValue) {
             return $defaultValue;
         }
-        throw new \InvalidArgumentException(sprintf('The coupon field name %s was not found in the coupon form', $fieldName));
+
+        throw new InvalidArgumentException(sprintf('The coupon field name %s was not found in the coupon form', $fieldName));
     }
 
     /**
      * A helper to create an standard field name that will be used in the coupon form.
-     *
-     * @param string $fieldName the field name
-     *
-     * @return string the complete name, ready to be used in a form
      */
-    protected function makeCouponFieldName($fieldName)
+    protected function makeCouponFieldName(string $fieldName): string
     {
         return sprintf('%s[%s][%s]', CouponCreationForm::COUPON_CREATION_FORM_NAME, self::COUPON_DATASET_NAME, $fieldName);
     }
 
     /**
      * Return a list of the fields name for this coupon.
-     *
-     * @return array
      */
-    protected function getFieldList()
+    protected function getFieldList(): array
     {
         return [self::AMOUNT_FIELD_NAME];
     }
 
     /**
      * Create the effect array from the list of fields.
-     *
-     * @param array $data the input form data (e.g. $form->getData())
-     *
-     * @return array a filedName => fieldValue array
      */
-    public function getEffects($data)
+    public function getEffects($data): array
     {
         $effects = [];
 
@@ -505,11 +400,8 @@ abstract class CouponAbstract implements CouponInterface
         // Does nothing. Override this function as needed.
     }
 
-    public function isInUse()
+    public function isInUse(): bool
     {
-        return \in_array(
-            $this->code,
-            $this->facade->getRequest()->getSession()->getConsumedCoupons()
-        );
+        return \in_array($this->code, $this->facade->getRequest()->getSession()->getConsumedCoupons(), true);
     }
 }

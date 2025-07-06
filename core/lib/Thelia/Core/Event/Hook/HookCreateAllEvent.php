@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Hook;
 
 /**
@@ -54,7 +55,7 @@ class HookCreateAllEvent extends HookEvent
      *
      * @return $this
      */
-    public function setLocale($locale)
+    public function setLocale($locale): static
     {
         $this->locale = $locale;
 
@@ -74,7 +75,7 @@ class HookCreateAllEvent extends HookEvent
      *
      * @return $this
      */
-    public function setNative($native)
+    public function setNative($native): static
     {
         $this->native = $native;
 
@@ -94,7 +95,7 @@ class HookCreateAllEvent extends HookEvent
      *
      * @return $this
      */
-    public function setTitle($title)
+    public function setTitle($title): static
     {
         $this->title = $title;
 
@@ -114,7 +115,7 @@ class HookCreateAllEvent extends HookEvent
      *
      * @return $this
      */
-    public function setType($type)
+    public function setType($type): static
     {
         $this->type = $type;
 
@@ -134,7 +135,7 @@ class HookCreateAllEvent extends HookEvent
      *
      * @return $this
      */
-    public function setActive($active)
+    public function setActive($active): static
     {
         $this->active = $active;
 
@@ -154,7 +155,7 @@ class HookCreateAllEvent extends HookEvent
      *
      * @return $this
      */
-    public function setCode($code)
+    public function setCode($code): static
     {
         $this->code = $code;
 
@@ -174,7 +175,7 @@ class HookCreateAllEvent extends HookEvent
      *
      * @return $this
      */
-    public function setBlock($block)
+    public function setBlock($block): static
     {
         $this->block = $block;
 
@@ -194,7 +195,7 @@ class HookCreateAllEvent extends HookEvent
      *
      * @return $this
      */
-    public function setByModule($by_module)
+    public function setByModule($by_module): static
     {
         $this->by_module = $by_module;
 
@@ -214,7 +215,7 @@ class HookCreateAllEvent extends HookEvent
      *
      * @return $this
      */
-    public function setChapo($chapo)
+    public function setChapo($chapo): static
     {
         $this->chapo = $chapo;
 
@@ -234,7 +235,7 @@ class HookCreateAllEvent extends HookEvent
      *
      * @return $this
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->description = $description;
 

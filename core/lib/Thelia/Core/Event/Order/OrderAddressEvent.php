@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Order;
 
 use Thelia\Core\Event\ActionEvent;
@@ -19,108 +20,85 @@ use Thelia\Model\OrderAddress;
 class OrderAddressEvent extends ActionEvent
 {
     /**
-     * @var int title id
-     */
-    protected $title;
-
-    /**
-     * @var string|null company name
-     */
-    protected $company;
-
-    /**
-     * @var string first name
-     */
-    protected $firstname;
-
-    /**
-     * @var string last name
-     */
-    protected $lastname;
-
-    /**
-     * @var string address
-     */
-    protected $address1;
-
-    /**
-     * @var string address line 2
-     */
-    protected $address2;
-
-    /**
-     * @var string address line 3
-     */
-    protected $address3;
-
-    /**
-     * @var string zipcode
-     */
-    protected $zipcode;
-
-    /**
-     * @var string city
-     */
-    protected $city;
-
-    /**
-     * @var int country id
-     */
-    protected $country;
-
-    /**
-     * @var int|null state id
-     */
-    protected $state;
-
-    /**
-     * @var string phone
-     */
-    protected $phone;
-
-    /**
-     * @var string cellphone
-     */
-    protected $cellphone;
-
-    /**
-     * @var \Thelia\Model\OrderAddress
+     * @var OrderAddress
      */
     protected $orderAddress;
 
     /**
-     * @var \Thelia\Model\Order
+     * @var Order
      */
     protected $order;
 
+    /**
+     * @param int $title
+     * @param string|null $company
+     * @param string $firstname
+     * @param string $lastname
+     * @param string $address1
+     * @param string $address2
+     * @param string $address3
+     * @param string $zipcode
+     * @param string $city
+     * @param int $country
+     * @param int|null $state
+     * @param string $phone
+     * @param string $cellphone
+     */
     public function __construct(
-        $title,
-        $firstname,
-        $lastname,
-        $address1,
-        $address2,
-        $address3,
-        $zipcode,
-        $city,
-        $country,
-        $phone,
-        $company,
-        $cellphone = null,
-        $state = null
-    ) {
-        $this->address1 = $address1;
-        $this->address2 = $address2;
-        $this->address3 = $address3;
-        $this->city = $city;
-        $this->company = $company;
-        $this->country = $country;
-        $this->state = $state;
-        $this->firstname = $firstname;
-        $this->lastname = $lastname;
-        $this->phone = $phone;
-        $this->cellphone = $cellphone;
-        $this->title = $title;
-        $this->zipcode = $zipcode;
+        /**
+         * @var int title id
+         */
+        protected $title,
+        /**
+         * @var string first name
+         */
+        protected $firstname,
+        /**
+         * @var string last name
+         */
+        protected $lastname,
+        /**
+         * @var string address
+         */
+        protected $address1,
+        /**
+         * @var string address line 2
+         */
+        protected $address2,
+        /**
+         * @var string address line 3
+         */
+        protected $address3,
+        /**
+         * @var string zipcode
+         */
+        protected $zipcode,
+        /**
+         * @var string city
+         */
+        protected $city,
+        /**
+         * @var int country id
+         */
+        protected $country,
+        /**
+         * @var string phone
+         */
+        protected $phone,
+        /**
+         * @var string|null company name
+         */
+        protected $company,
+        /**
+         * @var string cellphone
+         */
+        protected $cellphone = null,
+        /**
+         * @var int|null state id
+         */
+        protected $state = null
+    )
+    {
     }
 
     /**
@@ -238,7 +216,7 @@ class OrderAddressEvent extends ActionEvent
     }
 
     /**
-     * @return \Thelia\Model\OrderAddress
+     * @return OrderAddress
      */
     public function getOrderAddress()
     {
@@ -246,7 +224,7 @@ class OrderAddressEvent extends ActionEvent
     }
 
     /**
-     * @return \Thelia\Model\Order
+     * @return Order
      */
     public function getOrder()
     {

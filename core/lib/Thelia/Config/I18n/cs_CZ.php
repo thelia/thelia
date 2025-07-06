@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 return [
     '"%param" parameter cannot be empty in loop type: %type, name: %name' => '"%param" parametr nemůže být prázdný ve smyčce typu: % typ, název: %name',
     '"%param" parameter is missing in loop type: %type, name: %name' => 'Chybí parametr "%param" ve smyčce typu: % typ, název: %name',
@@ -19,7 +20,7 @@ return [
     'A currency with code "%name" already exists.' => 'Měna s kódem "%name" již existuje.',
     'A message with name "%name" already exists.' => 'Zpráva s názvem "%name" již existuje.',
     'A product with reference %ref already exists. Please choose another reference.' => 'Výrobek s odkazem %ref již existuje. Zvolte prosím jiný odkaz.',
-    'A user already exists with this email address. Please login or if you\'ve forgotten your password, go to Reset Your Password.' => 'Uživatel s touto e-mailovou adresou již existuje. Prosím přihlašte se nebo pokud jste zapomněli své heslo, přejděte na obnovení hesla.',
+    "A user already exists with this email address. Please login or if you've forgotten your password, go to Reset Your Password." => 'Uživatel s touto e-mailovou adresou již existuje. Prosím přihlašte se nebo pokud jste zapomněli své heslo, přejděte na obnovení hesla.',
     'A value for attribute "%name" is already present in the combination' => 'Hodnota pro atribut "%name" je již použita',
     'A variable with name "%name" already exists.' => 'Proměnná s názvem "%name" již existuje.',
     'Activate logs only for these IP Addresses' => 'Aktivovat logování pouze pro tyto adresy IP',
@@ -86,7 +87,7 @@ return [
     'Quantity' => 'Množství',
     'Register' => 'Registrace',
     'Search' => 'Vyhledávání',
-    'Sender\'s e-mail address: %email%' => 'E-mailová adresa odesílatele: %email%',
+    "Sender's e-mail address: %email%" => 'E-mailová adresa odesílatele: %email%',
     'Sender name: %name%' => 'Jméno odesílatele: %name%',
     'Start date' => 'Date de début de validité',
 ];

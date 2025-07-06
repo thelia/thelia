@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Form;
 
 use Symfony\Component\Form\Form;
@@ -25,16 +26,11 @@ use Thelia\Form\FirewallForm;
  */
 class TheliaFormValidator
 {
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    /** @var string */
-    protected $environment;
-
-    public function __construct(TranslatorInterface $translator, $kernelEnvironment)
+    /**
+     * @param string $kernelEnvironment
+     */
+    public function __construct(protected TranslatorInterface $translator, protected $environment)
     {
-        $this->translator = $translator;
-        $this->environment = $kernelEnvironment;
     }
 
     /**
@@ -45,7 +41,7 @@ class TheliaFormValidator
      *
      * @throws FormValidationException is the form contains error, or the method is not the right one
      *
-     * @return \Symfony\Component\Form\Form Form the symfony form object
+     * @return Form Form the symfony form object
      */
     public function validateForm(BaseForm $aBaseForm, $expectedMethod = null)
     {
@@ -68,6 +64,7 @@ class TheliaFormValidator
 
                 return $form;
             }
+
             $errorMessage = null;
             if ($form->get('error_message')->getData() != null) {
                 $errorMessage = $form->get('error_message')->getData();
@@ -79,9 +76,11 @@ class TheliaFormValidator
                     $this->getErrorMessages($form)
                 );
             }
+
             $aBaseForm->setError(true);
             throw new FormValidationException($errorMessage);
         }
+
         throw new FormValidationException(
             sprintf(
                 $this->translator->trans(
@@ -97,11 +96,11 @@ class TheliaFormValidator
      *
      * @return string the error string
      */
-    public function getErrorMessages(Form $form)
+    public function getErrorMessages(Form $form): string
     {
         $errors = '';
 
-        foreach ($form->getErrors() as $key => $error) {
+        foreach ($form->getErrors() as $error) {
             $errors .= $error->getMessage().', ';
         }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Service;
 
 use Symfony\Component\Cache\Adapter\AdapterInterface;
@@ -19,11 +20,10 @@ use Thelia\Model\ConfigQuery;
 class ConfigCacheService
 {
     public const CACHE_KEY = 'thelia_config';
-    protected $cache;
 
-    public function __construct(AdapterInterface $cache)
+
+    public function __construct(protected AdapterInterface $cache)
     {
-        $this->cache = $cache;
     }
 
     public function initCacheConfigs(bool $force = false): void
@@ -32,7 +32,7 @@ class ConfigCacheService
             $this->cache->delete(self::CACHE_KEY);
         }
 
-        $value = $this->cache->get(self::CACHE_KEY, function (ItemInterface $item) {
+        $value = $this->cache->get(self::CACHE_KEY, function (ItemInterface $item): array {
             $configs = ConfigQuery::create()->find();
             $caches = [];
 

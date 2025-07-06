@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Currency;
 
 class CurrencyUpdateEvent extends CurrencyCreateEvent
@@ -39,7 +40,7 @@ class CurrencyUpdateEvent extends CurrencyCreateEvent
     /**
      * @return $this
      */
-    public function setIsDefault($is_default)
+    public function setIsDefault($is_default): static
     {
         $this->is_default = $is_default;
 
@@ -57,7 +58,7 @@ class CurrencyUpdateEvent extends CurrencyCreateEvent
     /**
      * @return $this
      */
-    public function setVisible($visible)
+    public function setVisible($visible): static
     {
         $this->visible = $visible;
 

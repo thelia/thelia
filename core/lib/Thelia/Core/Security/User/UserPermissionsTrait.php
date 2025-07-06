@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Security\User;
 
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -22,7 +23,7 @@ trait UserPermissionsTrait
 {
     abstract public function getProfileId();
 
-    public function getPermissions()
+    public function getPermissions(): string|array
     {
         $profileId = $this->getProfileId();
 
@@ -46,6 +47,7 @@ trait UserPermissionsTrait
         foreach ($userResourcePermissionsQuery as $userResourcePermission) {
             $userPermissions[$userResourcePermission->getVirtualColumn('code')] = new AccessManager($userResourcePermission->getAccess());
         }
+
         foreach ($userModulePermissionsQuery as $userModulePermission) {
             $userPermissions['module'][strtolower($userModulePermission->getVirtualColumn('code'))] = new AccessManager($userModulePermission->getAccess());
         }

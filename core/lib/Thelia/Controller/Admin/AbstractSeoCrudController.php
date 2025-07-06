@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,14 +11,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Translation\Translator;
@@ -30,9 +33,6 @@ use Thelia\Form\Exception\FormValidationException;
  */
 abstract class AbstractSeoCrudController extends AbstractCrudController
 {
-    // Events
-    protected $updateSeoEventIdentifier;
-
     /**
      * @param string $objectName                      the lower case object name. Example. "message"
      * @param string $defaultListOrder                the default object list order, or null if list is not sortable. Example: manual
@@ -47,17 +47,17 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
      * @param string $moduleCode                      The module code for ACL
      */
     public function __construct(
-        $objectName,
-        $defaultListOrder,
-        $orderRequestParameterName,
-        $resourceCode,
-        $createEventIdentifier,
-        $updateEventIdentifier,
-        $deleteEventIdentifier,
-        $visibilityToggleEventIdentifier = null,
-        $changePositionEventIdentifier = null,
-        $updateSeoEventIdentifier = null,
-        $moduleCode = null
+        string $objectName,
+        ?string $defaultListOrder,
+        ?string $orderRequestParameterName,
+        string $resourceCode,
+        ?string $createEventIdentifier,
+        ?string $updateEventIdentifier,
+        ?string $deleteEventIdentifier,
+        ?string $visibilityToggleEventIdentifier = null,
+        ?string $changePositionEventIdentifier = null,
+        protected $updateSeoEventIdentifier = null,
+        ?string $moduleCode = null
     ) {
         parent::__construct(
             $objectName,
@@ -71,8 +71,6 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             $changePositionEventIdentifier,
             $moduleCode
         );
-
-        $this->updateSeoEventIdentifier = $updateSeoEventIdentifier;
     }
 
     /**
@@ -100,7 +98,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
      *
      * @return UpdateSeoEvent
      */
-    protected function getUpdateSeoEvent($formData)
+    protected function getUpdateSeoEvent(array $formData)
     {
         $updateSeoEvent = new UpdateSeoEvent($formData['id']);
 
@@ -142,7 +140,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
     /**
      * Update SEO modification, and either go back to the object list, or stay on the edition page.
      *
-     * @return \Thelia\Core\HttpFoundation\Response the response
+     * @return Response the response
      */
     public function processUpdateSeoAction(
         Request $request,
@@ -150,7 +148,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
         EventDispatcherInterface $eventDispatcher
     ) {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -191,13 +189,13 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             }
 
             return $response;
-        } catch (FormValidationException $ex) {
+        } catch (FormValidationException $formValidationException) {
             // Form cannot be validated
-            $errorMessage = $this->createStandardFormValidationErrorMessage($ex);
+            $errorMessage = $this->createStandardFormValidationErrorMessage($formValidationException);
         }
 
         // Load object if exist
-        if (null !== $object = $this->getExistingObject()) {
+        if (($object = $this->getExistingObject()) instanceof ActiveRecordInterface) {
             // Hydrate the form abd pass it to the parser
             $changeForm = $this->hydrateObjectForm($parserContext, $object);
 
@@ -209,7 +207,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             Translator::getInstance()->trans('%obj SEO modification', ['%obj' => $this->objectName]),
             $errorMessage,
             $updateSeoForm,
-            $ex
+            $formValidationException
         );
 
         // At this point, the form has errors, and should be redisplayed.

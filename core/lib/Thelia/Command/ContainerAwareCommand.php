@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Command;
 
+use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -71,7 +73,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
         // Initialize Thelia translator, if not already done.
         try {
             Translator::getInstance();
-        } catch (\Exception $ex) {
+        } catch (Exception) {
             $this->container->get('thelia.translator');
         }
 
@@ -93,6 +95,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
 
         $requestContext = new RequestContext();
         $requestContext->fromRequest($request);
+
         $url = $container->get('thelia.url.manager');
         $url->setRequestContext($requestContext);
         $this->getContainer()->get('router.admin')->setContext($requestContext);
@@ -108,16 +111,16 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
         $baseUrl = '';
 
         if ((int) ConfigQuery::read('one_domain_foreach_lang') === 1) {
-            if ($lang === null) {
+            if (!$lang instanceof Lang) {
                 $lang = LangQuery::create()->findOneByByDefault(true);
             }
 
             $baseUrl = $lang->getUrl();
         }
 
-        $baseUrl = trim($baseUrl);
+        $baseUrl = trim((string) $baseUrl);
 
-        if (empty($baseUrl)) {
+        if ($baseUrl === '' || $baseUrl === '0') {
             $baseUrl = ConfigQuery::read('url_site');
         }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
+use InvalidArgumentException;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface as SecurityUserInterface;
@@ -42,11 +44,11 @@ class Admin extends BaseAdmin implements UserInterface, SecurityUserInterface, P
 
     public function setPassword($password)
     {
-        if ($this->isNew() && ($password === null || trim($password) == '')) {
-            throw new \InvalidArgumentException('customer password is mandatory on creation');
+        if ($this->isNew() && ($password === null || trim($password) === '')) {
+            throw new InvalidArgumentException('customer password is mandatory on creation');
         }
 
-        if ($password !== null && trim($password) != '') {
+        if ($password !== null && trim($password) !== '') {
             $this->setAlgo('PASSWORD_BCRYPT');
 
             return parent::setPassword(password_hash($password, \PASSWORD_BCRYPT));
@@ -62,7 +64,7 @@ class Admin extends BaseAdmin implements UserInterface, SecurityUserInterface, P
 
     public function checkPassword($password)
     {
-        return password_verify($password, $this->password);
+        return password_verify((string) $password, $this->password);
     }
 
     public function getUsername()

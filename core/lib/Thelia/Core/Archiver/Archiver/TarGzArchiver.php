@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Archiver\Archiver;
+
+use Phar;
 
 /**
  * Class TarGzArchiver.
@@ -19,29 +22,29 @@ namespace Thelia\Core\Archiver\Archiver;
  */
 class TarGzArchiver extends TarArchiver
 {
-    public const COMPRESSION_METHOD = \Phar::GZ;
+    public const COMPRESSION_METHOD = Phar::GZ;
 
-    public function getId()
+    public function getId(): string
     {
         return 'thelia.tar.gz';
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'Gz';
     }
 
-    public function getExtension()
+    public function getExtension(): string
     {
         return 'tgz';
     }
 
-    public function getMimeType()
+    public function getMimeType(): string
     {
         return 'application/x-gzip';
     }
 
-    public function isAvailable()
+    public function isAvailable(): bool
     {
         return parent::isAvailable() && \extension_loaded('zlib');
     }

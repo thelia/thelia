@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiFilter;
@@ -92,27 +93,31 @@ class ProductSaleElementsProductImage implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:product_sale_elements_product_image:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:product_sale_elements_product_image:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:product_sale_elements_product_image:write';
 
     public const GROUP_ADMIN_WRITE_FILE = 'admin:product_sale_elements_product_image:write_file';
+
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:product_sale_elements_product_image:write_update';
 
     public const GROUP_FRONT_READ = 'front:product_sale_elements_product_image:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:product_sale_elements_product_image:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE_UPDATE])]
-    public ?int $productSaleElementsId;
+    public ?int $productSaleElementsId = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     #[Relation(targetResource: ProductSaleElements::class)]
-    public ?ProductSaleElements $productSaleElements;
+    public ?ProductSaleElements $productSaleElements = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE_UPDATE])]
-    public ?int $productImageId;
+    public ?int $productImageId = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?int $productId = null;
@@ -123,6 +128,7 @@ class ProductSaleElementsProductImage implements PropelResourceInterface
             $pse = ProductSaleElementsQuery::create()->findPk($this->productSaleElementsId);
             return $pse ? $pse->getProductId() : null;
         }
+
         return null;
     }
 

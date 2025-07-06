@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Condition\Implementation;
 
 use Thelia\Condition\Operators;
@@ -41,12 +42,12 @@ class CartContainsProducts extends ConditionAbstract
         parent::__construct($facade);
     }
 
-    public function getServiceId()
+    public function getServiceId(): string
     {
         return 'thelia.condition.cart_contains_products';
     }
 
-    public function setValidatorsFromForm(array $operators, array $values)
+    public function setValidatorsFromForm(array $operators, array $values): static
     {
         $this->checkComparisonOperatorValue($operators, self::PRODUCTS_LIST);
 
@@ -64,7 +65,7 @@ class CartContainsProducts extends ConditionAbstract
         // Check that at least one product is selected
         if (empty($values[self::PRODUCTS_LIST])) {
             throw new InvalidConditionValueException(
-                __CLASS__,
+                self::class,
                 self::PRODUCTS_LIST
             );
         }
@@ -75,7 +76,7 @@ class CartContainsProducts extends ConditionAbstract
         return $this;
     }
 
-    public function isMatching()
+    public function isMatching(): bool
     {
         $cartItems = $this->facade->getCart()->getCartItems();
 
@@ -93,7 +94,7 @@ class CartContainsProducts extends ConditionAbstract
         return false;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->translator->trans(
             'Cart contains specific products',
@@ -101,17 +102,15 @@ class CartContainsProducts extends ConditionAbstract
         );
     }
 
-    public function getToolTip()
+    public function getToolTip(): string
     {
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'The coupon applies if the cart contains at least one product of the specified product list',
             []
         );
-
-        return $toolTip;
     }
 
-    public function getSummary()
+    public function getSummary(): string
     {
         $i18nOperator = Operators::getI18n(
             $this->translator,
@@ -131,18 +130,16 @@ class CartContainsProducts extends ConditionAbstract
             $prodStrList = rtrim($prodStrList, ', ');
         }
 
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'Cart contains at least a product %op% <strong>%products_list%</strong>',
             [
                 '%products_list%' => $prodStrList,
                 '%op%' => $i18nOperator,
             ]
         );
-
-        return $toolTip;
     }
 
-    protected function generateInputs()
+    protected function generateInputs(): array
     {
         return [
             self::PRODUCTS_LIST => [

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Category;
 
 use Thelia\Core\Event\ActionEvent;
@@ -20,6 +21,9 @@ use Thelia\Model\Category;
  */
 class CategoryEvent extends ActionEvent
 {
+    /**
+     * @var Category|null
+     */
     public $category;
 
     public function __construct(Category $category = null)
@@ -27,7 +31,7 @@ class CategoryEvent extends ActionEvent
         $this->category = $category;
     }
 
-    public function hasCategory()
+    public function hasCategory(): bool
     {
         return null !== $this->category;
     }
@@ -37,7 +41,7 @@ class CategoryEvent extends ActionEvent
         return $this->category;
     }
 
-    public function setCategory(Category $category)
+    public function setCategory(Category $category): static
     {
         $this->category = $category;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
+
 
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
@@ -20,6 +22,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use DateTime;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -67,7 +70,9 @@ class OrderProductTax implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:order_product_tax:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order_product_tax:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:order_product_tax:write';
 
     #[Groups([
@@ -102,7 +107,7 @@ class OrderProductTax implements PropelResourceInterface
         Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
     ])]
-    public ?string $description;
+    public ?string $description = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -123,13 +128,13 @@ class OrderProductTax implements PropelResourceInterface
         Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
     ])]
-    public ?float $promoAmount;
+    public ?float $promoAmount = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $createdAt;
+    public ?DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public ?\DateTime $updatedAt;
+    public ?DateTime $updatedAt = null;
 
     public function getId(): ?int
     {
@@ -203,24 +208,24 @@ class OrderProductTax implements PropelResourceInterface
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): self
+    public function setCreatedAt(?DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): self
+    public function setUpdatedAt(?DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 

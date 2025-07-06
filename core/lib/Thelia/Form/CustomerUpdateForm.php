@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,14 +11,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Form;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 
@@ -48,7 +51,7 @@ class CustomerUpdateForm extends BaseForm
             ])
             ->add('firstname', TextType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
+                    new NotBlank(),
                 ],
                 'label' => Translator::getInstance()->trans('First Name'),
                 'label_attr' => [
@@ -57,7 +60,7 @@ class CustomerUpdateForm extends BaseForm
             ])
             ->add('lastname', TextType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
+                    new NotBlank(),
                 ],
                 'label' => Translator::getInstance()->trans('Last Name'),
                 'label_attr' => [
@@ -66,8 +69,8 @@ class CustomerUpdateForm extends BaseForm
             ])
             ->add('email', EmailType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Email(),
+                    new NotBlank(),
+                    new Email(),
                 ],
                 'label' => Translator::getInstance()->trans('Email address'),
                 'label_attr' => [
@@ -76,8 +79,8 @@ class CustomerUpdateForm extends BaseForm
             ])
             ->add('email_confirm', EmailType::class, [
                 'constraints' => [
-                    new Constraints\Email(),
-                    new Constraints\Callback([$this, 'verifyEmailField']),
+                    new Email(),
+                    new Callback($this->verifyEmailField(...)),
                 ],
                 'label' => Translator::getInstance()->trans('Confirm Email address'),
                 'label_attr' => [
@@ -94,7 +97,7 @@ class CustomerUpdateForm extends BaseForm
             ])
             ->add('address1', TextType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
+                    new NotBlank(),
                 ],
                 'label_attr' => [
                     'for' => 'address',
@@ -131,9 +134,9 @@ class CustomerUpdateForm extends BaseForm
             ])
             ->add('zipcode', TextType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Callback(
-                        [$this, 'verifyZipCode']),
+                    new NotBlank(),
+                    new Callback(
+                        $this->verifyZipCode(...)),
                 ],
                 'label' => Translator::getInstance()->trans('Zip code'),
                 'label_attr' => [
@@ -142,7 +145,7 @@ class CustomerUpdateForm extends BaseForm
             ])
             ->add('city', TextType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
+                    new NotBlank(),
                 ],
                 'label' => Translator::getInstance()->trans('City'),
                 'label_attr' => [
@@ -151,7 +154,7 @@ class CustomerUpdateForm extends BaseForm
             ])
             ->add('country', TextType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
+                    new NotBlank(),
                 ],
                 'label' => Translator::getInstance()->trans('Country'),
                 'label_attr' => [
@@ -161,8 +164,8 @@ class CustomerUpdateForm extends BaseForm
             ->add('state', TextType::class, [
                 'required' => false,
                 'constraints' => [
-                    new Constraints\Callback(
-                        [$this, 'verifyState']
+                    new Callback(
+                        $this->verifyState(...)
                     ),
                 ],
                 'label' => Translator::getInstance()->trans('State *'),
@@ -207,7 +210,7 @@ class CustomerUpdateForm extends BaseForm
     /**
      * @return string the name of you form. This name must be unique
      */
-    public static function getName()
+    public static function getName(): string
     {
         return 'thelia_customer_update';
     }

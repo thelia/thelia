@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+use RuntimeException;
+use Thelia\Service\DataTransfer\ExportHandler;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -31,13 +35,12 @@ use Thelia\Model\LangQuery;
  *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
+#[AsCommand(name: 'export', description: 'Export data')]
 class ExportCommand extends ContainerAwareCommand
 {
     protected function configure(): void
     {
         $this
-            ->setName('export')
-            ->setDescription('Export data')
             ->setHelp('The <info>export</info> command run selected export')
             ->addArgument(
                 'ref',
@@ -105,18 +108,18 @@ class ExportCommand extends ContainerAwareCommand
         $exportRef = $input->getArgument('ref');
         $serializer = $input->getArgument('serializer');
         if ($exportRef === null || $serializer === null) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'Not enough arguments.'.\PHP_EOL.'If no options are provided, ref and serializer arguments are required.'
             );
         }
 
-        /** @var \Thelia\Service\Handler\ExportHandler $exportHandler */
+        /** @var ExportHandler $exportHandler */
         $exportHandler = $this->getContainer()->get('thelia.export.handler');
 
         $export = $exportHandler->getExportByRef($exportRef);
         if ($export === null) {
-            throw new \RuntimeException(
-                $exportRef.' export doesn\'t exist.'
+            throw new RuntimeException(
+                $exportRef." export doesn't exist."
             );
         }
 
@@ -125,7 +128,7 @@ class ExportCommand extends ContainerAwareCommand
 
         $archiver = null;
         if ($input->getArgument('archiver')) {
-            /** @var \Thelia\Core\Archiver\ArchiverManager $archiverManager */
+            /** @var ArchiverManager $archiverManager */
             $archiverManager = $this->getContainer()->get(RegisterArchiverPass::MANAGER_SERVICE_ID);
             $archiver = $archiverManager->get($input->getArgument('archiver'));
         }
@@ -152,7 +155,7 @@ class ExportCommand extends ContainerAwareCommand
     /**
      * Output available exports.
      *
-     * @param \Symfony\Component\Console\Output\OutputInterface $output An output interface
+     * @param OutputInterface $output An output interface
      */
     protected function listExport(OutputInterface $output): void
     {
@@ -179,7 +182,7 @@ class ExportCommand extends ContainerAwareCommand
     /**
      * Output available serializers.
      *
-     * @param \Symfony\Component\Console\Output\OutputInterface $output An output interface
+     * @param OutputInterface $output An output interface
      */
     protected function listSerializer(OutputInterface $output): void
     {
@@ -212,7 +215,7 @@ class ExportCommand extends ContainerAwareCommand
     /**
      * Output available archivers.
      *
-     * @param \Symfony\Component\Console\Output\OutputInterface $output An output interface
+     * @param OutputInterface $output An output interface
      */
     protected function listArchiver(OutputInterface $output): void
     {

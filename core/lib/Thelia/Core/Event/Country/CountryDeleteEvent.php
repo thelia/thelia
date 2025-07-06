@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Country;
 
 /**
@@ -20,16 +21,10 @@ namespace Thelia\Core\Event\Country;
 class CountryDeleteEvent extends CountryEvent
 {
     /**
-     * @var int country id
-     */
-    protected $country_id;
-
-    /**
      * @param int $country_id
      */
-    public function __construct($country_id)
+    public function __construct(protected $country_id)
     {
-        $this->country_id = $country_id;
     }
 
     /**

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -18,7 +19,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\ImportCategoryQuery;
 use Thelia\Model\ImportQuery;
-use Thelia\Service\Handler\ImportHandler;
+use Thelia\Service\DataTransfer\ImportHandler;
 
 /**
  * Class Import.
@@ -28,16 +29,10 @@ use Thelia\Service\Handler\ImportHandler;
 class Import extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * @var \Thelia\Service\Handler\ImportHandler The import handler
+     * @param ImportHandler $handler The import handler
      */
-    protected $handler;
-
-    /**
-     * @param \Thelia\Service\Handler\ImportHandler $importHandler The import handler
-     */
-    public function __construct(ImportHandler $importHandler)
+    public function __construct(protected ImportHandler $handler)
     {
-        $this->handler = $importHandler;
     }
 
     public static function getSubscribedEvents(): array

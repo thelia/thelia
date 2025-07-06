@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Bridge\Propel\Event;
 
+use RuntimeException;
 use Thelia\Api\Resource\DeliveryModuleOption;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Translation\Translator;
@@ -23,36 +25,24 @@ use Thelia\Model\State;
 
 class DeliveryModuleOptionEvent extends ActionEvent
 {
-    protected Module $module;
-    protected ?Cart $cart;
-    protected ?Address $address;
-    protected ?Country $country;
-    protected ?State $state;
-
     protected array $deliveryModuleOptions = [];
 
     /**
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function __construct(
-        Module $module,
-        Address $address = null,
-        Cart $cart = null,
-        Country $country = null,
-        State $state = null
+        protected Module $module,
+        protected ?Address $address = null,
+        protected ?Cart $cart = null,
+        protected ?Country $country = null,
+        protected ?State $state = null
     ) {
-        $this->module = $module;
-        $this->address = $address;
-        $this->cart = $cart;
-        $this->country = $country;
-        $this->state = $state;
-
-        if (null === $this->address && null === $this->country) {
-            throw new \RuntimeException(Translator::getInstance()->trans('Not enough informations to retrieve module options'));
+        if (!$this->address instanceof Address && !$this->country instanceof Country) {
+            throw new RuntimeException(Translator::getInstance()->trans('Not enough informations to retrieve module options'));
         }
 
-        if (!$module->isDeliveryModule()) {
-            throw new \RuntimeException(Translator::getInstance()->trans($module->getTitle().' is not a delivery module.'));
+        if (!$this->module->isDeliveryModule()) {
+            throw new RuntimeException(Translator::getInstance()->trans($this->module->getTitle().' is not a delivery module.'));
         }
     }
 

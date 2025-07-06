@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,13 +11,18 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+
+use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Hook\HookCreateAllEvent;
 use Thelia\Core\Event\Hook\HookCreateEvent;
 use Thelia\Core\Event\Hook\HookDeactivationEvent;
@@ -29,7 +36,9 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Translation\Translator;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
+use Thelia\Form\HookModificationForm;
 use Thelia\Log\Tlog;
 use Thelia\Model\Hook;
 use Thelia\Model\HookQuery;
@@ -55,18 +64,18 @@ class HookController extends AbstractCrudController
         );
     }
 
-    public function indexAction()
+    public function indexAction(): Response
     {
-        if (null !== $response = $this->checkAuth(AdminResources::HOOK, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::HOOK, [], AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
         return $this->renderList();
     }
 
-    public function discoverAction()
+    public function discoverAction(): \Symfony\Component\HttpFoundation\Response|JsonResponse
     {
-        if (null !== $response = $this->checkAuth(AdminResources::HOOK, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::HOOK, [], AccessManager::VIEW)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -103,16 +112,16 @@ class HookController extends AbstractCrudController
             ];
 
             $response = new JsonResponse($json_data);
-        } catch (\Exception $e) {
-            $response = new JsonResponse(['error' => $e->getMessage()], 500);
+        } catch (Exception $exception) {
+            $response = new JsonResponse(['error' => $exception->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return $response;
     }
 
-    public function discoverSaveAction(EventDispatcherInterface $eventDispatcher)
+    public function discoverSaveAction(EventDispatcherInterface $eventDispatcher): \Symfony\Component\HttpFoundation\Response|JsonResponse
     {
-        if (null !== $response = $this->checkAuth(AdminResources::HOOK, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::HOOK, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -121,7 +130,7 @@ class HookController extends AbstractCrudController
         $templateType = $this->getRequest()->request->get('templateType');
 
         // new hooks in the template
-        if (null !== $newHooks = $this->getRequest()->request->get('new', null)) {
+        if (null !== $newHooks = $this->getRequest()->request->get('new')) {
             foreach ($newHooks as $hook) {
                 $event = $this->getDiscoverCreationEvent($hook, $templateType);
 
@@ -156,8 +165,8 @@ class HookController extends AbstractCrudController
             'success' => true,
         ];
 
-        if (\count($errors)) {
-            $response = new JsonResponse(['error' => $errors], 500);
+        if ($errors !== []) {
+            $response = new JsonResponse(['error' => $errors], Response::HTTP_INTERNAL_SERVER_ERROR);
         } else {
             $response = new JsonResponse($json_data);
         }
@@ -165,7 +174,7 @@ class HookController extends AbstractCrudController
         return $response;
     }
 
-    protected function getDiscoverCreationEvent($data, $type)
+    protected function getDiscoverCreationEvent(array $data, $type): HookCreateAllEvent
     {
         $event = new HookCreateAllEvent();
 
@@ -184,7 +193,7 @@ class HookController extends AbstractCrudController
         return $event;
     }
 
-    protected function getDeactivationEvent($code, $type)
+    protected function getDeactivationEvent($code, $type): ?HookDeactivationEvent
     {
         $event = null;
 
@@ -202,7 +211,10 @@ class HookController extends AbstractCrudController
         return $event;
     }
 
-    protected function getAllHooks($templateType)
+    /**
+     * @return array{id: mixed, code: mixed, native: mixed, activate: mixed, title: mixed}[]
+     */
+    protected function getAllHooks($templateType): array
     {
         // get the all hooks
         $hooks = HookQuery::create()
@@ -227,7 +239,7 @@ class HookController extends AbstractCrudController
     /**
      * Return the creation form for this object.
      */
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::HOOK_CREATION);
     }
@@ -235,7 +247,7 @@ class HookController extends AbstractCrudController
     /**
      * Return the update form for this object.
      */
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::HOOK_MODIFICATION);
     }
@@ -243,11 +255,11 @@ class HookController extends AbstractCrudController
     /**
      * Hydrate the update form for this object, before passing it to the update template.
      *
-     * @param \Thelia\Model\Hook $object
+     * @param Hook $object
      *
-     * @return \Thelia\Form\HookModificationForm
+     * @return HookModificationForm
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -271,7 +283,7 @@ class HookController extends AbstractCrudController
      *
      * @param unknown $formData
      */
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $event = new HookCreateEvent();
 
@@ -283,14 +295,14 @@ class HookController extends AbstractCrudController
      *
      * @param unknown $formData
      */
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $event = new HookUpdateEvent($formData['id']);
 
         return $this->hydrateEvent($event, $formData, true);
     }
 
-    protected function hydrateEvent($event, $formData, $update = false)
+    protected function hydrateEvent($event, array $formData, $update = false)
     {
         $event
             ->setLocale($formData['locale'])
@@ -313,7 +325,7 @@ class HookController extends AbstractCrudController
     /**
      * Creates the delete event with the provided form data.
      */
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): HookDeleteEvent
     {
         return new HookDeleteEvent($this->getRequest()->get('hook_id'));
     }
@@ -323,7 +335,7 @@ class HookController extends AbstractCrudController
      *
      * @param unknown $event
      */
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasHook();
     }
@@ -335,7 +347,7 @@ class HookController extends AbstractCrudController
      *
      * @internal param \Thelia\Controller\Admin\unknown $createEvent
      */
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->getHook();
     }
@@ -343,7 +355,7 @@ class HookController extends AbstractCrudController
     /**
      * Load an existing object from the database.
      */
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $hook = HookQuery::create()
             ->findPk($this->getRequest()->get('hook_id', 0));
@@ -358,23 +370,20 @@ class HookController extends AbstractCrudController
     /**
      * Returns the object label form the object event (name, title, etc.).
      *
-     * @param \Thelia\Model\Hook $object
+     * @param Hook $object
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
     /**
      * Returns the object ID from the object.
      *
-     * @param \Thelia\Model\Hook $object
-     *
-     * @return int
+     * @param Hook $object
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
@@ -384,7 +393,7 @@ class HookController extends AbstractCrudController
      *
      * @param unknown $currentOrder , if any, null otherwise
      */
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render('hooks', ['order' => $currentOrder]);
     }
@@ -392,12 +401,12 @@ class HookController extends AbstractCrudController
     /**
      * Render the edition template.
      */
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('hook-edit', $this->getEditionArgument());
     }
 
-    protected function getEditionArgument()
+    protected function getEditionArgument(): array
     {
         return [
             'hook_id' => $this->getRequest()->get('hook_id', 0),
@@ -407,7 +416,7 @@ class HookController extends AbstractCrudController
     /**
      * Redirect to the edition template.
      */
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.hook.update',
@@ -421,14 +430,14 @@ class HookController extends AbstractCrudController
     /**
      * Redirect to the list template.
      */
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.hook');
     }
 
-    public function toggleNativeAction(EventDispatcherInterface $eventDispatcher)
+    public function toggleNativeAction(EventDispatcherInterface $eventDispatcher): Response
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -441,18 +450,18 @@ class HookController extends AbstractCrudController
                 if ($toggleDefaultEvent->hasHook()) {
                     return $this->nullResponse();
                 }
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 $content = $ex->getMessage();
-                Tlog::getInstance()->debug(sprintf('%s', $content));
+                Tlog::getInstance()->debug($content);
             }
         }
 
         return $this->nullResponse(500);
     }
 
-    public function toggleActivationAction(EventDispatcherInterface $eventDispatcher)
+    public function toggleActivationAction(EventDispatcherInterface $eventDispatcher): Response
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -465,9 +474,9 @@ class HookController extends AbstractCrudController
                 if ($toggleDefaultEvent->hasHook()) {
                     return $this->nullResponse();
                 }
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 $content = $ex->getMessage();
-                Tlog::getInstance()->debug(sprintf('%s', $content));
+                Tlog::getInstance()->debug($content);
             }
         }
 

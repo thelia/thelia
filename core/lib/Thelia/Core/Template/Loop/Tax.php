@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Type\EnumListType;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -22,7 +24,6 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\Tax as TaxModel;
 use Thelia\Model\TaxQuery;
 use Thelia\Model\TaxRuleCountryQuery;
-use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
@@ -43,10 +44,7 @@ class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $timestampable = true;
 
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
@@ -57,7 +55,7 @@ class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(['id', 'id_reverse', 'alpha', 'alpha_reverse'])
+                    new EnumListType(['id', 'id_reverse', 'alpha', 'alpha_reverse'])
                 ),
                 'alpha'
             )
@@ -134,7 +132,7 @@ class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
         return $search;
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var TaxModel $tax */
         foreach ($loopResult->getResultDataCollection() as $tax) {

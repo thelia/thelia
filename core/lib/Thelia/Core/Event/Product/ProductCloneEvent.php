@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Product;
 
 use Thelia\Core\Event\ActionEvent;
@@ -17,14 +18,12 @@ use Thelia\Model\Product;
 
 class ProductCloneEvent extends ActionEvent
 {
-    /** @var string */
-    protected $ref;
-    /** @var string */
-    protected $lang;
-    /** @var Product */
-    protected $originalProduct;
+
+
+
     /** @var Product */
     protected $clonedProduct;
+
     /** @var array */
     protected $types = ['images', 'documents'];
 
@@ -33,20 +32,11 @@ class ProductCloneEvent extends ActionEvent
      *
      * @param string $lang the locale (such as fr_FR)
      */
-    public function __construct(
-        string $ref,
-        string $lang,
-        Product $originalProduct
-    ) {
-        $this->ref = $ref;
-        $this->lang = $lang;
-        $this->originalProduct = $originalProduct;
+    public function __construct(protected string $ref, protected string $lang, protected Product $originalProduct)
+    {
     }
 
-    /**
-     * @return string
-     */
-    public function getRef()
+    public function getRef(): string
     {
         return $this->ref;
     }
@@ -59,7 +49,7 @@ class ProductCloneEvent extends ActionEvent
     /**
      * @return string the locale (such as fr_FR)
      */
-    public function getLang()
+    public function getLang(): string
     {
         return $this->lang;
     }
@@ -72,18 +62,12 @@ class ProductCloneEvent extends ActionEvent
         $this->lang = $lang;
     }
 
-    /**
-     * @return Product
-     */
-    public function getOriginalProduct()
+    public function getOriginalProduct(): Product
     {
         return $this->originalProduct;
     }
 
-    /**
-     * @param Product $originalProduct
-     */
-    public function setOriginalProduct($originalProduct): void
+    public function setOriginalProduct(Product $originalProduct): void
     {
         $this->originalProduct = $originalProduct;
     }

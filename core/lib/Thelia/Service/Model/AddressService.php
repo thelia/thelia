@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Service\Model;
 
 use Propel\Runtime\Exception\PropelException;
@@ -64,6 +65,7 @@ readonly class AddressService
 
             return;
         }
+
         $this->createAddress($form);
     }
 
@@ -76,6 +78,7 @@ readonly class AddressService
         if (null === $customer) {
             throw new CustomerException();
         }
+
         $address = AddressQuery::create()->findPk($addressId);
 
         if (null === $address) {
@@ -154,6 +157,7 @@ readonly class AddressService
             if (!$session instanceof Session) {
                 return null;
             }
+
             $addressId = $session->getOrder()->getChoosenDeliveryAddress();
         }
 

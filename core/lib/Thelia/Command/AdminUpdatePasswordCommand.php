@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+use RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -34,6 +37,7 @@ use Thelia\Tools\Password;
  *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
+#[AsCommand(name: 'admin:updatePassword', description: 'change administrator password')]
 class AdminUpdatePasswordCommand extends ContainerAwareCommand
 {
     protected function init(): void
@@ -54,8 +58,6 @@ class AdminUpdatePasswordCommand extends ContainerAwareCommand
     protected function configure(): void
     {
         $this
-            ->setName('admin:updatePassword')
-            ->setDescription('change administrator password')
             ->setHelp('The <info>admin:updatePassword</info> command allows you to change the password for a given administrator')
             ->addArgument(
                 'login',
@@ -78,7 +80,7 @@ class AdminUpdatePasswordCommand extends ContainerAwareCommand
         $login = $input->getArgument('login');
 
         if (null === $admin = AdminQuery::create()->filterByLogin($login)->findOne()) {
-            throw new \RuntimeException(sprintf('Admin with login %s does not exists', $login));
+            throw new RuntimeException(sprintf('Admin with login %s does not exists', $login));
         }
 
         $password = $input->getOption('password') ?: Password::generateRandom();

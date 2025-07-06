@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Serializer;
+
+use SplFileObject;
 
 /**
  * Class AbstractSerializer.
@@ -19,7 +22,7 @@ namespace Thelia\Core\Serializer;
  */
 abstract class AbstractSerializer implements SerializerInterface
 {
-    public function prepareFile(\SplFileObject $fileObject): void
+    public function prepareFile(SplFileObject $fileObject): void
     {
     }
 
@@ -31,7 +34,7 @@ abstract class AbstractSerializer implements SerializerInterface
         return '';
     }
 
-    public function finalizeFile(\SplFileObject $fileObject): void
+    public function finalizeFile(SplFileObject $fileObject): void
     {
     }
 }

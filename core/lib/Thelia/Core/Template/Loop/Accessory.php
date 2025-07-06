@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -33,12 +34,10 @@ use Thelia\Model\AccessoryQuery;
 class Accessory extends Product
 {
     protected $accessoryId;
+
     protected $accessoryPosition;
 
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         $argumentCollection = parent::getArgDefinitions();
 
@@ -63,13 +62,14 @@ class Accessory extends Product
         $search->filterByProductId($product, Criteria::IN);
 
         $order = $this->getOrder();
-        $orderByAccessory = array_search('accessory', $order);
-        $orderByAccessoryReverse = array_search('accessory_reverse', $order);
+        $orderByAccessory = array_search('accessory', $order, true);
+        $orderByAccessoryReverse = array_search('accessory_reverse', $order, true);
         if ($orderByAccessory !== false) {
             $search->orderByPosition(Criteria::ASC);
             $order[$orderByAccessory] = 'given_id';
             $this->args->get('order')->setValue(implode(',', $order));
         }
+
         if ($orderByAccessoryReverse !== false) {
             $search->orderByPosition(Criteria::DESC);
             $order[$orderByAccessoryReverse] = 'given_id';
@@ -79,7 +79,8 @@ class Accessory extends Product
         $accessories = $this->search($search);
 
         $accessoryIdList = [0];
-        $this->accessoryPosition = $this->accessoryId = [];
+        $this->accessoryPosition = [];
+        $this->accessoryId = [];
 
         foreach ($accessories as $accessory) {
             $accessoryProductId = $accessory->getAccessory();
@@ -102,11 +103,11 @@ class Accessory extends Product
         return parent::buildModelCriteria();
     }
 
-    public function parseResults(LoopResult $results)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
-        $results = parent::parseResults($results);
+        $loopResult = parent::parseResults($loopResult);
 
-        foreach ($results as $loopResultRow) {
+        foreach ($loopResult as $loopResultRow) {
             $accessoryProductId = $loopResultRow->get('ID');
 
             $loopResultRow
@@ -116,6 +117,6 @@ class Accessory extends Product
             ;
         }
 
-        return $results;
+        return $loopResult;
     }
 }

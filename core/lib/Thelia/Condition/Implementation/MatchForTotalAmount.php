@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Condition\Implementation;
 
 use Thelia\Condition\Operators;
@@ -50,12 +51,12 @@ class MatchForTotalAmount extends ConditionAbstract
         parent::__construct($facade);
     }
 
-    public function getServiceId()
+    public function getServiceId(): string
     {
         return 'thelia.condition.match_for_total_amount';
     }
 
-    public function setValidatorsFromForm(array $operators, array $values)
+    public function setValidatorsFromForm(array $operators, array $values): static
     {
         $this
             ->checkComparisonOperatorValue($operators, self::CART_TOTAL)
@@ -79,10 +80,8 @@ class MatchForTotalAmount extends ConditionAbstract
 
     /**
      * Test if Customer meets conditions.
-     *
-     * @return bool
      */
-    public function isMatching()
+    public function isMatching(): bool
     {
         $condition1 = $this->conditionValidator->variableOpComparison(
             $this->facade->getCartTotalTaxPrice(),
@@ -105,7 +104,7 @@ class MatchForTotalAmount extends ConditionAbstract
         return false;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->translator->trans(
             'Cart total amount',
@@ -113,24 +112,22 @@ class MatchForTotalAmount extends ConditionAbstract
         );
     }
 
-    public function getToolTip()
+    public function getToolTip(): string
     {
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'Check the total Cart amount in the given currency',
             []
         );
-
-        return $toolTip;
     }
 
-    public function getSummary()
+    public function getSummary(): string
     {
         $i18nOperator = Operators::getI18n(
             $this->translator,
             $this->operators[self::CART_TOTAL]
         );
 
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'If cart total amount is <strong>%operator%</strong> %amount% %currency%',
             [
                 '%operator%' => $i18nOperator,
@@ -138,11 +135,9 @@ class MatchForTotalAmount extends ConditionAbstract
                 '%currency%' => $this->values[self::CART_CURRENCY],
             ]
         );
-
-        return $toolTip;
     }
 
-    protected function generateInputs()
+    protected function generateInputs(): array
     {
         $currencies = CurrencyQuery::create()->filterByVisible(true)->find();
 
@@ -175,9 +170,7 @@ class MatchForTotalAmount extends ConditionAbstract
             ->getTranslator()
             ->trans('Cart total amount is', []);
 
-        $html = $this->drawBackOfficeBaseInputsText($labelPrice, self::CART_TOTAL);
-
-        return $html;
+        return $this->drawBackOfficeBaseInputsText($labelPrice, self::CART_TOTAL);
     }
 
     protected function drawBackOfficeBaseInputsText($label, $inputKey)

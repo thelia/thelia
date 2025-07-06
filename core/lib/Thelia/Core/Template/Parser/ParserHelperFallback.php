@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Parser;
 
+use RuntimeException;
 use Thelia\Core\Template\ParserHelperInterface;
 
 /**
@@ -29,8 +31,8 @@ class ParserHelperFallback implements ParserHelperInterface
      *
      * @return array array of functions with 2 index name and attributes an array of name, value
      */
-    public function getFunctionsDefinition($content, array $functions = [])
+    public function getFunctionsDefinition($content, array $functions = []): never
     {
-        throw new \RuntimeException('if you want to use a parser, please register one');
+        throw new RuntimeException('if you want to use a parser, please register one');
     }
 }

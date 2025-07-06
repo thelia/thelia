@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Content;
 
 /**
@@ -20,23 +21,19 @@ namespace Thelia\Core\Event\Content;
 class ContentDeleteEvent extends ContentEvent
 {
     /** @var int */
-    protected $content_id;
-
-    /** @var int */
     protected $folder_id;
 
     /**
      * @param int $content_id
      */
-    public function __construct($content_id)
+    public function __construct(protected $content_id)
     {
-        $this->content_id = $content_id;
     }
 
     /**
      * @return $this
      */
-    public function setContentId($content_id)
+    public function setContentId($content_id): static
     {
         $this->content_id = $content_id;
 

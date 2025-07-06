@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Bridge\Propel\PropertyInfo;
 
+use ReflectionClass;
+use Traversable;
+use Reflector;
 use Propel\Runtime\Collection\Collection;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
@@ -38,17 +42,18 @@ class PropelExtractor implements PropertyListExtractorInterface, PropertyTypeExt
 
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
-        /** @var \Reflector $reflector */
-        $reflector = new \ReflectionClass($class);
+        /** @var Reflector $reflector */
+        $reflector = new ReflectionClass($class);
 
         if (!$reflector->hasProperty($property)) {
             return null;
         }
+
         $reflectionProperty = $reflector->getProperty($property);
         foreach ($reflectionProperty->getAttributes(Relation::class) as $relationAttribute) {
             $targetClass = $relationAttribute->getArguments()['targetResource'];
 
-            if ('array' === $reflectionProperty->getType()->getName() || \in_array(\Traversable::class, class_implements($reflectionProperty->getType()->getName()))) {
+            if ('array' === $reflectionProperty->getType()->getName() || \in_array(Traversable::class, class_implements($reflectionProperty->getType()->getName()))) {
                 return [
                     new Type(
                         Type::BUILTIN_TYPE_OBJECT,

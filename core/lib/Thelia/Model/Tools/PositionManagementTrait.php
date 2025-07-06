@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model\Tools;
 
+use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\PropelQuery;
@@ -24,7 +26,7 @@ trait PositionManagementTrait
      */
     private function createQuery()
     {
-        return PropelQuery::from(__CLASS__);
+        return PropelQuery::from(self::class);
     }
 
     /**
@@ -41,7 +43,7 @@ trait PositionManagementTrait
     /**
      * Get the position of the next inserted object.
      */
-    public function getNextPosition()
+    public function getNextPosition(): int|float
     {
         $query = $this->createQuery()
             ->orderByPosition(Criteria::DESC)
@@ -111,7 +113,7 @@ trait PositionManagementTrait
                 $result->setPosition($myPosition)->save($cnx);
 
                 $cnx->commit();
-            } catch (\Exception $e) {
+            } catch (Exception) {
                 $cnx->rollback();
             }
         }
@@ -175,7 +177,7 @@ trait PositionManagementTrait
                 ;
 
                 $cnx->commit();
-            } catch (\Exception $e) {
+            } catch (Exception) {
                 $cnx->rollback();
             }
         }
@@ -196,7 +198,7 @@ trait PositionManagementTrait
 
         $data[':position'] = $this->getPosition();
 
-        $sql = sprintf('UPDATE `%s` SET position=(position-1) WHERE '.(\count($whereCriteria) > 0 ? implode(' AND ', $whereCriteria) : '1').' AND position>:position', $mapClassName::TABLE_NAME);
+        $sql = sprintf('UPDATE `%s` SET position=(position-1) WHERE '.($whereCriteria !== [] ? implode(' AND ', $whereCriteria) : '1').' AND position>:position', $mapClassName::TABLE_NAME);
 
         $con = Propel::getConnection($mapClassName::DATABASE_NAME);
         $statement = $con->prepare($sql);

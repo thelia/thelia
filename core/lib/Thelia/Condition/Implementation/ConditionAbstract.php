@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Condition\Implementation;
 
+use Thelia\Exception\NotImplementedException;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Operators;
 use Thelia\Condition\SerializableCondition;
@@ -36,9 +38,6 @@ abstract class ConditionAbstract implements ConditionInterface
     /** @var array Parameters validating parameters against */
     protected $validators = [];
 
-    /** @var FacadeInterface Provide necessary value from Thelia */
-    protected $facade;
-
     /** @var Translator Service Translator */
     protected $translator;
 
@@ -56,22 +55,21 @@ abstract class ConditionAbstract implements ConditionInterface
      *
      * @param FacadeInterface $facade Service Facade
      */
-    public function __construct(FacadeInterface $facade)
+    public function __construct(protected FacadeInterface $facade)
     {
-        $this->facade = $facade;
-        $this->translator = $facade->getTranslator();
-        $this->conditionValidator = $facade->getConditionEvaluator();
+        $this->translator = $this->facade->getTranslator();
+        $this->conditionValidator = $this->facade->getConditionEvaluator();
     }
 
     /**
      * @param array  $operatorList  the list of comparison operator values, as entered in the condition parameter form
      * @param string $parameterName the name of the parameter to check
      *
-     * @throws \Thelia\Exception\InvalidConditionOperatorException if the operator value is not in the allowed value
+     * @throws InvalidConditionOperatorException if the operator value is not in the allowed value
      *
      * @return $this
      */
-    protected function checkComparisonOperatorValue($operatorList, $parameterName)
+    protected function checkComparisonOperatorValue(array $operatorList, $parameterName)
     {
         $isOperator1Legit = $this->isOperatorLegit(
             $operatorList[$parameterName],
@@ -80,7 +78,7 @@ abstract class ConditionAbstract implements ConditionInterface
 
         if (!$isOperator1Legit) {
             throw new InvalidConditionOperatorException(
-                __CLASS__,
+                self::class,
                 $parameterName
             );
         }
@@ -114,13 +112,11 @@ abstract class ConditionAbstract implements ConditionInterface
             $translatedInputs[$key] = $validator;
         }
 
-        $validators = [
+        return [
             'inputs' => $translatedInputs,
             'setOperators' => $this->operators,
             'setValues' => $this->values,
         ];
-
-        return $validators;
     }
 
     /**
@@ -128,14 +124,14 @@ abstract class ConditionAbstract implements ConditionInterface
      *
      * TODO: what these "inputs ready to be drawn" is not clear.
      *
-     * @throws \Thelia\Exception\NotImplementedException
+     * @throws NotImplementedException
      *
      * @return array
      */
     protected function generateInputs()
     {
-        throw new \Thelia\Exception\NotImplementedException(
-            'The generateInputs method must be implemented in '.__CLASS__
+        throw new NotImplementedException(
+            'The generateInputs method must be implemented in '.self::class
         );
     }
 
@@ -178,7 +174,7 @@ abstract class ConditionAbstract implements ConditionInterface
      *
      * @param string $currencyValue Currency EUR|USD|..
      *
-     * @throws \Thelia\Exception\InvalidConditionValueException
+     * @throws InvalidConditionValueException
      *
      * @return bool
      */
@@ -192,9 +188,10 @@ abstract class ConditionAbstract implements ConditionInterface
                 $currencyFound = true;
             }
         }
+
         if (!$currencyFound) {
             throw new InvalidConditionValueException(
-                __CLASS__,
+                self::class,
                 'currency'
             );
         }
@@ -207,7 +204,7 @@ abstract class ConditionAbstract implements ConditionInterface
      *
      * @param float $priceValue Price value to check
      *
-     * @throws \Thelia\Exception\InvalidConditionValueException
+     * @throws InvalidConditionValueException
      *
      * @return bool
      */
@@ -216,7 +213,7 @@ abstract class ConditionAbstract implements ConditionInterface
         $floatType = new FloatType();
         if (!$floatType->isValid($priceValue) || $priceValue <= 0) {
             throw new InvalidConditionValueException(
-                __CLASS__,
+                self::class,
                 'price'
             );
         }
@@ -266,7 +263,7 @@ abstract class ConditionAbstract implements ConditionInterface
         $operatorSelectHtml = $this->drawBackOfficeInputOperators($inputKey);
 
         $currentValue = '';
-        if (isset($this->values) && isset($this->values[$inputKey])) {
+        if ($this->values !== null && isset($this->values[$inputKey])) {
             $currentValue = $this->values[$inputKey];
         }
 

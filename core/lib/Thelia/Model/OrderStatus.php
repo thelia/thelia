@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
 use Thelia\Model\Base\OrderStatus as BaseOrderStatus;
@@ -20,10 +21,15 @@ class OrderStatus extends BaseOrderStatus
     use PositionManagementTrait;
 
     public const CODE_NOT_PAID = 'not_paid';
+
     public const CODE_PAID = 'paid';
+
     public const CODE_PROCESSING = 'processing';
+
     public const CODE_SENT = 'sent';
+
     public const CODE_CANCELED = 'canceled';
+
     public const CODE_REFUNDED = 'refunded';
 
     /**

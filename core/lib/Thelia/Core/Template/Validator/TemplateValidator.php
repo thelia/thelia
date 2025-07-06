@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Validator;
 
+use Exception;
+use SimpleXMLElement;
 use Thelia\Core\Template\Exception\TemplateException;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Thelia;
@@ -38,15 +41,15 @@ class TemplateValidator
     /** @var array array of errors */
     protected $errors = [];
 
-    /** @var \SimpleXMLElement */
+    /** @var SimpleXMLElement */
     protected $xmlDescriptorContent;
 
     /**
      * TemplateValidator constructor.
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function __construct($templatePath)
+    public function __construct(string $templatePath)
     {
         $templateValidator = new TemplateDescriptorValidator($templatePath.DS.'template.xml');
 
@@ -70,11 +73,11 @@ class TemplateValidator
      * @param string $name the template directory name
      * @param int    $type the template type (front, back, etc.)
      *
-     * @throws \Exception
+     * @throws Exception
      *
      * @return TemplateDescriptor the template descriptor
      */
-    public function getTemplateDefinition(string $name, int $type)
+    public function getTemplateDefinition(string $name, int $type): TemplateDescriptor
     {
         $templateDescriptor = new TemplateDescriptor($name, $type);
 
@@ -107,7 +110,7 @@ class TemplateValidator
                             $type
                         )
                     );
-                } catch (\Exception $ex) {
+                } catch (Exception) {
                     // The Translator could not be initialized, take care of this.
                     try {
                         $message = Translator::getInstance()->trans(
@@ -117,7 +120,7 @@ class TemplateValidator
                                 '%name' => $templateDescriptor->getName(),
                             ]
                         );
-                    } catch (\Exception $ex) {
+                    } catch (Exception) {
                         $message = \sprintf(
                             'The parent template "%s" of template "%s" could not be found',
                             $templateDescriptor->getParent()->getName(),
@@ -138,31 +141,32 @@ class TemplateValidator
      */
     protected function checkVersion($templateDescriptor): void
     {
-        if ($templateDescriptor->getTheliaVersion()) {
-            if (!Version::test(Thelia::THELIA_VERSION, $templateDescriptor->getTheliaVersion(), false, '>=')) {
-                // The Translator could not be initialized, take care of this.
-                try {
-                    $message = Translator::getInstance()->trans(
-                        'The template "%name" requires Thelia %version or newer',
-                        [
-                            '%name' => $templateDescriptor->getName(),
-                            '%version' => $templateDescriptor->getTheliaVersion(),
-                        ]
-                    );
-                } catch (\Exception $ex) {
-                    $message = \sprintf(
-                        'The template "%s" requires Thelia %s or newer',
-                        $templateDescriptor->getName(),
-                        $templateDescriptor->getTheliaVersion()
-                    );
-                }
-
-                throw new TemplateException($message);
+        if ($templateDescriptor->getTheliaVersion() && !Version::test(Thelia::THELIA_VERSION, $templateDescriptor->getTheliaVersion(), false, '>=')) {
+            // The Translator could not be initialized, take care of this.
+            try {
+                $message = Translator::getInstance()->trans(
+                    'The template "%name" requires Thelia %version or newer',
+                    [
+                        '%name' => $templateDescriptor->getName(),
+                        '%version' => $templateDescriptor->getTheliaVersion(),
+                    ]
+                );
+            } catch (Exception) {
+                $message = \sprintf(
+                    'The template "%s" requires Thelia %s or newer',
+                    $templateDescriptor->getName(),
+                    $templateDescriptor->getTheliaVersion()
+                );
             }
+
+            throw new TemplateException($message);
         }
     }
 
-    protected function getTemplateLanguages()
+    /**
+     * @return list<string>
+     */
+    protected function getTemplateLanguages(): array
     {
         $languages = [];
         foreach ($this->xmlDescriptorContent->languages->language as $language) {
@@ -172,7 +176,10 @@ class TemplateValidator
         return $languages;
     }
 
-    protected function getTemplateDescriptives()
+    /**
+     * @return array{title: string, subtitle: string, description: string, postscriptum: string}[]
+     */
+    protected function getTemplateDescriptives(): array
     {
         $descriptives = [];
         foreach ($this->xmlDescriptorContent->descriptive as $descriptive) {
@@ -187,7 +194,10 @@ class TemplateValidator
         return $descriptives;
     }
 
-    protected function getTemplateAuthors()
+    /**
+     * @return list<array{string, string, string, string}>
+     */
+    protected function getTemplateAuthors(): array
     {
         $authors = [];
 

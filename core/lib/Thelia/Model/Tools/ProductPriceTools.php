@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model\Tools;
 
 /**
@@ -22,23 +23,20 @@ namespace Thelia\Model\Tools;
 class ProductPriceTools
 {
     /**
-     * The value for the price field.
-     *
-     * @var float
+     * @param float $price
+     * @param float $promoPrice
      */
-    protected $price;
-
-    /**
-     * The value for the promoPrice field.
-     *
-     * @var float
-     */
-    protected $promoPrice;
-
-    public function __construct($price, $promoPrice)
+    public function __construct(
+        /**
+         * The value for the price field.
+         */
+        protected $price,
+        /**
+         * The value for the promoPrice field.
+         */
+        protected $promoPrice
+    )
     {
-        $this->price = $price;
-        $this->promoPrice = $promoPrice;
     }
 
     /**

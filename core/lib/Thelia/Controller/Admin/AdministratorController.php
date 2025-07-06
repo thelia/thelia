@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,15 +11,20 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Administrator\AdministratorEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Admin;
 use Thelia\Model\AdminQuery;
@@ -37,13 +44,13 @@ class AdministratorController extends AbstractCrudController
         );
     }
 
-    public function viewAction()
+    public function viewAction(): \Symfony\Component\HttpFoundation\Response
     {
         // Open the update dialog for the current administrator
         return $this->render('administrators', ['show_update_dialog' => true]);
     }
 
-    public function setEmailAction()
+    public function setEmailAction(): \Symfony\Component\HttpFoundation\Response
     {
         // Open the update dialog for the current administrator, and display the "set email address" notice.
         return $this->render(
@@ -55,17 +62,17 @@ class AdministratorController extends AbstractCrudController
         );
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::ADMINISTRATOR_CREATION);
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::ADMINISTRATOR_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $event = new AdministratorEvent();
 
@@ -80,7 +87,7 @@ class AdministratorController extends AbstractCrudController
         return $event;
     }
 
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $event = new AdministratorEvent();
 
@@ -96,7 +103,7 @@ class AdministratorController extends AbstractCrudController
         return $event;
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): AdministratorEvent
     {
         $event = new AdministratorEvent();
 
@@ -107,17 +114,15 @@ class AdministratorController extends AbstractCrudController
         return $event;
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasAdministrator();
     }
 
     /**
      * @param Admin $object
-     *
-     * @return \Thelia\Form\BaseForm
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -133,71 +138,68 @@ class AdministratorController extends AbstractCrudController
         return $this->createForm(AdminForm::ADMINISTRATOR_MODIFICATION, FormType::class, $data);
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): ?Admin
     {
         return $event->hasAdministrator() ? $event->getAdministrator() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         return AdminQuery::create()
             ->findOneById($this->getRequest()->get('administrator_id'));
     }
 
-    /**
-     * @param Admin $object
-     *
-     * @return string
-     */
-    protected function getObjectLabel($object)
+    protected function getObjectLabel(ActiveRecordInterface $object): string
     {
-        return $object->getLogin();
+        if ($object instanceof Admin) {
+            return $object->getLogin();
+        }
+
+        return (string) $object;
     }
 
-    /**
-     * @param Admin $object
-     *
-     * @return int
-     */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
-        return $object->getId();
+        if ($object instanceof Admin) {
+            return (string) $object->getId();
+        }
+
+        return (string) $object;
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         // We always return to the feature edition form
         return $this->render(
-            'administrators',
-            []
+            'administrators'
         );
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         // We always return to the feature edition form
         return $this->render('administrators');
     }
 
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         // We always return to the feature edition form
         return $this->redirectToListTemplate();
     }
 
-    protected function performAdditionalCreateAction($updateEvent)
+    protected function performAdditionalCreateAction(ActionEvent $createEvent): ?Response
     {
         // We always return to the feature edition form
         return $this->redirectToListTemplate();
     }
 
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, $updateEvent)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): ?Response
     {
         // We always return to the feature edition form
         return $this->redirectToListTemplate();
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.administrators.view'

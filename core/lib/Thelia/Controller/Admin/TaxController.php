@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,15 +11,19 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Tax\TaxEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Tax;
 use Thelia\Model\TaxQuery;
@@ -37,19 +43,17 @@ class TaxController extends AbstractCrudController
         );
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
-        $form = $this->createForm(AdminForm::TAX_CREATION);
-
-        return $form;
+        return $this->createForm(AdminForm::TAX_CREATION);
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::TAX_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $event = new TaxEvent();
 
@@ -62,7 +66,7 @@ class TaxController extends AbstractCrudController
         return $event;
     }
 
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $event = new TaxEvent();
 
@@ -76,7 +80,7 @@ class TaxController extends AbstractCrudController
         return $event;
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): TaxEvent
     {
         $event = new TaxEvent();
 
@@ -87,12 +91,12 @@ class TaxController extends AbstractCrudController
         return $event;
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasTax();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -110,12 +114,12 @@ class TaxController extends AbstractCrudController
         );
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasTax() ? $event->getTax() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $tax = TaxQuery::create()
             ->findOneById($this->getRequest()->get('tax_id', 0));
@@ -132,48 +136,44 @@ class TaxController extends AbstractCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
     /**
      * @param Tax $object
-     *
-     * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
 
-    protected function getViewArguments()
+    protected function getViewArguments(): array
     {
         return [];
     }
 
-    protected function getRouteArguments($tax_id = null)
+    protected function getRouteArguments($tax_id = null): array
     {
         return [
-            'tax_id' => $tax_id === null ? $this->getRequest()->get('tax_id') : $tax_id,
+            'tax_id' => $tax_id ?? $this->getRequest()->get('tax_id'),
         ];
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render(
-            'taxes-rules',
-            []
+            'taxes-rules'
         );
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         // We always return to the feature edition form
         return $this->render('tax-edit', array_merge($this->getViewArguments(), $this->getRouteArguments()));
     }
 
-    protected function redirectToEditionTemplate($request = null, $country = null)
+    protected function redirectToEditionTemplate($request = null, $country = null): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.taxes.update',
@@ -185,11 +185,11 @@ class TaxController extends AbstractCrudController
     /**
      * Put in this method post object creation processing if required.
      *
-     * @param TaxEvent $createEvent the create event
+     * @param ActionEvent $createEvent the create event
      *
      * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalCreateAction($createEvent)
+    protected function performAdditionalCreateAction(ActionEvent $createEvent): ?\Symfony\Component\HttpFoundation\Response
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.taxes.update',
@@ -198,20 +198,23 @@ class TaxController extends AbstractCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.configuration.taxes-rules.list');
     }
 
-    protected function getRequirements($type, $formData)
+    /**
+     * @return mixed[]
+     */
+    protected function getRequirements($type, $formData): array
     {
         $requirements = [];
         foreach ($formData as $data => $value) {
-            if (!strstr($data, ':')) {
+            if (!strstr((string) $data, ':')) {
                 continue;
             }
 
-            $couple = explode(':', $data);
+            $couple = explode(':', (string) $data);
 
             if (\count($couple) == 2 && $couple[0] == $type) {
                 $requirements[$couple[1]] = $value;

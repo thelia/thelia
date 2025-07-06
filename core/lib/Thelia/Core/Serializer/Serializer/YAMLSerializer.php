@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Serializer\Serializer;
 
+use SplFileObject;
 use Symfony\Component\Yaml\Yaml;
 use Thelia\Core\Serializer\AbstractSerializer;
 
@@ -22,32 +24,32 @@ use Thelia\Core\Serializer\AbstractSerializer;
  */
 class YAMLSerializer extends AbstractSerializer
 {
-    public function getId()
+    public function getId(): string
     {
         return 'thelia.yml';
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'YAML';
     }
 
-    public function getExtension()
+    public function getExtension(): string
     {
         return 'yaml';
     }
 
-    public function getMimeType()
+    public function getMimeType(): string
     {
         return 'application/x-yaml';
     }
 
-    public function serialize($data)
+    public function serialize($data): string
     {
         return Yaml::dump([$data]);
     }
 
-    public function unserialize(\SplFileObject $fileObject)
+    public function unserialize(SplFileObject $fileObject): mixed
     {
         return Yaml::parse(file_get_contents($fileObject->getPathname()));
     }

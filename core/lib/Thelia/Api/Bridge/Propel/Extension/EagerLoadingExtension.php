@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Bridge\Propel\Extension;
 
+use ReflectionClass;
+use ReflectionAttribute;
+use ReflectionProperty;
+use PDO;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -23,10 +28,10 @@ use Thelia\Api\Resource\I18n;
 use Thelia\Api\Resource\TranslatableResourceInterface;
 use Thelia\Model\LangQuery;
 
-final class EagerLoadingExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
+final readonly class EagerLoadingExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
     public function __construct(
-        private readonly int $maxJoins = 30
+        private int $maxJoins = 30
     ) {
     }
 
@@ -46,7 +51,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
         if (!isset($context['groups']) && !isset($context['attributes'])) {
             $contextType = isset($context['api_denormalize']) ? 'denormalization_context' : 'normalization_context';
-            if ($operation) {
+            if ($operation instanceof Operation) {
                 $context += 'denormalization_context' === $contextType ? ($operation->getDenormalizationContext() ?? []) : ($operation->getNormalizationContext() ?? []);
             }
         }
@@ -86,26 +91,26 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         int &$joinCount = 0,
         int $currentDepth = null,
         string $parentClass = null,
-        \ReflectionClass $parentReflector = null,
+        ReflectionClass $parentReflector = null,
         string $parentAlias = null
     ): void {
         if ($joinCount > $this->maxJoins) {
             throw new RuntimeException('The total number of joined relations has exceeded the specified maximum. Raise the limit if necessary with the "api_platform.eager_loading.max_joins" configuration key (https://api-platform.com/docs/core/performance/#eager-loading), or limit the maximum serialization depth using the "enable_max_depth" option of the Symfony serializer (https://symfony.com/doc/current/components/serializer.html#handling-serialization-depth).');
         }
 
-        $reflector = new \ReflectionClass($resourceClass);
+        $reflector = new ReflectionClass($resourceClass);
         $baseJoinAlias = ltrim($parentAlias ?: $parentReflector?->getShortName().'_'.$reflector->getShortName(), '_');
         $baseJoinAlias = strtolower($baseJoinAlias).'_';
 
-        if (is_subclass_of($resourceClass, TranslatableResourceInterface::class) && null !== $operation) {
+        if (is_subclass_of($resourceClass, TranslatableResourceInterface::class) && $operation instanceof Operation) {
             $this->joinI18ns($query, $resourceClass, $operation, $reflector, $baseJoinAlias);
         }
 
         foreach ($reflector->getProperties() as $property) {
             $isInFilters = array_reduce(
                 array_keys($context['filters'] ?? []),
-                function (bool $carry, $filter) use ($property) {
-                    if (true === $carry) {
+                function (bool $carry, $filter) use ($property): bool {
+                    if ($carry) {
                         return true;
                     }
 
@@ -114,7 +119,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 false
             );
 
-            $groupAttributes = $property->getAttributes(Groups::class, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null;
+            $groupAttributes = $property->getAttributes(Groups::class, ReflectionAttribute::IS_INSTANCEOF)[0] ?? null;
 
             if (!$isInFilters && null === $groupAttributes) {
                 continue;
@@ -123,7 +128,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             if (isset($context['groups'])) {
                 $propertyGroups = $groupAttributes->getArguments()['groups'] ?? $groupAttributes->getArguments()[0] ?? null;
 
-                if (!$isInFilters && empty(array_intersect($propertyGroups, $context['groups']))) {
+                if (!$isInFilters && array_intersect($propertyGroups, $context['groups']) === []) {
                     continue;
                 }
             }
@@ -136,16 +141,14 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 }
 
                 // Join only for non collection relation (Many to One or One to One) or if filter is applied to it
-                if ($property->getType()->getName() === 'array') {
-                    if (!$isInFilters) {
-                        continue;
-                    }
+                if ($property->getType()->getName() === 'array' && !$isInFilters) {
+                    continue;
                 }
 
-                $targetReflector = new \ReflectionClass($targetClass);
+                $targetReflector = new ReflectionClass($targetClass);
 
                 $isNullable = $property->getType()->allowsNull() || $property->getType()->getName() === 'array';
-                $isLeftJoin = false !== $wasLeftJoin || true === $isNullable;
+                $isLeftJoin = $wasLeftJoin || $isNullable;
                 $joinFunctionName = 'use'.ucfirst($targetReflector->getShortName()).'Query';
 
                 if (!method_exists($query, $joinFunctionName) && isset($relationAttribute->getArguments()['relationAlias'])) {
@@ -171,7 +174,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                         continue;
                     }
 
-                    $groupAttributes = $targetProperty->getAttributes(Groups::class, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null;
+                    $groupAttributes = $targetProperty->getAttributes(Groups::class, ReflectionAttribute::IS_INSTANCEOF)[0] ?? null;
 
                     if (null === $groupAttributes) {
                         continue;
@@ -180,7 +183,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                     if (isset($context['groups'])) {
                         $propertyGroups = $groupAttributes->getArguments()['groups'] ?? $groupAttributes->getArguments()[0] ?? null;
 
-                        if (empty(array_intersect($propertyGroups, $context['groups']))) {
+                        if (array_intersect($propertyGroups, $context['groups']) === []) {
                             continue;
                         }
                     }
@@ -224,11 +227,11 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         ModelCriteria $query,
         string $resourceClass,
         Operation $operation,
-        \ReflectionClass $reflector,
+        ReflectionClass $reflector,
         string $baseJoinAlias
     ): void {
         $normalizationContextGroups = $operation->getNormalizationContext()['groups'] ?? [];
-        $i18nAttributeGroups = $reflector->getProperty('i18ns')->getAttributes(Groups::class, \ReflectionAttribute::IS_INSTANCEOF);
+        $i18nAttributeGroups = $reflector->getProperty('i18ns')->getAttributes(Groups::class, ReflectionAttribute::IS_INSTANCEOF);
 
         if (empty($i18nAttributeGroups)) {
             return;
@@ -237,7 +240,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         $i18nGroups = $i18nAttributeGroups[0]->getArguments()['groups'] ?? $i18nAttributeGroups[0]->getArguments()[0] ?? null;
 
         // Don't join i18n table if i18ns property is not in current groups
-        if (empty(array_intersect($normalizationContextGroups, $i18nGroups))) {
+        if (array_intersect($normalizationContextGroups, $i18nGroups) === []) {
             return;
         }
 
@@ -249,10 +252,8 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         }
 
         $i18nFields = array_map(
-            function (\ReflectionProperty $reflectionProperty) {
-                return $reflectionProperty->getName();
-            },
-            (new \ReflectionClass($i18nResource))->getProperties()
+            fn(ReflectionProperty $reflectionProperty): string => $reflectionProperty->getName(),
+            (new ReflectionClass($i18nResource))->getProperties()
         );
 
         $tableName = $resourceClass::getPropelRelatedTableMap()->getPhpName();
@@ -260,7 +261,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         foreach ($langs as $lang) {
             $joinAlias = trim($baseJoinAlias.'lang_'.$lang->getLocale(), '_');
             $query->$joinMethodName($joinAlias);
-            $query->addJoinCondition($joinAlias, $joinAlias.'.locale = ?', $lang->getLocale(), null, \PDO::PARAM_STR);
+            $query->addJoinCondition($joinAlias, $joinAlias.'.locale = ?', $lang->getLocale(), null, PDO::PARAM_STR);
 
             foreach ($i18nFields as $i18nField) {
                 $query->withColumn($joinAlias.'.'.$i18nField, $joinAlias.'_'.$i18nField);

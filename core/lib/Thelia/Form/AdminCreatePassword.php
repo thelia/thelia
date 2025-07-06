@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -36,7 +37,7 @@ class AdminCreatePassword extends BruteforceForm
             ->add('password_confirm', PasswordType::class, [
                 'constraints' => [
                     new Callback(
-                        [$this, 'verifyPasswordField']
+                        $this->verifyPasswordField(...)
                     ),
                 ],
                 'label' => $this->translator->trans('Password confirmation'),
@@ -64,8 +65,8 @@ class AdminCreatePassword extends BruteforceForm
 
         $minLength = ConfigQuery::getMinimuAdminPasswordLength();
 
-        if (\strlen($data['password']) < $minLength) {
-            $context->addViolation("password must be composed of at least $minLength characters");
+        if (\strlen((string) $data['password']) < $minLength) {
+            $context->addViolation(sprintf('password must be composed of at least %s characters', $minLength));
         }
     }
 }

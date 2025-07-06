@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
 /**
@@ -19,38 +20,23 @@ namespace Thelia\Model;
  */
 class OrderPostage
 {
-    /** @var float */
-    protected $amount;
-
-    /** @var float */
-    protected $amountTax;
-
-    /** @var string */
-    protected $taxRuleTitle;
-
-    public function __construct($amount = 0.0, $amountTax = 0.0, $taxRuleTitle = '')
+    /**
+     * @param float $amount
+     * @param float $amountTax
+     * @param string $taxRuleTitle
+     */
+    public function __construct(protected $amount = 0.0, protected $amountTax = 0.0, protected $taxRuleTitle = '')
     {
-        $this->amount = $amount;
-        $this->amountTax = $amountTax;
-        $this->taxRuleTitle = $taxRuleTitle;
     }
 
     /**
      * Convert a amount or OrderPostage object to an OrderPostage object.
      *
      * @param OrderPostage|float $postage
-     *
-     * @return OrderPostage
      */
-    public static function loadFromPostage($postage)
+    public static function loadFromPostage($postage): self
     {
-        if ($postage instanceof self) {
-            $orderPostage = $postage;
-        } else {
-            $orderPostage = new self($postage);
-        }
-
-        return $orderPostage;
+        return $postage instanceof self ? $postage : new self($postage);
     }
 
     /**

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,13 +11,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Exception;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ShippingZone\ShippingZoneAddAreaEvent;
 use Thelia\Core\Event\ShippingZone\ShippingZoneRemoveAreaEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Exception\FormValidationException;
@@ -32,7 +36,7 @@ class ShippingZoneController extends BaseAdminController
 
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -41,7 +45,7 @@ class ShippingZoneController extends BaseAdminController
 
     public function updateAction($delivery_module_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::VIEW)) {
+        if (($response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
@@ -52,11 +56,11 @@ class ShippingZoneController extends BaseAdminController
     }
 
     /**
-     * @return mixed|\Thelia\Core\HttpFoundation\Response
+     * @return mixed|Response
      */
-    public function addArea(EventDispatcherInterface $eventDispatcher)
+    public function addArea(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse|null
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -78,7 +82,7 @@ class ShippingZoneController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -93,9 +97,9 @@ class ShippingZoneController extends BaseAdminController
         return $this->renderEditionTemplate();
     }
 
-    public function removeArea(EventDispatcherInterface $eventDispatcher)
+    public function removeArea(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse|null
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
@@ -117,7 +121,7 @@ class ShippingZoneController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -135,7 +139,7 @@ class ShippingZoneController extends BaseAdminController
     /**
      * Render the edition template.
      */
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render(
             'shipping-zones-edit',
@@ -143,7 +147,7 @@ class ShippingZoneController extends BaseAdminController
         );
     }
 
-    protected function getDeliveryModuleId()
+    protected function getDeliveryModuleId(): mixed
     {
         return $this->getRequest()->get('delivery_module_id', 0);
     }

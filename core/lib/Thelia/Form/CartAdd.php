@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,13 +11,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Form;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\Exception\ProductNotFoundException;
@@ -47,16 +50,14 @@ class CartAdd extends BaseForm
      *       )
      *   )
      *   ->add('age', IntegerType::class);
-     *
-     * @return null
      */
     protected function buildForm()
     {
         $this->formBuilder
             ->add('product', TextType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Callback([$this, 'checkProduct']),
+                    new NotBlank(),
+                    new Callback($this->checkProduct(...)),
                 ],
                 'label' => 'product',
                 'label_attr' => [
@@ -65,16 +66,16 @@ class CartAdd extends BaseForm
             ])
             ->add('product_sale_elements_id', TextType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Callback([$this, 'checkStockAvailability']),
+                    new NotBlank(),
+                    new Callback($this->checkStockAvailability(...)),
                 ],
                 'required' => true,
             ])
             ->add('quantity', NumberType::class, [
                 'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Callback([$this, 'checkStock']),
-                    new Constraints\GreaterThanOrEqual([
+                    new NotBlank(),
+                    new Callback($this->checkStock(...)),
+                    new GreaterThanOrEqual([
                         'value' => 0,
                     ]),
                 ],
@@ -136,7 +137,7 @@ class CartAdd extends BaseForm
     /**
      * @return string the name of you form. This name must be unique
      */
-    public static function getName()
+    public static function getName(): string
     {
         return 'thelia_cart_add';
     }

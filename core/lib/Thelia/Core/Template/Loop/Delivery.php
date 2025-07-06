@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use InvalidArgumentException;
+use Thelia\Model\Country;
+use Thelia\Model\State;
+use Thelia\Model\Address;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Element\LoopResult;
@@ -19,7 +24,6 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AreaDeliveryModuleQuery;
-use Thelia\Model\Cart as CartModel;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Module;
 use Thelia\Model\StateQuery;
@@ -40,7 +44,7 @@ use Thelia\Module\Exception\DeliveryException;
  */
 class Delivery extends BaseSpecificModule
 {
-    public function getArgDefinitions()
+    protected function getArgDefinitions()
     {
         $collection = parent::getArgDefinitions();
 
@@ -53,25 +57,19 @@ class Delivery extends BaseSpecificModule
         return $collection;
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         $cart = $this->getCurrentRequest()->getSession()->getSessionCart($this->dispatcher);
         $address = $this->getDeliveryAddress();
 
         $country = $this->getCurrentCountry();
         if (null === $country) {
-            if ($address !== null) {
-                $country = $address->getCountry();
-            } else {
-                $country = CountryQuery::create()->findOneByByDefault(true);
-            }
+            $country = $address !== null ? $address->getCountry() : CountryQuery::create()->findOneByByDefault(true);
         }
 
         $state = $this->getCurrentState();
-        if (null === $state) {
-            if ($address !== null) {
-                $state = $address->getState();
-            }
+        if (null === $state && $address !== null) {
+            $state = $address->getState();
         }
 
         $virtual = $cart->isVirtual();
@@ -137,7 +135,7 @@ class Delivery extends BaseSpecificModule
 
                     $loopResult->addRow($loopResultRow);
                 }
-            } catch (DeliveryException $ex) {
+            } catch (DeliveryException) {
                 // Module is not available
             }
         }
@@ -145,13 +143,13 @@ class Delivery extends BaseSpecificModule
         return $loopResult;
     }
 
-    protected function getModuleType()
+    protected function getModuleType(): int
     {
         return BaseModule::DELIVERY_MODULE_TYPE;
     }
 
     /**
-     * @return array|mixed|\Thelia\Model\Country
+     * @return array|mixed|Country
      */
     protected function getCurrentCountry()
     {
@@ -159,7 +157,7 @@ class Delivery extends BaseSpecificModule
         if (null !== $countryId) {
             $country = CountryQuery::create()->findPk($countryId);
             if (null === $country) {
-                throw new \InvalidArgumentException('Cannot found country id: `'.$countryId.'` in delivery loop');
+                throw new InvalidArgumentException('Cannot found country id: `'.$countryId.'` in delivery loop');
             }
 
             return $country;
@@ -169,7 +167,7 @@ class Delivery extends BaseSpecificModule
     }
 
     /**
-     * @return array|mixed|\Thelia\Model\State
+     * @return array|mixed|State
      */
     protected function getCurrentState()
     {
@@ -177,7 +175,7 @@ class Delivery extends BaseSpecificModule
         if (null !== $stateId) {
             $state = StateQuery::create()->findPk($stateId);
             if (null === $state) {
-                throw new \InvalidArgumentException('Cannot found state id: `'.$stateId.'` in delivery loop');
+                throw new InvalidArgumentException('Cannot found state id: `'.$stateId.'` in delivery loop');
             }
 
             return $state;
@@ -187,7 +185,7 @@ class Delivery extends BaseSpecificModule
     }
 
     /**
-     * @return array|mixed|\Thelia\Model\Address
+     * @return array|mixed|Address
      */
     protected function getDeliveryAddress()
     {

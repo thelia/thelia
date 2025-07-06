@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Log\Destination;
 
 use Symfony\Component\Finder\Finder;
@@ -22,9 +23,12 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
     // ----------------------------------
 
     public const VAR_MAX_FILE_SIZE_KB = 'tlog_destinationfile_max_file_size';
+
     public const VAR_MAX_FILE_COUNT = 'tlog_destinationfile_max_file_count';
 
-    public const MAX_FILE_SIZE_KB_DEFAULT = 1024; // 1 Mb
+    public const MAX_FILE_SIZE_KB_DEFAULT = 1024;
+
+     // 1 Mb
     public const MAX_FILE_COUNT_DEFAULT = 10;
 
     public function __construct($maxFileSize = self::MAX_FILE_SIZE_KB_DEFAULT)
@@ -36,7 +40,7 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
         parent::__construct();
     }
 
-    public function configure(): void
+    protected function configure(): void
     {
         parent::configure();
 
@@ -61,9 +65,9 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
             $finder = new Finder();
 
             $files = $finder
-                ->in(\dirname($filePath))
+                ->in(\dirname((string) $filePath))
                 ->files()
-                ->name(basename($filePath).'.*')
+                ->name(basename((string) $filePath).'.*')
                 ->sortByModifiedTime();
 
             $deleteCount = 1 + $files->count() - $maxCount;
@@ -82,17 +86,17 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
         $this->fh = fopen($filePath, $mode);
     }
 
-    public function getTitle()
+    public function getTitle(): string
     {
         return Translator::getInstance()->trans('Rotated Text File');
     }
 
-    public function getDescription()
+    public function getDescription(): string
     {
         return Translator::getInstance()->trans('Store logs into text file, up to a certian size, then a new file is created');
     }
 
-    public function getConfigs()
+    public function getConfigs(): array
     {
         $arr = parent::getConfigs();
 

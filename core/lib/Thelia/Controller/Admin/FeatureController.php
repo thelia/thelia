@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,11 +11,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+
+use Exception;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Feature\FeatureAvUpdateEvent;
 use Thelia\Core\Event\Feature\FeatureCreateEvent;
 use Thelia\Core\Event\Feature\FeatureDeleteEvent;
@@ -24,6 +31,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Feature;
 use Thelia\Model\FeatureQuery;
@@ -50,17 +58,17 @@ class FeatureController extends AbstractCrudController
         );
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::FEATURE_CREATION);
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::FEATURE_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $createEvent = new FeatureCreateEvent();
 
@@ -73,7 +81,7 @@ class FeatureController extends AbstractCrudController
         return $createEvent;
     }
 
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $changeEvent = new FeatureUpdateEvent($formData['id']);
 
@@ -94,9 +102,9 @@ class FeatureController extends AbstractCrudController
      *
      * @see \Thelia\Controller\Admin\AbstractCrudController::performAdditionalUpdateAction()
      */
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, $updateEvent)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): null
     {
-        $attr_values = $this->getRequest()->get('feature_values', null);
+        $attr_values = $this->getRequest()->get('feature_values');
 
         if ($attr_values !== null) {
             foreach ($attr_values as $id => $value) {
@@ -112,26 +120,26 @@ class FeatureController extends AbstractCrudController
         return null;
     }
 
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('feature_id', null),
+            $this->getRequest()->get('feature_id'),
             $positionChangeMode,
             $positionValue
         );
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): FeatureDeleteEvent
     {
         return new FeatureDeleteEvent($this->getRequest()->get('feature_id'));
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasFeature();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -146,12 +154,12 @@ class FeatureController extends AbstractCrudController
         return $this->createForm(AdminForm::FEATURE_MODIFICATION, FormType::class, $data);
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasFeature() ? $event->getFeature() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $feature = FeatureQuery::create()
         ->findOneById($this->getRequest()->get('feature_id', 0));
@@ -168,27 +176,24 @@ class FeatureController extends AbstractCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getTitle();
     }
 
     /**
      * @param Feature $object
-     *
-     * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render('features', ['order' => $currentOrder]);
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render(
             'feature-edit',
@@ -199,7 +204,7 @@ class FeatureController extends AbstractCrudController
         );
     }
 
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.features.update',
@@ -210,7 +215,7 @@ class FeatureController extends AbstractCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.configuration.features.default');
     }
@@ -220,7 +225,7 @@ class FeatureController extends AbstractCrudController
      *
      * @return string the current list order
      */
-    protected function getFeatureAvListOrder()
+    protected function getFeatureAvListOrder(): ?string
     {
         return $this->getListOrderFromSession(
             'featureav',
@@ -232,22 +237,22 @@ class FeatureController extends AbstractCrudController
     /**
      * Add or Remove from all product templates.
      */
-    protected function addRemoveFromAllTemplates(EventDispatcherInterface $eventDispatcher, $eventType)
+    protected function addRemoveFromAllTemplates(EventDispatcherInterface $eventDispatcher, object $eventType): Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
         try {
-            if (null !== $object = $this->getExistingObject()) {
+            if (($object = $this->getExistingObject()) instanceof ActiveRecordInterface) {
                 $event = new FeatureEvent($object);
 
                 $eventDispatcher->dispatch($eventType, $event);
             }
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             // Any error
-            return $this->errorPage($ex);
+            return $this->errorPage($exception);
         }
 
         return $this->redirectToListTemplate();
@@ -256,7 +261,7 @@ class FeatureController extends AbstractCrudController
     /**
      * Remove from all product templates.
      */
-    public function removeFromAllTemplates(EventDispatcherInterface $eventDispatcher)
+    public function removeFromAllTemplates(EventDispatcherInterface $eventDispatcher): Response
     {
         return $this->addRemoveFromAllTemplates($eventDispatcher, TheliaEvents::FEATURE_REMOVE_FROM_ALL_TEMPLATES);
     }
@@ -264,7 +269,7 @@ class FeatureController extends AbstractCrudController
     /**
      * Add to all product templates.
      */
-    public function addToAllTemplates(EventDispatcherInterface $eventDispatcher)
+    public function addToAllTemplates(EventDispatcherInterface $eventDispatcher): Response
     {
         return $this->addRemoveFromAllTemplates($eventDispatcher, TheliaEvents::FEATURE_ADD_TO_ALL_TEMPLATES);
     }

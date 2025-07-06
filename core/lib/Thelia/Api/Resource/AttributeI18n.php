@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
 
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -25,28 +26,28 @@ class AttributeI18n extends I18n
         ProductSaleElements::GROUP_ADMIN_READ_SINGLE,
         ProductSaleElements::GROUP_FRONT_READ_SINGLE,
     ])]
-    protected ?string $title;
+    protected ?string $title = null;
 
     #[Groups([
         Attribute::GROUP_ADMIN_READ,
         Attribute::GROUP_FRONT_READ,
         Attribute::GROUP_ADMIN_WRITE,
     ])]
-    protected ?string $description;
+    protected ?string $description = null;
 
     #[Groups([
         Attribute::GROUP_ADMIN_READ,
         Attribute::GROUP_FRONT_READ,
         Attribute::GROUP_ADMIN_WRITE,
     ])]
-    protected ?string $chapo;
+    protected ?string $chapo = null;
 
     #[Groups([
         Attribute::GROUP_ADMIN_READ,
         Attribute::GROUP_FRONT_READ,
         Attribute::GROUP_ADMIN_WRITE,
     ])]
-    protected ?string $postscriptum;
+    protected ?string $postscriptum = null;
 
     public function getTitle(): ?string
     {

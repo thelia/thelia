@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Module;
 
+use Exception;
+use RuntimeException;
+use DirectoryIterator;
+use Propel\Runtime\Propel\Runtime\Exception\PropelException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Throwable;
+use Thelia\Model\Hook;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -50,26 +58,32 @@ use Thelia\Tools\Image;
 
 class BaseModule implements BaseModuleInterface
 {
-    use ContainerAwareTrait;
+    protected ?ContainerInterface $container = null;
 
     public const CLASSIC_MODULE_TYPE = 1;
+
     public const DELIVERY_MODULE_TYPE = 2;
+
     public const PAYMENT_MODULE_TYPE = 3;
 
     public const MODULE_CATEGORIES = 'classic,delivery,payment,marketplace,price,accounting,seo,administration,statistic';
 
     public const IS_ACTIVATED = 1;
+
     public const IS_NOT_ACTIVATED = 0;
 
     public const IS_MANDATORY = 1;
+
     public const IS_NOT_MANDATORY = 0;
 
     public const IS_HIDDEN = 1;
+
     public const IS_NOT_HIDDEN = 0;
 
     protected $reflected;
 
     protected $dispatcher;
+
     protected $request;
 
     // Do no use this attribute directly, use getModuleModel() instead.
@@ -78,8 +92,8 @@ class BaseModule implements BaseModuleInterface
     /**
      * @param Module $moduleModel
      *
-     * @throws \Propel\Runtime\Exception\PropelException
-     * @throws \Throwable
+     * @throws PropelException
+     * @throws Throwable
      */
     public function activate($moduleModel = null): void
     {
@@ -93,7 +107,7 @@ class BaseModule implements BaseModuleInterface
 
             try {
                 if (!$this->preActivation($con)) {
-                    throw new \Exception('An error occured during the module pre activation.');
+                    throw new Exception('An error occured during the module pre activation.');
                 }
 
                 $moduleModel->setActivate(self::IS_ACTIVATED);
@@ -107,7 +121,7 @@ class BaseModule implements BaseModuleInterface
 
                 $this->postActivation($con);
                 $con->commit();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $con->rollBack();
                 $moduleModel->setActivate(self::IS_NOT_ACTIVATED);
                 $moduleModel->save();
@@ -123,6 +137,7 @@ class BaseModule implements BaseModuleInterface
         if (null === $moduleModel) {
             $moduleModel = $this->getModuleModel();
         }
+
         if ($moduleModel->getActivate() == self::IS_ACTIVATED) {
             $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
             $con->beginTransaction();
@@ -134,28 +149,28 @@ class BaseModule implements BaseModuleInterface
 
                     $con->commit();
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $con->rollBack();
                 throw $e;
             }
         }
     }
 
-    public function hasContainer()
+    public function hasContainer(): bool
     {
         return null !== $this->container;
     }
 
-    public function getContainer()
+    public function getContainer(): ContainerInterface
     {
         if ($this->hasContainer() === false) {
-            throw new \RuntimeException('Sorry, container is not available in this context');
+            throw new RuntimeException('Sorry, container is not available in this context');
         }
 
         return $this->container;
     }
 
-    public function hasRequest()
+    public function hasRequest(): bool
     {
         return null !== $this->request;
     }
@@ -166,25 +181,23 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @throws \RuntimeException
-     *
-     * @return \Thelia\Core\HttpFoundation\Request the request
+     * @throws RuntimeException
      */
-    public function getRequest()
+    public function getRequest(): Request
     {
         if ($this->hasRequest() === false) {
             // Try to get request from container.
-            $this->setRequest($this->getContainer()->get('request_stack')->getCurrentRequest());
+            $this->setRequest($this->getContainer()->get('request_stack')?->getCurrentRequest());
         }
 
         if ($this->hasRequest() === false) {
-            throw new \RuntimeException('Sorry, the request is not available in this context');
+            throw new RuntimeException('Sorry, the request is not available in this context');
         }
 
         return $this->request;
     }
 
-    public function hasDispatcher()
+    public function hasDispatcher(): bool
     {
         return null !== $this->dispatcher;
     }
@@ -195,7 +208,7 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @throws \RuntimeException
+     * @throws RuntimeException
      *
      * @return EventDispatcherInterface
      */
@@ -207,7 +220,7 @@ class BaseModule implements BaseModuleInterface
         }
 
         if ($this->hasDispatcher() === false) {
-            throw new \RuntimeException('Sorry, the dispatcher is not available in this context');
+            throw new RuntimeException('Sorry, the dispatcher is not available in this context');
         }
 
         return $this->dispatcher;
@@ -251,12 +264,9 @@ class BaseModule implements BaseModuleInterface
 
     public function deployImageFolder(Module $module, $folderPath, ConnectionInterface $con = null): void
     {
-        try {
-            $directoryBrowser = new \DirectoryIterator($folderPath);
-        } catch (\UnexpectedValueException $e) {
-            throw $e;
-        }
-        if (null === $con) {
+        $directoryBrowser = new DirectoryIterator($folderPath);
+
+        if (!$con instanceof ConnectionInterface) {
             $con = Propel::getConnection(
                 ModuleImageTableMap::DATABASE_NAME
             );
@@ -264,7 +274,7 @@ class BaseModule implements BaseModuleInterface
 
         /* browse the directory */
         $imagePosition = 1;
-        /** @var \DirectoryIterator $directoryContent */
+        /** @var DirectoryIterator $directoryContent */
         foreach ($directoryBrowser as $directoryContent) {
             /* is it a file ? */
             if ($directoryContent->isFile()) {
@@ -297,14 +307,12 @@ class BaseModule implements BaseModuleInterface
 
                     $imagePath = sprintf('%s/%s', $imageDirectory, $imageFileName);
 
-                    if (!is_dir($imageDirectory)) {
-                        if (!@mkdir($imageDirectory, 0777, true)) {
-                            $con->rollBack();
-                            throw new ModuleException(
-                                sprintf('Cannot create directory : %s', $imageDirectory),
-                                ModuleException::CODE_NOT_FOUND
-                            );
-                        }
+                    if (!is_dir($imageDirectory) && !mkdir($imageDirectory, 0777, true) && !is_dir($imageDirectory)) {
+                        $con->rollBack();
+                        throw new ModuleException(
+                            sprintf('Cannot create directory : %s', $imageDirectory),
+                            ModuleException::CODE_NOT_FOUND
+                        );
                     }
 
                     if (!@copy($filePath, $imagePath)) {
@@ -347,7 +355,7 @@ class BaseModule implements BaseModuleInterface
      *
      * @return int The module id, in a static way, with a cache
      */
-    private static $moduleIds = [];
+    private static array $moduleIds = [];
 
     public static function getModuleId()
     {
@@ -367,7 +375,7 @@ class BaseModule implements BaseModuleInterface
         return self::$moduleIds[$code];
     }
 
-    public static function getModuleCode()
+    public static function getModuleCode(): string
     {
         $fullClassName = explode('\\', static::class);
 
@@ -377,7 +385,7 @@ class BaseModule implements BaseModuleInterface
     /*
      * The module code
      */
-    public function getCode()
+    public function getCode(): string
     {
         return self::getModuleCode();
     }
@@ -389,7 +397,7 @@ class BaseModule implements BaseModuleInterface
      *
      * @return bool true if this module is the payment module for the given order
      */
-    public function isPaymentModuleFor(Order $order)
+    public function isPaymentModuleFor(Order $order): bool
     {
         $model = $this->getModuleModel();
 
@@ -403,7 +411,7 @@ class BaseModule implements BaseModuleInterface
      *
      * @return bool true if this module is the delivery module for the given order
      */
-    public function isDeliveryModuleFor(Order $order)
+    public function isDeliveryModuleFor(Order $order): bool
     {
         $model = $this->getModuleModel();
 
@@ -413,15 +421,13 @@ class BaseModule implements BaseModuleInterface
     /**
      * Use this method to process the total order just before payment. (ex: gift card, discount, credit).
      * Call on modules type 3  "AbstractPaymentModule pay()" to ensure that all discounts are taken into account.
-     *
-     * @return float|int
      */
     public function getOrderPayTotalAmount(
         Order $order,
         float|int &$tax = 0,
         bool $includeDiscount = true,
         bool $includePostage = true
-    ) {
+    ): float|int {
         $orderPayEvent = new OrderPayTotalEvent($order);
         $orderPayEvent
             ->setTax($tax)
@@ -479,7 +485,7 @@ class BaseModule implements BaseModuleInterface
         return $amount;
     }
 
-    public static function getCompilers()
+    public static function getCompilers(): array
     {
         return [];
     }
@@ -523,7 +529,7 @@ class BaseModule implements BaseModuleInterface
         // Override this method to do something useful.
     }
 
-    public function preActivation(ConnectionInterface $con = null)
+    public function preActivation(ConnectionInterface $con = null): bool
     {
         // Override this method to do something useful.
         return true;
@@ -534,7 +540,7 @@ class BaseModule implements BaseModuleInterface
         // Override this method to do something useful.
     }
 
-    public function preDeactivation(ConnectionInterface $con = null)
+    public function preDeactivation(ConnectionInterface $con = null): bool
     {
         // Override this method to do something useful.
         return true;
@@ -550,7 +556,7 @@ class BaseModule implements BaseModuleInterface
         // Override this method to do something useful.
     }
 
-    public function getHooks()
+    public function getHooks(): array
     {
         return [];
     }
@@ -559,7 +565,7 @@ class BaseModule implements BaseModuleInterface
     {
         $moduleHooks = $this->getHooks();
 
-        if (\is_array($moduleHooks) && !empty($moduleHooks)) {
+        if ($moduleHooks !== []) {
             $allowedTypes = (array) TemplateDefinition::getStandardTemplatesSubdirsIterator();
             $defaultLang = Lang::getDefaultLanguage();
             $defaultLocale = $defaultLang->getLocale();
@@ -575,7 +581,7 @@ class BaseModule implements BaseModuleInterface
                     && \array_key_exists($hook['type'], $allowedTypes)
                     && isset($hook['code'])
                     && \is_string($hook['code'])
-                    && !empty($hook['code'])
+                    && (isset($hook['code']) && ($hook['code'] !== '' && $hook['code'] !== '0'))
                 ;
 
                 if (!$isValid) {
@@ -587,7 +593,7 @@ class BaseModule implements BaseModuleInterface
                 /**
                  * Create or update hook db entry.
                  *
-                 * @var \Thelia\Model\Hook $hookModel
+                 * @var Hook $hookModel
                  */
                 [$hookModel, $updateData] = $this->createOrUpdateHook($hook, $dispatcher, $defaultLocale);
 
@@ -617,7 +623,7 @@ class BaseModule implements BaseModuleInterface
         }
     }
 
-    protected function createOrUpdateHook(array $hook, EventDispatcherInterface $dispatcher, $defaultLocale)
+    protected function createOrUpdateHook(array $hook, EventDispatcherInterface $dispatcher, $defaultLocale): array
     {
         $hookModel = HookQuery::create()->filterByCode($hook['code'])->findOne();
 
@@ -645,9 +651,7 @@ class BaseModule implements BaseModuleInterface
 
             unset($titles[$defaultLocale]);
         } else {
-            reset($titles);
-
-            $locale = key($titles);
+            $locale = array_key_first($titles);
             $title = array_shift($titles);
         }
 
@@ -687,7 +691,10 @@ class BaseModule implements BaseModuleInterface
         ];
     }
 
-    protected function formatHookDataForI18n(array $titles, array $descriptions, array $chapos)
+    /**
+     * @return array{title: mixed, description: mixed, chapo: mixed}[]
+     */
+    protected function formatHookDataForI18n(array $titles, array $descriptions, array $chapos): array
     {
         $locales = array_merge(
             array_keys($titles),
@@ -701,16 +708,16 @@ class BaseModule implements BaseModuleInterface
 
         foreach ($locales as $locale) {
             $data[$locale] = [
-                'title' => !isset($titles[$locale]) ? null : $titles[$locale],
-                'description' => !isset($descriptions[$locale]) ? null : $descriptions[$locale],
-                'chapo' => !isset($chapos[$locale]) ? null : $chapos[$locale],
+                'title' => $titles[$locale] ?? null,
+                'description' => $descriptions[$locale] ?? null,
+                'chapo' => $chapos[$locale] ?? null,
             ];
         }
 
         return $data;
     }
 
-    protected function getHookI18nInfo(array $hook, $defaultLocale)
+    protected function getHookI18nInfo(array $hook, $defaultLocale): array
     {
         $titles = [];
         $descriptions = [];
@@ -740,7 +747,10 @@ class BaseModule implements BaseModuleInterface
         return [$titles, $descriptions, $chapos];
     }
 
-    protected function extractI18nValues($data, $defaultLocale)
+    /**
+     * @return mixed[]
+     */
+    protected function extractI18nValues($data, $defaultLocale): array
     {
         $returnData = [];
 
@@ -774,8 +784,6 @@ class BaseModule implements BaseModuleInterface
 
     /**
      * @since 2.4
-     *
-     * @return string
      */
     protected function getPropelSchemaDir(): string
     {
@@ -784,8 +792,6 @@ class BaseModule implements BaseModuleInterface
 
     /**
      * @since 2.4
-     *
-     * @return bool
      */
     protected function hasPropelSchema(): bool
     {
@@ -823,5 +829,12 @@ class BaseModule implements BaseModuleInterface
         return is_dir(THELIA_MODULE_DIR.$this->getCode())
             ? THELIA_MODULE_DIR.$this->getCode()
             : THELIA_LOCAL_MODULE_DIR.$this->getCode();
+    }
+
+    public function setContainer(?ContainerInterface $container = null): static
+    {
+        $this->container = $container;
+
+        return $this;
     }
 }

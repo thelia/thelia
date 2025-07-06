@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Condition\Implementation;
+
 
 use Thelia\Condition\Operators;
 use Thelia\Coupon\FacadeInterface;
@@ -37,12 +39,12 @@ class StartDate extends ConditionAbstract
         parent::__construct($facade);
     }
 
-    public function getServiceId()
+    public function getServiceId(): string
     {
         return 'thelia.condition.start_date';
     }
 
-    public function setValidatorsFromForm(array $operators, array $values)
+    public function setValidatorsFromForm(array $operators, array $values): static
     {
         $this->checkComparisonOperatorValue($operators, self::START_DATE);
 
@@ -52,12 +54,12 @@ class StartDate extends ConditionAbstract
 
         // Parse the entered date to get a timestamp, if we don't already have one
         if (!\is_int($values[self::START_DATE])) {
-            $date = \DateTime::createFromFormat($this->getDateFormat(), $values[self::START_DATE]);
+            $date = DateTime::createFromFormat($this->getDateFormat(), $values[self::START_DATE]);
 
             // Check that the date is valid
             if (false === $date) {
                 throw new InvalidConditionValueException(
-                    __CLASS__,
+                    self::class,
                     self::START_DATE
                 );
             }
@@ -82,7 +84,7 @@ class StartDate extends ConditionAbstract
         );
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->translator->trans(
             'Start date',
@@ -90,31 +92,28 @@ class StartDate extends ConditionAbstract
         );
     }
 
-    public function getToolTip()
+    public function getToolTip(): string
     {
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'The coupon is valid after a given date',
             []
         );
-
-        return $toolTip;
     }
 
-    public function getSummary()
+    public function getSummary(): string
     {
         $date = new \DateTime();
         $date->setTimestamp($this->values[self::START_DATE]);
+
         $strDate = $date->format($this->getDateFormat());
 
-        $toolTip = $this->translator->trans(
+        return $this->translator->trans(
             'Valid only from %date% to the coupon expiration date',
             [
                 '%date%' => $strDate,
             ],
             'condition'
         );
-
-        return $toolTip;
     }
 
     private function getDateFormat()
@@ -122,7 +121,7 @@ class StartDate extends ConditionAbstract
         return DateTimeFormat::getInstance($this->facade->getRequest())->getFormat('date');
     }
 
-    protected function generateInputs()
+    protected function generateInputs(): array
     {
         return [
             self::START_DATE => [

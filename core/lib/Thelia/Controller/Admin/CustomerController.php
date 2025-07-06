@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,17 +11,22 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Exception\CustomerException;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
@@ -47,22 +54,22 @@ class CustomerController extends AbstractCrudController
         );
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::CUSTOMER_CREATE);
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::CUSTOMER_UPDATE);
     }
 
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $event = $this->createEventInstance($formData);
 
         // Create a secure password
-        $event->setPassword(Password::generateRandom(8));
+        $event->setPassword(Password::generateRandom());
 
         // We will notify the customer of account creation
         $event->setNotifyCustomerOfAccountCreation(true);
@@ -70,7 +77,7 @@ class CustomerController extends AbstractCrudController
         return $event;
     }
 
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $event = $this->createEventInstance($formData);
 
@@ -82,12 +89,12 @@ class CustomerController extends AbstractCrudController
         return $event;
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): ActionEvent
     {
         return new CustomerEvent($this->getExistingObject());
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         if (method_exists($event, 'hasCustomer')) {
             return $event->hasCustomer();
@@ -102,10 +109,8 @@ class CustomerController extends AbstractCrudController
 
     /**
      * @param Customer $object
-     *
-     * @return \Thelia\Form\BaseForm
      */
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         // Get default adress of the customer
         $address = $object->getDefaultAddress();
@@ -118,7 +123,7 @@ class CustomerController extends AbstractCrudController
             'email' => $object->getEmail(),
             'lang_id' => $object->getLangId(),
             'discount' => $object->getDiscount(),
-            'reseller' => $object->getReseller() ? true : false,
+            'reseller' => (bool) $object->getReseller(),
         ];
 
         if ($address !== null) {
@@ -138,7 +143,7 @@ class CustomerController extends AbstractCrudController
         return $this->createForm(AdminForm::CUSTOMER_UPDATE, FormType::class, $data);
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         if (method_exists($event, 'hasCustomer') && $event->hasCustomer()) {
             return $event->getCustomer();
@@ -151,17 +156,14 @@ class CustomerController extends AbstractCrudController
         return null;
     }
 
-    /**
-     * @return \Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent
-     */
-    private function createEventInstance($data)
+    private function createEventInstance(array $data): CustomerCreateOrUpdateEvent
     {
         // Use current language if it is not defined in the form
         if (empty($data['lang_id'])) {
             $data['lang_id'] = $this->getSession()->getLang()->getId();
         }
 
-        $customerCreateEvent = new CustomerCreateOrUpdateEvent(
+        return new CustomerCreateOrUpdateEvent(
             $data['title'] ?? null,
             $data['firstname'],
             $data['lastname'],
@@ -183,36 +185,30 @@ class CustomerController extends AbstractCrudController
             null,
             $data['state']
         );
-
-        return $customerCreateEvent;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         return CustomerQuery::create()->findPk($this->getRequest()->get('customer_id', 0));
     }
 
     /**
      * @param Customer $object
-     *
-     * @return string
      */
-    protected function getObjectLabel($object)
+    protected function getObjectLabel($object): string
     {
         return $object->getRef().'('.$object->getLastname().' '.$object->getFirstname().')';
     }
 
     /**
      * @param Customer $object
-     *
-     * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
 
-    protected function getEditionArguments()
+    protected function getEditionArguments(): array
     {
         return [
             'customer_id' => $this->getRequest()->get('customer_id', 0),
@@ -221,18 +217,15 @@ class CustomerController extends AbstractCrudController
         ];
     }
 
-    protected function renderListTemplate($currentOrder, $customParams = [])
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render(
             'customers',
-            array_merge([
-                'customer_order' => $currentOrder,
-                'page' => $this->getRequest()->get('page', 1),
-            ], $customParams)
+            ['customer_order' => $currentOrder, 'page' => $this->getRequest()->get('page', 1)]
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.customers',
@@ -242,12 +235,12 @@ class CustomerController extends AbstractCrudController
         );
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render('customer-edit', $this->getEditionArguments());
     }
 
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.customer.update.view',
@@ -260,7 +253,7 @@ class CustomerController extends AbstractCrudController
         TokenProvider $tokenProvider,
         EventDispatcherInterface $eventDispatcher,
         ParserContext $parserContext
-    ) {
+    ): Response {
         $errorMsg = 'No error.';
         $removalError = false;
 
@@ -271,15 +264,12 @@ class CustomerController extends AbstractCrudController
                 $eventDispatcher,
                 $parserContext
             );
-        } catch (CustomerException $e) {
-            $errorMsg = $e->getMessage();
+        } catch (CustomerException $customerException) {
+            $errorMsg = $customerException->getMessage();
 
             $removalError = true;
         }
 
-        return $this->renderListTemplate($this->getCurrentListOrder(), [
-            'removal_error' => $removalError,
-            'error_message' => $errorMsg,
-        ]);
+        return $this->renderListTemplate($this->getCurrentListOrder());
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\TaxEngine\TaxType;
 
 use Thelia\Core\Translation\Translator;
@@ -22,7 +23,7 @@ use Thelia\Type\FloatType;
  */
 class PricePercentTaxType extends BaseTaxType
 {
-    public function setPercentage($percent)
+    public function setPercentage($percent): static
     {
         $this->setRequirement('percent', $percent);
 
@@ -45,7 +46,7 @@ class PricePercentTaxType extends BaseTaxType
         ];
     }
 
-    public function getTitle()
+    public function getTitle(): string
     {
         return Translator::getInstance()->trans('Percentage of the product price');
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -22,7 +23,7 @@ use Thelia\Service\ConfigCacheService;
 
 class MailingSystem extends BaseAction implements EventSubscriberInterface
 {
-    public function __construct(private ConfigCacheService $configCache, private EventDispatcherInterface $dispatcher, private $kernelCacheDir)
+    public function __construct(private readonly ConfigCacheService $configCache, private readonly EventDispatcherInterface $dispatcher, private $kernelCacheDir)
     {
     }
 
@@ -33,6 +34,7 @@ class MailingSystem extends BaseAction implements EventSubscriberInterface
         } else {
             ConfigQuery::disableSmtp();
         }
+
         ConfigQuery::setSmtpHost($event->getHost());
         ConfigQuery::setSmtpPort($event->getPort());
         ConfigQuery::setSmtpEncryption($event->getEncryption());

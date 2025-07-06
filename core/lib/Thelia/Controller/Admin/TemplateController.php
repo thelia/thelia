@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,11 +11,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Controller\Admin;
 
+
+use Exception;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Template\TemplateAddAttributeEvent;
 use Thelia\Core\Event\Template\TemplateAddFeatureEvent;
 use Thelia\Core\Event\Template\TemplateCreateEvent;
@@ -27,6 +34,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\AttributeTemplateQuery;
 use Thelia\Model\FeatureTemplateQuery;
@@ -49,23 +57,21 @@ class TemplateController extends AbstractCrudController
             AdminResources::TEMPLATE,
             TheliaEvents::TEMPLATE_CREATE,
             TheliaEvents::TEMPLATE_UPDATE,
-            TheliaEvents::TEMPLATE_DELETE,
-            null, // No visibility toggle
-            null // No position update
+            TheliaEvents::TEMPLATE_DELETE // No position update
         );
     }
 
-    protected function getCreationForm()
+    protected function getCreationForm(): BaseForm
     {
         return $this->createForm(AdminForm::TEMPLATE_CREATION);
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): BaseForm
     {
         return $this->createForm(AdminForm::TEMPLATE_MODIFICATION);
     }
 
-    protected function getCreationEvent($formData)
+    protected function getCreationEvent(array $formData): ActionEvent
     {
         $createEvent = new TemplateCreateEvent();
 
@@ -77,7 +83,7 @@ class TemplateController extends AbstractCrudController
         return $createEvent;
     }
 
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent(array $formData): ActionEvent
     {
         $changeEvent = new TemplateUpdateEvent($formData['id']);
 
@@ -91,17 +97,17 @@ class TemplateController extends AbstractCrudController
         return $changeEvent;
     }
 
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): TemplateDeleteEvent
     {
         return new TemplateDeleteEvent($this->getRequest()->get('template_id'));
     }
 
-    protected function eventContainsObject($event)
+    protected function eventContainsObject($event): bool
     {
         return $event->hasTemplate();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -113,12 +119,12 @@ class TemplateController extends AbstractCrudController
         return $this->createForm(AdminForm::TEMPLATE_MODIFICATION, FormType::class, $data);
     }
 
-    protected function getObjectFromEvent($event)
+    protected function getObjectFromEvent($event): mixed
     {
         return $event->hasTemplate() ? $event->getTemplate() : null;
     }
 
-    protected function getExistingObject()
+    protected function getExistingObject(): ?ActiveRecordInterface
     {
         $template = TemplateQuery::create()
             ->findOneById($this->getRequest()->get('template_id', 0));
@@ -135,27 +141,24 @@ class TemplateController extends AbstractCrudController
      *
      * @return string
      */
-    protected function getObjectLabel($object)
-    {
+    protected function getObjectLabel(activeRecordInterface $object): ?string    {
         return $object->getName();
     }
 
     /**
      * @param Template $object
-     *
-     * @return int
      */
-    protected function getObjectId($object)
+    protected function getObjectId(ActiveRecordInterface $object): int
     {
         return $object->getId();
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder): Response
     {
         return $this->render('templates', ['order' => $currentOrder]);
     }
 
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate(): Response
     {
         return $this->render(
             'template-edit',
@@ -168,10 +171,8 @@ class TemplateController extends AbstractCrudController
     /**
      * @param Request $request
      * @param int     $id
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function redirectToEditionTemplate($request = null, $id = null)
+    protected function redirectToEditionTemplate($request = null, $id = null): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.templates.update',
@@ -181,7 +182,7 @@ class TemplateController extends AbstractCrudController
         );
     }
 
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute('admin.configuration.templates.default');
     }
@@ -189,11 +190,10 @@ class TemplateController extends AbstractCrudController
     /**
      * Process delete failure, which may occurs if template is in use.
      *
-     * @param TemplateDeleteEvent $deleteEvent
      *
-     * @return \Thelia\Core\HttpFoundation\Response|null
+     * @return \Symfony\Component\HttpFoundation\Response|null
      */
-    protected function performAdditionalDeleteAction($deleteEvent)
+    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent): ?Response
     {
         if ($deleteEvent->getProductCount() > 0) {
             $this->getParserContext()->setGeneralError(
@@ -209,10 +209,10 @@ class TemplateController extends AbstractCrudController
         return null;
     }
 
-    public function duplicateAction(EventDispatcherInterface $eventDispatcher)
+    public function duplicateAction(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::CREATE)) {
+        if (($response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::CREATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -227,7 +227,7 @@ class TemplateController extends AbstractCrudController
                 if ($event->hasTemplate()) {
                     $template_id = $event->getTemplate()->getId();
                 }
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -236,7 +236,7 @@ class TemplateController extends AbstractCrudController
         return $this->redirectToEditionTemplate(null, $template_id);
     }
 
-    public function getAjaxFeaturesAction()
+    public function getAjaxFeaturesAction(): \Symfony\Component\HttpFoundation\Response
     {
         return $this->render(
             'ajax/template-feature-list',
@@ -244,7 +244,7 @@ class TemplateController extends AbstractCrudController
         );
     }
 
-    public function getAjaxAttributesAction()
+    public function getAjaxAttributesAction(): \Symfony\Component\HttpFoundation\Response
     {
         return $this->render(
             'ajax/template-attribute-list',
@@ -252,10 +252,10 @@ class TemplateController extends AbstractCrudController
         );
     }
 
-    public function addAttributeAction(EventDispatcherInterface $eventDispatcher)
+    public function addAttributeAction(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -269,7 +269,7 @@ class TemplateController extends AbstractCrudController
 
             try {
                 $eventDispatcher->dispatch($event, TheliaEvents::TEMPLATE_ADD_ATTRIBUTE);
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -278,10 +278,10 @@ class TemplateController extends AbstractCrudController
         return $this->redirectToEditionTemplate();
     }
 
-    public function deleteAttributeAction(EventDispatcherInterface $eventDispatcher)
+    public function deleteAttributeAction(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -292,9 +292,9 @@ class TemplateController extends AbstractCrudController
 
         try {
             $eventDispatcher->dispatch($event, TheliaEvents::TEMPLATE_DELETE_ATTRIBUTE);
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             // Any error
-            return $this->errorPage($ex);
+            return $this->errorPage($exception);
         }
 
         return $this->redirectToEditionTemplate();
@@ -306,8 +306,8 @@ class TemplateController extends AbstractCrudController
     ) {
         // Find attribute_template
         $attributeTemplate = AttributeTemplateQuery::create()
-            ->filterByTemplateId($request->get('template_id', null))
-            ->filterByAttributeId($request->get('attribute_id', null))
+            ->filterByTemplateId($request->get('template_id'))
+            ->filterByAttributeId($request->get('attribute_id'))
             ->findOne()
         ;
 
@@ -319,10 +319,10 @@ class TemplateController extends AbstractCrudController
         );
     }
 
-    public function addFeatureAction(EventDispatcherInterface $eventDispatcher)
+    public function addFeatureAction(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -336,7 +336,7 @@ class TemplateController extends AbstractCrudController
 
             try {
                 $eventDispatcher->dispatch($event, TheliaEvents::TEMPLATE_ADD_FEATURE);
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -345,10 +345,10 @@ class TemplateController extends AbstractCrudController
         return $this->redirectToEditionTemplate();
     }
 
-    public function deleteFeatureAction(EventDispatcherInterface $eventDispatcher)
+    public function deleteFeatureAction(EventDispatcherInterface $eventDispatcher): Response
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) {
+        if (($response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) instanceof \Symfony\Component\HttpFoundation\Response) {
             return $response;
         }
 
@@ -359,9 +359,9 @@ class TemplateController extends AbstractCrudController
 
         try {
             $eventDispatcher->dispatch($event, TheliaEvents::TEMPLATE_DELETE_FEATURE);
-        } catch (\Exception $ex) {
+        } catch (Exception $exception) {
             // Any error
-            return $this->errorPage($ex);
+            return $this->errorPage($exception);
         }
 
         return $this->redirectToEditionTemplate();
@@ -373,8 +373,8 @@ class TemplateController extends AbstractCrudController
     ) {
         // Find feature_template
         $featureTemplate = FeatureTemplateQuery::create()
-            ->filterByTemplateId($request->get('template_id', null))
-            ->filterByFeatureId($request->get('feature_id', null))
+            ->filterByTemplateId($request->get('template_id'))
+            ->filterByFeatureId($request->get('feature_id'))
             ->findOne()
         ;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Exception;
+
+use RuntimeException;
 
 /**
  * these exception are non fatal exception, due to thelia process exception
@@ -20,23 +23,22 @@ namespace Thelia\Exception;
  *
  * Class TheliaProcessException
  */
-class TheliaProcessException extends \RuntimeException
+class TheliaProcessException extends RuntimeException
 {
-    public $data;
-
     public const UNKNOWN_EXCEPTION = 0;
 
     public const CART_ITEM_NOT_ENOUGH_STOCK = 100;
+
     public const NO_PLACED_ORDER = 101;
+
     public const PLACED_ORDER_ID_BAD_CURRENT_CUSTOMER = 102;
 
-    public function __construct($message, $code = null, $data = null, $previous = null)
+    public function __construct($message, $code = null, public $data = null, $previous = null)
     {
-        $this->data = $data;
-
         if ($code === null) {
             $code = self::UNKNOWN_EXCEPTION;
         }
+
         parent::__construct($message, $code, $previous);
     }
 }

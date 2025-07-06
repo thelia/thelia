@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Type\TypeCollection;
+use Thelia\Type\EnumType;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -19,7 +22,6 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Type;
 
 /**
  * Template loop, to get available back-office or front-office templates.
@@ -28,16 +30,13 @@ use Thelia\Type;
  */
 class Template extends BaseLoop implements ArraySearchLoopInterface
 {
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             new Argument(
                 'template-type',
-                new Type\TypeCollection(
-                    new Type\EnumType([
+                new TypeCollection(
+                    new EnumType([
                         'front-office',
                         'front',
                         'back-office',
@@ -70,7 +69,7 @@ class Template extends BaseLoop implements ArraySearchLoopInterface
         return $this->container->get('thelia.template_helper')->getList($templateType);
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var TemplateDefinition $template */
         foreach ($loopResult->getResultDataCollection() as $template) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Module;
 
 /**
@@ -19,14 +20,12 @@ namespace Thelia\Core\Event\Module;
  */
 class ModuleDeleteEvent extends ModuleEvent
 {
-    protected $module_id;
-    protected $delete_data;
-    protected $assume_delete;
 
-    public function __construct(int $module_id, bool $assume_delete = false)
+    protected $delete_data;
+
+
+    public function __construct(protected int $module_id, protected bool $assume_delete = false)
     {
-        $this->module_id = $module_id;
-        $this->assume_delete = $assume_delete;
     }
 
     public function setModuleId(int $module_id): void

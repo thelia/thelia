@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
+use InvalidArgumentException;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Loop\Argument\Argument;
@@ -34,12 +36,10 @@ use Thelia\Model\ProductAssociatedContentQuery;
 class AssociatedContent extends Content
 {
     protected $contentId;
+
     protected $contentPosition;
 
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         $argumentCollection = parent::getArgDefinitions();
 
@@ -64,7 +64,7 @@ class AssociatedContent extends Content
         $category = $this->getCategory();
 
         if ($product === null && $category === null) {
-            throw new \InvalidArgumentException('You have to provide either `product` or `category` argument in associated_content loop');
+            throw new InvalidArgumentException('You have to provide either `product` or `category` argument in associated_content loop');
         }
 
         if ($product !== null) {
@@ -102,14 +102,15 @@ class AssociatedContent extends Content
         }
 
         $order = $this->getOrder();
-        $orderByAssociatedContent = array_search('associated_content', $order);
-        $orderByAssociatedContentReverse = array_search('associated_content_reverse', $order);
+        $orderByAssociatedContent = array_search('associated_content', $order, true);
+        $orderByAssociatedContentReverse = array_search('associated_content_reverse', $order, true);
 
         if ($orderByAssociatedContent !== false) {
             $search->orderByPosition(Criteria::ASC);
             $order[$orderByAssociatedContent] = 'given_id';
             $this->args->get('order')->setValue(implode(',', $order));
         }
+
         if ($orderByAssociatedContentReverse !== false) {
             $search->orderByPosition(Criteria::DESC);
             $order[$orderByAssociatedContentReverse] = 'given_id';
@@ -119,8 +120,8 @@ class AssociatedContent extends Content
         $associatedContents = $this->search($search);
 
         $associatedContentIdList = [0];
-
-        $this->contentPosition = $this->contentId = [];
+        $this->contentPosition = [];
+        $this->contentId = [];
 
         foreach ($associatedContents as $associatedContent) {
             $associatedContentId = $associatedContent->getContentId();
@@ -142,11 +143,11 @@ class AssociatedContent extends Content
         return parent::buildModelCriteria();
     }
 
-    public function parseResults(LoopResult $results)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
-        $results = parent::parseResults($results);
+        $loopResult = parent::parseResults($loopResult);
 
-        foreach ($results as $loopResultRow) {
+        foreach ($loopResult as $loopResultRow) {
             $relatedContentId = $loopResultRow->get('ID');
 
             $loopResultRow
@@ -157,6 +158,6 @@ class AssociatedContent extends Content
             ;
         }
 
-        return $results;
+        return $loopResult;
     }
 }

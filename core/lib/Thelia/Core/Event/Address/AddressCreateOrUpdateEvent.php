@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Address;
 
 use Thelia\Core\Event\ActionEvent;
@@ -24,122 +25,92 @@ use Thelia\Model\Customer;
 class AddressCreateOrUpdateEvent extends ActionEvent
 {
     /**
-     * @var string address label
-     */
-    protected $label;
-
-    /**
-     * @var int title id
-     */
-    protected $title;
-
-    /**
-     * @var string|null company name
-     */
-    protected $company;
-
-    /**
-     * @var string first name
-     */
-    protected $firstname;
-
-    /**
-     * @var string last name
-     */
-    protected $lastname;
-
-    /**
-     * @var string address
-     */
-    protected $address1;
-
-    /**
-     * @var string address line 2
-     */
-    protected $address2;
-
-    /**
-     * @var string address line 3
-     */
-    protected $address3;
-
-    /**
-     * @var string zipcode
-     */
-    protected $zipcode;
-
-    /**
-     * @var string city
-     */
-    protected $city;
-
-    /**
-     * @var int country id
-     */
-    protected $country;
-
-    /**
-     * @var int state id
-     */
-    protected $state;
-
-    /**
-     * @var string cell phone
-     */
-    protected $cellphone;
-
-    /**
-     * @var string phone
-     */
-    protected $phone;
-
-    /**
-     * @var \Thelia\Model\Customer
+     * @var Customer
      */
     protected $customer;
 
     /**
-     * @var \Thelia\Model\Address
+     * @var Address
      */
     protected $address;
 
     /**
-     * @var int
+     * @param string $label
+     * @param int $title
+     * @param string|null $company
+     * @param string $firstname
+     * @param string $lastname
+     * @param string $address1
+     * @param string $address2
+     * @param string $address3
+     * @param string $zipcode
+     * @param string $city
+     * @param int $country
+     * @param int $state
+     * @param string $cellphone
+     * @param string $phone
+     * @param int $isDefault
      */
-    protected $isDefault;
-
     public function __construct(
-        $label,
-        $title,
-        $firstname,
-        $lastname,
-        $address1,
-        $address2,
-        $address3,
-        $zipcode,
-        $city,
-        $country,
-        $cellphone,
-        $phone,
-        $company,
-        $isDefault = 0,
-        $state = null
-    ) {
-        $this->address1 = $address1;
-        $this->address2 = $address2;
-        $this->address3 = $address3;
-        $this->cellphone = $cellphone;
-        $this->city = $city;
-        $this->company = $company;
-        $this->country = $country;
-        $this->state = $state;
-        $this->firstname = $firstname;
-        $this->label = $label;
-        $this->lastname = $lastname;
-        $this->phone = $phone;
-        $this->title = $title;
-        $this->zipcode = $zipcode;
-        $this->isDefault = $isDefault;
+        /**
+         * @var string address label
+         */
+        protected $label,
+        /**
+         * @var int title id
+         */
+        protected $title,
+        /**
+         * @var string first name
+         */
+        protected $firstname,
+        /**
+         * @var string last name
+         */
+        protected $lastname,
+        /**
+         * @var string address
+         */
+        protected $address1,
+        /**
+         * @var string address line 2
+         */
+        protected $address2,
+        /**
+         * @var string address line 3
+         */
+        protected $address3,
+        /**
+         * @var string zipcode
+         */
+        protected $zipcode,
+        /**
+         * @var string city
+         */
+        protected $city,
+        /**
+         * @var int country id
+         */
+        protected $country,
+        /**
+         * @var string cell phone
+         */
+        protected $cellphone,
+        /**
+         * @var string phone
+         */
+        protected $phone,
+        /**
+         * @var string|null company name
+         */
+        protected $company,
+        protected $isDefault = 0,
+        /**
+         * @var int state id
+         */
+        protected $state = null
+    )
+    {
     }
 
     /**
@@ -268,7 +239,7 @@ class AddressCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * @return \Thelia\Model\Customer
+     * @return Customer
      */
     public function getCustomer()
     {
@@ -282,7 +253,7 @@ class AddressCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * @return \Thelia\Model\Address
+     * @return Address
      */
     public function getAddress()
     {

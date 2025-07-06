@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -35,7 +36,7 @@ abstract class BaseSpecificModule extends BaseI18nLoop implements PropelSearchLo
     protected $timestampable = true;
 
     /**
-     * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
+     * @return ArgumentCollection
      */
     protected function getArgDefinitions()
     {
@@ -91,27 +92,14 @@ abstract class BaseSpecificModule extends BaseI18nLoop implements PropelSearchLo
 
         $order = $this->getOrder();
 
-        switch ($order) {
-            case 'id':
-                $search->orderById(Criteria::ASC);
-                break;
-            case 'id_reverse':
-                $search->orderById(Criteria::DESC);
-                break;
-            case 'alpha':
-                $search->addAscendingOrderByColumn('i18n_TITLE');
-                break;
-            case 'alpha_reverse':
-                $search->addDescendingOrderByColumn('i18n_TITLE');
-                break;
-            case 'manual_reverse':
-                $search->orderByPosition(Criteria::DESC);
-                break;
-            case 'manual':
-            default:
-                $search->orderByPosition(Criteria::ASC);
-                break;
-        }
+        match ($order) {
+            'id' => $search->orderById(Criteria::ASC),
+            'id_reverse' => $search->orderById(Criteria::DESC),
+            'alpha' => $search->addAscendingOrderByColumn('i18n_TITLE'),
+            'alpha_reverse' => $search->addDescendingOrderByColumn('i18n_TITLE'),
+            'manual_reverse' => $search->orderByPosition(Criteria::DESC),
+            default => $search->orderByPosition(Criteria::ASC),
+        };
 
         return $search;
     }

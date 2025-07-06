@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
+
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -19,6 +21,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use DateTime;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
@@ -76,11 +79,15 @@ class CartItem implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:cart_item:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:cart_item:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:cart_item:write';
 
     public const GROUP_FRONT_READ = 'front:cart_item:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:cart_item:read:single';
+
     public const GROUP_FRONT_WRITE = 'front:cart_item:write';
 
     #[Groups([self::GROUP_ADMIN_READ, Cart::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Cart::GROUP_FRONT_READ])]
@@ -88,7 +95,7 @@ class CartItem implements PropelResourceInterface
 
     #[Groups([self::GROUP_ADMIN_READ, Cart::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Cart::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
     #[NotNull(groups: [Order::GROUP_ADMIN_WRITE])]
-    public ?int $quantity;
+    public ?int $quantity = null;
 
     #[Relation(targetResource: Product::class)]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
@@ -104,41 +111,49 @@ class CartItem implements PropelResourceInterface
     public ProductSaleElements $productSaleElements;
 
     #[Groups([self::GROUP_ADMIN_READ, Cart::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Cart::GROUP_FRONT_READ])]
-    public ?float $price;
+    public ?float $price = null;
 
     #[Groups([self::GROUP_ADMIN_READ, Cart::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Cart::GROUP_FRONT_READ])]
-    public ?float $promoPrice;
+    public ?float $promoPrice = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?\DateTime $priceEndOfLife;
+    public ?DateTime $priceEndOfLife = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?int $promo;
+    public ?int $promo = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?\DateTime $createdAt;
+    public ?DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?\DateTime $updatedAt;
-    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?float $calculatedTotalPrice;
-    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?float $calculatedTotalPromoPrice;
-    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?float $calculatedTotalTaxedPrice;
-    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?float $calculatedTotalPromoTaxedPrice;
-    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?float $calculatedRealPrice;
-    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?float $calculatedRealTaxedPrice;
-    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?float $calculatedRealTotalPrice;
-    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?float $calculatedRealTotalTaxedPrice;
+    public ?DateTime $updatedAt = null;
 
     #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?bool $isPromo;
+    public ?float $calculatedTotalPrice = null;
+
+    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $calculatedTotalPromoPrice = null;
+
+    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $calculatedTotalTaxedPrice = null;
+
+    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $calculatedTotalPromoTaxedPrice = null;
+
+    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $calculatedRealPrice = null;
+
+    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $calculatedRealTaxedPrice = null;
+
+    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $calculatedRealTotalPrice = null;
+
+    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $calculatedRealTotalTaxedPrice = null;
+
+    #[Groups([Cart::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?bool $isPromo = null;
 
     public function getId(): ?int
     {
@@ -224,12 +239,12 @@ class CartItem implements PropelResourceInterface
         return $this;
     }
 
-    public function getPriceEndOfLife(): ?\DateTime
+    public function getPriceEndOfLife(): ?DateTime
     {
         return $this->priceEndOfLife;
     }
 
-    public function setPriceEndOfLife(?\DateTime $priceEndOfLife): self
+    public function setPriceEndOfLife(?DateTime $priceEndOfLife): self
     {
         $this->priceEndOfLife = $priceEndOfLife;
 
@@ -248,24 +263,24 @@ class CartItem implements PropelResourceInterface
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): self
+    public function setCreatedAt(?DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): self
+    public function setUpdatedAt(?DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 

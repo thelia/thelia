@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Loop;
 
 use Thelia\Core\Template\Element\BaseLoop;
@@ -22,22 +23,15 @@ use Thelia\Core\Template\Element\LoopResult;
  */
 class LoopExtendsParseResultsEvent extends LoopExtendsEvent
 {
-    /** @var LoopResult */
-    protected $loopResult;
-
     /**
      * LoopExtendsParseResultsEvent constructor.
      */
-    public function __construct(BaseLoop $loop, LoopResult $loopResult)
+    public function __construct(BaseLoop $loop, protected LoopResult $loopResult)
     {
         parent::__construct($loop);
-        $this->loopResult = $loopResult;
     }
 
-    /**
-     * @return LoopResult
-     */
-    public function getLoopResult()
+    public function getLoopResult(): LoopResult
     {
         return $this->loopResult;
     }

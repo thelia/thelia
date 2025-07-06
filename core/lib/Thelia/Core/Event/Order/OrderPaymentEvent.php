@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Order;
 
 use Symfony\Component\HttpFoundation\Response;
@@ -24,24 +25,15 @@ use Thelia\Model\Order;
 class OrderPaymentEvent extends ActionEvent
 {
     /**
-     * @var Order
-     */
-    protected $order;
-
-    /**
-     * @var \Thelia\Core\HttpFoundation\Response
+     * @var \Symfony\Component\HttpFoundation\Response
      */
     protected $response;
 
-    public function __construct(Order $order)
+    public function __construct(protected Order $order)
     {
-        $this->order = $order;
     }
 
-    /**
-     * @return \Thelia\Model\Order
-     */
-    public function getOrder()
+    public function getOrder(): Order
     {
         return $this->order;
     }
@@ -57,14 +49,14 @@ class OrderPaymentEvent extends ActionEvent
     }
 
     /**
-     * @return \Thelia\Core\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getResponse()
     {
         return $this->response;
     }
 
-    public function hasResponse()
+    public function hasResponse(): bool
     {
         return null !== $this->response;
     }

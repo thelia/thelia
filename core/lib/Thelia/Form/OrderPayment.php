@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,12 +11,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Form;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
-use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\AddressQuery;
@@ -34,25 +37,25 @@ class OrderPayment extends FirewallForm
             ->add('invoice-address', IntegerType::class, [
                 'required' => true,
                 'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Callback(
-                        [$this, 'verifyInvoiceAddress']
+                    new NotBlank(),
+                    new Callback(
+                        $this->verifyInvoiceAddress(...)
                     ),
                 ],
             ])
             ->add('payment-module', IntegerType::class, [
                 'required' => true,
                 'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Callback(
-                        [$this, 'verifyPaymentModule']
+                    new NotBlank(),
+                    new Callback(
+                        $this->verifyPaymentModule(...)
                     ),
                 ],
             ])
             // Add terms & conditions
             ->add('agreed', CheckboxType::class, [
                 'constraints' => [
-                    new Constraints\IsTrue(['message' => Translator::getInstance()->trans('Please accept the Terms and conditions in order to register.')]),
+                    new IsTrue(['message' => Translator::getInstance()->trans('Please accept the Terms and conditions in order to register.')]),
                 ],
                 'label' => 'Agreed',
                 'label_attr' => [
@@ -86,7 +89,7 @@ class OrderPayment extends FirewallForm
         }
     }
 
-    public static function getName()
+    public static function getName(): string
     {
         return 'thelia_order_payment';
     }

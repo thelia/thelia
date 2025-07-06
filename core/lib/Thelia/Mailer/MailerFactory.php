@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Mailer;
 
+use Exception;
+use RuntimeException;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
@@ -32,7 +35,7 @@ use Thelia\Model\MessageQuery;
  */
 class MailerFactory
 {
-    public function __construct(private ParserInterface $parser, private MailerInterface $mailer)
+    public function __construct(private readonly ParserInterface $parser, private readonly MailerInterface $mailer)
     {
     }
 
@@ -48,7 +51,7 @@ class MailerFactory
      * @param Customer $customer
      * @param array    $messageParameters an array of (name => value) parameters that will be available in the message
      */
-    public function sendEmailToCustomer($messageCode, $customer, $messageParameters = []): void
+    public function sendEmailToCustomer($messageCode, $customer, array $messageParameters = []): void
     {
         // Always add the customer ID to the parameters
         $messageParameters['customer_id'] = $customer->getId();
@@ -116,16 +119,16 @@ class MailerFactory
                     $instance = $this->createEmailMessage($messageCode, $from, $to, $messageParameters, $locale, $cc, $bcc, $replyTo);
 
                     $this->send($instance);
-                } catch (\Exception $ex) {
+                } catch (Exception $ex) {
                     Tlog::getInstance()->addError(
-                        "Error while sending email message $messageCode: ".$ex->getMessage()
+                        sprintf('Error while sending email message %s: ', $messageCode).$ex->getMessage()
                     );
                 }
             } else {
-                Tlog::getInstance()->addWarning("Message $messageCode not sent: recipient list is empty.");
+                Tlog::getInstance()->addWarning(sprintf('Message %s not sent: recipient list is empty.', $messageCode));
             }
         } else {
-            Tlog::getInstance()->addError("Can't send email message $messageCode: store email address is not defined.");
+            Tlog::getInstance()->addError(sprintf("Can't send email message %s: store email address is not defined.", $messageCode));
         }
     }
 
@@ -141,13 +144,13 @@ class MailerFactory
      * @param array  $bcc               Bcc addresses. An array of (email-address => name) [optional]
      * @param array  $replyTo           Reply to addresses. An array of (email-address => name) [optional]
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function createEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null, $cc = [], $bcc = [], $replyTo = [])
+    public function createEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null, $cc = [], $bcc = [], $replyTo = []): Email
     {
         $message = MessageQuery::getFromName($messageCode);
         if (null == $message) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 Translator::getInstance()->trans(
                     "Failed to load message with code '%code%', propably because it does'nt exists.",
                     ['%code%' => $messageCode]
@@ -202,7 +205,7 @@ class MailerFactory
      *
      * @return Email the generated and built message
      */
-    public function createSimpleEmailMessage($from, $to, $subject, $htmlBody, $textBody, $cc = [], $bcc = [], $replyTo = [])
+    public function createSimpleEmailMessage($from, $to, string $subject, $htmlBody, $textBody, $cc = [], $bcc = [], $replyTo = []): Email
     {
         $email = (new Email());
 
@@ -226,7 +229,7 @@ class MailerFactory
      * @param array  $bcc      Bcc addresses. An array of (email-address => name) [optional]
      * @param array  $replyTo  Reply to addresses. An array of (email-address => name) [optional]
      */
-    public function sendSimpleEmailMessage($from, $to, $subject, $htmlBody, $textBody, $cc = [], $bcc = [], $replyTo = []): void
+    public function sendSimpleEmailMessage($from, $to, string $subject, $htmlBody, $textBody, $cc = [], $bcc = [], $replyTo = []): void
     {
         $email = $this->createSimpleEmailMessage($from, $to, $subject, $htmlBody, $textBody, $cc, $bcc, $replyTo);
 

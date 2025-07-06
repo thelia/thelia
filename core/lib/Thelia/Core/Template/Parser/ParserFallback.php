@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,11 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Parser;
 
-use phpDocumentor\Reflection\DocBlock\Tags\Throws;
-use Thelia\Core\HttpFoundation\Request;
+use RuntimeException;
+use InvalidArgumentException;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 
@@ -57,8 +59,6 @@ class ParserFallback implements ParserInterface
      *
      * @param bool $webAssetTemplate Allow to load asset from another template
      *                               If the name of the template if provided
-     *
-     * @return TemplateDefinition
      */
     public function getTemplateDefinition($webAssetTemplate = false): void
     {
@@ -67,8 +67,6 @@ class ParserFallback implements ParserInterface
 
     /**
      * Check if template definition is not null.
-     *
-     * @return bool
      */
     public function hasTemplateDefinition(): void
     {
@@ -94,7 +92,7 @@ class ParserFallback implements ParserInterface
      *
      * @param int $templateType
      *
-     * @throws \InvalidArgumentException if the templateType is not defined
+     * @throws InvalidArgumentException if the templateType is not defined
      *
      * @return array: an array of defined templates directories for the given template type
      */
@@ -115,7 +113,7 @@ class ParserFallback implements ParserInterface
     }
 
     /**
-     * @return \Thelia\Core\Template\TemplateHelperInterface the parser template helper instance
+     * @return TemplateHelperInterface the parser template helper instance
      */
     public function getTemplateHelper(): void
     {
@@ -124,13 +122,11 @@ class ParserFallback implements ParserInterface
 
     private function throwException(): void
     {
-        throw new \RuntimeException('if you want to use a parser, please register one');
+        throw new RuntimeException('if you want to use a parser, please register one');
     }
 
     /**
      * Returns the request used by the parser.
-     *
-     * @return Request
      */
     public function getRequest(): void
     {
@@ -142,7 +138,6 @@ class ParserFallback implements ParserInterface
      *
      * @param bool $fallbackToDefaultTemplate if true, resources will be also searched in the "default" template
      *
-     * @throws \SmartyException
      */
     public function pushTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false): void
     {
@@ -152,7 +147,6 @@ class ParserFallback implements ParserInterface
     /**
      * Restore the previous stored template definition, if one exists.
      *
-     * @throws \SmartyException
      */
     public function popTemplateDefinition(): void
     {
@@ -161,8 +155,6 @@ class ParserFallback implements ParserInterface
 
     /**
      * Get the current status of the fallback to "default" feature.
-     *
-     * @return bool
      */
     public function getFallbackToDefaultTemplate(): void
     {

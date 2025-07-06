@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Model;
 
+use Exception;
 use Thelia\Model\Base\MessageQuery as BaseMessageQuery;
 
 /**
@@ -28,17 +30,18 @@ class MessageQuery extends BaseMessageQuery
      *
      * @param string $messageName the message name
      *
-     * @throws \Exception if the message could not be loaded
+     * @throws Exception if the message could not be loaded
      *
      * @return Message the loaded message
      */
     public static function getFromName($messageName)
     {
         if (false === $message = self::create()->filterByName($messageName)->findOne()) {
-            throw new \Exception("Failed to load message $messageName.");
+            throw new Exception(sprintf('Failed to load message %s.', $messageName));
         }
 
         return $message;
     }
 }
+
 // MessageQuery

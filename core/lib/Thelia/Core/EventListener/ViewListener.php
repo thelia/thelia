@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,22 +11,20 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\EventListener;
 
-use Symfony\Cmf\Component\Routing\ChainRouterInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\ViewCheckEvent;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
@@ -39,20 +39,18 @@ use Thelia\Exception\OrderException;
  */
 class ViewListener implements EventSubscriberInterface
 {
-    protected readonly Request $request;
+
     public const IGNORE_THELIA_VIEW = 'ignore_thelia_view';
 
     /**
      * ViewListener constructor.
      */
     public function __construct(
-        protected ParserResolver $parserResolver,
-        protected TemplateHelperInterface $templateHelper,
-        protected RequestStack $requestStack,
+        protected ParserResolver           $parserResolver,
+        protected TemplateHelperInterface  $templateHelper,
         protected EventDispatcherInterface $eventDispatcher,
-        protected ChainRouterInterface $chainRouter,
+        protected RouterInterface          $router,
     ) {
-        $this->request = $requestStack->getCurrentRequest();
     }
 
     /**
@@ -62,90 +60,76 @@ class ViewListener implements EventSubscriberInterface
      */
     public function onKernelView(ViewEvent $event): void
     {
-        $response = null;
-
-        if (null !== $this->request->attributes->get(self::IGNORE_THELIA_VIEW)) {
+        $request = $event->getRequest();
+        if ($request->attributes->has(self::IGNORE_THELIA_VIEW)) {
             return;
         }
 
         try {
-            $view = $this->request->attributes->get('_view');
+            $view = $request->attributes->get('_view');
             $templatePath = $this->templateHelper->getActiveFrontTemplate()->getAbsolutePath();
             $parser = $this->parserResolver->getParser($templatePath, $view);
             $parser->setTemplateDefinition($this->templateHelper->getActiveFrontTemplate(), true);
-            $viewId = $this->request->attributes->get($view.'_id');
+            $viewId = $request->attributes->get($view . '_id');
 
             $this->eventDispatcher->dispatch(new ViewCheckEvent($view, $viewId), TheliaEvents::VIEW_CHECK);
-
-            $content = $parser->render($view.'.'.$parser->getFileExtension());
+            $content = $parser->render($view . '.' . $parser->getFileExtension());
             $response = $content instanceof Response
                 ? $content
                 : new Response($content, $parser->getStatus() ?: 200);
-        } catch (ResourceNotFoundException $e) {
+        } catch (ResourceNotFoundException) {
             throw new NotFoundHttpException();
         } catch (OrderException $e) {
-            switch ($e->getCode()) {
-                case OrderException::CART_EMPTY:
-                    // Redirect to the cart template
-                    $response = new RedirectResponse($this->chainRouter->generate($e->cartRoute, $e->arguments, Router::ABSOLUTE_URL));
-                    break;
-                case OrderException::UNDEFINED_DELIVERY:
-                    // Redirect to the delivery choice template
-                    $response = new RedirectResponse($this->chainRouter->generate($e->orderDeliveryRoute, $e->arguments, Router::ABSOLUTE_URL));
-                    break;
-            }
-            if (null === $response) {
+            $response = match ($e->getCode()) {
+                OrderException::CART_EMPTY => new RedirectResponse(
+                    $this->router->generate($e->cartRoute, $e->arguments, UrlGeneratorInterface::ABSOLUTE_URL)
+                ),
+                OrderException::UNDEFINED_DELIVERY => new RedirectResponse(
+                    $this->router->generate($e->orderDeliveryRoute, $e->arguments, UrlGeneratorInterface::ABSOLUTE_URL)
+                ),
+                default => null,
+            };
+
+            if (!$response instanceof RedirectResponse) {
                 throw $e;
             }
         }
-        $event->setResponse($response);
+
+        if ($response) {
+            $event->setResponse($response);
+        }
     }
 
     public function beforeKernelView(ViewEvent $event): void
     {
-        $request = $this->request;
+        $request = $event->getRequest();
 
-        if (null !== $this->request->attributes->get(self::IGNORE_THELIA_VIEW)) {
+        if ($request->attributes->has(self::IGNORE_THELIA_VIEW)) {
             return;
         }
 
-        if (null === $view = $request->attributes->get('_view')) {
-            $request->attributes->set('_view', $this->findView($request));
-        }
+        $view = $request->attributes->get('_view', $this->findView($request));
+        $request->attributes->set('_view', $view);
 
-        if (null === $request->attributes->get($view.'_id')) {
-            $request->attributes->set($view.'_id', $this->findViewId($request, $view));
+        if (!$request->attributes->has($view . '_id')) {
+            $request->attributes->set($view . '_id', $this->findViewId($request, $view));
         }
     }
 
-    public function findView(Request $request)
+    public function findView(Request $request): string
     {
-        if (!$view = $request->query->get('view')) {
-            $view = 'index';
-            if ($request->request->has('view')) {
-                $view = $request->request->get('view');
-            }
-        }
-
-        return $view;
+        return $request->query->get('view') ?: $request->request->get('view', 'index');
     }
 
-    public function findViewId(Request $request, $view)
+    public function findViewId(Request $request, string $view): ?int
     {
-        if (!$viewId = $request->query->get($view.'_id')) {
-            $viewId = 0;
-            if ($request->request->has($view.'_id')) {
-                $viewId = $request->request->get($view.'_id');
-            }
-        }
+        $paramName = $view . '_id';
 
-        return $viewId;
+        $viewId = $request->query->getInt($paramName) ?: $request->request->getInt($paramName);
+
+        return $viewId ?: null;
     }
 
-    /**
-     * {@inheritdoc}
-     * api.
-     */
     public static function getSubscribedEvents(): array
     {
         return [

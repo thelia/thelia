@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,8 +11,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Api\Resource;
+
 
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
@@ -20,6 +22,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use DateTime;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -145,11 +148,15 @@ class Product extends AbstractTranslatableResource
     use UrlRewritingTrait;
 
     public const GROUP_ADMIN_READ = 'admin:product:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:product:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:product:write';
+
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:product:write:update';
 
     public const GROUP_FRONT_READ = 'front:product:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:product:read:single';
 
     #[Groups(
@@ -184,24 +191,24 @@ class Product extends AbstractTranslatableResource
     public bool $visible;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
-    public ?int $position;
+    public ?int $position = null;
 
     #[Relation(targetResource: Template::class)]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
-    public ?Template $template;
+    public ?Template $template = null;
 
     #[Relation(targetResource: Brand::class)]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?Brand $brand;
+    public ?Brand $brand = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public bool $virtual = false;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?\DateTime $createdAt;
+    public ?DateTime $createdAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public ?\DateTime $updatedAt;
+    public ?DateTime $updatedAt = null;
 
     #[Relation(targetResource: ProductCategory::class)]
     #[Groups([
@@ -210,7 +217,7 @@ class Product extends AbstractTranslatableResource
         self::GROUP_FRONT_READ_SINGLE,
         self::GROUP_FRONT_READ,
     ])]
-    public array $productCategories;
+    public array $productCategories = [];
 
     #[Column(propelFieldName: 'productSaleElementss')]
     #[Relation(targetResource: ProductSaleElements::class)]
@@ -221,11 +228,11 @@ class Product extends AbstractTranslatableResource
         self::GROUP_ADMIN_WRITE_UPDATE,
         self::GROUP_FRONT_READ,
     ])]
-    public array $productSaleElements;
+    public array $productSaleElements = [];
 
     #[Relation(targetResource: FeatureProduct::class)]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    public array $featureProducts;
+    public array $featureProducts = [];
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     #[Relation(targetResource: ProductAssociatedContent::class)]
@@ -242,9 +249,6 @@ class Product extends AbstractTranslatableResource
 
     public function __construct()
     {
-        $this->productCategories = [];
-        $this->productSaleElements = [];
-        $this->featureProducts = [];
         parent::__construct();
     }
 
@@ -344,24 +348,24 @@ class Product extends AbstractTranslatableResource
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): self
+    public function setCreatedAt(?DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): self
+    public function setUpdatedAt(?DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 
@@ -451,6 +455,7 @@ class Product extends AbstractTranslatableResource
         foreach ($resource->getProductCategories() as $productCategory) {
             $defaultCategory[] = $productCategory->getDefaultCategory();
         }
+
         if (!\in_array(true, $defaultCategory)) {
             $context->addViolation(
                 Translator::getInstance()->trans(

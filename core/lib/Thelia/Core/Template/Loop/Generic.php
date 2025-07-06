@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -32,10 +33,7 @@ use TheliaMain\PropelResolver;
  */
 class Generic extends BaseLoop implements PropelSearchLoopInterface
 {
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createAlphaNumStringTypeArgument('table_name', null, true),
@@ -68,7 +66,7 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
                 continue;
             }
 
-            $filterMethod = 'filterBy'.str_replace('_', '', ucwords($filter, '_'));
+            $filterMethod = 'filterBy'.str_replace('_', '', ucwords((string) $filter, '_'));
 
             if (!method_exists($query, $filterMethod)) {
                 continue;
@@ -94,10 +92,11 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
         $orders = $this->getParsedParams($this->getOrders());
 
         foreach ($orders as $order => $direction) {
-            $orderByMethod = 'orderBy'.str_replace('_', '', ucwords($order, '_'));
+            $orderByMethod = 'orderBy'.str_replace('_', '', ucwords((string) $order, '_'));
             if (!\is_callable([$query, $orderByMethod])) {
                 continue;
             }
+
             $direction = $direction[0] ?? 'ASC';
             $query->$orderByMethod($direction);
         }
@@ -107,7 +106,7 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
         return $query;
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         $tableMapClass = PropelResolver::getTableMapByTableName($this->getTableName());
         $tableMap = new $tableMapClass();
@@ -119,7 +118,7 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
             foreach (TableMap::getFieldnamesForClass($tableMap->getClassName(), TableMap::TYPE_FIELDNAME) as $columnIndex => $columnName) {
                 $getter = 'get'.$columnPhpNames[$columnIndex];
                 if (method_exists($item, $getter)) {
-                    $loopResultRow->set(strtoupper($columnName), $item->$getter());
+                    $loopResultRow->set(strtoupper((string) $columnName), $item->$getter());
                 }
             }
 
@@ -127,7 +126,7 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
             if (null !== $i18nTableMapClass) {
                 $i18nTableMap = new $i18nTableMapClass();
                 foreach (TableMap::getFieldnamesForClass($i18nTableMap->getClassName(), TableMap::TYPE_PHPNAME) as $columnName) {
-                    $loopResultRow->set(strtoupper($columnName), $item->getVirtualColumn($columnName));
+                    $loopResultRow->set(strtoupper((string) $columnName), $item->getVirtualColumn($columnName));
                 }
             }
 
@@ -139,9 +138,12 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
         return $loopResult;
     }
 
-    protected function getParsedParams($params)
+    /**
+     * @return list<string>[]|null[]
+     */
+    protected function getParsedParams(array $params): array
     {
-        $rawParams = explode('|', $params);
+        $rawParams = explode('|', (string) $params);
         $params = [];
 
         foreach ($rawParams as $rawParam) {
@@ -149,6 +151,7 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
             if (!isset($paramData[0]) || empty($paramData[0])) {
                 continue;
             }
+
             $params[$paramData[0]] = isset($paramData[1]) ? explode(',', $paramData[1]) : null;
         }
 

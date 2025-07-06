@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,9 +11,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Tools\FileDownload;
 
+use Thelia\Exception\FileNotFoundException;
+use ErrorException;
+use HttpUrlException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Translator;
 
@@ -26,9 +30,9 @@ interface FileDownloaderInterface
      * @param string $url
      * @param string $pathToStore
      *
-     * @throws \Thelia\Exception\FileNotFoundException
-     * @throws \ErrorException
-     * @throws \HttpUrlException
+     * @throws FileNotFoundException
+     * @throws ErrorException
+     * @throws HttpUrlException
      *
      * Downloads the file $url in $pathToStore
      */

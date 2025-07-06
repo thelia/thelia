@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\Cart;
 
 use Thelia\Core\Event\ActionEvent;
@@ -18,27 +19,29 @@ use Thelia\Model\CartItem;
 
 class CartEvent extends ActionEvent
 {
-    protected $cart;
+
     protected $quantity;
+
     protected $append;
+
     protected $newness;
+
     protected $productSaleElementsId;
+
     protected $product;
+
     protected $cartItem;
 
     protected $cartItemId;
 
-    public function __construct(Cart $cart)
+    public function __construct(protected Cart $cart)
     {
-        $this->cart = $cart;
     }
 
     /**
      * @param bool $append
-     *
-     * @return CartEvent
      */
-    public function setAppend($append)
+    public function setAppend($append): static
     {
         $this->append = $append;
 
@@ -53,10 +56,7 @@ class CartEvent extends ActionEvent
         return $this->append;
     }
 
-    /**
-     * @return CartEvent
-     */
-    public function setCartItem(CartItem $cartItem)
+    public function setCartItem(CartItem $cartItem): static
     {
         $this->cartItem = $cartItem;
 
@@ -65,10 +65,8 @@ class CartEvent extends ActionEvent
 
     /**
      * Clear the current cart item.
-     *
-     * @return CartEvent
      */
-    public function clearCartItem()
+    public function clearCartItem(): static
     {
         $this->cartItem = null;
 
@@ -91,7 +89,7 @@ class CartEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setCartItemId($cartItemId)
+    public function setCartItemId($cartItemId): static
     {
         $this->cartItemId = $cartItemId;
 
@@ -100,10 +98,8 @@ class CartEvent extends ActionEvent
 
     /**
      * @param bool $newness
-     *
-     * @return CartEvent
      */
-    public function setNewness($newness)
+    public function setNewness($newness): static
     {
         $this->newness = $newness;
 
@@ -120,10 +116,8 @@ class CartEvent extends ActionEvent
 
     /**
      * @param int $product the product ID
-     *
-     * @return CartEvent
      */
-    public function setProduct($product)
+    public function setProduct($product): static
     {
         $this->product = $product;
 
@@ -140,10 +134,8 @@ class CartEvent extends ActionEvent
 
     /**
      * @param int $productSaleElementsId
-     *
-     * @return CartEvent
      */
-    public function setProductSaleElementsId($productSaleElementsId)
+    public function setProductSaleElementsId($productSaleElementsId): static
     {
         $this->productSaleElementsId = $productSaleElementsId;
 
@@ -160,10 +152,8 @@ class CartEvent extends ActionEvent
 
     /**
      * @param int $quantity
-     *
-     * @return CartEvent
      */
-    public function setQuantity($quantity)
+    public function setQuantity($quantity): static
     {
         $this->quantity = $quantity;
 
@@ -178,10 +168,7 @@ class CartEvent extends ActionEvent
         return $this->quantity;
     }
 
-    /**
-     * @return \Thelia\Model\Cart
-     */
-    public function getCart()
+    public function getCart(): Cart
     {
         return $this->cart;
     }

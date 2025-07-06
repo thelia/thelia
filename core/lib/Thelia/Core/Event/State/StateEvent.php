@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\Event\State;
 
 use Thelia\Core\Event\ActionEvent;
@@ -24,39 +25,27 @@ use Thelia\Model\State;
  */
 class StateEvent extends ActionEvent
 {
-    /*
-     * @var \Thelia\Model\State
-     */
-    protected $state;
-
-    public function __construct(State $state = null)
+    public function __construct(protected ?State $state = null)
     {
-        $this->state = $state;
     }
 
     /**
      * @param mixed $state
      */
-    public function setState(State $state)
+    public function setState(State $state): static
     {
         $this->state = $state;
 
         return $this;
     }
 
-    /**
-     * @return \Thelia\Model\State|null
-     */
-    public function getState()
+    public function getState(): ?State
     {
         return $this->state;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasState()
+    public function hasState(): bool
     {
-        return null !== $this->state;
+        return $this->state instanceof State;
     }
 }

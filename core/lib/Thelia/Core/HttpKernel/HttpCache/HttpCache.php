@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -9,7 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Thelia\Core\HttpKernel\HttpCache;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +19,7 @@ use Symfony\Component\HttpKernel\HttpCache\HttpCache as BaseHttpCache;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
-use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class HttpCache.
@@ -40,13 +41,13 @@ class HttpCache extends BaseHttpCache implements HttpKernelInterface
         );
     }
 
-    public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = true): Response
+    public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): Response
     {
         if (!($request instanceof \Thelia\Core\HttpFoundation\Request)) {
             $request = TheliaRequest::create(
                 $request->getUri(),
                 $request->getMethod(),
-                $request->getMethod() == 'GET' ? $request->query->all() : $request->request->all(),
+                $request->getMethod() === 'GET' ? $request->query->all() : $request->request->all(),
                 $request->cookies->all(),
                 $request->files->all(),
                 $request->server->all(),
