@@ -160,11 +160,10 @@ class CustomerController extends AbstractCrudController
     {
         // Use current language if it is not defined in the form
         if (empty($data['lang_id'])) {
-            $data['lang_id'] = $this->getSession()->getLang()->getId();
+            $data['lang_id'] = $this->getSession()->getLang()?->getId();
         }
-
         return new CustomerCreateOrUpdateEvent(
-            $data['title'] ?? null,
+            $data['title'] ? (int) $data['title'] : null,
             $data['firstname'],
             $data['lastname'],
             $data['address1'],
@@ -176,11 +175,11 @@ class CustomerController extends AbstractCrudController
             $data['city'],
             $data['country'],
             $data['email'] ?? null,
-            isset($data['password']) && !empty($data['password']) ? $data['password'] : null,
+            !empty($data['password']) ? $data['password'] : null,
             $data['lang_id'],
             $data['reseller'] ?? null,
             $data['sponsor'] ?? null,
-            $data['discount'] ?? null,
+            $data['discount'] ? (float) $data['discount'] :  null,
             $data['company'] ?? null,
             null,
             $data['state']

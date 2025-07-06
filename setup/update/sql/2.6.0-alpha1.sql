@@ -103,4 +103,9 @@ INSERT INTO `choice_filter_other_i18n` (`id`, `locale`, `title`, `description`) 
 (3, 'fr_FR', 'Catégorie', NULL);
 
 
+ALTER TABLE `address`
+    MODIFY COLUMN `address2` VARCHAR(255) NULL,
+    MODIFY COLUMN `address3` VARCHAR(255) NULL;
+
+
 SET FOREIGN_KEY_CHECKS = 1;

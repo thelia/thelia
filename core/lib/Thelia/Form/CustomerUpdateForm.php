@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -48,6 +49,15 @@ class CustomerUpdateForm extends BaseForm
                     'for' => 'company',
                 ],
                 'required' => false,
+            ])
+            ->add('title', IntegerType::class, [
+                'constraints' => [
+                    new NotBlank(),
+                ],
+                'label' => Translator::getInstance()->trans('Title'),
+                'label_attr' => [
+                    'for' => 'title',
+                ],
             ])
             ->add('firstname', TextType::class, [
                 'constraints' => [
@@ -173,7 +183,7 @@ class CustomerUpdateForm extends BaseForm
                     'for' => 'state',
                 ],
             ])
-            ->add('discount', TextType::class, [
+            ->add('discount', NumberType::class, [
                 'required' => false,
                 'label' => Translator::getInstance()->trans('permanent discount (in percent)'),
                 'label_attr' => [

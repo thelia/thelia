@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -65,6 +66,15 @@ class AddressCreateForm extends FirewallForm
                 'label' => Translator::getInstance()->trans('Address label'),
                 'label_attr' => [
                     'for' => 'address_label',
+                ],
+            ])
+            ->add('title', IntegerType::class, [
+                'constraints' => [
+                    new NotBlank(),
+                ],
+                'label' => Translator::getInstance()->trans('Title'),
+                'label_attr' => [
+                    'for' => 'title',
                 ],
             ])
             ->add('firstname', TextType::class, [
@@ -170,6 +180,13 @@ class AddressCreateForm extends FirewallForm
                 'label' => Translator::getInstance()->trans('Phone'),
                 'label_attr' => [
                     'for' => 'phone',
+                ],
+                'required' => false,
+            ])
+            ->add('cellphone', TextType::class, [
+                'label' => Translator::getInstance()->trans('Cellphone'),
+                'label_attr' => [
+                    'for' => 'cellphone',
                 ],
                 'required' => false,
             ])
