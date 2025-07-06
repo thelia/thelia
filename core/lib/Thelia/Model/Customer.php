@@ -217,7 +217,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
             $id = $lastCustomer->getId() + 1;
         }
 
-        return sprintf('CUS%s', str_pad($id, 12, 0, \STR_PAD_LEFT));
+        return sprintf('CUS%s', str_pad((string) $id, 12, '0', \STR_PAD_LEFT));
     }
 
     /**
@@ -368,7 +368,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         parent::preInsert($con);
 
         // Set the serial number (for auto-login)
-        $this->setRememberMeSerial(uniqid());
+        $this->setRememberMeSerial(uniqid('', true));
 
         if (null === $this->getRef()) {
             $this->setRef($this->generateRef());

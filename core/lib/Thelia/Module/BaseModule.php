@@ -288,6 +288,7 @@ class BaseModule implements BaseModuleInterface
                     $image = new ModuleImage();
                     $image->setModuleId($module->getId());
                     $image->setPosition($imagePosition);
+                    $image->setFile('');
                     $image->save($con);
 
                     $imageDirectory = sprintf('%s/media/images/module', THELIA_LOCAL_DIR);
