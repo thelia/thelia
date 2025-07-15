@@ -25,7 +25,7 @@ interface FileModelInterface
      *
      * @return $this
      */
-    public function setParentId(int $parentId);
+    public function setParentId(int $parentId): static;
 
     /**
      * Get file parent id.
@@ -51,7 +51,6 @@ interface FileModelInterface
 
     /**
      * Get the ID of the form used to change this object information.
-     *
      */
     public function getUpdateFormId(): string;
 

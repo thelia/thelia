@@ -32,7 +32,6 @@ use Thelia\Type\TypeCollection;
 class Argument
 {
     public bool $mandatory;
-
     private int|string|null $value = null;
 
     public function __construct(public $name, public TypeCollection $type, public $default = null, $mandatory = false, public $empty = true, $value = null)
@@ -144,9 +143,6 @@ class Argument
         );
     }
 
-    /**
-     * @since 2.2
-     */
     public static function createAnyListTypeArgument($name, $default = null, bool $mandatory = false, bool $empty = true): self
     {
         return new self(
@@ -173,9 +169,6 @@ class Argument
         );
     }
 
-    /**
-     * @since 2.4.0
-     */
     public static function createAlphaNumStringTypeArgument($name, $default = null, bool $mandatory = false, bool $empty = true): self
     {
         return new self(
@@ -189,9 +182,6 @@ class Argument
         );
     }
 
-    /**
-     * @since 2.4.0
-     */
     public static function createAlphaNumStringListTypeArgument($name, $default = null, bool $mandatory = false, bool $empty = true): self
     {
         return new self(

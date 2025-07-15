@@ -24,29 +24,18 @@ use Thelia\Core\Event\ActionEvent;
 class TranslationEvent extends ActionEvent
 {
     public const WALK_MODE_PHP = 'php';
-
     public const WALK_MODE_TEMPLATE = 'tpl';
 
     protected string $directory;
-
     protected string $mode;
-
     protected string $locale;
-
     protected string $domain;
-
     protected array $translatableStrings;
-
     protected array $customFallbackStrings;
-
     protected array $globalFallbackStrings;
-
     protected int $translatableStringCount;
-
     protected string $translationFilePath;
-
     protected array $translatedStrings;
-
     protected bool $createFileIfNotExists;
 
     public static function createGetStringsEvent(string $directory, string $mode, string $locale, string $domain): self

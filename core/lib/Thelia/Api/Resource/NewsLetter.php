@@ -71,9 +71,7 @@ class NewsLetter implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:news_letters:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:news_letters:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:news_letters:write';
 
     #[Groups([self::GROUP_ADMIN_READ])]

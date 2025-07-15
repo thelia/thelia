@@ -31,15 +31,13 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
 
     /**
      * Calculate next position relative to our parent.
-     *
-     * @param BrandDocumentQuery $query
      */
-    protected function addCriteriaToPositionQuery($query): void
+    protected function addCriteriaToPositionQuery(BrandDocumentQuery $query): void
     {
         $query->filterByBrandId($this->getBrandId());
     }
 
-    public function preInsert(?ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): bool
     {
         parent::preInsert($con);
 
@@ -48,20 +46,20 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
         return true;
     }
 
-    public function preDelete(?ConnectionInterface $con = null)
+    public function preDelete(?ConnectionInterface $con = null): true
     {
         parent::preDelete($con);
 
         $this->reorderBeforeDelete(
             [
                 'brand_id' => $this->getBrandId(),
-            ]
+            ],
         );
 
         return true;
     }
 
-    public function setParentId($parentId)
+    public function setParentId(int $parentId): static
     {
         $this->setBrandId($parentId);
 
@@ -80,7 +78,6 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
 
     /**
      * Get the ID of the form used to change this object information.
-     *
      */
     public function getUpdateFormId(): string
     {
@@ -93,14 +90,14 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
     public function getUploadDir(): string
     {
         $uploadDir = ConfigQuery::read('documents_library_path');
-        $uploadDir = $uploadDir === null ? THELIA_LOCAL_DIR.'media'.DS.'documents' : THELIA_ROOT.$uploadDir;
+        $uploadDir = null === $uploadDir ? THELIA_LOCAL_DIR . 'media' . DS . 'documents' : THELIA_ROOT . $uploadDir;
 
-        return $uploadDir.DS.'brand';
+        return $uploadDir . DS . 'brand';
     }
 
     public function getRedirectionUrl(): string
     {
-        return '/admin/brand/update/'.$this->getBrandId();
+        return '/admin/brand/update/' . $this->getBrandId();
     }
 
     /**

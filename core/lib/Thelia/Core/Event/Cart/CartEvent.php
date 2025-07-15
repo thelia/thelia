@@ -21,17 +21,11 @@ use Thelia\Model\CartItem;
 class CartEvent extends ActionEvent
 {
     protected $quantity;
-
     protected $append;
-
     protected $newness;
-
     protected $productSaleElementsId;
-
     protected $product;
-
     protected $cartItem;
-
     protected $cartItemId;
 
     public function __construct(protected Cart $cart)

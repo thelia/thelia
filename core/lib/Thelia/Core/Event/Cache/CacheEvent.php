@@ -29,9 +29,6 @@ class CacheEvent extends ActionEvent
          * @var string cache directory
          */
         protected string $dir,
-        /**
-         * @since 2.4.0
-         */
         protected bool $onKernelTerminate = true,
     ) {
     }
@@ -48,17 +45,11 @@ class CacheEvent extends ActionEvent
         return $this->dir;
     }
 
-    /**
-     * @since 2.4.0
-     */
     public function isOnKernelTerminate(): bool
     {
         return $this->onKernelTerminate;
     }
 
-    /**
-     * @since 2.4.0
-     */
     public function setOnKernelTerminate(bool $onKernelTerminate): self
     {
         $this->onKernelTerminate = $onKernelTerminate;

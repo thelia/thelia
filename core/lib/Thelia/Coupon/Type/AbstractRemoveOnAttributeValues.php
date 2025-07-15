@@ -27,11 +27,9 @@ use Thelia\Model\CartItem;
 abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements AmountAndPercentageCouponInterface
 {
     public const ATTRIBUTES_AV_LIST = 'attribute_avs';
-
     public const ATTRIBUTE = 'attribute_id';
 
     public array $attributeAvList = [];
-
     public int $attribute = 0;
 
     /**

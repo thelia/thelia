@@ -35,7 +35,7 @@ trait BrandBreadcrumbTrait
             $breadcrumb[$brand->setLocale($locale)->getTitle()] = \sprintf(
                 '%s?current_tab=%s',
                 $router->generate('admin.brand.update', ['brand_id' => $brand->getId()], Router::ABSOLUTE_URL),
-                $tab
+                $tab,
             );
         }
 

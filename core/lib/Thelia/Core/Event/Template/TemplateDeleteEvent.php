@@ -17,7 +17,6 @@ namespace Thelia\Core\Event\Template;
 class TemplateDeleteEvent extends TemplateEvent
 {
     protected int $template_id;
-
     protected $product_count;
 
     public function __construct(int $template_id)

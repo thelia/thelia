@@ -21,8 +21,6 @@ use Symfony\Component\DependencyInjection\Definition;
 /**
  * Class AbastractAdminResourcesCompiler.
  *
- * @since 2.3
- *
  * @author Penalver Antony <apenalver@openstudio.fr>
  */
 abstract class AbstractAdminResourcesCompiler implements CompilerPassInterface

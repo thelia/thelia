@@ -96,7 +96,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
                 ->save();
 
             // Update rates when setting a new default currency
-            if ($event->getIsDefault() !== 0) {
+            if (0 !== $event->getIsDefault()) {
                 $updateRateEvent = new CurrencyUpdateRateEvent();
 
                 $dispatcher->dispatch($updateRateEvent, TheliaEvents::CURRENCY_UPDATE_RATES);

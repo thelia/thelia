@@ -95,13 +95,9 @@ use Thelia\Model\Map\FeatureTableMap;
 class Feature extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:feature:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:feature:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:feature:write';
-
     public const GROUP_FRONT_READ = 'front:feature:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:feature:read:single';
 
     #[Groups([

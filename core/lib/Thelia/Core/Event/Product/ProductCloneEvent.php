@@ -20,7 +20,6 @@ use Thelia\Model\Product;
 class ProductCloneEvent extends ActionEvent
 {
     protected Product $clonedProduct;
-
     protected array $types = ['images', 'documents'];
 
     /**

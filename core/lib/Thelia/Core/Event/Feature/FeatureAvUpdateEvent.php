@@ -17,11 +17,8 @@ namespace Thelia\Core\Event\Feature;
 class FeatureAvUpdateEvent extends FeatureAvCreateEvent
 {
     protected int $featureAv_id;
-
     protected $description;
-
     protected $chapo;
-
     protected $postscriptum;
 
     public function __construct(int $featureAv_id)

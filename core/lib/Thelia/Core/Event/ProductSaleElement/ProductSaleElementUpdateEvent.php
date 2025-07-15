@@ -19,31 +19,18 @@ use Thelia\Model\Product;
 class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 {
     protected int $product_sale_element_id;
-
     protected Product $product;
-
     protected string $reference;
-
     protected float $price;
-
     protected int $currency_id;
-
     protected float $weight;
-
     protected float $quantity;
-
     protected float $sale_price;
-
     protected int $onsale;
-
     protected int $isnew;
-
     protected bool $isdefault;
-
     protected string $ean_code;
-
     protected int $tax_rule_id;
-
     protected int $from_default_currency;
 
     /**

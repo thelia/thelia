@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Template\Loop;
 
-use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -47,7 +47,6 @@ use Thelia\Type\TypeCollection;
 class TaxRuleCountry extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $taxCountForOriginCountry;
-
     protected $timestampable = true;
 
     protected function getArgDefinitions(): ArgumentCollection
@@ -69,6 +68,7 @@ class TaxRuleCountry extends BaseI18nLoop implements PropelSearchLoopInterface
     {
         $ask = $this->getAsk();
         $search = TaxRuleCountryQuery::create();
+
         if ('countries' === $ask) {
             return $search;
         }
@@ -76,8 +76,6 @@ class TaxRuleCountry extends BaseI18nLoop implements PropelSearchLoopInterface
         $country = $this->getCountry();
         $state = $this->getState();
         $taxRule = $this->getTaxRule();
-
-
 
         $search->filterByCountryId($country);
         $search->filterByStateId($state);

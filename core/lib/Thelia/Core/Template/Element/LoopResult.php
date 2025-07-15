@@ -21,13 +21,9 @@ use Propel\Runtime\Util\PropelModelPager;
 class LoopResult implements \Iterator, \JsonSerializable
 {
     private int $position = 0;
-
     protected $collection = [];
-
     protected $versioned = false;
-
     protected $timestamped = false;
-
     protected $countable = false;
 
     public function __construct(public $resultsCollection)

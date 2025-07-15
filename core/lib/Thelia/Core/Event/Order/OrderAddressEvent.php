@@ -21,7 +21,6 @@ use Thelia\Model\OrderAddress;
 class OrderAddressEvent extends ActionEvent
 {
     protected OrderAddress $orderAddress;
-
     protected Order $order;
 
     /**

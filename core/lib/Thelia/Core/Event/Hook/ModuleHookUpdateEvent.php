@@ -22,7 +22,6 @@ namespace Thelia\Core\Event\Hook;
 class ModuleHookUpdateEvent extends ModuleHookCreateEvent
 {
     protected $module_hook_id;
-
     protected $active;
 
     /**

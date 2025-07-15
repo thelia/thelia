@@ -147,15 +147,10 @@ class Product extends AbstractTranslatableResource
     use UrlRewritingTrait;
 
     public const GROUP_ADMIN_READ = 'admin:product:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:product:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:product:write';
-
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:product:write:update';
-
     public const GROUP_FRONT_READ = 'front:product:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:product:read:single';
 
     #[Groups(

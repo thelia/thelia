@@ -21,7 +21,6 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 class OrderFilter extends AbstractFilter
 {
     public const DIRECTION_ASC = 'ASC';
-
     public const DIRECTION_DESC = 'DESC';
 
     public function apply(ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void

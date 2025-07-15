@@ -66,8 +66,6 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
 
     /**
      * For init an Request, if your command has need an Request.
-     *
-     * @since 2.3
      */
     protected function initRequest(?Lang $lang = null): void
     {
@@ -85,9 +83,6 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
         $this->getContainer()->get('router.admin')->setContext($requestContext);
     }
 
-    /**
-     * @since 2.3
-     */
     protected function getBaseUrl(?Lang $lang = null): string
     {
         $baseUrl = '';

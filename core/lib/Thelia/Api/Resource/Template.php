@@ -45,9 +45,7 @@ use Thelia\Model\Map\TemplateTableMap;
 class Template extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:template:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:template:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:template:write';
 
     #[Groups([self::GROUP_ADMIN_READ, Category::GROUP_ADMIN_READ, Category::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_READ, Product::GROUP_ADMIN_WRITE])]

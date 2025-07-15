@@ -21,7 +21,7 @@ class TokenProvider
     public function encodeKey(UserInterface $user): string
     {
         // Always set a new token in the user environment
-        $user->setToken(uniqid());
+        $user->setToken(uniqid('', true));
 
         return base64_encode(\sprintf("%s\0%s\0%s", $user->getUsername(), $user->getToken(), $user->getSerial()));
     }

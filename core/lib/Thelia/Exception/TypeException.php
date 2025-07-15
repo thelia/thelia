@@ -17,7 +17,6 @@ namespace Thelia\Exception;
 class TypeException extends \RuntimeException
 {
     public const UNKNOWN_EXCEPTION = 0;
-
     public const MODEL_NOT_FOUND = 404;
 
     public function __construct($message, $code = null, $previous = null)

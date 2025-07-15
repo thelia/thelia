@@ -21,7 +21,6 @@ use Thelia\Core\HttpFoundation\Request;
 class Translator extends BaseTranslator
 {
     public const GLOBAL_FALLBACK_DOMAIN = 'global';
-
     public const GLOBAL_FALLBACK_KEY = '%s.%s';
 
     protected static self $instance;
@@ -44,7 +43,7 @@ class Translator extends BaseTranslator
      */
     public static function getInstance(): self
     {
-        if (!self::$instance instanceof \Thelia\Core\Translation\Translator) {
+        if (!self::$instance instanceof self) {
             throw new \RuntimeException('Translator instance is not initialized.');
         }
 

@@ -22,15 +22,10 @@ class OrderStatus extends BaseOrderStatus
     use PositionManagementTrait;
 
     public const CODE_NOT_PAID = 'not_paid';
-
     public const CODE_PAID = 'paid';
-
     public const CODE_PROCESSING = 'processing';
-
     public const CODE_SENT = 'sent';
-
     public const CODE_CANCELED = 'canceled';
-
     public const CODE_REFUNDED = 'refunded';
 
     /**
@@ -41,7 +36,7 @@ class OrderStatus extends BaseOrderStatus
      *
      * @return bool true if NOT PAID, false otherwise
      */
-    public function isNotPaid($exact = true)
+    public function isNotPaid(bool $exact = true): bool
     {
         // return $this->hasStatusHelper(OrderStatus::CODE_NOT_PAID);
         if ($exact) {
@@ -59,12 +54,12 @@ class OrderStatus extends BaseOrderStatus
      *
      * @return bool true if PAID, false otherwise
      */
-    public function isPaid($exact = true)
+    public function isPaid(bool $exact = true): bool
     {
         return $this->hasStatusHelper(
             $exact ?
             self::CODE_PAID :
-            [self::CODE_PAID, self::CODE_PROCESSING, self::CODE_SENT]
+            [self::CODE_PAID, self::CODE_PROCESSING, self::CODE_SENT],
         );
     }
 
@@ -76,7 +71,7 @@ class OrderStatus extends BaseOrderStatus
      *
      * @return bool true if PROCESSING, false otherwise
      */
-    public function isProcessing($exact = true)
+    public function isProcessing(bool $exact = true): bool
     {
         return $this->hasStatusHelper(self::CODE_PROCESSING);
     }
@@ -89,7 +84,7 @@ class OrderStatus extends BaseOrderStatus
      *
      * @return bool true if SENT, false otherwise
      */
-    public function isSent($exact = true)
+    public function isSent(bool $exact = true): bool
     {
         return $this->hasStatusHelper(self::CODE_SENT);
     }
@@ -102,7 +97,7 @@ class OrderStatus extends BaseOrderStatus
      *
      * @return bool true if CANCELED, false otherwise
      */
-    public function isCancelled($exact = true)
+    public function isCancelled(bool $exact = true): bool
     {
         return $this->hasStatusHelper(self::CODE_CANCELED);
     }
@@ -115,7 +110,7 @@ class OrderStatus extends BaseOrderStatus
      *
      * @return bool true if REFUNDED, false otherwise
      */
-    public function isRefunded($exact = true)
+    public function isRefunded(bool $exact = true): bool
     {
         return $this->hasStatusHelper(self::CODE_REFUNDED);
     }
@@ -128,12 +123,12 @@ class OrderStatus extends BaseOrderStatus
      *
      * @return bool true if the current status is in the provided status, false otherwise
      */
-    public function hasStatusHelper($statusCode)
+    public function hasStatusHelper(string|array $statusCode): bool
     {
         if (\is_array($statusCode)) {
-            return \in_array($this->getCode(), $statusCode);
+            return \in_array($this->getCode(), $statusCode, true);
         }
 
-        return $this->getCode() == $statusCode;
+        return $this->getCode() === $statusCode;
     }
 }

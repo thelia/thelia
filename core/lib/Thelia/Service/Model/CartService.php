@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Service\Model;
 
-use Thelia\Model\OrderPostage;
 use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
@@ -40,6 +39,7 @@ use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponModule;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
+use Thelia\Model\OrderPostage;
 use Thelia\Model\State;
 use Thelia\Module\BaseModule;
 use Thelia\Module\Exception\DeliveryException;

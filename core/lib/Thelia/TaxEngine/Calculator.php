@@ -41,13 +41,9 @@ use Thelia\Tools\I18n;
 class Calculator
 {
     protected TaxRuleQuery $taxRuleQuery;
-
     protected ?ObjectCollection $taxRulesCollection = null;
-
     protected $product;
-
     protected $country;
-
     protected $state;
 
     public function __construct()
@@ -227,8 +223,6 @@ class Calculator
      * @return $this
      *
      * @throws PropelException
-     *
-     * @since 2.4
      */
     public function loadTaxRuleWithoutProduct(TaxRule $taxRule, Country $country, ?State $state = null): static
     {

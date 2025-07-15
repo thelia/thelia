@@ -109,7 +109,7 @@ class MailerFactory
         $storeEmail = ConfigQuery::getStoreEmail();
 
         if (!empty($storeEmail)) {
-            if ($to !== []) {
+            if ([] !== $to) {
                 try {
                     $instance = $this->createEmailMessage($messageCode, $from, $to, $messageParameters, $locale, $cc, $bcc, $replyTo);
 

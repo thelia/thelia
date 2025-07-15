@@ -41,7 +41,7 @@ class TaxRuleQuery extends BaseTaxRuleQuery
             '%s-%s-%s',
             $taxRule->getId(),
             ($country instanceof Country) ? $country->getId() : 0,
-            ($state instanceof State) ? $state->getId() : 0
+            ($state instanceof State) ? $state->getId() : 0,
         );
 
         if (\array_key_exists($key, self::$caches)) {

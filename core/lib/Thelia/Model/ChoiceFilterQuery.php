@@ -28,12 +28,11 @@ use Thelia\Model\Base\ChoiceFilterQuery as BaseChoiceFilterQuery;
 class ChoiceFilterQuery extends BaseChoiceFilterQuery
 {
     /**
-     * @param int $templateId
      * @param string[] list of locale
      *
      * @return Attribute[]|ObjectCollection
      */
-    public static function findAttributesByTemplateId($templateId, $locales = ['en_US']): ObjectCollection|array
+    public static function findAttributesByTemplateId(int $templateId, $locales = ['en_US']): ObjectCollection|array
     {
         $attributeQuery = AttributeQuery::create();
 
@@ -44,9 +43,9 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
         $attributeQuery->useAttributeI18nQuery(null, Criteria::LEFT_JOIN)
             ->endUse();
 
-        $locales = array_map(fn ($value): string => '"'.$value.'"', $locales);
+        $locales = array_map(static fn ($value): string => '"' . $value . '"', $locales);
 
-        $attributeQuery->addJoinCondition('AttributeI18n', 'AttributeI18n.locale IN ('.implode(',', $locales).')');
+        $attributeQuery->addJoinCondition('AttributeI18n', 'AttributeI18n.locale IN (' . implode(',', $locales) . ')');
 
         $attributeQuery->withColumn('AttributeI18n.title', 'Title');
         $attributeQuery->withColumn('AttributeTemplate.position', 'Position');
@@ -59,12 +58,11 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
     }
 
     /**
-     * @param int $templateId
      * @param string[] list of locale
      *
      * @return Feature[]|ObjectCollection
      */
-    public static function findFeaturesByTemplateId($templateId, $locales = ['en_US']): ObjectCollection|array
+    public static function findFeaturesByTemplateId(int $templateId, $locales = ['en_US']): ObjectCollection|array
     {
         $featureQuery = FeatureQuery::create();
 
@@ -75,9 +73,9 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
         $featureQuery->useFeatureI18nQuery(null, Criteria::LEFT_JOIN)
             ->endUse();
 
-        $locales = array_map(fn ($value): string => '"'.$value.'"', $locales);
+        $locales = array_map(static fn ($value): string => '"' . $value . '"', $locales);
 
-        $featureQuery->addJoinCondition('FeatureI18n', 'FeatureI18n.locale IN ('.implode(',', $locales).')');
+        $featureQuery->addJoinCondition('FeatureI18n', 'FeatureI18n.locale IN (' . implode(',', $locales) . ')');
 
         $featureQuery->withColumn('FeatureI18n.title', 'Title');
         $featureQuery->withColumn('FeatureTemplate.position', 'Position');
@@ -95,6 +93,7 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
     protected static function getParentCategoriesHasTemplate(Category $category): array
     {
         $categories = [];
+
         if (0 !== (int) $category->getParent()) {
             $category = CategoryQuery::create()->filterById($category->getParent())->findOne();
 

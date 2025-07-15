@@ -22,15 +22,10 @@ namespace Thelia\Core\Event\Hook;
 class HookCreateEvent extends HookEvent
 {
     protected string $locale;
-
     protected string $code;
-
     protected int $type;
-
     protected string $title;
-
     protected int $native;
-
     protected int $active;
 
     /**

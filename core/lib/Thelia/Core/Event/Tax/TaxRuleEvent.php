@@ -20,17 +20,11 @@ use Thelia\Model\TaxRule;
 class TaxRuleEvent extends ActionEvent
 {
     protected $locale;
-
     protected $id;
-
     protected $title;
-
     protected $description;
-
     protected $countryList;
-
     protected $countryDeletedList;
-
     protected $taxList;
 
     public function __construct(protected ?TaxRule $taxRule = null)

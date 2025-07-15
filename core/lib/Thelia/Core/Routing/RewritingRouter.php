@@ -42,7 +42,6 @@ use Thelia\Tools\URL;
 class RewritingRouter implements RouterInterface, RequestMatcherInterface
 {
     protected RequestContext $context;
-
     protected array $options;
 
     public function match(string $pathinfo): array

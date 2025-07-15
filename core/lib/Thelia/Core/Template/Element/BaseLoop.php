@@ -56,43 +56,29 @@ use Thelia\Type\TypeCollection;
 abstract class BaseLoop implements LoopInterface
 {
     protected ?string $loopName = null;
-
     protected static ?array $loopDefinitions = null;
 
     /** @var ArgumentCollection[] cache for loop arguments (class => ArgumentCollection) */
     protected static array $loopDefinitionsArgs = [];
 
     protected ContainerInterface $container;
-
     protected Request $request;
-
     protected EventDispatcherInterface $dispatcher;
-
     protected SecurityContext $securityContext;
-
     protected ArgumentCollection $args;
-
     protected $countable = true;
-
     protected $timestampable = false;
-
     protected $versionable = false;
-
     protected Translator $translator;
-
     private static array $cacheLoopResult = [];
-
     private static array $cacheLoopPagination = [];
-
     private static array $cacheCount = [];
 
     /** @var array cache of event to dispatch */
     protected static array $dispatchCache = [];
 
     protected RequestStack $requestStack;
-
     protected array $theliaParserLoops;
-
     protected string $kernelEnvironment;
 
     public function init(
@@ -504,7 +490,6 @@ abstract class BaseLoop implements LoopInterface
             $searchArray = $this->extendsBuildArray($this->buildArray());
 
             $results = $this->searchArray($searchArray);
-
         }
 
         $loopResult = new LoopResult($results);
@@ -714,9 +699,6 @@ abstract class BaseLoop implements LoopInterface
         return $this->loopName;
     }
 
-    /**
-     * @since 2.3
-     */
     protected function getCurrentRequest(): \Symfony\Component\HttpFoundation\Request
     {
         return $this->requestStack->getCurrentRequest();

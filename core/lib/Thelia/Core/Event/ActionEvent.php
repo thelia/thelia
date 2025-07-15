@@ -37,8 +37,6 @@ abstract class ActionEvent extends Event
         if (\array_key_exists($name, $this->parameters)) {
             return $this->parameters[$name];
         }
-
-        return null;
     }
 
     public function bindForm(Form $form): void

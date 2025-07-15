@@ -65,8 +65,6 @@ class ArgumentCollection implements \Iterator
 
     /**
      * @param array $argumentNames array with names of arguments to remove
-     *
-     * @since 2.2.0-beta1
      */
     public function removeArguments(array $argumentNames): static
     {
@@ -79,8 +77,6 @@ class ArgumentCollection implements \Iterator
 
     /**
      * @param string $argumentName name of the argument to remove
-     *
-     * @since 2.2.0-beta1
      */
     public function removeArgument(string $argumentName): static
     {

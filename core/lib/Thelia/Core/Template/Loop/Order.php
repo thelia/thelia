@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Template\Loop;
 
-use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -58,9 +58,7 @@ use Thelia\Type\TypeCollection;
 class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInterface
 {
     protected $countable = true;
-
     protected $timestampable = true;
-
     protected $versionable = false;
 
     protected function getArgDefinitions(): ArgumentCollection

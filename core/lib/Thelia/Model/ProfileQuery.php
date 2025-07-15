@@ -31,6 +31,7 @@ class ProfileQuery extends BaseProfileQuery
         $profileList = [
             AdminResources::SUPERADMINISTRATOR => 0,
         ];
+
         foreach (self::create()->find() as $profile) {
             $profileList[$profile->getCode()] = $profile->getId();
         }

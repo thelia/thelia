@@ -23,7 +23,7 @@ use Thelia\Model\Map\CountryTableMap;
 
 class Country extends BaseCountry
 {
-    protected static $defaultCountry;
+    protected static ?Country $defaultCountry = null;
 
     /**
      * get a regex pattern according to the zip code format field
@@ -37,7 +37,7 @@ class Country extends BaseCountry
      * @return string|null will return a regex to match the zip code, otherwise null will be return
      *                     if zip code format is not defined
      */
-    public function getZipCodeRE()
+    public function getZipCodeRE(): ?string
     {
         $zipCodeFormat = $this->getZipCodeFormat();
 
@@ -54,7 +54,7 @@ class Country extends BaseCountry
             ' ' => ' +',
         ];
 
-        return '#^'.strtr($zipCodeRE, $trans).'$#';
+        return '#^' . strtr($zipCodeRE, $trans) . '$#';
     }
 
     /**
@@ -63,14 +63,13 @@ class Country extends BaseCountry
      *
      * @deprecated a country may belong to several Areas (shipping zones). Use CountryArea queries instead
      */
-    public function getAreaId()
+    public function getAreaId(): ?int
     {
         $firstAreaCountry = CountryAreaQuery::create()->findOneByCountryId($this->getId());
 
         if (null !== $firstAreaCountry) {
             return $firstAreaCountry->getAreaId();
         }
-
         return null;
     }
 
@@ -83,7 +82,7 @@ class Country extends BaseCountry
      */
     public function toggleDefault(): void
     {
-        if ($this->getId() === null) {
+        if (null === $this->getId()) {
             throw new \RuntimeException('impossible to just uncheck default country, choose a new one');
         }
 
@@ -102,11 +101,12 @@ class Country extends BaseCountry
             $con->commit();
         } catch (PropelException $propelException) {
             $con->rollBack();
+
             throw $propelException;
         }
     }
 
-    public function preDelete(?ConnectionInterface $con = null)
+    public function preDelete(?ConnectionInterface $con = null): bool
     {
         parent::preDelete($con);
 
@@ -146,7 +146,8 @@ class Country extends BaseCountry
         }
 
         $shopCountry = CountryQuery::create()->findPk($countryId);
-        if ($shopCountry === null) {
+
+        if (null === $shopCountry) {
             throw new \LogicException(Translator::getInstance()->trans('Cannot find the shop country. Please select a shop country.'));
         }
 

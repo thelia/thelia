@@ -70,9 +70,7 @@ class OrderCoupon implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:order_coupon:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order_coupon:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:order_coupon:write';
 
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, Order::GROUP_FRONT_READ_SINGLE])]

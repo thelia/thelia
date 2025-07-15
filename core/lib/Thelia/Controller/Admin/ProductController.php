@@ -1296,8 +1296,6 @@ class ProductController extends AbstractSeoCrudController
 
     /**
      * Invoked through Ajax; this method calculates the taxed price from the untaxed price, and vice versa.
-     *
-     * @since version 2.2
      */
     public function priceCalculator(): JsonResponse
     {

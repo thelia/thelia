@@ -14,11 +14,11 @@ declare(strict_types=1);
 
 namespace Thelia\Controller\Admin;
 
-use Symfony\Contracts\EventDispatcher\Event;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Folder\FolderCreateEvent;

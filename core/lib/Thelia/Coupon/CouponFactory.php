@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Coupon;
 
-use Thelia\Model\Customer;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Coupon\Type\CouponInterface;
@@ -25,6 +24,7 @@ use Thelia\Exception\InactiveCouponException;
 use Thelia\Exception\InvalidConditionException;
 use Thelia\Exception\UnmatchableConditionException;
 use Thelia\Model\Coupon;
+use Thelia\Model\Customer;
 
 /**
  * Generate a CouponInterface.

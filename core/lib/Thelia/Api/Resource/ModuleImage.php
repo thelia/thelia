@@ -127,17 +127,11 @@ use Thelia\Model\Map\ModuleImageTableMap;
 class ModuleImage extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     public const GROUP_ADMIN_READ = 'admin:module_image:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:module_image:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:module_image:write';
-
     public const GROUP_ADMIN_WRITE_FILE = 'admin:module_image:write_file';
-
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:module_image:write_update';
-
     public const GROUP_FRONT_READ = 'front:module_image:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:module_image:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ])]

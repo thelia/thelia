@@ -25,11 +25,8 @@ use Thelia\Core\Serializer\AbstractSerializer;
 class XMLSerializer extends AbstractSerializer
 {
     private readonly XmlEncoder $xmlEncoder;
-
     private int|bool|null $xmlDataStart = null;
-
     private string $rootNodeName = 'root';
-
     private string $dataNodeName = 'data';
 
     /**

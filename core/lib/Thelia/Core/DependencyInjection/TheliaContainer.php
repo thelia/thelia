@@ -23,8 +23,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * Class TheliaContainer
  *
  * @author Gilles Bourgeat <manu@raynaud.io>
- *
- * @since 2.3
  */
 class TheliaContainer extends Container
 {

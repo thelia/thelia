@@ -37,8 +37,6 @@ class EnumListType extends BaseType
 
     /**
      * @param array|\Traversable $values
-     *
-     * @since 2.3.0
      */
     public function addValues(iterable $values): void
     {

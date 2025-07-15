@@ -29,7 +29,6 @@ use Thelia\Core\Security\Exception\TokenAuthenticationException;
 class TokenProvider
 {
     protected ?string $token = null;
-
     protected ?SessionInterface $session = null;
 
     public function __construct(

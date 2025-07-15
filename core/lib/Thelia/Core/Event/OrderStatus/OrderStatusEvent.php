@@ -25,21 +25,13 @@ use Thelia\Model\OrderStatus;
 class OrderStatusEvent extends ActionEvent
 {
     protected string $code;
-
     protected string $title;
-
     protected string $description;
-
     protected string $chapo;
-
     protected string $postscriptum;
-
     protected string $color;
-
     protected string $locale = 'en_US';
-
     protected OrderStatus $orderStatus;
-
     protected int $position;
 
     public function getPosition(): int

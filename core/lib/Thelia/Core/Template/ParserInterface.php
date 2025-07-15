@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template;
 
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
-use Thelia\Core\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 
 #[AutoconfigureTag('thelia.parser.template')]
@@ -70,7 +70,7 @@ interface ParserInterface
     /**
      * Returns the request used by the parser.
      */
-    public function getRequest(): Request;
+    public function getRequest(): ?Request;
 
     /**
      * Set a new template definition, and save the current one.

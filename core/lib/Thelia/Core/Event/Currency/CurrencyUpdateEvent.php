@@ -17,7 +17,6 @@ namespace Thelia\Core\Event\Currency;
 class CurrencyUpdateEvent extends CurrencyCreateEvent
 {
     protected int $is_default;
-
     protected int $visible;
 
     public function __construct(int $currencyId)

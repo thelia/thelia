@@ -29,19 +29,12 @@ use Thelia\Model\RewritingUrlQuery;
 class RewritingResolver
 {
     protected ?RewritingArgument $search = null;
-
     protected ?RewritingUrlQuery $rewritingUrlQuery = null;
-
     public mixed $view;
-
     public mixed $viewId;
-
     public mixed $locale;
-
     public mixed $otherParameters;
-
     public mixed $redirectedToUrl;
-
     public ?string $rewrittenUrl = null;
 
     public function __construct($url = null)

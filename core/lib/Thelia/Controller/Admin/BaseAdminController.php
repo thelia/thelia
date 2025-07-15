@@ -33,7 +33,6 @@ use Thelia\Tools\URL;
 class BaseAdminController extends BaseController
 {
     public const CONTROLLER_TYPE = 'admin';
-
     public const TEMPLATE_404 = '404';
 
     protected string $currentRouter = 'router.admin';

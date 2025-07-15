@@ -22,25 +22,15 @@ namespace Thelia\Core\Event\Lang;
 class LangCreateEvent extends LangEvent
 {
     protected $title;
-
     protected $code;
-
     protected $locale;
-
     protected $date_time_format;
-
     protected $date_format;
-
     protected $time_format;
-
     protected $decimal_separator;
-
     protected $thousands_separator;
-
     protected $decimals;
-
     protected bool $active;
-
     protected bool $visible;
 
     /**

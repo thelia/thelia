@@ -95,7 +95,6 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     use StandardI18nFieldsSearchTrait;
 
     protected $timestampable = true;
-
     protected $versionable = true;
 
     public function __construct(

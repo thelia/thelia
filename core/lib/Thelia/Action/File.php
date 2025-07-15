@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
-use Thelia\Files\FileModelInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -22,6 +21,7 @@ use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
+use Thelia\Files\FileModelInterface;
 use Thelia\Log\Tlog;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductDocumentI18n;

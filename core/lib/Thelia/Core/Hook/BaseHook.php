@@ -52,30 +52,20 @@ abstract class BaseHook implements BaseHookInterface
     public const INJECT_TEMPLATE_METHOD_NAME = 'insertTemplate';
 
     public ?BaseModule $module = null;
-
     protected array $templates = [];
-
     public TranslatorInterface $translator;
-
     protected ?Request $request = null;
-
     protected ?Session $session = null;
-
     protected ?Customer $customer = null;
-
     protected ?Cart $cart = null;
-
     protected ?Order $order = null;
-
     protected ?Lang $lang = null;
-
     protected ?Currency $currency = null;
 
     #[Required]
     public ContainerInterface $container;
 
     public ?EventDispatcherInterface $dispatcher = null;
-
     public ?ParserResolver $parserResolver = null;
 
     public function __construct(

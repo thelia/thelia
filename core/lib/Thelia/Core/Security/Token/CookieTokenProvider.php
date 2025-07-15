@@ -25,8 +25,6 @@ class CookieTokenProvider
             // Create the authenticator
             return $request->cookies->get($cookieName);
         }
-
-        return null;
     }
 
     public function createCookie(UserInterface $user, $cookieName, $cookieExpires): void

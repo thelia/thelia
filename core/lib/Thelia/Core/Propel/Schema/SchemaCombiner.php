@@ -19,14 +19,10 @@ namespace Thelia\Core\Propel\Schema;
  */
 class SchemaCombiner
 {
-    /**
-     * XML header version attribute for the generated schema documents.
-     */
+    /** XML header version attribute for the generated schema documents. */
     protected static string $GLOBAL_SCHEMA_XML_VERSION = '1.0';
 
-    /**
-     * XML header encoding attribute for the generated schema documents.
-     */
+    /** XML header encoding attribute for the generated schema documents. */
     protected static string $GLOBAL_SCHEMA_XML_ENCODING = 'UTF-8';
 
     /**
@@ -55,19 +51,13 @@ class SchemaCombiner
      */
     protected array $databases = [];
 
-    /**
-     * Map of [database name => global database \DOMElement for that database].
-     */
+    /** Map of [database name => global database \DOMElement for that database]. */
     protected array $globalDatabaseElements = [];
 
-    /**
-     * Map of [database name => [source database \DOMElement combined for this database]].
-     */
+    /** Map of [database name => [source database \DOMElement combined for this database]]. */
     protected array $sourceDatabaseElements = [];
 
-    /**
-     * Map of [database name => [external-schema database \DOMElement included for this database]].
-     */
+    /** Map of [database name => [external-schema database \DOMElement included for this database]]. */
     protected array $externalSchemaDatabaseElements = [];
 
     /**

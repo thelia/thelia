@@ -30,7 +30,7 @@ class AttributeAv extends BaseAttributeAv
         $query->filterByAttributeId($this->getAttributeId());
     }
 
-    public function preInsert(?ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): bool
     {
         parent::preInsert($con);
 

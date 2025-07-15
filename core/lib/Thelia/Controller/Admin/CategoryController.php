@@ -168,6 +168,7 @@ class CategoryController extends AbstractSeoCrudController
     protected function getObjectLabel(ActiveRecordInterface $object): string
     {
         \assert($object instanceof Category);
+
         return $object->getTitle();
     }
 

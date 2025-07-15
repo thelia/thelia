@@ -50,10 +50,8 @@ class ModuleQuery extends BaseModuleQuery
     /**
      * @param int $moduleType the module type : classic, payment or delivery. Use BaseModule constant here.
      * @param int $id         the module id
-     *
-     * @return ModuleQuery
      */
-    public function filterActivatedByTypeAndId($moduleType, $id)
+    public function filterActivatedByTypeAndId(int $moduleType, int $id): self
     {
         return $this
             ->filterByType($moduleType)
@@ -71,13 +69,12 @@ class ModuleQuery extends BaseModuleQuery
      *
      * @return false|BaseModule[]
      */
-    public function retrieveVirtualProductDelivery(?ContainerInterface $container = null)
+    public function retrieveVirtualProductDelivery(?ContainerInterface $container = null): bool|array
     {
         $modules = $this
             ->filterByType(BaseModule::DELIVERY_MODULE_TYPE)
             ->filterByActivate(BaseModule::IS_ACTIVATED)
-            ->find()
-        ;
+            ->find();
 
         $result = [];
 
@@ -90,11 +87,11 @@ class ModuleQuery extends BaseModuleQuery
                     $result[] = $instance;
                 }
             } catch (\Exception $ex) {
-                Tlog::getInstance()->addError('Failed to instantiate module '.$module->getCode(), $ex);
+                Tlog::getInstance()->addError('Failed to instantiate module ' . $module->getCode(), $ex);
             }
         }
 
-        return $result === [] ? false : $result;
+        return [] === $result ? false : $result;
     }
 }
 

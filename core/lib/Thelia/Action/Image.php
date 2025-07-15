@@ -66,9 +66,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 {
     // Resize mode constants
     public const EXACT_RATIO_WITH_BORDERS = 1;
-
     public const EXACT_RATIO_WITH_CROP = 2;
-
     public const KEEP_IMAGE_RATIO = 3;
 
     /**
@@ -95,7 +93,6 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     {
         $subdir = $event->getCacheSubdirectory();
         $sourceFile = $event->getSourceFilepath();
-
         $imageExt = pathinfo($sourceFile, PATHINFO_EXTENSION);
 
         if (null === $sourceFile) {
@@ -104,13 +101,11 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
         // Find cached file path
         $cacheFilePath = $this->getCacheFilePath($subdir, $sourceFile, $event->isOriginalImage(), $event->getOptionsHash());
-
         // Alternative image path is for browser that don't support webp
         $alternativeImagePath = null;
 
-        if ($event->getFormat() !== '' && $event->getFormat() !== '0') {
+        if ('' !== (string) $event->getFormat() && '0' !== $event->getFormat()) {
             $sourceExtension = pathinfo($cacheFilePath, PATHINFO_EXTENSION);
-
             if ('webp' === $event->getFormat()) {
                 $alternativeImagePath = $cacheFilePath;
             }
@@ -161,8 +156,8 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                         $svg->setAttribute('viewBox', $viewBox);
                     }
 
-                    $svg->setAttribute('width', $event->getWidth());
-                    $svg->setAttribute('height', $event->getWidth());
+                    $svg->setAttribute('width', (string)$event->getWidth());
+                    $svg->setAttribute('height', (string)$event->getWidth());
                     $dom->save($cacheFilePath);
                 } else {
                     $this->applyTransformation($sourceFile, $event, $dispatcher, $cacheFilePath);
@@ -250,7 +245,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             $image,
             $event->getWidth(),
             $event->getHeight(),
-            $event->getResizeMode(),
+            (int)$event->getResizeMode(),
             $bg_color,
             $event->getAllowZoom(),
         );
@@ -265,7 +260,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         // Flip
         // Process each effects
         foreach ($event->getEffects() as $effect) {
-            $effect = trim(strtolower((string) $effect));
+            $effect = strtolower(trim((string)$effect));
 
             $params = explode(':', $effect);
 
@@ -357,6 +352,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $width_orig = $image->getSize()->getWidth();
         $height_orig = $image->getSize()->getHeight();
         $ratio = $width_orig / $height_orig;
+
         if (null === $dest_width) {
             $dest_width = $dest_height * $ratio;
         }
@@ -375,6 +371,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $delta_y = 0;
         $border_width = 0;
         $border_height = 0;
+
         if ($width_diff > 1 && $height_diff > 1) {
             // Set the default final size. If zoom is allowed, we will get the required
             // image dimension. Otherwise, the final image may be smaller than required.
@@ -436,6 +433,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             ? ImageInterface::FILTER_LANCZOS
             : ImageInterface::FILTER_UNDEFINED;
         $image->resize(new Box($resize_width, $resize_height), $resizeFilter);
+
         if (self::EXACT_RATIO_WITH_BORDERS === $resize_mode) {
             $border_width = (int) (($dest_width - $resize_width) / 2);
             $border_height = (int) (($dest_height - $resize_height) / 2);

@@ -25,11 +25,8 @@ use Symfony\Contracts\Service\Attribute\Required;
 trait ParserTemplateTrait
 {
     protected array $tplStack = [];
-
     protected ?TemplateDefinition $templateDefinition = null;
-
     protected bool $fallbackToDefaultTemplate = false;
-
     protected int $status = 200;
 
     #[Required]
@@ -84,7 +81,7 @@ trait ParserTemplateTrait
         }
     }
 
-    public function getTemplateDefinition($webAssetTemplateName = false): ?TemplateDefinition
+    public function getTemplateDefinition(string|bool $webAssetTemplateName = false): TemplateDefinition
     {
         return $this->templateDefinition;
     }

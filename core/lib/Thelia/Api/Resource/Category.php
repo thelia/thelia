@@ -99,13 +99,9 @@ class Category extends AbstractTranslatableResource
     use UrlRewritingTrait;
 
     public const GROUP_ADMIN_READ = 'admin:category:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:category:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:category:write';
-
     public const GROUP_FRONT_READ = 'front:category:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:category:read:single';
 
     #[Groups([

@@ -24,7 +24,6 @@ use Iterator;
 class FragmentBag implements \Iterator
 {
     private int $position = 0;
-
     protected array $fragments = [];
 
     /**

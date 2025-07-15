@@ -43,7 +43,7 @@ class Tax extends BaseTax
         try {
             $taxRuleCountryPosition = $this->getVirtualColumn(TaxRuleQuery::ALIAS_FOR_TAX_RULE_COUNTRY_POSITION);
         } catch (PropelException) {
-            throw new PropelException('Virtual column `'.TaxRuleQuery::ALIAS_FOR_TAX_RULE_COUNTRY_POSITION.'` does not exist in Tax::getTaxRuleCountryPosition');
+            throw new PropelException('Virtual column `' . TaxRuleQuery::ALIAS_FOR_TAX_RULE_COUNTRY_POSITION . '` does not exist in Tax::getTaxRuleCountryPosition');
         }
 
         return $taxRuleCountryPosition;
@@ -58,7 +58,7 @@ class Tax extends BaseTax
         $typeService = $taxEvent->getTaxTypeService();
 
         if (!$typeService instanceof TaxTypeInterface) {
-            throw new TaxEngineException('Recorded type `'.$this->getType().'` does not exists', TaxEngineException::BAD_RECORDED_TYPE);
+            throw new TaxEngineException('Recorded type `' . $this->getType() . '` does not exists', TaxEngineException::BAD_RECORDED_TYPE);
         }
 
         $typeService->loadRequirements($this->getRequirements());
@@ -73,9 +73,9 @@ class Tax extends BaseTax
 
     public function getRequirements()
     {
-        $requirements = json_decode(base64_decode(parent::getSerializedRequirements()), true);
+        $requirements = json_decode(base64_decode(parent::getSerializedRequirements(), true), true);
 
-        if (json_last_error() != \JSON_ERROR_NONE || !\is_array($requirements)) {
+        if (JSON_ERROR_NONE !== json_last_error() || !\is_array($requirements)) {
             throw new TaxEngineException('BAD RECORDED REQUIREMENTS', TaxEngineException::BAD_RECORDED_REQUIREMENTS);
         }
 

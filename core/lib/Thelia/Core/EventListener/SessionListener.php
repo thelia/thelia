@@ -37,6 +37,10 @@ class SessionListener implements EventSubscriberInterface
 
     public function prodSession(SessionEvent $event): void
     {
+        if (PHP_SESSION_ACTIVE === session_status()) {
+            session_write_close();
+        }
+
         $storage = new NativeSessionStorage(
             ['cookie_lifetime' => ConfigQuery::read('session_config.lifetime', 0)],
         );

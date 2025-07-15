@@ -27,5 +27,5 @@ interface BreadcrumbInterface
      *
      * @return array an array of (label => URL)
      */
-    public function getBreadcrumb(Router $router, $tab, $locale);
+    public function getBreadcrumb(Router $router, string $tab, string $locale): array;
 }

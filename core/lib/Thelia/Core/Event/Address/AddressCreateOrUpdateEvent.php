@@ -26,7 +26,6 @@ use Thelia\Model\Customer;
 class AddressCreateOrUpdateEvent extends ActionEvent
 {
     protected Customer $customer;
-
     protected Address $address;
 
     /**

@@ -32,7 +32,7 @@ class Admin extends BaseAdmin implements UserInterface, SecurityUserInterface, P
 {
     use UserPermissionsTrait;
 
-    public function preInsert(?ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): bool
     {
         parent::preInsert($con);
 
@@ -44,14 +44,14 @@ class Admin extends BaseAdmin implements UserInterface, SecurityUserInterface, P
 
     public function setPassword($password)
     {
-        if ($this->isNew() && ($password === null || trim($password) === '')) {
+        if ($this->isNew() && (null === $password || '' === trim($password))) {
             throw new \InvalidArgumentException('customer password is mandatory on creation');
         }
 
-        if ($password !== null && trim($password) !== '') {
+        if (null !== $password && '' !== trim($password)) {
             $this->setAlgo('PASSWORD_BCRYPT');
 
-            return parent::setPassword(password_hash($password, \PASSWORD_BCRYPT));
+            return parent::setPassword(password_hash($password, PASSWORD_BCRYPT));
         }
 
         return $this;

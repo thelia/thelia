@@ -48,14 +48,10 @@ use Thelia\Log\Tlog;
 
 /**
  * Propel cache and initialization service.
- *
- * @since 2.4
  */
 class PropelInitService
 {
-    /**
-     * Name of the Propel initialization file.
-     */
+    /** Name of the Propel initialization file. */
     protected static string $PROPEL_CONFIG_CACHE_FILENAME = 'propel.init.php';
 
     /**

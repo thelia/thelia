@@ -73,13 +73,9 @@ use Thelia\Model\Map\TaxRuleTableMap;
 class TaxRule extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:tax_rule:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:tax_rule:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:tax_rule:write';
-
     public const GROUP_FRONT_READ = 'front:tax_rule:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:tax_rule:read:single';
 
     #[Groups([

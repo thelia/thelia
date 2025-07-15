@@ -17,7 +17,6 @@ namespace Thelia\Core\Event\FeatureProduct;
 class FeatureProductUpdateEvent extends FeatureProductEvent
 {
     protected $is_text_value;
-
     protected $locale;
 
     /**

@@ -94,9 +94,7 @@ use Thelia\Model\Map\CurrencyTableMap;
 class Currency extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:currency:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:currency:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:currency:write';
 
     #[Groups([

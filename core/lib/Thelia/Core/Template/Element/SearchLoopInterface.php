@@ -22,9 +22,7 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 interface SearchLoopInterface
 {
     public const MODE_ANY_WORD = 'any_word';
-
     public const MODE_SENTENCE = 'sentence';
-
     public const MODE_STRICT_SENTENCE = 'strict_sentence';
 
     /**

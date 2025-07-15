@@ -27,7 +27,6 @@ use Thelia\Model\Exception\InvalidArgumentException;
 class OrderStatusQuery extends BaseOrderStatusQuery
 {
     protected static $statusIdListsCache = [];
-
     protected static $statusModelCache = [];
 
     public static function getNotPaidStatus()
@@ -71,60 +70,48 @@ class OrderStatusQuery extends BaseOrderStatusQuery
 
     /**
      * Return the list of order status IDs for which an order is considered as not paid.
-     *
-     * @return array
      */
-    public static function getNotPaidStatusIdList()
+    public static function getNotPaidStatusIdList(): array
     {
         return self::getStatusIdList(OrderStatus::CODE_NOT_PAID);
     }
 
     /**
      * Return the list of order status IDs for which an order is considered as paid.
-     *
-     * @return array
      */
-    public static function getPaidStatusIdList()
+    public static function getPaidStatusIdList(): array
     {
         return self::getStatusIdList(OrderStatus::CODE_PAID);
     }
 
     /**
      * Return the list of order status IDs for which an order is considered as in process.
-     *
-     * @return array
      */
-    public static function getProcessingStatusIdList()
+    public static function getProcessingStatusIdList(): array
     {
         return self::getStatusIdList(OrderStatus::CODE_PROCESSING);
     }
 
     /**
      * Return the list of order status IDs for which an order is considered as sent.
-     *
-     * @return array
      */
-    public static function getSentStatusIdList()
+    public static function getSentStatusIdList(): array
     {
         return self::getStatusIdList(OrderStatus::CODE_SENT);
     }
 
     /**
      * Return the list of order status IDs for which an order is considered as canceled.
-     *
-     * @return array
      */
-    public static function getCanceledStatusIdList()
+    public static function getCanceledStatusIdList(): array
     {
         return self::getStatusIdList(OrderStatus::CODE_CANCELED);
     }
 
     /**
      * Return the list of order status IDs for which an order is considered as refunded.
-     *
-     * @return array
      */
-    public static function getRefundedStatusIdList()
+    public static function getRefundedStatusIdList(): array
     {
         return self::getStatusIdList(OrderStatus::CODE_REFUNDED);
     }
@@ -133,10 +120,8 @@ class OrderStatusQuery extends BaseOrderStatusQuery
      * Return a list of status IDs which match $statusCode value.
      *
      * @param string $statusCode the satus code
-     *
-     * @return array
      */
-    public static function getStatusIdList($statusCode)
+    public static function getStatusIdList(string $statusCode): array
     {
         if (!isset(self::$statusIdListsCache[$statusCode])) {
             $statusIdList = [];

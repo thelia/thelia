@@ -22,27 +22,16 @@ namespace Thelia\Module\Validator;
 class ModuleDefinition
 {
     protected string $code;
-
     protected string $namespace;
-
     protected string $type;
-
     protected string $logo;
-
     protected array $languages = [];
-
     protected array $descriptives = [];
-
     protected string $theliaVersion;
-
     protected string $version;
-
     protected array $dependencies = [];
-
     protected string $documentation;
-
     protected string $stability;
-
     protected array $authors = [];
 
     public function getAuthors(): array

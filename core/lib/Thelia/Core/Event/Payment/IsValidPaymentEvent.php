@@ -25,9 +25,7 @@ use Thelia\Module\PaymentModuleInterface;
 class IsValidPaymentEvent extends BasePaymentEvent
 {
     protected bool $validModule = false;
-
     protected float $minimumAmount;
-
     protected float $maximumAmount;
 
     /**

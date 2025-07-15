@@ -39,18 +39,12 @@ class ProductPriceTools
     ) {
     }
 
-    /**
-     * @return float
-     */
-    public function getPrice()
+    public function getPrice(): float
     {
         return $this->price;
     }
 
-    /**
-     * @return float
-     */
-    public function getPromoPrice()
+    public function getPromoPrice(): float
     {
         return $this->promoPrice;
     }

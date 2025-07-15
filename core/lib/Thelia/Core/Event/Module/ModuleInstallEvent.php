@@ -26,7 +26,6 @@ use Thelia\Module\Validator\ModuleDefinition;
 class ModuleInstallEvent extends ActionEvent
 {
     protected ModuleDefinition $moduleDefinition;
-
     protected string $modulePath;
 
     public function __construct(protected ?Module $module = null)

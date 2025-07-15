@@ -30,7 +30,7 @@ class ProductAssociatedContent extends BaseProductAssociatedContent
         $query->filterByProductId($this->getProductId());
     }
 
-    public function preInsert(?ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): bool
     {
         parent::preInsert($con);
 

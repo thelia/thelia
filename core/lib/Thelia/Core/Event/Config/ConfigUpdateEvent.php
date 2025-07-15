@@ -17,11 +17,8 @@ namespace Thelia\Core\Event\Config;
 class ConfigUpdateEvent extends ConfigCreateEvent
 {
     protected int $config_id;
-
     protected $description;
-
     protected $chapo;
-
     protected $postscriptum;
 
     public function __construct(int $config_id)

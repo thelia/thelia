@@ -20,21 +20,13 @@ use Thelia\Model\Profile;
 class ProfileEvent extends ActionEvent
 {
     protected $id;
-
     protected $locale;
-
     protected $code;
-
     protected $title;
-
     protected $chapo;
-
     protected $description;
-
     protected $postscriptum;
-
     protected $resourceAccess;
-
     protected $moduleAccess;
 
     public function __construct(protected ?Profile $profile = null)

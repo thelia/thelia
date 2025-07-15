@@ -19,7 +19,6 @@ use Thelia\Model\ConfigQuery;
 class TlogDestinationConfig
 {
     public const TYPE_TEXTAREA = 1;
-
     public const TYPE_TEXTFIELD = 2;
 
     protected $value;

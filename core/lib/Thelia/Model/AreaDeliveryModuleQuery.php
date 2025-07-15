@@ -30,10 +30,8 @@ class AreaDeliveryModuleQuery extends BaseAreaDeliveryModuleQuery
      * Check if a delivery module is suitable for the given country.
      *
      * @throws PropelException
-     *
-     * @return AreaDeliveryModule|null
      */
-    public function findByCountryAndModule(Country $country, Module $module, ?State $state = null)
+    public function findByCountryAndModule(Country $country, Module $module, ?State $state = null): ?AreaDeliveryModule
     {
         $response = null;
 
@@ -43,10 +41,9 @@ class AreaDeliveryModuleQuery extends BaseAreaDeliveryModuleQuery
         foreach ($countryInAreaList as $countryInArea) {
             $response = self::create()->filterByAreaId($countryInArea->getAreaId())
                 ->filterByModule($module)
-                ->findOne()
-            ;
+                ->findOne();
 
-            if ($response !== null) {
+            if (null !== $response) {
                 break;
             }
         }

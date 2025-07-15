@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Template\Loop;
 
-use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -49,7 +49,6 @@ use Thelia\Type\TypeCollection;
 class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $useAttributePosistion;
-
     protected $timestampable = true;
 
     protected function getArgDefinitions(): ArgumentCollection

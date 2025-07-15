@@ -46,7 +46,7 @@ abstract class AbstractMatchCountries extends ConditionAbstract
 
     abstract protected function getFormLabel();
 
-    public function setValidatorsFromForm(array $operators, array $values): AbstractMatchCountries|static
+    public function setValidatorsFromForm(array $operators, array $values): self|static
     {
         $this->checkComparisonOperatorValue($operators, self::COUNTRIES_LIST);
 

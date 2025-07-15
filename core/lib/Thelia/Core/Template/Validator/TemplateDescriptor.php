@@ -24,21 +24,13 @@ use Thelia\Core\Template\TemplateDefinition;
 class TemplateDescriptor
 {
     protected array $languages = [];
-
     protected array $descriptives = [];
-
     protected string $theliaVersion;
-
     protected string $version;
-
-    protected TemplateDefinition $parent;
-
+    protected ?TemplateDefinition $parent = null;
     protected string $documentation;
-
     protected string $stability;
-
     protected array $authors = [];
-
     protected string $assets = '';
 
     /**
@@ -142,7 +134,7 @@ class TemplateDescriptor
         return $this;
     }
 
-    public function getParent(): TemplateDefinition
+    public function getParent(): ?TemplateDefinition
     {
         return $this->parent;
     }
@@ -150,7 +142,7 @@ class TemplateDescriptor
     /**
      * @return $this
      */
-    public function setParent(TemplateDefinition $parent): self
+    public function setParent(?TemplateDefinition $parent): self
     {
         $this->parent = $parent;
 

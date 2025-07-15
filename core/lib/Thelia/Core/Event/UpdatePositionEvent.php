@@ -17,14 +17,9 @@ namespace Thelia\Core\Event;
 class UpdatePositionEvent extends ActionEvent
 {
     public const POSITION_UP = 1;
-
     public const POSITION_DOWN = 2;
-
     public const POSITION_ABSOLUTE = 3;
 
-    /**
-     * @since 2.3
-     */
     protected int $objectId;
 
     /** @deprecated since 2.3, will be removed in 2.5, because this variable is not used */
@@ -41,9 +36,7 @@ class UpdatePositionEvent extends ActionEvent
      */
         protected $object_id,
         protected $mode,
-        protected $position = null, /**
-     * @since 2.3
-     */
+        protected $position = null,
         protected $referrerId = null,
     ) {
         $this->objectId = $this->object_id;

@@ -47,9 +47,6 @@ class BaseAction
         }
     }
 
-    /**
-     * @since 2.3
-     */
     protected function genericUpdateDelegatePosition(ModelCriteria $query, UpdatePositionEvent $event, ?EventDispatcherInterface $dispatcher = null): void
     {
         if (null !== $object = $query->findOne()) {

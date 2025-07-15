@@ -54,7 +54,6 @@ use Thelia\Type\TypeCollection;
 class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $useFeaturePosition;
-
     protected $timestampable = true;
 
     protected function getArgDefinitions(): ArgumentCollection

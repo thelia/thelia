@@ -65,7 +65,7 @@ abstract class AbstractTheliaType extends AbstractType
             $options['constraints'] = [];
         }
 
-        /**
+        /*
          * Then replace groups.
          */
         return $this->replaceGroups($groups, $options['constraints']);

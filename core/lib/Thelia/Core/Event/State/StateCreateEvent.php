@@ -22,9 +22,7 @@ namespace Thelia\Core\Event\State;
 class StateCreateEvent extends StateEvent
 {
     protected $locale;
-
     protected $title;
-
     protected $isocode;
 
     /** @var bool is visible */

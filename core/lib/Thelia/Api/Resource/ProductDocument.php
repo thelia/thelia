@@ -126,17 +126,11 @@ use Thelia\Model\Map\ProductDocumentTableMap;
 class ProductDocument extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     public const GROUP_ADMIN_READ = 'admin:product_document:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:product_document:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:product_document:write';
-
     public const GROUP_ADMIN_WRITE_FILE = 'admin:product_document:write_file';
-
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:product_document:write_update';
-
     public const GROUP_FRONT_READ = 'front:product_document:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:product_document:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]

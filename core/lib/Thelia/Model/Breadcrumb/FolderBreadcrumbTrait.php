@@ -41,12 +41,13 @@ trait FolderBreadcrumbTrait
 
         // Todo refactor this ugly code
         $currentId = $folderId;
+
         do {
             $folder = FolderQuery::create()
                 ->filterById($currentId)
                 ->findOne();
 
-            if ($folder != null) {
+            if (null !== $folder) {
                 $results[] = [
                     'ID' => $folder->getId(),
                     'TITLE' => $folder->setLocale($locale)->getTitle(),
@@ -57,20 +58,14 @@ trait FolderBreadcrumbTrait
 
                 if ($currentId > 0) {
                     // Prevent circular refererences
-                    if (\in_array($currentId, $ids)) {
-                        throw new \LogicException(
-                            \sprintf(
-                                'Circular reference detected in folder ID=%d hierarchy (folder ID=%d appears more than one times in path)',
-                                $folderId,
-                                $currentId
-                            )
-                        );
+                    if (\in_array($currentId, $ids, true)) {
+                        throw new \LogicException(\sprintf('Circular reference detected in folder ID=%d hierarchy (folder ID=%d appears more than one times in path)', $folderId, $currentId));
                     }
 
                     $ids[] = $currentId;
                 }
             }
-        } while ($folder != null && $currentId > 0 && --$depth > 0);
+        } while (null !== $folder && $currentId > 0 && --$depth > 0);
 
         foreach ($results as $result) {
             $breadcrumb[$result['TITLE']] = \sprintf(
@@ -78,9 +73,9 @@ trait FolderBreadcrumbTrait
                 $router->generate(
                     'admin.folders.default',
                     [],
-                    Router::ABSOLUTE_URL
+                    Router::ABSOLUTE_URL,
                 ),
-                $result['ID']
+                $result['ID'],
             );
         }
 
@@ -90,7 +85,7 @@ trait FolderBreadcrumbTrait
     public function getFolderBreadcrumb(Router $router, $tab, $locale)
     {
         if (!method_exists($this, 'getFolder')) {
-            return null;
+            return;
         }
 
         /** @var Folder $folder */
@@ -104,18 +99,18 @@ trait FolderBreadcrumbTrait
             $router->generate(
                 'admin.folders.update',
                 ['folder_id' => $folder->getId()],
-                Router::ABSOLUTE_URL
+                Router::ABSOLUTE_URL,
             ),
-            $tab
+            $tab,
         );
 
         return $breadcrumb;
     }
 
-    public function getContentBreadcrumb(Router $router, $tab, $locale)
+    public function getContentBreadcrumb(Router $router, $tab, $locale): array
     {
         if (!method_exists($this, 'getContent')) {
-            return null;
+            return [];
         }
 
         /** @var Content $content */
@@ -130,9 +125,9 @@ trait FolderBreadcrumbTrait
             $router->generate(
                 'admin.content.update',
                 ['content_id' => $content->getId()],
-                Router::ABSOLUTE_URL
+                Router::ABSOLUTE_URL,
             ),
-            $tab
+            $tab,
         );
 
         return $breadcrumb;

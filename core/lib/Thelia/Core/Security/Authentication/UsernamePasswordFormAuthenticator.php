@@ -27,7 +27,6 @@ use Thelia\Model\Customer;
 class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
 {
     protected Form $loginForm;
-
     protected $options;
 
     public function __construct(protected Request $request, protected BaseForm $baseLoginForm, protected UserProviderInterface $userProvider, array $options = [])

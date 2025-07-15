@@ -87,15 +87,10 @@ class Thelia extends Kernel
     public const THELIA_VERSION = '2.5.5';
 
     protected SchemaLocator $propelSchemaLocator;
-
     protected PropelInitService $propelInitService;
-
     protected ParserResolver $parserResolver;
-
     protected ConnectionInterface $theliaDatabaseConnection;
-
     protected bool $cacheRefresh = false;
-
     protected bool $propelConnectionAvailable;
 
     public function __construct(string $environment, bool $debug)

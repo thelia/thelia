@@ -64,9 +64,7 @@ class OrderAddress implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:order_address:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order_address:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:order_address:write';
 
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE])]

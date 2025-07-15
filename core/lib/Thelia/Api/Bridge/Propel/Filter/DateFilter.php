@@ -21,19 +21,12 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 class DateFilter extends AbstractFilter
 {
     public const PARAMETER_BEFORE = 'before';
-
     public const PARAMETER_STRICTLY_BEFORE = 'strictly_before';
-
     public const PARAMETER_AFTER = 'after';
-
     public const PARAMETER_STRICTLY_AFTER = 'strictly_after';
-
     public const EXCLUDE_NULL = 'exclude_null';
-
     public const INCLUDE_NULL_BEFORE = 'include_null_before';
-
     public const INCLUDE_NULL_AFTER = 'include_null_after';
-
     public const INCLUDE_NULL_BEFORE_AND_AFTER = 'include_null_before_and_after';
 
     protected function filterProperty(string $property, $values, ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void

@@ -22,7 +22,6 @@ namespace Thelia\Core\Event\Module;
 class ModuleToggleActivationEvent extends ModuleEvent
 {
     protected bool $noCheck;
-
     protected bool $recursive;
 
     /**

@@ -22,9 +22,7 @@ namespace Thelia\Core\Event\Customer;
 class CustomerCreateOrUpdateEvent extends CustomerEvent
 {
     protected bool $emailUpdateAllowed;
-
     protected bool $notifyCustomerOfAccountCreation;
-
     protected bool $notifyCustomerOfAccountModification = true;
 
     public function __construct(

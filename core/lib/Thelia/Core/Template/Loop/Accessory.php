@@ -36,7 +36,6 @@ use Thelia\Model\AccessoryQuery;
 class Accessory extends Product
 {
     protected $accessoryId;
-
     protected $accessoryPosition;
 
     protected function getArgDefinitions(): ArgumentCollection

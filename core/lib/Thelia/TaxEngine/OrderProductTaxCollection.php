@@ -23,7 +23,6 @@ use Thelia\Model\OrderProductTax;
 class OrderProductTaxCollection implements \Iterator
 {
     private ?int $position = null;
-
     protected $taxes = [];
 
     public function __construct()

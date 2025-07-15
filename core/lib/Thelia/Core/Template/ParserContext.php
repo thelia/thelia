@@ -37,7 +37,6 @@ class ParserContext implements \IteratorAggregate
     public const FORM_ERROR_LIFETIME_SECONDS = 60;
 
     private array $formStore = [];
-
     private $store = [];
 
     public function __construct(

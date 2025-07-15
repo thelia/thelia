@@ -22,9 +22,7 @@ use Thelia\Model\Product;
  */
 abstract class BaseTaxType implements TaxTypeInterface
 {
-    /**
-     * A var <-> value array which contains TaxtType requirements (e.g. parameters).
-     */
+    /** A var <-> value array which contains TaxtType requirements (e.g. parameters). */
     protected array $requirements = [];
 
     /**

@@ -25,13 +25,9 @@ use Thelia\Model\CustomerTitle;
 class CustomerTitleEvent extends ActionEvent
 {
     protected bool $default = false;
-
     protected string $short;
-
     protected string $long;
-
     protected string $locale;
-
     protected ?CustomerTitle $customerTitle = null;
 
     public function getCustomerTitle(): CustomerTitle

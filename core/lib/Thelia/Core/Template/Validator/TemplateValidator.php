@@ -29,17 +29,14 @@ use Thelia\Tools\Version\Version;
 class TemplateValidator
 {
     protected $templatePath;
-
     protected TemplateDescriptorValidator $templateDescriptor;
-
     protected TemplateDefinition $templateDefinition;
-
     protected $templateVersion;
 
     /** @var array array of errors */
     protected array $errors = [];
 
-    protected \SimpleXMLElement $xmlDescriptorContent;
+    protected ?\SimpleXMLElement $xmlDescriptorContent = null;
 
     /**
      * TemplateValidator constructor.

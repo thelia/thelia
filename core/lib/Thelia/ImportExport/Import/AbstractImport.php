@@ -26,13 +26,9 @@ use Thelia\Model\Lang;
 abstract class AbstractImport implements \Iterator
 {
     private ?array $data = null;
-
     protected File $file;
-
     protected Lang $language;
-
     protected array $mandatoryColumns = [];
-
     protected int $importedRows = 0;
 
     #[\ReturnTypeWillChange]

@@ -22,12 +22,9 @@ use Thelia\TaxEngine\Calculator;
 class ProductSaleElements extends BaseProductSaleElements
 {
     /**
-     * @param string $virtualColumnName
-     * @param int    $discount
-     *
      * @throws PropelException
      */
-    public function getPrice($virtualColumnName = 'price_PRICE', $discount = 0): mixed
+    public function getPrice(string $virtualColumnName = 'price_PRICE', int $discount = 0): mixed
     {
         try {
             $amount = $this->getVirtualColumn($virtualColumnName);
@@ -43,12 +40,9 @@ class ProductSaleElements extends BaseProductSaleElements
     }
 
     /**
-     * @param string $virtualColumnName
-     * @param int    $discount
-     *
      * @throws PropelException
      */
-    public function getPromoPrice($virtualColumnName = 'price_PROMO_PRICE', $discount = 0): mixed
+    public function getPromoPrice(string $virtualColumnName = 'price_PROMO_PRICE', int $discount = 0): mixed
     {
         try {
             $amount = $this->getVirtualColumn($virtualColumnName);
@@ -64,14 +58,9 @@ class ProductSaleElements extends BaseProductSaleElements
     }
 
     /**
-     * @param string $virtualColumnName
-     * @param int    $discount
-     *
      * @throws PropelException
-     *
-     * @return int
      */
-    public function getTaxedPrice(Country $country, $virtualColumnName = 'price_PRICE', $discount = 0)
+    public function getTaxedPrice(Country $country, string $virtualColumnName = 'price_PRICE', int $discount = 0): int
     {
         $taxCalculator = new Calculator();
 
@@ -79,14 +68,9 @@ class ProductSaleElements extends BaseProductSaleElements
     }
 
     /**
-     * @param string $virtualColumnName
-     * @param int    $discount
-     *
      * @throws PropelException
-     *
-     * @return int
      */
-    public function getTaxedPromoPrice(Country $country, $virtualColumnName = 'price_PROMO_PRICE', $discount = 0)
+    public function getTaxedPromoPrice(Country $country, string $virtualColumnName = 'price_PROMO_PRICE', int $discount = 0): int
     {
         $taxCalculator = new Calculator();
 
@@ -101,14 +85,10 @@ class ProductSaleElements extends BaseProductSaleElements
      *      the currency or when the `from_default_currency` flag is set to `true`
      * - set directly in the product price when `from_default_currency` is set to `false`
      *
-     * @param int $discount
-     *
      * @throws \RuntimeException
      * @throws PropelException
-     *
-     * @return ProductPriceTools
      */
-    public function getPricesByCurrency(Currency $currency, $discount = 0)
+    public function getPricesByCurrency(Currency $currency, int $discount = 0): ProductPriceTools
     {
         $defaultCurrency = Currency::getDefaultCurrency();
 
@@ -123,11 +103,12 @@ class ProductSaleElements extends BaseProductSaleElements
                 ->filterByProductSaleElementsId($this->getId())
                 ->filterByCurrencyId($defaultCurrency->getId())
                 ->findOne();
+
             if (null !== $productPrice) {
                 $price = $productPrice->getPrice() * $currency->getRate() / $defaultCurrency->getRate();
                 $promoPrice = $productPrice->getPromoPrice() * $currency->getRate() / $defaultCurrency->getRate();
             } else {
-                throw new \RuntimeException('Cannot find product prices for currency id: `'.$currency->getId().'`');
+                throw new \RuntimeException('Cannot find product prices for currency id: `' . $currency->getId() . '`');
             }
         } else {
             $price = $productPrice->getPrice();

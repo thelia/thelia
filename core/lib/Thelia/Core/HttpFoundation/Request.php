@@ -30,9 +30,7 @@ use Thelia\Model\ConfigQuery;
 class Request extends BaseRequest
 {
     private ?string $resolvedPathInfo = null;
-
     protected ?string $controllerType = null;
-
     public static bool $isAdminEnv = false;
 
     /**

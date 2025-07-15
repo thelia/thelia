@@ -30,11 +30,11 @@ class MessageQuery extends BaseMessageQuery
      *
      * @param string $messageName the message name
      *
-     * @throws \Exception if the message could not be loaded
-     *
      * @return Message the loaded message
+     *
+     * @throws \Exception if the message could not be loaded
      */
-    public static function getFromName($messageName)
+    public static function getFromName(string $messageName): Message
     {
         if (false === $message = self::create()->filterByName($messageName)->findOne()) {
             throw new \Exception(\sprintf('Failed to load message %s.', $messageName));

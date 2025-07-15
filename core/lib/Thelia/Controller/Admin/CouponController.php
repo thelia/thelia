@@ -276,7 +276,7 @@ class CouponController extends BaseAdminController
 
         $this->checkXmlHttpRequest();
 
-        if ($conditionId !== '' && $conditionId !== '0') {
+        if ('' !== $conditionId && '0' !== $conditionId) {
             /** @var ConditionFactory $conditionFactory */
             $conditionFactory = $this->container->get('thelia.condition.factory');
             $inputs = $conditionFactory->getInputsFromServiceId($conditionId);
@@ -631,7 +631,7 @@ class CouponController extends BaseAdminController
             return $response;
         }
 
-        if ($couponServiceId !== '' && $couponServiceId !== '0') {
+        if ('' !== $couponServiceId && '0' !== $couponServiceId) {
             $this->checkXmlHttpRequest();
 
             $couponManager = $this->container->get($couponServiceId);

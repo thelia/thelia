@@ -21,8 +21,7 @@ use Thelia\Model\Base\OrderProduct as BaseOrderProduct;
 
 class OrderProduct extends BaseOrderProduct
 {
-    /** @var int */
-    protected $cartItemId;
+    protected int $cartItemId;
 
     /**
      * @return $this
@@ -39,7 +38,7 @@ class OrderProduct extends BaseOrderProduct
         return $this->cartItemId;
     }
 
-    public function preInsert(?ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): bool
     {
         parent::preInsert($con);
 
@@ -51,7 +50,7 @@ class OrderProduct extends BaseOrderProduct
             $con->getEventDispatcher()->dispatch(
                 (new OrderProductEvent($this->getOrder(), null))
                     ->setCartItemId($this->cartItemId),
-                TheliaEvents::ORDER_PRODUCT_BEFORE_CREATE
+                TheliaEvents::ORDER_PRODUCT_BEFORE_CREATE,
             );
         }
 
@@ -70,7 +69,7 @@ class OrderProduct extends BaseOrderProduct
             $con->getEventDispatcher()->dispatch(
                 (new OrderProductEvent($this->getOrder(), $this->getId()))
                     ->setCartItemId($this->cartItemId),
-                TheliaEvents::ORDER_PRODUCT_AFTER_CREATE
+                TheliaEvents::ORDER_PRODUCT_AFTER_CREATE,
             );
         }
     }

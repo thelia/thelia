@@ -58,7 +58,6 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     use StandardI18nFieldsSearchTrait;
 
     protected $timestampable = true;
-
     protected $versionable = true;
 
     protected function getArgDefinitions(): ArgumentCollection

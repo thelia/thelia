@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Api\State\Provider;
 
-use Thelia\Model\Cart;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\Exception\PropelException;
@@ -25,6 +24,7 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Address;
+use Thelia\Model\Cart;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Module;
 use Thelia\Model\StateQuery;

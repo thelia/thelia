@@ -126,17 +126,11 @@ use Thelia\Model\Map\CategoryImageTableMap;
 class CategoryImage extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     public const GROUP_ADMIN_READ = 'admin:category_image:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:category_image:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:category_image:write';
-
     public const GROUP_ADMIN_WRITE_FILE = 'admin:category_image:write_file';
-
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:category_image:write_update';
-
     public const GROUP_FRONT_READ = 'front:category_image:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:category_image:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]

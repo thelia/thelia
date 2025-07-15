@@ -92,11 +92,8 @@ use Thelia\Model\Map\OrderStatusTableMap;
 class OrderStatus extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:order_status:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order_status:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:order_status:write';
-
     public const GROUP_FRONT_READ = 'front:order_status:read';
 
     #[Groups([

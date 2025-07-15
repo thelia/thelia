@@ -53,13 +53,9 @@ class ProductAssociatedContent implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:product_associated_content:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:product_associated_content:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:product_associated_content:write';
-
     public const GROUP_FRONT_READ = 'front:product_associated_content:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:product_associated_content:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Product::GROUP_FRONT_READ_SINGLE, Product::GROUP_FRONT_READ_SINGLE])]

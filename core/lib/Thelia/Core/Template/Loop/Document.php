@@ -55,9 +55,7 @@ use Thelia\Type\TypeCollection;
 class Document extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $objectType;
-
     protected $objectId;
-
     protected $timestampable = true;
 
     /** @var array Possible standard document sources */

@@ -69,7 +69,6 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
     use StandardI18nFieldsSearchTrait;
 
     protected $timestampable = true;
-
     protected $versionable = true;
 
     protected function getArgDefinitions(): ArgumentCollection

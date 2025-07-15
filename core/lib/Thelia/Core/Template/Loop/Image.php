@@ -65,9 +65,7 @@ use Thelia\Type\TypeCollection;
 class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $objectType;
-
     protected $objectId;
-
     protected $timestampable = true;
 
     /** @var array Possible standard image sources */

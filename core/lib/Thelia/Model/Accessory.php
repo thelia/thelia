@@ -30,7 +30,7 @@ class Accessory extends BaseAccessory
         $query->filterByProductId($this->getProductId());
     }
 
-    public function preInsert(?ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): bool
     {
         $this->setPosition($this->getNextPosition());
 

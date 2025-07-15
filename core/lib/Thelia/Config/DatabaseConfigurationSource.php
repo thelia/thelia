@@ -27,9 +27,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class DatabaseConfigurationSource
 {
-    /**
-     * Map of [connection name => connection ParameterBag].
-     */
+    /** Map of [connection name => connection ParameterBag]. */
     protected array $connections;
 
     /**

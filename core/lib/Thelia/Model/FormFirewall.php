@@ -28,7 +28,7 @@ class FormFirewall extends BaseFormFirewall
     public function incrementAttempts()
     {
         $this->setAttempts(
-            $this->getAttempts() + 1
+            $this->getAttempts() + 1,
         );
 
         $this->save();

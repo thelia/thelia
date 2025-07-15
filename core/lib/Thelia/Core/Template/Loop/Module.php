@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Template\Loop;
 
-use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
 use Thelia\Core\Security\AccessManager;

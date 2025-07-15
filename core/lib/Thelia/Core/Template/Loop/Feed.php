@@ -59,8 +59,7 @@ class Feed extends BaseLoop implements ArraySearchLoopInterface
         }
 
         /** @var array $itemAsArray */
-        $itemAsArray = $cacheItem->get();
-        return $itemAsArray;
+        return $cacheItem->get();
     }
 
     public function parseResults(LoopResult $loopResult): LoopResult

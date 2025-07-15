@@ -31,40 +31,31 @@ class ImageEvent extends CachedFileEvent
     /** @var string The image category (i.e. the subdirectory in image cache) */
     protected string $category;
 
-    /** @var int the required image width */
-    protected int $width;
-
-    /** @var int the required image height */
-    protected int $height;
-
-    /** @var string the resize mode, either crop, bands, none */
-    protected string $resize_mode;
-
-    /** @var string the background color in RGB format (eg. #ff8000) */
-    protected string $background_color;
+    protected ?int $width = null;
+    protected ?int $height = null;
+    protected ?string $resize_mode = null;
+    protected ?string $background_color = null;
 
     /** @var array a list of effects (grayscale, negative, mirror...), applied in the specified order. */
     protected array $effects = [];
 
-    /** @var int the rotation angle in degrees, none if zero or null */
-    protected int $rotation;
+    /** the rotation angle in degrees, none if zero or null */
+    protected ?int $rotation = null;
 
-    /** @var int the quality of the result image, from 0 (!) to 100 */
-    protected int $quality;
+    /** the quality of the result image, from 0 (!) to 100 */
+    protected ?int $quality = null;
 
     protected ImageInterface $imageObject;
-
     protected bool $allowZoom;
-
-    protected string $format;
+    protected ?string $format = null;
 
     /**
      * @return bool true if the required image is the original image (resize_mode and background_color are not significant)
      */
     public function isOriginalImage(): bool
     {
-        return (!isset($this->width) || $this->width === 0) && (!isset($this->height) || $this->height === 0) /* && empty($this->resize_mode) && empty($this->background_color) not significant */
-        && [] === $this->effects && (!isset($this->rotation) || $this->rotation === 0) && (!isset($this->quality) || $this->quality === 0);
+        return (!isset($this->width) || 0 === $this->width) && (!isset($this->height) || 0 === $this->height) /* && empty($this->resize_mode) && empty($this->background_color) not significant */
+        && [] === $this->effects && (!isset($this->rotation) || 0 === $this->rotation) && (!isset($this->quality) || 0 === $this->quality);
     }
 
     /**
@@ -72,6 +63,9 @@ class ImageEvent extends CachedFileEvent
      */
     public function getOptionsHash(): string
     {
+        if ($this->width === null || $this->height === null || $this->resize_mode === null || $this->background_color === null ) {
+            return '';
+        }
         return md5(
             $this->width . $this->height . $this->resize_mode . $this->background_color . implode(',', $this->effects)
             . $this->rotation . $this->allowZoom,
@@ -222,7 +216,7 @@ class ImageEvent extends CachedFileEvent
         return $this;
     }
 
-    public function getFormat(): string
+    public function getFormat(): ?string
     {
         return $this->format;
     }

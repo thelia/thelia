@@ -104,13 +104,9 @@ use Thelia\Model\Map\FolderImageTableMap;
 class FolderImage extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     public const GROUP_ADMIN_READ = 'admin:folder_image:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:folder_image:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:folder_image:write';
-
     public const GROUP_ADMIN_WRITE_FILE = 'admin:folder_image:write_file';
-
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:folder_image:write_update';
 
     #[Groups([self::GROUP_ADMIN_READ])]

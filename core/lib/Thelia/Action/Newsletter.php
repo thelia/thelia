@@ -81,9 +81,6 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @since 2.3.0-alpha2
-     */
     public function confirmSubscription(NewsletterEvent $event): void
     {
         $this->mailer->sendEmailMessage(

@@ -283,7 +283,6 @@ class HookController extends AbstractCrudController
 
     /**
      * Creates the creation event with the provided form data.
-     *
      */
     protected function getCreationEvent(array $formData): ActionEvent
     {
@@ -294,7 +293,6 @@ class HookController extends AbstractCrudController
 
     /**
      * Creates the update event with the provided form data.
-     *
      */
     protected function getUpdateEvent(array $formData): ActionEvent
     {

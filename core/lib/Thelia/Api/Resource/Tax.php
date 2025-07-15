@@ -77,13 +77,9 @@ use Thelia\Model\Map\TaxTableMap;
 class Tax extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:tax:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:tax:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:tax:write';
-
     public const GROUP_FRONT_READ = 'front:tax:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:tax:read:single';
 
     #[Groups([

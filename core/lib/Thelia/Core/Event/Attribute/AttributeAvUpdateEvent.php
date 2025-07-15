@@ -17,11 +17,8 @@ namespace Thelia\Core\Event\Attribute;
 class AttributeAvUpdateEvent extends AttributeAvCreateEvent
 {
     protected int $attributeAv_id;
-
     protected $description;
-
     protected $chapo;
-
     protected $postscriptum;
 
     public function __construct(int $attributeAv_id)

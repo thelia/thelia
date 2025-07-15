@@ -78,15 +78,10 @@ class CartItem implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:cart_item:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:cart_item:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:cart_item:write';
-
     public const GROUP_FRONT_READ = 'front:cart_item:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:cart_item:read:single';
-
     public const GROUP_FRONT_WRITE = 'front:cart_item:write';
 
     #[Groups([self::GROUP_ADMIN_READ, Cart::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Cart::GROUP_FRONT_READ])]

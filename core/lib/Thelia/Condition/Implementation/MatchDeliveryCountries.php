@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Condition\Implementation;
 
-use Thelia\Model\Customer;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\UnmatchableConditionException;
+use Thelia\Model\Customer;
 
 /**
  * Check a Checkout against its Product number.

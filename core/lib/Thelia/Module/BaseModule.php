@@ -57,29 +57,18 @@ class BaseModule implements BaseModuleInterface
     protected ?ContainerInterface $container = null;
 
     public const CLASSIC_MODULE_TYPE = 1;
-
     public const DELIVERY_MODULE_TYPE = 2;
-
     public const PAYMENT_MODULE_TYPE = 3;
-
     public const MODULE_CATEGORIES = 'classic,delivery,payment,marketplace,price,accounting,seo,administration,statistic';
-
     public const IS_ACTIVATED = 1;
-
     public const IS_NOT_ACTIVATED = 0;
-
     public const IS_MANDATORY = 1;
-
     public const IS_NOT_MANDATORY = 0;
-
     public const IS_HIDDEN = 1;
-
     public const IS_NOT_HIDDEN = 0;
 
     protected $reflected;
-
     protected $dispatcher;
-
     protected $request;
 
     // Do no use this attribute directly, use getModuleModel() instead.
@@ -347,7 +336,7 @@ class BaseModule implements BaseModuleInterface
      */
     private static array $moduleIds = [];
 
-    public static function getModuleId(): string
+    public static function getModuleId(): int
     {
         $code = self::getModuleCode();
 
@@ -765,17 +754,11 @@ class BaseModule implements BaseModuleInterface
         return $value;
     }
 
-    /**
-     * @since 2.4
-     */
     protected function getPropelSchemaDir(): string
     {
         return $this->getModuleDir() . DS . 'Config' . DS . 'schema.xml';
     }
 
-    /**
-     * @since 2.4
-     */
     protected function hasPropelSchema(): bool
     {
         return (new Filesystem())->exists($this->getPropelSchemaDir());

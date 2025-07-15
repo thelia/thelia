@@ -44,107 +44,107 @@ class Module extends BaseModule
 
     public function getAdminIncludesTranslationDomain(): string
     {
-        return $this->getTranslationDomain().'.ai';
+        return $this->getTranslationDomain() . '.ai';
     }
 
     public function getAbsoluteBackOfficeTemplatePath(string $subdir): string
     {
         return \sprintf(
-            '%s'.DS.'%s'.DS.'%s',
+            '%s' . DS . '%s' . DS . '%s',
             $this->getAbsoluteTemplateBasePath(),
             TemplateDefinition::BACK_OFFICE_SUBDIR,
-            $subdir
+            $subdir,
         );
     }
 
     public function getAbsoluteBackOfficeI18nTemplatePath(string $subdir): string
     {
         return \sprintf(
-            '%s'.DS.'%s'.DS.'%s',
+            '%s' . DS . '%s' . DS . '%s',
             $this->getAbsoluteI18nPath(),
             TemplateDefinition::BACK_OFFICE_SUBDIR,
-            $subdir
+            $subdir,
         );
     }
 
     public function getBackOfficeTemplateTranslationDomain(string $templateName): string
     {
-        return $this->getTranslationDomain().'.bo.'.$templateName;
+        return $this->getTranslationDomain() . '.bo.' . $templateName;
     }
 
     public function getAbsoluteFrontOfficeTemplatePath(string $subdir): string
     {
         return \sprintf(
-            '%s'.DS.'%s'.DS.'%s',
+            '%s' . DS . '%s' . DS . '%s',
             $this->getAbsoluteTemplateBasePath(),
             TemplateDefinition::FRONT_OFFICE_SUBDIR,
-            $subdir
+            $subdir,
         );
     }
 
     public function getAbsoluteFrontOfficeI18nTemplatePath(string $subdir): string
     {
         return \sprintf(
-            '%s'.DS.'%s'.DS.'%s',
+            '%s' . DS . '%s' . DS . '%s',
             $this->getAbsoluteI18nPath(),
             TemplateDefinition::FRONT_OFFICE_SUBDIR,
-            $subdir
+            $subdir,
         );
     }
 
     public function getFrontOfficeTemplateTranslationDomain(string $templateName): string
     {
-        return $this->getTranslationDomain().'.fo.'.$templateName;
+        return $this->getTranslationDomain() . '.fo.' . $templateName;
     }
 
     public function getAbsolutePdfTemplatePath(string $subdir): string
     {
         return \sprintf(
-            '%s'.DS.'%s'.DS.'%s',
+            '%s' . DS . '%s' . DS . '%s',
             $this->getAbsoluteTemplateBasePath(),
             TemplateDefinition::PDF_SUBDIR,
-            $subdir
+            $subdir,
         );
     }
 
     public function getAbsolutePdfI18nTemplatePath(string $subdir): string
     {
         return \sprintf(
-            '%s'.DS.'%s'.DS.'%s',
+            '%s' . DS . '%s' . DS . '%s',
             $this->getAbsoluteI18nPath(),
             TemplateDefinition::PDF_SUBDIR,
-            $subdir
+            $subdir,
         );
     }
 
     public function getPdfTemplateTranslationDomain(string $templateName): string
     {
-        return $this->getTranslationDomain().'.pdf.'.$templateName;
+        return $this->getTranslationDomain() . '.pdf.' . $templateName;
     }
 
     public function getAbsoluteEmailTemplatePath(string $subdir): string
     {
         return \sprintf(
-            '%s'.DS.'%s'.DS.'%s',
+            '%s' . DS . '%s' . DS . '%s',
             $this->getAbsoluteTemplateBasePath(),
             TemplateDefinition::EMAIL_SUBDIR,
-            $subdir
+            $subdir,
         );
     }
 
     public function getAbsoluteEmailI18nTemplatePath(string $subdir): string
     {
         return \sprintf(
-            '%s'.DS.'%s'.DS.'%s',
+            '%s' . DS . '%s' . DS . '%s',
             $this->getAbsoluteI18nPath(),
             TemplateDefinition::EMAIL_SUBDIR,
-            $subdir
+            $subdir,
         );
     }
 
     public function getEmailTemplateTranslationDomain(string $templateName): string
     {
-        return $this->getTranslationDomain().'.email.'.$templateName;
+        return $this->getTranslationDomain() . '.email.' . $templateName;
     }
 
     /**
@@ -160,7 +160,7 @@ class Module extends BaseModule
      */
     public function getAbsoluteBaseDir(): string
     {
-        return $this->getModuleDir().$this->getBaseDir();
+        return $this->getModuleDir() . $this->getBaseDir();
     }
 
     /**
@@ -168,7 +168,7 @@ class Module extends BaseModule
      */
     public function getConfigPath(): string
     {
-        return $this->getBaseDir().DS.'Config';
+        return $this->getBaseDir() . DS . 'Config';
     }
 
     /**
@@ -176,7 +176,7 @@ class Module extends BaseModule
      */
     public function getAbsoluteConfigPath(): string
     {
-        return $this->getModuleDir().$this->getConfigPath();
+        return $this->getModuleDir() . $this->getConfigPath();
     }
 
     /**
@@ -184,7 +184,7 @@ class Module extends BaseModule
      */
     public function getI18nPath(): string
     {
-        return $this->getBaseDir().DS.'I18n';
+        return $this->getBaseDir() . DS . 'I18n';
     }
 
     /**
@@ -192,7 +192,7 @@ class Module extends BaseModule
      */
     public function getAbsoluteI18nPath(): string
     {
-        return $this->getModuleDir().$this->getI18nPath();
+        return $this->getModuleDir() . $this->getI18nPath();
     }
 
     /**
@@ -200,7 +200,7 @@ class Module extends BaseModule
      */
     public function getAbsoluteAdminIncludesPath(): string
     {
-        return $this->getAbsoluteBaseDir().DS.self::ADMIN_INCLUDES_DIRECTORY_NAME;
+        return $this->getAbsoluteBaseDir() . DS . self::ADMIN_INCLUDES_DIRECTORY_NAME;
     }
 
     /**
@@ -208,7 +208,7 @@ class Module extends BaseModule
      */
     public function getAbsoluteAdminIncludesI18nPath(): string
     {
-        return $this->getModuleDir().$this->getI18nPath().DS.self::ADMIN_INCLUDES_DIRECTORY_NAME;
+        return $this->getModuleDir() . $this->getI18nPath() . DS . self::ADMIN_INCLUDES_DIRECTORY_NAME;
     }
 
     /**
@@ -218,7 +218,7 @@ class Module extends BaseModule
      */
     public function getAbsoluteTemplateBasePath(): string
     {
-        return $this->getAbsoluteBaseDir().DS.'templates';
+        return $this->getAbsoluteBaseDir() . DS . 'templates';
     }
 
     /**
@@ -228,9 +228,9 @@ class Module extends BaseModule
      *
      * @return string a path
      */
-    public function getAbsoluteTemplateDirectoryPath($templateSubdirName): string
+    public function getAbsoluteTemplateDirectoryPath(string $templateSubdirName): string
     {
-        return $this->getAbsoluteTemplateBasePath().DS.$templateSubdirName;
+        return $this->getAbsoluteTemplateBasePath() . DS . $templateSubdirName;
     }
 
     /**
@@ -265,15 +265,15 @@ class Module extends BaseModule
     /**
      * @param ContainerInterface $container the Thelia container
      *
-     * @throws \InvalidArgumentException if the module could not be found in the container/
-     *
      * @return BaseModuleInterface a module instance
+     *
+     * @throws \InvalidArgumentException if the module could not be found in the container/
      */
     public function getModuleInstance(ContainerInterface $container): BaseModuleInterface
     {
         $instance = $container->get(\sprintf('module.%s', $this->getCode()));
 
-        if ($instance === null) {
+        if (null === $instance) {
             throw new \InvalidArgumentException(\sprintf('Undefined module in container: "%s"', $this->getCode()));
         }
 
@@ -283,17 +283,17 @@ class Module extends BaseModule
     /**
      * @param ContainerInterface $container the Thelia container
      *
-     * @throws \InvalidArgumentException if the module could not be found in the container/
-     *
      * @return BaseModuleInterface a module instance
+     *
+     * @throws \InvalidArgumentException if the module could not be found in the container/
      */
     public function getDeliveryModuleInstance(ContainerInterface $container): BaseModuleInterface
     {
         $instance = $this->getModuleInstance($container);
 
         if (
-            !\in_array(DeliveryModuleInterface::class, class_implements($instance))
-            && !\in_array(DeliveryModuleWithStateInterface::class, class_implements($instance))
+            !\in_array(DeliveryModuleInterface::class, class_implements($instance), true)
+            && !\in_array(DeliveryModuleWithStateInterface::class, class_implements($instance), true)
         ) {
             throw new \InvalidArgumentException(\sprintf('Module "%s" is not a delivery module', $this->getCode()));
         }
@@ -304,9 +304,9 @@ class Module extends BaseModule
     /**
      * @param ContainerInterface $container the Thelia container
      *
-     * @throws \InvalidArgumentException if the module is not found or not a payment module
-     *
      * @return PaymentModuleInterface a payment module instance
+     *
+     * @throws \InvalidArgumentException if the module is not found or not a payment module
      */
     public function getPaymentModuleInstance(ContainerInterface $container): PaymentModuleInterface
     {
@@ -348,7 +348,7 @@ class Module extends BaseModule
 
     public function getModuleDir(): string
     {
-        return is_dir(THELIA_LOCAL_MODULE_DIR.$this->getBaseDir())
+        return is_dir(THELIA_LOCAL_MODULE_DIR . $this->getBaseDir())
             ? THELIA_LOCAL_MODULE_DIR
             : THELIA_MODULE_DIR;
     }

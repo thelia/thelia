@@ -17,9 +17,7 @@ namespace Thelia\Core\Event\Feature;
 class FeatureAvCreateEvent extends FeatureAvEvent
 {
     protected $title;
-
     protected $locale;
-
     protected $feature_id;
 
     public function getLocale()

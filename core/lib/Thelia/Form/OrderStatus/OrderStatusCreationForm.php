@@ -29,8 +29,6 @@ use Thelia\Model\OrderStatusQuery;
  * Class OrderStatusCreationForm.
  *
  * @author  Gilles Bourgeat <gbourgeat@openstudio.fr>
- *
- * @since 2.4
  */
 class OrderStatusCreationForm extends BaseForm
 {

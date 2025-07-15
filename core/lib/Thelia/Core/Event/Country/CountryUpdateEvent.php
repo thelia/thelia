@@ -22,13 +22,9 @@ namespace Thelia\Core\Event\Country;
 class CountryUpdateEvent extends CountryCreateEvent
 {
     protected bool $needZipCode;
-
     protected string $zipCodeFormat;
-
     protected string $chapo;
-
     protected string $description;
-
     protected string $postscriptum;
 
     public function __construct(protected int $country_id)

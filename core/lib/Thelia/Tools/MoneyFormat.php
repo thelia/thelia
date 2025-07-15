@@ -53,9 +53,6 @@ class MoneyFormat extends NumberFormat
         return $number;
     }
 
-    /**
-     * @since 2.3
-     */
     public function formatByCurrency(
         float $number,
         ?int $decimals = null,

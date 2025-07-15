@@ -25,15 +25,10 @@ use Thelia\Model\Module;
 class ModuleEvent extends ActionEvent
 {
     protected $id;
-
     protected $locale;
-
     protected $title;
-
     protected $chapo;
-
     protected $description;
-
     protected $postscriptum;
 
     public function setChapo(?string $chapo): void

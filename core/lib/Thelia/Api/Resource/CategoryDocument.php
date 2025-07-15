@@ -125,17 +125,11 @@ use Thelia\Model\Map\CategoryDocumentTableMap;
 class CategoryDocument extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     public const GROUP_ADMIN_READ = 'admin:category_document:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:category_document:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:category_document:write';
-
     public const GROUP_ADMIN_WRITE_FILE = 'admin:category_document:write_file';
-
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:category_document:write_update';
-
     public const GROUP_FRONT_READ = 'front:category_document:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:category_document:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ])]

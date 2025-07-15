@@ -24,7 +24,6 @@ class Lang extends BaseLang
 {
     // Constants to define behavior when a request string does not exists in the current language
     public const STRICTLY_USE_REQUESTED_LANGUAGE = 0;
-
     public const REPLACE_BY_DEFAULT_LANGUAGE = 1;
 
     protected static $defaultLanguage;
@@ -51,7 +50,7 @@ class Lang extends BaseLang
 
     public function toggleDefault(): void
     {
-        if ($this->getId() === null) {
+        if (null === $this->getId()) {
             throw new \RuntimeException('impossible to just uncheck default language, choose a new one');
         }
 
@@ -61,6 +60,7 @@ class Lang extends BaseLang
 
         $con = Propel::getWriteConnection(LangTableMap::DATABASE_NAME);
         $con->beginTransaction();
+
         try {
             LangQuery::create()
                 ->filterByByDefault(1)
@@ -75,6 +75,7 @@ class Lang extends BaseLang
             $con->commit();
         } catch (PropelException $propelException) {
             $con->rollBack();
+
             throw $propelException;
         }
     }
@@ -83,6 +84,7 @@ class Lang extends BaseLang
     {
         // If the date/time format is not specified, generate it.
         $dateTimeFormat = $this->getDateTimeFormat();
+
         if (empty($dateTimeFormat)) {
             $this->setDatetimeFormat(\sprintf('%s %s', $this->getDateFormat(), $this->getTimeFormat()));
         }

@@ -21,8 +21,6 @@ use Symfony\Component\Validator\Constraints\GreaterThan;
  * Class OrderStatusModificationForm.
  *
  * @author  Gilles Bourgeat <gbourgeat@openstudio.fr>
- *
- * @since 2.4
  */
 class OrderStatusModificationForm extends OrderStatusCreationForm
 {

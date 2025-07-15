@@ -30,7 +30,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class TheliaHttpKernel extends HttpKernel
 {
     protected static $session;
-
     protected ContainerInterface $container;
 
     public function __construct(

@@ -141,13 +141,16 @@ class RequestListener implements EventSubscriberInterface
             $request,
             $cookieCustomerName,
         );
+        if (null === $cookie) {
+            return;
+        }
         // try to log
         $authenticator = new CustomerTokenAuthenticator($cookie);
+
         try {
             // If have found a user, store it in the security context
             /** @var Customer $user */
             $user = $authenticator->getAuthentifiedUser();
-
             $session->setCustomerUser($user);
 
             $dispatcher->dispatch(
@@ -168,8 +171,12 @@ class RequestListener implements EventSubscriberInterface
             $request,
             $cookieAdminName,
         );
+        if (null === $cookie) {
+            return;
+        }
         // try to log
         $authenticator = new AdminTokenAuthenticator($cookie);
+
         try {
             // If have found a user, store it in the security context
             $user = $authenticator->getAuthentifiedUser();

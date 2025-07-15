@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Thelia\Core\Event\CachedFileEvent;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;

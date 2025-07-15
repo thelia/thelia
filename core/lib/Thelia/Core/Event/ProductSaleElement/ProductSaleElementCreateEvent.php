@@ -19,9 +19,7 @@ use Thelia\Model\Product;
 class ProductSaleElementCreateEvent extends ProductSaleElementEvent
 {
     protected $product;
-
     protected $attribute_av_list;
-
     protected $currency_id;
 
     public function __construct(Product $product, $attribute_av_list, $currency_id)

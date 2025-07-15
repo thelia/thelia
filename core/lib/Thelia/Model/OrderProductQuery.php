@@ -49,14 +49,14 @@ class OrderProductQuery extends BaseOrderProductQuery
             if ($startDate instanceof DateTime) {
                 $subQuery->filterByCreatedAt(
                     \sprintf('%s 00:00:00', $startDate->format('Y-m-d')),
-                    Criteria::GREATER_EQUAL
+                    Criteria::GREATER_EQUAL,
                 );
             }
 
             if ($startDate instanceof DateTime) {
                 $subQuery->filterByCreatedAt(
                     \sprintf('%s 23:59:59', $endDate->format('Y-m-d')),
-                    Criteria::LESS_EQUAL
+                    Criteria::LESS_EQUAL,
                 );
             }
 
@@ -70,8 +70,7 @@ class OrderProductQuery extends BaseOrderProductQuery
         $query
             ->filterByProductRef($productRef)
             ->withColumn('SUM(`order_product`.QUANTITY)', 'TOTAL')
-            ->select('TOTAL')
-        ;
+            ->select('TOTAL');
 
         $count = $query->findOne();
 

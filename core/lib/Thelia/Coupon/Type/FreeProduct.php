@@ -30,13 +30,10 @@ use Thelia\Model\ProductQuery;
 class FreeProduct extends AbstractRemoveOnProducts
 {
     public const OFFERED_PRODUCT_ID = 'offered_product_id';
-
     public const OFFERED_CATEGORY_ID = 'offered_category_id';
 
     protected string $serviceId = 'thelia.coupon.type.free_product';
-
     protected int $offeredProductId;
-
     protected int $offeredCategoryId;
 
     /**

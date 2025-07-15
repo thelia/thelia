@@ -21,17 +21,12 @@ use Thelia\Core\Event\ActionEvent;
  * Class ContactController.
  *
  * @author Vincent Lopes-Vicente <vlopesvicente@gmail.com>
- *
- * @since 2.4
  */
 class ContactEvent extends ActionEvent
 {
     protected string $subject;
-
     protected string $message;
-
     protected string $email;
-
     protected string $name;
 
     public function __construct(protected Form $form)

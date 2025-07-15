@@ -24,33 +24,19 @@ use Thelia\Model\Order;
 class OrderEvent extends ActionEvent
 {
     protected Order $order;
-
     protected Order $placedOrder;
-
     protected ?int $invoiceAddress = null;
-
     protected ?int $deliveryAddress = null;
-
     protected ?int $deliveryModule = null;
-
     protected ?int $paymentModule = null;
-
     protected ?float $postage = null;
-
     protected float $postageTax = 0.0;
-
     protected ?string $postageTaxRuleTitle = null;
-
     protected ?string $ref = null;
-
     protected ?int $status = null;
-
     protected ?string $deliveryRef = null;
-
     protected ?int $cartItemId = null;
-
     protected ?string $transactionRef = null;
-
     protected Response $response;
 
     public function __construct(Order $order)
@@ -329,17 +315,12 @@ class OrderEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     * @since 2.4.0
-     */
     public function getTransactionRef(): ?string
     {
         return $this->transactionRef;
     }
 
     /**
-     * @since 2.4.0
-     *
      * @return $this
      */
     public function setTransactionRef(?string $transactionRef): self

@@ -140,7 +140,7 @@ class Session extends BaseSession
 
     // -- Customer user --------------------------------------------------------
 
-    public function setCustomerUser(UserInterface $user): static
+    public function setCustomerUser(?UserInterface $user): static
     {
         $this->set('thelia.customer_user', $user);
 

@@ -101,7 +101,7 @@ class KernelListener implements EventSubscriberInterface
     protected function initParam(TheliaRequest $request)
     {
         if (!$request->hasSession() || !$request->getSession() instanceof SessionInterface) {
-            return null;
+            return;
         }
 
         $event = new IsAdminEnvEvent($request);
@@ -117,7 +117,7 @@ class KernelListener implements EventSubscriberInterface
                 return $lang;
             }
 
-            return null;
+            return;
         }
 
         $lang = $this->detectLang($request);
@@ -129,8 +129,6 @@ class KernelListener implements EventSubscriberInterface
         if ($lang instanceof Lang) {
             $request->getSession()->setLang($lang);
         }
-
-        return null;
     }
 
     protected function detectAdminLang(TheliaRequest $request): ?Lang
@@ -202,6 +200,7 @@ class KernelListener implements EventSubscriberInterface
             // At this point, set the lang to the default one.
             return Lang::getDefaultLanguage();
         }
+        return Lang::getDefaultLanguage();
     }
 
     public function sessionInit(RequestEvent $event): void
@@ -213,7 +212,6 @@ class KernelListener implements EventSubscriberInterface
         }
 
         $request = $event->getRequest();
-        $session = self::$session;
         $event = new SessionEvent($this->cacheDir, $this->debug, $this->env);
         $this->eventDispatcher->dispatch($event, TheliaKernelEvents::SESSION);
         self::$session = $event->getSession();

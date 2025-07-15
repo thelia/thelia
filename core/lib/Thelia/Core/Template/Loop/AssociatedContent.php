@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Template\Loop;
 
-use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
@@ -37,7 +37,6 @@ use Thelia\Model\ProductAssociatedContentQuery;
 class AssociatedContent extends Content
 {
     protected $contentId;
-
     protected $contentPosition;
 
     protected function getArgDefinitions(): ArgumentCollection

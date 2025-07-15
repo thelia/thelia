@@ -34,11 +34,8 @@ use Thelia\Tools\Version\Version;
 class GenerateSQLCommand extends ContainerAwareCommand
 {
     protected Translator $translator;
-
     protected $parser;
-
     protected \PDO $con;
-
     protected array $locales;
 
     protected function configure(): void
@@ -188,7 +185,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
             $useDefault,
         );
 
-        if ($translation === '' || $translation === '0') {
+        if ('' === $translation || '0' === $translation) {
             $translation = ($inString) ? '' : 'NULL';
         } else {
             $translation = $this->con->quote($translation);

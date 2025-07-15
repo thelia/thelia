@@ -209,7 +209,9 @@ class Customer extends BaseAction implements EventSubscriberInterface
     public function login(CustomerLoginEvent $event): void
     {
         $customer = $event->getCustomer();
-
+        if ($customer === null) {
+            return;
+        }
         if (method_exists($customer, 'clearDispatcher')) {
             $customer->clearDispatcher();
         }

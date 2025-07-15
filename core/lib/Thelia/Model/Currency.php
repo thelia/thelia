@@ -38,7 +38,7 @@ class Currency extends BaseCurrency
         return self::$defaultCurrency;
     }
 
-    public function preInsert(?ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): bool
     {
         parent::preInsert($con);
 
@@ -52,12 +52,10 @@ class Currency extends BaseCurrency
      * Get the [rate] column value.
      *
      * @throws PropelException
-     *
-     * @return float
      */
-    public function getRate()
+    public function getRate(): float
     {
-        if (false === filter_var($this->rate, \FILTER_VALIDATE_FLOAT)) {
+        if (false === filter_var($this->rate, FILTER_VALIDATE_FLOAT)) {
             throw new PropelException('Currency::rate is not float value');
         }
 

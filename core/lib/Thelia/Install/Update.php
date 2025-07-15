@@ -38,13 +38,10 @@ use Thelia\Tools\Version\Version;
 class Update
 {
     public const SQL_DIR = 'update/sql/';
-
     public const PHP_DIR = 'update/php/';
-
     public const INSTRUCTION_DIR = 'update/instruction/';
 
     protected array $version;
-
     protected ?Tlog $logger;
 
     /** @var array log messages */
@@ -54,15 +51,10 @@ class Update
     protected array $postInstructions = [];
 
     protected array $updatedVersions = [];
-
     protected \PDO $connection;
-
     protected ?string $backupFile = null;
-
     protected string $backupDir = 'local/backup/';
-
     protected array $messages = [];
-
     protected Translator $translator;
 
     /**

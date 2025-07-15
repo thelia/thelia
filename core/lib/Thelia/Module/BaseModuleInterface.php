@@ -142,7 +142,7 @@ interface BaseModuleInterface
     /**
      * @return string The module id
      */
-    public static function getModuleId(): string;
+    public static function getModuleId(): int;
 
     /**
      * @return string The module code, in a static way

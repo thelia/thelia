@@ -28,18 +28,14 @@ trait I18nTimestampableTrait
     {
         $this->getBaseQueryObject()
             ->filterById($this->getId())
-            ->update([$this->getUpdatedAtColumnName() => new \DateTime()], $con)
-        ;
+            ->update([$this->getUpdatedAtColumnName() => new \DateTime()], $con);
 
         parent::postSave($con);
     }
 
-    /**
-     * @return ModelCriteria
-     */
-    protected function getBaseQueryObject()
+    protected function getBaseQueryObject(): ModelCriteria
     {
-        $parentClass = preg_replace("#^([\w\_\\\\]+)I18n$#", '$1Query', self::class);
+        $parentClass = preg_replace('#^([\\w\\_\\\\]+)I18n$#', '$1Query', self::class);
 
         return new $parentClass();
     }

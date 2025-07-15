@@ -27,7 +27,6 @@ use Thelia\ImportExport\Export\JsonFileAbstractExport;
 class OrderExport extends JsonFileAbstractExport
 {
     public const FILE_NAME = 'order';
-
     public const USE_RANGE_DATE = true;
 
     protected array $orderAndAliases = [

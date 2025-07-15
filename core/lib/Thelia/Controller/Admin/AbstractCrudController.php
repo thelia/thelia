@@ -404,8 +404,7 @@ abstract class AbstractCrudController extends BaseAdminController
         mixed $object,
         ?string $eventName,
         $doFinalRedirect = true,
-    ): RedirectResponse|Response|null
-    {
+    ): RedirectResponse|Response|null {
         // Check current user authorization
         if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof Response) {
             return $response;
@@ -443,8 +442,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
     public function setToggleVisibilityAction(
         EventDispatcherInterface $eventDispatcher,
-    ): ?Response
-    {
+    ): ?Response {
         // Check current user authorization
         if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof Response) {
             return $response;

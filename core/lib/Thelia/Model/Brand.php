@@ -30,7 +30,7 @@ class Brand extends BaseBrand implements FileModelParentInterface
         return 'brand';
     }
 
-    public function preInsert(?ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): bool
     {
         parent::preInsert($con);
 

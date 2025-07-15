@@ -29,7 +29,6 @@ class ProductI18nExport extends JsonFileAbstractExport
         'product_i18n_DESCRIPTION' => 'product_description',
         'product_i18n_POSTSCRIPTUM' => 'product_postscriptum',
     ];
-
     protected $idxStripHtml = [
         'product_i18n_CHAPO',
         'product_i18n_DESCRIPTION',

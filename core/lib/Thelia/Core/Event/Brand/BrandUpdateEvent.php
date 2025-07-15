@@ -22,11 +22,8 @@ namespace Thelia\Core\Event\Brand;
 class BrandUpdateEvent extends BrandCreateEvent
 {
     protected $chapo;
-
     protected $description;
-
     protected $postscriptum;
-
     protected $logo_image_id;
 
     /**

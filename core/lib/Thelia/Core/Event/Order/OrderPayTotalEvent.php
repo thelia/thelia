@@ -20,11 +20,8 @@ namespace Thelia\Core\Event\Order;
 class OrderPayTotalEvent extends OrderEvent
 {
     protected float|int $tax;
-
     protected bool $includePostage;
-
     protected bool $includeDiscount;
-
     protected float|int $total;
 
     public function isIncludePostage(): bool

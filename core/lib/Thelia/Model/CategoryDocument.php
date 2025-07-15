@@ -19,7 +19,6 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\Routing\Router;
 use Thelia\Files\FileModelInterface;
 use Thelia\Files\FileModelParentInterface;
-use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\CategoryDocument as BaseCategoryDocument;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
@@ -33,15 +32,13 @@ class CategoryDocument extends BaseCategoryDocument implements BreadcrumbInterfa
 
     /**
      * Calculate next position relative to our parent.
-     *
-     * @param CategoryDocumentQuery $query
      */
-    protected function addCriteriaToPositionQuery($query): void
+    protected function addCriteriaToPositionQuery(CategoryDocumentQuery $query): void
     {
         $query->filterByCategory($this->getCategory());
     }
 
-    public function preInsert(?ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): true
     {
         parent::preInsert($con);
 
@@ -50,32 +47,32 @@ class CategoryDocument extends BaseCategoryDocument implements BreadcrumbInterfa
         return true;
     }
 
-    public function setParentId($parentId)
+    public function setParentId($parentId): static
     {
         $this->setCategoryId($parentId);
 
         return $this;
     }
 
-    public function getParentId()
+    public function getParentId(): int
     {
         return $this->getCategoryId();
     }
 
-    public function preDelete(?ConnectionInterface $con = null)
+    public function preDelete(?ConnectionInterface $con = null): true
     {
         parent::preDelete($con);
 
         $this->reorderBeforeDelete(
             [
                 'category_id' => $this->getCategoryId(),
-            ]
+            ],
         );
 
         return true;
     }
 
-    public function getBreadcrumb(Router $router, $tab, $locale)
+    public function getBreadcrumb(Router $router, $tab, $locale): array
     {
         return $this->getCategoryBreadcrumb($router, $tab, $locale);
     }
@@ -90,8 +87,6 @@ class CategoryDocument extends BaseCategoryDocument implements BreadcrumbInterfa
 
     /**
      * Get the ID of the form used to change this object information.
-     *
-     * @return BaseForm the form
      */
     public function getUpdateFormId(): string
     {
@@ -104,26 +99,29 @@ class CategoryDocument extends BaseCategoryDocument implements BreadcrumbInterfa
     public function getUploadDir(): string
     {
         $uploadDir = ConfigQuery::read('documents_library_path');
-        $uploadDir = $uploadDir === null ? THELIA_LOCAL_DIR.'media'.DS.'documents' : THELIA_ROOT.$uploadDir;
+        $uploadDir = null === $uploadDir ? THELIA_LOCAL_DIR . 'media' . DS . 'documents' : THELIA_ROOT . $uploadDir;
 
-        return $uploadDir.DS.'category';
+        return $uploadDir . DS . 'category';
     }
 
     /**
      * @return string the URL to redirect to after update from the back-office
      */
-    public function getRedirectionUrl()
+    public function getRedirectionUrl(): string
     {
-        return '/admin/categories/update?category_id='.$this->getCategoryId();
+        return '/admin/categories/update?category_id=' . $this->getCategoryId();
     }
 
     /**
      * Get the Query instance for this object.
-     *
-     * @return ModelCriteria
      */
-    public function getQueryInstance()
+    public function getQueryInstance(): ModelCriteria
     {
         return CategoryDocumentQuery::create();
+    }
+
+    public function getFile(): string
+    {
+        return parent::getFile();
     }
 }

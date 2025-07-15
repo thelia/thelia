@@ -32,7 +32,6 @@ use Thelia\Module\Validator\ModuleValidator;
 class ModuleInstallForm extends BaseForm
 {
     protected ModuleDefinition $moduleDefinition;
-
     protected $modulePath;
 
     protected function buildForm(): void

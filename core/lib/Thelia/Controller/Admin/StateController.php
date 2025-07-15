@@ -181,7 +181,6 @@ class StateController extends AbstractCrudController
 
     /**
      * Render the main list template.
-     *
      */
     protected function renderListTemplate(string $currentOrder): Response
     {

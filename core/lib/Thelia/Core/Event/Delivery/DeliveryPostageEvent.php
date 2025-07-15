@@ -33,13 +33,9 @@ use Thelia\Module\BaseModuleInterface;
 class DeliveryPostageEvent extends ActionEvent
 {
     protected bool $validModule = false;
-
     protected ?OrderPostage $postage = null;
-
     protected ?DateTime $deliveryDate = null;
-
     protected string $deliveryMode;
-
     protected array $additionalData = [];
 
     /**
@@ -125,7 +121,7 @@ class DeliveryPostageEvent extends ActionEvent
 
     public function hasAdditionalData(): bool
     {
-        return $this->additionalData !== [];
+        return [] !== $this->additionalData;
     }
 
     public function getAdditionalData(): array

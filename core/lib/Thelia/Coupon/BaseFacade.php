@@ -41,7 +41,6 @@ use Thelia\TaxEngine\TaxEngine;
 class BaseFacade implements FacadeInterface
 {
     protected CouponFactory $couponFactory;
-
     protected ?Request $request;
 
     /**
@@ -109,7 +108,6 @@ class BaseFacade implements FacadeInterface
      * Return Products total price.
      *
      * @param bool $withItemsInPromo if true, the discounted items are included in the total
-     *
      */
     public function getCartTotalPrice(bool $withItemsInPromo = true): float
     {
@@ -257,7 +255,6 @@ class BaseFacade implements FacadeInterface
 
     /**
      * Return the event dispatcher,.
-     *
      */
     public function getDispatcher(): EventDispatcherInterface
     {
