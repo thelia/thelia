@@ -186,14 +186,10 @@ class AdminResources
 
     public function addResource(string $name, string $value, string $module = 'thelia'): void
     {
-        if (null !== $value) {
-            $nameFormated = strtoupper($name);
-
-            if (!$this->resources[$module]) {
-                $this->resources[$module] = [];
-            }
-
-            $this->resources[$module][$nameFormated] = $value;
+        $nameFormated = strtoupper($name);
+        if (!$this->resources[$module]) {
+            $this->resources[$module] = [];
         }
+        $this->resources[$module][$nameFormated] = $value;
     }
 }

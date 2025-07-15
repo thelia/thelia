@@ -223,10 +223,6 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             }
         }
 
-        if (!$search instanceof ModelCriteria) {
-            throw new \InvalidArgumentException(\sprintf('Unable to find image source. Valid sources are %s', implode(',', $this->possible_sources)));
-        }
-
         return $search;
     }
 
@@ -363,7 +359,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 // Dispatch image processing event
                 $this->dispatcher->dispatch($event, TheliaEvents::IMAGE_PROCESS);
 
-                $imageExt = pathinfo((string) $event->getSourceFilepath(), PATHINFO_EXTENSION);
+                $imageExt = pathinfo($event->getSourceFilepath(), PATHINFO_EXTENSION);
 
                 $loopResultRow
                     ->set('IMAGE_URL', $event->getFileUrl())
@@ -434,7 +430,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         return $loopResult;
     }
 
-    private function toBase64($path): string
+    private function toBase64(string $path): string
     {
         $imgData = base64_encode(file_get_contents($path));
 

@@ -129,6 +129,7 @@ class KernelListener implements EventSubscriberInterface
         if ($lang instanceof Lang) {
             $request->getSession()->setLang($lang);
         }
+
         return null;
     }
 
@@ -212,16 +213,14 @@ class KernelListener implements EventSubscriberInterface
         }
 
         $request = $event->getRequest();
-
-        if (!($session = self::$session) instanceof Session) {
-            $event = new SessionEvent($this->cacheDir, $this->debug, $this->env);
-
-            $this->eventDispatcher->dispatch($event, TheliaKernelEvents::SESSION);
-            self::$session = $event->getSession();
-            $session = self::$session;
-        }
+        $session = self::$session;
+        $event = new SessionEvent($this->cacheDir, $this->debug, $this->env);
+        $this->eventDispatcher->dispatch($event, TheliaKernelEvents::SESSION);
+        self::$session = $event->getSession();
+        $session = self::$session;
 
         $session->start();
+
         $request->setSession($session);
     }
 

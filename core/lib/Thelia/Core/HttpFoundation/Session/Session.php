@@ -236,12 +236,9 @@ class Session extends BaseSession
 
             $dispatcher->dispatch($cartEvent, TheliaEvents::CART_RESTORE_CURRENT);
 
-            if (!($cart = $cartEvent->getCart()) instanceof Cart) {
-                throw new \LogicException('Unable to get a Cart.');
-            }
+            $cart = $cartEvent->getCart();
 
-            // Store the cart.
-            $this->setSessionCart($cart);
+            throw new \LogicException('Unable to get a Cart.');
         }
 
         return $cart;

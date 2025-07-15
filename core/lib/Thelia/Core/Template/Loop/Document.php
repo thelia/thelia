@@ -195,10 +195,6 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
             }
         }
 
-        if (!$search instanceof ModelCriteria) {
-            throw new \InvalidArgumentException(\sprintf('Unable to find document source. Valid sources are %s', implode(',', $this->possible_sources)));
-        }
-
         return $search;
     }
 

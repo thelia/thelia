@@ -25,6 +25,7 @@ class CookieTokenProvider
             // Create the authenticator
             return $request->cookies->get($cookieName);
         }
+
         return null;
     }
 
