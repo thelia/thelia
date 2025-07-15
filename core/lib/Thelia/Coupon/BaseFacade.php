@@ -51,7 +51,7 @@ class BaseFacade implements FacadeInterface
         protected TaxEngine $taxEngine,
         protected TranslatorInterface $translator,
         protected ParserInterface $parser,
-        RequestStack $requestStack,
+        protected RequestStack $requestStack,
         protected ConditionEvaluator $conditionEvaluator,
         protected EventDispatcherInterface $eventDispatcher,
     ) {
@@ -227,7 +227,11 @@ class BaseFacade implements FacadeInterface
     public function getRequest(): Request
     {
         if (!$this->request instanceof \Symfony\Component\HttpFoundation\Request) {
-            throw new \LogicException('Request is not set. Please ensure that the RequestStack is properly configured.');
+            // If the request is not set, we try to get it from the RequestStack again.
+            $this->request = $this->requestStack->getCurrentRequest();
+            if (!$this->request instanceof \Symfony\Component\HttpFoundation\Request) {
+                throw new \LogicException('Request is not set. Please ensure that the RequestStack is properly configured.');
+            }
         }
 
         return $this->request;

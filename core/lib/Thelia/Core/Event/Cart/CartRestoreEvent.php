@@ -19,17 +19,14 @@ use Thelia\Model\Cart;
 
 class CartRestoreEvent extends ActionEvent
 {
-    protected $cart;
+    protected ?Cart $cart = null;
 
-    public function getCart(): Cart
+    public function getCart(): ?Cart
     {
         return $this->cart;
     }
 
-    /**
-     * @return $this
-     */
-    public function setCart(Cart $cart): static
+    public function setCart(?Cart $cart): static
     {
         $this->cart = $cart;
 

@@ -88,9 +88,9 @@ class ConfigQuery extends BaseConfigQuery
         return self::read('default_lang_without_translation', 1);
     }
 
-    public static function isRewritingEnable()
+    public static function isRewritingEnable(): bool
     {
-        return 1 === self::read('rewriting_enable');
+        return '1' === self::read('rewriting_enable');
     }
 
     public static function getPageNotFoundView()
@@ -103,14 +103,14 @@ class ConfigQuery extends BaseConfigQuery
         return self::read('obsolete_rewriten_url_view', 'obsolete-rewritten-url');
     }
 
-    public static function useTaxFreeAmounts()
+    public static function useTaxFreeAmounts(): bool
     {
-        return 1 === self::read('use_tax_free_amounts', 'default');
+        return '1' === self::read('use_tax_free_amounts', 'default');
     }
 
-    public static function checkAvailableStock()
+    public static function checkAvailableStock(): bool
     {
-        return 0 !== self::read('check-available-stock', 1);
+        return '0 ' !== self::read('check-available-stock', 1);
     }
 
     public static function getUnknownFlagPath()
@@ -143,7 +143,7 @@ class ConfigQuery extends BaseConfigQuery
 
     public static function getNotifyNewsletterSubscription(): bool
     {
-        return 0 !== self::read('notify_newsletter_subscription', 0);
+        return '0' !== self::read('notify_newsletter_subscription', 0);
     }
 
     public static function isCustomerEmailConfirmationEnable(): bool
@@ -170,14 +170,14 @@ class ConfigQuery extends BaseConfigQuery
     }
 
     /* smtp config */
-    public static function isSmtpInEnv()
+    public static function isSmtpInEnv(): bool
     {
         return isset($_ENV['SMTP_ENABLED']) || isset($_ENV['SMTP_HOST']) || isset($_ENV['MAILER_DSN']);
     }
 
-    public static function isSmtpEnable()
+    public static function isSmtpEnable(): bool
     {
-        return 1 === self::read('smtp.enabled');
+        return '1' === self::read('smtp.enabled');
     }
 
     public static function getSmtpHost()

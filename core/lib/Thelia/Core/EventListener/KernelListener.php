@@ -138,6 +138,7 @@ class KernelListener implements EventSubscriberInterface
         if (null !== $requestedLangCodeOrLocale) {
             return LangQuery::create()->findOneByCode($requestedLangCodeOrLocale);
         }
+        return Lang::getDefaultLanguage();
     }
 
     protected function detectLang(TheliaRequest $request): ?Lang

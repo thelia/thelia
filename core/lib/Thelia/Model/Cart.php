@@ -227,9 +227,9 @@ class Cart extends BaseCart
         return $this->getCartItems()->count() > 0;
     }
 
-    public function setDiscount($discount): ?string
+    public function setDiscount($discount): Cart
     {
-        return parent::setDiscount(round($discount, 2));
+        return parent::setDiscount(round((float) $discount, 2));
     }
 
     /**

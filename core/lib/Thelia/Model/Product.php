@@ -50,14 +50,14 @@ class Product extends BaseProduct implements FileModelParentInterface
     {
         $taxCalculator = new Calculator();
 
-        return $taxCalculator->load($this, $country, $state)->getTaxedPrice($price);
+        return $taxCalculator->load($this, $country, $state)->getTaxedPrice((float) $price);
     }
 
     public function getTaxedPromoPrice(Country $country, $price, ?State $state = null)
     {
         $taxCalculator = new Calculator();
 
-        return $taxCalculator->load($this, $country, $state)->getTaxedPrice($price);
+        return $taxCalculator->load($this, $country, $state)->getTaxedPrice((float) $price);
     }
 
     /**

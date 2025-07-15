@@ -16,8 +16,8 @@ namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
-use Propel\Runtime\Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -31,11 +31,11 @@ use Thelia\TaxEngine\Calculator;
 
 class Order extends BaseOrder
 {
-    protected ?int $choosenDeliveryAddress;
+    protected ?int $choosenDeliveryAddress = null;
 
-    protected ?int $choosenInvoiceAddress;
+    protected ?int $choosenInvoiceAddress = null;
 
-    protected $disableVersioning = false;
+    protected bool $disableVersioning = false;
 
     /**
      * @param int $choosenDeliveryAddress the choosen delivery address ID

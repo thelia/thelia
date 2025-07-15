@@ -140,7 +140,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             // Select all content which have one of the required folders as the default one, or an associated one
             $depth = $this->getDepth();
 
-            $allFolderIDs = FolderQuery::getFolderTreeIds($folderIdList, $depth);
+            $allFolderIDs = FolderQuery::getFolderTreeIds($folderIdList, (int) $depth);
 
             $search
                 ->useContentFolderQuery('FolderSelect')
@@ -148,7 +148,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->endUse();
 
             // We can only sort by position if we have a single folder ID, with a depth of 1
-            $manualOrderAllowed = (1 === $depth && 1 === \count($folderIdList));
+            $manualOrderAllowed = (1 === (int) $depth && 1 === \count($folderIdList));
         } else {
             $search
                 ->leftJoinContentFolder('FolderSelect')

@@ -456,7 +456,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     /**
      * @throws PropelException
      */
-    protected function manageFeatureAv(ProductQuery &$search, array $feature_availability): void
+    protected function manageFeatureAv(ProductQuery $search, array $feature_availability): void
     {
         foreach ($feature_availability as $feature => $feature_choice) {
             foreach ($feature_choice['values'] as $feature_av) {
@@ -663,7 +663,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             // Select all products which have one of the required categories as the default one, or an associated one
             $depth = $this->getDepth();
 
-            $allCategoryIDs = CategoryQuery::getCategoryTreeIds($categoryIdList, $depth);
+            $allCategoryIDs = CategoryQuery::getCategoryTreeIds($categoryIdList, (int) $depth);
 
             $search
                 ->useProductCategoryQuery('CategorySelect')
@@ -1065,11 +1065,11 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         $feature_availability = $this->getFeatureAvailability();
 
-        $this->manageFeatureAv($search, $feature_availability);
+        $this->manageFeatureAv($search, $feature_availability ?? []);
 
         $feature_values = $this->getFeatureValues();
 
-        $this->manageFeatureValue($search, $feature_values);
+        $this->manageFeatureValue($search, $feature_values ?? []);
 
         $search->groupBy(ProductTableMap::COL_ID);
 

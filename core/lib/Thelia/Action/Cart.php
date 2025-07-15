@@ -68,11 +68,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
     /**
      * add an article in the current cart.
+     * @throws PropelException
      */
     public function addItem(CartEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $cart = $event->getCart();
-        $newness = $event->getNewness();
         $append = $event->getAppend();
         $quantity = $event->getQuantity();
         $currency = $cart->getCurrency();
@@ -93,21 +93,27 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         // Search for an identical item in the cart
         $findItemEvent = clone $event;
-
         $dispatcher->dispatch($findItemEvent, TheliaEvents::CART_FINDITEM);
 
         $cartItem = $findItemEvent->getCartItem();
 
-        if ($newness) {
+        if ($cartItem instanceof CartItem) {
+            if ($append) {
+                $cartItem->addQuantity($quantity)->save();
+            } else {
+                $cartItem->setQuantity($quantity)->save();
+            }
+        } else {
             $productSaleElements = ProductSaleElementsQuery::create()->findPk($productSaleElementsId);
 
             if (null !== $productSaleElements) {
-                $productPrices = $productSaleElements->getPricesByCurrency($currency, $discount);
+                $productPrices = $productSaleElements->getPricesByCurrency(
+                    $currency ?? CurrencyModel::getDefaultCurrency(),
+                    $discount,
+                );
 
                 $cartItem = $this->doAddItem($dispatcher, $cart, $productId, $productSaleElements, $quantity, $productPrices);
             }
-        } elseif ($append && $cartItem instanceof CartItem) {
-            $cartItem->addQuantity($quantity)->save();
         }
 
         $event->setCartItem($cartItem);

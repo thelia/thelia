@@ -213,8 +213,10 @@ class Session extends BaseSession
 
     public function getSessionCart(?EventDispatcherInterface $dispatcher = null): ?Cart
     {
-        $cart_id = $this->get('thelia.cart_id', null);
-        $cart = null !== $cart_id ? CartQuery::create()->findPk($cart_id) : self::$transientCart;
+        $cartId = $this->get('thelia.cart_id');
+        $cart = null !== $cartId
+            ? CartQuery::create()->findPk($cartId)
+            : self::$transientCart;
 
         // If we do not have a cart, or if the current cart is nor valid
         // restore it from the cart cookie, or create a new one
@@ -236,9 +238,10 @@ class Session extends BaseSession
 
             $dispatcher->dispatch($cartEvent, TheliaEvents::CART_RESTORE_CURRENT);
 
-            $cart = $cartEvent->getCart();
-
-            throw new \LogicException('Unable to get a Cart.');
+            if (null === $cart = $cartEvent->getCart()) {
+                throw new \LogicException('Unable to get a Cart.');
+            }
+            $this->setSessionCart($cart);
         }
 
         return $cart;

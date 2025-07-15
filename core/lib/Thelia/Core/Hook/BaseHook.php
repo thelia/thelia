@@ -137,7 +137,7 @@ abstract class BaseHook implements BaseHookInterface
 
     public function render(string $templateName, array $parameters = []): string
     {
-        $templateDir = $this->getAssetsResolver()->resolveAssetSourcePath($this->module->getCode(), false, $templateName, $this->getParser());
+        $templateDir = $this->getAssetsResolver()->resolveAssetSourcePath($this->module->getCode(), '', $templateName, $this->getParser());
 
         if (null !== $templateDir) {
             // retrieve the template
@@ -151,7 +151,7 @@ abstract class BaseHook implements BaseHookInterface
 
     public function dump(string $fileName): string
     {
-        $fileDir = $this->getAssetsResolver()->resolveAssetSourcePath($this->module->getCode(), false, $fileName, $this->getParser());
+        $fileDir = $this->getAssetsResolver()->resolveAssetSourcePath($this->module->getCode(), '', $fileName, $this->getParser());
 
         if (null !== $fileDir) {
             $content = file_get_contents($fileDir . DS . $fileName);

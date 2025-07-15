@@ -20,31 +20,33 @@ use Thelia\Model\CartItem;
 
 class CartEvent extends ActionEvent
 {
-    protected $quantity;
-    protected $append;
-    protected $newness;
-    protected $productSaleElementsId;
-    protected $product;
-    protected $cartItem;
-    protected $cartItemId;
+    protected ?int $quantity = null;
+    protected ?bool $append = null;
+    protected ?bool $newness = null;
+    protected ?int $productSaleElementsId = null;
+    protected ?int $product = null;
+    protected ?CartItem $cartItem = null;
+    protected ?int $cartItemId = null;
 
-    public function __construct(protected Cart $cart)
+    public function __construct(
+        protected Cart $cart
+    )
     {
     }
 
-    public function setAppend(bool $append): static
+    public function setAppend(bool|int $append): static
     {
-        $this->append = $append;
+        $this->append = (bool) $append;
 
         return $this;
     }
 
-    public function getAppend(): bool
+    public function getAppend(): ?bool
     {
         return $this->append;
     }
 
-    public function setCartItem(CartItem $cartItem): static
+    public function setCartItem(?CartItem $cartItem): static
     {
         $this->cartItem = $cartItem;
 
@@ -61,12 +63,12 @@ class CartEvent extends ActionEvent
         return $this;
     }
 
-    public function getCartItem(): CartItem
+    public function getCartItem(): ?CartItem
     {
         return $this->cartItem;
     }
 
-    public function getCartItemId()
+    public function getCartItemId(): ?int
     {
         return $this->cartItemId;
     }
@@ -81,14 +83,14 @@ class CartEvent extends ActionEvent
         return $this;
     }
 
-    public function setNewness(bool $newness): static
+    public function setNewness(int|bool $newness): static
     {
-        $this->newness = $newness;
+        $this->newness = (bool) $newness;
 
         return $this;
     }
 
-    public function getNewness(): bool
+    public function getNewness(): ?bool
     {
         return $this->newness;
     }
@@ -96,9 +98,9 @@ class CartEvent extends ActionEvent
     /**
      * @param int $product the product ID
      */
-    public function setProduct(int $product): static
+    public function setProduct(int|string $product): static
     {
-        $this->product = $product;
+        $this->product = (int) $product;
 
         return $this;
     }
@@ -106,31 +108,31 @@ class CartEvent extends ActionEvent
     /**
      * @return int the product ID
      */
-    public function getProduct(): int
+    public function getProduct(): ?int
     {
         return $this->product;
     }
 
-    public function setProductSaleElementsId(int $productSaleElementsId): static
+    public function setProductSaleElementsId(int|string $productSaleElementsId): static
     {
-        $this->productSaleElementsId = $productSaleElementsId;
+        $this->productSaleElementsId = (int) $productSaleElementsId;
 
         return $this;
     }
 
-    public function getProductSaleElementsId(): int
+    public function getProductSaleElementsId(): ?int
     {
         return $this->productSaleElementsId;
     }
 
-    public function setQuantity(int $quantity): static
+    public function setQuantity(int|float $quantity): static
     {
-        $this->quantity = $quantity;
+        $this->quantity = (int) $quantity;
 
         return $this;
     }
 
-    public function getQuantity(): int
+    public function getQuantity(): ?int
     {
         return $this->quantity;
     }

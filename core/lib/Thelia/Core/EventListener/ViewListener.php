@@ -72,7 +72,6 @@ class ViewListener implements EventSubscriberInterface
             $parser = $this->parserResolver->getParser($templatePath, $view);
             $parser->setTemplateDefinition($this->templateHelper->getActiveFrontTemplate(), true);
             $viewId = $request->attributes->get($view . '_id');
-
             $this->eventDispatcher->dispatch(new ViewCheckEvent($view, $viewId), TheliaEvents::VIEW_CHECK);
             $content = $parser->render($view . '.' . $parser->getFileExtension());
             $response = $content instanceof Response
@@ -108,7 +107,6 @@ class ViewListener implements EventSubscriberInterface
         if ($request->attributes->has(self::IGNORE_THELIA_VIEW)) {
             return;
         }
-
         $view = $request->attributes->get('_view', $this->findView($request));
         $request->attributes->set('_view', $view);
 

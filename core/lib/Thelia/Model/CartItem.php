@@ -146,6 +146,10 @@ class CartItem extends BaseCartItem
     public function getProduct(?ConnectionInterface $con = null, $locale = null): Product
     {
         $product = parent::getProduct($con);
+        if (null === $locale) {
+            /** @var string $locale */
+            $locale = Lang::getDefaultLanguage()->getLocale();
+        }
 
         $translation = $product->getTranslation($locale);
 
@@ -173,7 +177,7 @@ class CartItem extends BaseCartItem
     {
         $taxCalculator = new Calculator();
 
-        return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice($this->getPrice());
+        return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice((float) $this->getPrice());
     }
 
     /**
@@ -183,7 +187,7 @@ class CartItem extends BaseCartItem
     {
         $taxCalculator = new Calculator();
 
-        return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice($this->getPromoPrice());
+        return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice((float) $this->getPromoPrice());
     }
 
     /**

@@ -16,7 +16,7 @@ namespace Thelia\Module;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
-use Propel\Runtime\Propel\Runtime\Exception\PropelException;
+use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -236,13 +236,13 @@ class BaseModule implements BaseModuleInterface
     public static function getConfigValue($variableName, $defaultValue = null, $valueLocale = null): string
     {
         return ModuleConfigQuery::create()
-            ->getConfigValue(self::getModuleId(), $variableName, $defaultValue, $valueLocale);
+            ->getConfigValue(self::getModuleId(), $variableName, (string) $defaultValue, $valueLocale);
     }
 
     public static function setConfigValue($variableName, $variableValue, $valueLocale = null, $createIfNotExists = true): void
     {
         ModuleConfigQuery::create()
-            ->setConfigValue(self::getModuleId(), $variableName, $variableValue, $valueLocale, $createIfNotExists);
+            ->setConfigValue(self::getModuleId(), $variableName, (string) $variableValue, $valueLocale, $createIfNotExists);
     }
 
     public function deployImageFolder(Module $module, $folderPath, ?ConnectionInterface $con = null): void

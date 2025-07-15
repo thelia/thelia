@@ -16,6 +16,7 @@ namespace Thelia\Core\Template\Element;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Model\Lang;
 use Thelia\Model\Tools\ModelCriteriaTools;
 
 /**
@@ -57,14 +58,15 @@ abstract class BaseI18nLoop extends BaseLoop
         ?string $foreignTable = null,
         string $foreignKey = 'ID',
         bool $forceReturn = false,
-    ): mixed {
+    ): void {
         /* manage translations */
-
+        /** @var Lang $lang */
+        $lang = $this->getCurrentRequest()->getSession()->getLang() ?? Lang::getDefaultLanguage();
         $this->locale = ModelCriteriaTools::getI18n(
             $this->getBackendContext(),
-            $this->getLang(),
+            $lang->getId(),
             $search,
-            $this->getCurrentRequest()->getSession()->getLang()->getLocale(),
+            $lang->getLocale(),
             $columns,
             $foreignTable,
             $foreignKey,

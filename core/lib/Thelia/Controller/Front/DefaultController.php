@@ -40,15 +40,12 @@ class DefaultController extends BaseFrontController
      */
     public function noAction(Request $request): void
     {
-        if (!$view = ($request->query->get('view') && $request->request->has('view'))) {
-            $view = $request->request->get('view');
-        }
-
-        if (null !== $view) {
+        if ($view = $request->query->get('view') ?? $request->request->has('view')) {
             $request->attributes->set('_view', $view);
+            return;
         }
 
-        if (null === $view && null === $request->attributes->get('_view')) {
+        if (null === $request->attributes->get('_view')) {
             $request->attributes->set('_view', 'index');
         }
 

@@ -37,7 +37,7 @@ class Admin extends BaseAdmin implements UserInterface, SecurityUserInterface, P
         parent::preInsert($con);
 
         // Set the serial number (for auto-login)
-        $this->setRememberMeSerial(uniqid());
+        $this->setRememberMeSerial(uniqid('', true));
 
         return true;
     }
@@ -115,6 +115,6 @@ class Admin extends BaseAdmin implements UserInterface, SecurityUserInterface, P
 
     public function getLocale(): string
     {
-        return $this->getLangModel()->getLocale();
+        return parent::getLocale();
     }
 }

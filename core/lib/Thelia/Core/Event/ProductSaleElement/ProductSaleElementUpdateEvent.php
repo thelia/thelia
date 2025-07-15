@@ -29,7 +29,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
     protected int $onsale;
     protected int $isnew;
     protected bool $isdefault;
-    protected string $ean_code;
+    protected ?string $ean_code;
     protected int $tax_rule_id;
     protected int $from_default_currency;
 
@@ -165,7 +165,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
         return $this;
     }
 
-    public function getEanCode(): string
+    public function getEanCode(): ?string
     {
         return $this->ean_code;
     }
@@ -173,7 +173,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
     /**
      * @return $this
      */
-    public function setEanCode(string $ean_code): self
+    public function setEanCode(?string $ean_code): self
     {
         $this->ean_code = $ean_code;
 

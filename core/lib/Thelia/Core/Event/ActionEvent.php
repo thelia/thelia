@@ -32,11 +32,14 @@ abstract class ActionEvent extends Event
         $this->parameters[$name] = $value;
     }
 
+    public function __isset(string $name): bool
+    {
+        return isset($this->parameters[$name]);
+    }
+
     public function __get($name)
     {
-        if (\array_key_exists($name, $this->parameters)) {
-            return $this->parameters[$name];
-        }
+        return $this->parameters[$name] ?? null;
     }
 
     public function bindForm(Form $form): void

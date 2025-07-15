@@ -32,7 +32,7 @@ class ModelCriteriaTools
      * @param string $forceReturn
      */
     public static function getFrontEndI18n(
-        ModelCriteria &$search,
+        ModelCriteria $search,
         $requestedLocale,
         array $columns,
         $foreignTable,
@@ -154,7 +154,7 @@ class ModelCriteriaTools
     }
 
     public static function getBackEndI18n(
-        ModelCriteria &$search,
+        ModelCriteria $search,
         $requestedLocale,
         $columns = ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'],
         $foreignTable = null,
@@ -217,7 +217,7 @@ class ModelCriteriaTools
         ModelCriteria &$search,
         string $currentLocale,
         array $columns,
-        string $foreignTable,
+        ?string $foreignTable,
         string $foreignKey,
         bool $forceReturn = false,
         ?string $localeAlias = null,

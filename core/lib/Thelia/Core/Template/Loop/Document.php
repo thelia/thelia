@@ -158,7 +158,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
      *
      * @return ModelCriteria the propel Query object
      */
-    protected function getSearchQuery(string &$object_type, string &$object_id): ModelCriteria
+    protected function getSearchQuery(?string &$object_type, ?string &$object_id): ModelCriteria
     {
         $search = null;
 
@@ -173,10 +173,10 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                 throw new \InvalidArgumentException("If 'source' argument is specified, 'id' or 'source_id' argument should be specified");
             }
 
-            $search = $this->createSearchQuery($source, $source_id);
+            $search = $this->createSearchQuery($source, (int) $source_id);
 
             $object_type = $source;
-            $object_id = $source_id;
+            $object_id = (string) $source_id;
         } else {
             // Check for product="id" folder="id", etc. style arguments
             foreach ($this->possible_sources as $source) {
@@ -186,7 +186,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                     $search = $this->createSearchQuery($source, $argValue);
 
                     $object_type = $source;
-                    $object_id = $argValue;
+                    $object_id = (string) $argValue;
 
                     break;
                 }

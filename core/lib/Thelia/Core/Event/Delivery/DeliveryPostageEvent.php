@@ -24,6 +24,7 @@ use Thelia\Model\OrderPostage;
 use Thelia\Model\State;
 use Thelia\Module\AbstractDeliveryModule;
 use Thelia\Module\BaseModuleInterface;
+use Thelia\Module\DeliveryModuleInterface;
 
 /**
  * Class DeliveryPostageEvent.
@@ -83,12 +84,12 @@ class DeliveryPostageEvent extends ActionEvent
         return $this;
     }
 
-    public function getModule(): AbstractDeliveryModule
+    public function getModule(): BaseModuleInterface
     {
         return $this->module;
     }
 
-    public function setModule(AbstractDeliveryModule $module): static
+    public function setModule(BaseModuleInterface $module): static
     {
         $this->module = $module;
 

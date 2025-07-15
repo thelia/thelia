@@ -184,7 +184,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
      *
      * @return ModelCriteria the propel Query object
      */
-    protected function getSearchQuery(string &$objectType, string &$objectId): ModelCriteria
+    protected function getSearchQuery(?string &$objectType, ?string &$objectId): ModelCriteria
     {
         $search = null;
 
@@ -199,7 +199,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 throw new \InvalidArgumentException("If 'source' argument is specified, 'id' or 'source_id' argument should be specified");
             }
 
-            $search = $this->createSearchQuery($source, $sourceId);
+            $search = $this->createSearchQuery($source, (int) $sourceId);
 
             $objectType = $source;
             $objectId = $sourceId;
@@ -294,17 +294,17 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $result) {
             // Setup required transformations
             if (null !== $width) {
-                $event->setWidth($width);
+                $event->setWidth((int) $width);
             }
 
             if (null !== $height) {
-                $event->setHeight($height);
+                $event->setHeight((int) $height);
             }
 
-            $event->setResizeMode($resizeMode);
+            $event->setResizeMode((string)$resizeMode);
 
             if (null !== $rotation) {
-                $event->setRotation($rotation);
+                $event->setRotation((int) $rotation);
             }
 
             if (null !== $background_color) {

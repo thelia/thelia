@@ -120,7 +120,7 @@ class ImageEvent extends CachedFileEvent
         return $this;
     }
 
-    public function getBackgroundColor(): string
+    public function getBackgroundColor(): ?string
     {
         return $this->background_color;
     }
@@ -156,7 +156,7 @@ class ImageEvent extends CachedFileEvent
         return $this;
     }
 
-    public function getQuality(): int
+    public function getQuality(): ?int
     {
         return $this->quality;
     }

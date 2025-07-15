@@ -69,7 +69,7 @@ class BaseAdminController extends BaseController
             $this->requestStack->getCurrentRequest(),
             $this->securityContext->getAdminUser(),
             true,
-            $resourceId,
+            (int) $resourceId,
         );
     }
 

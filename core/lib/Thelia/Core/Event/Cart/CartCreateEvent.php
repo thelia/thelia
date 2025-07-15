@@ -19,7 +19,7 @@ use Thelia\Model\Cart;
 
 class CartCreateEvent extends ActionEvent
 {
-    protected $cart;
+    protected Cart $cart;
 
     public function getCart(): Cart
     {

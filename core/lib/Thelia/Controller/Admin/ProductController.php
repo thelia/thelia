@@ -1062,7 +1062,7 @@ class ProductController extends AbstractSeoCrudController
             ->setCurrencyId($data['currency'])
             ->setWeight($data['weight'])
             ->setQuantity($data['quantity'])
-            ->setSalePrice($data['sale_price'])
+            ->setSalePrice((float) $data['sale_price'])
             ->setOnsale($data['onsale'])
             ->setIsnew($data['isnew'])
             ->setIsdefault($data['isdefault'])
@@ -1409,23 +1409,24 @@ class ProductController extends AbstractSeoCrudController
     protected function computePrice($price, $price_type, Product $product, bool $convert = false): float
     {
         $calc = new Calculator();
+        $calc->load($product, Country::getShopLocation());
 
-        $calc->load(
-            $product,
-            Country::getShopLocation(),
-        );
+        // Calculer le prix selon le type demandé
+        $return_price = match ($price_type) {
+            'without_tax' => $calc->getUntaxedPrice((float) $price),
+            'with_tax' => $calc->getTaxedPrice((float) $price),
+            default => (float) $price,
+        };
 
-        if ('without_tax' === $price_type) {
-            $return_price = $calc->getTaxedPrice($price);
-        } elseif ('with_tax' === $price_type) {
-            $return_price = $calc->getUntaxedPrice($price);
-        } else {
-            $return_price = $price;
+        if ($convert) {
+            $defaultCurrency = Currency::getDefaultCurrency();
+
+            if ($defaultCurrency) {
+                $return_price *= $defaultCurrency->getRate();
+            }
         }
 
-        $return_price = $price * Currency::getDefaultCurrency()->getRate();
-
-        return (float) $return_price;
+        return $return_price;
     }
 
     /**

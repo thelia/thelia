@@ -24,7 +24,7 @@ class ProductSaleElements extends BaseProductSaleElements
     /**
      * @throws PropelException
      */
-    public function getPrice(string $virtualColumnName = 'price_PRICE', int $discount = 0): mixed
+    public function getPrice(string $virtualColumnName = 'price_PRICE', int $discount = 0): float
     {
         try {
             $amount = $this->getVirtualColumn($virtualColumnName);
@@ -36,13 +36,13 @@ class ProductSaleElements extends BaseProductSaleElements
             throw new PropelException(\sprintf('Virtual column `%s` does not exist in ProductSaleElements::getPrice', $virtualColumnName));
         }
 
-        return $amount;
+        return (float) $amount;
     }
 
     /**
      * @throws PropelException
      */
-    public function getPromoPrice(string $virtualColumnName = 'price_PROMO_PRICE', int $discount = 0): mixed
+    public function getPromoPrice(string $virtualColumnName = 'price_PROMO_PRICE', int $discount = 0): float
     {
         try {
             $amount = $this->getVirtualColumn($virtualColumnName);
@@ -54,13 +54,13 @@ class ProductSaleElements extends BaseProductSaleElements
             throw new PropelException(\sprintf('Virtual column `%s` does not exist in ProductSaleElements::getPromoPrice', $virtualColumnName));
         }
 
-        return $amount;
+        return (float) $amount;
     }
 
     /**
      * @throws PropelException
      */
-    public function getTaxedPrice(Country $country, string $virtualColumnName = 'price_PRICE', int $discount = 0): int
+    public function getTaxedPrice(Country $country, string $virtualColumnName = 'price_PRICE', int $discount = 0): float
     {
         $taxCalculator = new Calculator();
 
@@ -70,7 +70,7 @@ class ProductSaleElements extends BaseProductSaleElements
     /**
      * @throws PropelException
      */
-    public function getTaxedPromoPrice(Country $country, string $virtualColumnName = 'price_PROMO_PRICE', int $discount = 0): int
+    public function getTaxedPromoPrice(Country $country, string $virtualColumnName = 'price_PROMO_PRICE', int $discount = 0): float
     {
         $taxCalculator = new Calculator();
 
