@@ -17,6 +17,7 @@ declare(strict_types=1);
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Contracts\EventDispatcher\Event;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -100,7 +101,7 @@ class ProfileController extends AbstractCrudController
         return $event;
     }
 
-    protected function eventContainsObject(\Symfony\Contracts\EventDispatcher\Event $event): bool
+    protected function eventContainsObject(Event $event): bool
     {
         return $event->hasProfile();
     }
@@ -240,7 +241,7 @@ class ProfileController extends AbstractCrudController
 
         $object = $this->getExistingObject();
 
-        if (null !== $object) {
+        if ($object instanceof ActiveRecordInterface) {
             // Hydrate the form and pass it to the parser
             $resourceAccessForm = $this->hydrateResourceUpdateForm($object);
             $moduleAccessForm = $this->hydrateModuleUpdateForm($object);

@@ -98,7 +98,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         $cartItem = $findItemEvent->getCartItem();
 
-        if (null === $cartItem || $newness) {
+        if ($newness) {
             $productSaleElements = ProductSaleElementsQuery::create()->findPk($productSaleElementsId);
 
             if (null !== $productSaleElements) {
@@ -106,7 +106,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
                 $cartItem = $this->doAddItem($dispatcher, $cart, $productId, $productSaleElements, $quantity, $productPrices);
             }
-        } elseif ($append && null !== $cartItem) {
+        } elseif ($append && $cartItem instanceof CartItem) {
             $cartItem->addQuantity($quantity)->save();
         }
 
@@ -167,7 +167,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         $cart = $event->getRequest()->getSession()->getSessionCart($dispatcher);
 
-        if (null !== $cart) {
+        if ($cart instanceof CartModel) {
             $this->updateCartPrices($cart, $event->getCurrency());
         }
     }
@@ -268,7 +268,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         // Do not try to find a cartItem if one exists in the event, as previous event handlers
         // mays have put it in th event.
-        if (null === $event->getCartItem() && null !== $foundItem = CartItemQuery::create()
+        if (!$event->getCartItem() instanceof CartItem && null !== $foundItem = CartItemQuery::create()
             ->filterByCartId($event->getCart()->getId())
             ->filterByProductId($event->getProduct())
             ->filterByProductSaleElementsId($event->getProductSaleElementsId())
@@ -295,7 +295,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         }
 
         // Still no cart ? Create a new one.
-        if (null === $cart) {
+        if (!$cart instanceof CartModel) {
             $cart = $this->dispatchNewCart($dispatcher);
         }
 
@@ -318,7 +318,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         $cart = $cartRestoreEvent->getCart();
 
-        if (null === $cart) {
+        if (!$cart instanceof CartModel) {
             $cart = $this->dispatchNewCart($dispatcher);
         } else {
             $cart = $this->manageCartDuplicationAtCustomerLogin($cart, $dispatcher);

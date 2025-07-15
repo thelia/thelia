@@ -89,9 +89,13 @@ class ProductSaleElements implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:product_sale_elements:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:product_sale_elements:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:product_sale_elements:write';
+
     public const GROUP_FRONT_READ = 'front:product_sale_elements:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:product_sale_elements:read:single';
 
     #[Groups([

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Condition\Implementation;
 
+use Thelia\Model\Customer;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\UnmatchableConditionException;
 
@@ -31,7 +32,7 @@ class MatchBillingCountries extends AbstractMatchCountries
 
     public function isMatching(): bool
     {
-        if (null === $customer = $this->facade->getCustomer()) {
+        if (!($customer = $this->facade->getCustomer()) instanceof Customer) {
             throw new UnmatchableConditionException(UnmatchableConditionException::getMissingCustomerMessage());
         }
 

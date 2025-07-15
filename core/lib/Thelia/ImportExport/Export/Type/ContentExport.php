@@ -30,8 +30,11 @@ use Thelia\Model\Content;
 class ContentExport extends JsonFileAbstractExport
 {
     public const FILE_NAME = 'content';
+
     public const EXPORT_IMAGE = true;
+
     public const EXPORT_DOCUMENT = true;
+
     public const DIRECTORY_NAME = 'content';
 
     protected array $orderAndAliases = [

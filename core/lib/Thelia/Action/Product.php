@@ -376,7 +376,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher): mixed
     {
         return $this->genericUpdateSeo(ProductQuery::create(), $event, $dispatcher);
     }

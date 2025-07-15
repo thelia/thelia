@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Service\Model;
 
+use Thelia\Model\OrderPostage;
 use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
@@ -166,7 +167,7 @@ readonly class CartService
             );
             $postage = $deliveryPostageEvent->getPostage();
 
-            if (null !== $postage) {
+            if ($postage instanceof OrderPostage) {
                 $orderEvent->setPostage($postage->getAmount());
                 $orderEvent->setPostageTax($postage->getAmountTax());
                 $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
@@ -191,7 +192,7 @@ readonly class CartService
 
         $cart = $session->getSessionCart($this->eventDispatcher);
 
-        if (null === $cart) {
+        if (!$cart instanceof Cart) {
             throw new \RuntimeException('Failed to get cart event : no cart in session.');
         }
 
@@ -248,7 +249,7 @@ readonly class CartService
                 if ($deliveryPostageEvent->isValidModule()) {
                     $modulePostage = $deliveryPostageEvent->getPostage();
 
-                    if (null !== $modulePostage && (null === $postage || $postage > $modulePostage->getAmount())) {
+                    if ($modulePostage instanceof OrderPostage && (null === $postage || $postage > $modulePostage->getAmount())) {
                         $postage = $modulePostage->getAmount() - $modulePostage->getAmountTax();
                         $postageTax = $modulePostage->getAmountTax();
                     }

@@ -126,11 +126,17 @@ use Thelia\Model\Map\BrandImageTableMap;
 class BrandImage extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     public const GROUP_ADMIN_READ = 'admin:brand_image:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:brand_image:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:brand_image:write';
+
     public const GROUP_ADMIN_WRITE_FILE = 'admin:brand_image:write_file';
+
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:brand_image:write_update';
+
     public const GROUP_FRONT_READ = 'front:brand_image:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:brand_image:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ])]

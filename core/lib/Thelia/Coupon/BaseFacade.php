@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Coupon;
 
 use Propel\Runtime\Exception\PropelException;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -228,14 +227,13 @@ class BaseFacade implements FacadeInterface
 
     /**
      * Return request.
-     *
-     * @return Request
      */
     public function getRequest(): Request
     {
-        if (null === $this->request) {
+        if (!$this->request instanceof \Symfony\Component\HttpFoundation\Request) {
             throw new \LogicException('Request is not set. Please ensure that the RequestStack is properly configured.');
         }
+
         return $this->request;
     }
 
@@ -281,6 +279,7 @@ class BaseFacade implements FacadeInterface
 
             return $this->getRequest()->getSession()->setConsumedCoupons($consumedCoupons);
         }
+
         return null;
     }
 }

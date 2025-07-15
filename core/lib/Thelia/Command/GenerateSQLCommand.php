@@ -188,7 +188,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
             $useDefault,
         );
 
-        if (empty($translation)) {
+        if ($translation === '' || $translation === '0') {
             $translation = ($inString) ? '' : 'NULL';
         } else {
             $translation = $this->con->quote($translation);

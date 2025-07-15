@@ -22,6 +22,7 @@ use Iterator;
 class TypeCollection implements \Iterator
 {
     private ?int $position = null;
+
     protected $types = [];
 
     public function __construct()
@@ -130,6 +131,7 @@ class TypeCollection implements \Iterator
                 return $type->getFormattedValue($value);
             }
         }
+        return null;
     }
 
     public function getKey($key)

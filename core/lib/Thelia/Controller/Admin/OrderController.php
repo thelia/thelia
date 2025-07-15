@@ -235,16 +235,14 @@ class OrderController extends BaseAdminController
         return $this->generateBackOfficeOrderPdf($eventDispatcher, $order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'), 0 === $browser);
     }
 
-    private function generateBackOfficeOrderPdf(EventDispatcherInterface $eventDispatcher, $order_id, $fileName, bool $browser): RedirectResponse|Response
+    private function generateBackOfficeOrderPdf(EventDispatcherInterface $eventDispatcher, int $order_id, string $fileName, bool $browser): RedirectResponse|Response
     {
-        if (!($response = $this->generateOrderPdf($eventDispatcher, $order_id, $fileName, true, true, 0 === $browser)) instanceof Response) {
-            return $this->generateRedirectFromRoute(
-                'admin.order.update.view',
-                [],
-                ['order_id' => $order_id],
-            );
-        }
+        $this->generateOrderPdf($eventDispatcher, $order_id, $fileName, true, true, 0 === $browser);
 
-        return $response;
+        return $this->generateRedirectFromRoute(
+            'admin.order.update.view',
+            [],
+            ['order_id' => $order_id],
+        );
     }
 }

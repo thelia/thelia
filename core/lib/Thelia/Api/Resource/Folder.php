@@ -98,9 +98,13 @@ class Folder extends AbstractTranslatableResource
     use UrlRewritingTrait;
 
     public const GROUP_ADMIN_READ = 'admin:folder:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:folder:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:folder:write';
+
     public const GROUP_FRONT_READ = 'front:folder:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:folder:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ,

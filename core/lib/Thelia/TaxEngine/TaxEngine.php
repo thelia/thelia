@@ -30,6 +30,7 @@ use Thelia\Model\State;
 class TaxEngine
 {
     protected $taxCountry;
+
     protected $taxState;
 
     public function __construct(protected RequestStack $requestStack)

@@ -180,8 +180,6 @@ class ImportController extends BaseAdminController
      * Handle import action.
      *
      * @param int $id An import identifier
-     *
-     * @return Response
      */
     public function importAction(int $id): Response|RedirectResponse
     {

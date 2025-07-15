@@ -18,7 +18,6 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Files\FileModelInterface;
 use Thelia\Files\FileModelParentInterface;
-use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\BrandDocument as BaseBrandDocument;
 use Thelia\Model\Breadcrumb\BrandBreadcrumbTrait;
@@ -106,8 +105,6 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
 
     /**
      * Get the Query instance for this object.
-     *
-     * @return ModelCriteria
      */
     public function getQueryInstance(): ModelCriteria
     {

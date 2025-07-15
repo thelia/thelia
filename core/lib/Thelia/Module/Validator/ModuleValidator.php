@@ -33,9 +33,13 @@ use Thelia\Tools\Version\Version;
 class ModuleValidator
 {
     protected ?\SimpleXMLElement $moduleDescriptor = null;
+
     protected ?ModuleDefinition $moduleDefinition = null;
+
     protected ?string $moduleVersion = null;
+
     protected array $errors = [];
+
     protected ?string $moduleDirName = null;
 
     /**
@@ -272,16 +276,14 @@ class ModuleValidator
                 $definition = $validator->getModuleDefinition();
                 $dependencies = $definition->getDependencies();
 
-                if (\count($dependencies) > 0) {
-                    foreach ($dependencies as $dependency) {
-                        if ($dependency[0] === $code) {
-                            $dependantModules[] = [
-                                'code' => $definition->getCode(),
-                                'version' => $dependency[1],
-                            ];
+                foreach ($dependencies as $dependency) {
+                    if ($dependency[0] === $code) {
+                        $dependantModules[] = [
+                            'code' => $definition->getCode(),
+                            'version' => $dependency[1],
+                        ];
 
-                            break;
-                        }
+                        break;
                     }
                 }
             } catch (\Exception) {

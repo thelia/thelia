@@ -399,9 +399,6 @@ class LangController extends BaseAdminController
         return $this->generateRedirectFromRoute('admin.configuration.languages');
     }
 
-    /**
-     * @return Response
-     */
     protected function toggleLangDispatch(EventDispatcherInterface $eventDispatcher, ?string $eventName, LangEvent $event): Response|JsonResponse|RedirectResponse
     {
         if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof Response) {

@@ -70,7 +70,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
         $subdir = $event->getCacheSubdirectory();
         $sourceFile = $event->getSourceFilepath();
 
-        if (null === $subdir || null === $sourceFile) {
+        if (null === $sourceFile) {
             throw new \InvalidArgumentException('Cache sub-directory and source file path cannot be null');
         }
 
@@ -85,11 +85,11 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
 
             if ('symlink' === $mode) {
                 if (false === symlink($sourceFile, $originalDocumentPathInCache)) {
-                    throw new DocumentException(\sprintf('Failed to create symbolic link for %s in %s document cache directory', basename((string) $sourceFile), $subdir));
+                    throw new DocumentException(\sprintf('Failed to create symbolic link for %s in %s document cache directory', basename($sourceFile), $subdir));
                 }
             } elseif (false === @copy($sourceFile, $originalDocumentPathInCache)) {
                 // mode = 'copy'
-                throw new DocumentException(\sprintf('Failed to copy %s in %s document cache directory', basename((string) $sourceFile), $subdir));
+                throw new DocumentException(\sprintf('Failed to copy %s in %s document cache directory', basename($sourceFile), $subdir));
             }
         }
 

@@ -67,6 +67,7 @@ class IntToCombinedIntsListType extends BaseType
 
             return $return;
         }
+        return null;
     }
 
     protected function checkLogicalFormat($string)

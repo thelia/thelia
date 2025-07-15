@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\CachedFileEvent;
@@ -237,7 +238,7 @@ abstract class BaseCachedFile extends BaseAction
     public function updateFile(FileCreateOrUpdateEvent $event): void
     {
         // Copy and save file
-        if ($event->getUploadedFile()) {
+        if ($event->getUploadedFile() instanceof UploadedFile) {
             // Remove old picture file from file storage
             $url = $event->getModel()->getUploadDir() . '/' . $event->getOldModel()->getFile();
             unlink(str_replace('..', '', $url));

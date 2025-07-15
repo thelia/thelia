@@ -112,17 +112,24 @@ class Address implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:address:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:address:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:address:write';
+
     public const GROUP_FRONT_READ = 'front:address:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:address:read:single';
+
     public const GROUP_FRONT_WRITE = 'front:address:write';
+
     public const GROUP_ADMIN_COMBINED = [
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         Customer::GROUP_ADMIN_READ_SINGLE,
         Customer::GROUP_ADMIN_WRITE,
     ];
+
     public const GROUP_FRONT_COMBINED = [
         self::GROUP_FRONT_READ,
         self::GROUP_FRONT_READ_SINGLE,

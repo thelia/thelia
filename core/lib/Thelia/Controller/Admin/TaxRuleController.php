@@ -255,7 +255,7 @@ class TaxRuleController extends AbstractCrudController
 
         $object = $this->getExistingObject();
 
-        if (null !== $object) {
+        if ($object instanceof ActiveRecordInterface) {
             // Hydrate the form abd pass it to the parser
             $changeTaxesForm = $this->hydrateTaxUpdateForm($object);
 

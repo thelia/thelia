@@ -42,10 +42,12 @@ class Calculator
 {
     protected TaxRuleQuery $taxRuleQuery;
 
-    protected ?ObjectCollection $taxRulesCollection;
+    protected ?ObjectCollection $taxRulesCollection = null;
 
     protected $product;
+
     protected $country;
+
     protected $state;
 
     public function __construct()
@@ -252,7 +254,7 @@ class Calculator
      *
      * @throws PropelException
      */
-    public function getTaxAmountFromUntaxedPrice($untaxedPrice, &$taxCollection = null): int|float
+    public function getTaxAmountFromUntaxedPrice(float $untaxedPrice, ?OrderProductTaxCollection &$taxCollection = null): int|float
     {
         return $this->getTaxedPrice($untaxedPrice, $taxCollection) - $untaxedPrice;
     }
@@ -274,7 +276,7 @@ class Calculator
      */
     public function getTaxedPrice(float $untaxedPrice, ?OrderProductTaxCollection &$taxCollection = null, ?string $askedLocale = null): int|float
     {
-        if (null === $this->taxRulesCollection) {
+        if (!$this->taxRulesCollection instanceof ObjectCollection) {
             throw new TaxEngineException('Tax rules collection is empty in Calculator::getTaxedPrice', TaxEngineException::UNDEFINED_TAX_RULES_COLLECTION);
         }
 
@@ -282,7 +284,7 @@ class Calculator
             throw new TaxEngineException('Product is empty in Calculator::getTaxedPrice', TaxEngineException::UNDEFINED_PRODUCT);
         }
 
-        if (false === filter_var($untaxedPrice, FILTER_VALIDATE_FLOAT)) {
+        if (false === $untaxedPrice) {
             throw new TaxEngineException('BAD AMOUNT FORMAT', TaxEngineException::BAD_AMOUNT_FORMAT);
         }
 
@@ -290,7 +292,7 @@ class Calculator
         $currentPosition = 1;
         $currentTax = 0;
 
-        if (null !== $taxCollection) {
+        if ($taxCollection instanceof OrderProductTaxCollection) {
             $taxCollection = new OrderProductTaxCollection();
         }
 
@@ -331,7 +333,7 @@ class Calculator
      */
     public function getUntaxedPrice($taxedPrice): int|float
     {
-        if (null === $this->taxRulesCollection) {
+        if (!$this->taxRulesCollection instanceof ObjectCollection) {
             throw new TaxEngineException('Tax rules collection is empty in Calculator::getTaxAmount', TaxEngineException::UNDEFINED_TAX_RULES_COLLECTION);
         }
 

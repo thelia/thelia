@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Model;
 
-use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Model\Base\OrderCoupon as BaseOrderCoupon;
 
 class OrderCoupon extends BaseOrderCoupon

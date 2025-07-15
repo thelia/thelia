@@ -62,7 +62,7 @@ class CustomerTitle extends BaseAction implements EventSubscriberInterface
 
     protected function checkCustomerTitle(CustomerTitleEvent $event): void
     {
-        if (null === $event->getCustomerTitle()) {
+        if (!$event->getCustomerTitle() instanceof CustomerTitleModel) {
             throw new \LogicException('You must set the customer title before its update');
         }
     }

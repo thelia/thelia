@@ -23,7 +23,8 @@ use Thelia\Model\ConfigQuery;
  */
 abstract class BruteforceForm extends FirewallForm
 {
-    public const DEFAULT_TIME_TO_WAIT = 10; // 10 minutes
+    public const DEFAULT_TIME_TO_WAIT = 10;
+     // 10 minutes
     public const DEFAULT_ATTEMPTS = 10;
 
     public function getConfigTime(): int

@@ -75,7 +75,7 @@ return RectorConfig::configure()
     ->withPaths(
         [
             __DIR__ . '/src',
-            __DIR__ . '/core/lib/Thelia/Core',
+            __DIR__ . '/core',
         ],
     )
     ->withSkip([

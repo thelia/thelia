@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Contracts\EventDispatcher\Event;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -24,7 +25,6 @@ use Thelia\Core\Event\Sale\SaleActiveStatusCheckEvent;
 use Thelia\Core\Event\Sale\SaleClearStatusEvent;
 use Thelia\Core\Event\Sale\SaleCreateEvent;
 use Thelia\Core\Event\Sale\SaleDeleteEvent;
-use Thelia\Core\Event\Sale\SaleEvent;
 use Thelia\Core\Event\Sale\SaleToggleActivityEvent;
 use Thelia\Core\Event\Sale\SaleUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -189,7 +189,7 @@ class SaleController extends AbstractCrudController
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      */
-    protected function eventContainsObject(\Symfony\Contracts\EventDispatcher\Event $event): bool
+    protected function eventContainsObject(Event $event): bool
     {
         return $event->hasSale();
     }

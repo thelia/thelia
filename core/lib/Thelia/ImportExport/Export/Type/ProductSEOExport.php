@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\ImportExport\Export\Type;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Propel;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
 use Thelia\Model\Product;
@@ -40,7 +41,7 @@ class ProductSEOExport extends JsonFileAbstractExport
         'product_i18n_meta_keywords' => 'meta_keywords',
     ];
 
-    protected function getData(): array|string|\Propel\Runtime\ActiveQuery\ModelCriteria
+    protected function getData(): array|string|ModelCriteria
     {
         $locale = $this->language->getLocale();
 

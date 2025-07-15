@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Contracts\EventDispatcher\Event;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -22,7 +23,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Folder\FolderCreateEvent;
 use Thelia\Core\Event\Folder\FolderDeleteEvent;
-use Thelia\Core\Event\Folder\FolderEvent;
 use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
 use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -166,7 +166,7 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      */
-    protected function eventContainsObject(\Symfony\Contracts\EventDispatcher\Event $event): bool
+    protected function eventContainsObject(Event $event): bool
     {
         return $event->hasFolder();
     }
@@ -305,8 +305,6 @@ class FolderController extends AbstractSeoCrudController
 
     /**
      * Redirect to the edition template.
-     *
-     * @return Response
      */
     protected function redirectToEditionTemplate(?Request $request = null): Response|RedirectResponse
     {

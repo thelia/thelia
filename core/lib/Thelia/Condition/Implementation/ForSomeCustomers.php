@@ -75,7 +75,7 @@ class ForSomeCustomers extends ConditionAbstract
 
     public function isMatching(): bool
     {
-        if (null === $customer = $this->facade->getCustomer()) {
+        if (!($customer = $this->facade->getCustomer()) instanceof Customer) {
             throw new UnmatchableConditionException(UnmatchableConditionException::getMissingCustomerMessage());
         }
 

@@ -200,7 +200,7 @@ class AddressController extends AbstractCrudController
         );
     }
 
-    protected function eventContainsObject(\Symfony\Contracts\EventDispatcher\Event $event): bool
+    protected function eventContainsObject(Event $event): bool
     {
         return null !== $event->getAddress();
     }

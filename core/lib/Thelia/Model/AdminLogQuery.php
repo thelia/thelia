@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Model\Base\AdminLogQuery as BaseAdminLogQuery;
 
 /**

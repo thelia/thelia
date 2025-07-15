@@ -93,11 +93,8 @@ abstract class JsonFileAbstractExport extends AbstractExport
         $processedData = [];
 
         foreach ($this->orderAndAliases as $key => $value) {
-            if (\is_int($key)) {
-                $fieldName = $value;
-            } else {
-                $fieldName = $key;
-            }
+            $fieldName = \is_int($key) ? $value : $key;
+
             $fieldAlias = $value;
 
             $processedData[$fieldAlias] = null;

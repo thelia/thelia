@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Files\Service;
 
+use Thelia\Files\FileModelParentInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -102,7 +103,7 @@ readonly class FileProcessorService
 
         $parentModel = $fileModel->getParentFileModel();
 
-        if (null === $parentModel) {
+        if (!$parentModel instanceof FileModelParentInterface) {
             throw new ProcessFileException('', 404);
         }
 

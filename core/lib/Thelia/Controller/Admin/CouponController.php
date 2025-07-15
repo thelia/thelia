@@ -71,8 +71,6 @@ class CouponController extends BaseAdminController
 
     /**
      * Manage Coupons creation display.
-     *
-     * @return Response
      */
     public function createAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
@@ -122,8 +120,6 @@ class CouponController extends BaseAdminController
      * Manage Coupons edition display.
      *
      * @param int $couponId Coupon id
-     *
-     * @return Response
      */
     public function updateAction(EventDispatcherInterface $eventDispatcher, int $couponId): Response|RedirectResponse
     {
@@ -280,7 +276,7 @@ class CouponController extends BaseAdminController
 
         $this->checkXmlHttpRequest();
 
-        if (!empty($conditionId)) {
+        if ($conditionId !== '' && $conditionId !== '0') {
             /** @var ConditionFactory $conditionFactory */
             $conditionFactory = $this->container->get('thelia.condition.factory');
             $inputs = $conditionFactory->getInputsFromServiceId($conditionId);
@@ -635,7 +631,7 @@ class CouponController extends BaseAdminController
             return $response;
         }
 
-        if (!empty($couponServiceId)) {
+        if ($couponServiceId !== '' && $couponServiceId !== '0') {
             $this->checkXmlHttpRequest();
 
             $couponManager = $this->container->get($couponServiceId);
@@ -814,7 +810,7 @@ class CouponController extends BaseAdminController
     {
         $data = [];
 
-        if (null !== $coupon) {
+        if ($coupon instanceof Coupon) {
             $data['code'] = $coupon->getCode();
         }
 
@@ -823,7 +819,7 @@ class CouponController extends BaseAdminController
         ]);
     }
 
-    public function deleteAction(EventDispatcherInterface $eventDispatcher)
+    public function deleteAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         // Check current user authorization
         if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::DELETE)) instanceof Response) {

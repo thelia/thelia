@@ -88,9 +88,13 @@ use Thelia\Model\Map\AttributeTableMap;
 class Attribute extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:attribute:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:attribute:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:attribute:write';
+
     public const GROUP_FRONT_READ = 'front:attribute:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:attribute:read:single';
 
     #[Groups([

@@ -128,7 +128,7 @@ class HookCleanCommand extends ContainerAwareCommand
     {
         $query = ModuleHookQuery::create();
 
-        if (null !== $module) {
+        if ($module instanceof Module) {
             $query
                 ->filterByModule($module)
                 ->delete();
@@ -138,7 +138,7 @@ class HookCleanCommand extends ContainerAwareCommand
 
         $query = IgnoredModuleHookQuery::create();
 
-        if (null !== $module) {
+        if ($module instanceof Module) {
             $query
                 ->filterByModule($module)
                 ->delete();

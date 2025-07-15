@@ -117,9 +117,13 @@ class Order implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:order:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:order:write';
+
     public const GROUP_FRONT_READ = 'front:order:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:order:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ,

@@ -27,8 +27,11 @@ use Symfony\Component\Translation\Translator;
 class CheckPermission extends BaseInstall
 {
     public const DIR_CONF = 'vendor/thelia/config';
+
     public const DIR_VAR = 'var';
+
     public const DIR_WEB = 'public';
+
     public const DIR_MEDIA = 'local/media';
 
     /** @var array Directory needed to be writable */
@@ -50,6 +53,7 @@ class CheckPermission extends BaseInstall
         'min' => '7.2',
         'max' => '8.0',
     ];
+
     protected $extensions = [
         'curl',
         'fileinfo',
@@ -60,6 +64,7 @@ class CheckPermission extends BaseInstall
         'dom',
         'zip',
     ];
+
     protected $validationMessages = [];
 
     /** @var bool If permissions are OK */
@@ -87,7 +92,7 @@ class CheckPermission extends BaseInstall
             ];
         }
 
-        foreach ($this->minServerConfigurationNecessary as $key => $value) {
+        foreach (array_keys($this->minServerConfigurationNecessary) as $key) {
             $this->validationMessages[$key] = [
                 'text' => '',
                 'hint' => $this->getI18nConfigHint(),

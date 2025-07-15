@@ -173,7 +173,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             // Execute additional Action
             $response = $this->performAdditionalUpdateSeoAction($updateSeoEvent);
 
-            if (null === $response) {
+            if (!$response instanceof Response) {
                 // If we have to stay on the same page, do not redirect to the successUrl,
                 // just redirect to the edit page again.
                 if ('stay' === $request->get('save_mode')) {

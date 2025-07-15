@@ -64,11 +64,11 @@ class Version
     /**
      * @return list<(ConstraintEqual|ConstraintGreater|ConstraintLower|ConstraintNearlyEqual)>
      */
-    private static function parseConstraints($constraints, string $defaultComparison = '='): array
+    private static function parseConstraints(string $constraints, string $defaultComparison = '='): array
     {
         $constraintsList = [];
 
-        foreach (explode(' ', (string) $constraints) as $expression) {
+        foreach (explode(' ', $constraints) as $expression) {
             if (1 === preg_match('/^\d/', $expression)) {
                 $expression = $defaultComparison . $expression;
             }

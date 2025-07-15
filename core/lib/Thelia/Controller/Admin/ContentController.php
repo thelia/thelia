@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Contracts\EventDispatcher\Event;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -23,7 +24,6 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Content\ContentAddFolderEvent;
 use Thelia\Core\Event\Content\ContentCreateEvent;
 use Thelia\Core\Event\Content\ContentDeleteEvent;
-use Thelia\Core\Event\Content\ContentEvent;
 use Thelia\Core\Event\Content\ContentRemoveFolderEvent;
 use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
@@ -210,7 +210,7 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      */
-    protected function eventContainsObject(\Symfony\Contracts\EventDispatcher\Event $event): bool
+    protected function eventContainsObject(Event $event): bool
     {
         return $event->hasContent();
     }

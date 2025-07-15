@@ -190,6 +190,7 @@ class AdminResources
         if (!$this->resources[$module]) {
             $this->resources[$module] = [];
         }
+
         $this->resources[$module][$nameFormated] = $value;
     }
 }

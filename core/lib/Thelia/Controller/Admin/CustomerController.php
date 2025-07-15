@@ -176,7 +176,7 @@ class CustomerController extends AbstractCrudController
             $data['city'],
             $data['country'],
             $data['email'] ?? null,
-            !empty($data['password']) ? $data['password'] : null,
+            empty($data['password']) ? null : $data['password'],
             $data['lang_id'],
             $data['reseller'] ?? null,
             $data['sponsor'] ?? null,

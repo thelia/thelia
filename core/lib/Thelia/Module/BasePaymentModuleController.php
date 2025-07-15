@@ -82,9 +82,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
      */
     public function confirmPayment(EventDispatcherInterface $eventDispatcher, int $orderId): void
     {
-        $orderId = (int) $orderId;
-
-        if (null === $order = $this->getOrder($orderId)) {
+        if (!($order = $this->getOrder($orderId)) instanceof Order) {
             return;
         }
 
@@ -134,9 +132,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
      */
     public function saveTransactionRef(EventDispatcherInterface $eventDispatcher, int $orderId, int $transactionRef): void
     {
-        $orderId = (int) $orderId;
-
-        if (null === $order = $this->getOrder($orderId)) {
+        if (!($order = $this->getOrder($orderId)) instanceof Order) {
             return;
         }
 
@@ -180,9 +176,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
      */
     public function cancelPayment(EventDispatcherInterface $eventDispatcher, int $orderId): void
     {
-        $orderId = (int) $orderId;
-
-        if (null === $order = $this->getOrder($orderId)) {
+        if (!($order = $this->getOrder($orderId)) instanceof Order) {
             return;
         }
 

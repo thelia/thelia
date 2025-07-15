@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Files;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Thelia\Form\BaseForm;
 
 interface FileModelInterface
 {

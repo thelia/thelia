@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Coupon;
 
+use Thelia\Model\Customer;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Coupon\Type\CouponInterface;
@@ -57,7 +58,7 @@ class CouponFactory
     {
         $couponModel = $this->facade->findOneCouponByCode($couponCode);
 
-        if (null === $couponModel) {
+        if (!$couponModel instanceof Coupon) {
             return false;
         }
 
@@ -80,7 +81,7 @@ class CouponFactory
 
         // Check coupon usage count
         if (!$couponModel->isUsageUnlimited()) {
-            if (null === $customer = $this->facade->getCustomer()) {
+            if (!($customer = $this->facade->getCustomer()) instanceof Customer) {
                 throw new UnmatchableConditionException(UnmatchableConditionException::getMissingCustomerMessage());
             }
 

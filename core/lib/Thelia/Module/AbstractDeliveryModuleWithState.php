@@ -57,7 +57,7 @@ abstract class AbstractDeliveryModuleWithState extends BaseModule implements Del
         return 'delivery';
     }
 
-    public function buildOrderPostage($untaxedPostage, Country $country, $locale, $taxRuleId = null)
+    public function buildOrderPostage(float $untaxedPostage, Country $country, $locale, $taxRuleId = null)
     {
         $taxRuleQuery = TaxRuleQuery::create();
         $taxRuleId = ($taxRuleId) ?: ConfigQuery::read('taxrule_id_delivery_module');

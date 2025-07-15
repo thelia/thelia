@@ -57,7 +57,7 @@ class Brand extends BaseAction implements EventSubscriberInterface
         if (null !== $brand = BrandQuery::create()->findPk($event->getBrandId())) {
             $brand
                 ->setVisible($event->getVisible())
-                ->setLogoImageId(0 === (int) $event->getLogoImageId() ? null : $event->getLogoImageId())
+                ->setLogoImageId(0 === $event->getLogoImageId() ? null : $event->getLogoImageId())
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setDescription($event->getDescription())

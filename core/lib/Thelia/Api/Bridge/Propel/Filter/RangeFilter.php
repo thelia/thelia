@@ -21,8 +21,11 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 class RangeFilter extends AbstractFilter
 {
     public const PARAMETER_GREATER_THAN = 'gt';
+
     public const PARAMETER_GREATER_THAN_OR_EQUAL = 'gte';
+
     public const PARAMETER_LESS_THAN = 'lt';
+
     public const PARAMETER_LESS_THAN_OR_EQUAL = 'lte';
 
     protected function filterProperty(string $property, $values, ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void

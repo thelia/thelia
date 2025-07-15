@@ -58,7 +58,7 @@ abstract class AbstractExport implements \Iterator
     protected array $orderAndAliases = [];
 
     /** @var array|null Keep untranslated */
-    private ?array $originalOrderAndAliases;
+    private ?array $originalOrderAndAliases = null;
 
     /** @var bool Whether to export images or not */
     protected bool $exportImages = false;
@@ -73,7 +73,7 @@ abstract class AbstractExport implements \Iterator
     protected array $documentsPaths = [];
 
     /** @var array|null Export date range */
-    protected ?array $rangeDate;
+    protected ?array $rangeDate = null;
 
     /**
      * @throws \Exception
@@ -124,6 +124,7 @@ abstract class AbstractExport implements \Iterator
         if (null !== $this->data->getIterator()->key()) {
             return $this->data->getIterator()->key() + ($this->data->getPage() - 1) * 1000;
         }
+        return null;
     }
 
     /**

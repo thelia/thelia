@@ -198,7 +198,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
         $fs = new Filesystem();
 
-        if (!$fs->exists($file) && true === $event->isCreateFileIfNotExists()) {
+        if (!$fs->exists($file) && $event->isCreateFileIfNotExists()) {
             $dir = \dirname($file);
 
             if (!$fs->exists($file)) {
@@ -245,7 +245,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
         $translations = [];
 
         if (!$fs->exists($file)) {
-            if (true === $event->isCreateFileIfNotExists()) {
+            if ($event->isCreateFileIfNotExists()) {
                 $dir = \dirname($file);
                 $fs->mkdir($dir);
 

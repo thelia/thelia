@@ -15,8 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
-use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Model\Base\TaxRuleQuery as BaseTaxRuleQuery;
 use Thelia\Model\Map\TaxRuleCountryTableMap;

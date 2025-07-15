@@ -113,8 +113,6 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
 
     /**
      * Get the Query instance for this object.
-     *
-     * @return ModelCriteria
      */
     public function getQueryInstance(): ModelCriteria
     {

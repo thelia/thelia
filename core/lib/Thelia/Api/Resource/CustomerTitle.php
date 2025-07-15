@@ -83,8 +83,11 @@ use Thelia\Model\Map\CustomerTitleTableMap;
 class CustomerTitle extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:customer_title:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:customer_title:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:customer_title:write';
+
     public const GROUP_FRONT_READ = 'front:customer_title:read';
 
     #[Groups([

@@ -85,7 +85,7 @@ class CouponManager
      */
     public function getCurrentCoupons(): array
     {
-        $couponCodes = $this->facade->getRequest()?->getSession()?->getConsumedCoupons();
+        $couponCodes = $this->facade->getRequest()->getSession()->getConsumedCoupons();
 
         if (null === $couponCodes) {
             return [];
@@ -124,7 +124,7 @@ class CouponManager
     {
         $coupons = $this->getCurrentCoupons();
 
-        if (0 === \count($coupons)) {
+        if ([] === $coupons) {
             return false;
         }
 

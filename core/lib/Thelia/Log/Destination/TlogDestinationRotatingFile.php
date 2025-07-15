@@ -24,7 +24,9 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
     // ----------------------------------
 
     public const VAR_MAX_FILE_SIZE_KB = 'tlog_destinationfile_max_file_size';
+
     public const VAR_MAX_FILE_COUNT = 'tlog_destinationfile_max_file_count';
+
     public const MAX_FILE_SIZE_KB_DEFAULT = 1024;
 
     // 1 Mb

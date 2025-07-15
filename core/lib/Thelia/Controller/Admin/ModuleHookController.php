@@ -24,7 +24,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Hook\ModuleHookCreateEvent;
 use Thelia\Core\Event\Hook\ModuleHookDeleteEvent;
-use Thelia\Core\Event\Hook\ModuleHookEvent;
 use Thelia\Core\Event\Hook\ModuleHookToggleActivationEvent;
 use Thelia\Core\Event\Hook\ModuleHookUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -199,7 +198,7 @@ class ModuleHookController extends AbstractCrudController
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      */
-    protected function eventContainsObject(\Symfony\Contracts\EventDispatcher\Event $event): bool
+    protected function eventContainsObject(Event $event): bool
     {
         return $event->hasModuleHook();
     }
@@ -273,8 +272,6 @@ class ModuleHookController extends AbstractCrudController
 
     /**
      * Redirect to the edition template.
-     *
-     * @return Response
      */
     protected function redirectToEditionTemplate($request = null, $country = null): Response|RedirectResponse
     {

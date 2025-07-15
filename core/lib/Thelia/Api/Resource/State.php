@@ -80,7 +80,9 @@ use Thelia\Model\Map\StateTableMap;
 class State extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:state:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:state:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:state:write';
 
     #[Groups([

@@ -98,9 +98,13 @@ class OrderProduct implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:order_product:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order_product:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:order_product:write';
+
     public const GROUP_FRONT_READ = 'front:order_product:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:order_product:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ,

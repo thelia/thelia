@@ -16,7 +16,6 @@ namespace Thelia\Model;
 
 use Exception;
 use Propel\Runtime\Propel;
-use Propel\Runtime\Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Model\Base\Coupon as BaseCoupon;
 use Thelia\Model\Map\CouponTableMap;
 

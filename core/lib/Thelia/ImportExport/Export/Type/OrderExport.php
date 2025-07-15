@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\ImportExport\Export\Type;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Propel;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
 
@@ -26,6 +27,7 @@ use Thelia\ImportExport\Export\JsonFileAbstractExport;
 class OrderExport extends JsonFileAbstractExport
 {
     public const FILE_NAME = 'order';
+
     public const USE_RANGE_DATE = true;
 
     protected array $orderAndAliases = [
@@ -72,7 +74,7 @@ class OrderExport extends JsonFileAbstractExport
         'order_product_tax_title' => 'tax',
     ];
 
-    protected function getData(): array|string|\Propel\Runtime\ActiveQuery\ModelCriteria
+    protected function getData(): array|string|ModelCriteria
     {
         $locale = $this->language->getLocale();
 

@@ -74,7 +74,7 @@ class Module extends BaseAction implements EventSubscriberInterface
 
     public function checkToggleActivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (true === $event->isNoCheck()) {
+        if ($event->isNoCheck()) {
             return;
         }
 

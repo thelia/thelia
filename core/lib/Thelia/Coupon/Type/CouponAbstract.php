@@ -47,23 +47,41 @@ abstract class CouponAbstract implements CouponInterface
     public const AMOUNT_FIELD_NAME = 'amount';
 
     protected Translator|TranslatorInterface $translator;
+
     protected ConditionOrganizerInterface $organizer;
+
     protected ConditionCollection $conditions;
+
     protected ConditionEvaluator $conditionEvaluator;
+
     protected string $serviceId;
+
     protected float $amount = .0;
+
     protected array $effects = ['amount' => 0];
+
     protected string $code;
+
     protected string $title;
+
     protected string $shortDescription;
+
     protected string $description;
+
     protected bool $isEnabled = false;
+
     protected DateTime $startDate;
+
     protected DateTime $expirationDate;
+
     protected bool $isCumulative = false;
+
     protected bool $isRemovingPostage = false;
+
     protected int $maxUsage = -1;
+
     protected bool $isAvailableOnSpecialOffers = false;
+
     protected array $freeShippingForCountries = [];
 
     /** @var CouponModule[] */
@@ -196,7 +214,7 @@ abstract class CouponAbstract implements CouponInterface
 
     public function exec(): float
     {
-        return (float) $this->amount;
+        return $this->amount;
     }
 
     public function getConditions(): ConditionCollection

@@ -30,10 +30,13 @@ use Thelia\Module\Validator\ModuleValidator;
 abstract class BaseModuleGenerate extends ContainerAwareCommand
 {
     protected $module;
+
     protected $moduleDirectory;
+
     protected $reservedKeyWords = [
         'thelia',
     ];
+
     protected $neededDirectories = [
         'Config',
         'Model',

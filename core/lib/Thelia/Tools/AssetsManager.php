@@ -17,7 +17,9 @@ namespace Thelia\Tools;
 class AssetsManager
 {
     private static ?AssetsManager $instance = null;
+
     protected $processed = [];
+
     protected $entrypoints = [];
 
     protected function __construct(protected $entrypointsPath)

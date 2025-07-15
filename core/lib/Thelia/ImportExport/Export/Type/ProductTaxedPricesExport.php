@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\ImportExport\Export\Type;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Propel;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
 use Thelia\Model\ProductQuery;
@@ -52,7 +53,7 @@ class ProductTaxedPricesExport extends JsonFileAbstractExport
         'tax_rule_i18n_title' => 'tax_title',
     ];
 
-    protected function getData(): array|string|\Propel\Runtime\ActiveQuery\ModelCriteria
+    protected function getData(): array|string|ModelCriteria
     {
         $locale = $this->language->getLocale();
 

@@ -92,9 +92,13 @@ use Thelia\Model\Map\FeatureAvTableMap;
 class FeatureAv extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:feature_av:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:feature_av:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:feature_av:write';
+
     public const GROUP_FRONT_READ = 'front:feature_av:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:feature_av:read:single';
 
     #[Groups([

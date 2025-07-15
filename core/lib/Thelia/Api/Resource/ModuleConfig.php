@@ -67,7 +67,9 @@ use Thelia\Model\Map\ModuleConfigTableMap;
 class ModuleConfig extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:module_config:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:module_config:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:module_config:write';
 
     #[Groups([self::GROUP_ADMIN_READ])]

@@ -100,7 +100,7 @@ class ModuleInstallForm extends BaseForm
         }
     }
 
-    public function getModuleDefinition()
+    public function getModuleDefinition(): ModuleDefinition
     {
         return $this->moduleDefinition;
     }

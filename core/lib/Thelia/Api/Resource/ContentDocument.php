@@ -125,11 +125,17 @@ use Thelia\Model\Map\ContentDocumentTableMap;
 class ContentDocument extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     public const GROUP_ADMIN_READ = 'admin:content_document:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:content_document:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:content_document:write';
+
     public const GROUP_ADMIN_WRITE_FILE = 'admin:content_document:write_file';
+
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:content_document:write_update';
+
     public const GROUP_FRONT_READ = 'front:content_document:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:content_document:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ])]

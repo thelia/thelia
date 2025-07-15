@@ -95,8 +95,11 @@ class Lang implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:lang:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:lang:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:lang:write';
+
     public const GROUP_FRONT_READ = 'front:lang:read';
 
     #[Groups([self::GROUP_ADMIN_READ,

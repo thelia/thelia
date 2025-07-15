@@ -91,9 +91,13 @@ use Thelia\Model\Map\ModuleTableMap;
 class Module extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:module:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:module:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:module:write';
+
     public const GROUP_FRONT_READ = 'front:module:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:module:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ,

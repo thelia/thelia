@@ -97,9 +97,13 @@ use Thelia\Model\Map\CountryTableMap;
 class Country extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:country:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:country:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:country:write';
+
     public const GROUP_FRONT_READ = 'front:country:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:country:read:single';
 
     #[Groups([

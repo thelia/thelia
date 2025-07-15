@@ -57,18 +57,29 @@ class BaseModule implements BaseModuleInterface
     protected ?ContainerInterface $container = null;
 
     public const CLASSIC_MODULE_TYPE = 1;
+
     public const DELIVERY_MODULE_TYPE = 2;
+
     public const PAYMENT_MODULE_TYPE = 3;
+
     public const MODULE_CATEGORIES = 'classic,delivery,payment,marketplace,price,accounting,seo,administration,statistic';
+
     public const IS_ACTIVATED = 1;
+
     public const IS_NOT_ACTIVATED = 0;
+
     public const IS_MANDATORY = 1;
+
     public const IS_NOT_MANDATORY = 0;
+
     public const IS_HIDDEN = 1;
+
     public const IS_NOT_HIDDEN = 0;
 
     protected $reflected;
+
     protected $dispatcher;
+
     protected $request;
 
     // Do no use this attribute directly, use getModuleModel() instead.
@@ -80,7 +91,7 @@ class BaseModule implements BaseModuleInterface
      */
     public function activate(?Module $moduleModel = null): void
     {
-        if (null === $moduleModel) {
+        if (!$moduleModel instanceof Module) {
             $moduleModel = $this->getModuleModel();
         }
 
@@ -98,7 +109,7 @@ class BaseModule implements BaseModuleInterface
 
                 $this->initializeCoreI18n();
                 $cacheEvent = new CacheEvent(
-                    $this->getContainer()?->getParameter('kernel.cache_dir'),
+                    $this->getContainer()->getParameter('kernel.cache_dir'),
                 );
                 $this->getDispatcher()->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
 
@@ -144,7 +155,7 @@ class BaseModule implements BaseModuleInterface
 
     public function hasContainer(): bool
     {
-        return null !== $this->container;
+        return $this->container instanceof ContainerInterface;
     }
 
     public function getContainer(): ContainerInterface
@@ -233,7 +244,7 @@ class BaseModule implements BaseModuleInterface
         }
     }
 
-    public static function getConfigValue($variableName, $defaultValue = null, $valueLocale = null)
+    public static function getConfigValue($variableName, $defaultValue = null, $valueLocale = null): string
     {
         return ModuleConfigQuery::create()
             ->getConfigValue(self::getModuleId(), $variableName, $defaultValue, $valueLocale);
@@ -315,7 +326,7 @@ class BaseModule implements BaseModuleInterface
         }
     }
 
-    public function getModuleModel()
+    public function getModuleModel(): Module
     {
         if (null === $this->moduleModel) {
             $this->moduleModel = ModuleQuery::create()->findOneByCode($this->getCode());
@@ -336,7 +347,7 @@ class BaseModule implements BaseModuleInterface
      */
     private static array $moduleIds = [];
 
-    public static function getModuleId()
+    public static function getModuleId(): string
     {
         $code = self::getModuleCode();
 

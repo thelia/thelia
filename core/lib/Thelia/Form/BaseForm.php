@@ -48,15 +48,25 @@ use Thelia\Tools\URL;
 abstract class BaseForm implements FormInterface
 {
     protected FormBuilderInterface $formBuilder;
+
     protected FormFactoryBuilderInterface $formFactoryBuilder;
+
     protected SymfonyFormInterface $form;
+
     protected Request $request;
+
     protected ValidatorBuilder $validatorBuilder;
+
     protected ?TranslatorInterface $translator = null;
+
     private FormView $view;
+
     private bool $hasError = false;
+
     private string $errorMessage = '';
+
     protected EventDispatcherInterface $dispatcher;
+
     private ?string $type = null;
 
     public function init(

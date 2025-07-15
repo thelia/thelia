@@ -61,9 +61,13 @@ class FeatureProduct implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:feature_product:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:feature_product:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:feature_product:write';
+
     public const GROUP_FRONT_READ = 'front:feature_product:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:feature_product:read:single';
 
     #[Groups([

@@ -37,7 +37,6 @@ use Thelia\Core\Event\Product\ProductDeleteAccessoryEvent;
 use Thelia\Core\Event\Product\ProductDeleteCategoryEvent;
 use Thelia\Core\Event\Product\ProductDeleteContentEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
-use Thelia\Core\Event\Product\ProductEvent;
 use Thelia\Core\Event\Product\ProductSetTemplateEvent;
 use Thelia\Core\Event\Product\ProductToggleVisibilityEvent;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
@@ -215,7 +214,7 @@ class ProductController extends AbstractSeoCrudController
         return new ProductDeleteEvent($this->getRequest()->get('product_id', 0));
     }
 
-    protected function eventContainsObject(\Symfony\Contracts\EventDispatcher\Event $event): bool
+    protected function eventContainsObject(Event $event): bool
     {
         return $event->hasProduct();
     }
@@ -430,7 +429,7 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        return null !== $category_id ? $category_id : 0;
+        return $category_id ?? 0;
     }
 
     protected function renderListTemplate(string $currentOrder): Response
@@ -732,7 +731,7 @@ class ProductController extends AbstractSeoCrudController
     public function updateAccessoryPositionAction(
         Request $request,
         EventDispatcherInterface $eventDispatcher,
-    ) {
+    ): ?Response {
         $accessory = AccessoryQuery::create()->findPk($request->get('accessory_id'));
 
         return $this->genericUpdatePositionAction(
@@ -749,7 +748,7 @@ class ProductController extends AbstractSeoCrudController
     public function updateContentPositionAction(
         Request $request,
         EventDispatcherInterface $eventDispatcher,
-    ) {
+    ): ?Response {
         $content = ProductAssociatedContentQuery::create()->findPk($request->get('content_id'));
 
         return $this->genericUpdatePositionAction(
@@ -762,8 +761,6 @@ class ProductController extends AbstractSeoCrudController
 
     /**
      * Change product template for a given product.
-     *
-     * @return mixed
      */
     public function setProductTemplateAction(EventDispatcherInterface $eventDispatcher, int $productId): Response|RedirectResponse
     {
@@ -1076,7 +1073,7 @@ class ProductController extends AbstractSeoCrudController
         $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT);
 
         // Log object modification
-        if (null !== $changedObject = $event->getProductSaleElement()) {
+        if (($changedObject = $event->getProductSaleElement()) instanceof ProductSaleElementsModel) {
             $this->adminLogAppend(
                 $this->resourceCode,
                 AccessManager::UPDATE,
@@ -1254,14 +1251,14 @@ class ProductController extends AbstractSeoCrudController
             );
 
             $event
-                ->setReference(null === $data['reference'] ? '' : $data['reference'])
-                ->setPrice(null === $data['price'] ? 0 : $data['price'])
-                ->setWeight(null === $data['weight'] ? 0 : $data['weight'])
-                ->setQuantity(null === $data['quantity'] ? 0 : $data['quantity'])
-                ->setSalePrice(null === $data['sale_price'] ? 0 : $data['sale_price'])
-                ->setOnsale(null === $data['onsale'] ? false : $data['onsale'])
-                ->setIsnew(null === $data['isnew'] ? false : $data['isnew'])
-                ->setEanCode(null === $data['ean_code'] ? '' : $data['ean_code']);
+                ->setReference($data['reference'] ?? '')
+                ->setPrice($data['price'] ?? 0)
+                ->setWeight($data['weight'] ?? 0)
+                ->setQuantity($data['quantity'] ?? 0)
+                ->setSalePrice($data['sale_price'] ?? 0)
+                ->setOnsale($data['onsale'] ?? false)
+                ->setIsnew($data['isnew'] ?? false)
+                ->setEanCode($data['ean_code'] ?? '');
 
             $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_COMBINATION_GENERATION);
 
@@ -1428,9 +1425,7 @@ class ProductController extends AbstractSeoCrudController
             $return_price = $price;
         }
 
-        if (0 !== $convert) {
-            $return_price = $price * Currency::getDefaultCurrency()->getRate();
-        }
+        $return_price = $price * Currency::getDefaultCurrency()->getRate();
 
         return (float) $return_price;
     }
@@ -1809,8 +1804,6 @@ class ProductController extends AbstractSeoCrudController
     }
 
     /**
-     * @return mixed
-     *
      * @throws \Exception
      */
     public function cloneAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse

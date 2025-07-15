@@ -55,7 +55,7 @@ class RemoveXAmount extends AbstractRemove
             return $cartTotal;
         }
 
-        return (float) $this->amount;
+        return $this->amount;
     }
 
     public function drawBackOfficeInputs(): string

@@ -45,9 +45,13 @@ class ContentFolder implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:content_folder:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:content_folder:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:content_folder:write';
+
     public const GROUP_FRONT_READ = 'front:content_folder:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:content_folder:read:single';
 
     #[Relation(targetResource: Content::class)]

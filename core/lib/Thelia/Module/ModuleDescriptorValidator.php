@@ -29,7 +29,9 @@ class ModuleDescriptorValidator
         '2' => 'module-2_1.xsd',
         '3' => 'module-2_2.xsd',
     ];
+
     protected Finder $xsdFinder;
+
     protected $moduleVersion;
 
     public function __construct()

@@ -26,11 +26,13 @@ use Thelia\Service\Rewriting\RewritingRetriever;
 class URL
 {
     protected RewritingResolver $resolver;
+
     protected RewritingRetriever $retriever;
 
     protected RequestContext $requestContext;
 
     public const PATH_TO_FILE = true;
+
     public const WITH_INDEX_PAGE = false;
 
     protected static self $instance;
@@ -90,8 +92,9 @@ class URL
         if (null === $this->baseUrlScheme) {
             $scheme = 'http';
             $port = 80;
+            $host = $this->requestContext->getHost();
 
-            if ($host = $this->requestContext->getHost()) {
+            if ($host !== '' && $host !== '0') {
                 $scheme = $this->requestContext->getScheme();
 
                 $port = '';
@@ -134,7 +137,7 @@ class URL
     {
         // Already absolute ?
         if (!str_starts_with($path, 'http')) {
-            if (empty($alternateBaseUrl)) {
+            if ($alternateBaseUrl === null || $alternateBaseUrl === '' || $alternateBaseUrl === '0') {
                 // Prevent duplication of the subdirectory name when Thelia is installed in a subdirectory.
                 // This happens when $path was calculated with Router::generate(), which returns an absolute URL,
                 // starting at web server root. For example, if Thelia is installed in /thelia2, we got something like /thelia2/my/path
@@ -143,7 +146,7 @@ class URL
                 // We have to compensate for this.
                 $rcbu = $this->requestContext->getBaseUrl();
 
-                $hasSubdirectory = !empty($rcbu) && str_starts_with($path, $rcbu);
+                $hasSubdirectory = $rcbu !== '' && $rcbu !== '0' && str_starts_with($path, $rcbu);
 
                 $base_url = $this->getBaseUrl($hasSubdirectory);
             } else {

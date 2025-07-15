@@ -40,7 +40,7 @@ readonly class CartController
 
         $cart = $session->getSessionCart($eventDispatcher);
 
-        if (null === $cart) {
+        if (!$cart instanceof \Thelia\Model\Cart) {
             throw new NotFoundHttpException('Cart not found.');
         }
 

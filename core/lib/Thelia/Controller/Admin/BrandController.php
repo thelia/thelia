@@ -22,7 +22,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Brand\BrandCreateEvent;
 use Thelia\Core\Event\Brand\BrandDeleteEvent;
-use Thelia\Core\Event\Brand\BrandEvent;
 use Thelia\Core\Event\Brand\BrandToggleVisibilityEvent;
 use Thelia\Core\Event\Brand\BrandUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -147,7 +146,7 @@ class BrandController extends AbstractSeoCrudController
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      */
-    protected function eventContainsObject(\Symfony\Contracts\EventDispatcher\Event $event): bool
+    protected function eventContainsObject(Event $event): bool
     {
         return $event->hasBrand();
     }
@@ -156,8 +155,6 @@ class BrandController extends AbstractSeoCrudController
      * Get the created object from an event.
      *
      * @param $event \Thelia\Core\Event\Brand\BrandEvent
-     *
-     * @return \Brand|null
      */
     protected function getObjectFromEvent($event): ?Brand
     {

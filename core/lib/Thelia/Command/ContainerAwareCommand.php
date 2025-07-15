@@ -20,7 +20,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Thelia\Core\Application;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Translation\Translator;
@@ -40,12 +39,6 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
 
     protected function getContainer(): ContainerInterface
     {
-        if (null === $this->container) {
-            /** @var Application $application */
-            $application = $this->getApplication();
-            $this->container = $application->getKernel()->getContainer();
-        }
-
         return $this->container;
     }
 

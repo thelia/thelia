@@ -292,7 +292,7 @@ class TemplateController extends AbstractCrudController
     public function updateAttributePositionAction(
         Request $request,
         EventDispatcherInterface $eventDispatcher,
-    ) {
+    ): ?Response {
         // Find attribute_template
         $attributeTemplate = AttributeTemplateQuery::create()
             ->filterByTemplateId($request->get('template_id'))
@@ -358,7 +358,7 @@ class TemplateController extends AbstractCrudController
     public function updateFeaturePositionAction(
         Request $request,
         EventDispatcherInterface $eventDispatcher,
-    ) {
+    ): ?Response {
         // Find feature_template
         $featureTemplate = FeatureTemplateQuery::create()
             ->filterByTemplateId($request->get('template_id'))

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
+use Thelia\Files\FileModelInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -138,7 +139,7 @@ class File extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function cloneFileI18n($originalProductFileI18ns, $clonedProductFile, $type, ProductCloneEvent $event, EventDispatcherInterface $dispatcher): void
+    public function cloneFileI18n($originalProductFileI18ns, FileModelInterface $clonedProductFile, $type, ProductCloneEvent $event, EventDispatcherInterface $dispatcher): void
     {
         // Set clone files I18n
         /** @var ProductDocumentI18n $originalProductFileI18n */

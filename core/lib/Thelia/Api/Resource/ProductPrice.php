@@ -48,9 +48,13 @@ class ProductPrice implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:product_price:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:product_price:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:product_price:write';
+
     public const GROUP_FRONT_READ = 'front:product_price:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:product_price:read:single';
 
     #[Relation(targetResource: ProductSaleElements::class)]

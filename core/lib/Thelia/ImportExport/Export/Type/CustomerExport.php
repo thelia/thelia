@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\ImportExport\Export\Type;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Propel;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
 
@@ -48,7 +49,7 @@ class CustomerExport extends JsonFileAbstractExport
         'address_cellphone' => 'cellphone',
     ];
 
-    protected function getData(): array|string|\Propel\Runtime\ActiveQuery\ModelCriteria
+    protected function getData(): array|string|ModelCriteria
     {
         $locale = $this->language->getLocale();
 

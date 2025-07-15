@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\ImportExport\Export\Type;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Propel;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
 
@@ -28,13 +29,14 @@ class ProductI18nExport extends JsonFileAbstractExport
         'product_i18n_DESCRIPTION' => 'product_description',
         'product_i18n_POSTSCRIPTUM' => 'product_postscriptum',
     ];
+
     protected $idxStripHtml = [
         'product_i18n_CHAPO',
         'product_i18n_DESCRIPTION',
         'product_i18n_POSTSCRIPTUM',
     ];
 
-    protected function getData(): array|string|\Propel\Runtime\ActiveQuery\ModelCriteria
+    protected function getData(): array|string|ModelCriteria
     {
         $locale = $this->language->getLocale();
 

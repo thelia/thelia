@@ -176,7 +176,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
      * @throws PropelException
      */
     private function createOrUpdateCustomer(
-        CustomerModel $customer,
+        ?CustomerModel $customer,
         CustomerCreateOrUpdateEvent $event,
     ): void {
         $customer->createOrUpdate(

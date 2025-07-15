@@ -27,8 +27,11 @@ use Thelia\Tools\URL;
 class RewritingRetriever
 {
     protected $search;
+
     protected RewritingUrlQuery $rewritingUrlQuery;
+
     public $url;
+
     public $rewrittenUrl;
 
     public function __construct()
@@ -62,7 +65,7 @@ class RewritingRetriever
 
     public function loadSpecificUrl(string $view, $viewLocale, $viewId = null, array $viewOtherParameters = []): void
     {
-        if (empty($viewOtherParameters)) {
+        if ($viewOtherParameters === []) {
             $this->loadViewUrl($view, $viewLocale, $viewId);
 
             return;

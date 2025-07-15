@@ -38,7 +38,9 @@ use Thelia\Tools\Version\Version;
 class Update
 {
     public const SQL_DIR = 'update/sql/';
+
     public const PHP_DIR = 'update/php/';
+
     public const INSTRUCTION_DIR = 'update/instruction/';
 
     protected array $version;
@@ -55,7 +57,7 @@ class Update
 
     protected \PDO $connection;
 
-    protected ?string $backupFile;
+    protected ?string $backupFile = null;
 
     protected string $backupDir = 'local/backup/';
 
@@ -143,7 +145,7 @@ class Update
         return $lastEntry === $version;
     }
 
-    public function process()
+    public function process(): array
     {
         $this->updatedVersions = [];
 
@@ -297,7 +299,7 @@ class Update
         return $this->backupFile;
     }
 
-    public function getLogs()
+    public function getLogs(): array
     {
         return $this->logs;
     }
@@ -384,7 +386,7 @@ class Update
 
     public function setCurrentVersion($version): void
     {
-        if (null !== $this->connection) {
+        if ($this->connection instanceof \PDO) {
             try {
                 $stmt = $this->connection->prepare('UPDATE config set value = ? where name = ?');
                 $stmt->execute([$version, 'thelia_version']);
@@ -483,7 +485,7 @@ class Update
     {
         $content = [];
 
-        if (0 === \count($this->postInstructions)) {
+        if ([] === $this->postInstructions) {
             return '';
         }
 
@@ -508,7 +510,7 @@ class Update
 
     public function hasPostInstructions(): bool
     {
-        return 0 !== \count($this->postInstructions);
+        return [] !== $this->postInstructions;
     }
 
     /**

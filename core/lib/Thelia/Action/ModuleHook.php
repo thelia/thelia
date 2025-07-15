@@ -168,7 +168,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
 
     public function toggleModuleHookActivation(ModuleHookToggleActivationEvent $event): ModuleHookToggleActivationEvent
     {
-        if (null !== $moduleHook = $event->getModuleHook()) {
+        if (($moduleHook = $event->getModuleHook()) instanceof ModuleHookModel) {
             if ($moduleHook->getModuleActive()) {
                 $moduleHook->setActive(!$moduleHook->getActive());
                 $moduleHook->save();

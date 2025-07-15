@@ -76,8 +76,6 @@ class AddressFormat
 
     /**
      * Format a Thelia address (Address or OrderAddress).
-     *
-     * @param OrderAddress|OrderAddress $address
      */
     public function formatTheliaAddress(OrderAddress $address, $locale = null, bool $html = true, string $htmlTag = 'p', array $htmlAttributes = []): string
     {
@@ -121,8 +119,6 @@ class AddressFormat
 
     /**
      * Format a Thelia address (Address or OrderAddress) to a postal label.
-     *
-     * @param OrderAddress|OrderAddress $address
      */
     public function postalLabelFormatTheliaAddress(OrderAddress $address, $locale = null, $originCountry = null, array $options = []): string
     {
@@ -133,8 +129,6 @@ class AddressFormat
 
     /**
      * Convert a Thelia address (Address or OrderAddress) to ImmutableAddressInterface.
-     *
-     * @param OrderAddress|OrderAddress $address
      */
     protected function mapTheliaAddress(OrderAddress $address, $locale = null)
     {

@@ -176,7 +176,7 @@ class HookController extends AbstractCrudController
         return $response;
     }
 
-    protected function getDiscoverCreationEvent(array $data, $type): HookCreateAllEvent
+    protected function getDiscoverCreationEvent(array $data, int $type): HookCreateAllEvent
     {
         $event = new HookCreateAllEvent();
 

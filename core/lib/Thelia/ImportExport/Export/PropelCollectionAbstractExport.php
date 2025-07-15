@@ -66,7 +66,7 @@ abstract class PropelCollectionAbstractExport extends AbstractExport
      */
     public function rewind(): void
     {
-        if (null === $this->data) {
+        if (!$this->data instanceof PropelModelPager) {
             $data = $this->getData();
 
             if ($data instanceof ModelCriteria) {

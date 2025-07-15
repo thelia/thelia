@@ -110,10 +110,15 @@ class Customer implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:customer:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:customer:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:customer:write';
+
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:customer:write:update';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:customer:read:single';
+
     public const GROUP_FRONT_WRITE = 'front:customer:write';
 
     #[Groups([self::GROUP_ADMIN_READ,
@@ -190,7 +195,9 @@ class Customer implements PropelResourceInterface
     public ?float $discount = null;
 
     public ?string $rememberMeToken = null;
+
     public ?string $rememberMeSerial = null;
+
     public ?bool $enable = null;
 
     #[Groups([self::GROUP_FRONT_READ_SINGLE])]
@@ -203,7 +210,9 @@ class Customer implements PropelResourceInterface
     public ?\DateTime $updatedAt = null;
 
     public ?int $version = null;
+
     public ?\DateTime $versionCreatedAt = null;
+
     public ?string $versionCreatedBy = null;
 
     #[Relation(targetResource: Address::class)]

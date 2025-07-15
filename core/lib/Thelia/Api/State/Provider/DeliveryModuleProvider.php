@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Api\State\Provider;
 
+use Thelia\Model\Cart;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\Exception\PropelException;
@@ -51,7 +52,7 @@ class DeliveryModuleProvider implements ProviderInterface
     {
         $cart = $this->session->getSessionCart($this->dispatcher);
 
-        if (null === $cart) {
+        if (!$cart instanceof Cart) {
             return null;
         }
 

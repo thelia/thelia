@@ -69,7 +69,9 @@ class OrderProductTax implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:order_product_tax:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order_product_tax:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:order_product_tax:write';
 
     #[Groups([

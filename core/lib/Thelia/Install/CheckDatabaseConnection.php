@@ -72,7 +72,7 @@ class CheckDatabaseConnection extends BaseInstall
         return $this->isValid;
     }
 
-    public function getConnection()
+    public function getConnection(): \PDO
     {
         return $this->connection;
     }

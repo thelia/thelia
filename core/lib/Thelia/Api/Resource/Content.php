@@ -115,9 +115,13 @@ class Content extends AbstractTranslatableResource
     use UrlRewritingTrait;
 
     public const GROUP_ADMIN_READ = 'admin:content:read';
+
     public const GROUP_ADMIN_READ_SINGLE = 'admin:content:read:single';
+
     public const GROUP_ADMIN_WRITE = 'admin:content:write';
+
     public const GROUP_FRONT_READ = 'front:content:read';
+
     public const GROUP_FRONT_READ_SINGLE = 'front:content:read:single';
 
     #[Groups([
