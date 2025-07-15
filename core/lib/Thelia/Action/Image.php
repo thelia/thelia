@@ -360,12 +360,15 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         if (null === $dest_width) {
             $dest_width = $dest_height * $ratio;
         }
+
         if (null === $dest_height) {
             $dest_height = $dest_width / $ratio;
         }
+
         if (null === $resize_mode) {
             $resize_mode = self::KEEP_IMAGE_RATIO;
         }
+
         $width_diff = $dest_width / $width_orig;
         $height_diff = $dest_height / $height_orig;
         $delta_x = 0;
@@ -427,6 +430,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                 $dest_height = $resize_height;
             }
         }
+
         $image->resize(new Box($resize_width, $resize_height));
         $resizeFilter = 'imagick' === ConfigQuery::read('imagine_graphic_driver', 'gd')
             ? ImageInterface::FILTER_LANCZOS
@@ -456,12 +460,14 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             return $imagine->create($canvas, $bg_color)
                 ->paste($image, new Point($border_width, $border_height));
         }
+
         if (self::EXACT_RATIO_WITH_CROP === $resize_mode) {
             $image->crop(
                 new Point($delta_x, $delta_y),
                 new Box($dest_width, $dest_height),
             );
         }
+
         return $image;
     }
 

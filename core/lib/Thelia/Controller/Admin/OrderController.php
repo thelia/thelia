@@ -217,7 +217,7 @@ class OrderController extends BaseAdminController
         );
     }
 
-    public function generateInvoicePdf(EventDispatcherInterface $eventDispatcher, $order_id, $browser): Response|RedirectResponse
+    public function generateInvoicePdf(EventDispatcherInterface $eventDispatcher, int $order_id, $browser): Response|RedirectResponse
     {
         if (($response = $this->checkAuth(AdminResources::ORDER, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
@@ -226,7 +226,7 @@ class OrderController extends BaseAdminController
         return $this->generateBackOfficeOrderPdf($eventDispatcher, $order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'), 0 === $browser);
     }
 
-    public function generateDeliveryPdf(EventDispatcherInterface $eventDispatcher, $order_id, $browser): Response|RedirectResponse
+    public function generateDeliveryPdf(EventDispatcherInterface $eventDispatcher, int $order_id, $browser): Response|RedirectResponse
     {
         if (($response = $this->checkAuth(AdminResources::ORDER, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;

@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Condition\Implementation;
 
 use Thelia\Model\Customer;
-use Thelia\Model\Address;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\UnmatchableConditionException;
 
@@ -37,15 +36,9 @@ class MatchDeliveryCountries extends AbstractMatchCountries
             throw new UnmatchableConditionException(UnmatchableConditionException::getMissingCustomerMessage());
         }
 
-        if (!($deliveryAddress = $this->facade->getDeliveryAddress()) instanceof Address) {
-            throw new UnmatchableConditionException(Translator::getInstance()->trans('You must choose a delivery address before using this coupon.'));
-        }
+        $this->facade->getDeliveryAddress();
 
-        return $this->conditionValidator->variableOpComparison(
-            $deliveryAddress->getCountryId(),
-            $this->operators[self::COUNTRIES_LIST],
-            $this->values[self::COUNTRIES_LIST],
-        );
+        throw new UnmatchableConditionException(Translator::getInstance()->trans('You must choose a delivery address before using this coupon.'));
     }
 
     public function getName(): string

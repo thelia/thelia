@@ -58,10 +58,6 @@ class CouponFactory
     {
         $couponModel = $this->facade->findOneCouponByCode($couponCode);
 
-        if (!$couponModel instanceof Coupon) {
-            return false;
-        }
-
         // check if coupon is enabled
         if (!$couponModel->getIsEnabled()) {
             throw new InactiveCouponException($couponCode);

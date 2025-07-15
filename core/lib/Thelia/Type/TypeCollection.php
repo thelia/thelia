@@ -131,6 +131,7 @@ class TypeCollection implements \Iterator
                 return $type->getFormattedValue($value);
             }
         }
+
         return null;
     }
 

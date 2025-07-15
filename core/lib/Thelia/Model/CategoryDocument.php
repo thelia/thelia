@@ -83,7 +83,7 @@ class CategoryDocument extends BaseCategoryDocument implements BreadcrumbInterfa
     /**
      * @return FileModelParentInterface the parent file model
      */
-    public function getParentFileModel()
+    public function getParentFileModel(): FileModelParentInterface
     {
         return new Category();
     }
@@ -93,7 +93,7 @@ class CategoryDocument extends BaseCategoryDocument implements BreadcrumbInterfa
      *
      * @return BaseForm the form
      */
-    public function getUpdateFormId()
+    public function getUpdateFormId(): string
     {
         return AdminForm::CATEGORY_DOCUMENT_MODIFICATION;
     }
@@ -101,7 +101,7 @@ class CategoryDocument extends BaseCategoryDocument implements BreadcrumbInterfa
     /**
      * @return string the path to the upload directory where files are stored, without final slash
      */
-    public function getUploadDir()
+    public function getUploadDir(): string
     {
         $uploadDir = ConfigQuery::read('documents_library_path');
         $uploadDir = $uploadDir === null ? THELIA_LOCAL_DIR.'media'.DS.'documents' : THELIA_ROOT.$uploadDir;

@@ -124,6 +124,7 @@ abstract class AbstractExport implements \Iterator
         if (null !== $this->data->getIterator()->key()) {
             return $this->data->getIterator()->key() + ($this->data->getPage() - 1) * 1000;
         }
+
         return null;
     }
 
