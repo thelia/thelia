@@ -23,12 +23,12 @@ class FeatureAvDeleteEvent extends FeatureAvEvent
         $this->setFeatureAvId($featureAv_id);
     }
 
-    public function getFeatureAvId()
+    public function getFeatureAvId(): int
     {
         return $this->featureAv_id;
     }
 
-    public function setFeatureAvId($featureAv_id): static
+    public function setFeatureAvId(int $featureAv_id): static
     {
         $this->featureAv_id = $featureAv_id;
 

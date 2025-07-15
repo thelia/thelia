@@ -24,19 +24,16 @@ use Thelia\Model\Hook;
  */
 class HookEvent extends ActionEvent
 {
-    public ?Hook $hook;
-
-    public function __construct(?Hook $hook = null)
+    public function __construct(public ?Hook $hook = null)
     {
-        $this->hook = $hook;
     }
 
     public function hasHook(): bool
     {
-        return null !== $this->hook;
+        return $this->hook instanceof Hook;
     }
 
-    public function getHook()
+    public function getHook(): ?Hook
     {
         return $this->hook;
     }

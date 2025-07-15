@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Core;
 
-use Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,6 +30,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class TheliaHttpKernel extends HttpKernel
 {
     protected static $session;
+
     protected ContainerInterface $container;
 
     public function __construct(

@@ -56,7 +56,7 @@ class OrderStatusEvent extends ActionEvent
 
     public function hasOrderStatus(): bool
     {
-        return null !== $this->orderStatus;
+        return $this->orderStatus instanceof OrderStatus;
     }
 
     public function getOrderStatus(): OrderStatus

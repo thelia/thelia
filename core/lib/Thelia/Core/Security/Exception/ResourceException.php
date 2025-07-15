@@ -17,6 +17,7 @@ namespace Thelia\Core\Security\Exception;
 class ResourceException extends \RuntimeException
 {
     public const UNKNOWN_EXCEPTION = 0;
+
     public const RESOURCE_NOT_FOUND = 404;
 
     public function __construct($message, $code = null, $previous = null)

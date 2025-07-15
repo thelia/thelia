@@ -17,16 +17,27 @@ namespace Thelia\Core\Event\Product;
 class ProductCreateEvent extends ProductEvent
 {
     protected $ref;
+
     protected $title;
+
     protected $locale;
+
     protected $default_category;
+
     protected $visible;
+
     protected $virtual;
+
     protected $basePrice;
+
     protected $baseWeight;
+
     protected $taxRuleId;
+
     protected $currencyId;
+
     protected $baseQuantity;
+
     protected $templateId;
 
     public function getRef()

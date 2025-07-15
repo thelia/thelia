@@ -20,12 +20,19 @@ use Thelia\Model\Admin;
 class AdministratorEvent extends ActionEvent
 {
     protected $id;
+
     protected $firstname;
+
     protected $lastname;
+
     protected $login;
+
     protected $email;
+
     protected $password;
+
     protected $profile;
+
     protected $locale;
 
     public function __construct(protected ?Admin $administrator = null)

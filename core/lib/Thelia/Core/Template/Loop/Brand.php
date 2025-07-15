@@ -96,7 +96,7 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
         return $this->getStandardI18nSearchFields();
     }
 
-    public function doSearch(\Propel\Runtime\ActiveQuery\ModelCriteria $search, string $searchTerm, array $searchIn, string $searchCriteria): void
+    public function doSearch(ModelCriteria $search, string $searchTerm, array $searchIn, string $searchCriteria): void
     {
         $search->_and();
 

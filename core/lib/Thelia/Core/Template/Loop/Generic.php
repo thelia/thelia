@@ -45,7 +45,7 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
         );
     }
 
-    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
+    public function buildModelCriteria(): ModelCriteria
     {
         if (!$locale = $this->getLocale()) {
             $locale = $this->getCurrentRequest()->getSession()->getLang()->getLocale();

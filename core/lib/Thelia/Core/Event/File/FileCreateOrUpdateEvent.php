@@ -26,8 +26,11 @@ use Thelia\Files\FileModelInterface;
 class FileCreateOrUpdateEvent extends ActionEvent
 {
     protected FileModelInterface $model;
+
     protected FileModelInterface $oldModel;
+
     protected UploadedFile $uploadedFile;
+
     protected string $parentName;
 
     /**

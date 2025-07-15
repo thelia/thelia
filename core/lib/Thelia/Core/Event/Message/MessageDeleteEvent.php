@@ -23,12 +23,12 @@ class MessageDeleteEvent extends MessageEvent
         $this->setMessageId($message_id);
     }
 
-    public function getMessageId()
+    public function getMessageId(): int
     {
         return $this->message_id;
     }
 
-    public function setMessageId($message_id): static
+    public function setMessageId(int $message_id): static
     {
         $this->message_id = $message_id;
 

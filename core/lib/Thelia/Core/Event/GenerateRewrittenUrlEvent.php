@@ -69,7 +69,7 @@ class GenerateRewrittenUrlEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setUrl($url): static
+    public function setUrl(string $url): static
     {
         $this->url = $url;
 

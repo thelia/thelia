@@ -24,6 +24,7 @@ use Thelia\Core\Event\ActionEvent;
 class TranslationEvent extends ActionEvent
 {
     public const WALK_MODE_PHP = 'php';
+
     public const WALK_MODE_TEMPLATE = 'tpl';
 
     protected string $directory;
@@ -48,7 +49,7 @@ class TranslationEvent extends ActionEvent
 
     protected bool $createFileIfNotExists;
 
-    public static function createGetStringsEvent($directory, $mode, $locale, $domain): self
+    public static function createGetStringsEvent(string $directory, string $mode, string $locale, string $domain): self
     {
         $event = new self();
 
@@ -61,10 +62,10 @@ class TranslationEvent extends ActionEvent
     }
 
     public static function createWriteFileEvent(
-        $translationFilePath,
-        $translatableStrings,
-        $translatedStrings,
-        $createFileIfNotExists,
+        string $translationFilePath,
+        array $translatableStrings,
+        array $translatedStrings,
+        bool $createFileIfNotExists,
     ): self {
         $event = new self();
 

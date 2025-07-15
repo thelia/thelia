@@ -19,14 +19,23 @@ use Thelia\Model\Product;
 class ProductCombinationGenerationEvent extends ProductEvent
 {
     protected $reference;
+
     protected $price;
+
     protected $currency_id;
+
     protected $weight;
+
     protected $quantity;
+
     protected $sale_price;
+
     protected $onsale;
+
     protected $isnew;
+
     protected $ean_code;
+
     protected $combinations;
 
     public function __construct(Product $product, $currency_id, $combinations)

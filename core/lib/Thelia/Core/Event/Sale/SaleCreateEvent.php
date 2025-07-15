@@ -22,7 +22,9 @@ namespace Thelia\Core\Event\Sale;
 class SaleCreateEvent extends SaleEvent
 {
     protected $title;
+
     protected $saleLabel;
+
     protected $locale;
 
     /**

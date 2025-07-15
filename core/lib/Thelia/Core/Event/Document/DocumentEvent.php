@@ -22,6 +22,7 @@ use Thelia\Core\Event\CachedFileEvent;
 class DocumentEvent extends CachedFileEvent
 {
     protected $documentPath;
+
     protected $documentUrl;
 
     /**

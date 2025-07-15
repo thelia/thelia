@@ -23,12 +23,12 @@ class AttributeAvDeleteEvent extends AttributeAvEvent
         $this->setAttributeAvId($attributeAv_id);
     }
 
-    public function getAttributeAvId()
+    public function getAttributeAvId(): int
     {
         return $this->attributeAv_id;
     }
 
-    public function setAttributeAvId($attributeAv_id): static
+    public function setAttributeAvId(int $attributeAv_id): static
     {
         $this->attributeAv_id = $attributeAv_id;
 

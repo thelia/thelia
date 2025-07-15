@@ -102,7 +102,7 @@ class FragmentBag implements \Iterator
 
     public function isEmpty(): bool
     {
-        return 0 === \count($this->fragments);
+        return [] === $this->fragments;
     }
 
     public function getCount(): int

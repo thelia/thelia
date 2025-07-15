@@ -24,6 +24,7 @@ use Iterator;
 class FlashMessage implements \Iterator
 {
     private int $position = 0;
+
     protected $collection = [];
 
     public function add($type, $messages): void

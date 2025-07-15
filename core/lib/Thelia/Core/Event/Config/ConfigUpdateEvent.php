@@ -19,7 +19,9 @@ class ConfigUpdateEvent extends ConfigCreateEvent
     protected int $config_id;
 
     protected $description;
+
     protected $chapo;
+
     protected $postscriptum;
 
     public function __construct(int $config_id)
@@ -27,12 +29,12 @@ class ConfigUpdateEvent extends ConfigCreateEvent
         $this->setConfigId($config_id);
     }
 
-    public function getConfigId()
+    public function getConfigId(): int
     {
         return $this->config_id;
     }
 
-    public function setConfigId($config_id): static
+    public function setConfigId(int $config_id): static
     {
         $this->config_id = $config_id;
 

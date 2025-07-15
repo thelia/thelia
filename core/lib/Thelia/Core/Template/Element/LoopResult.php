@@ -21,9 +21,13 @@ use Propel\Runtime\Util\PropelModelPager;
 class LoopResult implements \Iterator, \JsonSerializable
 {
     private int $position = 0;
+
     protected $collection = [];
+
     protected $versioned = false;
+
     protected $timestamped = false;
+
     protected $countable = false;
 
     public function __construct(public $resultsCollection)
@@ -32,17 +36,17 @@ class LoopResult implements \Iterator, \JsonSerializable
 
     public function setCountable(bool $countable = true): void
     {
-        $this->countable = true === $countable;
+        $this->countable = $countable;
     }
 
     public function setTimestamped(bool $timestamped = true): void
     {
-        $this->timestamped = true === $timestamped;
+        $this->timestamped = $timestamped;
     }
 
     public function setVersioned(bool $versioned = true): void
     {
-        $this->versioned = true === $versioned;
+        $this->versioned = $versioned;
     }
 
     public function isEmpty(): bool

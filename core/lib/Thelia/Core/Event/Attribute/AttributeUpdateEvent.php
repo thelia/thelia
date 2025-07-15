@@ -19,7 +19,9 @@ class AttributeUpdateEvent extends AttributeCreateEvent
     protected int $attribute_id;
 
     protected $description;
+
     protected $chapo;
+
     protected $postscriptum;
 
     public function __construct(int $attribute_id)
@@ -27,12 +29,12 @@ class AttributeUpdateEvent extends AttributeCreateEvent
         $this->setAttributeId($attribute_id);
     }
 
-    public function getAttributeId()
+    public function getAttributeId(): int
     {
         return $this->attribute_id;
     }
 
-    public function setAttributeId($attribute_id): static
+    public function setAttributeId(int $attribute_id): static
     {
         $this->attribute_id = $attribute_id;
 

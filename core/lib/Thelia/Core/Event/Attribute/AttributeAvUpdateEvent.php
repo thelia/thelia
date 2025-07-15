@@ -19,7 +19,9 @@ class AttributeAvUpdateEvent extends AttributeAvCreateEvent
     protected int $attributeAv_id;
 
     protected $description;
+
     protected $chapo;
+
     protected $postscriptum;
 
     public function __construct(int $attributeAv_id)
@@ -27,12 +29,12 @@ class AttributeAvUpdateEvent extends AttributeAvCreateEvent
         $this->setAttributeAvId($attributeAv_id);
     }
 
-    public function getAttributeAvId()
+    public function getAttributeAvId(): int
     {
         return $this->attributeAv_id;
     }
 
-    public function setAttributeAvId($attributeAv_id): static
+    public function setAttributeAvId(int $attributeAv_id): static
     {
         $this->attributeAv_id = $attributeAv_id;
 

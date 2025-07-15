@@ -21,19 +21,16 @@ use Thelia\Model\Accessory;
  */
 class AccessoryEvent extends ActionEvent
 {
-    public ?Accessory $accessory;
-
-    public function __construct(?Accessory $accessory = null)
+    public function __construct(public ?Accessory $accessory = null)
     {
-        $this->accessory = $accessory;
     }
 
     public function hasAccessory(): bool
     {
-        return null !== $this->accessory;
+        return $this->accessory instanceof Accessory;
     }
 
-    public function getAccessory()
+    public function getAccessory(): ?Accessory
     {
         return $this->accessory;
     }

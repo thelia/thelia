@@ -157,6 +157,7 @@ class XmlFileLoader extends FileLoader
         foreach ($loops as $loop) {
             $loopConfig[$this->getAttributeAsPhp($loop, 'name')] = $this->getAttributeAsPhp($loop, 'class');
         }
+
         $this->container->setParameter('Thelia.parser.loops', $loopConfig);
     }
 
@@ -237,7 +238,7 @@ class XmlFileLoader extends FileLoader
         }
     }
 
-    protected function parseDefinition($id, $service, $file): void
+    protected function parseDefinition(string $id, \SimpleXMLElement $service, string $file): void
     {
         $definition = $this->parseService($id, $service, $file);
 
@@ -260,7 +261,7 @@ class XmlFileLoader extends FileLoader
         }
     }
 
-    protected function parseHook($id, $hook, $file, $type): void
+    protected function parseHook(string $id, $hook, string $file, $type): void
     {
         if (!isset($hook['class'])) {
             $hook['class'] = self::DEFAULT_HOOK_CLASS;

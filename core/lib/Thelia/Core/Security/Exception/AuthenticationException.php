@@ -30,7 +30,7 @@ class AuthenticationException extends \Exception
     /**
      * Set the login template name.
      */
-    public function setLoginTemplate($loginTemplate): void
+    public function setLoginTemplate(string $loginTemplate): void
     {
         $this->loginTemplate = $loginTemplate;
     }

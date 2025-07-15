@@ -53,6 +53,6 @@ class OrderPaymentEvent extends ActionEvent
 
     public function hasResponse(): bool
     {
-        return null !== $this->response;
+        return $this->response instanceof Response;
     }
 }

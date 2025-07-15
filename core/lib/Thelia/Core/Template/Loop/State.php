@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Template\Loop;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -42,6 +43,7 @@ use Thelia\Type\TypeCollection;
 class State extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $countable = true;
+
     protected $timestampable = false;
 
     protected function getArgDefinitions(): ArgumentCollection
@@ -71,7 +73,7 @@ class State extends BaseI18nLoop implements PropelSearchLoopInterface
         );
     }
 
-    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = StateQuery::create();
 

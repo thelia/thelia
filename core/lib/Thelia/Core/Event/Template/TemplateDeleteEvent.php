@@ -25,12 +25,12 @@ class TemplateDeleteEvent extends TemplateEvent
         $this->setTemplateId($template_id);
     }
 
-    public function getTemplateId()
+    public function getTemplateId(): int
     {
         return $this->template_id;
     }
 
-    public function setTemplateId($template_id): static
+    public function setTemplateId(int $template_id): static
     {
         $this->template_id = $template_id;
 

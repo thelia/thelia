@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Template\Loop;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Template\Element\BaseLoop;
@@ -57,7 +58,9 @@ use Thelia\Type\TypeCollection;
 class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInterface
 {
     protected $countable = true;
+
     protected $timestampable = true;
+
     protected $versionable = false;
 
     protected function getArgDefinitions(): ArgumentCollection
@@ -130,7 +133,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
     /**
      * @throws PropelException
      */
-    public function doSearch(\Propel\Runtime\ActiveQuery\ModelCriteria $search, $searchTerm, $searchIn, $searchCriteria): void
+    public function doSearch(ModelCriteria $search, $searchTerm, $searchIn, $searchCriteria): void
     {
         $search->_and();
 
@@ -184,7 +187,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
         }
     }
 
-    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = OrderQuery::create();
 

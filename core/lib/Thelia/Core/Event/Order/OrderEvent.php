@@ -27,29 +27,29 @@ class OrderEvent extends ActionEvent
 
     protected Order $placedOrder;
 
-    protected ?int $invoiceAddress;
+    protected ?int $invoiceAddress = null;
 
-    protected ?int $deliveryAddress;
+    protected ?int $deliveryAddress = null;
 
-    protected ?int $deliveryModule;
+    protected ?int $deliveryModule = null;
 
-    protected ?int $paymentModule;
+    protected ?int $paymentModule = null;
 
-    protected ?float $postage;
+    protected ?float $postage = null;
 
     protected float $postageTax = 0.0;
 
-    protected ?string $postageTaxRuleTitle;
+    protected ?string $postageTaxRuleTitle = null;
 
-    protected ?string $ref;
+    protected ?string $ref = null;
 
-    protected ?int $status;
+    protected ?int $status = null;
 
-    protected ?string $deliveryRef;
+    protected ?string $deliveryRef = null;
 
-    protected ?int $cartItemId;
+    protected ?int $cartItemId = null;
 
-    protected ?string $transactionRef;
+    protected ?string $transactionRef = null;
 
     protected Response $response;
 
@@ -204,10 +204,6 @@ class OrderEvent extends ActionEvent
      */
     public function getPlacedOrder(): Order
     {
-        if (null === $this->placedOrder) {
-            throw new \LogicException('The placed order is defined only after dispatching of the ORDER_PAY event');
-        }
-
         return $this->placedOrder;
     }
 
@@ -300,10 +296,10 @@ class OrderEvent extends ActionEvent
      */
     public function hasResponse(): bool
     {
-        return null !== $this->response;
+        return $this->response instanceof Response;
     }
 
-    public function getPostageTax()
+    public function getPostageTax(): float
     {
         return $this->postageTax;
     }
@@ -311,14 +307,14 @@ class OrderEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setPostageTax($postageTax): self
+    public function setPostageTax(float $postageTax): self
     {
         $this->postageTax = $postageTax;
 
         return $this;
     }
 
-    public function getPostageTaxRuleTitle()
+    public function getPostageTaxRuleTitle(): ?string
     {
         return $this->postageTaxRuleTitle;
     }
@@ -326,7 +322,7 @@ class OrderEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setPostageTaxRuleTitle($postageTaxRuleTitle): self
+    public function setPostageTaxRuleTitle(?string $postageTaxRuleTitle): self
     {
         $this->postageTaxRuleTitle = $postageTaxRuleTitle;
 

@@ -101,7 +101,7 @@ class KernelListener implements EventSubscriberInterface
     protected function initParam(TheliaRequest $request)
     {
         if (!$request->hasSession() || !$request->getSession() instanceof SessionInterface) {
-            return;
+            return null;
         }
 
         $event = new IsAdminEnvEvent($request);
@@ -111,13 +111,13 @@ class KernelListener implements EventSubscriberInterface
         if ($event->isAdminEnv()) {
             TheliaRequest::$isAdminEnv = true;
 
-            if (null !== $lang = $this->detectAdminLang($request)) {
+            if (($lang = $this->detectAdminLang($request)) instanceof Lang) {
                 $request->getSession()->setAdminLang($lang);
 
                 return $lang;
             }
 
-            return;
+            return null;
         }
 
         $lang = $this->detectLang($request);
@@ -126,9 +126,10 @@ class KernelListener implements EventSubscriberInterface
             return $lang;
         }
 
-        if ($lang) {
+        if ($lang instanceof Lang) {
             $request->getSession()->setLang($lang);
         }
+        return null;
     }
 
     protected function detectAdminLang(TheliaRequest $request): ?Lang
@@ -187,7 +188,7 @@ class KernelListener implements EventSubscriberInterface
         }
 
         // Next, check if lang is defined in the current session. If not we have to set one.
-        if (null === $request->getSession()->getLang(false)) {
+        if (!$request->getSession()->getLang(false) instanceof Lang) {
             if (ConfigQuery::isMultiDomainActivated()) {
                 // find lang with domain
                 $domainLang = LangQuery::create()->filterByUrl($request->getSchemeAndHttpHost(), ModelCriteria::LIKE)->findOne();
@@ -212,7 +213,7 @@ class KernelListener implements EventSubscriberInterface
 
         $request = $event->getRequest();
 
-        if (null === $session = self::$session) {
+        if (!($session = self::$session) instanceof Session) {
             $event = new SessionEvent($this->cacheDir, $this->debug, $this->env);
 
             $this->eventDispatcher->dispatch($event, TheliaKernelEvents::SESSION);

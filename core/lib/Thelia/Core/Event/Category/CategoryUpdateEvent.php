@@ -17,9 +17,13 @@ namespace Thelia\Core\Event\Category;
 class CategoryUpdateEvent extends CategoryCreateEvent
 {
     protected $chapo;
+
     protected $description;
+
     protected $postscriptum;
+
     protected $parent;
+
     protected $defaultTemplateId;
 
     /**

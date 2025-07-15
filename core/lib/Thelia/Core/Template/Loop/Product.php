@@ -95,6 +95,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     use StandardI18nFieldsSearchTrait;
 
     protected $timestampable = true;
+
     protected $versionable = true;
 
     public function __construct(
@@ -200,7 +201,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         );
     }
 
-    public function doSearch(\Propel\Runtime\ActiveQuery\ModelCriteria $search, $searchTerm, $searchIn, $searchCriteria): void
+    public function doSearch(ModelCriteria $search, $searchTerm, $searchIn, $searchCriteria): void
     {
         $search->_and();
 
@@ -458,36 +459,34 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
      */
     protected function manageFeatureAv(ProductQuery &$search, array $feature_availability): void
     {
-        if (null !== $feature_availability) {
-            foreach ($feature_availability as $feature => $feature_choice) {
-                foreach ($feature_choice['values'] as $feature_av) {
-                    $featureAlias = 'fa_' . $feature;
+        foreach ($feature_availability as $feature => $feature_choice) {
+            foreach ($feature_choice['values'] as $feature_av) {
+                $featureAlias = 'fa_' . $feature;
 
-                    if ('*' !== $feature_av) {
-                        $featureAlias .= '_' . $feature_av;
-                    }
-
-                    $search->joinFeatureProduct($featureAlias, Criteria::LEFT_JOIN)
-                        ->addJoinCondition($featureAlias, \sprintf('`%s`.FEATURE_ID = ?', $featureAlias), $feature, null, \PDO::PARAM_INT);
-
-                    if ('*' !== $feature_av) {
-                        $search->addJoinCondition($featureAlias, \sprintf('`%s`.FEATURE_AV_ID = ?', $featureAlias), $feature_av, null, \PDO::PARAM_INT);
-                    }
+                if ('*' !== $feature_av) {
+                    $featureAlias .= '_' . $feature_av;
                 }
 
-                /* format for mysql */
-                $sqlWhereString = $feature_choice['expression'];
+                $search->joinFeatureProduct($featureAlias, Criteria::LEFT_JOIN)
+                    ->addJoinCondition($featureAlias, \sprintf('`%s`.FEATURE_ID = ?', $featureAlias), $feature, null, \PDO::PARAM_INT);
 
-                if ('*' === $sqlWhereString) {
-                    $sqlWhereString = 'NOT ISNULL(`fa_' . $feature . '`.ID)';
-                } else {
-                    $sqlWhereString = preg_replace('#(\d+)#', 'NOT ISNULL(`fa_' . $feature . '_\1`.ID)', (string) $sqlWhereString);
-                    $sqlWhereString = str_replace('&', ' AND ', $sqlWhereString);
-                    $sqlWhereString = str_replace('|', ' OR ', $sqlWhereString);
+                if ('*' !== $feature_av) {
+                    $search->addJoinCondition($featureAlias, \sprintf('`%s`.FEATURE_AV_ID = ?', $featureAlias), $feature_av, null, \PDO::PARAM_INT);
                 }
-
-                $search->where('(' . $sqlWhereString . ')');
             }
+
+            /* format for mysql */
+            $sqlWhereString = $feature_choice['expression'];
+
+            if ('*' === $sqlWhereString) {
+                $sqlWhereString = 'NOT ISNULL(`fa_' . $feature . '`.ID)';
+            } else {
+                $sqlWhereString = preg_replace('#(\d+)#', 'NOT ISNULL(`fa_' . $feature . '_\1`.ID)', (string) $sqlWhereString);
+                $sqlWhereString = str_replace('&', ' AND ', $sqlWhereString);
+                $sqlWhereString = str_replace('|', ' OR ', $sqlWhereString);
+            }
+
+            $search->where('(' . $sqlWhereString . ')');
         }
     }
 
@@ -496,60 +495,58 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
      */
     protected function manageFeatureValue(ProductQuery &$search, array $feature_values): void
     {
-        if (null !== $feature_values) {
-            foreach ($feature_values as $feature => $feature_choice) {
-                $aliasMatches = [];
+        foreach ($feature_values as $feature => $feature_choice) {
+            $aliasMatches = [];
 
-                foreach ($feature_choice['values'] as $feature_value) {
-                    $featureAlias = 'fv_' . $feature;
+            foreach ($feature_choice['values'] as $feature_value) {
+                $featureAlias = 'fv_' . $feature;
 
-                    if ('*' !== $feature_value) {
-                        // Generate a unique alias for this value
-                        $featureAlias .= '_' . hash('crc32', (string) $feature_value) . '_' . preg_replace('/[^[:alnum:]_]/', '_', (string) $feature_value);
-                    }
-
-                    $search->joinFeatureProduct($featureAlias, Criteria::LEFT_JOIN)
-                        ->addJoinCondition($featureAlias, \sprintf('`%s`.FEATURE_ID = ?', $featureAlias), $feature, null, \PDO::PARAM_INT);
-
-                    if ('*' !== $feature_value) {
-                        $featureAliasI18n = $featureAlias . '_i18n';
-                        $featureAliasI18nJoin = $featureAlias . '_i18n_join';
-
-                        $featureAvValueJoin = new Join();
-                        $featureAvValueJoin->setJoinType(Criteria::LEFT_JOIN);
-                        $featureAvValueJoin->addExplicitCondition(
-                            $featureAlias,
-                            'FEATURE_AV_ID',
-                            null,
-                            FeatureAvI18nTableMap::TABLE_NAME,
-                            'ID',
-                            $featureAliasI18n,
-                        );
-
-                        $search
-                            ->addJoinObject($featureAvValueJoin, $featureAliasI18nJoin)
-                            ->addJoinCondition($featureAliasI18nJoin, \sprintf('`%s`.LOCALE = ?', $featureAliasI18n), $this->locale, null, \PDO::PARAM_STR)
-                            ->addJoinCondition($featureAliasI18nJoin, \sprintf('`%s`.TITLE = ?', $featureAliasI18n), $feature_value, null, \PDO::PARAM_STR);
-
-                        $aliasMatches[$feature_value] = $featureAliasI18n;
-                    }
+                if ('*' !== $feature_value) {
+                    // Generate a unique alias for this value
+                    $featureAlias .= '_' . hash('crc32', (string) $feature_value) . '_' . preg_replace('/[^[:alnum:]_]/', '_', (string) $feature_value);
                 }
 
-                /* format for mysql */
-                $sqlWhereString = $feature_choice['expression'];
+                $search->joinFeatureProduct($featureAlias, Criteria::LEFT_JOIN)
+                    ->addJoinCondition($featureAlias, \sprintf('`%s`.FEATURE_ID = ?', $featureAlias), $feature, null, \PDO::PARAM_INT);
 
-                if ('*' === $sqlWhereString) {
-                    $sqlWhereString = 'NOT ISNULL(`fv_' . $feature . '`.ID)';
-                } else {
-                    foreach ($aliasMatches as $value => $alias) {
-                        $sqlWhereString = str_replace($value, 'NOT ISNULL(`' . $alias . '`.ID)', $sqlWhereString);
-                    }
+                if ('*' !== $feature_value) {
+                    $featureAliasI18n = $featureAlias . '_i18n';
+                    $featureAliasI18nJoin = $featureAlias . '_i18n_join';
 
-                    $sqlWhereString = str_replace(['&', '|'], [' AND ', ' OR '], $sqlWhereString);
+                    $featureAvValueJoin = new Join();
+                    $featureAvValueJoin->setJoinType(Criteria::LEFT_JOIN);
+                    $featureAvValueJoin->addExplicitCondition(
+                        $featureAlias,
+                        'FEATURE_AV_ID',
+                        null,
+                        FeatureAvI18nTableMap::TABLE_NAME,
+                        'ID',
+                        $featureAliasI18n,
+                    );
+
+                    $search
+                        ->addJoinObject($featureAvValueJoin, $featureAliasI18nJoin)
+                        ->addJoinCondition($featureAliasI18nJoin, \sprintf('`%s`.LOCALE = ?', $featureAliasI18n), $this->locale, null, \PDO::PARAM_STR)
+                        ->addJoinCondition($featureAliasI18nJoin, \sprintf('`%s`.TITLE = ?', $featureAliasI18n), $feature_value, null, \PDO::PARAM_STR);
+
+                    $aliasMatches[$feature_value] = $featureAliasI18n;
                 }
-
-                $search->where('(' . $sqlWhereString . ')');
             }
+
+            /* format for mysql */
+            $sqlWhereString = $feature_choice['expression'];
+
+            if ('*' === $sqlWhereString) {
+                $sqlWhereString = 'NOT ISNULL(`fv_' . $feature . '`.ID)';
+            } else {
+                foreach ($aliasMatches as $value => $alias) {
+                    $sqlWhereString = str_replace($value, 'NOT ISNULL(`' . $alias . '`.ID)', $sqlWhereString);
+                }
+
+                $sqlWhereString = str_replace(['&', '|'], [' AND ', ' OR '], $sqlWhereString);
+            }
+
+            $search->where('(' . $sqlWhereString . ')');
         }
     }
 

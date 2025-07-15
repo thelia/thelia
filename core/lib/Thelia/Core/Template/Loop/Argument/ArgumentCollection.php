@@ -40,7 +40,7 @@ class ArgumentCollection implements \Iterator
 
     public function isEmpty(): bool
     {
-        return 0 === \count($this->arguments);
+        return [] === $this->arguments;
     }
 
     public function addArguments(array $argumentList, $force = true): static

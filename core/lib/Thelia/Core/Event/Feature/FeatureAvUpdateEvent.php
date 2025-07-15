@@ -19,7 +19,9 @@ class FeatureAvUpdateEvent extends FeatureAvCreateEvent
     protected int $featureAv_id;
 
     protected $description;
+
     protected $chapo;
+
     protected $postscriptum;
 
     public function __construct(int $featureAv_id)
@@ -27,12 +29,12 @@ class FeatureAvUpdateEvent extends FeatureAvCreateEvent
         $this->setFeatureAvId($featureAv_id);
     }
 
-    public function getFeatureAvId()
+    public function getFeatureAvId(): int
     {
         return $this->featureAv_id;
     }
 
-    public function setFeatureAvId($featureAv_id): static
+    public function setFeatureAvId(int $featureAv_id): static
     {
         $this->featureAv_id = $featureAv_id;
 

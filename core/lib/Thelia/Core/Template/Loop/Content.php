@@ -58,6 +58,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     use StandardI18nFieldsSearchTrait;
 
     protected $timestampable = true;
+
     protected $versionable = true;
 
     protected function getArgDefinitions(): ArgumentCollection
@@ -104,14 +105,14 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         return $this->getStandardI18nSearchFields();
     }
 
-    public function doSearch(\Propel\Runtime\ActiveQuery\ModelCriteria $search, string $searchTerm, array $searchIn, string $searchCriteria): void
+    public function doSearch(ModelCriteria $search, string $searchTerm, array $searchIn, string $searchCriteria): void
     {
         $search->_and();
 
         $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria, $searchIn);
     }
 
-    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = ContentQuery::create();
 

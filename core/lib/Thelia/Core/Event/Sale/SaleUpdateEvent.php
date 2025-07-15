@@ -24,15 +24,25 @@ use Propel\Runtime\Util\PropelDateTime;
 class SaleUpdateEvent extends SaleCreateEvent
 {
     protected $chapo;
+
     protected $description;
+
     protected $postscriptum;
+
     protected $active;
+
     protected $startDate;
+
     protected $endDate;
+
     protected $priceOffsetType;
+
     protected $displayInitialPrice;
+
     protected $priceOffsets;
+
     protected $products;
+
     protected $productAttributes;
 
     /**

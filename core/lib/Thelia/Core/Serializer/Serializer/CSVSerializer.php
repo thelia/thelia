@@ -24,8 +24,10 @@ use Thelia\Core\Serializer\AbstractSerializer;
 class CSVSerializer extends AbstractSerializer
 {
     protected string $delimiter = ',';
+
     protected string $enclosure = '"';
-    private ?array $headers;
+
+    private ?array $headers = null;
 
     public function getId(): string
     {

@@ -56,62 +56,88 @@ class AdminResources
     }
 
     public const SUPERADMINISTRATOR = 'SUPERADMINISTRATOR';
-    public const ADDRESS = 'admin.address';
-    public const ADMINISTRATOR = 'admin.configuration.administrator';
-    public const ADVANCED_CONFIGURATION = 'admin.configuration.advanced';
-    public const AREA = 'admin.configuration.area';
-    public const ATTRIBUTE = 'admin.configuration.attribute';
-    public const BRAND = 'admin.brand';
-    public const CATEGORY = 'admin.category';
-    public const CONFIG = 'admin.configuration';
-    public const CONTENT = 'admin.content';
-    public const COUNTRY = 'admin.configuration.country';
-    public const STATE = 'admin.configuration.state';
-    public const COUPON = 'admin.coupon';
-    public const CURRENCY = 'admin.configuration.currency';
-    public const CUSTOMER = 'admin.customer';
-    public const FEATURE = 'admin.configuration.feature';
-    public const FOLDER = 'admin.folder';
-    public const HOME = 'admin.home';
-    public const LANGUAGE = 'admin.configuration.language';
-    public const MAILING_SYSTEM = 'admin.configuration.mailing-system';
-    public const MESSAGE = 'admin.configuration.message';
-    public const MODULE = 'admin.module';
-    public const HOOK = 'admin.hook';
-    public const MODULE_HOOK = 'admin.module-hook';
-    public const ORDER = 'admin.order';
-    public const ORDER_STATUS = 'admin.configuration.order-status';
-    public const PRODUCT = 'admin.product';
-    public const PROFILE = 'admin.configuration.profile';
-    public const SHIPPING_ZONE = 'admin.configuration.shipping-zone';
-    public const TAX = 'admin.configuration.tax';
-    public const TEMPLATE = 'admin.configuration.template';
-    public const SYSTEM_LOG = 'admin.configuration.system-logs';
-    public const ADMIN_LOG = 'admin.configuration.admin-logs';
-    public const STORE = 'admin.configuration.store';
-    public const TRANSLATIONS = 'admin.configuration.translations';
-    public const UPDATE = 'admin.configuration.update';
-    public const EXPORT = 'admin.export';
-    public const IMPORT = 'admin.import';
-    public const TOOLS = 'admin.tools';
-    public const SALES = 'admin.sales';
-    public const API = 'admin.configuration.api';
-    public const TITLE = 'admin.customer.title';
 
-    /**
-     * Stock all resources by modules
-     * Exemple :
-     * [
-     *      "thelia" => [
-     *          "ADDRESS" => "admin.address",
-     *          ...
-     *      ],
-     *      "Front" => [
-     *          ...
-     *      ]
-     * ].
-     */
-    protected array $resources;
+    public const ADDRESS = 'admin.address';
+
+    public const ADMINISTRATOR = 'admin.configuration.administrator';
+
+    public const ADVANCED_CONFIGURATION = 'admin.configuration.advanced';
+
+    public const AREA = 'admin.configuration.area';
+
+    public const ATTRIBUTE = 'admin.configuration.attribute';
+
+    public const BRAND = 'admin.brand';
+
+    public const CATEGORY = 'admin.category';
+
+    public const CONFIG = 'admin.configuration';
+
+    public const CONTENT = 'admin.content';
+
+    public const COUNTRY = 'admin.configuration.country';
+
+    public const STATE = 'admin.configuration.state';
+
+    public const COUPON = 'admin.coupon';
+
+    public const CURRENCY = 'admin.configuration.currency';
+
+    public const CUSTOMER = 'admin.customer';
+
+    public const FEATURE = 'admin.configuration.feature';
+
+    public const FOLDER = 'admin.folder';
+
+    public const HOME = 'admin.home';
+
+    public const LANGUAGE = 'admin.configuration.language';
+
+    public const MAILING_SYSTEM = 'admin.configuration.mailing-system';
+
+    public const MESSAGE = 'admin.configuration.message';
+
+    public const MODULE = 'admin.module';
+
+    public const HOOK = 'admin.hook';
+
+    public const MODULE_HOOK = 'admin.module-hook';
+
+    public const ORDER = 'admin.order';
+
+    public const ORDER_STATUS = 'admin.configuration.order-status';
+
+    public const PRODUCT = 'admin.product';
+
+    public const PROFILE = 'admin.configuration.profile';
+
+    public const SHIPPING_ZONE = 'admin.configuration.shipping-zone';
+
+    public const TAX = 'admin.configuration.tax';
+
+    public const TEMPLATE = 'admin.configuration.template';
+
+    public const SYSTEM_LOG = 'admin.configuration.system-logs';
+
+    public const ADMIN_LOG = 'admin.configuration.admin-logs';
+
+    public const STORE = 'admin.configuration.store';
+
+    public const TRANSLATIONS = 'admin.configuration.translations';
+
+    public const UPDATE = 'admin.configuration.update';
+
+    public const EXPORT = 'admin.export';
+
+    public const IMPORT = 'admin.import';
+
+    public const TOOLS = 'admin.tools';
+
+    public const SALES = 'admin.sales';
+
+    public const API = 'admin.configuration.api';
+
+    public const TITLE = 'admin.customer.title';
 
     /**
      * Create a new AdminRessources instance.
@@ -119,10 +145,9 @@ class AdminResources
      * @param array $resources with format module => [ KEY => value ]
      */
     public function __construct(
-        #[Autowire(param: 'admin.resources')]
-        array $resources,
-    ) {
-        $this->resources = $resources;
+        #[Autowire(param: 'admin.resources')]protected array $resources
+    )
+    {
     }
 
     public function getResource(string $name, string $module = 'thelia'): string
@@ -161,7 +186,7 @@ class AdminResources
 
     public function addResource(string $name, string $value, string $module = 'thelia'): void
     {
-        if (null !== $name && null !== $value) {
+        if (null !== $value) {
             $nameFormated = strtoupper($name);
 
             if (!$this->resources[$module]) {

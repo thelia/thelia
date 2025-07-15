@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Security\Authentication;
 
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Validator\Exception\ValidatorException;
@@ -25,7 +26,8 @@ use Thelia\Model\Customer;
 
 class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
 {
-    protected $loginForm;
+    protected Form $loginForm;
+
     protected $options;
 
     public function __construct(protected Request $request, protected BaseForm $baseLoginForm, protected UserProviderInterface $userProvider, array $options = [])

@@ -17,8 +17,11 @@ namespace Thelia\Core\Event\Message;
 class MessageCreateEvent extends MessageEvent
 {
     protected $message_name;
+
     protected $locale;
+
     protected $title;
+
     protected $secured;
 
     // Use message_name to prevent conflict with Event::name property.

@@ -16,7 +16,6 @@ namespace Thelia\Core\Template\Parser;
 
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Core\Template\TemplateHelperInterface;
 
 /**
  * Class ParserFallback.

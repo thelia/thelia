@@ -55,8 +55,9 @@ use Thelia\Type\TypeCollection;
  */
 abstract class BaseLoop implements LoopInterface
 {
-    protected ?string $loopName;
-    protected static ?array $loopDefinitions;
+    protected ?string $loopName = null;
+
+    protected static ?array $loopDefinitions = null;
 
     /** @var ArgumentCollection[] cache for loop arguments (class => ArgumentCollection) */
     protected static array $loopDefinitionsArgs = [];
@@ -72,13 +73,17 @@ abstract class BaseLoop implements LoopInterface
     protected ArgumentCollection $args;
 
     protected $countable = true;
+
     protected $timestampable = false;
+
     protected $versionable = false;
 
     protected Translator $translator;
 
     private static array $cacheLoopResult = [];
+
     private static array $cacheLoopPagination = [];
+
     private static array $cacheCount = [];
 
     /** @var array cache of event to dispatch */
@@ -318,7 +323,7 @@ abstract class BaseLoop implements LoopInterface
     {
         $arg = $this->args->get($argumentName);
 
-        if (null === $arg) {
+        if (!$arg instanceof Argument) {
             throw new \InvalidArgumentException($this->translator->trans('Undefined loop argument "%name"', ['%name' => $argumentName]));
         }
 
@@ -371,7 +376,7 @@ abstract class BaseLoop implements LoopInterface
                 switch ($searchMode) {
                     case SearchLoopInterface::MODE_ANY_WORD:
                         $searchCriteria = Criteria::IN;
-                        $searchTerm = explode(' ', $searchTerm);
+                        $searchTerm = explode(' ', (string) $searchTerm);
                         break;
                     case SearchLoopInterface::MODE_SENTENCE:
                         $searchCriteria = Criteria::LIKE;
@@ -455,7 +460,7 @@ abstract class BaseLoop implements LoopInterface
         if ($this instanceof PropelSearchLoopInterface) {
             $searchModelCriteria = $this->extendsBuildModelCriteria($this->buildModelCriteria());
 
-            if (null === $searchModelCriteria) {
+            if (!$searchModelCriteria instanceof ModelCriteria) {
                 $count = 0;
             } else {
                 $this->setupSearchContext($searchModelCriteria);

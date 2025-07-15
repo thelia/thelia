@@ -54,7 +54,7 @@ class CountryUpdateEvent extends CountryCreateEvent
         return $this;
     }
 
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -66,7 +66,7 @@ class CountryUpdateEvent extends CountryCreateEvent
         return $this;
     }
 
-    public function getPostscriptum()
+    public function getPostscriptum(): string
     {
         return $this->postscriptum;
     }

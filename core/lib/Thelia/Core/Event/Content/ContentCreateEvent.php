@@ -22,8 +22,11 @@ namespace Thelia\Core\Event\Content;
 class ContentCreateEvent extends ContentEvent
 {
     protected $title;
+
     protected $default_folder;
+
     protected $locale;
+
     protected $visible;
 
     public function setLocale($locale): self

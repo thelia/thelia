@@ -22,8 +22,11 @@ namespace Thelia\Core\Security;
 class AccessManager
 {
     public const VIEW = 'VIEW';
+
     public const CREATE = 'CREATE';
+
     public const UPDATE = 'UPDATE';
+
     public const DELETE = 'DELETE';
 
     protected $accessGranted = [
@@ -32,6 +35,7 @@ class AccessManager
         self::UPDATE => false,
         self::DELETE => false,
     ];
+
     protected static $accessPows = [
         self::VIEW => 3,
         self::CREATE => 2,

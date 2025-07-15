@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Template\Loop;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -52,6 +53,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
     use StandardI18nFieldsSearchTrait;
 
     protected $timestampable = true;
+
     protected $versionable = true;
 
     protected function getArgDefinitions(): ArgumentCollection
@@ -97,13 +99,13 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
         return $this->getStandardI18nSearchFields();
     }
 
-    public function doSearch(\Propel\Runtime\ActiveQuery\ModelCriteria $search, string $searchTerm, array $searchIn, string $searchCriteria): void
+    public function doSearch(ModelCriteria $search, string $searchTerm, array $searchIn, string $searchCriteria): void
     {
         $search->_and();
         $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria, $searchIn);
     }
 
-    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = FolderQuery::create();
 

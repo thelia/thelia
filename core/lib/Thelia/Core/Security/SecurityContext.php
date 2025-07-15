@@ -94,7 +94,7 @@ class SecurityContext
      */
     final public function hasRequiredRole(?UserInterface $user = null, array $roles = []): bool
     {
-        if (null !== $user) {
+        if ($user instanceof UserInterface) {
             // Check if user's roles matches required roles
             $userRoles = $user->getRoles();
 
@@ -179,7 +179,7 @@ class SecurityContext
         // Find a user which matches the required roles.
         $user = $this->checkRole($roles);
 
-        if (null === $user) {
+        if (!$user instanceof UserInterface) {
             return false;
         }
 

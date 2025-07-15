@@ -22,9 +22,13 @@ namespace Thelia\Core\Event\Country;
 class CountryCreateEvent extends CountryEvent
 {
     protected $locale;
+
     protected $title;
+
     protected $isocode;
+
     protected $isoAlpha2;
+
     protected $isoAlpha3;
 
     /** @var bool is visible */

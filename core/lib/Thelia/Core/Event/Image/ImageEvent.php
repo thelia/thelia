@@ -63,8 +63,8 @@ class ImageEvent extends CachedFileEvent
      */
     public function isOriginalImage(): bool
     {
-        return empty($this->width) && empty($this->height) /* && empty($this->resize_mode) && empty($this->background_color) not significant */
-        && [] === $this->effects && empty($this->rotation) && empty($this->quality);
+        return (!isset($this->width) || $this->width === 0) && (!isset($this->height) || $this->height === 0) /* && empty($this->resize_mode) && empty($this->background_color) not significant */
+        && [] === $this->effects && (!isset($this->rotation) || $this->rotation === 0) && (!isset($this->quality) || $this->quality === 0);
     }
 
     /**
@@ -78,67 +78,67 @@ class ImageEvent extends CachedFileEvent
         );
     }
 
-    public function getCategory()
+    public function getCategory(): string
     {
         return $this->category;
     }
 
-    public function setCategory($category): static
+    public function setCategory(string $category): static
     {
         $this->category = $category;
 
         return $this;
     }
 
-    public function getWidth()
+    public function getWidth(): int
     {
         return $this->width;
     }
 
-    public function setWidth($width): static
+    public function setWidth(int $width): static
     {
         $this->width = $width;
 
         return $this;
     }
 
-    public function getHeight()
+    public function getHeight(): int
     {
         return $this->height;
     }
 
-    public function setHeight($height): static
+    public function setHeight(int $height): static
     {
         $this->height = $height;
 
         return $this;
     }
 
-    public function getResizeMode()
+    public function getResizeMode(): string
     {
         return $this->resize_mode;
     }
 
-    public function setResizeMode($resize_mode): static
+    public function setResizeMode(string $resize_mode): static
     {
         $this->resize_mode = $resize_mode;
 
         return $this;
     }
 
-    public function getBackgroundColor()
+    public function getBackgroundColor(): string
     {
         return $this->background_color;
     }
 
-    public function setBackgroundColor($background_color): static
+    public function setBackgroundColor(string $background_color): static
     {
         $this->background_color = $background_color;
 
         return $this;
     }
 
-    public function getEffects()
+    public function getEffects(): array
     {
         return $this->effects;
     }
@@ -150,48 +150,48 @@ class ImageEvent extends CachedFileEvent
         return $this;
     }
 
-    public function getRotation()
+    public function getRotation(): int
     {
         return $this->rotation;
     }
 
-    public function setRotation($rotation): static
+    public function setRotation(int $rotation): static
     {
         $this->rotation = $rotation;
 
         return $this;
     }
 
-    public function getQuality()
+    public function getQuality(): int
     {
         return $this->quality;
     }
 
-    public function setQuality($quality): static
+    public function setQuality(int $quality): static
     {
         $this->quality = $quality;
 
         return $this;
     }
 
-    public function getOriginalFileUrl()
+    public function getOriginalFileUrl(): string
     {
         return $this->original_file_url;
     }
 
-    public function setOriginalFileUrl($original_file_url): static
+    public function setOriginalFileUrl(string $original_file_url): static
     {
         $this->original_file_url = $original_file_url;
 
         return $this;
     }
 
-    public function getCacheOriginalFilepath()
+    public function getCacheOriginalFilepath(): string
     {
         return $this->cache_original_filepath;
     }
 
-    public function setCacheOriginalFilepath($cache_original_filepath): static
+    public function setCacheOriginalFilepath(string $cache_original_filepath): static
     {
         $this->cache_original_filepath = $cache_original_filepath;
 

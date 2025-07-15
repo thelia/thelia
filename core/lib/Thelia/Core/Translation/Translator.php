@@ -17,11 +17,11 @@ namespace Thelia\Core\Translation;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\Translator as BaseTranslator;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\HttpFoundation\Session\Session;
 
 class Translator extends BaseTranslator
 {
     public const GLOBAL_FALLBACK_DOMAIN = 'global';
+
     public const GLOBAL_FALLBACK_KEY = '%s.%s';
 
     protected static self $instance;
@@ -44,7 +44,7 @@ class Translator extends BaseTranslator
      */
     public static function getInstance(): self
     {
-        if (null === self::$instance) {
+        if (!self::$instance instanceof \Thelia\Core\Translation\Translator) {
             throw new \RuntimeException('Translator instance is not initialized.');
         }
 
@@ -58,9 +58,7 @@ class Translator extends BaseTranslator
         if ($currentRequest instanceof Request) {
             $session = $currentRequest->getSession();
 
-            if ($session instanceof Session) {
-                return $session->getLang()->getLocale();
-            }
+            return $session->getLang()->getLocale();
         }
 
         return parent::getLocale();

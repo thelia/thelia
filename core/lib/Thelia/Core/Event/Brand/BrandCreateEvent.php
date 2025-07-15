@@ -22,7 +22,9 @@ namespace Thelia\Core\Event\Brand;
 class BrandCreateEvent extends BrandEvent
 {
     protected $title;
+
     protected $locale;
+
     protected $visible;
 
     /**

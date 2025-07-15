@@ -55,7 +55,9 @@ use Thelia\Type\TypeCollection;
 class Document extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $objectType;
+
     protected $objectId;
+
     protected $timestampable = true;
 
     /** @var array Possible standard document sources */
@@ -117,13 +119,11 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
 
         // xxxDocumentQuery::create()
         $method = new \ReflectionMethod($queryClass, 'create');
-        $search = $method->invoke(null); // Static !
-
+        $search = $method->invoke(null);
+        // Static !
         // $query->filterByXXX(id)
-        if (null !== $object_id) {
-            $method = new \ReflectionMethod($queryClass, $filterMethod);
-            $method->invoke($search, $object_id);
-        }
+        $method = new \ReflectionMethod($queryClass, $filterMethod);
+        $method->invoke($search, $object_id);
 
         $orders = $this->getOrder();
 
@@ -195,14 +195,14 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
             }
         }
 
-        if (null === $search) {
+        if (!$search instanceof ModelCriteria) {
             throw new \InvalidArgumentException(\sprintf('Unable to find document source. Valid sources are %s', implode(',', $this->possible_sources)));
         }
 
         return $search;
     }
 
-    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
+    public function buildModelCriteria(): ModelCriteria
     {
         // Select the proper query to use, and get the object type
         $this->objectType = null;

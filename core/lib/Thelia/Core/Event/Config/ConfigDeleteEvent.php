@@ -23,12 +23,12 @@ class ConfigDeleteEvent extends ConfigEvent
         $this->setConfigId($config_id);
     }
 
-    public function getConfigId()
+    public function getConfigId(): int
     {
         return $this->config_id;
     }
 
-    public function setConfigId($config_id): static
+    public function setConfigId(int $config_id): static
     {
         $this->config_id = $config_id;
 

@@ -57,6 +57,7 @@ class Feed extends BaseLoop implements ArraySearchLoopInterface
             $cacheItem->set($feed->get_items());
             $cacheAdapter->save($cacheItem);
         }
+
         /** @var array $itemAsArray */
         $itemAsArray = $cacheItem->get();
         return $itemAsArray;

@@ -29,7 +29,9 @@ use Thelia\Model\State;
 class PickupLocationEvent extends ActionEvent
 {
     protected ?int $radius;
+
     protected ?int $maxRelays;
+
     protected array $locations = [];
 
     /**

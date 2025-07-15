@@ -32,7 +32,7 @@ class CustomerTitleEvent extends ActionEvent
 
     protected string $locale;
 
-    protected ?CustomerTitle $customerTitle;
+    protected ?CustomerTitle $customerTitle = null;
 
     public function getCustomerTitle(): CustomerTitle
     {

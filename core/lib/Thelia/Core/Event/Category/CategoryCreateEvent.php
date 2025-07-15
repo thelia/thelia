@@ -17,8 +17,11 @@ namespace Thelia\Core\Event\Category;
 class CategoryCreateEvent extends CategoryEvent
 {
     protected $title;
+
     protected $parent;
+
     protected $locale;
+
     protected $visible;
 
     public function getTitle()

@@ -29,17 +29,13 @@ use Thelia\Command\Install;
  */
 class Application extends BaseApplication
 {
-    public KernelInterface $kernel;
-
-    public function __construct(KernelInterface $kernel)
+    public function __construct(public KernelInterface $kernel)
     {
-        $this->kernel = $kernel;
-
         parent::__construct('Thelia', Thelia::THELIA_VERSION);
 
         $this->kernel->boot();
 
-        $this->getDefinition()->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The Environment name.', $kernel->getEnvironment()));
+        $this->getDefinition()->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The Environment name.', $this->kernel->getEnvironment()));
         $this->getDefinition()->addOption(new InputOption('--no-debug', null, InputOption::VALUE_NONE, 'Switches off debug mode.'));
     }
 

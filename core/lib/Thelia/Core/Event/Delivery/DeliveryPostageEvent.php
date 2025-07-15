@@ -34,9 +34,9 @@ class DeliveryPostageEvent extends ActionEvent
 {
     protected bool $validModule = false;
 
-    protected ?OrderPostage $postage;
+    protected ?OrderPostage $postage = null;
 
-    protected ?DateTime $deliveryDate;
+    protected ?DateTime $deliveryDate = null;
 
     protected string $deliveryMode;
 
@@ -125,7 +125,7 @@ class DeliveryPostageEvent extends ActionEvent
 
     public function hasAdditionalData(): bool
     {
-        return \count($this->additionalData) > 0;
+        return $this->additionalData !== [];
     }
 
     public function getAdditionalData(): array
@@ -167,7 +167,7 @@ class DeliveryPostageEvent extends ActionEvent
         return $this->getAddress() instanceof Address ? $this->getAddress()->getState() : $this->state;
     }
 
-    public function getDeliveryMode()
+    public function getDeliveryMode(): string
     {
         return $this->deliveryMode;
     }

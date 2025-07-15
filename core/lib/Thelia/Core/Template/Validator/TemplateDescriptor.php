@@ -159,7 +159,7 @@ class TemplateDescriptor
 
     public function hasParent(): bool
     {
-        return null !== $this->parent;
+        return $this->parent instanceof TemplateDefinition;
     }
 
     public function getDocumentation(): string
@@ -215,7 +215,7 @@ class TemplateDescriptor
     /**
      * @return $this
      */
-    public function setAssets($assets): self
+    public function setAssets(string $assets): self
     {
         $this->assets = $assets;
 

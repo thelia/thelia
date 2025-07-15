@@ -45,12 +45,12 @@ class ContentDeleteEvent extends ContentEvent
         return $this->content_id;
     }
 
-    public function setDefaultFolderId($folderid): void
+    public function setDefaultFolderId(int $folderid): void
     {
         $this->folder_id = $folderid;
     }
 
-    public function getDefaultFolderId()
+    public function getDefaultFolderId(): int
     {
         return $this->folder_id;
     }

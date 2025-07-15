@@ -23,9 +23,13 @@ use Thelia\Model\Order;
 class OrderManualEvent extends OrderEvent
 {
     protected $currency;
+
     protected $lang;
+
     protected $cart;
+
     protected $customer;
+
     protected $useOrderDefinedAddresses = false;
 
     public function __construct(Order $order, Currency $currency, Lang $lang, Cart $cart, Customer $customer)

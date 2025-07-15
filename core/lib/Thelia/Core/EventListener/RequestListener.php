@@ -141,26 +141,22 @@ class RequestListener implements EventSubscriberInterface
             $request,
             $cookieCustomerName,
         );
+        // try to log
+        $authenticator = new CustomerTokenAuthenticator($cookie);
+        try {
+            // If have found a user, store it in the security context
+            /** @var Customer $user */
+            $user = $authenticator->getAuthentifiedUser();
 
-        if (null !== $cookie) {
-            // try to log
-            $authenticator = new CustomerTokenAuthenticator($cookie);
+            $session->setCustomerUser($user);
 
-            try {
-                // If have found a user, store it in the security context
-                /** @var Customer $user */
-                $user = $authenticator->getAuthentifiedUser();
-
-                $session->setCustomerUser($user);
-
-                $dispatcher->dispatch(
-                    new CustomerLoginEvent($user),
-                    TheliaEvents::CUSTOMER_LOGIN,
-                );
-            } catch (TokenAuthenticationException) {
-                // Clear the cookie
-                $this->clearRememberMeCookie($cookieCustomerName);
-            }
+            $dispatcher->dispatch(
+                new CustomerLoginEvent($user),
+                TheliaEvents::CUSTOMER_LOGIN,
+            );
+        } catch (TokenAuthenticationException) {
+            // Clear the cookie
+            $this->clearRememberMeCookie($cookieCustomerName);
         }
     }
 
@@ -172,26 +168,22 @@ class RequestListener implements EventSubscriberInterface
             $request,
             $cookieAdminName,
         );
+        // try to log
+        $authenticator = new AdminTokenAuthenticator($cookie);
+        try {
+            // If have found a user, store it in the security context
+            $user = $authenticator->getAuthentifiedUser();
 
-        if (null !== $cookie) {
-            // try to log
-            $authenticator = new AdminTokenAuthenticator($cookie);
+            $session->setAdminUser($user);
 
-            try {
-                // If have found a user, store it in the security context
-                $user = $authenticator->getAuthentifiedUser();
+            $this->applyUserLocale($user, $session);
 
-                $session->setAdminUser($user);
+            AdminLog::append('admin', 'LOGIN', 'Authentication successful', $request, $user, false);
+        } catch (TokenAuthenticationException) {
+            AdminLog::append('admin', 'LOGIN', 'Token based authentication failed.', $request);
 
-                $this->applyUserLocale($user, $session);
-
-                AdminLog::append('admin', 'LOGIN', 'Authentication successful', $request, $user, false);
-            } catch (TokenAuthenticationException) {
-                AdminLog::append('admin', 'LOGIN', 'Token based authentication failed.', $request);
-
-                // Clear the cookie
-                $this->clearRememberMeCookie($cookieAdminName);
-            }
+            // Clear the cookie
+            $this->clearRememberMeCookie($cookieAdminName);
         }
     }
 

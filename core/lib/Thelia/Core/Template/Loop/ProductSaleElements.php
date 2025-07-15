@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Template\Loop;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\BaseLoop;
@@ -102,7 +103,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         );
     }
 
-    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = ProductSaleElementsQuery::create();
 
@@ -316,7 +317,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         ];
     }
 
-    public function doSearch(\Propel\Runtime\ActiveQuery\ModelCriteria $search, $searchTerm, $searchIn, $searchCriteria): void
+    public function doSearch(ModelCriteria $search, $searchTerm, $searchIn, $searchCriteria): void
     {
         $search->_and();
 

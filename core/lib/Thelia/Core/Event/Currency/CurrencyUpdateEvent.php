@@ -33,7 +33,7 @@ class CurrencyUpdateEvent extends CurrencyCreateEvent
     /**
      * @return $this
      */
-    public function setIsDefault($is_default): static
+    public function setIsDefault(int $is_default): static
     {
         $this->is_default = $is_default;
 
@@ -48,7 +48,7 @@ class CurrencyUpdateEvent extends CurrencyCreateEvent
     /**
      * @return $this
      */
-    public function setVisible($visible): static
+    public function setVisible(int $visible): static
     {
         $this->visible = $visible;
 

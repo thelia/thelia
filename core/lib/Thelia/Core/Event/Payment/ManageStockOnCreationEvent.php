@@ -23,7 +23,7 @@ use Thelia\Module\PaymentModuleInterface;
  */
 class ManageStockOnCreationEvent extends BasePaymentEvent
 {
-    protected ?bool $manageStock;
+    protected ?bool $manageStock = null;
 
     /**
      * ManageStockOnCreationEvent constructor.

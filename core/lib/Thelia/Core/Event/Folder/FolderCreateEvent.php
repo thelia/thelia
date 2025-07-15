@@ -22,8 +22,11 @@ namespace Thelia\Core\Event\Folder;
 class FolderCreateEvent extends FolderEvent
 {
     protected $title;
+
     protected $parent;
+
     protected $locale;
+
     protected $visible;
 
     /**

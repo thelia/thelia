@@ -25,8 +25,11 @@ use Thelia\Core\Serializer\AbstractSerializer;
 class XMLSerializer extends AbstractSerializer
 {
     private readonly XmlEncoder $xmlEncoder;
+
     private int|bool|null $xmlDataStart = null;
+
     private string $rootNodeName = 'root';
+
     private string $dataNodeName = 'data';
 
     /**
@@ -60,6 +63,7 @@ class XMLSerializer extends AbstractSerializer
     {
         return 'application/xml';
     }
+
     public function getDataNodeName(): string
     {
         return $this->dataNodeName;

@@ -224,7 +224,7 @@ class Session extends BaseSession
             // When genCart() will be removed, this check should be removed, and  $dispatcher should become
             // a required parameter.
 
-            if (null === $dispatcher) {
+            if (!$dispatcher instanceof EventDispatcherInterface) {
                 throw new \InvalidArgumentException('In this context (no cart in session), an EventDispatcher should be provided to Session::getSessionCart().');
             }
 
@@ -236,7 +236,7 @@ class Session extends BaseSession
 
             $dispatcher->dispatch($cartEvent, TheliaEvents::CART_RESTORE_CURRENT);
 
-            if (null === $cart = $cartEvent->getCart()) {
+            if (!($cart = $cartEvent->getCart()) instanceof Cart) {
                 throw new \LogicException('Unable to get a Cart.');
             }
 

@@ -28,6 +28,7 @@ class TemplateDescriptorValidator
     protected static $versions = [
         '1' => 'template-1_0.xsd',
     ];
+
     protected Finder $xsdFinder;
 
     /**

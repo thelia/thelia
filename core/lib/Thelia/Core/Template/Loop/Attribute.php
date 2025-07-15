@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Template\Loop;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -48,6 +49,7 @@ use Thelia\Type\TypeCollection;
 class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $useAttributePosistion;
+
     protected $timestampable = true;
 
     protected function getArgDefinitions(): ArgumentCollection
@@ -68,7 +70,7 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
         );
     }
 
-    public function buildModelCriteria(): \Propel\Runtime\ActiveQuery\ModelCriteria
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = AttributeQuery::create();
 
