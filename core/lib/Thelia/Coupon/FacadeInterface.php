@@ -52,7 +52,7 @@ interface FacadeInterface
     /**
      * Return a Cart a CouponManager can process.
      */
-    public function getCart(): Cart;
+    public function getCart(): ?Cart;
 
     /**
      * Return an Address a CouponManager can process.
@@ -67,7 +67,7 @@ interface FacadeInterface
     /**
      * Return an Customer a CouponManager can process.
      */
-    public function getCustomer(): Customer;
+    public function getCustomer(): ?Customer;
 
     /**
      * Return Checkout total price.

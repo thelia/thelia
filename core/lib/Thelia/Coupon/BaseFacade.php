@@ -42,7 +42,7 @@ class BaseFacade implements FacadeInterface
 {
     protected CouponFactory $couponFactory;
 
-    protected ?\Symfony\Component\HttpFoundation\Request $request;
+    protected ?Request $request;
 
     /**
      * Constructor.
@@ -62,7 +62,7 @@ class BaseFacade implements FacadeInterface
     /**
      * Return a Cart a CouponManager can process.
      */
-    public function getCart(): Cart
+    public function getCart(): ?Cart
     {
         return $this->getRequest()->getSession()->getSessionCart($this->getDispatcher());
     }
@@ -84,7 +84,7 @@ class BaseFacade implements FacadeInterface
     /**
      * Return a Customer a CouponManager can process.
      */
-    public function getCustomer(): Customer
+    public function getCustomer(): ?Customer
     {
         return $this->securityContext->getCustomerUser();
     }
@@ -102,7 +102,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getCheckoutPostagePrice(): float
     {
-        return $this->getRequest()->getSession()->getOrder()->getPostage();
+        return (float) $this->getRequest()->getSession()->getOrder()->getPostage();
     }
 
     /**
@@ -115,7 +115,7 @@ class BaseFacade implements FacadeInterface
     {
         $total = 0;
 
-        $cartItems = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems();
+        $cartItems = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())?->getCartItems() ?? [];
 
         foreach ($cartItems as $cartItem) {
             if ($withItemsInPromo || !$cartItem->getPromo()) {
@@ -132,7 +132,7 @@ class BaseFacade implements FacadeInterface
     public function getCartTotalTaxPrice(bool $withItemsInPromo = true): float
     {
         $taxCountry = $this->taxEngine->getDeliveryCountry();
-        $cartItems = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems();
+        $cartItems = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())?->getCartItems() ?? [];
 
         $total = 0;
 
@@ -166,12 +166,12 @@ class BaseFacade implements FacadeInterface
      */
     public function getNbArticlesInCart(): int
     {
-        return \count($this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems());
+        return \count($this->getRequest()->getSession()->getSessionCart($this->getDispatcher())?->getCartItems() ?? []);
     }
 
     public function getNbArticlesInCartIncludeQuantity(): int
     {
-        $cartItems = $this->getCart()->getCartItems();
+        $cartItems = $this->getCart()?->getCartItems() ?? [];
         $quantity = 0;
 
         foreach ($cartItems as $cartItem) {
@@ -188,9 +188,7 @@ class BaseFacade implements FacadeInterface
      */
     public function findOneCouponByCode(string $code): Coupon
     {
-        $couponQuery = CouponQuery::create();
-
-        return $couponQuery->findOneByCode($code);
+        return CouponQuery::create()->findOneByCode($code);
     }
 
     /**
