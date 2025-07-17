@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -19,15 +21,17 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
 use Thelia\Core\Application;
 use Thelia\Core\Thelia;
+use Thelia\Install\KernelInstall;
+use Thelia\Install\Exception\AlreadyInstallException;
 
 if (!in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
-    echo 'Warning: The console should be invoked via the CLI version of PHP, not the '.\PHP_SAPI.' SAPI'.\PHP_EOL;
+    echo 'Warning: The console should be invoked via the CLI version of PHP, not the ' . \PHP_SAPI . ' SAPI' . \PHP_EOL;
 }
 
 set_time_limit(0);
 
 if (!isset($bootstrapFile)) {
-    $bootstrapFile = dirname(__DIR__).'/vendor/autoload.php';
+    $bootstrapFile = dirname(__DIR__) . '/vendor/autoload.php';
 }
 
 require $bootstrapFile;
@@ -39,78 +43,34 @@ if (!class_exists(Application::class) || !class_exists(Dotenv::class)) {
 $input = new ArgvInput();
 
 if (null !== $askedEnv = $input->getParameterOption(['--env', '-e'], null, true)) {
-    putenv('APP_ENV='.$_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = $askedEnv);
+    putenv('APP_ENV=' . $_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = $askedEnv);
 }
 
-(new Dotenv())->bootEnv(THELIA_ROOT.'.env', 'dev', []);
+(new Dotenv())->bootEnv(THELIA_ROOT . '.env', 'dev', []);
 $env = $_ENV['APP_ENV'];
 
 if ($input->hasParameterOption('--no-debug', true)) {
-    putenv('APP_DEBUG='.$_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = '0');
+    putenv('APP_DEBUG=' . $_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = '0');
 }
 
 if ($_SERVER['APP_DEBUG']) {
-    umask(0000);
+    umask(0o000);
 
     if (class_exists(Debug::class)) {
         Debug::enable();
     }
 }
 
-// for Thelia not installed
-function getTheliaDatabaseConfigFile($env = 'prod')
-{
-    $fs = new Filesystem();
-
-    $databaseConfigFile = THELIA_CONF_DIR.'database_'.$env.'.yml';
-    if (!$fs->exists($databaseConfigFile)) {
-        $databaseConfigFile = THELIA_CONF_DIR.'database.yml';
-    }
-
-    return $databaseConfigFile;
-}
-
 if (!Thelia::isInstalled()) {
-    $kernel = new class($env = 'prod', true) extends Kernel {
-        use MicroKernelTrait;
-
-        public function getCacheDir(): string
-        {
-            if (defined('THELIA_ROOT')) {
-                return THELIA_CACHE_DIR.$this->environment;
-            }
-
-            return parent::getCacheDir();
-        }
-
-        public function getLogDir(): string
-        {
-            if (defined('THELIA_ROOT')) {
-                return THELIA_LOG_DIR;
-            } else {
-                return parent::getLogDir();
-            }
-        }
-
-        public function registerBundles(): array
-        {
-            return [
-                new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
-            ];
-        }
-
-        public function registerContainerConfiguration(LoaderInterface $loader): void
-        {
-        }
-    };
-
+    $kernel = new KernelInstall($env, (bool) $_SERVER['APP_DEBUG']);
     $application = new Application($kernel);
     $application->run($input);
-
     exit;
 }
-// end for Thelia not installed
-
-$thelia = new App\Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
-$application = new Application($thelia);
-$application->run($input);
+try {
+    $thelia = new App\Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
+    $application = new Application($thelia);
+    $application->run($input);
+} catch(AlreadyInstallException $e) {
+    echo 'Thelia is already installed. If you want to reinstall it, please empty your database et remove database environment variable from your en file.' . PHP_EOL;
+}

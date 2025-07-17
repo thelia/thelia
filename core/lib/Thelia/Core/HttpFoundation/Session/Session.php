@@ -14,7 +14,11 @@ declare(strict_types=1);
 
 namespace Thelia\Core\HttpFoundation\Session;
 
+use _PHPStan_ac6dae9b0\Symfony\Contracts\Service\Attribute\Required;
+use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
+use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartCreateEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
@@ -26,13 +30,26 @@ use Thelia\Model\Cart;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\Lang;
-use Thelia\Model\LangQuery;
 use Thelia\Model\Order;
+use Thelia\Service\Model\LangService;
 use Thelia\Tools\URL;
 
 class Session extends BaseSession
 {
     protected static ?Cart $transientCart = null;
+
+    #[Required]
+    protected ?LangService $langService = null;
+
+    public function __construct(
+        ?SessionStorageInterface $storage = null,
+        ?AttributeBagInterface $attributes = null,
+        ?FlashBagInterface $flashes = null,
+        ?callable $usageReporter = null,
+    )
+    {
+        parent::__construct($storage, $attributes, $flashes, $usageReporter);
+    }
 
     public function getLang(bool $forceDefault = true): ?Lang
     {
@@ -64,10 +81,8 @@ class Session extends BaseSession
 
         $adminUser = $this->getAdminUser();
 
-        if (
-            $adminUser instanceof Admin
-            && $lang = LangQuery::create()->findOneByLocale($adminUser->getLocale())
-        ) {
+        if ($adminUser instanceof Admin) {
+            $lang = $this->langService->resolveAdminLanguageFromAdmin($adminUser);
             $this->setAdminLang($lang);
 
             return $lang;
@@ -137,8 +152,6 @@ class Session extends BaseSession
 
         return $this;
     }
-
-    // -- Customer user --------------------------------------------------------
 
     public function setCustomerUser(?UserInterface $user): static
     {
@@ -218,14 +231,7 @@ class Session extends BaseSession
             ? CartQuery::create()->findPk($cartId)
             : self::$transientCart;
 
-        // If we do not have a cart, or if the current cart is nor valid
-        // restore it from the cart cookie, or create a new one
         if (null === $cart || !$this->isValidCart($cart)) {
-            // A dispatcher is required here. If we do not have it, throw an exception
-            // This is a temporary workaround to ensure backward compatibility with getCart(),
-            // When genCart() will be removed, this check should be removed, and  $dispatcher should become
-            // a required parameter.
-
             if (!$dispatcher instanceof EventDispatcherInterface) {
                 throw new \InvalidArgumentException('In this context (no cart in session), an EventDispatcher should be provided to Session::getSessionCart().');
             }
@@ -261,7 +267,7 @@ class Session extends BaseSession
         $customer = $this->getCustomerUser();
 
         return (null !== $customer && $cart->getCustomerId() === $customer->getId())
-        || (null === $customer && null === $cart->getCustomerId());
+            || (null === $customer && null === $cart->getCustomerId());
     }
 
     public function setOrder(Order $order): static

@@ -32,7 +32,7 @@ class Request extends BaseRequest
     private ?string $resolvedPathInfo = null;
     protected ?string $controllerType = null;
     public static bool $isAdminEnv = false;
-
+    
     /**
      * Filter PathInfo to allow slash ending uri.
      *

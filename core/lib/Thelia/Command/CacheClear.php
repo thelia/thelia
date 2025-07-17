@@ -58,7 +58,7 @@ class CacheClear extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $cacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
+        $cacheDir = (string) $this->getContainer()->getParameter('kernel.cache_dir');
 
         $this->clearCache($cacheDir, $output);
 
@@ -89,7 +89,7 @@ class CacheClear extends ContainerAwareCommand
         return 0;
     }
 
-    protected function clearCache($dir, OutputInterface $output): void
+    protected function clearCache(string $dir, OutputInterface $output): void
     {
         $output->writeln(\sprintf('Clearing cache in <info>%s</info> directory', $dir));
 
