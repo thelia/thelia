@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Controller\Admin;
 
+use DateTime;
 use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
@@ -625,7 +626,7 @@ class CouponController extends BaseAdminController
      *
      * @param string $couponServiceId Coupon service id
      */
-    public function getBackOfficeInputsAjaxAction(string $couponServiceId): ResponseRest
+    public function getBackOfficeInputsAjaxAction(string $couponServiceId): Response
     {
         if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
@@ -640,11 +641,11 @@ class CouponController extends BaseAdminController
                 $this->pageNotFound();
             }
 
-            $response = new ResponseRest($couponManager->drawBackOfficeInputs(), 'text');
+            $response = new ResponseRest([$couponManager->drawBackOfficeInputs()]);
         } else {
             // Return an empty response if the service ID is not defined
             // Typically, when the user chooses "Please select a coupon type"
-            $response = new ResponseRest('');
+            $response = new ResponseRest([]);
         }
 
         return $response;
@@ -656,7 +657,7 @@ class CouponController extends BaseAdminController
      *
      * @param int $couponId Coupon id
      */
-    public function getBackOfficeConditionSummariesAjaxAction(int $couponId): ResponseRest
+    public function getBackOfficeConditionSummariesAjaxAction(int $couponId): Response
     {
         if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
@@ -699,7 +700,6 @@ class CouponController extends BaseAdminController
 
         /** @var CouponInterface $coupon */
         $coupon = $this->container->get($serviceId);
-
         $couponEvent = new CouponCreateOrUpdateEvent(
             $data['code'],
             $serviceId,
@@ -707,16 +707,16 @@ class CouponController extends BaseAdminController
             $coupon->getEffects($data),
             $data['shortDescription'],
             $data['description'],
-            $data['isEnabled'],
+            $data['isEnabled'] === 'on',
             DateTime::createFromFormat($this->getDefaultDateFormat(), $data['expirationDate']),
-            $data['isAvailableOnSpecialOffers'],
-            $data['isCumulative'],
-            $data['isRemovingPostage'],
-            $data['maxUsage'],
+            $data['isAvailableOnSpecialOffers'] === 'on',
+            $data['isCumulative'] === 'on',
+            $data['isRemovingPostage'] === 'on',
+            $data['maxUsage'] ? (int) $data['maxUsage'] : null,
             $data['locale'],
             $data['freeShippingForCountries'],
             $data['freeShippingForModules'],
-            $data['perCustomerUsageCount'],
+            $data['perCustomerUsageCount'] === 'on',
             empty($data['startDate']) ? null : DateTime::createFromFormat($this->getDefaultDateFormat(), $data['startDate']),
         );
 

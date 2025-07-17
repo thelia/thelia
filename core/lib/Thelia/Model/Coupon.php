@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Model;
 
+use DateTime;
 use Exception;
 use Propel\Runtime\Propel;
 use Thelia\Model\Base\Coupon as BaseCoupon;
@@ -60,8 +61,8 @@ class Coupon extends BaseCoupon
         array $effects,
         string $type,
         bool $isRemovingPostage,
-        string $shortDescription,
-        string $description,
+        ?string $shortDescription,
+        ?string $description,
         bool $isEnabled,
         DateTime $expirationDate,
         bool $isAvailableOnSpecialOffers,

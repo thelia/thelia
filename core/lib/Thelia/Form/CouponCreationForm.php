@@ -271,11 +271,14 @@ class CouponCreationForm extends BaseForm
     /**
      * Validate a date entered with the default Language date format.
      */
-    public function checkLocalizedDate(string $value, ExecutionContextInterface $context): void
+    public function checkLocalizedDate(?string $value, ExecutionContextInterface $context): void
     {
+        if (null === $value || '' === $value) {
+            return;
+        }
         $format = LangQuery::create()->findOneByByDefault(true)->getDatetimeFormat();
 
-        if (false === DateTime::createFromFormat($format, $value)) {
+        if (false === \DateTime::createFromFormat($format, $value)) {
             $context->addViolation(
                 Translator::getInstance()->trans(
                     "Date '%date' is invalid, please enter a valid date using %fmt format",
@@ -296,8 +299,8 @@ class CouponCreationForm extends BaseForm
 
         $format = LangQuery::create()->findOneByByDefault(true)->getDatetimeFormat();
 
-        $startDate = DateTime::createFromFormat($format, $startDate);
-        $expirationDate = DateTime::createFromFormat($format, $value);
+        $startDate = \DateTime::createFromFormat($format, $startDate);
+        $expirationDate = \DateTime::createFromFormat($format, $value);
 
         if ($startDate <= $expirationDate) {
             return;

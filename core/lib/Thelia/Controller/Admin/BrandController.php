@@ -121,7 +121,7 @@ class BrandController extends AbstractSeoCrudController
      */
     protected function getUpdateEvent(array $formData): ActionEvent
     {
-        $brandUpdateEvent = new BrandUpdateEvent($formData['id']);
+        $brandUpdateEvent = new BrandUpdateEvent((int) $formData['id']);
 
         $brandUpdateEvent
             ->setLogoImageId($formData['logo_image_id'])

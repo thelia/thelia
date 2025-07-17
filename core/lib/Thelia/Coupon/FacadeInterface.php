@@ -37,19 +37,6 @@ use Thelia\TaxEngine\TaxEngine;
 interface FacadeInterface
 {
     /**
-     * Constructor.
-     */
-    public function __construct(
-        SecurityContext $securityContext,
-        TaxEngine $taxEngine,
-        TranslatorInterface $translator,
-        ParserInterface $parser,
-        RequestStack $requestStack,
-        ConditionEvaluator $conditionEvaluator,
-        EventDispatcherInterface $eventDispatcher,
-    );
-
-    /**
      * Return a Cart a CouponManager can process.
      */
     public function getCart(): ?Cart;

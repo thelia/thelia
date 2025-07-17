@@ -21,29 +21,27 @@ namespace Thelia\Core\Event\Brand;
  */
 class BrandUpdateEvent extends BrandCreateEvent
 {
-    protected $chapo;
-    protected $description;
-    protected $postscriptum;
-    protected $logo_image_id;
+    protected ?string $chapo;
+    protected ?string $description;
+    protected ?string $postscriptum;
+    protected ?int $logoImageId;
 
-    /**
-     * @param int $brandId
-     */
-    public function __construct(protected $brandId)
+    public function __construct(protected int $brandId)
     {
+        parent::__construct();
     }
 
     /**
      * @return BrandUpdateEvent $this
      */
-    public function setChapo(string $chapo): static
+    public function setChapo(?string $chapo): static
     {
         $this->chapo = $chapo;
 
         return $this;
     }
 
-    public function getChapo(): string
+    public function getChapo(): ?string
     {
         return $this->chapo;
     }
@@ -66,14 +64,14 @@ class BrandUpdateEvent extends BrandCreateEvent
     /**
      * @return BrandUpdateEvent $this
      */
-    public function setDescription(string $description): static
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
 
         return $this;
     }
 
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -81,14 +79,14 @@ class BrandUpdateEvent extends BrandCreateEvent
     /**
      * @return BrandUpdateEvent $this
      */
-    public function setPostscriptum(string $postscriptum): static
+    public function setPostscriptum(?string $postscriptum): static
     {
         $this->postscriptum = $postscriptum;
 
         return $this;
     }
 
-    public function getPostscriptum(): string
+    public function getPostscriptum(): ?string
     {
         return $this->postscriptum;
     }
@@ -96,15 +94,15 @@ class BrandUpdateEvent extends BrandCreateEvent
     /**
      * @return $this
      */
-    public function setLogoImageId(int $logo_image_id): static
+    public function setLogoImageId(?int $logoImageId): static
     {
-        $this->logo_image_id = $logo_image_id;
+        $this->logoImageId = $logoImageId;
 
         return $this;
     }
 
-    public function getLogoImageId(): int
+    public function getLogoImageId(): ?int
     {
-        return $this->logo_image_id;
+        return $this->logoImageId;
     }
 }

@@ -28,14 +28,10 @@ class FileCreateOrUpdateEvent extends ActionEvent
     protected FileModelInterface $model;
     protected FileModelInterface $oldModel;
     protected UploadedFile $uploadedFile;
-    protected string $parentName;
+    protected ?string $parentName = null;
 
-    /**
-     * Constructor.
-     *
-     * @param int $parentId file parent id
-     */
-    public function __construct(protected $parentId)
+
+    public function __construct(protected ?int $parentId)
     {
     }
 
@@ -68,7 +64,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setParentId(int $parentId): static
+    public function setParentId(?int $parentId): static
     {
         $this->parentId = $parentId;
 
@@ -112,7 +108,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setParentName(string $parentName): static
+    public function setParentName(?string $parentName): static
     {
         $this->parentName = $parentName;
 

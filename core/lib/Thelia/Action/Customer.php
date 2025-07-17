@@ -44,7 +44,12 @@ use Thelia\Tools\Password;
  */
 class Customer extends BaseAction implements EventSubscriberInterface
 {
-    public function __construct(protected SecurityContext $securityContext, protected MailerFactory $mailer, protected CustomerService $customerService, protected ?RequestStack $requestStack = null)
+    public function __construct(
+        protected SecurityContext $securityContext,
+        protected MailerFactory $mailer,
+        protected CustomerService $customerService,
+        protected ?RequestStack $requestStack = null
+    )
     {
     }
 
@@ -179,8 +184,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
         ?CustomerModel $customer,
         CustomerCreateOrUpdateEvent $event,
     ): void {
-        $customer->createOrUpdate(
-            $event->getTitle() ?? $this->customerService->getDefaultCustomerTitle()->getId(),
+        $customer?->createOrUpdate(
+            $event->getTitle() ?? $this->customerService->getDefaultCustomerTitle()?->getId(),
             $event->getFirstname(),
             $event->getLastname(),
             $event->getAddress1(),
@@ -190,7 +195,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
             $event->getCellphone(),
             $event->getZipcode(),
             $event->getCity(),
-            $event->getCountry(),
+            (int) $event->getCountry(),
             $event->getEmail(),
             $event->getPassword(),
             $event->getLangId(),

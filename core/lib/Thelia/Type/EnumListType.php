@@ -30,7 +30,7 @@ class EnumListType extends BaseType
 
     public function addValue($value): void
     {
-        if (!\in_array($value, $this->values, true)) {
+        if (!\in_array($value, $this->values, false)) {
             $this->values[] = $value;
         }
     }
@@ -59,7 +59,6 @@ class EnumListType extends BaseType
         if (null === $values) {
             return false;
         }
-
         foreach (explode(',', $values) as $value) {
             if (!$this->isSingleValueValid($value)) {
                 return false;
@@ -76,7 +75,7 @@ class EnumListType extends BaseType
 
     public function isSingleValueValid($value): bool
     {
-        return \in_array($value, $this->values, true);
+        return \in_array($value, $this->values, false);
     }
 
     public function getFormOptions(): array

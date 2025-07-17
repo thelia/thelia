@@ -23,6 +23,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Translation\Translator;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 
@@ -82,12 +83,13 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
      */
     protected function performAdditionalUpdateSeoAction(UpdateSeoEvent $updateSeoEvent): ?Response
     {
+        return null;
     }
 
     /**
      * Return the update SEO form for this object.
      */
-    protected function getUpdateSeoForm()
+    protected function getUpdateSeoForm(): BaseForm
     {
         return $this->createForm(AdminForm::SEO);
     }

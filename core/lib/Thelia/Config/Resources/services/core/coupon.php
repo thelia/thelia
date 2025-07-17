@@ -49,17 +49,16 @@ return static function (ContainerConfigurator $configurator): void {
     $services->alias('thelia.condition.factory', ConditionFactory::class)->public();
 
     // Coupon types only aliases for BC (autoconfigured by CouponInterface)
-    $services->alias('thelia.coupon.type.remove_x_amount', RemoveXAmount::class);
-    $services->alias('thelia.coupon.type.remove_x_percent', RemoveXPercent::class);
-    $services->alias('thelia.coupon.type.remove_amount_on_categories', RemoveAmountOnCategories::class);
-    $services->alias('thelia.coupon.type.remove_percentage_on_categories', RemovePercentageOnCategories::class);
-    $services->alias('thelia.coupon.type.remove_amount_on_products', RemoveAmountOnProducts::class);
-    $services->alias('thelia.coupon.type.remove_percentage_on_products', RemovePercentageOnProducts::class);
-    $services->alias('thelia.coupon.type.remove_amount_on_attribute_av', RemoveAmountOnAttributeValues::class);
-    $services->alias('thelia.coupon.type.remove_percentage_on_attribute_av', RemovePercentageOnAttributeValues::class);
-    $services->alias('thelia.coupon.type.free_product', FreeProduct::class);
+    $services->alias('thelia.coupon.type.remove_x_amount', RemoveXAmount::class)->public();
+    $services->alias('thelia.coupon.type.remove_x_percent', RemoveXPercent::class)->public();
+    $services->alias('thelia.coupon.type.remove_amount_on_categories', RemoveAmountOnCategories::class)->public();
+    $services->alias('thelia.coupon.type.remove_percentage_on_categories', RemovePercentageOnCategories::class)->public();
+    $services->alias('thelia.coupon.type.remove_amount_on_products', RemoveAmountOnProducts::class)->public();
+    $services->alias('thelia.coupon.type.remove_percentage_on_products', RemovePercentageOnProducts::class)->public();
+    $services->alias('thelia.coupon.type.remove_amount_on_attribute_av', RemoveAmountOnAttributeValues::class)->public();
+    $services->alias('thelia.coupon.type.remove_percentage_on_attribute_av', RemovePercentageOnAttributeValues::class)->public();
+    $services->alias('thelia.coupon.type.free_product', FreeProduct::class)->public();
 
-    // Conditions only aliases for BC (autoconfigured by ConditionInterface)
     $services->alias('thelia.condition.validator', ConditionEvaluator::class);
     $services->alias('thelia.condition.match_for_everyone', MatchForEveryone::class);
     $services->alias('thelia.condition.match_for_total_amount', MatchForTotalAmount::class);

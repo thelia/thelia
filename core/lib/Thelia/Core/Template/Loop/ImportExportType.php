@@ -176,7 +176,7 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
         );
     }
 
-    public static function getAllowedOrders()
+    public static function getAllowedOrders(): array
     {
         return ['id', 'id_reverse', 'ref', 'ref_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse'];
     }

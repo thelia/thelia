@@ -59,8 +59,14 @@ class Sale extends BaseAction implements EventSubscriberInterface
      *
      * @throws PropelException
      */
-    protected function updateProductSaleElementsPrices(array $pseList, bool $promoStatus, int $offsetType, Calculator $taxCalculator, array $saleOffsetByCurrency, ConnectionInterface $con): void
-    {
+    protected function updateProductSaleElementsPrices(
+        array $pseList,
+        bool $promoStatus,
+        int $offsetType,
+        Calculator $taxCalculator,
+        array $saleOffsetByCurrency,
+        ConnectionInterface $con,
+    ): void {
         /** @var ProductSaleElements $pse */
         foreach ($pseList as $pse) {
             if ($pse->getPromo() !== $promoStatus) {
@@ -77,7 +83,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
                 if (null !== $productPrice) {
                     // Get the taxed price
-                    $priceWithTax = $taxCalculator->getTaxedPrice($productPrice->getPrice());
+                    $priceWithTax = $taxCalculator->getTaxedPrice((float)$productPrice->getPrice());
 
                     // Remove the price offset to get the taxed promo price
                     $promoPrice = match ($offsetType) {
@@ -111,69 +117,71 @@ class Sale extends BaseAction implements EventSubscriberInterface
         $sale = $event->getSale();
 
         // Get all selected product sale elements for this sale
-        if (null !== $saleProducts = SaleProductQuery::create()->filterBySale($sale)->orderByProductId()) {
-            $saleOffsetByCurrency = $sale->getPriceOffsets();
+        if (null === $sale || null === $saleProducts = SaleProductQuery::create()->filterBySale($sale)->orderByProductId()) {
+            return;
+        }
+        $saleOffsetByCurrency = $sale->getPriceOffsets();
 
-            $offsetType = $sale->getPriceOffsetType();
+        $offsetType = $sale->getPriceOffsetType();
 
-            $con = Propel::getWriteConnection(SaleTableMap::DATABASE_NAME);
+        $con = Propel::getWriteConnection(SaleTableMap::DATABASE_NAME);
 
-            $con->beginTransaction();
+        $con->beginTransaction();
 
-            try {
-                /** @var SaleProduct $saleProduct */
-                foreach ($saleProducts as $saleProduct) {
-                    // Reset all sale status on product's PSE
-                    ProductSaleElementsQuery::create()
-                        ->filterByProductId($saleProduct->getProductId())
-                        ->update(['Promo' => false], $con);
+        try {
+            /** @var SaleProduct $saleProduct */
+            foreach ($saleProducts as $saleProduct) {
+                // Reset all sale status on product's PSE
+                ProductSaleElementsQuery::create()
+                    ->filterByProductId($saleProduct->getProductId())
+                    ->update(['Promo' => false], $con);
 
-                    $taxCalculator->load(
-                        $saleProduct->getProduct($con),
-                        CountryModel::getShopLocation(),
-                    );
+                $taxCalculator->load(
+                    $saleProduct->getProduct($con),
+                    CountryModel::getShopLocation(),
+                );
 
-                    $attributeAvId = $saleProduct->getAttributeAvId();
+                $attributeAvId = $saleProduct->getAttributeAvId();
 
-                    $pseRequest = ProductSaleElementsQuery::create()
-                        ->filterByProductId($saleProduct->getProductId());
+                $pseRequest = ProductSaleElementsQuery::create()
+                    ->filterByProductId($saleProduct->getProductId());
 
-                    // If no attribute AV id is defined, consider ALL product combinations
-                    if (null !== $attributeAvId) {
-                        // Find PSE attached to combination containing this attribute av :
-                        // SELECT * from product_sale_elements pse
-                        // left join attribute_combination ac on ac.product_sale_elements_id = pse.id
-                        // where pse.product_id=363
-                        // and ac.attribute_av_id = 7
-                        // group by pse.id
+                // If no attribute AV id is defined, consider ALL product combinations
+                if (null !== $attributeAvId) {
+                    // Find PSE attached to combination containing this attribute av :
+                    // SELECT * from product_sale_elements pse
+                    // left join attribute_combination ac on ac.product_sale_elements_id = pse.id
+                    // where pse.product_id=363
+                    // and ac.attribute_av_id = 7
+                    // group by pse.id
 
-                        $pseRequest
-                            ->useAttributeCombinationQuery(null, Criteria::LEFT_JOIN)
-                            ->filterByAttributeAvId($attributeAvId)
-                            ->endUse();
-                    }
-
-                    $pseList = $pseRequest->find();
-
-                    if (null !== $pseList) {
-                        $this->updateProductSaleElementsPrices(
-                            $pseList,
-                            $sale->getActive(),
-                            $offsetType,
-                            $taxCalculator,
-                            $saleOffsetByCurrency,
-                            $con,
-                        );
-                    }
+                    $pseRequest
+                        ->useAttributeCombinationQuery(null, Criteria::LEFT_JOIN)
+                        ->filterByAttributeAvId($attributeAvId)
+                        ->endUse();
                 }
 
-                $con->commit();
-            } catch (PropelException $e) {
-                $con->rollback();
+                $pseList = $pseRequest->find();
 
-                throw $e;
+                if (null !== $pseList) {
+                    $this->updateProductSaleElementsPrices(
+                        $pseList->getData(),
+                        $sale->getActive(),
+                        $offsetType,
+                        $taxCalculator,
+                        $saleOffsetByCurrency,
+                        $con,
+                    );
+                }
             }
+
+            $con->commit();
+        } catch (PropelException $e) {
+            $con->rollback();
+
+            throw $e;
         }
+
     }
 
     /**

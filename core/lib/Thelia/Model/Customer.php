@@ -60,19 +60,19 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         string $firstname,
         string $lastname,
         string $address1,
-        string $address2,
-        string $address3,
-        string $phone,
-        string $cellphone,
+        ?string $address2,
+        ?string $address3,
+        ?string $phone,
+        ?string $cellphone,
         string $zipcode,
         string $city,
         int $countryId,
         ?string $email = null,
         ?string $plainPassword = null,
         ?int $lang = null,
-        int $reseller = 0,
+        bool $reseller = false,
         $sponsor = null,
-        int $discount = 0,
+        ?float $discount = 0,
         $company = null,
         $ref = null,
         bool $forceEmailUpdate = false,
@@ -86,7 +86,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
             ->setPassword($plainPassword)
             ->setReseller($reseller)
             ->setSponsor($sponsor)
-            ->setDiscount($discount)
+            ->setDiscount($discount ?? 0)
             ->setRef($ref);
 
         if (null !== $lang) {

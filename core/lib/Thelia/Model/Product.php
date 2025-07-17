@@ -161,7 +161,14 @@ class Product extends BaseProduct implements FileModelParentInterface
      *
      * @throws \Exception
      */
-    public function create(int $defaultCategoryId, float $basePrice, int $priceCurrencyId, int $taxRuleId, float $baseWeight, int $baseQuantity = 0): void
+    public function create(
+        int $defaultCategoryId,
+        float $basePrice,
+        int $priceCurrencyId,
+        int $taxRuleId,
+        float $baseWeight = 0,
+        int $baseQuantity = 0
+    ): void
     {
         $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
 
@@ -194,7 +201,19 @@ class Product extends BaseProduct implements FileModelParentInterface
      * @throws PropelException
      * @throws \Exception
      */
-    public function createProductSaleElement(ConnectionInterface $con, float $weight, float $basePrice, float $salePrice, int $currencyId, int $isDefault, bool $isPromo = false, bool $isNew = false, int $quantity = 0, string $eanCode = '', bool $ref = false): ProductSaleElements
+    public function createProductSaleElement(
+        ConnectionInterface $con,
+        float $weight,
+        float $basePrice,
+        float $salePrice,
+        int $currencyId,
+        bool $isDefault,
+        bool $isPromo = false,
+        bool $isNew = false,
+        int $quantity = 0,
+        string $eanCode = '',
+        bool $ref = false
+    ): ProductSaleElements
     {
         // Create an empty product sale element
         $saleElements = new ProductSaleElements();

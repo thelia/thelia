@@ -26,59 +26,32 @@ use Thelia\Model\Exception\InvalidArgumentException;
  */
 class CouponCreateOrUpdateEvent extends ActionEvent
 {
-    /** @var ConditionCollection Array of ConditionInterface */
     protected ConditionCollection $conditions;
 
-    /** @var float Amount that will be removed from the Checkout (Coupon Effect) */
     protected float $amount = 0;
 
-    /** @var array Effects ready to be serialized */
     protected array $effects = [];
 
-    /** @var Coupon Coupon model */
     protected Coupon $couponModel;
 
-    /**
-     * Constructor.
-     *
-     * @param string   $code                       Coupon Code
-     * @param string   $serviceId                  Coupon Service id
-     * @param string   $title                      Coupon title
-     * @param array    $effects                    Coupon effects ready to be serialized
-     *                                             'amount' key is mandatory and reflects
-     *                                             the amount deduced from the cart
-     * @param string   $shortDescription           Coupon short description
-     * @param string   $description                Coupon description
-     * @param bool     $isEnabled                  Enable/Disable
-     * @param DateTime $expirationDate             Coupon expiration date
-     * @param bool     $isAvailableOnSpecialOffers Is available on special offers
-     * @param bool     $isCumulative               Is cumulative
-     * @param bool     $isRemovingPostage          Is removing Postage
-     * @param int      $maxUsage                   Coupon quantity
-     * @param string   $locale                     Coupon Language code ISO (ex: fr_FR)
-     * @param array    $freeShippingForCountries   ID of Countries to which shipping is free
-     * @param array    $freeShippingForMethods     ID of Shipping modules for which shipping is free
-     * @param bool     $perCustomerUsageCount      Usage count is per customer
-     * @param DateTime $startDate                  Coupon start date
-     */
     public function __construct(
         protected $code,
         protected $serviceId,
         protected $title,
         array $effects,
-        protected $shortDescription,
-        protected $description,
-        protected $isEnabled,
-        protected DateTime $expirationDate,
-        protected $isAvailableOnSpecialOffers,
-        protected $isCumulative,
-        protected $isRemovingPostage,
+        protected ?string $shortDescription,
+        protected ?string $description,
+        protected bool $isEnabled,
+        protected \DateTime $expirationDate,
+        protected bool $isAvailableOnSpecialOffers,
+        protected bool $isCumulative,
+        protected bool $isRemovingPostage,
         protected $maxUsage,
         protected $locale,
         protected $freeShippingForCountries,
         protected $freeShippingForMethods,
         protected $perCustomerUsageCount,
-        protected ?DateTime $startDate = null,
+        protected ?\DateTime $startDate = null,
     ) {
         $this->setEffects($effects);
     }
@@ -150,7 +123,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /**
      * Return Coupon short description.
      */
-    public function getShortDescription(): string
+    public function getShortDescription(): ?string
     {
         return $this->shortDescription;
     }
@@ -158,7 +131,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /**
      * Return Coupon description.
      */
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -194,9 +167,9 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /**
      * Return Coupon start date.
      */
-    public function getStartDate(): ?DateTime
+    public function getStartDate(): ?\DateTime
     {
-        if (!$this->startDate instanceof DateTime) {
+        if (!$this->startDate instanceof \DateTime) {
             return null;
         }
 
@@ -206,7 +179,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /**
      * Return Coupon expiration date.
      */
-    public function getExpirationDate(): DateTime
+    public function getExpirationDate(): \DateTime
     {
         return clone $this->expirationDate;
     }
@@ -264,7 +237,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     public function setEffects(array $effects): void
     {
         // Amount is now optionnal.
-        $this->amount = $effects['amount'] ?? 0;
+        $this->amount = $effects['amount'] ? (float) $effects['amount'] : .0;
 
         $this->effects = $effects;
     }

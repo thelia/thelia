@@ -81,9 +81,6 @@ class Product extends BaseAction implements EventSubscriberInterface
     {
     }
 
-    /**
-     * Create a new product entry.
-     */
     public function create(ProductCreateEvent $event): void
     {
         $defaultTaxRuleId = null;
@@ -109,8 +106,8 @@ class Product extends BaseAction implements EventSubscriberInterface
                 $event->getCurrencyId(),
                 // Set the default tax rule if not defined
                 $event->getTaxRuleId() ?: $defaultTaxRuleId,
-                $event->getBaseWeight(),
-                $event->getBaseQuantity(),
+                $event->getBaseWeight() ?? 0,
+                $event->getBaseQuantity() ?? 0,
             );
 
         $event->setProduct($product);

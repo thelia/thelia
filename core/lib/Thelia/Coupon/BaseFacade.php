@@ -21,6 +21,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
@@ -50,7 +51,7 @@ class BaseFacade implements FacadeInterface
         protected SecurityContext $securityContext,
         protected TaxEngine $taxEngine,
         protected TranslatorInterface $translator,
-        protected ParserInterface $parser,
+        protected ParserResolver $parserResolver,
         protected RequestStack $requestStack,
         protected ConditionEvaluator $conditionEvaluator,
         protected EventDispatcherInterface $eventDispatcher,
@@ -202,14 +203,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getParser(): ParserInterface
     {
-        if ($this->parser instanceof ParserInterface) {
-            // Define the current back-office template that should be used
-            $this->parser->setTemplateDefinition(
-                $this->parser->getTemplateHelper()->getActiveAdminTemplate(),
-            );
-        }
-
-        return $this->parser;
+        return $this->parserResolver->getParserByCurrentRequest();
     }
 
     /**

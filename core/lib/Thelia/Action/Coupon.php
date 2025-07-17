@@ -204,7 +204,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $event->getTitle(),
             $event->getEffects(),
             $event->getServiceId(),
-            $event->isRemovingPostage(),
+            $event->isRemovingPostage() ?? false,
             $event->getShortDescription(),
             $event->getDescription(),
             $event->isEnabled(),
