@@ -23,9 +23,9 @@ class Currency extends BaseCurrency
 {
     use PositionManagementTrait;
 
-    protected static $defaultCurrency;
+    protected static ?Currency $defaultCurrency = null;
 
-    public static function getDefaultCurrency()
+    public static function getDefaultCurrency(): self
     {
         if (null === self::$defaultCurrency) {
             self::$defaultCurrency = CurrencyQuery::create()->findOneByByDefault(1);
@@ -55,7 +55,7 @@ class Currency extends BaseCurrency
      */
     public function getRate(): float
     {
-        if (false === filter_var($this->rate, FILTER_VALIDATE_FLOAT)) {
+        if (false === filter_var($this->rate, \FILTER_VALIDATE_FLOAT)) {
             throw new PropelException('Currency::rate is not float value');
         }
 

@@ -216,7 +216,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     protected function updateQuantity(EventDispatcherInterface $dispatcher, CartItem $cartItem, float $quantity): CartItem
     {
-        $cartItem->setDisptacher($dispatcher);
+        $cartItem->setDispatcher($dispatcher);
         $cartItem->updateQuantity($quantity)
             ->save();
 
@@ -235,7 +235,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         ProductPriceTools $productPrices,
     ): CartItem {
         $cartItem = new CartItem();
-        $cartItem->setDisptacher($dispatcher);
+        $cartItem->setDispatcher($dispatcher);
         $cartItem
             ->setCart($cart)
             ->setProductId($productId)

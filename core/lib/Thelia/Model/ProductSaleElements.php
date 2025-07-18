@@ -120,6 +120,6 @@ class ProductSaleElements extends BaseProductSaleElements
             $promoPrice *= (1 - ($discount / 100));
         }
 
-        return new ProductPriceTools($price, $promoPrice);
+        return new ProductPriceTools((float) $price,(float) $promoPrice);
     }
 }

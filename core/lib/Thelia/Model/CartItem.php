@@ -25,9 +25,9 @@ use Thelia\TaxEngine\Calculator;
 
 class CartItem extends BaseCartItem
 {
-    protected EventDispatcherInterface $dispatcher;
+    protected ?EventDispatcherInterface $dispatcher = null;
 
-    public function setDisptacher(EventDispatcherInterface $dispatcher): void
+    public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
