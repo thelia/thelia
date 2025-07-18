@@ -30,6 +30,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 use Thelia\Model\RewritingUrlQuery;
+use Thelia\Service\Model\LangService;
 use Thelia\Service\Rewriting\RewritingResolver;
 use Thelia\Tools\URL;
 
@@ -43,6 +44,12 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
 {
     protected RequestContext $context;
     protected array $options;
+
+    public function __construct(
+        protected LangService $langService
+    )
+    {
+    }
 
     public function match(string $pathinfo): array
     {
@@ -60,7 +67,9 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
 
         $urlTool = URL::getInstance();
 
-        $pathInfo = $request instanceof TheliaRequest ? $request->getRealPathInfo() : $request->getPathInfo();
+        $pathInfo = $request instanceof TheliaRequest
+            ? $request->getRealPathInfo()
+            : $request->getPathInfo();
 
         try {
             $rewrittenUrlData = $urlTool->resolve($pathInfo);
@@ -126,7 +135,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
             $request->attributes->set('_view', $rewrittenUrlData->view);
 
             if (null !== $rewrittenUrlData->viewId) {
-                $request->query->set($rewrittenUrlData->view . '_id', $rewrittenUrlData->viewId);
+                $request->query->set($rewrittenUrlData->view.'_id', $rewrittenUrlData->viewId);
             }
         }
 
@@ -144,7 +153,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
     private function defaultActionOptions(): array
     {
         return [
-            '_controller' => DefaultController::class . '::noAction',
+            '_controller' => DefaultController::class.'::noAction',
             '_route' => 'rewrite',
             '_rewritten' => true,
         ];
@@ -158,14 +167,14 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
 
         $langSession = $request->getSession()->getLang();
 
-        if ($lang->getLocale() !== $langSession->getLocale()) {
+        if ($lang->getLocale() !== $langSession?->getLocale()) {
             if (ConfigQuery::isMultiDomainActivated()) {
                 $this->redirect(
                     \sprintf('%s/%s', $lang->getUrl(), $rewrittenUrlData->rewrittenUrl),
                     301,
                 );
             } else {
-                $request->getSession()->setLang($lang);
+                $this->langService->setLang($lang);
             }
         }
     }

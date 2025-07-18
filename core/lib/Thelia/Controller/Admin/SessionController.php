@@ -33,6 +33,7 @@ use Thelia\Model\AdminQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
+use Thelia\Service\Model\LangService;
 use Thelia\Tools\RememberMeTrait;
 use Thelia\Tools\URL;
 
@@ -41,6 +42,12 @@ class SessionController extends BaseAdminController
     use RememberMeTrait;
 
     public const ADMIN_TOKEN_SESSION_VAR_NAME = 'thelia_admin_password_renew_token';
+
+    public function __construct(
+        private readonly LangService $langService
+    )
+    {
+    }
 
     protected function checkAdminLoggedIn(): ?RedirectResponse
     {
@@ -310,7 +317,7 @@ class SessionController extends BaseAdminController
             $lang = Lang::getDefaultLanguage();
         }
 
-        $this->getSession()->setLang($lang);
+        $this->langService->setLang($lang);
     }
 
     protected function getRememberMeCookieName()

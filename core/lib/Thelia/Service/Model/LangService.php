@@ -45,6 +45,18 @@ readonly class LangService
         return $request->getSession()->getLang();
     }
 
+    public function setLang(Lang $lang): void
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (!$request instanceof Request) {
+            return;
+        }
+
+        $request->getSession()->setLang($lang);
+        $request->setLocale($lang->getLocale());
+    }
+
     public function resolveFrontLanguageFromRequest(TheliaRequest $request): Lang|Response
     {
         $requestedLang = $this->getLanguageFromRequestParameters($request);

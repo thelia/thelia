@@ -113,7 +113,7 @@ class KernelListener
         }
 
         if ($langOrResponse instanceof Lang) {
-            $request->getSession()->setLang($langOrResponse);
+            $this->langService->setLang($langOrResponse);
         }
 
         return null;

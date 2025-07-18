@@ -24,6 +24,7 @@ return static function (ContainerConfigurator $container): void {
         ],
         'defaults' => [
             'pagination_client_items_per_page' => true,
+            'stateless' => false
         ],
         'mapping' => [
             'paths' => [],

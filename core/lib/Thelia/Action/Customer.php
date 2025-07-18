@@ -33,6 +33,7 @@ use Thelia\Model\CustomerQuery;
 use Thelia\Model\Event\CustomerEvent;
 use Thelia\Model\LangQuery;
 use Thelia\Service\Model\CustomerService;
+use Thelia\Service\Model\LangService;
 use Thelia\Tools\Password;
 
 /**
@@ -48,6 +49,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
         protected SecurityContext $securityContext,
         protected MailerFactory $mailer,
         protected CustomerService $customerService,
+        protected LangService $langService,
         protected ?RequestStack $requestStack = null
     )
     {
@@ -225,10 +227,10 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
         // Set the preferred customer language
         if ($this->requestStack instanceof RequestStack
-            && !empty($customer->getLangId())
+            && $customer->getLangId() !== null
             && (null !== $lang = LangQuery::create()->findPk($customer->getLangId()))
         ) {
-            $this->requestStack->getCurrentRequest()->getSession()->setLang($lang);
+            $this->langService->setLang($lang);
         }
     }
 

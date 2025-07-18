@@ -25,6 +25,7 @@ use Thelia\Core\Routing\ModuleAttributeLoader;
 use Thelia\Core\Routing\ModuleXmlLoader;
 use Thelia\Core\Routing\RewritingRouter;
 use Thelia\Core\Routing\TemplateAttributeLoader;
+use Thelia\Service\Model\LangService;
 
 return static function (ContainerConfigurator $container): void {
     $services = $container->services();
@@ -59,7 +60,7 @@ return static function (ContainerConfigurator $container): void {
     // Router file locator
     $services->set('router.fileLocator', FileLocator::class)
         ->args([
-            param('thelia.core_dir') . '/Config/Resources/routing',
+            param('thelia.core_dir').'/Config/Resources/routing',
         ])
         ->public();
 
@@ -96,7 +97,11 @@ return static function (ContainerConfigurator $container): void {
         ->public();
 
     // Rewriting router
-    $services->set('router.rewrite', RewritingRouter::class);
+    $services->set('router.rewrite', RewritingRouter::class)->args(
+        [
+            service(LangService::class),
+        ]
+    );
 
     // Template attribute loader
     $services->set('thelia.loader.template_attributes', TemplateAttributeLoader::class)->public()
