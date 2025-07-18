@@ -70,7 +70,7 @@ class ConditionEvaluator
             Operators::IN => \in_array($v1, $v2, true),
             // not in
             Operators::OUT => !\in_array($v1, $v2, true),
-            default => throw new \Exception('Unrecognized operator ' . $o),
+            default => throw new \Exception('Unrecognized operator '.$o),
         };
     }
 }

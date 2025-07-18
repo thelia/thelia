@@ -31,7 +31,7 @@ class IntListType extends BaseType
         }
 
         foreach (explode(',', (string) $values) as $value) {
-            if (false === filter_var($value, FILTER_VALIDATE_INT)) {
+            if (false === filter_var($value, \FILTER_VALIDATE_INT)) {
                 return false;
             }
         }

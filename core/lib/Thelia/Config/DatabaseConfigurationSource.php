@@ -59,10 +59,10 @@ class DatabaseConfigurationSource
 
         $fs = new Filesystem();
 
-        $databaseConfigFile = THELIA_CONF_DIR . 'database_' . $envParameters['kernel.environment'] . '.yml';
+        $databaseConfigFile = THELIA_CONF_DIR.'database_'.$envParameters['kernel.environment'].'.yml';
 
         if (!$fs->exists($databaseConfigFile)) {
-            $databaseConfigFile = THELIA_CONF_DIR . 'database.yml';
+            $databaseConfigFile = THELIA_CONF_DIR.'database.yml';
         }
 
         if (!$fs->exists($databaseConfigFile)) {

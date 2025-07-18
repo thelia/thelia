@@ -37,7 +37,7 @@ class ModuleDescriptorValidator
         $this->xsdFinder = new Finder();
         $this->xsdFinder
             ->name('*.xsd')
-            ->in(__DIR__ . '/schema/module/');
+            ->in(__DIR__.'/schema/module/');
     }
 
     public function getModuleVersion()
@@ -92,7 +92,7 @@ class ModuleDescriptorValidator
 
                 foreach ($errors as $error) {
                     $errorMessages[] = \sprintf(
-                        'XML error "%s" [%d] (Code %d) in %s on line %d column %d' . "\n",
+                        'XML error "%s" [%d] (Code %d) in %s on line %d column %d'."\n",
                         $error->message,
                         $error->level,
                         $error->code,

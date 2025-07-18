@@ -74,7 +74,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      */
     protected function getCacheDirFromWebRoot(): string
     {
-        return ConfigQuery::read('image_cache_dir_from_web_root', 'cache' . DS . 'images');
+        return ConfigQuery::read('image_cache_dir_from_web_root', 'cache'.DS.'images');
     }
 
     /**
@@ -93,7 +93,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     {
         $subdir = $event->getCacheSubdirectory();
         $sourceFile = $event->getSourceFilepath();
-        $imageExt = pathinfo($sourceFile, PATHINFO_EXTENSION);
+        $imageExt = pathinfo($sourceFile, \PATHINFO_EXTENSION);
 
         if (null === $sourceFile) {
             throw new \InvalidArgumentException('Cache sub-directory and source file path cannot be null');
@@ -105,7 +105,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $alternativeImagePath = null;
 
         if ('' !== (string) $event->getFormat() && '0' !== $event->getFormat()) {
-            $sourceExtension = pathinfo($cacheFilePath, PATHINFO_EXTENSION);
+            $sourceExtension = pathinfo($cacheFilePath, \PATHINFO_EXTENSION);
             if ('webp' === $event->getFormat()) {
                 $alternativeImagePath = $cacheFilePath;
             }
@@ -156,8 +156,8 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                         $svg->setAttribute('viewBox', $viewBox);
                     }
 
-                    $svg->setAttribute('width', (string)$event->getWidth());
-                    $svg->setAttribute('height', (string)$event->getWidth());
+                    $svg->setAttribute('width', (string) $event->getWidth());
+                    $svg->setAttribute('height', (string) $event->getWidth());
                     $dom->save($cacheFilePath);
                 } else {
                     $this->applyTransformation($sourceFile, $event, $dispatcher, $cacheFilePath);
@@ -245,7 +245,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             $image,
             $event->getWidth(),
             $event->getHeight(),
-            (int)$event->getResizeMode(),
+            (int) $event->getResizeMode(),
             $bg_color,
             $event->getAllowZoom(),
         );
@@ -260,7 +260,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         // Flip
         // Process each effects
         foreach ($event->getEffects() as $effect) {
-            $effect = strtolower(trim((string)$effect));
+            $effect = strtolower(trim((string) $effect));
 
             $params = explode(':', $effect);
 

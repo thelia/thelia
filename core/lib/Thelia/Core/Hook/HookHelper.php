@@ -45,7 +45,7 @@ class HookHelper
             TemplateDefinition::BACK_OFFICE => 'active-admin-template',
             TemplateDefinition::PDF => 'active-pdf-template',
             TemplateDefinition::EMAIL => 'active-mail-template',
-            default => throw new TheliaProcessException('Unknown template type: ' . $templateType),
+            default => throw new TheliaProcessException('Unknown template type: '.$templateType),
         };
 
         return $this->parseTemplate($templateType, ConfigQuery::read($tplVar, 'default'));
@@ -152,7 +152,7 @@ class HookHelper
                     $ret['context'] = $attributes['name'];
                     $ret['type'] = '';
                 } else {
-                    throw new \UnexpectedValueException('skipping hook as name contains variable : ' . $attributes['name']);
+                    throw new \UnexpectedValueException('skipping hook as name contains variable : '.$attributes['name']);
                 }
             } else {
                 $ret['context'] = $params[0];

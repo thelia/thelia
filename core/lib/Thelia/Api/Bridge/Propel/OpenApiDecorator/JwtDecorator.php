@@ -75,13 +75,13 @@ class JwtDecorator implements OpenApiFactoryInterface
     private function getLoginPathItem(string $type): PathItem
     {
         return new PathItem(
-            ref: 'JWT ' . $type . ' Token',
+            ref: 'JWT '.$type.' Token',
             post: new Operation(
-                operationId: 'postCredentialsItem' . $type,
-                tags: ['Token ' . $type],
+                operationId: 'postCredentialsItem'.$type,
+                tags: ['Token '.$type],
                 responses: [
                     '200' => [
-                        'description' => 'Get JWT token for ' . $type . ' routes',
+                        'description' => 'Get JWT token for '.$type.' routes',
                         'content' => [
                             'application/json' => [
                                 'schema' => [
@@ -91,7 +91,7 @@ class JwtDecorator implements OpenApiFactoryInterface
                         ],
                     ],
                 ],
-                summary: 'Get JWT token to login to ' . $type,
+                summary: 'Get JWT token to login to '.$type,
                 requestBody: new RequestBody(
                     description: 'Generate new JWT Token',
                     content: new \ArrayObject([

@@ -54,7 +54,7 @@ class ModuleListCommand extends ContainerAwareCommand
         $moduleData = ModuleQuery::create()
             ->orderByType()
             ->addAsColumn('code', ModuleTableMap::COL_CODE)
-            ->addAsColumn('active', 'IF(' . ModuleTableMap::COL_ACTIVATE . ', "Yes", "No")')
+            ->addAsColumn('active', 'IF('.ModuleTableMap::COL_ACTIVATE.', "Yes", "No")')
             ->addAsColumn('type', ModuleTableMap::COL_TYPE)
             ->addAsColumn('version', ModuleTableMap::COL_VERSION)
             ->select([

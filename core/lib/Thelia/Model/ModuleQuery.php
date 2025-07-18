@@ -87,7 +87,7 @@ class ModuleQuery extends BaseModuleQuery
                     $result[] = $instance;
                 }
             } catch (\Exception $ex) {
-                Tlog::getInstance()->addError('Failed to instantiate module ' . $module->getCode(), $ex);
+                Tlog::getInstance()->addError('Failed to instantiate module '.$module->getCode(), $ex);
             }
         }
 

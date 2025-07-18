@@ -112,7 +112,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterByCode($consumedCoupons, $criteria);
         }
 
-        $search->addAsColumn('days_left', 'DATEDIFF(' . CouponTableMap::COL_EXPIRATION_DATE . ', CURDATE()) - 1');
+        $search->addAsColumn('days_left', 'DATEDIFF('.CouponTableMap::COL_EXPIRATION_DATE.', CURDATE()) - 1');
 
         $orders = $this->getOrder();
 

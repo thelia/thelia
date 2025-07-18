@@ -102,9 +102,9 @@ class ContentDocument extends BaseContentDocument implements BreadcrumbInterface
     public function getUploadDir(): string
     {
         $uploadDir = ConfigQuery::read('documents_library_path');
-        $uploadDir = null === $uploadDir ? THELIA_LOCAL_DIR . 'media' . DS . 'documents' : THELIA_ROOT . $uploadDir;
+        $uploadDir = null === $uploadDir ? THELIA_LOCAL_DIR.'media'.DS.'documents' : THELIA_ROOT.$uploadDir;
 
-        return $uploadDir . DS . 'content';
+        return $uploadDir.DS.'content';
     }
 
     /**
@@ -112,7 +112,7 @@ class ContentDocument extends BaseContentDocument implements BreadcrumbInterface
      */
     public function getRedirectionUrl(): string
     {
-        return '/admin/content/update/' . $this->getContentId();
+        return '/admin/content/update/'.$this->getContentId();
     }
 
     /**

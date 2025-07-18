@@ -61,7 +61,7 @@ class LangController extends BaseAdminController
         $data = [];
 
         foreach (LangQuery::create()->find() as $lang) {
-            $data[LangUrlForm::LANG_PREFIX . $lang->getId()] = $lang->getUrl();
+            $data[LangUrlForm::LANG_PREFIX.$lang->getId()] = $lang->getUrl();
         }
 
         $langUrlForm = $this->createForm(AdminForm::LANG_URL, FormType::class, $data);

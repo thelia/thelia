@@ -96,9 +96,9 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
     public function getUploadDir(): string
     {
         $uploadDir = ConfigQuery::read('images_library_path');
-        $uploadDir = null === $uploadDir ? THELIA_LOCAL_DIR . 'media' . DS . 'images' : THELIA_ROOT . $uploadDir;
+        $uploadDir = null === $uploadDir ? THELIA_LOCAL_DIR.'media'.DS.'images' : THELIA_ROOT.$uploadDir;
 
-        return $uploadDir . DS . 'brand';
+        return $uploadDir.DS.'brand';
     }
 
     /**
@@ -106,7 +106,7 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
      */
     public function getRedirectionUrl(): string
     {
-        return '/admin/brand/update/' . $this->getBrandId();
+        return '/admin/brand/update/'.$this->getBrandId();
     }
 
     /**

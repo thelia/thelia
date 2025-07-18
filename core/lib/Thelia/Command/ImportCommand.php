@@ -74,7 +74,7 @@ class ImportCommand extends ContainerAwareCommand
         $path = $input->getArgument('filePath');
 
         if (null === $importRef || null === $path) {
-            throw new \RuntimeException('Not enough arguments.' . PHP_EOL . 'If no options are provided, ref and filePath arguments are required.');
+            throw new \RuntimeException('Not enough arguments.'.\PHP_EOL.'If no options are provided, ref and filePath arguments are required.');
         }
 
         /** @var ImportHandler $importHandler */
@@ -83,7 +83,7 @@ class ImportCommand extends ContainerAwareCommand
         $import = $importHandler->getImportByRef($importRef);
 
         if (null === $import) {
-            throw new \RuntimeException($importRef . " import doesn't exist.");
+            throw new \RuntimeException($importRef." import doesn't exist.");
         }
 
         $importEvent = $importHandler->import(
@@ -93,7 +93,7 @@ class ImportCommand extends ContainerAwareCommand
         );
 
         $formattedLine = $this->getHelper('formatter')->formatBlock(
-            'Successfully import ' . $importEvent->getImport()->getImportedRows() . ' row(s)',
+            'Successfully import '.$importEvent->getImport()->getImportedRows().' row(s)',
             'fg=black;bg=green',
             true,
         );
@@ -108,7 +108,7 @@ class ImportCommand extends ContainerAwareCommand
             $output->writeln($formattedLine);
 
             foreach ($importEvent->getErrors() as $error) {
-                $output->writeln('<comment>' . $error . '</comment>');
+                $output->writeln('<comment>'.$error.'</comment>');
             }
         }
 

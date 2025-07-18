@@ -249,7 +249,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
                 // we a register an event which is relative to a specific module
                 if ($hook->getByModule()) {
-                    $eventName .= '.' . $moduleHook->getModuleId();
+                    $eventName .= '.'.$moduleHook->getModuleId();
                 }
 
                 $definition->addMethodCall(
@@ -265,10 +265,10 @@ class RegisterHookListenersPass implements CompilerPassInterface
                 );
 
                 if ($moduleHook->getTemplates() && $container->hasDefinition($moduleHook->getClassname())) {
-                    $moduleHookEventName = 'hook.' . $hook->getType() . '.' . $hook->getCode();
+                    $moduleHookEventName = 'hook.'.$hook->getType().'.'.$hook->getCode();
 
                     if (true === $moduleHook->getHook()->getByModule()) {
-                        $moduleHookEventName .= '.' . $moduleHook->getModuleId();
+                        $moduleHookEventName .= '.'.$moduleHook->getModuleId();
                     }
 
                     $container
@@ -355,7 +355,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
             }
 
             $callback = (static fn ($matches) => strtoupper((string) $matches[0]));
-            $event['method'] = 'on' . preg_replace_callback(
+            $event['method'] = 'on'.preg_replace_callback(
                 [
                     '/(?<=\b)[a-z]/i',
                     '/[^a-z0-9]/i',

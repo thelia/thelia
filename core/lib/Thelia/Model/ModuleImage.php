@@ -76,7 +76,7 @@ class ModuleImage extends BaseModuleImage implements FileModelInterface
      */
     public function getUploadDir(): string
     {
-        return THELIA_LOCAL_DIR . 'media' . DS . 'images' . DS . 'module';
+        return THELIA_LOCAL_DIR.'media'.DS.'images'.DS.'module';
     }
 
     /**
@@ -84,7 +84,7 @@ class ModuleImage extends BaseModuleImage implements FileModelInterface
      */
     public function getRedirectionUrl(): string
     {
-        return '/admin/module/update/' . $this->getModuleId();
+        return '/admin/module/update/'.$this->getModuleId();
     }
 
     /**

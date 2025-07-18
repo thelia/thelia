@@ -48,7 +48,7 @@ class ProfileUpdateResourceAccessForm extends BaseForm
 
         foreach (ResourceQuery::create()->find() as $resource) {
             $this->formBuilder->add(
-                self::RESOURCE_ACCESS_FIELD_PREFIX . ':' . str_replace('.', ':', $resource->getCode()),
+                self::RESOURCE_ACCESS_FIELD_PREFIX.':'.str_replace('.', ':', $resource->getCode()),
                 ChoiceType::class,
                 [
                     'choices' => [

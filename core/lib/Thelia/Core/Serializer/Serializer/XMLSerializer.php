@@ -78,7 +78,7 @@ class XMLSerializer extends AbstractSerializer
         $this->xmlDataStart = null;
 
         $fileObject->fwrite(
-            '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL . '<' . $this->rootNodeName . '>' . PHP_EOL,
+            '<?xml version="1.0" encoding="UTF-8"?>'.\PHP_EOL.'<'.$this->rootNodeName.'>'.\PHP_EOL,
         );
     }
 
@@ -87,7 +87,7 @@ class XMLSerializer extends AbstractSerializer
         $xml = $this->xmlEncoder->encode($data, 'array');
 
         if (null === $this->xmlDataStart) {
-            $this->xmlDataStart = strpos($xml, '<' . $this->dataNodeName . '>');
+            $this->xmlDataStart = strpos($xml, '<'.$this->dataNodeName.'>');
         }
 
         return substr($xml, $this->xmlDataStart, -1);
@@ -95,12 +95,12 @@ class XMLSerializer extends AbstractSerializer
 
     public function separator(): string
     {
-        return PHP_EOL;
+        return \PHP_EOL;
     }
 
     public function finalizeFile(\SplFileObject $fileObject): void
     {
-        $fileObject->fwrite(PHP_EOL . '</' . $this->rootNodeName . '>');
+        $fileObject->fwrite(\PHP_EOL.'</'.$this->rootNodeName.'>');
     }
 
     public function unserialize(\SplFileObject $fileObject): array

@@ -25,7 +25,7 @@ class KernelInstall extends Kernel
     public function getCacheDir(): string
     {
         if (\defined('THELIA_ROOT')) {
-            return THELIA_CACHE_DIR . $this->environment;
+            return THELIA_CACHE_DIR.$this->environment;
         }
 
         return parent::getCacheDir();

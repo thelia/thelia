@@ -30,7 +30,6 @@ class FileCreateOrUpdateEvent extends ActionEvent
     protected UploadedFile $uploadedFile;
     protected ?string $parentName = null;
 
-
     public function __construct(protected ?int $parentId)
     {
     }

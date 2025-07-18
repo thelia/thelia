@@ -50,7 +50,7 @@ class ModuleXmlLoader extends Loader
 
         /** @var Module $module */
         foreach ($modules as $module) {
-            $routingConfigFilePath = $module->getAbsoluteBaseDir() . DS . 'Config' . DS . 'routing.xml';
+            $routingConfigFilePath = $module->getAbsoluteBaseDir().DS.'Config'.DS.'routing.xml';
 
             if (!file_exists($routingConfigFilePath)) {
                 continue;
@@ -60,14 +60,14 @@ class ModuleXmlLoader extends Loader
             $moduleRoutePrefix = \call_user_func([$module->getFullNamespace(), 'getRoutePrefix']);
 
             foreach ($moduleRoutes->all() as $moduleRoute) {
-                $moduleRoute->setPath($moduleRoutePrefix . $moduleRoute->getPath());
+                $moduleRoute->setPath($moduleRoutePrefix.$moduleRoute->getPath());
             }
 
             $routes->addCollection($moduleRoutes);
         }
 
         foreach ($routes as $route) {
-            $route->setPath('/' . $route->getPath());
+            $route->setPath('/'.$route->getPath());
         }
 
         $this->isLoaded = true;

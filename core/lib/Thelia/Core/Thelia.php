@@ -97,9 +97,9 @@ class Thelia extends Kernel
     {
         $loader = new ClassLoader();
 
-        $loader->addPsr4('', THELIA_ROOT . \sprintf('var/cache/%s/propel/model', $environment));
+        $loader->addPsr4('', THELIA_ROOT.\sprintf('var/cache/%s/propel/model', $environment));
 
-        $loader->addPsr4('TheliaMain\\', THELIA_ROOT . \sprintf('var/cache/%s/propel/database/TheliaMain', $environment));
+        $loader->addPsr4('TheliaMain\\', THELIA_ROOT.\sprintf('var/cache/%s/propel/database/TheliaMain', $environment));
         $loader->register();
 
         parent::__construct($environment, $debug);
@@ -147,8 +147,8 @@ class Thelia extends Kernel
             TheliaBundle::class => ['all' => true],
         ];
 
-        if (file_exists(THELIA_ROOT . 'config/bundles.php')) {
-            $contents = array_merge($contents, require THELIA_ROOT . 'config/bundles.php');
+        if (file_exists(THELIA_ROOT.'config/bundles.php')) {
+            $contents = array_merge($contents, require THELIA_ROOT.'config/bundles.php');
         }
 
         foreach ($contents as $class => $envs) {
@@ -187,26 +187,26 @@ class Thelia extends Kernel
             ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME, 'default'),
         );
 
-        $container->import(__DIR__ . '/../Config/Resources/*.php');
+        $container->import(__DIR__.'/../Config/Resources/*.php');
 
-        $container->import(__DIR__ . '/../Config/Resources/packages/*.php');
-        $container->import(__DIR__ . '/../Config/Resources/parameters/*.php');
-        $container->import(__DIR__ . '/../Config/Resources/services/*.php');
-        $container->import(__DIR__ . '/../Config/Resources/services/core/*.php');
-        $container->import(__DIR__ . '/../Config/Resources/services/handlers/*.php');
-        $container->import(__DIR__ . '/../Config/Resources/services/integrations/*.php');
-        $container->import(__DIR__ . '/../Config/Resources/services/providers/*.php');
-        $container->import(__DIR__ . '/../Config/Resources/services/utilities/*.php');
+        $container->import(__DIR__.'/../Config/Resources/packages/*.php');
+        $container->import(__DIR__.'/../Config/Resources/parameters/*.php');
+        $container->import(__DIR__.'/../Config/Resources/services/*.php');
+        $container->import(__DIR__.'/../Config/Resources/services/core/*.php');
+        $container->import(__DIR__.'/../Config/Resources/services/handlers/*.php');
+        $container->import(__DIR__.'/../Config/Resources/services/integrations/*.php');
+        $container->import(__DIR__.'/../Config/Resources/services/providers/*.php');
+        $container->import(__DIR__.'/../Config/Resources/services/utilities/*.php');
     }
 
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
-        $routes->import(__DIR__ . '/../Config/Resources/routing/*.php');
+        $routes->import(__DIR__.'/../Config/Resources/routing/*.php');
 
-        $envRouteDir = __DIR__ . '/../Config/Resources/routing/' . $this->environment;
+        $envRouteDir = __DIR__.'/../Config/Resources/routing/'.$this->environment;
 
         if (is_dir($envRouteDir)) {
-            $routes->import($envRouteDir . '/*.php');
+            $routes->import($envRouteDir.'/*.php');
         }
     }
 
@@ -244,7 +244,7 @@ class Thelia extends Kernel
 
     protected function checkMySQLConfigurations(ConnectionInterface $con): void
     {
-        if (!file_exists($this->getCacheDir() . DS . 'check_mysql_configurations.php')) {
+        if (!file_exists($this->getCacheDir().DS.'check_mysql_configurations.php')) {
             $sessionSqlMode = [];
             $canUpdate = false;
             $logs = [];
@@ -307,18 +307,18 @@ class Thelia extends Kernel
             }
 
             (new Filesystem())->dumpFile(
-                $this->getCacheDir() . DS . 'check_mysql_configurations.php',
-                '<?php return ' . VarExporter::export([
+                $this->getCacheDir().DS.'check_mysql_configurations.php',
+                '<?php return '.VarExporter::export([
                     'modes' => array_values($sessionSqlMode),
                     'canUpdate' => $canUpdate,
                     'logs' => $logs,
-                ]) . ';',
+                ]).';',
             );
         }
 
-        $cache = require $this->getCacheDir() . DS . 'check_mysql_configurations.php';
+        $cache = require $this->getCacheDir().DS.'check_mysql_configurations.php';
 
-        if (!empty($cache['canUpdate']) && null === $con->query("SET SESSION sql_mode='" . implode(',', $cache['modes']) . "';")) {
+        if (!empty($cache['canUpdate']) && null === $con->query("SET SESSION sql_mode='".implode(',', $cache['modes'])."';")) {
             throw new \RuntimeException('Failed to set MySQL global and session sql_mode');
         }
     }
@@ -341,7 +341,7 @@ class Thelia extends Kernel
     public function getCacheDir(): string
     {
         if (\defined('THELIA_ROOT')) {
-            return THELIA_CACHE_DIR . $this->environment;
+            return THELIA_CACHE_DIR.$this->environment;
         }
 
         return parent::getCacheDir();
@@ -395,7 +395,7 @@ class Thelia extends Kernel
 
     public static function isInstalled(): bool
     {
-        return file_exists(THELIA_CONF_DIR . 'database.yml') || (!empty($_SERVER['DATABASE_HOST']));
+        return file_exists(THELIA_CONF_DIR.'database.yml') || (!empty($_SERVER['DATABASE_HOST']));
     }
 
     private function loadAutoConfigureInterfaces(ContainerBuilder $container): void
@@ -448,7 +448,7 @@ class Thelia extends Kernel
      */
     private function loadService(ContainerBuilder $container): void
     {
-        $fileLocator = new FileLocator(__DIR__ . '/../Config/Resources');
+        $fileLocator = new FileLocator(__DIR__.'/../Config/Resources');
         $phpLoader = new PhpFileLoader($container, $fileLocator);
         $phpLoader->load('services.php');
     }
@@ -479,7 +479,7 @@ class Thelia extends Kernel
                     ->setPublic(true);
 
                 $container->setDefinition(
-                    'module.' . $module->getCode(),
+                    'module.'.$module->getCode(),
                     $definition,
                 );
 
@@ -494,13 +494,13 @@ class Thelia extends Kernel
                 }
 
                 $loader = new XmlFileLoader($container, new FileLocator($module->getAbsoluteConfigPath()));
-                $loader->load('config.xml', 'module.' . $module->getCode());
+                $loader->load('config.xml', 'module.'.$module->getCode());
 
                 $envConfigFileName = \sprintf('config_%s.xml', $this->environment);
                 $envConfigFile = \sprintf('%s%s%s', $module->getAbsoluteConfigPath(), DS, $envConfigFileName);
 
                 if (is_file($envConfigFile) && is_readable($envConfigFile)) {
-                    $loader->load($envConfigFileName, 'module.' . $module->getCode());
+                    $loader->load($envConfigFileName, 'module.'.$module->getCode());
                 }
 
                 $templateBasePath = $module->getAbsoluteTemplateBasePath();
@@ -508,7 +508,7 @@ class Thelia extends Kernel
                 if (is_dir($templateBasePath)) {
                     $container->loadFromExtension('twig', [
                         'paths' => [
-                            $templateBasePath => $module->getCode() . 'Module',
+                            $templateBasePath => $module->getCode().'Module',
                         ],
                     ]);
                 }
@@ -557,10 +557,10 @@ class Thelia extends Kernel
         }
 
         // Load core translation
-        $translationDirs['core'] = THELIA_LIB . 'Config' . DS . 'I18n';
+        $translationDirs['core'] = THELIA_LIB.'Config'.DS.'I18n';
 
         // Load core translation
-        $translationDirs[Translator::GLOBAL_FALLBACK_DOMAIN] = THELIA_LOCAL_DIR . 'I18n';
+        $translationDirs[Translator::GLOBAL_FALLBACK_DOMAIN] = THELIA_LOCAL_DIR.'I18n';
 
         // Standard templates (front, back, pdf, mail)
         /** @var TemplateDefinition $templateDefinition */
@@ -741,7 +741,7 @@ class Thelia extends Kernel
             foreach ($templates as $template) {
                 $templateName = $template->getName();
                 $typeName = ucfirst((string) TemplateDefinition::$standardTemplatesSubdirs[$type]);
-                $moduleMethod = 'getAbsolute' . $typeName . 'I18nTemplatePath';
+                $moduleMethod = 'getAbsolute'.$typeName.'I18nTemplatePath';
 
                 if (!method_exists($moduleMethod, $module::class)) {
                     continue;

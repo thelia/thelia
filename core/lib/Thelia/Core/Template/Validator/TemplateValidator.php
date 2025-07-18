@@ -45,7 +45,7 @@ class TemplateValidator
      */
     public function __construct(string $templatePath)
     {
-        $templateValidator = new TemplateDescriptorValidator($templatePath . DS . 'template.xml');
+        $templateValidator = new TemplateDescriptorValidator($templatePath.DS.'template.xml');
 
         $this->xmlDescriptorContent = $templateValidator->getDescriptor();
     }

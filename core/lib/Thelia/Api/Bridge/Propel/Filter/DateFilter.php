@@ -44,7 +44,7 @@ class DateFilter extends AbstractFilter
         $fieldPath = $this->getPropertyQueryPath($query, $property, $context);
 
         foreach ($values as $key => $value) {
-            $conditionName = 'cond_' . $key;
+            $conditionName = 'cond_'.$key;
 
             switch ($key) {
                 case self::PARAMETER_BEFORE:

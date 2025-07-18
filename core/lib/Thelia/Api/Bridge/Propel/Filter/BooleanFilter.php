@@ -34,7 +34,7 @@ final class BooleanFilter extends AbstractFilter
             $fieldPath = $this->properties[$property]['fieldPath'];
         }
 
-        $query->where($fieldPath . ' = ?', filter_var($value, FILTER_VALIDATE_BOOLEAN));
+        $query->where($fieldPath.' = ?', filter_var($value, \FILTER_VALIDATE_BOOLEAN));
     }
 
     public function getDescription(string $resourceClass): array

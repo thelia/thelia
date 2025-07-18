@@ -37,7 +37,7 @@ class IntToCombinedIntsListType extends BaseType
                 return false;
             }
 
-            if (false === filter_var($parts[0], FILTER_VALIDATE_INT)) {
+            if (false === filter_var($parts[0], \FILTER_VALIDATE_INT)) {
                 return false;
             }
 

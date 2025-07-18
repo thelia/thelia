@@ -200,8 +200,8 @@ class ImportController extends BaseAdminController
             /** @var UploadedFile $file */
             $file = $validatedForm->get('file_upload')->getData();
             $file = $file->move(
-                THELIA_CACHE_DIR . 'import' . DS . (new \DateTime())->format('Ymd'),
-                uniqid() . '-' . $file->getClientOriginalName(),
+                THELIA_CACHE_DIR.'import'.DS.(new \DateTime())->format('Ymd'),
+                uniqid().'-'.$file->getClientOriginalName(),
             );
 
             $lang = (new LangQuery())->findPk($validatedForm->get('language')->getData());

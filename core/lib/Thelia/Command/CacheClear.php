@@ -63,14 +63,14 @@ class CacheClear extends ContainerAwareCommand
         $this->clearCache($cacheDir, $output);
 
         if (!$input->getOption('without-assets')) {
-            $this->clearCache(THELIA_WEB_DIR . ConfigQuery::read('asset_dir_from_web_root', 'assets'), $output);
+            $this->clearCache(THELIA_WEB_DIR.ConfigQuery::read('asset_dir_from_web_root', 'assets'), $output);
         }
 
         if ($input->getOption('with-images')) {
             $this->clearCache(
-                THELIA_WEB_DIR . ConfigQuery::read(
+                THELIA_WEB_DIR.ConfigQuery::read(
                     'image_cache_dir_from_web_root',
-                    'cache' . DS . 'images',
+                    'cache'.DS.'images',
                 ),
                 $output,
             );
@@ -78,9 +78,9 @@ class CacheClear extends ContainerAwareCommand
 
         if ($input->getOption('with-documents')) {
             $this->clearCache(
-                THELIA_WEB_DIR . ConfigQuery::read(
+                THELIA_WEB_DIR.ConfigQuery::read(
                     'document_cache_dir_from_web_root',
-                    'cache' . DS . 'documents',
+                    'cache'.DS.'documents',
                 ),
                 $output,
             );

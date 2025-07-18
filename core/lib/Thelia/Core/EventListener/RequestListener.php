@@ -64,18 +64,18 @@ class RequestListener implements EventSubscriberInterface
             ? $request->getSession()->getLang()
             : Lang::getDefaultLanguage();
 
-        $vendorFormDir = THELIA_VENDOR . 'symfony' . DS . 'form';
-        $vendorValidatorDir = THELIA_VENDOR . 'symfony' . DS . 'validator';
+        $vendorFormDir = THELIA_VENDOR.'symfony'.DS.'form';
+        $vendorValidatorDir = THELIA_VENDOR.'symfony'.DS.'validator';
 
         $this->translator->addResource(
             'xlf',
-            \sprintf($vendorFormDir . DS . 'Resources' . DS . 'translations' . DS . 'validators.%s.xlf', $lang->getCode()),
+            \sprintf($vendorFormDir.DS.'Resources'.DS.'translations'.DS.'validators.%s.xlf', $lang->getCode()),
             $lang->getLocale(),
             'validators',
         );
         $this->translator->addResource(
             'xlf',
-            \sprintf($vendorValidatorDir . DS . 'Resources' . DS . 'translations' . DS . 'validators.%s.xlf', $lang->getCode()),
+            \sprintf($vendorValidatorDir.DS.'Resources'.DS.'translations'.DS.'validators.%s.xlf', $lang->getCode()),
             $lang->getLocale(),
             'validators',
         );

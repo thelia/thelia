@@ -73,7 +73,7 @@ trait AddressCountryValidationTrait
 
         $re = '/\D+/';
 
-        if (!preg_match($re, (string) $data['city'], $matches, PREG_OFFSET_CAPTURE, 0)) {
+        if (!preg_match($re, (string) $data['city'], $matches, \PREG_OFFSET_CAPTURE, 0)) {
             $context->addViolation(
                 Translator::getInstance()->trans(
                     'Your city can only contains letters.',

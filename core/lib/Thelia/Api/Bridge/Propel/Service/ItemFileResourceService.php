@@ -47,7 +47,7 @@ readonly class ItemFileResourceService
         }
 
         $fileModel->setParentId($parentId)
-            ->setVisible(filter_var($request->get('visible'), FILTER_VALIDATE_BOOLEAN))
+            ->setVisible(filter_var($request->get('visible'), \FILTER_VALIDATE_BOOLEAN))
             ->setPosition($request->get('position'));
 
         $i18ns = json_decode((string) $request->get('i18ns'), true);
@@ -78,9 +78,9 @@ readonly class ItemFileResourceService
         $baseSourceFilePath = ConfigQuery::read('images_library_path');
 
         if (null === $baseSourceFilePath) {
-            $baseSourceFilePath = THELIA_LOCAL_DIR . 'media' . DS . 'images';
+            $baseSourceFilePath = THELIA_LOCAL_DIR.'media'.DS.'images';
         } else {
-            $baseSourceFilePath = THELIA_ROOT . $baseSourceFilePath;
+            $baseSourceFilePath = THELIA_ROOT.$baseSourceFilePath;
         }
 
         $sourceFilePath = \sprintf(

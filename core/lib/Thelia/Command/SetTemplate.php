@@ -45,7 +45,7 @@ class SetTemplate extends ContainerAwareCommand
             ->addArgument(
                 'type',
                 InputArgument::REQUIRED,
-                'template type : ' . implode(', ', array_keys(TemplateDefinition::CONFIG_NAMES)),
+                'template type : '.implode(', ', array_keys(TemplateDefinition::CONFIG_NAMES)),
             )
             ->addArgument(
                 'name',
@@ -68,10 +68,10 @@ class SetTemplate extends ContainerAwareCommand
             return self::FAILURE;
         }
 
-        $path = THELIA_TEMPLATE_DIR . $type . DS . $name;
+        $path = THELIA_TEMPLATE_DIR.$type.DS.$name;
 
         if (!is_dir($path)) {
-            $pathVendor = THELIA_VENDOR_ROOT . $name;
+            $pathVendor = THELIA_VENDOR_ROOT.$name;
 
             if (!is_dir($pathVendor)) {
                 $output->writeln(\sprintf('<error>Template %s not found.</error>', $pathVendor));
@@ -107,7 +107,7 @@ class SetTemplate extends ContainerAwareCommand
     private function execDumpAutoload(
         OutputInterface $output,
     ): ?int {
-        $command = THELIA_VENDOR . 'bin' . DS . 'composer dump-autoload 2>&1';
+        $command = THELIA_VENDOR.'bin'.DS.'composer dump-autoload 2>&1';
         $returnCode = 0;
 
         exec($command, $outputExec, $returnCode);

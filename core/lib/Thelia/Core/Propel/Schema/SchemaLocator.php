@@ -43,8 +43,8 @@ class SchemaLocator
         $finder = new Finder();
         $filesystem = new Filesystem();
         $modulesPath = [
-            THELIA_MODULE_DIR => THELIA_MODULE_DIR . '*' . DS . 'Config',
-            THELIA_LOCAL_MODULE_DIR => THELIA_LOCAL_MODULE_DIR . '*' . DS . 'Config',
+            THELIA_MODULE_DIR => THELIA_MODULE_DIR.'*'.DS.'Config',
+            THELIA_LOCAL_MODULE_DIR => THELIA_LOCAL_MODULE_DIR.'*'.DS.'Config',
         ];
         $modules = [];
 
@@ -197,7 +197,7 @@ class SchemaLocator
                     continue;
                 }
 
-                $externalSchemaPath = THELIA_ROOT . $externalSchemaElement->getAttribute('filename');
+                $externalSchemaPath = THELIA_ROOT.$externalSchemaElement->getAttribute('filename');
 
                 if (!$fs->exists($externalSchemaPath)) {
                     continue;

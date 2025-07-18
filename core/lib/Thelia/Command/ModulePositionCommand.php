@@ -71,7 +71,7 @@ class ModulePositionCommand extends ContainerAwareCommand
         }
 
         if ($isAbsolute) {
-            array_multisort($this->positionsList, SORT_ASC, SORT_REGULAR, $this->modulesList);
+            array_multisort($this->positionsList, \SORT_ASC, \SORT_REGULAR, $this->modulesList);
         }
 
         $maxPositionByType = $this->cleanPosition();

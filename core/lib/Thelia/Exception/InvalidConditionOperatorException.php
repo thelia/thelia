@@ -31,7 +31,7 @@ class InvalidConditionOperatorException extends \RuntimeException
      */
     public function __construct(string $className, string $parameter)
     {
-        $message = 'Invalid Operator for Condition ' . $className . ' on parameter ' . $parameter;
+        $message = 'Invalid Operator for Condition '.$className.' on parameter '.$parameter;
         Tlog::getInstance()->addError($message);
 
         parent::__construct($message);

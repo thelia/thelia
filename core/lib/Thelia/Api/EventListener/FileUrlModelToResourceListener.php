@@ -41,12 +41,12 @@ class FileUrlModelToResourceListener implements EventSubscriberInterface
 
         $documentType = $resource::getFileType();
 
-        $baseSourceFilePath = ConfigQuery::read($documentType . 's_library_path');
+        $baseSourceFilePath = ConfigQuery::read($documentType.'s_library_path');
 
         if (null === $baseSourceFilePath) {
-            $baseSourceFilePath = THELIA_LOCAL_DIR . 'media' . DS . $documentType . 's';
+            $baseSourceFilePath = THELIA_LOCAL_DIR.'media'.DS.$documentType.'s';
         } else {
-            $baseSourceFilePath = THELIA_ROOT . $baseSourceFilePath;
+            $baseSourceFilePath = THELIA_ROOT.$baseSourceFilePath;
         }
 
         $event = 'image' === $documentType ? new ImageEvent() : new DocumentEvent();

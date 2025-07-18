@@ -32,7 +32,7 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
 
     public function __construct($maxFileSize = self::MAX_FILE_SIZE_KB_DEFAULT)
     {
-        $this->path_defaut = THELIA_LOG_DIR . self::TLOG_DEFAULT_NAME;
+        $this->path_defaut = THELIA_LOG_DIR.self::TLOG_DEFAULT_NAME;
 
         $this->setConfig(self::VAR_MAX_FILE_SIZE_KB, $maxFileSize, false);
 
@@ -51,7 +51,7 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
         }
 
         if (filesize($filePath) > 1024 * $this->getConfig(self::VAR_MAX_FILE_SIZE_KB, self::MAX_FILE_SIZE_KB_DEFAULT)) {
-            $backupFile = $filePath . '.' . strftime('%Y-%m-%d_%H-%M-%S');
+            $backupFile = $filePath.'.'.strftime('%Y-%m-%d_%H-%M-%S');
 
             @rename($filePath, $backupFile);
 
@@ -66,7 +66,7 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
             $files = $finder
                 ->in(\dirname((string) $filePath))
                 ->files()
-                ->name(basename((string) $filePath) . '.*')
+                ->name(basename((string) $filePath).'.*')
                 ->sortByModifiedTime();
 
             $deleteCount = 1 + $files->count() - $maxCount;

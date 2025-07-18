@@ -43,9 +43,9 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
         $attributeQuery->useAttributeI18nQuery(null, Criteria::LEFT_JOIN)
             ->endUse();
 
-        $locales = array_map(static fn ($value): string => '"' . $value . '"', $locales);
+        $locales = array_map(static fn ($value): string => '"'.$value.'"', $locales);
 
-        $attributeQuery->addJoinCondition('AttributeI18n', 'AttributeI18n.locale IN (' . implode(',', $locales) . ')');
+        $attributeQuery->addJoinCondition('AttributeI18n', 'AttributeI18n.locale IN ('.implode(',', $locales).')');
 
         $attributeQuery->withColumn('AttributeI18n.title', 'Title');
         $attributeQuery->withColumn('AttributeTemplate.position', 'Position');
@@ -73,9 +73,9 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
         $featureQuery->useFeatureI18nQuery(null, Criteria::LEFT_JOIN)
             ->endUse();
 
-        $locales = array_map(static fn ($value): string => '"' . $value . '"', $locales);
+        $locales = array_map(static fn ($value): string => '"'.$value.'"', $locales);
 
-        $featureQuery->addJoinCondition('FeatureI18n', 'FeatureI18n.locale IN (' . implode(',', $locales) . ')');
+        $featureQuery->addJoinCondition('FeatureI18n', 'FeatureI18n.locale IN ('.implode(',', $locales).')');
 
         $featureQuery->withColumn('FeatureI18n.title', 'Title');
         $featureQuery->withColumn('FeatureTemplate.position', 'Position');

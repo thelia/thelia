@@ -260,7 +260,7 @@ class SchemaCombiner
                 // add an inheritance notice
                 $databaseAttributeInheritanceNoticeComment = $tableElement->ownerDocument->createComment(
                     \sprintf("Attribute '%s'", $tableAttribute)
-                    . \sprintf(" inherited from parent database attribute '%s'", $databaseAttribute),
+                    .\sprintf(" inherited from parent database attribute '%s'", $databaseAttribute),
                 );
                 $tableElement->insertBefore(
                     $databaseAttributeInheritanceNoticeComment,
@@ -299,7 +299,7 @@ class SchemaCombiner
             $tableElement->appendChild($tablePrefixingNoticeComment);
 
             $table = $tableElement->getAttribute('name');
-            $tableElement->setAttribute('name', $tablePrefix . $table);
+            $tableElement->setAttribute('name', $tablePrefix.$table);
         }
     }
 

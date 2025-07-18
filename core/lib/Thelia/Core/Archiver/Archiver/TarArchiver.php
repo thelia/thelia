@@ -53,7 +53,7 @@ class TarArchiver extends AbstractArchiver
 
     public function create($baseName): self
     {
-        $this->archivePath = $baseName . '.' . $this->getExtension();
+        $this->archivePath = $baseName.'.'.$this->getExtension();
 
         $this->archive = new \PharData($this->archivePath);
 

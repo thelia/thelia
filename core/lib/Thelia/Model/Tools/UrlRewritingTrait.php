@@ -92,7 +92,7 @@ trait UrlRewritingTrait
         // Only allow one dash separator at a time (and make string lowercase)
         $cleanString = mb_strtolower((string) preg_replace('/--+/u', '-', (string) $string), 'UTF-8');
 
-        $urlFilePart = rtrim($cleanString, '.-~_') . '.html';
+        $urlFilePart = rtrim($cleanString, '.-~_').'.html';
 
         try {
             $i = 0;

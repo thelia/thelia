@@ -103,14 +103,14 @@ abstract class BaseForm implements FormInterface
 
         $this->dispatcher->dispatch(
             $event,
-            TheliaEvents::FORM_BEFORE_BUILD . '.' . $name,
+            TheliaEvents::FORM_BEFORE_BUILD.'.'.$name,
         );
 
         $this->buildForm();
 
         $this->dispatcher->dispatch(
             $event,
-            TheliaEvents::FORM_AFTER_BUILD . '.' . $name,
+            TheliaEvents::FORM_AFTER_BUILD.'.'.$name,
         );
 
         // If not already set, define the success_url field

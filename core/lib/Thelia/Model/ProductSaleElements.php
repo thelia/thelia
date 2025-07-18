@@ -108,7 +108,7 @@ class ProductSaleElements extends BaseProductSaleElements
                 $price = $productPrice->getPrice() * $currency->getRate() / $defaultCurrency->getRate();
                 $promoPrice = $productPrice->getPromoPrice() * $currency->getRate() / $defaultCurrency->getRate();
             } else {
-                throw new \RuntimeException('Cannot find product prices for currency id: `' . $currency->getId() . '`');
+                throw new \RuntimeException('Cannot find product prices for currency id: `'.$currency->getId().'`');
             }
         } else {
             $price = $productPrice->getPrice();
@@ -120,6 +120,6 @@ class ProductSaleElements extends BaseProductSaleElements
             $promoPrice *= (1 - ($discount / 100));
         }
 
-        return new ProductPriceTools((float) $price,(float) $promoPrice);
+        return new ProductPriceTools((float) $price, (float) $promoPrice);
     }
 }

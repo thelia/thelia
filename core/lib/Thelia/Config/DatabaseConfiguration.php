@@ -51,7 +51,7 @@ class DatabaseConfiguration implements ConfigurationInterface
                 static fn ($connections): bool => !isset($connections[static::THELIA_CONNECTION_NAME]),
             )
             ->thenInvalid(
-                "The '" . static::THELIA_CONNECTION_NAME . "' connection must be defined.",
+                "The '".static::THELIA_CONNECTION_NAME."' connection must be defined.",
             );
         $databaseNodeBuilder->append($connectionsNode);
 

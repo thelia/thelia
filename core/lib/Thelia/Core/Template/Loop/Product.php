@@ -460,10 +460,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     {
         foreach ($feature_availability as $feature => $feature_choice) {
             foreach ($feature_choice['values'] as $feature_av) {
-                $featureAlias = 'fa_' . $feature;
+                $featureAlias = 'fa_'.$feature;
 
                 if ('*' !== $feature_av) {
-                    $featureAlias .= '_' . $feature_av;
+                    $featureAlias .= '_'.$feature_av;
                 }
 
                 $search->joinFeatureProduct($featureAlias, Criteria::LEFT_JOIN)
@@ -478,14 +478,14 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $sqlWhereString = $feature_choice['expression'];
 
             if ('*' === $sqlWhereString) {
-                $sqlWhereString = 'NOT ISNULL(`fa_' . $feature . '`.ID)';
+                $sqlWhereString = 'NOT ISNULL(`fa_'.$feature.'`.ID)';
             } else {
-                $sqlWhereString = preg_replace('#(\d+)#', 'NOT ISNULL(`fa_' . $feature . '_\1`.ID)', (string) $sqlWhereString);
+                $sqlWhereString = preg_replace('#(\d+)#', 'NOT ISNULL(`fa_'.$feature.'_\1`.ID)', (string) $sqlWhereString);
                 $sqlWhereString = str_replace('&', ' AND ', $sqlWhereString);
                 $sqlWhereString = str_replace('|', ' OR ', $sqlWhereString);
             }
 
-            $search->where('(' . $sqlWhereString . ')');
+            $search->where('('.$sqlWhereString.')');
         }
     }
 
@@ -498,19 +498,19 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $aliasMatches = [];
 
             foreach ($feature_choice['values'] as $feature_value) {
-                $featureAlias = 'fv_' . $feature;
+                $featureAlias = 'fv_'.$feature;
 
                 if ('*' !== $feature_value) {
                     // Generate a unique alias for this value
-                    $featureAlias .= '_' . hash('crc32', (string) $feature_value) . '_' . preg_replace('/[^[:alnum:]_]/', '_', (string) $feature_value);
+                    $featureAlias .= '_'.hash('crc32', (string) $feature_value).'_'.preg_replace('/[^[:alnum:]_]/', '_', (string) $feature_value);
                 }
 
                 $search->joinFeatureProduct($featureAlias, Criteria::LEFT_JOIN)
                     ->addJoinCondition($featureAlias, \sprintf('`%s`.FEATURE_ID = ?', $featureAlias), $feature, null, \PDO::PARAM_INT);
 
                 if ('*' !== $feature_value) {
-                    $featureAliasI18n = $featureAlias . '_i18n';
-                    $featureAliasI18nJoin = $featureAlias . '_i18n_join';
+                    $featureAliasI18n = $featureAlias.'_i18n';
+                    $featureAliasI18nJoin = $featureAlias.'_i18n_join';
 
                     $featureAvValueJoin = new Join();
                     $featureAvValueJoin->setJoinType(Criteria::LEFT_JOIN);
@@ -536,16 +536,16 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $sqlWhereString = $feature_choice['expression'];
 
             if ('*' === $sqlWhereString) {
-                $sqlWhereString = 'NOT ISNULL(`fv_' . $feature . '`.ID)';
+                $sqlWhereString = 'NOT ISNULL(`fv_'.$feature.'`.ID)';
             } else {
                 foreach ($aliasMatches as $value => $alias) {
-                    $sqlWhereString = str_replace($value, 'NOT ISNULL(`' . $alias . '`.ID)', $sqlWhereString);
+                    $sqlWhereString = str_replace($value, 'NOT ISNULL(`'.$alias.'`.ID)', $sqlWhereString);
                 }
 
                 $sqlWhereString = str_replace(['&', '|'], [' AND ', ' OR '], $sqlWhereString);
             }
 
-            $search->where('(' . $sqlWhereString . ')');
+            $search->where('('.$sqlWhereString.')');
         }
     }
 
@@ -562,7 +562,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $currency = CurrencyQuery::create()->findOneById($currencyId);
 
             if (null === $currency) {
-                throw new \InvalidArgumentException('Cannot found currency id: `' . $currency . '` in product_sale_elements loop');
+                throw new \InvalidArgumentException('Cannot found currency id: `'.$currency.'` in product_sale_elements loop');
             }
         } else {
             $currency = $this->getCurrentRequest()->getSession()->getCurrency();
@@ -594,24 +594,24 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             if ($defaultCurrency?->getId() !== $currency->getId()) {
                 $priceJoinDefaultCurrency = new Join();
-                $priceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'pse', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'price' . $defaultCurrencySuffix);
+                $priceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'pse', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'price'.$defaultCurrencySuffix);
                 $priceJoinDefaultCurrency->setJoinType(Criteria::LEFT_JOIN);
 
-                $search->addJoinObject($priceJoinDefaultCurrency, 'price_join' . $defaultCurrencySuffix)
-                    ->addJoinCondition('price_join' . $defaultCurrencySuffix, '`price' . $defaultCurrencySuffix . '`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
+                $search->addJoinObject($priceJoinDefaultCurrency, 'price_join'.$defaultCurrencySuffix)
+                    ->addJoinCondition('price_join'.$defaultCurrencySuffix, '`price'.$defaultCurrencySuffix.'`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
 
                 /**
                  * rate value is checked as a float in overloaded getRate method.
                  */
                 $priceToCompareAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN
-                    CASE WHEN `pse`.PROMO=1 THEN `price' . $defaultCurrencySuffix . '`.PROMO_PRICE ELSE `price' . $defaultCurrencySuffix . '`.PRICE END * ' . $currency->getRate() . '
+                    CASE WHEN `pse`.PROMO=1 THEN `price'.$defaultCurrencySuffix.'`.PROMO_PRICE ELSE `price'.$defaultCurrencySuffix.'`.PRICE END * '.$currency->getRate().'
                 ELSE
                     CASE WHEN `pse`.PROMO=1 THEN `price`.PROMO_PRICE ELSE `price`.PRICE END
                 END';
 
                 $search->withColumn($priceToCompareAsSQL, 'real_price');
-                $search->withColumn('CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price' . $defaultCurrencySuffix . '`.PRICE * ' . $currency->getRate() . ' ELSE `price`.PRICE END', 'price');
-                $search->withColumn('CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price' . $defaultCurrencySuffix . '`.PROMO_PRICE * ' . $currency->getRate() . ' ELSE `price`.PROMO_PRICE END', 'promo_price');
+                $search->withColumn('CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price'.$defaultCurrencySuffix.'`.PRICE * '.$currency->getRate().' ELSE `price`.PRICE END', 'price');
+                $search->withColumn('CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price'.$defaultCurrencySuffix.'`.PROMO_PRICE * '.$currency->getRate().' ELSE `price`.PROMO_PRICE END', 'promo_price');
             } else {
                 $priceToCompareAsSQL = 'CASE WHEN `pse`.PROMO=1 THEN `price`.PROMO_PRICE ELSE `price`.PRICE END';
 
@@ -639,7 +639,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $title = $this->getTitle();
 
         if (null !== $title) {
-            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, '%' . $title . '%');
+            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, '%'.$title.'%');
         }
 
         $templateIdList = $this->getTemplateId();
@@ -678,7 +678,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
 
         $search->withColumn(
-            'CASE WHEN ISNULL(`CategorySelect`.POSITION) THEN ' . PHP_INT_MAX . ' ELSE CAST(`CategorySelect`.POSITION as SIGNED) END',
+            'CASE WHEN ISNULL(`CategorySelect`.POSITION) THEN '.\PHP_INT_MAX.' ELSE CAST(`CategorySelect`.POSITION as SIGNED) END',
             'position_delegate',
         );
         $search->withColumn('`CategorySelect`.CATEGORY_ID', 'default_category_id');
@@ -782,45 +782,45 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             if (true === $new) {
                 $isPSELeftJoinList[] = 'is_new';
                 $search->joinProductSaleElements('is_new', Criteria::LEFT_JOIN)
-                    ->where('`is_new`.NEWNESS' . Criteria::EQUAL . '1')
+                    ->where('`is_new`.NEWNESS'.Criteria::EQUAL.'1')
                     ->where('NOT ISNULL(`is_new`.ID)');
             } elseif (false === $new) {
                 $isPSELeftJoinList[] = 'is_new';
                 $search->joinProductSaleElements('is_new', Criteria::LEFT_JOIN)
-                    ->where('`is_new`.NEWNESS' . Criteria::EQUAL . '0')
+                    ->where('`is_new`.NEWNESS'.Criteria::EQUAL.'0')
                     ->where('NOT ISNULL(`is_new`.ID)');
             }
 
             if (true === $promo) {
                 $isPSELeftJoinList[] = 'is_promo';
                 $search->joinProductSaleElements('is_promo', Criteria::LEFT_JOIN)
-                    ->where('`is_promo`.PROMO' . Criteria::EQUAL . '1')
+                    ->where('`is_promo`.PROMO'.Criteria::EQUAL.'1')
                     ->where('NOT ISNULL(`is_promo`.ID)');
             } elseif (false === $promo) {
                 $isPSELeftJoinList[] = 'is_promo';
                 $search->joinProductSaleElements('is_promo', Criteria::LEFT_JOIN)
-                    ->where('`is_promo`.PROMO' . Criteria::EQUAL . '0')
+                    ->where('`is_promo`.PROMO'.Criteria::EQUAL.'0')
                     ->where('NOT ISNULL(`is_promo`.ID)');
             }
 
             if (null !== $min_stock) {
                 $isPSELeftJoinList[] = 'is_min_stock';
                 $search->joinProductSaleElements('is_min_stock', Criteria::LEFT_JOIN)
-                    ->where('`is_min_stock`.QUANTITY' . Criteria::GREATER_EQUAL . '?', $min_stock, \PDO::PARAM_INT)
+                    ->where('`is_min_stock`.QUANTITY'.Criteria::GREATER_EQUAL.'?', $min_stock, \PDO::PARAM_INT)
                     ->where('NOT ISNULL(`is_min_stock`.ID)');
             }
 
             if (null !== $min_weight) {
                 $isPSELeftJoinList[] = 'is_min_weight';
                 $search->joinProductSaleElements('is_min_weight', Criteria::LEFT_JOIN)
-                    ->where('`is_min_weight`.WEIGHT' . Criteria::GREATER_EQUAL . '?', $min_weight, \PDO::PARAM_STR)
+                    ->where('`is_min_weight`.WEIGHT'.Criteria::GREATER_EQUAL.'?', $min_weight, \PDO::PARAM_STR)
                     ->where('NOT ISNULL(`is_min_weight`.ID)');
             }
 
             if (null !== $max_weight) {
                 $isPSELeftJoinList[] = 'is_max_weight';
                 $search->joinProductSaleElements('is_max_weight', Criteria::LEFT_JOIN)
-                    ->where('`is_max_weight`.WEIGHT' . Criteria::LESS_EQUAL . '?', $max_weight, \PDO::PARAM_STR)
+                    ->where('`is_max_weight`.WEIGHT'.Criteria::LESS_EQUAL.'?', $max_weight, \PDO::PARAM_STR)
                     ->where('NOT ISNULL(`is_max_weight`.ID)');
             }
 
@@ -838,7 +838,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                         continue;
                     }
 
-                    $search->where('`' . $actuallyUsedAttributeNonStrictMatch . '`.ID=`' . $actuallyUsedAttributeNonStrictMatchList[$key - 1] . '`.ID');
+                    $search->where('`'.$actuallyUsedAttributeNonStrictMatch.'`.ID=`'.$actuallyUsedAttributeNonStrictMatchList[$key - 1].'`.ID');
                 }
             }
 
@@ -860,18 +860,18 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
                 if ($defaultCurrency?->getId() !== $currency->getId()) {
                     $minPriceJoinDefaultCurrency = new Join();
-                    $minPriceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'is_min_price', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'min_price_data' . $defaultCurrencySuffix);
+                    $minPriceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'is_min_price', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'min_price_data'.$defaultCurrencySuffix);
                     $minPriceJoinDefaultCurrency->setJoinType(Criteria::LEFT_JOIN);
 
-                    $search->addJoinObject($minPriceJoinDefaultCurrency, 'is_min_price_join' . $defaultCurrencySuffix)
-                        ->addJoinCondition('is_min_price_join' . $defaultCurrencySuffix, '`min_price_data' . $defaultCurrencySuffix . '`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
+                    $search->addJoinObject($minPriceJoinDefaultCurrency, 'is_min_price_join'.$defaultCurrencySuffix)
+                        ->addJoinCondition('is_min_price_join'.$defaultCurrencySuffix, '`min_price_data'.$defaultCurrencySuffix.'`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
 
                     /**
                      * In propel we trust : $currency->getRate() always returns a float.
                      * Or maybe not : rate value is checked as a float in overloaded getRate method.
                      */
                     $MinPriceToCompareAsSQL = 'CASE WHEN ISNULL(CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data`.PROMO_PRICE ELSE `min_price_data`.PRICE END) OR `min_price_data`.FROM_DEFAULT_CURRENCY = 1 THEN
-                    CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data' . $defaultCurrencySuffix . '`.PROMO_PRICE ELSE `min_price_data' . $defaultCurrencySuffix . '`.PRICE END * ' . $currency->getRate() . '
+                    CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data'.$defaultCurrencySuffix.'`.PROMO_PRICE ELSE `min_price_data'.$defaultCurrencySuffix.'`.PRICE END * '.$currency->getRate().'
                 ELSE
                     CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data`.PROMO_PRICE ELSE `min_price_data`.PRICE END
                 END';
@@ -879,7 +879,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     $MinPriceToCompareAsSQL = 'CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data`.PROMO_PRICE ELSE `min_price_data`.PRICE END';
                 }
 
-                $search->where($MinPriceToCompareAsSQL . ' >= ?', $min_price, \PDO::PARAM_STR);
+                $search->where($MinPriceToCompareAsSQL.' >= ?', $min_price, \PDO::PARAM_STR);
             }
 
             if (null !== $max_price) {
@@ -896,18 +896,18 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
                 if ($defaultCurrency?->getId() !== $currency->getId()) {
                     $maxPriceJoinDefaultCurrency = new Join();
-                    $maxPriceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'is_max_price', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'max_price_data' . $defaultCurrencySuffix);
+                    $maxPriceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'is_max_price', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'max_price_data'.$defaultCurrencySuffix);
                     $maxPriceJoinDefaultCurrency->setJoinType(Criteria::LEFT_JOIN);
 
-                    $search->addJoinObject($maxPriceJoinDefaultCurrency, 'is_max_price_join' . $defaultCurrencySuffix)
-                        ->addJoinCondition('is_max_price_join' . $defaultCurrencySuffix, '`max_price_data' . $defaultCurrencySuffix . '`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
+                    $search->addJoinObject($maxPriceJoinDefaultCurrency, 'is_max_price_join'.$defaultCurrencySuffix)
+                        ->addJoinCondition('is_max_price_join'.$defaultCurrencySuffix, '`max_price_data'.$defaultCurrencySuffix.'`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
 
                     /**
                      * In propel we trust : $currency->getRate() always returns a float.
                      * Or maybe not : rate value is checked as a float in overloaded getRate method.
                      */
                     $MaxPriceToCompareAsSQL = 'CASE WHEN ISNULL(CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data`.PROMO_PRICE ELSE `max_price_data`.PRICE END) OR `min_price_data`.FROM_DEFAULT_CURRENCY = 1 THEN
-                    CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data' . $defaultCurrencySuffix . '`.PROMO_PRICE ELSE `max_price_data' . $defaultCurrencySuffix . '`.PRICE END * ' . $currency->getRate() . '
+                    CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data'.$defaultCurrencySuffix.'`.PROMO_PRICE ELSE `max_price_data'.$defaultCurrencySuffix.'`.PRICE END * '.$currency->getRate().'
                 ELSE
                     CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data`.PROMO_PRICE ELSE `max_price_data`.PRICE END
                 END';
@@ -915,7 +915,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     $MaxPriceToCompareAsSQL = 'CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data`.PROMO_PRICE ELSE `max_price_data`.PRICE END';
                 }
 
-                $search->where($MaxPriceToCompareAsSQL . '<=?', $max_price, \PDO::PARAM_STR);
+                $search->where($MaxPriceToCompareAsSQL.'<=?', $max_price, \PDO::PARAM_STR);
             }
 
             /*
@@ -945,10 +945,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
                 if ($defaultCurrency?->getId() !== $currency->getId()) {
                     $globalPriceJoinDefaultCurrency = new Join();
-                    $globalPriceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', $joiningTable, ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'global_price_data' . $defaultCurrencySuffix);
+                    $globalPriceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', $joiningTable, ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'global_price_data'.$defaultCurrencySuffix);
                     $globalPriceJoinDefaultCurrency->setJoinType(Criteria::LEFT_JOIN);
-                    $search->addJoinObject($globalPriceJoinDefaultCurrency, 'global_price_join' . $defaultCurrencySuffix)
-                        ->addJoinCondition('global_price_join' . $defaultCurrencySuffix, '`global_price_data' . $defaultCurrencySuffix . '`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
+                    $search->addJoinObject($globalPriceJoinDefaultCurrency, 'global_price_join'.$defaultCurrencySuffix)
+                        ->addJoinCondition('global_price_join'.$defaultCurrencySuffix, '`global_price_data'.$defaultCurrencySuffix.'`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
                 }
             }
 
@@ -970,18 +970,18 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $booleanMatchedNewnessList = [];
 
             foreach ($isPSELeftJoinList as $isPSELeftJoin) {
-                $booleanMatchedPromoList[] = '`' . $isPSELeftJoin . '`.PROMO';
-                $booleanMatchedNewnessList[] = '`' . $isPSELeftJoin . '`.NEWNESS';
+                $booleanMatchedPromoList[] = '`'.$isPSELeftJoin.'`.PROMO';
+                $booleanMatchedNewnessList[] = '`'.$isPSELeftJoin.'`.NEWNESS';
             }
 
-            $search->withColumn('(' . implode(' OR ', $booleanMatchedPromoList) . ')', 'main_product_is_promo');
-            $search->withColumn('(' . implode(' OR ', $booleanMatchedNewnessList) . ')', 'main_product_is_new');
+            $search->withColumn('('.implode(' OR ', $booleanMatchedPromoList).')', 'main_product_is_promo');
+            $search->withColumn('('.implode(' OR ', $booleanMatchedNewnessList).')', 'main_product_is_new');
 
             $booleanMatchedPrice =
-                'CASE WHEN `' . $isProductPriceFirstLeftJoin[0] . '`.PROMO=1 THEN `'
-                . $isProductPriceFirstLeftJoin[1] . '`.PROMO_PRICE ELSE `'
-                . $isProductPriceFirstLeftJoin[1] . '`.PRICE END';
-            $booleanMatchedPriceDefaultCurrency = 'CASE WHEN `' . $isProductPriceFirstLeftJoin[0] . '`.PROMO=1 THEN `' . $isProductPriceFirstLeftJoin[1] . $defaultCurrencySuffix . '`.PROMO_PRICE ELSE `' . $isProductPriceFirstLeftJoin[1] . $defaultCurrencySuffix . '`.PRICE END';
+                'CASE WHEN `'.$isProductPriceFirstLeftJoin[0].'`.PROMO=1 THEN `'
+                .$isProductPriceFirstLeftJoin[1].'`.PROMO_PRICE ELSE `'
+                .$isProductPriceFirstLeftJoin[1].'`.PRICE END';
+            $booleanMatchedPriceDefaultCurrency = 'CASE WHEN `'.$isProductPriceFirstLeftJoin[0].'`.PROMO=1 THEN `'.$isProductPriceFirstLeftJoin[1].$defaultCurrencySuffix.'`.PROMO_PRICE ELSE `'.$isProductPriceFirstLeftJoin[1].$defaultCurrencySuffix.'`.PRICE END';
 
             if ($defaultCurrency?->getId() !== $currency->getId()) {
                 /**
@@ -989,38 +989,38 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                  * Or maybe not : rate value is checked as a float in overloaded getRate method.
                  */
                 $priceToCompareAsSQL =
-                    'CASE WHEN ISNULL(' . $booleanMatchedPrice . ') THEN '
-                    . $booleanMatchedPriceDefaultCurrency . ' * ' . $currency->getRate()
-                    . ' ELSE ' . $booleanMatchedPrice . ' END';
+                    'CASE WHEN ISNULL('.$booleanMatchedPrice.') THEN '
+                    .$booleanMatchedPriceDefaultCurrency.' * '.$currency->getRate()
+                    .' ELSE '.$booleanMatchedPrice.' END';
             } else {
                 $priceToCompareAsSQL = $booleanMatchedPrice;
             }
 
-            $search->withColumn('MAX(' . $priceToCompareAsSQL . ')', 'real_highest_price');
-            $search->withColumn('MIN(' . $priceToCompareAsSQL . ')', 'real_lowest_price');
+            $search->withColumn('MAX('.$priceToCompareAsSQL.')', 'real_highest_price');
+            $search->withColumn('MIN('.$priceToCompareAsSQL.')', 'real_lowest_price');
         } else {
             if (true === $new) {
-                $search->where('`pse`.NEWNESS' . Criteria::EQUAL . '1');
+                $search->where('`pse`.NEWNESS'.Criteria::EQUAL.'1');
             } elseif (false === $new) {
-                $search->where('`pse`.NEWNESS' . Criteria::EQUAL . '0');
+                $search->where('`pse`.NEWNESS'.Criteria::EQUAL.'0');
             }
 
             if (true === $promo) {
-                $search->where('`pse`.PROMO' . Criteria::EQUAL . '1');
+                $search->where('`pse`.PROMO'.Criteria::EQUAL.'1');
             } elseif (false === $promo) {
-                $search->where('`pse`.PROMO' . Criteria::EQUAL . '0');
+                $search->where('`pse`.PROMO'.Criteria::EQUAL.'0');
             }
 
             if (null !== $min_stock) {
-                $search->where('`pse`.QUANTITY' . Criteria::GREATER_EQUAL . '?', $min_stock, \PDO::PARAM_INT);
+                $search->where('`pse`.QUANTITY'.Criteria::GREATER_EQUAL.'?', $min_stock, \PDO::PARAM_INT);
             }
 
             if (null !== $min_weight) {
-                $search->where('`pse`.WEIGHT' . Criteria::GREATER_EQUAL . '?', $min_weight, \PDO::PARAM_STR);
+                $search->where('`pse`.WEIGHT'.Criteria::GREATER_EQUAL.'?', $min_weight, \PDO::PARAM_STR);
             }
 
             if (null !== $max_weight) {
-                $search->where('`is_max_weight`.WEIGHT' . Criteria::LESS_EQUAL . '?', $max_weight, \PDO::PARAM_STR);
+                $search->where('`is_max_weight`.WEIGHT'.Criteria::LESS_EQUAL.'?', $max_weight, \PDO::PARAM_STR);
             }
 
             if (null !== $min_price) {
@@ -1028,7 +1028,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     // @todo
                 }
 
-                $search->where($priceToCompareAsSQL . '>=?', $min_price, \PDO::PARAM_STR);
+                $search->where($priceToCompareAsSQL.'>=?', $min_price, \PDO::PARAM_STR);
             }
 
             if (null !== $max_price) {
@@ -1036,7 +1036,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     // @todo
                 }
 
-                $search->where($priceToCompareAsSQL . '<=?', $max_price, \PDO::PARAM_STR);
+                $search->where($priceToCompareAsSQL.'<=?', $max_price, \PDO::PARAM_STR);
             }
         }
 
@@ -1183,8 +1183,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     }
 
                     foreach ($id as $singleId) {
-                        $givenIdMatched = 'given_id_matched_' . $singleId;
-                        $search->withColumn(ProductTableMap::COL_ID . \sprintf("='%d'", $singleId), $givenIdMatched);
+                        $givenIdMatched = 'given_id_matched_'.$singleId;
+                        $search->withColumn(ProductTableMap::COL_ID.\sprintf("='%d'", $singleId), $givenIdMatched);
                         $search->orderBy($givenIdMatched, Criteria::DESC);
                     }
 

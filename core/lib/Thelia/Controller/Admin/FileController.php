@@ -275,7 +275,7 @@ class FileController extends BaseAdminController
                 ->addForm($fileUpdateForm)
                 ->setGeneralError($message);
         } catch (\Exception $e) {
-            $message = \sprintf('Sorry, an error occurred: %s', $e->getMessage() . ' ' . $e->getFile());
+            $message = \sprintf('Sorry, an error occurred: %s', $e->getMessage().' '.$e->getFile());
             $fileUpdateService->logUpdateError('image', $message);
             $fileUpdateForm->setErrorMessage($message);
 
@@ -344,7 +344,7 @@ class FileController extends BaseAdminController
                 ->addForm($fileUpdateForm)
                 ->setGeneralError($message);
         } catch (\Exception $e) {
-            $message = \sprintf('Sorry, an error occurred: %s', $e->getMessage() . ' ' . $e->getFile());
+            $message = \sprintf('Sorry, an error occurred: %s', $e->getMessage().' '.$e->getFile());
             $fileUpdateService->logUpdateError('document', $message);
             $fileUpdateForm->setErrorMessage($message);
 

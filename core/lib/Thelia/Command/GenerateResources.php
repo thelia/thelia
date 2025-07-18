@@ -54,7 +54,7 @@ class GenerateResources extends ContainerAwareCommand
         switch ($input->getOption('output')) {
             case 'sql':
                 $output->writeln(
-                    'INSERT INTO ' . ResourceTableMap::TABLE_NAME . ' (`id`, `code`, `created_at`, `updated_at`) VALUES ',
+                    'INSERT INTO '.ResourceTableMap::TABLE_NAME.' (`id`, `code`, `created_at`, `updated_at`) VALUES ',
                 );
                 $compteur = 0;
 
@@ -65,14 +65,14 @@ class GenerateResources extends ContainerAwareCommand
 
                     ++$compteur;
                     $output->writeln(
-                        \sprintf("(%d, '%s', NOW(), NOW())", $compteur, $value) . ($constant === key(\array_slice($constants, -1, 1, true)) ? ';' : ','),
+                        \sprintf("(%d, '%s', NOW(), NOW())", $compteur, $value).($constant === key(\array_slice($constants, -1, 1, true)) ? ';' : ','),
                     );
                 }
 
                 break;
             case 'sql-i18n':
                 $output->writeln(
-                    'INSERT INTO ' . ResourceI18nTableMap::TABLE_NAME . ' (`id`, `locale`, `title`) VALUES ',
+                    'INSERT INTO '.ResourceI18nTableMap::TABLE_NAME.' (`id`, `locale`, `title`) VALUES ',
                 );
                 $compteur = 0;
 
@@ -89,7 +89,7 @@ class GenerateResources extends ContainerAwareCommand
                         \sprintf("(%d, 'en_US', '%s'),", $compteur, $title),
                     );
                     $output->writeln(
-                        \sprintf("(%d, 'fr_FR', '%s')", $compteur, $title) . ($constant === key(\array_slice($constants, -1, 1, true)) ? ';' : ','),
+                        \sprintf("(%d, 'fr_FR', '%s')", $compteur, $title).($constant === key(\array_slice($constants, -1, 1, true)) ? ';' : ','),
                     );
                 }
 
@@ -100,7 +100,7 @@ class GenerateResources extends ContainerAwareCommand
                         continue;
                     }
 
-                    $output->writeln('[' . $constant . '] => ' . $value);
+                    $output->writeln('['.$constant.'] => '.$value);
                 }
 
                 break;

@@ -14,12 +14,10 @@ declare(strict_types=1);
 
 namespace Thelia\Coupon;
 
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Model\Address;
 use Thelia\Model\Cart;
@@ -27,7 +25,6 @@ use Thelia\Model\Country;
 use Thelia\Model\Coupon;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
-use Thelia\TaxEngine\TaxEngine;
 
 /**
  * Allow to assist in getting relevant data on the current application state.

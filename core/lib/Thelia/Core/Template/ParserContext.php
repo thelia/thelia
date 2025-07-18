@@ -140,10 +140,10 @@ class ParserContext implements \IteratorAggregate
             }
         }
 
-        $this->set($form::class . ':' . $form->getType(), $form);
+        $this->set($form::class.':'.$form->getType(), $form);
 
         // Set form error information
-        $formErrorInformation[$form::class . ':' . $form->getType()] = [
+        $formErrorInformation[$form::class.':'.$form->getType()] = [
             'data' => $this->cleanFormData($form->getForm()->getData()),
             'hasError' => $form->hasError(),
             'errorMessage' => $form->getErrorMessage(),
@@ -169,14 +169,14 @@ class ParserContext implements \IteratorAggregate
      */
     public function getForm(string $formId, string $formClass, string $formType): ?BaseForm
     {
-        if (isset($this->store[$formClass . ':' . $formType]) && $this->store[$formClass . ':' . $formType] instanceof BaseForm) {
-            return $this->store[$formClass . ':' . $formType];
+        if (isset($this->store[$formClass.':'.$formType]) && $this->store[$formClass.':'.$formType] instanceof BaseForm) {
+            return $this->store[$formClass.':'.$formType];
         }
 
         $formErrorInformation = $this->getSession()->getFormErrorInformation();
 
-        if (isset($formErrorInformation[$formClass . ':' . $formType])) {
-            $formInfo = $formErrorInformation[$formClass . ':' . $formType];
+        if (isset($formErrorInformation[$formClass.':'.$formType])) {
+            $formInfo = $formErrorInformation[$formClass.':'.$formType];
 
             if (\is_array($formInfo['data'])) {
                 $form = $this->formFactory->createForm(
@@ -243,7 +243,7 @@ class ParserContext implements \IteratorAggregate
     {
         $formErrorInformation = $this->getSession()->getFormErrorInformation();
 
-        $formClass = $form::class . ':' . $form->getType();
+        $formClass = $form::class.':'.$form->getType();
 
         if (isset($formErrorInformation[$formClass])) {
             unset($formErrorInformation[$formClass]);

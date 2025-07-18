@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
-use Propel\Runtime\Propel;
 use Propel\Runtime\Exception\PropelException;
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -538,14 +538,14 @@ class Order extends BaseAction implements EventSubscriberInterface
             }
 
             Tlog::getInstance()->addInfo(
-                'Checking stock operation for status change of order : ' . $order->getRef()
-                . ', version: ' . $order->getVersion()
-                . ', manageStockOnCreation: ' . ($manageStockOnCreation ? 0 : 1)
-                . ', paid:' . ($order->isPaid(false) ? 1 : 0)
-                . ', is not paid:' . ($order->isNotPaid(false) ? 1 : 0)
-                . ', new status paid:' . ($newStatus->isPaid(false) ? 1 : 0)
-                . ', new status is not paid:' . ($newStatus->isNotPaid(false) ? 1 : 0)
-                . ' = operation: ' . $event->getOperation(),
+                'Checking stock operation for status change of order : '.$order->getRef()
+                .', version: '.$order->getVersion()
+                .', manageStockOnCreation: '.($manageStockOnCreation ? 0 : 1)
+                .', paid:'.($order->isPaid(false) ? 1 : 0)
+                .', is not paid:'.($order->isNotPaid(false) ? 1 : 0)
+                .', new status paid:'.($newStatus->isPaid(false) ? 1 : 0)
+                .', new status is not paid:'.($newStatus->isNotPaid(false) ? 1 : 0)
+                .' = operation: '.$event->getOperation(),
             );
         }
     }
@@ -583,13 +583,13 @@ class Order extends BaseAction implements EventSubscriberInterface
                         } elseif ($operationEvent->getOperation() === $operationEvent::DECREASE_STOCK) {
                             /* Check if we have enough stock */
                             if ($orderProduct->getQuantity() > $productSaleElements->getQuantity() && true === ConfigQuery::checkAvailableStock()) {
-                                throw new TheliaProcessException($productSaleElements->getRef() . ' : Not enough stock 2');
+                                throw new TheliaProcessException($productSaleElements->getRef().' : Not enough stock 2');
                             }
 
                             $offset = -$orderProduct->getQuantity();
                         }
 
-                        Tlog::getInstance()->addError('Product stock: ' . $productSaleElements->getQuantity() . ' -> ' . ($productSaleElements->getQuantity() + $offset));
+                        Tlog::getInstance()->addError('Product stock: '.$productSaleElements->getQuantity().' -> '.($productSaleElements->getQuantity() + $offset));
 
                         $productSaleElements
                             ->setQuantity($productSaleElements->getQuantity() + $offset)

@@ -102,9 +102,9 @@ class FolderImage extends BaseFolderImage implements BreadcrumbInterface, FileMo
     public function getUploadDir(): string
     {
         $uploadDir = ConfigQuery::read('images_library_path');
-        $uploadDir = null === $uploadDir ? THELIA_LOCAL_DIR . 'media' . DS . 'images' : THELIA_ROOT . $uploadDir;
+        $uploadDir = null === $uploadDir ? THELIA_LOCAL_DIR.'media'.DS.'images' : THELIA_ROOT.$uploadDir;
 
-        return $uploadDir . DS . 'folder';
+        return $uploadDir.DS.'folder';
     }
 
     /**
@@ -112,7 +112,7 @@ class FolderImage extends BaseFolderImage implements BreadcrumbInterface, FileMo
      */
     public function getRedirectionUrl(): string
     {
-        return '/admin/folders/update/' . $this->getFolderId();
+        return '/admin/folders/update/'.$this->getFolderId();
     }
 
     /**

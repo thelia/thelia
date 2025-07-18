@@ -30,7 +30,7 @@ class BooleanOrBothType extends BaseType
 
     public function isValid($value): bool
     {
-        return self::ANY === $value || null !== filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        return self::ANY === $value || null !== filter_var($value, \FILTER_VALIDATE_BOOLEAN, \FILTER_NULL_ON_FAILURE);
     }
 
     public function getFormattedValue($value)
@@ -39,7 +39,7 @@ class BooleanOrBothType extends BaseType
             return $value;
         }
 
-        return null === $value ? null : filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        return null === $value ? null : filter_var($value, \FILTER_VALIDATE_BOOLEAN, \FILTER_NULL_ON_FAILURE);
     }
 
     public function getFormOptions(): array

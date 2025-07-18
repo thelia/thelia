@@ -335,7 +335,7 @@ class Calculator
             throw new TaxEngineException('Product is empty in Calculator::getTaxedPrice', TaxEngineException::UNDEFINED_PRODUCT);
         }
 
-        if (false === filter_var($taxedPrice, FILTER_VALIDATE_FLOAT)) {
+        if (false === filter_var($taxedPrice, \FILTER_VALIDATE_FLOAT)) {
             throw new TaxEngineException('BAD AMOUNT FORMAT', TaxEngineException::BAD_AMOUNT_FORMAT);
         }
 

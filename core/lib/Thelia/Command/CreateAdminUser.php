@@ -86,7 +86,7 @@ class CreateAdminUser extends ContainerAwareCommand
 
         $output->writeln([
             '',
-            '<info>User ' . $admin->getLogin() . ' successfully created.</info>',
+            '<info>User '.$admin->getLogin().' successfully created.</info>',
             '',
         ]);
 
@@ -189,7 +189,7 @@ class CreateAdminUser extends ContainerAwareCommand
         $question->setValidator(static function ($answer): string {
             $answer = trim($answer);
 
-            if ('' !== $answer && '0' !== $answer && !filter_var($answer, FILTER_VALIDATE_EMAIL)) {
+            if ('' !== $answer && '0' !== $answer && !filter_var($answer, \FILTER_VALIDATE_EMAIL)) {
                 throw new \RuntimeException('Please enter an email or an empty value.');
             }
 

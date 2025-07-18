@@ -63,12 +63,13 @@ class ImageEvent extends CachedFileEvent
      */
     public function getOptionsHash(): string
     {
-        if ($this->width === null || $this->height === null || $this->resize_mode === null || $this->background_color === null ) {
+        if ($this->width === null || $this->height === null || $this->resize_mode === null || $this->background_color === null) {
             return '';
         }
+
         return md5(
-            $this->width . $this->height . $this->resize_mode . $this->background_color . implode(',', $this->effects)
-            . $this->rotation . $this->allowZoom,
+            $this->width.$this->height.$this->resize_mode.$this->background_color.implode(',', $this->effects)
+            .$this->rotation.$this->allowZoom,
         );
     }
 

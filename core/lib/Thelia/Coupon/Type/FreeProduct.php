@@ -59,7 +59,7 @@ class FreeProduct extends AbstractRemoveOnProducts
      */
     protected function getSessionVarName(): string
     {
-        return 'coupon.free_product.cart_items.' . $this->getCode();
+        return 'coupon.free_product.cart_items.'.$this->getCode();
     }
 
     /**

@@ -135,7 +135,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         $ns = $this->getQueryNamespace();
 
         if ('\\' !== $ns[0]) {
-            $ns = '\\' . $ns;
+            $ns = '\\'.$ns;
         }
 
         $queryClass = \sprintf('%s\\%sImageQuery', $ns, $object);
@@ -285,9 +285,9 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         $baseSourceFilePath = ConfigQuery::read('images_library_path');
 
         if (null === $baseSourceFilePath) {
-            $baseSourceFilePath = THELIA_LOCAL_DIR . 'media' . DS . 'images';
+            $baseSourceFilePath = THELIA_LOCAL_DIR.'media'.DS.'images';
         } else {
-            $baseSourceFilePath = THELIA_ROOT . $baseSourceFilePath;
+            $baseSourceFilePath = THELIA_ROOT.$baseSourceFilePath;
         }
 
         /** @var ProductImage $result */
@@ -301,7 +301,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 $event->setHeight((int) $height);
             }
 
-            $event->setResizeMode((string)$resizeMode);
+            $event->setResizeMode((string) $resizeMode);
 
             if (null !== $rotation) {
                 $event->setRotation((int) $rotation);
@@ -357,7 +357,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 // Dispatch image processing event
                 $this->dispatcher->dispatch($event, TheliaEvents::IMAGE_PROCESS);
 
-                $imageExt = pathinfo($event->getSourceFilepath(), PATHINFO_EXTENSION);
+                $imageExt = pathinfo($event->getSourceFilepath(), \PATHINFO_EXTENSION);
 
                 $loopResultRow
                     ->set('IMAGE_URL', $event->getFileUrl())
@@ -432,6 +432,6 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
     {
         $imgData = base64_encode(file_get_contents($path));
 
-        return $src = 'data: ' . mime_content_type($path) . ';base64,' . $imgData;
+        return $src = 'data: '.mime_content_type($path).';base64,'.$imgData;
     }
 }

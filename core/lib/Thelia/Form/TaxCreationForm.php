@@ -102,7 +102,7 @@ class TaxCreationForm extends BaseForm
                     // Replace the '\' in the class name by hyphens
                     // See TaxController::getRequirements if some changes are made about this.
                     ->add(
-                        Tax::escapeTypeName($name) . ':' . $requirement->getName(),
+                        Tax::escapeTypeName($name).':'.$requirement->getName(),
                         $requirement->getType()->getFormType(),
                         $options,
                     );

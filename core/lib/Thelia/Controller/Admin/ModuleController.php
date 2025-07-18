@@ -394,11 +394,11 @@ class ModuleController extends AbstractCrudController
             $title = $module->setLocale($this->getSession()->getLang()->getLocale())->getTitle();
 
             // Get the module descriptor
-            $moduleDescriptor = $module->getAbsoluteConfigPath() . DS . 'module.xml';
+            $moduleDescriptor = $module->getAbsoluteConfigPath().DS.'module.xml';
 
             if (false !== $xmlData = @simplexml_load_string(file_get_contents($moduleDescriptor))) {
                 // Transform the pseudo-array into a real array
-                $arrayData = json_decode(json_encode((array) $xmlData, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
+                $arrayData = json_decode(json_encode((array) $xmlData, \JSON_THROW_ON_ERROR), true, 512, \JSON_THROW_ON_ERROR);
 
                 $content = $this->renderRaw('ajax/module-information', [
                     'moduleId' => $module_id,
@@ -438,7 +438,7 @@ class ModuleController extends AbstractCrudController
             $finder = null;
 
             // Check if the module has declared a documentation
-            $moduleDescriptor = $module->getAbsoluteConfigPath() . DS . 'module.xml';
+            $moduleDescriptor = $module->getAbsoluteConfigPath().DS.'module.xml';
 
             if (false !== $xmlData = @simplexml_load_string(file_get_contents($moduleDescriptor))) {
                 $documentationDirectory = (string) $xmlData->documentation;

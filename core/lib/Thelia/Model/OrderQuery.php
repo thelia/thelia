@@ -34,7 +34,7 @@ class OrderQuery extends BaseOrderQuery
      */
     public static function getMonthlySaleStats($month, $year, $includeShipping = true, $withTaxes = true): array
     {
-        $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        $numberOfDay = cal_days_in_month(\CAL_GREGORIAN, $month, $year);
 
         $stats = [];
 
@@ -53,7 +53,7 @@ class OrderQuery extends BaseOrderQuery
 
     public static function getMonthlyOrdersStats($month, $year, $status = null)
     {
-        $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        $numberOfDay = cal_days_in_month(\CAL_GREGORIAN, $month, $year);
 
         $stats = [];
 
@@ -78,7 +78,7 @@ class OrderQuery extends BaseOrderQuery
      */
     public static function getFirstOrdersStats($month, $year): array
     {
-        $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        $numberOfDay = cal_days_in_month(\CAL_GREGORIAN, $month, $year);
 
         $stats = [];
 

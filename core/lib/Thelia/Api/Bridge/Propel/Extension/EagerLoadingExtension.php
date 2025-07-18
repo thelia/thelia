@@ -97,8 +97,8 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
         }
 
         $reflector = new \ReflectionClass($resourceClass);
-        $baseJoinAlias = ltrim($parentAlias ?: $parentReflector?->getShortName() . '_' . $reflector->getShortName(), '_');
-        $baseJoinAlias = strtolower($baseJoinAlias) . '_';
+        $baseJoinAlias = ltrim($parentAlias ?: $parentReflector?->getShortName().'_'.$reflector->getShortName(), '_');
+        $baseJoinAlias = strtolower($baseJoinAlias).'_';
 
         if (is_subclass_of($resourceClass, TranslatableResourceInterface::class) && $operation instanceof Operation) {
             $this->joinI18ns($query, $resourceClass, $operation, $reflector, $baseJoinAlias);
@@ -147,17 +147,17 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
 
                 $isNullable = $property->getType()->allowsNull() || 'array' === $property->getType()->getName();
                 $isLeftJoin = $wasLeftJoin || $isNullable;
-                $joinFunctionName = 'use' . ucfirst($targetReflector->getShortName()) . 'Query';
+                $joinFunctionName = 'use'.ucfirst($targetReflector->getShortName()).'Query';
 
                 if (!method_exists($query, $joinFunctionName) && isset($relationAttribute->getArguments()['relationAlias'])) {
-                    $joinFunctionName = 'use' . $relationAttribute->getArguments()['relationAlias'] . 'Query';
+                    $joinFunctionName = 'use'.$relationAttribute->getArguments()['relationAlias'].'Query';
                 }
 
                 if (!method_exists($query, $joinFunctionName)) {
                     continue;
                 }
 
-                $joinAlias = trim($baseJoinAlias . strtolower($property->getName()), '_');
+                $joinAlias = trim($baseJoinAlias.strtolower($property->getName()), '_');
 
                 ++$joinCount;
                 /** @var ModelCriteria $relationQuery */
@@ -190,7 +190,7 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
                         continue;
                     }
 
-                    $relationQuery->withColumn($relationQuery->getTableNameInQuery() . '.' . $targetProperty->getName(), $relationQuery->getTableNameInQuery() . '_' . $targetProperty->getName());
+                    $relationQuery->withColumn($relationQuery->getTableNameInQuery().'.'.$targetProperty->getName(), $relationQuery->getTableNameInQuery().'_'.$targetProperty->getName());
                 }
 
                 // Avoid recursive joins for self-referencing relations
@@ -246,7 +246,7 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
         $i18nResource = new ($resourceClass::getI18nResourceClass());
 
         if (!$i18nResource instanceof I18n) {
-            throw new RuntimeException($i18nResource::class . ' should extend ' . I18n::class . ' to be used as i18n resource');
+            throw new RuntimeException($i18nResource::class.' should extend '.I18n::class.' to be used as i18n resource');
         }
 
         $i18nFields = array_map(
@@ -255,15 +255,15 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
         );
 
         $tableName = $resourceClass::getPropelRelatedTableMap()->getPhpName();
-        $joinMethodName = 'join' . $tableName . 'I18n';
+        $joinMethodName = 'join'.$tableName.'I18n';
 
         foreach ($langs as $lang) {
-            $joinAlias = trim($baseJoinAlias . 'lang_' . $lang->getLocale(), '_');
+            $joinAlias = trim($baseJoinAlias.'lang_'.$lang->getLocale(), '_');
             $query->{$joinMethodName}($joinAlias);
-            $query->addJoinCondition($joinAlias, $joinAlias . '.locale = ?', $lang->getLocale(), null, \PDO::PARAM_STR);
+            $query->addJoinCondition($joinAlias, $joinAlias.'.locale = ?', $lang->getLocale(), null, \PDO::PARAM_STR);
 
             foreach ($i18nFields as $i18nField) {
-                $query->withColumn($joinAlias . '.' . $i18nField, $joinAlias . '_' . $i18nField);
+                $query->withColumn($joinAlias.'.'.$i18nField, $joinAlias.'_'.$i18nField);
             }
         }
     }

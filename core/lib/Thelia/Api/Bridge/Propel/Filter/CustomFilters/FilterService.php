@@ -100,14 +100,14 @@ readonly class FilterService
         $filters = $this->getAvailableFiltersWithTFilter($resource, $tfilters);
 
         if (!$query instanceof ModelCriteria) {
-            $queryClass = 'Thelia\\Model\\' . ucfirst($resource) . 'Query';
+            $queryClass = 'Thelia\\Model\\'.ucfirst($resource).'Query';
 
             if (!class_exists($queryClass)) {
-                $queryClass = 'Thelia\\Model\\' . ucfirst(mb_substr($resource, 0, -1)) . 'Query';
+                $queryClass = 'Thelia\\Model\\'.ucfirst(mb_substr($resource, 0, -1)).'Query';
             }
 
             if (!class_exists($queryClass)) {
-                throw new \RuntimeException('Not found class: ' . $queryClass);
+                throw new \RuntimeException('Not found class: '.$queryClass);
             }
 
             $query = $queryClass::create();
@@ -212,7 +212,7 @@ readonly class FilterService
 
             if ($hasMainResource) {
                 $values = array_intersect_key($values, array_unique(array_map(
-                    static fn ($item): string => $item['id'] . '-' . $item['mainId'],
+                    static fn ($item): string => $item['id'].'-'.$item['mainId'],
                     $values,
                 )));
 

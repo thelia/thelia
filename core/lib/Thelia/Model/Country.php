@@ -54,7 +54,7 @@ class Country extends BaseCountry
             ' ' => ' +',
         ];
 
-        return '#^' . strtr($zipCodeRE, $trans) . '$#';
+        return '#^'.strtr($zipCodeRE, $trans).'$#';
     }
 
     /**
@@ -70,6 +70,7 @@ class Country extends BaseCountry
         if (null !== $firstAreaCountry) {
             return $firstAreaCountry->getAreaId();
         }
+
         return null;
     }
 

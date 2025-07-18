@@ -24,7 +24,7 @@ class I18n
     public function __construct($data = [])
     {
         foreach ($data as $field => $value) {
-            $setter = 'set' . ucfirst((string) $field);
+            $setter = 'set'.ucfirst((string) $field);
 
             if (method_exists($this, $setter)) {
                 $this->{$setter}($value);

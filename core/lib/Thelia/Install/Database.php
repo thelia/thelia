@@ -75,8 +75,8 @@ class Database
         if (null === $extraSqlFiles) {
             $sql = array_merge(
                 $sql,
-                $this->prepareSql(file_get_contents(THELIA_SETUP_DIRECTORY . 'thelia.sql')),
-                $this->prepareSql(file_get_contents(THELIA_SETUP_DIRECTORY . 'insert.sql')),
+                $this->prepareSql(file_get_contents(THELIA_SETUP_DIRECTORY.'thelia.sql')),
+                $this->prepareSql(file_get_contents(THELIA_SETUP_DIRECTORY.'insert.sql')),
             );
         } else {
             foreach ($extraSqlFiles as $fileToInsert) {
@@ -109,13 +109,13 @@ class Database
         $stmt = $this->connection->prepare($sql);
 
         if (false === $stmt) {
-            throw new \RuntimeException(\sprintf('Failed to prepare statement for %s: ', $sql) . print_r($this->connection->errorInfo(), 1));
+            throw new \RuntimeException(\sprintf('Failed to prepare statement for %s: ', $sql).print_r($this->connection->errorInfo(), 1));
         }
 
         $success = $stmt->execute($args);
 
         if (false === $success || 0 !== $stmt->errorCode()) {
-            throw new \RuntimeException(\sprintf("Failed to execute SQL '%s', arguments:", $sql) . print_r($args, 1) . ', error:' . print_r($stmt->errorInfo(), 1));
+            throw new \RuntimeException(\sprintf("Failed to execute SQL '%s', arguments:", $sql).print_r($args, 1).', error:'.print_r($stmt->errorInfo(), 1));
         }
 
         return $stmt;
@@ -132,7 +132,7 @@ class Database
 
         foreach ($m[0] as $k => $v) {
             if ('|' === $m[1][$k]) {
-                throw new \RuntimeException('You can not use "|" as delimiter: ' . $v);
+                throw new \RuntimeException('You can not use "|" as delimiter: '.$v);
             }
 
             $stored = str_replace(';', '|', $m[2][$k]);
@@ -190,13 +190,13 @@ class Database
                 continue;
             }
 
-            $result = $this->execute('SELECT * FROM `' . $table . '`');
+            $result = $this->execute('SELECT * FROM `'.$table.'`');
 
             $fieldCount = $result->columnCount();
 
-            $data[] = 'DROP TABLE `' . $table . '`;';
+            $data[] = 'DROP TABLE `'.$table.'`;';
 
-            $resultStruct = $this->execute('SHOW CREATE TABLE `' . $table . '`');
+            $resultStruct = $this->execute('SHOW CREATE TABLE `'.$table.'`');
 
             $rowStruct = $resultStruct->fetch(\PDO::FETCH_NUM);
 
@@ -206,12 +206,12 @@ class Database
 
             for ($i = 0; $i < $fieldCount; ++$i) {
                 while ($row = $result->fetch(\PDO::FETCH_NUM)) {
-                    $data[] = 'INSERT INTO `' . $table . '` VALUES(';
+                    $data[] = 'INSERT INTO `'.$table.'` VALUES(';
 
                     for ($j = 0; $j < $fieldCount; ++$j) {
                         $row[$j] = addslashes((string) $row[$j]);
                         $row[$j] = str_replace("\n", '\\n', $row[$j]);
-                        $data[] = isset($row[$j]) ? '"' . $row[$j] . '"' : '""';
+                        $data[] = isset($row[$j]) ? '"'.$row[$j].'"' : '""';
 
                         if ($j < ($fieldCount - 1)) {
                             $data[] = ',';

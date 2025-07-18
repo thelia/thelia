@@ -106,7 +106,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
             $this->mailer->sendEmailMessage(
                 'new_admin_password',
                 [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
-                [$email => $admin->getFirstname() . ' ' . $admin->getLastname()],
+                [$email => $admin->getFirstname().' '.$admin->getLastname()],
                 [
                     'token' => $renewToken,
                     'admin' => $admin,

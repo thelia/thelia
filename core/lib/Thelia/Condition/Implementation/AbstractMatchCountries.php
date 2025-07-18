@@ -99,7 +99,7 @@ abstract class AbstractMatchCountries extends ConditionAbstract
         if (null !== $cntryList = CountryQuery::create()->findPks($cntryIds)) {
             /** @var Country $cntry */
             foreach ($cntryList as $cntry) {
-                $cntryStrList .= $cntry->setLocale($this->getCurrentLocale())->getTitle() . ', ';
+                $cntryStrList .= $cntry->setLocale($this->getCurrentLocale())->getTitle().', ';
             }
 
             $cntryStrList = rtrim($cntryStrList, ', ');

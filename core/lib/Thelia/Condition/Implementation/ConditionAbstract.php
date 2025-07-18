@@ -124,7 +124,7 @@ abstract class ConditionAbstract implements ConditionInterface
      */
     protected function generateInputs(): array
     {
-        throw new NotImplementedException('The generateInputs method must be implemented in ' . self::class);
+        throw new NotImplementedException('The generateInputs method must be implemented in '.self::class);
     }
 
     public function getServiceId(): string

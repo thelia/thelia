@@ -76,12 +76,12 @@ class ModuleActivateCommand extends BaseModuleGenerate
             $module = ModuleQuery::create()->findOneByCode($moduleCode);
 
             if (null === $module) {
-                if (is_dir(THELIA_LOCAL_MODULE_DIR . $moduleCode)) {
-                    $module = $this->installModule(THELIA_LOCAL_MODULE_DIR . $moduleCode);
+                if (is_dir(THELIA_LOCAL_MODULE_DIR.$moduleCode)) {
+                    $module = $this->installModule(THELIA_LOCAL_MODULE_DIR.$moduleCode);
                 }
 
-                if (is_dir(THELIA_MODULE_DIR . $moduleCode)) {
-                    $module = $this->installModule(THELIA_MODULE_DIR . $moduleCode);
+                if (is_dir(THELIA_MODULE_DIR.$moduleCode)) {
+                    $module = $this->installModule(THELIA_MODULE_DIR.$moduleCode);
                 }
 
                 if (!$module instanceof Module) {

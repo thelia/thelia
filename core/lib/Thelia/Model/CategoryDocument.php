@@ -99,9 +99,9 @@ class CategoryDocument extends BaseCategoryDocument implements BreadcrumbInterfa
     public function getUploadDir(): string
     {
         $uploadDir = ConfigQuery::read('documents_library_path');
-        $uploadDir = null === $uploadDir ? THELIA_LOCAL_DIR . 'media' . DS . 'documents' : THELIA_ROOT . $uploadDir;
+        $uploadDir = null === $uploadDir ? THELIA_LOCAL_DIR.'media'.DS.'documents' : THELIA_ROOT.$uploadDir;
 
-        return $uploadDir . DS . 'category';
+        return $uploadDir.DS.'category';
     }
 
     /**
@@ -109,7 +109,7 @@ class CategoryDocument extends BaseCategoryDocument implements BreadcrumbInterfa
      */
     public function getRedirectionUrl(): string
     {
-        return '/admin/categories/update?category_id=' . $this->getCategoryId();
+        return '/admin/categories/update?category_id='.$this->getCategoryId();
     }
 
     /**

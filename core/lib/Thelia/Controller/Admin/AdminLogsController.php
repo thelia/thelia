@@ -50,7 +50,7 @@ class AdminLogsController extends BaseAdminController
                     $entry->getAdminLogin(),
                     $entry->getResource(),
                     $entry->getAction(),
-                    (null !== $entry->getResourceId()) ? ':' . $entry->getResourceId() : '',
+                    (null !== $entry->getResourceId()) ? ':'.$entry->getResourceId() : '',
                 ),
                 'data' => $entry->getMessage(),
             ];

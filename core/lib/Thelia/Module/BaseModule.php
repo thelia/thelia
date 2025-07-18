@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace Thelia\Module;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Propel\Runtime\Propel;
 use Propel\Runtime\Exception\PropelException;
+use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -280,7 +280,7 @@ class BaseModule implements BaseModuleInterface
 
                     $increment = 0;
 
-                    while (file_exists($imageDirectory . '/' . $imageFileName)) {
+                    while (file_exists($imageDirectory.'/'.$imageFileName)) {
                         $imageFileName = \sprintf(
                             '%s-%d-%d-%s',
                             $module->getCode(),
@@ -560,7 +560,7 @@ class BaseModule implements BaseModuleInterface
                     && (isset($hook['code']) && ('' !== $hook['code'] && '0' !== $hook['code']));
 
                 if (!$isValid) {
-                    Tlog::getInstance()->notice('The module ' . $this->getCode() . ' tried to register an invalid hook');
+                    Tlog::getInstance()->notice('The module '.$this->getCode().' tried to register an invalid hook');
 
                     continue;
                 }
@@ -756,7 +756,7 @@ class BaseModule implements BaseModuleInterface
 
     protected function getPropelSchemaDir(): string
     {
-        return $this->getModuleDir() . DS . 'Config' . DS . 'schema.xml';
+        return $this->getModuleDir().DS.'Config'.DS.'schema.xml';
     }
 
     protected function hasPropelSchema(): bool
@@ -792,9 +792,9 @@ class BaseModule implements BaseModuleInterface
 
     public function getModuleDir(): string
     {
-        return is_dir(THELIA_MODULE_DIR . $this->getCode())
-            ? THELIA_MODULE_DIR . $this->getCode()
-            : THELIA_LOCAL_MODULE_DIR . $this->getCode();
+        return is_dir(THELIA_MODULE_DIR.$this->getCode())
+            ? THELIA_MODULE_DIR.$this->getCode()
+            : THELIA_LOCAL_MODULE_DIR.$this->getCode();
     }
 
     public function setContainer(?ContainerInterface $container = null): static

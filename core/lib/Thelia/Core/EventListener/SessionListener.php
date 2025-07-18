@@ -37,7 +37,7 @@ class SessionListener implements EventSubscriberInterface
 
     public function prodSession(SessionEvent $event): void
     {
-        if (PHP_SESSION_ACTIVE === session_status()) {
+        if (\PHP_SESSION_ACTIVE === session_status()) {
             session_write_close();
         }
 
@@ -62,7 +62,7 @@ class SessionListener implements EventSubscriberInterface
     public function testSession(SessionEvent $event): void
     {
         if ('test' === $event->getEnv()) {
-            $storage = new MockFileSessionStorage($event->getCacheDir() . DS . 'sessions');
+            $storage = new MockFileSessionStorage($event->getCacheDir().DS.'sessions');
             $event->setSession($this->getSession($storage));
             $event->stopPropagation();
         }

@@ -19,7 +19,6 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\Routing\Router;
 use Thelia\Files\FileModelInterface;
 use Thelia\Files\FileModelParentInterface;
-use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\CategoryImage as BaseCategoryImage;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
@@ -102,9 +101,9 @@ class CategoryImage extends BaseCategoryImage implements BreadcrumbInterface, Fi
     public function getUploadDir(): string
     {
         $uploadDir = ConfigQuery::read('images_library_path');
-        $uploadDir = null === $uploadDir ? THELIA_LOCAL_DIR . 'media' . DS . 'images' : THELIA_ROOT . $uploadDir;
+        $uploadDir = null === $uploadDir ? THELIA_LOCAL_DIR.'media'.DS.'images' : THELIA_ROOT.$uploadDir;
 
-        return $uploadDir . DS . 'category';
+        return $uploadDir.DS.'category';
     }
 
     /**
@@ -112,7 +111,7 @@ class CategoryImage extends BaseCategoryImage implements BreadcrumbInterface, Fi
      */
     public function getRedirectionUrl(): string
     {
-        return '/admin/categories/update?category_id=' . $this->getCategoryId();
+        return '/admin/categories/update?category_id='.$this->getCategoryId();
     }
 
     /**

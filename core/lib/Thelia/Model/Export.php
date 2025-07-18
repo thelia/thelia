@@ -35,7 +35,7 @@ class Export extends BaseExport
         $class = $this->getHandleClass();
 
         if ('\\' !== $class[0]) {
-            $class = '\\' . $class;
+            $class = '\\'.$class;
         }
 
         if (!class_exists($class)) {

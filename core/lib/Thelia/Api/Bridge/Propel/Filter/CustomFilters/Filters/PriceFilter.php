@@ -60,8 +60,8 @@ class PriceFilter // implements TheliaFilterInterface
     private function betweenFilter(ModelCriteria $query, string $item): void
     {
         $values = explode('..', $item);
-        $min = filter_var($values[0], FILTER_VALIDATE_FLOAT);
-        $max = filter_var($values[1], FILTER_VALIDATE_FLOAT);
+        $min = filter_var($values[0], \FILTER_VALIDATE_FLOAT);
+        $max = filter_var($values[1], \FILTER_VALIDATE_FLOAT);
         $query
             ->useProductSaleElementsQuery()
             ->filterByIsDefault(1)

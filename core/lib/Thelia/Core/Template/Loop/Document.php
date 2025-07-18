@@ -109,7 +109,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         $ns = $this->getQueryNamespace();
 
         if ('\\' !== $ns[0]) {
-            $ns = '\\' . $ns;
+            $ns = '\\'.$ns;
         }
 
         $queryClass = \sprintf('%s\\%sDocumentQuery', $ns, $object);
@@ -233,9 +233,9 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         $baseSourceFilePath = ConfigQuery::read('documents_library_path');
 
         if (null === $baseSourceFilePath) {
-            $baseSourceFilePath = THELIA_LOCAL_DIR . 'media' . DS . 'documents';
+            $baseSourceFilePath = THELIA_LOCAL_DIR.'media'.DS.'documents';
         } else {
-            $baseSourceFilePath = THELIA_ROOT . $baseSourceFilePath;
+            $baseSourceFilePath = THELIA_ROOT.$baseSourceFilePath;
         }
 
         /** @var ProductDocument $result */

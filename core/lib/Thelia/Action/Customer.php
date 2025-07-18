@@ -50,9 +50,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
         protected MailerFactory $mailer,
         protected CustomerService $customerService,
         protected LangService $langService,
-        protected ?RequestStack $requestStack = null
-    )
-    {
+        protected ?RequestStack $requestStack = null,
+    ) {
     }
 
     /**

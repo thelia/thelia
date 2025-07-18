@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Controller\Admin;
 
-use DateTime;
 use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
@@ -253,7 +252,7 @@ class CouponController extends BaseAdminController
             ['couponId' => $couponId],
         );
 
-        $args['formAction'] = 'admin/coupon/update/' . $couponId;
+        $args['formAction'] = 'admin/coupon/update/'.$couponId;
 
         $args['dateFormat'] = $this->getDefaultDateFormat();
 
@@ -468,7 +467,7 @@ class CouponController extends BaseAdminController
     {
         Tlog::getInstance()->error(
             \sprintf(
-                'Error during Coupon ' . $action . ' process : %s. Exception was %s',
+                'Error during Coupon '.$action.' process : %s. Exception was %s',
                 $message,
                 $e->getMessage(),
             ),
@@ -510,7 +509,7 @@ class CouponController extends BaseAdminController
                 AdminResources::COUPON,
                 AccessManager::UPDATE,
                 \sprintf(
-                    'Coupon %s (ID ) ' . $log,
+                    'Coupon %s (ID ) '.$log,
                     $couponEvent->getTitle(),
                     $couponEvent->getCouponModel()->getId(),
                 ),
@@ -708,7 +707,7 @@ class CouponController extends BaseAdminController
             $data['shortDescription'],
             $data['description'],
             $data['isEnabled'] === 'on',
-            DateTime::createFromFormat($this->getDefaultDateFormat(), $data['expirationDate']),
+            \DateTime::createFromFormat($this->getDefaultDateFormat(), $data['expirationDate']),
             $data['isAvailableOnSpecialOffers'] === 'on',
             $data['isCumulative'] === 'on',
             $data['isRemovingPostage'] === 'on',
@@ -717,7 +716,7 @@ class CouponController extends BaseAdminController
             $data['freeShippingForCountries'],
             $data['freeShippingForModules'],
             $data['perCustomerUsageCount'] === 'on',
-            empty($data['startDate']) ? null : DateTime::createFromFormat($this->getDefaultDateFormat(), $data['startDate']),
+            empty($data['startDate']) ? null : \DateTime::createFromFormat($this->getDefaultDateFormat(), $data['startDate']),
         );
 
         // If Update mode

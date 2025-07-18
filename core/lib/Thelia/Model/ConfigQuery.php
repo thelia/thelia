@@ -279,7 +279,7 @@ class ConfigQuery extends BaseConfigQuery
         $minorVersion = self::read('thelia_minus_version');
         $releaseVersion = self::read('thelia_release_version');
 
-        return $majorVersion . '.' . $minorVersion . '.' . $releaseVersion;
+        return $majorVersion.'.'.$minorVersion.'.'.$releaseVersion;
     }
 
     public static function isShowingErrorMessage()

@@ -194,7 +194,7 @@ class CustomerController extends AbstractCrudController
 
     protected function getObjectLabel(ActiveRecordInterface $object): string
     {
-        return $object->getRef() . '(' . $object->getLastname() . ' ' . $object->getFirstname() . ')';
+        return $object->getRef().'('.$object->getLastname().' '.$object->getFirstname().')';
     }
 
     /**

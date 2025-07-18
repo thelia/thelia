@@ -102,9 +102,9 @@ class ProductDocument extends BaseProductDocument implements BreadcrumbInterface
     public function getUploadDir(): string
     {
         $uploadDir = ConfigQuery::read('documents_library_path');
-        $uploadDir = null === $uploadDir ? THELIA_LOCAL_DIR . 'media' . DS . 'documents' : THELIA_ROOT . $uploadDir;
+        $uploadDir = null === $uploadDir ? THELIA_LOCAL_DIR.'media'.DS.'documents' : THELIA_ROOT.$uploadDir;
 
-        return $uploadDir . DS . 'product';
+        return $uploadDir.DS.'product';
     }
 
     /**
@@ -112,7 +112,7 @@ class ProductDocument extends BaseProductDocument implements BreadcrumbInterface
      */
     public function getRedirectionUrl(): string
     {
-        return '/admin/products/update?product_id=' . $this->getProductId();
+        return '/admin/products/update?product_id='.$this->getProductId();
     }
 
     /**

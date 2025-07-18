@@ -58,7 +58,7 @@ class ConfigStoreController extends BaseAdminController
             $oldFileName = ConfigQuery::read($configKey);
 
             if (null !== $oldFileName) {
-                $oldFilePath = $storeMediaUploadDir . DS . $oldFileName;
+                $oldFilePath = $storeMediaUploadDir.DS.$oldFileName;
 
                 if ($fs->exists($oldFilePath)) {
                     $fs->remove($oldFilePath);
@@ -66,7 +66,7 @@ class ConfigStoreController extends BaseAdminController
             }
 
             // Write the new file
-            $newFileName = uniqid() . '-' . $file->getClientOriginalName();
+            $newFileName = uniqid().'-'.$file->getClientOriginalName();
             $file->move($storeMediaUploadDir, $newFileName);
             ConfigQuery::write($configKey, $newFileName, false);
         }
@@ -90,12 +90,12 @@ class ConfigStoreController extends BaseAdminController
             $storeMediaUploadDir = ConfigQuery::read('images_library_path');
 
             if (null === $storeMediaUploadDir) {
-                $storeMediaUploadDir = THELIA_LOCAL_DIR . 'media' . DS . 'images';
+                $storeMediaUploadDir = THELIA_LOCAL_DIR.'media'.DS.'images';
             } else {
-                $storeMediaUploadDir = THELIA_ROOT . $storeMediaUploadDir;
+                $storeMediaUploadDir = THELIA_ROOT.$storeMediaUploadDir;
             }
 
-            $storeMediaUploadDir .= DS . 'store';
+            $storeMediaUploadDir .= DS.'store';
 
             // List of medias that can be uploaded through this form.
             //  [Name of the form input] => [Key in the config table]

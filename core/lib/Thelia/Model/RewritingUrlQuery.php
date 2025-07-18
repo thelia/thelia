@@ -83,7 +83,7 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
             $parameterConditions = [];
 
             foreach ($viewOtherParameters as $parameter => $value) {
-                $conditionName = 'other_parameter_condition_' . \count($parameterConditions);
+                $conditionName = 'other_parameter_condition_'.\count($parameterConditions);
                 $urlQuery->condition('parameter_condition', '`ra`.PARAMETER= ?', $parameter, \PDO::PARAM_STR)
                     ->condition('value_condition', '`ra`.VALUE = ?', $value, \PDO::PARAM_STR)
                     ->combine(['parameter_condition', 'value_condition'], Criteria::LOGICAL_AND, $conditionName);
@@ -94,8 +94,8 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
 
             $urlQuery->groupBy(RewritingUrlTableMap::COL_ID);
 
-            $urlQuery->condition('count_condition_1', 'COUNT(' . RewritingUrlTableMap::COL_ID . ') = ?', $otherParametersCount, \PDO::PARAM_INT) // ensure we got all the asked parameters (provided by the query)
-                ->condition('count_condition_2', 'COUNT(' . RewritingUrlTableMap::COL_ID . ') = (SELECT COUNT(*) FROM rewriting_argument WHERE rewriting_argument.REWRITING_URL_ID = ra_REWRITING_URL_ID)'); // ensure we don't miss any parameters (needed to match the rewritten url)
+            $urlQuery->condition('count_condition_1', 'COUNT('.RewritingUrlTableMap::COL_ID.') = ?', $otherParametersCount, \PDO::PARAM_INT) // ensure we got all the asked parameters (provided by the query)
+                ->condition('count_condition_2', 'COUNT('.RewritingUrlTableMap::COL_ID.') = (SELECT COUNT(*) FROM rewriting_argument WHERE rewriting_argument.REWRITING_URL_ID = ra_REWRITING_URL_ID)'); // ensure we don't miss any parameters (needed to match the rewritten url)
 
             $urlQuery->having(['count_condition_1', 'count_condition_2'], Criteria::LOGICAL_AND);
         } else {

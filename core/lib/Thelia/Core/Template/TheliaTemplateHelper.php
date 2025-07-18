@@ -128,7 +128,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
                 continue;
             }
 
-            $baseDir = rtrim($base, DS) . DS . $subdir;
+            $baseDir = rtrim($base, DS).DS.$subdir;
 
             try {
                 // Every subdir of the basedir is supposed to be a template.
@@ -190,7 +190,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     {
         ConfigQuery::write($configType, $name);
         $envName = mb_strtoupper(str_replace('-', '_', $configType));
-        $envFilePath = THELIA_ROOT . '.env.local';
+        $envFilePath = THELIA_ROOT.'.env.local';
 
         $envContent = '';
 
@@ -198,10 +198,10 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
             $envContent = file_get_contents($envFilePath);
         }
 
-        $pattern = '/^' . preg_quote($envName, '/') . '=.*$/m';
+        $pattern = '/^'.preg_quote($envName, '/').'=.*$/m';
 
         if (preg_match($pattern, $envContent)) {
-            $envContent = preg_replace($pattern, $envName . '=' . $name, $envContent);
+            $envContent = preg_replace($pattern, $envName.'='.$name, $envContent);
             file_put_contents($envFilePath, $envContent);
 
             return;
@@ -212,8 +212,8 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
         $sectionEnd = '###< thelia/templates ###';
 
         if (str_contains($envContent, $sectionStart)) {
-            $newVariable = $envName . '=' . $name . "\n";
-            $envContent = str_replace($sectionEnd, $newVariable . $sectionEnd, $envContent);
+            $newVariable = $envName.'='.$name."\n";
+            $envContent = str_replace($sectionEnd, $newVariable.$sectionEnd, $envContent);
             file_put_contents($envFilePath, $envContent);
 
             return;
@@ -224,7 +224,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
             $envName,
             $name,
         );
-        file_put_contents($envFilePath, $newSection, FILE_APPEND);
+        file_put_contents($envFilePath, $newSection, \FILE_APPEND);
     }
 
     public static function getSubscribedEvents(): array

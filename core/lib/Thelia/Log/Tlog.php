@@ -37,7 +37,7 @@ class Tlog implements LoggerInterface
     public const CRITICAL = 600;
     public const ALERT = 700;
     public const EMERGENCY = 800;
-    public const MUET = PHP_INT_MAX;
+    public const MUET = \PHP_INT_MAX;
 
     protected array $levels = [
         100 => 'DEBUG',
@@ -96,8 +96,8 @@ class Tlog implements LoggerInterface
         $this->setLevel(ConfigQuery::read(self::VAR_LEVEL, self::DEFAULT_LEVEL));
 
         $this->dir_destinations = [
-            __DIR__ . DS . 'Destination',
-            THELIA_LOCAL_DIR . 'tlog' . DS . 'destinations',
+            __DIR__.DS.'Destination',
+            THELIA_LOCAL_DIR.'tlog'.DS.'destinations',
         ];
 
         $this->setPrefix(ConfigQuery::read(self::VAR_PREFIXE, self::DEFAUT_PREFIXE));
@@ -323,9 +323,9 @@ class Tlog implements LoggerInterface
         if (self::MUET !== $this->level && $this->show_redirect) {
             echo '
 <html>
-<head><title>' . Translator::getInstance()->trans('Redirecting ...') . "</title></head>
+<head><title>'.Translator::getInstance()->trans('Redirecting ...')."</title></head>
 <body>
-<a href=\"{$url}\">" . Translator::getInstance()->trans('Redirecting to %url', ['%url' => $url]) . '</a>
+<a href=\"{$url}\">".Translator::getInstance()->trans('Redirecting to %url', ['%url' => $url]).'</a>
 </body>
 </html>
 ';
@@ -352,7 +352,7 @@ class Tlog implements LoggerInterface
 
     public function isActivedFile(string $file): bool
     {
-        return ($this->all_files || \in_array($file, $this->files, true)) && !\in_array('!' . $file, $this->files, true);
+        return ($this->all_files || \in_array($file, $this->files, true)) && !\in_array('!'.$file, $this->files, true);
     }
 
     private function findOrigin(): array
@@ -405,7 +405,7 @@ class Tlog implements LoggerInterface
         $replace = [];
 
         foreach ($context as $key => $val) {
-            $replace['{' . $key . '}'] = $val;
+            $replace['{'.$key.'}'] = $val;
         }
 
         return strtr($message, $replace);
@@ -414,7 +414,7 @@ class Tlog implements LoggerInterface
     private function out(string $level, mixed $message, array $context = []): void
     {
         if ($message instanceof \Exception) {
-            $text = $message->getMessage() . "\n" . $message->getTraceAsString();
+            $text = $message->getMessage()."\n".$message->getTraceAsString();
         } elseif (!\is_scalar($message)) {
             $text = print_r($message, true);
         } else {
@@ -435,7 +435,7 @@ class Tlog implements LoggerInterface
                 $this->prefix,
             );
 
-            $trace = $prefix . $text;
+            $trace = $prefix.$text;
 
             foreach ($this->destinations as $dest) {
                 $dest->add($trace);
@@ -455,7 +455,7 @@ class Tlog implements LoggerInterface
                 $class = new $active();
 
                 if (!$class instanceof AbstractTlogDestination) {
-                    throw new \UnexpectedValueException($active . ' must extends Thelia\\Tlog\\AbstractTlogDestination');
+                    throw new \UnexpectedValueException($active.' must extends Thelia\\Tlog\\AbstractTlogDestination');
                 }
 
                 $destinations[$active] = $class;

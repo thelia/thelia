@@ -51,7 +51,7 @@ readonly class PropelItemProvider implements ProviderInterface
         }
 
         /** @var ModelCriteria $queryClass */
-        $queryClass = $resourceClass::getPropelRelatedTableMap()->getClassName() . 'Query';
+        $queryClass = $resourceClass::getPropelRelatedTableMap()->getClassName().'Query';
 
         /** @var ModelCriteria $query */
         $query = $queryClass::create();
@@ -81,7 +81,7 @@ readonly class PropelItemProvider implements ProviderInterface
 
         if (\in_array($operation::class, [Patch::class, Put::class], true)) {
             $langs = new Collection();
-            $content = json_decode((string) $context['request']->getContent(), true, 512, JSON_THROW_ON_ERROR);
+            $content = json_decode((string) $context['request']->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
             if (isset($content['i18ns'])) {
                 $langs = LangQuery::create()->filterByLocale(array_keys($content['i18ns']))->find();

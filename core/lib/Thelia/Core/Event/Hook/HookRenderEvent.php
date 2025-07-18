@@ -65,7 +65,7 @@ class HookRenderEvent extends BaseHookRenderEvent
         $ret = '';
 
         if ([] !== $this->fragments) {
-            $ret = $before . implode($glue, $this->fragments) . $after;
+            $ret = $before.implode($glue, $this->fragments).$after;
         }
 
         return $ret;

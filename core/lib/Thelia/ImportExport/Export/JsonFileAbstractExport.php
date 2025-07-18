@@ -29,7 +29,7 @@ abstract class JsonFileAbstractExport extends AbstractExport
 
     public function current(): mixed
     {
-        $result = json_decode($this->data->current(), true, 512, JSON_THROW_ON_ERROR);
+        $result = json_decode($this->data->current(), true, 512, \JSON_THROW_ON_ERROR);
 
         if (null !== $result) {
             return $result;
@@ -109,7 +109,7 @@ abstract class JsonFileAbstractExport extends AbstractExport
 
     protected function getDataJsonCache(StatementInterface $statement, string $exportName): string
     {
-        $filename = THELIA_CACHE_DIR . '/export/' . $exportName . '.json';
+        $filename = THELIA_CACHE_DIR.'/export/'.$exportName.'.json';
 
         if (0 === $statement->rowCount()) {
             throw new \Exception(Translator::getInstance()->trans('No data found for your export.'));
@@ -120,7 +120,7 @@ abstract class JsonFileAbstractExport extends AbstractExport
         }
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            file_put_contents($filename, json_encode($row, JSON_THROW_ON_ERROR) . "\r\n", FILE_APPEND);
+            file_put_contents($filename, json_encode($row, \JSON_THROW_ON_ERROR)."\r\n", \FILE_APPEND);
         }
 
         return $filename;

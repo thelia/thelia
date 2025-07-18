@@ -163,7 +163,7 @@ abstract class BaseLoop implements LoopInterface
         if (true === $this->countable) {
             $defaultArgs[] = Argument::createIntTypeArgument('offset', 0);
             $defaultArgs[] = Argument::createIntTypeArgument('page');
-            $defaultArgs[] = Argument::createIntTypeArgument('limit', PHP_INT_MAX);
+            $defaultArgs[] = Argument::createIntTypeArgument('limit', \PHP_INT_MAX);
         }
 
         if ($this instanceof SearchLoopInterface) {
@@ -366,7 +366,7 @@ abstract class BaseLoop implements LoopInterface
                         break;
                     case SearchLoopInterface::MODE_SENTENCE:
                         $searchCriteria = Criteria::LIKE;
-                        $searchTerm = '%' . $searchTerm . '%';
+                        $searchTerm = '%'.$searchTerm.'%';
                         break;
                     case SearchLoopInterface::MODE_STRICT_SENTENCE:
                         $searchCriteria = Criteria::EQUAL;

@@ -43,8 +43,8 @@ class TranslationsCustomerTitleController extends BaseAdminController
 
             foreach ($myCustomersTitle as $aCustomerTitle) {
                 $aCustomerTitle->setLocale($local)
-                    ->setShort($data['short_title_' . $aCustomerTitle->getId()])
-                    ->setLong($data['long_title_' . $aCustomerTitle->getId()])
+                    ->setShort($data['short_title_'.$aCustomerTitle->getId()])
+                    ->setLong($data['long_title_'.$aCustomerTitle->getId()])
                     ->save();
             }
 

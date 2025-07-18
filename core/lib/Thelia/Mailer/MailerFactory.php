@@ -56,7 +56,7 @@ class MailerFactory
         $this->sendEmailMessage(
             $messageCode,
             [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
-            [$customer->getEmail() => $customer->getFirstname() . ' ' . $customer->getLastname()],
+            [$customer->getEmail() => $customer->getFirstname().' '.$customer->getLastname()],
             $messageParameters,
             $customer->getCustomerLang()->getLocale(),
         );
@@ -116,7 +116,7 @@ class MailerFactory
                     $this->send($instance);
                 } catch (\Exception $ex) {
                     Tlog::getInstance()->addError(
-                        \sprintf('Error while sending email message %s: ', $messageCode) . $ex->getMessage(),
+                        \sprintf('Error while sending email message %s: ', $messageCode).$ex->getMessage(),
                     );
                 }
             } else {

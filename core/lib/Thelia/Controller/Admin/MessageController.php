@@ -189,7 +189,7 @@ class MessageController extends AbstractCrudController
             $finder->in($parentTemplate->getAbsolutePath());
         }
 
-        $finder->ignoreDotFiles(true)->sortByName()->name('*.' . $requiredExtension);
+        $finder->ignoreDotFiles(true)->sortByName()->name('*.'.$requiredExtension);
 
         /** @var SplFileInfo $file */
         foreach ($finder as $file) {
@@ -201,7 +201,7 @@ class MessageController extends AbstractCrudController
 
         /** @var Module $module */
         foreach ($modules as $module) {
-            $dir = $module->getAbsoluteTemplateBasePath() . DS . TemplateDefinition::EMAIL_SUBDIR . DS . 'default';
+            $dir = $module->getAbsoluteTemplateBasePath().DS.TemplateDefinition::EMAIL_SUBDIR.DS.'default';
 
             if (file_exists($dir)) {
                 $finder = Finder::create()
@@ -209,7 +209,7 @@ class MessageController extends AbstractCrudController
                     ->in($dir)
                     ->ignoreDotFiles(true)
                     ->sortByName()
-                    ->name('*.' . $requiredExtension);
+                    ->name('*.'.$requiredExtension);
 
                 foreach ($finder as $file) {
                     $fileName = $file->getBasename();

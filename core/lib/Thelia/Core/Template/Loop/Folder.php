@@ -153,7 +153,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
         $title = $this->getTitle();
 
         if (null !== $title) {
-            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, '%' . $title . '%');
+            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, '%'.$title.'%');
         }
 
         $visible = $this->getVisible();

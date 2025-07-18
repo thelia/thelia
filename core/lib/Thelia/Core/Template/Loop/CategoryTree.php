@@ -48,7 +48,7 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('category', null, true),
-            Argument::createIntTypeArgument('depth', PHP_INT_MAX),
+            Argument::createIntTypeArgument('depth', \PHP_INT_MAX),
             Argument::createBooleanTypeArgument('need_count_child', false),
             Argument::createBooleanOrBothTypeArgument('visible', true, false),
             Argument::createIntListTypeArgument('exclude', []),

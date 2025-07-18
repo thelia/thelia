@@ -324,7 +324,7 @@ class SaleController extends AbstractCrudController
         $categories = '';
 
         foreach ($this->getRequest()->get('categories', []) as $category_id) {
-            $categories .= $category_id . ',';
+            $categories .= $category_id.',';
         }
 
         return $this->render(

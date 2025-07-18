@@ -79,9 +79,9 @@ class Update
                 $this->connection = $this->connection->getWrappedConnection();
             }
         } catch (ParseException $ex) {
-            throw new UpdateException('database.yml is not a valid file : ' . $ex->getMessage());
+            throw new UpdateException('database.yml is not a valid file : '.$ex->getMessage());
         } catch (\PDOException $ex) {
-            throw new UpdateException('Wrong connection information' . $ex->getMessage());
+            throw new UpdateException('Wrong connection information'.$ex->getMessage());
         }
 
         $this->version = $this->getVersionList();
@@ -228,8 +228,8 @@ class Update
             throw new UpdateException($message);
         }
 
-        $this->backupFile = THELIA_ROOT . $this->backupDir . 'update.sql';
-        $backupDir = THELIA_ROOT . $this->backupDir;
+        $this->backupFile = THELIA_ROOT.$this->backupDir.'update.sql';
+        $backupDir = THELIA_ROOT.$this->backupDir;
 
         $fs = new Filesystem();
 
@@ -331,13 +331,13 @@ class Update
             '%s%s%s',
             THELIA_SETUP_DIRECTORY,
             str_replace('/', DS, self::SQL_DIR),
-            $version . '.sql',
+            $version.'.sql',
         );
 
         if (file_exists($filename)) {
-            $this->log('debug', \sprintf('inserting file %s', $version . '.sql'));
+            $this->log('debug', \sprintf('inserting file %s', $version.'.sql'));
             $database->insertSql(null, [$filename]);
-            $this->log('debug', \sprintf('end inserting file %s', $version . '.sql'));
+            $this->log('debug', \sprintf('end inserting file %s', $version.'.sql'));
         }
 
         // php update
@@ -345,13 +345,13 @@ class Update
             '%s%s%s',
             THELIA_SETUP_DIRECTORY,
             str_replace('/', DS, self::PHP_DIR),
-            $version . '.php',
+            $version.'.php',
         );
 
         if (file_exists($filename)) {
-            $this->log('debug', \sprintf('executing file %s', $version . '.php'));
+            $this->log('debug', \sprintf('executing file %s', $version.'.php'));
             include_once $filename;
-            $this->log('debug', \sprintf('end executing file %s', $version . '.php'));
+            $this->log('debug', \sprintf('end executing file %s', $version.'.php'));
         }
 
         // instructions
@@ -359,7 +359,7 @@ class Update
             '%s%s%s',
             THELIA_SETUP_DIRECTORY,
             str_replace('/', DS, self::INSTRUCTION_DIR),
-            $version . '.md',
+            $version.'.md',
         );
 
         if (file_exists($filename)) {
@@ -563,10 +563,10 @@ class Update
     {
         $url = 'http://thelia.net/version.php';
         $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HEADER, false);
-        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
-        curl_setopt($curl, CURLOPT_TIMEOUT, 5);
+        curl_setopt($curl, \CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, \CURLOPT_HEADER, false);
+        curl_setopt($curl, \CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($curl, \CURLOPT_TIMEOUT, 5);
         $res = curl_exec($curl);
 
         try {

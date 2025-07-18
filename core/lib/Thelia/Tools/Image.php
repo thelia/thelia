@@ -21,7 +21,7 @@ class Image
         $imageFile = getimagesize($filePath);
         $imageType = $imageFile[2];
 
-        if (!\is_array($allowedImageTypes) && IMAGETYPE_UNKNOWN !== $imageType) {
+        if (!\is_array($allowedImageTypes) && \IMAGETYPE_UNKNOWN !== $imageType) {
             return true;
         }
 

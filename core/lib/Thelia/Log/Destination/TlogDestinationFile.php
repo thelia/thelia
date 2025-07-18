@@ -32,7 +32,7 @@ class TlogDestinationFile extends AbstractTlogDestination
 
     public function __construct()
     {
-        $this->path_defaut = THELIA_LOG_DIR . self::TLOG_DEFAULT_NAME;
+        $this->path_defaut = THELIA_LOG_DIR.self::TLOG_DEFAULT_NAME;
         parent::__construct();
     }
 
@@ -41,7 +41,7 @@ class TlogDestinationFile extends AbstractTlogDestination
         $filePath = $this->getConfig(self::VAR_PATH_FILE);
 
         if (0 === preg_match('/^[a-z]:\\\|^\//i', (string) $filePath)) {
-            $filePath = THELIA_ROOT . $filePath;
+            $filePath = THELIA_ROOT.$filePath;
         }
 
         return $filePath;
@@ -104,7 +104,7 @@ class TlogDestinationFile extends AbstractTlogDestination
             new TlogDestinationConfig(
                 self::VAR_PATH_FILE,
                 'Absolute file path',
-                'You should enter an abolute file path. The base directory of your Thelia installation is ' . THELIA_ROOT,
+                'You should enter an abolute file path. The base directory of your Thelia installation is '.THELIA_ROOT,
                 $this->path_defaut,
                 TlogDestinationConfig::TYPE_TEXTFIELD,
             ),
@@ -121,7 +121,7 @@ class TlogDestinationFile extends AbstractTlogDestination
     public function add($texte): void
     {
         if ($this->fh) {
-            fwrite($this->fh, $texte . "\n");
+            fwrite($this->fh, $texte."\n");
         }
     }
 

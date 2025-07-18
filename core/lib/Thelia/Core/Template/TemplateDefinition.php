@@ -60,19 +60,19 @@ class TemplateDefinition
     {
         switch ($type) {
             case self::FRONT_OFFICE:
-                $this->path = self::FRONT_OFFICE_SUBDIR . DS . $name;
+                $this->path = self::FRONT_OFFICE_SUBDIR.DS.$name;
                 $this->translationDomainPrefix = 'fo.';
                 break;
             case self::BACK_OFFICE:
-                $this->path = self::BACK_OFFICE_SUBDIR . DS . $name;
+                $this->path = self::BACK_OFFICE_SUBDIR.DS.$name;
                 $this->translationDomainPrefix = 'bo.';
                 break;
             case self::PDF:
-                $this->path = self::PDF_SUBDIR . DS . $name;
+                $this->path = self::PDF_SUBDIR.DS.$name;
                 $this->translationDomainPrefix = 'pdf.';
                 break;
             case self::EMAIL:
-                $this->path = self::EMAIL_SUBDIR . DS . $name;
+                $this->path = self::EMAIL_SUBDIR.DS.$name;
                 $this->translationDomainPrefix = 'email.';
                 break;
             default:
@@ -92,7 +92,7 @@ class TemplateDefinition
             $parent = $this->getDescriptor()?->getParent();
 
             for ($index = 1; $parent instanceof self; ++$index) {
-                $this->parentList[$parent->getName() . '-'] = $parent;
+                $this->parentList[$parent->getName().'-'] = $parent;
 
                 $parent = $parent->getDescriptor()?->getParent();
             }
@@ -122,7 +122,7 @@ class TemplateDefinition
             }
         }
 
-        throw new TemplateException('Template file not found: ' . $templateName);
+        throw new TemplateException('Template file not found: '.$templateName);
     }
 
     public function getAssetsPath(): string
@@ -139,12 +139,12 @@ class TemplateDefinition
 
     public function getAbsoluteAssetsPath(): string
     {
-        return $this->getAbsolutePath() . DS . $this->templateDescriptor->getAssets();
+        return $this->getAbsolutePath().DS.$this->templateDescriptor->getAssets();
     }
 
     public function getTranslationDomain(): string
     {
-        return $this->translationDomainPrefix . strtolower($this->getName());
+        return $this->translationDomainPrefix.strtolower($this->getName());
     }
 
     public function getName(): string
@@ -161,12 +161,12 @@ class TemplateDefinition
 
     public function getI18nPath(): string
     {
-        return $this->getPath() . DS . 'I18n';
+        return $this->getPath().DS.'I18n';
     }
 
     public function getAbsoluteI18nPath(): string
     {
-        return THELIA_TEMPLATE_DIR . $this->getI18nPath();
+        return THELIA_TEMPLATE_DIR.$this->getI18nPath();
     }
 
     public function getPath(): ?string
@@ -176,17 +176,17 @@ class TemplateDefinition
 
     public function getAbsolutePath(): string
     {
-        return THELIA_TEMPLATE_DIR . $this->getPath();
+        return THELIA_TEMPLATE_DIR.$this->getPath();
     }
 
     public function getConfigPath(): string
     {
-        return $this->getPath() . DS . 'configs';
+        return $this->getPath().DS.'configs';
     }
 
     public function getAbsoluteConfigPath(): string
     {
-        return THELIA_TEMPLATE_DIR . $this->getConfigPath();
+        return THELIA_TEMPLATE_DIR.$this->getConfigPath();
     }
 
     public function setPath(?string $path): static

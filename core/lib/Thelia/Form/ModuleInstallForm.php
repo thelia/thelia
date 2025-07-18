@@ -166,7 +166,7 @@ class ModuleInstallForm extends BaseForm
         ];
 
         foreach ($paths as $path) {
-            if (is_dir($dir . DS . $path)) {
+            if (is_dir($dir.DS.$path)) {
                 $out['directories'][] = $path;
             } else {
                 $out['files'][] = $path;

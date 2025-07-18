@@ -104,7 +104,7 @@ class ExportHandler
             $startMonth = '' !== $rangeDate['start']['month'] ? $rangeDate['start']['month'] : (new \DateTime())->format('m');
             $rangeDate['start'] = DateTime::createFromFormat(
                 'Y-m-d H:i:s',
-                $startYear . '-' . $startMonth . '-1 00:00:00',
+                $startYear.'-'.$startMonth.'-1 00:00:00',
             );
         }
 
@@ -113,7 +113,7 @@ class ExportHandler
             $endMonth = '' !== $rangeDate['end']['month'] ? $rangeDate['end']['month'] : (new \DateTime())->format('m');
             $rangeDate['end'] = DateTime::createFromFormat(
                 'Y-m-d H:i:s',
-                $endYear . '-' . $endMonth . '-1 23:59:59',
+                $endYear.'-'.$endMonth.'-1 23:59:59',
             );
 
             if ($rangeDate['end'] instanceof DateTime) {
@@ -172,7 +172,7 @@ class ExportHandler
             $serializer->getExtension(),
         );
 
-        $filePath = THELIA_CACHE_DIR . 'export' . DS . $filename;
+        $filePath = THELIA_CACHE_DIR.'export'.DS.$filename;
 
         $fileSystem = new Filesystem();
         $fileSystem->mkdir(\dirname($filePath));
@@ -188,7 +188,7 @@ class ExportHandler
             $data = $export->afterSerialize($data);
 
             if ($idx > 0) {
-                $data = $serializer->separator() . $data;
+                $data = $serializer->separator().$data;
             }
 
             $file->fwrite($data);

@@ -407,7 +407,7 @@ class TaxRuleController extends AbstractCrudController
                     $specKey = [];
                 }
 
-                $specKey[] = $taxRuleCountry->getTaxId() . '-' . $taxRuleCountry->getPosition();
+                $specKey[] = $taxRuleCountry->getTaxId().'-'.$taxRuleCountry->getPosition();
 
                 $taxRuleCountry = $taxRuleCountries->getNext();
             }

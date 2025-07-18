@@ -54,33 +54,33 @@ class GenerateSQLCommand extends ContainerAwareCommand
         $this->init($input);
 
         // Main insert.sql file
-        $content = file_get_contents(THELIA_SETUP_DIRECTORY . 'insert.sql.tpl');
+        $content = file_get_contents(THELIA_SETUP_DIRECTORY.'insert.sql.tpl');
         $version = Version::parse();
         $content = $this->parser->renderString($content, $version, false);
 
-        if (false === file_put_contents(THELIA_SETUP_DIRECTORY . 'insert.sql', $content)) {
-            $output->writeln("Can't write file " . THELIA_SETUP_DIRECTORY . 'insert.sql');
+        if (false === file_put_contents(THELIA_SETUP_DIRECTORY.'insert.sql', $content)) {
+            $output->writeln("Can't write file ".THELIA_SETUP_DIRECTORY.'insert.sql');
         } else {
-            $output->writeln('File ' . THELIA_SETUP_DIRECTORY . 'insert.sql generated successfully.');
+            $output->writeln('File '.THELIA_SETUP_DIRECTORY.'insert.sql generated successfully.');
         }
 
         // sql update files
         $finder = Finder::create()
             ->name('*.tpl')
             ->depth(0)
-            ->in(THELIA_SETUP_DIRECTORY . 'update' . DS . 'tpl');
+            ->in(THELIA_SETUP_DIRECTORY.'update'.DS.'tpl');
 
         /** @var \SplFileInfo $file */
         foreach ($finder as $file) {
             $content = file_get_contents($file->getRealPath());
             $content = $this->parser->renderString($content, [], false);
 
-            $destination = THELIA_SETUP_DIRECTORY . 'update' . DS . 'sql' . DS . $file->getBasename('.tpl');
+            $destination = THELIA_SETUP_DIRECTORY.'update'.DS.'sql'.DS.$file->getBasename('.tpl');
 
             if (false === file_put_contents($destination, $content)) {
-                $output->writeln("Can't write file " . $destination);
+                $output->writeln("Can't write file ".$destination);
             } else {
-                $output->writeln('File ' . $destination . ' generated successfully.');
+                $output->writeln('File '.$destination.' generated successfully.');
             }
         }
 
@@ -112,7 +112,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
             ->name('*.php')
             ->depth(0)
             ->sortByName()
-            ->in(THELIA_SETUP_DIRECTORY . 'I18n');
+            ->in(THELIA_SETUP_DIRECTORY.'I18n');
 
         // limit to only some locale(s)
         $localesToKeep = $input->getOption('locales');

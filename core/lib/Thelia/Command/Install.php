@@ -186,12 +186,12 @@ class Install extends ContainerAwareCommand
     {
         $fs = new Filesystem();
 
-        if (!$fs->exists(THELIA_ROOT . '.env.local')) {
-            $fs->touch(THELIA_ROOT . '.env.local');
+        if (!$fs->exists(THELIA_ROOT.'.env.local')) {
+            $fs->touch(THELIA_ROOT.'.env.local');
         }
 
         file_put_contents(
-            THELIA_ROOT . '.env.local',
+            THELIA_ROOT.'.env.local',
             \sprintf(
                 "\n###> thelia/database-configuration ###\nDATABASE_HOST=%s\nDATABASE_PORT=%s\nDATABASE_NAME=%s\nDATABASE_USER=%s\nDATABASE_PASSWORD=%s\n###< thelia/database-configuration ###",
                 $connectionInfo['host'],
@@ -200,7 +200,7 @@ class Install extends ContainerAwareCommand
                 $connectionInfo['username'],
                 $connectionInfo['password'],
             ),
-            FILE_APPEND,
+            \FILE_APPEND,
         );
 
         $fs->remove($this->getContainer()->getParameter('kernel.cache_dir'));

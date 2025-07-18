@@ -38,7 +38,7 @@ final readonly class ResourceAddonExtension implements QueryCollectionExtensionI
     public function apply(ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         foreach ($this->apiResourcePropelTransformerService->getResourceAddonDefinitions($resourceClass) as $extendClass) {
-            \call_user_func($extendClass . '::extendQuery', $query, $operation, $context);
+            \call_user_func($extendClass.'::extendQuery', $query, $operation, $context);
         }
     }
 }

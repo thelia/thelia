@@ -66,7 +66,7 @@ class ModuleManagement
 
             $finder
                 ->name('module.xml')
-                ->in($dir . '*' . DS . 'Config');
+                ->in($dir.'*'.DS.'Config');
 
             $errors = [];
 
@@ -151,7 +151,7 @@ class ModuleManagement
                 if (isset($content->{'images-folder'}) && !$module->isModuleImageDeployed($con)) {
                     /** @var BaseModule $moduleInstance */
                     $moduleInstance = $reflected->newInstance();
-                    $imagesFolder = $moduleInstance->getModuleDir() . DS . $content->{'images-folder'};
+                    $imagesFolder = $moduleInstance->getModuleDir().DS.$content->{'images-folder'};
                     $moduleInstance->deployImageFolder($module, $imagesFolder, $con);
                 }
             }
@@ -173,7 +173,7 @@ class ModuleManagement
 
             $con->commit();
         } catch (\Exception $exception) {
-            Tlog::getInstance()->addError('Failed to update module ' . $module->getCode(), $exception);
+            Tlog::getInstance()->addError('Failed to update module '.$module->getCode(), $exception);
 
             $con->rollBack();
 
@@ -260,16 +260,16 @@ class ModuleManagement
     public function listModulesFromTemplatePath(string $directory): array
     {
         $composerJson = $this->composerHelper?->getComposerPackagesFromPath($directory);
-        $vendorDir = $composerJson['config']['vendor-dir'] ?? THELIA_ROOT . 'vendor';
+        $vendorDir = $composerJson['config']['vendor-dir'] ?? THELIA_ROOT.'vendor';
         $modules = [];
 
-        $installedJsonPath = $vendorDir . '/composer/installed.json';
+        $installedJsonPath = $vendorDir.'/composer/installed.json';
 
         if (!file_exists($installedJsonPath)) {
             return $modules;
         }
 
-        $installed = json_decode(file_get_contents($installedJsonPath), true, 512, JSON_THROW_ON_ERROR);
+        $installed = json_decode(file_get_contents($installedJsonPath), true, 512, \JSON_THROW_ON_ERROR);
 
         $packages = $installed['packages'] ?? $installed;
 
@@ -280,7 +280,7 @@ class ModuleManagement
             }
 
             $installPath = str_replace('..', '', $package['install-path']);
-            $packagePath = $vendorDir . $installPath;
+            $packagePath = $vendorDir.$installPath;
             $package['path'] = $packagePath;
             $modules[] = ComposerTheliaModuleDTO::fromArray($package);
         }
@@ -295,7 +295,7 @@ class ModuleManagement
     {
         $modulesInstalled = [];
 
-        if (!file_exists($path . DS . 'composer.json')) {
+        if (!file_exists($path.DS.'composer.json')) {
             return [];
         }
 

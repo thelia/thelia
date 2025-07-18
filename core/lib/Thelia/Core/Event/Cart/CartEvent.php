@@ -29,9 +29,8 @@ class CartEvent extends ActionEvent
     protected ?int $cartItemId = null;
 
     public function __construct(
-        protected Cart $cart
-    )
-    {
+        protected Cart $cart,
+    ) {
     }
 
     public function setAppend(bool|int $append): static

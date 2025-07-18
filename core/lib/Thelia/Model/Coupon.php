@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Model;
 
-use DateTime;
 use Exception;
 use Propel\Runtime\Propel;
 use Thelia\Model\Base\Coupon as BaseCoupon;
@@ -35,23 +34,23 @@ class Coupon extends BaseCoupon
     /**
      * Create or Update this Coupon.
      *
-     * @param string   $code                       Coupon Code
-     * @param string   $title                      Coupon title
-     * @param array    $effects                    Ready to be serialized in JSON effect params
-     * @param string   $type                       Coupon type
-     * @param bool     $isRemovingPostage          Is removing Postage
-     * @param string   $shortDescription           Coupon short description
-     * @param string   $description                Coupon description
-     * @param bool     $isEnabled                  Enable/Disable
-     * @param DateTime $expirationDate             Coupon expiration date
-     * @param bool     $isAvailableOnSpecialOffers Is available on special offers
-     * @param bool     $isCumulative               Is cumulative
-     * @param int      $maxUsage                   Coupon quantity
-     * @param string   $defaultSerializedRule      Serialized default rule added if none found
-     * @param string   $locale                     Coupon Language code ISO (ex: fr_FR)
-     * @param array    $freeShippingForCountries   ID of Countries to which shipping is free
-     * @param array    $freeShippingForMethods     ID of Shipping modules for which shipping is free
-     * @param bool     $perCustomerUsageCount      True if usage coiunt is per customer
+     * @param string    $code                       Coupon Code
+     * @param string    $title                      Coupon title
+     * @param array     $effects                    Ready to be serialized in JSON effect params
+     * @param string    $type                       Coupon type
+     * @param bool      $isRemovingPostage          Is removing Postage
+     * @param string    $shortDescription           Coupon short description
+     * @param string    $description                Coupon description
+     * @param bool      $isEnabled                  Enable/Disable
+     * @param \DateTime $expirationDate             Coupon expiration date
+     * @param bool      $isAvailableOnSpecialOffers Is available on special offers
+     * @param bool      $isCumulative               Is cumulative
+     * @param int       $maxUsage                   Coupon quantity
+     * @param string    $defaultSerializedRule      Serialized default rule added if none found
+     * @param string    $locale                     Coupon Language code ISO (ex: fr_FR)
+     * @param array     $freeShippingForCountries   ID of Countries to which shipping is free
+     * @param array     $freeShippingForMethods     ID of Shipping modules for which shipping is free
+     * @param bool      $perCustomerUsageCount      True if usage coiunt is per customer
      *
      * @throws \Exception
      */
@@ -64,7 +63,7 @@ class Coupon extends BaseCoupon
         ?string $shortDescription,
         ?string $description,
         bool $isEnabled,
-        DateTime $expirationDate,
+        \DateTime $expirationDate,
         bool $isAvailableOnSpecialOffers,
         bool $isCumulative,
         int $maxUsage,

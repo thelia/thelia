@@ -43,9 +43,7 @@ class ControllerListener implements EventSubscriberInterface
             && (false === $this->securityContext->hasAdminUser()
                 && '1' !== $event->getRequest()->attributes->get('not-logged'))
         ) {
-            throw new AdminAccessDenied(
-                Translator::getInstance()->trans("You're not currently connected to the administration panel. Please log in to access this page")
-            );
+            throw new AdminAccessDenied(Translator::getInstance()->trans("You're not currently connected to the administration panel. Please log in to access this page"));
         }
     }
 

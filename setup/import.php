@@ -31,7 +31,7 @@ foreach ($argv as $arg) {
     }
 
     if ($bootstrapToggle) {
-        require __DIR__ . \DIRECTORY_SEPARATOR . $arg;
+        require __DIR__.\DIRECTORY_SEPARATOR.$arg;
 
         $bootstraped = true;
     }
@@ -40,9 +40,9 @@ foreach ($argv as $arg) {
 if (!$bootstraped) {
     if (isset($bootstrapFile)) {
         require $bootstrapFile;
-    } elseif (is_file($file = __DIR__ . '/../vendor/autoload.php')) {
+    } elseif (is_file($file = __DIR__.'/../vendor/autoload.php')) {
         require $file;
-    } elseif (is_file($file = __DIR__ . '/../../bootstrap.php')) {
+    } elseif (is_file($file = __DIR__.'/../../bootstrap.php')) {
         // Here we are on a thelia/thelia-project
         require $file;
     } else {
@@ -51,11 +51,11 @@ if (!$bootstraped) {
     }
 }
 
-if (is_file(dirname(__DIR__) . '/.env')) {
-    (new Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__) . '/.env');
-} elseif (is_file($file = __DIR__ . '/../../bootstrap.php')) {
+if (is_file(dirname(__DIR__).'/.env')) {
+    (new Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__).'/.env');
+} elseif (is_file($file = __DIR__.'/../../bootstrap.php')) {
     // Here we are on a thelia/thelia-project
-    (new Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__) . '/../.env');
+    (new Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__).'/../.env');
 }
 
 $thelia = new App\Kernel($_ENV['APP_ENV'], true);
@@ -124,7 +124,7 @@ try {
 
     $con->commit();
 } catch (Exception $e) {
-    echo 'error : ' . $e->getMessage() . "\n";
+    echo 'error : '.$e->getMessage()."\n";
     $con->rollBack();
 }
 
@@ -133,7 +133,7 @@ function createProduct($categories, $brands, $contents, $template, $attribute, $
     echo "start creating products\n";
     $fileSystem = new Symfony\Component\Filesystem\Filesystem();
 
-    if (($handle = fopen(THELIA_SETUP_DIRECTORY . 'import/products.csv', 'r')) !== false) {
+    if (($handle = fopen(THELIA_SETUP_DIRECTORY.'import/products.csv', 'r')) !== false) {
         $row = 0;
 
         while (($data = fgetcsv($handle, 100000, ';')) !== false) {
@@ -199,7 +199,7 @@ function createProduct($categories, $brands, $contents, $template, $attribute, $
                     ->setProduct($product)
                     ->setFile($image)
                     ->save($con);
-                $fileSystem->copy(THELIA_SETUP_DIRECTORY . 'import/images/' . $image, THELIA_LOCAL_DIR . 'media/images/product/' . $image, true);
+                $fileSystem->copy(THELIA_SETUP_DIRECTORY.'import/images/'.$image, THELIA_LOCAL_DIR.'media/images/product/'.$image, true);
             }
 
             $pses = explode(';', $data[12]);
@@ -210,7 +210,7 @@ function createProduct($categories, $brands, $contents, $template, $attribute, $
                 }
                 $stock = new Thelia\Model\ProductSaleElements();
                 $stock->setProduct($product);
-                $stock->setRef($product->getId() . '_' . uniqid('', true));
+                $stock->setRef($product->getId().'_'.uniqid('', true));
                 $stock->setQuantity(random_int(1, 50));
 
                 if (!empty($data[9])) {
@@ -360,7 +360,7 @@ function createMaterials($con)
     $feature = null;
     $features = [];
 
-    if (($handle = fopen(THELIA_SETUP_DIRECTORY . 'import/materials.csv', 'r')) !== false) {
+    if (($handle = fopen(THELIA_SETUP_DIRECTORY.'import/materials.csv', 'r')) !== false) {
         $row = 0;
         $feature = new Thelia\Model\Feature();
         $feature
@@ -400,7 +400,7 @@ function createBrands($con)
 
     $brands = [];
 
-    if (($handle = fopen(THELIA_SETUP_DIRECTORY . 'import/brand.csv', 'r')) !== false) {
+    if (($handle = fopen(THELIA_SETUP_DIRECTORY.'import/brand.csv', 'r')) !== false) {
         $row = 0;
 
         while (($data = fgetcsv($handle, 1000, ';')) !== false) {
@@ -444,7 +444,7 @@ function createBrands($con)
                 if (null === $logoId) {
                     $logoId = $brandImage->getId();
                 }
-                $fileSystem->copy(THELIA_SETUP_DIRECTORY . 'import/images/' . $image, THELIA_LOCAL_DIR . 'media/images/brand/' . $image, true);
+                $fileSystem->copy(THELIA_SETUP_DIRECTORY.'import/images/'.$image, THELIA_LOCAL_DIR.'media/images/brand/'.$image, true);
             }
 
             if (null !== $logoId) {
@@ -466,7 +466,7 @@ function createCategories($templateId, $con)
 
     $categories = [];
 
-    if (($handle = fopen(THELIA_SETUP_DIRECTORY . 'import/categories.csv', 'r')) !== false) {
+    if (($handle = fopen(THELIA_SETUP_DIRECTORY.'import/categories.csv', 'r')) !== false) {
         $row = 0;
 
         while (($data = fgetcsv($handle, 1000, ';')) !== false) {
@@ -505,7 +505,7 @@ function createCategories($templateId, $con)
                     ->setCategory($category)
                     ->setFile($image)
                     ->save($con);
-                $fileSystem->copy(THELIA_SETUP_DIRECTORY . 'import/images/' . $image, THELIA_LOCAL_DIR . 'media/images/category/' . $image, true);
+                $fileSystem->copy(THELIA_SETUP_DIRECTORY.'import/images/'.$image, THELIA_LOCAL_DIR.'media/images/category/'.$image, true);
             }
         }
         fclose($handle);
@@ -520,7 +520,7 @@ function createSales($con)
     echo "start creating sales\n";
     $sales = [];
 
-    if (($handle = fopen(THELIA_SETUP_DIRECTORY . 'import/sales.csv', 'r')) !== false) {
+    if (($handle = fopen(THELIA_SETUP_DIRECTORY.'import/sales.csv', 'r')) !== false) {
         $row = 0;
         $start = new DateTime();
         $end = new DateTime();
@@ -593,7 +593,7 @@ function createFolders($con)
 
     $folders = [];
 
-    if (($handle = fopen(THELIA_SETUP_DIRECTORY . 'import/folders.csv', 'r')) !== false) {
+    if (($handle = fopen(THELIA_SETUP_DIRECTORY.'import/folders.csv', 'r')) !== false) {
         $row = 0;
 
         while (($data = fgetcsv($handle, 1000, ';')) !== false) {
@@ -632,7 +632,7 @@ function createFolders($con)
                     ->setFolderId($folder->getId())
                     ->setFile($image)
                     ->save($con);
-                $fileSystem->copy(THELIA_SETUP_DIRECTORY . 'import/images/' . $image, THELIA_LOCAL_DIR . 'media/images/folder/' . $image, true);
+                $fileSystem->copy(THELIA_SETUP_DIRECTORY.'import/images/'.$image, THELIA_LOCAL_DIR.'media/images/folder/'.$image, true);
             }
         }
         fclose($handle);
@@ -650,7 +650,7 @@ function createContents($folders, $con)
 
     $contents = [];
 
-    if (($handle = fopen(THELIA_SETUP_DIRECTORY . 'import/contents.csv', 'r')) !== false) {
+    if (($handle = fopen(THELIA_SETUP_DIRECTORY.'import/contents.csv', 'r')) !== false) {
         $row = 0;
 
         while (($data = fgetcsv($handle, 1000, ';')) !== false) {
@@ -709,7 +709,7 @@ function createContents($folders, $con)
                     ->setContentId($content->getId())
                     ->setFile($image)
                     ->save($con);
-                $fileSystem->copy(THELIA_SETUP_DIRECTORY . 'import/images/' . $image, THELIA_LOCAL_DIR . 'media/images/content/' . $image, true);
+                $fileSystem->copy(THELIA_SETUP_DIRECTORY.'import/images/'.$image, THELIA_LOCAL_DIR.'media/images/content/'.$image, true);
             }
 
             $contents[trim($data[1])] = $content;
@@ -725,7 +725,7 @@ function createColors($con)
 {
     echo "start creating colors attributes\n";
 
-    if (($handle = fopen(THELIA_SETUP_DIRECTORY . 'import/colors.csv', 'r')) !== false) {
+    if (($handle = fopen(THELIA_SETUP_DIRECTORY.'import/colors.csv', 'r')) !== false) {
         $row = 0;
         $attribute = new Thelia\Model\Attribute();
         $attribute

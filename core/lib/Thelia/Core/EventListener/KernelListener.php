@@ -46,7 +46,7 @@ class KernelListener
     ) {
     }
 
-    #[AsEventListener(event: KernelEvents::REQUEST, priority: PHP_INT_MAX - 1)]
+    #[AsEventListener(event: KernelEvents::REQUEST, priority: \PHP_INT_MAX - 1)]
     public function initializeLanguageAndAdmin(RequestEvent $event): ?Response
     {
         if (HttpKernelInterface::MAIN_REQUEST !== $event->getRequestType()) {
@@ -77,7 +77,7 @@ class KernelListener
         return null;
     }
 
-    #[AsEventListener(event: KernelEvents::REQUEST, priority: PHP_INT_MAX)]
+    #[AsEventListener(event: KernelEvents::REQUEST, priority: \PHP_INT_MAX)]
     public function initializeSession(RequestEvent $event): void
     {
         $isApiRoute = preg_match('/^\/api\//', $event->getRequest()->getPathInfo());

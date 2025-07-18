@@ -54,11 +54,11 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
         $orderStatus = $this->getOrderStatus($event);
 
         if ($orderStatus->getProtectedStatus()) {
-            throw new \Exception(Translator::getInstance()->trans('This status is protected.') . ' ' . Translator::getInstance()->trans('You can not delete it.'));
+            throw new \Exception(Translator::getInstance()->trans('This status is protected.').' '.Translator::getInstance()->trans('You can not delete it.'));
         }
 
         if (null !== OrderQuery::create()->findOneByStatusId($orderStatus->getId())) {
-            throw new \Exception(Translator::getInstance()->trans('Some commands use this status.') . ' ' . Translator::getInstance()->trans('You can not delete it.'));
+            throw new \Exception(Translator::getInstance()->trans('Some commands use this status.').' '.Translator::getInstance()->trans('You can not delete it.'));
         }
 
         $orderStatus->delete();

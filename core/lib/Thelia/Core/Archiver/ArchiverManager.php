@@ -85,7 +85,7 @@ class ArchiverManager
 
         foreach ($archivers as $archiver) {
             if (!($archiver instanceof ArchiverInterface)) {
-                throw new \Exception('ArchiverManager manage only ' . __NAMESPACE__ . '\\ArchiverInterface');
+                throw new \Exception('ArchiverManager manage only '.__NAMESPACE__.'\\ArchiverInterface');
             }
 
             $this->archivers[$archiver->getId()] = $archiver;

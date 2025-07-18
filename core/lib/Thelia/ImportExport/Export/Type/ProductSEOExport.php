@@ -57,7 +57,7 @@ class ProductSEOExport extends JsonFileAbstractExport
                         product_i18n.meta_keywords as "product_i18n_meta_keywords"
                     FROM product
                     LEFT JOIN product_i18n ON product_i18n.id = product.id AND product_i18n.locale = :locale
-                    LEFT JOIN rewriting_url ON rewriting_url.view = "' . (new Product())->getRewrittenUrlViewName() . '" AND rewriting_url.view_id = product.id
+                    LEFT JOIN rewriting_url ON rewriting_url.view = "'.(new Product())->getRewrittenUrlViewName().'" AND rewriting_url.view_id = product.id
                     ORDER BY product.id';
         $stmt = $con->prepare($query);
         $stmt->bindValue('locale', $locale);

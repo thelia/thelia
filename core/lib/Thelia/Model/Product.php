@@ -167,9 +167,8 @@ class Product extends BaseProduct implements FileModelParentInterface
         int $priceCurrencyId,
         int $taxRuleId,
         float $baseWeight = 0,
-        int $baseQuantity = 0
-    ): void
-    {
+        int $baseQuantity = 0,
+    ): void {
         $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
 
         $con->beginTransaction();
@@ -212,9 +211,8 @@ class Product extends BaseProduct implements FileModelParentInterface
         bool $isNew = false,
         int $quantity = 0,
         string $eanCode = '',
-        bool $ref = false
-    ): ProductSaleElements
-    {
+        bool $ref = false,
+    ): ProductSaleElements {
         // Create an empty product sale element
         $saleElements = new ProductSaleElements();
 

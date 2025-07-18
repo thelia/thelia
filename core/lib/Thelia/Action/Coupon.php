@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
-use Propel\Runtime\Propel;
 use Propel\Runtime\Exception\PropelException;
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;

@@ -78,7 +78,7 @@ abstract class AbstractTlogDestination
         $match = [];
 
         if (preg_match('/(<body[^>]*>)/i', (string) $res, $match)) {
-            $res = str_replace($match[0], $match[0] . "\n" . $logdata, $res);
+            $res = str_replace($match[0], $match[0]."\n".$logdata, $res);
         }
     }
 

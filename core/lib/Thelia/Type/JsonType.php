@@ -28,7 +28,7 @@ class JsonType extends BaseType
     {
         json_decode((string) $value, true);
 
-        return JSON_ERROR_NONE === json_last_error();
+        return \JSON_ERROR_NONE === json_last_error();
     }
 
     public function getFormattedValue($value)

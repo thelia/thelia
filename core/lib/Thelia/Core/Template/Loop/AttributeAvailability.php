@@ -114,7 +114,7 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
                 ->leftJoinAttributeCombination('attribute_combination')
                 ->groupById()
                 ->addJoinObject($pseJoin)
-                ->where(ProductSaleElementsTableMap::COL_PRODUCT_ID . '=?', $product, \PDO::PARAM_INT);
+                ->where(ProductSaleElementsTableMap::COL_PRODUCT_ID.'=?', $product, \PDO::PARAM_INT);
         }
 
         $orders = $this->getOrder();

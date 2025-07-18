@@ -101,21 +101,21 @@ final class SearchFilter extends AbstractFilter
         $conditions = [];
 
         foreach ($values as $key => $value) {
-            $conditionName = 'cond_' . $key;
+            $conditionName = 'cond_'.$key;
 
             switch ($strategy) {
                 case self::STRATEGY_PARTIAL:
-                    $query->addCond($conditionName, $fieldPath, '%' . $value . '%', Criteria::LIKE);
+                    $query->addCond($conditionName, $fieldPath, '%'.$value.'%', Criteria::LIKE);
                     break;
                 case self::STRATEGY_START:
-                    $query->addCond($conditionName, $fieldPath, $value . '%', Criteria::LIKE);
+                    $query->addCond($conditionName, $fieldPath, $value.'%', Criteria::LIKE);
                     break;
                 case self::STRATEGY_END:
-                    $query->addCond($conditionName, $fieldPath, '%' . $value, Criteria::LIKE);
+                    $query->addCond($conditionName, $fieldPath, '%'.$value, Criteria::LIKE);
                     break;
                 case self::STRATEGY_WORD_START:
-                    $query->addCond('first_world', $fieldPath, $value . '%', Criteria::LIKE);
-                    $query->addCond('other_worlds', $fieldPath, '% ' . $value . '%', Criteria::LIKE);
+                    $query->addCond('first_world', $fieldPath, $value.'%', Criteria::LIKE);
+                    $query->addCond('other_worlds', $fieldPath, '% '.$value.'%', Criteria::LIKE);
                     $query->combine(['first_world', 'other_worlds'], Criteria::LOGICAL_OR, $conditionName);
                     break;
                 default:
@@ -157,7 +157,7 @@ final class SearchFilter extends AbstractFilter
             $filterParameterNames = [$propertyName];
 
             if (self::STRATEGY_EXACT === $strategy) {
-                $filterParameterNames[] = $propertyName . '[]';
+                $filterParameterNames[] = $propertyName.'[]';
             }
 
             foreach ($filterParameterNames as $filterParameterName) {

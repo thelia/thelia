@@ -212,7 +212,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
             $id = $lastCustomer->getId() + 1;
         }
 
-        return \sprintf('CUS%s', str_pad((string) $id, 12, '0', STR_PAD_LEFT));
+        return \sprintf('CUS%s', str_pad((string) $id, 12, '0', \STR_PAD_LEFT));
     }
 
     public function getDefaultAddress(): Address
@@ -250,7 +250,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         if (null !== $password && '' !== trim($password)) {
             $this->setAlgo('PASSWORD_BCRYPT');
 
-            parent::setPassword(password_hash($password, PASSWORD_BCRYPT));
+            parent::setPassword(password_hash($password, \PASSWORD_BCRYPT));
         }
 
         return $this;

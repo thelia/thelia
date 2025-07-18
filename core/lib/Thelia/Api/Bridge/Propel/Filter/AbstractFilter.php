@@ -140,7 +140,7 @@ abstract class AbstractFilter implements FilterInterface
             return $this->getLocalizedPropertyQueryPath($query, $property, $context);
         }
 
-        $fieldPath = $query->getTableMap()->getName() . '.' . $property;
+        $fieldPath = $query->getTableMap()->getName().'.'.$property;
         // Replace all dot by underscore to build relation alias
         $fieldPath = str_replace('.', '_', $fieldPath);
 
@@ -157,7 +157,7 @@ abstract class AbstractFilter implements FilterInterface
         $field = strtok('');
         $column = strtolower((string) preg_replace('/(?<!^)[A-Z]/', '_$0', $field));
 
-        return strtolower($tableAlias . '.' . $column);
+        return strtolower($tableAlias.'.'.$column);
     }
 
     protected function getLocalizedPropertyQueryPath(
@@ -167,6 +167,6 @@ abstract class AbstractFilter implements FilterInterface
     ) {
         $locale = $context['filters']['locale'] ?? Lang::getDefaultLanguage()->getLocale();
 
-        return str_replace('_', '', $query->getTableMap()->getName()) . '_lang_' . $locale . '.' . $property;
+        return str_replace('_', '', $query->getTableMap()->getName()).'_lang_'.$locale.'.'.$property;
     }
 }

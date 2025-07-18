@@ -46,8 +46,7 @@ class Session extends BaseSession
         ?AttributeBagInterface $attributes = null,
         ?FlashBagInterface $flashes = null,
         ?callable $usageReporter = null,
-    )
-    {
+    ) {
         parent::__construct($storage, $attributes, $flashes, $usageReporter);
     }
 

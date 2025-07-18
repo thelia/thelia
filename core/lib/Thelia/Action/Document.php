@@ -49,7 +49,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
      */
     protected function getCacheDirFromWebRoot(): string
     {
-        return ConfigQuery::read('document_cache_dir_from_web_root', 'cache' . DS . 'documents');
+        return ConfigQuery::read('document_cache_dir_from_web_root', 'cache'.DS.'documents');
     }
 
     /**

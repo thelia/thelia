@@ -32,7 +32,7 @@ class Request extends BaseRequest
     private ?string $resolvedPathInfo = null;
     protected ?string $controllerType = null;
     public static bool $isAdminEnv = false;
-    
+
     /**
      * Filter PathInfo to allow slash ending uri.
      *
@@ -78,17 +78,17 @@ class Request extends BaseRequest
         }
 
         if ('' === $this->getQueryString()) {
-            $additionalQs = '?' . ltrim($additionalQs, '&');
+            $additionalQs = '?'.ltrim($additionalQs, '&');
         }
 
-        return $uri . $additionalQs;
+        return $uri.$additionalQs;
     }
 
     public function toString($withContent = true): string
     {
         $string =
             \sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))
-            . "\r\n" . $this->headers . "\r\n";
+            ."\r\n".$this->headers."\r\n";
 
         if (true === $withContent) {
             $string .= $this->getContent();

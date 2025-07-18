@@ -30,7 +30,7 @@ class I18nConstraintValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint): void
     {
         if (!$value instanceof I18nCollection) {
-            throw new \RuntimeException('I18nConstraint attribute should be used on' . I18nCollection::class);
+            throw new \RuntimeException('I18nConstraint attribute should be used on'.I18nCollection::class);
         }
 
         $request = $this->requestStack->getCurrentRequest();

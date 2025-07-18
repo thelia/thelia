@@ -99,7 +99,7 @@ class SerializerManager
 
         foreach ($serializers as $serializer) {
             if (!($serializer instanceof SerializerInterface)) {
-                throw new \Exception('SerializerManager manage only ' . __NAMESPACE__ . '\\SerializerInterface');
+                throw new \Exception('SerializerManager manage only '.__NAMESPACE__.'\\SerializerInterface');
             }
 
             $this->serializers[$serializer->getId()] = $serializer;

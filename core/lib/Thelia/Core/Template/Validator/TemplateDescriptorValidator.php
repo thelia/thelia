@@ -40,7 +40,7 @@ class TemplateDescriptorValidator
         $this->xsdFinder = new Finder();
         $this->xsdFinder
             ->name('*.xsd')
-            ->in(__DIR__ . '/schema/template/');
+            ->in(__DIR__.'/schema/template/');
     }
 
     /**
@@ -95,7 +95,7 @@ class TemplateDescriptorValidator
 
                 foreach ($errors as $error) {
                     $errorMessages[] = \sprintf(
-                        'XML error "%s" [%d] (Code %d) in %s on line %d column %d' . "\n",
+                        'XML error "%s" [%d] (Code %d) in %s on line %d column %d'."\n",
                         $error->message,
                         $error->level,
                         $error->code,

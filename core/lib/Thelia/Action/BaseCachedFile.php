@@ -240,7 +240,7 @@ abstract class BaseCachedFile extends BaseAction
         // Copy and save file
         if ($event->getUploadedFile() instanceof UploadedFile) {
             // Remove old picture file from file storage
-            $url = $event->getModel()->getUploadDir() . '/' . $event->getOldModel()->getFile();
+            $url = $event->getModel()->getUploadDir().'/'.$event->getOldModel()->getFile();
             unlink(str_replace('..', '', $url));
             $event->getModel()->setFile('')->save();
 

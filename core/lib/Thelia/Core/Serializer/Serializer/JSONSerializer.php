@@ -53,12 +53,12 @@ class JSONSerializer extends AbstractSerializer
      */
     public function serialize(mixed $data): string
     {
-        return json_encode($data, JSON_THROW_ON_ERROR);
+        return json_encode($data, \JSON_THROW_ON_ERROR);
     }
 
     public function separator(): string
     {
-        return ',' . PHP_EOL;
+        return ','.\PHP_EOL;
     }
 
     public function finalizeFile(\SplFileObject $fileObject): void
@@ -71,6 +71,6 @@ class JSONSerializer extends AbstractSerializer
      */
     public function unserialize(\SplFileObject $fileObject): array
     {
-        return json_decode(file_get_contents($fileObject->getPathname()), true, 512, JSON_THROW_ON_ERROR);
+        return json_decode(file_get_contents($fileObject->getPathname()), true, 512, \JSON_THROW_ON_ERROR);
     }
 }

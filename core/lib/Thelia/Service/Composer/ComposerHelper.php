@@ -21,18 +21,18 @@ class ComposerHelper
      */
     public function getComposerPackagesFromPath(string $path): array
     {
-        $composerJsonPath = rtrim($path, '/') . '/composer.json';
+        $composerJsonPath = rtrim($path, '/').'/composer.json';
 
         if (!file_exists($composerJsonPath)) {
             throw new \InvalidArgumentException(\sprintf("No composer.json find in '%s'", $path));
         }
 
-        return json_decode(file_get_contents($composerJsonPath), true, 512, JSON_THROW_ON_ERROR);
+        return json_decode(file_get_contents($composerJsonPath), true, 512, \JSON_THROW_ON_ERROR);
     }
 
     public function addNamespaceToBundlesSymfony(string $namespace, array $environnement): void
     {
-        $bundlesPath = THELIA_ROOT . 'config/bundles.php';
+        $bundlesPath = THELIA_ROOT.'config/bundles.php';
 
         if (!file($bundlesPath)) {
             throw new \InvalidArgumentException(\sprintf("No bundles.php file found in '%s'", $bundlesPath));
@@ -74,7 +74,7 @@ class ComposerHelper
                 continue;
             }
 
-            return $nsMatch[1] . '\\' . $classMatch[1];
+            return $nsMatch[1].'\\'.$classMatch[1];
         }
 
         return null;
@@ -84,32 +84,32 @@ class ComposerHelper
         string $bundleNamespace,
         string $path,
     ): void {
-        $composerJsonPath = THELIA_ROOT . 'composer.json';
+        $composerJsonPath = THELIA_ROOT.'composer.json';
 
         if (!file_exists($composerJsonPath)) {
             throw new \InvalidArgumentException(\sprintf("No composer.json found at '%s'", $composerJsonPath));
         }
 
         try {
-            $composerData = json_decode(file_get_contents($composerJsonPath), true, 512, JSON_THROW_ON_ERROR);
+            $composerData = json_decode(file_get_contents($composerJsonPath), true, 512, \JSON_THROW_ON_ERROR);
 
             $namespaceParts = explode('\\', $bundleNamespace);
             array_pop($namespaceParts);
-            $baseNamespace = implode('\\', $namespaceParts) . '\\';
+            $baseNamespace = implode('\\', $namespaceParts).'\\';
 
             if (!isset($composerData['autoload']['psr-4'][$baseNamespace])) {
                 $path = str_replace(THELIA_ROOT, '', $path);
-                $composerData['autoload']['psr-4'][$baseNamespace] = $path . DS . 'src' . DS;
+                $composerData['autoload']['psr-4'][$baseNamespace] = $path.DS.'src'.DS;
 
                 ksort($composerData['autoload']['psr-4']);
 
                 file_put_contents(
                     $composerJsonPath,
-                    json_encode($composerData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n",
+                    json_encode($composerData, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES)."\n",
                 );
             }
         } catch (\JsonException $jsonException) {
-            throw new \InvalidArgumentException('Invalid JSON in composer.json: ' . $jsonException->getMessage(), $jsonException->getCode(), $jsonException);
+            throw new \InvalidArgumentException('Invalid JSON in composer.json: '.$jsonException->getMessage(), $jsonException->getCode(), $jsonException);
         }
     }
 
@@ -121,10 +121,10 @@ class ComposerHelper
             $envParts = [];
 
             foreach ($envs as $env => $enabled) {
-                $envParts[] = \sprintf("'%s' => ", $env) . ($enabled ? 'true' : 'false');
+                $envParts[] = \sprintf("'%s' => ", $env).($enabled ? 'true' : 'false');
             }
 
-            $line = \sprintf('    %s::class => [', $fqcn) . implode(', ', $envParts) . "],\n";
+            $line = \sprintf('    %s::class => [', $fqcn).implode(', ', $envParts)."],\n";
             $lines[] = $line;
         }
 

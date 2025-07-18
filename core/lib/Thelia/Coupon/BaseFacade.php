@@ -77,7 +77,7 @@ class BaseFacade implements FacadeInterface
                 $this->getRequest()->getSession()->getOrder()->getChoosenDeliveryAddress(),
             );
         } catch (\Exception $exception) {
-            throw new \LogicException('Failed to get delivery address (' . $exception->getMessage() . ')', $exception->getCode(), $exception);
+            throw new \LogicException('Failed to get delivery address ('.$exception->getMessage().')', $exception->getCode(), $exception);
         }
     }
 

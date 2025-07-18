@@ -43,7 +43,7 @@ class Feed extends BaseLoop implements ArraySearchLoopInterface
         /** @var AdapterInterface $cacheAdapter */
         $cacheAdapter = $this->container->get('thelia.cache');
 
-        $cacheItem = $cacheAdapter->getItem('feed_' . md5($this->getUrl()));
+        $cacheItem = $cacheAdapter->getItem('feed_'.md5($this->getUrl()));
 
         if (!$cacheItem->isHit()) {
             $feed = new \SimplePie();
@@ -58,7 +58,7 @@ class Feed extends BaseLoop implements ArraySearchLoopInterface
             $cacheAdapter->save($cacheItem);
         }
 
-        /** @var array $itemAsArray */
+        /* @var array $itemAsArray */
         return $cacheItem->get();
     }
 

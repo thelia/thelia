@@ -201,10 +201,10 @@ class PropelInitService
 
             $databaseSchemaCache->write($schemaCombiner->getCombinedDocument($database)->saveXML());
 
-            $hash .= md5(file_get_contents($this->getPropelSchemaDir() . $database . '.schema.xml'));
+            $hash .= md5(file_get_contents($this->getPropelSchemaDir().$database.'.schema.xml'));
         }
 
-        $fs->dumpFile($this->getPropelCacheDir() . 'hash', $hash);
+        $fs->dumpFile($this->getPropelCacheDir().'hash', $hash);
 
         return true;
     }
@@ -219,8 +219,8 @@ class PropelInitService
         $fs = new Filesystem();
 
         // cache testing
-        if ($fs->exists($this->getPropelModelDir() . 'hash')
-            && file_get_contents($this->getPropelCacheDir() . 'hash') === file_get_contents($this->getPropelModelDir() . 'hash')) {
+        if ($fs->exists($this->getPropelModelDir().'hash')
+            && file_get_contents($this->getPropelCacheDir().'hash') === file_get_contents($this->getPropelModelDir().'hash')) {
             return false;
         }
 
@@ -235,8 +235,8 @@ class PropelInitService
             ],
         );
         $fs->copy(
-            $this->getPropelCacheDir() . 'hash',
-            $this->getPropelModelDir() . 'hash',
+            $this->getPropelCacheDir().'hash',
+            $this->getPropelModelDir().'hash',
         );
 
         return true;
@@ -248,7 +248,7 @@ class PropelInitService
             new MigrationUpCommand(),
             [
                 '--config-dir' => $this->getPropelConfigDir(),
-                '--output-dir' => THELIA_CACHE_DIR . 'propel-migrations' . DS,
+                '--output-dir' => THELIA_CACHE_DIR.'propel-migrations'.DS,
             ],
         );
 
@@ -258,7 +258,7 @@ class PropelInitService
                 '--config-dir' => $this->getPropelConfigDir(),
                 '--schema-dir' => $this->getPropelSchemaDir(),
                 '--skip-removed-table' => true,
-                '--output-dir' => THELIA_CACHE_DIR . 'propel-migrations' . DS,
+                '--output-dir' => THELIA_CACHE_DIR.'propel-migrations'.DS,
             ],
         );
 
@@ -266,7 +266,7 @@ class PropelInitService
             new MigrationUpCommand(),
             [
                 '--config-dir' => $this->getPropelConfigDir(),
-                '--output-dir' => THELIA_CACHE_DIR . 'propel-migrations' . DS,
+                '--output-dir' => THELIA_CACHE_DIR.'propel-migrations'.DS,
             ],
         );
     }
@@ -322,7 +322,7 @@ class PropelInitService
             }
         } catch (\Throwable $throwable) {
             $fs = new Filesystem();
-            $fs->remove(THELIA_CACHE_DIR . $this->environment);
+            $fs->remove(THELIA_CACHE_DIR.$this->environment);
             $fs->remove($this->getPropelModelDir());
 
             throw $throwable;
@@ -336,46 +336,46 @@ class PropelInitService
 
     public function getPropelCacheDir(): string
     {
-        return THELIA_CACHE_DIR . $this->environment . DS . 'propel' . DS;
+        return THELIA_CACHE_DIR.$this->environment.DS.'propel'.DS;
     }
 
     public function getPropelConfigDir(): string
     {
-        return $this->getPropelCacheDir() . 'config' . DS;
+        return $this->getPropelCacheDir().'config'.DS;
     }
 
     public function getPropelConfigFile(): string
     {
-        return $this->getPropelConfigDir() . 'propel.yml';
+        return $this->getPropelConfigDir().'propel.yml';
     }
 
     public function getPropelInitFile(): string
     {
-        return $this->getPropelConfigDir() . static::$PROPEL_CONFIG_CACHE_FILENAME;
+        return $this->getPropelConfigDir().static::$PROPEL_CONFIG_CACHE_FILENAME;
     }
 
     public function getPropelSchemaDir(): string
     {
-        return $this->getPropelCacheDir() . 'schema' . DS;
+        return $this->getPropelCacheDir().'schema'.DS;
     }
 
     public function getPropelModelDir(): string
     {
-        return $this->getPropelCacheDir() . 'model' . DS;
+        return $this->getPropelCacheDir().'model'.DS;
     }
 
     public function getPropelDatabaseDir(): string
     {
-        return $this->getPropelCacheDir() . 'database' . DS;
+        return $this->getPropelCacheDir().'database'.DS;
     }
 
     public function getPropelMigrationDir(): string
     {
-        return $this->getPropelCacheDir() . 'migration' . DS;
+        return $this->getPropelCacheDir().'migration'.DS;
     }
 
     public function getPropelLoaderScriptDir(): string
     {
-        return $this->getPropelCacheDir() . 'loader' . DS;
+        return $this->getPropelCacheDir().'loader'.DS;
     }
 }

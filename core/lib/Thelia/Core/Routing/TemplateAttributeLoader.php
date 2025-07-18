@@ -39,7 +39,7 @@ class TemplateAttributeLoader extends Loader
         $templates = TemplateService::getTemplatesAbsolutePath();
 
         foreach ($templates as $templatePath) {
-            $templateControllerPath = $templatePath . \DIRECTORY_SEPARATOR . 'src';
+            $templateControllerPath = $templatePath.\DIRECTORY_SEPARATOR.'src';
 
             if (!is_dir($templateControllerPath)) {
                 continue;
@@ -55,7 +55,7 @@ class TemplateAttributeLoader extends Loader
         }
 
         foreach ($routes as $route) {
-            $route->setPath('/' . $route->getPath());
+            $route->setPath('/'.$route->getPath());
         }
 
         $this->isLoaded = true;

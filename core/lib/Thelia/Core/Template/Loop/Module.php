@@ -319,11 +319,11 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
             return true;
         }
 
-        $routerId = 'router.' . $module->getBaseDir();
+        $routerId = 'router.'.$module->getBaseDir();
 
         if ($this->container->has($routerId)) {
             try {
-                if ($this->container->get($routerId)->match('/admin/module/' . $module->getCode())) {
+                if ($this->container->get($routerId)->match('/admin/module/'.$module->getCode())) {
                     return true;
                 }
             } catch (ResourceNotFoundException) {
@@ -332,7 +332,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         try {
-            if ($this->router->match('/admin/module/' . $module->getCode())) {
+            if ($this->router->match('/admin/module/'.$module->getCode())) {
                 return true;
             }
         } catch (\Exception) {
@@ -340,7 +340,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         try {
-            if ($this->router->match('/admin/module/' . $module->getCode())) {
+            if ($this->router->match('/admin/module/'.$module->getCode())) {
                 return true;
             }
         } catch (\Exception) {
@@ -348,19 +348,19 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         // Make a quick and dirty test on the module's config.xml file
-        $configContent = @file_get_contents($module->getAbsoluteConfigPath() . DS . 'config.xml');
+        $configContent = @file_get_contents($module->getAbsoluteConfigPath().DS.'config.xml');
 
         if ($configContent && 1 === preg_match('/event\s*=\s*[\'"]module.configuration[\'"]/', $configContent)) {
             return true;
         }
 
-        $routing = @file_get_contents($module->getAbsoluteConfigPath() . DS . 'routing.xml');
+        $routing = @file_get_contents($module->getAbsoluteConfigPath().DS.'routing.xml');
 
-        if ($routing && preg_match('@[\'"]/?admin/module/' . $module->getCode() . '[\'"]@', $routing)) {
+        if ($routing && preg_match('@[\'"]/?admin/module/'.$module->getCode().'[\'"]@', $routing)) {
             return true;
         }
 
         /* if not ; test if it uses admin inclusion : module_configuration.html */
-        return file_exists($module->getAbsoluteAdminIncludesPath() . DS . 'module_configuration.html');
+        return file_exists($module->getAbsoluteAdminIncludesPath().DS.'module_configuration.html');
     }
 }

@@ -44,9 +44,8 @@ class SessionController extends BaseAdminController
     public const ADMIN_TOKEN_SESSION_VAR_NAME = 'thelia_admin_password_renew_token';
 
     public function __construct(
-        private readonly LangService $langService
-    )
-    {
+        private readonly LangService $langService,
+    ) {
     }
 
     protected function checkAdminLoggedIn(): ?RedirectResponse

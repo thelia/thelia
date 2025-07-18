@@ -41,7 +41,7 @@ class ModuleAnnotationLoader extends Loader
             ->find();
 
         foreach ($modules as $module) {
-            $moduleControllerPath = $module->getAbsoluteBaseDir() . \DIRECTORY_SEPARATOR . 'Controller';
+            $moduleControllerPath = $module->getAbsoluteBaseDir().\DIRECTORY_SEPARATOR.'Controller';
 
             if (!is_dir($moduleControllerPath)) {
                 continue;
@@ -58,14 +58,14 @@ class ModuleAnnotationLoader extends Loader
             $moduleRoutePrefix = \call_user_func([$module->getFullNamespace(), 'getAnnotationRoutePrefix']);
 
             foreach ($moduleRoutes->all() as $moduleRoute) {
-                $moduleRoute->setPath($moduleRoutePrefix . $moduleRoute->getPath());
+                $moduleRoute->setPath($moduleRoutePrefix.$moduleRoute->getPath());
             }
 
             $routes->addCollection($moduleRoutes);
         }
 
         foreach ($routes as $route) {
-            $route->setPath('/' . $route->getPath());
+            $route->setPath('/'.$route->getPath());
         }
 
         $this->isLoaded = true;

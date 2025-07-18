@@ -141,7 +141,7 @@ abstract class BaseHook implements BaseHookInterface
 
         if (null !== $templateDir) {
             // retrieve the template
-            $content = $this->getParser()->render($templateDir . DS . $templateName, $parameters);
+            $content = $this->getParser()->render($templateDir.DS.$templateName, $parameters);
         } else {
             $content = \sprintf('ERR: Unknown template %s for module %s', $templateName, $this->module->getCode());
         }
@@ -154,7 +154,7 @@ abstract class BaseHook implements BaseHookInterface
         $fileDir = $this->getAssetsResolver()->resolveAssetSourcePath($this->module->getCode(), '', $fileName, $this->getParser());
 
         if (null !== $fileDir) {
-            $content = file_get_contents($fileDir . DS . $fileName);
+            $content = file_get_contents($fileDir.DS.$fileName);
 
             if (false === $content) {
                 $content = '';
@@ -174,11 +174,11 @@ abstract class BaseHook implements BaseHookInterface
         if ('' !== $url) {
             $tags = [];
             $tags[] = '<link rel="stylesheet" type="text/css" ';
-            $tags[] = ' href="' . $url . '" ';
+            $tags[] = ' href="'.$url.'" ';
 
             foreach ($attributes as $name => $val) {
                 if (\is_string($name) && !\in_array($name, ['href', 'rel', 'type'], true)) {
-                    $tags[] = $name . '="' . $val . '" ';
+                    $tags[] = $name.'="'.$val.'" ';
                 }
             }
 
@@ -197,11 +197,11 @@ abstract class BaseHook implements BaseHookInterface
         if ('' !== $url) {
             $tags = [];
             $tags[] = '<script';
-            $tags[] = ' src="' . $url . '" ';
+            $tags[] = ' src="'.$url.'" ';
 
             foreach ($attributes as $name => $val) {
                 if (\is_string($name) && !\in_array($name, ['src', 'type'], true)) {
-                    $tags[] = $name . '="' . $val . '" ';
+                    $tags[] = $name.'="'.$val.'" ';
                 }
             }
 

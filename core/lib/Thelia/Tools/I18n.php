@@ -78,7 +78,7 @@ class I18n
                 $method = \sprintf('set%s', $need);
 
                 if (method_exists($i18n, $method)) {
-                    $i18n->{$method}('DEFAULT ' . strtoupper((string) $need));
+                    $i18n->{$method}('DEFAULT '.strtoupper((string) $need));
                 }
 
                 // @todo throw sg ?
@@ -106,12 +106,12 @@ class I18n
         $query
             ->_and()
             ->where(
-                'CASE WHEN ' . $tableIdColumn . ' IN' .
-                '(SELECT DISTINCT ' . $i18nIdColumn . ' ' .
-                'FROM `' . $i18nTableName . '` ' .
-                \sprintf('WHERE locale=%s) ', $locale) .
-                'THEN ' . $localeColumn . \sprintf(' = %s ', $locale) .
-                'ELSE ' . $localeColumn . \sprintf(' = %s ', $defaultLocale) .
+                'CASE WHEN '.$tableIdColumn.' IN'.
+                '(SELECT DISTINCT '.$i18nIdColumn.' '.
+                'FROM `'.$i18nTableName.'` '.
+                \sprintf('WHERE locale=%s) ', $locale).
+                'THEN '.$localeColumn.\sprintf(' = %s ', $locale).
+                'ELSE '.$localeColumn.\sprintf(' = %s ', $defaultLocale).
                 'END',
             );
     }
@@ -129,11 +129,11 @@ class I18n
         $len = \strlen($str);
 
         for ($i = 0; $i < $len; ++$i) {
-            $return .= 'CHAR(' . \ord($str[$i]) . '),';
+            $return .= 'CHAR('.\ord($str[$i]).'),';
         }
 
         $return = $i > 0 ? substr($return, 0, -1) : '""';
 
-        return $return . ')';
+        return $return.')';
     }
 }

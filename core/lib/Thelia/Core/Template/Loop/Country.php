@@ -116,11 +116,11 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
             $search
                 ->distinct()
                 ->joinCountryArea('with_area', Criteria::LEFT_JOIN)
-                ->where('`with_area`.country_id ' . Criteria::ISNOTNULL);
+                ->where('`with_area`.country_id '.Criteria::ISNOTNULL);
         } elseif (false === $withArea) {
             $search
                 ->joinCountryArea('with_area', Criteria::LEFT_JOIN)
-                ->where('`with_area`.country_id ' . Criteria::ISNULL);
+                ->where('`with_area`.country_id '.Criteria::ISNULL);
         }
 
         $exclude = $this->getExclude();

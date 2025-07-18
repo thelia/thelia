@@ -114,10 +114,10 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
         foreach ($orders as $order) {
             switch ($order) {
                 case 'alpha':
-                    $search->addAscendingOrderByColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE');
+                    $search->addAscendingOrderByColumn(FeatureAvTableMap::TABLE_NAME.'_i18n_TITLE');
                     break;
                 case 'alpha_reverse':
-                    $search->addDescendingOrderByColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE');
+                    $search->addDescendingOrderByColumn(FeatureAvTableMap::TABLE_NAME.'_i18n_TITLE');
                     break;
                 case 'manual':
                     $search->orderBy('feature_av_position', Criteria::ASC);
@@ -146,10 +146,10 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('IS_FREE_TEXT', null === $featureValue->getFeatureAvId() ? 1 : 0)
                 ->set('IS_FEATURE_AV', null === $featureValue->getFeatureAvId() ? 0 : 1)
                 ->set('LOCALE', $this->locale)
-                ->set('TITLE', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE'))
-                ->set('CHAPO', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_CHAPO'))
-                ->set('DESCRIPTION', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
-                ->set('POSTSCRIPTUM', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'))
+                ->set('TITLE', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME.'_i18n_TITLE'))
+                ->set('CHAPO', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME.'_i18n_CHAPO'))
+                ->set('DESCRIPTION', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME.'_i18n_DESCRIPTION'))
+                ->set('POSTSCRIPTUM', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME.'_i18n_POSTSCRIPTUM'))
                 ->set('POSITION', $featureValue->getPosition());
             $this->addOutputFields($loopResultRow, $featureValue);
 

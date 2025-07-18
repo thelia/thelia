@@ -31,7 +31,7 @@ class ModelValidIdType extends BaseType
      */
     public function __construct(string $expectedModelActiveRecord)
     {
-        $class = '\\Thelia\\Model\\' . $expectedModelActiveRecord . 'Query';
+        $class = '\\Thelia\\Model\\'.$expectedModelActiveRecord.'Query';
 
         if (!class_exists($class) && new $class() instanceof ModelCriteria) {
             throw new TypeException('MODEL NOT FOUND', TypeException::MODEL_NOT_FOUND);

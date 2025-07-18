@@ -42,7 +42,7 @@ class DeliveryModuleOptionEvent extends ActionEvent
         }
 
         if (!$this->module->isDeliveryModule()) {
-            throw new \RuntimeException(Translator::getInstance()->trans($this->module->getTitle() . ' is not a delivery module.'));
+            throw new \RuntimeException(Translator::getInstance()->trans($this->module->getTitle().' is not a delivery module.'));
         }
     }
 

@@ -71,9 +71,9 @@ class ViewListener implements EventSubscriberInterface
             $templatePath = $this->templateHelper->getActiveFrontTemplate()->getAbsolutePath();
             $parser = $this->parserResolver->getParser($templatePath, $view);
             $parser->setTemplateDefinition($this->templateHelper->getActiveFrontTemplate(), true);
-            $viewId = $request->attributes->get($view . '_id');
+            $viewId = $request->attributes->get($view.'_id');
             $this->eventDispatcher->dispatch(new ViewCheckEvent($view, $viewId), TheliaEvents::VIEW_CHECK);
-            $content = $parser->render($view . '.' . $parser->getFileExtension());
+            $content = $parser->render($view.'.'.$parser->getFileExtension());
             $response = $content instanceof Response
                 ? $content
                 : new Response($content, $parser->getStatus() ?: 200);
@@ -110,8 +110,8 @@ class ViewListener implements EventSubscriberInterface
         $view = $request->attributes->get('_view', $this->findView($request));
         $request->attributes->set('_view', $view);
 
-        if (!$request->attributes->has($view . '_id')) {
-            $request->attributes->set($view . '_id', $this->findViewId($request, $view));
+        if (!$request->attributes->has($view.'_id')) {
+            $request->attributes->set($view.'_id', $this->findViewId($request, $view));
         }
     }
 
@@ -122,7 +122,7 @@ class ViewListener implements EventSubscriberInterface
 
     public function findViewId(Request $request, string $view): ?int
     {
-        $paramName = $view . '_id';
+        $paramName = $view.'_id';
 
         $viewId = $request->query->getInt($paramName) ?: $request->request->getInt($paramName);
 

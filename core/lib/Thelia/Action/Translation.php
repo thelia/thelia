@@ -110,11 +110,11 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
                     if (\in_array($ext, $allowedExts, true) && $content = file_get_contents($fileInfo->getPathName())) {
                         $short_path = $this->normalizePath($fileInfo->getPathName());
-                        Tlog::getInstance()->debug(\sprintf('Examining file %s%s', $short_path, PHP_EOL));
+                        Tlog::getInstance()->debug(\sprintf('Examining file %s%s', $short_path, \PHP_EOL));
                         $matches = [];
 
                         if (preg_match_all(
-                            '/' . $prefix . '((?<![\\\\])[\'"])((?:.(?!(?<![\\\\])\1))*.?)*?\1/ms',
+                            '/'.$prefix.'((?<![\\\\])[\'"])((?:.(?!(?<![\\\\])\1))*.?)*?\1/ms',
                             $content,
                             $matches,
                         )) {
@@ -137,7 +137,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
                                     $quote = $matches[1][$idx];
 
-                                    $match = str_replace('\\' . $quote, $quote, $match);
+                                    $match = str_replace('\\'.$quote, $quote, $match);
 
                                     // Ignore empty strings
                                     if ('' === $match) {
@@ -209,7 +209,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
         }
 
         if ($fp = @fopen($file, 'w')) {
-            fwrite($fp, '<' . "?php\n\n");
+            fwrite($fp, '<'."?php\n\n");
             fwrite($fp, "return array(\n");
 
             $texts = $event->getTranslatableStrings();
@@ -239,7 +239,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
     public function writeFallbackFile(TranslationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        $file = THELIA_LOCAL_DIR . 'I18n' . DS . $event->getLocale() . '.php';
+        $file = THELIA_LOCAL_DIR.'I18n'.DS.$event->getLocale().'.php';
 
         $fs = new Filesystem();
         $translations = [];
@@ -285,7 +285,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
                 }
             }
 
-            fwrite($fp, '<' . "?php\n\n");
+            fwrite($fp, '<'."?php\n\n");
             fwrite($fp, "return [\n");
 
             // Sort keys alphabetically while keeping index

@@ -156,7 +156,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
 
         $search->withColumn(
-            "CAST(CASE WHEN ISNULL(`FolderSelect`.POSITION) THEN '" . PHP_INT_MAX . "' ELSE `FolderSelect`.POSITION END AS SIGNED)",
+            "CAST(CASE WHEN ISNULL(`FolderSelect`.POSITION) THEN '".\PHP_INT_MAX."' ELSE `FolderSelect`.POSITION END AS SIGNED)",
             'position_delegate',
         );
         $search->withColumn('`FolderSelect`.FOLDER_ID', 'default_folder_id');
@@ -191,7 +191,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $title = $this->getTitle();
 
         if (null !== $title) {
-            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, '%' . $title . '%');
+            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, '%'.$title.'%');
         }
 
         $exclude = $this->getExclude();
@@ -246,8 +246,8 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     }
 
                     foreach ($id as $singleId) {
-                        $givenIdMatched = 'given_id_matched_' . $singleId;
-                        $search->withColumn(ContentTableMap::COL_ID . \sprintf("='%d'", $singleId), $givenIdMatched);
+                        $givenIdMatched = 'given_id_matched_'.$singleId;
+                        $search->withColumn(ContentTableMap::COL_ID.\sprintf("='%d'", $singleId), $givenIdMatched);
                         $search->orderBy($givenIdMatched, Criteria::DESC);
                     }
 

@@ -94,16 +94,16 @@ class URL
                 $port = '';
 
                 if ('http' === $scheme && 80 !== $this->requestContext->getHttpPort()) {
-                    $port = ':' . $this->requestContext->getHttpPort();
+                    $port = ':'.$this->requestContext->getHttpPort();
                 } elseif ('https' === $scheme && 443 !== $this->requestContext->getHttpsPort()) {
-                    $port = ':' . $this->requestContext->getHttpsPort();
+                    $port = ':'.$this->requestContext->getHttpsPort();
                 }
             }
 
             $this->baseUrlScheme = \sprintf('%s://%s%s', $scheme, $host, $port);
         }
 
-        return $scheme_only ? $this->baseUrlScheme : $this->baseUrlScheme . $this->requestContext->getBaseUrl();
+        return $scheme_only ? $this->baseUrlScheme : $this->baseUrlScheme.$this->requestContext->getBaseUrl();
     }
 
     /**
@@ -153,7 +153,7 @@ class URL
             }
 
             // Normalize the given path
-            $base = rtrim($base_url, '/') . '/' . ltrim($path, '/');
+            $base = rtrim($base_url, '/').'/'.ltrim($path, '/');
         } else {
             $base = $path;
         }
@@ -166,7 +166,7 @@ class URL
         if (null !== $parameters) {
             foreach ($parameters as $name => $value) {
                 // Remove this parameter from base URL to prevent duplicate parameters
-                $base = preg_replace('`([?&])' . preg_quote($name, '`') . '=(?:[^&]*)(?:&|$)`', '$1', (string) $base);
+                $base = preg_replace('`([?&])'.preg_quote($name, '`').'=(?:[^&]*)(?:&|$)`', '$1', (string) $base);
 
                 $queryString .= \sprintf('%s=%s&', urlencode($name), urlencode((string) $value));
             }
@@ -185,10 +185,10 @@ class URL
 
             $sepChar = str_contains($base, '?') ? '&' : '?';
 
-            $queryString = $sepChar . $queryString;
+            $queryString = $sepChar.$queryString;
         }
 
-        return $base . $queryString . $anchor;
+        return $base.$queryString.$anchor;
     }
 
     /**
@@ -235,7 +235,7 @@ class URL
             $allParametersWithoutView['lang'] = $viewLocale;
 
             if (null !== $viewId) {
-                $allParametersWithoutView[$view . '_id'] = $viewId;
+                $allParametersWithoutView[$view.'_id'] = $viewId;
             }
 
             $this->retriever->rewrittenUrl = null;
@@ -259,13 +259,13 @@ class URL
 
             $viewLocale = $this->getViewLocale($request);
 
-            $viewId = null === $view ? null : $request->query->get($view . '_id', null);
+            $viewId = null === $view ? null : $request->query->get($view.'_id', null);
 
             if (null !== $view) {
                 unset($allOtherParameters['view']);
 
                 if (null !== $viewId) {
-                    unset($allOtherParameters[$view . '_id']);
+                    unset($allOtherParameters[$view.'_id']);
                 }
             }
 

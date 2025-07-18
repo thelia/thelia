@@ -190,14 +190,14 @@ class TranslationsController extends BaseAdminController
                 case 'co':
                     $directory = THELIA_LIB;
                     $domain = 'core';
-                    $i18nDirectory = THELIA_LIB . 'Config' . DS . 'I18n';
+                    $i18nDirectory = THELIA_LIB.'Config'.DS.'I18n';
                     $walkMode = TranslationEvent::WALK_MODE_PHP;
                     break;
                     // Thelia Install
                 case 'in':
                     $directory = THELIA_SETUP_DIRECTORY;
                     $domain = 'install';
-                    $i18nDirectory = THELIA_SETUP_DIRECTORY . 'I18n';
+                    $i18nDirectory = THELIA_SETUP_DIRECTORY.'I18n';
                     $walkMode = TranslationEvent::WALK_MODE_TEMPLATE;
                     // resources not loaded by default
                     $this->loadTranslation($i18nDirectory, $domain);
@@ -206,7 +206,7 @@ class TranslationsController extends BaseAdminController
                 case 'wi':
                     $directory = THELIA_SETUP_WIZARD_DIRECTORY;
                     $domain = 'wizard';
-                    $i18nDirectory = THELIA_SETUP_WIZARD_DIRECTORY . 'I18n';
+                    $i18nDirectory = THELIA_SETUP_WIZARD_DIRECTORY.'I18n';
                     $walkMode = TranslationEvent::WALK_MODE_PHP;
                     // resources not loaded by default
                     $this->loadTranslation($i18nDirectory, $domain);
@@ -254,7 +254,7 @@ class TranslationsController extends BaseAdminController
 
                         if (!empty($texts)) {
                             $event = TranslationEvent::createWriteFileEvent(
-                                \sprintf('%s' . DS . '%s.php', $i18nDirectory, $this->getCurrentEditionLocale()),
+                                \sprintf('%s'.DS.'%s.php', $i18nDirectory, $this->getCurrentEditionLocale()),
                                 $texts,
                                 $request->get('translation', []),
                                 true,
@@ -301,7 +301,7 @@ class TranslationsController extends BaseAdminController
                     $templateArguments['all_strings'] = $event->getTranslatableStrings();
                 }
 
-                $templateArguments['is_writable'] = $this->checkWritableI18nDirectory(THELIA_LOCAL_DIR . 'I18n');
+                $templateArguments['is_writable'] = $this->checkWritableI18nDirectory(THELIA_LOCAL_DIR.'I18n');
             }
         }
 

@@ -625,7 +625,7 @@ class XmlFileLoader extends FileLoader
      */
     public function validateSchema(\DOMDocument $dom): bool
     {
-        $schemaLocations = ['http://thelia.net/schema/dic/config' => str_replace('\\', '/', __DIR__ . '/schema/dic/config/thelia-1.0.xsd')];
+        $schemaLocations = ['http://thelia.net/schema/dic/config' => str_replace('\\', '/', __DIR__.'/schema/dic/config/thelia-1.0.xsd')];
 
         $tmpfiles = [];
         $imports = '';
@@ -643,10 +643,10 @@ class XmlFileLoader extends FileLoader
                 }
             }
 
-            $drive = '\\' === \DIRECTORY_SEPARATOR ? array_shift($parts) . '/' : '';
-            $location = 'file:///' . $drive . implode('/', array_map('rawurlencode', $parts));
+            $drive = '\\' === \DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';
+            $location = 'file:///'.$drive.implode('/', array_map('rawurlencode', $parts));
 
-            $imports .= \sprintf('  <xsd:import namespace="%s" schemaLocation="%s" />' . "\n", $namespace, $location);
+            $imports .= \sprintf('  <xsd:import namespace="%s" schemaLocation="%s" />'."\n", $namespace, $location);
         }
 
         $source = <<<EOF
@@ -705,7 +705,7 @@ class XmlFileLoader extends FileLoader
             // this is used by DefinitionDecorator to overwrite a specific
             // argument of the parent definition
             if (isset($arg['index'])) {
-                $key = 'index_' . $arg['index'];
+                $key = 'index_'.$arg['index'];
             }
 
             switch ($arg['type']) {

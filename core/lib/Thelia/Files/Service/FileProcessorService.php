@@ -67,7 +67,7 @@ readonly class FileProcessorService
                     ['%types%' => implode(', ', array_keys($validMimeTypes))],
                 );
             } else {
-                $regex = '#^(.+)\\.(' . implode('|', $validMimeTypes[$mimeType]) . ')$#i';
+                $regex = '#^(.+)\\.('.implode('|', $validMimeTypes[$mimeType]).')$#i';
 
                 if (!preg_match($regex, $realFileName)) {
                     $message = $this->translator->trans(
@@ -82,7 +82,7 @@ readonly class FileProcessorService
         }
 
         if ([] !== $extBlackList) {
-            $regex = '#^(.+)\\.(' . implode('|', $extBlackList) . ')$#i';
+            $regex = '#^(.+)\\.('.implode('|', $extBlackList).')$#i';
 
             if (preg_match($regex, $realFileName)) {
                 $message = $this->translator->trans(

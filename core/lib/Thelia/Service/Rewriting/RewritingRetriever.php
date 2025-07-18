@@ -47,7 +47,7 @@ class RewritingRetriever
         }
 
         if (null !== $viewId) {
-            $allParametersWithoutView[$view . '_id'] = $viewId;
+            $allParametersWithoutView[$view.'_id'] = $viewId;
         }
 
         $this->rewrittenUrl = null;
@@ -74,7 +74,7 @@ class RewritingRetriever
         $allParametersWithoutView['lang'] = $viewLocale;
 
         if (null !== $viewId) {
-            $allParametersWithoutView[$view . '_id'] = $viewId;
+            $allParametersWithoutView[$view.'_id'] = $viewId;
         }
 
         $this->rewrittenUrl = null;

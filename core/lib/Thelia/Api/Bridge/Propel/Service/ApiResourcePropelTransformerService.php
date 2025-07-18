@@ -214,7 +214,7 @@ readonly class ApiResourcePropelTransformerService
             $request = $context['request'];
             $reflector = new \ReflectionClass($data::class);
             /** @var ModelCriteria $queryClass */
-            $queryClass = $data::getPropelRelatedTableMap()->getClassName() . 'Query';
+            $queryClass = $data::getPropelRelatedTableMap()->getClassName().'Query';
             /** @var ModelCriteria $query */
             $query = $queryClass::create();
             $compositeIdentifiers = $this->getResourceCompositeIdentifierValues(reflector: $reflector, param: 'keys');
@@ -240,7 +240,7 @@ readonly class ApiResourcePropelTransformerService
 
                     if (ucfirst((string) $compositeIdentifier) === $reflectorPreviousPropelModel->getShortName()) {
                         $id = $previousPropelModel->getId();
-                        $setter = 'set' . ucfirst((string) $compositeIdentifier) . 'Id';
+                        $setter = 'set'.ucfirst((string) $compositeIdentifier).'Id';
                         $propelModel->{$setter}($id);
 
                         // This is a fix related to Propel. It enables database persistence of my entity in its child collections.
@@ -346,11 +346,11 @@ readonly class ApiResourcePropelTransformerService
         \ReflectionProperty $property,
         bool &$setterForced = false,
     ): string {
-        $propelSetter = 'set' . ucfirst($property->getName());
+        $propelSetter = 'set'.ucfirst($property->getName());
 
         foreach ($property->getAttributes(Column::class) as $columnAttribute) {
             if (isset($columnAttribute->getArguments()['propelFieldName'])) {
-                $propelSetter = 'set' . ucfirst($columnAttribute->getArguments()['propelFieldName']);
+                $propelSetter = 'set'.ucfirst($columnAttribute->getArguments()['propelFieldName']);
             }
 
             if (isset($columnAttribute->getArguments()['propelSetter'])) {
@@ -370,7 +370,7 @@ readonly class ApiResourcePropelTransformerService
     ): string {
         foreach ($property->getAttributes($attributeClass) as $attribute) {
             if (isset($attribute->getArguments()[$argumentKey])) {
-                return 'get' . ucfirst($attribute->getArguments()[$argumentKey]);
+                return 'get'.ucfirst($attribute->getArguments()[$argumentKey]);
             }
         }
 
@@ -380,8 +380,8 @@ readonly class ApiResourcePropelTransformerService
     private function getPropertyValue(PropelResourceInterface $data, \ReflectionProperty $property): mixed
     {
         $possibleGetters = [
-            'get' . ucfirst($property->getName()),
-            'is' . ucfirst($property->getName()),
+            'get'.ucfirst($property->getName()),
+            'is'.ucfirst($property->getName()),
         ];
 
         $availableMethods = array_filter(array_intersect($possibleGetters, get_class_methods($data)));
@@ -442,7 +442,7 @@ readonly class ApiResourcePropelTransformerService
                                         $newViolation = new \ReflectionClass($violation);
                                         $newViolation->getProperty('propertyPath')->setValue(
                                             $violation,
-                                            $property->getName() . '[' . $index . '].' . $violation->getPropertyPath(),
+                                            $property->getName().'['.$index.'].'.$violation->getPropertyPath(),
                                         );
 
                                         return $violation;
@@ -476,7 +476,7 @@ readonly class ApiResourcePropelTransformerService
         Collection $langs,
     ): void {
         foreach ($reflector->getProperties() as $property) {
-            $defaultGetter = 'get' . ucfirst($property->getName());
+            $defaultGetter = 'get'.ucfirst($property->getName());
             $propelGetter = $this->determinePropelGetterName($property, Column::class, 'propelFieldName', $defaultGetter);
             $propelGetter = $this->determinePropelGetterName($property, Relation::class, 'relationAlias', $propelGetter);
 
@@ -484,7 +484,7 @@ readonly class ApiResourcePropelTransformerService
                 continue;
             }
 
-            $resourceSetter = 'set' . ucfirst($property->getName());
+            $resourceSetter = 'set'.ucfirst($property->getName());
 
             if (!method_exists($apiResource, $resourceSetter)) {
                 continue;
@@ -536,7 +536,7 @@ readonly class ApiResourcePropelTransformerService
             foreach ($data->getI18ns() as $locale => $i18n) {
                 $i18nGetters = array_filter(
                     array_map(
-                        static fn (\ReflectionProperty $reflectionProperty) => $reflectionProperty->isInitialized($i18n) ? 'get' . ucfirst($reflectionProperty->getName()) : null,
+                        static fn (\ReflectionProperty $reflectionProperty) => $reflectionProperty->isInitialized($i18n) ? 'get'.ucfirst($reflectionProperty->getName()) : null,
                         (new \ReflectionClass($i18n))->getProperties(),
                     ),
                 );
@@ -645,7 +645,7 @@ readonly class ApiResourcePropelTransformerService
 
                 $fieldValue = null;
 
-                $virtualColumn = ltrim(strtolower($parentReflector?->getShortName() . '_' . $reflector->getShortName()) . '_lang_' . $lang->getLocale() . '_' . $i18nFieldName, '_');
+                $virtualColumn = ltrim(strtolower($parentReflector?->getShortName().'_'.$reflector->getShortName()).'_lang_'.$lang->getLocale().'_'.$i18nFieldName, '_');
 
                 if ($baseModel->hasVirtualColumn($virtualColumn)) {
                     $fieldValue = $baseModel->getVirtualColumn($virtualColumn);
@@ -653,7 +653,7 @@ readonly class ApiResourcePropelTransformerService
 
                 if (null === $fieldValue) {
                     $propelModel->setlocale($lang->getLocale());
-                    $getter = 'get' . ucfirst($i18nFieldName);
+                    $getter = 'get'.ucfirst($i18nFieldName);
 
                     $fieldValue = $propelModel->{$getter}();
                 }
@@ -662,7 +662,7 @@ readonly class ApiResourcePropelTransformerService
                     continue;
                 }
 
-                $setter = 'set' . ucfirst($i18nFieldName);
+                $setter = 'set'.ucfirst($i18nFieldName);
                 $i18nResource->{$setter}($fieldValue);
 
                 if ('id' !== $i18nFieldName && !empty($fieldValue)) {
@@ -685,7 +685,7 @@ readonly class ApiResourcePropelTransformerService
 
         if ([] !== $compositeIdentifiers) {
             /** @var ModelCriteria $queryClass */
-            $queryClass = $data::getPropelRelatedTableMap()->getClassName() . 'Query';
+            $queryClass = $data::getPropelRelatedTableMap()->getClassName().'Query';
             /** @var ModelCriteria $query */
             $query = $queryClass::create();
             $columnValues = $this->getColumnValues(reflector: $reflector, columns: $compositeIdentifiers);
@@ -693,7 +693,7 @@ readonly class ApiResourcePropelTransformerService
 
             foreach ($compositeIdentifiers as $compositeIdentifier) {
                 if ($reflector->hasProperty($compositeIdentifier) && $reflector->getProperty($compositeIdentifier)->isInitialized($data)) {
-                    $getter = 'get' . ucfirst((string) $compositeIdentifier);
+                    $getter = 'get'.ucfirst((string) $compositeIdentifier);
 
                     if (method_exists($data, $getter)) {
                         $getterId = 'getId';
@@ -733,13 +733,13 @@ readonly class ApiResourcePropelTransformerService
                 $value = $uriVariables[$field];
             }
 
-            $filterName = 'filterBy' . ucfirst((string) $field) . 'Id';
+            $filterName = 'filterBy'.ucfirst((string) $field).'Id';
 
             if (null === $filterMethod && method_exists($query, $filterName)) {
                 $filterMethod = $filterName;
             }
 
-            $filterName = 'filterBy' . ucfirst((string) $field);
+            $filterName = 'filterBy'.ucfirst((string) $field);
 
             if (null === $filterMethod && method_exists($query, $filterName)) {
                 $filterMethod = $filterName;

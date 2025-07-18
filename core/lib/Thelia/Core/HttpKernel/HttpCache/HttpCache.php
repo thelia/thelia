@@ -33,7 +33,7 @@ class HttpCache extends BaseHttpCache implements HttpKernelInterface
     {
         parent::__construct(
             $kernel,
-            new Store($kernel->getCacheDir() . '/http_cache'),
+            new Store($kernel->getCacheDir().'/http_cache'),
             new Esi(),
             array_merge(
                 ['debug' => $kernel->isDebug()],

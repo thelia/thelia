@@ -78,7 +78,7 @@ class FileManager
         }
 
         $fileName = $this->renameFile($model->getId(), $uploadedFile);
-        $filePath = $directory . DS . $fileName;
+        $filePath = $directory.DS.$fileName;
 
         $fileSystem->rename($uploadedFile->getPathname(), $filePath);
         $fileSystem->chmod($filePath, 0o660);
@@ -130,7 +130,7 @@ class FileManager
 
     public function deleteFile(FileModelInterface $model): void
     {
-        $url = $model->getUploadDir() . DS . $model->getFile();
+        $url = $model->getUploadDir().DS.$model->getFile();
 
         @unlink(str_replace('..', '', $url));
 
@@ -142,7 +142,7 @@ class FileManager
         $extension = $uploadedFile->getClientOriginalExtension();
 
         if ('' !== $extension && '0' !== $extension) {
-            $extension = '.' . strtolower($extension);
+            $extension = '.'.strtolower($extension);
         }
 
         return $this->sanitizeFileName(
@@ -150,7 +150,7 @@ class FileManager
                 $extension,
                 '',
                 $uploadedFile->getClientOriginalName(),
-            ) . '-' . $modelId . $extension,
+            ).'-'.$modelId.$extension,
         );
     }
 

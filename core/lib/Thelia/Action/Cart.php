@@ -68,6 +68,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
     /**
      * add an article in the current cart.
+     *
      * @throws PropelException
      */
     public function addItem(CartEvent $event, $eventName, EventDispatcherInterface $dispatcher): void

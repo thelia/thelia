@@ -42,6 +42,7 @@ class DefaultController extends BaseFrontController
     {
         if ($view = $request->query->get('view') ?? $request->request->has('view')) {
             $request->attributes->set('_view', $view);
+
             return;
         }
 

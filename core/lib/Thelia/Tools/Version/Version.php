@@ -70,7 +70,7 @@ class Version
 
         foreach (explode(' ', $constraints) as $expression) {
             if (1 === preg_match('/^\d/', $expression)) {
-                $expression = $defaultComparison . $expression;
+                $expression = $defaultComparison.$expression;
             }
 
             if (str_contains($expression, '>=')) {
@@ -122,7 +122,7 @@ class Version
         )$`x';
 
         if (!preg_match($pattern, $version, $match)) {
-            throw new \InvalidArgumentException(\sprintf('Invalid version number provided : %s' . PHP_EOL, $version));
+            throw new \InvalidArgumentException(\sprintf('Invalid version number provided : %s'.\PHP_EOL, $version));
         }
 
         return [

@@ -16,7 +16,6 @@ namespace Thelia\Model\Breadcrumb;
 
 use Symfony\Component\Routing\Router;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\Category;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Product;
 use Thelia\Tools\URL;

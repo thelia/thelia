@@ -157,7 +157,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
         $updateSeoForm = $this->getUpdateSeoForm();
 
         // Pass the object id to the request
-        $request->attributes->set($this->objectName . '_id', $request->get('current_id'));
+        $request->attributes->set($this->objectName.'_id', $request->get('current_id'));
 
         try {
             // Check the form against constraints violations

@@ -173,7 +173,7 @@ class ModuleValidator
 
     public function checkModulePropelSchema(): void
     {
-        $schemaFile = $this->getModulePath() . DS . 'Config' . DS . 'schema.xml';
+        $schemaFile = $this->getModulePath().DS.'Config'.DS.'schema.xml';
         $fs = new Filesystem();
 
         if (false === $fs->exists($schemaFile)) {
@@ -317,7 +317,7 @@ class ModuleValidator
             }
 
             if ($recursive) {
-                $recursiveModuleValidator = new self(THELIA_MODULE_DIR . '/' . $dependency);
+                $recursiveModuleValidator = new self(THELIA_MODULE_DIR.'/'.$dependency);
                 array_merge(
                     $dependencies,
                     $recursiveModuleValidator->getCurrentModuleDependencies(true),

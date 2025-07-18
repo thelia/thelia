@@ -58,7 +58,7 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
             $loopResultRow = new LoopResultRow($type);
 
             $url = URL::getInstance()->absoluteUrl(
-                $this->getBaseUrl() . '/' . $type->getId(),
+                $this->getBaseUrl().'/'.$type->getId(),
             );
 
             try {

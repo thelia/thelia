@@ -51,7 +51,7 @@ class UpdateCurrenciesRates extends ContainerAwareCommand
 
                 /** @var Currency $currency */
                 foreach ($undefinedCurrencies as $currency) {
-                    $output->writeln('  -' . $currency->getName() . ' (' . $currency->getCode() . '), current rate is ' . $currency->getRate());
+                    $output->writeln('  -'.$currency->getName().' ('.$currency->getCode().'), current rate is '.$currency->getRate());
                 }
 
                 $output->writeln('Update done with errors</comment>');
@@ -60,7 +60,7 @@ class UpdateCurrenciesRates extends ContainerAwareCommand
             }
         } catch (\Exception $exception) {
             // Any error
-            $output->writeln('<error>Update failed: ' . $exception->getMessage() . '</error>');
+            $output->writeln('<error>Update failed: '.$exception->getMessage().'</error>');
 
             return 1;
         }

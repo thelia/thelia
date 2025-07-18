@@ -64,7 +64,7 @@ class IriConverter implements IriConverterInterface
                 $identifiers = array_reduce(
                     $compositeIdentifiers[0]->getArguments()[0],
                     static function (array $carry, $identifier) use ($resource) {
-                        $getter = 'get' . ucfirst($identifier);
+                        $getter = 'get'.ucfirst($identifier);
                         $carry[$identifier] = $resource->{$getter}()->getId();
 
                         return $carry;
@@ -81,7 +81,7 @@ class IriConverter implements IriConverterInterface
         try {
             return $this->decorated->getIriFromResource($resource, $referenceType, $operation, $context);
         } catch (\Exception $exception) {
-            Tlog::getInstance()->warning('Iri convert failure : ' . $exception->getMessage());
+            Tlog::getInstance()->warning('Iri convert failure : '.$exception->getMessage());
 
             return 'undefined_iri';
         }

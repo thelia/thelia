@@ -53,7 +53,7 @@ class PostItemFileController
                 $errors[] = $violation->getMessage();
             }
 
-            throw new \Exception('Validation error: ' . implode(', ', $errors));
+            throw new \Exception('Validation error: '.implode(', ', $errors));
         }
 
         $itemType = $resourceClass::getItemType();

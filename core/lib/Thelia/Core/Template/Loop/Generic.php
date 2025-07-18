@@ -55,7 +55,7 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
         $tableMap = new $tableMapClass();
 
         /** @var ModelCriteria $queryClass */
-        $queryClass = $tableMap->getClassName() . 'Query';
+        $queryClass = $tableMap->getClassName().'Query';
 
         /** @var ModelCriteria $query */
         $query = $queryClass::create();
@@ -67,7 +67,7 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
                 continue;
             }
 
-            $filterMethod = 'filterBy' . str_replace('_', '', ucwords((string) $filter, '_'));
+            $filterMethod = 'filterBy'.str_replace('_', '', ucwords((string) $filter, '_'));
 
             if (!method_exists($query, $filterMethod)) {
                 continue;
@@ -76,8 +76,8 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
             $query->{$filterMethod}($value, Criteria::IN);
         }
 
-        $i18nTableMapClass = PropelResolver::getTableMapByTableName($this->getTableName() . '_i18n');
-        $useI18nQueryMethod = 'use' . $tableMap->getPhpName() . 'I18nQuery';
+        $i18nTableMapClass = PropelResolver::getTableMapByTableName($this->getTableName().'_i18n');
+        $useI18nQueryMethod = 'use'.$tableMap->getPhpName().'I18nQuery';
 
         if (null !== $i18nTableMapClass && method_exists($query, $useI18nQueryMethod)) {
             $i18nTableMap = new $i18nTableMapClass();
@@ -95,7 +95,7 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
         $orders = $this->getParsedParams($this->getOrders());
 
         foreach ($orders as $order => $direction) {
-            $orderByMethod = 'orderBy' . str_replace('_', '', ucwords((string) $order, '_'));
+            $orderByMethod = 'orderBy'.str_replace('_', '', ucwords((string) $order, '_'));
 
             if (!\is_callable([$query, $orderByMethod])) {
                 continue;
@@ -121,14 +121,14 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
             $columnPhpNames = TableMap::getFieldnamesForClass($tableMap->getClassName(), TableMap::TYPE_PHPNAME);
 
             foreach (TableMap::getFieldnamesForClass($tableMap->getClassName(), TableMap::TYPE_FIELDNAME) as $columnIndex => $columnName) {
-                $getter = 'get' . $columnPhpNames[$columnIndex];
+                $getter = 'get'.$columnPhpNames[$columnIndex];
 
                 if (method_exists($item, $getter)) {
                     $loopResultRow->set(strtoupper((string) $columnName), $item->{$getter}());
                 }
             }
 
-            $i18nTableMapClass = PropelResolver::getTableMapByTableName($this->getTableName() . '_i18n');
+            $i18nTableMapClass = PropelResolver::getTableMapByTableName($this->getTableName().'_i18n');
 
             if (null !== $i18nTableMapClass) {
                 $i18nTableMap = new $i18nTableMapClass();

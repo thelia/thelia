@@ -89,7 +89,7 @@ abstract class BaseI18nLoop extends BaseLoop
                 "CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID)
                         THEN `requested_locale_i18n`.`{$columnName}`
                         ELSE `default_locale_i18n`.`{$columnName}`
-                        END " . $searchCriteria . ' ?',
+                        END ".$searchCriteria.' ?',
                 $searchTerm,
                 \PDO::PARAM_STR,
             );

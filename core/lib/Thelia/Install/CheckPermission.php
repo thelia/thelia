@@ -74,7 +74,7 @@ class CheckPermission extends BaseInstall
     public function __construct(bool $verifyInstall = true, protected ?Translator $translator = null)
     {
         $this->validationMessages['php_version'] = [
-            'text' => $this->getI18nPhpVersionText(PHP_VERSION, true),
+            'text' => $this->getI18nPhpVersionText(\PHP_VERSION, true),
             'hint' => $this->getI18nPhpVersionHint(),
             'status' => true,
         ];
@@ -111,17 +111,17 @@ class CheckPermission extends BaseInstall
      */
     public function exec(): bool
     {
-        $currentVersion = substr(PHP_VERSION, 0, strrpos(PHP_VERSION, '.'));
+        $currentVersion = substr(\PHP_VERSION, 0, strrpos(\PHP_VERSION, '.'));
 
         if (!version_compare($currentVersion, $this->phpExpectedVerions['min'], '>=') && version_compare($currentVersion, $this->phpExpectedVerions['max'], '<=')) {
             $this->isValid = false;
-            $this->validationMessages['php_version']['text'] = $this->getI18nPhpVersionText(PHP_VERSION, false);
+            $this->validationMessages['php_version']['text'] = $this->getI18nPhpVersionText(\PHP_VERSION, false);
             $this->validationMessages['php_version']['status'] = false;
             $this->validationMessages['php_version']['hint'] = $this->getI18nPhpVersionHint();
         }
 
         foreach ($this->directoriesToBeWritable as $directory) {
-            $fullDirectory = THELIA_ROOT . $directory;
+            $fullDirectory = THELIA_ROOT.$directory;
             $this->validationMessages[$directory]['text'] = $this->getI18nDirectoryText($fullDirectory, true);
 
             if (false === is_writable($fullDirectory) && !$this->makeDirectoryWritable($fullDirectory)) {
@@ -169,7 +169,7 @@ class CheckPermission extends BaseInstall
      */
     protected function makeDirectoryWritable(string $directory): bool
     {
-        return is_writable(THELIA_ROOT . $directory);
+        return is_writable(THELIA_ROOT.$directory);
     }
 
     /**
@@ -311,7 +311,7 @@ class CheckPermission extends BaseInstall
         $base = log($bytes) / log(1024);
         $suffixes = ['', 'k', 'M', 'G', 'T'];
 
-        return round(1024 ** ($base - floor($base)), $precision) . $suffixes[floor($base)];
+        return round(1024 ** ($base - floor($base)), $precision).$suffixes[floor($base)];
     }
 
     protected function formatString(string $string, array $parameters = []): string

@@ -46,9 +46,8 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
     protected array $options;
 
     public function __construct(
-        protected LangService $langService
-    )
-    {
+        protected LangService $langService,
+    ) {
     }
 
     public function match(string $pathinfo): array

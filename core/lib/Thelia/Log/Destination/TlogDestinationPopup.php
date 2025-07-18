@@ -47,7 +47,7 @@ class TlogDestinationPopup extends AbstractTlogDestination
                 self::VAR_POPUP_TPL,
                 'Popup windows template',
                 'Put #LOGTEXT in the template text where you want to display logs..',
-                file_get_contents(__DIR__ . DS . self::VALEUR_POPUP_TPL_DEFAUT),
+                file_get_contents(__DIR__.DS.self::VALEUR_POPUP_TPL_DEFAUT),
                 TlogDestinationConfig::TYPE_TEXTAREA,
             ),
             new TlogDestinationConfig(
@@ -73,7 +73,7 @@ class TlogDestinationPopup extends AbstractTlogDestination
         $count = 1;
 
         foreach ($this->logs as $line) {
-            $content .= '<div class="' . (0 !== $count++ % 2 ? 'paire' : 'impaire') . '">' . htmlspecialchars((string) $line) . '</div>';
+            $content .= '<div class="'.(0 !== $count++ % 2 ? 'paire' : 'impaire').'">'.htmlspecialchars((string) $line).'</div>';
         }
 
         $tpl = $this->getConfig(self::VAR_POPUP_TPL);
@@ -97,7 +97,7 @@ class TlogDestinationPopup extends AbstractTlogDestination
         );
 
         if (preg_match('|</body>|i', (string) $res)) {
-            $res = preg_replace('|</body>|i', $wop . '
+            $res = preg_replace('|</body>|i', $wop.'
 </body>', (string) $res);
         } else {
             $res .= $wop;

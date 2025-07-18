@@ -16,8 +16,8 @@ namespace Thelia\Action;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Propel\Runtime\Propel;
 use Propel\Runtime\Exception\PropelException;
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Product\ProductCloneEvent;
@@ -406,7 +406,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
         $clonedProductUpdatePSEEvent = new ProductSaleElementUpdateEvent($event->getClonedProduct(), $clonedProductPSEId);
         $clonedProductUpdatePSEEvent
-            ->setReference($event->getClonedProduct()->getRef() . '-' . ($key + 1))
+            ->setReference($event->getClonedProduct()->getRef().'-'.($key + 1))
             ->setIsdefault($originalProductPSE->getIsDefault())
             ->setFromDefaultCurrency(0)
 

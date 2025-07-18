@@ -53,7 +53,7 @@ abstract class AbstractArchiver implements ArchiverInterface
         $path = realpath($path);
 
         if (!file_exists($path)) {
-            throw new \RuntimeException('File ' . $path . " doesn't exists");
+            throw new \RuntimeException('File '.$path." doesn't exists");
         }
 
         if (null === $pathInArchive) {
@@ -66,7 +66,7 @@ abstract class AbstractArchiver implements ArchiverInterface
                     continue;
                 }
 
-                $this->add($dirItem->getPathname(), $pathInArchive . DS . $dirItem->getFilename());
+                $this->add($dirItem->getPathname(), $pathInArchive.DS.$dirItem->getFilename());
             }
         } else {
             $this->archive->addFile($path, $pathInArchive);

@@ -38,7 +38,7 @@ foreach ($argv as $arg) {
     }
 
     if ($bootstrapToggle) {
-        require __DIR__ . \DIRECTORY_SEPARATOR . $arg;
+        require __DIR__.\DIRECTORY_SEPARATOR.$arg;
 
         $bootstraped = true;
     }
@@ -47,9 +47,9 @@ foreach ($argv as $arg) {
 if (!$bootstraped) {
     if (isset($bootstrapFile)) {
         require $bootstrapFile;
-    } elseif (is_file($file = __DIR__ . '/../vendor/autoload.php')) {
+    } elseif (is_file($file = __DIR__.'/../vendor/autoload.php')) {
         require $file;
-    } elseif (is_file($file = __DIR__ . '/../../bootstrap.php')) {
+    } elseif (is_file($file = __DIR__.'/../../bootstrap.php')) {
         // Here we are on a thelia/thelia-project
         require $file;
     } else {
@@ -58,13 +58,13 @@ if (!$bootstraped) {
     }
 }
 
-if (is_file(dirname(__DIR__) . "/.env.{$env}.local")) {
-    (new Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__) . "/.env.{$env}.local");
-} elseif (is_file(dirname(__DIR__) . '/.env')) {
-    (new Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__) . '/.env');
-} elseif (is_file($file = __DIR__ . '/../../bootstrap.php')) {
+if (is_file(dirname(__DIR__)."/.env.{$env}.local")) {
+    (new Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__)."/.env.{$env}.local");
+} elseif (is_file(dirname(__DIR__).'/.env')) {
+    (new Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__).'/.env');
+} elseif (is_file($file = __DIR__.'/../../bootstrap.php')) {
     // Here we are on a thelia/thelia-project
-    (new Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__) . '/../.env');
+    (new Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__).'/../.env');
 }
 
 $thelia = new App\Kernel($_ENV['APP_ENV'], false);
@@ -87,7 +87,7 @@ try {
  */
 
 if ($update->isLatestVersion()) {
-    cliOutput('You already have the latest version of Thelia : ' . $update->getCurrentVersion(), 'success');
+    cliOutput('You already have the latest version of Thelia : '.$update->getCurrentVersion(), 'success');
     exit(3);
 }
 
@@ -115,8 +115,8 @@ while (1) {
             $files,
         ), 'warning');
         cliOutput(
-            'It is recommended to upgrade your files first then run this script again.' . \PHP_EOL
-            . 'The latest version is available at http://thelia.net/#download .',
+            'It is recommended to upgrade your files first then run this script again.'.\PHP_EOL
+            .'The latest version is available at http://thelia.net/#download .',
             'warning',
         );
         cliOutput('Continue update process anyway ? (Y/n)');
@@ -167,7 +167,7 @@ try {
             $update->backupDb();
             cliOutput(sprintf('Your database has been backed up. The sql file : %s', $update->getBackupFile()), 'info');
         } catch (Exception $e) {
-            cliOutput('Sorry, your database can\'t be backed up. Reason : ' . $e->getMessage(), 'error');
+            cliOutput('Sorry, your database can\'t be backed up. Reason : '.$e->getMessage(), 'error');
             exit(4);
         }
     }
@@ -191,11 +191,11 @@ if (null === $updateError) {
     }
 } else {
     cliOutput(sprintf('Sorry, an unexpected error has occured : %s', $updateError->getMessage()), 'error');
-    echo $updateError->getTraceAsString() . \PHP_EOL;
-    echo 'Trace: ' . \PHP_EOL;
+    echo $updateError->getTraceAsString().\PHP_EOL;
+    echo 'Trace: '.\PHP_EOL;
 
     foreach ($update->getLogs() as $log) {
-        cliOutput(sprintf('[%s] %s' . \PHP_EOL, $log[0], $log[1]), 'error');
+        cliOutput(sprintf('[%s] %s'.\PHP_EOL, $log[0], $log[1]), 'error');
     }
 
     if (true === $backup) {
@@ -246,7 +246,7 @@ foreach ($finder as $file) {
 }
 
 if (true === $hasDeleteError) {
-    cliOutput('The cache has not been cleared properly. Try to run the command manually : ' .
+    cliOutput('The cache has not been cleared properly. Try to run the command manually : '.
         '(sudo) php Thelia cache:clear (--env=prod).');
 }
 
@@ -283,7 +283,7 @@ function joinPaths()
     $path = implode(\DIRECTORY_SEPARATOR, $paths);
 
     if ('/' === substr($args[0], 0, 1)) {
-        $path = \DIRECTORY_SEPARATOR . $path;
+        $path = \DIRECTORY_SEPARATOR.$path;
     }
 
     return $path;
@@ -308,5 +308,5 @@ function cliOutput($message, $type = null): void
             $color = "\033[0m";
     }
 
-    echo \PHP_EOL . $color . $message . "\033[0m" . \PHP_EOL;
+    echo \PHP_EOL.$color.$message."\033[0m".\PHP_EOL;
 }

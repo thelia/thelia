@@ -127,7 +127,7 @@ class CartContainsCategories extends ConditionAbstract
         if (null !== $catList = CategoryQuery::create()->findPks($catIds)) {
             /** @var Category $cat */
             foreach ($catList as $cat) {
-                $catStrList .= $cat->setLocale($this->getCurrentLocale())->getTitle() . ', ';
+                $catStrList .= $cat->setLocale($this->getCurrentLocale())->getTitle().', ';
             }
 
             $catStrList = rtrim($catStrList, ', ');

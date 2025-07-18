@@ -69,7 +69,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
      */
     protected function getLogFilePath(): string
     {
-        return \sprintf(THELIA_LOG_DIR . '%s.log', strtolower($this->getModuleCode()));
+        return \sprintf(THELIA_LOG_DIR.'%s.log', strtolower($this->getModuleCode()));
     }
 
     /**

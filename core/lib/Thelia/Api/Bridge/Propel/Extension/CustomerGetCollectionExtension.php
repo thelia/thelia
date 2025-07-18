@@ -48,7 +48,7 @@ final readonly class CustomerGetCollectionExtension implements QueryCollectionEx
 
         if (isset($operation->getExtraProperties()['usesForCustomer'])) {
             foreach ($operation->getExtraProperties()['usesForCustomer'] as $joinTable) {
-                $use = 'use' . ucwords(strtolower((string) $joinTable)) . 'Query';
+                $use = 'use'.ucwords(strtolower((string) $joinTable)).'Query';
                 $query = $query->{$use}();
             }
 

@@ -50,8 +50,8 @@ return static function (ContainerConfigurator $configurator): void {
     $serviceConfigurator->load('Thelia\\', THELIA_LIB)
         ->exclude(
             [
-                THELIA_LIB . '/Command/Skeleton/Module/I18n/*.php',
-                THELIA_LIB . '/Config/**/*.php',
+                THELIA_LIB.'/Command/Skeleton/Module/I18n/*.php',
+                THELIA_LIB.'/Config/**/*.php',
             ],
         )
         ->autowire()
@@ -64,13 +64,13 @@ return static function (ContainerConfigurator $configurator): void {
             $dsn = 'smtp://';
 
             if (ConfigQuery::getSmtpUsername()) {
-                $dsn .= urlencode((string) ConfigQuery::getSmtpUsername()) . ':' . urlencode((string) ConfigQuery::getSmtpPassword()) . '@';
+                $dsn .= urlencode((string) ConfigQuery::getSmtpUsername()).':'.urlencode((string) ConfigQuery::getSmtpPassword()).'@';
             }
 
             // Escape "%" added by urlencode
             $dsn = str_replace('%', '%%', $dsn);
 
-            $dsn .= ConfigQuery::getSmtpHost() . ':' . ConfigQuery::getSmtpPort();
+            $dsn .= ConfigQuery::getSmtpHost().':'.ConfigQuery::getSmtpPort();
         }
 
         $configurator->extension('framework', [
@@ -82,7 +82,7 @@ return static function (ContainerConfigurator $configurator): void {
 
     if (false === \defined('THELIA_INSTALL_MODE')) {
         $apiResourcePaths = [
-            THELIA_LIB . '/Api/Resource',
+            THELIA_LIB.'/Api/Resource',
         ];
         $modules = ModuleQuery::getActivated();
 
@@ -95,7 +95,7 @@ return static function (ContainerConfigurator $configurator): void {
 
                 \call_user_func([$module->getFullNamespace(), 'configureContainer'], $configurator);
                 \call_user_func([$module->getFullNamespace(), 'configureServices'], $serviceConfigurator);
-                $apiModulePath = $module->getAbsoluteBaseDir() . '/Api/Resource';
+                $apiModulePath = $module->getAbsoluteBaseDir().'/Api/Resource';
 
                 if (is_dir($apiModulePath)) {
                     $apiResourcePaths[] = $apiModulePath;

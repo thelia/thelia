@@ -59,7 +59,7 @@ class ResponseRest extends Response
                 $this->setContent($serializer->serialize($data, $this->format));
             }
 
-            $this->headers->set('Content-Type', 'application/' . $this->format);
+            $this->headers->set('Content-Type', 'application/'.$this->format);
         }
     }
 

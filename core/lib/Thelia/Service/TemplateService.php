@@ -25,7 +25,7 @@ class TemplateService
         $configTemplatesNames = TemplateDefinition::CONFIG_NAMES;
 
         foreach ($configTemplatesNames as $templateType => $configName) {
-            $templatePath = THELIA_TEMPLATE_DIR . $templateType . DS . ConfigQuery::read($configName, 'default');
+            $templatePath = THELIA_TEMPLATE_DIR.$templateType.DS.ConfigQuery::read($configName, 'default');
 
             if (is_dir($templatePath)) {
                 $templatesPath[$templateType] = $templatePath;
@@ -38,11 +38,11 @@ class TemplateService
     public static function getTemplateAbsolutePathByType(string $type): string
     {
         if (!isset(TemplateDefinition::CONFIG_NAMES[$type])) {
-            throw new \InvalidArgumentException('Invalid template type: ' . $type);
+            throw new \InvalidArgumentException('Invalid template type: '.$type);
         }
 
         $configName = TemplateDefinition::CONFIG_NAMES[$type];
 
-        return THELIA_TEMPLATE_DIR . $type . DS . ConfigQuery::read($configName, 'default');
+        return THELIA_TEMPLATE_DIR.$type.DS.ConfigQuery::read($configName, 'default');
     }
 }

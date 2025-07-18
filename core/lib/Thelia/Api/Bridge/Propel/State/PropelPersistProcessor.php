@@ -115,8 +115,8 @@ readonly class PropelPersistProcessor implements ProcessorInterface
         if (is_subclass_of($data, TranslatableResourceInterface::class) && $operation instanceof Put && method_exists($data, 'getI18ns')) {
             $i18nResourceClass = $data::getI18nResourceClass();
             $array = explode('\\', $i18nResourceClass);
-            $i18nGetter = 'get' . end($array) . 's';
-            $i18nRemove = 'remove' . end($array);
+            $i18nGetter = 'get'.end($array).'s';
+            $i18nRemove = 'remove'.end($array);
 
             if (method_exists($propelModel, $i18nGetter)) {
                 foreach ($propelModel->{$i18nGetter}() as $i18n) {
@@ -130,7 +130,7 @@ readonly class PropelPersistProcessor implements ProcessorInterface
         $reflector = new \ReflectionClass($data);
 
         foreach ($reflector->getProperties() as $property) {
-            $propelGetter = 'get' . ucfirst($property->getName());
+            $propelGetter = 'get'.ucfirst($property->getName());
 
             foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
                 if (isset($relationAttribute->getArguments()['targetResource'])) {
@@ -143,14 +143,14 @@ readonly class PropelPersistProcessor implements ProcessorInterface
 
                     foreach ($propelModel->{$propelGetter}()->getData() as $item) {
                         /** @var ModelCriteria $queryClass */
-                        $queryClass = $item::class . 'Query';
+                        $queryClass = $item::class.'Query';
 
                         /** @var ModelCriteria $query */
                         $query = $queryClass::create();
 
                         foreach ($compositeIdentifiers as $compositeIdentifier) {
-                            $filter = 'filterBy' . ucfirst((string) $compositeIdentifier) . 'Id';
-                            $getter = 'get' . ucfirst((string) $compositeIdentifier) . 'Id';
+                            $filter = 'filterBy'.ucfirst((string) $compositeIdentifier).'Id';
+                            $getter = 'get'.ucfirst((string) $compositeIdentifier).'Id';
 
                             if (!method_exists($item, $getter) || !method_exists($query, $filter)) {
                                 return;
@@ -174,7 +174,7 @@ readonly class PropelPersistProcessor implements ProcessorInterface
         PropelResourceInterface $data,
     ): array {
         $resourceAddons = [];
-        $jsonData = json_decode((string) $this->requestStack->getCurrentRequest()?->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $jsonData = json_decode((string) $this->requestStack->getCurrentRequest()?->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         $resourceAddonDefinitions = $this->apiResourcePropelTransformerService->getResourceAddonDefinitions($data::class);
 
         foreach ($resourceAddonDefinitions as $addonShortName => $addonClass) {

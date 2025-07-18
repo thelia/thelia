@@ -83,7 +83,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
                 if (null !== $productPrice) {
                     // Get the taxed price
-                    $priceWithTax = $taxCalculator->getTaxedPrice((float)$productPrice->getPrice());
+                    $priceWithTax = $taxCalculator->getTaxedPrice((float) $productPrice->getPrice());
 
                     // Remove the price offset to get the taxed promo price
                     $promoPrice = match ($offsetType) {
@@ -181,7 +181,6 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
             throw $e;
         }
-
     }
 
     /**

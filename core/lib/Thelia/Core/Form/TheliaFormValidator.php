@@ -50,7 +50,7 @@ class TheliaFormValidator
 
             if ($form->isValid()) {
                 if ($aBaseForm instanceof FirewallForm && !$aBaseForm->isFirewallOk($this->environment)) {
-                    throw new FormValidationException($this->translator->trans("You've submitted this form too many times. ") . $this->translator->trans('Further submissions will be ignored during %time', ['%time' => $aBaseForm->getWaitingTime()]));
+                    throw new FormValidationException($this->translator->trans("You've submitted this form too many times. ").$this->translator->trans('Further submissions will be ignored during %time', ['%time' => $aBaseForm->getWaitingTime()]));
                 }
 
                 return $form;
@@ -87,7 +87,7 @@ class TheliaFormValidator
         $errors = '';
 
         foreach ($form->getErrors() as $error) {
-            $errors .= $error->getMessage() . ', ';
+            $errors .= $error->getMessage().', ';
         }
 
         /** @var Form $child */

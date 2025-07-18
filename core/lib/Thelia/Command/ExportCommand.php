@@ -108,7 +108,7 @@ class ExportCommand extends ContainerAwareCommand
         $serializer = $input->getArgument('serializer');
 
         if (null === $exportRef || null === $serializer) {
-            throw new \RuntimeException('Not enough arguments.' . PHP_EOL . 'If no options are provided, ref and serializer arguments are required.');
+            throw new \RuntimeException('Not enough arguments.'.\PHP_EOL.'If no options are provided, ref and serializer arguments are required.');
         }
 
         /** @var ExportHandler $exportHandler */
@@ -117,7 +117,7 @@ class ExportCommand extends ContainerAwareCommand
         $export = $exportHandler->getExportByRef($exportRef);
 
         if (null === $export) {
-            throw new \RuntimeException($exportRef . " export doesn't exist.");
+            throw new \RuntimeException($exportRef." export doesn't exist.");
         }
 
         $serializerManager = $this->getContainer()->get(RegisterSerializerPass::MANAGER_SERVICE_ID);
@@ -145,7 +145,7 @@ class ExportCommand extends ContainerAwareCommand
         );
         $output->writeln($formattedLine);
         $output->writeln('<info>Export available at path:</info>');
-        $output->writeln('<comment>' . $exportEvent->getFilePath() . '</comment>');
+        $output->writeln('<comment>'.$exportEvent->getFilePath().'</comment>');
 
         return 0;
     }

@@ -971,7 +971,7 @@ class ProductController extends AbstractSeoCrudController
                     if ($attrAv->getId() === $attributeAv->getId()) {
                         $result['error'] = $this->getTranslator()->trans(
                             'A value for attribute "%name" is already present in the combination',
-                            ['%name' => $attribute->getTitle() . ' : ' . $attributeAv->getTitle()],
+                            ['%name' => $attribute->getTitle().' : '.$attributeAv->getTitle()],
                         );
 
                         $addIt = false;
@@ -981,12 +981,12 @@ class ProductController extends AbstractSeoCrudController
                         ->joinWithI18n($this->getCurrentEditionLocale())
                         ->findPk($attributeAv->getAttributeId());
 
-                    $result[] = ['id' => $attrAv->getId(), 'title' => $subAttribute->getTitle() . ' : ' . $attrAv->getTitle()];
+                    $result[] = ['id' => $attrAv->getId(), 'title' => $subAttribute->getTitle().' : '.$attrAv->getTitle()];
                 }
             }
 
             if ($addIt) {
-                $result[] = ['id' => $attributeAv->getId(), 'title' => $attribute->getTitle() . ' : ' . $attributeAv->getTitle()];
+                $result[] = ['id' => $attributeAv->getId(), 'title' => $attribute->getTitle().' : '.$attributeAv->getTitle()];
             }
         }
 
@@ -1856,7 +1856,7 @@ class ProductController extends AbstractSeoCrudController
      */
     public function searchCategoryAction(): Response
     {
-        $search = '%' . $this->getRequest()->query->get('q') . '%';
+        $search = '%'.$this->getRequest()->query->get('q').'%';
 
         $resultArray = [];
 
@@ -1878,7 +1878,7 @@ class ProductController extends AbstractSeoCrudController
      */
     public function searchProductAction(): Response
     {
-        $search = '%' . $this->getRequest()->query->get('q') . '%';
+        $search = '%'.$this->getRequest()->query->get('q').'%';
 
         $resultArray = [];
 

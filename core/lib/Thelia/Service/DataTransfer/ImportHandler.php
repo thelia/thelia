@@ -100,7 +100,7 @@ class ImportHandler
         $serializer = $this->matchSerializerByExtension($file->getFilename());
 
         if (!$serializer instanceof AbstractSerializer) {
-            throw new FormValidationException(Translator::getInstance()->trans('The extension "%extension" is not allowed', ['%extension' => pathinfo($file->getFilename(), PATHINFO_EXTENSION)]));
+            throw new FormValidationException(Translator::getInstance()->trans('The extension "%extension" is not allowed', ['%extension' => pathinfo($file->getFilename(), \PATHINFO_EXTENSION)]));
         }
 
         $importHandleClass = $import->getHandleClass();
@@ -132,7 +132,7 @@ class ImportHandler
     {
         /** @var AbstractArchiver $archiver */
         foreach ($this->archiverManager->getArchivers(true) as $archiver) {
-            if (false !== stripos($fileName, '.' . $archiver->getExtension())) {
+            if (false !== stripos($fileName, '.'.$archiver->getExtension())) {
                 return $archiver;
             }
         }
@@ -144,7 +144,7 @@ class ImportHandler
     {
         /** @var AbstractSerializer $serializer */
         foreach ($this->serializerManager->getSerializers() as $serializer) {
-            if (false !== stripos((string) $fileName, '.' . $serializer->getExtension())) {
+            if (false !== stripos((string) $fileName, '.'.$serializer->getExtension())) {
                 return $serializer;
             }
         }
@@ -156,7 +156,7 @@ class ImportHandler
     {
         $archiver->open($file->getPathname());
 
-        $extractPath = \dirname($archiver->getArchivePath()) . DS . uniqid('', true);
+        $extractPath = \dirname($archiver->getArchivePath()).DS.uniqid('', true);
 
         $archiver->extract($extractPath);
 

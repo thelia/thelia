@@ -22,9 +22,7 @@ use Thelia\Model\Cart;
 use Thelia\Model\Country;
 use Thelia\Model\OrderPostage;
 use Thelia\Model\State;
-use Thelia\Module\AbstractDeliveryModule;
 use Thelia\Module\BaseModuleInterface;
-use Thelia\Module\DeliveryModuleInterface;
 
 /**
  * Class DeliveryPostageEvent.

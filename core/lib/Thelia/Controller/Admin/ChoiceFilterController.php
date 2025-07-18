@@ -65,7 +65,7 @@ class ChoiceFilterController extends BaseAdminController
             $parameters = [
                 'category_id' => $categoryId,
             ];
-            $redirectUrl = '/admin/categories/update?category_id=' . $categoryId . '&current_tab=associations#choice-filter';
+            $redirectUrl = '/admin/categories/update?category_id='.$categoryId.'&current_tab=associations#choice-filter';
         } else {
             throw new \RuntimeException('Missing parameter');
         }
@@ -129,7 +129,7 @@ class ChoiceFilterController extends BaseAdminController
             $parameters = [
                 'category_id' => $categoryId,
             ];
-            $redirectUrl = '/admin/categories/update?category_id=' . $categoryId . '&current_tab=associations#choice-filter';
+            $redirectUrl = '/admin/categories/update?category_id='.$categoryId.'&current_tab=associations#choice-filter';
         } else {
             throw new \RuntimeException('Missing parameter');
         }

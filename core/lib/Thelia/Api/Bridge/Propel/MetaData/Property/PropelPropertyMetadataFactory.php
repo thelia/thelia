@@ -79,7 +79,7 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
                                 return $carry;
                             }
 
-                            $carry[$property->getName()] = 'en_US ' . $property->getName();
+                            $carry[$property->getName()] = 'en_US '.$property->getName();
 
                             return $carry;
                         },
@@ -92,7 +92,7 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
                                 return $carry;
                             }
 
-                            $carry[$property->getName()] = 'fr_FR ' . $property->getName();
+                            $carry[$property->getName()] = 'fr_FR '.$property->getName();
 
                             return $carry;
                         },

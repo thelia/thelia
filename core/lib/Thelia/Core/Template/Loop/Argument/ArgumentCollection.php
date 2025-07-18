@@ -167,7 +167,7 @@ class ArgumentCollection implements \Iterator
         $string = '';
 
         foreach ($arguments as $key => $argument) {
-            $string .= $key . '=' . $argument->getRawValue();
+            $string .= $key.'='.$argument->getRawValue();
         }
 
         return md5($string);

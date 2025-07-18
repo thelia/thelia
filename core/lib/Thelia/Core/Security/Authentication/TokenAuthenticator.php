@@ -32,6 +32,7 @@ class TokenAuthenticator implements AuthenticatorInterface
         if (empty($keyData) || $keyData['username'] === '') {
             return null;
         }
+
         return $this->userProvider->getUser($keyData);
     }
 }

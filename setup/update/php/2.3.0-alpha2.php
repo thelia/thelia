@@ -24,7 +24,7 @@ $modules = [
 ];
 
 foreach ($modules as $moduleCode) {
-    $path = THELIA_MODULE_DIR . $moduleCode . DS . 'AdminIncludes';
+    $path = THELIA_MODULE_DIR.$moduleCode.DS.'AdminIncludes';
 
     if ($fs->exists($path)) {
         try {

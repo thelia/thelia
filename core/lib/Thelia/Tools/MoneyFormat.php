@@ -47,7 +47,7 @@ class MoneyFormat extends NumberFormat
         $number = $this->preFormat($number, $decimals, $decPoint, $thousandsSep, $removeZeroDecimal);
 
         if (null !== $symbol) {
-            return $number . ' ' . $symbol;
+            return $number.' '.$symbol;
         }
 
         return $number;

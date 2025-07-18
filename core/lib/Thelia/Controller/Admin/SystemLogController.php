@@ -66,7 +66,7 @@ class SystemLogController extends BaseAdminController
                     $classname = $matches[1];
 
                     if (!isset($destinations[$classname])) {
-                        $full_class_name = 'Thelia\\Log\\Destination\\' . $classname;
+                        $full_class_name = 'Thelia\\Log\\Destination\\'.$classname;
 
                         $destinations[$classname] = new $full_class_name();
                     }

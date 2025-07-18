@@ -87,11 +87,11 @@ abstract class BaseTaxType implements TaxTypeInterface
             $requirementName = $requirement->getName();
 
             if (!\array_key_exists($requirementName, $requirementsValues)) {
-                throw new TaxEngineException('Cannot load requirements : requirement value for `' . $requirementName . '` not found', TaxEngineException::TAX_TYPE_REQUIREMENT_NOT_FOUND);
+                throw new TaxEngineException('Cannot load requirements : requirement value for `'.$requirementName.'` not found', TaxEngineException::TAX_TYPE_REQUIREMENT_NOT_FOUND);
             }
 
             if (!$requirement->isValueValid($requirementsValues[$requirementName])) {
-                throw new TaxEngineException('Requirement value for `' . $requirementName . '` does not match required type', TaxEngineException::TAX_TYPE_BAD_REQUIREMENT_VALUE);
+                throw new TaxEngineException('Requirement value for `'.$requirementName.'` does not match required type', TaxEngineException::TAX_TYPE_BAD_REQUIREMENT_VALUE);
             }
 
             $this->requirements[$requirementName] = $requirementsValues[$requirementName];
@@ -108,7 +108,7 @@ abstract class BaseTaxType implements TaxTypeInterface
     public function getRequirement($key)
     {
         if (!\array_key_exists($key, $this->requirements)) {
-            throw new TaxEngineException('Requirement value for `' . $key . '` does not exists in BaseTaxType::$requirements', TaxEngineException::UNDEFINED_REQUIREMENT_VALUE);
+            throw new TaxEngineException('Requirement value for `'.$key.'` does not exists in BaseTaxType::$requirements', TaxEngineException::UNDEFINED_REQUIREMENT_VALUE);
         }
 
         return $this->requirements[$key];

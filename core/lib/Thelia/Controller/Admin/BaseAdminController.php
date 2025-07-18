@@ -86,7 +86,7 @@ class BaseAdminController extends BaseController
                 ['%msg' => $message->getMessage()],
             );
 
-            Tlog::getInstance()->addError($strMessage . ': ' . $message->getTraceAsString());
+            Tlog::getInstance()->addError($strMessage.': '.$message->getTraceAsString());
 
             $message = $strMessage;
         } else {
@@ -252,10 +252,10 @@ class BaseAdminController extends BaseController
 
     protected function renderRaw(string $templateName, array $args = [], $templateDir = null): string
     {
-        $parser = $this->getParser($templateDir . '/' . $templateName);
+        $parser = $this->getParser($templateDir.'/'.$templateName);
 
         // Add the template standard extension
-        $templateName .= '.' . $parser->getFileExtension();
+        $templateName .= '.'.$parser->getFileExtension();
 
         // Find the current edit language ID
         $editionLang = $this->getCurrentEditionLang();

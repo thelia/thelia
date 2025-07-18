@@ -101,7 +101,7 @@ class HookCleanCommand extends ContainerAwareCommand
             $questionText = 'Would you like to delete all hooks ';
             $questionText .= (empty($moduleCode))
                 ? 'of all modules'
-                : 'of module ' . $moduleCode;
+                : 'of module '.$moduleCode;
             $questionText .= ' ? (yes, or no) ';
 
             $question = new ConfirmationQuestion($questionText, false);

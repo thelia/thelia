@@ -90,14 +90,14 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
     public function getUploadDir(): string
     {
         $uploadDir = ConfigQuery::read('documents_library_path');
-        $uploadDir = null === $uploadDir ? THELIA_LOCAL_DIR . 'media' . DS . 'documents' : THELIA_ROOT . $uploadDir;
+        $uploadDir = null === $uploadDir ? THELIA_LOCAL_DIR.'media'.DS.'documents' : THELIA_ROOT.$uploadDir;
 
-        return $uploadDir . DS . 'brand';
+        return $uploadDir.DS.'brand';
     }
 
     public function getRedirectionUrl(): string
     {
-        return '/admin/brand/update/' . $this->getBrandId();
+        return '/admin/brand/update/'.$this->getBrandId();
     }
 
     /**

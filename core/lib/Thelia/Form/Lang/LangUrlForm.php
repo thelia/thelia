@@ -49,7 +49,7 @@ class LangUrlForm extends BaseForm
     {
         foreach (LangQuery::create()->find() as $lang) {
             $this->formBuilder->add(
-                self::LANG_PREFIX . $lang->getId(),
+                self::LANG_PREFIX.$lang->getId(),
                 TextType::class,
                 [
                     'constraints' => [

@@ -169,7 +169,7 @@ class ModuleHookCreationForm extends BaseForm
 
         /** @var Hook $hook */
         foreach ($hooks as $hook) {
-            $choices[$hook->getTitle() . ' (code ' . $hook->getCode() . ')'] = $hook->getId();
+            $choices[$hook->getTitle().' (code '.$hook->getCode().')'] = $hook->getId();
         }
 
         return $choices;
