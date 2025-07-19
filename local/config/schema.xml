@@ -768,6 +768,7 @@
     <column name="color" size="7" type="CHAR" />
     <column name="position" type="INTEGER" />
     <column defaultValue="0" name="protected_status" type="BOOLEAN" />
+    <column defaultValue="0" name="paid_status" type="BOOLEAN" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
