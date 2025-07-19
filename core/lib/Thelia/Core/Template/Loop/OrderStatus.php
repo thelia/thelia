@@ -76,7 +76,7 @@ class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         if (null !== $paid = $this->getPaid()) {
-            $search->filterByPaisStatus($paid, Criteria::EQUAL);
+            $search->filterByPaidStatus($paid, Criteria::EQUAL);
         }
 
         $orders = $this->getOrder();
