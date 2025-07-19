@@ -14,6 +14,7 @@ namespace Thelia\Form\OrderStatus;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -73,6 +74,21 @@ class OrderStatusCreationForm extends BaseForm
                     ],
                     'attr' => [
                         'placeholder' => Translator::getInstance()->trans('The order status code'),
+                    ],
+                ]
+            )
+            ->add(
+                'paid_status',
+                CheckboxType::class,
+                [
+                    'required' => false,
+                    'label' => Translator::getInstance()->trans('Paid status'),
+                    'label_attr' => [
+                        'for' => 'title',
+                        'help' => Translator::getInstance()->trans('Check if this status is considered as a "paid status"'),
+                    ],
+                    'attr' => [
+                        'placeholder' => Translator::getInstance()->trans('Paid status'),
                     ],
                 ]
             )
