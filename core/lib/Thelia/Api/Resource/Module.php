@@ -32,36 +32,36 @@ use Thelia\Model\Map\ModuleTableMap;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/modules'
+            uriTemplate: '/admin/modules',
         ),
         new GetCollection(
-            uriTemplate: '/admin/modules'
+            uriTemplate: '/admin/modules',
         ),
         new Get(
             uriTemplate: '/admin/modules/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/modules/{id}'
+            uriTemplate: '/admin/modules/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/modules/{id}'
+            uriTemplate: '/admin/modules/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/front/modules'
+            uriTemplate: '/front/modules',
         ),
         new Get(
             uriTemplate: '/front/modules/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]]
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -70,15 +70,15 @@ use Thelia\Model\Map\ModuleTableMap;
         'category' => 'exact',
         'type' => 'exact',
         'code',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
-    properties: ['position']
+    properties: ['position'],
 )]
 #[ApiFilter(
     filterClass: NotInFilter::class,
-    properties: ['id']
+    properties: ['id'],
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
@@ -86,18 +86,14 @@ use Thelia\Model\Map\ModuleTableMap;
         'activate',
         'hidden',
         'mandatory',
-    ]
+    ],
 )]
 class Module extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:module:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:module:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:module:write';
-
     public const GROUP_FRONT_READ = 'front:module:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:module:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ,

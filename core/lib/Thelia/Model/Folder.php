@@ -35,24 +35,22 @@ class Folder extends BaseFolder implements FileModelParentInterface
     /**
      * @return int number of contents for the folder
      */
-    public function countChild()
+    public function countChild(): int
     {
         return FolderQuery::countChild($this->getId());
     }
 
     /**
      * count all products for current category and sub categories.
-     *
-     * @return int
      */
-    public function countAllContents($contentVisibility = true)
+    public function countAllContents($contentVisibility = true): int
     {
         $children = FolderQuery::findAllChild($this->getId());
         $children[] = $this;
 
         $query = ContentQuery::create()->filterByFolder(new ObjectCollection($children), Criteria::IN);
 
-        if ($contentVisibility !== '*') {
+        if ('*' !== $contentVisibility) {
             $query->filterByVisible($contentVisibility);
         }
 
@@ -61,10 +59,8 @@ class Folder extends BaseFolder implements FileModelParentInterface
 
     /**
      * Get the root folder.
-     *
-     * @param int $folderId
      */
-    public function getRoot($folderId)
+    public function getRoot(int $folderId)
     {
         $folder = FolderQuery::create()->findPk($folderId);
 
@@ -81,15 +77,13 @@ class Folder extends BaseFolder implements FileModelParentInterface
 
     /**
      * Calculate next position relative to our parent.
-     *
-     * @param FolderQuery $query
      */
-    protected function addCriteriaToPositionQuery($query): void
+    protected function addCriteriaToPositionQuery(FolderQuery $query): void
     {
         $query->filterByParent($this->getParent());
     }
 
-    public function preInsert(?ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): bool
     {
         parent::preInsert($con);
 
@@ -98,14 +92,14 @@ class Folder extends BaseFolder implements FileModelParentInterface
         return true;
     }
 
-    public function preDelete(?ConnectionInterface $con = null)
+    public function preDelete(?ConnectionInterface $con = null): bool
     {
         parent::preDelete($con);
 
         $this->reorderBeforeDelete(
             [
                 'parent' => $this->getParent(),
-            ]
+            ],
         );
 
         return true;
@@ -120,10 +114,8 @@ class Folder extends BaseFolder implements FileModelParentInterface
 
     /**
      * Overload for the position management.
-     *
-     * @param Base\ContentFolder $contentFolder
      */
-    protected function doAddContentFolder($contentFolder): void
+    protected function doAddContentFolder(Base\ContentFolder $contentFolder): void
     {
         parent::doAddContentFolder($contentFolder);
 
@@ -132,6 +124,6 @@ class Folder extends BaseFolder implements FileModelParentInterface
             ->orderByPosition(Criteria::DESC)
             ->findOne();
 
-        $contentFolder->setPosition($contentFolderPosition !== null ? $contentFolderPosition->getPosition() + 1 : 1);
+        $contentFolder->setPosition(null !== $contentFolderPosition ? $contentFolderPosition->getPosition() + 1 : 1);
     }
 }

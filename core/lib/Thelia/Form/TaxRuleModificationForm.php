@@ -33,11 +33,10 @@ class TaxRuleModificationForm extends TaxRuleCreationForm
                 'constraints' => [
                     new NotBlank(),
                     new Callback(
-                        $this->verifyTaxRuleId(...)
+                        $this->verifyTaxRuleId(...),
                     ),
                 ],
-            ])
-        ;
+            ]);
     }
 
     public static function getName(): string

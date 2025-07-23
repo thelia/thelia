@@ -23,10 +23,8 @@ use Thelia\Type\TypeInterface;
  */
 class TaxTypeRequirementDefinition
 {
-    /**
-     * @var string The translated requirement title
-     */
-    protected $title;
+    /** @var string The translated requirement title */
+    protected string $title;
 
     /**
      * Create a new Tax type requirement.
@@ -49,7 +47,7 @@ class TaxTypeRequirementDefinition
         return $this->type;
     }
 
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }

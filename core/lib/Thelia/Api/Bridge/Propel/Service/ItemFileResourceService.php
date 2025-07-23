@@ -66,17 +66,18 @@ readonly class ItemFileResourceService
 
         $file = $this->eventDispatcher->dispatch(
             $fileEvent,
-            TheliaEvents::DOCUMENT_SAVE
+            TheliaEvents::DOCUMENT_SAVE,
         );
 
-        if ($fileType !== 'image') {
+        if ('image' !== $fileType) {
             return;
         }
 
         $event = new ImageEvent();
 
         $baseSourceFilePath = ConfigQuery::read('images_library_path');
-        if ($baseSourceFilePath === null) {
+
+        if (null === $baseSourceFilePath) {
             $baseSourceFilePath = THELIA_LOCAL_DIR.'media'.DS.'images';
         } else {
             $baseSourceFilePath = THELIA_ROOT.$baseSourceFilePath;
@@ -86,7 +87,7 @@ readonly class ItemFileResourceService
             '%s/%s/%s',
             $baseSourceFilePath,
             $itemType,
-            basename($file->getUploadedFile()->getFilename())
+            basename($file->getUploadedFile()->getFilename()),
         );
 
         $event->setSourceFilepath($sourceFilePath);
@@ -107,16 +108,19 @@ readonly class ItemFileResourceService
         $constraints = [];
 
         $reflectionClass = new \ReflectionClass($className);
+
         if ($reflectionClass->hasProperty($propertyName)) {
             $property = $reflectionClass->getProperty($propertyName);
 
             $attributes = $property->getAttributes(Assert\File::class);
+
             foreach ($attributes as $attribute) {
                 $constraintInstance = $attribute->newInstance();
                 $constraints[] = $constraintInstance;
             }
 
             $attributes = $property->getAttributes(Assert\Image::class);
+
             foreach ($attributes as $attribute) {
                 $constraintInstance = $attribute->newInstance();
                 $constraints[] = $constraintInstance;

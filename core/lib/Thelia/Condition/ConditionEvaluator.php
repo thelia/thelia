@@ -27,12 +27,11 @@ class ConditionEvaluator
      * Check if an Event matches SerializableCondition.
      *
      * @param ConditionCollection $conditions Conditions to check against the Event
-     *
-     * @return bool
      */
-    public function isMatching(ConditionCollection $conditions)
+    public function isMatching(ConditionCollection $conditions): bool
     {
         $isMatching = true;
+
         /** @var ConditionInterface $condition */
         foreach ($conditions as $condition) {
             if (!$condition->isMatching()) {
@@ -51,14 +50,12 @@ class ConditionEvaluator
      * @param mixed  $v2 Variable 2
      *
      * @throws \Exception
-     *
-     * @return bool
      */
-    public function variableOpComparison($v1, $o, $v2)
+    public function variableOpComparison(mixed $v1, string $o, mixed $v2): bool
     {
         return match ($o) {
             // !=
-            Operators::DIFFERENT => $v1 != $v2,
+            Operators::DIFFERENT => $v1 !== $v2,
             // >
             Operators::SUPERIOR => $v1 > $v2,
             // >=
@@ -68,11 +65,11 @@ class ConditionEvaluator
             // <=
             Operators::INFERIOR_OR_EQUAL => $v1 <= $v2,
             // ==
-            Operators::EQUAL => $v1 == $v2,
+            Operators::EQUAL => $v1 === $v2,
             // in
-            Operators::IN => \in_array($v1, $v2),
+            Operators::IN => \in_array($v1, $v2, true),
             // not in
-            Operators::OUT => !\in_array($v1, $v2),
+            Operators::OUT => !\in_array($v1, $v2, true),
             default => throw new \Exception('Unrecognized operator '.$o),
         };
     }

@@ -46,11 +46,9 @@ class MailerFactory
     /**
      * Send a message to the customer.
      *
-     * @param string   $messageCode
-     * @param Customer $customer
-     * @param array    $messageParameters an array of (name => value) parameters that will be available in the message
+     * @param array $messageParameters an array of (name => value) parameters that will be available in the message
      */
-    public function sendEmailToCustomer($messageCode, $customer, array $messageParameters = []): void
+    public function sendEmailToCustomer(string $messageCode, Customer $customer, array $messageParameters = []): void
     {
         // Always add the customer ID to the parameters
         $messageParameters['customer_id'] = $customer->getId();
@@ -60,18 +58,17 @@ class MailerFactory
             [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
             [$customer->getEmail() => $customer->getFirstname().' '.$customer->getLastname()],
             $messageParameters,
-            $customer->getCustomerLang()->getLocale()
+            $customer->getCustomerLang()->getLocale(),
         );
     }
 
     /**
      * Send a message to the shop managers.
      *
-     * @param string $messageCode
-     * @param array  $messageParameters an array of (name => value) parameters that will be available in the message
-     * @param array  $replyTo           Reply to addresses. An array of (email-address => name) [optional]
+     * @param array $messageParameters an array of (name => value) parameters that will be available in the message
+     * @param array $replyTo           Reply to addresses. An array of (email-address => name) [optional]
      */
-    public function sendEmailToShopManagers($messageCode, $messageParameters = [], $replyTo = []): void
+    public function sendEmailToShopManagers(string $messageCode, array $messageParameters = [], array $replyTo = []): void
     {
         $storeName = ConfigQuery::getStoreName();
 
@@ -92,14 +89,13 @@ class MailerFactory
             null,
             [],
             [],
-            $replyTo
+            $replyTo,
         );
     }
 
     /**
      * Send a message to the customer.
      *
-     * @param string $messageCode
      * @param array  $from              From addresses. An array of (email-address => name)
      * @param array  $to                To addresses. An array of (email-address => name)
      * @param array  $messageParameters an array of (name => value) parameters that will be available in the message
@@ -108,19 +104,19 @@ class MailerFactory
      * @param array  $bcc               Bcc addresses. An array of (email-address => name) [optional]
      * @param array  $replyTo           Reply to addresses. An array of (email-address => name) [optional]
      */
-    public function sendEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null, $cc = [], $bcc = [], $replyTo = []): void
+    public function sendEmailMessage(string $messageCode, array $from, array $to, array $messageParameters = [], ?string $locale = null, array $cc = [], array $bcc = [], array $replyTo = []): void
     {
         $storeEmail = ConfigQuery::getStoreEmail();
 
         if (!empty($storeEmail)) {
-            if (!empty($to)) {
+            if ([] !== $to) {
                 try {
                     $instance = $this->createEmailMessage($messageCode, $from, $to, $messageParameters, $locale, $cc, $bcc, $replyTo);
 
                     $this->send($instance);
                 } catch (\Exception $ex) {
                     Tlog::getInstance()->addError(
-                        \sprintf('Error while sending email message %s: ', $messageCode).$ex->getMessage()
+                        \sprintf('Error while sending email message %s: ', $messageCode).$ex->getMessage(),
                     );
                 }
             } else {
@@ -134,7 +130,6 @@ class MailerFactory
     /**
      * Create a SwiftMessage instance from a given message code.
      *
-     * @param string $messageCode
      * @param array  $from              From addresses. An array of (email-address => name)
      * @param array  $to                To addresses. An array of (email-address => name)
      * @param array  $messageParameters an array of (name => value) parameters that will be available in the message
@@ -145,19 +140,15 @@ class MailerFactory
      *
      * @throws \Exception
      */
-    public function createEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null, $cc = [], $bcc = [], $replyTo = []): Email
+    public function createEmailMessage(string $messageCode, array $from, array $to, array $messageParameters = [], ?string $locale = null, array $cc = [], array $bcc = [], array $replyTo = []): Email
     {
         $message = MessageQuery::getFromName($messageCode);
-        if (null == $message) {
-            throw new \RuntimeException(
-                Translator::getInstance()->trans(
-                    "Failed to load message with code '%code%', propably because it does'nt exists.",
-                    ['%code%' => $messageCode]
-                )
-            );
+
+        if (null === $message) {
+            throw new \RuntimeException(Translator::getInstance()->trans("Failed to load message with code '%code%', propably because it does'nt exists.", ['%code%' => $messageCode]));
         }
 
-        if ($locale === null) {
+        if (null === $locale) {
             $locale = Lang::getDefaultLanguage()->getLocale();
         }
 
@@ -204,7 +195,7 @@ class MailerFactory
      *
      * @return Email the generated and built message
      */
-    public function createSimpleEmailMessage($from, $to, string $subject, $htmlBody, $textBody, $cc = [], $bcc = [], $replyTo = []): Email
+    public function createSimpleEmailMessage(array $from, array $to, string $subject, string $htmlBody, string $textBody, array $cc = [], array $bcc = [], array $replyTo = []): Email
     {
         $email = (new Email());
 
@@ -228,7 +219,7 @@ class MailerFactory
      * @param array  $bcc      Bcc addresses. An array of (email-address => name) [optional]
      * @param array  $replyTo  Reply to addresses. An array of (email-address => name) [optional]
      */
-    public function sendSimpleEmailMessage($from, $to, string $subject, $htmlBody, $textBody, $cc = [], $bcc = [], $replyTo = []): void
+    public function sendSimpleEmailMessage(array $from, array $to, string $subject, string $htmlBody, string $textBody, array $cc = [], array $bcc = [], array $replyTo = []): void
     {
         $email = $this->createSimpleEmailMessage($from, $to, $subject, $htmlBody, $textBody, $cc, $bcc, $replyTo);
 
@@ -236,14 +227,13 @@ class MailerFactory
     }
 
     /**
-     * @param Email $email
      * @param array $from    From addresses. An array of (email-address => name)
      * @param array $to      To addresses. An array of (email-address => name)
      * @param array $cc      Cc addresses. An array of (email-address => name) [optional]
      * @param array $bcc     Bcc addresses. An array of (email-address => name) [optional]
      * @param array $replyTo Reply to addresses. An array of (email-address => name) [optional]
      */
-    protected function setupMessageHeaders($email, $from, $to, $cc = [], $bcc = [], $replyTo = []): void
+    protected function setupMessageHeaders(Email $email, array $from, array $to, array $cc = [], array $bcc = [], array $replyTo = []): void
     {
         // Add from addresses
         foreach ($from as $address => $name) {

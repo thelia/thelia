@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\ImportExport\Export\Type;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Propel;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
 
@@ -31,7 +32,7 @@ class ProductPricesExport extends JsonFileAbstractExport
 {
     public const FILE_NAME = 'product_price';
 
-    protected $orderAndAliases = [
+    protected array $orderAndAliases = [
         'product_sale_elements_id' => 'id',
         'product_i18n_id' => 'product_id',
         'product_i18n_title' => 'product_title',
@@ -43,7 +44,7 @@ class ProductPricesExport extends JsonFileAbstractExport
         'product_sale_elements_promo' => 'promo',
     ];
 
-    protected function getData()
+    protected function getData(): array|string|ModelCriteria
     {
         $locale = $this->language->getLocale();
 
@@ -63,8 +64,7 @@ class ProductPricesExport extends JsonFileAbstractExport
                     LEFT JOIN attribute_combination ON attribute_combination.product_sale_elements_id = product_sale_elements.id
                     LEFT JOIN attribute_av_i18n ON attribute_av_i18n.id = attribute_combination.attribute_av_id AND attribute_av_i18n.locale = :locale
                     LEFT JOIN product_price ON product_price.product_sale_elements_id = product_sale_elements.id
-                    LEFT JOIN currency ON currency.id = product_price.currency_id'
-        ;
+                    LEFT JOIN currency ON currency.id = product_price.currency_id';
 
         $stmt = $con->prepare($query);
         $stmt->bindValue('locale', $locale);

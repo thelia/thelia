@@ -40,14 +40,14 @@ class ParserAssetResolverFallback implements AssetResolverInterface
      * @param mixed           $sourceTemplateName      A template name, of false. If provided, the assets will be searched in this template directory instead of the current one.
      */
     public function resolveAssetURL(
-        $source,
-        $file,
-        $type,
+        string $source,
+        string $file,
+        string $type,
         ParserInterface $parserInterface,
-        $filters = [],
-        $debug = false,
-        $declaredAssetsDirectory = null,
-        $sourceTemplateName = false,
+        array $filters = [],
+        bool $debug = false,
+        ?string $declaredAssetsDirectory = null,
+        mixed $sourceTemplateName = false,
     ): void {
         throw new \RuntimeException('if you want to use a parser, please register one');
     }
@@ -67,7 +67,7 @@ class ParserAssetResolverFallback implements AssetResolverInterface
      *
      * @return mixed the path to directory containing the file, or null if the file doesn't exists
      */
-    public function resolveAssetSourcePath($source, $templateName, $fileName, ParserInterface $parserInterface): never
+    public function resolveAssetSourcePath(string $source, string $templateName, string $fileName, ParserInterface $parserInterface): never
     {
         throw new \RuntimeException('if you want to use a parser, please register one');
     }
@@ -90,9 +90,9 @@ class ParserAssetResolverFallback implements AssetResolverInterface
      * @return mixed the path to directory containing the file, or null if the file doesn't exists
      */
     public function resolveAssetSourcePathAndTemplate(
-        $source,
-        $templateName,
-        $fileName,
+        string $source,
+        string $templateName,
+        string $fileName,
         ParserInterface $parserInterface,
         TemplateDefinition &$templateDefinition,
     ): never {

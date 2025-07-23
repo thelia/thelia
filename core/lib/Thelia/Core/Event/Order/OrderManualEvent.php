@@ -23,13 +23,9 @@ use Thelia\Model\Order;
 class OrderManualEvent extends OrderEvent
 {
     protected $currency;
-
     protected $lang;
-
     protected $cart;
-
     protected $customer;
-
     protected $useOrderDefinedAddresses = false;
 
     public function __construct(Order $order, Currency $currency, Lang $lang, Cart $cart, Customer $customer)
@@ -40,8 +36,7 @@ class OrderManualEvent extends OrderEvent
             ->setCurrency($currency)
             ->setLang($lang)
             ->setCart($cart)
-            ->setCustomer($customer)
-        ;
+            ->setCustomer($customer);
     }
 
     public function getCurrency()
@@ -50,81 +45,61 @@ class OrderManualEvent extends OrderEvent
     }
 
     /**
-     * @param Currency $currency
-     *
      * @return $this
      */
-    public function setCurrency($currency): static
+    public function setCurrency(Currency $currency): static
     {
         $this->currency = $currency;
 
         return $this;
     }
 
-    /**
-     * @return Lang
-     */
-    public function getLang()
+    public function getLang(): Lang
     {
         return $this->lang;
     }
 
     /**
-     * @param Lang $lang
-     *
      * @return $this
      */
-    public function setLang($lang): static
+    public function setLang(Lang $lang): static
     {
         $this->lang = $lang;
 
         return $this;
     }
 
-    /**
-     * @return Cart
-     */
-    public function getCart()
+    public function getCart(): Cart
     {
         return $this->cart;
     }
 
     /**
-     * @param Cart $cart
-     *
      * @return $this
      */
-    public function setCart($cart): static
+    public function setCart(Cart $cart): static
     {
         $this->cart = $cart;
 
         return $this;
     }
 
-    /**
-     * @return Customer
-     */
-    public function getCustomer()
+    public function getCustomer(): Customer
     {
         return $this->customer;
     }
 
     /**
-     * @param Customer $customer
-     *
      * @return $this
      */
-    public function setCustomer($customer): static
+    public function setCustomer(Customer $customer): static
     {
         $this->customer = $customer;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function getUseOrderDefinedAddresses()
+    public function getUseOrderDefinedAddresses(): bool
     {
         return $this->useOrderDefinedAddresses;
     }
@@ -133,11 +108,9 @@ class OrderManualEvent extends OrderEvent
      * If true, the order will be created using the delivery and invoice addresses defined in $this->order instead of
      * creating new OrderAdresses using the Order::getChoosenXXXAddress().
      *
-     * @param bool $useOrderDefinedAddresses
-     *
      * @return $this
      */
-    public function setUseOrderDefinedAddresses($useOrderDefinedAddresses): static
+    public function setUseOrderDefinedAddresses(bool $useOrderDefinedAddresses): static
     {
         $this->useOrderDefinedAddresses = $useOrderDefinedAddresses;
 

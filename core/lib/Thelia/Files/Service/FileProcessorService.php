@@ -45,11 +45,11 @@ readonly class FileProcessorService
         string $moduleRight = 'thelia',
     ): FileCreateOrUpdateEvent {
         // Validate if file is too big
-        if ($fileBeingUploaded->getError() === 1) {
+        if (1 === $fileBeingUploaded->getError()) {
             $message = $this->translator->trans(
                 'File is too large, please retry with a file having a size less than %size%.',
                 ['%size%' => \ini_get('upload_max_filesize')],
-                'core'
+                'core',
             );
 
             throw new ProcessFileException($message, 403);
@@ -58,16 +58,16 @@ readonly class FileProcessorService
         $message = null;
         $realFileName = $fileBeingUploaded->getClientOriginalName();
 
-        if ($validMimeTypes !== []) {
+        if ([] !== $validMimeTypes) {
             $mimeType = $fileBeingUploaded->getMimeType();
 
             if (!isset($validMimeTypes[$mimeType])) {
                 $message = $this->translator->trans(
                     'Only files having the following mime type are allowed: %types%',
-                    ['%types%' => implode(', ', array_keys($validMimeTypes))]
+                    ['%types%' => implode(', ', array_keys($validMimeTypes))],
                 );
             } else {
-                $regex = "#^(.+)\.(".implode('|', $validMimeTypes[$mimeType]).')$#i';
+                $regex = '#^(.+)\\.('.implode('|', $validMimeTypes[$mimeType]).')$#i';
 
                 if (!preg_match($regex, $realFileName)) {
                     $message = $this->translator->trans(
@@ -75,26 +75,26 @@ readonly class FileProcessorService
                         [
                             '%mime' => $mimeType,
                             '%ext' => $fileBeingUploaded->getClientOriginalExtension(),
-                        ]
+                        ],
                     );
                 }
             }
         }
 
-        if ($extBlackList !== []) {
-            $regex = "#^(.+)\.(".implode('|', $extBlackList).')$#i';
+        if ([] !== $extBlackList) {
+            $regex = '#^(.+)\\.('.implode('|', $extBlackList).')$#i';
 
             if (preg_match($regex, $realFileName)) {
                 $message = $this->translator->trans(
                     'Files with the following extension are not allowed: %extension, please do an archive of the file if you want to upload it',
                     [
                         '%extension' => $fileBeingUploaded->getClientOriginalExtension(),
-                    ]
+                    ],
                 );
             }
         }
 
-        if ($message !== null) {
+        if (null !== $message) {
             throw new ProcessFileException($message, 415);
         }
 
@@ -102,21 +102,16 @@ readonly class FileProcessorService
 
         $parentModel = $fileModel->getParentFileModel();
 
-        if ($parentModel === null) {
-            throw new ProcessFileException('', 404);
-        }
-
         $defaultTitle = $parentModel->getTitle();
 
-        if (empty($defaultTitle) && $objectType !== 'image') {
+        if (empty($defaultTitle) && 'image' !== $objectType) {
             $defaultTitle = $fileBeingUploaded->getClientOriginalName();
         }
 
         $fileModel
             ->setParentId($parentId)
             ->setLocale(Lang::getDefaultLanguage()->getLocale())
-            ->setTitle($defaultTitle)
-        ;
+            ->setTitle($defaultTitle);
 
         $fileCreateOrUpdateEvent = new FileCreateOrUpdateEvent($parentId);
         $fileCreateOrUpdateEvent->setModel($fileModel);
@@ -126,7 +121,7 @@ readonly class FileProcessorService
         // Dispatch Event to the Action
         $eventDispatcher->dispatch(
             $fileCreateOrUpdateEvent,
-            TheliaEvents::IMAGE_SAVE
+            TheliaEvents::IMAGE_SAVE,
         );
 
         return $fileCreateOrUpdateEvent;

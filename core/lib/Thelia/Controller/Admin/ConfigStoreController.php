@@ -52,13 +52,14 @@ class ConfigStoreController extends BaseAdminController
     {
         $file = $form->get($inputName)->getData();
 
-        if ($file != null) {
+        if (null !== $file) {
             // Delete the old file
             $fs = new Filesystem();
             $oldFileName = ConfigQuery::read($configKey);
 
-            if ($oldFileName !== null) {
+            if (null !== $oldFileName) {
                 $oldFilePath = $storeMediaUploadDir.DS.$oldFileName;
+
                 if ($fs->exists($oldFilePath)) {
                     $fs->remove($oldFilePath);
                 }
@@ -82,12 +83,13 @@ class ConfigStoreController extends BaseAdminController
         $configStoreForm = $this->createForm(AdminForm::CONFIG_STORE);
 
         $exception = null;
+
         try {
             $form = $this->validateForm($configStoreForm);
 
             $storeMediaUploadDir = ConfigQuery::read('images_library_path');
 
-            if ($storeMediaUploadDir === null) {
+            if (null === $storeMediaUploadDir) {
                 $storeMediaUploadDir = THELIA_LOCAL_DIR.'media'.DS.'images';
             } else {
                 $storeMediaUploadDir = THELIA_ROOT.$storeMediaUploadDir;
@@ -118,7 +120,7 @@ class ConfigStoreController extends BaseAdminController
 
             $this->adminLogAppend(AdminResources::STORE, AccessManager::UPDATE, 'Store configuration changed');
 
-            if ($this->getRequest()->get('save_mode') == 'stay') {
+            if ('stay' === $this->getRequest()->get('save_mode')) {
                 $response = $this->generateRedirectFromRoute('admin.configuration.store.default');
             } else {
                 $response = $this->generateSuccessRedirect($configStoreForm);
@@ -132,7 +134,7 @@ class ConfigStoreController extends BaseAdminController
                 $this->getTranslator()->trans('Store configuration failed.'),
                 $error_msg,
                 $configStoreForm,
-                $exception
+                $exception,
             );
 
             $response = $this->renderTemplate();

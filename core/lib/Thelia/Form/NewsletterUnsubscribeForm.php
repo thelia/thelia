@@ -42,8 +42,7 @@ class NewsletterUnsubscribeForm extends BaseForm
                 'label_attr' => [
                     'for' => 'email_newsletter',
                 ],
-            ])
-        ;
+            ]);
     }
 
     public function verifyExistingEmail($value, ExecutionContextInterface $context): void
@@ -52,8 +51,8 @@ class NewsletterUnsubscribeForm extends BaseForm
             $context->addViolation(
                 Translator::getInstance()->trans(
                     'The email address "%mail" was not found.',
-                    ['%mail' => $value]
-                )
+                    ['%mail' => $value],
+                ),
             );
         }
     }

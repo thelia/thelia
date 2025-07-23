@@ -23,14 +23,12 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * Class TheliaContainer
  *
  * @author Gilles Bourgeat <manu@raynaud.io>
- *
- * @since 2.3
  */
 class TheliaContainer extends Container
 {
     public function set(string $id, ?object $service): void
     {
-        if ($id === 'request' && \PHP_SAPI === 'cli' && !isset($this->services['request_stack'])
+        if ('request' === $id && \PHP_SAPI === 'cli' && !isset($this->services['request_stack'])
         ) {
             $this->services['request_stack'] = new RequestStack();
         }

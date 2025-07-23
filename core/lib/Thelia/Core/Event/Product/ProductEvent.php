@@ -22,22 +22,16 @@ use Thelia\Model\Product;
  */
 class ProductEvent extends ActionEvent
 {
-    /**
-     * @var Product|null
-     */
-    public $product;
-
-    public function __construct(?Product $product = null)
+    public function __construct(public ?Product $product = null)
     {
-        $this->product = $product;
     }
 
     public function hasProduct(): bool
     {
-        return null !== $this->product;
+        return $this->product instanceof Product;
     }
 
-    public function getProduct()
+    public function getProduct(): ?Product
     {
         return $this->product;
     }

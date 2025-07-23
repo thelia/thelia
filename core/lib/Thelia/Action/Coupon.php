@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
+use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
-use Propel\Runtime\Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -91,9 +91,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $coupon = $event->getCoupon();
 
         if (!$coupon instanceof CouponModel) {
-            throw new \InvalidArgumentException(
-                'The coupon should not be null'
-            );
+            throw new \InvalidArgumentException('The coupon should not be null');
         }
 
         $coupon->delete();
@@ -153,8 +151,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
                 $this->getSession()
                     ->getOrder()
-                    ->setDiscount($totalDiscount)
-                ;
+                    ->setDiscount($totalDiscount);
             }
         }
 
@@ -165,6 +162,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     public function updateOrderDiscount(Event $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
+
         if (!$session instanceof Session || !$session->isStarted()) {
             return;
         }
@@ -198,7 +196,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $couponRuleCollection = new ConditionCollection();
         $couponRuleCollection[] = $noConditionRule;
         $defaultSerializedRule = $conditionFactory->serializeConditionCollection(
-            $couponRuleCollection
+            $couponRuleCollection,
         );
 
         $coupon->createOrUpdate(
@@ -206,7 +204,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $event->getTitle(),
             $event->getEffects(),
             $event->getServiceId(),
-            $event->isRemovingPostage(),
+            $event->isRemovingPostage() ?? false,
             $event->getShortDescription(),
             $event->getDescription(),
             $event->isEnabled(),
@@ -219,7 +217,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $event->getFreeShippingForCountries(),
             $event->getFreeShippingForMethods(),
             $event->getPerCustomerUsageCount(),
-            $event->getStartDate()
+            $event->getStartDate(),
         );
 
         $event->setCouponModel($coupon);
@@ -239,7 +237,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
         $coupon->createOrUpdateConditions(
             $conditionFactory->serializeConditionCollection($event->getConditions()),
-            $event->getLocale()
+            $event->getLocale(),
         );
 
         $event->setCouponModel($coupon);
@@ -266,7 +264,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         /** @var CouponInterface[] $consumedCoupons */
         $consumedCoupons = $this->couponManager->getCouponsKept();
 
-        if (\is_array($consumedCoupons) && $consumedCoupons !== []) {
+        if (\is_array($consumedCoupons) && [] !== $consumedCoupons) {
             $con = Propel::getWriteConnection(OrderCouponTableMap::DATABASE_NAME);
             $con->beginTransaction();
 
@@ -296,8 +294,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                         ->setIsRemovingPostage($couponModel->getIsRemovingPostage())
                         ->setIsAvailableOnSpecialOffers($couponModel->getIsAvailableOnSpecialOffers())
                         ->setSerializedConditions($couponModel->getSerializedConditions())
-                        ->setPerCustomerUsageCount($couponModel->getPerCustomerUsageCount())
-                    ;
+                        ->setPerCustomerUsageCount($couponModel->getPerCustomerUsageCount());
                     $orderCoupon->save();
 
                     // Copy order coupon free shipping data for countries and modules
@@ -342,12 +339,10 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * Cancels order coupons usage when order is canceled or refunded,
      * or use canceled coupons again if the order is no longer canceled or refunded.
      *
-     * @param string $eventName
-     *
      * @throws \Exception
      * @throws PropelException
      */
-    public function orderStatusChange(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    public function orderStatusChange(OrderEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {
         // The order has been canceled or refunded ?
         if ($event->getOrder()->isCancelled() || $event->getOrder()->isRefunded()) {
@@ -411,10 +406,8 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
     /**
      * Returns the session from the current request.
-     *
-     * @return Session
      */
-    protected function getSession()
+    protected function getSession(): Session
     {
         return $this->requestStack->getCurrentRequest()->getSession();
     }

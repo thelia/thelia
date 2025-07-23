@@ -28,10 +28,7 @@ use Thelia\Log\Tlog;
  */
 class Database
 {
-    /**
-     * @var \PDO
-     */
-    protected $connection;
+    protected \PDO $connection;
 
     /**
      * Create a new instance, using the provided connection information, either none for
@@ -41,10 +38,10 @@ class Database
      *
      * @throws \InvalidArgumentException if $connection is not of the suitable type
      */
-    public function __construct($connection = null)
+    public function __construct(ConnectionInterface|\PDO|null $connection = null)
     {
         // Get a connection from Propel if we don't have one
-        if (null == $connection) {
+        if (null === $connection) {
             $connection = Propel::getConnection(ServiceContainerInterface::CONNECTION_WRITE);
         }
 
@@ -67,7 +64,7 @@ class Database
      * @param string $dbName        Database name
      * @param array  $extraSqlFiles SQL Files uri to insert
      */
-    public function insertSql($dbName = null, ?array $extraSqlFiles = null): void
+    public function insertSql(?string $dbName = null, ?array $extraSqlFiles = null): void
     {
         if ($dbName) {
             $this->connection->query(\sprintf('use `%s`', $dbName));
@@ -79,18 +76,19 @@ class Database
             $sql = array_merge(
                 $sql,
                 $this->prepareSql(file_get_contents(THELIA_SETUP_DIRECTORY.'thelia.sql')),
-                $this->prepareSql(file_get_contents(THELIA_SETUP_DIRECTORY.'insert.sql'))
+                $this->prepareSql(file_get_contents(THELIA_SETUP_DIRECTORY.'insert.sql')),
             );
         } else {
             foreach ($extraSqlFiles as $fileToInsert) {
                 $sql = array_merge(
                     $sql,
-                    $this->prepareSql(file_get_contents($fileToInsert))
+                    $this->prepareSql(file_get_contents($fileToInsert)),
                 );
             }
         }
 
         $size = \count($sql);
+
         for ($i = 0; $i < $size; ++$i) {
             if (!empty($sql[$i])) {
                 $this->execute($sql[$i]);
@@ -105,20 +103,18 @@ class Database
      * @param array  $args SQL request parameters (PDO style)
      *
      * @throws \RuntimeException|\PDOException if something goes wrong
-     *
-     * @return \PDOStatement
      */
-    public function execute($sql, $args = [])
+    public function execute(string $sql, array $args = []): \PDOStatement
     {
         $stmt = $this->connection->prepare($sql);
 
-        if ($stmt === false) {
+        if (false === $stmt) {
             throw new \RuntimeException(\sprintf('Failed to prepare statement for %s: ', $sql).print_r($this->connection->errorInfo(), 1));
         }
 
         $success = $stmt->execute($args);
 
-        if ($success === false || $stmt->errorCode() != 0) {
+        if (false === $success || 0 !== $stmt->errorCode()) {
             throw new \RuntimeException(\sprintf("Failed to execute SQL '%s', arguments:", $sql).print_r($args, 1).', error:'.print_r($stmt->errorInfo(), 1));
         }
 
@@ -133,8 +129,9 @@ class Database
         $sql = str_replace(";',", '-CODE-', $sql);
         $sql = trim($sql);
         preg_match_all('#DELIMITER (.+?)\n(.+?)DELIMITER ;#s', $sql, $m);
+
         foreach ($m[0] as $k => $v) {
-            if ($m[1][$k] == '|') {
+            if ('|' === $m[1][$k]) {
                 throw new \RuntimeException('You can not use "|" as delimiter: '.$v);
             }
 
@@ -147,6 +144,7 @@ class Database
 
         $tab = explode(";\n", $sql);
         $size = \count($tab);
+
         for ($i = 0; $i < $size; ++$i) {
             $queryTemp = str_replace('-CODE-', ";',", $tab[$i]);
             $queryTemp = str_replace('|', ';', $queryTemp);
@@ -158,19 +156,17 @@ class Database
 
     /**
      * Backup the db OR just a table.
-     *
-     * @param string $filename
-     * @param string $tables
      */
-    public function backupDb($filename, $tables = '*'): void
+    public function backupDb(string $filename, string $tables = '*'): void
     {
         $data = [];
 
         // get all of the tables
-        if ($tables == '*') {
+        if ('*' === $tables) {
             $tables = [];
             $result = $this->connection->prepare('SHOW TABLES');
             $result->execute();
+
             while ($row = $result->fetch(\PDO::FETCH_NUM)) {
                 $tables[] = $row[0];
             }
@@ -183,12 +179,12 @@ class Database
         $data[] = "\n\n";
 
         foreach ($tables as $table) {
-            if (!preg_match("/^[\w_\-]+$/", (string) $table)) {
+            if (!preg_match('/^[\\w_\\-]+$/', (string) $table)) {
                 Tlog::getInstance()->alert(
                     \sprintf(
                         "Attempt to backup the db with this invalid table name: '%s'",
-                        $table
-                    )
+                        $table,
+                    ),
                 );
 
                 continue;
@@ -211,6 +207,7 @@ class Database
             for ($i = 0; $i < $fieldCount; ++$i) {
                 while ($row = $result->fetch(\PDO::FETCH_NUM)) {
                     $data[] = 'INSERT INTO `'.$table.'` VALUES(';
+
                     for ($j = 0; $j < $fieldCount; ++$j) {
                         $row[$j] = addslashes((string) $row[$j]);
                         $row[$j] = str_replace("\n", '\\n', $row[$j]);
@@ -239,18 +236,15 @@ class Database
      *
      * @param string $filename the file containing sql queries
      */
-    public function restoreDb($filename): void
+    public function restoreDb(string $filename): void
     {
         $this->insertSql(null, [$filename]);
     }
 
     /**
      * Save an array of data to a filename.
-     *
-     * @param string $filename
-     * @param array  $data
      */
-    private function writeFilename($filename, $data): void
+    private function writeFilename(string $filename, array $data): void
     {
         $f = fopen($filename, 'w+');
 
@@ -266,15 +260,12 @@ class Database
         $this->execute(
             \sprintf(
                 'CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET utf8',
-                $dbName
-            )
+                $dbName,
+            ),
         );
     }
 
-    /**
-     * @return \PDO
-     */
-    public function getConnection()
+    public function getConnection(): \PDO
     {
         return $this->connection;
     }

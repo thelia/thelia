@@ -21,40 +21,24 @@ namespace Thelia\Core\Event\Hook;
  */
 class HookCreateEvent extends HookEvent
 {
-    /** @var string */
-    protected $locale;
-
-    /** @var string */
-    protected $code;
-
-    /** @var int */
-    protected $type;
-
-    /** @var string */
-    protected $title;
-
-    /** @var int */
-    protected $native;
-
-    /** @var int */
-    protected $active;
+    protected string $locale;
+    protected string $code;
+    protected int $type;
+    protected string $title;
+    protected int $native;
+    protected int $active;
 
     /**
-     * @param string $locale
-     *
      * @return $this
      */
-    public function setLocale($locale): self
+    public function setLocale(string $locale): self
     {
         $this->locale = $locale;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->locale;
     }
@@ -62,14 +46,14 @@ class HookCreateEvent extends HookEvent
     /**
      * @return $this
      */
-    public function setNative($native): self
+    public function setNative(int $native): self
     {
         $this->native = $native;
 
         return $this;
     }
 
-    public function getNative()
+    public function getNative(): int
     {
         return $this->native;
     }
@@ -77,14 +61,14 @@ class HookCreateEvent extends HookEvent
     /**
      * @return $this
      */
-    public function setTitle($title): self
+    public function setTitle(string $title): self
     {
         $this->title = $title;
 
         return $this;
     }
 
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -92,14 +76,14 @@ class HookCreateEvent extends HookEvent
     /**
      * @return $this
      */
-    public function setType($type): self
+    public function setType(int $type): self
     {
         $this->type = $type;
 
         return $this;
     }
 
-    public function getType()
+    public function getType(): int
     {
         return $this->type;
     }
@@ -107,14 +91,14 @@ class HookCreateEvent extends HookEvent
     /**
      * @return $this
      */
-    public function setActive($active): self
+    public function setActive(int $active): self
     {
         $this->active = $active;
 
         return $this;
     }
 
-    public function getActive()
+    public function getActive(): int
     {
         return $this->active;
     }
@@ -122,14 +106,14 @@ class HookCreateEvent extends HookEvent
     /**
      * @return $this
      */
-    public function setCode($code): self
+    public function setCode(string $code): self
     {
         $this->code = $code;
 
         return $this;
     }
 
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }

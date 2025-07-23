@@ -52,10 +52,10 @@ class ModuleHookCreationForm extends BaseForm
                     'label_attr' => [
                         'for' => 'module_id',
                         'help' => $this->trans(
-                            'Only hookable modules are displayed in this menu.'
+                            'Only hookable modules are displayed in this menu.',
                         ),
                     ],
-                ]
+                ],
             )
             ->add(
                 'hook_id',
@@ -67,7 +67,7 @@ class ModuleHookCreationForm extends BaseForm
                     ],
                     'label' => $this->trans('Hook'),
                     'label_attr' => ['for' => 'hook_id'],
-                ]
+                ],
             )
             ->add(
                 'classname',
@@ -80,10 +80,10 @@ class ModuleHookCreationForm extends BaseForm
                     'label_attr' => [
                         'for' => 'classname',
                         'help' => $this->trans(
-                            'The service id that will handle the hook (defined in the config.xml file of the module).'
+                            'The service id that will handle the hook (defined in the config.xml file of the module).',
                         ),
                     ],
-                ]
+                ],
             )
             ->add(
                 'method',
@@ -96,10 +96,10 @@ class ModuleHookCreationForm extends BaseForm
                     'label_attr' => [
                         'for' => 'method',
                         'help' => $this->trans(
-                            'The method name that will handle the hook event.'
+                            'The method name that will handle the hook event.',
                         ),
                     ],
-                ]
+                ],
             )
             ->add(
                 'templates',
@@ -108,20 +108,19 @@ class ModuleHookCreationForm extends BaseForm
                     'label' => $this->trans('Automatic rendered templates'),
                     'constraints' => [
                         new Callback(
-                            $this->verifyTemplates(...)
+                            $this->verifyTemplates(...),
                         ),
                     ],
                     'label_attr' => [
                         'for' => 'templates',
                         'help' => $this->trans(
                             'When using the %method% method you can automatically render or dump templates or add CSS and JS files (e.g.: render:mytemplate.html;js:assets/js/myjs.js)',
-                            ['%method%' => BaseHook::INJECT_TEMPLATE_METHOD_NAME]
+                            ['%method%' => BaseHook::INJECT_TEMPLATE_METHOD_NAME],
                         ),
                     ],
                     'required' => false,
-                ]
-            )
-        ;
+                ],
+            );
     }
 
     protected function trans(?string $id, array $parameters = []): string
@@ -183,14 +182,14 @@ class ModuleHookCreationForm extends BaseForm
     {
         $data = $context->getRoot()->getData();
 
-        if (!empty($data['templates']) && $data['method'] !== BaseHook::INJECT_TEMPLATE_METHOD_NAME) {
+        if (!empty($data['templates']) && BaseHook::INJECT_TEMPLATE_METHOD_NAME !== $data['method']) {
             $context->addViolation(
                 $this->trans(
                     'If you use automatic insert templates, you should use the method %method%',
                     [
                         '%method%' => BaseHook::INJECT_TEMPLATE_METHOD_NAME,
-                    ]
-                )
+                    ],
+                ),
             );
         }
     }

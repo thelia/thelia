@@ -41,15 +41,13 @@ use Thelia\Tools\URL;
  */
 class Document extends BaseCachedFile implements EventSubscriberInterface
 {
-    /**
-     * @var string Config key for document delivery mode
-     */
+    /** @var string Config key for document delivery mode */
     public const CONFIG_DELIVERY_MODE = 'original_document_delivery_mode';
 
     /**
      * @return string root of the document cache directory in web space
      */
-    protected function getCacheDirFromWebRoot()
+    protected function getCacheDirFromWebRoot(): string
     {
         return ConfigQuery::read('document_cache_dir_from_web_root', 'cache'.DS.'documents');
     }
@@ -72,7 +70,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
         $subdir = $event->getCacheSubdirectory();
         $sourceFile = $event->getSourceFilepath();
 
-        if (null == $subdir || null == $sourceFile) {
+        if (null === $sourceFile) {
             throw new \InvalidArgumentException('Cache sub-directory and source file path cannot be null');
         }
 
@@ -85,13 +83,13 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
 
             $mode = ConfigQuery::read(self::CONFIG_DELIVERY_MODE, 'symlink');
 
-            if ($mode == 'symlink') {
+            if ('symlink' === $mode) {
                 if (false === symlink($sourceFile, $originalDocumentPathInCache)) {
-                    throw new DocumentException(\sprintf('Failed to create symbolic link for %s in %s document cache directory', basename((string) $sourceFile), $subdir));
+                    throw new DocumentException(\sprintf('Failed to create symbolic link for %s in %s document cache directory', basename($sourceFile), $subdir));
                 }
             } elseif (false === @copy($sourceFile, $originalDocumentPathInCache)) {
                 // mode = 'copy'
-                throw new DocumentException(\sprintf('Failed to copy %s in %s document cache directory', basename((string) $sourceFile), $subdir));
+                throw new DocumentException(\sprintf('Failed to copy %s in %s document cache directory', basename($sourceFile), $subdir));
             }
         }
 

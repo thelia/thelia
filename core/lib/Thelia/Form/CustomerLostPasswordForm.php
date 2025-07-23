@@ -54,7 +54,7 @@ class CustomerLostPasswordForm extends FirewallForm
                     new NotBlank(),
                     new Email(),
                     new Callback(
-                        $this->verifyExistingEmail(...)
+                        $this->verifyExistingEmail(...),
                     ),
                 ],
                 'label' => Translator::getInstance()->trans('Please enter your email address'),
@@ -67,6 +67,7 @@ class CustomerLostPasswordForm extends FirewallForm
     public function verifyExistingEmail($value, ExecutionContextInterface $context): void
     {
         $customer = CustomerQuery::create()->findOneByEmail($value);
+
         if (null === $customer) {
             $context->addViolation(Translator::getInstance()->trans('This email does not exists'));
         }

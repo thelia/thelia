@@ -43,14 +43,14 @@ use Thelia\Model\Map\CategoryDocumentTableMap;
             controller: PostItemFileController::class,
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
             denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_FILE]],
-            deserialize: false
+            deserialize: false,
         ),
         new GetCollection(
-            uriTemplate: '/admin/category_documents'
+            uriTemplate: '/admin/category_documents',
         ),
         new Get(
             uriTemplate: '/admin/category_documents/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Get(
             uriTemplate: '/admin/category_documents/{id}/file',
@@ -60,32 +60,32 @@ use Thelia\Model\Map\CategoryDocumentTableMap;
                     '200' => [
                         'description' => 'The binary file',
                     ],
-                ]
-            )
+                ],
+            ),
         ),
         new Put(
             uriTemplate: '/admin/category_documents/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
         ),
         new Patch(
             uriTemplate: '/admin/category_documents/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
         ),
         new Delete(
-            uriTemplate: '/admin/category_documents/{id}'
+            uriTemplate: '/admin/category_documents/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/front/category_documents'
+            uriTemplate: '/front/category_documents',
         ),
         new Get(
             uriTemplate: '/front/category_documents/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
         new Get(
             uriTemplate: '/front/category_documents/{id}/file',
@@ -95,8 +95,8 @@ use Thelia\Model\Map\CategoryDocumentTableMap;
                     '200' => [
                         'description' => 'The binary file',
                     ],
-                ]
-            )
+                ],
+            ),
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
@@ -105,13 +105,13 @@ use Thelia\Model\Map\CategoryDocumentTableMap;
     filterClass: OrderFilter::class,
     properties: [
         'position',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
         'visible',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -120,22 +120,16 @@ use Thelia\Model\Map\CategoryDocumentTableMap;
             'strategy' => 'exact',
             'fieldPath' => 'category_document.category_id',
         ],
-    ]
+    ],
 )]
 class CategoryDocument extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     public const GROUP_ADMIN_READ = 'admin:category_document:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:category_document:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:category_document:write';
-
     public const GROUP_ADMIN_WRITE_FILE = 'admin:category_document:write_file';
-
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:category_document:write_update';
-
     public const GROUP_FRONT_READ = 'front:category_document:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:category_document:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ])]
@@ -150,7 +144,7 @@ class CategoryDocument extends AbstractTranslatableResource implements ItemFileR
         openapiContext: [
             'type' => 'string',
             'format' => 'binary',
-        ]
+        ],
     )]
     public UploadedFile $fileToUpload;
 

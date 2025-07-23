@@ -24,45 +24,22 @@ use Thelia\Model\OrderStatus;
  */
 class OrderStatusEvent extends ActionEvent
 {
-    /** @var string */
-    protected $code;
+    protected string $code;
+    protected string $title;
+    protected string $description;
+    protected string $chapo;
+    protected string $postscriptum;
+    protected string $color;
+    protected string $locale = 'en_US';
+    protected OrderStatus $orderStatus;
+    protected int $position;
 
-    /** @var string */
-    protected $title;
-
-    /** @var string */
-    protected $description;
-
-    /** @var string */
-    protected $chapo;
-
-    /** @var string */
-    protected $postscriptum;
-
-    /** @var string */
-    protected $color;
-
-    /** @var string */
-    protected $locale = 'en_US';
-
-    /** @var OrderStatus */
-    protected $orderStatus;
-
-    /** @var int */
-    protected $position;
-
-    /**
-     * @return int
-     */
-    public function getPosition()
+    public function getPosition(): int
     {
         return $this->position;
     }
 
-    /**
-     * @param int $position
-     */
-    public function setPosition($position): static
+    public function setPosition(int $position): static
     {
         $this->position = $position;
 
@@ -71,147 +48,99 @@ class OrderStatusEvent extends ActionEvent
 
     public function hasOrderStatus(): bool
     {
-        return null !== $this->orderStatus;
+        return $this->orderStatus instanceof OrderStatus;
     }
 
-    /**
-     * @return OrderStatus
-     */
-    public function getOrderStatus()
+    public function getOrderStatus(): OrderStatus
     {
         return $this->orderStatus;
     }
 
-    /**
-     * @param OrderStatus $orderStatus
-     */
-    public function setOrderStatus($orderStatus): static
+    public function setOrderStatus(OrderStatus $orderStatus): static
     {
         $this->orderStatus = $orderStatus;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->locale;
     }
 
-    /**
-     * @param string $locale
-     */
-    public function setLocale($locale): static
+    public function setLocale(string $locale): static
     {
         $this->locale = $locale;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }
 
-    /**
-     * @param string $code
-     */
-    public function setCode($code): static
+    public function setCode(string $code): static
     {
         $this->code = $code;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getColor()
+    public function getColor(): string
     {
         return $this->color;
     }
 
-    /**
-     * @param string $color
-     */
-    public function setColor($color): static
+    public function setColor(string $color): static
     {
         $this->color = $color;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
 
-    /**
-     * @param string $title
-     */
-    public function setTitle($title): static
+    public function setTitle(string $title): static
     {
         $this->title = $title;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
 
-    /**
-     * @param string $description
-     */
-    public function setDescription($description): static
+    public function setDescription(string $description): static
     {
         $this->description = $description;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getChapo()
+    public function getChapo(): string
     {
         return $this->chapo;
     }
 
-    /**
-     * @param string $chapo
-     */
-    public function setChapo($chapo): static
+    public function setChapo(string $chapo): static
     {
         $this->chapo = $chapo;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getPostscriptum()
+    public function getPostscriptum(): string
     {
         return $this->postscriptum;
     }
 
-    /**
-     * @param string $postscriptum
-     */
-    public function setPostscriptum($postscriptum): static
+    public function setPostscriptum(string $postscriptum): static
     {
         $this->postscriptum = $postscriptum;
 

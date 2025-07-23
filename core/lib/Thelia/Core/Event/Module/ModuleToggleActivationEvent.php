@@ -21,15 +21,8 @@ namespace Thelia\Core\Event\Module;
  */
 class ModuleToggleActivationEvent extends ModuleEvent
 {
-    /**
-     * @var bool
-     */
-    protected $noCheck;
-
-    /**
-     * @var bool
-     */
-    protected $recursive;
+    protected bool $noCheck;
+    protected bool $recursive;
 
     /**
      * @param int  $module_id
@@ -40,69 +33,51 @@ class ModuleToggleActivationEvent extends ModuleEvent
     }
 
     /**
-     * @param int $module_id
-     *
      * @return $this
      */
-    public function setModuleId($module_id): self
+    public function setModuleId(int $module_id): self
     {
         $this->module_id = $module_id;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getModuleId()
+    public function getModuleId(): int
     {
         return $this->module_id;
     }
 
-    /**
-     * @return bool
-     */
-    public function isNoCheck()
+    public function isNoCheck(): bool
     {
         return $this->noCheck;
     }
 
     /**
-     * @param bool $noCheck
-     *
      * @return $this;
      */
-    public function setNoCheck($noCheck): self
+    public function setNoCheck(bool $noCheck): self
     {
         $this->noCheck = $noCheck;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isRecursive()
+    public function isRecursive(): bool
     {
         return $this->recursive;
     }
 
     /**
-     * @param bool $recursive
-     *
      * @return $this;
      */
-    public function setRecursive($recursive): self
+    public function setRecursive(bool $recursive): self
     {
         $this->recursive = $recursive;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function getAssumeDeactivate()
+    public function getAssumeDeactivate(): bool
     {
         return $this->assume_deactivate;
     }

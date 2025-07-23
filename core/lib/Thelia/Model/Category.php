@@ -32,7 +32,7 @@ class Category extends BaseCategory implements FileModelParentInterface
     /**
      * @return int number of child for the current category
      */
-    public function countChild()
+    public function countChild(): int
     {
         return CategoryQuery::countChild($this->getId());
     }
@@ -46,23 +46,21 @@ class Category extends BaseCategory implements FileModelParentInterface
      * count all products for current category and sub categories.
      *
      * /!\ the number of queries is exponential, use it with caution
-     *
-     * @return int
      */
-    public function countAllProducts($productVisibility = true)
+    public function countAllProducts($productVisibility = true): int
     {
         $children = CategoryQuery::findAllChild($this->getId());
         $children[] = $this;
 
         $query = ProductQuery::create();
 
-        if ($productVisibility !== '*') {
+        if ('*' !== $productVisibility) {
             $query->filterByVisible($productVisibility);
         }
 
         $query
             ->useProductCategoryQuery()
-                ->filterByCategory(new ObjectCollection($children), Criteria::IN)
+            ->filterByCategory(new ObjectCollection($children), Criteria::IN)
             ->endUse();
 
         return $query->count();
@@ -72,20 +70,16 @@ class Category extends BaseCategory implements FileModelParentInterface
      * count visible products only for current category and sub categories.
      *
      * /!\ the number of queries is exponential, use it with caution
-     *
-     * @return int
      */
-    public function countAllProductsVisibleOnly()
+    public function countAllProductsVisibleOnly(): int
     {
         return $this->countAllProducts(true);
     }
 
     /**
      * Get the root category.
-     *
-     * @param int $categoryId
      */
-    public function getRoot($categoryId)
+    public function getRoot(int $categoryId)
     {
         $category = CategoryQuery::create()->findPk($categoryId);
 
@@ -102,10 +96,8 @@ class Category extends BaseCategory implements FileModelParentInterface
 
     /**
      * Calculate next position relative to our parent.
-     *
-     * @param CategoryQuery $query
      */
-    protected function addCriteriaToPositionQuery($query): void
+    protected function addCriteriaToPositionQuery(CategoryQuery $query): void
     {
         $query->filterByParent($this->getParent());
     }
@@ -123,6 +115,7 @@ class Category extends BaseCategory implements FileModelParentInterface
             && null !== $con->getEventDispatcher()
         ) {
             $eventDispatcher = $con->getEventDispatcher();
+
             foreach ($productsCategories as $productCategory) {
                 if (null !== $product = $productCategory->getProduct()) {
                     $eventDispatcher->dispatch(new ProductDeleteEvent($product->getId()), TheliaEvents::PRODUCT_DELETE);
@@ -131,7 +124,7 @@ class Category extends BaseCategory implements FileModelParentInterface
         }
     }
 
-    public function preInsert(?ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): bool
     {
         $this->setPosition($this->getNextPosition());
 
@@ -140,14 +133,14 @@ class Category extends BaseCategory implements FileModelParentInterface
         return true;
     }
 
-    public function preDelete(?ConnectionInterface $con = null)
+    public function preDelete(?ConnectionInterface $con = null): bool
     {
         parent::preDelete($con);
 
         $this->reorderBeforeDelete(
             [
                 'parent' => $this->getParent(),
-            ]
+            ],
         );
         $this->deleteProducts($con);
 
@@ -170,10 +163,8 @@ class Category extends BaseCategory implements FileModelParentInterface
 
     /**
      * Overload for the position management.
-     *
-     * @param Base\ProductCategory $productCategory
      */
-    protected function doAddProductCategory($productCategory): void
+    protected function doAddProductCategory(Base\ProductCategory $productCategory): void
     {
         parent::doAddProductCategory($productCategory);
 
@@ -182,6 +173,6 @@ class Category extends BaseCategory implements FileModelParentInterface
             ->orderByPosition(Criteria::DESC)
             ->findOne();
 
-        $productCategory->setPosition($productCategoryPosition !== null ? $productCategoryPosition->getPosition() + 1 : 1);
+        $productCategory->setPosition(null !== $productCategoryPosition ? $productCategoryPosition->getPosition() + 1 : 1);
     }
 }

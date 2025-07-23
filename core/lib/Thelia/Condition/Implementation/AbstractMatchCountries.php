@@ -46,7 +46,7 @@ abstract class AbstractMatchCountries extends ConditionAbstract
 
     abstract protected function getFormLabel();
 
-    public function setValidatorsFromForm(array $operators, array $values)
+    public function setValidatorsFromForm(array $operators, array $values): self|static
     {
         $this->checkComparisonOperatorValue($operators, self::COUNTRIES_LIST);
 
@@ -63,10 +63,7 @@ abstract class AbstractMatchCountries extends ConditionAbstract
 
         // Check that at least one category is selected
         if (empty($values[self::COUNTRIES_LIST])) {
-            throw new InvalidConditionValueException(
-                self::class,
-                self::COUNTRIES_LIST
-            );
+            throw new InvalidConditionValueException(self::class, self::COUNTRIES_LIST);
         }
 
         $this->operators = [self::COUNTRIES_LIST => $operators[self::COUNTRIES_LIST]];
@@ -75,7 +72,7 @@ abstract class AbstractMatchCountries extends ConditionAbstract
         return $this;
     }
 
-    public function isMatching()
+    public function isMatching(): bool
     {
         // The delivery address should match one of the selected countries.
 
@@ -84,15 +81,15 @@ abstract class AbstractMatchCountries extends ConditionAbstract
         return $this->conditionValidator->variableOpComparison(
             $this->facade->getNbArticlesInCart(),
             $this->operators[self::COUNTRIES_LIST],
-            $this->values[self::COUNTRIES_LIST]
+            $this->values[self::COUNTRIES_LIST],
         );
     }
 
-    public function getSummary()
+    public function getSummary(): string
     {
         $i18nOperator = Operators::getI18n(
             $this->translator,
-            $this->operators[self::COUNTRIES_LIST]
+            $this->operators[self::COUNTRIES_LIST],
         );
 
         $cntryStrList = '';
@@ -111,7 +108,7 @@ abstract class AbstractMatchCountries extends ConditionAbstract
         return $this->getSummaryLabel($cntryStrList, $i18nOperator);
     }
 
-    protected function generateInputs()
+    protected function generateInputs(): array
     {
         return [
             self::COUNTRIES_LIST => [
@@ -122,7 +119,7 @@ abstract class AbstractMatchCountries extends ConditionAbstract
         ];
     }
 
-    public function drawBackOfficeInputs()
+    public function drawBackOfficeInputs(): string
     {
         return $this->facade->getParser()->render(
             'coupon/condition-fragments/countries-condition.html',
@@ -131,7 +128,7 @@ abstract class AbstractMatchCountries extends ConditionAbstract
                 'countries_field_name' => self::COUNTRIES_LIST,
                 'values' => $this->values[self::COUNTRIES_LIST] ?? [],
                 'countryLabel' => $this->getFormLabel(),
-            ]
+            ],
         );
     }
 }

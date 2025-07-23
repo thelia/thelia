@@ -28,24 +28,18 @@ interface CouponInterface
 {
     /**
      * Get I18n name.
-     *
-     * @return string
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Get I18n tooltip.
-     *
-     * @return string
      */
-    public function getToolTip();
+    public function getToolTip(): string;
 
     /**
      * Get Coupon Manager service Id.
-     *
-     * @return string
      */
-    public function getServiceId();
+    public function getServiceId(): string;
 
     /**
      * Set Coupon.
@@ -69,72 +63,60 @@ interface CouponInterface
      */
     public function set(
         FacadeInterface $facade,
-        $code,
-        $title,
-        $shortDescription,
-        $description,
+        string $code,
+        string $title,
+        string $shortDescription,
+        string $description,
         array $effects,
-        $isCumulative,
-        $isRemovingPostage,
-        $isAvailableOnSpecialOffers,
-        $isEnabled,
-        $maxUsage,
+        bool $isCumulative,
+        bool $isRemovingPostage,
+        bool $isAvailableOnSpecialOffers,
+        bool $isEnabled,
+        int $maxUsage,
         DateTime $expirationDate,
-        $freeShippingForCountries,
-        $freeShippingForModules,
-        $perCustomerUsageCount,
+        ObjectCollection $freeShippingForCountries,
+        ObjectCollection $freeShippingForModules,
+        bool $perCustomerUsageCount,
     );
 
     /**
      * Return Coupon code (ex: XMAS).
-     *
-     * @return string
      */
-    public function getCode();
+    public function getCode(): string;
 
     /**
      * Return Coupon title (ex: Coupon for XMAS).
-     *
-     * @return string
      */
-    public function getTitle();
+    public function getTitle(): string;
 
     /**
      * Return Coupon short description.
-     *
-     * @return string
      */
-    public function getShortDescription();
+    public function getShortDescription(): string;
 
     /**
      * Return Coupon description.
-     *
-     * @return string
      */
-    public function getDescription();
+    public function getDescription(): string;
 
     /**
      * If Coupon is cumulative or prevent any accumulation
      * If is cumulative you can sum Coupon effects
      * If not cancel all other Coupon and take the last given.
-     *
-     * @return bool
      */
-    public function isCumulative();
+    public function isCumulative(): bool;
 
     /**
      * If Coupon is removing Checkout Postage.
-     *
-     * @return bool
      */
-    public function isRemovingPostage();
+    public function isRemovingPostage(): bool;
 
     /**
      * Return condition to validate the Coupon or not.
      *
      * @return ConditionCollection A set of ConditionInterface
      */
-    public function getConditions();
+    public function getConditions(): ConditionCollection;
 
     /**
      * Replace the existing Conditions by those given in parameter
@@ -142,56 +124,44 @@ interface CouponInterface
      *
      * @param ConditionCollection $conditions ConditionInterface to add
      *
-     * @throws InvalidConditionException
-     *
      * @return $this
+     *
+     * @throws InvalidConditionException
      */
     public function setConditions(ConditionCollection $conditions);
 
     /**
      * Return Coupon expiration date.
-     *
-     * @return DateTime
      */
-    public function getExpirationDate();
+    public function getExpirationDate(): DateTime;
 
     /**
      * Check if the Coupon can be used against a
      * product already with a special offer price.
-     *
-     * @return bool
      */
-    public function isAvailableOnSpecialOffers();
+    public function isAvailableOnSpecialOffers(): bool;
 
     /**
      * Check if the Coupon can be used against a
      * product already with a special offer price.
-     *
-     * @return bool
      */
-    public function getPerCustomerUsageCount();
+    public function getPerCustomerUsageCount(): bool;
 
     /**
      * Check if Coupon has been disabled by admin.
-     *
-     * @return bool
      */
-    public function isEnabled();
+    public function isEnabled(): bool;
 
     /**
      * Return how many time the Coupon can be used again
      * Ex : -1 unlimited.
-     *
-     * @return int
      */
-    public function getMaxUsage();
+    public function getMaxUsage(): int;
 
     /**
      * Check if the Coupon is already Expired.
-     *
-     * @return bool
      */
-    public function isExpired();
+    public function isExpired(): bool;
 
     /**
      * Return an amount thant will be subtracted to the cart total, or zero.
@@ -204,15 +174,13 @@ interface CouponInterface
      *
      * @return float Amount removed from the cart total
      */
-    public function exec();
+    public function exec(): float;
 
     /**
      * Check if the current Coupon is matching its conditions
      * Thelia variables are given by the FacadeInterface.
-     *
-     * @return bool
      */
-    public function isMatching();
+    public function isMatching(): bool;
 
     /**
      * Draw the input displayed in the BackOffice
@@ -220,17 +188,17 @@ interface CouponInterface
      *
      * @return string HTML string
      */
-    public function drawBackOfficeInputs();
+    public function drawBackOfficeInputs(): string;
 
     /**
-     * @return ObjectCollection list of country IDs for which shipping is free. All if empty
+     * @return array list of country IDs for which shipping is free. All if empty
      */
-    public function getFreeShippingForCountries();
+    public function getFreeShippingForCountries(): array;
 
     /**
-     * @return ObjectCollection list of module IDs for which shipping is free. All if empty
+     * @return array list of module IDs for which shipping is free. All if empty
      */
-    public function getFreeShippingForModules();
+    public function getFreeShippingForModules(): array;
 
     /**
      * Create the effect array from the list of fields.
@@ -239,7 +207,7 @@ interface CouponInterface
      *
      * @return array a filedName => fieldValue array
      */
-    public function getEffects($data);
+    public function getEffects(array $data): array;
 
     /**
      * Clear all the data the coupon may have stored, called after an order is completed.
@@ -249,5 +217,5 @@ interface CouponInterface
     /**
      * @return bool true if the coupon is currently in use in the current order process, false otherwise
      */
-    public function isInUse();
+    public function isInUse(): bool;
 }

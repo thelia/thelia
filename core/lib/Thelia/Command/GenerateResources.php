@@ -37,9 +37,8 @@ class GenerateResources extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Output format amid (string, sql, sql-i18n)',
-                null
-            )
-        ;
+                null,
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -48,35 +47,37 @@ class GenerateResources extends ContainerAwareCommand
 
         $constants = $class->getConstants();
 
-        if (\count($constants) == 0) {
+        if (0 === \count($constants)) {
             throw new \RuntimeException('No resources found');
         }
 
         switch ($input->getOption('output')) {
             case 'sql':
                 $output->writeln(
-                    'INSERT INTO '.ResourceTableMap::TABLE_NAME.' (`id`, `code`, `created_at`, `updated_at`) VALUES '
+                    'INSERT INTO '.ResourceTableMap::TABLE_NAME.' (`id`, `code`, `created_at`, `updated_at`) VALUES ',
                 );
                 $compteur = 0;
+
                 foreach ($constants as $constant => $value) {
-                    if ($constant == AdminResources::SUPERADMINISTRATOR) {
+                    if (AdminResources::SUPERADMINISTRATOR === $constant) {
                         continue;
                     }
 
                     ++$compteur;
                     $output->writeln(
-                        \sprintf("(%d, '%s', NOW(), NOW())", $compteur, $value).($constant === key(\array_slice($constants, -1, 1, true)) ? ';' : ',')
+                        \sprintf("(%d, '%s', NOW(), NOW())", $compteur, $value).($constant === key(\array_slice($constants, -1, 1, true)) ? ';' : ','),
                     );
                 }
 
                 break;
             case 'sql-i18n':
                 $output->writeln(
-                    'INSERT INTO '.ResourceI18nTableMap::TABLE_NAME.' (`id`, `locale`, `title`) VALUES '
+                    'INSERT INTO '.ResourceI18nTableMap::TABLE_NAME.' (`id`, `locale`, `title`) VALUES ',
                 );
                 $compteur = 0;
+
                 foreach ($constants as $constant => $value) {
-                    if ($constant == AdminResources::SUPERADMINISTRATOR) {
+                    if (AdminResources::SUPERADMINISTRATOR === $constant) {
                         continue;
                     }
 
@@ -85,17 +86,17 @@ class GenerateResources extends ContainerAwareCommand
                     $title = ucwords(str_replace('.', ' / ', str_replace('admin.', '', $value)));
 
                     $output->writeln(
-                        \sprintf("(%d, 'en_US', '%s'),", $compteur, $title)
+                        \sprintf("(%d, 'en_US', '%s'),", $compteur, $title),
                     );
                     $output->writeln(
-                        \sprintf("(%d, 'fr_FR', '%s')", $compteur, $title).($constant === key(\array_slice($constants, -1, 1, true)) ? ';' : ',')
+                        \sprintf("(%d, 'fr_FR', '%s')", $compteur, $title).($constant === key(\array_slice($constants, -1, 1, true)) ? ';' : ','),
                     );
                 }
 
                 break;
             default:
                 foreach ($constants as $constant => $value) {
-                    if ($constant == AdminResources::SUPERADMINISTRATOR) {
+                    if (AdminResources::SUPERADMINISTRATOR === $constant) {
                         continue;
                     }
 

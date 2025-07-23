@@ -16,7 +16,6 @@ namespace Thelia\Core\Template\Parser;
 
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Core\Template\TemplateHelperInterface;
 
 /**
  * Class ParserFallback.
@@ -25,135 +24,82 @@ use Thelia\Core\Template\TemplateHelperInterface;
  */
 class ParserFallback implements ParserInterface
 {
-    public function render($realTemplateName, array $parameters = [], $compressOutput = true): void
+    public function render($realTemplateName, array $parameters = [], $compressOutput = true): never
     {
         $this->throwException();
     }
 
-    public function renderString($templateText, array $parameters = [], $compressOutput = true): void
+    public function renderString($templateText, array $parameters = [], $compressOutput = true): never
     {
         $this->throwException();
     }
 
-    public function getStatus(): int
+    public function getStatus(): never
     {
         $this->throwException();
     }
 
-    public function setStatus($status): self
+    public function setStatus($status): never
     {
         $this->throwException();
     }
 
-    /**
-     * Setup the parser with a template definition, which provides a template description.
-     */
-    public function setTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false): void
+    public function setTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false): never
     {
         $this->throwException();
     }
 
-    /**
-     * Get template definition.
-     *
-     * @param bool $webAssetTemplate Allow to load asset from another template
-     *                               If the name of the template if provided
-     */
-    public function getTemplateDefinition($webAssetTemplate = false): void
+    public function getTemplateDefinition(bool|string $webAssetTemplateName = false): never
     {
         $this->throwException();
     }
 
-    /**
-     * Check if template definition is not null.
-     */
-    public function hasTemplateDefinition(): void
+    public function hasTemplateDefinition(): never
     {
         $this->throwException();
     }
 
-    /**
-     * Add a template directory to the current template list.
-     *
-     * @param int    $templateType      the template type (
-     * @param string $templateName      the template name
-     * @param string $templateDirectory path to the template dirtectory
-     * @param string $key               ???
-     * @param bool   $unshift           ??? Etienne ?
-     */
-    public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $unshift = false): void
+    public function addTemplateDirectory(int $templateType, string $templateName, string $templateDirectory, string $key, bool $unshift = false): never
     {
         $this->throwException();
     }
 
-    /**
-     * Return the registered template directories for a given template type.
-     *
-     * @param int $templateType
-     *
-     * @throws \InvalidArgumentException if the templateType is not defined
-     *
-     * @return array: an array of defined templates directories for the given template type
-     */
-    public function getTemplateDirectories($templateType): void
+    public function getTemplateDirectories(int $templateType): never
     {
         $this->throwException();
     }
 
-    /**
-     * Create a variable that will be available in the templates.
-     *
-     * @param string $variable the variable name
-     * @param mixed  $value    the value of the variable
-     */
-    public function assign($variable, $value = null): void
+    public function assign(string|array $variable, mixed $value = null): never
     {
         $this->throwException();
     }
 
-    /**
-     * @return TemplateHelperInterface the parser template helper instance
-     */
-    public function getTemplateHelper(): void
+    public function getTemplateHelper(): never
     {
         $this->throwException();
     }
 
-    private function throwException(): void
+    private function throwException(): never
     {
         throw new \RuntimeException('if you want to use a parser, please register one');
     }
 
-    /**
-     * Returns the request used by the parser.
-     */
-    public function getRequest(): void
+    public function getRequest(): never
     {
         $this->throwException();
     }
 
-    /**
-     * Set a new template definition, and save the current one.
-     *
-     * @param bool $fallbackToDefaultTemplate if true, resources will be also searched in the "default" template
-     */
-    public function pushTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false): void
+    public function pushTemplateDefinition(TemplateDefinition $templateDefinition, bool $fallbackToDefaultTemplate = false): never
     {
         $this->throwException();
     }
 
-    /**
-     * Restore the previous stored template definition, if one exists.
-     */
-    public function popTemplateDefinition(): void
+    public function popTemplateDefinition(): never
     {
         $this->throwException();
     }
 
-    /**
-     * Get the current status of the fallback to "default" feature.
-     */
-    public function getFallbackToDefaultTemplate(): void
+    public function getFallbackToDefaultTemplate(): never
     {
         $this->throwException();
     }
@@ -163,7 +109,7 @@ class ParserFallback implements ParserInterface
         return false;
     }
 
-    public function getFileExtension(): string
+    public function getFileExtension(): never
     {
         $this->throwException();
     }

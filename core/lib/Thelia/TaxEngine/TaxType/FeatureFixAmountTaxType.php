@@ -55,6 +55,7 @@ class FeatureFixAmountTaxType extends BaseTaxType
             }
 
             $testFloat = new FloatType();
+
             if (!$testFloat->isValid($taxAmount)) {
                 // We cannot modify "bad" (consider uninitialized) feature value in backOffice if we throw exception
                 Tlog::getInstance()->error(Translator::getInstance()->trans('Feature value does not match FLOAT format'));
@@ -72,12 +73,12 @@ class FeatureFixAmountTaxType extends BaseTaxType
             new TaxTypeRequirementDefinition(
                 'feature',
                 new ModelValidIdType('Feature'),
-                Translator::getInstance()->trans('Feature')
+                Translator::getInstance()->trans('Feature'),
             ),
             new TaxTypeRequirementDefinition(
                 'lang',
                 new ModelValidIdType('Lang'),
-                Translator::getInstance()->trans('Language')
+                Translator::getInstance()->trans('Language'),
             ),
         ];
     }

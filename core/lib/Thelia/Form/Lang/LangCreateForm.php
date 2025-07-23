@@ -124,8 +124,7 @@ class LangCreateForm extends BaseForm
                 'label_attr' => [
                     'for' => 'decimals',
                 ],
-            ])
-        ;
+            ]);
     }
 
     /**

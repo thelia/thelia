@@ -24,7 +24,7 @@ namespace Thelia\Core\Event\Hook;
 class HookRenderEvent extends BaseHookRenderEvent
 {
     /** @var array an array of fragments collected during the event dispatch */
-    protected $fragments = [];
+    protected array $fragments = [];
 
     public function __construct($code, array $arguments = [], array $templateVariables = [])
     {
@@ -34,11 +34,9 @@ class HookRenderEvent extends BaseHookRenderEvent
     /**
      * Add a new fragment.
      *
-     * @param string $content
-     *
      * @return $this
      */
-    public function add($content): static
+    public function add(string $content): static
     {
         $this->fragments[] = $content;
 
@@ -47,10 +45,8 @@ class HookRenderEvent extends BaseHookRenderEvent
 
     /**
      * Get an array of all the fragments.
-     *
-     * @return array
      */
-    public function get()
+    public function get(): array
     {
         return $this->fragments;
     }
@@ -64,10 +60,11 @@ class HookRenderEvent extends BaseHookRenderEvent
      *
      * @return string the concatenate string
      */
-    public function dump($glue = '', string $before = '', string $after = ''): string
+    public function dump(string $glue = '', string $before = '', string $after = ''): string
     {
         $ret = '';
-        if (0 !== \count($this->fragments)) {
+
+        if ([] !== $this->fragments) {
             $ret = $before.implode($glue, $this->fragments).$after;
         }
 

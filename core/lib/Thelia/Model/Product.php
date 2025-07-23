@@ -50,22 +50,20 @@ class Product extends BaseProduct implements FileModelParentInterface
     {
         $taxCalculator = new Calculator();
 
-        return $taxCalculator->load($this, $country, $state)->getTaxedPrice($price);
+        return $taxCalculator->load($this, $country, $state)->getTaxedPrice((float) $price);
     }
 
     public function getTaxedPromoPrice(Country $country, $price, ?State $state = null)
     {
         $taxCalculator = new Calculator();
 
-        return $taxCalculator->load($this, $country, $state)->getTaxedPrice($price);
+        return $taxCalculator->load($this, $country, $state)->getTaxedPrice((float) $price);
     }
 
     /**
      * Return the default PSE for this product.
-     *
-     * @return ProductSaleElements
      */
-    public function getDefaultSaleElements()
+    public function getDefaultSaleElements(): ProductSaleElements
     {
         return ProductSaleElementsQuery::create()->filterByProductId($this->id)->filterByIsDefault(true)->findOne();
     }
@@ -74,10 +72,8 @@ class Product extends BaseProduct implements FileModelParentInterface
      * Return PSE count fir this product.
      *
      * @param ConnectionInterface $con an optional connection object
-     *
-     * @return int
      */
-    public function countSaleElements($con = null)
+    public function countSaleElements(?ConnectionInterface $con = null): int
     {
         return ProductSaleElementsQuery::create()->filterByProductId($this->id)->count($con);
     }
@@ -85,7 +81,7 @@ class Product extends BaseProduct implements FileModelParentInterface
     /**
      * @return int the current default category ID for this product
      */
-    public function getDefaultCategoryId()
+    public function getDefaultCategoryId(): int
     {
         // Find default category
         $default_category = ProductCategoryQuery::create()
@@ -93,7 +89,7 @@ class Product extends BaseProduct implements FileModelParentInterface
             ->filterByDefaultCategory(true)
             ->findOne();
 
-        return $default_category == null ? 0 : $default_category->getCategoryId();
+        return null === $default_category ? 0 : $default_category->getCategoryId();
     }
 
     /**
@@ -103,7 +99,7 @@ class Product extends BaseProduct implements FileModelParentInterface
      *
      * @return $this
      */
-    public function setDefaultCategory($defaultCategoryId)
+    public function setDefaultCategory(int $defaultCategoryId)
     {
         // Allow uncategorized products (NULL instead of 0, to bypass delete cascade constraint)
         if ($defaultCategoryId <= 0) {
@@ -114,14 +110,13 @@ class Product extends BaseProduct implements FileModelParentInterface
         $productCategory = ProductCategoryQuery::create()
             ->filterByProductId($this->getId())
             ->filterByDefaultCategory(true)
-            ->findOne()
-        ;
+            ->findOne();
 
-        if ($productCategory !== null && (int) $productCategory->getCategoryId() === (int) $defaultCategoryId) {
+        if (null !== $productCategory && (int) $productCategory->getCategoryId() === (int) $defaultCategoryId) {
             return $this;
         }
 
-        if ($productCategory !== null) {
+        if (null !== $productCategory) {
             $productCategory->delete();
         }
 
@@ -147,11 +142,9 @@ class Product extends BaseProduct implements FileModelParentInterface
     /**
      * @deprecated since 2.3, and will be removed in 2.4, please use Product::setDefaultCategory
      *
-     * @param int $defaultCategoryId
-     *
      * @return $this
      */
-    public function updateDefaultCategory($defaultCategoryId)
+    public function updateDefaultCategory(int $defaultCategoryId)
     {
         return $this->setDefaultCategory($defaultCategoryId);
     }
@@ -168,8 +161,14 @@ class Product extends BaseProduct implements FileModelParentInterface
      *
      * @throws \Exception
      */
-    public function create($defaultCategoryId, $basePrice, $priceCurrencyId, $taxRuleId, $baseWeight, $baseQuantity = 0): void
-    {
+    public function create(
+        int $defaultCategoryId,
+        float $basePrice,
+        int $priceCurrencyId,
+        int $taxRuleId,
+        float $baseWeight = 0,
+        int $baseQuantity = 0,
+    ): void {
         $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
 
         $con->beginTransaction();
@@ -198,38 +197,35 @@ class Product extends BaseProduct implements FileModelParentInterface
     /**
      * Create a basic product sale element attached to this product.
      *
-     * @param float  $weight
-     * @param float  $basePrice
-     * @param float  $salePrice
-     * @param int    $currencyId
-     * @param int    $isDefault
-     * @param bool   $isPromo
-     * @param bool   $isNew
-     * @param int    $quantity
-     * @param string $eanCode
-     * @param bool   $ref
-     *
      * @throws PropelException
      * @throws \Exception
-     *
-     * @return ProductSaleElements
      */
-    public function createProductSaleElement(ConnectionInterface $con, $weight, $basePrice, $salePrice, $currencyId, $isDefault, $isPromo = false, $isNew = false, $quantity = 0, $eanCode = '', $ref = false)
-    {
+    public function createProductSaleElement(
+        ConnectionInterface $con,
+        float $weight,
+        float $basePrice,
+        float $salePrice,
+        int $currencyId,
+        bool $isDefault,
+        bool $isPromo = false,
+        bool $isNew = false,
+        int $quantity = 0,
+        string $eanCode = '',
+        bool $ref = false,
+    ): ProductSaleElements {
         // Create an empty product sale element
         $saleElements = new ProductSaleElements();
 
         $saleElements
             ->setProduct($this)
-            ->setRef($ref == false ? $this->getRef() : $ref)
+            ->setRef(false === $ref ? $this->getRef() : $ref)
             ->setPromo($isPromo)
             ->setNewness($isNew)
             ->setWeight($weight)
             ->setIsDefault($isDefault)
             ->setEanCode($eanCode)
             ->setQuantity($quantity)
-            ->save($con)
-        ;
+            ->save($con);
 
         // Create an empty product price in the provided currency
         $productPrice = new ProductPrice();
@@ -240,8 +236,7 @@ class Product extends BaseProduct implements FileModelParentInterface
             ->setPrice($basePrice)
             ->setCurrencyId($currencyId)
             ->setFromDefaultCurrency(false)
-            ->save($con)
-        ;
+            ->save($con);
 
         return $saleElements;
     }
@@ -249,11 +244,9 @@ class Product extends BaseProduct implements FileModelParentInterface
     /**
      * Calculate next position relative to our default category.
      *
-     * @param ProductQuery $query
-     *
      * @deprecated since 2.3, and will be removed in 2.4
      */
-    protected function addCriteriaToPositionQuery($query): void
+    protected function addCriteriaToPositionQuery(ProductQuery $query): void
     {
         // Find products in the same category
         $products = ProductCategoryQuery::create()
@@ -262,12 +255,12 @@ class Product extends BaseProduct implements FileModelParentInterface
             ->select('product_id')
             ->find();
 
-        if ($products != null) {
+        if (null !== $products) {
             $query->filterById($products, Criteria::IN);
         }
     }
 
-    public function preDelete(?ConnectionInterface $con = null)
+    public function preDelete(?ConnectionInterface $con = null): bool
     {
         parent::preDelete($con);
 
@@ -278,14 +271,12 @@ class Product extends BaseProduct implements FileModelParentInterface
             ->filterByIsFreeText(true)
             ->filterByProductId($this->getId())
             ->endUse()
-            ->find($con)
-        ;
+            ->find($con);
 
         /** @var FeatureAv $featureAv */
         foreach ($featureAvs as $featureAv) {
             $featureAv
-                ->delete($con)
-            ;
+                ->delete($con);
         }
 
         return true;
@@ -318,9 +309,9 @@ class Product extends BaseProduct implements FileModelParentInterface
     {
         // For BC, will be removed in 2.4
         if (!$this->isNew() && (isset($this->modifiedColumns[ProductTableMap::COL_POSITION]) && $this->modifiedColumns[ProductTableMap::COL_POSITION]) && null !== $productCategory = ProductCategoryQuery::create()
-                ->filterByProduct($this)
-                ->filterByDefaultCategory(true)
-                ->findOne()) {
+            ->filterByProduct($this)
+            ->filterByDefaultCategory(true)
+            ->findOne()) {
             $productCategory->changeAbsolutePosition($this->getPosition());
         }
 
@@ -329,10 +320,8 @@ class Product extends BaseProduct implements FileModelParentInterface
 
     /**
      * Overload for the position management.
-     *
-     * @param ProductCategory $productCategory
      */
-    protected function doAddProductCategory($productCategory): void
+    protected function doAddProductCategory(ProductCategory $productCategory): void
     {
         parent::doAddProductCategory($productCategory);
 
@@ -341,6 +330,6 @@ class Product extends BaseProduct implements FileModelParentInterface
             ->orderByPosition(Criteria::DESC)
             ->findOne();
 
-        $productCategory->setPosition($productCategoryPosition !== null ? $productCategoryPosition->getPosition() + 1 : 1);
+        $productCategory->setPosition(null !== $productCategoryPosition ? $productCategoryPosition->getPosition() + 1 : 1);
     }
 }

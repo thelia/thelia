@@ -48,7 +48,7 @@ class TranslationsCustomerTitleController extends BaseAdminController
                     ->save();
             }
 
-            if ($request->get('save_mode') === 'close') {
+            if ('close' === $request->get('save_mode')) {
                 return $this->generateRedirectFromRoute('admin.configuration.index');
             }
 
@@ -65,7 +65,7 @@ class TranslationsCustomerTitleController extends BaseAdminController
             'customer title i18n',
             $errorMessage,
             $translationForm,
-            $ex
+            $ex,
         );
 
         return $this->generateRedirectFromRoute('admin.configuration.translations-customers-title');

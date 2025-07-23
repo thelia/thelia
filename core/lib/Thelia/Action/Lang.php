@@ -88,9 +88,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
             if ($lang->getByDefault()) {
-                throw new \RuntimeException(
-                    Translator::getInstance()->trans('Cannot disable the default language')
-                );
+                throw new \RuntimeException(Translator::getInstance()->trans('Cannot disable the default language'));
             }
 
             $lang->setActive($lang->getActive() ? 0 : 1);
@@ -112,9 +110,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
             if ($lang->getByDefault()) {
-                throw new \RuntimeException(
-                    Translator::getInstance()->trans('Cannot hide the default language')
-                );
+                throw new \RuntimeException(Translator::getInstance()->trans('Cannot hide the default language'));
             }
 
             $lang->setVisible($lang->getVisible() ? 0 : 1);
@@ -158,9 +154,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
             if ($lang->getByDefault()) {
-                throw new \RuntimeException(
-                    Translator::getInstance()->trans('It is not allowed to delete the default language')
-                );
+                throw new \RuntimeException(Translator::getInstance()->trans('It is not allowed to delete the default language'));
             }
 
             $lang
@@ -170,12 +164,12 @@ class Lang extends BaseAction implements EventSubscriberInterface
             $session = $this->requestStack->getCurrentRequest()->getSession();
 
             // If we've just deleted the current admin edition language, set it to the default one.
-            if ($lang->getId() == $session->getAdminEditionLang()->getId()) {
+            if ($lang->getId() === $session->getAdminEditionLang()->getId()) {
                 $session->setAdminEditionLang(LangModel::getDefaultLanguage());
             }
 
             // If we've just deleted the current admin language, set it to the default one.
-            if ($lang->getId() == $session->getLang()->getId()) {
+            if ($lang->getId() === $session->getLang()->getId()) {
                 $session->setLang(LangModel::getDefaultLanguage());
             }
 
@@ -226,14 +220,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
                 $fs->copy($unknownFlagPath, $countryFlag);
             }
         } catch (TemplateException $templateException) {
-            throw new \RuntimeException(
-                Translator::getInstance()->trans(
-                    'The image which replaces an undefined country flag (%file) was not found. Please check unknown-flag-path configuration variable, and check that the image exists.',
-                    ['%file' => $unknownFlag]
-                ),
-                0,
-                $templateException
-            );
+            throw new \RuntimeException(Translator::getInstance()->trans('The image which replaces an undefined country flag (%file) was not found. Please check unknown-flag-path configuration variable, and check that the image exists.', ['%file' => $unknownFlag]), 0, $templateException);
         }
     }
 

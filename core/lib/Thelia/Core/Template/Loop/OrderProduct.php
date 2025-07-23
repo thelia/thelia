@@ -16,6 +16,7 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -49,11 +50,11 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
         return new ArgumentCollection(
             Argument::createIntTypeArgument('order', null, true),
             Argument::createIntListTypeArgument('id'),
-            Argument::createBooleanOrBothTypeArgument('virtual', BooleanOrBothType::ANY)
+            Argument::createBooleanOrBothTypeArgument('virtual', BooleanOrBothType::ANY),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = OrderProductQuery::create();
 
@@ -66,22 +67,22 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
         $pseJoin = new Join(
             OrderProductTableMap::COL_PRODUCT_SALE_ELEMENTS_ID,
             ProductSaleElementsTableMap::COL_ID,
-            Criteria::LEFT_JOIN
+            Criteria::LEFT_JOIN,
         );
         $search
             ->addJoinObject($pseJoin)
             ->addAsColumn(
                 'product_id',
-                ProductSaleElementsTableMap::COL_PRODUCT_ID
-            )
-        ;
+                ProductSaleElementsTableMap::COL_PRODUCT_ID,
+            );
 
         $order = $this->getOrder();
 
         $search->filterByOrderId($order, Criteria::EQUAL);
 
         $virtual = $this->getVirtual();
-        if ($virtual !== BooleanOrBothType::ANY) {
+
+        if (BooleanOrBothType::ANY !== $virtual) {
             if ($virtual) {
                 $search
                     ->filterByVirtual(1, Criteria::EQUAL)
@@ -152,8 +153,8 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
                 ->set('PRODUCT_ID', $orderProduct->getVirtualColumn('product_id'))
                 ->set('PRODUCT_SALE_ELEMENTS_ID', $orderProduct->getProductSaleElementsId())
                 ->set('PRODUCT_SALE_ELEMENTS_REF', $orderProduct->getProductSaleElementsRef())
-                ->set('WAS_NEW', $orderProduct->getWasNew() === 1 ? 1 : 0)
-                ->set('WAS_IN_PROMO', $orderProduct->getWasInPromo() === 1 ? 1 : 0)
+                ->set('WAS_NEW', 1 === $orderProduct->getWasNew() ? 1 : 0)
+                ->set('WAS_IN_PROMO', 1 === $orderProduct->getWasInPromo() ? 1 : 0)
                 ->set('WEIGHT', $orderProduct->getWeight())
                 ->set('TITLE', $orderProduct->getTitle())
                 ->set('CHAPO', $orderProduct->getChapo())
@@ -186,9 +187,7 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
 
                 ->set('REAL_TOTAL_PRICE', $orderProduct->getWasInPromo() ? $totalPromoPrice : $totalPrice)
                 ->set('REAL_TOTAL_TAXED_PRICE', $orderProduct->getWasInPromo() ? $totalTaxedPromoPrice : $totalTaxedPrice)
-                ->set('REAL_TOTAL_PRICE_TAX', $orderProduct->getWasInPromo() ? $totalPromoTax : $totalTax)
-
-            ;
+                ->set('REAL_TOTAL_PRICE_TAX', $orderProduct->getWasInPromo() ? $totalPromoTax : $totalTax);
             $this->addOutputFields($loopResultRow, $orderProduct);
 
             $loopResult->addRow($loopResultRow);

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -48,7 +49,6 @@ use Thelia\Type\TypeCollection;
 class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $useAttributePosistion;
-
     protected $timestampable = true;
 
     protected function getArgDefinitions(): ArgumentCollection
@@ -62,14 +62,14 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumListType(['id', 'id_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse'])
+                    new EnumListType(['id', 'id_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse']),
                 ),
-                'manual'
-            )
+                'manual',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = AttributeQuery::create();
 
@@ -99,9 +99,9 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
             $products = ProductQuery::create()->findById($product);
 
             // Ignore if the product cannot be found.
-            if ($products !== null) {
+            if (null !== $products) {
                 // Create template array
-                if ($template == null) {
+                if (null === $template) {
                     $template = [];
                 }
 
@@ -118,7 +118,7 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
             // franck@cqfdev.fr - 05/12/2013 : if the given product has no template
             // or if the product cannot be found, do not return anything.
             if (empty($template)) {
-                return null;
+                return $search;
             }
         }
 
@@ -127,12 +127,11 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
             $search
                 ->withColumn(AttributeTemplateTableMap::COL_POSITION, 'position')
                 ->useAttributeTemplateQuery()
-                    ->filterByTemplate(
-                        TemplateQuery::create()->filterById($template, Criteria::IN)->find(),
-                        Criteria::IN
-                    )
-                ->endUse()
-            ;
+                ->filterByTemplate(
+                    TemplateQuery::create()->filterById($template, Criteria::IN)->find(),
+                    Criteria::IN,
+                )
+                ->endUse();
 
             $this->useAttributePosistion = false;
         } elseif (null !== $excludeTemplate) {
@@ -140,8 +139,7 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
             $excludeAttributes = AttributeTemplateQuery::create()->filterByTemplateId($excludeTemplate)->select('attribute_id')->find();
 
             $search
-                ->filterById($excludeAttributes, Criteria::NOT_IN)
-            ;
+                ->filterById($excludeAttributes, Criteria::NOT_IN);
         }
 
         $orders = $this->getOrder();
@@ -194,8 +192,7 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('CHAPO', $attribute->getVirtualColumn('i18n_CHAPO'))
                 ->set('DESCRIPTION', $attribute->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set('POSTSCRIPTUM', $attribute->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set('POSITION', $this->useAttributePosistion ? $attribute->getPosition() : $attribute->getVirtualColumn('position'))
-            ;
+                ->set('POSITION', $this->useAttributePosistion ? $attribute->getPosition() : $attribute->getVirtualColumn('position'));
             $this->addOutputFields($loopResultRow, $attribute);
 
             $loopResult->addRow($loopResultRow);

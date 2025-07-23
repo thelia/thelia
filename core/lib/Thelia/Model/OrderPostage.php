@@ -32,59 +32,39 @@ class OrderPostage
 
     /**
      * Convert a amount or OrderPostage object to an OrderPostage object.
-     *
-     * @param OrderPostage|float $postage
      */
-    public static function loadFromPostage($postage): self
+    public static function loadFromPostage(self|float $postage): self
     {
         return $postage instanceof self ? $postage : new self($postage);
     }
 
-    /**
-     * @return float
-     */
-    public function getAmount()
+    public function getAmount(): float
     {
         return $this->amount;
     }
 
-    /**
-     * @param float $amount
-     */
-    public function setAmount($amount): void
+    public function setAmount(float $amount): void
     {
         $this->amount = $amount;
     }
 
-    /**
-     * @return float
-     */
-    public function getAmountTax()
+    public function getAmountTax(): float
     {
         return $this->amountTax;
     }
 
-    /**
-     * @param float $amountTax
-     */
-    public function setAmountTax($amountTax): void
+    public function setAmountTax(float $amountTax): void
     {
         // We have to round the postage tax to prevent small delta amounts in tax calculations.
         $this->amountTax = round($amountTax, 2);
     }
 
-    /**
-     * @return string
-     */
-    public function getTaxRuleTitle()
+    public function getTaxRuleTitle(): string
     {
         return $this->taxRuleTitle;
     }
 
-    /**
-     * @param string $taxRuleTitle
-     */
-    public function setTaxRuleTitle($taxRuleTitle): void
+    public function setTaxRuleTitle(string $taxRuleTitle): void
     {
         $this->taxRuleTitle = $taxRuleTitle;
     }

@@ -14,10 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\EventListener;
 
-use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -25,219 +23,99 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\Event\IsAdminEnvEvent;
 use Thelia\Core\Event\SessionEvent;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\TheliaKernelEvents;
 use Thelia\Core\Translation\Translator;
-use Thelia\Log\Tlog;
-use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
-use Thelia\Model\LangQuery;
+use Thelia\Service\Model\LangService;
 
-class KernelListener implements EventSubscriberInterface
+class KernelListener
 {
-    protected static $session;
+    protected static Session $session;
 
     public function __construct(
         protected HttpKernelInterface $app,
         protected Translator $translator,
         protected EventDispatcherInterface $eventDispatcher,
+        protected LangService $langService,
         protected $cacheDir,
         protected $debug,
         protected $env,
     ) {
     }
 
-    public function paramInit(RequestEvent $event): ?Response
+    #[AsEventListener(event: KernelEvents::REQUEST, priority: \PHP_INT_MAX - 1)]
+    public function initializeLanguageAndAdmin(RequestEvent $event): ?Response
     {
-        if ($event->getRequestType() === HttpKernelInterface::MAIN_REQUEST) {
-            $request = $event->getRequest();
-            $response = $this->initParam($request);
+        if (HttpKernelInterface::MAIN_REQUEST !== $event->getRequestType()) {
+            return null;
+        }
+        $request = $event->getRequest();
 
-            if ($response instanceof Response) {
-                return $response;
-            }
-
-            $this->checkMultiDomainLang($request);
+        if (!$request instanceof TheliaRequest) {
+            return null;
         }
 
-        return null;
-    }
-
-    protected function checkMultiDomainLang(TheliaRequest $request): void
-    {
-        if (!ConfigQuery::isMultiDomainActivated()) {
-            return;
-        }
-
-        if (TheliaRequest::$isAdminEnv) {
-            return;
-        }
-
-        if (!$request->getSession() instanceof SessionInterface) {
-            return;
-        }
-
-        $domainUrl = $request->getSession()->getLang()->getUrl();
-
-        // if lang domain is different from current domain, redirect to the proper one
-        if (!empty($domainUrl) && rtrim((string) $domainUrl, '/') !== $request->getSchemeAndHttpHost()) {
-            $langs = LangQuery::create()
-                ->filterByActive(true)
-                ->filterByVisible(true)
-                ->find();
-
-            foreach ($langs as $lang) {
-                $domainUrl = $lang->getUrl();
-                if (rtrim((string) $domainUrl, '/') === $request->getSchemeAndHttpHost()) {
-                    $request->getSession()->setLang($lang);
-                    break;
-                }
-            }
-        }
-    }
-
-    protected function initParam(TheliaRequest $request)
-    {
-        if (!$request->hasSession() || !$request->getSession() instanceof SessionInterface) {
+        if (!$request->hasSession() || !($session = $request->getSession()) instanceof SessionInterface) {
             return null;
         }
 
         $event = new IsAdminEnvEvent($request);
-
+        TheliaRequest::$isAdminEnv = $event->isAdminEnv();
         $this->eventDispatcher->dispatch($event, IsAdminEnvEvent::class);
 
-        if ($event->isAdminEnv()) {
-            TheliaRequest::$isAdminEnv = true;
+        $response = $this->handleLang($session, $request);
 
-            if (null !== $lang = $this->detectAdminLang($request)) {
-                $request->getSession()->setAdminLang($lang);
-
-                return $lang;
-            }
-
-            return null;
+        if ($response instanceof Response) {
+            return $response;
         }
 
-        $lang = $this->detectLang($request);
-
-        if ($lang instanceof Response) {
-            return $lang;
-        }
-
-        if ($lang) {
-            $request->getSession()->setLang($lang);
-        }
+        $this->langService->syncMultiDomainLanguage($request);
 
         return null;
     }
 
-    /**
-     * @return Lang|null
-     */
-    protected function detectAdminLang(TheliaRequest $request)
-    {
-        $requestedLangCodeOrLocale = $request->query->get('lang');
-
-        if (null !== $requestedLangCodeOrLocale) {
-            return LangQuery::create()->findOneByCode($requestedLangCodeOrLocale);
-        }
-
-        return null;
-    }
-
-    /**
-     * @return Lang|null
-     */
-    protected function detectLang(TheliaRequest $request)
-    {
-        // first priority => lang parameter present in request (get or post)
-        $requestedLangCodeOrLocale = $request->query->get('lang');
-
-        // add a fallback on locale parameter
-        if (null === $requestedLangCodeOrLocale) {
-            $requestedLangCodeOrLocale = $request->query->get('locale');
-        }
-
-        // The lang parameter may contains a lang code (fr, en, ru) for Thelia < 2.2,
-        // or a locale (fr_FR, en_US, etc.) for Thelia > 2.2.beta1
-        if (null !== $requestedLangCodeOrLocale) {
-            if (\strlen($requestedLangCodeOrLocale) > 2) {
-                $lang = LangQuery::create()->filterByActive(true)->findOneByLocale($requestedLangCodeOrLocale);
-            } else {
-                $lang = LangQuery::create()->filterByActive(true)->findOneByCode($requestedLangCodeOrLocale);
-            }
-
-            if (null === $lang) {
-                return Lang::getDefaultLanguage();
-            }
-
-            // if each lang has its own domain, we redirect the user to the proper one.
-            if (ConfigQuery::isMultiDomainActivated()) {
-                $domainUrl = $lang->getUrl();
-
-                if (!empty($domainUrl)) {
-                    // if lang domain is different from current domain, redirect to the proper one
-                    if (rtrim((string) $domainUrl, '/') !== $request->getSchemeAndHttpHost()) {
-                        return new RedirectResponse($domainUrl, Response::HTTP_MOVED_PERMANENTLY);
-                    }
-
-                    // the user is currently on the proper domain, nothing to change
-                    return null;
-                }
-
-                Tlog::getInstance()->warning('The domain URL for language '.$lang->getTitle().' (id '.$lang->getId().') is not defined.');
-
-                return Lang::getDefaultLanguage();
-            }
-
-            // one domain for all languages, the lang has to be set into session
-            return $lang;
-        }
-
-        // Next, check if lang is defined in the current session. If not we have to set one.
-        if (null === $request->getSession()->getLang(false)) {
-            if (ConfigQuery::isMultiDomainActivated()) {
-                // find lang with domain
-                $domainLang = LangQuery::create()->filterByUrl($request->getSchemeAndHttpHost(), ModelCriteria::LIKE)->findOne();
-                if ($domainLang !== null) {
-                    return $domainLang;
-                }
-            }
-
-            // At this point, set the lang to the default one.
-            return Lang::getDefaultLanguage();
-        }
-
-        return null;
-    }
-
-    public function sessionInit(RequestEvent $event): void
+    #[AsEventListener(event: KernelEvents::REQUEST, priority: \PHP_INT_MAX)]
+    public function initializeSession(RequestEvent $event): void
     {
         $isApiRoute = preg_match('/^\/api\//', $event->getRequest()->getPathInfo());
+
         if ($isApiRoute) {
             $event->getRequest()->request->set('isApiRoute', $isApiRoute);
         }
 
         $request = $event->getRequest();
-        if (null === $session = self::$session) {
-            $event = new SessionEvent($this->cacheDir, $this->debug, $this->env);
-
-            $this->eventDispatcher->dispatch($event, TheliaKernelEvents::SESSION);
-            self::$session = $event->getSession();
-            $session = self::$session;
-        }
+        $event = new SessionEvent($this->cacheDir, $this->debug, $this->env);
+        $this->eventDispatcher->dispatch($event, TheliaKernelEvents::SESSION);
+        self::$session = $event->getSession();
+        $session = self::$session;
 
         $session->start();
+
         $request->setSession($session);
     }
 
-    public static function getSubscribedEvents(): array
+    protected function handleLang(Session $session, Request $request): Response|Lang|null
     {
-        return [
-            KernelEvents::REQUEST => [
-                ['paramInit', \PHP_INT_MAX - 1],
-                ['sessionInit', \PHP_INT_MAX],
-            ],
-        ];
+        if (true === TheliaRequest::$isAdminEnv) {
+            $lang = $this->langService->resolveAdminLanguageFromRequest($request);
+            $session->setAdminLang($lang);
+
+            return $lang;
+        }
+
+        $langOrResponse = $this->langService->resolveFrontLanguageFromRequest($request);
+
+        if ($langOrResponse instanceof Response) {
+            return $langOrResponse;
+        }
+
+        if ($langOrResponse instanceof Lang) {
+            $this->langService->setLang($langOrResponse);
+        }
+
+        return null;
     }
 }

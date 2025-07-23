@@ -43,47 +43,27 @@ abstract class CouponAbstract implements CouponInterface
      */
     public const COUPON_DATASET_NAME = 'coupon_specific';
 
-    /**
-     * A standard 'amount' filed name, thant can be used in coupons which extends this class.
-     */
+    /** A standard 'amount' filed name, thant can be used in coupons which extends this class. */
     public const AMOUNT_FIELD_NAME = 'amount';
 
     protected Translator|TranslatorInterface $translator;
-
     protected ConditionOrganizerInterface $organizer;
-
     protected ConditionCollection $conditions;
-
     protected ConditionEvaluator $conditionEvaluator;
-
     protected string $serviceId;
-
-    protected int|float $amount = 0;
-
+    protected float $amount = .0;
     protected array $effects = ['amount' => 0];
-
     protected string $code;
-
     protected string $title;
-
     protected string $shortDescription;
-
     protected string $description;
-
     protected bool $isEnabled = false;
-
     protected DateTime $startDate;
-
     protected DateTime $expirationDate;
-
     protected bool $isCumulative = false;
-
     protected bool $isRemovingPostage = false;
-
     protected int $maxUsage = -1;
-
     protected bool $isAvailableOnSpecialOffers = false;
-
     protected array $freeShippingForCountries = [];
 
     /** @var CouponModule[] */
@@ -214,7 +194,7 @@ abstract class CouponAbstract implements CouponInterface
         return $this->freeShippingForModules;
     }
 
-    public function exec(): float|int
+    public function exec(): float
     {
         return $this->amount;
     }
@@ -279,6 +259,7 @@ abstract class CouponAbstract implements CouponInterface
         $ret = true;
 
         $now = new \DateTime();
+
         if ($this->expirationDate > $now) {
             $ret = false;
         }
@@ -350,10 +331,11 @@ abstract class CouponAbstract implements CouponInterface
     protected function getCouponFieldValue(string $fieldName, array $data, mixed $defaultValue = null): mixed
     {
         $couponSpecificData = json_decode((string) $data[self::COUPON_DATASET_NAME], true);
+
         if (isset($couponSpecificData[$fieldName])) {
             return $this->checkCouponFieldValue(
                 $fieldName,
-                $couponSpecificData[$fieldName]
+                $couponSpecificData[$fieldName],
             );
         }
 

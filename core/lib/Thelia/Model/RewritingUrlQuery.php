@@ -33,10 +33,11 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
         $redirectedJoin = new Join();
         $redirectedJoin->addExplicitCondition(
             RewritingUrlTableMap::TABLE_NAME,
-            'REDIRECTED', 'ru',
+            'REDIRECTED',
+            'ru',
             RewritingUrlTableMap::TABLE_NAME,
             'ID',
-            'is_redirected'
+            'is_redirected',
         );
         $redirectedJoin->setJoinType(Criteria::LEFT_JOIN);
 
@@ -52,10 +53,7 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
             ->findOne();
     }
 
-    /**
-     * @return RewritingUrl|null
-     */
-    public function getViewUrlQuery($view, $viewLocale, $viewId)
+    public function getViewUrlQuery($view, $viewLocale, $viewId): ?RewritingUrl
     {
         return self::create()
             ->joinRewritingArgument('ra', Criteria::LEFT_JOIN)
@@ -68,10 +66,7 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
             ->findOne();
     }
 
-    /**
-     * @return RewritingUrl|null
-     */
-    public function getSpecificUrlQuery($view, $viewLocale, $viewId, $viewOtherParameters)
+    public function getSpecificUrlQuery($view, $viewLocale, $viewId, $viewOtherParameters): ?RewritingUrl
     {
         $urlQuery = self::create()
             ->joinRewritingArgument('ra', Criteria::LEFT_JOIN)
@@ -83,6 +78,7 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
             ->orderById(Criteria::DESC);
 
         $otherParametersCount = \count($viewOtherParameters);
+
         if ($otherParametersCount > 0) {
             $parameterConditions = [];
 
@@ -111,7 +107,7 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
 
     protected function retrieveLocale($viewLocale)
     {
-        if (\strlen((string) $viewLocale) == 2 && null !== $lang = LangQuery::create()->findOneByCode($viewLocale)) {
+        if (2 === \strlen((string) $viewLocale) && null !== $lang = LangQuery::create()->findOneByCode($viewLocale)) {
             $viewLocale = $lang->getLocale();
         }
 

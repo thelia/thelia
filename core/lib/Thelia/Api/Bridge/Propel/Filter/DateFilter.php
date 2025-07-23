@@ -21,19 +21,12 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 class DateFilter extends AbstractFilter
 {
     public const PARAMETER_BEFORE = 'before';
-
     public const PARAMETER_STRICTLY_BEFORE = 'strictly_before';
-
     public const PARAMETER_AFTER = 'after';
-
     public const PARAMETER_STRICTLY_AFTER = 'strictly_after';
-
     public const EXCLUDE_NULL = 'exclude_null';
-
     public const INCLUDE_NULL_BEFORE = 'include_null_before';
-
     public const INCLUDE_NULL_AFTER = 'include_null_after';
-
     public const INCLUDE_NULL_BEFORE_AND_AFTER = 'include_null_before_and_after';
 
     protected function filterProperty(string $property, $values, ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
@@ -49,8 +42,10 @@ class DateFilter extends AbstractFilter
 
         $conditions = [];
         $fieldPath = $this->getPropertyQueryPath($query, $property, $context);
+
         foreach ($values as $key => $value) {
             $conditionName = 'cond_'.$key;
+
             switch ($key) {
                 case self::PARAMETER_BEFORE:
                     $query->addCond($conditionName, $fieldPath, $value, Criteria::LESS_EQUAL);
@@ -93,15 +88,18 @@ class DateFilter extends AbstractFilter
     public function getDescription(string $resourceClass): array
     {
         $filterProperties = $this->getProperties();
+
         if (null === $filterProperties) {
             return [];
         }
 
         $description = [];
+
         foreach (array_keys($filterProperties) as $property) {
             $propertyName = $this->normalizePropertyName($property);
 
             $reflectionProperty = $this->getReflectionProperty($propertyName, $resourceClass);
+
             if (!$reflectionProperty instanceof \ReflectionProperty) {
                 continue;
             }

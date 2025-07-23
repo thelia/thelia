@@ -59,10 +59,8 @@ class Folder extends BaseAction implements EventSubscriberInterface
 
     /**
      * Change Folder SEO.
-     *
-     * @return object
      */
-    public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher): object
     {
         return $this->genericUpdateSeo(FolderQuery::create(), $event, $dispatcher);
     }
@@ -102,6 +100,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
                 $con->commit();
             } catch (\Exception $e) {
                 $con->rollback();
+
                 throw $e;
             }
         }
@@ -152,18 +151,16 @@ class Folder extends BaseAction implements EventSubscriberInterface
 
     /**
      * Check if is a folder view and if folder_id is visible.
-     *
-     * @param string $eventName
      */
-    public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    public function viewCheck(ViewCheckEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if ($event->getView() == 'folder') {
+        if ('folder' === $event->getView()) {
             $folder = FolderQuery::create()
                 ->filterById($event->getViewId())
                 ->filterByVisible(1)
                 ->count();
 
-            if ($folder == 0) {
+            if (0 === $folder) {
                 $dispatcher->dispatch($event, TheliaEvents::VIEW_FOLDER_ID_NOT_VISIBLE);
             }
         }

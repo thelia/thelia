@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -77,11 +78,11 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
                             'created-reverse',
                             'updated',
                             'updated-reverse',
-                        ]
-                    )
+                        ],
+                    ),
                 ),
-                'start-date'
-            )
+                'start-date',
+            ),
         );
     }
 
@@ -92,17 +93,11 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
     {
         return array_merge(
             ['sale_label'],
-            $this->getStandardI18nSearchFields()
+            $this->getStandardI18nSearchFields(),
         );
     }
 
-    /**
-     * @param SaleQuery $search
-     * @param string    $searchTerm
-     * @param array     $searchIn
-     * @param string    $searchCriteria
-     */
-    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria): void
+    public function doSearch(ModelCriteria $search, string $searchTerm, array $searchIn, string $searchCriteria): void
     {
         $search->_and();
 
@@ -111,7 +106,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
                 $search->_or();
             }
 
-            if ($searchInElement === 'sale_label') {
+            if ('sale_label' === $searchInElement) {
                 $this->addSearchInI18nColumn($search, 'SALE_LABEL', $searchCriteria, $searchTerm);
             }
         }
@@ -119,7 +114,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
         $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria, $searchIn);
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = SaleQuery::create();
 
@@ -134,7 +129,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
 
         $active = $this->getActive();
 
-        if ($active !== BooleanOrBothType::ANY) {
+        if (BooleanOrBothType::ANY !== $active) {
             $search->filterByActive($active ? 1 : 0);
         }
 
@@ -149,16 +144,14 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
         if (null !== $productIdList) {
             $search
                 ->useSaleProductQuery()
-                    ->filterByProductId($productIdList, Criteria::IN)
-                    ->groupByProductId()
-                ->endUse()
-            ;
+                ->filterByProductId($productIdList, Criteria::IN)
+                ->groupByProductId()
+                ->endUse();
         }
 
         $search
             ->leftJoinSaleOffsetCurrency('SaleOffsetCurrency')
-            ->addJoinCondition('SaleOffsetCurrency', '`SaleOffsetCurrency`.`currency_id` = ?', $this->getCurrency(), null, \PDO::PARAM_INT)
-        ;
+            ->addJoinCondition('SaleOffsetCurrency', '`SaleOffsetCurrency`.`currency_id` = ?', $this->getCurrency(), null, \PDO::PARAM_INT);
 
         $search->withColumn('`SaleOffsetCurrency`.PRICE_OFFSET_VALUE', 'price_offset_value');
 
@@ -256,8 +249,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
                 ->set('HAS_END_DATE', $sale->hasEndDate() ? 1 : 0)
                 ->set('PRICE_OFFSET_TYPE', $priceOffsetType)
                 ->set('PRICE_OFFSET_SYMBOL', $priceOffsetSymbol)
-                ->set('PRICE_OFFSET_VALUE', $sale->getVirtualColumn('price_offset_value'))
-            ;
+                ->set('PRICE_OFFSET_VALUE', $sale->getVirtualColumn('price_offset_value'));
 
             $this->addOutputFields($loopResultRow, $sale);
             $loopResult->addRow($loopResultRow);

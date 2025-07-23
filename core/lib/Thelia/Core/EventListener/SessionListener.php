@@ -37,26 +37,31 @@ class SessionListener implements EventSubscriberInterface
 
     public function prodSession(SessionEvent $event): void
     {
+        if (\PHP_SESSION_ACTIVE === session_status()) {
+            session_write_close();
+        }
+
         $storage = new NativeSessionStorage(
-            ['cookie_lifetime' => ConfigQuery::read('session_config.lifetime', 0)]
+            ['cookie_lifetime' => ConfigQuery::read('session_config.lifetime', 0)],
         );
 
         $sessionSavePath = ConfigQuery::read('session_config.save_path');
-        if (null == $sessionSavePath) {
+
+        if (null === $sessionSavePath) {
             $sessionSavePath = $this->sessionSavePath;
         }
 
         $storage->setSaveHandler(
             new NativeFileSessionHandler(
-                $sessionSavePath
-            )
+                $sessionSavePath,
+            ),
         );
         $event->setSession($this->getSession($storage));
     }
 
     public function testSession(SessionEvent $event): void
     {
-        if ($event->getEnv() == 'test') {
+        if ('test' === $event->getEnv()) {
             $storage = new MockFileSessionStorage($event->getCacheDir().DS.'sessions');
             $event->setSession($this->getSession($storage));
             $event->stopPropagation();

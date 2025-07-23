@@ -29,9 +29,7 @@ use Thelia\Model\State;
 class PickupLocationEvent extends ActionEvent
 {
     protected ?int $radius;
-
     protected ?int $maxRelays;
-
     protected array $locations = [];
 
     /**
@@ -54,6 +52,7 @@ class PickupLocationEvent extends ActionEvent
     ) {
         $this->radius = $radius ?? 20000;
         $this->maxRelays = $maxRelays ?? 15;
+
         if ($addressModel instanceof Address) {
             $this->address = $addressModel->getAddress1();
             $this->city = $addressModel->getCity();
@@ -62,7 +61,7 @@ class PickupLocationEvent extends ActionEvent
             $this->country = $addressModel->getCountry();
         }
 
-        if ($this->address === null && $this->city === null && $this->zipCode === null) {
+        if (null === $this->address && null === $this->city && null === $this->zipCode) {
             throw new \Exception('Not enough informations to retrieve pickup locations');
         }
     }

@@ -20,7 +20,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Thelia\Core\Application;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Translation\Translator;
@@ -36,22 +35,10 @@ use Thelia\Model\LangQuery;
  */
 abstract class ContainerAwareCommand extends Command implements ContainerAwareInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    private ContainerInterface $container;
 
-    /**
-     * @return ContainerInterface
-     */
-    protected function getContainer()
+    protected function getContainer(): ContainerInterface
     {
-        if (null === $this->container) {
-            /** @var Application $application */
-            $application = $this->getApplication();
-            $this->container = $application->getKernel()->getContainer();
-        }
-
         return $this->container;
     }
 
@@ -63,10 +50,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
         $this->container = $container;
     }
 
-    /**
-     * @return EventDispatcherInterface
-     */
-    public function getDispatcher()
+    public function getDispatcher(): EventDispatcherInterface
     {
         $container = $this->getContainer();
 
@@ -82,8 +66,6 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
 
     /**
      * For init an Request, if your command has need an Request.
-     *
-     * @since 2.3
      */
     protected function initRequest(?Lang $lang = null): void
     {
@@ -101,16 +83,11 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
         $this->getContainer()->get('router.admin')->setContext($requestContext);
     }
 
-    /**
-     * @return string
-     *
-     * @since 2.3
-     */
-    protected function getBaseUrl(?Lang $lang = null)
+    protected function getBaseUrl(?Lang $lang = null): string
     {
         $baseUrl = '';
 
-        if ((int) ConfigQuery::read('one_domain_foreach_lang') === 1) {
+        if (1 === (int) ConfigQuery::read('one_domain_foreach_lang')) {
             if (!$lang instanceof Lang) {
                 $lang = LangQuery::create()->findOneByByDefault(true);
             }
@@ -120,7 +97,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
 
         $baseUrl = trim((string) $baseUrl);
 
-        if ($baseUrl === '' || $baseUrl === '0') {
+        if ('' === $baseUrl || '0' === $baseUrl) {
             $baseUrl = ConfigQuery::read('url_site');
         }
 

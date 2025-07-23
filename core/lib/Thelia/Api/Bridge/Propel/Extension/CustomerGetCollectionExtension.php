@@ -35,26 +35,28 @@ final readonly class CustomerGetCollectionExtension implements QueryCollectionEx
     public function applyToCollection(ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         $user = $this->token->getToken()?->getUser();
+
         if (!$user instanceof Customer) {
             return;
         }
 
         $patterns = $this->accessMap->getPatterns($this->requestStack->getCurrentRequest());
 
-        if (!isset($patterns[0][0]) || $patterns[0][0] !== 'ROLE_CUSTOMER') {
+        if (!isset($patterns[0][0]) || 'ROLE_CUSTOMER' !== $patterns[0][0]) {
             return;
         }
 
         if (isset($operation->getExtraProperties()['usesForCustomer'])) {
             foreach ($operation->getExtraProperties()['usesForCustomer'] as $joinTable) {
                 $use = 'use'.ucwords(strtolower((string) $joinTable)).'Query';
-                $query = $query->$use();
+                $query = $query->{$use}();
             }
 
             $query->filterByCustomer($user);
             $endUse = 'endUse';
+
             foreach ($operation->getExtraProperties()['usesForCustomer'] as $joinTable) {
-                $query = $query->$endUse();
+                $query = $query->{$endUse}();
             }
 
             return;

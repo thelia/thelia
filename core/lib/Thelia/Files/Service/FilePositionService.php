@@ -43,7 +43,7 @@ readonly class FilePositionService
         $modelInstance = $this->fileManager->getModelInstance($objectType, $parentType);
         $model = $modelInstance->getQueryInstance()->findPk($fileId);
 
-        if ($model === null) {
+        if (null === $model) {
             throw new \Exception('File not found');
         }
 
@@ -52,7 +52,7 @@ readonly class FilePositionService
             $modelInstance->getQueryInstance(),
             $fileId,
             UpdateFilePositionEvent::POSITION_ABSOLUTE,
-            $position
+            $position,
         );
 
         // Dispatch Event to the Action
@@ -60,13 +60,14 @@ readonly class FilePositionService
             $eventDispatcher->dispatch($event, $eventName);
             $message = $this->translator->trans(
                 '%type% position updated',
-                ['%type%' => ucfirst($objectType)]
+                ['%type%' => ucfirst($objectType)],
             );
         } catch (\Exception $exception) {
             $message = $this->translator->trans(
                 'Fail to update %type% position: %err%',
-                ['%type%' => $objectType, '%err%' => $exception->getMessage()]
+                ['%type%' => $objectType, '%err%' => $exception->getMessage()],
             );
+
             throw new \Exception($message, 0, $exception);
         }
 

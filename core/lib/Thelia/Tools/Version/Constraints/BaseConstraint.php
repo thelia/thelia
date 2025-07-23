@@ -27,14 +27,14 @@ abstract class BaseConstraint implements ConstraintInterface
     {
     }
 
-    public function test($version, $strict = false)
+    public function test($version, $strict = false): bool
     {
         $version = $this->normalize($version, $strict);
 
         return version_compare($version, $this->expression, $this->operator);
     }
 
-    public function normalize($version, $strict = false)
+    public function normalize($version, $strict = false): string
     {
         return $strict ? $version : $this->normalizePrecision($version);
     }
@@ -55,14 +55,14 @@ abstract class BaseConstraint implements ConstraintInterface
                         array_fill(
                             \count($expressionElements) - 1,
                             \count($versionElements) - \count($expressionElements),
-                            '0'
-                        )
-                    )
+                            '0',
+                        ),
+                    ),
                 );
             } else {
                 $version = implode(
                     '.',
-                    \array_slice($versionElements, 0, \count($expressionElements))
+                    \array_slice($versionElements, 0, \count($expressionElements)),
                 );
             }
         }

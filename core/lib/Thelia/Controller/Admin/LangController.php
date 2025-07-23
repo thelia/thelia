@@ -59,6 +59,7 @@ class LangController extends BaseAdminController
     public function renderDefault(array $param = [], int $status = 200): Response
     {
         $data = [];
+
         foreach (LangQuery::create()->find() as $lang) {
             $data[LangUrlForm::LANG_PREFIX.$lang->getId()] = $lang->getUrl();
         }
@@ -121,9 +122,7 @@ class LangController extends BaseAdminController
             $eventDispatcher->dispatch($event, TheliaEvents::LANG_UPDATE);
 
             if (false === $event->hasLang()) {
-                throw new \LogicException(
-                    $this->getTranslator()->trans('No %obj was updated.', ['%obj', 'Lang'])
-                );
+                throw new \LogicException($this->getTranslator()->trans('No %obj was updated.', ['%obj', 'Lang']));
             }
 
             /** @var Lang $changedObject */
@@ -135,9 +134,9 @@ class LangController extends BaseAdminController
                     '%s %s (ID %s) modified',
                     'Lang',
                     $changedObject->getTitle(),
-                    $changedObject->getId()
+                    $changedObject->getId(),
                 ),
-                $changedObject->getId()
+                $changedObject->getId(),
             );
 
             $response = $this->generateRedirectFromRoute('admin.configuration.languages');
@@ -153,10 +152,7 @@ class LangController extends BaseAdminController
         return $response;
     }
 
-    /**
-     * @param LangCreateEvent $event
-     */
-    protected function hydrateEvent($event, Form $form): LangCreateEvent
+    protected function hydrateEvent(LangCreateEvent $event, Form $form): LangCreateEvent
     {
         return $event
             ->setTitle($form->get('title')->getData())
@@ -167,8 +163,7 @@ class LangController extends BaseAdminController
             ->setTimeFormat($form->get('time_format')->getData())
             ->setDecimalSeparator($form->get('decimal_separator')->getData())
             ->setThousandsSeparator($form->get('thousands_separator')->getData())
-            ->setDecimals($form->get('decimals')->getData())
-        ;
+            ->setDecimals($form->get('decimals')->getData());
     }
 
     public function toggleDefaultAction(EventDispatcherInterface $eventDispatcher, $lang_id): Response|JsonResponse|RedirectResponse
@@ -176,7 +171,7 @@ class LangController extends BaseAdminController
         return $this->toggleLangDispatch(
             $eventDispatcher,
             TheliaEvents::LANG_TOGGLEDEFAULT,
-            new LangToggleDefaultEvent($lang_id)
+            new LangToggleDefaultEvent($lang_id),
         );
     }
 
@@ -185,7 +180,7 @@ class LangController extends BaseAdminController
         return $this->toggleLangDispatch(
             $eventDispatcher,
             TheliaEvents::LANG_TOGGLEACTIVE,
-            new LangToggleActiveEvent($lang_id)
+            new LangToggleActiveEvent($lang_id),
         );
     }
 
@@ -194,7 +189,7 @@ class LangController extends BaseAdminController
         return $this->toggleLangDispatch(
             $eventDispatcher,
             TheliaEvents::LANG_TOGGLEVISIBLE,
-            new LangToggleVisibleEvent($lang_id)
+            new LangToggleVisibleEvent($lang_id),
         );
     }
 
@@ -218,9 +213,7 @@ class LangController extends BaseAdminController
             $eventDispatcher->dispatch($createEvent, TheliaEvents::LANG_CREATE);
 
             if (false === $createEvent->hasLang()) {
-                throw new \LogicException(
-                    $this->getTranslator()->trans('No %obj was updated.', ['%obj', 'Lang'])
-                );
+                throw new \LogicException($this->getTranslator()->trans('No %obj was updated.', ['%obj', 'Lang']));
             }
 
             /** @var Lang $createdObject */
@@ -232,9 +225,9 @@ class LangController extends BaseAdminController
                     '%s %s (ID %s) created',
                     'Lang',
                     $createdObject->getTitle(),
-                    $createdObject->getId()
+                    $createdObject->getId(),
                 ),
-                $createdObject->getId()
+                $createdObject->getId(),
             );
 
             $response = $this->generateRedirectFromRoute('admin.configuration.languages');
@@ -251,7 +244,7 @@ class LangController extends BaseAdminController
                 $this->getTranslator()->trans('%obj creation', ['%obj' => 'Lang']),
                 $error_msg,
                 $createForm,
-                $ex
+                $ex,
             );
 
             // At this point, the form has error, and should be redisplayed.
@@ -271,7 +264,7 @@ class LangController extends BaseAdminController
 
         try {
             $this->getTokenProvider()->checkToken(
-                $this->getRequest()->query->get('_token')
+                $this->getRequest()->query->get('_token'),
             );
 
             $deleteEvent = new LangDeleteEvent($this->getRequest()->get('language_id', 0));
@@ -325,7 +318,7 @@ class LangController extends BaseAdminController
                 $this->getTranslator()->trans('%obj creation', ['%obj' => 'Lang']),
                 $error_msg,
                 $behaviorForm,
-                $ex
+                $ex,
             );
 
             // At this point, the form has error, and should be redisplayed.
@@ -350,6 +343,7 @@ class LangController extends BaseAdminController
 
             $data = $form->getData();
             $event = new LangUrlEvent();
+
             foreach ($data as $key => $value) {
                 if (str_contains((string) $key, LangUrlForm::LANG_PREFIX)) {
                     $event->addUrl(substr((string) $key, \strlen(LangUrlForm::LANG_PREFIX)), $value);
@@ -372,7 +366,7 @@ class LangController extends BaseAdminController
                 $this->getTranslator()->trans('%obj creation', ['%obj' => 'Lang']),
                 $error_msg,
                 $langUrlForm,
-                $ex
+                $ex,
             );
 
             // At this point, the form has error, and should be redisplayed.
@@ -405,12 +399,7 @@ class LangController extends BaseAdminController
         return $this->generateRedirectFromRoute('admin.configuration.languages');
     }
 
-    /**
-     * @param LangEvent $event
-     *
-     * @return Response
-     */
-    protected function toggleLangDispatch(EventDispatcherInterface $eventDispatcher, ?string $eventName, $event): Response|JsonResponse|RedirectResponse
+    protected function toggleLangDispatch(EventDispatcherInterface $eventDispatcher, ?string $eventName, LangEvent $event): Response|JsonResponse|RedirectResponse
     {
         if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
@@ -419,16 +408,14 @@ class LangController extends BaseAdminController
         $errorMessage = null;
 
         $this->getTokenProvider()->checkToken(
-            $this->getRequest()->query->get('_token')
+            $this->getRequest()->query->get('_token'),
         );
 
         try {
             $eventDispatcher->dispatch($event, $eventName);
 
             if (false === $event->hasLang()) {
-                throw new \LogicException(
-                    $this->getTranslator()->trans('No %obj was updated.', ['%obj', 'Lang'])
-                );
+                throw new \LogicException($this->getTranslator()->trans('No %obj was updated.', ['%obj', 'Lang']));
             }
 
             $changedObject = $event->getLang();
@@ -439,9 +426,9 @@ class LangController extends BaseAdminController
                     '%s %s (ID %s) modified',
                     'Lang',
                     $changedObject->getTitle(),
-                    $changedObject->getId()
+                    $changedObject->getId(),
                 ),
-                $changedObject->getId()
+                $changedObject->getId(),
             );
         } catch (\Exception $exception) {
             Tlog::getInstance()->error(\sprintf('Error on changing languages with message : %s', $exception->getMessage()));
@@ -450,12 +437,12 @@ class LangController extends BaseAdminController
 
         if ($this->getRequest()->isXmlHttpRequest()) {
             return new JsonResponse(
-                $errorMessage !== null ? ['message' => $errorMessage] : [],
-                $errorMessage !== null ? 500 : 200
+                null !== $errorMessage ? ['message' => $errorMessage] : [],
+                null !== $errorMessage ? 500 : 200,
             );
         }
 
-        if ($errorMessage !== null) {
+        if (null !== $errorMessage) {
             return $this->renderDefault(['error_message' => $errorMessage], 500);
         }
 

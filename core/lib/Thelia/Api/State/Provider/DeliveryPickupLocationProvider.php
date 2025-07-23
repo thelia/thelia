@@ -55,7 +55,7 @@ readonly class DeliveryPickupLocationProvider implements ProviderInterface
             $this->request->get('orderWeight'),
             $state,
             $country,
-            $this->request->get('moduleIds')
+            $this->request->get('moduleIds'),
         );
 
         $this->dispatcher->dispatch($pickupLocationEvent, TheliaEvents::MODULE_DELIVERY_GET_PICKUP_LOCATIONS);

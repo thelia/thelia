@@ -24,23 +24,21 @@ use Thelia\Core\Translation\Translator;
  */
 abstract class JsonFileAbstractExport extends AbstractExport
 {
-    /**
-     * @var \SplFileObject Data to export
-     */
+    /** @var \SplFileObject Data to export */
     private ?\SplFileObject $data = null;
 
-    public function current()
+    public function current(): mixed
     {
-        $result = json_decode($this->data->current(), true);
+        $result = json_decode($this->data->current(), true, 512, \JSON_THROW_ON_ERROR);
 
-        if ($result !== null) {
+        if (null !== $result) {
             return $result;
         }
 
         return [];
     }
 
-    public function key()
+    public function key(): mixed
     {
         return $this->data->key();
     }
@@ -68,9 +66,7 @@ abstract class JsonFileAbstractExport extends AbstractExport
                 return;
             }
 
-            throw new \DomainException(
-                'Data should be a JSON file, ending with .json'
-            );
+            throw new \DomainException('Data should be a JSON file, ending with .json');
         }
 
         throw new \LogicException("Export data can't be rewinded");
@@ -88,24 +84,21 @@ abstract class JsonFileAbstractExport extends AbstractExport
      *
      * @return array Ordered and aliased data
      */
-    public function applyOrderAndAliases(array $data)
+    public function applyOrderAndAliases(array $data): array
     {
-        if ($this->orderAndAliases === null) {
+        if (null === $this->orderAndAliases) {
             return $data;
         }
 
         $processedData = [];
 
         foreach ($this->orderAndAliases as $key => $value) {
-            if (\is_int($key)) {
-                $fieldName = $value;
-                $fieldAlias = $value;
-            } else {
-                $fieldName = $key;
-                $fieldAlias = $value;
-            }
+            $fieldName = \is_int($key) ? $value : $key;
+
+            $fieldAlias = $value;
 
             $processedData[$fieldAlias] = null;
+
             if (\array_key_exists($fieldName, $data)) {
                 $processedData[$fieldAlias] = $data[$fieldName];
             }
@@ -114,11 +107,11 @@ abstract class JsonFileAbstractExport extends AbstractExport
         return $processedData;
     }
 
-    protected function getDataJsonCache(StatementInterface $statement, string $exportName)
+    protected function getDataJsonCache(StatementInterface $statement, string $exportName): string
     {
         $filename = THELIA_CACHE_DIR.'/export/'.$exportName.'.json';
 
-        if ($statement->rowCount() === 0) {
+        if (0 === $statement->rowCount()) {
             throw new \Exception(Translator::getInstance()->trans('No data found for your export.'));
         }
 
@@ -127,7 +120,7 @@ abstract class JsonFileAbstractExport extends AbstractExport
         }
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            file_put_contents($filename, json_encode($row)."\r\n", \FILE_APPEND);
+            file_put_contents($filename, json_encode($row, \JSON_THROW_ON_ERROR)."\r\n", \FILE_APPEND);
         }
 
         return $filename;

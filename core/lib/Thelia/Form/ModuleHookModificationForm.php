@@ -38,8 +38,7 @@ class ModuleHookModificationForm extends ModuleHookCreationForm
                 'label_attr' => [
                     'for' => 'active',
                 ],
-            ])
-        ;
+            ]);
     }
 
     public static function getName(): string

@@ -39,7 +39,7 @@ abstract class FirewallForm extends BaseForm
 
     public function isFirewallOk($env)
     {
-        if ($env === 'prod' && $this->isFirewallActive()) {
+        if ('prod' === $env && $this->isFirewallActive()) {
             /**
              * Empty the firewall.
              */
@@ -54,8 +54,7 @@ abstract class FirewallForm extends BaseForm
             $firewallInstance = FormFirewallQuery::create()
                 ->filterByFormName($this::getName())
                 ->filterByIpAddress($this->request->getClientIp())
-                ->findOne()
-            ;
+                ->findOne();
 
             if (null !== $firewallInstance) {
                 if ($firewallInstance->getAttempts() < $this->getConfigAttempts()) {
@@ -69,8 +68,7 @@ abstract class FirewallForm extends BaseForm
             } else {
                 $firewallInstance = (new FormFirewall())
                     ->setIpAddress($this->request->getClientIp())
-                    ->setFormName($this::getName())
-                ;
+                    ->setFormName($this::getName());
                 $firewallInstance->save();
             }
         }
@@ -83,7 +81,7 @@ abstract class FirewallForm extends BaseForm
      *
      * The time (in hours) to wait if the attempts have been exceeded
      */
-    public function getConfigTime()
+    public function getConfigTime(): int
     {
         return ConfigQuery::read('form_firewall_time_to_wait', static::DEFAULT_TIME_TO_WAIT);
     }
@@ -93,7 +91,7 @@ abstract class FirewallForm extends BaseForm
      *
      * The number of allowed attempts
      */
-    public function getConfigAttempts()
+    public function getConfigAttempts(): int
     {
         return ConfigQuery::read('form_firewall_attempts', static::DEFAULT_ATTEMPTS);
     }
@@ -116,7 +114,7 @@ abstract class FirewallForm extends BaseForm
             $text = $hour.' '.$translator->trans('hour(s)').' ';
         }
 
-        if ($minutes !== 0) {
+        if (0 !== $minutes) {
             $text .= $minutes.' '.$minutesName;
         } else {
             $text = rtrim($text);

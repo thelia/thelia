@@ -48,7 +48,7 @@ class SystemLogController extends BaseAdminController
                 'ip_address' => $this->getRequest()->getClientIp(),
                 'destinations' => $destinations,
                 'active_destinations' => $active_destinations,
-            ]
+            ],
         );
     }
 
@@ -62,7 +62,7 @@ class SystemLogController extends BaseAdminController
 
                 $matches = [];
 
-                if (preg_match("/([^\.]+)\.php/", $fileInfo->getFilename(), $matches)) {
+                if (preg_match('/([^\\.]+)\\.php/', $fileInfo->getFilename(), $matches)) {
                     $classname = $matches[1];
 
                     if (!isset($destinations[$classname])) {
@@ -77,10 +77,7 @@ class SystemLogController extends BaseAdminController
         }
     }
 
-    /**
-     * @return mixed|Response
-     */
-    public function defaultAction()
+    public function defaultAction(): mixed
     {
         if (($response = $this->checkAuth(AdminResources::SYSTEM_LOG, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
@@ -144,7 +141,7 @@ class SystemLogController extends BaseAdminController
             $this->adminLogAppend(
                 AdminResources::SYSTEM_LOG,
                 AccessManager::UPDATE,
-                'System log configuration changed'
+                'System log configuration changed',
             );
 
             $response = $this->generateRedirectFromRoute('admin.configuration.system-logs.default');
@@ -155,7 +152,7 @@ class SystemLogController extends BaseAdminController
                 $this->getTranslator()->trans('System log configuration failed.'),
                 $error_msg,
                 $systemLogForm,
-                $exception
+                $exception,
             );
 
             $response = $this->renderTemplate();

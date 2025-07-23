@@ -19,21 +19,13 @@ use Thelia\Core\Event\ActionEvent;
 class MailingSystemEvent extends ActionEvent
 {
     protected $enabled;
-
     protected $host;
-
     protected $port;
-
     protected $encryption;
-
     protected $username;
-
     protected $password;
-
     protected $authMode;
-
     protected $timeout;
-
     protected $sourceIp;
 
     public function setAuthMode($authMode): void

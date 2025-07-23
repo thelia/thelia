@@ -32,32 +32,32 @@ use Thelia\Model\Map\CustomerTitleTableMap;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/customer_titles'
+            uriTemplate: '/admin/customer_titles',
         ),
         new GetCollection(
-            uriTemplate: '/admin/customer_titles'
+            uriTemplate: '/admin/customer_titles',
         ),
         new Get(
             uriTemplate: '/admin/customer_titles/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/customer_titles/{id}'
+            uriTemplate: '/admin/customer_titles/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/customer_titles/{id}'
+            uriTemplate: '/admin/customer_titles/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/customer_titles/{id}'
+            uriTemplate: '/admin/customer_titles/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/front/customer_titles'
+            uriTemplate: '/front/customer_titles',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -66,28 +66,25 @@ use Thelia\Model\Map\CustomerTitleTableMap;
     filterClass: SearchFilter::class,
     properties: [
         'id' => 'exact',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
         'position',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
         'byDefault',
-    ]
+    ],
 )]
 class CustomerTitle extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:customer_title:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:customer_title:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:customer_title:write';
-
     public const GROUP_FRONT_READ = 'front:customer_title:read';
 
     #[Groups([

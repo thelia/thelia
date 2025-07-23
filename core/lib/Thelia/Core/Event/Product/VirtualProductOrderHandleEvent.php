@@ -32,13 +32,13 @@ use Thelia\Model\Order;
 class VirtualProductOrderHandleEvent extends ActionEvent
 {
     /** @var string the path of the file */
-    protected $path;
+    protected string $path;
 
     /** @var bool is virtual product is really virtual */
-    protected $virtual = true;
+    protected bool $virtual = true;
 
     /** @var bool use the stock for this virtual product */
-    protected $useStock = false;
+    protected bool $useStock = false;
 
     /**
      * @param int $pseId
@@ -63,72 +63,48 @@ class VirtualProductOrderHandleEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }
 
-    /**
-     * @param string $path
-     */
-    public function setPath($path): static
+    public function setPath(string $path): static
     {
         $this->path = $path;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getPseId()
+    public function getPseId(): int
     {
         return $this->pseId;
     }
 
-    /**
-     * @param int $pseId
-     */
-    public function setPseId($pseId): static
+    public function setPseId(int $pseId): static
     {
         $this->pseId = $pseId;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isUseStock()
+    public function isUseStock(): bool
     {
         return $this->useStock;
     }
 
-    /**
-     * @param bool $useStock
-     */
-    public function setUseStock($useStock): static
+    public function setUseStock(bool $useStock): static
     {
         $this->useStock = $useStock;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isVirtual()
+    public function isVirtual(): bool
     {
         return $this->virtual;
     }
 
-    /**
-     * @param bool $virtual
-     */
-    public function setVirtual($virtual): static
+    public function setVirtual(bool $virtual): static
     {
         $this->virtual = $virtual;
 

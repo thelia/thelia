@@ -53,6 +53,7 @@ class ModuleManagement
     public function updateModules(ContainerInterface $container): void
     {
         $directories = [THELIA_LOCAL_MODULE_DIR, THELIA_MODULE_DIR];
+
         foreach ($directories as $directory) {
             $this->fetchDirModuleForUpdate($directory, $container);
         }
@@ -83,11 +84,11 @@ class ModuleManagement
                 }
             }
 
-            if ($errors !== []) {
+            if ([] !== $errors) {
                 throw new InvalidModuleException($errors);
             }
 
-            if ($modulesUpdated !== []) {
+            if ([] !== $modulesUpdated) {
                 $this->cacheClear();
             }
         } catch (DirectoryNotFoundException) {
@@ -140,8 +141,7 @@ class ModuleManagement
                 ->setCategory((string) $content->type)
                 ->setMandatory($mandatory)
                 ->setHidden($hidden)
-                ->save($con)
-            ;
+                ->save($con);
 
             // Update the module images, title and description when the module is installed, but not after
             // as these data may have been modified byt the administrator
@@ -161,13 +161,13 @@ class ModuleManagement
 
             $instance->setContainer($container);
 
-            if ($action === 'install') {
+            if ('install' === $action) {
                 $instance->install($con);
-            } elseif ($action === 'update') {
+            } elseif ('update' === $action) {
                 $instance->update($currentVersion, $version, $con);
             }
 
-            if ($action !== 'none') {
+            if ('none' !== $action) {
                 $instance->registerHooks();
             }
 
@@ -176,6 +176,7 @@ class ModuleManagement
             Tlog::getInstance()->addError('Failed to update module '.$module->getCode(), $exception);
 
             $con->rollBack();
+
             throw $exception;
         }
 
@@ -224,8 +225,7 @@ class ModuleManagement
                 ->setDescription($description->description ?? null)
                 ->setPostscriptum($description->postscriptum ?? null)
                 ->setChapo($description->subtitle ?? null)
-                ->save($con)
-            ;
+                ->save($con);
         }
     }
 
@@ -235,8 +235,9 @@ class ModuleManagement
         $moduleValidator->loadModuleDefinition();
 
         $checkModule = ModuleQuery::create()->findOneByFullNamespace(
-            $moduleValidator->getModuleDefinition()?->getNamespace() ?? ''
+            $moduleValidator->getModuleDefinition()?->getNamespace() ?? '',
         );
+
         if ($checkModule) {
             return $checkModule;
         }
@@ -263,6 +264,7 @@ class ModuleManagement
         $modules = [];
 
         $installedJsonPath = $vendorDir.'/composer/installed.json';
+
         if (!file_exists($installedJsonPath)) {
             return $modules;
         }
@@ -273,7 +275,7 @@ class ModuleManagement
 
         foreach ($packages as $package) {
             if (!isset($package['type'], $composerJson['require'][$package['name']])
-               || $package['type'] !== self::COMPOSER_TYPE_MODULE) {
+               || self::COMPOSER_TYPE_MODULE !== $package['type']) {
                 continue;
             }
 
@@ -292,17 +294,19 @@ class ModuleManagement
     public function installModulesFromTemplatePath(string $path): array
     {
         $modulesInstalled = [];
+
         if (!file_exists($path.DS.'composer.json')) {
             return [];
         }
 
         $composerModuleDTOS = $this->listModulesFromTemplatePath($path);
+
         foreach ($composerModuleDTOS as $composerModuleDTO) {
             $module = $this->installModule($composerModuleDTO->getPath());
             $cacheEvent = new CacheEvent($this->kernelCacheDir);
             $this->eventDispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
 
-            if ($module->getActivate() === BaseModule::IS_ACTIVATED) {
+            if (BaseModule::IS_ACTIVATED === $module->getActivate()) {
                 continue;
             }
 

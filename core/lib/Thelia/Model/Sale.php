@@ -18,9 +18,7 @@ use Thelia\Model\Base\Sale as BaseSale;
 
 class Sale extends BaseSale
 {
-    /**
-     * The price offsets types, either amount or percentage.
-     */
+    /** The price offsets types, either amount or percentage. */
     public const OFFSET_TYPE_PERCENTAGE = 10;
 
     public const OFFSET_TYPE_AMOUNT = 20;
@@ -28,7 +26,7 @@ class Sale extends BaseSale
     /**
      * @return bool true if the sale has an end date, false otherwise
      */
-    public function hasStartDate()
+    public function hasStartDate(): bool
     {
         return null !== $this->getStartDate();
     }
@@ -36,7 +34,7 @@ class Sale extends BaseSale
     /**
      * @return bool true if the sale has a begin date, false otherwise
      */
-    public function hasEndDate()
+    public function hasEndDate(): bool
     {
         return null !== $this->getEndDate();
     }
@@ -46,7 +44,7 @@ class Sale extends BaseSale
      *
      * @return array an array of (currency ID => offset value)
      */
-    public function getPriceOffsets()
+    public function getPriceOffsets(): array
     {
         $currencyOffsets = SaleOffsetCurrencyQuery::create()->filterBySaleId($this->getId())->find();
 
@@ -65,7 +63,7 @@ class Sale extends BaseSale
      *
      * @return array an array of Products
      */
-    public function getSaleProductList()
+    public function getSaleProductList(): array
     {
         return SaleProductQuery::create()->filterBySaleId($this->getId())->groupByProductId()->find();
     }
@@ -75,7 +73,7 @@ class Sale extends BaseSale
      *
      * @return array an array of (product ID => array of attribute availability ID)
      */
-    public function getSaleProductsAttributeList()
+    public function getSaleProductsAttributeList(): array
     {
         $saleProducts = SaleProductQuery::create()->filterBySaleId($this->getId())->orderByProductId()->find();
 
@@ -85,7 +83,7 @@ class Sale extends BaseSale
 
         /** @var SaleProduct $saleProduct */
         foreach ($saleProducts as $saleProduct) {
-            if ($currentProduct != $saleProduct->getProductId()) {
+            if ($currentProduct !== $saleProduct->getProductId()) {
                 $currentProduct = $saleProduct->getProductId();
 
                 $selectedAttributes[$currentProduct] = [];

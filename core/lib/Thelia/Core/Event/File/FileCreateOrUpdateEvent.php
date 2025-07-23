@@ -25,24 +25,12 @@ use Thelia\Files\FileModelInterface;
  */
 class FileCreateOrUpdateEvent extends ActionEvent
 {
-    /** @var FileModelInterface model to save */
-    protected $model = [];
+    protected FileModelInterface $model;
+    protected FileModelInterface $oldModel;
+    protected UploadedFile $uploadedFile;
+    protected ?string $parentName = null;
 
-    /** @var FileModelInterface model to save */
-    protected $oldModel = [];
-
-    /** @var UploadedFile Document file to save */
-    protected $uploadedFile;
-
-    /** @var string Parent name */
-    protected $parentName;
-
-    /**
-     * Constructor.
-     *
-     * @param int $parentId file parent id
-     */
-    public function __construct(protected $parentId)
+    public function __construct(protected ?int $parentId)
     {
     }
 
@@ -53,7 +41,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setModel($model): static
+    public function setModel(FileModelInterface $model): static
     {
         $this->model = $model;
 
@@ -62,10 +50,8 @@ class FileCreateOrUpdateEvent extends ActionEvent
 
     /**
      * Get file being saved.
-     *
-     * @return FileModelInterface
      */
-    public function getModel()
+    public function getModel(): FileModelInterface
     {
         return $this->model;
     }
@@ -77,7 +63,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setParentId($parentId): static
+    public function setParentId(?int $parentId): static
     {
         $this->parentId = $parentId;
 
@@ -86,10 +72,8 @@ class FileCreateOrUpdateEvent extends ActionEvent
 
     /**
      * Get Document parent id.
-     *
-     * @return int
      */
-    public function getParentId()
+    public function getParentId(): int
     {
         return $this->parentId;
     }
@@ -101,7 +85,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setUploadedFile($uploadedFile): static
+    public function setUploadedFile(?UploadedFile $uploadedFile): static
     {
         $this->uploadedFile = $uploadedFile;
 
@@ -110,10 +94,8 @@ class FileCreateOrUpdateEvent extends ActionEvent
 
     /**
      * Get uploaded file.
-     *
-     * @return UploadedFile|null
      */
-    public function getUploadedFile()
+    public function getUploadedFile(): ?UploadedFile
     {
         return $this->uploadedFile;
     }
@@ -125,7 +107,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setParentName($parentName): static
+    public function setParentName(?string $parentName): static
     {
         $this->parentName = $parentName;
 
@@ -134,30 +116,24 @@ class FileCreateOrUpdateEvent extends ActionEvent
 
     /**
      * Get parent name.
-     *
-     * @return string
      */
-    public function getParentName()
+    public function getParentName(): string
     {
         return $this->parentName;
     }
 
     /**
      * Set old model value.
-     *
-     * @param FileModelInterface $oldModel
      */
-    public function setOldModel($oldModel): void
+    public function setOldModel(FileModelInterface $oldModel): void
     {
         $this->oldModel = $oldModel;
     }
 
     /**
      * Get old model value.
-     *
-     * @return FileModelInterface
      */
-    public function getOldModel()
+    public function getOldModel(): FileModelInterface
     {
         return $this->oldModel;
     }

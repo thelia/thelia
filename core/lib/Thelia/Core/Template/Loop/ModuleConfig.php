@@ -44,7 +44,7 @@ class ModuleConfig extends BaseLoop implements ArraySearchLoopInterface
             Argument::createAnyTypeArgument('module', null, true),
             Argument::createAnyTypeArgument('variable', null, true),
             Argument::createAnyTypeArgument('default_value', null),
-            Argument::createAnyTypeArgument('locale', null)
+            Argument::createAnyTypeArgument('locale', null),
         );
     }
 
@@ -60,15 +60,14 @@ class ModuleConfig extends BaseLoop implements ArraySearchLoopInterface
             $module->getId(),
             $this->getVariable(),
             $this->getDefaultValue(),
-            $this->getLocale()
+            $this->getLocale(),
         );
 
         $loopResultRow = new LoopResultRow();
 
         $loopResultRow
             ->set('VARIABLE', $this->getVariable())
-            ->set('VALUE', $configValue)
-        ;
+            ->set('VALUE', $configValue);
 
         $loopResult->addRow($loopResultRow);
 

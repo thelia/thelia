@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Template\Element;
 
+use Propel\Runtime\Util\PropelModelPager;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -36,5 +37,5 @@ interface LoopInterface
 
     public function count();
 
-    public function exec(&$pagination);
+    public function exec(PropelModelPager $pagination): LoopResult;
 }

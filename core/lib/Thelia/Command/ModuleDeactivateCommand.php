@@ -49,20 +49,19 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
                 'with-dependencies',
                 null,
                 InputOption::VALUE_NONE,
-                'activate module recursively'
+                'activate module recursively',
             )
             ->addArgument(
                 'module',
                 InputArgument::REQUIRED,
-                'module to deactivate'
+                'module to deactivate',
             )
             ->addOption(
                 'assume-yes',
                 'y',
                 InputOption::VALUE_NONE,
-                'Assume to deactivate a mandatory module'
-            )
-        ;
+                'Assume to deactivate a mandatory module',
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -75,7 +74,7 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
             throw new \RuntimeException(\sprintf('module %s not found', $moduleCode));
         }
 
-        if ($module->getActivate() == BaseModule::IS_NOT_ACTIVATED) {
+        if (BaseModule::IS_NOT_ACTIVATED === $module->getActivate()) {
             throw new \RuntimeException(\sprintf('module %s is already deactivated', $moduleCode));
         }
 
@@ -83,7 +82,8 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
             $event = new ModuleToggleActivationEvent($module->getId());
 
             $module = ModuleQuery::create()->findPk($module->getId());
-            if ($module->getMandatory() == BaseModule::IS_MANDATORY) {
+
+            if (BaseModule::IS_MANDATORY === $module->getMandatory()) {
                 if (!$this->askConfirmation($input, $output)) {
                     return 1;
                 }

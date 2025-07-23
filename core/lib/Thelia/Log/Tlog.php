@@ -24,33 +24,19 @@ use Thelia\Model\ConfigQuery;
 class Tlog implements LoggerInterface
 {
     public const VAR_LEVEL = 'tlog_level';
-
     public const VAR_DESTINATIONS = 'tlog_destinations';
-
     public const VAR_PREFIXE = 'tlog_prefix';
-
     public const VAR_FILES = 'tlog_files';
-
     public const VAR_IP = 'tlog_ip';
-
     public const VAR_SHOW_REDIRECT = 'tlog_show_redirect';
-
     public const DEBUG = 100;
-
     public const INFO = 200;
-
     public const NOTICE = 300;
-
     public const WARNING = 400;
-
     public const ERROR = 500;
-
     public const CRITICAL = 600;
-
     public const ALERT = 700;
-
     public const EMERGENCY = 800;
-
     public const MUET = \PHP_INT_MAX;
 
     protected array $levels = [
@@ -65,37 +51,22 @@ class Tlog implements LoggerInterface
     ];
 
     public const DEFAULT_LEVEL = self::ERROR;
-
-    public const DEFAUT_DESTINATIONS = "Thelia\Log\Destination\TlogDestinationRotatingFile";
-
+    public const DEFAUT_DESTINATIONS = 'Thelia\\Log\\Destination\\TlogDestinationRotatingFile';
     public const DEFAUT_PREFIXE = '#INDEX: #LEVEL [#FILE:#FUNCTION()] {#LINE} #DATE #HOUR: ';
-
     public const DEFAUT_FILES = '*';
-
     public const DEFAUT_IP = '';
-
     public const DEFAUT_SHOW_REDIRECT = false;
 
     private static ?self $instance = null;
-
     protected array $destinations = [];
-
     protected bool $mode_back_office = false;
-
     protected int $level = self::ERROR;
-
     protected string $prefix = '';
-
     protected array $files = [];
-
     protected bool $all_files = false;
-
     protected bool $show_redirect = false;
-
     private int $linecount = 0;
-
     protected bool $done = false;
-
     public array $dir_destinations = [];
 
     private function __construct()
@@ -140,7 +111,7 @@ class Tlog implements LoggerInterface
 
     public function setDestinations(string $destinations): static
     {
-        if ($destinations !== '' && $destinations !== '0') {
+        if ('' !== $destinations && '0' !== $destinations) {
             $this->destinations = [];
             $classes_destinations = explode(';', $destinations);
             $this->loadDestinations($this->destinations, $classes_destinations);
@@ -171,14 +142,14 @@ class Tlog implements LoggerInterface
     public function setFiles(string $files): static
     {
         $this->files = explode(';', $files);
-        $this->all_files = \in_array('*', $this->files);
+        $this->all_files = \in_array('*', $this->files, true);
 
         return $this;
     }
 
     public function setIp(string $ips): static
     {
-        if ($ips !== '' && $ips !== '0' && isset($_SERVER['REMOTE_ADDR']) && !\in_array($_SERVER['REMOTE_ADDR'], explode(';', $ips))) {
+        if ('' !== $ips && '0' !== $ips && isset($_SERVER['REMOTE_ADDR']) && !\in_array($_SERVER['REMOTE_ADDR'], explode(';', $ips), true)) {
             $this->level = self::MUET;
         }
 
@@ -329,7 +300,7 @@ class Tlog implements LoggerInterface
     {
         $this->done = true;
 
-        if ($this->level === self::MUET) {
+        if (self::MUET === $this->level) {
             return;
         }
 
@@ -340,7 +311,7 @@ class Tlog implements LoggerInterface
 
     public function writeOnExit(): void
     {
-        if ($this->done === false) {
+        if (false === $this->done) {
             $res = '';
             $this->write($res);
             echo $res;
@@ -349,7 +320,7 @@ class Tlog implements LoggerInterface
 
     public function showRedirect(string $url): bool
     {
-        if ($this->level !== self::MUET && $this->show_redirect) {
+        if (self::MUET !== $this->level && $this->show_redirect) {
             echo '
 <html>
 <head><title>'.Translator::getInstance()->trans('Redirecting ...')."</title></head>
@@ -393,10 +364,11 @@ class Tlog implements LoggerInterface
             $prevHop = null;
             $hop = array_pop($trace);
 
-            while ($hop !== null) {
+            while (null !== $hop) {
                 if (isset($hop['class'])) {
                     $className = $hop['class'];
-                    $parentClassName = get_parent_class($className) === false ? '' : get_parent_class($className);
+                    $parentClassName = false === get_parent_class($className) ? '' : get_parent_class($className);
+
                     if (
                         !empty($className)
                         && ($className === ltrim(self::class, '\\')
@@ -415,10 +387,10 @@ class Tlog implements LoggerInterface
             $origin['class'] = $prevHop['class'] ?? 'main';
 
             if (isset($prevHop['function'])
-                && $prevHop['function'] !== 'include'
-                && $prevHop['function'] !== 'include_once'
-                && $prevHop['function'] !== 'require'
-                && $prevHop['function'] !== 'require_once') {
+                && 'include' !== $prevHop['function']
+                && 'include_once' !== $prevHop['function']
+                && 'require' !== $prevHop['function']
+                && 'require_once' !== $prevHop['function']) {
                 $origin['function'] = $prevHop['function'];
             } else {
                 $origin['function'] = 'main';
@@ -431,6 +403,7 @@ class Tlog implements LoggerInterface
     protected function interpolate(string $message, array $context = []): string
     {
         $replace = [];
+
         foreach ($context as $key => $val) {
             $replace['{'.$key.'}'] = $val;
         }
@@ -459,7 +432,7 @@ class Tlog implements LoggerInterface
             $prefix = str_replace(
                 ['#INDEX', '#LEVEL', '#FILE', '#FUNCTION', '#LINE', '#DATE', '#HOUR'],
                 [1 + $this->linecount, $level, $file, $function, $line, date('Y-m-d'), date('G:i:s')],
-                $this->prefix
+                $this->prefix,
             );
 
             $trace = $prefix.$text;
@@ -482,7 +455,7 @@ class Tlog implements LoggerInterface
                 $class = new $active();
 
                 if (!$class instanceof AbstractTlogDestination) {
-                    throw new \UnexpectedValueException($active." must extends Thelia\Tlog\AbstractTlogDestination");
+                    throw new \UnexpectedValueException($active.' must extends Thelia\\Tlog\\AbstractTlogDestination');
                 }
 
                 $destinations[$active] = $class;

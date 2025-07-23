@@ -60,12 +60,7 @@ trait AmountCouponTrait
         $this->checkBaseCouponFieldValue($fieldName, $fieldValue);
 
         if ($fieldName === $this->getAmountFieldName() && (float) $fieldValue < 0) {
-            throw new \InvalidArgumentException(
-                Translator::getInstance()->trans(
-                    'Value %val for Discount Amount is invalid. Please enter a positive value.',
-                    ['%val' => $fieldValue]
-                )
-            );
+            throw new \InvalidArgumentException(Translator::getInstance()->trans('Value %val for Discount Amount is invalid. Please enter a positive value.', ['%val' => $fieldValue]));
         }
 
         return $fieldValue;

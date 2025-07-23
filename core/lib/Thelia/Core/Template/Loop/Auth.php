@@ -41,29 +41,29 @@ class Auth extends BaseLoop implements ArraySearchLoopInterface
             new Argument(
                 'role',
                 new TypeCollection(
-                    new AlphaNumStringListType()
+                    new AlphaNumStringListType(),
                 ),
                 null,
-                true
+                true,
             ),
             new Argument(
                 'resource',
                 new TypeCollection(
-                    new AlphaNumStringListType()
-                )
+                    new AlphaNumStringListType(),
+                ),
             ),
             new Argument(
                 'module',
                 new TypeCollection(
-                    new AlphaNumStringListType()
-                )
+                    new AlphaNumStringListType(),
+                ),
             ),
             new Argument(
                 'access',
                 new TypeCollection(
-                    new EnumListType([AccessManager::VIEW, AccessManager::CREATE, AccessManager::UPDATE, AccessManager::DELETE])
-                )
-            )
+                    new EnumListType([AccessManager::VIEW, AccessManager::CREATE, AccessManager::UPDATE, AccessManager::DELETE]),
+                ),
+            ),
         );
     }
 
@@ -80,11 +80,11 @@ class Auth extends BaseLoop implements ArraySearchLoopInterface
         $access = $this->getAccess();
 
         try {
-            if (true === $this->securityContext->isGranted(
+            if ($this->securityContext->isGranted(
                 $roles,
                 $resource ?? [],
                 $module ?? [],
-                $access ?? []
+                $access ?? [],
             )
             ) {
                 // Create an empty row: loop is no longer empty :)

@@ -34,7 +34,7 @@ class ChoiceFilterController extends BaseAdminController
     #[Route(
         '/admin/choicefilter/save',
         name: 'choicefilter.save',
-        methods: ['POST']
+        methods: ['POST'],
     )]
     public function saveAction(Request $request): Response
     {
@@ -77,10 +77,10 @@ class ChoiceFilterController extends BaseAdminController
                 ->setVisible((int) $filter['visible'])
                 ->setPosition((int) $filter['position']);
 
-            if ($filter['type'] === 'attribute') {
+            if ('attribute' === $filter['type']) {
                 $choiceFilter
                     ->setAttributeId($filter['id']);
-            } elseif ($filter['type'] === 'feature') {
+            } elseif ('feature' === $filter['type']) {
                 $choiceFilter
                     ->setFeatureId((int) $filter['id']);
             } else {
@@ -94,7 +94,7 @@ class ChoiceFilterController extends BaseAdminController
         $this->getSession()->getFlashBag()->add('choice-filter-success', Translator::getInstance()->trans('Configuration saved successfully'));
 
         return $this->generateRedirect(
-            URL::getInstance()->absoluteUrl($redirectUrl, $parameters)
+            URL::getInstance()->absoluteUrl($redirectUrl, $parameters),
         );
     }
 
@@ -104,7 +104,7 @@ class ChoiceFilterController extends BaseAdminController
     #[Route(
         '/admin/choicefilter/clear',
         name: 'choicefilter.clear',
-        methods: ['POST']
+        methods: ['POST'],
     )]
     public function clearAction(Request $request): Response
     {
@@ -137,7 +137,7 @@ class ChoiceFilterController extends BaseAdminController
         $this->getSession()->getFlashBag()->add('choice-filter-success', Translator::getInstance()->trans('Configuration saved successfully'));
 
         return $this->generateRedirect(
-            URL::getInstance()->absoluteUrl($redirectUrl, $parameters)
+            URL::getInstance()->absoluteUrl($redirectUrl, $parameters),
         );
     }
 }

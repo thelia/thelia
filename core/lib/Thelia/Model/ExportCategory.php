@@ -22,7 +22,7 @@ class ExportCategory extends BaseExportCategory
 {
     use PositionManagementTrait;
 
-    public function preInsert(?ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): bool
     {
         parent::preInsert($con);
 

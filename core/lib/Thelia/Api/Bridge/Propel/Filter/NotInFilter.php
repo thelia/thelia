@@ -66,6 +66,7 @@ class NotInFilter extends AbstractFilter
         $description = [];
 
         $filterProperties = $this->getProperties();
+
         if (null === $filterProperties) {
             return [];
         }

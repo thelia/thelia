@@ -32,10 +32,10 @@ use Thelia\Model\Map\CountryTableMap;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/countries'
+            uriTemplate: '/admin/countries',
         ),
         new GetCollection(
-            uriTemplate: '/admin/countries'
+            uriTemplate: '/admin/countries',
         ),
         new Get(
             uriTemplate: '/admin/countries/{id}',
@@ -47,28 +47,28 @@ use Thelia\Model\Map\CountryTableMap;
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/countries/{id}'
+            uriTemplate: '/admin/countries/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/countries/{id}'
+            uriTemplate: '/admin/countries/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/countries/{id}'
+            uriTemplate: '/admin/countries/{id}',
         ),
     ],
     uriVariables: [
         'id' => new Link(
             fromClass: Country::class,
-            identifiers: ['id']
+            identifiers: ['id'],
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/front/countries'
+            uriTemplate: '/front/countries',
         ),
         new Get(
             uriTemplate: '/front/countries/{id}',
@@ -83,7 +83,7 @@ use Thelia\Model\Map\CountryTableMap;
     uriVariables: [
         'id' => new Link(
             fromClass: Country::class,
-            identifiers: ['id']
+            identifiers: ['id'],
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -92,18 +92,14 @@ use Thelia\Model\Map\CountryTableMap;
     filterClass: BooleanFilter::class,
     properties: [
         'visible',
-    ]
+    ],
 )]
 class Country extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:country:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:country:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:country:write';
-
     public const GROUP_FRONT_READ = 'front:country:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:country:read:single';
 
     #[Groups([

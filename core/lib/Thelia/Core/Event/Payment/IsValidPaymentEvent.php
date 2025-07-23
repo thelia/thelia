@@ -24,14 +24,9 @@ use Thelia\Module\PaymentModuleInterface;
  */
 class IsValidPaymentEvent extends BasePaymentEvent
 {
-    /** @var bool */
-    protected $validModule = false;
-
-    /** @var float */
-    protected $minimumAmount;
-
-    /** @var float */
-    protected $maximumAmount;
+    protected bool $validModule = false;
+    protected float $minimumAmount;
+    protected float $maximumAmount;
 
     /**
      * IsValidPaymentEvent constructor.
@@ -53,54 +48,36 @@ class IsValidPaymentEvent extends BasePaymentEvent
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isValidModule()
+    public function isValidModule(): bool
     {
         return $this->validModule;
     }
 
-    /**
-     * @param bool $validModule
-     */
-    public function setValidModule($validModule): static
+    public function setValidModule(bool $validModule): static
     {
         $this->validModule = $validModule;
 
         return $this;
     }
 
-    /**
-     * @return float
-     */
-    public function getMinimumAmount()
+    public function getMinimumAmount(): float
     {
         return $this->minimumAmount;
     }
 
-    /**
-     * @param float $minimumAmount
-     */
-    public function setMinimumAmount($minimumAmount): static
+    public function setMinimumAmount(float $minimumAmount): static
     {
         $this->minimumAmount = $minimumAmount;
 
         return $this;
     }
 
-    /**
-     * @return float
-     */
-    public function getMaximumAmount()
+    public function getMaximumAmount(): float
     {
         return $this->maximumAmount;
     }
 
-    /**
-     * @param float $maximumAmount
-     */
-    public function setMaximumAmount($maximumAmount): static
+    public function setMaximumAmount(float $maximumAmount): static
     {
         $this->maximumAmount = $maximumAmount;
 

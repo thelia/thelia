@@ -34,7 +34,7 @@ class Pdf extends BaseAction implements EventSubscriberInterface
             $event->getLang(),
             $event->getUnicode(),
             $event->getEncoding(),
-            $event->getMarges()
+            $event->getMarges(),
         );
 
         $html2pdf->setDefaultFont($event->getFontName());

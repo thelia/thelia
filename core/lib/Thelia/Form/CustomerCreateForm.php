@@ -51,7 +51,7 @@ class CustomerCreateForm extends AddressCreateForm
                     new NotBlank(),
                     new Email(),
                     new Callback(
-                        $this->verifyExistingEmail(...)
+                        $this->verifyExistingEmail(...),
                     ),
                 ],
                 'label' => Translator::getInstance()->trans('Email Address'),
@@ -95,11 +95,10 @@ class CustomerCreateForm extends AddressCreateForm
                 'label_attr' => [
                     'for' => 'lang_id',
                 ],
-            ])
-        ;
+            ]);
 
         // confirm email
-        if ((int) ConfigQuery::read('customer_confirm_email', 0) !== 0) {
+        if (0 !== (int) ConfigQuery::read('customer_confirm_email', 0)) {
             $this->formBuilder->add('email_confirm', EmailType::class, [
                 'constraints' => [
                     new NotBlank(),
@@ -118,7 +117,7 @@ class CustomerCreateForm extends AddressCreateForm
     {
         $data = $context->getRoot()->getData();
 
-        if ($data['password'] != $data['password_confirm']) {
+        if ($data['password'] !== $data['password_confirm']) {
             $context->addViolation(Translator::getInstance()->trans('password confirmation is not the same as password field'));
         }
     }
@@ -127,7 +126,7 @@ class CustomerCreateForm extends AddressCreateForm
     {
         $data = $context->getRoot()->getData();
 
-        if ($data['email'] != $data['email_confirm']) {
+        if ($data['email'] !== $data['email_confirm']) {
             $context->addViolation(Translator::getInstance()->trans('email confirmation is not the same as email field'));
         }
     }
@@ -135,6 +134,7 @@ class CustomerCreateForm extends AddressCreateForm
     public function verifyExistingEmail($value, ExecutionContextInterface $context): void
     {
         $customer = CustomerQuery::getCustomerByEmail($value);
+
         if ($customer) {
             $context->addViolation(Translator::getInstance()->trans('This email already exists.'));
         }

@@ -22,35 +22,35 @@ class DeliveryModuleOption
     #[ApiProperty(
         description: 'Code of the delivery module option',
         required: true,
-        example: 'DHL'
+        example: 'DHL',
     )]
     #[Groups([DeliveryModule::GROUP_FRONT_READ])]
     private string $code;
 
     #[ApiProperty(
         description: 'Validity of the delivery module option',
-        example: true
+        example: true,
     )]
     #[Groups([DeliveryModule::GROUP_FRONT_READ])]
     private bool $valid;
 
     #[ApiProperty(
         description: 'Title of the delivery module option',
-        example: 'Express Delivery'
+        example: 'Express Delivery',
     )]
     #[Groups([DeliveryModule::GROUP_FRONT_READ])]
     private string $title;
 
     #[ApiProperty(
         description: 'Description of the delivery module option',
-        example: 'Fast delivery within 24 hours'
+        example: 'Fast delivery within 24 hours',
     )]
     #[Groups([DeliveryModule::GROUP_FRONT_READ])]
     private string $description;
 
     #[ApiProperty(
         description: 'URL of the delivery logo',
-        example: 'https://example.com/logo.png'
+        example: 'https://example.com/logo.png',
     )]
     #[Groups([DeliveryModule::GROUP_FRONT_READ])]
     private string $image;

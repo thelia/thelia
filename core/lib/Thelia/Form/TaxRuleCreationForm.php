@@ -26,8 +26,7 @@ class TaxRuleCreationForm extends BaseForm
         $this->formBuilder
             ->add('locale', HiddenType::class, [
                 'constraints' => [new NotBlank()],
-            ])
-        ;
+            ]);
 
         $this->addStandardDescFields(['postscriptum', 'chapo', 'locale']);
     }

@@ -15,8 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
-use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Model\Base\TaxRuleQuery as BaseTaxRuleQuery;
 use Thelia\Model\Map\TaxRuleCountryTableMap;
@@ -32,20 +30,18 @@ class TaxRuleQuery extends BaseTaxRuleQuery
 {
     public const ALIAS_FOR_TAX_RULE_COUNTRY_POSITION = 'taxRuleCountryPosition';
 
-    protected static $caches = [];
+    protected static array $caches = [];
 
     /**
      * @throws PropelException
-     *
-     * @return array|mixed|ActiveRecordInterface[]|ObjectCollection|Tax[]
      */
-    public function getTaxCalculatorCollection(TaxRule $taxRule, ?Country $country = null, ?State $state = null)
+    public function getTaxCalculatorCollection(TaxRule $taxRule, ?Country $country = null, ?State $state = null): mixed
     {
         $key = \sprintf(
             '%s-%s-%s',
             $taxRule->getId(),
             ($country instanceof Country) ? $country->getId() : 0,
-            ($state instanceof State) ? $state->getId() : 0
+            ($state instanceof State) ? $state->getId() : 0,
         );
 
         if (\array_key_exists($key, self::$caches)) {

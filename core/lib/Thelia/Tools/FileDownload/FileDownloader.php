@@ -39,29 +39,19 @@ class FileDownloader implements FileDownloaderInterface
     }
 
     /**
-     * @param string $url
-     * @param string $pathToStore
-     *
      * @throws FileNotFoundException
      * @throws \ErrorException
      * @throws \HttpUrlException
      *
      * Downloads the file $url in $pathToStore
      */
-    public function download($url, $pathToStore): void
+    public function download(string $url, string $pathToStore): void
     {
         if (!URL::checkUrl($url)) {
             /*
              * The URL is not valid
              */
-            throw new HttpUrlException(
-                $this->translator->trans(
-                    'Tried to download a file, but the URL was not valid: %url',
-                    [
-                        '%url' => $url,
-                    ]
-                )
-            );
+            throw new HttpUrlException($this->translator->trans('Tried to download a file, but the URL was not valid: %url', ['%url' => $url]));
         }
 
         /**
@@ -79,8 +69,8 @@ class FileDownloader implements FileDownloaderInterface
 
         curl_close($con);
 
-        if (false === $response || $errno !== 0
-            || ($httpCode != '200' && $httpCode != '204')
+        if (false === $response || 0 !== $errno
+            || ('200' !== $httpCode && '204' !== $httpCode)
         ) {
             /**
              * The server is down ? The file doesn't exist ? Anything else ?
@@ -92,12 +82,11 @@ class FileDownloader implements FileDownloaderInterface
                     '%path' => $url,
                     '%error' => $curlErrorMessage,
                     '%http_code' => $httpCode,
-                ]
+                ],
             );
 
             $this->logger
-                ->error($errorMessage)
-            ;
+                ->error($errorMessage);
 
             throw new FileNotFoundException($errorMessage);
         }
@@ -111,25 +100,25 @@ class FileDownloader implements FileDownloaderInterface
                     'The file %path has been successfully downloaded',
                     [
                         '%path' => $url,
-                    ]
-                )
-            )
-        ;
+                    ],
+                ),
+            );
 
         /**
          * Then try to write it on the disk.
          */
         $file = @fopen($pathToStore, 'w');
 
-        if ($file === false) {
+        if (false === $file) {
             $translatedErrorMessage = $this->translator->trans(
                 'Failed to open a writing stream on the file: %file',
                 [
                     '%file' => $pathToStore,
-                ]
+                ],
             );
 
             $this->logger->error($translatedErrorMessage);
+
             throw new \ErrorException($translatedErrorMessage);
         }
 

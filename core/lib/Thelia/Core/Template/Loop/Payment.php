@@ -18,7 +18,7 @@ use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-use Thelia\Core\Template\Element\PropelSearchLoopInterface;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\Module;
 use Thelia\Module\BaseModule;
 
@@ -27,9 +27,9 @@ use Thelia\Module\BaseModule;
  *
  * @author Etienne Roudeix <eroudeix@gmail.com>
  */
-class Payment extends BaseSpecificModule implements PropelSearchLoopInterface
+class Payment extends BaseSpecificModule
 {
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return parent::getArgDefinitions();
     }
@@ -47,7 +47,7 @@ class Payment extends BaseSpecificModule implements PropelSearchLoopInterface
             $isValidPaymentEvent = new IsValidPaymentEvent($moduleInstance, $cart);
             $this->dispatcher->dispatch(
                 $isValidPaymentEvent,
-                TheliaEvents::MODULE_PAYMENT_IS_VALID
+                TheliaEvents::MODULE_PAYMENT_IS_VALID,
             );
 
             if (false === $isValidPaymentEvent->isValidModule()) {
@@ -60,8 +60,7 @@ class Payment extends BaseSpecificModule implements PropelSearchLoopInterface
                 ->set('TITLE', $paymentModule->getVirtualColumn('i18n_TITLE'))
                 ->set('CHAPO', $paymentModule->getVirtualColumn('i18n_CHAPO'))
                 ->set('DESCRIPTION', $paymentModule->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set('POSTSCRIPTUM', $paymentModule->getVirtualColumn('i18n_POSTSCRIPTUM'))
-            ;
+                ->set('POSTSCRIPTUM', $paymentModule->getVirtualColumn('i18n_POSTSCRIPTUM'));
             $this->addOutputFields($loopResultRow, $paymentModule);
 
             $loopResult->addRow($loopResultRow);

@@ -37,7 +37,7 @@ class MessageSendSampleForm extends BaseForm
                     'attr' => [
                         'placeholder' => Translator::getInstance()->trans('Recipient e-mail address'),
                     ],
-                ]
+                ],
             );
     }
 }

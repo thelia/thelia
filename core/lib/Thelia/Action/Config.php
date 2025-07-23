@@ -39,7 +39,7 @@ class Config extends BaseAction implements EventSubscriberInterface
             ->setTitle($event->getTitle())
             ->setHidden($event->getHidden())
             ->setSecured($event->getSecured())
-        ->save();
+            ->save();
 
         $event->setConfig($config);
     }
@@ -71,7 +71,7 @@ class Config extends BaseAction implements EventSubscriberInterface
                 ->setDescription($event->getDescription())
                 ->setChapo($event->getChapo())
                 ->setPostscriptum($event->getPostscriptum())
-            ->save();
+                ->save();
         }
     }
 

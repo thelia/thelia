@@ -58,9 +58,7 @@ class TheliaFormFactory
         }
 
         if (null === $formId) {
-            throw new \OutOfBoundsException(
-                \sprintf("The form '%s' doesn't exist", $formId)
-            );
+            throw new \OutOfBoundsException(\sprintf("The form '%s' doesn't exist", $formId));
         }
 
         /** @var BaseForm $form */
@@ -75,7 +73,7 @@ class TheliaFormFactory
             $this->tokenStorage,
             $type,
             $data,
-            $options
+            $options,
         );
 
         return $form;

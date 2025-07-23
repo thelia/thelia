@@ -16,6 +16,7 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -56,14 +57,14 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumListType(['id', 'id_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse'])
+                    new EnumListType(['id', 'id_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse']),
                 ),
-                'manual'
-            )
+                'manual',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = AttributeAvQuery::create();
 
@@ -105,7 +106,7 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
             $pseJoin->addCondition(
                 AttributeCombinationTableMap::COL_PRODUCT_SALE_ELEMENTS_ID,
                 ProductSaleElementsTableMap::COL_ID,
-                Criteria::EQUAL
+                Criteria::EQUAL,
             );
             $pseJoin->setJoinType(Criteria::LEFT_JOIN);
 
@@ -113,8 +114,7 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
                 ->leftJoinAttributeCombination('attribute_combination')
                 ->groupById()
                 ->addJoinObject($pseJoin)
-                ->where(ProductSaleElementsTableMap::COL_PRODUCT_ID.'=?', $product, \PDO::PARAM_INT)
-            ;
+                ->where(ProductSaleElementsTableMap::COL_PRODUCT_ID.'=?', $product, \PDO::PARAM_INT);
         }
 
         $orders = $this->getOrder();
@@ -159,8 +159,7 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
                 ->set('CHAPO', $attributeAv->getVirtualColumn('i18n_CHAPO'))
                 ->set('DESCRIPTION', $attributeAv->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set('POSTSCRIPTUM', $attributeAv->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set('POSITION', $attributeAv->getPosition())
-            ;
+                ->set('POSITION', $attributeAv->getPosition());
             $this->addOutputFields($loopResultRow, $attributeAv);
 
             $loopResult->addRow($loopResultRow);

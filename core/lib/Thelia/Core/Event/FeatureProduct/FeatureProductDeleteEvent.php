@@ -24,7 +24,7 @@ class FeatureProductDeleteEvent extends FeatureProductEvent
      */
     public function __construct(protected $product_id, protected $feature_id)
     {
-        parent::__construct(null);
+        parent::__construct();
     }
 
     public function getProductId()

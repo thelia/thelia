@@ -127,7 +127,6 @@ class MessageModificationForm extends BaseForm
                     'for' => 'text_template_file_name',
                 ],
                 'required' => false,
-            ])
-        ;
+            ]);
     }
 }

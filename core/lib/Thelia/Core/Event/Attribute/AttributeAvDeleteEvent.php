@@ -16,23 +16,19 @@ namespace Thelia\Core\Event\Attribute;
 
 class AttributeAvDeleteEvent extends AttributeAvEvent
 {
-    /** @var int */
-    protected $attributeAv_id;
+    protected int $attributeAv_id;
 
-    /**
-     * @param int $attributeAv_id
-     */
-    public function __construct($attributeAv_id)
+    public function __construct(int $attributeAv_id)
     {
         $this->setAttributeAvId($attributeAv_id);
     }
 
-    public function getAttributeAvId()
+    public function getAttributeAvId(): int
     {
         return $this->attributeAv_id;
     }
 
-    public function setAttributeAvId($attributeAv_id): static
+    public function setAttributeAvId(int $attributeAv_id): static
     {
         $this->attributeAv_id = $attributeAv_id;
 

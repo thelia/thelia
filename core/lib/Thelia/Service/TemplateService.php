@@ -23,8 +23,10 @@ class TemplateService
     {
         $templatesPath = [];
         $configTemplatesNames = TemplateDefinition::CONFIG_NAMES;
+
         foreach ($configTemplatesNames as $templateType => $configName) {
             $templatePath = THELIA_TEMPLATE_DIR.$templateType.DS.ConfigQuery::read($configName, 'default');
+
             if (is_dir($templatePath)) {
                 $templatesPath[$templateType] = $templatePath;
             }

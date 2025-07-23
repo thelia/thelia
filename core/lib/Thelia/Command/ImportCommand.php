@@ -40,27 +40,26 @@ class ImportCommand extends ContainerAwareCommand
             ->addArgument(
                 'ref',
                 InputArgument::OPTIONAL,
-                'Import reference.'
+                'Import reference.',
             )
             ->addArgument(
                 'filePath',
                 InputArgument::OPTIONAL,
-                'File path to import'
+                'File path to import',
             )
             ->addOption(
                 'locale',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Locale for export',
-                'en_US'
+                'en_US',
             )
             ->addOption(
                 'list',
                 null,
                 InputOption::VALUE_NONE,
-                'List available imports and exit.'
-            )
-        ;
+                'List available imports and exit.',
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -73,32 +72,30 @@ class ImportCommand extends ContainerAwareCommand
 
         $importRef = $input->getArgument('ref');
         $path = $input->getArgument('filePath');
-        if ($importRef === null || $path === null) {
-            throw new \RuntimeException(
-                'Not enough arguments.'.\PHP_EOL.'If no options are provided, ref and filePath arguments are required.'
-            );
+
+        if (null === $importRef || null === $path) {
+            throw new \RuntimeException('Not enough arguments.'.\PHP_EOL.'If no options are provided, ref and filePath arguments are required.');
         }
 
         /** @var ImportHandler $importHandler */
         $importHandler = $this->getContainer()->get('thelia.import.handler');
 
         $import = $importHandler->getImportByRef($importRef);
-        if ($import === null) {
-            throw new \RuntimeException(
-                $importRef." import doesn't exist."
-            );
+
+        if (null === $import) {
+            throw new \RuntimeException($importRef." import doesn't exist.");
         }
 
         $importEvent = $importHandler->import(
             $import,
             new File($input->getArgument('filePath')),
-            (new LangQuery())->findOneByLocale($input->getOption('locale'))
+            (new LangQuery())->findOneByLocale($input->getOption('locale')),
         );
 
         $formattedLine = $this->getHelper('formatter')->formatBlock(
             'Successfully import '.$importEvent->getImport()->getImportedRows().' row(s)',
             'fg=black;bg=green',
-            true
+            true,
         );
         $output->writeln($formattedLine);
 
@@ -106,7 +103,7 @@ class ImportCommand extends ContainerAwareCommand
             $formattedLine = $this->getHelper('formatter')->formatBlock(
                 'With error',
                 'fg=black;bg=yellow',
-                true
+                true,
             );
             $output->writeln($formattedLine);
 
@@ -141,7 +138,6 @@ class ImportCommand extends ContainerAwareCommand
                 'Title',
                 'Description',
             ])
-            ->render()
-        ;
+            ->render();
     }
 }

@@ -51,7 +51,7 @@ class MessageCreationForm extends BaseForm
                     'for' => 'purpose',
                     'help' => Translator::getInstance()->trans(
                         'Enter here the mail template purpose in the default language (%title%)',
-                        ['%title%' => Lang::getDefaultLanguage()->getTitle()]
+                        ['%title%' => Lang::getDefaultLanguage()->getTitle()],
                     ),
                 ],
                 'attr' => [
@@ -63,8 +63,7 @@ class MessageCreationForm extends BaseForm
                     new NotBlank(),
                 ],
             ])
-            ->add('secured', HiddenType::class, [])
-        ;
+            ->add('secured', HiddenType::class, []);
     }
 
     public static function getName(): string

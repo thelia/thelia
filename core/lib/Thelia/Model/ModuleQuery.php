@@ -30,10 +30,7 @@ class ModuleQuery extends BaseModuleQuery
 {
     protected static $activated;
 
-    /**
-     * @return array|mixed|\PropelObjectCollection
-     */
-    public static function getActivated()
+    public static function getActivated(): mixed
     {
         if (null === self::$activated) {
             self::$activated = self::create()
@@ -53,10 +50,8 @@ class ModuleQuery extends BaseModuleQuery
     /**
      * @param int $moduleType the module type : classic, payment or delivery. Use BaseModule constant here.
      * @param int $id         the module id
-     *
-     * @return ModuleQuery
      */
-    public function filterActivatedByTypeAndId($moduleType, $id)
+    public function filterActivatedByTypeAndId(int $moduleType, int $id): self
     {
         return $this
             ->filterByType($moduleType)
@@ -74,13 +69,12 @@ class ModuleQuery extends BaseModuleQuery
      *
      * @return false|BaseModule[]
      */
-    public function retrieveVirtualProductDelivery(?ContainerInterface $container = null)
+    public function retrieveVirtualProductDelivery(?ContainerInterface $container = null): bool|array
     {
         $modules = $this
             ->filterByType(BaseModule::DELIVERY_MODULE_TYPE)
             ->filterByActivate(BaseModule::IS_ACTIVATED)
-            ->find()
-        ;
+            ->find();
 
         $result = [];
 
@@ -97,7 +91,7 @@ class ModuleQuery extends BaseModuleQuery
             }
         }
 
-        return $result === [] ? false : $result;
+        return [] === $result ? false : $result;
     }
 }
 

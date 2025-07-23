@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -42,11 +43,11 @@ class Admin extends BaseLoop implements PropelSearchLoopInterface
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
-            Argument::createIntListTypeArgument('profile')
+            Argument::createIntListTypeArgument('profile'),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = AdminQuery::create();
 
@@ -78,8 +79,7 @@ class Admin extends BaseLoop implements PropelSearchLoopInterface
                 ->set('LASTNAME', $admin->getLastname())
                 ->set('LOGIN', $admin->getLogin())
                 ->set('LOCALE', $admin->getLocale())
-                ->set('EMAIL', $admin->getEmail())
-            ;
+                ->set('EMAIL', $admin->getEmail());
             $this->addOutputFields($loopResultRow, $admin);
 
             $loopResult->addRow($loopResultRow);

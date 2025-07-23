@@ -44,14 +44,14 @@ use Thelia\Model\Map\BrandImageTableMap;
             controller: PostItemFileController::class,
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
             denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_FILE]],
-            deserialize: false
+            deserialize: false,
         ),
         new GetCollection(
-            uriTemplate: '/admin/brand_images'
+            uriTemplate: '/admin/brand_images',
         ),
         new Get(
             uriTemplate: '/admin/brand_images/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Get(
             uriTemplate: '/admin/brand_images/{id}/file',
@@ -61,8 +61,8 @@ use Thelia\Model\Map\BrandImageTableMap;
                     '200' => [
                         'description' => 'The binary file',
                     ],
-                ]
-            )
+                ],
+            ),
         ),
         new Put(
             uriTemplate: '/admin/brand_images/{id}',
@@ -70,23 +70,23 @@ use Thelia\Model\Map\BrandImageTableMap;
         ),
         new Patch(
             uriTemplate: '/admin/brand_images/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
         ),
         new Delete(
-            uriTemplate: '/admin/brand_images/{id}'
+            uriTemplate: '/admin/brand_images/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/admin/brand_images'
+            uriTemplate: '/admin/brand_images',
         ),
         new Get(
             uriTemplate: '/admin/brand_images/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
         new Get(
             uriTemplate: '/admin/brand_images/{id}/file',
@@ -96,8 +96,8 @@ use Thelia\Model\Map\BrandImageTableMap;
                     '200' => [
                         'description' => 'The binary file',
                     ],
-                ]
-            )
+                ],
+            ),
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -106,13 +106,13 @@ use Thelia\Model\Map\BrandImageTableMap;
     filterClass: OrderFilter::class,
     properties: [
         'position',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
         'visible',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -121,22 +121,16 @@ use Thelia\Model\Map\BrandImageTableMap;
             'strategy' => 'exact',
             'fieldPath' => 'brand_image.brand_id',
         ],
-    ]
+    ],
 )]
 class BrandImage extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     public const GROUP_ADMIN_READ = 'admin:brand_image:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:brand_image:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:brand_image:write';
-
     public const GROUP_ADMIN_WRITE_FILE = 'admin:brand_image:write_file';
-
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:brand_image:write_update';
-
     public const GROUP_FRONT_READ = 'front:brand_image:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:brand_image:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ])]
@@ -151,7 +145,7 @@ class BrandImage extends AbstractTranslatableResource implements ItemFileResourc
         openapiContext: [
             'type' => 'string',
             'format' => 'binary',
-        ]
+        ],
     )]
     #[Assert\Image(
         mimeTypes: [

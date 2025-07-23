@@ -24,7 +24,6 @@ use Thelia\Model\ConfigQuery;
 class AssetManager implements AssetManagerInterface
 {
     protected array $source_file_extensions = ['less', 'js', 'coffee', 'html', 'tpl', 'htm', 'xml'];
-
     protected array $assetFilters = [];
 
     public function __construct(protected $debugMode)
@@ -44,7 +43,7 @@ class AssetManager implements AssetManagerInterface
 
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($directory, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::LEAVES_ONLY
+            \RecursiveIteratorIterator::LEAVES_ONLY,
         );
 
         foreach ($iterator as $file) {
@@ -71,10 +70,10 @@ class AssetManager implements AssetManagerInterface
 
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($fromDirectory, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::SELF_FIRST
+            \RecursiveIteratorIterator::SELF_FIRST,
         );
 
-        $fs->mkdir($toDirectory, 0777);
+        $fs->mkdir($toDirectory, 0o777);
 
         /** @var \RecursiveDirectoryIterator $iterator */
         foreach ($iterator as $item) {
@@ -86,7 +85,7 @@ class AssetManager implements AssetManagerInterface
                         $fs->remove($destinationDir);
                     }
 
-                    $fs->mkdir($destinationDir, 0777);
+                    $fs->mkdir($destinationDir, 0o777);
                 }
             } elseif (!$this->isSourceFile($item)) {
                 $destinationFile = $toDirectory.DS.$iterator->getSubPathName();
@@ -126,7 +125,7 @@ class AssetManager implements AssetManagerInterface
      *
      * @throws \RuntimeException if something goes wrong
      */
-    public function prepareAssets($sourceAssetsDirectory, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey): void
+    public function prepareAssets(string $sourceAssetsDirectory, string $webAssetsDirectoryBase, $webAssetsTemplate, string $webAssetsKey): void
     {
         // Compute the absolute path of the output directory
         $to_directory = $this->getDestinationDirectory($webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey);
@@ -159,9 +158,7 @@ class AssetManager implements AssetManagerInterface
             $fs->rename($tmp_dir, $to_directory);
 
             if (false === @file_put_contents($stamp_file_path, $curr_stamp)) {
-                throw new \RuntimeException(
-                    \sprintf('Failed to create asset stamp file %s. Please check that your web server has the proper access rights to do that.', $stamp_file_path)
-                );
+                throw new \RuntimeException(\sprintf('Failed to create asset stamp file %s. Please check that your web server has the proper access rights to do that.', $stamp_file_path));
             }
         }
     }
@@ -183,7 +180,7 @@ class AssetManager implements AssetManagerInterface
         bool $debug,
     ): string {
         Tlog::getInstance()->addDebug(
-            \sprintf('Processing asset: assetSource=%s, assetDirectoryBase=%s, webAssetsDirectoryBase=%s, webAssetsTemplate=%s, webAssetsKey=%s, outputUrl=%s', $assetSource, $assetDirectoryBase, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey, $outputUrl)
+            \sprintf('Processing asset: assetSource=%s, assetDirectoryBase=%s, webAssetsDirectoryBase=%s, webAssetsTemplate=%s, webAssetsKey=%s, outputUrl=%s', $assetSource, $assetDirectoryBase, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey, $outputUrl),
         );
 
         $assetName = basename($assetSource);

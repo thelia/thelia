@@ -23,11 +23,10 @@ class ConditionOrganizer implements ConditionOrganizerInterface
 {
     /**
      * Organize ConditionInterface.
-     *
-     * @param array $conditions Array of ConditionInterface
      */
-    public function organize(array $conditions): void
+    public function organize(array $conditions): array
     {
         // @todo: Implement organize() method.
+        return $conditions;
     }
 }

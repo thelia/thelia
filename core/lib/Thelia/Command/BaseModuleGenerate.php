@@ -30,13 +30,10 @@ use Thelia\Module\Validator\ModuleValidator;
 abstract class BaseModuleGenerate extends ContainerAwareCommand
 {
     protected $module;
-
     protected $moduleDirectory;
-
     protected $reservedKeyWords = [
         'thelia',
     ];
-
     protected $neededDirectories = [
         'Config',
         'Model',
@@ -52,18 +49,13 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
     protected function verifyExistingModule(): void
     {
         if (file_exists($this->moduleDirectory)) {
-            throw new \RuntimeException(
-                \sprintf(
-                    '%s module already exists. Use --force option to force generation.',
-                    $this->module
-                )
-            );
+            throw new \RuntimeException(\sprintf('%s module already exists. Use --force option to force generation.', $this->module));
         }
     }
 
     protected function formatModuleName($name)
     {
-        if (\in_array(strtolower((string) $name), $this->reservedKeyWords)) {
+        if (\in_array(strtolower((string) $name), $this->reservedKeyWords, true)) {
             throw new \RuntimeException(\sprintf('%s module name is a reserved keyword', $name));
         }
 
@@ -73,9 +65,7 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
     protected function validModuleName($name): void
     {
         if (!preg_match('#^[A-Z]([A-Za-z\d])+$#', (string) $name)) {
-            throw new \RuntimeException(
-                \sprintf('%s module name is not a valid name, it must be in CamelCase. (ex: MyModuleName)', $name)
-            );
+            throw new \RuntimeException(\sprintf('%s module name is not a valid name, it must be in CamelCase. (ex: MyModuleName)', $name));
         }
     }
 
@@ -93,7 +83,7 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
         $propelInitService = $this->getContainer()->get('thelia.propel.init');
 
         $schemaCombiner = new SchemaCombiner(
-            $schemaLocator->findForModules([$this->module])
+            $schemaLocator->findForModules([$this->module]),
         );
 
         $fs = new Filesystem();
@@ -103,7 +93,7 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
         foreach ($schemaCombiner->getDatabases() as $database) {
             file_put_contents(
                 \sprintf('%s/%s.schema.xml', $schemasDir, $database),
-                $schemaCombiner->getCombinedDocument($database)->saveXML()
+                $schemaCombiner->getCombinedDocument($database)->saveXML(),
             );
         }
 

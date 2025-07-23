@@ -19,11 +19,11 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Hook\ModuleHookCreateEvent;
 use Thelia\Core\Event\Hook\ModuleHookDeleteEvent;
-use Thelia\Core\Event\Hook\ModuleHookEvent;
 use Thelia\Core\Event\Hook\ModuleHookToggleActivationEvent;
 use Thelia\Core\Event\Hook\ModuleHookUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -58,7 +58,7 @@ class ModuleHookController extends AbstractCrudController
             TheliaEvents::MODULE_HOOK_UPDATE,
             TheliaEvents::MODULE_HOOK_DELETE,
             null,
-            TheliaEvents::MODULE_HOOK_UPDATE_POSITION
+            TheliaEvents::MODULE_HOOK_UPDATE_POSITION,
         );
     }
 
@@ -101,7 +101,7 @@ class ModuleHookController extends AbstractCrudController
         return new UpdatePositionEvent(
             $this->getRequest()->get('module_hook_id'),
             $positionChangeMode,
-            $positionValue
+            $positionValue,
         );
     }
 
@@ -181,8 +181,7 @@ class ModuleHookController extends AbstractCrudController
                 ->setClassname($formData['classname'])
                 ->setMethod($formData['method'])
                 ->setActive($formData['active'])
-                ->setTemplates($formData['templates'])
-            ;
+                ->setTemplates($formData['templates']);
         }
 
         return $event;
@@ -198,10 +197,8 @@ class ModuleHookController extends AbstractCrudController
 
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
-     *
-     * @param ModuleHookEvent $event
      */
-    protected function eventContainsObject($event): bool
+    protected function eventContainsObject(Event $event): bool
     {
         return $event->hasModuleHook();
     }
@@ -209,38 +206,26 @@ class ModuleHookController extends AbstractCrudController
     /**
      * Get the created object from an event.
      *
-     * @param ModuleHookEvent $event
-     *
      * @return ModuleHook|null
      */
-    protected function getObjectFromEvent($event): mixed
+    protected function getObjectFromEvent(Event $event): mixed
     {
         return $event->getModuleHook();
     }
 
-    /**
-     * Load an existing object from the database.
-     *
-     * @return ModuleHook|null
-     */
     protected function getExistingObject(): ?ActiveRecordInterface
     {
         return ModuleHookQuery::create()
             ->findPK($this->getRequest()->get('module_hook_id', 0));
     }
 
-    /**
-     * Returns the object label form the object event (name, title, etc.).
-     *
-     * @param ModuleHook $object
-     */
-    protected function getObjectLabel($object): string
+    protected function getObjectLabel(ActiveRecordInterface $object): string
     {
         try {
             return \sprintf(
                 '%s on %s',
                 $object->getModule()->getTitle(),
-                $object->getHook()->getTitle()
+                $object->getHook()->getTitle(),
             );
         } catch (\Exception) {
             return 'Undefined module hook';
@@ -262,11 +247,11 @@ class ModuleHookController extends AbstractCrudController
      *
      * @param string $currentOrder , if any, null otherwise
      */
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         return $this->render(
             'module-hooks',
-            ['module_order' => $currentOrder]
+            ['module_order' => $currentOrder],
         );
     }
 
@@ -287,15 +272,13 @@ class ModuleHookController extends AbstractCrudController
 
     /**
      * Redirect to the edition template.
-     *
-     * @return Response
      */
     protected function redirectToEditionTemplate($request = null, $country = null): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.module-hook.update',
             $this->getViewArguments(),
-            $this->getRouteArguments()
+            $this->getRouteArguments(),
         );
     }
 
@@ -345,7 +328,8 @@ class ModuleHookController extends AbstractCrudController
         /** @var IgnoredModuleHook $moduleHook */
         foreach ($ignoredModuleHooks as $moduleHook) {
             $className = $moduleHook->getClassname();
-            if (null !== $className && !\in_array($className, $result)) {
+
+            if (null !== $className && !\in_array($className, $result, true)) {
                 $result[] = $className;
             }
         }
@@ -371,7 +355,8 @@ class ModuleHookController extends AbstractCrudController
         /** @var ModuleHook $moduleHook */
         foreach ($moduleHooks as $moduleHook) {
             $method = $moduleHook->getMethod();
-            if (!\in_array($method, $result)) {
+
+            if (!\in_array($method, $result, true)) {
                 $result[] = $method;
             }
         }
@@ -384,7 +369,8 @@ class ModuleHookController extends AbstractCrudController
         /** @var IgnoredModuleHook $moduleHook */
         foreach ($ignoredModuleHooks as $moduleHook) {
             $method = $moduleHook->getMethod();
-            if (!\in_array($method, $result)) {
+
+            if (!\in_array($method, $result, true)) {
                 $result[] = $method;
             }
         }

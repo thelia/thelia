@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template;
 
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
-use Thelia\Core\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 
 #[AutoconfigureTag('thelia.parser.template')]
@@ -35,12 +35,12 @@ interface ParserInterface
      * @param array  $parameters       an associative array of names / value pairs
      * @param bool   $compressOutput   if true, te output is compressed using trimWhitespaces. If false, no compression occurs
      *
+     * @return string the rendered template text
+     *
      * @throws ResourceNotFoundException if the template cannot be found
      * @throws \Exception
-     *
-     * @return string the rendered template text
      */
-    public function render($realTemplateName, array $parameters = [], $compressOutput = true);
+    public function render(string $realTemplateName, array $parameters = [], bool $compressOutput = true): string;
 
     /**
      * Return a rendered template text.
@@ -49,11 +49,11 @@ interface ParserInterface
      * @param array  $parameters     an associative array of names / value pairs
      * @param bool   $compressOutput if true, te output is compressed using trimWhitespaces. If false, no compression occurs
      *
-     * @throws \Exception
-     *
      * @return string the rendered template text
+     *
+     * @throws \Exception
      */
-    public function renderString($templateText, array $parameters = [], $compressOutput = true);
+    public function renderString(string $templateText, array $parameters = [], bool $compressOutput = true): string;
 
     /**
      * @return int the HTTP status of the response
@@ -69,17 +69,15 @@ interface ParserInterface
 
     /**
      * Returns the request used by the parser.
-     *
-     * @return Request
      */
-    public function getRequest();
+    public function getRequest(): ?Request;
 
     /**
      * Set a new template definition, and save the current one.
      *
      * @param bool $fallbackToDefaultTemplate if true, resources will be also searched in the "default" template
      */
-    public function pushTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false);
+    public function pushTemplateDefinition(TemplateDefinition $templateDefinition, bool $fallbackToDefaultTemplate = false);
 
     /**
      * Restore the previous stored template definition, if one exists.
@@ -91,31 +89,25 @@ interface ParserInterface
      *
      * @param bool $fallbackToDefaultTemplate if true, also search files in hte "default" template
      */
-    public function setTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false);
+    public function setTemplateDefinition(TemplateDefinition $templateDefinition, bool $fallbackToDefaultTemplate = false);
 
     /**
      * Get template definition.
      *
      * @param bool|string $webAssetTemplateName false to use the current template path, or a template name to
      *                                          load assets from this template instead of the current one
-     *
-     * @return TemplateDefinition
      */
-    public function getTemplateDefinition($webAssetTemplateName = false);
+    public function getTemplateDefinition(bool|string $webAssetTemplateName = false): TemplateDefinition;
 
     /**
      * Check if template definition is not null.
-     *
-     * @return bool
      */
-    public function hasTemplateDefinition();
+    public function hasTemplateDefinition(): bool;
 
     /**
      * Get the current status of the fallback to "default" feature.
-     *
-     * @return bool
      */
-    public function getFallbackToDefaultTemplate();
+    public function getFallbackToDefaultTemplate(): bool;
 
     /**
      * Add a template directory to the current template list.
@@ -126,18 +118,16 @@ interface ParserInterface
      * @param string $key               the template directory identifier
      * @param bool   $unshift           if true, add template at the top of the list
      */
-    public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $unshift = false);
+    public function addTemplateDirectory(int $templateType, string $templateName, string $templateDirectory, string $key, bool $unshift = false);
 
     /**
      * Return the registeted template directories for a givent template type.
      *
-     * @param int $templateType
+     * @return array: an array of defined templates directories for the given template type
      *
      * @throws \InvalidArgumentException if the templateType is not defined
-     *
-     * @return array: an array of defined templates directories for the given template type
      */
-    public function getTemplateDirectories($templateType);
+    public function getTemplateDirectories(int $templateType);
 
     /**
      * Create a variable that will be available in the templates.
@@ -152,12 +142,12 @@ interface ParserInterface
      * @param array|string $variable the template variable name(s)
      * @param mixed        $value    the value to assign
      */
-    public function assign($variable, $value = null);
+    public function assign(array|string $variable, mixed $value = null);
 
     /**
      * @return TemplateHelperInterface the parser template helper instance
      */
-    public function getTemplateHelper();
+    public function getTemplateHelper(): TemplateHelperInterface;
 
     public function supportTemplateRender(string $templatePath, ?string $templateName): bool;
 

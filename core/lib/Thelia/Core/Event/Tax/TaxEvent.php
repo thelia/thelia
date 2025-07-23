@@ -21,17 +21,11 @@ use Thelia\TaxEngine\TaxTypeInterface;
 class TaxEvent extends ActionEvent
 {
     protected $locale;
-
     protected $id;
-
     protected $title;
-
     protected $description;
-
     protected $type;
-
     protected $requirements;
-
     protected ?TaxTypeInterface $taxTypeService = null;
 
     public function __construct(protected ?Tax $tax = null)

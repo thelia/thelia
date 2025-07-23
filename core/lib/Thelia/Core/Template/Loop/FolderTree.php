@@ -46,7 +46,7 @@ class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
             Argument::createIntTypeArgument('folder', null, true),
             Argument::createIntTypeArgument('depth', \PHP_INT_MAX),
             Argument::createBooleanOrBothTypeArgument('visible', true, false),
-            Argument::createIntListTypeArgument('exclude', [])
+            Argument::createIntListTypeArgument('exclude', []),
         );
     }
 
@@ -65,11 +65,11 @@ class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
 
         $search->filterByParent($parent);
 
-        if ($visible != BooleanOrBothType::ANY) {
+        if (BooleanOrBothType::ANY !== $visible) {
             $search->filterByVisible($visible);
         }
 
-        if ($exclude != null) {
+        if (null !== $exclude) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
@@ -96,6 +96,7 @@ class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
     {
         foreach ($loopResult->getResultDataCollection() as $result) {
             $loopResultRow = new LoopResultRow($result);
+
             foreach ($result as $output => $outputValue) {
                 $loopResultRow->set($output, $outputValue);
             }
@@ -107,7 +108,7 @@ class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
         return $loopResult;
     }
 
-    public function buildArray()
+    public function buildArray(): array
     {
         $id = $this->getFolder();
         $depth = $this->getDepth();

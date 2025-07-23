@@ -48,7 +48,7 @@ class FeatureAvController extends AbstractCrudController
             TheliaEvents::FEATURE_AV_UPDATE,
             TheliaEvents::FEATURE_AV_DELETE,
             null, // No visibility toggle
-            TheliaEvents::FEATURE_AV_UPDATE_POSITION
+            TheliaEvents::FEATURE_AV_UPDATE_POSITION,
         );
     }
 
@@ -69,8 +69,7 @@ class FeatureAvController extends AbstractCrudController
         $createEvent
             ->setFeatureId($formData['feature_id'])
             ->setTitle($formData['title'])
-            ->setLocale($formData['locale'])
-        ;
+            ->setLocale($formData['locale']);
 
         return $createEvent;
     }
@@ -84,8 +83,7 @@ class FeatureAvController extends AbstractCrudController
             ->setTitle($formData['title'])
             ->setChapo($formData['chapo'])
             ->setDescription($formData['description'])
-            ->setPostscriptum($formData['postscriptum'])
-        ;
+            ->setPostscriptum($formData['postscriptum']);
 
         return $changeEvent;
     }
@@ -95,7 +93,7 @@ class FeatureAvController extends AbstractCrudController
         return new UpdatePositionEvent(
             $this->getRequest()->get('featureav_id'),
             $positionChangeMode,
-            $positionValue
+            $positionValue,
         );
     }
 
@@ -122,7 +120,7 @@ class FeatureAvController extends AbstractCrudController
     protected function getExistingObject(): ?ActiveRecordInterface
     {
         $featureAv = FeatureAvQuery::create()
-        ->findOneById($this->getRequest()->get('featureav_id', 0));
+            ->findOneById($this->getRequest()->get('featureav_id', 0));
 
         if (null !== $featureAv) {
             $featureAv->setLocale($this->getCurrentEditionLocale());
@@ -155,12 +153,12 @@ class FeatureAvController extends AbstractCrudController
         ];
     }
 
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         // We always return to the feature edition form
         return $this->render(
             'feature-edit',
-            $this->getViewArguments()
+            $this->getViewArguments(),
         );
     }
 
@@ -175,7 +173,7 @@ class FeatureAvController extends AbstractCrudController
         // We always return to the feature edition form
         return $this->generateRedirectFromRoute(
             'admin.configuration.features.update',
-            $this->getViewArguments()
+            $this->getViewArguments(),
         );
     }
 
@@ -183,7 +181,7 @@ class FeatureAvController extends AbstractCrudController
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.features.update',
-            $this->getViewArguments()
+            $this->getViewArguments(),
         );
     }
 }

@@ -46,8 +46,7 @@ class ProductSaleElementsImage extends BaseLoop implements PropelSearchLoopInter
             $row
                 ->set('ID', $productSaleElementImage->getId())
                 ->set('PRODUCT_SALE_ELEMENTS_ID', $productSaleElementImage->getProductSaleElementsId())
-                ->set('PRODUCT_IMAGE_ID', $productSaleElementImage->getProductImageId())
-            ;
+                ->set('PRODUCT_IMAGE_ID', $productSaleElementImage->getProductImageId());
 
             $this->addOutputFields($row, $productSaleElementImage);
             $loopResult->addRow($row);
@@ -90,17 +89,15 @@ class ProductSaleElementsImage extends BaseLoop implements PropelSearchLoopInter
                     'position',
                     'position-reverse',
                 ],
-                'position'
-            )
+                'position',
+            ),
         );
     }
 
     /**
      * this method returns a Propel ModelCriteria.
-     *
-     * @return ModelCriteria
      */
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $query = ProductSaleElementsProductImageQuery::create();
 
@@ -121,16 +118,14 @@ class ProductSaleElementsImage extends BaseLoop implements PropelSearchLoopInter
                 case 'position':
                     $query
                         ->useProductImageQuery()
-                            ->orderByPosition(Criteria::ASC)
-                        ->endUse()
-                    ;
+                        ->orderByPosition(Criteria::ASC)
+                        ->endUse();
                     break;
                 case 'position-reverse':
                     $query
                         ->useProductImageQuery()
-                            ->orderByPosition(Criteria::DESC)
-                        ->endUse()
-                    ;
+                        ->orderByPosition(Criteria::DESC)
+                        ->endUse();
                     break;
             }
         }

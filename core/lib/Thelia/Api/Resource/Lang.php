@@ -33,32 +33,32 @@ use Thelia\Model\Map\LangTableMap;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/languages'
+            uriTemplate: '/admin/languages',
         ),
         new GetCollection(
-            uriTemplate: '/admin/languages'
+            uriTemplate: '/admin/languages',
         ),
         new Get(
             uriTemplate: '/admin/languages/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/languages/{id}'
+            uriTemplate: '/admin/languages/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/languages/{id}'
+            uriTemplate: '/admin/languages/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/languages/{id}'
+            uriTemplate: '/admin/languages/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/front/languages'
+            uriTemplate: '/front/languages',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -69,37 +69,34 @@ use Thelia\Model\Map\LangTableMap;
         'visible',
         'active',
         'byDefault',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
         'position',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
         'id',
         'code',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: NotInFilter::class,
     properties: [
         'id',
-    ]
+    ],
 )]
 class Lang implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:lang:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:lang:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:lang:write';
-
     public const GROUP_FRONT_READ = 'front:lang:read';
 
     #[Groups([self::GROUP_ADMIN_READ,

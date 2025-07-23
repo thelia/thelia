@@ -38,8 +38,8 @@ class Payment implements EventSubscriberInterface
             $event,
             TheliaEvents::getModuleEvent(
                 TheliaEvents::MODULE_PAYMENT_IS_VALID,
-                $module->getCode()
-            )
+                $module->getCode(),
+            ),
         );
 
         if ($event->isPropagationStopped()) {

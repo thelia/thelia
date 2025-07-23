@@ -16,23 +16,19 @@ namespace Thelia\Core\Event\Config;
 
 class ConfigDeleteEvent extends ConfigEvent
 {
-    /** @var int */
-    protected $config_id;
+    protected int $config_id;
 
-    /**
-     * @param int $config_id
-     */
-    public function __construct($config_id)
+    public function __construct(int $config_id)
     {
         $this->setConfigId($config_id);
     }
 
-    public function getConfigId()
+    public function getConfigId(): int
     {
         return $this->config_id;
     }
 
-    public function setConfigId($config_id): static
+    public function setConfigId(int $config_id): static
     {
         $this->config_id = $config_id;
 

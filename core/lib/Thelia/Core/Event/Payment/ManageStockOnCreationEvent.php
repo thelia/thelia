@@ -23,8 +23,7 @@ use Thelia\Module\PaymentModuleInterface;
  */
 class ManageStockOnCreationEvent extends BasePaymentEvent
 {
-    /** @var bool|null */
-    protected $manageStock;
+    protected ?bool $manageStock = null;
 
     /**
      * ManageStockOnCreationEvent constructor.
@@ -34,18 +33,12 @@ class ManageStockOnCreationEvent extends BasePaymentEvent
         parent::__construct($module);
     }
 
-    /**
-     * @return bool|null
-     */
-    public function getManageStock()
+    public function getManageStock(): ?bool
     {
         return $this->manageStock;
     }
 
-    /**
-     * @param bool|null $manageStock
-     */
-    public function setManageStock($manageStock): static
+    public function setManageStock(?bool $manageStock): static
     {
         $this->manageStock = $manageStock;
 

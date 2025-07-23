@@ -42,7 +42,7 @@ class CustomerUpdateForm extends BaseForm
         $this->formBuilder
             ->add(
                 'update_logged_in_user',
-                IntegerType::class// In a front office context, update the in-memory logged-in user data
+                IntegerType::class,// In a front office context, update the in-memory logged-in user data
             )
             ->add('company', TextType::class, [
                 'label' => Translator::getInstance()->trans('Company'),
@@ -147,7 +147,8 @@ class CustomerUpdateForm extends BaseForm
                 'constraints' => [
                     new NotBlank(),
                     new Callback(
-                        $this->verifyZipCode(...)),
+                        $this->verifyZipCode(...),
+                    ),
                 ],
                 'label' => Translator::getInstance()->trans('Zip code'),
                 'label_attr' => [
@@ -176,7 +177,7 @@ class CustomerUpdateForm extends BaseForm
                 'required' => false,
                 'constraints' => [
                     new Callback(
-                        $this->verifyState(...)
+                        $this->verifyState(...),
                     ),
                 ],
                 'label' => Translator::getInstance()->trans('State *'),
@@ -211,9 +212,9 @@ class CustomerUpdateForm extends BaseForm
     {
         $data = $context->getRoot()->getData();
 
-        if (isset($data['email_confirm']) && $data['email'] != $data['email_confirm']) {
+        if (isset($data['email_confirm']) && $data['email'] !== $data['email_confirm']) {
             $context->addViolation(
-                Translator::getInstance()->trans('email confirmation is not the same as email field')
+                Translator::getInstance()->trans('email confirmation is not the same as email field'),
             );
         }
     }

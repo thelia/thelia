@@ -33,7 +33,6 @@ use Thelia\Tools\URL;
 class BaseAdminController extends BaseController
 {
     public const CONTROLLER_TYPE = 'admin';
-
     public const TEMPLATE_404 = '404';
 
     protected string $currentRouter = 'router.admin';
@@ -41,7 +40,7 @@ class BaseAdminController extends BaseController
     public function processTemplateAction(string $template): Response|RedirectResponse|string
     {
         try {
-            if ($template !== '' && $template !== '0') {
+            if ('' !== $template && '0' !== $template) {
                 // If we have a view in the URL, render this view
                 return $this->render($template);
             }
@@ -70,7 +69,7 @@ class BaseAdminController extends BaseController
             $this->requestStack->getCurrentRequest(),
             $this->securityContext->getAdminUser(),
             true,
-            $resourceId
+            (int) $resourceId,
         );
     }
 
@@ -84,7 +83,7 @@ class BaseAdminController extends BaseController
         if ($message instanceof \Exception) {
             $strMessage = $this->translator->trans(
                 'Sorry, an error occured: %msg',
-                ['%msg' => $message->getMessage()]
+                ['%msg' => $message->getMessage()],
             );
 
             Tlog::getInstance()->addError($strMessage.': '.$message->getTraceAsString());
@@ -99,7 +98,7 @@ class BaseAdminController extends BaseController
             [
                 'error_message' => $message,
             ],
-            $status
+            $status,
         );
     }
 
@@ -126,7 +125,7 @@ class BaseAdminController extends BaseController
             'Please check your input: %error',
             [
                 '%error' => $exception->getMessage(),
-            ]
+            ],
         );
     }
 
@@ -139,9 +138,9 @@ class BaseAdminController extends BaseController
                 [
                     '%action' => $action,
                     '%error' => $error_message,
-                    '%exc' => $exception != null ? $exception->getMessage() : 'no exception',
-                ]
-            )
+                    '%exc' => $exception instanceof \Exception ? $exception->getMessage() : 'no exception',
+                ],
+            ),
         );
 
         if ($form instanceof BaseForm) {
@@ -163,7 +162,7 @@ class BaseAdminController extends BaseController
         // Define the template that should be used
         $parser->setTemplateDefinition(
             $parser->getTemplateDefinition() ?: $this->templateHelper->getActiveAdminTemplate(),
-            $this->useFallbackTemplate
+            $this->useFallbackTemplate,
         );
 
         return $parser;
@@ -234,7 +233,7 @@ class BaseAdminController extends BaseController
         // Find the current order
         $order = $this->requestStack->getCurrentRequest()?->get(
             $requestParameterName,
-            $this->getSession()->get($orderSessionIdentifier, $defaultListOrder)
+            $this->getSession()->get($orderSessionIdentifier, $defaultListOrder),
         );
 
         if ($updateSession) {
@@ -274,8 +273,7 @@ class BaseAdminController extends BaseController
         // Update the current edition language & currency in session
         $this->getSession()
             ->setAdminEditionLang($editionLang)
-            ->setAdminEditionCurrency($editionCurrency)
-        ;
+            ->setAdminEditionCurrency($editionCurrency);
 
         // Render the template.
         try {

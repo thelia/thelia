@@ -45,25 +45,25 @@ class Template extends BaseLoop implements ArraySearchLoopInterface
                         'pdf',
                         'email',
                         'mail',
-                    ])
-                )
-            )
+                    ]),
+                ),
+            ),
         );
     }
 
-    public function buildArray()
+    public function buildArray(): array
     {
         $type = $this->getArg('template-type')->getValue();
 
         $templateType = TemplateDefinition::FRONT_OFFICE;
 
-        if ($type == 'front-office' || $type == 'front') {
+        if ('front-office' === $type || 'front' === $type) {
             $templateType = TemplateDefinition::FRONT_OFFICE;
-        } elseif ($type == 'back-office' || $type == 'admin') {
+        } elseif ('back-office' === $type || 'admin' === $type) {
             $templateType = TemplateDefinition::BACK_OFFICE;
-        } elseif ($type == 'pdf') {
+        } elseif ('pdf' === $type) {
             $templateType = TemplateDefinition::PDF;
-        } elseif ($type == 'email' || $type == 'mail') {
+        } elseif ('email' === $type || 'mail' === $type) {
             $templateType = TemplateDefinition::EMAIL;
         }
 
@@ -79,8 +79,7 @@ class Template extends BaseLoop implements ArraySearchLoopInterface
             $loopResultRow
                 ->set('NAME', $template->getName())
                 ->set('RELATIVE_PATH', $template->getPath())
-                ->set('ABSOLUTE_PATH', $template->getAbsolutePath())
-            ;
+                ->set('ABSOLUTE_PATH', $template->getAbsolutePath());
             $this->addOutputFields($loopResultRow, $template);
 
             $loopResult->addRow($loopResultRow);

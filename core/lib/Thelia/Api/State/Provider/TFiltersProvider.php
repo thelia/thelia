@@ -28,6 +28,7 @@ class TFiltersProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
         $resource = $uriVariables['resource'] ?? null;
+
         if (!$resource) {
             throw new \InvalidArgumentException('The "resource" parameter is required.');
         }

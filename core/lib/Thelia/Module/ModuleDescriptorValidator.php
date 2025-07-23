@@ -29,9 +29,7 @@ class ModuleDescriptorValidator
         '2' => 'module-2_1.xsd',
         '3' => 'module-2_2.xsd',
     ];
-
     protected Finder $xsdFinder;
-
     protected $moduleVersion;
 
     public function __construct()
@@ -57,13 +55,13 @@ class ModuleDescriptorValidator
             foreach ($this->xsdFinder as $xsdFile) {
                 $xsdVersion = array_search($xsdFile->getBasename(), self::$versions, true);
 
-                if (false === $xsdVersion || (null !== $version && $version != $xsdVersion)) {
+                if (false === $xsdVersion || (null !== $version && $version !== $xsdVersion)) {
                     continue;
                 }
 
                 $errors = $this->schemaValidate($dom, $xsdFile);
 
-                if ($errors === []) {
+                if ([] === $errors) {
                     $this->moduleVersion = $xsdVersion;
 
                     return true;
@@ -71,13 +69,7 @@ class ModuleDescriptorValidator
             }
         }
 
-        throw new InvalidXmlDocumentException(
-            \sprintf(
-                '%s file is not a valid file : %s',
-                $xml_file,
-                implode(', ', $errors)
-            )
-        );
+        throw new InvalidXmlDocumentException(\sprintf('%s file is not a valid file : %s', $xml_file, implode(', ', $errors)));
     }
 
     /**
@@ -106,7 +98,7 @@ class ModuleDescriptorValidator
                         $error->code,
                         $error->file,
                         $error->line,
-                        $error->column
+                        $error->column,
                     );
                 }
 

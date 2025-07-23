@@ -22,9 +22,7 @@ namespace Thelia\Core\Event\Folder;
 class FolderUpdateEvent extends FolderCreateEvent
 {
     protected $chapo;
-
     protected $description;
-
     protected $postscriptum;
 
     public function __construct(protected int $folder_id)

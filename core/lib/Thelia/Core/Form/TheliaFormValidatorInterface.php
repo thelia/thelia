@@ -29,16 +29,16 @@ interface TheliaFormValidatorInterface
      * @param BaseForm $aBaseForm      the form
      * @param string   $expectedMethod the expected method, POST or GET, or null for any of them
      *
-     * @throws FormValidationException is the form contains error, or the method is not the right one
-     *
      * @return Form Form the symfony form object
+     *
+     * @throws FormValidationException is the form contains error, or the method is not the right one
      */
-    public function validateForm(BaseForm $aBaseForm, $expectedMethod = null);
+    public function validateForm(BaseForm $aBaseForm, ?string $expectedMethod = null): Form;
 
     /**
      * Get all errors that occurred in a form.
      *
      * @return string the error string
      */
-    public function getErrorMessages(Form $form);
+    public function getErrorMessages(Form $form): string;
 }

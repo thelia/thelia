@@ -35,7 +35,8 @@ class TaxCreationForm extends BaseForm
     use StandardDescriptionFieldsTrait;
 
     public function __construct(
-        #[TaggedIterator('thelia.taxType')] private iterable $taxTypeIterator,
+        #[TaggedIterator('thelia.taxType')]
+        private iterable $taxTypeIterator,
     ) {
     }
 
@@ -57,7 +58,7 @@ class TaxCreationForm extends BaseForm
                 HiddenType::class,
                 [
                     'constraints' => [new NotBlank()],
-                ]
+                ],
             )
             ->add(
                 'type',
@@ -70,9 +71,8 @@ class TaxCreationForm extends BaseForm
                     ],
                     'label' => Translator::getInstance()->trans('Type'),
                     'label_attr' => ['for' => 'type_field'],
-                ]
-            )
-        ;
+                ],
+            );
 
         foreach ($requirementList as $name => $requirements) {
             /** @var TaxTypeRequirementDefinition $requirement */
@@ -81,20 +81,21 @@ class TaxCreationForm extends BaseForm
                     self::$typeList[$requirement->getName()] = $requirement->getType();
                 }
 
-                $options = array_merge([
-                    'constraints' => [
-                        new Callback($this->checkRequirementField(...)),
+                $options = array_merge(
+                    [
+                        'constraints' => [
+                            new Callback($this->checkRequirementField(...)),
+                        ],
+                        'attr' => [
+                            'tag' => 'requirements',
+                            'tax_type' => Tax::escapeTypeName($name),
+                        ],
+                        'label_attr' => [
+                            'type' => $requirement->getName(),
+                        ],
+                        'label' => Translator::getInstance()->trans($requirement->getTitle()),
                     ],
-                    'attr' => [
-                        'tag' => 'requirements',
-                        'tax_type' => Tax::escapeTypeName($name),
-                    ],
-                    'label_attr' => [
-                        'type' => $requirement->getName(),
-                    ],
-                    'label' => Translator::getInstance()->trans($requirement->getTitle()),
-                ],
-                    $requirement->getType()->getFormOptions()
+                    $requirement->getType()->getFormOptions(),
                 );
 
                 $this->formBuilder
@@ -103,7 +104,7 @@ class TaxCreationForm extends BaseForm
                     ->add(
                         Tax::escapeTypeName($name).':'.$requirement->getName(),
                         $requirement->getType()->getFormType(),
-                        $options
+                        $options,
                     );
             }
         }
@@ -120,6 +121,7 @@ class TaxCreationForm extends BaseForm
             // extract requirement type
             if (preg_match('@\:(.+)\]@', $context->getPropertyPath(), $matches)) {
                 $requirementType = $matches[1];
+
                 if (isset(self::$typeList[$requirementType])) {
                     /** @var TypeInterface $typeClass */
                     $typeClass = self::$typeList[$requirementType];
@@ -135,8 +137,8 @@ class TaxCreationForm extends BaseForm
                     [
                         '%value' => $value,
                         '%type' => $type,
-                    ]
-                )
+                    ],
+                ),
             );
         }
     }

@@ -46,8 +46,7 @@ class ProductSaleElementsDocument extends BaseLoop implements PropelSearchLoopIn
             $row
                 ->set('ID', $productSaleElementDocument->getId())
                 ->set('PRODUCT_SALE_ELEMENTS_ID', $productSaleElementDocument->getProductSaleElementsId())
-                ->set('PRODUCT_DOCUMENT_ID', $productSaleElementDocument->getProductDocumentId())
-            ;
+                ->set('PRODUCT_DOCUMENT_ID', $productSaleElementDocument->getProductDocumentId());
 
             $this->addOutputFields($row, $productSaleElementDocument);
             $loopResult->addRow($row);
@@ -90,17 +89,15 @@ class ProductSaleElementsDocument extends BaseLoop implements PropelSearchLoopIn
                     'position',
                     'position-reverse',
                 ],
-                'position'
-            )
+                'position',
+            ),
         );
     }
 
     /**
      * this method returns a Propel ModelCriteria.
-     *
-     * @return ModelCriteria
      */
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $query = ProductSaleElementsProductDocumentQuery::create();
 
@@ -121,16 +118,14 @@ class ProductSaleElementsDocument extends BaseLoop implements PropelSearchLoopIn
                 case 'position':
                     $query
                         ->useProductDocumentQuery()
-                            ->orderByPosition(Criteria::ASC)
-                        ->endUse()
-                    ;
+                        ->orderByPosition(Criteria::ASC)
+                        ->endUse();
                     break;
                 case 'position-reverse':
                     $query
                         ->useProductDocumentQuery()
-                            ->orderByPosition(Criteria::DESC)
-                        ->endUse()
-                    ;
+                        ->orderByPosition(Criteria::DESC)
+                        ->endUse();
                     break;
             }
         }

@@ -23,20 +23,9 @@ use Thelia\Core\Serializer\AbstractSerializer;
  */
 class CSVSerializer extends AbstractSerializer
 {
-    /**
-     * @var string CSV delimiter char
-     */
-    protected $delimiter = ',';
-
-    /**
-     * @var string CSV enclosure char
-     */
-    protected $enclosure = '"';
-
-    /**
-     * @var array|null Headers
-     */
-    private $headers;
+    protected string $delimiter = ',';
+    protected string $enclosure = '"';
+    private ?array $headers = null;
 
     public function getId(): string
     {
@@ -65,7 +54,7 @@ class CSVSerializer extends AbstractSerializer
      *
      * @return $this Return $this, allow chaining
      */
-    public function setDelimiter($delimiter): self
+    public function setDelimiter(string $delimiter): self
     {
         $this->delimiter = $delimiter;
 
@@ -79,7 +68,7 @@ class CSVSerializer extends AbstractSerializer
      *
      * @return $this Return $this, allow chaining
      */
-    public function setEnclosure($enclosure): self
+    public function setEnclosure(string $enclosure): self
     {
         $this->enclosure = $enclosure;
 
@@ -91,9 +80,9 @@ class CSVSerializer extends AbstractSerializer
         $this->headers = null;
     }
 
-    public function serialize($data): string|false
+    public function serialize(mixed $data): string
     {
-        if ($this->headers === null) {
+        if (null === $this->headers) {
             $this->headers = array_keys($data);
         }
 
@@ -109,12 +98,12 @@ class CSVSerializer extends AbstractSerializer
         $csvRow = stream_get_contents($fd);
         fclose($fd);
 
-        return $csvRow;
+        return (string) $csvRow;
     }
 
     public function finalizeFile(\SplFileObject $fileObject): void
     {
-        if ($this->headers !== null) {
+        if (null !== $this->headers) {
             // Create tmp file with header
             $fd = fopen('php://temp', 'w+');
             fputcsv($fd, $this->headers, $this->delimiter, $this->enclosure);
@@ -146,13 +135,15 @@ class CSVSerializer extends AbstractSerializer
         $data = [];
 
         $index = 0;
+
         while (false !== $row = $fileObject->fgetcsv($this->delimiter, $this->enclosure)) {
             ++$index;
+
             if (empty($row)) {
                 continue;
             }
 
-            if ($index === 1) {
+            if (1 === $index) {
                 $this->headers = $row;
                 continue;
             }
@@ -163,7 +154,7 @@ class CSVSerializer extends AbstractSerializer
 
             $data[] = array_combine(
                 $this->headers,
-                $row
+                $row,
             );
         }
 

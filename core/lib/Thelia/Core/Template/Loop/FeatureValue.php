@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -58,15 +59,15 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumListType(['alpha', 'alpha_reverse', 'manual', 'manual_reverse'])
+                    new EnumListType(['alpha', 'alpha_reverse', 'manual', 'manual_reverse']),
                 ),
-                'manual'
+                'manual',
             ),
-            Argument::createBooleanTypeArgument('force_return', true)
+            Argument::createBooleanTypeArgument('force_return', true),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = FeatureProductQuery::create();
 
@@ -76,12 +77,12 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
             ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'],
             FeatureAvTableMap::TABLE_NAME,
             'FEATURE_AV_ID',
-            true
+            true,
         );
 
         $search
             ->useFeatureAvQuery('feature_av')
-                ->withColumn(FeatureAvTableMap::COL_POSITION, 'feature_av_position')
+            ->withColumn(FeatureAvTableMap::COL_POSITION, 'feature_av_position')
             ->endUse();
 
         $feature = $this->getFeature();
@@ -149,8 +150,7 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('CHAPO', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME.'_i18n_CHAPO'))
                 ->set('DESCRIPTION', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME.'_i18n_DESCRIPTION'))
                 ->set('POSTSCRIPTUM', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME.'_i18n_POSTSCRIPTUM'))
-                ->set('POSITION', $featureValue->getPosition())
-            ;
+                ->set('POSITION', $featureValue->getPosition());
             $this->addOutputFields($loopResultRow, $featureValue);
 
             $loopResult->addRow($loopResultRow);

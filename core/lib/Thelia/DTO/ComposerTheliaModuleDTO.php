@@ -34,7 +34,7 @@ class ComposerTheliaModuleDTO
             $data['version'],
             $data['path'],
             $data['description'] ?? null,
-            $data['extra'] ?? []
+            $data['extra'] ?? [],
         );
     }
 

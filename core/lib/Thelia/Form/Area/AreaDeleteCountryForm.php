@@ -45,7 +45,7 @@ class AreaDeleteCountryForm extends BaseForm
                         new GreaterThan(['value' => 0]),
                         new NotBlank(),
                     ],
-                ]
+                ],
             )
             ->add(
                 'country_id',
@@ -62,12 +62,11 @@ class AreaDeleteCountryForm extends BaseForm
                     'label_attr' => [
                         'for' => 'country_delete_id',
                         'help' => Translator::getInstance()->trans(
-                            'Select the countries to delete from this shipping zone'
+                            'Select the countries to delete from this shipping zone',
                         ),
                     ],
-                ]
-            )
-        ;
+                ],
+            );
     }
 
     /**

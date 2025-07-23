@@ -28,8 +28,7 @@ class ClearImageCache extends ContainerAwareCommand
     protected function configure(): void
     {
         $this
-            ->addArgument('subdir', InputArgument::OPTIONAL, 'Clear only the specified subdirectory')
-        ;
+            ->addArgument('subdir', InputArgument::OPTIONAL, 'Clear only the specified subdirectory');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

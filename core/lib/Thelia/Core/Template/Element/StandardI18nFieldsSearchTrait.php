@@ -36,6 +36,7 @@ trait StandardI18nFieldsSearchTrait
     protected function addStandardI18nSearch(ModelCriteria $search, string $searchTerm, string $searchCriteria, array $searchIn = ['title', 'chapo', 'description', 'postscriptum']): void
     {
         $firstSearch = true;
+
         foreach (self::$standardI18nSearchFields as $searchInElement) {
             if (!\in_array($searchInElement, $searchIn, true)) {
                 continue;

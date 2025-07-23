@@ -22,12 +22,8 @@ use Thelia\Model\Product;
  */
 abstract class BaseTaxType implements TaxTypeInterface
 {
-    /**
-     * A var <-> value array which contains TaxtType requirements (e.g. parameters).
-     *
-     * @var array
-     */
-    protected $requirements = [];
+    /** A var <-> value array which contains TaxtType requirements (e.g. parameters). */
+    protected array $requirements = [];
 
     /**
      * For a price percent tax type, return the percentage (e.g. 20 for 20%) of the product price

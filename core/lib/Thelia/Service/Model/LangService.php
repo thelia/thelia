@@ -14,25 +14,169 @@ declare(strict_types=1);
 
 namespace Thelia\Service\Model;
 
+use Propel\Runtime\ActiveQuery\Criteria;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Request as TheliaRequest;
+use Thelia\Model\Admin;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 
 readonly class LangService
 {
     public function __construct(
         private RequestStack $requestStack,
+        private LoggerInterface $logger,
     ) {
     }
 
     public function getLang(): ?Lang
     {
         $request = $this->requestStack->getCurrentRequest();
+
         if (!$request instanceof Request) {
             return null;
         }
 
         return $request->getSession()->getLang();
+    }
+
+    public function setLang(Lang $lang): void
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (!$request instanceof Request) {
+            return;
+        }
+
+        $request->getSession()->setLang($lang);
+        $request->setLocale($lang->getLocale());
+    }
+
+    public function resolveFrontLanguageFromRequest(TheliaRequest $request): Lang|Response
+    {
+        $requestedLang = $this->getLanguageFromRequestParameters($request);
+
+        if (null !== $requestedLang) {
+            return $this->handleLanguageWithDomainRedirect($requestedLang, $request);
+        }
+
+        $sessionLang = $request->getSession()->getLang(false);
+
+        if ($sessionLang instanceof Lang) {
+            return $sessionLang;
+        }
+
+        if (ConfigQuery::isMultiDomainActivated()) {
+            $domainLang = $this->getLanguageByDomain($request);
+
+            if (null !== $domainLang) {
+                return $domainLang;
+            }
+        }
+
+        return Lang::getDefaultLanguage();
+    }
+
+    public function resolveAdminLanguageFromRequest(TheliaRequest $request): Lang
+    {
+        $requestedLangCodeOrLocale = $request->query->get('lang');
+
+        if (null !== $requestedLangCodeOrLocale) {
+            $lang = LangQuery::create()->findOneByCode($requestedLangCodeOrLocale);
+
+            if ($lang instanceof Lang) {
+                return $lang;
+            }
+        }
+
+        return $request->getSession()->getLang() ?? Lang::getDefaultLanguage();
+    }
+
+    public function resolveAdminLanguageFromAdmin(Admin $adminUser): Lang
+    {
+        $lang = LangQuery::create()->findOneByLocale($adminUser->getLocale());
+
+        return $lang instanceof Lang ? $lang : Lang::getDefaultLanguage();
+    }
+
+    public function syncMultiDomainLanguage(TheliaRequest $request): void
+    {
+        if (TheliaRequest::$isAdminEnv || !ConfigQuery::isMultiDomainActivated()) {
+            return;
+        }
+
+        $session = $request->getSession();
+
+        $currentLang = $session->getLang();
+        $domainUrl = $currentLang?->getUrl();
+
+        if (!empty($domainUrl) && rtrim($domainUrl, '/') !== $request->getSchemeAndHttpHost()) {
+            $langs = LangQuery::create()
+                ->filterByActive(true)
+                ->filterByVisible(true)
+                ->find();
+
+            foreach ($langs as $lang) {
+                $langDomainUrl = $lang->getUrl();
+
+                if (rtrim($langDomainUrl, '/') === $request->getSchemeAndHttpHost()) {
+                    $session->setLang($lang);
+                    break;
+                }
+            }
+        }
+    }
+
+    private function getLanguageFromRequestParameters(TheliaRequest $request): ?Lang
+    {
+        $requestedLangCodeOrLocale = $request->query->get('lang') ?? $request->query->get('locale');
+
+        if (null === $requestedLangCodeOrLocale) {
+            return null;
+        }
+
+        $isLocale = \strlen($requestedLangCodeOrLocale) > 2;
+        $query = LangQuery::create()->filterByActive(true);
+
+        return $isLocale
+            ? $query->findOneByLocale($requestedLangCodeOrLocale)
+            : $query->findOneByCode($requestedLangCodeOrLocale);
+    }
+
+    private function handleLanguageWithDomainRedirect(Lang $lang, TheliaRequest $request): Lang|Response
+    {
+        if (!ConfigQuery::isMultiDomainActivated()) {
+            return $lang;
+        }
+
+        $domainUrl = $lang->getUrl();
+
+        if (empty($domainUrl)) {
+            $this->logger->warning(
+                'The domain URL for language {title} (id {id}) is not defined.',
+                ['title' => $lang->getTitle(), 'id' => $lang->getId()],
+            );
+
+            return Lang::getDefaultLanguage();
+        }
+
+        if (rtrim($domainUrl, '/') !== $request->getSchemeAndHttpHost()) {
+            return new RedirectResponse($domainUrl, Response::HTTP_MOVED_PERMANENTLY);
+        }
+
+        return $lang;
+    }
+
+    private function getLanguageByDomain(TheliaRequest $request): ?Lang
+    {
+        return LangQuery::create()
+            ->filterByUrl($request->getSchemeAndHttpHost(), Criteria::LIKE)
+            ->findOne();
     }
 
     public function getLocale(): ?string

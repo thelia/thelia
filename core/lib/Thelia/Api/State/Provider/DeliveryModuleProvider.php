@@ -24,6 +24,7 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Address;
+use Thelia\Model\Cart;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Module;
 use Thelia\Model\StateQuery;
@@ -50,7 +51,8 @@ class DeliveryModuleProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         $cart = $this->session->getSessionCart($this->dispatcher);
-        if (null === $cart) {
+
+        if (!$cart instanceof Cart) {
             return null;
         }
 
@@ -58,6 +60,7 @@ class DeliveryModuleProvider implements ProviderInterface
         $country = $deliveryAddress instanceof Address
             ? $deliveryAddress->getCountry()
             : CountryQuery::create()->filterByByDefault(1)->findOne();
+
         if (null === $country) {
             throw new \RuntimeException(Translator::getInstance()->trans('You must either pass an address id or have a customer connected'));
         }
@@ -68,6 +71,7 @@ class DeliveryModuleProvider implements ProviderInterface
 
         $modules = $this->deliveryModuleService->getDeliveryModules();
         $deliveryModules = [];
+
         /** @var Module $module */
         foreach ($modules as $module) {
             $deliveryModules[] = $this->deliveryModuleApiService->getDeliveryModuleResource(
@@ -75,12 +79,12 @@ class DeliveryModuleProvider implements ProviderInterface
                 $cart,
                 $deliveryAddress,
                 $country,
-                $state
+                $state,
             );
         }
 
         if ($context['filters']['by_code'] ?? null === '1') {
-            $deliveryModules = array_reduce($deliveryModules, function (array $carry, $item) {
+            $deliveryModules = array_reduce($deliveryModules, static function (array $carry, $item) {
                 $carry[$item->getDeliveryMode()][] = $item;
 
                 return $carry;

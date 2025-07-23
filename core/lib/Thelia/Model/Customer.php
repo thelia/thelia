@@ -46,13 +46,9 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
      * @param string $phone            customer phone number
      * @param string $cellphone        customer cellphone number
      * @param string $zipcode          customer zipcode
-     * @param string $city
      * @param int    $countryId        customer country id (from Country table)
      * @param string $email            customer email, must be unique
      * @param string $plainPassword    customer plain password, hash is made calling setPassword method. Not mandatory parameter but an exception is thrown if customer is new without password
-     * @param int    $lang
-     * @param int    $reseller
-     * @param int    $discount
      * @param bool   $forceEmailUpdate true if the email address could be updated
      * @param int    $stateId          customer state id (from State table)
      *
@@ -60,27 +56,27 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
      * @throws PropelException
      */
     public function createOrUpdate(
-        $titleId,
-        $firstname,
-        $lastname,
-        $address1,
-        $address2,
-        $address3,
-        $phone,
-        $cellphone,
-        $zipcode,
-        $city,
-        $countryId,
-        $email = null,
-        $plainPassword = null,
-        $lang = null,
-        $reseller = 0,
+        int $titleId,
+        string $firstname,
+        string $lastname,
+        string $address1,
+        ?string $address2,
+        ?string $address3,
+        ?string $phone,
+        ?string $cellphone,
+        string $zipcode,
+        string $city,
+        int $countryId,
+        ?string $email = null,
+        ?string $plainPassword = null,
+        ?int $lang = null,
+        bool $reseller = false,
         $sponsor = null,
-        $discount = 0,
+        ?float $discount = 0,
         $company = null,
         $ref = null,
-        $forceEmailUpdate = false,
-        $stateId = null,
+        bool $forceEmailUpdate = false,
+        ?int $stateId = null,
     ): void {
         $this
             ->setTitleId($titleId)
@@ -90,9 +86,8 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
             ->setPassword($plainPassword)
             ->setReseller($reseller)
             ->setSponsor($sponsor)
-            ->setDiscount($discount)
-            ->setRef($ref)
-        ;
+            ->setDiscount($discount ?? 0)
+            ->setRef($ref);
 
         if (null !== $lang) {
             $this->setLangId($lang);
@@ -100,6 +95,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
 
         $con = Propel::getWriteConnection(CustomerTableMap::DATABASE_NAME);
         $con->beginTransaction();
+
         try {
             if ($this->isNew()) {
                 $address = new Address();
@@ -119,8 +115,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
                     ->setCity($city)
                     ->setCountryId($countryId)
                     ->setStateId($stateId)
-                    ->setIsDefault(1)
-                ;
+                    ->setIsDefault(1);
 
                 $this->addAddress($address);
 
@@ -144,8 +139,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
                     ->setCity($city)
                     ->setCountryId($countryId)
                     ->setStateId($stateId)
-                    ->save($con)
-                ;
+                    ->save($con);
             }
 
             $this->save($con);
@@ -153,6 +147,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
             $con->commit();
         } catch (PropelException $propelException) {
             $con->rollBack();
+
             throw $propelException;
         }
     }
@@ -162,15 +157,14 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
      *
      * @return Lang Lang model
      */
-    public function getCustomerLang()
+    public function getCustomerLang(): Lang
     {
         $lang = $this->getLangModel();
 
-        if ($lang === null) {
+        if (null === $lang) {
             $lang = (new LangQuery())
                 ->filterByByDefault(1)
-                ->findOne()
-            ;
+                ->findOne();
         }
 
         return $lang;
@@ -185,7 +179,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
      * @see \Thelia\Model\Customer::getLangId()
      * @see \Thelia\Model\Customer::getLangModel()
      */
-    public function getLang()
+    public function getLang(): int
     {
         return $this->getLangId();
     }
@@ -201,7 +195,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
      * @see \Thelia\Model\Customer::setLangId()
      * @see \Thelia\Model\Customer::setLangModel()
      */
-    public function setLang($langId)
+    public function setLang(int $langId)
     {
         return $this->setLangId($langId);
     }
@@ -210,10 +204,10 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
     {
         $lastCustomer = CustomerQuery::create()
             ->orderById(Criteria::DESC)
-            ->findOne()
-        ;
+            ->findOne();
 
         $id = 1;
+
         if (null !== $lastCustomer) {
             $id = $lastCustomer->getId() + 1;
         }
@@ -221,10 +215,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         return \sprintf('CUS%s', str_pad((string) $id, 12, '0', \STR_PAD_LEFT));
     }
 
-    /**
-     * @return Address
-     */
-    public function getDefaultAddress()
+    public function getDefaultAddress(): Address
     {
         return AddressQuery::create()
             ->filterByCustomer($this)
@@ -246,17 +237,17 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
      *
      * @param string $password plain password before hashing
      *
-     * @throws Exception\InvalidArgumentException
-     *
      * @return $this|Customer
+     *
+     * @throws Exception\InvalidArgumentException
      */
     public function setPassword($password)
     {
-        if ($this->isNew() && ($password === null || trim($password) === '')) {
+        if ($this->isNew() && (null === $password || '' === trim($password))) {
             throw new InvalidArgumentException('customer password is mandatory on creation');
         }
 
-        if ($password !== null && trim($password) !== '') {
+        if (null !== $password && '' !== trim($password)) {
             $this->setAlgo('PASSWORD_BCRYPT');
 
             parent::setPassword(password_hash($password, \PASSWORD_BCRYPT));
@@ -288,30 +279,30 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
     {
         $email = trim((string) $email);
 
-        if (($this->isNew() || $force === true) && ($email === null || $email === '')) {
+        if (($this->isNew() || true === $force) && (null === $email || '' === $email)) {
             throw new InvalidArgumentException('customer email is mandatory');
         }
 
-        if (!$this->isNew() && $force === false) {
+        if (!$this->isNew() && false === $force) {
             return $this;
         }
 
         return parent::setEmail($email);
     }
 
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->getEmail();
     }
 
-    public function getPassword(): ?string
+    public function getPassword(): string
     {
-        return $this->password;
+        return $this->password ?? '';
     }
 
-    public function checkPassword($password)
+    public function checkPassword(string $password): bool
     {
-        return password_verify((string) $password, $this->password);
+        return password_verify($password, $this->password);
     }
 
     public function eraseCredentials(): void
@@ -325,7 +316,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         return ['ROLE_CUSTOMER', 'CUSTOMER'];
     }
 
-    public function getToken()
+    public function getToken(): string
     {
         return $this->getRememberMeToken();
     }
@@ -335,17 +326,15 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         $this->setRememberMeToken($token)->save();
     }
 
-    public function getSerial()
+    public function getSerial(): string
     {
         return $this->getRememberMeSerial();
     }
 
     /**
      * @throws PropelException
-     *
-     * @return string
      */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->getLangModel()->getLocale();
     }
@@ -364,7 +353,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         $this->setRememberMeSerial($serial)->save();
     }
 
-    public function preInsert(?ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): bool
     {
         parent::preInsert($con);
 
@@ -381,5 +370,10 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
     public function getUserIdentifier(): string
     {
         return $this->getEmail();
+    }
+
+    public function getId(): int
+    {
+        return parent::getId();
     }
 }

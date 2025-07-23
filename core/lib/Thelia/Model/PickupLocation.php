@@ -25,39 +25,27 @@ class PickupLocation
     public const MONDAY_OPENING_HOURS_KEY = '0';
 
     public const TUESDAY_OPENING_HOURS_KEY = '1';
-
     public const WEDNESDAY_OPENING_HOURS_KEY = '2';
-
     public const THURSDAY_OPENING_HOURS_KEY = '3';
-
     public const FRIDAY_OPENING_HOURS_KEY = '4';
-
     public const SATURDAY_OPENING_HOURS_KEY = '5';
-
     public const SUNDAY_OPENING_HOURS_KEY = '6';
 
-    /** @var string */
-    protected $id;
+    protected string $id;
 
-    /** @var float */
-    protected $latitude;
+    protected float $latitude;
 
-    /** @var float */
-    protected $longitude;
+    protected float $longitude;
 
-    /** @var string */
-    protected $title;
+    protected string $title;
 
-    /** @var int */
-    protected $moduleId;
+    protected int $moduleId;
 
-    /** @var string */
-    protected $moduleOptionCode;
+    protected string $moduleOptionCode;
 
     protected Serializer $serializer;
 
-    /** @var array */
-    protected $openingHours = [
+    protected array $openingHours = [
         self::MONDAY_OPENING_HOURS_KEY => null,
         self::TUESDAY_OPENING_HOURS_KEY => null,
         self::WEDNESDAY_OPENING_HOURS_KEY => null,
@@ -67,36 +55,26 @@ class PickupLocation
         self::SUNDAY_OPENING_HOURS_KEY => null,
     ];
 
-    /**
-     * @var PickupLocationAddress
-     */
-    protected $address;
+    protected PickupLocationAddress $address;
 
     public function __construct()
     {
         $this->serializer = new Serializer([new ObjectNormalizer()], [new JsonEncoder()]);
     }
 
-    /**
-     * @return string
-     */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
 
-    /**
-     * @param string $id
-     */
-    public function setId($id): static
+    public function setId(string $id): static
     {
         $this->id = $id;
 
         return $this;
     }
 
-    /** @return float */
-    public function getLatitude()
+    public function getLatitude(): float
     {
         return $this->latitude;
     }
@@ -111,8 +89,7 @@ class PickupLocation
         return $this;
     }
 
-    /** @return float */
-    public function getLongitude()
+    public function getLongitude(): float
     {
         return $this->longitude;
     }
@@ -126,8 +103,7 @@ class PickupLocation
         return $this;
     }
 
-    /** @return string */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -141,28 +117,19 @@ class PickupLocation
         return $this;
     }
 
-    /**
-     * @return PickupLocationAddress
-     */
-    public function getAddress()
+    public function getAddress(): PickupLocationAddress
     {
         return $this->address;
     }
 
-    /**
-     * @param PickupLocationAddress $address
-     */
-    public function setAddress($address): static
+    public function setAddress(PickupLocationAddress $address): static
     {
         $this->address = $address;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getModuleId()
+    public function getModuleId(): int
     {
         return $this->moduleId;
     }
@@ -174,41 +141,29 @@ class PickupLocation
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getModuleOptionCode()
+    public function getModuleOptionCode(): string
     {
         return $this->moduleOptionCode;
     }
 
-    /**
-     * @param int $moduleId
-     */
-    public function setModuleId($moduleId): static
+    public function setModuleId(int $moduleId): static
     {
         $this->moduleId = $moduleId;
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getOpeningHours()
+    public function getOpeningHours(): array
     {
         return $this->openingHours;
     }
 
     /**
-     * @param int    $day
-     * @param string $hours
+     * @return $this
      *
      * @throws \Exception
-     *
-     * @return $this
      */
-    public function setOpeningHours($day, $hours): static
+    public function setOpeningHours(int $day, string $hours): static
     {
         if (!\array_key_exists($day, $this->openingHours)) {
             throw new \Exception(Translator::getInstance()->trans('Tried to set the opening hours for a non existant day in the array. Please use the constants defined in the PickupLocation class.'));

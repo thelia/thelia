@@ -32,6 +32,7 @@ class RedirectException extends BaseAction implements EventSubscriberInterface
     public function checkRedirectException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
+
         if ($exception instanceof ExceptionRedirectException) {
             $response = new RedirectResponse($exception->getUrl(), $exception->getStatusCode());
             $event->setResponse($response);

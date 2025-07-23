@@ -31,10 +31,7 @@ class SecurityContext
     {
     }
 
-    /**
-     * @return Session
-     */
-    private function getSession()
+    private function getSession(): Session
     {
         return $this->requestStack->getCurrentRequest()->getSession();
     }
@@ -56,7 +53,7 @@ class SecurityContext
      */
     public function hasAdminUser(): bool
     {
-        return $this->getSession()->getAdminUser() !== null;
+        return null !== $this->getSession()->getAdminUser();
     }
 
     /**
@@ -76,7 +73,7 @@ class SecurityContext
      */
     public function hasCustomerUser(): bool
     {
-        return $this->getSession()->getCustomerUser() !== null;
+        return null !== $this->getSession()->getCustomerUser();
     }
 
     /**
@@ -97,12 +94,12 @@ class SecurityContext
      */
     final public function hasRequiredRole(?UserInterface $user = null, array $roles = []): bool
     {
-        if ($user != null) {
+        if ($user instanceof UserInterface) {
             // Check if user's roles matches required roles
             $userRoles = $user->getRoles();
 
             foreach ($userRoles as $role) {
-                if (\in_array($role, $roles)) {
+                if (\in_array($role, $roles, true)) {
                     return true;
                 }
             }
@@ -117,7 +114,7 @@ class SecurityContext
             return false;
         }
 
-        if (($resources === [] && $modules === []) || $accesses === []) {
+        if (([] === $resources && [] === $modules) || [] === $accesses) {
             return true;
         }
 
@@ -127,12 +124,12 @@ class SecurityContext
 
         $userPermissions = $user->getPermissions();
 
-        if ($userPermissions === AdminResources::SUPERADMINISTRATOR) {
+        if (AdminResources::SUPERADMINISTRATOR === $userPermissions) {
             return true;
         }
 
         foreach ($resources as $resource) {
-            if ($resource === '') {
+            if ('' === $resource) {
                 continue;
             }
 
@@ -150,7 +147,7 @@ class SecurityContext
         }
 
         foreach ($modules as $module) {
-            if ($module === '') {
+            if ('' === $module) {
                 continue;
             }
 
@@ -176,15 +173,13 @@ class SecurityContext
 
     /**
      * Checks if the current user is allowed.
-     *
-     * @return bool
      */
-    final public function isGranted(array $roles, array $resources, array $modules, array $accesses)
+    final public function isGranted(array $roles, array $resources, array $modules, array $accesses): bool
     {
         // Find a user which matches the required roles.
         $user = $this->checkRole($roles);
 
-        if (null === $user) {
+        if (!$user instanceof UserInterface) {
             return false;
         }
 
@@ -193,10 +188,8 @@ class SecurityContext
 
     /**
      * look if a user has the required role.
-     *
-     * @return UserInterface|null
      */
-    public function checkRole(array $roles)
+    public function checkRole(array $roles): ?UserInterface
     {
         // Find a user which matches the required roles.
         $user = $this->getCustomerUser();

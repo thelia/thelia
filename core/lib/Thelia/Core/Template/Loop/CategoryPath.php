@@ -46,7 +46,7 @@ class CategoryPath extends BaseI18nLoop implements ArraySearchLoopInterface
         return new ArgumentCollection(
             Argument::createIntTypeArgument('category', null, true),
             Argument::createIntTypeArgument('depth', \PHP_INT_MAX),
-            Argument::createBooleanOrBothTypeArgument('visible', true, false)
+            Argument::createBooleanOrBothTypeArgument('visible', true, false),
         );
     }
 
@@ -68,13 +68,13 @@ class CategoryPath extends BaseI18nLoop implements ArraySearchLoopInterface
 
             $search->filterById($currentId);
 
-            if ($visible !== BooleanOrBothType::ANY) {
+            if (BooleanOrBothType::ANY !== $visible) {
                 $search->filterByVisible($visible);
             }
 
             $category = $search->findOne();
 
-            if ($category != null) {
+            if (null !== $category) {
                 $results[] = [
                     'ID' => $category->getId(),
                     'TITLE' => $category->getVirtualColumn('i18n_TITLE'),
@@ -87,20 +87,14 @@ class CategoryPath extends BaseI18nLoop implements ArraySearchLoopInterface
 
                 if ($currentId > 0) {
                     // Prevent circular refererences
-                    if (\in_array($currentId, $ids)) {
-                        throw new \LogicException(
-                            \sprintf(
-                                'Circular reference detected in category ID=%d hierarchy (category ID=%d appears more than one times in path)',
-                                $originalId,
-                                $currentId
-                            )
-                        );
+                    if (\in_array($currentId, $ids, true)) {
+                        throw new \LogicException(\sprintf('Circular reference detected in category ID=%d hierarchy (category ID=%d appears more than one times in path)', $originalId, $currentId));
                     }
 
                     $ids[] = $currentId;
                 }
             }
-        } while ($category != null && $currentId > 0 && --$depth > 0);
+        } while (null !== $category && $currentId > 0 && --$depth > 0);
 
         // Reverse list and build the final result
         return array_reverse($results);
@@ -110,6 +104,7 @@ class CategoryPath extends BaseI18nLoop implements ArraySearchLoopInterface
     {
         foreach ($loopResult->getResultDataCollection() as $result) {
             $loopResultRow = new LoopResultRow($result);
+
             foreach ($result as $output => $outputValue) {
                 $loopResultRow->set($output, $outputValue);
             }

@@ -52,13 +52,14 @@ return static function (ContainerConfigurator $configurator): void {
             [
                 THELIA_LIB.'/Command/Skeleton/Module/I18n/*.php',
                 THELIA_LIB.'/Config/**/*.php',
-            ]
+            ],
         )
         ->autowire()
         ->autoconfigure();
 
     if (!isset($_SERVER['MAILER_DSN'])) {
         $dsn = 'smtp://localhost:25';
+
         if (ConfigQuery::isSmtpEnable()) {
             $dsn = 'smtp://';
 
@@ -79,11 +80,12 @@ return static function (ContainerConfigurator $configurator): void {
         ]);
     }
 
-    if (\defined('THELIA_INSTALL_MODE') === false) {
+    if (false === \defined('THELIA_INSTALL_MODE')) {
         $apiResourcePaths = [
             THELIA_LIB.'/Api/Resource',
         ];
         $modules = ModuleQuery::getActivated();
+
         /** @var Module $module */
         foreach ($modules as $module) {
             try {
@@ -94,6 +96,7 @@ return static function (ContainerConfigurator $configurator): void {
                 \call_user_func([$module->getFullNamespace(), 'configureContainer'], $configurator);
                 \call_user_func([$module->getFullNamespace(), 'configureServices'], $serviceConfigurator);
                 $apiModulePath = $module->getAbsoluteBaseDir().'/Api/Resource';
+
                 if (is_dir($apiModulePath)) {
                     $apiResourcePaths[] = $apiModulePath;
                 }
@@ -104,7 +107,7 @@ return static function (ContainerConfigurator $configurator): void {
 
                 Tlog::getInstance()->addError(
                     \sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
-                    $e
+                    $e,
                 );
             }
         }

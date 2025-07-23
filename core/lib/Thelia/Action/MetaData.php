@@ -59,6 +59,7 @@ class MetaData extends BaseAction implements EventSubscriberInterface
             ->filterByElementId($event->getElementId())
             ->findOne();
         $event->setMetaData($metaData);
+
         if (null !== $metaData) {
             $metaData->delete();
         }

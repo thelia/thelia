@@ -32,20 +32,20 @@ trait StandardDescriptionFieldsTrait
      *
      * @param array $exclude name of the fields that should not be added to the form
      */
-    protected function addStandardDescFields($exclude = []): void
+    protected function addStandardDescFields(array $exclude = []): void
     {
-        if (!\in_array('locale', $exclude)) {
+        if (!\in_array('locale', $exclude, true)) {
             $this->formBuilder->add(
                 'locale',
                 HiddenType::class,
                 [
                     'constraints' => [new NotBlank()],
                     'required' => true,
-                ]
+                ],
             );
         }
 
-        if (!\in_array('title', $exclude)) {
+        if (!\in_array('title', $exclude, true)) {
             $this->formBuilder->add(
                 'title',
                 TextType::class,
@@ -59,11 +59,11 @@ trait StandardDescriptionFieldsTrait
                     'attr' => [
                         'placeholder' => Translator::getInstance()->trans('A descriptive title'),
                     ],
-                ]
+                ],
             );
         }
 
-        if (!\in_array('chapo', $exclude)) {
+        if (!\in_array('chapo', $exclude, true)) {
             $this->formBuilder->add(
                 'chapo',
                 TextareaType::class,
@@ -79,11 +79,11 @@ trait StandardDescriptionFieldsTrait
                         'rows' => 3,
                         'placeholder' => Translator::getInstance()->trans('Short description text'),
                     ],
-                ]
+                ],
             );
         }
 
-        if (!\in_array('description', $exclude)) {
+        if (!\in_array('description', $exclude, true)) {
             $this->formBuilder->add(
                 'description',
                 TextareaType::class,
@@ -98,11 +98,11 @@ trait StandardDescriptionFieldsTrait
                     'attr' => [
                         'rows' => 10,
                     ],
-                ]
+                ],
             );
         }
 
-        if (!\in_array('postscriptum', $exclude)) {
+        if (!\in_array('postscriptum', $exclude, true)) {
             $this->formBuilder->add(
                 'postscriptum',
                 TextareaType::class,
@@ -118,7 +118,7 @@ trait StandardDescriptionFieldsTrait
                         'placeholder' => Translator::getInstance()->trans('Short additional text'),
                         'rows' => 3,
                     ],
-                ]
+                ],
             );
         }
     }

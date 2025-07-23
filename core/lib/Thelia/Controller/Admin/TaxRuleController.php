@@ -47,7 +47,7 @@ class TaxRuleController extends AbstractCrudController
             AdminResources::TAX,
             TheliaEvents::TAX_RULE_CREATE,
             TheliaEvents::TAX_RULE_UPDATE,
-            TheliaEvents::TAX_RULE_DELETE
+            TheliaEvents::TAX_RULE_DELETE,
         );
     }
 
@@ -117,7 +117,7 @@ class TaxRuleController extends AbstractCrudController
         $event = new TaxRuleEvent();
 
         $event->setId(
-            $this->getRequest()->get('tax_rule_id', 0)
+            $this->getRequest()->get('tax_rule_id', 0),
         );
 
         return $event;
@@ -141,10 +141,7 @@ class TaxRuleController extends AbstractCrudController
         return $this->createForm(AdminForm::TAX_RULE_MODIFICATION, FormType::class, $data);
     }
 
-    /**
-     * @param TaxRule $object
-     */
-    protected function hydrateTaxUpdateForm($object): BaseForm
+    protected function hydrateTaxUpdateForm(TaxRule $object): BaseForm
     {
         $data = [
             'id' => $object->getId(),
@@ -203,14 +200,14 @@ class TaxRuleController extends AbstractCrudController
         ];
     }
 
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         // We always return to the feature edition form
         return $this->render(
             'taxes-rules',
             [
                 'taxruleIdDeliveryModule' => ConfigQuery::read('taxrule_id_delivery_module'),
-            ]
+            ],
         );
     }
 
@@ -225,7 +222,7 @@ class TaxRuleController extends AbstractCrudController
         return $this->generateRedirectFromRoute(
             'admin.configuration.taxes-rules.update',
             $this->getViewArguments($country, null, $state),
-            $this->getRouteArguments()
+            $this->getRouteArguments(),
         );
     }
 
@@ -241,7 +238,7 @@ class TaxRuleController extends AbstractCrudController
         return $this->generateRedirectFromRoute(
             'admin.configuration.taxes-rules.update',
             $this->getViewArguments(),
-            $this->getRouteArguments($createEvent->getTaxRule()->getId())
+            $this->getRouteArguments($createEvent->getTaxRule()->getId()),
         );
     }
 
@@ -258,7 +255,7 @@ class TaxRuleController extends AbstractCrudController
 
         $object = $this->getExistingObject();
 
-        if ($object != null) {
+        if ($object instanceof ActiveRecordInterface) {
             // Hydrate the form abd pass it to the parser
             $changeTaxesForm = $this->hydrateTaxUpdateForm($object);
 
@@ -280,7 +277,7 @@ class TaxRuleController extends AbstractCrudController
         $taxRuleId = $this->getRequest()->attributes->get('tax_rule_id');
 
         $setDefaultEvent->setId(
-            $taxRuleId
+            $taxRuleId,
         );
 
         $eventDispatcher->dispatch($setDefaultEvent, TheliaEvents::TAX_RULE_SET_DEFAULT);
@@ -317,9 +314,7 @@ class TaxRuleController extends AbstractCrudController
             $eventDispatcher->dispatch($changeEvent, TheliaEvents::TAX_RULE_TAXES_UPDATE);
 
             if (!$this->eventContainsObject($changeEvent)) {
-                throw new \LogicException(
-                    $this->getTranslator()->trans('No %obj was updated.', ['%obj', $this->objectName])
-                );
+                throw new \LogicException($this->getTranslator()->trans('No %obj was updated.', ['%obj', $this->objectName]));
             }
 
             // Log object modification
@@ -331,15 +326,15 @@ class TaxRuleController extends AbstractCrudController
                         '%s %s (ID %s) modified',
                         ucfirst($this->objectName),
                         $this->getObjectLabel($changedObject),
-                        $this->getObjectId($changedObject)
+                        $this->getObjectId($changedObject),
                     ),
-                    $this->getObjectId($changedObject)
+                    $this->getObjectId($changedObject),
                 );
             }
 
             $responseData['success'] = true;
             $responseData['data'] = $this->getSpecification(
-                $changeEvent->getTaxRule()->getId()
+                $changeEvent->getTaxRule()->getId(),
             );
 
             return $this->jsonResponse(json_encode($responseData));
@@ -386,10 +381,9 @@ class TaxRuleController extends AbstractCrudController
             $currentStateId = (int) $taxRuleCountry->getStateId();
 
             while (true) {
-                $hasChanged = $taxRuleCountry === null
-                    || $taxRuleCountry->getCountryId() != $currentCountryId
-                    || (int) $taxRuleCountry->getStateId() !== $currentStateId
-                ;
+                $hasChanged = null === $taxRuleCountry
+                    || $taxRuleCountry->getCountryId() !== $currentCountryId
+                    || (int) $taxRuleCountry->getStateId() !== $currentStateId;
 
                 if ($hasChanged) {
                     $specification = implode(',', $specKey);
@@ -400,7 +394,7 @@ class TaxRuleController extends AbstractCrudController
                         'specification' => $specification,
                     ];
 
-                    if (!\in_array($specification, $taxRules)) {
+                    if (!\in_array($specification, $taxRules, true)) {
                         $taxRules[] = $specification;
                     }
 
@@ -428,7 +422,7 @@ class TaxRuleController extends AbstractCrudController
     #[Route(
         '/admin/configuration/taxes_rules/delivery_module/update',
         name: 'admin.configuration.tax-rule.delivery.modules.update',
-        methods: ['POST']
+        methods: ['POST'],
     )]
     public function updateDeliveryModulesTaxRule(): Response|RedirectResponse
     {

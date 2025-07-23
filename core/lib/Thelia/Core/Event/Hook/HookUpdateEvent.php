@@ -24,11 +24,8 @@ use Thelia\Model\Hook;
 class HookUpdateEvent extends HookCreateEvent
 {
     protected $by_module;
-
     protected $block;
-
     protected $chapo;
-
     protected $description;
 
     public function __construct(protected int $hook_id)

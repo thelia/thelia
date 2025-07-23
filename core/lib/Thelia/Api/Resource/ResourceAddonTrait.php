@@ -42,9 +42,10 @@ trait ResourceAddonTrait
         }
 
         $use = 'use'.$tableMap->getPhpName().'Query';
-        $query->$use(joinType: Criteria::LEFT_JOIN)->endUse();
+        $query->{$use}(joinType: Criteria::LEFT_JOIN)->endUse();
 
         $addonName = static::getAddonName();
+
         foreach ($tableMap->getColumns() as $column) {
             $query->withColumn($column->getFullyQualifiedName(), $addonName.'_'.$column->getName());
         }
@@ -58,11 +59,12 @@ trait ResourceAddonTrait
             }
 
             $virtualColumnName = static::getAddonName().'_'.$property;
+
             if (!$activeRecord->hasVirtualColumn($virtualColumnName)) {
                 continue;
             }
 
-            $this->$property = $activeRecord->getVirtualColumn($virtualColumnName);
+            $this->{$property} = $activeRecord->getVirtualColumn($virtualColumnName);
         }
 
         return $this;
@@ -79,7 +81,7 @@ trait ResourceAddonTrait
                 continue;
             }
 
-            $this->$property = $data[$property];
+            $this->{$property} = $data[$property];
         }
 
         return $this;
@@ -94,11 +96,13 @@ trait ResourceAddonTrait
 
         $tableMap = static::getPropelRelatedTableMap();
         $columnPhpNames = TableMap::getFieldnamesForClass($tableMap->getClassName(), TableMap::TYPE_PHPNAME);
+
         foreach (TableMap::getFieldnamesForClass($tableMap->getClassName(), TableMap::TYPE_FIELDNAME) as $columnIndex => $columnName) {
             $setter = 'set'.$columnPhpNames[$columnIndex];
             $getter = 'get'.$columnPhpNames[$columnIndex];
+
             if (method_exists($this, $getter) && method_exists($model, $setter)) {
-                $model->$setter($this->$getter());
+                $model->{$setter}($this->{$getter}());
             }
         }
 

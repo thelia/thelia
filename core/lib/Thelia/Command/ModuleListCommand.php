@@ -44,8 +44,7 @@ class ModuleListCommand extends ContainerAwareCommand
 
         $helper
             ->setHeaders(['Code', 'Active', 'Type', 'Version'])
-            ->render()
-        ;
+            ->render();
 
         return 0;
     }
@@ -65,8 +64,7 @@ class ModuleListCommand extends ContainerAwareCommand
                 'version',
             ])
             ->find()
-            ->toArray()
-        ;
+            ->toArray();
 
         foreach ($moduleData as &$row) {
             switch ($row['type']) {

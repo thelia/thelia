@@ -31,8 +31,7 @@ class CustomerTitle extends BaseCustomerTitle
 
         try {
             CustomerTitleQuery::create()
-                ->update(['ByDefault' => '0'])
-            ;
+                ->update(['ByDefault' => '0']);
 
             $this->setByDefault(1)->save();
 

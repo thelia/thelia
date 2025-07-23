@@ -18,6 +18,7 @@ use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
@@ -49,7 +50,7 @@ class AddressController extends AbstractCrudController
             AdminResources::ADDRESS,
             TheliaEvents::ADDRESS_CREATE,
             TheliaEvents::ADDRESS_UPDATE,
-            TheliaEvents::ADDRESS_DELETE
+            TheliaEvents::ADDRESS_DELETE,
         );
     }
 
@@ -78,13 +79,15 @@ class AddressController extends AbstractCrudController
                 \sprintf(
                     'address %d for customer %d set as default address',
                     $address_id,
-                    $address->getCustomerId()
+                    $address->getCustomerId(),
                 ),
-                $address_id
+                $address_id,
             );
         } catch (\Exception $exception) {
-            Tlog::getInstance()->error(\sprintf('error during address setting as default with message %s',
-                $exception->getMessage()));
+            Tlog::getInstance()->error(\sprintf(
+                'error during address setting as default with message %s',
+                $exception->getMessage(),
+            ));
         }
 
         return $this->redirectToEditionTemplate();
@@ -108,10 +111,8 @@ class AddressController extends AbstractCrudController
 
     /**
      * Fills in the form data array.
-     *
-     * @param unknown $object
      */
-    protected function createFormDataArray($object): array
+    protected function createFormDataArray(unknown $object): array
     {
         return [
             'label' => $object->getLabel(),
@@ -172,7 +173,7 @@ class AddressController extends AbstractCrudController
             $formData['phone'],
             $formData['company'],
             $formData['is_default'],
-            $formData['state']
+            $formData['state'],
         );
     }
 
@@ -195,11 +196,11 @@ class AddressController extends AbstractCrudController
             $address->getPhone(),
             $address->getCompany(),
             false, // is_default is not used for delete
-            $address->getStateId()
+            $address->getStateId(),
         );
     }
 
-    protected function eventContainsObject($event): bool
+    protected function eventContainsObject(Event $event): bool
     {
         return null !== $event->getAddress();
     }
@@ -224,7 +225,7 @@ class AddressController extends AbstractCrudController
         return $object->getId();
     }
 
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         // We render here the customer edit template.
         return $this->renderEditionTemplate();
@@ -247,7 +248,7 @@ class AddressController extends AbstractCrudController
             [
                 'page' => $this->getRequest()->get('page'),
                 'customer_id' => $this->getCustomerId(),
-            ]
+            ],
         );
     }
 
@@ -258,7 +259,7 @@ class AddressController extends AbstractCrudController
             [
                 'page' => $this->getRequest()->get('page'),
                 'customer_id' => $this->getCustomerId(),
-            ]
+            ],
         );
     }
 

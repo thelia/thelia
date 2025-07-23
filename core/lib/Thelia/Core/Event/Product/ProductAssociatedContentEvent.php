@@ -22,22 +22,16 @@ use Thelia\Model\ProductAssociatedContent;
  */
 class ProductAssociatedContentEvent extends ActionEvent
 {
-    /**
-     * @var ProductAssociatedContent|null
-     */
-    public $content;
-
-    public function __construct(?ProductAssociatedContent $content = null)
+    public function __construct(public ?ProductAssociatedContent $content = null)
     {
-        $this->content = $content;
     }
 
     public function hasProductAssociatedContent(): bool
     {
-        return null !== $this->content;
+        return $this->content instanceof ProductAssociatedContent;
     }
 
-    public function getProductAssociatedContent()
+    public function getProductAssociatedContent(): ?ProductAssociatedContent
     {
         return $this->content;
     }

@@ -40,13 +40,12 @@ class ProfileCreationForm extends BaseForm
                 'constraints' => [
                     new NotBlank(),
                     new Callback(
-                        $this->verifyCode(...)
+                        $this->verifyCode(...),
                     ),
                 ],
                 'label' => Translator::getInstance()->trans('Profile Code'),
                 'label_attr' => ['for' => 'profile_code_fiels'],
-            ])
-        ;
+            ]);
 
         $this->addStandardDescFields(['locale']);
     }

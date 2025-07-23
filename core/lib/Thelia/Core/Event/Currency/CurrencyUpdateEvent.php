@@ -16,24 +16,15 @@ namespace Thelia\Core\Event\Currency;
 
 class CurrencyUpdateEvent extends CurrencyCreateEvent
 {
-    /** @var int */
-    protected $is_default;
+    protected int $is_default;
+    protected int $visible;
 
-    /** @var int */
-    protected $visible;
-
-    /**
-     * @param int $currencyId
-     */
-    public function __construct($currencyId)
+    public function __construct(int $currencyId)
     {
         $this->setCurrencyId($currencyId);
     }
 
-    /**
-     * @return int
-     */
-    public function getIsDefault()
+    public function getIsDefault(): int
     {
         return $this->is_default;
     }
@@ -41,17 +32,14 @@ class CurrencyUpdateEvent extends CurrencyCreateEvent
     /**
      * @return $this
      */
-    public function setIsDefault($is_default): static
+    public function setIsDefault(int $is_default): static
     {
         $this->is_default = $is_default;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getVisible()
+    public function getVisible(): int
     {
         return $this->visible;
     }
@@ -59,7 +47,7 @@ class CurrencyUpdateEvent extends CurrencyCreateEvent
     /**
      * @return $this
      */
-    public function setVisible($visible): static
+    public function setVisible(int $visible): static
     {
         $this->visible = $visible;
 

@@ -26,6 +26,7 @@ use Thelia\Form\StandardDescriptionFieldsTrait;
 class StandardFieldsType extends AbstractType
 {
     use StandardDescriptionFieldsTrait;
+
     protected $formBuilder;
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

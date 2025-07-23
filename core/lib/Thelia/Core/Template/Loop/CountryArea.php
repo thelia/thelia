@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -58,15 +59,15 @@ class CountryArea extends BaseLoop implements PropelSearchLoopInterface
                             'area', 'area_reverse',
                             'country', 'country_reverse',
                             'state', 'state_reverse',
-                        ]
-                    )
+                        ],
+                    ),
                 ),
-                'id'
-            )
+                'id',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = CountryAreaQuery::create();
 
@@ -87,6 +88,7 @@ class CountryArea extends BaseLoop implements PropelSearchLoopInterface
         }
 
         $orders = $this->getOrder();
+
         foreach ($orders as $order) {
             switch ($order) {
                 case 'id':
@@ -128,8 +130,7 @@ class CountryArea extends BaseLoop implements PropelSearchLoopInterface
                 ->set('ID', $countryArea->getId())
                 ->set('AREA_ID', $countryArea->getAreaId())
                 ->set('COUNTRY_ID', $countryArea->getCountryId())
-                ->set('STATE_ID', $countryArea->getStateId())
-            ;
+                ->set('STATE_ID', $countryArea->getStateId());
 
             $this->addOutputFields($loopResultRow, $countryArea);
 

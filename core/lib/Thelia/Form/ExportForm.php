@@ -47,7 +47,7 @@ class ExportForm extends BaseForm
                     'label_attr' => [
                         'for' => 'serializer',
                     ],
-                ]
+                ],
             )
             // Todo: use list
             ->add(
@@ -61,10 +61,10 @@ class ExportForm extends BaseForm
                     ],
                     'constraints' => [
                         new Callback(
-                            $this->checkLanguage(...)
+                            $this->checkLanguage(...),
                         ),
                     ],
-                ]
+                ],
             )
             ->add('do_compress', CheckboxType::class, [
                 'label' => $this->translator->trans('Do compress'),
@@ -81,7 +81,7 @@ class ExportForm extends BaseForm
                     'label_attr' => [
                         'for' => 'archiver',
                     ],
-                ]
+                ],
             )
             ->add('images', CheckboxType::class, [
                 'label' => $this->translator->trans('Include images'),
@@ -121,8 +121,8 @@ class ExportForm extends BaseForm
                     "The language \"%id\" doesn't exist",
                     [
                         '%id' => $value,
-                    ]
-                )
+                    ],
+                ),
             );
         }
     }

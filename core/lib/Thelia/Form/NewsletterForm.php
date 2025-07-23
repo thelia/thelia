@@ -55,7 +55,7 @@ class NewsletterForm extends BaseForm
                     new NotBlank(),
                     new Email(),
                     new Callback(
-                        $this->verifyExistingEmail(...)
+                        $this->verifyExistingEmail(...),
                     ),
                 ],
                 'label' => Translator::getInstance()->trans('Email address'),
@@ -80,6 +80,7 @@ class NewsletterForm extends BaseForm
     public function verifyExistingEmail($value, ExecutionContextInterface $context): void
     {
         $customer = NewsletterQuery::create()->filterByUnsubscribed(false)->findOneByEmail($value);
+
         if ($customer) {
             $context->addViolation(Translator::getInstance()->trans('You are already registered!'));
         }

@@ -30,7 +30,7 @@ trait RememberMeTrait
      *
      * @return string hte key found, or null if no key was found
      */
-    protected function getRememberMeKeyFromCookie(Request $request, $cookieName)
+    protected function getRememberMeKeyFromCookie(Request $request, $cookieName): ?string
     {
         $ctp = new CookieTokenProvider();
 
@@ -47,7 +47,7 @@ trait RememberMeTrait
         $ctp->createCookie(
             $user,
             $cookieName,
-            $cookieExpiration
+            $cookieExpiration,
         );
     }
 

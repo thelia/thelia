@@ -55,62 +55,31 @@ use Thelia\Type\TypeCollection;
  */
 abstract class BaseLoop implements LoopInterface
 {
-    /** @var string|null The loop name */
-    protected $loopName;
-
-    /** @var array|null array of loop definitions (class => id) */
-    protected static $loopDefinitions;
+    protected ?string $loopName = null;
+    protected static ?array $loopDefinitions = null;
 
     /** @var ArgumentCollection[] cache for loop arguments (class => ArgumentCollection) */
-    protected static $loopDefinitionsArgs = [];
+    protected static array $loopDefinitionsArgs = [];
 
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * @var Request
-     */
-    protected $request;
-
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
-
-    /** @var SecurityContext */
-    protected $securityContext;
-
-    /** @var ArgumentCollection */
-    protected $args;
-
+    protected ContainerInterface $container;
+    protected Request $request;
+    protected EventDispatcherInterface $dispatcher;
+    protected SecurityContext $securityContext;
+    protected ArgumentCollection $args;
     protected $countable = true;
-
     protected $timestampable = false;
-
     protected $versionable = false;
-
-    /** @var Translator */
-    protected $translator;
-
-    private static $cacheLoopResult = [];
-
+    protected Translator $translator;
+    private static array $cacheLoopResult = [];
     private static array $cacheLoopPagination = [];
-
-    private static $cacheCount = [];
+    private static array $cacheCount = [];
 
     /** @var array cache of event to dispatch */
-    protected static $dispatchCache = [];
+    protected static array $dispatchCache = [];
 
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    /** @var array */
-    protected $theliaParserLoops;
-
-    /** @var string */
-    protected $kernelEnvironment;
+    protected RequestStack $requestStack;
+    protected array $theliaParserLoops;
+    protected string $kernelEnvironment;
 
     public function init(
         ContainerInterface $container,
@@ -156,10 +125,11 @@ abstract class BaseLoop implements LoopInterface
             $this->args = $this->getArgDefinitions()->addArguments($this->getDefaultArgs(), false);
 
             $eventName = $this->getDispatchEventName(TheliaEvents::LOOP_EXTENDS_ARG_DEFINITIONS);
+
             if (null !== $eventName) {
                 $this->dispatcher->dispatch(
                     new LoopExtendsArgDefinitionsEvent($this),
-                    $eventName
+                    $eventName,
                 );
             }
 
@@ -180,7 +150,7 @@ abstract class BaseLoop implements LoopInterface
      *
      * @return Argument[]
      */
-    protected function getDefaultArgs()
+    protected function getDefaultArgs(): array
     {
         $defaultArgs = [
             Argument::createBooleanTypeArgument('backend_context', false),
@@ -201,8 +171,8 @@ abstract class BaseLoop implements LoopInterface
             $defaultArgs[] = new Argument(
                 'search_in',
                 new TypeCollection(
-                    new EnumListType($this->getSearchIn())
-                )
+                    new EnumListType($this->getSearchIn()),
+                ),
             );
             $defaultArgs[] = new Argument(
                 'search_mode',
@@ -212,10 +182,10 @@ abstract class BaseLoop implements LoopInterface
                             SearchLoopInterface::MODE_ANY_WORD,
                             SearchLoopInterface::MODE_SENTENCE,
                             SearchLoopInterface::MODE_STRICT_SENTENCE,
-                        ]
-                    )
+                        ],
+                    ),
                 ),
-                SearchLoopInterface::MODE_STRICT_SENTENCE
+                SearchLoopInterface::MODE_STRICT_SENTENCE,
             );
         }
 
@@ -228,11 +198,11 @@ abstract class BaseLoop implements LoopInterface
      * @param string $name      the method name (only getArgname is supported)
      * @param mixed  $arguments this parameter is ignored
      *
-     * @throws \InvalidArgumentException if the parameter is unknown or the method name is not supported
-     *
      * @return mixed the argument value
+     *
+     * @throws \InvalidArgumentException if the parameter is unknown or the method name is not supported
      */
-    public function __call($name, $arguments)
+    public function __call(string $name, mixed $arguments): mixed
     {
         if (str_starts_with($name, 'get')) {
             // camelCase to underscore: getNotEmpty -> not_empty
@@ -241,9 +211,7 @@ abstract class BaseLoop implements LoopInterface
             return $this->getArgValue($argName);
         }
 
-        throw new \InvalidArgumentException(
-            $this->translator->trans('Unsupported magic method %name. only getArgname() is supported.', ['%name' => $name])
-        );
+        throw new \InvalidArgumentException($this->translator->trans('Unsupported magic method %name. only getArgname() is supported.', ['%name' => $name]));
     }
 
     /**
@@ -268,13 +236,14 @@ abstract class BaseLoop implements LoopInterface
         $loopName = $nameValuePairs['name'] ?? 'undefined';
 
         $this->args->rewind();
+
         while (($argument = $this->args->current()) !== false) {
             $this->args->next();
 
             $value = $nameValuePairs[$argument->name] ?? null;
 
             /* check if mandatory */
-            if ($value === null && $argument->mandatory) {
+            if (null === $value && $argument->mandatory) {
                 $faultActor[] = $argument->name;
                 $faultDetails[] = $this->translator->trans(
                     '"%param" parameter is missing in loop type: %type, name: %name',
@@ -282,9 +251,9 @@ abstract class BaseLoop implements LoopInterface
                         '%param' => $argument->name,
                         '%type' => $loopType,
                         '%name' => $loopName,
-                    ]
+                    ],
                 );
-            } elseif ($value === '') {
+            } elseif ('' === $value) {
                 if (!$argument->empty) {
                     /* check if empty */
                     $faultActor[] = $argument->name;
@@ -294,10 +263,10 @@ abstract class BaseLoop implements LoopInterface
                             '%param' => $argument->name,
                             '%type' => $loopType,
                             '%name' => $loopName,
-                        ]
+                        ],
                     );
                 }
-            } elseif ($value !== null && !$argument->type->isValid($value)) {
+            } elseif (null !== $value && !$argument->type->isValid($value)) {
                 /* check type */
                 $faultActor[] = $argument->name;
                 $faultDetails[] = $this->translator->trans(
@@ -307,12 +276,12 @@ abstract class BaseLoop implements LoopInterface
                         '%param' => $argument->name,
                         '%type' => $loopType,
                         '%name' => $loopName,
-                    ]
+                    ],
                 );
             } else {
                 /* set default value */
                 /* did it as last checking for we consider default value is acceptable no matter type or empty restriction */
-                if ($value === null) {
+                if (null === $value) {
                     $value = $argument->default;
                 }
 
@@ -320,7 +289,7 @@ abstract class BaseLoop implements LoopInterface
             }
         }
 
-        if ($faultActor !== []) {
+        if ([] !== $faultActor) {
             $complement = \sprintf('[%s]', implode(', ', $faultDetails));
 
             throw new \InvalidArgumentException($complement);
@@ -332,18 +301,16 @@ abstract class BaseLoop implements LoopInterface
      *
      * @param string $argumentName the argument name
      *
-     * @throws \InvalidArgumentException if argument is not found in loop argument list
-     *
      * @return Argument the loop argument
+     *
+     * @throws \InvalidArgumentException if argument is not found in loop argument list
      */
-    protected function getArg($argumentName)
+    protected function getArg(string $argumentName): Argument
     {
         $arg = $this->args->get($argumentName);
 
-        if ($arg === null) {
-            throw new \InvalidArgumentException(
-                $this->translator->trans('Undefined loop argument "%name"', ['%name' => $argumentName])
-            );
+        if (!$arg instanceof Argument) {
+            throw new \InvalidArgumentException($this->translator->trans('Undefined loop argument "%name"', ['%name' => $argumentName]));
         }
 
         return $arg;
@@ -354,11 +321,11 @@ abstract class BaseLoop implements LoopInterface
      *
      * @param string $argumentName the argument name
      *
-     * @throws \InvalidArgumentException if argument is not found in loop argument list
-     *
      * @return mixed the loop argument value
+     *
+     * @throws \InvalidArgumentException if argument is not found in loop argument list
      */
-    protected function getArgValue($argumentName)
+    protected function getArgValue(string $argumentName): mixed
     {
         return $this->getArg($argumentName)->getValue();
     }
@@ -368,10 +335,8 @@ abstract class BaseLoop implements LoopInterface
      * @param PropelModelPager|null $pagination the pagination part
      *
      * @throws \InvalidArgumentException if the search mode is undefined
-     *
-     * @return array|PropelModelPager|ObjectCollection
      */
-    protected function search(ModelCriteria $search, &$pagination = null)
+    protected function search(ModelCriteria $search, ?PropelModelPager &$pagination = null): array|PropelModelPager|ObjectCollection
     {
         if (false === $this->countable) {
             return $search->find();
@@ -379,7 +344,7 @@ abstract class BaseLoop implements LoopInterface
 
         $this->setupSearchContext($search);
 
-        if ($this->getArgValue('page') !== null) {
+        if (null !== $this->getArgValue('page')) {
             return $this->searchWithPagination($search, $pagination);
         }
 
@@ -397,7 +362,7 @@ abstract class BaseLoop implements LoopInterface
                 switch ($searchMode) {
                     case SearchLoopInterface::MODE_ANY_WORD:
                         $searchCriteria = Criteria::IN;
-                        $searchTerm = explode(' ', $searchTerm);
+                        $searchTerm = explode(' ', (string) $searchTerm);
                         break;
                     case SearchLoopInterface::MODE_SENTENCE:
                         $searchCriteria = Criteria::LIKE;
@@ -407,9 +372,7 @@ abstract class BaseLoop implements LoopInterface
                         $searchCriteria = Criteria::EQUAL;
                         break;
                     default:
-                        throw new \InvalidArgumentException(
-                            $this->translator->trans("Undefined search mode '%mode'", ['%mode' => $searchMode])
-                        );
+                        throw new \InvalidArgumentException($this->translator->trans("Undefined search mode '%mode'", ['%mode' => $searchMode]));
                 }
 
                 $this->doSearch($search, $searchTerm, $searchIn, $searchCriteria);
@@ -426,7 +389,7 @@ abstract class BaseLoop implements LoopInterface
         $limit = (int) $this->getArgValue('limit');
         $offset = (int) $this->getArgValue('offset');
 
-        if ($this->getArgValue('page') !== null) {
+        if (null !== $this->getArgValue('page')) {
             $pageNum = (int) $this->getArgValue('page');
 
             $totalPageCount = ceil(\count($search) / $limit);
@@ -443,10 +406,7 @@ abstract class BaseLoop implements LoopInterface
         return \array_slice($search, $offset, $limit, false);
     }
 
-    /**
-     * @return ObjectCollection
-     */
-    protected function searchWithOffset(ModelCriteria $search)
+    protected function searchWithOffset(ModelCriteria $search): ObjectCollection
     {
         $limit = (int) $this->getArgValue('limit');
 
@@ -459,12 +419,7 @@ abstract class BaseLoop implements LoopInterface
         return $search->find();
     }
 
-    /**
-     * @param PropelModelPager|null $pagination
-     *
-     * @return array|PropelModelPager
-     */
-    protected function searchWithPagination(ModelCriteria $search, &$pagination)
+    protected function searchWithPagination(ModelCriteria $search, ?PropelModelPager &$pagination): array|PropelModelPager
     {
         $page = (int) $this->getArgValue('page');
         $limit = (int) $this->getArgValue('limit');
@@ -487,10 +442,11 @@ abstract class BaseLoop implements LoopInterface
         }
 
         $count = 0;
+
         if ($this instanceof PropelSearchLoopInterface) {
             $searchModelCriteria = $this->extendsBuildModelCriteria($this->buildModelCriteria());
 
-            if (null === $searchModelCriteria) {
+            if (!$searchModelCriteria instanceof ModelCriteria) {
                 $count = 0;
             } else {
                 $this->setupSearchContext($searchModelCriteria);
@@ -509,12 +465,7 @@ abstract class BaseLoop implements LoopInterface
         return $count;
     }
 
-    /**
-     * @param PropelModelPager $pagination
-     *
-     * @return LoopResult
-     */
-    public function exec(&$pagination)
+    public function exec(?PropelModelPager $pagination): LoopResult
     {
         $hash = $this->args->getHash();
 
@@ -531,18 +482,14 @@ abstract class BaseLoop implements LoopInterface
         if ($this instanceof PropelSearchLoopInterface) {
             $searchModelCriteria = $this->extendsBuildModelCriteria($this->buildModelCriteria());
 
-            if (null !== $searchModelCriteria) {
-                $results = $this->search(
-                    $searchModelCriteria,
-                    $pagination
-                );
-            }
+            $results = $this->search(
+                $searchModelCriteria,
+                $pagination,
+            );
         } elseif ($this instanceof ArraySearchLoopInterface) {
             $searchArray = $this->extendsBuildArray($this->buildArray());
 
-            if (null !== $searchArray) {
-                $results = $this->searchArray($searchArray);
-            }
+            $results = $this->searchArray($searchArray);
         }
 
         $loopResult = new LoopResult($results);
@@ -584,12 +531,7 @@ abstract class BaseLoop implements LoopInterface
 
         if ($this instanceof PropelSearchLoopInterface) {
             if ($searchInterface) {
-                throw new LoopException(
-                    $this->translator->trans(
-                        'Loop cannot implements multiple Search Interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`'
-                    ),
-                    LoopException::MULTIPLE_SEARCH_INTERFACE
-                );
+                throw new LoopException($this->translator->trans('Loop cannot implements multiple Search Interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`'), LoopException::MULTIPLE_SEARCH_INTERFACE);
             }
 
             $searchInterface = true;
@@ -597,53 +539,34 @@ abstract class BaseLoop implements LoopInterface
 
         if ($this instanceof ArraySearchLoopInterface) {
             if ($searchInterface) {
-                throw new LoopException(
-                    $this->translator->trans(
-                        'Loop cannot implements multiple Search Interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`'
-                    ),
-                    LoopException::MULTIPLE_SEARCH_INTERFACE
-                );
+                throw new LoopException($this->translator->trans('Loop cannot implements multiple Search Interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`'), LoopException::MULTIPLE_SEARCH_INTERFACE);
             }
 
             $searchInterface = true;
         }
 
         if (false === $searchInterface) {
-            throw new LoopException(
-                $this->translator->trans(
-                    'Loop must implements one of the following interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`'
-                ),
-                LoopException::SEARCH_INTERFACE_NOT_FOUND
-            );
+            throw new LoopException($this->translator->trans('Loop must implements one of the following interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`'), LoopException::SEARCH_INTERFACE_NOT_FOUND);
         }
 
         /* Only PropelSearch allows timestamp and version */
         if (!$this instanceof PropelSearchLoopInterface) {
             if (true === $this->timestampable) {
-                throw new LoopException(
-                    $this->translator->trans("Loop must implements 'PropelSearchLoopInterface' to be timestampable"),
-                    LoopException::NOT_TIMESTAMPED
-                );
+                throw new LoopException($this->translator->trans("Loop must implements 'PropelSearchLoopInterface' to be timestampable"), LoopException::NOT_TIMESTAMPED);
             }
 
             if (true === $this->versionable) {
-                throw new LoopException(
-                    $this->translator->trans("Loop must implements 'PropelSearchLoopInterface' to be versionable"),
-                    LoopException::NOT_VERSIONED
-                );
+                throw new LoopException($this->translator->trans("Loop must implements 'PropelSearchLoopInterface' to be versionable"), LoopException::NOT_VERSIONED);
             }
         }
     }
 
-    protected function isCaching()
+    protected function isCaching(): bool
     {
-        return !$this->getArg('no-cache')->getValue() && $this->kernelEnvironment !== 'test';
+        return !$this->getArg('no-cache')->getValue() && 'test' !== $this->kernelEnvironment;
     }
 
-    /**
-     * @return LoopResult
-     */
-    abstract public function parseResults(LoopResult $loopResult);
+    abstract public function parseResults(LoopResult $loopResult): LoopResult;
 
     /**
      * Definition of loop arguments.
@@ -666,17 +589,13 @@ abstract class BaseLoop implements LoopInterface
      *       ...
      *   );
      * }
-     *
-     * @return ArgumentCollection
      */
-    abstract protected function getArgDefinitions();
+    abstract protected function getArgDefinitions(): ArgumentCollection;
 
     /**
      * Use this method in order to add fields in sub-classes.
-     *
-     * @param object|array $item
      */
-    protected function addOutputFields(LoopResultRow $loopResultRow, $item): void
+    protected function addOutputFields(LoopResultRow $loopResultRow, object|array $item): void
     {
     }
 
@@ -691,7 +610,7 @@ abstract class BaseLoop implements LoopInterface
      *
      * @return string|null The event name for the loop if listeners exist, otherwise null is returned
      */
-    protected function getDispatchEventName(string $eventName)
+    protected function getDispatchEventName(string $eventName): ?string
     {
         $customEventName = TheliaEvents::getLoopExtendsEvent($eventName, $this->loopName);
 
@@ -706,20 +625,19 @@ abstract class BaseLoop implements LoopInterface
 
     /**
      * Dispatch an event to extend the BuildModelCriteria.
-     *
-     * @return ModelCriteria
      */
-    protected function extendsBuildModelCriteria(?ModelCriteria $search = null)
+    protected function extendsBuildModelCriteria(?ModelCriteria $search = null): ?ModelCriteria
     {
         if (!$search instanceof ModelCriteria) {
             return null;
         }
 
         $eventName = $this->getDispatchEventName(TheliaEvents::LOOP_EXTENDS_BUILD_MODEL_CRITERIA);
+
         if (null !== $eventName) {
             $this->dispatcher->dispatch(
                 new LoopExtendsBuildModelCriteriaEvent($this, $search),
-                $eventName
+                $eventName,
             );
         }
 
@@ -728,16 +646,15 @@ abstract class BaseLoop implements LoopInterface
 
     /**
      * Dispatch an event to extend the BuildArray.
-     *
-     * @return array
      */
-    protected function extendsBuildArray(?array $search = null)
+    protected function extendsBuildArray(?array $search = null): array
     {
         if (null === $search) {
-            return null;
+            return [];
         }
 
         $eventName = $this->getDispatchEventName(TheliaEvents::LOOP_EXTENDS_BUILD_ARRAY);
+
         if (null !== $eventName) {
             $event = new LoopExtendsBuildArrayEvent($this, $search);
 
@@ -751,16 +668,15 @@ abstract class BaseLoop implements LoopInterface
 
     /**
      * Dispatch an event to extend the ParseResults.
-     *
-     * @return LoopResult
      */
-    protected function extendsParseResults(LoopResult $loopResult)
+    protected function extendsParseResults(LoopResult $loopResult): LoopResult
     {
         $eventName = $this->getDispatchEventName(TheliaEvents::LOOP_EXTENDS_PARSE_RESULTS);
+
         if (null !== $eventName) {
             $this->dispatcher->dispatch(
                 new LoopExtendsParseResultsEvent($this, $loopResult),
-                $eventName
+                $eventName,
             );
         }
 
@@ -769,30 +685,21 @@ abstract class BaseLoop implements LoopInterface
 
     /**
      * Get the argument collection.
-     *
-     * @return ArgumentCollection
      */
-    public function getArgumentCollection()
+    public function getArgumentCollection(): ArgumentCollection
     {
         return $this->args;
     }
 
     /**
      * Get the loop name.
-     *
-     * @return string|null
      */
-    public function getLoopName()
+    public function getLoopName(): ?string
     {
         return $this->loopName;
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\Request
-     *
-     * @since 2.3
-     */
-    protected function getCurrentRequest()
+    protected function getCurrentRequest(): \Symfony\Component\HttpFoundation\Request
     {
         return $this->requestStack->getCurrentRequest();
     }

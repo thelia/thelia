@@ -26,14 +26,10 @@ use Thelia\Service\Rewriting\RewritingRetriever;
 class URL
 {
     protected RewritingResolver $resolver;
-
     protected RewritingRetriever $retriever;
-
-    /** @var RequestContext */
-    protected $requestContext;
+    protected RequestContext $requestContext;
 
     public const PATH_TO_FILE = true;
-
     public const WITH_INDEX_PAGE = false;
 
     protected static self $instance;
@@ -56,9 +52,6 @@ class URL
         $this->resolver = new RewritingResolver();
     }
 
-    /**
-     * @since Version 2.2
-     */
     public function setRequestContext(RequestContext $requestContext): void
     {
         $this->requestContext = $requestContext;
@@ -67,9 +60,9 @@ class URL
     /**
      * Return this class instance, only once instanciated.
      *
-     * @throws \RuntimeException if the class has not been instanciated
-     *
      * @return URL the instance
+     *
+     * @throws \RuntimeException if the class has not been instanciated
      */
     public static function getInstance(): self
     {
@@ -88,20 +81,21 @@ class URL
      *
      * @return string the base URL, with a trailing '/'
      */
-    public function getBaseUrl($scheme_only = false): string
+    public function getBaseUrl(bool $scheme_only = false): string
     {
         if (null === $this->baseUrlScheme) {
             $scheme = 'http';
             $port = 80;
+            $host = $this->requestContext->getHost();
 
-            if ($host = $this->requestContext->getHost()) {
+            if ('' !== $host && '0' !== $host) {
                 $scheme = $this->requestContext->getScheme();
 
                 $port = '';
 
-                if ('http' === $scheme && 80 != $this->requestContext->getHttpPort()) {
+                if ('http' === $scheme && 80 !== $this->requestContext->getHttpPort()) {
                     $port = ':'.$this->requestContext->getHttpPort();
-                } elseif ('https' === $scheme && 443 != $this->requestContext->getHttpsPort()) {
+                } elseif ('https' === $scheme && 443 !== $this->requestContext->getHttpsPort()) {
                     $port = ':'.$this->requestContext->getHttpsPort();
                 }
             }
@@ -133,11 +127,11 @@ class URL
      *
      * @return string The generated URL
      */
-    public function absoluteUrl($path, ?array $parameters = null, $path_only = self::WITH_INDEX_PAGE, $alternateBaseUrl = null): string
+    public function absoluteUrl(string $path, ?array $parameters = null, bool $path_only = self::WITH_INDEX_PAGE, ?string $alternateBaseUrl = null): string
     {
         // Already absolute ?
         if (!str_starts_with($path, 'http')) {
-            if (empty($alternateBaseUrl)) {
+            if (null === $alternateBaseUrl || '' === $alternateBaseUrl || '0' === $alternateBaseUrl) {
                 // Prevent duplication of the subdirectory name when Thelia is installed in a subdirectory.
                 // This happens when $path was calculated with Router::generate(), which returns an absolute URL,
                 // starting at web server root. For example, if Thelia is installed in /thelia2, we got something like /thelia2/my/path
@@ -146,7 +140,7 @@ class URL
                 // We have to compensate for this.
                 $rcbu = $this->requestContext->getBaseUrl();
 
-                $hasSubdirectory = !empty($rcbu) && str_starts_with($path, $rcbu);
+                $hasSubdirectory = '' !== $rcbu && '0' !== $rcbu && str_starts_with($path, $rcbu);
 
                 $base_url = $this->getBaseUrl($hasSubdirectory);
             } else {
@@ -154,7 +148,7 @@ class URL
             }
 
             // If only a path is requested, be sure to remove the script name (index.php or index_dev.php), if any.
-            if ($path_only == self::PATH_TO_FILE && str_ends_with($base_url, 'php')) {
+            if (self::PATH_TO_FILE === $path_only && str_ends_with($base_url, 'php')) {
                 $base_url = \dirname($base_url);
             }
 
@@ -181,7 +175,8 @@ class URL
         if ('' !== $queryString = rtrim($queryString, '&')) {
             // url could contain anchor
             $pos = strrpos((string) $base, '#');
-            if ($pos !== false) {
+
+            if (false !== $pos) {
                 $anchor = substr((string) $base, $pos);
                 $base = substr((string) $base, 0, $pos);
             }
@@ -204,7 +199,7 @@ class URL
      *
      * @return string The generated URL
      */
-    public function adminViewUrl($viewName, array $parameters = []): string
+    public function adminViewUrl(string $viewName, array $parameters = []): string
     {
         $path = \sprintf('%s/admin/%s', $this->getIndexPage(), $viewName);
 
@@ -219,7 +214,7 @@ class URL
      *
      * @return string The generated URL
      */
-    public function viewUrl($viewName, array $parameters = []): string
+    public function viewUrl(string $viewName, array $parameters = []): string
     {
         $path = \sprintf('?view=%s', $viewName);
 
@@ -238,6 +233,7 @@ class URL
         } else {
             $allParametersWithoutView = [];
             $allParametersWithoutView['lang'] = $viewLocale;
+
             if (null !== $viewId) {
                 $allParametersWithoutView[$view.'_id'] = $viewId;
             }
@@ -263,16 +259,17 @@ class URL
 
             $viewLocale = $this->getViewLocale($request);
 
-            $viewId = $view === null ? null : $request->query->get($view.'_id', null);
+            $viewId = null === $view ? null : $request->query->get($view.'_id', null);
 
-            if ($view !== null) {
+            if (null !== $view) {
                 unset($allOtherParameters['view']);
-                if ($viewId !== null) {
+
+                if (null !== $viewId) {
                     unset($allOtherParameters[$view.'_id']);
                 }
             }
 
-            if ($viewLocale !== null) {
+            if (null !== $viewLocale) {
                 unset($allOtherParameters['lang']);
                 unset($allOtherParameters['locale']);
             }
@@ -281,6 +278,7 @@ class URL
         } else {
             $allParametersWithoutView = $request->query->all();
             $view = $request->attributes->get('_view');
+
             if (isset($allOtherParameters['view'])) {
                 unset($allOtherParameters['view']);
             }
@@ -330,12 +328,11 @@ class URL
 
     /**
      * Get the locale code from the lang attribute in URL.
-     *
-     * @return string|null
      */
-    private function getViewLocale(Request $request)
+    private function getViewLocale(Request $request): ?string
     {
         $viewLocale = $request->query->get('lang', null);
+
         if (null === $viewLocale) {
             // fallback for old parameter
             $viewLocale = $request->query->get('locale', null);

@@ -41,11 +41,10 @@ class ProfileUpdateResourceAccessForm extends BaseForm
                 'constraints' => [
                     new NotBlank(),
                     new Callback(
-                        $this->verifyProfileId(...)
+                        $this->verifyProfileId(...),
                     ),
                 ],
-            ])
-        ;
+            ]);
 
         foreach (ResourceQuery::create()->find() as $resource) {
             $this->formBuilder->add(
@@ -65,7 +64,7 @@ class ProfileUpdateResourceAccessForm extends BaseForm
                     'multiple' => true,
                     'constraints' => [
                     ],
-                ]
+                ],
             );
         }
     }

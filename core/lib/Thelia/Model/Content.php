@@ -36,11 +36,9 @@ class Content extends BaseContent implements FileModelParentInterface
     /**
      * Calculate next position relative to our parent.
      *
-     * @param ContentQuery $query
-     *
      * @deprecated since 2.3, and will be removed in 2.4
      */
-    protected function addCriteriaToPositionQuery($query): void
+    protected function addCriteriaToPositionQuery(ContentQuery $query): void
     {
         $contents = ContentFolderQuery::create()
             ->filterByFolderId($this->getDefaultFolderId())
@@ -49,15 +47,12 @@ class Content extends BaseContent implements FileModelParentInterface
             ->find();
 
         // Filtrer la requete sur ces produits
-        if ($contents != null) {
+        if (null !== $contents) {
             $query->filterById($contents, Criteria::IN);
         }
     }
 
-    /**
-     * @return int
-     */
-    public function getDefaultFolderId()
+    public function getDefaultFolderId(): int
     {
         // Find default folder
         $default_folder = ContentFolderQuery::create()
@@ -65,15 +60,13 @@ class Content extends BaseContent implements FileModelParentInterface
             ->filterByDefaultFolder(true)
             ->findOne();
 
-        return $default_folder == null ? 0 : $default_folder->getFolderId();
+        return null === $default_folder ? 0 : $default_folder->getFolderId();
     }
 
     /**
-     * @param int $defaultFolderId
-     *
      * @return $this
      */
-    public function setDefaultFolder($defaultFolderId)
+    public function setDefaultFolder(int $defaultFolderId)
     {
         // Allow uncategorized content (NULL instead of 0, to bypass delete cascade constraint)
         if ($defaultFolderId <= 0) {
@@ -85,11 +78,11 @@ class Content extends BaseContent implements FileModelParentInterface
             ->filterByDefaultFolder(true)
             ->findOne();
 
-        if ($contentFolder !== null && (int) $contentFolder->getFolderId() === (int) $defaultFolderId) {
+        if (null !== $contentFolder && (int) $contentFolder->getFolderId() === (int) $defaultFolderId) {
             return $this;
         }
 
-        if ($contentFolder !== null) {
+        if (null !== $contentFolder) {
             $contentFolder->delete();
         }
 
@@ -116,11 +109,9 @@ class Content extends BaseContent implements FileModelParentInterface
     /**
      * @deprecated since 2.3, and will be removed in 2.4, please use Content::setDefaultFolder
      *
-     * @param int $defaultFolderId
-     *
      * @return $this
      */
-    public function updateDefaultFolder($defaultFolderId)
+    public function updateDefaultFolder(int $defaultFolderId)
     {
         return $this->setDefaultFolder($defaultFolderId);
     }
@@ -130,9 +121,9 @@ class Content extends BaseContent implements FileModelParentInterface
      *
      * Here pre and post insert event are fired
      *
-     * @throws \Exception
-     *
      * @return $this Return $this, allow chaining
+     *
+     * @throws \Exception
      */
     public function create($defaultFolderId)
     {
@@ -182,9 +173,9 @@ class Content extends BaseContent implements FileModelParentInterface
     {
         // For BC, will be removed in 2.4
         if (!$this->isNew() && (isset($this->modifiedColumns[ContentTableMap::COL_POSITION]) && $this->modifiedColumns[ContentTableMap::COL_POSITION]) && null !== $productCategory = ContentFolderQuery::create()
-                ->filterByContent($this)
-                ->filterByDefaultFolder(true)
-                ->findOne()) {
+            ->filterByContent($this)
+            ->filterByDefaultFolder(true)
+            ->findOne()) {
             $productCategory->changeAbsolutePosition($this->getPosition());
         }
 
@@ -193,10 +184,8 @@ class Content extends BaseContent implements FileModelParentInterface
 
     /**
      * Overload for the position management.
-     *
-     * @param ContentFolder $contentFolder
      */
-    protected function doAddContentFolder($contentFolder): void
+    protected function doAddContentFolder(ContentFolder $contentFolder): void
     {
         parent::doAddContentFolder($contentFolder);
 
@@ -205,6 +194,6 @@ class Content extends BaseContent implements FileModelParentInterface
             ->orderByPosition(Criteria::DESC)
             ->findOne();
 
-        $contentFolder->setPosition($contentFolderPosition !== null ? $contentFolderPosition->getPosition() + 1 : 1);
+        $contentFolder->setPosition(null !== $contentFolderPosition ? $contentFolderPosition->getPosition() + 1 : 1);
     }
 }

@@ -40,13 +40,12 @@ class Attribute extends BaseAction implements EventSubscriberInterface
         $attribute
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
-            ->save()
-        ;
+            ->save();
 
         $event->setAttribute($attribute);
 
         // Add atribute to all product templates if required
-        if ($event->getAddToAllTemplates() != 0) {
+        if (0 !== $event->getAddToAllTemplates()) {
             $this->doAddToAllTemplates($attribute);
         }
     }
@@ -77,8 +76,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
     {
         if (null !== ($attribute = AttributeQuery::create()->findPk($event->getAttributeId()))) {
             $attribute
-                ->delete()
-            ;
+                ->delete();
 
             $event->setAttribute($attribute);
         }
@@ -103,8 +101,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
                 $attribute_template
                     ->setAttribute($attribute)
                     ->setTemplate($template)
-                    ->save()
-                ;
+                    ->save();
             }
         }
     }

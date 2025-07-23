@@ -30,41 +30,39 @@ use Thelia\Model\Map\ConfigTableMap;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/configs'
+            uriTemplate: '/admin/configs',
         ),
         new GetCollection(
-            uriTemplate: '/admin/configs'
+            uriTemplate: '/admin/configs',
         ),
         new Get(
             uriTemplate: '/admin/configs/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/configs/{id}'
+            uriTemplate: '/admin/configs/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/configs/{id}'
+            uriTemplate: '/admin/configs/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/configs/{id}'
+            uriTemplate: '/admin/configs/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
         'id',
         'name',
-    ]
+    ],
 )]
 class Config extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:config:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:config:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:config:write';
 
     #[Groups([self::GROUP_ADMIN_READ])]

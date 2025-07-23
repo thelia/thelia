@@ -88,8 +88,7 @@ class HookCreationForm extends BaseForm
                 'label_attr' => [
                     'for' => 'title',
                 ],
-            ])
-        ;
+            ]);
     }
 
     public function checkCodeUnicity($code, ExecutionContextInterface $context): void
@@ -106,8 +105,8 @@ class HookCreationForm extends BaseForm
             $context->addViolation(
                 Translator::getInstance()->trans(
                     'A Hook with code %name already exists. Please choose another code.',
-                    ['%name' => $code]
-                )
+                    ['%name' => $code],
+                ),
             );
         }
     }

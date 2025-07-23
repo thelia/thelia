@@ -41,29 +41,29 @@ use Thelia\Model\Map\CustomerTableMap;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/customers'
+            uriTemplate: '/admin/customers',
         ),
         new GetCollection(
-            uriTemplate: '/admin/customers'
+            uriTemplate: '/admin/customers',
         ),
         new Get(
             uriTemplate: '/admin/customers/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
             uriTemplate: '/admin/customers/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
         ),
         new Patch(
             uriTemplate: '/admin/customers/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
         ),
         new Delete(
-            uriTemplate: '/admin/customers/{id}'
+            uriTemplate: '/admin/customers/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
@@ -72,15 +72,15 @@ use Thelia\Model\Map\CustomerTableMap;
         ),
         new Get(
             uriTemplate: '/front/account/customers/{id}',
-            security: 'object.getId() == user.getId()'
+            security: 'object.getId() == user.getId()',
         ),
         new Put(
             uriTemplate: '/front/account/customers/{id}',
-            security: 'object.getId() == user.getId()'
+            security: 'object.getId() == user.getId()',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ_SINGLE]],
-    denormalizationContext: ['groups' => [self::GROUP_FRONT_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_FRONT_WRITE]],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -89,7 +89,7 @@ use Thelia\Model\Map\CustomerTableMap;
         'ref',
         'firstname',
         'lastname',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
@@ -97,28 +97,23 @@ use Thelia\Model\Map\CustomerTableMap;
         'createdAt',
         'firstname',
         'lastname',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
         'reseller',
-    ]
+    ],
 )]
 class Customer implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:customer:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:customer:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:customer:write';
-
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:customer:write:update';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:customer:read:single';
-
     public const GROUP_FRONT_WRITE = 'front:customer:write';
 
     #[Groups([self::GROUP_ADMIN_READ,
@@ -195,9 +190,7 @@ class Customer implements PropelResourceInterface
     public ?float $discount = null;
 
     public ?string $rememberMeToken = null;
-
     public ?string $rememberMeSerial = null;
-
     public ?bool $enable = null;
 
     #[Groups([self::GROUP_FRONT_READ_SINGLE])]
@@ -210,9 +203,7 @@ class Customer implements PropelResourceInterface
     public ?\DateTime $updatedAt = null;
 
     public ?int $version = null;
-
     public ?\DateTime $versionCreatedAt = null;
-
     public ?string $versionCreatedBy = null;
 
     #[Relation(targetResource: Address::class)]
@@ -492,6 +483,7 @@ class Customer implements PropelResourceInterface
     public function verifyPasswordLength(ExecutionContextInterface $context): void
     {
         $resource = $context->getRoot();
+
         if (isset($resource->password) && \strlen($resource->password) < ConfigQuery::read('password.length', 4)) {
             $context->addViolation(Translator::getInstance()->trans('The password size is too small.', [], null, 'en_US'));
         }
@@ -502,6 +494,7 @@ class Customer implements PropelResourceInterface
     {
         $resource = $context->getRoot();
         $customer = CustomerQuery::getCustomerByEmail($resource->email);
+
         if ($customer && $customer->getId() !== $this->getId()) {
             $context->addViolation(Translator::getInstance()->trans('This email already exists.', [], null, 'en_US'));
         }

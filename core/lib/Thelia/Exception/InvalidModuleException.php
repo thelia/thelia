@@ -47,7 +47,7 @@ class InvalidModuleException extends \RuntimeException
     {
         return \sprintf(
             'InvalidModuleException: %s',
-            $this->getErrorsAsString()
+            $this->getErrorsAsString(),
         );
     }
 }

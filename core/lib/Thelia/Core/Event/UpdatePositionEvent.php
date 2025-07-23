@@ -17,21 +17,12 @@ namespace Thelia\Core\Event;
 class UpdatePositionEvent extends ActionEvent
 {
     public const POSITION_UP = 1;
-
     public const POSITION_DOWN = 2;
-
     public const POSITION_ABSOLUTE = 3;
 
-    /**
-     * @var int
-     *
-     * @since 2.3
-     */
-    protected $objectId;
+    protected int $objectId;
 
-    /**
-     * @deprecated since 2.3, will be removed in 2.5, because this variable is not used
-     */
+    /** @deprecated since 2.3, will be removed in 2.5, because this variable is not used */
     protected $object;
 
     /**
@@ -43,68 +34,53 @@ class UpdatePositionEvent extends ActionEvent
     public function __construct(/**
      * @deprecated since 2.3, will be removed in 2.5, this variable has been replaced by $objectId
      */
-        protected $object_id, protected $mode, protected $position = null, /**
-     * @since 2.3
-     */
-        protected $referrerId = null)
-    {
+        protected $object_id,
+        protected $mode,
+        protected $position = null,
+        protected $referrerId = null,
+    ) {
         $this->objectId = $this->object_id;
     }
 
-    /**
-     * @return int
-     */
-    public function getMode()
+    public function getMode(): int
     {
         return $this->mode;
     }
 
     /**
-     * @param int $mode
-     *
      * @return $this
      */
-    public function setMode($mode): static
+    public function setMode(int $mode): static
     {
         $this->mode = $mode;
 
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getPosition()
+    public function getPosition(): ?int
     {
         return $this->position;
     }
 
     /**
-     * @param int $position
-     *
      * @return $this
      */
-    public function setPosition($position): static
+    public function setPosition(int $position): static
     {
         $this->position = $position;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getObjectId()
+    public function getObjectId(): int
     {
         return $this->objectId;
     }
 
     /**
-     * @param int $objectId
-     *
      * @return $this
      */
-    public function setObjectId($objectId): static
+    public function setObjectId(int $objectId): static
     {
         $this->object_id = $objectId;
         $this->objectId = $objectId;
@@ -112,18 +88,12 @@ class UpdatePositionEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getReferrerId()
+    public function getReferrerId(): ?int
     {
         return $this->referrerId;
     }
 
-    /**
-     * @param int|null $referrerId
-     */
-    public function setReferrerId($referrerId): void
+    public function setReferrerId(?int $referrerId): void
     {
         $this->referrerId = $referrerId;
     }

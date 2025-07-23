@@ -22,7 +22,7 @@ class CustomerTokenAuthenticator extends TokenAuthenticator
     {
         parent::__construct(
             $key,
-            new CustomerTokenUserProvider()
+            new CustomerTokenUserProvider(),
         );
     }
 }

@@ -69,8 +69,7 @@ class TheliaBundle extends Bundle
             ->addCompilerPass(new CurrencyConverterProviderPass())
             ->addCompilerPass(new RegisterCommandPass())
             ->addCompilerPass(new RegisterFormPass())
-            ->addCompilerPass(new RegisterApiResourceAddonPass())
-        ;
+            ->addCompilerPass(new RegisterApiResourceAddonPass());
     }
 
     public function boot(): void

@@ -29,93 +29,62 @@ use Thelia\Model\Lang;
  */
 abstract class AbstractExport implements \Iterator
 {
-    /**
-     * @var string Default file name
-     */
+    /** @var string Default file name */
     public const FILE_NAME = 'export';
 
-    /**
-     * @var bool Export images with data
-     */
+    /** @var bool Export images with data */
     public const EXPORT_IMAGE = false;
 
-    /**
-     * @var bool Export documents with data
-     */
+    /** @var bool Export documents with data */
     public const EXPORT_DOCUMENT = false;
 
-    /**
-     * @var bool Use range date
-     */
+    /** @var bool Use range date */
     public const USE_RANGE_DATE = false;
 
     /**
      * @var \SplFileObject|PropelModelPager Data to export
      */
-    private $data;
+    private \SplFileObject|PropelModelPager $data;
 
-    /**
-     * @var bool True if data is array, false otherwise
-     */
+    /** @var bool True if data is array, false otherwise */
     private ?bool $dataIsArray = null;
 
-    /**
-     * @var bool True if data is a path to a JSON file, false otherwise
-     */
+    /** @var bool True if data is a path to a JSON file, false otherwise */
     private ?bool $dataIsJSONFile = null;
 
-    /**
-     * @var Lang A language model
-     */
-    protected $language;
+    /** @var Lang A language model */
+    protected Lang $language;
 
-    /**
-     * @var array|null List of fields in order in which they must be exported and there alias name
-     */
-    protected $orderAndAliases;
+    protected array $orderAndAliases = [];
 
-    /**
-     * @var array|null Keep untranslated
-     */
-    private $originalOrderAndAliases;
+    /** @var array|null Keep untranslated */
+    private ?array $originalOrderAndAliases = null;
 
-    /**
-     * @var bool Whether to export images or not
-     */
-    protected $exportImages = false;
+    /** @var bool Whether to export images or not */
+    protected bool $exportImages = false;
 
-    /**
-     * @var array Images paths list
-     */
-    protected $imagesPaths = [];
+    /** @var array Images paths list */
+    protected array $imagesPaths = [];
 
-    /**
-     * @var bool Whether to export documents or not
-     */
-    protected $exportDocuments = false;
+    /** @var bool Whether to export documents or not */
+    protected bool $exportDocuments = false;
 
-    /**
-     * @var array Documents paths list
-     */
-    protected $documentsPaths = [];
+    /** @var array Documents paths list */
+    protected array $documentsPaths = [];
 
-    /**
-     * @var array|null Export date range
-     */
-    protected $rangeDate;
+    /** @var array|null Export date range */
+    protected ?array $rangeDate = null;
 
     /**
      * @throws \Exception
-     *
-     * @return array|false|mixed|string
      */
     #[\ReturnTypeWillChange]
-    public function current()
+    public function current(): mixed
     {
         if ($this->dataIsJSONFile) {
             $result = json_decode($this->data->current(), true);
 
-            if ($result !== null) {
+            if (null !== $result) {
                 return $result;
             }
 
@@ -137,9 +106,9 @@ abstract class AbstractExport implements \Iterator
     }
 
     /**
-     * @throws \Exception
-     *
      * @return bool|float|int|string|null
+     *
+     * @throws \Exception
      */
     #[\ReturnTypeWillChange]
     public function key()
@@ -152,11 +121,9 @@ abstract class AbstractExport implements \Iterator
             return key($this->data);
         }
 
-        if ($this->data->getIterator()->key() !== null) {
+        if (null !== $this->data->getIterator()->key()) {
             return $this->data->getIterator()->key() + ($this->data->getPage() - 1) * 1000;
         }
-
-        return null;
     }
 
     /**
@@ -170,6 +137,7 @@ abstract class AbstractExport implements \Iterator
             next($this->data);
         } else {
             $this->data->getIterator()->next();
+
             if (!$this->valid() && !$this->data->isLastPage()) {
                 $this->data = $this->data->getQuery()->paginate($this->data->getNextPage(), 1000);
                 $this->data->getIterator()->rewind();
@@ -185,7 +153,7 @@ abstract class AbstractExport implements \Iterator
         // Since it's first method call on traversable, we get raw data here
         // but we do not permit to go back
 
-        if ($this->data === null) {
+        if (null === $this->data) {
             $data = $this->getData();
 
             // Check if $data is a path to a json file
@@ -217,9 +185,7 @@ abstract class AbstractExport implements \Iterator
                 return;
             }
 
-            throw new \DomainException(
-                'Data must an array, an instance of \\Propel\\Runtime\\ActiveQuery\\ModelCriteria or a JSON file ending with.json'
-            );
+            throw new \DomainException('Data must an array, an instance of \\Propel\\Runtime\\ActiveQuery\\ModelCriteria or a JSON file ending with.json');
         }
 
         throw new \LogicException("Export data can't be rewinded");
@@ -235,7 +201,7 @@ abstract class AbstractExport implements \Iterator
         }
 
         if ($this->dataIsArray) {
-            return key($this->data) !== null;
+            return null !== key($this->data);
         }
 
         return $this->data->getIterator()->valid();
@@ -246,7 +212,7 @@ abstract class AbstractExport implements \Iterator
      *
      * @return Lang A language model
      */
-    public function getLang()
+    public function getLang(): Lang
     {
         return $this->language;
     }
@@ -262,14 +228,15 @@ abstract class AbstractExport implements \Iterator
     {
         $this->language = $language;
 
-        if ($this->originalOrderAndAliases === null) {
+        if (null === $this->originalOrderAndAliases) {
             $this->originalOrderAndAliases = $this->orderAndAliases;
         }
 
-        if ($this->language instanceof Lang && $this->orderAndAliases !== null) {
+        if ($this->language instanceof Lang && null !== $this->orderAndAliases) {
             $previousLocale = Translator::getInstance()->getLocale();
 
             Translator::getInstance()->setLocale($this->language->getLocale());
+
             foreach ($this->orderAndAliases as &$alias) {
                 $alias = Translator::getInstance()->trans($alias);
             }
@@ -285,17 +252,15 @@ abstract class AbstractExport implements \Iterator
      *
      * @return bool true if export is empty, else false
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return empty($this->data);
     }
 
     /**
      * Whether images has to be exported as data.
-     *
-     * @return bool
      */
-    public function hasImages()
+    public function hasImages(): bool
     {
         return static::EXPORT_IMAGE;
     }
@@ -305,7 +270,7 @@ abstract class AbstractExport implements \Iterator
      *
      * @return bool Whether to export images or not
      */
-    public function isExportImages()
+    public function isExportImages(): bool
     {
         return $this->exportImages;
     }
@@ -317,7 +282,7 @@ abstract class AbstractExport implements \Iterator
      *
      * @return $this Return $this, allow chaining
      */
-    public function setExportImages($exportImages)
+    public function setExportImages(bool $exportImages)
     {
         $this->exportImages = $exportImages;
 
@@ -329,7 +294,7 @@ abstract class AbstractExport implements \Iterator
      *
      * @return array|null Images paths list
      */
-    public function getImagesPaths()
+    public function getImagesPaths(): ?array
     {
         return $this->imagesPaths;
     }
@@ -350,10 +315,8 @@ abstract class AbstractExport implements \Iterator
 
     /**
      * Whether documents has to be exported as data.
-     *
-     * @return bool
      */
-    public function hasDocuments()
+    public function hasDocuments(): bool
     {
         return static::EXPORT_DOCUMENT;
     }
@@ -363,7 +326,7 @@ abstract class AbstractExport implements \Iterator
      *
      * @return bool Whether to export documents or not
      */
-    public function isExportDocuments()
+    public function isExportDocuments(): bool
     {
         return $this->exportDocuments;
     }
@@ -375,7 +338,7 @@ abstract class AbstractExport implements \Iterator
      *
      * @return $this Return $this, allow chaining
      */
-    public function setExportDocuments($exportDocuments)
+    public function setExportDocuments(bool $exportDocuments)
     {
         $this->exportDocuments = $exportDocuments;
 
@@ -387,7 +350,7 @@ abstract class AbstractExport implements \Iterator
      *
      * @return array|null Documents paths list
      */
-    public function getDocumentsPaths()
+    public function getDocumentsPaths(): ?array
     {
         return $this->documentsPaths;
     }
@@ -411,7 +374,7 @@ abstract class AbstractExport implements \Iterator
      *
      * @return array|null Array with date range
      */
-    public function getRangeDate()
+    public function getRangeDate(): ?array
     {
         return $this->rangeDate;
     }
@@ -432,10 +395,8 @@ abstract class AbstractExport implements \Iterator
 
     /**
      * Whether export bounded with date.
-     *
-     * @return bool
      */
-    public function useRangeDate()
+    public function useRangeDate(): bool
     {
         return static::USE_RANGE_DATE;
     }
@@ -445,7 +406,7 @@ abstract class AbstractExport implements \Iterator
      *
      * @return string Export file name
      */
-    public function getFileName()
+    public function getFileName(): string
     {
         return static::FILE_NAME;
     }
@@ -457,9 +418,9 @@ abstract class AbstractExport implements \Iterator
      *
      * @return array Ordered and aliased data
      */
-    public function applyOrderAndAliases(array $data)
+    public function applyOrderAndAliases(array $data): array
     {
-        if ($this->orderAndAliases === null) {
+        if (null === $this->orderAndAliases) {
             return $data;
         }
 
@@ -481,6 +442,7 @@ abstract class AbstractExport implements \Iterator
             }
 
             $processedData[$fieldAlias] = null;
+
             if (\array_key_exists($fieldName, $data)) {
                 $processedData[$fieldAlias] = $data[$fieldName];
             }
@@ -496,7 +458,7 @@ abstract class AbstractExport implements \Iterator
      *
      * @return array Processed data before serialization
      */
-    public function beforeSerialize(array $data)
+    public function beforeSerialize(array $data): array
     {
         foreach ($data as &$value) {
             if ($value instanceof DateTime) {
@@ -514,7 +476,7 @@ abstract class AbstractExport implements \Iterator
      *
      * @return string Processed after before serialization
      */
-    public function afterSerialize($data)
+    public function afterSerialize(string $data): string
     {
         return $data;
     }
@@ -524,5 +486,5 @@ abstract class AbstractExport implements \Iterator
      *
      * @return string|array|ModelCriteria Data to export
      */
-    abstract protected function getData();
+    abstract protected function getData(): string|array|ModelCriteria;
 }

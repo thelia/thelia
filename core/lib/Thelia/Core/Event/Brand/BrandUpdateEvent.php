@@ -21,118 +21,88 @@ namespace Thelia\Core\Event\Brand;
  */
 class BrandUpdateEvent extends BrandCreateEvent
 {
-    protected $chapo;
+    protected ?string $chapo;
+    protected ?string $description;
+    protected ?string $postscriptum;
+    protected ?int $logoImageId;
 
-    protected $description;
-
-    protected $postscriptum;
-
-    protected $logo_image_id;
-
-    /**
-     * @param int $brandId
-     */
-    public function __construct(protected $brandId)
+    public function __construct(protected int $brandId)
     {
+        parent::__construct();
     }
 
     /**
-     * @param string $chapo
-     *
      * @return BrandUpdateEvent $this
      */
-    public function setChapo($chapo): static
+    public function setChapo(?string $chapo): static
     {
         $this->chapo = $chapo;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getChapo()
+    public function getChapo(): ?string
     {
         return $this->chapo;
     }
 
     /**
-     * @param int $brandId
-     *
      * @return BrandUpdateEvent $this
      */
-    public function setBrandId($brandId): static
+    public function setBrandId(int $brandId): static
     {
         $this->brandId = $brandId;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getBrandId()
+    public function getBrandId(): int
     {
         return $this->brandId;
     }
 
     /**
-     * @param string $description
-     *
      * @return BrandUpdateEvent $this
      */
-    public function setDescription($description): static
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
     /**
-     * @param string $postscriptum
-     *
      * @return BrandUpdateEvent $this
      */
-    public function setPostscriptum($postscriptum): static
+    public function setPostscriptum(?string $postscriptum): static
     {
         $this->postscriptum = $postscriptum;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getPostscriptum()
+    public function getPostscriptum(): ?string
     {
         return $this->postscriptum;
     }
 
     /**
-     * @param int $logo_image_id
-     *
      * @return $this
      */
-    public function setLogoImageId($logo_image_id): static
+    public function setLogoImageId(?int $logoImageId): static
     {
-        $this->logo_image_id = $logo_image_id;
+        $this->logoImageId = $logoImageId;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getLogoImageId()
+    public function getLogoImageId(): ?int
     {
-        return $this->logo_image_id;
+        return $this->logoImageId;
     }
 }

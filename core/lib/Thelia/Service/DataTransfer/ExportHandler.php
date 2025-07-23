@@ -43,15 +43,8 @@ class ExportHandler
     {
         $export = (new ExportQuery())->findPk($exportId);
 
-        if ($export === null && $dispatchException) {
-            throw new \ErrorException(
-                Translator::getInstance()->trans(
-                    'There is no id "%id" in the exports',
-                    [
-                        '%id' => $exportId,
-                    ]
-                )
-            );
+        if (null === $export && $dispatchException) {
+            throw new \ErrorException(Translator::getInstance()->trans('There is no id "%id" in the exports', ['%id' => $exportId]));
         }
 
         return $export;
@@ -61,15 +54,8 @@ class ExportHandler
     {
         $export = (new ExportQuery())->findOneByRef($exportRef);
 
-        if ($export === null && $dispatchException) {
-            throw new \ErrorException(
-                Translator::getInstance()->trans(
-                    'There is no ref "%ref" in the exports',
-                    [
-                        '%ref' => $exportRef,
-                    ]
-                )
-            );
+        if (null === $export && $dispatchException) {
+            throw new \ErrorException(Translator::getInstance()->trans('There is no ref "%ref" in the exports', ['%ref' => $exportRef]));
         }
 
         return $export;
@@ -79,15 +65,8 @@ class ExportHandler
     {
         $category = (new ExportCategoryQuery())->findPk($exportCategoryId);
 
-        if ($category === null && $dispatchException) {
-            throw new \ErrorException(
-                Translator::getInstance()->trans(
-                    'There is no id "%id" in the export categories',
-                    [
-                        '%id' => $exportCategoryId,
-                    ]
-                )
-            );
+        if (null === $category && $dispatchException) {
+            throw new \ErrorException(Translator::getInstance()->trans('There is no id "%id" in the export categories', ['%id' => $exportCategoryId]));
         }
 
         return $category;
@@ -109,6 +88,7 @@ class ExportHandler
 
         // Configure handle class
         $instance->setLang($language);
+
         if ($archiver instanceof ArchiverInterface) {
             if ($includeImages && $instance->hasImages()) {
                 $instance->setExportImages(true);
@@ -120,20 +100,20 @@ class ExportHandler
         }
 
         if ($rangeDate['start'] && !($rangeDate['start'] instanceof DateTime)) {
-            $startYear = $rangeDate['start']['year'] !== '' ? $rangeDate['start']['year'] : (new \DateTime())->format('Y');
-            $startMonth = $rangeDate['start']['month'] !== '' ? $rangeDate['start']['month'] : (new \DateTime())->format('m');
+            $startYear = '' !== $rangeDate['start']['year'] ? $rangeDate['start']['year'] : (new \DateTime())->format('Y');
+            $startMonth = '' !== $rangeDate['start']['month'] ? $rangeDate['start']['month'] : (new \DateTime())->format('m');
             $rangeDate['start'] = DateTime::createFromFormat(
                 'Y-m-d H:i:s',
-                $startYear.'-'.$startMonth.'-1 00:00:00'
+                $startYear.'-'.$startMonth.'-1 00:00:00',
             );
         }
 
         if ($rangeDate['end'] && !($rangeDate['end'] instanceof DateTime)) {
-            $endYear = $rangeDate['end']['year'] !== '' ? $rangeDate['end']['year'] : (new \DateTime())->format('Y');
-            $endMonth = $rangeDate['end']['month'] !== '' ? $rangeDate['end']['month'] : (new \DateTime())->format('m');
+            $endYear = '' !== $rangeDate['end']['year'] ? $rangeDate['end']['year'] : (new \DateTime())->format('Y');
+            $endMonth = '' !== $rangeDate['end']['month'] ? $rangeDate['end']['month'] : (new \DateTime())->format('m');
             $rangeDate['end'] = DateTime::createFromFormat(
                 'Y-m-d H:i:s',
-                $endYear.'-'.$endMonth.'-1 23:59:59'
+                $endYear.'-'.$endMonth.'-1 23:59:59',
             );
 
             if ($rangeDate['end'] instanceof DateTime) {
@@ -189,7 +169,7 @@ class ExportHandler
             (new \DateTime())->format('Ymd'),
             uniqid('', true),
             $export->getFileName(),
-            $serializer->getExtension()
+            $serializer->getExtension(),
         );
 
         $filePath = THELIA_CACHE_DIR.'export'.DS.$filename;

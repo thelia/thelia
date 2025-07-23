@@ -72,7 +72,7 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
             $expirationDate,
             $freeShippingForCountries,
             $freeShippingForModules,
-            $perCustomerUsageCount
+            $perCustomerUsageCount,
         );
 
         $this->category_list = $effects[self::CATEGORIES_LIST] ?? [];
@@ -86,7 +86,7 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
         return $this;
     }
 
-    public function exec(): float|int
+    public function exec(): float
     {
         // This coupon subtracts the specified amount from the order total
         // for each product of the selected categories.
@@ -101,7 +101,7 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
 
                 /** @var Category $category */
                 foreach ($categories as $category) {
-                    if (\in_array($category->getId(), $this->category_list)) {
+                    if (\in_array($category->getId(), $this->category_list, true)) {
                         $discount += $this->getCartItemDiscount($cartItem);
 
                         break;
@@ -110,7 +110,7 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
             }
         }
 
-        return $discount;
+        return (float) $discount;
     }
 
     public function drawBaseBackOfficeInputs(string $templateName, array $otherFields): string
@@ -129,12 +129,8 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
 
     public function checkBaseCouponFieldValue(string $fieldName, string $fieldValue): string
     {
-        if ($fieldName === self::CATEGORIES_LIST && ($fieldValue === '' || $fieldValue === '0')) {
-            throw new \InvalidArgumentException(
-                Translator::getInstance()->trans(
-                    'Please select at least one category'
-                )
-            );
+        if (self::CATEGORIES_LIST === $fieldName && ('' === $fieldValue || '0' === $fieldValue)) {
+            throw new \InvalidArgumentException(Translator::getInstance()->trans('Please select at least one category'));
         }
 
         return $fieldValue;

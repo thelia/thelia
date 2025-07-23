@@ -25,7 +25,7 @@ class AdminUsernamePasswordFormAuthenticator extends UsernamePasswordFormAuthent
         parent::__construct(
             $request,
             $loginForm,
-            new AdminUserProvider()
+            new AdminUserProvider(),
         );
     }
 }

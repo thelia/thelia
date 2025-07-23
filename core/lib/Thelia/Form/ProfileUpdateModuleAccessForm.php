@@ -41,11 +41,10 @@ class ProfileUpdateModuleAccessForm extends BaseForm
                 'constraints' => [
                     new NotBlank(),
                     new Callback(
-                        $this->verifyProfileId(...)
+                        $this->verifyProfileId(...),
                     ),
                 ],
-            ])
-        ;
+            ]);
 
         foreach (ModuleQuery::create()->find() as $module) {
             $this->formBuilder->add(
@@ -65,7 +64,7 @@ class ProfileUpdateModuleAccessForm extends BaseForm
                     'multiple' => true,
                     'constraints' => [
                     ],
-                ]
+                ],
             );
         }
     }

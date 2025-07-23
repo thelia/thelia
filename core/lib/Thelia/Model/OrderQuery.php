@@ -31,20 +31,19 @@ class OrderQuery extends BaseOrderQuery
 {
     /**
      * @throws \Exception
-     *
-     * @return array
      */
-    public static function getMonthlySaleStats($month, $year, $includeShipping = true, $withTaxes = true)
+    public static function getMonthlySaleStats($month, $year, $includeShipping = true, $withTaxes = true): array
     {
         $numberOfDay = cal_days_in_month(\CAL_GREGORIAN, $month, $year);
 
         $stats = [];
+
         for ($day = 1; $day <= $numberOfDay; ++$day) {
             $dayAmount = self::getSaleStats(
                 new \DateTime(\sprintf('%s-%s-%s', $year, $month, $day)),
                 new \DateTime(\sprintf('%s-%s-%s', $year, $month, $day)),
                 $includeShipping,
-                $withTaxes
+                $withTaxes,
             );
             $stats[] = [$day - 1, $dayAmount];
         }
@@ -57,10 +56,12 @@ class OrderQuery extends BaseOrderQuery
         $numberOfDay = cal_days_in_month(\CAL_GREGORIAN, $month, $year);
 
         $stats = [];
+
         for ($day = 1; $day <= $numberOfDay; ++$day) {
             $dayOrdersQuery = self::create()
                 ->filterByInvoiceDate(\sprintf('%s-%s-%s 00:00:00', $year, $month, $day), Criteria::GREATER_EQUAL)
                 ->filterByInvoiceDate(\sprintf('%s-%s-%s 23:59:59', $year, $month, $day), Criteria::LESS_EQUAL);
+
             if (null !== $status) {
                 $dayOrdersQuery->filterByStatusId($status, Criteria::IN);
             }
@@ -74,14 +75,13 @@ class OrderQuery extends BaseOrderQuery
 
     /**
      * @throws PropelException
-     *
-     * @return array
      */
-    public static function getFirstOrdersStats($month, $year)
+    public static function getFirstOrdersStats($month, $year): array
     {
         $numberOfDay = cal_days_in_month(\CAL_GREGORIAN, $month, $year);
 
         $stats = [];
+
         for ($day = 1; $day <= $numberOfDay; ++$day) {
             $dayOrdersQuery = self::create()
                 ->filterByCreatedAt(\sprintf('%s-%s-%s 00:00:00', $year, $month, $day), Criteria::GREATER_EQUAL)
@@ -105,61 +105,47 @@ class OrderQuery extends BaseOrderQuery
     }
 
     /**
-     * @param bool $includeShipping
-     * @param bool $withTaxes
-     *
      * @throws PropelException
-     *
-     * @return float|int
      */
-    public static function getSaleStats(\DateTime $startDate, \DateTime $endDate, $includeShipping, $withTaxes = true)
+    public static function getSaleStats(\DateTime $startDate, \DateTime $endDate, bool $includeShipping, bool $withTaxes = true): float|int
     {
         $amount = (float)
             self::baseSaleStats($startDate, $endDate, 'o')
                 ->innerJoinOrderProduct()
                 ->withColumn('SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product`.PROMO_PRICE,`order_product`.PRICE)))', 'TOTAL')
                 ->select(['TOTAL'])
-                ->findOne()
-        ;
+                ->findOne();
 
         if ($withTaxes) {
             $amount += (float)
                 self::baseSaleStats($startDate, $endDate, 'o')
                     ->useOrderProductQuery()
-                        ->useOrderProductTaxQuery()
-                            ->withColumn('SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product_tax`.PROMO_AMOUNT,`order_product_tax`.AMOUNT)))', 'TAX')
-                        ->endUse()
+                    ->useOrderProductTaxQuery()
+                    ->withColumn('SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product_tax`.PROMO_AMOUNT,`order_product_tax`.AMOUNT)))', 'TAX')
+                    ->endUse()
                     ->endUse()
                     ->select(['TAX'])
-                    ->findOne()
-            ;
+                    ->findOne();
         }
 
         $amount -= (float)
             self::baseSaleStats($startDate, $endDate)
                 ->withColumn('SUM(`order`.discount)', 'DISCOUNT')
                 ->select('DISCOUNT')
-                ->findOne()
-        ;
+                ->findOne();
 
         if ($includeShipping) {
             $amount += (float)
                 self::baseSaleStats($startDate, $endDate)
                     ->withColumn('SUM(`order`.postage)', 'POSTAGE')
                     ->select('POSTAGE')
-                    ->findOne()
-            ;
+                    ->findOne();
         }
 
         return $amount;
     }
 
-    /**
-     * @param string $modelAlias
-     *
-     * @return OrderQuery
-     */
-    protected static function baseSaleStats(\DateTime $startDate, \DateTime $endDate, $modelAlias = null)
+    protected static function baseSaleStats(\DateTime $startDate, \DateTime $endDate, ?string $modelAlias = null): self
     {
         // The sales are considered at invoice date, not order creation date
         return self::create($modelAlias)
@@ -170,12 +156,10 @@ class OrderQuery extends BaseOrderQuery
 
     /**
      * @param int[] $status
-     *
-     * @return int
      */
-    public static function getOrderStats(\DateTime $startDate, \DateTime $endDate, $status = null)
+    public static function getOrderStats(\DateTime $startDate, \DateTime $endDate, ?array $status = null): int
     {
-        if ($status === null) {
+        if (null === $status) {
             $status = OrderStatusQuery::getPaidStatusIdList();
         }
 

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -66,15 +67,15 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
                             'alpha', 'alpha_reverse',
                             'visible', 'visible_reverse',
                             'random',
-                        ]
-                    )
+                        ],
+                    ),
                 ),
-                'id'
-            )
+                'id',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = CountryQuery::create();
 
@@ -104,8 +105,7 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
             $countries = CountryAreaQuery::create()
                 ->filterByAreaId($excludeArea, Criteria::IN)
                 ->select(['country_id'])
-                ->find()
-            ;
+                ->find();
 
             $search->filterById($countries->toArray(), Criteria::NOT_IN);
         }
@@ -130,16 +130,19 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         $hasStates = $this->getHasStates();
-        if ($hasStates !== BooleanOrBothType::ANY) {
+
+        if (BooleanOrBothType::ANY !== $hasStates) {
             $search->filterByHasStates($hasStates ? 1 : 0);
         }
 
         $visible = $this->getVisible();
-        if ($visible !== BooleanOrBothType::ANY) {
+
+        if (BooleanOrBothType::ANY !== $visible) {
             $search->filterByVisible($visible ? 1 : 0);
         }
 
         $orders = $this->getOrder();
+
         foreach ($orders as $order) {
             switch ($order) {
                 case 'id':
@@ -191,8 +194,7 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('IS_SHOP_COUNTRY', $country->getShopCountry() ? '1' : '0')
                 ->set('HAS_STATES', $country->getHasStates() ? '1' : '0')
                 ->set('NEED_ZIP_CODE', $country->getNeedZipCode() ? '1' : '0')
-                ->set('ZIP_CODE_FORMAT', $country->getZipCodeFormat())
-            ;
+                ->set('ZIP_CODE_FORMAT', $country->getZipCodeFormat());
 
             $this->addOutputFields($loopResultRow, $country);
 

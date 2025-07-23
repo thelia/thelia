@@ -57,10 +57,8 @@ class CouponController extends BaseAdminController
 
     /**
      * Manage Coupons list display.
-     *
-     * @return Response
      */
-    public function browseAction()
+    public function browseAction(): Response
     {
         if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
@@ -73,8 +71,6 @@ class CouponController extends BaseAdminController
 
     /**
      * Manage Coupons creation display.
-     *
-     * @return Response
      */
     public function createAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
@@ -92,7 +88,7 @@ class CouponController extends BaseAdminController
                 $eventDispatcher,
                 $eventToDispatch,
                 'created',
-                'creation'
+                'creation',
             )) instanceof RedirectResponse) {
                 return $response;
             }
@@ -107,7 +103,7 @@ class CouponController extends BaseAdminController
         $args['availableCoupons'] = $this->getAvailableCoupons();
         $args['urlAjaxAdminCouponDrawInputs'] = $this->getRoute(
             'admin.coupon.draw.inputs.ajax',
-            ['couponServiceId' => 'couponServiceId']
+            ['couponServiceId' => 'couponServiceId'],
         );
         $args['formAction'] = 'admin/coupon/create';
 
@@ -116,7 +112,7 @@ class CouponController extends BaseAdminController
 
         return $this->render(
             'coupon-create',
-            $args
+            $args,
         );
     }
 
@@ -124,10 +120,8 @@ class CouponController extends BaseAdminController
      * Manage Coupons edition display.
      *
      * @param int $couponId Coupon id
-     *
-     * @return Response
      */
-    public function updateAction(EventDispatcherInterface $eventDispatcher, $couponId): Response|RedirectResponse
+    public function updateAction(EventDispatcherInterface $eventDispatcher, int $couponId): Response|RedirectResponse
     {
         if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
@@ -135,6 +129,7 @@ class CouponController extends BaseAdminController
 
         /** @var Coupon $coupon */
         $coupon = CouponQuery::create()->findPk($couponId);
+
         if (null === $coupon) {
             return $this->pageNotFound();
         }
@@ -157,7 +152,7 @@ class CouponController extends BaseAdminController
                 $eventToDispatch,
                 'updated',
                 'update',
-                $coupon
+                $coupon,
             )) instanceof RedirectResponse) {
                 return $response;
             }
@@ -167,7 +162,7 @@ class CouponController extends BaseAdminController
             /** @var ConditionFactory $conditionFactory */
             $conditionFactory = $this->container->get('thelia.condition.factory');
             $conditions = $conditionFactory->unserializeConditionCollection(
-                $coupon->getSerializedConditions()
+                $coupon->getSerializedConditions(),
             );
             $freeShippingForCountries = [];
             $freeShippingForModules = [];
@@ -182,11 +177,11 @@ class CouponController extends BaseAdminController
                 $freeShippingForModules[] = $item->getModuleId();
             }
 
-            if ($freeShippingForCountries === []) {
+            if ([] === $freeShippingForCountries) {
                 $freeShippingForCountries[] = 0;
             }
 
-            if ($freeShippingForModules === []) {
+            if ([] === $freeShippingForModules) {
                 $freeShippingForModules[] = 0;
             }
 
@@ -226,35 +221,35 @@ class CouponController extends BaseAdminController
         $args['couponInputsHtml'] = $couponManager->drawBackOfficeInputs();
         $args['urlAjaxAdminCouponDrawInputs'] = $this->getRoute(
             'admin.coupon.draw.inputs.ajax',
-            ['couponServiceId' => 'couponServiceId']
+            ['couponServiceId' => 'couponServiceId'],
         );
         $args['availableConditions'] = $this->getAvailableConditions();
         $args['urlAjaxGetConditionInputFromServiceId'] = $this->getRoute(
             'admin.coupon.draw.condition.read.inputs.ajax',
-            ['conditionId' => 'conditionId']
+            ['conditionId' => 'conditionId'],
         );
         $args['urlAjaxGetConditionInputFromConditionInterface'] = $this->getRoute(
             'admin.coupon.draw.condition.update.inputs.ajax',
             [
                 'couponId' => $couponId,
                 'conditionIndex' => 8888888,
-            ]
+            ],
         );
 
         $args['urlAjaxSaveConditions'] = $this->getRoute(
             'admin.coupon.condition.save',
-            ['couponId' => $couponId]
+            ['couponId' => $couponId],
         );
         $args['urlAjaxDeleteConditions'] = $this->getRoute(
             'admin.coupon.condition.delete',
             [
                 'couponId' => $couponId,
                 'conditionIndex' => 8888888,
-            ]
+            ],
         );
         $args['urlAjaxGetConditionSummaries'] = $this->getRoute(
             'admin.coupon.draw.condition.summaries.ajax',
-            ['couponId' => $couponId]
+            ['couponId' => $couponId],
         );
 
         $args['formAction'] = 'admin/coupon/update/'.$couponId;
@@ -273,7 +268,7 @@ class CouponController extends BaseAdminController
      *
      * @return Response
      */
-    public function getConditionEmptyInputAjaxAction($conditionId): Response|false
+    public function getConditionEmptyInputAjaxAction(string $conditionId): Response|false
     {
         if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
@@ -281,7 +276,7 @@ class CouponController extends BaseAdminController
 
         $this->checkXmlHttpRequest();
 
-        if (!empty($conditionId)) {
+        if ('' !== $conditionId && '0' !== $conditionId) {
             /** @var ConditionFactory $conditionFactory */
             $conditionFactory = $this->container->get('thelia.condition.factory');
             $inputs = $conditionFactory->getInputsFromServiceId($conditionId);
@@ -290,7 +285,7 @@ class CouponController extends BaseAdminController
                 return false;
             }
 
-            if ($inputs === null) {
+            if (null === $inputs) {
                 return $this->pageNotFound();
             }
 
@@ -310,7 +305,7 @@ class CouponController extends BaseAdminController
                 'inputsDrawn' => $html,
                 'conditionServiceId' => $serviceId,
                 'conditionIndex' => '',
-            ]
+            ],
         );
     }
 
@@ -319,10 +314,8 @@ class CouponController extends BaseAdminController
      *
      * @param int $couponId       Coupon id being updated
      * @param int $conditionIndex Coupon Condition position in the collection
-     *
-     * @return Response
      */
-    public function getConditionToUpdateInputAjaxAction($couponId, $conditionIndex)
+    public function getConditionToUpdateInputAjaxAction(int $couponId, int $conditionIndex): Response
     {
         if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
@@ -333,6 +326,7 @@ class CouponController extends BaseAdminController
         $search = CouponQuery::create();
         /** @var Coupon $coupon */
         $coupon = $search->findOneById($couponId);
+
         if (!$coupon) {
             return $this->pageNotFound();
         }
@@ -346,6 +340,7 @@ class CouponController extends BaseAdminController
         }
 
         $conditions = $couponManager->getConditions();
+
         if (!isset($conditions[$conditionIndex])) {
             return $this->pageNotFound();
         }
@@ -357,7 +352,7 @@ class CouponController extends BaseAdminController
         $conditionFactory = $this->container->get('thelia.condition.factory');
         $inputs = $conditionFactory->getInputsFromConditionInterface($condition);
 
-        if ($inputs === null) {
+        if (null === $inputs) {
             return $this->pageNotFound();
         }
 
@@ -367,7 +362,7 @@ class CouponController extends BaseAdminController
                 'inputsDrawn' => $condition->drawBackOfficeInputs(),
                 'conditionServiceId' => $condition->getServiceId(),
                 'conditionIndex' => $conditionIndex,
-            ]
+            ],
         );
     }
 
@@ -376,7 +371,7 @@ class CouponController extends BaseAdminController
      *
      * @param int $couponId Coupon id
      */
-    public function saveConditionsAction(EventDispatcherInterface $eventDispatcher, $couponId): Response
+    public function saveConditionsAction(EventDispatcherInterface $eventDispatcher, int $couponId): Response
     {
         if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
@@ -387,6 +382,7 @@ class CouponController extends BaseAdminController
         $search = CouponQuery::create();
         /** @var Coupon $coupon */
         $coupon = $search->findOneById($couponId);
+
         if (!$coupon) {
             return $this->pageNotFound();
         }
@@ -403,6 +399,7 @@ class CouponController extends BaseAdminController
 
         $conditions = $couponManager->getConditions();
         $conditionIndex = $this->getRequest()->request->get('conditionIndex');
+
         if ($conditionIndex >= 0) {
             // Update mode
             $conditions[$conditionIndex] = $conditionToSave;
@@ -424,7 +421,7 @@ class CouponController extends BaseAdminController
      * @param int $couponId       Coupon id
      * @param int $conditionIndex Coupon condition index in the collection
      */
-    public function deleteConditionsAction(EventDispatcherInterface $eventDispatcher, $couponId, $conditionIndex): Response
+    public function deleteConditionsAction(EventDispatcherInterface $eventDispatcher, int $couponId, int $conditionIndex): Response
     {
         if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
@@ -435,6 +432,7 @@ class CouponController extends BaseAdminController
         $search = CouponQuery::create();
         /** @var Coupon $coupon */
         $coupon = $search->findOneById($couponId);
+
         if (!$coupon) {
             return $this->pageNotFound();
         }
@@ -465,14 +463,14 @@ class CouponController extends BaseAdminController
      *
      * @return $this
      */
-    protected function logError(string $action, $message, $e): static
+    protected function logError(string $action, string $message, \Exception $e): static
     {
         Tlog::getInstance()->error(
             \sprintf(
                 'Error during Coupon '.$action.' process : %s. Exception was %s',
                 $message,
-                $e->getMessage()
-            )
+                $e->getMessage(),
+            ),
         );
 
         return $this;
@@ -488,12 +486,13 @@ class CouponController extends BaseAdminController
      *
      * @return $this
      */
-    protected function validateCreateOrUpdateForm(EventDispatcherInterface $eventDispatcher, ?string $eventToDispatch, string $log, $action, ?Coupon $model = null): ?RedirectResponse
+    protected function validateCreateOrUpdateForm(EventDispatcherInterface $eventDispatcher, ?string $eventToDispatch, string $log, string $action, ?Coupon $model = null): ?RedirectResponse
     {
         // Create the form from the request
         $couponForm = $this->getForm($action, $model);
         $response = null;
         $message = false;
+
         try {
             // Check the form against conditions violations
             $form = $this->validateForm($couponForm, 'POST');
@@ -503,7 +502,7 @@ class CouponController extends BaseAdminController
             // Dispatch Event to the Action
             $eventDispatcher->dispatch(
                 $couponEvent,
-                $eventToDispatch
+                $eventToDispatch,
             );
 
             $this->adminLogAppend(
@@ -512,21 +511,21 @@ class CouponController extends BaseAdminController
                 \sprintf(
                     'Coupon %s (ID ) '.$log,
                     $couponEvent->getTitle(),
-                    $couponEvent->getCouponModel()->getId()
+                    $couponEvent->getCouponModel()->getId(),
                 ),
-                $couponEvent->getCouponModel()->getId()
+                $couponEvent->getCouponModel()->getId(),
             );
 
-            if ($this->getRequest()->get('save_mode') == 'stay') {
+            if ('stay' === $this->getRequest()->get('save_mode')) {
                 $response = new RedirectResponse(str_replace(
                     '{id}',
                     $couponEvent->getCouponModel()->getId(),
-                    $couponForm->getSuccessUrl()
+                    $couponForm->getSuccessUrl(),
                 ));
             } else {
                 // Redirect to the success URL
                 $response = new RedirectResponse(
-                    URL::getInstance()->absoluteUrl($this->getRoute('admin.coupon.list'))
+                    URL::getInstance()->absoluteUrl($this->getRoute('admin.coupon.list')),
                 );
             }
         } catch (FormValidationException $ex) {
@@ -539,7 +538,7 @@ class CouponController extends BaseAdminController
             $this->logError($action, $message, $ex);
         }
 
-        if ($message !== false) {
+        if (false !== $message) {
             // Mark the form as with error
             $couponForm->setErrorMessage($message);
 
@@ -561,6 +560,7 @@ class CouponController extends BaseAdminController
         $couponManager = $this->container->get('thelia.coupon.manager');
         $availableConditions = $couponManager->getAvailableConditions();
         $cleanedConditions = [];
+
         /** @var ConditionInterface $availableCondition */
         foreach ($availableConditions as $availableCondition) {
             $condition = [];
@@ -580,6 +580,7 @@ class CouponController extends BaseAdminController
     {
         $availableCoupons = $this->couponManager->getAvailableCoupons();
         $cleanedCoupons = [];
+
         /** @var CouponInterface $availableCoupon */
         foreach ($availableCoupons as $availableCoupon) {
             $condition = [];
@@ -601,6 +602,7 @@ class CouponController extends BaseAdminController
     protected function cleanConditionForTemplate(ConditionCollection $conditions): array
     {
         $cleanedConditions = [];
+
         /** @var $condition ConditionInterface */
         foreach ($conditions as $index => $condition) {
             $temp = [
@@ -623,13 +625,13 @@ class CouponController extends BaseAdminController
      *
      * @param string $couponServiceId Coupon service id
      */
-    public function getBackOfficeInputsAjaxAction($couponServiceId): ResponseRest
+    public function getBackOfficeInputsAjaxAction(string $couponServiceId): Response
     {
         if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
         }
 
-        if (!empty($couponServiceId)) {
+        if ('' !== $couponServiceId && '0' !== $couponServiceId) {
             $this->checkXmlHttpRequest();
 
             $couponManager = $this->container->get($couponServiceId);
@@ -638,11 +640,11 @@ class CouponController extends BaseAdminController
                 $this->pageNotFound();
             }
 
-            $response = new ResponseRest($couponManager->drawBackOfficeInputs(), 'text');
+            $response = new ResponseRest([$couponManager->drawBackOfficeInputs()]);
         } else {
             // Return an empty response if the service ID is not defined
             // Typically, when the user chooses "Please select a coupon type"
-            $response = new ResponseRest('');
+            $response = new ResponseRest([]);
         }
 
         return $response;
@@ -653,10 +655,8 @@ class CouponController extends BaseAdminController
      * allowing Admin to set its Coupon effect.
      *
      * @param int $couponId Coupon id
-     *
-     * @return ResponseRest
      */
-    public function getBackOfficeConditionSummariesAjaxAction($couponId)
+    public function getBackOfficeConditionSummariesAjaxAction(int $couponId): Response
     {
         if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) instanceof Response) {
             return $response;
@@ -666,6 +666,7 @@ class CouponController extends BaseAdminController
 
         /** @var Coupon $coupon */
         $coupon = CouponQuery::create()->findPk($couponId);
+
         if (null === $coupon) {
             return $this->pageNotFound();
         }
@@ -698,7 +699,6 @@ class CouponController extends BaseAdminController
 
         /** @var CouponInterface $coupon */
         $coupon = $this->container->get($serviceId);
-
         $couponEvent = new CouponCreateOrUpdateEvent(
             $data['code'],
             $serviceId,
@@ -706,17 +706,17 @@ class CouponController extends BaseAdminController
             $coupon->getEffects($data),
             $data['shortDescription'],
             $data['description'],
-            $data['isEnabled'],
-            DateTime::createFromFormat($this->getDefaultDateFormat(), $data['expirationDate']),
-            $data['isAvailableOnSpecialOffers'],
-            $data['isCumulative'],
-            $data['isRemovingPostage'],
-            $data['maxUsage'],
+            $data['isEnabled'] === 'on',
+            \DateTime::createFromFormat($this->getDefaultDateFormat(), $data['expirationDate']),
+            $data['isAvailableOnSpecialOffers'] === 'on',
+            $data['isCumulative'] === 'on',
+            $data['isRemovingPostage'] === 'on',
+            $data['maxUsage'] ? (int) $data['maxUsage'] : null,
             $data['locale'],
             $data['freeShippingForCountries'],
             $data['freeShippingForModules'],
-            $data['perCustomerUsageCount'],
-            empty($data['startDate']) ? null : DateTime::createFromFormat($this->getDefaultDateFormat(), $data['startDate'])
+            $data['perCustomerUsageCount'] === 'on',
+            empty($data['startDate']) ? null : \DateTime::createFromFormat($this->getDefaultDateFormat(), $data['startDate']),
         );
 
         // If Update mode
@@ -729,16 +729,15 @@ class CouponController extends BaseAdminController
 
     /**
      * Build ConditionInterface from request.
-     *
-     * @return ConditionInterface
      */
-    protected function buildConditionFromRequest()
+    protected function buildConditionFromRequest(): ConditionInterface
     {
         $request = $this->getRequest();
         $post = $request->request->getIterator();
         $serviceId = $request->request->get('categoryCondition');
         $operators = [];
         $values = [];
+
         foreach ($post as $key => $input) {
             if (isset($input['operator']) && isset($input['value'])) {
                 $operators[$key] = $input['operator'];
@@ -777,7 +776,7 @@ class CouponController extends BaseAdminController
             $coupon->getFreeShippingForCountries(),
             $coupon->getFreeShippingForModules(),
             $coupon->getPerCustomerUsageCount(),
-            $coupon->getStartDate()
+            $coupon->getStartDate(),
         );
         $couponEvent->setCouponModel($coupon);
         $couponEvent->setConditions($conditions);
@@ -786,7 +785,7 @@ class CouponController extends BaseAdminController
         // Dispatch Event to the Action
         $eventDispatcher->dispatch(
             $couponEvent,
-            $eventToDispatch
+            $eventToDispatch,
         );
 
         $this->adminLogAppend(
@@ -795,9 +794,9 @@ class CouponController extends BaseAdminController
             \sprintf(
                 'Coupon %s (ID %s) conditions updated',
                 $couponEvent->getCouponModel()->getTitle(),
-                $couponEvent->getCouponModel()->getType()
+                $couponEvent->getCouponModel()->getType(),
             ),
-            $couponEvent->getCouponModel()->getId()
+            $couponEvent->getCouponModel()->getId(),
         );
     }
 
@@ -806,15 +805,11 @@ class CouponController extends BaseAdminController
         return LangQuery::create()->findOneByByDefault(true)->getDatetimeFormat();
     }
 
-    /**
-     * @param string      $action
-     * @param Coupon|null $coupon
-     */
-    protected function getForm($action, $coupon): BaseForm
+    protected function getForm(string $action, ?Coupon $coupon): BaseForm
     {
         $data = [];
 
-        if (null !== $coupon) {
+        if ($coupon instanceof Coupon) {
             $data['code'] = $coupon->getCode();
         }
 
@@ -823,7 +818,7 @@ class CouponController extends BaseAdminController
         ]);
     }
 
-    public function deleteAction(EventDispatcherInterface $eventDispatcher)
+    public function deleteAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         // Check current user authorization
         if (($response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::DELETE)) instanceof Response) {
@@ -833,13 +828,12 @@ class CouponController extends BaseAdminController
         try {
             // Check token
             $this->getTokenProvider()->checkToken(
-                $this->getRequest()->query->get('_token')
+                $this->getRequest()->query->get('_token'),
             );
 
             // Retrieve coupon
             $coupon = CouponQuery::create()
-                ->findPk($couponId = $this->getRequest()->request->get('coupon_id'))
-            ;
+                ->findPk($couponId = $this->getRequest()->request->get('coupon_id'));
             $deleteEvent = new CouponDeleteEvent($coupon);
 
             $eventDispatcher->dispatch($deleteEvent, TheliaEvents::COUPON_DELETE);
@@ -851,19 +845,18 @@ class CouponController extends BaseAdminController
                     \sprintf(
                         'Coupon %s (ID %s) deleted',
                         $deletedObject->getCode(),
-                        $deletedObject->getId()
+                        $deletedObject->getId(),
                     ),
-                    $deletedObject->getId()
+                    $deletedObject->getId(),
                 );
             }
 
             return new RedirectResponse(
-                URL::getInstance()->absoluteUrl($this->getRoute('admin.coupon.list'))
+                URL::getInstance()->absoluteUrl($this->getRoute('admin.coupon.list')),
             );
         } catch (\Exception $exception) {
             $this->getParserContext()
-                ->setGeneralError($exception->getMessage())
-            ;
+                ->setGeneralError($exception->getMessage());
 
             return $this->browseAction();
         }

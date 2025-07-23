@@ -39,6 +39,7 @@ class BrandFilter implements TheliaFilterInterface
     public function getValue(ActiveRecordInterface $activeRecord, string $locale, $valueSearched = null, ?int $depth = 1): ?array
     {
         $brand = $activeRecord->getBrand();
+
         if (!$brand instanceof Brand) {
             return null;
         }

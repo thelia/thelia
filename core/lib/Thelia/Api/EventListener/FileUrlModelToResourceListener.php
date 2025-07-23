@@ -42,27 +42,28 @@ class FileUrlModelToResourceListener implements EventSubscriberInterface
         $documentType = $resource::getFileType();
 
         $baseSourceFilePath = ConfigQuery::read($documentType.'s_library_path');
-        if ($baseSourceFilePath === null) {
+
+        if (null === $baseSourceFilePath) {
             $baseSourceFilePath = THELIA_LOCAL_DIR.'media'.DS.$documentType.'s';
         } else {
             $baseSourceFilePath = THELIA_ROOT.$baseSourceFilePath;
         }
 
-        $event = $documentType === 'image' ? new ImageEvent() : new DocumentEvent();
-        $eventName = $documentType === 'image' ? TheliaEvents::IMAGE_PROCESS : TheliaEvents::DOCUMENT_PROCESS;
+        $event = 'image' === $documentType ? new ImageEvent() : new DocumentEvent();
+        $eventName = 'image' === $documentType ? TheliaEvents::IMAGE_PROCESS : TheliaEvents::DOCUMENT_PROCESS;
         $sourceFilePath = \sprintf(
             '%s/%s/%s',
             $baseSourceFilePath,
             $resource::getItemType(),
-            $resource->getFile()
+            $resource->getFile(),
         );
         $event->setSourceFilepath($sourceFilePath);
         $event->setCacheSubdirectory($resource::getItemType());
 
         $this->eventDispatcher->dispatch($event, $eventName);
 
-        $urlGetter = $documentType === 'image' ? 'getFileUrl' : 'getDocumentUrl';
-        $resource->setFileUrl($event->$urlGetter());
+        $urlGetter = 'image' === $documentType ? 'getFileUrl' : 'getDocumentUrl';
+        $resource->setFileUrl($event->{$urlGetter}());
     }
 
     public static function getSubscribedEvents(): array

@@ -16,8 +16,8 @@ namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
-use Propel\Runtime\Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -31,20 +31,18 @@ use Thelia\TaxEngine\Calculator;
 
 class Order extends BaseOrder
 {
-    /** @var int|null */
-    protected $choosenDeliveryAddress;
+    protected ?int $choosenDeliveryAddress = null;
 
-    /** @var int|null */
-    protected $choosenInvoiceAddress;
+    protected ?int $choosenInvoiceAddress = null;
 
-    protected $disableVersioning = false;
+    protected bool $disableVersioning = false;
 
     /**
      * @param int $choosenDeliveryAddress the choosen delivery address ID
      *
      * @return $this
      */
-    public function setChoosenDeliveryAddress($choosenDeliveryAddress)
+    public function setChoosenDeliveryAddress(int $choosenDeliveryAddress)
     {
         $this->choosenDeliveryAddress = $choosenDeliveryAddress;
 
@@ -52,11 +50,9 @@ class Order extends BaseOrder
     }
 
     /**
-     * @param bool $disableVersioning
-     *
      * @return $this
      */
-    public function setDisableVersioning($disableVersioning)
+    public function setDisableVersioning(bool $disableVersioning)
     {
         $this->disableVersioning = (bool) $disableVersioning;
 
@@ -68,7 +64,7 @@ class Order extends BaseOrder
         return $this->disableVersioning;
     }
 
-    public function isVersioningNecessary($con = null)
+    public function isVersioningNecessary($con = null): bool
     {
         if ($this->isVersioningDisable()) {
             return false;
@@ -80,7 +76,7 @@ class Order extends BaseOrder
     /**
      * @return int|null the choosen delivery address ID
      */
-    public function getChoosenDeliveryAddress()
+    public function getChoosenDeliveryAddress(): ?int
     {
         return $this->choosenDeliveryAddress;
     }
@@ -90,7 +86,7 @@ class Order extends BaseOrder
      *
      * @return $this
      */
-    public function setChoosenInvoiceAddress($choosenInvoiceAddress)
+    public function setChoosenInvoiceAddress(int $choosenInvoiceAddress)
     {
         $this->choosenInvoiceAddress = $choosenInvoiceAddress;
 
@@ -100,7 +96,7 @@ class Order extends BaseOrder
     /**
      * @return int|null the choosen invoice address ID
      */
-    public function getChoosenInvoiceAddress()
+    public function getChoosenInvoiceAddress(): ?int
     {
         return $this->choosenInvoiceAddress;
     }
@@ -108,7 +104,7 @@ class Order extends BaseOrder
     /**
      * @throws PropelException
      */
-    public function preSave(?ConnectionInterface $con = null)
+    public function preSave(?ConnectionInterface $con = null): bool
     {
         if ($this->isPaid(false) && null === $this->getInvoiceDate()) {
             $this
@@ -146,10 +142,8 @@ class Order extends BaseOrder
      * @param bool      $includeDiscount if true, the discount will be included to the total
      *
      * @throws PropelException
-     *
-     * @return float
      */
-    public function getTotalAmount(&$tax = 0, $includePostage = true, $includeDiscount = true)
+    public function getTotalAmount(float|int &$tax = 0, bool $includePostage = true, bool $includeDiscount = true): float
     {
         // To prevent price changes in pre-2.4 orders, use the legacy calculation method
         if ($this->getId() <= ConfigQuery::read('last_legacy_rounding_order_id', 0)) {
@@ -211,13 +205,7 @@ class Order extends BaseOrder
             $stmt = $con->prepare($query);
 
             if (false === $stmt->execute([':order_id' => $this->getId()])) {
-                throw new TheliaProcessException(
-                    \sprintf(
-                        'Failed to get order total and order tax: %s (%s)',
-                        $stmt->errorInfo(),
-                        $stmt->errorCode()
-                    )
-                );
+                throw new TheliaProcessException(\sprintf('Failed to get order total and order tax: %s (%s)', $stmt->errorInfo(), $stmt->errorCode()));
             }
 
             $queryResult[$id] = $stmt->fetch(\PDO::FETCH_OBJ);
@@ -258,10 +246,8 @@ class Order extends BaseOrder
      * @param bool      $includeDiscount if true, the discount will be included to the total
      *
      * @throws PropelException
-     *
-     * @return float
      */
-    public function getTotalAmountLegacy(&$tax = 0, $includePostage = true, $includeDiscount = true)
+    public function getTotalAmountLegacy(float|int &$tax = 0, bool $includePostage = true, bool $includeDiscount = true): float
     {
         $amount = (float) OrderProductQuery::create()
             ->filterByOrderId($this->getId())
@@ -309,10 +295,8 @@ class Order extends BaseOrder
      * During invoice process, use all cart methods instead of order methods (the order doest not exists at this moment)
      *
      * @throws PropelException
-     *
-     * @return float
      */
-    public function getWeight()
+    public function getWeight(): float
     {
         $weight = 0;
 
@@ -326,10 +310,8 @@ class Order extends BaseOrder
 
     /**
      * Return the postage without tax.
-     *
-     * @return float|int
      */
-    public function getUntaxedPostage()
+    public function getUntaxedPostage(): float|int
     {
         return 0 < $this->getPostageTax() ? $this->getPostage() - $this->getPostageTax() : $this->getPostage();
     }
@@ -339,15 +321,14 @@ class Order extends BaseOrder
      *
      * @return bool true if this order have at less 1 file to download, false otherwise
      */
-    public function hasVirtualProduct()
+    public function hasVirtualProduct(): bool
     {
         $virtualProductCount = OrderProductQuery::create()
             ->filterByOrderId($this->getId())
             ->filterByVirtual(1, Criteria::EQUAL)
-            ->count()
-        ;
+            ->count();
 
-        return $virtualProductCount !== 0;
+        return 0 !== $virtualProductCount;
     }
 
     /**
@@ -365,11 +346,11 @@ class Order extends BaseOrder
      *
      * @param bool $exact if true, the status should be the exact required status, not a derived one
      *
-     * @throws PropelException
-     *
      * @return bool true if this order is NOT PAID, false otherwise
+     *
+     * @throws PropelException
      */
-    public function isNotPaid($exact = true)
+    public function isNotPaid(bool $exact = true): bool
     {
         return $this->getOrderStatus()->isNotPaid($exact);
     }
@@ -389,11 +370,11 @@ class Order extends BaseOrder
      *
      * @param bool $exact if true, the status should be the exact required status, not a derived one
      *
-     * @throws PropelException
-     *
      * @return bool true if this order is PAID, false otherwise
+     *
+     * @throws PropelException
      */
-    public function isPaid($exact = true)
+    public function isPaid(bool $exact = true): bool
     {
         return $this->getOrderStatus()->isPaid($exact);
     }
@@ -413,11 +394,11 @@ class Order extends BaseOrder
      *
      * @param bool $exact if true, the status should be the exact required status, not a derived one
      *
-     * @throws PropelException
-     *
      * @return bool true if this order is PROCESSING, false otherwise
+     *
+     * @throws PropelException
      */
-    public function isProcessing($exact = true)
+    public function isProcessing(bool $exact = true): bool
     {
         return $this->getOrderStatus()->isProcessing($exact);
     }
@@ -437,11 +418,11 @@ class Order extends BaseOrder
      *
      * @param bool $exact if true, the status should be the exact required status, not a derived one
      *
-     * @throws PropelException
-     *
      * @return bool true if this order is SENT, false otherwise
+     *
+     * @throws PropelException
      */
-    public function isSent($exact = true)
+    public function isSent(bool $exact = true): bool
     {
         return $this->getOrderStatus()->isSent($exact);
     }
@@ -461,11 +442,11 @@ class Order extends BaseOrder
      *
      * @param bool $exact if true, the status should be the exact required status, not a derived one
      *
-     * @throws PropelException
-     *
      * @return bool true if this order is CANCELED, false otherwise
+     *
+     * @throws PropelException
      */
-    public function isCancelled($exact = true)
+    public function isCancelled(bool $exact = true): bool
     {
         return $this->getOrderStatus()->isCancelled($exact);
     }
@@ -485,11 +466,11 @@ class Order extends BaseOrder
      *
      * @param bool $exact if true, the status should be the exact required status, not a derived one
      *
-     * @throws PropelException
-     *
      * @return bool true if this order is REFUNDED, false otherwise
+     *
+     * @throws PropelException
      */
-    public function isRefunded($exact = true)
+    public function isRefunded(bool $exact = true): bool
     {
         return $this->getOrderStatus()->isRefunded($exact);
     }
@@ -501,7 +482,7 @@ class Order extends BaseOrder
      *
      * @throws PropelException
      */
-    public function setStatusHelper($statusCode): void
+    public function setStatusHelper(string $statusCode): void
     {
         if (null !== $ordeStatus = OrderStatusQuery::create()->findOneByCode($statusCode)) {
             $this->setOrderStatus($ordeStatus)->save();
@@ -512,10 +493,8 @@ class Order extends BaseOrder
      * Get an instance of the payment module.
      *
      * @throws TheliaProcessException
-     *
-     * @return PaymentModuleInterface
      */
-    public function getPaymentModuleInstance()
+    public function getPaymentModuleInstance(): PaymentModuleInterface
     {
         if (null === $paymentModule = ModuleQuery::create()->findPk($this->getPaymentModuleId())) {
             throw new TheliaProcessException('Payment module ID='.$this->getPaymentModuleId().' was not found.');
@@ -528,10 +507,8 @@ class Order extends BaseOrder
      * Get an instance of the delivery module.
      *
      * @throws TheliaProcessException
-     *
-     * @return BaseModuleInterface
      */
-    public function getDeliveryModuleInstance()
+    public function getDeliveryModuleInstance(): BaseModuleInterface
     {
         if (null === $deliveryModule = ModuleQuery::create()->findPk($this->getDeliveryModuleId())) {
             throw new TheliaProcessException('Delivery module ID='.$this->getDeliveryModuleId().' was not found.');
@@ -546,7 +523,7 @@ class Order extends BaseOrder
      *
      * @return bool true if the stock was decreased at order creation, false otherwise
      */
-    public function isStockManagedOnOrderCreation(EventDispatcherInterface $dispatcher)
+    public function isStockManagedOnOrderCreation(EventDispatcherInterface $dispatcher): bool
     {
         $paymentModule = $this->getPaymentModuleInstance();
 
@@ -556,8 +533,8 @@ class Order extends BaseOrder
             $event,
             TheliaEvents::getModuleEvent(
                 TheliaEvents::MODULE_PAYMENT_MANAGE_STOCK,
-                $paymentModule->getCode()
-            )
+                $paymentModule->getCode(),
+            ),
         );
 
         return $event->getManageStock() ?? $paymentModule->manageStockOnCreation();

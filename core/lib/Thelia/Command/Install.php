@@ -48,34 +48,33 @@ class Install extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'host for your database',
-                'localhost'
+                'localhost',
             )
             ->addOption(
                 'database_username',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'username for your database'
+                'username for your database',
             )
             ->addOption(
                 'database_password',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'password for your database'
+                'password for your database',
             )
             ->addOption(
                 'database_name',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'database name'
+                'database name',
             )
             ->addOption(
                 'database_port',
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'database port',
-                '3306'
-            )
-        ;
+                '3306',
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -160,16 +159,16 @@ class Install extends ContainerAwareCommand
                         \sprintf(
                             '<info>%s ...</info> %s',
                             $data['text'],
-                            '<info>Ok</info>'
+                            '<info>Ok</info>',
                         ),
-                    ]
+                    ],
                 );
             } else {
                 $output->writeln([
                     \sprintf(
                         '<error>%s </error>%s',
                         $data['text'],
-                        \sprintf('<error>%s</error>', $data['hint'])
+                        \sprintf('<error>%s</error>', $data['hint']),
                     ),
                 ]);
             }
@@ -199,9 +198,9 @@ class Install extends ContainerAwareCommand
                 $connectionInfo['port'],
                 $connectionInfo['dbName'],
                 $connectionInfo['username'],
-                $connectionInfo['password']
+                $connectionInfo['password'],
             ),
-            \FILE_APPEND
+            \FILE_APPEND,
         );
 
         $fs->remove($this->getContainer()->getParameter('kernel.cache_dir'));
@@ -222,7 +221,7 @@ class Install extends ContainerAwareCommand
             $connection = new \PDO(
                 \sprintf($dsn, $connectionInfo['host'], $connectionInfo['port']),
                 $connectionInfo['username'],
-                $connectionInfo['password']
+                $connectionInfo['password'],
             );
             $connection->query("SET NAMES 'UTF8'");
         } catch (\PDOException) {
@@ -253,7 +252,7 @@ class Install extends ContainerAwareCommand
             'Database host [default: localhost] : ',
             'You must specify a database host',
             false,
-            'localhost'
+            'localhost',
         );
 
         $connectionInfo['port'] = $this->enterData(
@@ -263,7 +262,7 @@ class Install extends ContainerAwareCommand
             'Database port [default: 3306] : ',
             'You must specify a database port',
             false,
-            '3306'
+            '3306',
         );
 
         $connectionInfo['dbName'] = $this->enterData(
@@ -271,7 +270,7 @@ class Install extends ContainerAwareCommand
             $input,
             $output,
             'Database name (if database does not exist, Thelia will try to create it) : ',
-            'You must specify a database name'
+            'You must specify a database name',
         );
 
         $connectionInfo['username'] = $this->enterData(
@@ -279,7 +278,7 @@ class Install extends ContainerAwareCommand
             $input,
             $output,
             'Database username : ',
-            'You must specify a database username'
+            'You must specify a database username',
         );
 
         $connectionInfo['password'] = $this->enterData(
@@ -290,7 +289,7 @@ class Install extends ContainerAwareCommand
             'You must specify a database username',
             true,
             null,
-            true
+            true,
         );
 
         return $connectionInfo;
@@ -313,8 +312,8 @@ class Install extends ContainerAwareCommand
             $question->setHiddenFallback(false);
         }
 
-        $question->setValidator(function ($value) use (&$errorMessage, &$beEmpty) {
-            if (trim($value) === '' && (null === $value && !$beEmpty)) {
+        $question->setValidator(static function ($value) use (&$errorMessage, &$beEmpty) {
+            if ('' === trim($value) && (null === $value && !$beEmpty)) {
                 throw new \Exception($errorMessage);
             }
 

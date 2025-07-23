@@ -29,11 +29,10 @@ class TemplateModificationForm extends TemplateCreationForm
             ->add('id', HiddenType::class, [
                 'constraints' => [
                     new GreaterThan(
-                        ['value' => 0]
+                        ['value' => 0],
                     ),
                 ],
-            ])
-        ;
+            ]);
     }
 
     public static function getName(): string

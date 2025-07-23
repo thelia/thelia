@@ -47,13 +47,13 @@ class ErrorListener implements EventSubscriberInterface
             $this->parser->setTemplateDefinition(
                 $this->securityContext->hasAdminUser() ?
                     $this->parser->getTemplateHelper()->getActiveAdminTemplate() :
-                    $this->parser->getTemplateHelper()->getActiveFrontTemplate()
+                    $this->parser->getTemplateHelper()->getActiveFrontTemplate(),
             );
         }
 
         $response = new Response(
             $this->parser->render(ConfigQuery::getErrorMessagePageName()),
-            Response::HTTP_INTERNAL_SERVER_ERROR
+            Response::HTTP_INTERNAL_SERVER_ERROR,
         );
 
         $event->setResponse($response);
@@ -69,9 +69,8 @@ class ErrorListener implements EventSubscriberInterface
             $this->eventDispatcher
                 ->dispatch(
                     $event,
-                    TheliaKernelEvents::THELIA_HANDLE_ERROR
-                )
-            ;
+                    TheliaKernelEvents::THELIA_HANDLE_ERROR,
+                );
         }
     }
 
@@ -84,15 +83,15 @@ class ErrorListener implements EventSubscriberInterface
 
         do {
             $logMessage .=
-                ($logMessage !== '' && $logMessage !== '0' ? \PHP_EOL.'Caused by' : 'Uncaught exception')
+                ('' !== $logMessage && '0' !== $logMessage ? \PHP_EOL.'Caused by' : 'Uncaught exception')
                 .$exception->getMessage()
                 .\PHP_EOL
-                .'Stack Trace: '.$exception->getTraceAsString()
-            ;
+                .'Stack Trace: '.$exception->getTraceAsString();
         } while (($exception = $exception->getPrevious()) instanceof \Throwable);
 
         Tlog::getInstance()->error($logMessage);
-        if ($exception !== null) {
+
+        if (null !== $exception) {
             Tlog::getInstance()->error($exception->getTraceAsString());
         }
     }
@@ -100,9 +99,10 @@ class ErrorListener implements EventSubscriberInterface
     public function authenticationException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
+
         if ($exception instanceof AuthenticationException) {
             $event->setResponse(
-                new RedirectResponse($exception->getLoginTemplate())
+                new RedirectResponse($exception->getLoginTemplate()),
             );
         }
     }

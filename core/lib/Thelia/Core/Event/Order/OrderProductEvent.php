@@ -21,13 +21,12 @@ use Thelia\Model\Order;
  */
 class OrderProductEvent extends OrderEvent
 {
-    /** @var int */
-    protected $id;
+    protected int $id;
 
     /**
      * @param int $id order product id
      */
-    public function __construct(Order $order, $id)
+    public function __construct(Order $order, int $id)
     {
         parent::__construct($order);
         $this->setId($id);
@@ -36,17 +35,14 @@ class OrderProductEvent extends OrderEvent
     /**
      * @return $this
      */
-    public function setId($id): self
+    public function setId(int $id): self
     {
         $this->id = $id;
 
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

@@ -25,15 +25,8 @@ use Thelia\Model\Customer;
  */
 class AddressCreateOrUpdateEvent extends ActionEvent
 {
-    /**
-     * @var Customer
-     */
-    protected $customer;
-
-    /**
-     * @var Address
-     */
-    protected $address;
+    protected Customer $customer;
+    protected Address $address;
 
     /**
      * @param string      $label
@@ -113,122 +106,77 @@ class AddressCreateOrUpdateEvent extends ActionEvent
     ) {
     }
 
-    /**
-     * @return string
-     */
-    public function getAddress1()
+    public function getAddress1(): string
     {
         return $this->address1;
     }
 
-    /**
-     * @return string
-     */
-    public function getAddress2()
+    public function getAddress2(): string
     {
         return $this->address2;
     }
 
-    /**
-     * @return string
-     */
-    public function getAddress3()
+    public function getAddress3(): string
     {
         return $this->address3;
     }
 
-    /**
-     * @return string
-     */
-    public function getCellphone()
+    public function getCellphone(): string
     {
         return $this->cellphone;
     }
 
-    /**
-     * @return string
-     */
-    public function getCity()
+    public function getCity(): string
     {
         return $this->city;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getCompany()
+    public function getCompany(): ?string
     {
         return $this->company;
     }
 
-    /**
-     * @return int
-     */
-    public function getCountry()
+    public function getCountry(): int
     {
         return $this->country;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getState()
+    public function getState(): ?int
     {
         return $this->state;
     }
 
-    /**
-     * @return string
-     */
-    public function getFirstname()
+    public function getFirstname(): string
     {
         return $this->firstname;
     }
 
-    /**
-     * @return string
-     */
-    public function getLabel()
+    public function getLabel(): string
     {
         return $this->label;
     }
 
-    /**
-     * @return string
-     */
-    public function getLastname()
+    public function getLastname(): string
     {
         return $this->lastname;
     }
 
-    /**
-     * @return string
-     */
-    public function getPhone()
+    public function getPhone(): string
     {
         return $this->phone;
     }
 
-    /**
-     * @return int
-     */
-    public function getTitle()
+    public function getTitle(): int
     {
         return $this->title;
     }
 
-    /**
-     * @return string
-     */
-    public function getZipcode()
+    public function getZipcode(): string
     {
         return $this->zipcode;
     }
 
-    /**
-     * @return int
-     */
-    public function getIsDefault()
+    public function getIsDefault(): int
     {
         return $this->isDefault;
     }
@@ -238,10 +186,7 @@ class AddressCreateOrUpdateEvent extends ActionEvent
         $this->customer = $customer;
     }
 
-    /**
-     * @return Customer
-     */
-    public function getCustomer()
+    public function getCustomer(): Customer
     {
         return $this->customer;
     }
@@ -252,10 +197,7 @@ class AddressCreateOrUpdateEvent extends ActionEvent
         $this->setCustomer($address->getCustomer());
     }
 
-    /**
-     * @return Address
-     */
-    public function getAddress()
+    public function getAddress(): Address
     {
         return $this->address;
     }

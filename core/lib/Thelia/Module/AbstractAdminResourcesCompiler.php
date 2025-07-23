@@ -21,8 +21,6 @@ use Symfony\Component\DependencyInjection\Definition;
 /**
  * Class AbastractAdminResourcesCompiler.
  *
- * @since 2.3
- *
  * @author Penalver Antony <apenalver@openstudio.fr>
  */
 abstract class AbstractAdminResourcesCompiler implements CompilerPassInterface
@@ -35,12 +33,12 @@ abstract class AbstractAdminResourcesCompiler implements CompilerPassInterface
      *               ...
      *               ]
      */
-    abstract public function getResources();
+    abstract public function getResources(): array;
 
     /**
      * @return string ModuleCode
      */
-    abstract public function getModuleCode();
+    abstract public function getModuleCode(): string;
 
     /**
      * Allow module to add resources in AdminResources Service.

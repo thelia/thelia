@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
@@ -36,10 +37,7 @@ abstract class BaseSpecificModule extends BaseI18nLoop implements PropelSearchLo
 {
     protected $timestampable = true;
 
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('id'),
@@ -57,15 +55,15 @@ abstract class BaseSpecificModule extends BaseI18nLoop implements PropelSearchLo
                             'alpha_reverse',
                             'manual',
                             'manual_reverse',
-                        ]
-                    )
+                        ],
+                    ),
                 ),
-                'manual'
-            )
+                'manual',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = ModuleQuery::create();
 

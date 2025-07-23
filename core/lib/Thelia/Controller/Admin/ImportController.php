@@ -42,20 +42,18 @@ class ImportController extends BaseAdminController
      * Handle default action, that is, list available imports.
      *
      * @param string $_view View to render
-     *
-     * @return Response
      */
-    public function indexAction(string $_view = 'import')
+    public function indexAction(string $_view = 'import'): Response
     {
         $authResponse = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::VIEW]);
+
         if ($authResponse instanceof Response) {
             return $authResponse;
         }
 
         $this->getParserContext()
             ->set('category_order', $this->getRequest()->query->get('category_order', 'manual'))
-            ->set('import_order', $this->getRequest()->query->get('import_order', 'manual'))
-        ;
+            ->set('import_order', $this->getRequest()->query->get('import_order', 'manual'));
 
         return $this->render($_view);
     }
@@ -66,6 +64,7 @@ class ImportController extends BaseAdminController
     public function changeImportPositionAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         $authResponse = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::UPDATE]);
+
         if ($authResponse instanceof Response) {
             return $authResponse;
         }
@@ -76,9 +75,9 @@ class ImportController extends BaseAdminController
             new UpdatePositionEvent(
                 $query->get('id'),
                 $this->matchPositionMode($query->get('mode')),
-                $query->get('value')
+                $query->get('value'),
             ),
-            TheliaEvents::IMPORT_CHANGE_POSITION
+            TheliaEvents::IMPORT_CHANGE_POSITION,
         );
 
         return $this->generateRedirectFromRoute('import.list');
@@ -90,6 +89,7 @@ class ImportController extends BaseAdminController
     public function changeCategoryPositionAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         $authResponse = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::UPDATE]);
+
         if ($authResponse instanceof Response) {
             return $authResponse;
         }
@@ -100,7 +100,7 @@ class ImportController extends BaseAdminController
             new UpdatePositionEvent(
                 $query->get('id'),
                 $this->matchPositionMode($query->get('mode')),
-                $query->get('value')
+                $query->get('value'),
             ),
             TheliaEvents::IMPORT_CATEGORY_CHANGE_POSITION,
         );
@@ -115,13 +115,13 @@ class ImportController extends BaseAdminController
      *
      * @return int Position mode constant value
      */
-    protected function matchPositionMode($mode): int
+    protected function matchPositionMode(?string $mode): int
     {
-        if ($mode === 'up') {
+        if ('up' === $mode) {
             return UpdatePositionEvent::POSITION_UP;
         }
 
-        if ($mode === 'down') {
+        if ('down' === $mode) {
             return UpdatePositionEvent::POSITION_DOWN;
         }
 
@@ -139,7 +139,8 @@ class ImportController extends BaseAdminController
         $importHandler = $this->container->get('thelia.import.handler');
 
         $import = $importHandler->getImport($id);
-        if ($import === null) {
+
+        if (null === $import) {
             return $this->pageNotFound();
         }
 
@@ -160,6 +161,7 @@ class ImportController extends BaseAdminController
 
         // Render standard view or ajax one
         $templateName = 'import-page';
+
         if ($this->getRequest()->isXmlHttpRequest()) {
             $templateName = 'ajax/import-modal';
         }
@@ -170,7 +172,7 @@ class ImportController extends BaseAdminController
                 'importId' => $id,
                 'ALLOWED_MIME_TYPES' => implode(', ', $mimeTypes),
                 'ALLOWED_EXTENSIONS' => implode(', ', $extensions),
-            ]
+            ],
         );
     }
 
@@ -178,8 +180,6 @@ class ImportController extends BaseAdminController
      * Handle import action.
      *
      * @param int $id An import identifier
-     *
-     * @return Response
      */
     public function importAction(int $id): Response|RedirectResponse
     {
@@ -187,7 +187,8 @@ class ImportController extends BaseAdminController
         $importHandler = $this->container->get('thelia.import.handler');
 
         $import = $importHandler->getImport($id);
-        if ($import === null) {
+
+        if (null === $import) {
             return $this->pageNotFound();
         }
 
@@ -200,7 +201,7 @@ class ImportController extends BaseAdminController
             $file = $validatedForm->get('file_upload')->getData();
             $file = $file->move(
                 THELIA_CACHE_DIR.'import'.DS.(new \DateTime())->format('Ymd'),
-                uniqid().'-'.$file->getClientOriginalName()
+                uniqid().'-'.$file->getClientOriginalName(),
             );
 
             $lang = (new LangQuery())->findPk($validatedForm->get('language')->getData());
@@ -214,8 +215,8 @@ class ImportController extends BaseAdminController
                         'Error(s) in import&nbsp;:<br />%errors',
                         [
                             '%errors' => implode('<br />', $importEvent->getErrors()),
-                        ]
-                    )
+                        ],
+                    ),
                 );
             }
 
@@ -225,8 +226,8 @@ class ImportController extends BaseAdminController
                     'Import successfully done, %count row(s) have been changed',
                     [
                         '%count' => $importEvent->getImport()->getImportedRows(),
-                    ]
-                )
+                    ],
+                ),
             );
 
             return $this->generateRedirectFromRoute('import.view', [], ['id' => $id]);
@@ -237,8 +238,7 @@ class ImportController extends BaseAdminController
         }
 
         $this->getParserContext()
-            ->addForm($form)
-        ;
+            ->addForm($form);
 
         return $this->configureAction($id);
     }

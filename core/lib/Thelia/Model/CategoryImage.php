@@ -19,7 +19,6 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\Routing\Router;
 use Thelia\Files\FileModelInterface;
 use Thelia\Files\FileModelParentInterface;
-use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\CategoryImage as BaseCategoryImage;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
@@ -33,15 +32,13 @@ class CategoryImage extends BaseCategoryImage implements BreadcrumbInterface, Fi
 
     /**
      * Calculate next position relative to our parent.
-     *
-     * @param CategoryImageQuery $query
      */
-    protected function addCriteriaToPositionQuery($query): void
+    protected function addCriteriaToPositionQuery(CategoryImageQuery $query): void
     {
         $query->filterByCategory($this->getCategory());
     }
 
-    public function preInsert(?ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): bool
     {
         parent::preInsert($con);
 
@@ -50,32 +47,32 @@ class CategoryImage extends BaseCategoryImage implements BreadcrumbInterface, Fi
         return true;
     }
 
-    public function setParentId($parentId)
+    public function setParentId($parentId): static
     {
         $this->setCategoryId($parentId);
 
         return $this;
     }
 
-    public function getParentId()
+    public function getParentId(): int
     {
         return $this->getCategoryId();
     }
 
-    public function preDelete(?ConnectionInterface $con = null)
+    public function preDelete(?ConnectionInterface $con = null): bool
     {
         parent::preDelete($con);
 
         $this->reorderBeforeDelete(
             [
                 'category_id' => $this->getCategoryId(),
-            ]
+            ],
         );
 
         return true;
     }
 
-    public function getBreadcrumb(Router $router, $tab, $locale)
+    public function getBreadcrumb(Router $router, $tab, $locale): array
     {
         return $this->getCategoryBreadcrumb($router, $tab, $locale);
     }
@@ -83,7 +80,7 @@ class CategoryImage extends BaseCategoryImage implements BreadcrumbInterface, Fi
     /**
      * @return FileModelParentInterface the parent file model
      */
-    public function getParentFileModel()
+    public function getParentFileModel(): FileModelParentInterface
     {
         return new Category();
     }
@@ -91,9 +88,9 @@ class CategoryImage extends BaseCategoryImage implements BreadcrumbInterface, Fi
     /**
      * Get the ID of the form used to change this object information.
      *
-     * @return BaseForm the form
+     * @return string the form
      */
-    public function getUpdateFormId()
+    public function getUpdateFormId(): string
     {
         return AdminForm::CATEGORY_IMAGE_MODIFICATION;
     }
@@ -101,10 +98,10 @@ class CategoryImage extends BaseCategoryImage implements BreadcrumbInterface, Fi
     /**
      * @return string the path to the upload directory where files are stored, without final slash
      */
-    public function getUploadDir()
+    public function getUploadDir(): string
     {
         $uploadDir = ConfigQuery::read('images_library_path');
-        $uploadDir = $uploadDir === null ? THELIA_LOCAL_DIR.'media'.DS.'images' : THELIA_ROOT.$uploadDir;
+        $uploadDir = null === $uploadDir ? THELIA_LOCAL_DIR.'media'.DS.'images' : THELIA_ROOT.$uploadDir;
 
         return $uploadDir.DS.'category';
     }
@@ -112,18 +109,21 @@ class CategoryImage extends BaseCategoryImage implements BreadcrumbInterface, Fi
     /**
      * @return string the URL to redirect to after update from the back-office
      */
-    public function getRedirectionUrl()
+    public function getRedirectionUrl(): string
     {
         return '/admin/categories/update?category_id='.$this->getCategoryId();
     }
 
     /**
      * Get the Query instance for this object.
-     *
-     * @return ModelCriteria
      */
-    public function getQueryInstance()
+    public function getQueryInstance(): ModelCriteria
     {
         return CategoryImageQuery::create();
+    }
+
+    public function getFile(): string
+    {
+        return parent::getFile();
     }
 }

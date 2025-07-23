@@ -22,6 +22,7 @@ class ComposerHelper
     public function getComposerPackagesFromPath(string $path): array
     {
         $composerJsonPath = rtrim($path, '/').'/composer.json';
+
         if (!file_exists($composerJsonPath)) {
             throw new \InvalidArgumentException(\sprintf("No composer.json find in '%s'", $path));
         }
@@ -32,11 +33,13 @@ class ComposerHelper
     public function addNamespaceToBundlesSymfony(string $namespace, array $environnement): void
     {
         $bundlesPath = THELIA_ROOT.'config/bundles.php';
+
         if (!file($bundlesPath)) {
             throw new \InvalidArgumentException(\sprintf("No bundles.php file found in '%s'", $bundlesPath));
         }
 
         $bundles = require $bundlesPath;
+
         if (!isset($bundles[$namespace])) {
             $bundles[$namespace] = $environnement;
             ksort($bundles);
@@ -48,16 +51,17 @@ class ComposerHelper
     public function findFirstClassBundle(string $directory): ?string
     {
         $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($directory)
+            new \RecursiveDirectoryIterator($directory),
         );
 
         /** @var \SplFileInfo $file */
         foreach ($iterator as $file) {
-            if (!$file->isFile() || $file->getExtension() !== 'php') {
+            if (!$file->isFile() || 'php' !== $file->getExtension()) {
                 continue;
             }
 
             $content = file_get_contents($file->getRealPath());
+
             if (!$content) {
                 continue;
             }
@@ -101,7 +105,7 @@ class ComposerHelper
 
                 file_put_contents(
                     $composerJsonPath,
-                    json_encode($composerData, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES)."\n"
+                    json_encode($composerData, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES)."\n",
                 );
             }
         } catch (\JsonException $jsonException) {
@@ -115,6 +119,7 @@ class ComposerHelper
 
         foreach ($bundles as $fqcn => $envs) {
             $envParts = [];
+
             foreach ($envs as $env => $enabled) {
                 $envParts[] = \sprintf("'%s' => ", $env).($enabled ? 'true' : 'false');
             }

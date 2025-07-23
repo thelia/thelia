@@ -27,11 +27,9 @@ use Thelia\Model\CartItem;
 abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements AmountAndPercentageCouponInterface
 {
     public const ATTRIBUTES_AV_LIST = 'attribute_avs';
-
     public const ATTRIBUTE = 'attribute_id';
 
     public array $attributeAvList = [];
-
     public int $attribute = 0;
 
     /**
@@ -76,14 +74,10 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
             $expirationDate,
             $freeShippingForCountries,
             $freeShippingForModules,
-            $perCustomerUsageCount
+            $perCustomerUsageCount,
         );
 
         $this->attributeAvList = $effects[self::ATTRIBUTES_AV_LIST] ?? [];
-
-        if (!\is_array($this->attributeAvList)) {
-            $this->attributeAvList = [$this->attributeAvList];
-        }
 
         $this->attribute = $effects[self::ATTRIBUTE] ?? 0;
 
@@ -92,7 +86,7 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
         return $this;
     }
 
-    public function exec(): float|int
+    public function exec(): float
     {
         // This coupon subtracts the specified amount from the order total
         // for each product which uses the selected attributes
@@ -111,7 +105,7 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
                 foreach ($combinations as $combination) {
                     $attrValue = $combination->getAttributeAvId();
 
-                    if (\in_array($attrValue, $this->attributeAvList)) {
+                    if (\in_array($attrValue, $this->attributeAvList, true)) {
                         $discount += $this->getCartItemDiscount($cartItem);
 
                         break;
@@ -120,7 +114,7 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
             }
         }
 
-        return $discount;
+        return (float) $discount;
     }
 
     /**
@@ -147,21 +141,13 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
 
     public function checkBaseCouponFieldValue(string $fieldName, string $fieldValue): string
     {
-        if ($fieldName === self::ATTRIBUTE) {
-            if ($fieldValue === '' || $fieldValue === '0') {
-                throw new \InvalidArgumentException(
-                    Translator::getInstance()->trans(
-                        'Please select an attribute'
-                    )
-                );
+        if (self::ATTRIBUTE === $fieldName) {
+            if ('' === $fieldValue || '0' === $fieldValue) {
+                throw new \InvalidArgumentException(Translator::getInstance()->trans('Please select an attribute'));
             }
-        } elseif ($fieldName === self::ATTRIBUTES_AV_LIST) {
-            if ($fieldValue === '' || $fieldValue === '0') {
-                throw new \InvalidArgumentException(
-                    Translator::getInstance()->trans(
-                        'Please select at least one attribute value'
-                    )
-                );
+        } elseif (self::ATTRIBUTES_AV_LIST === $fieldName) {
+            if ('' === $fieldValue || '0' === $fieldValue) {
+                throw new \InvalidArgumentException(Translator::getInstance()->trans('Please select at least one attribute value'));
             }
         }
 

@@ -72,6 +72,7 @@ class HookHelper
         $this->loadTrans($templateType, $locale);
 
         $ret = [];
+
         foreach ($hooks as $hook) {
             try {
                 $ret[] = $this->prepareHook($hook);
@@ -116,7 +117,7 @@ class HookHelper
                 if ($fileInfo->isFile()) {
                     $ext = $fileInfo->getExtension();
 
-                    if (\in_array($ext, $allowed_exts) && $content = file_get_contents($fileInfo->getPathName())) {
+                    if (\in_array($ext, $allowed_exts, true) && $content = file_get_contents($fileInfo->getPathName())) {
                         foreach ($this->parserHelper->getFunctionsDefinition($content, ['hook', 'hookblock']) as $hook) {
                             $hook['file'] = $fileInfo->getFilename();
                             $hooks[] = $hook;
@@ -132,6 +133,7 @@ class HookHelper
     protected function prepareHook(array $hook): array
     {
         $ret = [];
+
         if (!\array_key_exists('attributes', $hook)) {
             throw new \UnexpectedValueException('The hook should have attributes.');
         }
@@ -139,12 +141,12 @@ class HookHelper
         $attributes = $hook['attributes'];
 
         if (\array_key_exists('name', $attributes)) {
-            $ret['block'] = ($hook['name'] !== 'hook');
+            $ret['block'] = ('hook' !== $hook['name']);
 
             $ret['code'] = $attributes['name'];
             $params = explode('.', (string) $attributes['name']);
 
-            if (\count($params) !== 2) {
+            if (2 !== \count($params)) {
                 // the hook does not respect the convention
                 if (!str_contains((string) $attributes['name'], '$')) {
                     $ret['context'] = $attributes['name'];
@@ -160,6 +162,7 @@ class HookHelper
             unset($attributes['name']);
 
             $ret['module'] = false;
+
             if (\array_key_exists('module', $attributes)) {
                 $ret['module'] = true;
                 unset($attributes['module']);

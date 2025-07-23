@@ -36,19 +36,17 @@ class ControllerListener implements EventSubscriberInterface
     public function adminFirewall(ControllerEvent $event): void
     {
         $controller = $event->getController();
+
         // check if an admin is logged in
-        if (\is_array($controller) && $controller[0] instanceof BaseAdminController && (false === $this->securityContext->hasAdminUser() && $event->getRequest()->attributes->get('not-logged') != 1)) {
-            throw new AdminAccessDenied(
-                Translator::getInstance()->trans(
-                    "You're not currently connected to the administration panel. Please log in to access this page"
-                )
-            );
+        if (\is_array($controller)
+            && $controller[0] instanceof BaseAdminController
+            && (false === $this->securityContext->hasAdminUser()
+                && '1' !== $event->getRequest()->attributes->get('not-logged'))
+        ) {
+            throw new AdminAccessDenied(Translator::getInstance()->trans("You're not currently connected to the administration panel. Please log in to access this page"));
         }
     }
 
-    /**
-     * @api
-     */
     public static function getSubscribedEvents(): array
     {
         return [

@@ -51,6 +51,7 @@ class ModuleAttributeLoader extends Loader
             }
 
             $moduleRoutes = $loader->load($moduleControllerPath, 'attribute');
+
             if (!$moduleRoutes instanceof RouteCollection) {
                 continue;
             }

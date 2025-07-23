@@ -25,8 +25,7 @@ use Thelia\Model\OrderProduct;
  */
 class VirtualProductOrderDownloadResponseEvent extends ActionEvent
 {
-    /** @var Response */
-    protected $response;
+    protected Response $response;
 
     public function __construct(protected OrderProduct $orderProduct)
     {
@@ -47,10 +46,7 @@ class VirtualProductOrderDownloadResponseEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     * @return Response
-     */
-    public function getResponse()
+    public function getResponse(): Response
     {
         return $this->response;
     }

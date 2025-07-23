@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -53,55 +54,62 @@ class ModuleHook extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumListType(['id', 'id_reverse', 'hook', 'hook_reverse', 'manual', 'manual_reverse', 'enabled', 'enabled_reverse'])
+                    new EnumListType(['id', 'id_reverse', 'hook', 'hook_reverse', 'manual', 'manual_reverse', 'enabled', 'enabled_reverse']),
                 ),
-                'manual'
+                'manual',
             ),
             Argument::createIntListTypeArgument('exclude'),
             Argument::createBooleanOrBothTypeArgument('active', BooleanOrBothType::ANY),
             Argument::createBooleanOrBothTypeArgument('hook_active', BooleanOrBothType::ANY),
-            Argument::createBooleanOrBothTypeArgument('module_active', BooleanOrBothType::ANY)
+            Argument::createBooleanOrBothTypeArgument('module_active', BooleanOrBothType::ANY),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = ModuleHookQuery::create();
 
         $this->configureI18nProcessing($search, []);
 
         $id = $this->getId();
+
         if (null !== $id) {
             $search->filterById($id, Criteria::IN);
         }
 
         $hook = $this->getHook();
+
         if (null !== $hook) {
             $search->filterByHookId($hook, Criteria::EQUAL);
         }
 
         $module = $this->getModule();
+
         if (null !== $module) {
             $search->filterByModuleId($module, Criteria::EQUAL);
         }
 
         $exclude = $this->getExclude();
+
         if (null !== $exclude) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
         $active = $this->getActive();
-        if ($active !== BooleanOrBothType::ANY) {
+
+        if (BooleanOrBothType::ANY !== $active) {
             $search->filterByActive($active, Criteria::EQUAL);
         }
 
         $hookActive = $this->getHookActive();
-        if ($hookActive !== BooleanOrBothType::ANY) {
+
+        if (BooleanOrBothType::ANY !== $hookActive) {
             $search->filterByHookActive($hookActive, Criteria::EQUAL);
         }
 
         $moduleActive = $this->getModuleActive();
-        if ($moduleActive !== BooleanOrBothType::ANY) {
+
+        if (BooleanOrBothType::ANY !== $moduleActive) {
             $search->filterByModuleActive($moduleActive, Criteria::EQUAL);
         }
 
@@ -158,8 +166,7 @@ class ModuleHook extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set('HOOK_ACTIVE', $moduleHook->getHookActive())
                     ->set('MODULE_ACTIVE', $moduleHook->getModuleActive())
                     ->set('POSITION', $moduleHook->getPosition())
-                    ->set('TEMPLATES', $moduleHook->getTemplates())
-                ;
+                    ->set('TEMPLATES', $moduleHook->getTemplates());
 
                 $this->addOutputFields($loopResultRow, $moduleHook);
                 $loopResult->addRow($loopResultRow);

@@ -21,46 +21,33 @@ use Propel\Runtime\Util\PropelModelPager;
 class LoopResult implements \Iterator, \JsonSerializable
 {
     private int $position = 0;
-
     protected $collection = [];
-
     protected $versioned = false;
-
     protected $timestamped = false;
-
     protected $countable = false;
 
     public function __construct(public $resultsCollection)
     {
     }
 
-    /**
-     * @param bool $countable
-     */
-    public function setCountable($countable = true): void
+    public function setCountable(bool $countable = true): void
     {
-        $this->countable = true === $countable;
+        $this->countable = $countable;
     }
 
-    /**
-     * @param bool $timestamped
-     */
-    public function setTimestamped($timestamped = true): void
+    public function setTimestamped(bool $timestamped = true): void
     {
-        $this->timestamped = true === $timestamped;
+        $this->timestamped = $timestamped;
     }
 
-    /**
-     * @param bool $versioned
-     */
-    public function setVersioned($versioned = true): void
+    public function setVersioned(bool $versioned = true): void
     {
-        $this->versioned = true === $versioned;
+        $this->versioned = $versioned;
     }
 
     public function isEmpty(): bool
     {
-        return \count($this->collection) == 0;
+        return 0 === \count($this->collection);
     }
 
     public function addRow(LoopResultRow $row, $key = null): void
@@ -89,10 +76,7 @@ class LoopResult implements \Iterator, \JsonSerializable
         }
     }
 
-    /**
-     * @param int $key
-     */
-    public function remove($key): void
+    public function remove(int $key): void
     {
         if (isset($this->collection[$key])) {
             unset($this->collection[$key]);
@@ -155,8 +139,6 @@ class LoopResult implements \Iterator, \JsonSerializable
      * Move forward to next element.
      *
      * @see http://php.net/manual/en/iterator.next.php
-     *
-     * @return void any returned value is ignored
      */
     public function next(): void
     {
@@ -196,8 +178,6 @@ class LoopResult implements \Iterator, \JsonSerializable
      * Rewind the Iterator to the first element.
      *
      * @see http://php.net/manual/en/iterator.rewind.php
-     *
-     * @return void any returned value is ignored
      */
     public function rewind(): void
     {
@@ -225,6 +205,7 @@ class LoopResult implements \Iterator, \JsonSerializable
     public function jsonSerialize(): array
     {
         $return = [];
+
         foreach ($this->collection as $collection) {
             $return[] = $collection->getVarVal();
         }

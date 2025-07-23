@@ -33,15 +33,13 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
 
     /**
      * Calculate next position relative to our parent.
-     *
-     * @param FolderDocumentQuery $query
      */
-    protected function addCriteriaToPositionQuery($query): void
+    protected function addCriteriaToPositionQuery(FolderDocumentQuery $query): void
     {
         $query->filterByFolder($this->getFolder());
     }
 
-    public function preInsert(?ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): bool
     {
         parent::preInsert($con);
 
@@ -50,32 +48,32 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
         return true;
     }
 
-    public function setParentId($parentId)
+    public function setParentId($parentId): static
     {
         $this->setFolderId($parentId);
 
         return $this;
     }
 
-    public function getParentId()
+    public function getParentId(): int
     {
         return $this->getFolderId();
     }
 
-    public function preDelete(?ConnectionInterface $con = null)
+    public function preDelete(?ConnectionInterface $con = null): bool
     {
         parent::preDelete($con);
 
         $this->reorderBeforeDelete(
             [
                 'folder_id' => $this->getFolderId(),
-            ]
+            ],
         );
 
         return true;
     }
 
-    public function getBreadcrumb(Router $router, $tab, $locale)
+    public function getBreadcrumb(Router $router, $tab, $locale): array
     {
         return $this->getFolderBreadcrumb($router, $tab, $locale);
     }
@@ -83,7 +81,7 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
     /**
      * @return FileModelParentInterface the parent file model
      */
-    public function getParentFileModel()
+    public function getParentFileModel(): FileModelParentInterface
     {
         return new Folder();
     }
@@ -93,7 +91,7 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
      *
      * @return BaseForm the form
      */
-    public function getUpdateFormId()
+    public function getUpdateFormId(): string
     {
         return AdminForm::FOLDER_DOCUMENT_MODIFICATION;
     }
@@ -101,10 +99,10 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
     /**
      * @return string the path to the upload directory where files are stored, without final slash
      */
-    public function getUploadDir()
+    public function getUploadDir(): string
     {
         $uploadDir = ConfigQuery::read('documents_library_path');
-        $uploadDir = $uploadDir === null ? THELIA_LOCAL_DIR.'media'.DS.'documents' : THELIA_ROOT.$uploadDir;
+        $uploadDir = null === $uploadDir ? THELIA_LOCAL_DIR.'media'.DS.'documents' : THELIA_ROOT.$uploadDir;
 
         return $uploadDir.DS.'folder';
     }
@@ -112,18 +110,21 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
     /**
      * @return string the URL to redirect to after update from the back-office
      */
-    public function getRedirectionUrl()
+    public function getRedirectionUrl(): string
     {
         return '/admin/folders/update/'.$this->getFolderId();
     }
 
     /**
      * Get the Query instance for this object.
-     *
-     * @return ModelCriteria
      */
-    public function getQueryInstance()
+    public function getQueryInstance(): ModelCriteria
     {
         return FolderDocumentQuery::create();
+    }
+
+    public function getFile(): string
+    {
+        return parent::getFile();
     }
 }

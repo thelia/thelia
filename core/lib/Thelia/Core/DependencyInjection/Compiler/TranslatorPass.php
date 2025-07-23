@@ -28,8 +28,6 @@ class TranslatorPass implements CompilerPassInterface
 {
     /**
      * You can modify the container here before it is dumped to PHP code.
-     *
-     * @api
      */
     public function process(ContainerBuilder $container): void
     {
@@ -41,6 +39,7 @@ class TranslatorPass implements CompilerPassInterface
 
         foreach ($container->findTaggedServiceIds('translation.loader') as $id => $attributes) {
             $translator->addMethodCall('addLoader', [$attributes[0]['alias'], new Reference($id)]);
+
             if (isset($attributes[0]['legacy-alias'])) {
                 $translator->addMethodCall('addLoader', [$attributes[0]['legacy-alias'], new Reference($id)]);
             }

@@ -24,35 +24,13 @@ use Thelia\Model\CustomerTitle;
  */
 class CustomerTitleEvent extends ActionEvent
 {
-    /**
-     * @var bool
-     */
-    protected $default = false;
+    protected bool $default = false;
+    protected string $short;
+    protected string $long;
+    protected string $locale;
+    protected ?CustomerTitle $customerTitle = null;
 
-    /**
-     * @var string
-     */
-    protected $short;
-
-    /**
-     * @var string
-     */
-    protected $long;
-
-    /**
-     * @var string
-     */
-    protected $locale;
-
-    /**
-     * @var CustomerTitle|null
-     */
-    protected $customerTitle;
-
-    /**
-     * @return CustomerTitle
-     */
-    public function getCustomerTitle()
+    public function getCustomerTitle(): CustomerTitle
     {
         return $this->customerTitle;
     }
@@ -67,80 +45,60 @@ class CustomerTitleEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isDefault()
+    public function isDefault(): bool
     {
         return $this->default;
     }
 
     /**
-     * @param bool $default
-     *
      * @return $this
      */
-    public function setDefault($default): static
+    public function setDefault(bool $default): static
     {
         $this->default = $default;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->locale;
     }
 
     /**
-     * @param string $locale
-     *
      * @return $this
      */
-    public function setLocale($locale): static
+    public function setLocale(string $locale): static
     {
         $this->locale = $locale;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLong()
+    public function getLong(): string
     {
         return $this->long;
     }
 
     /**
-     * @param string $long
-     *
      * @return $this
      */
-    public function setLong($long): static
+    public function setLong(string $long): static
     {
         $this->long = $long;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getShort()
+    public function getShort(): string
     {
         return $this->short;
     }
 
     /**
-     * @param string $short
-     *
      * @return $this
      */
-    public function setShort($short): static
+    public function setShort(string $short): static
     {
         $this->short = $short;
 

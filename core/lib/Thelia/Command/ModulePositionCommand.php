@@ -38,15 +38,11 @@ class ModulePositionCommand extends ContainerAwareCommand
 {
     protected ModuleQuery $moduleQuery;
 
-    /**
-     * @var array Modules list
-     */
-    protected $modulesList = [];
+    /** @var array Modules list */
+    protected array $modulesList = [];
 
-    /**
-     * @var array Modules positions list
-     */
-    protected $positionsList = [];
+    /** @var array Modules positions list */
+    protected array $positionsList = [];
 
     public function __construct(?string $name = null)
     {
@@ -61,9 +57,8 @@ class ModulePositionCommand extends ContainerAwareCommand
             ->addArgument(
                 'modules',
                 InputArgument::REQUIRED | InputArgument::IS_ARRAY,
-                'Module in format moduleName:[+|-]position where position is an integer or up or down.'
-            )
-        ;
+                'Module in format moduleName:[+|-]position where position is an integer or up or down.',
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -86,12 +81,12 @@ class ModulePositionCommand extends ContainerAwareCommand
             $module = $this->moduleQuery->findOneByCode($moduleName);
             $position = $this->positionsList[$moduleIdx];
 
-            if ($position === 'up') {
+            if ('up' === $position) {
                 $event = new UpdatePositionEvent($module->getId(), UpdatePositionEvent::POSITION_UP);
-            } elseif ($position === 'down') {
+            } elseif ('down' === $position) {
                 $event = new UpdatePositionEvent($module->getId(), UpdatePositionEvent::POSITION_DOWN);
             } else {
-                if ($position[0] === '+' || $position[0] === '-') {
+                if ('+' === $position[0] || '-' === $position[0]) {
                     $position = $module->getPosition() + $position;
                 }
 
@@ -100,6 +95,7 @@ class ModulePositionCommand extends ContainerAwareCommand
                 }
 
                 $maxPosition = $maxPositionByType[$module->getType()];
+
                 if ($position > $maxPosition) {
                     $position = $maxPosition;
                 }
@@ -121,22 +117,19 @@ class ModulePositionCommand extends ContainerAwareCommand
     /**
      * Check a module argument format.
      *
-     * @param string $paramValue
-     *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    protected function checkModuleArgument($paramValue): void
+    protected function checkModuleArgument(string $paramValue): void
     {
         if (!preg_match('#^([a-z0-9]+):([\+-]?[0-9]+|up|down)$#i', $paramValue, $matches)) {
-            throw new \InvalidArgumentException(
-                'Arguments must be in format moduleName:[+|-]position where position is an integer or up or down.'
-            );
+            throw new \InvalidArgumentException('Arguments must be in format moduleName:[+|-]position where position is an integer or up or down.');
         }
 
         $this->moduleQuery->clear();
         $module = $this->moduleQuery->findOneByCode($matches[1]);
-        if ($module === null) {
+
+        if (null === $module) {
             throw new \RuntimeException(\sprintf('%s module does not exists. Try to refresh first.', $matches[1]));
         }
 
@@ -164,8 +157,7 @@ class ModulePositionCommand extends ContainerAwareCommand
 
             $module
                 ->setPosition(++$modulesType[$module->getType()])
-                ->save()
-            ;
+                ->save();
         }
 
         return $modulesType;
@@ -178,15 +170,16 @@ class ModulePositionCommand extends ContainerAwareCommand
      * @param OutputInterface $output     An OutputInterface instance
      * @param bool            $isAbsolute Set to true or false according to position values
      *
-     * @throws \InvalidArgumentException
-     *
      * @return bool Continue or stop command
+     *
+     * @throws \InvalidArgumentException
      */
-    protected function checkPositions(InputInterface $input, OutputInterface $output, &$isAbsolute = false)
+    protected function checkPositions(InputInterface $input, OutputInterface $output, bool &$isAbsolute = false): bool
     {
         $isRelative = false;
+
         foreach (array_count_values($this->positionsList) as $value => $count) {
-            if (\is_int($value) && $value[0] !== '+' && $value[0] !== '-') {
+            if (\is_int($value) && '+' !== $value[0] && '-' !== $value[0]) {
                 $isAbsolute = true;
 
                 if ($count > 1) {
@@ -203,7 +196,7 @@ class ModulePositionCommand extends ContainerAwareCommand
             $formattedBlock = $formatter->formatBlock(
                 'Mix absolute and relative positions may produce unexpected results !',
                 'bg=yellow;fg=black',
-                true
+                true,
             );
             $output->writeln($formattedBlock);
 

@@ -37,7 +37,6 @@ class ParserContext implements \IteratorAggregate
     public const FORM_ERROR_LIFETIME_SECONDS = 60;
 
     private array $formStore = [];
-
     private $store = [];
 
     public function __construct(
@@ -68,12 +67,8 @@ class ParserContext implements \IteratorAggregate
 
     /**
      * Set the current form.
-     *
-     * @param BaseForm|null $default
-     *
-     * @return BaseForm|null
      */
-    public function popCurrentForm($default = null)
+    public function popCurrentForm(?BaseForm $default = null): ?BaseForm
     {
         $form = array_pop($this->formStore);
 
@@ -89,9 +84,7 @@ class ParserContext implements \IteratorAggregate
         $form = end($this->formStore);
 
         if (false === $form) {
-            throw new \RuntimeException(
-                'There is currently no defined form'
-            );
+            throw new \RuntimeException('There is currently no defined form');
         }
 
         return $form;
@@ -192,7 +185,7 @@ class ParserContext implements \IteratorAggregate
                     $formInfo['data'],
                     [
                         'validation_groups' => $formInfo['validation_groups'],
-                    ]
+                    ],
                 );
 
                 // If the form has errors, perform a validation, to restore the internal error context
@@ -212,13 +205,13 @@ class ParserContext implements \IteratorAggregate
                         /** @var Form $field */
                         $field = $form->getForm()->get($fieldName);
 
-                        if (null !== $field && \count($field->getErrors()) == 0) {
+                        if (null !== $field && 0 === \count($field->getErrors())) {
                             foreach ($errors as $errorData) {
                                 $error = new FormError(
                                     $errorData['message'],
                                     $errorData['template'],
                                     $errorData['parameters'],
-                                    $errorData['pluralization']
+                                    $errorData['pluralization'],
                                 );
 
                                 $field->addError($error);
@@ -325,10 +318,7 @@ class ParserContext implements \IteratorAggregate
         return new \ArrayIterator($this->store);
     }
 
-    /**
-     * @return Session
-     */
-    public function getSession()
+    public function getSession(): Session
     {
         return $this->requestStack->getCurrentRequest()->getSession();
     }

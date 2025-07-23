@@ -38,10 +38,10 @@ class TaxRuleTaxListUpdateForm extends BaseForm
                     'constraints' => [
                         new NotBlank(),
                         new Callback(
-                            $this->verifyTaxRuleId(...)
+                            $this->verifyTaxRuleId(...),
                         ),
                     ],
-                ]
+                ],
             )
             ->add(
                 'tax_list',
@@ -53,10 +53,10 @@ class TaxRuleTaxListUpdateForm extends BaseForm
                     ],
                     'constraints' => [
                         new Callback(
-                            $this->verifyTaxList(...)
+                            $this->verifyTaxList(...),
                         ),
                     ],
-                ]
+                ],
             )
             ->add(
                 'country_list',
@@ -68,10 +68,10 @@ class TaxRuleTaxListUpdateForm extends BaseForm
                     ],
                     'constraints' => [
                         new Callback(
-                            $this->verifyCountryList(...)
+                            $this->verifyCountryList(...),
                         ),
                     ],
-                ]
+                ],
             )
             ->add(
                 'country_deleted_list',
@@ -83,12 +83,11 @@ class TaxRuleTaxListUpdateForm extends BaseForm
                     ],
                     'constraints' => [
                         new Callback(
-                            $this->verifyCountryList(...)
+                            $this->verifyCountryList(...),
                         ),
                     ],
-                ]
-            )
-        ;
+                ],
+            );
     }
 
     public static function getName(): string
@@ -99,8 +98,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
     public function verifyTaxRuleId($value, ExecutionContextInterface $context): void
     {
         $taxRule = TaxRuleQuery::create()
-            ->findPk($value)
-        ;
+            ->findPk($value);
 
         if (null === $taxRule) {
             $context->addViolation(Translator::getInstance()->trans('Tax rule ID not found'));
@@ -110,6 +108,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
     public function verifyTaxList($value, ExecutionContextInterface $context): void
     {
         $jsonType = new JsonType();
+
         if (!$jsonType->isValid($value)) {
             $context->addViolation(Translator::getInstance()->trans('Tax list is not valid JSON'));
         }
@@ -125,6 +124,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
                         $context->addViolation(Translator::getInstance()->trans('Bad tax list JSON'));
                     } else {
                         $taxModel = TaxQuery::create()->findPk($taxLevel2);
+
                         if (null === $taxModel) {
                             $context->addViolation(Translator::getInstance()
                                 ->trans('Tax ID not found in tax list JSON'));
@@ -133,6 +133,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
                 }
             } else {
                 $taxModel = TaxQuery::create()->findPk($taxLevel1);
+
                 if (null === $taxModel) {
                     $context->addViolation(Translator::getInstance()->trans('Tax ID not found in tax list JSON'));
                 }
@@ -143,6 +144,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
     public function verifyCountryList($value, ExecutionContextInterface $context): void
     {
         $jsonType = new JsonType();
+
         if (!$jsonType->isValid($value)) {
             $context->addViolation(Translator::getInstance()->trans('Country list is not valid JSON'));
         }
@@ -152,26 +154,28 @@ class TaxRuleTaxListUpdateForm extends BaseForm
         foreach ($countryList as $countryItem) {
             if (\is_array($countryItem)) {
                 $country = CountryQuery::create()->findPk($countryItem[0]);
+
                 if (null === $country) {
                     $context->addViolation(
                         Translator::getInstance()->trans(
                             'Country ID %id not found',
-                            ['%id' => $countryItem[0]]
-                        )
+                            ['%id' => $countryItem[0]],
+                        ),
                     );
                 }
 
-                if ($countryItem[1] == '0') {
+                if ('0' === $countryItem[1]) {
                     continue;
                 }
 
                 $state = StateQuery::create()->findPk($countryItem[1]);
+
                 if (null === $state) {
                     $context->addViolation(
                         Translator::getInstance()->trans(
                             'State ID %id not found',
-                            ['%id' => $countryItem[1]]
-                        )
+                            ['%id' => $countryItem[1]],
+                        ),
                     );
                 }
             } else {

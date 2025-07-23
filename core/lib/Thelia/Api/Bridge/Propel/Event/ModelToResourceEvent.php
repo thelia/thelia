@@ -21,7 +21,6 @@ use Thelia\Api\Resource\PropelResourceInterface;
 class ModelToResourceEvent extends Event
 {
     public const BEFORE_TRANSFORM = 'api_before_model_to_resource';
-
     public const AFTER_TRANSFORM = 'api_after_model_to_resource';
 
     private PropelResourceInterface $resource;

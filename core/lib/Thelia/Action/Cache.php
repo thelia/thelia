@@ -30,10 +30,8 @@ use Thelia\Core\Event\TheliaEvents;
  */
 class Cache extends BaseAction implements EventSubscriberInterface
 {
-    /**
-     * @var CacheEvent[]
-     */
-    protected $onTerminateCacheClearEvents = [];
+    /** @var CacheEvent[] */
+    protected array $onTerminateCacheClearEvents = [];
 
     /**
      * CacheListener constructor.
@@ -51,6 +49,7 @@ class Cache extends BaseAction implements EventSubscriberInterface
         }
 
         $findDir = false;
+
         foreach ($this->onTerminateCacheClearEvents as $cacheEvent) {
             if ($cacheEvent->getDir() === $event->getDir()) {
                 $findDir = true;

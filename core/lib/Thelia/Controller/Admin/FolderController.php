@@ -18,11 +18,11 @@ use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Folder\FolderCreateEvent;
 use Thelia\Core\Event\Folder\FolderDeleteEvent;
-use Thelia\Core\Event\Folder\FolderEvent;
 use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
 use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -54,7 +54,7 @@ class FolderController extends AbstractSeoCrudController
             TheliaEvents::FOLDER_DELETE,
             TheliaEvents::FOLDER_TOGGLE_VISIBILITY,
             TheliaEvents::FOLDER_UPDATE_POSITION,
-            TheliaEvents::FOLDER_UPDATE_SEO
+            TheliaEvents::FOLDER_UPDATE_SEO,
         );
     }
 
@@ -130,8 +130,7 @@ class FolderController extends AbstractSeoCrudController
             ->setDescription($formData['description'])
             ->setPostscriptum($formData['postscriptum'])
             ->setVisible($formData['visible'])
-            ->setParent($formData['parent'])
-        ;
+            ->setParent($formData['parent']);
 
         return $updateEvent;
     }
@@ -160,16 +159,14 @@ class FolderController extends AbstractSeoCrudController
         return new UpdatePositionEvent(
             $this->getRequest()->get('folder_id'),
             $positionChangeMode,
-            $positionValue
+            $positionValue,
         );
     }
 
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
-     *
-     * @param FolderEvent $event
      */
-    protected function eventContainsObject($event): bool
+    protected function eventContainsObject(Event $event): bool
     {
         return $event->hasFolder();
     }
@@ -224,7 +221,7 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Render the main list template.
      */
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         // Get content order
         $content_order = $this->getListOrderFromSession('content', 'content_order', 'manual');
@@ -235,7 +232,7 @@ class FolderController extends AbstractSeoCrudController
                 'folder_order' => $currentOrder,
                 'content_order' => $content_order,
                 'parent' => $this->getRequest()->get('parent', 0),
-            ]
+            ],
         );
     }
 
@@ -264,10 +261,10 @@ class FolderController extends AbstractSeoCrudController
      */
     protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): ?Response
     {
-        if ($this->getRequest()->get('save_mode') != 'stay') {
+        if ('stay' !== $this->getRequest()->get('save_mode')) {
             return $this->generateRedirectFromRoute(
                 'admin.folders.default',
-                ['parent' => $updateEvent->getFolder()->getParent()]
+                ['parent' => $updateEvent->getFolder()->getParent()],
             );
         }
 
@@ -285,7 +282,7 @@ class FolderController extends AbstractSeoCrudController
     {
         return $this->generateRedirectFromRoute(
             'admin.folders.default',
-            ['parent' => $deleteEvent->getFolder()->getParent()]
+            ['parent' => $deleteEvent->getFolder()->getParent()],
         );
     }
 
@@ -296,10 +293,10 @@ class FolderController extends AbstractSeoCrudController
     {
         $folder = FolderQuery::create()->findPk($positionChangeEvent->getObjectId());
 
-        if ($folder != null) {
+        if (null !== $folder) {
             return $this->generateRedirectFromRoute(
                 'admin.folders.default',
-                ['parent' => $folder->getParent()]
+                ['parent' => $folder->getParent()],
             );
         }
 
@@ -308,8 +305,6 @@ class FolderController extends AbstractSeoCrudController
 
     /**
      * Redirect to the edition template.
-     *
-     * @return Response
      */
     protected function redirectToEditionTemplate(?Request $request = null): Response|RedirectResponse
     {
@@ -323,7 +318,7 @@ class FolderController extends AbstractSeoCrudController
     {
         return $this->generateRedirectFromRoute(
             'admin.folders.default',
-            ['parent' => $this->getRequest()->get('parent', 0)]
+            ['parent' => $this->getRequest()->get('parent', 0)],
         );
     }
 }

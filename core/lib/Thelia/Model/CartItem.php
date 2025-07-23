@@ -25,18 +25,14 @@ use Thelia\TaxEngine\Calculator;
 
 class CartItem extends BaseCartItem
 {
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
+    protected ?EventDispatcherInterface $dispatcher = null;
 
-    public function setDisptacher(EventDispatcherInterface $dispatcher): void
+    public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * @return bool
-     */
-    public function preInsert(?ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): bool
     {
         parent::preInsert($con);
 
@@ -48,10 +44,7 @@ class CartItem extends BaseCartItem
         return true;
     }
 
-    /**
-     * @return bool
-     */
-    public function preUpdate(?ConnectionInterface $con = null)
+    public function preUpdate(?ConnectionInterface $con = null): bool
     {
         parent::preUpdate($con);
 
@@ -92,9 +85,9 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @throws PropelException
-     *
      * @return $this
+     *
+     * @throws PropelException
      */
     public function updateQuantity($value)
     {
@@ -108,7 +101,7 @@ class CartItem extends BaseCartItem
             $productSaleElements = $this->getProductSaleElements();
             $product = $productSaleElements->getProduct();
 
-            if ($product->getVirtual() === 0 && $productSaleElements->getQuantity() < $value) {
+            if (0 === $product->getVirtual() && $productSaleElements->getQuantity() < $value) {
                 $value = $currentQuantity;
             }
         }
@@ -119,9 +112,9 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @throws PropelException
-     *
      * @return $this
+     *
+     * @throws PropelException
      */
     public function addQuantity($value)
     {
@@ -132,7 +125,7 @@ class CartItem extends BaseCartItem
             $productSaleElements = $this->getProductSaleElements();
             $product = $productSaleElements->getProduct();
 
-            if ($product->getVirtual() === 0 && $productSaleElements->getQuantity() < $newQuantity) {
+            if (0 === $product->getVirtual() && $productSaleElements->getQuantity() < $newQuantity) {
                 $newQuantity = $currentQuantity;
             }
         }
@@ -142,26 +135,25 @@ class CartItem extends BaseCartItem
         return $this;
     }
 
-    /**
-     * @return float
-     */
-    public function getRealPrice()
+    public function getRealPrice(): float
     {
-        return (float) ((int) $this->getPromo() === 1 ? $this->getPromoPrice() : $this->getPrice());
+        return (float) (1 === (int) $this->getPromo() ? $this->getPromoPrice() : $this->getPrice());
     }
 
     /**
      * @throws PropelException
-     *
-     * @return Product
      */
-    public function getProduct(?ConnectionInterface $con = null, $locale = null)
+    public function getProduct(?ConnectionInterface $con = null, $locale = null): Product
     {
         $product = parent::getProduct($con);
+        if (null === $locale) {
+            /** @var string $locale */
+            $locale = Lang::getDefaultLanguage()->getLocale();
+        }
 
         $translation = $product->getTranslation($locale);
 
-        if ($translation->isNew() && ConfigQuery::getDefaultLangWhenNoTranslationAvailable() == Lang::REPLACE_BY_DEFAULT_LANGUAGE) {
+        if ($translation->isNew() && Lang::REPLACE_BY_DEFAULT_LANGUAGE === ConfigQuery::getDefaultLangWhenNoTranslationAvailable()) {
             $locale = Lang::getDefaultLanguage()->getLocale();
         }
 
@@ -172,65 +164,49 @@ class CartItem extends BaseCartItem
 
     /**
      * @throws PropelException
-     *
-     * @return float
      */
-    public function getRealTaxedPrice(Country $country, ?State $state = null)
+    public function getRealTaxedPrice(Country $country, ?State $state = null): float
     {
-        return (int) $this->getPromo() === 1 ? $this->getTaxedPromoPrice($country, $state) : $this->getTaxedPrice($country, $state);
+        return 1 === (int) $this->getPromo() ? $this->getTaxedPromoPrice($country, $state) : $this->getTaxedPrice($country, $state);
     }
 
     /**
      * @throws PropelException
-     *
-     * @return float
      */
-    public function getTaxedPrice(Country $country, ?State $state = null)
+    public function getTaxedPrice(Country $country, ?State $state = null): float
     {
         $taxCalculator = new Calculator();
 
-        return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice($this->getPrice());
+        return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice((float) $this->getPrice());
     }
 
     /**
      * @throws PropelException
-     *
-     * @return float
      */
-    public function getTaxedPromoPrice(Country $country, ?State $state = null)
+    public function getTaxedPromoPrice(Country $country, ?State $state = null): float
     {
         $taxCalculator = new Calculator();
 
-        return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice($this->getPromoPrice());
+        return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice((float) $this->getPromoPrice());
     }
 
     /**
-     * @since Version 2.3
-     *
      * @throws PropelException
-     *
-     * @return float
      */
-    public function getTotalRealTaxedPrice(Country $country, ?State $state = null)
+    public function getTotalRealTaxedPrice(Country $country, ?State $state = null): float
     {
-        return (int) $this->getPromo() === 1 ? $this->getTotalTaxedPromoPrice($country, $state) : $this->getTotalTaxedPrice($country, $state);
+        return 1 === (int) $this->getPromo() ? $this->getTotalTaxedPromoPrice($country, $state) : $this->getTotalTaxedPrice($country, $state);
     }
 
     /**
-     * @since Version 2.3
-     *
      * @throws PropelException
-     *
-     * @return float
      */
-    public function getTotalTaxedPrice(Country $country, ?State $state = null)
+    public function getTotalTaxedPrice(Country $country, ?State $state = null): float
     {
         return round($this->getTaxedPrice($country, $state), 2) * $this->getQuantity();
     }
 
     /**
-     * @since Version 2.3
-     *
      * @throws PropelException
      */
     public function getTotalTaxedPromoPrice(Country $country, ?State $state = null)
@@ -238,32 +214,17 @@ class CartItem extends BaseCartItem
         return round($this->getTaxedPromoPrice($country, $state), 2) * $this->getQuantity();
     }
 
-    /**
-     * @since Version 2.4
-     *
-     * @return float
-     */
-    public function getTotalPrice()
+    public function getTotalPrice(): float
     {
         return round($this->getPrice(), 2) * $this->getQuantity();
     }
 
-    /**
-     * @since Version 2.4
-     *
-     * @return float
-     */
-    public function getTotalPromoPrice()
+    public function getTotalPromoPrice(): float
     {
         return round($this->getPromoPrice(), 2) * $this->getQuantity();
     }
 
-    /**
-     * @since Version 2.4
-     *
-     * @return float
-     */
-    public function getTotalRealPrice()
+    public function getTotalRealPrice(): float
     {
         return round($this->getRealPrice(), 2) * $this->getQuantity();
     }

@@ -25,9 +25,7 @@ use Thelia\Module\Validator\ModuleValidator;
  */
 class SchemaLocator
 {
-    /**
-     * Argument to Finder::name() used to filter schema files.
-     */
+    /** Argument to Finder::name() used to filter schema files. */
     protected static string $SCHEMA_FILE_PATTERN = '*schema.xml';
 
     public function __construct(
@@ -49,6 +47,7 @@ class SchemaLocator
             THELIA_LOCAL_MODULE_DIR => THELIA_LOCAL_MODULE_DIR.'*'.DS.'Config',
         ];
         $modules = [];
+
         foreach ($modulesPath as $rootPath => $modulePath) {
             try {
                 if (!$filesystem->exists($rootPath)) {
@@ -84,18 +83,21 @@ class SchemaLocator
         }
 
         $schemas = [];
+
         foreach ($modulesCodes as $moduleCode) {
-            if ($moduleCode === 'Thelia') {
+            if ('Thelia' === $moduleCode) {
                 $moduleSchemas = $this->getSchemaPathsForThelia();
             } else {
                 $moduleSchemas = $this->getSchemaPathsForModule($moduleCode);
             }
 
             $schemaDocuments = [];
+
             /** @var SplFileInfo $schemaFile */
             foreach ($moduleSchemas as $schemaFile) {
                 $schemaDocument = new \DOMDocument();
                 $isValid = $schemaDocument->load($schemaFile->getRealPath());
+
                 if ($isValid) {
                     $schemaDocuments[] = $schemaDocument;
                 }
@@ -117,18 +119,18 @@ class SchemaLocator
      */
     protected function addModulesDependencies(array $modules = []): array
     {
-        if ($modules === []) {
+        if ([] === $modules) {
             return [];
         }
 
         // Thelia is always a dependency
-        if (!\in_array('Thelia', $modules)) {
+        if (!\in_array('Thelia', $modules, true)) {
             $modules[] = 'Thelia';
         }
 
         foreach ($modules as $module) {
             // Thelia is not a real module, do not try to get its dependencies
-            if ($module === 'Thelia') {
+            if ('Thelia' === $module) {
                 continue;
             }
 
@@ -138,6 +140,7 @@ class SchemaLocator
 
             $moduleValidator = new ModuleValidator($modulePath);
             $dependencies = $moduleValidator->getCurrentModuleDependencies(true);
+
             foreach ($dependencies as $dependency) {
                 if (!\in_array($dependency['code'], $modules, true)) {
                     $modules[] = $dependency['code'];
@@ -201,6 +204,7 @@ class SchemaLocator
                 }
 
                 $externalSchemaDocument = new \DOMDocument();
+
                 if (!$externalSchemaDocument->load($externalSchemaPath)) {
                     continue;
                 }
@@ -220,10 +224,12 @@ class SchemaLocator
     protected function mergeDOMDocumentsArrays(array $documentArrays): array
     {
         $result = [];
+
         foreach ($documentArrays as $documentArray) {
             foreach ($documentArray as $document) {
                 $baseUri = str_replace(THELIA_LOCAL_MODULE_DIR, '', $document->baseURI);
                 $baseUri = str_replace(THELIA_MODULE_DIR, '', $baseUri);
+
                 if (isset($result[$baseUri])) {
                     continue;
                 }

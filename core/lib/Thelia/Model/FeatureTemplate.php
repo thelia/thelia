@@ -30,7 +30,7 @@ class FeatureTemplate extends BaseFeatureTemplate
         $query->filterByTemplateId($this->getTemplateId());
     }
 
-    public function preInsert(?ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): bool
     {
         parent::preInsert($con);
 

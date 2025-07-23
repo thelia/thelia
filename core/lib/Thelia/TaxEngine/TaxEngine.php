@@ -30,7 +30,6 @@ use Thelia\Model\State;
 class TaxEngine
 {
     protected $taxCountry;
-
     protected $taxState;
 
     public function __construct(protected RequestStack $requestStack)
@@ -84,12 +83,8 @@ class TaxEngine
      * First look for a picked delivery address state
      * Then look at the current customer default address state
      * Else null
-     *
-     * @return State|null
-     *
-     * @since 2.3.0-alpha1
      */
-    public function getDeliveryState()
+    public function getDeliveryState(): ?State
     {
         if (null === $this->taxCountry) {
             /* is there a logged in customer ? */

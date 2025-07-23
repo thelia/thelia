@@ -33,70 +33,68 @@ use Thelia\Model\Map\CurrencyTableMap;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/currencies'
+            uriTemplate: '/admin/currencies',
         ),
         new GetCollection(
-            uriTemplate: '/admin/currencies'
+            uriTemplate: '/admin/currencies',
         ),
         new Get(
             uriTemplate: '/admin/currencies/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/currencies/{id}'
+            uriTemplate: '/admin/currencies/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/currencies/{id}'
+            uriTemplate: '/admin/currencies/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/currencies/{id}'
+            uriTemplate: '/admin/currencies/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/front/currencies'
+            uriTemplate: '/front/currencies',
         ),
         new Get(
             uriTemplate: '/front/currencies/{id}',
         ),
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
         'position',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
         'visible',
         'byDefault',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
         'id',
         'code',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: NotInFilter::class,
     properties: [
         'id',
-    ]
+    ],
 )]
 class Currency extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:currency:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:currency:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:currency:write';
 
     #[Groups([

@@ -53,7 +53,7 @@ class AttributeController extends AbstractCrudController
             TheliaEvents::ATTRIBUTE_UPDATE,
             TheliaEvents::ATTRIBUTE_DELETE,
             null, // No visibility toggle
-            TheliaEvents::ATTRIBUTE_UPDATE_POSITION
+            TheliaEvents::ATTRIBUTE_UPDATE_POSITION,
         );
     }
 
@@ -74,8 +74,7 @@ class AttributeController extends AbstractCrudController
         $createEvent
             ->setTitle($formData['title'])
             ->setLocale($formData['locale'])
-            ->setAddToAllTemplates($formData['add_to_all'])
-        ;
+            ->setAddToAllTemplates($formData['add_to_all']);
 
         return $createEvent;
     }
@@ -89,8 +88,7 @@ class AttributeController extends AbstractCrudController
             ->setTitle($formData['title'])
             ->setChapo($formData['chapo'])
             ->setDescription($formData['description'])
-            ->setPostscriptum($formData['postscriptum'])
-        ;
+            ->setPostscriptum($formData['postscriptum']);
 
         return $changeEvent;
     }
@@ -104,7 +102,7 @@ class AttributeController extends AbstractCrudController
     {
         $attr_values = $this->getRequest()->get('attribute_values');
 
-        if ($attr_values !== null) {
+        if (null !== $attr_values) {
             foreach ($attr_values as $id => $value) {
                 $event = new AttributeAvUpdateEvent($id);
 
@@ -123,7 +121,7 @@ class AttributeController extends AbstractCrudController
         return new UpdatePositionEvent(
             $this->getRequest()->get('attribute_id'),
             $positionChangeMode,
-            $positionValue
+            $positionValue,
         );
     }
 
@@ -160,7 +158,7 @@ class AttributeController extends AbstractCrudController
     protected function getExistingObject(): ?ActiveRecordInterface
     {
         $attribute = AttributeQuery::create()
-        ->findOneById($this->getRequest()->get('attribute_id', 0));
+            ->findOneById($this->getRequest()->get('attribute_id', 0));
 
         if (null !== $attribute) {
             $attribute->setLocale($this->getCurrentEditionLocale());
@@ -185,7 +183,7 @@ class AttributeController extends AbstractCrudController
         return $object->getId();
     }
 
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         return $this->render('attributes', ['order' => $currentOrder]);
     }
@@ -197,7 +195,7 @@ class AttributeController extends AbstractCrudController
             [
                 'attribute_id' => $this->getRequest()->get('attribute_id'),
                 'attributeav_order' => $this->getAttributeAvListOrder(),
-            ]
+            ],
         );
     }
 
@@ -208,7 +206,7 @@ class AttributeController extends AbstractCrudController
             [
                 'attribute_id' => $this->getRequest()->get('attribute_id'),
                 'attributeav_order' => $this->getAttributeAvListOrder(),
-            ]
+            ],
         );
     }
 
@@ -227,7 +225,7 @@ class AttributeController extends AbstractCrudController
         return $this->getListOrderFromSession(
             'attributeav',
             'attributeav_order',
-            'manual'
+            'manual',
         );
     }
 

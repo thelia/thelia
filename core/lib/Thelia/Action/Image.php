@@ -66,15 +66,13 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 {
     // Resize mode constants
     public const EXACT_RATIO_WITH_BORDERS = 1;
-
     public const EXACT_RATIO_WITH_CROP = 2;
-
     public const KEEP_IMAGE_RATIO = 3;
 
     /**
      * @return string root of the image cache directory in web space
      */
-    protected function getCacheDirFromWebRoot()
+    protected function getCacheDirFromWebRoot(): string
     {
         return ConfigQuery::read('image_cache_dir_from_web_root', 'cache'.DS.'images');
     }
@@ -88,31 +86,27 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      *
      * This method updates the cache_file_path and file_url attributes of the event
      *
-     * @param string $eventName
-     *
      * @throws ImageException
      * @throws \InvalidArgumentException
      */
-    public function processImage(ImageEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    public function processImage(ImageEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {
         $subdir = $event->getCacheSubdirectory();
         $sourceFile = $event->getSourceFilepath();
+        $imageExt = pathinfo($sourceFile, \PATHINFO_EXTENSION);
 
-        $imageExt = pathinfo((string) $sourceFile, \PATHINFO_EXTENSION);
-
-        if (null == $subdir || null == $sourceFile) {
+        if (null === $sourceFile) {
             throw new \InvalidArgumentException('Cache sub-directory and source file path cannot be null');
         }
 
         // Find cached file path
         $cacheFilePath = $this->getCacheFilePath($subdir, $sourceFile, $event->isOriginalImage(), $event->getOptionsHash());
-
         // Alternative image path is for browser that don't support webp
         $alternativeImagePath = null;
 
-        if ($event->getFormat()) {
+        if ('' !== (string) $event->getFormat() && '0' !== $event->getFormat()) {
             $sourceExtension = pathinfo($cacheFilePath, \PATHINFO_EXTENSION);
-            if ($event->getFormat() === 'webp') {
+            if ('webp' === $event->getFormat()) {
                 $alternativeImagePath = $cacheFilePath;
             }
 
@@ -131,13 +125,13 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             if (!file_exists($originalImagePathInCache)) {
                 $mode = ConfigQuery::read('original_image_delivery_mode', 'symlink');
 
-                if ($mode == 'symlink') {
+                if ('symlink' === $mode) {
                     if (false === symlink($sourceFile, $originalImagePathInCache)) {
-                        throw new ImageException(\sprintf('Failed to create symbolic link for %s in %s image cache directory', basename((string) $sourceFile), $subdir));
+                        throw new ImageException(\sprintf('Failed to create symbolic link for %s in %s image cache directory', basename($sourceFile), $subdir));
                     }
                 } elseif (false === @copy($sourceFile, $originalImagePathInCache)) {
                     // mode = 'copy'
-                    throw new ImageException(\sprintf('Failed to copy %s in %s image cache directory', basename((string) $sourceFile), $subdir));
+                    throw new ImageException(\sprintf('Failed to copy %s in %s image cache directory', basename($sourceFile), $subdir));
                 }
             }
 
@@ -162,11 +156,12 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                         $svg->setAttribute('viewBox', $viewBox);
                     }
 
-                    $svg->setAttribute('width', $event->getWidth());
-                    $svg->setAttribute('height', $event->getWidth());
+                    $svg->setAttribute('width', (string) $event->getWidth());
+                    $svg->setAttribute('height', (string) $event->getWidth());
                     $dom->save($cacheFilePath);
                 } else {
                     $this->applyTransformation($sourceFile, $event, $dispatcher, $cacheFilePath);
+
                     if ($alternativeImagePath) {
                         $this->applyTransformation($sourceFile, $event, $dispatcher, $alternativeImagePath);
                     }
@@ -193,23 +188,25 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     }
 
     private function applyTransformation(
-        $sourceFile,
+        string $sourceFile,
         ImageEvent $event,
         EventDispatcherInterface $dispatcher,
-        $cacheFilePath,
+        string|array $cacheFilePath,
     ): void {
         $imagine = $this->createImagineInstance();
         $image = $imagine->open($sourceFile);
 
         if (!$image) {
-            throw new ImageException(\sprintf('Source file %s cannot be opened.', basename((string) $sourceFile)));
+            throw new ImageException(\sprintf('Source file %s cannot be opened.', basename($sourceFile)));
         }
 
         if (\function_exists('exif_read_data')) {
             $exifdata = @exif_read_data($sourceFile);
+
             if (isset($exifdata['Orientation'])) {
                 $orientation = $exifdata['Orientation'];
                 $color = new RGB();
+
                 switch ($orientation) {
                     case 3:
                         $image->rotate(180, $color->color('#F00'));
@@ -235,7 +232,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
         $palette = new RGB();
 
-        if ($background_color != null) {
+        if (null !== $background_color) {
             $bg_color = $palette->color($background_color);
         } else {
             // Define a fully transparent white background color
@@ -248,22 +245,22 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             $image,
             $event->getWidth(),
             $event->getHeight(),
-            $event->getResizeMode(),
+            (int) $event->getResizeMode(),
             $bg_color,
-            $event->getAllowZoom()
+            $event->getAllowZoom(),
         );
 
         // Rotate if required
-        $rotation = (int) $event->getRotation();
+        $rotation = $event->getRotation();
 
-        if ($rotation != 0) {
+        if (0 !== $rotation) {
             $image->rotate($rotation, $bg_color);
         }
 
         // Flip
         // Process each effects
         foreach ($event->getEffects() as $effect) {
-            $effect = trim(strtolower((string) $effect));
+            $effect = strtolower(trim((string) $effect));
 
             $params = explode(':', $effect);
 
@@ -325,7 +322,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
         $image->save(
             $cacheFilePath,
-            ['quality' => $quality, 'animated' => true]
+            ['quality' => $quality, 'animated' => true],
         );
     }
 
@@ -346,131 +343,127 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     protected function applyResize(
         ImagineInterface $imagine,
         ImageInterface $image,
-        $dest_width,
-        $dest_height,
-        $resize_mode,
+        int $dest_width,
+        int $dest_height,
+        int $resize_mode,
         ?ColorInterface $bg_color,
-        $allow_zoom = false,
-    ) {
-        if (!(null === $dest_width && null === $dest_height)) {
-            $width_orig = $image->getSize()->getWidth();
-            $height_orig = $image->getSize()->getHeight();
+        bool $allow_zoom = false,
+    ): ImageInterface {
+        $width_orig = $image->getSize()->getWidth();
+        $height_orig = $image->getSize()->getHeight();
+        $ratio = $width_orig / $height_orig;
 
-            $ratio = $width_orig / $height_orig;
+        if (null === $dest_width) {
+            $dest_width = $dest_height * $ratio;
+        }
 
-            if (null === $dest_width) {
-                $dest_width = $dest_height * $ratio;
-            }
+        if (null === $dest_height) {
+            $dest_height = $dest_width / $ratio;
+        }
 
-            if (null === $dest_height) {
-                $dest_height = $dest_width / $ratio;
-            }
+        if (null === $resize_mode) {
+            $resize_mode = self::KEEP_IMAGE_RATIO;
+        }
 
-            if (null === $resize_mode) {
-                $resize_mode = self::KEEP_IMAGE_RATIO;
-            }
+        $width_diff = $dest_width / $width_orig;
+        $height_diff = $dest_height / $height_orig;
+        $delta_x = 0;
+        $delta_y = 0;
+        $border_width = 0;
+        $border_height = 0;
 
-            $width_diff = $dest_width / $width_orig;
-            $height_diff = $dest_height / $height_orig;
-            $delta_x = 0;
-            $delta_y = 0;
-            $border_width = 0;
-            $border_height = 0;
-
-            if ($width_diff > 1 && $height_diff > 1) {
-                // Set the default final size. If zoom is allowed, we will get the required
-                // image dimension. Otherwise, the final image may be smaller than required.
-                if ($allow_zoom) {
-                    $resize_width = $dest_width;
-                    $resize_height = $dest_height;
-                } else {
-                    $resize_width = $width_orig;
-                    $resize_height = $height_orig;
-                }
-
-                // When cropping, be sure to always generate an image which is
-                // not smaller than the required size, zooming it if required.
-                if ($resize_mode == self::EXACT_RATIO_WITH_CROP) {
-                    if ($allow_zoom) {
-                        if ($width_diff > $height_diff) {
-                            $resize_width = $dest_width;
-                            $resize_height = (int) ($height_orig * $dest_width / $width_orig);
-                            $delta_y = ($resize_height - $dest_height) / 2;
-                        } else {
-                            $resize_height = $dest_height;
-                            $resize_width = (int) (($width_orig * $resize_height) / $height_orig);
-                            $delta_x = ($resize_width - $dest_width) / 2;
-                        }
-                    } else {
-                        // No zoom : final image may be smaller than the required size.
-                        $dest_width = $resize_width;
-                        $dest_height = $resize_height;
-                    }
-                }
-            } elseif ($width_diff > $height_diff) {
-                // Image height > image width
-                $resize_height = $dest_height;
-                $resize_width = (int) (($width_orig * $resize_height) / $height_orig);
-
-                if ($resize_mode == self::EXACT_RATIO_WITH_CROP) {
-                    $resize_width = $dest_width;
-                    $resize_height = (int) ($height_orig * $dest_width / $width_orig);
-                    $delta_y = ($resize_height - $dest_height) / 2;
-                } elseif ($resize_mode != self::EXACT_RATIO_WITH_BORDERS) {
-                    $dest_width = $resize_width;
-                }
-            } else {
-                // Image width > image height
+        if ($width_diff > 1 && $height_diff > 1) {
+            // Set the default final size. If zoom is allowed, we will get the required
+            // image dimension. Otherwise, the final image may be smaller than required.
+            if ($allow_zoom) {
                 $resize_width = $dest_width;
-                $resize_height = (int) ($height_orig * $dest_width / $width_orig);
+                $resize_height = $dest_height;
+            } else {
+                $resize_width = $width_orig;
+                $resize_height = $height_orig;
+            }
 
-                if ($resize_mode == self::EXACT_RATIO_WITH_CROP) {
-                    $resize_height = $dest_height;
-                    $resize_width = (int) (($width_orig * $resize_height) / $height_orig);
-                    $delta_x = ($resize_width - $dest_width) / 2;
-                } elseif ($resize_mode != self::EXACT_RATIO_WITH_BORDERS) {
+            // When cropping, be sure to always generate an image which is
+            // not smaller than the required size, zooming it if required.
+            if (self::EXACT_RATIO_WITH_CROP === $resize_mode) {
+                if ($allow_zoom) {
+                    if ($width_diff > $height_diff) {
+                        $resize_width = $dest_width;
+                        $resize_height = (int) ($height_orig * $dest_width / $width_orig);
+                        $delta_y = ($resize_height - $dest_height) / 2;
+                    } else {
+                        $resize_height = $dest_height;
+                        $resize_width = (int) (($width_orig * $resize_height) / $height_orig);
+                        $delta_x = ($resize_width - $dest_width) / 2;
+                    }
+                } else {
+                    // No zoom : final image may be smaller than the required size.
+                    $dest_width = $resize_width;
                     $dest_height = $resize_height;
                 }
             }
+        } elseif ($width_diff > $height_diff) {
+            // Image height > image width
+            $resize_height = $dest_height;
+            $resize_width = (int) (($width_orig * $resize_height) / $height_orig);
 
-            $image->resize(new Box($resize_width, $resize_height));
+            if (self::EXACT_RATIO_WITH_CROP === $resize_mode) {
+                $resize_width = $dest_width;
+                $resize_height = (int) ($height_orig * $dest_width / $width_orig);
+                $delta_y = ($resize_height - $dest_height) / 2;
+            } elseif (self::EXACT_RATIO_WITH_BORDERS !== $resize_mode) {
+                $dest_width = $resize_width;
+            }
+        } else {
+            // Image width > image height
+            $resize_width = $dest_width;
+            $resize_height = (int) ($height_orig * $dest_width / $width_orig);
 
-            $resizeFilter = 'imagick' === ConfigQuery::read('imagine_graphic_driver', 'gd')
-                ? ImageInterface::FILTER_LANCZOS
-                : ImageInterface::FILTER_UNDEFINED;
+            if (self::EXACT_RATIO_WITH_CROP === $resize_mode) {
+                $resize_height = $dest_height;
+                $resize_width = (int) (($width_orig * $resize_height) / $height_orig);
+                $delta_x = ($resize_width - $dest_width) / 2;
+            } elseif (self::EXACT_RATIO_WITH_BORDERS !== $resize_mode) {
+                $dest_height = $resize_height;
+            }
+        }
 
-            $image->resize(new Box($resize_width, $resize_height), $resizeFilter);
+        $image->resize(new Box($resize_width, $resize_height));
+        $resizeFilter = 'imagick' === ConfigQuery::read('imagine_graphic_driver', 'gd')
+            ? ImageInterface::FILTER_LANCZOS
+            : ImageInterface::FILTER_UNDEFINED;
+        $image->resize(new Box($resize_width, $resize_height), $resizeFilter);
 
-            if ($resize_mode == self::EXACT_RATIO_WITH_BORDERS) {
-                $border_width = (int) (($dest_width - $resize_width) / 2);
-                $border_height = (int) (($dest_height - $resize_height) / 2);
+        if (self::EXACT_RATIO_WITH_BORDERS === $resize_mode) {
+            $border_width = (int) (($dest_width - $resize_width) / 2);
+            $border_height = (int) (($dest_height - $resize_height) / 2);
 
-                $canvas = new Box($dest_width, $dest_height);
-                $layersCount = \count($image->layers());
+            $canvas = new Box($dest_width, $dest_height);
+            $layersCount = \count($image->layers());
 
-                if ('imagick' === ConfigQuery::read('imagine_graphic_driver', 'gd') && $layersCount > 1) {
-                    // If image has layers we apply transformation to all layers since paste method would flatten the image
-                    $newImage = $imagine->create($canvas, $bg_color);
-                    $resizedLayers = $newImage->layers();
-                    $resizedLayers->remove(0);
-                    for ($i = 0; $i < $layersCount; ++$i) {
-                        $newImage2 = $imagine->create($canvas, $bg_color);
-                        $resizedLayers[] = $newImage2->paste($image->layers()->get($i)->resize(new Box($resize_width, $resize_height), $resizeFilter), new Point($border_width, $border_height));
-                    }
+            if ('imagick' === ConfigQuery::read('imagine_graphic_driver', 'gd') && $layersCount > 1) {
+                // If image has layers we apply transformation to all layers since paste method would flatten the image
+                $newImage = $imagine->create($canvas, $bg_color);
+                $resizedLayers = $newImage->layers();
+                $resizedLayers->remove(0);
 
-                    return $newImage;
+                for ($i = 0; $i < $layersCount; ++$i) {
+                    $newImage2 = $imagine->create($canvas, $bg_color);
+                    $resizedLayers[] = $newImage2->paste($image->layers()->get($i)->resize(new Box($resize_width, $resize_height), $resizeFilter), new Point($border_width, $border_height));
                 }
 
-                return $imagine->create($canvas, $bg_color)
-                        ->paste($image, new Point($border_width, $border_height));
+                return $newImage;
             }
 
-            if ($resize_mode == self::EXACT_RATIO_WITH_CROP) {
-                $image->crop(
-                    new Point($delta_x, $delta_y),
-                    new Box($dest_width, $dest_height)
-                );
-            }
+            return $imagine->create($canvas, $bg_color)
+                ->paste($image, new Point($border_width, $border_height));
+        }
+
+        if (self::EXACT_RATIO_WITH_CROP === $resize_mode) {
+            $image->crop(
+                new Point($delta_x, $delta_y),
+                new Box($dest_width, $dest_height),
+            );
         }
 
         return $image;

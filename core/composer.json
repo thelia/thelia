@@ -80,7 +80,7 @@
         "thelia/config": "dev-twig",
         "thelia/setup": "dev-twig",
         "thelia/currency-converter": "~1.0",
-        "thelia/propel": "dev-thelia-2.5"
+        "thelia/propel": "dev-thelia3.0"
     },
     "require-dev": {
         "phpunit/phpunit": "9.5.*",

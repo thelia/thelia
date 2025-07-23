@@ -33,36 +33,36 @@ use Thelia\Model\Map\FeatureAvTableMap;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/feature_avs'
+            uriTemplate: '/admin/feature_avs',
         ),
         new GetCollection(
-            uriTemplate: '/admin/feature_avs'
+            uriTemplate: '/admin/feature_avs',
         ),
         new Get(
             uriTemplate: '/admin/feature_avs/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/feature_avs/{id}'
+            uriTemplate: '/admin/feature_avs/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/feature_avs/{id}'
+            uriTemplate: '/admin/feature_avs/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/feature_avs/{id}'
+            uriTemplate: '/admin/feature_avs/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/front/feature_avs'
+            uriTemplate: '/front/feature_avs',
         ),
         new Get(
             uriTemplate: '/front/feature_avs/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -71,13 +71,13 @@ use Thelia\Model\Map\FeatureAvTableMap;
     filterClass: OrderFilter::class,
     properties: [
         'position',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: NotInFilter::class,
     properties: [
         'id',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -87,18 +87,14 @@ use Thelia\Model\Map\FeatureAvTableMap;
             'strategy' => 'exact',
             'fieldPath' => 'feature_av.feature_id',
         ],
-    ]
+    ],
 )]
 class FeatureAv extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:feature_av:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:feature_av:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:feature_av:write';
-
     public const GROUP_FRONT_READ = 'front:feature_av:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:feature_av:read:single';
 
     #[Groups([

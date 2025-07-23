@@ -27,15 +27,12 @@ use Symfony\Component\Translation\Translator;
 class CheckPermission extends BaseInstall
 {
     public const DIR_CONF = 'vendor/thelia/config';
-
     public const DIR_VAR = 'var';
-
     public const DIR_WEB = 'public';
-
     public const DIR_MEDIA = 'local/media';
 
     /** @var array Directory needed to be writable */
-    protected $directoriesToBeWritable = [
+    protected array $directoriesToBeWritable = [
         self::DIR_CONF,
         self::DIR_VAR,
         self::DIR_WEB,
@@ -43,7 +40,7 @@ class CheckPermission extends BaseInstall
     ];
 
     /** @var array Minimum server configuration necessary */
-    protected $minServerConfigurationNecessary = [
+    protected array $minServerConfigurationNecessary = [
         'memory_limit' => 134217728,
         'post_max_size' => 20971520,
         'upload_max_filesize' => 2097152,
@@ -53,7 +50,6 @@ class CheckPermission extends BaseInstall
         'min' => '7.2',
         'max' => '8.0',
     ];
-
     protected $extensions = [
         'curl',
         'fileinfo',
@@ -64,11 +60,10 @@ class CheckPermission extends BaseInstall
         'dom',
         'zip',
     ];
-
     protected $validationMessages = [];
 
     /** @var bool If permissions are OK */
-    protected $isValid = true;
+    protected bool $isValid = true;
 
     /**
      * Constructor.
@@ -76,7 +71,7 @@ class CheckPermission extends BaseInstall
      * @param bool            $verifyInstall If verify install
      * @param Translator|null $translator    Translator Service necessary for install wizard
      */
-    public function __construct($verifyInstall = true, protected ?Translator $translator = null)
+    public function __construct(bool $verifyInstall = true, protected ?Translator $translator = null)
     {
         $this->validationMessages['php_version'] = [
             'text' => $this->getI18nPhpVersionText(\PHP_VERSION, true),
@@ -92,7 +87,7 @@ class CheckPermission extends BaseInstall
             ];
         }
 
-        foreach ($this->minServerConfigurationNecessary as $key => $value) {
+        foreach (array_keys($this->minServerConfigurationNecessary) as $key) {
             $this->validationMessages[$key] = [
                 'text' => '',
                 'hint' => $this->getI18nConfigHint(),
@@ -113,12 +108,11 @@ class CheckPermission extends BaseInstall
 
     /**
      * Perform file permission check.
-     *
-     * @return bool
      */
-    public function exec()
+    public function exec(): bool
     {
         $currentVersion = substr(\PHP_VERSION, 0, strrpos(\PHP_VERSION, '.'));
+
         if (!version_compare($currentVersion, $this->phpExpectedVerions['min'], '>=') && version_compare($currentVersion, $this->phpExpectedVerions['max'], '<=')) {
             $this->isValid = false;
             $this->validationMessages['php_version']['text'] = $this->getI18nPhpVersionText(\PHP_VERSION, false);
@@ -129,7 +123,8 @@ class CheckPermission extends BaseInstall
         foreach ($this->directoriesToBeWritable as $directory) {
             $fullDirectory = THELIA_ROOT.$directory;
             $this->validationMessages[$directory]['text'] = $this->getI18nDirectoryText($fullDirectory, true);
-            if (is_writable($fullDirectory) === false && !$this->makeDirectoryWritable($fullDirectory)) {
+
+            if (false === is_writable($fullDirectory) && !$this->makeDirectoryWritable($fullDirectory)) {
                 $this->isValid = false;
                 $this->validationMessages[$directory]['status'] = false;
                 $this->validationMessages[$directory]['text'] = $this->getI18nDirectoryText($fullDirectory, false);
@@ -138,6 +133,7 @@ class CheckPermission extends BaseInstall
 
         foreach ($this->minServerConfigurationNecessary as $key => $value) {
             $this->validationMessages[$key]['text'] = $this->getI18nConfigText($key, $this->formatBytes($value), \ini_get($key), true);
+
             if (!$this->verifyServerMemoryValues($key, $value)) {
                 $this->isValid = false;
                 $this->validationMessages[$key]['status'] = false;
@@ -147,6 +143,7 @@ class CheckPermission extends BaseInstall
 
         foreach ($this->extensions as $extension) {
             $this->validationMessages[$extension]['text'] = $this->getI18nExtensionText($extension, true);
+
             if (false === \extension_loaded($extension)) {
                 $this->isValid = false;
                 $this->validationMessages[$extension]['status'] = false;
@@ -159,10 +156,8 @@ class CheckPermission extends BaseInstall
 
     /**
      * Get validation messages.
-     *
-     * @return array
      */
-    public function getValidationMessages()
+    public function getValidationMessages(): array
     {
         return $this->validationMessages;
     }
@@ -183,7 +178,7 @@ class CheckPermission extends BaseInstall
      * @param string $directory Directory being checked
      * @param bool   $isValid   If directory permission is valid
      */
-    protected function getI18nDirectoryText($directory, $isValid): string
+    protected function getI18nDirectoryText(string $directory, bool $isValid): string
     {
         $sentence = $isValid ? 'The directory %directory% is writable' : 'The directory %directory% is not writable';
 
@@ -206,7 +201,7 @@ class CheckPermission extends BaseInstall
      * @param string $currentValue  Actual server value
      * @param bool   $isValid       If server configuration is valid
      */
-    protected function getI18nConfigText($key, $expectedValue, $currentValue, $isValid): string
+    protected function getI18nConfigText(string $key, string $expectedValue, string $currentValue, bool $isValid): string
     {
         $sentence = $isValid ? 'The PHP "%key%" configuration value (currently %currentValue%) is correct (%expectedValue% required).'
             : 'The PHP "%key%" configuration value (currently %currentValue%) is below minimal requirements to run Thelia2 (%expectedValue% required).';
@@ -217,7 +212,7 @@ class CheckPermission extends BaseInstall
                 '%key%' => $key,
                 '%expectedValue%' => $expectedValue,
                 '%currentValue%' => $currentValue,
-            ]
+            ],
         );
     }
 
@@ -236,11 +231,8 @@ class CheckPermission extends BaseInstall
 
     /**
      * Get Translated hint about the PHP version requirement issue.
-     *
-     * @param string $currentValue
-     * @param bool   $isValid
      */
-    protected function getI18nPhpVersionText($currentValue, $isValid): string
+    protected function getI18nPhpVersionText(string $currentValue, bool $isValid): string
     {
         $sentence = $isValid ? 'PHP version %currentValue% matches the version required (>= %minExpectedValue% <= %maxExpectedValue%).'
             : 'The installer detected PHP version %currentValue%, but Thelia 2 requires PHP between %minExpectedValue% and %maxExpectedValue%.';
@@ -251,7 +243,7 @@ class CheckPermission extends BaseInstall
                 '%minExpectedValue%' => $this->phpExpectedVerions['min'],
                 '%maxExpectedValue%' => $this->phpExpectedVerions['max'],
                 '%currentValue%' => $currentValue,
-            ]
+            ],
         );
     }
 
@@ -268,14 +260,12 @@ class CheckPermission extends BaseInstall
      *
      * @param string $key                   .ini file key
      * @param int    $necessaryValueInBytes Expected value in bytes
-     *
-     * @return bool
      */
-    protected function verifyServerMemoryValues($key, $necessaryValueInBytes)
+    protected function verifyServerMemoryValues(string $key, int $necessaryValueInBytes): bool
     {
         $serverValueInBytes = $this->returnBytes(\ini_get($key));
 
-        if ($serverValueInBytes == -1) {
+        if (-1 === $serverValueInBytes) {
             return true;
         }
 
@@ -289,10 +279,11 @@ class CheckPermission extends BaseInstall
      *
      * @return int
      */
-    protected function returnBytes($val): string|int
+    protected function returnBytes(string $val): string|int
     {
         $val = trim($val);
         $last = strtolower($val[\strlen($val) - 1]);
+
         // Do not add breaks in the switch below
         switch ($last) {
             // The 'G' modifier is available since PHP 5.1.0
@@ -315,7 +306,7 @@ class CheckPermission extends BaseInstall
      * @param int $bytes     bytes
      * @param int $precision conversion precision
      */
-    protected function formatBytes($bytes, $precision = 2): string
+    protected function formatBytes(int $bytes, int $precision = 2): string
     {
         $base = log($bytes) / log(1024);
         $suffixes = ['', 'k', 'M', 'G', 'T'];
@@ -329,7 +320,7 @@ class CheckPermission extends BaseInstall
             return $this->translator->trans(
                 $string,
                 $parameters,
-                'install-wizard'
+                'install-wizard',
             );
         }
 

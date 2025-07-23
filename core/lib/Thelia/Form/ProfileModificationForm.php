@@ -39,8 +39,7 @@ class ProfileModificationForm extends ProfileCreationForm
                     new NotBlank(),
                     new Callback($this->verifyProfileId(...)),
                 ],
-            ])
-        ;
+            ]);
 
         $this->formBuilder->remove('code');
     }

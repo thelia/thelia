@@ -48,6 +48,7 @@ readonly class PropelPersistProcessor implements ProcessorInterface
         }
 
         $propelModel = $this->apiResourcePropelTransformerService->resourceToModel(data: $data, operation: $operation, context: $context);
+
         if (isset($uriVariables['id'])) {
             $propelModel->setId($uriVariables['id']);
         }
@@ -59,13 +60,14 @@ readonly class PropelPersistProcessor implements ProcessorInterface
             $this->beforeSave($data, $operation, $propelModel);
             $implementsItemFileResource =
                 \in_array(ItemFileResourceInterface::class, class_implements($data), true)
-                && $operation->getController() === PostItemFileController::class;
+                && PostItemFileController::class === $operation->getController();
 
             if ($implementsItemFileResource) {
                 $propelModel->setNew(false);
             }
 
             $propelModel->save();
+
             if (!$implementsItemFileResource) {
                 $resourceAddons = $this->manageResourceAddons($propelModel, $data);
             }
@@ -77,18 +79,21 @@ readonly class PropelPersistProcessor implements ProcessorInterface
             $data->setId($propelModel->getId());
         } catch (\Exception $exception) {
             $connection->rollBack();
+
             throw $exception;
         }
 
         /** @var Post $postOperation */
         $postOperation = $context['operation'] ?? null;
+
         if (null !== $postOperation) {
             $data = $this->apiResourcePropelTransformerService->modelToResource(
                 resourceClass: $data::class,
                 propelModel: $propelModel,
                 context: $postOperation->getNormalizationContext(),
-                withAddon: false
+                withAddon: false,
             );
+
             foreach ($resourceAddons as $addonShortName => $addon) {
                 $data->setResourceAddon($addonShortName, $addon);
             }
@@ -99,40 +104,44 @@ readonly class PropelPersistProcessor implements ProcessorInterface
 
     private function beforeSave(mixed $data, Operation $operation, ActiveRecordInterface &$propelModel): void
     {
-        if (!\in_array($operation::class, [Patch::class, Put::class])) {
+        if (!\in_array($operation::class, [Patch::class, Put::class], true)) {
             $propelModel->setNew(true);
 
             return;
         }
 
         $propelModel->setNew(false);
+
         if (is_subclass_of($data, TranslatableResourceInterface::class) && $operation instanceof Put && method_exists($data, 'getI18ns')) {
             $i18nResourceClass = $data::getI18nResourceClass();
             $array = explode('\\', $i18nResourceClass);
             $i18nGetter = 'get'.end($array).'s';
             $i18nRemove = 'remove'.end($array);
+
             if (method_exists($propelModel, $i18nGetter)) {
-                foreach ($propelModel->$i18nGetter() as $i18n) {
+                foreach ($propelModel->{$i18nGetter}() as $i18n) {
                     if (!$i18n->isNew() && method_exists($propelModel, $i18nRemove)) {
-                        $propelModel->$i18nRemove($i18n);
+                        $propelModel->{$i18nRemove}($i18n);
                     }
                 }
             }
         }
 
         $reflector = new \ReflectionClass($data);
+
         foreach ($reflector->getProperties() as $property) {
             $propelGetter = 'get'.ucfirst($property->getName());
+
             foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
                 if (isset($relationAttribute->getArguments()['targetResource'])) {
                     $reflectorChild = new \ReflectionClass($relationAttribute->getArguments()['targetResource']);
                     $compositeIdentifiers = $this->apiResourcePropelTransformerService->getResourceCompositeIdentifierValues(reflector: $reflectorChild, param: 'keys');
 
-                    if ($compositeIdentifiers === [] || !$propelModel->$propelGetter() instanceof Collection) {
+                    if ([] === $compositeIdentifiers || !$propelModel->{$propelGetter}() instanceof Collection) {
                         continue;
                     }
 
-                    foreach ($propelModel->$propelGetter()->getData() as $item) {
+                    foreach ($propelModel->{$propelGetter}()->getData() as $item) {
                         /** @var ModelCriteria $queryClass */
                         $queryClass = $item::class.'Query';
 
@@ -142,15 +151,16 @@ readonly class PropelPersistProcessor implements ProcessorInterface
                         foreach ($compositeIdentifiers as $compositeIdentifier) {
                             $filter = 'filterBy'.ucfirst((string) $compositeIdentifier).'Id';
                             $getter = 'get'.ucfirst((string) $compositeIdentifier).'Id';
+
                             if (!method_exists($item, $getter) || !method_exists($query, $filter)) {
                                 return;
                             }
 
-                            $id = $item->$getter();
-                            $query->$filter($id);
+                            $id = $item->{$getter}();
+                            $query->{$filter}($id);
                         }
 
-                        if ($query->findOne() !== null) {
+                        if (null !== $query->findOne()) {
                             $item->setNew(false);
                         }
                     }
@@ -166,6 +176,7 @@ readonly class PropelPersistProcessor implements ProcessorInterface
         $resourceAddons = [];
         $jsonData = json_decode((string) $this->requestStack->getCurrentRequest()?->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         $resourceAddonDefinitions = $this->apiResourcePropelTransformerService->getResourceAddonDefinitions($data::class);
+
         foreach ($resourceAddonDefinitions as $addonShortName => $addonClass) {
             if (!isset($jsonData[$addonShortName])) {
                 $resourceAddons[$addonShortName] = null;

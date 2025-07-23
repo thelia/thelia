@@ -15,13 +15,13 @@ declare(strict_types=1);
 namespace Thelia\Coupon;
 
 use Propel\Runtime\Exception\PropelException;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
@@ -29,6 +29,7 @@ use Thelia\Model\Cart;
 use Thelia\Model\Country;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
+use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Customer;
 use Thelia\TaxEngine\TaxEngine;
@@ -40,12 +41,8 @@ use Thelia\TaxEngine\TaxEngine;
  */
 class BaseFacade implements FacadeInterface
 {
-    /**
-     * @var CouponFactory
-     */
-    protected $couponFactory;
-
-    protected ?\Symfony\Component\HttpFoundation\Request $request;
+    protected CouponFactory $couponFactory;
+    protected ?Request $request;
 
     /**
      * Constructor.
@@ -54,8 +51,8 @@ class BaseFacade implements FacadeInterface
         protected SecurityContext $securityContext,
         protected TaxEngine $taxEngine,
         protected TranslatorInterface $translator,
-        protected ParserInterface $parser,
-        RequestStack $requestStack,
+        protected ParserResolver $parserResolver,
+        protected RequestStack $requestStack,
         protected ConditionEvaluator $conditionEvaluator,
         protected EventDispatcherInterface $eventDispatcher,
     ) {
@@ -64,24 +61,20 @@ class BaseFacade implements FacadeInterface
 
     /**
      * Return a Cart a CouponManager can process.
-     *
-     * @return Cart
      */
-    public function getCart()
+    public function getCart(): ?Cart
     {
         return $this->getRequest()->getSession()->getSessionCart($this->getDispatcher());
     }
 
     /**
      * Return an Address a CouponManager can process.
-     *
-     * @return Address
      */
-    public function getDeliveryAddress()
+    public function getDeliveryAddress(): Address
     {
         try {
             return AddressQuery::create()->findPk(
-                $this->getRequest()->getSession()->getOrder()->getChoosenDeliveryAddress()
+                $this->getRequest()->getSession()->getOrder()->getChoosenDeliveryAddress(),
             );
         } catch (\Exception $exception) {
             throw new \LogicException('Failed to get delivery address ('.$exception->getMessage().')', $exception->getCode(), $exception);
@@ -89,47 +82,39 @@ class BaseFacade implements FacadeInterface
     }
 
     /**
-     * Return an Customer a CouponManager can process.
-     *
-     * @return Customer
+     * Return a Customer a CouponManager can process.
      */
-    public function getCustomer(): mixed
+    public function getCustomer(): ?Customer
     {
         return $this->securityContext->getCustomerUser();
     }
 
     /**
      * Return Checkout total price.
-     *
-     * @return float
      */
-    public function getCheckoutTotalPrice()
+    public function getCheckoutTotalPrice(): float
     {
         return $this->getRequest()->getSession()->getOrder()->getTotalAmount();
     }
 
     /**
      * Return Checkout total postage (only) price.
-     *
-     * @return float
      */
-    public function getCheckoutPostagePrice()
+    public function getCheckoutPostagePrice(): float
     {
-        return $this->getRequest()->getSession()->getOrder()->getPostage();
+        return (float) $this->getRequest()->getSession()->getOrder()->getPostage();
     }
 
     /**
      * Return Products total price.
      *
      * @param bool $withItemsInPromo if true, the discounted items are included in the total
-     *
-     * @return float
      */
-    public function getCartTotalPrice($withItemsInPromo = true): int|float
+    public function getCartTotalPrice(bool $withItemsInPromo = true): float
     {
         $total = 0;
 
-        $cartItems = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems();
+        $cartItems = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())?->getCartItems() ?? [];
 
         foreach ($cartItems as $cartItem) {
             if ($withItemsInPromo || !$cartItem->getPromo()) {
@@ -137,18 +122,16 @@ class BaseFacade implements FacadeInterface
             }
         }
 
-        return $total;
+        return (float) $total;
     }
 
     /**
-     * @param bool $withItemsInPromo
-     *
      * @throws PropelException
      */
-    public function getCartTotalTaxPrice($withItemsInPromo = true): int|float
+    public function getCartTotalTaxPrice(bool $withItemsInPromo = true): float
     {
         $taxCountry = $this->taxEngine->getDeliveryCountry();
-        $cartItems = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems();
+        $cartItems = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())?->getCartItems() ?? [];
 
         $total = 0;
 
@@ -171,10 +154,8 @@ class BaseFacade implements FacadeInterface
 
     /**
      * Return the Checkout currency EUR|USD.
-     *
-     * @return string
      */
-    public function getCheckoutCurrency()
+    public function getCheckoutCurrency(): string
     {
         return $this->getRequest()->getSession()->getCurrency()->getCode();
     }
@@ -184,12 +165,12 @@ class BaseFacade implements FacadeInterface
      */
     public function getNbArticlesInCart(): int
     {
-        return \count($this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems());
+        return \count($this->getRequest()->getSession()->getSessionCart($this->getDispatcher())?->getCartItems() ?? []);
     }
 
-    public function getNbArticlesInCartIncludeQuantity(): int|float
+    public function getNbArticlesInCartIncludeQuantity(): int
     {
-        $cartItems = $this->getCart()->getCartItems();
+        $cartItems = $this->getCart()?->getCartItems() ?? [];
         $quantity = 0;
 
         foreach ($cartItems as $cartItem) {
@@ -203,14 +184,10 @@ class BaseFacade implements FacadeInterface
      * Find one Coupon in the database from its code.
      *
      * @param string $code Coupon code
-     *
-     * @return Coupon
      */
-    public function findOneCouponByCode($code)
+    public function findOneCouponByCode(string $code): Coupon
     {
-        $couponQuery = CouponQuery::create();
-
-        return $couponQuery->findOneByCode($code);
+        return CouponQuery::create()->findOneByCode($code);
     }
 
     /**
@@ -226,34 +203,31 @@ class BaseFacade implements FacadeInterface
      */
     public function getParser(): ParserInterface
     {
-        if ($this->parser instanceof ParserInterface) {
-            // Define the current back-office template that should be used
-            $this->parser->setTemplateDefinition(
-                $this->parser->getTemplateHelper()->getActiveAdminTemplate()
-            );
-        }
-
-        return $this->parser;
+        return $this->parserResolver->getParserByCurrentRequest();
     }
 
     /**
      * Return the main currency
      * THe one used to set prices in BackOffice.
-     *
-     * @return string
      */
-    public function getMainCurrency()
+    public function getMainCurrency(): Currency
     {
         return $this->getRequest()->getSession()->getCurrency();
     }
 
     /**
      * Return request.
-     *
-     * @return Request
      */
-    public function getRequest(): ?\Symfony\Component\HttpFoundation\Request
+    public function getRequest(): Request
     {
+        if (!$this->request instanceof \Symfony\Component\HttpFoundation\Request) {
+            // If the request is not set, we try to get it from the RequestStack again.
+            $this->request = $this->requestStack->getCurrentRequest();
+            if (!$this->request instanceof \Symfony\Component\HttpFoundation\Request) {
+                throw new \LogicException('Request is not set. Please ensure that the RequestStack is properly configured.');
+            }
+        }
+
         return $this->request;
     }
 
@@ -270,7 +244,7 @@ class BaseFacade implements FacadeInterface
      *
      * @return array of Currency
      */
-    public function getAvailableCurrencies()
+    public function getAvailableCurrencies(): array
     {
         $currencies = CurrencyQuery::create();
 
@@ -279,8 +253,6 @@ class BaseFacade implements FacadeInterface
 
     /**
      * Return the event dispatcher,.
-     *
-     * @return EventDispatcher
      */
     public function getDispatcher(): EventDispatcherInterface
     {
@@ -290,7 +262,7 @@ class BaseFacade implements FacadeInterface
     /**
      * Add a coupon in session.
      */
-    public function pushCouponInSession($couponCode): void
+    public function pushCouponInSession($couponCode): mixed
     {
         $consumedCoupons = $this->getRequest()->getSession()->getConsumedCoupons();
 
@@ -298,7 +270,9 @@ class BaseFacade implements FacadeInterface
             // Prevent accumulation of the same Coupon on a Checkout
             $consumedCoupons[$couponCode] = $couponCode;
 
-            $this->getRequest()->getSession()->setConsumedCoupons($consumedCoupons);
+            return $this->getRequest()->getSession()->setConsumedCoupons($consumedCoupons);
         }
+
+        return null;
     }
 }

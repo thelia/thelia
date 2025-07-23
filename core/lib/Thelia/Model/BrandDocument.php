@@ -18,7 +18,6 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Files\FileModelInterface;
 use Thelia\Files\FileModelParentInterface;
-use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\BrandDocument as BaseBrandDocument;
 use Thelia\Model\Breadcrumb\BrandBreadcrumbTrait;
@@ -32,15 +31,13 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
 
     /**
      * Calculate next position relative to our parent.
-     *
-     * @param BrandDocumentQuery $query
      */
-    protected function addCriteriaToPositionQuery($query): void
+    protected function addCriteriaToPositionQuery(BrandDocumentQuery $query): void
     {
         $query->filterByBrandId($this->getBrandId());
     }
 
-    public function preInsert(?ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): bool
     {
         parent::preInsert($con);
 
@@ -49,45 +46,40 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
         return true;
     }
 
-    public function preDelete(?ConnectionInterface $con = null)
+    public function preDelete(?ConnectionInterface $con = null): true
     {
         parent::preDelete($con);
 
         $this->reorderBeforeDelete(
             [
                 'brand_id' => $this->getBrandId(),
-            ]
+            ],
         );
 
         return true;
     }
 
-    public function setParentId($parentId)
+    public function setParentId(int $parentId): static
     {
         $this->setBrandId($parentId);
 
         return $this;
     }
 
-    public function getParentId()
+    public function getParentId(): int
     {
         return $this->getBrandId();
     }
 
-    /**
-     * @return FileModelParentInterface the parent file model
-     */
-    public function getParentFileModel()
+    public function getParentFileModel(): FileModelParentInterface
     {
         return new Brand();
     }
 
     /**
      * Get the ID of the form used to change this object information.
-     *
-     * @return BaseForm the form
      */
-    public function getUpdateFormId()
+    public function getUpdateFormId(): string
     {
         return AdminForm::BRAND_DOCUMENT_MODIFICATION;
     }
@@ -95,29 +87,39 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
     /**
      * @return string the path to the upload directory where files are stored, without final slash
      */
-    public function getUploadDir()
+    public function getUploadDir(): string
     {
         $uploadDir = ConfigQuery::read('documents_library_path');
-        $uploadDir = $uploadDir === null ? THELIA_LOCAL_DIR.'media'.DS.'documents' : THELIA_ROOT.$uploadDir;
+        $uploadDir = null === $uploadDir ? THELIA_LOCAL_DIR.'media'.DS.'documents' : THELIA_ROOT.$uploadDir;
 
         return $uploadDir.DS.'brand';
     }
 
-    /**
-     * @return string the URL to redirect to after update from the back-office
-     */
-    public function getRedirectionUrl()
+    public function getRedirectionUrl(): string
     {
         return '/admin/brand/update/'.$this->getBrandId();
     }
 
     /**
      * Get the Query instance for this object.
-     *
-     * @return ModelCriteria
      */
-    public function getQueryInstance()
+    public function getQueryInstance(): ModelCriteria
     {
         return BrandDocumentQuery::create();
+    }
+
+    public function getFile(): string
+    {
+        return parent::getFile();
+    }
+
+    public function getId(): int
+    {
+        return parent::getId();
+    }
+
+    public function getTitle(): string
+    {
+        return parent::getTitle();
     }
 }

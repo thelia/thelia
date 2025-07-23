@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\ImportExport\Export\Type;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Propel;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
 
@@ -21,21 +22,20 @@ class ProductI18nExport extends JsonFileAbstractExport
 {
     public const FILE_NAME = 'product_i18n';
 
-    protected $orderAndAliases = [
+    protected array $orderAndAliases = [
         'product_ref' => 'ref',
         'product_i18n_TITLE' => 'product_title',
         'product_i18n_CHAPO' => 'product_chapo',
         'product_i18n_DESCRIPTION' => 'product_description',
         'product_i18n_POSTSCRIPTUM' => 'product_postscriptum',
     ];
-
     protected $idxStripHtml = [
         'product_i18n_CHAPO',
         'product_i18n_DESCRIPTION',
         'product_i18n_POSTSCRIPTUM',
     ];
 
-    protected function getData()
+    protected function getData(): array|string|ModelCriteria
     {
         $locale = $this->language->getLocale();
 
@@ -48,8 +48,7 @@ class ProductI18nExport extends JsonFileAbstractExport
                         product_i18n.description as "product_i18n_DESCRIPTION",
                         product_i18n.postscriptum as "product_i18n_POSTSCRIPTUM"
                     FROM product
-                    LEFT JOIN product_i18n ON (product_i18n.id = product.id AND product_i18n.locale = :locale)'
-        ;
+                    LEFT JOIN product_i18n ON (product_i18n.id = product.id AND product_i18n.locale = :locale)';
 
         $stmt = $con->prepare($query);
         $stmt->bindValue('locale', $locale);
@@ -58,13 +57,10 @@ class ProductI18nExport extends JsonFileAbstractExport
         return $this->getDataJsonCache($stmt, 'product_i18n');
     }
 
-    /**
-     * @return array
-     */
-    public function beforeSerialize(array $data)
+    public function beforeSerialize(array $data): array
     {
         foreach ($data as $idx => &$value) {
-            if (\in_array($idx, $this->idxStripHtml) && !empty($value)) {
+            if (\in_array($idx, $this->idxStripHtml, true) && !empty($value)) {
                 $value = strip_tags((string) $value);
 
                 $value = html_entity_decode($value, \ENT_QUOTES, 'UTF-8');

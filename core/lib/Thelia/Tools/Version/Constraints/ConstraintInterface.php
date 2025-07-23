@@ -28,7 +28,7 @@ interface ConstraintInterface
      *
      * @return string the normalized expression
      */
-    public function normalize($version, $strict = false);
+    public function normalize(string $version, $strict = false): string;
 
     /**
      * Test if the version number is valid.
@@ -38,5 +38,5 @@ interface ConstraintInterface
      *
      * @return bool true if the version is equal, otherwise false
      */
-    public function test($version, $strict = false);
+    public function test(string $version, bool $strict = false): bool;
 }

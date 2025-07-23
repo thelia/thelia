@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
@@ -36,7 +37,6 @@ use Thelia\Model\ProductAssociatedContentQuery;
 class AssociatedContent extends Content
 {
     protected $contentId;
-
     protected $contentPosition;
 
     protected function getArgDefinitions(): ArgumentCollection
@@ -47,8 +47,7 @@ class AssociatedContent extends Content
             ->addArgument(Argument::createIntTypeArgument('product'))
             ->addArgument(Argument::createIntTypeArgument('category'))
             ->addArgument(Argument::createIntListTypeArgument('exclude_product'))
-            ->addArgument(Argument::createIntListTypeArgument('exclude_category'))
-        ;
+            ->addArgument(Argument::createIntListTypeArgument('exclude_category'));
 
         $argumentCollection->get('order')->default = 'associated_content';
 
@@ -58,21 +57,21 @@ class AssociatedContent extends Content
         return $argumentCollection;
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $product = $this->getProduct();
         $category = $this->getCategory();
 
-        if ($product === null && $category === null) {
+        if (null === $product && null === $category) {
             throw new \InvalidArgumentException('You have to provide either `product` or `category` argument in associated_content loop');
         }
 
-        if ($product !== null) {
+        if (null !== $product) {
             /** @var ProductAssociatedContentQuery $search */
             $search = ProductAssociatedContentQuery::create();
 
             $search->filterByProductId($product, Criteria::EQUAL);
-        } elseif ($category !== null) {
+        } elseif (null !== $category) {
             /** @var CategoryAssociatedContentQuery $search */
             $search = CategoryAssociatedContentQuery::create();
 
@@ -86,7 +85,7 @@ class AssociatedContent extends Content
             // Exclude all contents related to the given product
             $search->filterById(
                 ProductAssociatedContentQuery::create()->filterByProductId($excludeProduct)->select('product_id')->find(),
-                Criteria::NOT_IN
+                Criteria::NOT_IN,
             );
         }
 
@@ -97,7 +96,7 @@ class AssociatedContent extends Content
             // Exclure tous les attribut qui sont attachés aux templates indiqués
             $search->filterById(
                 CategoryAssociatedContentQuery::create()->filterByProductId($excludeCategory)->select('category_id')->find(),
-                Criteria::NOT_IN
+                Criteria::NOT_IN,
             );
         }
 
@@ -105,13 +104,13 @@ class AssociatedContent extends Content
         $orderByAssociatedContent = array_search('associated_content', $order, true);
         $orderByAssociatedContentReverse = array_search('associated_content_reverse', $order, true);
 
-        if ($orderByAssociatedContent !== false) {
+        if (false !== $orderByAssociatedContent) {
             $search->orderByPosition(Criteria::ASC);
             $order[$orderByAssociatedContent] = 'given_id';
             $this->args->get('order')->setValue(implode(',', $order));
         }
 
-        if ($orderByAssociatedContentReverse !== false) {
+        if (false !== $orderByAssociatedContentReverse) {
             $search->orderByPosition(Criteria::DESC);
             $order[$orderByAssociatedContentReverse] = 'given_id';
             $this->args->get('order')->setValue(implode(',', $order));
@@ -134,7 +133,7 @@ class AssociatedContent extends Content
         $receivedIdList = $this->getId();
 
         /* if an Id list is receive, loop will only match accessories from this list */
-        if ($receivedIdList === null) {
+        if (null === $receivedIdList) {
             $this->args->get('id')->setValue(implode(',', $associatedContentIdList));
         } else {
             $this->args->get('id')->setValue(implode(',', array_intersect($receivedIdList, $associatedContentIdList)));
@@ -153,9 +152,7 @@ class AssociatedContent extends Content
             $loopResultRow
                 ->set('ID', $this->contentId[$relatedContentId])
                 ->set('CONTENT_ID', $relatedContentId)
-                ->set('POSITION', $this->contentPosition[$relatedContentId])
-
-            ;
+                ->set('POSITION', $this->contentPosition[$relatedContentId]);
         }
 
         return $loopResult;

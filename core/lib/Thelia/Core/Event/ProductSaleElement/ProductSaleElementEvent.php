@@ -19,22 +19,16 @@ use Thelia\Model\ProductSaleElements;
 
 class ProductSaleElementEvent extends ActionEvent
 {
-    /**
-     * @var ProductSaleElements|null
-     */
-    public $product_sale_element;
-
-    public function __construct(?ProductSaleElements $product_sale_element = null)
+    public function __construct(public ?ProductSaleElements $product_sale_element = null)
     {
-        $this->product_sale_element = $product_sale_element;
     }
 
     public function hasProductSaleElement(): bool
     {
-        return null !== $this->product_sale_element;
+        return $this->product_sale_element instanceof ProductSaleElements;
     }
 
-    public function getProductSaleElement()
+    public function getProductSaleElement(): ?ProductSaleElements
     {
         return $this->product_sale_element;
     }

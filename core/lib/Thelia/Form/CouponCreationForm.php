@@ -82,16 +82,16 @@ class CouponCreationForm extends BaseForm
                             [
                                 'callback' => $this->checkDuplicateCouponCode(...),
                                 'groups' => 'creation',
-                            ]
+                            ],
                         ),
                         new Callback(
                             [
                                 'callback' => $this->checkCouponCodeChangedAndDoesntExists(...),
                                 'groups' => 'update',
-                            ]
+                            ],
                         ),
                     ],
-                ]
+                ],
             )
             ->add(
                 'title',
@@ -100,15 +100,15 @@ class CouponCreationForm extends BaseForm
                     'constraints' => [
                         new NotBlank(),
                     ],
-                ]
+                ],
             )
             ->add(
                 'shortDescription',
-                TextType::class
+                TextType::class,
             )
             ->add(
                 'description',
-                TextareaType::class
+                TextareaType::class,
             )
             ->add(
                 'type',
@@ -119,15 +119,15 @@ class CouponCreationForm extends BaseForm
                         new NotEqualTo(
                             [
                                 'value' => -1,
-                            ]
+                            ],
                         ),
                     ],
-                ]
+                ],
             )
             ->add(
                 'isEnabled',
                 TextType::class,
-                []
+                [],
             )
             ->add(
                 'startDate',
@@ -135,10 +135,10 @@ class CouponCreationForm extends BaseForm
                 [
                     'constraints' => [
                         new Callback(
-                            $this->checkLocalizedDate(...)
+                            $this->checkLocalizedDate(...),
                         ),
                     ],
-                ]
+                ],
             )
             ->add(
                 'expirationDate',
@@ -149,17 +149,17 @@ class CouponCreationForm extends BaseForm
                         new Callback($this->checkLocalizedDate(...)),
                         new Callback($this->checkConsistencyDates(...)),
                     ],
-                ]
+                ],
             )
             ->add(
                 'isCumulative',
                 TextType::class,
-                []
+                [],
             )
             ->add(
                 'isRemovingPostage',
                 TextType::class,
-                []
+                [],
             )
             ->add(
                 'freeShippingForCountries',
@@ -167,7 +167,7 @@ class CouponCreationForm extends BaseForm
                 [
                     'multiple' => true,
                     'choices' => $countries,
-                ]
+                ],
             )
             ->add(
                 'freeShippingForModules',
@@ -175,12 +175,12 @@ class CouponCreationForm extends BaseForm
                 [
                     'multiple' => true,
                     'choices' => $modules,
-                ]
+                ],
             )
             ->add(
                 'isAvailableOnSpecialOffers',
                 TextType::class,
-                []
+                [],
             )
             ->add(
                 'maxUsage',
@@ -190,7 +190,7 @@ class CouponCreationForm extends BaseForm
                         new NotBlank(),
                         new GreaterThanOrEqual(['value' => -1]),
                     ],
-                ]
+                ],
             )
             ->add(
                 'perCustomerUsageCount',
@@ -202,7 +202,7 @@ class CouponCreationForm extends BaseForm
                         Translator::getInstance()->trans('Per customer') => 1,
                         Translator::getInstance()->trans('Overall') => 0,
                     ],
-                ]
+                ],
             )
             ->add(
                 'locale',
@@ -211,7 +211,7 @@ class CouponCreationForm extends BaseForm
                     'constraints' => [
                         new NotBlank(),
                     ],
-                ]
+                ],
             )
             ->add(
                 'coupon_specific',
@@ -220,11 +220,10 @@ class CouponCreationForm extends BaseForm
                 [
                     // Value can be array or string so no validation possible here...
                     'validation_groups' => false,
-                ]
-            )
-        ;
+                ],
+            );
 
-        $this->formBuilder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event): void {
+        $this->formBuilder->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $event): void {
             $data = $event->getData();
 
             if (isset($data['coupon_specific'])) {
@@ -246,8 +245,8 @@ class CouponCreationForm extends BaseForm
             $context->addViolation(
                 Translator::getInstance()->trans(
                     "The coupon code '%code' already exists. Please choose another coupon code",
-                    ['%code' => $value]
-                )
+                    ['%code' => $value],
+                ),
             );
         }
     }
@@ -263,8 +262,8 @@ class CouponCreationForm extends BaseForm
             $context->addViolation(
                 Translator::getInstance()->trans(
                     "The coupon code '%code' already exist. Please choose another coupon code",
-                    ['%code' => $value]
-                )
+                    ['%code' => $value],
+                ),
             );
         }
     }
@@ -272,19 +271,22 @@ class CouponCreationForm extends BaseForm
     /**
      * Validate a date entered with the default Language date format.
      */
-    public function checkLocalizedDate(string $value, ExecutionContextInterface $context): void
+    public function checkLocalizedDate(?string $value, ExecutionContextInterface $context): void
     {
+        if (null === $value || '' === $value) {
+            return;
+        }
         $format = LangQuery::create()->findOneByByDefault(true)->getDatetimeFormat();
 
-        if (false === DateTime::createFromFormat($format, $value)) {
+        if (false === \DateTime::createFromFormat($format, $value)) {
             $context->addViolation(
                 Translator::getInstance()->trans(
                     "Date '%date' is invalid, please enter a valid date using %fmt format",
                     [
                         '%fmt' => $format,
                         '%date' => $value,
-                    ]
-                )
+                    ],
+                ),
             );
         }
     }
@@ -297,15 +299,15 @@ class CouponCreationForm extends BaseForm
 
         $format = LangQuery::create()->findOneByByDefault(true)->getDatetimeFormat();
 
-        $startDate = DateTime::createFromFormat($format, $startDate);
-        $expirationDate = DateTime::createFromFormat($format, $value);
+        $startDate = \DateTime::createFromFormat($format, $startDate);
+        $expirationDate = \DateTime::createFromFormat($format, $value);
 
         if ($startDate <= $expirationDate) {
             return;
         }
 
         $context->addViolation(
-            Translator::getInstance()->trans('Start date and expiration date are inconsistent')
+            Translator::getInstance()->trans('Start date and expiration date are inconsistent'),
         );
     }
 

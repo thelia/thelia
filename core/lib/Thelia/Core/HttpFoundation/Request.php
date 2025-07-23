@@ -44,8 +44,8 @@ class Request extends BaseRequest
         $pathInfo = parent::getPathInfo();
         $pathLength = \strlen($pathInfo);
 
-        if ($pathInfo !== '/' && $pathInfo[$pathLength - 1] === '/'
-            && true === (bool) ConfigQuery::read('allow_slash_ended_uri', false)
+        if ('/' !== $pathInfo && '/' === $pathInfo[$pathLength - 1]
+            && (bool) ConfigQuery::read('allow_slash_ended_uri', false)
         ) {
             if (null === $this->resolvedPathInfo) {
                 $this->resolvedPathInfo = substr($pathInfo, 0, $pathLength - 1); // Remove the slash
@@ -109,12 +109,12 @@ class Request extends BaseRequest
 
     public function fromAdmin(): bool
     {
-        return $this->controllerType === BaseAdminController::CONTROLLER_TYPE;
+        return BaseAdminController::CONTROLLER_TYPE === $this->controllerType;
     }
 
     public function fromFront(): bool
     {
-        return $this->controllerType === BaseFrontController::CONTROLLER_TYPE;
+        return BaseFrontController::CONTROLLER_TYPE === $this->controllerType;
     }
 
     public function getSession(): Session
@@ -122,9 +122,7 @@ class Request extends BaseRequest
         if (!$this->hasSession()) {
             $this->setSession(new Session());
         }
-        /** @var Session $session */
-        $session = $this->session;
 
-        return $session;
+        return $this->session;
     }
 }

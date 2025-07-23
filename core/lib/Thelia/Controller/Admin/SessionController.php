@@ -33,6 +33,7 @@ use Thelia\Model\AdminQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
+use Thelia\Service\Model\LangService;
 use Thelia\Tools\RememberMeTrait;
 use Thelia\Tools\URL;
 
@@ -41,6 +42,11 @@ class SessionController extends BaseAdminController
     use RememberMeTrait;
 
     public const ADMIN_TOKEN_SESSION_VAR_NAME = 'thelia_admin_password_renew_token';
+
+    public function __construct(
+        private readonly LangService $langService,
+    ) {
+    }
 
     protected function checkAdminLoggedIn(): ?RedirectResponse
     {
@@ -61,7 +67,7 @@ class SessionController extends BaseAdminController
                 'admin',
                 'ADMIN_CREATE_PASSWORD',
                 'Lost password recovery function invoked',
-                $this->getRequest()
+                $this->getRequest(),
             );
 
             // Redirect to the error page
@@ -152,10 +158,10 @@ class SessionController extends BaseAdminController
         }
 
         // Check the token
-        if (null == $admin = AdminQuery::create()->findOneByPasswordRenewToken($token)) {
+        if (null === $admin = AdminQuery::create()->findOneByPasswordRenewToken($token)) {
             return $this->render(
                 'lost-password',
-                ['token_error' => true]
+                ['token_error' => true],
             );
         }
 
@@ -259,7 +265,7 @@ class SessionController extends BaseAdminController
                 $this->createRememberMeCookie(
                     $user,
                     $this->getRememberMeCookieName(),
-                    $this->getRememberMeCookieExpiration()
+                    $this->getRememberMeCookieExpiration(),
                 );
             }
 
@@ -288,7 +294,7 @@ class SessionController extends BaseAdminController
 
             $message = $this->getTranslator()->trans(
                 'Unable to process your request. Please try again (%err).',
-                ['%err' => $ex->getMessage()]
+                ['%err' => $ex->getMessage()],
             );
         }
 
@@ -310,7 +316,7 @@ class SessionController extends BaseAdminController
             $lang = Lang::getDefaultLanguage();
         }
 
-        $this->getSession()->setLang($lang);
+        $this->langService->setLang($lang);
     }
 
     protected function getRememberMeCookieName()

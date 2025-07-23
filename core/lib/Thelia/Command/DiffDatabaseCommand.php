@@ -42,7 +42,7 @@ class DiffDatabaseCommand extends ContainerAwareCommand
 
         $output->writeln($formatter->formatBlock(
             'This is an experimental command that may be changed or removed at any time.',
-            'bg=yellow;fg=black'
+            'bg=yellow;fg=black',
         ));
 
         /** @var PropelInitService $propelInitService */
@@ -61,7 +61,7 @@ class DiffDatabaseCommand extends ContainerAwareCommand
                 '--config-dir' => $propelInitService->getPropelConfigDir(),
                 '--schema-dir' => $propelInitService->getPropelSchemaDir(),
                 '--output-dir' => $propelInitService->getPropelMigrationDir(),
-            ]
+            ],
         );
 
         // get the generated migration class
@@ -70,7 +70,7 @@ class DiffDatabaseCommand extends ContainerAwareCommand
             ->files()
             ->in($propelInitService->getPropelMigrationDir());
 
-        if ($finder->count() != 1) {
+        if (1 !== $finder->count()) {
             $output->writeln('Could not find the generated migration class.');
 
             return 1;

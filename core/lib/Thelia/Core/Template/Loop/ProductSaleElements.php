@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -77,8 +78,8 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             new Argument(
                 'attribute_availability',
                 new TypeCollection(
-                    new IntToCombinedIntsListType()
-                )
+                    new IntToCombinedIntsListType(),
+                ),
             ),
             new Argument(
                 'order',
@@ -94,15 +95,15 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                             'created', 'created_reverse',
                             'updated', 'updated_reverse',
                             'random',
-                        ]
-                    )
+                        ],
+                    ),
                 ),
-                'random'
-            )
+                'random',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = ProductSaleElementsQuery::create();
 
@@ -139,7 +140,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         if (BooleanOrBothType::ANY !== $visible) {
             $search->useProductQuery()
                 ->filterByVisible($visible)
-            ->endUse();
+                ->endUse();
         }
 
         $default = $this->getDefault();
@@ -208,8 +209,10 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         }
 
         $currencyId = $this->getCurrency();
+
         if (null !== $currencyId) {
             $currency = CurrencyQuery::create()->findPk($currencyId);
+
             if (null === $currency) {
                 throw new \InvalidArgumentException('Cannot found currency id: `'.$currency.'` in product_sale_elements loop');
             }
@@ -256,22 +259,24 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             $loopResultRow = new LoopResultRow($PSEValue);
 
             $price = $PSEValue->getPrice('price_PRICE', $discount);
+
             try {
                 $taxedPrice = $PSEValue->getTaxedPrice(
                     $taxCountry,
                     'price_PRICE',
-                    $discount
+                    $discount,
                 );
             } catch (TaxEngineException) {
                 $taxedPrice = null;
             }
 
             $promoPrice = $PSEValue->getPromoPrice('price_PROMO_PRICE', $discount);
+
             try {
                 $taxedPromoPrice = $PSEValue->getTaxedPromoPrice(
                     $taxCountry,
                     'price_PROMO_PRICE',
-                    $discount
+                    $discount,
                 );
             } catch (TaxEngineException) {
                 $taxedPromoPrice = null;
@@ -280,8 +285,8 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             $loopResultRow
                 ->set('ID', $PSEValue->getId())
                 ->set('QUANTITY', $PSEValue->getQuantity())
-                ->set('IS_PROMO', $PSEValue->getPromo() === 1 ? 1 : 0)
-                ->set('IS_NEW', $PSEValue->getNewness() === 1 ? 1 : 0)
+                ->set('IS_PROMO', 1 === $PSEValue->getPromo() ? 1 : 0)
+                ->set('IS_NEW', 1 === $PSEValue->getNewness() ? 1 : 0)
                 ->set('IS_DEFAULT', $PSEValue->getIsDefault() ? 1 : 0)
                 ->set('WEIGHT', $PSEValue->getWeight())
                 ->set('REF', $PSEValue->getRef())
@@ -312,10 +317,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         ];
     }
 
-    /**
-     * @param ProductSaleElementsQuery $search
-     */
-    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria): void
+    public function doSearch(ModelCriteria $search, $searchTerm, $searchIn, $searchCriteria): void
     {
         $search->_and();
 

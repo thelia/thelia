@@ -45,10 +45,8 @@ abstract class ImportExportCategory extends BaseI18nLoop implements PropelSearch
 
     /**
      * @throws PropelException
-     *
-     * @return LoopResult
      */
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var ExportCategory|ImportCategory $category */
         foreach ($loopResult->getResultDataCollection() as $category) {
@@ -58,8 +56,7 @@ abstract class ImportExportCategory extends BaseI18nLoop implements PropelSearch
                 ->set('ID', $category->getId())
                 ->set('REF', $category->getRef())
                 ->set('TITLE', $category->getVirtualColumn('i18n_TITLE'))
-                ->set('POSITION', $category->getPosition())
-            ;
+                ->set('POSITION', $category->getPosition());
 
             $this->addOutputFields($loopResultRow, $category);
             $loopResult->addRow($loopResultRow);
@@ -70,10 +67,8 @@ abstract class ImportExportCategory extends BaseI18nLoop implements PropelSearch
 
     /**
      * this method returns a Propel ModelCriteria.
-     *
-     * @return ModelCriteria
      */
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         /** @var ImportCategoryQuery|ExportCategoryQuery $query */
         $query = $this->getQueryModel();
@@ -122,10 +117,7 @@ abstract class ImportExportCategory extends BaseI18nLoop implements PropelSearch
         return $query;
     }
 
-    /**
-     * @return ArgumentCollection
-     */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
@@ -133,15 +125,12 @@ abstract class ImportExportCategory extends BaseI18nLoop implements PropelSearch
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumListType(['id', 'id_reverse', 'ref', 'ref_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse'])
+                    new EnumListType(['id', 'id_reverse', 'ref', 'ref_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse']),
                 ),
-                'manual'
-            )
+                'manual',
+            ),
         );
     }
 
-    /**
-     * @return ImportCategoryQuery|ExportCategoryQuery
-     */
-    abstract protected function getQueryModel();
+    abstract protected function getQueryModel(): ImportCategoryQuery|ExportCategoryQuery;
 }

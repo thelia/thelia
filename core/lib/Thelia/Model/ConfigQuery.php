@@ -26,7 +26,6 @@ use Thelia\Model\Base\ConfigQuery as BaseConfigQuery;
 class ConfigQuery extends BaseConfigQuery
 {
     protected static $booted = false;
-
     protected static $cache = [];
 
     /**
@@ -62,16 +61,16 @@ class ConfigQuery extends BaseConfigQuery
     {
         $config = self::create()->findOneByName($configName);
 
-        if (null == $config) {
+        if (null === $config) {
             $config = new Config();
             $config->setName($configName);
         }
 
-        if ($secured !== null) {
+        if (null !== $secured) {
             $config->setSecured($secured ? 1 : 0);
         }
 
-        if ($hidden !== null) {
+        if (null !== $hidden) {
             $config->setHidden($hidden ? 1 : 0);
         }
 
@@ -89,9 +88,9 @@ class ConfigQuery extends BaseConfigQuery
         return self::read('default_lang_without_translation', 1);
     }
 
-    public static function isRewritingEnable()
+    public static function isRewritingEnable(): bool
     {
-        return self::read('rewriting_enable') == 1;
+        return '1' === self::read('rewriting_enable');
     }
 
     public static function getPageNotFoundView()
@@ -104,14 +103,14 @@ class ConfigQuery extends BaseConfigQuery
         return self::read('obsolete_rewriten_url_view', 'obsolete-rewritten-url');
     }
 
-    public static function useTaxFreeAmounts()
+    public static function useTaxFreeAmounts(): bool
     {
-        return self::read('use_tax_free_amounts', 'default') == 1;
+        return '1' === self::read('use_tax_free_amounts', 'default');
     }
 
-    public static function checkAvailableStock()
+    public static function checkAvailableStock(): bool
     {
-        return self::read('check-available-stock', 1) != 0;
+        return '0 ' !== self::read('check-available-stock', 1);
     }
 
     public static function getUnknownFlagPath()
@@ -135,31 +134,19 @@ class ConfigQuery extends BaseConfigQuery
     }
 
     /**
-     * @since 2.3.0-alpha2
-     *
      * @return int|null the store country id
      */
-    public static function getStoreCountry()
+    public static function getStoreCountry(): ?int
     {
         return self::read('store_country', null);
     }
 
-    /**
-     * @since 2.3.0-alpha2
-     *
-     * @return bool
-     */
-    public static function getNotifyNewsletterSubscription()
+    public static function getNotifyNewsletterSubscription(): bool
     {
-        return self::read('notify_newsletter_subscription', 0) != 0;
+        return '0' !== self::read('notify_newsletter_subscription', 0);
     }
 
-    /**
-     * @since 2.4
-     *
-     * @return bool
-     */
-    public static function isCustomerEmailConfirmationEnable()
+    public static function isCustomerEmailConfirmationEnable(): bool
     {
         return (bool) self::read('customer_email_confirmation', false);
     }
@@ -167,7 +154,7 @@ class ConfigQuery extends BaseConfigQuery
     /**
      * @return array a list of email addresses to send the shop's notifications
      */
-    public static function getNotificationEmailsList()
+    public static function getNotificationEmailsList(): array
     {
         $contactEmail = self::getStoreEmail();
 
@@ -183,14 +170,14 @@ class ConfigQuery extends BaseConfigQuery
     }
 
     /* smtp config */
-    public static function isSmtpInEnv()
+    public static function isSmtpInEnv(): bool
     {
         return isset($_ENV['SMTP_ENABLED']) || isset($_ENV['SMTP_HOST']) || isset($_ENV['MAILER_DSN']);
     }
 
-    public static function isSmtpEnable()
+    public static function isSmtpEnable(): bool
     {
-        return self::read('smtp.enabled') == 1;
+        return '1' === self::read('smtp.enabled');
     }
 
     public static function getSmtpHost()
@@ -300,10 +287,7 @@ class ConfigQuery extends BaseConfigQuery
         return (bool) static::read('error_message.show', false);
     }
 
-    /**
-     * @param bool $v
-     */
-    public static function setShowingErrorMessage($v): void
+    public static function setShowingErrorMessage(bool $v): void
     {
         static::write('error_message.show', (int) (@(bool) $v));
     }
@@ -325,10 +309,8 @@ class ConfigQuery extends BaseConfigQuery
 
     /**
      * check if Thelia multi domain is activated. (Means one domain for each language).
-     *
-     * @return bool
      */
-    public static function isMultiDomainActivated()
+    public static function isMultiDomainActivated(): bool
     {
         return (bool) self::read('one_domain_foreach_lang', false);
     }

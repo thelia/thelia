@@ -34,22 +34,22 @@ use Thelia\Type\FloatType;
 abstract class ConditionAbstract implements ConditionInterface
 {
     /** @var array Available Operators (Operators::CONST) */
-    protected $availableOperators = [];
+    protected array $availableOperators = [];
 
     /** @var array Parameters validating parameters against */
-    protected $validators = [];
+    protected array $validators = [];
 
     /** @var Translator Service Translator */
-    protected $translator;
+    protected Translator $translator;
 
     /** @var array Operators set by Admin in BackOffice */
-    protected $operators = [];
+    protected array $operators = [];
 
     /** @var array Values set by Admin in BackOffice */
-    protected $values = [];
+    protected array $values = [];
 
     /** @var ConditionEvaluator Conditions validator */
-    protected $conditionValidator;
+    protected ConditionEvaluator $conditionValidator;
 
     /**
      * Constructor.
@@ -66,22 +66,19 @@ abstract class ConditionAbstract implements ConditionInterface
      * @param array  $operatorList  the list of comparison operator values, as entered in the condition parameter form
      * @param string $parameterName the name of the parameter to check
      *
-     * @throws InvalidConditionOperatorException if the operator value is not in the allowed value
-     *
      * @return $this
+     *
+     * @throws InvalidConditionOperatorException if the operator value is not in the allowed value
      */
-    protected function checkComparisonOperatorValue(array $operatorList, $parameterName)
+    protected function checkComparisonOperatorValue(array $operatorList, string $parameterName)
     {
         $isOperator1Legit = $this->isOperatorLegit(
             $operatorList[$parameterName],
-            $this->availableOperators[$parameterName]
+            $this->availableOperators[$parameterName],
         );
 
         if (!$isOperator1Legit) {
-            throw new InvalidConditionOperatorException(
-                self::class,
-                $parameterName
-            );
+            throw new InvalidConditionOperatorException(self::class, $parameterName);
         }
 
         return $this;
@@ -89,10 +86,8 @@ abstract class ConditionAbstract implements ConditionInterface
 
     /**
      * Return all validators.
-     *
-     * @return array
      */
-    public function getValidators()
+    public function getValidators(): array
     {
         $this->validators = $this->generateInputs();
 
@@ -104,7 +99,7 @@ abstract class ConditionAbstract implements ConditionInterface
             foreach ($validator['availableOperators'] as $availableOperators) {
                 $translatedOperators[$availableOperators] = Operators::getI18n(
                     $this->translator,
-                    $availableOperators
+                    $availableOperators,
                 );
             }
 
@@ -126,17 +121,13 @@ abstract class ConditionAbstract implements ConditionInterface
      * TODO: what these "inputs ready to be drawn" is not clear.
      *
      * @throws NotImplementedException
-     *
-     * @return array
      */
-    protected function generateInputs()
+    protected function generateInputs(): array
     {
-        throw new NotImplementedException(
-            'The generateInputs method must be implemented in '.self::class
-        );
+        throw new NotImplementedException('The generateInputs method must be implemented in '.self::class);
     }
 
-    public function getServiceId()
+    public function getServiceId(): string
     {
         return static::class;
     }
@@ -146,20 +137,16 @@ abstract class ConditionAbstract implements ConditionInterface
      *
      * @param string $operator           Operator to validate ex <
      * @param array  $availableOperators Available operators
-     *
-     * @return bool
      */
-    protected function isOperatorLegit($operator, array $availableOperators)
+    protected function isOperatorLegit(string $operator, array $availableOperators): bool
     {
-        return \in_array($operator, $availableOperators);
+        return \in_array($operator, $availableOperators, true);
     }
 
     /**
      * Return a serializable Condition.
-     *
-     * @return SerializableCondition
      */
-    public function getSerializableCondition()
+    public function getSerializableCondition(): SerializableCondition
     {
         $serializableCondition = new SerializableCondition();
         $serializableCondition->conditionServiceId = $this->getServiceId();
@@ -176,25 +163,21 @@ abstract class ConditionAbstract implements ConditionInterface
      * @param string $currencyValue Currency EUR|USD|..
      *
      * @throws InvalidConditionValueException
-     *
-     * @return bool
      */
-    protected function isCurrencyValid($currencyValue)
+    protected function isCurrencyValid(string $currencyValue): bool
     {
         $availableCurrencies = $this->facade->getAvailableCurrencies();
         /** @var Currency $currency */
         $currencyFound = false;
+
         foreach ($availableCurrencies as $currency) {
-            if ($currencyValue == $currency->getCode()) {
+            if ($currencyValue === $currency->getCode()) {
                 $currencyFound = true;
             }
         }
 
         if (!$currencyFound) {
-            throw new InvalidConditionValueException(
-                self::class,
-                'currency'
-            );
+            throw new InvalidConditionValueException(self::class, 'currency');
         }
 
         return true;
@@ -206,17 +189,13 @@ abstract class ConditionAbstract implements ConditionInterface
      * @param float $priceValue Price value to check
      *
      * @throws InvalidConditionValueException
-     *
-     * @return bool
      */
-    protected function isPriceValid($priceValue)
+    protected function isPriceValid(float $priceValue): bool
     {
         $floatType = new FloatType();
+
         if (!$floatType->isValid($priceValue) || $priceValue <= 0) {
-            throw new InvalidConditionValueException(
-                self::class,
-                'price'
-            );
+            throw new InvalidConditionValueException(self::class, 'price');
         }
 
         return true;
@@ -230,7 +209,7 @@ abstract class ConditionAbstract implements ConditionInterface
      *
      * @return string HTML string
      */
-    protected function drawBackOfficeInputOperators($inputKey)
+    protected function drawBackOfficeInputOperators(string $inputKey): string
     {
         $html = '';
 
@@ -243,7 +222,7 @@ abstract class ConditionAbstract implements ConditionInterface
                     'operators' => $inputs['inputs'][$inputKey]['availableOperators'],
                     'value' => $this->operators[$inputKey] ?? '',
                     'inputKey' => $inputKey,
-                ]
+                ],
             );
         }
 
@@ -259,12 +238,13 @@ abstract class ConditionAbstract implements ConditionInterface
      *
      * @return string HTML string
      */
-    protected function drawBackOfficeBaseInputsText($label, $inputKey)
+    protected function drawBackOfficeBaseInputsText(string $label, string $inputKey): string
     {
         $operatorSelectHtml = $this->drawBackOfficeInputOperators($inputKey);
 
         $currentValue = '';
-        if ($this->values !== null && isset($this->values[$inputKey])) {
+
+        if (null !== $this->values && isset($this->values[$inputKey])) {
             $currentValue = $this->values[$inputKey];
         }
 
@@ -275,7 +255,7 @@ abstract class ConditionAbstract implements ConditionInterface
                 'inputKey' => $inputKey,
                 'currentValue' => $currentValue,
                 'operatorSelectHtml' => $operatorSelectHtml,
-            ]
+            ],
         );
     }
 
@@ -289,7 +269,7 @@ abstract class ConditionAbstract implements ConditionInterface
      *
      * @return string HTML string
      */
-    protected function drawBackOfficeInputQuantityValues($inputKey, $max = 10, $min = 0)
+    protected function drawBackOfficeInputQuantityValues(string $inputKey, int $max = 10, int $min = 0): string
     {
         return $this->facade->getParser()->render(
             'coupon/condition-fragments/quantity-selector.html',
@@ -298,7 +278,7 @@ abstract class ConditionAbstract implements ConditionInterface
                 'max' => $max,
                 'value' => $this->values[$inputKey] ?? '',
                 'inputKey' => $inputKey,
-            ]
+            ],
         );
     }
 
@@ -310,7 +290,7 @@ abstract class ConditionAbstract implements ConditionInterface
      *
      * @return string HTML string
      */
-    protected function drawBackOfficeCurrencyInput($inputKey)
+    protected function drawBackOfficeCurrencyInput(string $inputKey): string
     {
         $currencies = CurrencyQuery::create()->find();
 
@@ -327,7 +307,7 @@ abstract class ConditionAbstract implements ConditionInterface
                 'currencies' => $cleanedCurrencies,
                 'value' => $this->values[$inputKey] ?? '',
                 'inputKey' => $inputKey,
-            ]
+            ],
         );
     }
 
@@ -336,7 +316,7 @@ abstract class ConditionAbstract implements ConditionInterface
      *
      * @return string the current locale
      */
-    protected function getCurrentLocale()
+    protected function getCurrentLocale(): string
     {
         return $this->facade->getRequest()->getSession()->getLang()->getLocale();
     }

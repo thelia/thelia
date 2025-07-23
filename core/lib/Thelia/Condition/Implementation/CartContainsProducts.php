@@ -65,10 +65,7 @@ class CartContainsProducts extends ConditionAbstract
 
         // Check that at least one product is selected
         if (empty($values[self::PRODUCTS_LIST])) {
-            throw new InvalidConditionValueException(
-                self::class,
-                self::PRODUCTS_LIST
-            );
+            throw new InvalidConditionValueException(self::class, self::PRODUCTS_LIST);
         }
 
         $this->operators = [self::PRODUCTS_LIST => $operators[self::PRODUCTS_LIST]];
@@ -86,7 +83,7 @@ class CartContainsProducts extends ConditionAbstract
             if ($this->conditionValidator->variableOpComparison(
                 $cartItem->getProduct()->getId(),
                 $this->operators[self::PRODUCTS_LIST],
-                $this->values[self::PRODUCTS_LIST]
+                $this->values[self::PRODUCTS_LIST],
             )) {
                 return true;
             }
@@ -99,7 +96,7 @@ class CartContainsProducts extends ConditionAbstract
     {
         return $this->translator->trans(
             'Cart contains specific products',
-            []
+            [],
         );
     }
 
@@ -107,7 +104,7 @@ class CartContainsProducts extends ConditionAbstract
     {
         return $this->translator->trans(
             'The coupon applies if the cart contains at least one product of the specified product list',
-            []
+            [],
         );
     }
 
@@ -115,7 +112,7 @@ class CartContainsProducts extends ConditionAbstract
     {
         $i18nOperator = Operators::getI18n(
             $this->translator,
-            $this->operators[self::PRODUCTS_LIST]
+            $this->operators[self::PRODUCTS_LIST],
         );
 
         $prodStrList = '';
@@ -136,7 +133,7 @@ class CartContainsProducts extends ConditionAbstract
             [
                 '%products_list%' => $prodStrList,
                 '%op%' => $i18nOperator,
-            ]
+            ],
         );
     }
 
@@ -151,7 +148,7 @@ class CartContainsProducts extends ConditionAbstract
         ];
     }
 
-    public function drawBackOfficeInputs()
+    public function drawBackOfficeInputs(): string
     {
         return $this->facade->getParser()->render(
             'coupon/condition-fragments/cart-contains-products-condition.html',
@@ -159,7 +156,7 @@ class CartContainsProducts extends ConditionAbstract
                 'operatorSelectHtml' => $this->drawBackOfficeInputOperators(self::PRODUCTS_LIST),
                 'products_field_name' => self::PRODUCTS_LIST,
                 'values' => $this->values[self::PRODUCTS_LIST] ?? [],
-            ]
+            ],
         );
     }
 }

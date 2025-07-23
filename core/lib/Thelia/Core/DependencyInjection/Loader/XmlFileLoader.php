@@ -82,22 +82,22 @@ class XmlFileLoader extends FileLoader
 
         $this->propelOnlyRun(
             [$this, 'parseExportCategories'],
-            $xml
+            $xml,
         );
 
         $this->propelOnlyRun(
             [$this, 'parseExports'],
-            $xml
+            $xml,
         );
 
         $this->propelOnlyRun(
             [$this, 'parseImportCategories'],
-            $xml
+            $xml,
         );
 
         $this->propelOnlyRun(
             [$this, 'parseImports'],
-            $xml
+            $xml,
         );
     }
 
@@ -157,6 +157,7 @@ class XmlFileLoader extends FileLoader
         foreach ($loops as $loop) {
             $loopConfig[$this->getAttributeAsPhp($loop, 'name')] = $this->getAttributeAsPhp($loop, 'class');
         }
+
         $this->container->setParameter('Thelia.parser.loops', $loopConfig);
     }
 
@@ -225,10 +226,8 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Parses multiple definitions.
-     *
-     * @param string $file
      */
-    protected function parseDefinitions(\SimpleXMLElement $xml, $file): void
+    protected function parseDefinitions(\SimpleXMLElement $xml, string $file): void
     {
         if (false === $services = $xml->xpath('//config:services/config:service')) {
             return;
@@ -239,9 +238,10 @@ class XmlFileLoader extends FileLoader
         }
     }
 
-    protected function parseDefinition($id, $service, $file): void
+    protected function parseDefinition(string $id, \SimpleXMLElement $service, string $file): void
     {
         $definition = $this->parseService($id, $service, $file);
+
         if ($definition instanceof Definition) {
             $this->container->setDefinition($id, $definition);
         }
@@ -249,11 +249,8 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Parses multiple definitions.
-     *
-     * @param string $file
-     * @param string $type
      */
-    protected function parseHooks(\SimpleXMLElement $xml, $file, $type): void
+    protected function parseHooks(\SimpleXMLElement $xml, string $file, string $type): void
     {
         if (false === $hooks = $xml->xpath('//config:hooks/config:hook')) {
             return;
@@ -264,13 +261,14 @@ class XmlFileLoader extends FileLoader
         }
     }
 
-    protected function parseHook($id, $hook, $file, $type): void
+    protected function parseHook(string $id, $hook, string $file, $type): void
     {
         if (!isset($hook['class'])) {
             $hook['class'] = self::DEFAULT_HOOK_CLASS;
         }
 
         $definition = $this->parseService($id, $hook, $file);
+
         if ($definition instanceof Definition) {
             if (null !== $type) {
                 // inject the BaseModule
@@ -290,16 +288,13 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses an individual Definition.
      *
-     * @param string            $id
-     * @param \SimpleXMLElement $service
-     * @param string            $file
-     *
      * @return Definition
      */
-    protected function parseService($id, $service, $file): Definition|ChildDefinition|null
+    protected function parseService(string $id, \SimpleXMLElement $service, string $file): Definition|ChildDefinition|null
     {
-        if ((string) $service['alias'] !== '' && (string) $service['alias'] !== '0') {
+        if ('' !== (string) $service['alias'] && '0' !== (string) $service['alias']) {
             $public = true;
+
             if (isset($service['public'])) {
                 $public = $this->getAttributeAsPhp($service, 'public');
             }
@@ -333,11 +328,12 @@ class XmlFileLoader extends FileLoader
 
         $definition->setArguments($this->getArgumentsAsPhp($service, 'argument'));
         $definition->setProperties($this->getArgumentsAsPhp($service, 'property'));
-        if ($this->getArgumentsAsPhp($service, 'factory') !== []) {
+
+        if ([] !== $this->getArgumentsAsPhp($service, 'factory')) {
             $definition->setFactory($this->getServiceFactory($service->factory));
         }
 
-        if (property_exists($service, 'configurator') && $service->configurator !== null) {
+        if (property_exists($service, 'configurator') && null !== $service->configurator) {
             if (isset($service->configurator['function'])) {
                 $definition->setConfigurator((string) $service->configurator['function']);
             } else {
@@ -357,6 +353,7 @@ class XmlFileLoader extends FileLoader
 
         foreach ($service->tag as $tag) {
             $parameters = [];
+
             foreach ($tag->attributes() as $name => $value) {
                 if ('name' === $name) {
                     continue;
@@ -387,12 +384,11 @@ class XmlFileLoader extends FileLoader
 
                 $exportCategoryModel = ExportCategoryQuery::create()->findOneByRef($id);
 
-                if ($exportCategoryModel === null) {
+                if (null === $exportCategoryModel) {
                     $exportCategoryModel = new ExportCategory();
                     $exportCategoryModel
                         ->setRef($id)
-                        ->save($con)
-                    ;
+                        ->save($con);
                 }
 
                 /** @var \SimpleXMLElement $child */
@@ -432,17 +428,13 @@ class XmlFileLoader extends FileLoader
                 $categoryRef = (string) $this->getAttributeAsPhp($export, 'category_id');
 
                 if (!class_exists($class)) {
-                    throw new \ErrorException(
-                        \sprintf("The class \"%s\" doesn't exist", $class)
-                    );
+                    throw new \ErrorException(\sprintf("The class \"%s\" doesn't exist", $class));
                 }
 
                 $category = ExportCategoryQuery::create()->findOneByRef($categoryRef);
 
                 if (null === $category) {
-                    throw new \ErrorException(
-                        \sprintf("The export category \"%s\" doesn't exist", $categoryRef)
-                    );
+                    throw new \ErrorException(\sprintf("The export category \"%s\" doesn't exist", $categoryRef));
                 }
 
                 $exportModel = ExportQuery::create()->findOneByRef($id);
@@ -450,15 +442,13 @@ class XmlFileLoader extends FileLoader
                 if (null === $exportModel) {
                     $exportModel = new Export();
                     $exportModel
-                        ->setRef($id)
-                    ;
+                        ->setRef($id);
                 }
 
                 $exportModel
                     ->setExportCategory($category)
                     ->setHandleClass($class)
-                    ->save($con)
-                ;
+                    ->save($con);
 
                 /** @var \SimpleXMLElement $descriptive */
                 foreach ($export->children() as $descriptive) {
@@ -482,8 +472,7 @@ class XmlFileLoader extends FileLoader
                         ->setLocale($locale)
                         ->setTitle($title)
                         ->setDescription($description)
-                        ->save($con)
-                    ;
+                        ->save($con);
                 }
             }
 
@@ -511,12 +500,11 @@ class XmlFileLoader extends FileLoader
 
                 $importCategoryModel = ImportCategoryQuery::create()->findOneByRef($id);
 
-                if ($importCategoryModel === null) {
+                if (null === $importCategoryModel) {
                     $importCategoryModel = new ImportCategory();
                     $importCategoryModel
                         ->setRef($id)
-                        ->save($con)
-                    ;
+                        ->save($con);
                 }
 
                 /** @var \SimpleXMLElement $child */
@@ -556,17 +544,13 @@ class XmlFileLoader extends FileLoader
                 $categoryRef = (string) $this->getAttributeAsPhp($import, 'category_id');
 
                 if (!class_exists($class)) {
-                    throw new \ErrorException(
-                        \sprintf("The class \"%s\" doesn't exist", $class)
-                    );
+                    throw new \ErrorException(\sprintf("The class \"%s\" doesn't exist", $class));
                 }
 
                 $category = ImportCategoryQuery::create()->findOneByRef($categoryRef);
 
                 if (null === $category) {
-                    throw new \ErrorException(
-                        \sprintf("The import category \"%s\" doesn't exist", $categoryRef)
-                    );
+                    throw new \ErrorException(\sprintf("The import category \"%s\" doesn't exist", $categoryRef));
                 }
 
                 $importModel = ImportQuery::create()->findOneByRef($id);
@@ -574,15 +558,13 @@ class XmlFileLoader extends FileLoader
                 if (null === $importModel) {
                     $importModel = new Import();
                     $importModel
-                        ->setRef($id)
-                    ;
+                        ->setRef($id);
                 }
 
                 $importModel
                     ->setImportCategory($category)
                     ->setHandleClass($class)
-                    ->save($con)
-                ;
+                    ->save($con);
 
                 /** @var \SimpleXMLElement $descriptive */
                 foreach ($import->children() as $descriptive) {
@@ -606,8 +588,7 @@ class XmlFileLoader extends FileLoader
                         ->setLocale($locale)
                         ->setTitle($title)
                         ->setDescription($description)
-                        ->save($con)
-                    ;
+                        ->save($con);
                 }
             }
 
@@ -641,19 +622,20 @@ class XmlFileLoader extends FileLoader
      * Validates a documents XML schema.
      *
      * @throws RuntimeException When extension references a non-existent XSD file
-     *
-     * @return bool
      */
-    public function validateSchema(\DOMDocument $dom)
+    public function validateSchema(\DOMDocument $dom): bool
     {
         $schemaLocations = ['http://thelia.net/schema/dic/config' => str_replace('\\', '/', __DIR__.'/schema/dic/config/thelia-1.0.xsd')];
 
         $tmpfiles = [];
         $imports = '';
+
         foreach ($schemaLocations as $namespace => $location) {
             $parts = explode('/', $location);
+
             if (0 === stripos($location, 'phar://')) {
                 $tmpfile = tempnam(sys_get_temp_dir(), 'sf2');
+
                 if ($tmpfile) {
                     copy($location, $tmpfile);
                     $tmpfiles[] = $tmpfile;
@@ -668,17 +650,16 @@ class XmlFileLoader extends FileLoader
         }
 
         $source = <<<EOF
-<?xml version="1.0" encoding="utf-8" ?>
-<xsd:schema xmlns="http://symfony.com/schema"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://symfony.com/schema"
-    elementFormDefault="qualified">
+            <?xml version="1.0" encoding="utf-8" ?>
+            <xsd:schema xmlns="http://symfony.com/schema"
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                targetNamespace="http://symfony.com/schema"
+                elementFormDefault="qualified">
 
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
-{$imports}
-</xsd:schema>
-EOF
-        ;
+                <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+            {$imports}
+            </xsd:schema>
+            EOF;
 
         $valid = @$dom->schemaValidateSource($source);
 
@@ -697,7 +678,7 @@ EOF
      *
      * @return bool true if this class supports the given resource, false otherwise
      */
-    public function supports(mixed $resource, $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         // TODO: Implement supports() method.
     }
@@ -708,15 +689,16 @@ EOF
     private function getArgumentsAsPhp(\SimpleXMLElement $xml, $name, bool $lowercase = true): array
     {
         $arguments = [];
-        foreach ($xml->$name as $arg) {
+
+        foreach ($xml->{$name} as $arg) {
             if (isset($arg['name'])) {
                 $arg['key'] = (string) $arg['name'];
             }
 
-            $key = isset($arg['key']) ? (string) $arg['key'] : ($arguments === [] ? 0 : max(array_keys($arguments)) + 1);
+            $key = isset($arg['key']) ? (string) $arg['key'] : ([] === $arguments ? 0 : max(array_keys($arguments)) + 1);
 
             // parameter keys are case insensitive
-            if ('parameter' == $name && $lowercase) {
+            if ('parameter' === $name && $lowercase) {
                 $key = strtolower((string) $key);
             }
 
@@ -729,9 +711,10 @@ EOF
             switch ($arg['type']) {
                 case 'service':
                     $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
-                    if (isset($arg['on-invalid']) && 'ignore' == $arg['on-invalid']) {
+
+                    if (isset($arg['on-invalid']) && 'ignore' === $arg['on-invalid']) {
                         $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
-                    } elseif (isset($arg['on-invalid']) && 'null' == $arg['on-invalid']) {
+                    } elseif (isset($arg['on-invalid']) && 'null' === $arg['on-invalid']) {
                         $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
                     }
 

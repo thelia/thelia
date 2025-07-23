@@ -28,26 +28,22 @@ interface DeliveryModuleInterface extends BaseModuleInterface
      * If you return false, the delivery method will not be displayed
      *
      * @param Country $country the country to deliver to
-     *
-     * @return bool
      */
-    public function isValidDelivery(Country $country);
+    public function isValidDelivery(Country $country): bool;
 
     /**
      * Calculate and return delivery price in the shop's default currency.
      *
      * @param Country $country the country to deliver to
      *
-     * @throws DeliveryException if the postage price cannot be calculated
-     *
      * @return OrderPostage|float the delivery price
+     *
+     * @throws DeliveryException if the postage price cannot be calculated
      */
-    public function getPostage(Country $country);
+    public function getPostage(Country $country): OrderPostage|float;
 
     /**
      * This method return true if your delivery manages virtual product delivery.
-     *
-     * @return bool
      */
-    public function handleVirtualProductDelivery();
+    public function handleVirtualProductDelivery(): bool;
 }

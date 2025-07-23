@@ -34,7 +34,7 @@ interface BaseModuleInterface
      * @param string $currentVersion the current (installed) module version, as defined in the module.xml file
      * @param string $newVersion     the new module version, as defined in the module.xml file
      */
-    public function update($currentVersion, $newVersion, ?ConnectionInterface $con = null);
+    public function update(string $currentVersion, string $newVersion, ?ConnectionInterface $con = null);
 
     /**
      * This method is called just before the deletion of the module, giving the module an opportunity
@@ -42,28 +42,28 @@ interface BaseModuleInterface
      *
      * @param bool $deleteModuleData if true, the module should remove all its data from the system
      */
-    public function destroy(?ConnectionInterface $con = null, $deleteModuleData = false);
+    public function destroy(?ConnectionInterface $con = null, bool $deleteModuleData = false);
 
     /**
      * This method is called when the module is activated.
      *
      * @param Module $moduleModel the module
      */
-    public function activate($moduleModel = null);
+    public function activate(?Module $moduleModel = null);
 
     /**
      * This method is called when the module is deactivated.
      *
      * @param Module $moduleModel the module
      */
-    public function deActivate($moduleModel = null);
+    public function deActivate(?Module $moduleModel = null);
 
     /**
      * This method is called before the module activation, and may prevent it by returning false.
      *
      * @return bool true to continue module activation, false to prevent it
      */
-    public function preActivation(?ConnectionInterface $con = null);
+    public function preActivation(?ConnectionInterface $con = null): bool;
 
     /**
      * This method is called just after the module was successfully activated.
@@ -75,7 +75,7 @@ interface BaseModuleInterface
      *
      * @return bool true to continue module de-activation, false to prevent it
      */
-    public function preDeactivation(?ConnectionInterface $con = null);
+    public function preDeactivation(?ConnectionInterface $con = null): bool;
 
     /**
      * This method is called just after the module was successfully deactivated.
@@ -88,7 +88,7 @@ interface BaseModuleInterface
      * @param Module $module the module
      * @param array  $titles an associative array of locale => title_string
      */
-    public function setTitle(Module $module, $titles);
+    public function setTitle(Module $module, array $titles);
 
     /**
      * Get a module's configuration variable.
@@ -99,7 +99,7 @@ interface BaseModuleInterface
      *
      * @return string the variable value
      */
-    public static function getConfigValue($variableName, $defaultValue = null, $valueLocale = null);
+    public static function getConfigValue(string $variableName, ?string $defaultValue = null, $valueLocale = null): string;
 
     /**
      * Set module configuration variable, creating it if required.
@@ -109,15 +109,15 @@ interface BaseModuleInterface
      * @param null   $valueLocale       the locale, or null if not required
      * @param bool   $createIfNotExists if true, the variable will be created if not already defined
      *
-     * @throws \LogicException if variable does not exists and $createIfNotExists is false
-     *
      * @return $this;
+     *
+     * @throws \LogicException if variable does not exists and $createIfNotExists is false
      */
     public static function setConfigValue(
-        $variableName,
-        $variableValue,
+        string $variableName,
+        string $variableValue,
         $valueLocale = null,
-        $createIfNotExists = true,
+        bool $createIfNotExists = true,
     );
 
     /**
@@ -132,29 +132,27 @@ interface BaseModuleInterface
      * @throws \Exception
      * @throws \UnexpectedValueException
      */
-    public function deployImageFolder(Module $module, $folderPath, ?ConnectionInterface $con = null);
+    public function deployImageFolder(Module $module, string $folderPath, ?ConnectionInterface $con = null);
 
     /**
      * @throws ModuleException
-     *
-     * @return Module
      */
-    public function getModuleModel();
+    public function getModuleModel(): Module;
 
     /**
      * @return string The module id
      */
-    public static function getModuleId();
+    public static function getModuleId(): int;
 
     /**
      * @return string The module code, in a static way
      */
-    public static function getModuleCode();
+    public static function getModuleCode(): string;
 
     /**
      * @return string The module code
      */
-    public function getCode();
+    public function getCode(): string;
 
     /**
      * This method adds new compilers to Thelia container.
@@ -253,7 +251,7 @@ interface BaseModuleInterface
      *      )
      * );
      */
-    public function getHooks();
+    public function getHooks(): array;
 
     /**
      * Create or update module hooks returned by the `getHooks` function.

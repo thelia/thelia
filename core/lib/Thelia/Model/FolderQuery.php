@@ -30,10 +30,8 @@ class FolderQuery extends BaseFolderQuery
      * count how many direct contents a folder has.
      *
      * @param int $parent folder id
-     *
-     * @return int
      */
-    public static function countChild($parent)
+    public static function countChild(int $parent): int
     {
         return self::create()->filterByParent($parent)->count();
     }
@@ -47,7 +45,7 @@ class FolderQuery extends BaseFolderQuery
      *
      * @return Folder[]
      */
-    public static function findAllChild($folderId, $depth = 0, $currentPosition = 0)
+    public static function findAllChild(int $folderId, int $depth = 0, int $currentPosition = 0): array
     {
         $result = [];
 
@@ -58,7 +56,7 @@ class FolderQuery extends BaseFolderQuery
         } else {
             ++$currentPosition;
 
-            if ($depth == $currentPosition && $depth != 0) {
+            if ($depth === $currentPosition && 0 !== $depth) {
                 return [];
             }
 
@@ -82,10 +80,8 @@ class FolderQuery extends BaseFolderQuery
      * @param int       $depth    max tree traversal depth
      *
      * @return int[]
-     *
-     * @since 2.3
      */
-    public static function getFolderTreeIds($folderId, $depth = 1)
+    public static function getFolderTreeIds(int|array $folderId, int $depth = 1): array
     {
         $result = \is_array($folderId) ? $folderId : [$folderId];
 
@@ -98,7 +94,7 @@ class FolderQuery extends BaseFolderQuery
             foreach ($folders as $folder) {
                 $result = array_merge(
                     $result,
-                    self::getFolderTreeIds($folder->getId(), $depth - 1)
+                    self::getFolderTreeIds($folder->getId(), $depth - 1),
                 );
             }
         }

@@ -48,6 +48,7 @@ class AdvancedConfigurationController extends BaseAdminController
         }
 
         $form = $this->createForm(AdminForm::CACHE_FLUSH);
+
         try {
             $this->validateForm($form);
 
@@ -67,6 +68,7 @@ class AdvancedConfigurationController extends BaseAdminController
         }
 
         $form = $this->createForm(AdminForm::ASSETS_FLUSH);
+
         try {
             $this->validateForm($form);
 
@@ -86,22 +88,23 @@ class AdvancedConfigurationController extends BaseAdminController
         }
 
         $form = $this->createForm(AdminForm::IMAGES_AND_DOCUMENTS_CACHE_FLUSH);
+
         try {
             $this->validateForm($form);
 
             $event = new CacheEvent(
                 THELIA_WEB_DIR.ConfigQuery::read(
                     'image_cache_dir_from_web_root',
-                    'cache'.DS.'images'
-                )
+                    'cache'.DS.'images',
+                ),
             );
             $eventDispatcher->dispatch($event, TheliaEvents::CACHE_CLEAR);
 
             $event = new CacheEvent(
                 THELIA_WEB_DIR.ConfigQuery::read(
                     'document_cache_dir_from_web_root',
-                    'cache'.DS.'documents'
-                )
+                    'cache'.DS.'documents',
+                ),
             );
             $eventDispatcher->dispatch($event, TheliaEvents::CACHE_CLEAR);
         } catch (\Exception $exception) {

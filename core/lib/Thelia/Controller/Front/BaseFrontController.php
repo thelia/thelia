@@ -30,7 +30,7 @@ class BaseFrontController extends BaseController
 
     public function checkAuth(): void
     {
-        if ($this->getSecurityContext()->hasCustomerUser() === false) {
+        if (false === $this->getSecurityContext()->hasCustomerUser()) {
             throw new RedirectException($this->retrieveUrlFromRouteId('customer.login.process'));
         }
     }
@@ -43,7 +43,8 @@ class BaseFrontController extends BaseController
     protected function checkCartNotEmpty(EventDispatcherInterface $eventDispatcher): void
     {
         $cart = $this->getSession()->getSessionCart($eventDispatcher);
-        if ($cart === null || $cart->countCartItems() === 0) {
+
+        if (null === $cart || 0 === $cart->countCartItems()) {
             throw new RedirectException($this->retrieveUrlFromRouteId('cart.view'));
         }
     }
@@ -51,6 +52,7 @@ class BaseFrontController extends BaseController
     protected function checkValidDelivery(): void
     {
         $order = $this->getSession()->getOrder();
+
         if (null === $order
             || null === $order->getChoosenDeliveryAddress()
             || null === $order->getDeliveryModuleId()
@@ -63,6 +65,7 @@ class BaseFrontController extends BaseController
     protected function checkValidInvoice(): void
     {
         $order = $this->getSession()->getOrder();
+
         if (null === $order
             || null === $order->getChoosenInvoiceAddress()
             || null === $order->getPaymentModuleId()
@@ -80,7 +83,7 @@ class BaseFrontController extends BaseController
         // Define the template that should be used
         $parser->setTemplateDefinition(
             $template ?: $this->getTemplateHelper()->getActiveFrontTemplate(),
-            $this->useFallbackTemplate
+            $this->useFallbackTemplate,
         );
 
         return $parser;

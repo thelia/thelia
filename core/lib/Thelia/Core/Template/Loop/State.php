@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -42,7 +43,6 @@ use Thelia\Type\TypeCollection;
 class State extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $countable = true;
-
     protected $timestampable = false;
 
     protected function getArgDefinitions(): ArgumentCollection
@@ -64,15 +64,15 @@ class State extends BaseI18nLoop implements PropelSearchLoopInterface
                             'visible',
                             'visible_reverse',
                             'random',
-                        ]
-                    )
+                        ],
+                    ),
                 ),
-                'id'
-            )
+                'id',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = StateQuery::create();
 
@@ -80,26 +80,31 @@ class State extends BaseI18nLoop implements PropelSearchLoopInterface
         $this->configureI18nProcessing($search, ['TITLE']);
 
         $id = $this->getId();
+
         if (null !== $id) {
             $search->filterById($id, Criteria::IN);
         }
 
         $country = $this->getCountry();
+
         if (null !== $country) {
             $search->filterByCountryId($country, Criteria::IN);
         }
 
         $exclude = $this->getExclude();
+
         if (null !== $exclude) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
         $visible = $this->getVisible();
-        if ($visible !== BooleanOrBothType::ANY) {
+
+        if (BooleanOrBothType::ANY !== $visible) {
             $search->filterByVisible($visible ? 1 : 0);
         }
 
         $orders = $this->getOrder();
+
         foreach ($orders as $order) {
             switch ($order) {
                 case 'id':
@@ -142,8 +147,7 @@ class State extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('IS_TRANSLATED', $state->getVirtualColumn('IS_TRANSLATED'))
                 ->set('LOCALE', $this->locale)
                 ->set('TITLE', $state->getVirtualColumn('i18n_TITLE'))
-                ->set('ISOCODE', $state->getIsocode())
-            ;
+                ->set('ISOCODE', $state->getIsocode());
 
             $this->addOutputFields($loopResultRow, $state);
 

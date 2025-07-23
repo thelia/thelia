@@ -14,20 +14,17 @@ declare(strict_types=1);
 
 namespace Thelia\Coupon;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Model\Address;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
 use Thelia\Model\Coupon;
+use Thelia\Model\Currency;
 use Thelia\Model\Customer;
-use Thelia\TaxEngine\TaxEngine;
 
 /**
  * Allow to assist in getting relevant data on the current application state.
@@ -37,161 +34,112 @@ use Thelia\TaxEngine\TaxEngine;
 interface FacadeInterface
 {
     /**
-     * Constructor.
-     */
-    public function __construct(
-        SecurityContext $securityContext,
-        TaxEngine $taxEngine,
-        TranslatorInterface $translator,
-        ParserInterface $parser,
-        RequestStack $requestStack,
-        ConditionEvaluator $conditionEvaluator,
-        EventDispatcherInterface $eventDispatcher,
-    );
-
-    /**
      * Return a Cart a CouponManager can process.
-     *
-     * @return Cart
      */
-    public function getCart();
+    public function getCart(): ?Cart;
 
     /**
      * Return an Address a CouponManager can process.
-     *
-     * @return Address
      */
-    public function getDeliveryAddress();
+    public function getDeliveryAddress(): Address;
 
     /**
      * @return Country the delivery country
      */
-    public function getDeliveryCountry();
+    public function getDeliveryCountry(): Country;
 
     /**
      * Return an Customer a CouponManager can process.
-     *
-     * @return Customer
      */
-    public function getCustomer();
+    public function getCustomer(): ?Customer;
 
     /**
      * Return Checkout total price.
-     *
-     * @return float
      */
-    public function getCheckoutTotalPrice();
+    public function getCheckoutTotalPrice(): float;
 
     /**
      * Return Products total price
      * CartTotalPrice = Checkout total - discount - postage.
      *
      * @param bool $withItemsInPromo true (default) if item in promotion should be included in the total, false otherwise
-     *
-     * @return float
      */
-    public function getCartTotalPrice($withItemsInPromo = true);
+    public function getCartTotalPrice(bool $withItemsInPromo = true): float;
 
     /**
      * Return Product total tax price.
      *
      * @param bool $withItemsInPromo true (default) if item in promotion should be included in the total, false otherwise
-     *
-     * @return float
      */
-    public function getCartTotalTaxPrice($withItemsInPromo = true);
+    public function getCartTotalTaxPrice(bool $withItemsInPromo = true): float;
 
     /**
      * Return the Checkout currency EUR|USD.
-     *
-     * @return string
      */
-    public function getCheckoutCurrency();
+    public function getCheckoutCurrency(): string;
 
     /**
      * Return Checkout total postage (only) price.
-     *
-     * @return float
      */
-    public function getCheckoutPostagePrice();
+    public function getCheckoutPostagePrice(): float;
 
     /**
      * Return the number of Products in the Cart.
-     *
-     * @return int
      */
-    public function getNbArticlesInCart();
+    public function getNbArticlesInCart(): int;
 
     /**
      * Return the number of Products include quantity in the Cart.
-     *
-     * @return int
      */
-    public function getNbArticlesInCartIncludeQuantity();
+    public function getNbArticlesInCartIncludeQuantity(): int;
 
     /**
      * Find one Coupon in the database from its code.
      *
      * @param string $code Coupon code
-     *
-     * @return Coupon
      */
-    public function findOneCouponByCode($code);
+    public function findOneCouponByCode(string $code): Coupon;
 
     /**
      * Return platform TranslatorInterface.
-     *
-     * @return TranslatorInterface
      */
-    public function getTranslator();
+    public function getTranslator(): TranslatorInterface;
 
     /**
      * Return platform ParserInterface.
-     *
-     * @return ParserInterface
      */
-    public function getParser();
+    public function getParser(): ParserInterface;
 
     /**
      * Return the main currency
      * THe one used to set prices in BackOffice.
-     *
-     * @return string
      */
-    public function getMainCurrency();
+    public function getMainCurrency(): Currency;
 
     /**
      * Return request.
-     *
-     * @return Request
      */
-    public function getRequest();
+    public function getRequest(): Request;
 
     /**
      * Return Condition Evaluator.
-     *
-     * @return ConditionEvaluator
      */
-    public function getConditionEvaluator();
+    public function getConditionEvaluator(): ConditionEvaluator;
 
     /**
      * Return all available currencies.
      *
      * @return array of Currency
      */
-    public function getAvailableCurrencies();
+    public function getAvailableCurrencies(): array;
 
     /**
      * Return the event dispatcher,.
-     *
-     * @return EventDispatcher
      */
-    public function getDispatcher();
+    public function getDispatcher(): EventDispatcherInterface;
 
     /**
      * Add a coupon in session.
-     *
-     * @return mixed|void
      */
-    public function pushCouponInSession($couponCode);
+    public function pushCouponInSession($couponCode): mixed;
 }

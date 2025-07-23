@@ -59,15 +59,20 @@ class Sale extends BaseAction implements EventSubscriberInterface
      *
      * @throws PropelException
      */
-    protected function updateProductSaleElementsPrices($pseList, $promoStatus, $offsetType, Calculator $taxCalculator, $saleOffsetByCurrency, ConnectionInterface $con): void
-    {
+    protected function updateProductSaleElementsPrices(
+        array $pseList,
+        bool $promoStatus,
+        int $offsetType,
+        Calculator $taxCalculator,
+        array $saleOffsetByCurrency,
+        ConnectionInterface $con,
+    ): void {
         /** @var ProductSaleElements $pse */
         foreach ($pseList as $pse) {
-            if ($pse->getPromo() != $promoStatus) {
+            if ($pse->getPromo() !== $promoStatus) {
                 $pse
                     ->setPromo($promoStatus)
-                    ->save($con)
-                ;
+                    ->save($con);
             }
 
             foreach ($saleOffsetByCurrency as $currencyId => $offset) {
@@ -78,7 +83,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
                 if (null !== $productPrice) {
                     // Get the taxed price
-                    $priceWithTax = $taxCalculator->getTaxedPrice($productPrice->getPrice());
+                    $priceWithTax = $taxCalculator->getTaxedPrice((float) $productPrice->getPrice());
 
                     // Remove the price offset to get the taxed promo price
                     $promoPrice = match ($offsetType) {
@@ -92,8 +97,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
                     $productPrice
                         ->setPromoPrice($promoPrice)
-                        ->save($con)
-                    ;
+                        ->save($con);
                 }
             }
         }
@@ -113,70 +117,69 @@ class Sale extends BaseAction implements EventSubscriberInterface
         $sale = $event->getSale();
 
         // Get all selected product sale elements for this sale
-        if (null !== $saleProducts = SaleProductQuery::create()->filterBySale($sale)->orderByProductId()) {
-            $saleOffsetByCurrency = $sale->getPriceOffsets();
+        if (null === $sale || null === $saleProducts = SaleProductQuery::create()->filterBySale($sale)->orderByProductId()) {
+            return;
+        }
+        $saleOffsetByCurrency = $sale->getPriceOffsets();
 
-            $offsetType = $sale->getPriceOffsetType();
+        $offsetType = $sale->getPriceOffsetType();
 
-            $con = Propel::getWriteConnection(SaleTableMap::DATABASE_NAME);
+        $con = Propel::getWriteConnection(SaleTableMap::DATABASE_NAME);
 
-            $con->beginTransaction();
+        $con->beginTransaction();
 
-            try {
-                /** @var SaleProduct $saleProduct */
-                foreach ($saleProducts as $saleProduct) {
-                    // Reset all sale status on product's PSE
-                    ProductSaleElementsQuery::create()
-                        ->filterByProductId($saleProduct->getProductId())
-                        ->update(['Promo' => false], $con)
-                    ;
+        try {
+            /** @var SaleProduct $saleProduct */
+            foreach ($saleProducts as $saleProduct) {
+                // Reset all sale status on product's PSE
+                ProductSaleElementsQuery::create()
+                    ->filterByProductId($saleProduct->getProductId())
+                    ->update(['Promo' => false], $con);
 
-                    $taxCalculator->load(
-                        $saleProduct->getProduct($con),
-                        CountryModel::getShopLocation()
-                    );
+                $taxCalculator->load(
+                    $saleProduct->getProduct($con),
+                    CountryModel::getShopLocation(),
+                );
 
-                    $attributeAvId = $saleProduct->getAttributeAvId();
+                $attributeAvId = $saleProduct->getAttributeAvId();
 
-                    $pseRequest = ProductSaleElementsQuery::create()
-                        ->filterByProductId($saleProduct->getProductId())
-                    ;
+                $pseRequest = ProductSaleElementsQuery::create()
+                    ->filterByProductId($saleProduct->getProductId());
 
-                    // If no attribute AV id is defined, consider ALL product combinations
-                    if (null !== $attributeAvId) {
-                        // Find PSE attached to combination containing this attribute av :
-                        // SELECT * from product_sale_elements pse
-                        // left join attribute_combination ac on ac.product_sale_elements_id = pse.id
-                        // where pse.product_id=363
-                        // and ac.attribute_av_id = 7
-                        // group by pse.id
+                // If no attribute AV id is defined, consider ALL product combinations
+                if (null !== $attributeAvId) {
+                    // Find PSE attached to combination containing this attribute av :
+                    // SELECT * from product_sale_elements pse
+                    // left join attribute_combination ac on ac.product_sale_elements_id = pse.id
+                    // where pse.product_id=363
+                    // and ac.attribute_av_id = 7
+                    // group by pse.id
 
-                        $pseRequest
-                            ->useAttributeCombinationQuery(null, Criteria::LEFT_JOIN)
-                                ->filterByAttributeAvId($attributeAvId)
-                            ->endUse()
-                        ;
-                    }
-
-                    $pseList = $pseRequest->find();
-
-                    if (null !== $pseList) {
-                        $this->updateProductSaleElementsPrices(
-                            $pseList,
-                            $sale->getActive(),
-                            $offsetType,
-                            $taxCalculator,
-                            $saleOffsetByCurrency,
-                            $con
-                        );
-                    }
+                    $pseRequest
+                        ->useAttributeCombinationQuery(null, Criteria::LEFT_JOIN)
+                        ->filterByAttributeAvId($attributeAvId)
+                        ->endUse();
                 }
 
-                $con->commit();
-            } catch (PropelException $e) {
-                $con->rollback();
-                throw $e;
+                $pseList = $pseRequest->find();
+
+                if (null !== $pseList) {
+                    $this->updateProductSaleElementsPrices(
+                        $pseList->getData(),
+                        $sale->getActive(),
+                        $offsetType,
+                        $taxCalculator,
+                        $saleOffsetByCurrency,
+                        $con,
+                    );
+                }
             }
+
+            $con->commit();
+        } catch (PropelException $e) {
+            $con->rollback();
+
+            throw $e;
         }
     }
 
@@ -191,8 +194,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
             ->setSaleLabel($event->getSaleLabel())
-            ->save()
-        ;
+            ->save();
 
         $event->setSale($sale);
     }
@@ -216,7 +218,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
                 $dispatcher->dispatch(
                     new ProductSaleStatusUpdateEvent($sale),
-                    TheliaEvents::UPDATE_PRODUCT_SALE_STATUS
+                    TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
                 );
 
                 $sale
@@ -231,8 +233,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     ->setDescription($event->getDescription())
                     ->setChapo($event->getChapo())
                     ->setPostscriptum($event->getPostscriptum())
-                    ->save($con)
-                ;
+                    ->save($con);
 
                 $event->setSale($sale);
 
@@ -246,8 +247,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                         ->setCurrencyId($currencyId)
                         ->setSaleId($sale->getId())
                         ->setPriceOffsetValue($priceOffset)
-                        ->save($con)
-                    ;
+                        ->save($con);
                 }
 
                 // Update products
@@ -264,8 +264,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                                 ->setSaleId($sale->getId())
                                 ->setProductId($productId)
                                 ->setAttributeAvId($attributeId)
-                                ->save($con)
-                            ;
+                                ->save($con);
                         }
                     } else {
                         $saleProduct = new SaleProduct();
@@ -274,8 +273,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                             ->setSaleId($sale->getId())
                             ->setProductId($productId)
                             ->setAttributeAvId(null)
-                            ->save($con)
-                        ;
+                            ->save($con);
                     }
                 }
 
@@ -284,13 +282,14 @@ class Sale extends BaseAction implements EventSubscriberInterface
                 if ($sale->getActive()) {
                     $dispatcher->dispatch(
                         new ProductSaleStatusUpdateEvent($sale),
-                        TheliaEvents::UPDATE_PRODUCT_SALE_STATUS
+                        TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
                     );
                 }
 
                 $con->commit();
             } catch (PropelException $e) {
                 $con->rollback();
+
                 throw $e;
             }
         }
@@ -311,13 +310,13 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
         try {
             $sale
-            ->setActive(!$sale->getActive())
-            ->save($con);
+                ->setActive(!$sale->getActive())
+                ->save($con);
 
             // Update related products sale status
             $dispatcher->dispatch(
                 new ProductSaleStatusUpdateEvent($sale),
-                TheliaEvents::UPDATE_PRODUCT_SALE_STATUS
+                TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
             );
 
             $event->setSale($sale);
@@ -325,6 +324,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
             $con->commit();
         } catch (PropelException $propelException) {
             $con->rollback();
+
             throw $propelException;
         }
     }
@@ -349,7 +349,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     // Update related products sale status
                     $dispatcher->dispatch(
                         new ProductSaleStatusUpdateEvent($sale),
-                        TheliaEvents::UPDATE_PRODUCT_SALE_STATUS
+                        TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
                     );
                 }
 
@@ -360,6 +360,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                 $con->commit();
             } catch (PropelException $e) {
                 $con->rollback();
+
                 throw $e;
             }
         }
@@ -379,18 +380,17 @@ class Sale extends BaseAction implements EventSubscriberInterface
             // Set the active status of all Sales to false
             SaleQuery::create()
                 ->filterByActive(true)
-                ->update(['Active' => false], $con)
-            ;
+                ->update(['Active' => false], $con);
 
             // Reset all sale status on PSE
             ProductSaleElementsQuery::create()
                 ->filterByPromo(true)
-                ->update(['Promo' => false], $con)
-            ;
+                ->update(['Promo' => false], $con);
 
             $con->commit();
         } catch (PropelException $propelException) {
             $con->rollback();
+
             throw $propelException;
         }
     }
@@ -411,9 +411,9 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
             // Disable expired sales
             if (null !== $salesToDisable = SaleQuery::create()
-                    ->filterByActive(true)
-                    ->filterByEndDate($now, Criteria::LESS_THAN)
-                    ->find()) {
+                ->filterByActive(true)
+                ->filterByEndDate($now, Criteria::LESS_THAN)
+                ->find()) {
                 /** @var SaleModel $sale */
                 foreach ($salesToDisable as $sale) {
                     $sale->setActive(false)->save();
@@ -421,17 +421,17 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     // Update related products sale status
                     $dispatcher->dispatch(
                         new ProductSaleStatusUpdateEvent($sale),
-                        TheliaEvents::UPDATE_PRODUCT_SALE_STATUS
+                        TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
                     );
                 }
             }
 
             // Enable sales that should be enabled.
             if (null !== $salesToEnable = SaleQuery::create()
-                    ->filterByActive(false)
-                    ->filterByStartDate($now, Criteria::LESS_EQUAL)
-                    ->filterByEndDate($now, Criteria::GREATER_EQUAL)
-                    ->find()) {
+                ->filterByActive(false)
+                ->filterByStartDate($now, Criteria::LESS_EQUAL)
+                ->filterByEndDate($now, Criteria::GREATER_EQUAL)
+                ->find()) {
                 /** @var SaleModel $sale */
                 foreach ($salesToEnable as $sale) {
                     $sale->setActive(true)->save();
@@ -439,7 +439,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     // Update related products sale status
                     $dispatcher->dispatch(
                         new ProductSaleStatusUpdateEvent($sale),
-                        TheliaEvents::UPDATE_PRODUCT_SALE_STATUS
+                        TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
                     );
                 }
             }
@@ -447,6 +447,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
             $con->commit();
         } catch (PropelException $propelException) {
             $con->rollback();
+
             throw $propelException;
         }
     }

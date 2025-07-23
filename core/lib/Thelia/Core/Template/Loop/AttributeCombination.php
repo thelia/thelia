@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -50,12 +51,12 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
                 [
                     'alpha', 'alpha_reverse', 'manual', 'manual_reverse',
                 ],
-                'alpha'
-            )
+                'alpha',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = AttributeCombinationQuery::create();
 
@@ -64,7 +65,7 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
             $search,
             ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'],
             AttributeTableMap::TABLE_NAME,
-            'ATTRIBUTE_ID'
+            'ATTRIBUTE_ID',
         );
 
         /* manage attributeAv translations */
@@ -72,7 +73,7 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
             $search,
             ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'],
             AttributeAvTableMap::TABLE_NAME,
-            'ATTRIBUTE_AV_ID'
+            'ATTRIBUTE_AV_ID',
         );
 
         $productSaleElements = $this->getProductSaleElements();
@@ -131,18 +132,18 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
     /**
      * @param string $order Criteria::ASC|Criteria::DESC
      */
-    protected function orderByTemplateAttributePosition(AttributeCombinationQuery $search, $order): AttributeCombinationQuery
+    protected function orderByTemplateAttributePosition(AttributeCombinationQuery $search, string $order): AttributeCombinationQuery
     {
         $search
             ->useProductSaleElementsQuery()
-                ->joinProduct()
+            ->joinProduct()
             ->endUse()
             ->useAttributeQuery()
-                ->leftJoinAttributeTemplate(AttributeTemplateTableMap::TABLE_NAME)
-                ->addJoinCondition(
-                    AttributeTemplateTableMap::TABLE_NAME,
-                    AttributeTemplateTableMap::COL_TEMPLATE_ID.Criteria::EQUAL.ProductTableMap::COL_TEMPLATE_ID
-                )
+            ->leftJoinAttributeTemplate(AttributeTemplateTableMap::TABLE_NAME)
+            ->addJoinCondition(
+                AttributeTemplateTableMap::TABLE_NAME,
+                AttributeTemplateTableMap::COL_TEMPLATE_ID.Criteria::EQUAL.ProductTableMap::COL_TEMPLATE_ID,
+            )
             ->endUse()
             ->orderBy(AttributeTemplateTableMap::COL_POSITION, $order);
 

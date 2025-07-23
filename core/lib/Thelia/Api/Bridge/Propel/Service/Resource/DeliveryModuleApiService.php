@@ -54,6 +54,7 @@ class DeliveryModuleApiService
         $isCartVirtual = $cart->isVirtual();
 
         $isValid = true;
+
         if (false === $isCartVirtual && null === $areaDeliveryModule) {
             $isValid = false;
         }
@@ -65,10 +66,11 @@ class DeliveryModuleApiService
         }
 
         $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, $address, $country, $state);
+
         try {
             $this->dispatcher->dispatch(
                 $deliveryPostageEvent,
-                TheliaEvents::MODULE_DELIVERY_GET_POSTAGE
+                TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
             );
         } catch (DeliveryException) {
             $isValid = false;
@@ -82,7 +84,7 @@ class DeliveryModuleApiService
 
         $this->dispatcher->dispatch(
             $deliveryModuleOptionEvent,
-            TheliaEvents::MODULE_DELIVERY_GET_OPTIONS
+            TheliaEvents::MODULE_DELIVERY_GET_OPTIONS,
         );
 
         $deliveryModuleApi = (new DeliveryModule())
@@ -92,6 +94,7 @@ class DeliveryModuleApiService
             ->setDeliveryMode($deliveryPostageEvent->getDeliveryMode())
             ->setPosition($theliaDeliveryModule->getPosition())
             ->setOptions($deliveryModuleOptionEvent->getDeliveryModuleOptions());
+
         foreach ($theliaDeliveryModule->getModuleI18ns() as $i18n) {
             $deliveryModuleApi->addI18n(new ModuleI18n($i18n->toArray()), $i18n->getLocale());
         }

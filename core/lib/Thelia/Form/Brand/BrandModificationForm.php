@@ -32,7 +32,7 @@ class BrandModificationForm extends BrandCreationForm
     protected function buildForm(): void
     {
         $this->doBuilForm(
-            Translator::getInstance()->trans('The brand name or title')
+            Translator::getInstance()->trans('The brand name or title'),
         );
 
         $this->formBuilder->add(
@@ -41,18 +41,17 @@ class BrandModificationForm extends BrandCreationForm
             [
                 'constraints' => [new GreaterThan(['value' => 0])],
                 'required' => true,
-            ]
-        )
-        ->add('logo_image_id', IntegerType::class, [
-            'constraints' => [],
-            'required' => false,
-            'label' => Translator::getInstance()->trans('Select the brand logo'),
-            'label_attr' => [
-                'for' => 'logo_image_id',
-                'help' => Translator::getInstance()->trans('Select the brand logo amongst the brand images'),
             ],
-        ])
-        ;
+        )
+            ->add('logo_image_id', IntegerType::class, [
+                'constraints' => [],
+                'required' => false,
+                'label' => Translator::getInstance()->trans('Select the brand logo'),
+                'label_attr' => [
+                    'for' => 'logo_image_id',
+                    'help' => Translator::getInstance()->trans('Select the brand logo amongst the brand images'),
+                ],
+            ]);
 
         // Add standard description fields, excluding title and locale, which are already defined
         $this->addStandardDescFields(['title', 'locale']);

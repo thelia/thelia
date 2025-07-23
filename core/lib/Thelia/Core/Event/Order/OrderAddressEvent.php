@@ -20,15 +20,8 @@ use Thelia\Model\OrderAddress;
 
 class OrderAddressEvent extends ActionEvent
 {
-    /**
-     * @var OrderAddress
-     */
-    protected $orderAddress;
-
-    /**
-     * @var Order
-     */
-    protected $order;
+    protected OrderAddress $orderAddress;
+    protected Order $order;
 
     /**
      * @param int         $title
@@ -101,106 +94,67 @@ class OrderAddressEvent extends ActionEvent
     ) {
     }
 
-    /**
-     * @return string
-     */
-    public function getAddress1()
+    public function getAddress1(): string
     {
         return $this->address1;
     }
 
-    /**
-     * @return string
-     */
-    public function getAddress2()
+    public function getAddress2(): string
     {
         return $this->address2;
     }
 
-    /**
-     * @return string
-     */
-    public function getAddress3()
+    public function getAddress3(): string
     {
         return $this->address3;
     }
 
-    /**
-     * @return string
-     */
-    public function getCity()
+    public function getCity(): string
     {
         return $this->city;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getCompany()
+    public function getCompany(): ?string
     {
         return $this->company;
     }
 
-    /**
-     * @return int
-     */
-    public function getCountry()
+    public function getCountry(): int
     {
         return $this->country;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getState()
+    public function getState(): ?int
     {
         return $this->state;
     }
 
-    /**
-     * @return string
-     */
-    public function getFirstname()
+    public function getFirstname(): string
     {
         return $this->firstname;
     }
 
-    /**
-     * @return string
-     */
-    public function getLastname()
+    public function getLastname(): string
     {
         return $this->lastname;
     }
 
-    /**
-     * @return string
-     */
-    public function getPhone()
+    public function getPhone(): string
     {
         return $this->phone;
     }
 
-    /**
-     * @return string
-     */
-    public function getCellphone()
+    public function getCellphone(): string
     {
         return $this->cellphone;
     }
 
-    /**
-     * @return int
-     */
-    public function getTitle()
+    public function getTitle(): int
     {
         return $this->title;
     }
 
-    /**
-     * @return string
-     */
-    public function getZipcode()
+    public function getZipcode(): string
     {
         return $this->zipcode;
     }
@@ -215,18 +169,12 @@ class OrderAddressEvent extends ActionEvent
         $this->order = $order;
     }
 
-    /**
-     * @return OrderAddress
-     */
-    public function getOrderAddress()
+    public function getOrderAddress(): OrderAddress
     {
         return $this->orderAddress;
     }
 
-    /**
-     * @return Order
-     */
-    public function getOrder()
+    public function getOrder(): Order
     {
         return $this->order;
     }

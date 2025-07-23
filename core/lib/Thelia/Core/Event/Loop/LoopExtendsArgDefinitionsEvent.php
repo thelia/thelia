@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Event\Loop;
 
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+
 /**
  * Class LoopExtendsArgDefinitionsEvent.
  *
@@ -21,7 +23,7 @@ namespace Thelia\Core\Event\Loop;
  */
 class LoopExtendsArgDefinitionsEvent extends LoopExtendsEvent
 {
-    public function getArgumentCollection()
+    public function getArgumentCollection(): ArgumentCollection
     {
         return $this->loop->getArgumentCollection();
     }

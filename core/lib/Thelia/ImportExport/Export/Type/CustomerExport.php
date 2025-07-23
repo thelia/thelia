@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\ImportExport\Export\Type;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Propel;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
 
@@ -28,7 +29,7 @@ class CustomerExport extends JsonFileAbstractExport
 {
     public const FILE_NAME = 'customer';
 
-    protected $orderAndAliases = [
+    protected array $orderAndAliases = [
         'customer_ref' => 'ref',
         'customer_title_i18n_long' => 'title',
         'customer_firstname' => 'last_name',
@@ -48,7 +49,7 @@ class CustomerExport extends JsonFileAbstractExport
         'address_cellphone' => 'cellphone',
     ];
 
-    protected function getData()
+    protected function getData(): array|string|ModelCriteria
     {
         $locale = $this->language->getLocale();
 
@@ -76,8 +77,7 @@ class CustomerExport extends JsonFileAbstractExport
                     LEFT JOIN address ON address.customer_id = customer.id AND address.is_default = 1
                     LEFT JOIN country_i18n ON address.country_id = country_i18n.id AND country_i18n.locale = :locale
                     LEFT JOIN newsletter ON newsletter.email = customer.email
-                    GROUP BY customer.id'
-        ;
+                    GROUP BY customer.id';
         $stmt = $con->prepare($query);
         $stmt->bindValue('locale', $locale);
         $stmt->execute();

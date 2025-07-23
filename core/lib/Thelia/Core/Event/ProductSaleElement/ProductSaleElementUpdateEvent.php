@@ -18,54 +18,25 @@ use Thelia\Model\Product;
 
 class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 {
-    /** @var int */
-    protected $product_sale_element_id;
-
-    /** @var Product */
-    protected $product;
-
-    /** @var string */
-    protected $reference;
-
-    /** @var float */
-    protected $price;
-
-    /** @var int */
-    protected $currency_id;
-
-    /** @var float */
-    protected $weight;
-
-    /** @var float */
-    protected $quantity;
-
-    /** @var float */
-    protected $sale_price;
-
-    /** @var int */
-    protected $onsale;
-
-    /** @var int */
-    protected $isnew;
-
-    /** @var bool */
-    protected $isdefault;
-
-    /** @var string */
-    protected $ean_code;
-
-    /** @var int */
-    protected $tax_rule_id;
-
-    /** @var int */
-    protected $from_default_currency;
+    protected int $product_sale_element_id;
+    protected Product $product;
+    protected string $reference;
+    protected float $price;
+    protected int $currency_id;
+    protected float $weight;
+    protected float $quantity;
+    protected float $sale_price;
+    protected int $onsale;
+    protected int $isnew;
+    protected bool $isdefault;
+    protected ?string $ean_code;
+    protected int $tax_rule_id;
+    protected int $from_default_currency;
 
     /**
      * ProductSaleElementUpdateEvent constructor.
-     *
-     * @param int $product_sale_element_id
      */
-    public function __construct(Product $product, $product_sale_element_id)
+    public function __construct(Product $product, int $product_sale_element_id)
     {
         parent::__construct();
 
@@ -74,280 +45,210 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
         $this->setProductSaleElementId($product_sale_element_id);
     }
 
-    /**
-     * @return int
-     */
-    public function getProductSaleElementId()
+    public function getProductSaleElementId(): int
     {
         return $this->product_sale_element_id;
     }
 
     /**
-     * @param int $product_sale_element_id
-     *
      * @return $this
      */
-    public function setProductSaleElementId($product_sale_element_id): self
+    public function setProductSaleElementId(int $product_sale_element_id): self
     {
         $this->product_sale_element_id = $product_sale_element_id;
 
         return $this;
     }
 
-    /**
-     * @return float
-     */
-    public function getPrice()
+    public function getPrice(): float
     {
         return $this->price;
     }
 
     /**
-     * @param float $price
-     *
      * @return $this
      */
-    public function setPrice($price): self
+    public function setPrice(float $price): self
     {
         $this->price = $price;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getCurrencyId()
+    public function getCurrencyId(): int
     {
         return $this->currency_id;
     }
 
     /**
-     * @param int $currency_id
-     *
      * @return $this
      */
-    public function setCurrencyId($currency_id): self
+    public function setCurrencyId(int $currency_id): self
     {
         $this->currency_id = $currency_id;
 
         return $this;
     }
 
-    /**
-     * @return float
-     */
-    public function getWeight()
+    public function getWeight(): float
     {
         return $this->weight;
     }
 
     /**
-     * @param float $weight
-     *
      * @return $this
      */
-    public function setWeight($weight): self
+    public function setWeight(float $weight): self
     {
         $this->weight = $weight;
 
         return $this;
     }
 
-    /**
-     * @return float
-     */
-    public function getQuantity()
+    public function getQuantity(): float
     {
         return $this->quantity;
     }
 
     /**
-     * @param float $quantity
-     *
      * @return $this
      */
-    public function setQuantity($quantity): self
+    public function setQuantity(float $quantity): self
     {
         $this->quantity = $quantity;
 
         return $this;
     }
 
-    /**
-     * @return float
-     */
-    public function getSalePrice()
+    public function getSalePrice(): float
     {
         return $this->sale_price;
     }
 
     /**
-     * @param float $sale_price
-     *
      * @return $this
      */
-    public function setSalePrice($sale_price): self
+    public function setSalePrice(float $sale_price): self
     {
         $this->sale_price = $sale_price;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getOnsale()
+    public function getOnsale(): int
     {
         return $this->onsale;
     }
 
     /**
-     * @param int $onsale
-     *
      * @return $this
      */
-    public function setOnsale($onsale): self
+    public function setOnsale(int $onsale): self
     {
         $this->onsale = $onsale;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getIsnew()
+    public function getIsnew(): int
     {
         return $this->isnew;
     }
 
     /**
-     * @param int $isnew
-     *
      * @return $this
      */
-    public function setIsnew($isnew): self
+    public function setIsnew(int $isnew): self
     {
         $this->isnew = $isnew;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getEanCode()
+    public function getEanCode(): ?string
     {
         return $this->ean_code;
     }
 
     /**
-     * @param string $ean_code
-     *
      * @return $this
      */
-    public function setEanCode($ean_code): self
+    public function setEanCode(?string $ean_code): self
     {
         $this->ean_code = $ean_code;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function getIsdefault()
+    public function getIsdefault(): bool
     {
         return $this->isdefault;
     }
 
     /**
-     * @param bool $isdefault
-     *
      * @return $this
      */
-    public function setIsdefault($isdefault): self
+    public function setIsdefault(bool $isdefault): self
     {
         $this->isdefault = $isdefault;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getReference()
+    public function getReference(): string
     {
         return $this->reference;
     }
 
     /**
-     * @param string $reference
-     *
      * @return $this
      */
-    public function setReference($reference): self
+    public function setReference(string $reference): self
     {
         $this->reference = $reference;
 
         return $this;
     }
 
-    /**
-     * @return Product
-     */
-    public function getProduct()
+    public function getProduct(): Product
     {
         return $this->product;
     }
 
     /**
-     * @param Product $product
-     *
      * @return $this
      */
-    public function setProduct($product): static
+    public function setProduct(Product $product): static
     {
         $this->product = $product;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getTaxRuleId()
+    public function getTaxRuleId(): int
     {
         return $this->tax_rule_id;
     }
 
     /**
-     * @param int $tax_rule_id
-     *
      * @return $this
      */
-    public function setTaxRuleId($tax_rule_id): static
+    public function setTaxRuleId(int $tax_rule_id): static
     {
         $this->tax_rule_id = $tax_rule_id;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getFromDefaultCurrency()
+    public function getFromDefaultCurrency(): int
     {
         return $this->from_default_currency;
     }
 
     /**
-     * @param int $from_default_currency
-     *
      * @return $this
      */
-    public function setFromDefaultCurrency($from_default_currency): static
+    public function setFromDefaultCurrency(int $from_default_currency): static
     {
         $this->from_default_currency = $from_default_currency;
 

@@ -22,22 +22,16 @@ use Thelia\Model\CategoryAssociatedContent;
  */
 class CategoryAssociatedContentEvent extends ActionEvent
 {
-    /**
-     * @var CategoryAssociatedContent|null
-     */
-    public $content;
-
-    public function __construct(?CategoryAssociatedContent $content = null)
+    public function __construct(public ?CategoryAssociatedContent $content = null)
     {
-        $this->content = $content;
     }
 
     public function hasCategoryAssociatedContent(): bool
     {
-        return null !== $this->content;
+        return $this->content instanceof CategoryAssociatedContent;
     }
 
-    public function getCategoryAssociatedContent()
+    public function getCategoryAssociatedContent(): ?CategoryAssociatedContent
     {
         return $this->content;
     }

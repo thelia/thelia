@@ -28,18 +28,12 @@ class StateDeleteEvent extends StateEvent
     {
     }
 
-    /**
-     * @param int $state_id
-     */
-    public function setStateId($state_id): void
+    public function setStateId(int $state_id): void
     {
         $this->state_id = $state_id;
     }
 
-    /**
-     * @return int
-     */
-    public function getStateId()
+    public function getStateId(): int
     {
         return $this->state_id;
     }

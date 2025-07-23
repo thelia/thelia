@@ -48,25 +48,15 @@ use Thelia\Tools\URL;
 abstract class BaseForm implements FormInterface
 {
     protected FormBuilderInterface $formBuilder;
-
     protected FormFactoryBuilderInterface $formFactoryBuilder;
-
     protected SymfonyFormInterface $form;
-
     protected Request $request;
-
     protected ValidatorBuilder $validatorBuilder;
-
     protected ?TranslatorInterface $translator = null;
-
     private FormView $view;
-
     private bool $hasError = false;
-
     private string $errorMessage = '';
-
     protected EventDispatcherInterface $dispatcher;
-
     private ?string $type = null;
 
     public function init(
@@ -90,14 +80,13 @@ abstract class BaseForm implements FormInterface
 
         $this->initFormWithRequest($type, $data, $options);
 
-        if (!isset($options['csrf_protection']) || $options['csrf_protection'] !== false) {
+        if (!isset($options['csrf_protection']) || false !== $options['csrf_protection']) {
             $this->formFactoryBuilder
                 ->addExtension(
                     new CsrfExtension(
-                        new CsrfTokenManager(null, $tokenStorage)
-                    )
-                )
-            ;
+                        new CsrfTokenManager(null, $tokenStorage),
+                    ),
+                );
         }
 
         /**
@@ -108,21 +97,20 @@ abstract class BaseForm implements FormInterface
         $this->formBuilder = $this->formFactoryBuilder
             ->addExtension(new ValidatorExtension($this->validatorBuilder->getValidator()))
             ->getFormFactory()
-            ->createNamedBuilder($name, $type, $data, $this->cleanOptions($options))
-        ;
+            ->createNamedBuilder($name, $type, $data, $this->cleanOptions($options));
 
         $event = new TheliaFormEvent($this);
 
         $this->dispatcher->dispatch(
             $event,
-            TheliaEvents::FORM_BEFORE_BUILD.'.'.$name
+            TheliaEvents::FORM_BEFORE_BUILD.'.'.$name,
         );
 
         $this->buildForm();
 
         $this->dispatcher->dispatch(
             $event,
-            TheliaEvents::FORM_AFTER_BUILD.'.'.$name
+            TheliaEvents::FORM_AFTER_BUILD.'.'.$name,
         );
 
         // If not already set, define the success_url field
@@ -154,8 +142,7 @@ abstract class BaseForm implements FormInterface
         $this->validatorBuilder = Validation::createValidatorBuilder();
 
         $this->formFactoryBuilder = Forms::createFormFactoryBuilder()
-            ->addExtension(new HttpFoundationExtension())
-        ;
+            ->addExtension(new HttpFoundationExtension());
 
         $this->translator = Translator::getInstance();
 
@@ -164,18 +151,12 @@ abstract class BaseForm implements FormInterface
             ->setTranslator($this->translator);
     }
 
-    /**
-     * @return FormBuilderInterface
-     */
-    public function getFormBuilder()
+    public function getFormBuilder(): FormBuilderInterface
     {
         return $this->formBuilder;
     }
 
-    /**
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
@@ -193,13 +174,10 @@ abstract class BaseForm implements FormInterface
 
     public function isTemplateDefinedHiddenFieldName($fieldName): bool
     {
-        return $fieldName === 'success_url' || $fieldName === 'error_url' || $fieldName === 'error_message';
+        return 'success_url' === $fieldName || 'error_url' === $fieldName || 'error_message' === $fieldName;
     }
 
-    /**
-     * @return Request
-     */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }
@@ -219,7 +197,7 @@ abstract class BaseForm implements FormInterface
      *
      * @return string an absolute URL
      */
-    public function getErrorUrl(?string $default = null)
+    public function getErrorUrl(?string $default = null): string
     {
         return $this->getFormDefinedUrl('error_url', $default);
     }
@@ -227,7 +205,7 @@ abstract class BaseForm implements FormInterface
     /**
      * @return bool true if an error URL is defined in the 'error_url' form parameter, false otherwise
      */
-    public function hasErrorUrl()
+    public function hasErrorUrl(): bool
     {
         return null !== $this->form->get('error_url')->getData();
     }
@@ -240,7 +218,7 @@ abstract class BaseForm implements FormInterface
      *
      * @return string an absolute URL
      */
-    public function getSuccessUrl(?string $default = null)
+    public function getSuccessUrl(?string $default = null): string
     {
         return $this->getFormDefinedUrl('success_url', $default);
     }
@@ -248,7 +226,7 @@ abstract class BaseForm implements FormInterface
     /**
      * @return bool true if a success URL is defined in the form, false otherwise
      */
-    public function hasSuccessUrl()
+    public function hasSuccessUrl(): bool
     {
         return null !== $this->form->get('success_url')->getData();
     }
@@ -266,7 +244,7 @@ abstract class BaseForm implements FormInterface
         $formDefinedUrl = $this->form->get($parameterName)->getData();
 
         if (empty($formDefinedUrl)) {
-            if ($default === null) {
+            if (null === $default) {
                 $default = ConfigQuery::read('base_url', '/');
             }
 
@@ -285,10 +263,8 @@ abstract class BaseForm implements FormInterface
 
     /**
      * @throws \LogicException
-     *
-     * @return FormView
      */
-    public function getView()
+    public function getView(): FormView
     {
         return $this->view;
     }
@@ -308,10 +284,8 @@ abstract class BaseForm implements FormInterface
 
     /**
      * Get the cuirrent error status of the form.
-     *
-     * @return bool
      */
-    public function hasError()
+    public function hasError(): bool
     {
         return $this->hasError;
     }
@@ -331,18 +305,13 @@ abstract class BaseForm implements FormInterface
 
     /**
      * Get the form error message.
-     *
-     * @return string
      */
-    public function getErrorMessage()
+    public function getErrorMessage(): string
     {
         return $this->errorMessage;
     }
 
-    /**
-     * @return Form
-     */
-    public function getForm()
+    public function getForm(): Form
     {
         return $this->form;
     }
@@ -355,7 +324,7 @@ abstract class BaseForm implements FormInterface
     public static function getName(): string
     {
         $classParts = explode('\\', static::class);
-        $nameParts = array_map(function ($classPart, $index) use ($classParts) {
+        $nameParts = array_map(static function ($classPart, $index) use ($classParts) {
             if ($index !== \count($classParts) - 1) {
                 return strtolower($classPart);
             }

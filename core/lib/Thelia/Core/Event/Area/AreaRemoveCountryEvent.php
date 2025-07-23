@@ -31,18 +31,12 @@ class AreaRemoveCountryEvent extends AreaAddCountryEvent
         parent::__construct($area, $countryIds);
     }
 
-    /**
-     * @return int|null
-     */
-    public function getStateId()
+    public function getStateId(): ?int
     {
         return $this->stateId;
     }
 
-    /**
-     * @param int|null $stateId
-     */
-    public function setStateId($stateId)
+    public function setStateId(?int $stateId)
     {
         $this->stateId = $stateId;
 

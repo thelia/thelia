@@ -49,6 +49,7 @@ class PriceFilter // implements TheliaFilterInterface
     {
         $defaultCurrencyId = CurrencyQuery::create()->filterByByDefault(true)->findOne()?->getId();
         $defaultPseId = $activeRecord->getDefaultSaleElements()->getId();
+
         if (!$defaultPseId || !$defaultCurrencyId) {
             return null;
         }
@@ -72,13 +73,13 @@ class PriceFilter // implements TheliaFilterInterface
 
     private function orderByPrice(ModelCriteria $query, string $order): void
     {
-        if ($order === 'asc') {
+        if ('asc' === $order) {
             $query->useProductSaleElementsQuery()
                 ->useProductPriceQuery()
                 ->orderByPrice('ASC')
                 ->endUse()
                 ->endUse();
-        } elseif ($order === 'desc') {
+        } elseif ('desc' === $order) {
             $query->useProductSaleElementsQuery()
                 ->useProductPriceQuery()
                 ->orderByPrice('DESC')

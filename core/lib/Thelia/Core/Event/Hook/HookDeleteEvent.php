@@ -38,10 +38,7 @@ class HookDeleteEvent extends HookEvent
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getHookId()
+    public function getHookId(): int
     {
         return $this->hook_id;
     }

@@ -30,9 +30,9 @@ trait SeoFieldsTrait
      *
      * @param array $exclude name of the fields that should not be added to the form
      */
-    protected function addSeoFields($exclude = []): void
+    protected function addSeoFields(array $exclude = []): void
     {
-        if (!\in_array('url', $exclude)) {
+        if (!\in_array('url', $exclude, true)) {
             $this->formBuilder->add(
                 'url',
                 TextType::class,
@@ -45,11 +45,11 @@ trait SeoFieldsTrait
                     'attr' => [
                         'placeholder' => Translator::getInstance()->trans('Use the keyword phrase in your URL.'),
                     ],
-                ]
+                ],
             );
         }
 
-        if (!\in_array('meta_title', $exclude)) {
+        if (!\in_array('meta_title', $exclude, true)) {
             $this->formBuilder->add(
                 'meta_title',
                 TextType::class,
@@ -63,11 +63,11 @@ trait SeoFieldsTrait
                     'attr' => [
                         'placeholder' => Translator::getInstance()->trans('Make sure that your title is clear, and contains many of the keywords within the page itself.'),
                     ],
-                ]
+                ],
             );
         }
 
-        if (!\in_array('meta_description', $exclude)) {
+        if (!\in_array('meta_description', $exclude, true)) {
             $this->formBuilder->add(
                 'meta_description',
                 TextareaType::class,
@@ -82,11 +82,11 @@ trait SeoFieldsTrait
                         'rows' => 6,
                         'placeholder' => Translator::getInstance()->trans('Make sure it uses keywords found within the page itself.'),
                     ],
-                ]
+                ],
             );
         }
 
-        if (!\in_array('meta_keywords', $exclude)) {
+        if (!\in_array('meta_keywords', $exclude, true)) {
             $this->formBuilder->add(
                 'meta_keywords',
                 TextareaType::class,
@@ -101,7 +101,7 @@ trait SeoFieldsTrait
                         'rows' => 3,
                         'placeholder' => Translator::getInstance()->trans("Don't repeat keywords over and over in a row. Rather, put in keyword phrases."),
                     ],
-                ]
+                ],
             );
         }
     }

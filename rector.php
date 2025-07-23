@@ -1,5 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Array_\RemoveDuplicatedArrayKeyRector;
@@ -49,6 +61,7 @@ use Rector\DeadCode\Rector\TryCatch\RemoveDeadCatchRector;
 use Rector\DeadCode\Rector\TryCatch\RemoveDeadTryCatchRector;
 use Rector\Php80\Rector\Property\NestedAnnotationToAttributeRector;
 use Rector\Symfony\DependencyInjection\Rector\Class_\GetBySymfonyStringToConstructorInjectionRector;
+use Rector\TypeDeclaration\Rector\Class_\ReturnTypeFromStrictTernaryRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeDeclarationRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddReturnTypeDeclarationRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddTypeFromResourceDocblockRector;
@@ -62,14 +75,14 @@ return RectorConfig::configure()
     ->withPaths(
         [
             __DIR__ . '/src',
-            __DIR__ . '/core/lib/Thelia/Core',
-        ]
+            __DIR__ . '/core',
+        ],
     )
     ->withSkip([
-        'core/lib/Thelia/Form/Sale/SaleModificationForm.php'
+        'core/lib/Thelia/Form/Sale/SaleModificationForm.php',
     ])
     ->withPhpSets(
-        php83: true
+        php83: true,
     )
     ->withPreparedSets(
         codeQuality: true,
@@ -77,13 +90,13 @@ return RectorConfig::configure()
         typeDeclarations: true,
         privatization: true,
         rectorPreset: true,
-        symfonyCodeQuality: true
+        symfonyCodeQuality: true,
     )
     ->withAttributesSets(
-        symfony: true
+        symfony: true,
     )
     ->withComposerBased(
-        symfony: true
+        symfony: true,
     )
     ->withRules([
         AddParamTypeDeclarationRector::class,
@@ -150,4 +163,3 @@ return RectorConfig::configure()
         RemoveDeadReturnRector::class,
         RemoveArgumentFromDefaultParentCallRector::class,
     ]);
-

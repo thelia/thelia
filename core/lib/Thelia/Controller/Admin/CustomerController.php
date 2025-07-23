@@ -50,7 +50,7 @@ class CustomerController extends AbstractCrudController
             AdminResources::CUSTOMER,
             TheliaEvents::CUSTOMER_CREATEACCOUNT,
             TheliaEvents::CUSTOMER_UPDATEACCOUNT,
-            TheliaEvents::CUSTOMER_DELETEACCOUNT
+            TheliaEvents::CUSTOMER_DELETEACCOUNT,
         );
     }
 
@@ -101,7 +101,7 @@ class CustomerController extends AbstractCrudController
         }
 
         if (method_exists($event, 'getModel')) {
-            return $event->getModel() !== null;
+            return null !== $event->getModel();
         }
 
         return false;
@@ -126,7 +126,7 @@ class CustomerController extends AbstractCrudController
             'reseller' => (bool) $object->getReseller(),
         ];
 
-        if ($address !== null) {
+        if (null !== $address) {
             $data['company'] = $address->getCompany();
             $data['address1'] = $address->getAddress1();
             $data['address2'] = $address->getAddress2();
@@ -176,14 +176,14 @@ class CustomerController extends AbstractCrudController
             $data['city'],
             $data['country'],
             $data['email'] ?? null,
-            !empty($data['password']) ? $data['password'] : null,
+            empty($data['password']) ? null : $data['password'],
             $data['lang_id'],
             $data['reseller'] ?? null,
             $data['sponsor'] ?? null,
             $data['discount'] ? (float) $data['discount'] : null,
             $data['company'] ?? null,
             null,
-            $data['state']
+            $data['state'],
         );
     }
 
@@ -192,10 +192,7 @@ class CustomerController extends AbstractCrudController
         return CustomerQuery::create()->findPk($this->getRequest()->get('customer_id', 0));
     }
 
-    /**
-     * @param Customer $object
-     */
-    protected function getObjectLabel($object): string
+    protected function getObjectLabel(ActiveRecordInterface $object): string
     {
         return $object->getRef().'('.$object->getLastname().' '.$object->getFirstname().')';
     }
@@ -217,11 +214,11 @@ class CustomerController extends AbstractCrudController
         ];
     }
 
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         return $this->render(
             'customers',
-            ['customer_order' => $currentOrder, 'page' => $this->getRequest()->get('page', 1)]
+            ['customer_order' => $currentOrder, 'page' => $this->getRequest()->get('page', 1)],
         );
     }
 
@@ -231,7 +228,7 @@ class CustomerController extends AbstractCrudController
             'admin.customers',
             [
                 'page' => $this->getRequest()->get('page', 1),
-            ]
+            ],
         );
     }
 
@@ -244,7 +241,7 @@ class CustomerController extends AbstractCrudController
     {
         return $this->generateRedirectFromRoute(
             'admin.customer.update.view',
-            $this->getEditionArguments()
+            $this->getEditionArguments(),
         );
     }
 
@@ -262,7 +259,7 @@ class CustomerController extends AbstractCrudController
                 $request,
                 $tokenProvider,
                 $eventDispatcher,
-                $parserContext
+                $parserContext,
             );
         } catch (CustomerException $customerException) {
             $errorMsg = $customerException->getMessage();

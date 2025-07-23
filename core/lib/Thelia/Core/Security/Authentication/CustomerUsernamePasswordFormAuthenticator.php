@@ -28,7 +28,7 @@ class CustomerUsernamePasswordFormAuthenticator extends UsernamePasswordFormAuth
             new CustomerUserProvider(),
             [
                 'username_field_name' => 'email',
-            ]
+            ],
         );
     }
 }

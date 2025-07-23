@@ -28,7 +28,6 @@ class TemplateDescriptorValidator
     protected static $versions = [
         '1' => 'template-1_0.xsd',
     ];
-
     protected Finder $xsdFinder;
 
     /**
@@ -61,25 +60,19 @@ class TemplateDescriptorValidator
             foreach ($this->xsdFinder as $xsdFile) {
                 $xsdVersion = array_search($xsdFile->getBasename(), self::$versions, true);
 
-                if (false === $xsdVersion || (null !== $version && $version != $xsdVersion)) {
+                if (false === $xsdVersion || (null !== $version && $version !== $xsdVersion)) {
                     continue;
                 }
 
                 $errors = $this->schemaValidate($dom, $xsdFile);
 
-                if ($errors === []) {
+                if ([] === $errors) {
                     return $this;
                 }
             }
         }
 
-        throw new InvalidDescriptorException(
-            \sprintf(
-                '%s file is not a valid template descriptor : %s',
-                $this->xmlDescriptorPath,
-                implode(', ', $errors)
-            )
-        );
+        throw new InvalidDescriptorException(\sprintf('%s file is not a valid template descriptor : %s', $this->xmlDescriptorPath, implode(', ', $errors)));
     }
 
     /**
@@ -108,7 +101,7 @@ class TemplateDescriptorValidator
                         $error->code,
                         $error->file,
                         $error->line,
-                        $error->column
+                        $error->column,
                     );
                 }
 

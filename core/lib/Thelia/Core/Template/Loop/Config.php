@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -66,15 +67,15 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
                             'name', 'name_reverse',
                             'title', 'title_reverse',
                             'value', 'value_reverse',
-                        ]
-                    )
+                        ],
+                    ),
                 ),
-                'name'
-            )
+                'name',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $id = $this->getId();
         $name = $this->getVariable();
@@ -97,11 +98,11 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        if ($this->getHidden() != BooleanOrBothType::ANY) {
+        if (BooleanOrBothType::ANY !== $this->getHidden()) {
             $search->filterByHidden($this->getHidden() ? 1 : 0);
         }
 
-        if (null !== $secured && $secured != BooleanOrBothType::ANY) {
+        if (null !== $secured && BooleanOrBothType::ANY !== $secured) {
             $search->filterBySecured($secured ? 1 : 0);
         }
 
@@ -157,8 +158,7 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('DESCRIPTION', $result->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set('POSTSCRIPTUM', $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set('HIDDEN', $result->getHidden())
-                ->set('SECURED', $result->isOverriddenInEnv() ? 1 : $result->getSecured())
-            ;
+                ->set('SECURED', $result->isOverriddenInEnv() ? 1 : $result->getSecured());
 
             $this->addOutputFields($loopResultRow, $result);
             $loopResult->addRow($loopResultRow);

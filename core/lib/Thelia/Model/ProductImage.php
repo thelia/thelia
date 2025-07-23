@@ -18,6 +18,7 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\Routing\Router;
 use Thelia\Files\FileModelInterface;
+use Thelia\Files\FileModelParentInterface;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\ProductImage as BaseProductImage;
@@ -32,15 +33,13 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
 
     /**
      * Calculate next position relative to our parent.
-     *
-     * @param ProductImageQuery $query
      */
-    protected function addCriteriaToPositionQuery($query): void
+    protected function addCriteriaToPositionQuery(ProductImageQuery $query): void
     {
         $query->filterByProduct($this->getProduct());
     }
 
-    public function preInsert(?ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): bool
     {
         parent::preInsert($con);
 
@@ -49,40 +48,37 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
         return true;
     }
 
-    public function setParentId($parentId)
+    public function setParentId($parentId): static
     {
         $this->setProductId($parentId);
 
         return $this;
     }
 
-    public function getParentId()
+    public function getParentId(): int
     {
         return $this->getProductId();
     }
 
-    public function preDelete(?ConnectionInterface $con = null)
+    public function preDelete(?ConnectionInterface $con = null): bool
     {
         parent::preDelete($con);
 
         $this->reorderBeforeDelete(
             [
                 'product_id' => $this->getProductId(),
-            ]
+            ],
         );
 
         return true;
     }
 
-    public function getBreadcrumb(Router $router, $tab, $locale)
+    public function getBreadcrumb(Router $router, $tab, $locale): array
     {
         return $this->getProductBreadcrumb($router, $tab, $locale);
     }
 
-    /**
-     * @return FileModelParentInterface the parent file model
-     */
-    public function getParentFileModel()
+    public function getParentFileModel(): FileModelParentInterface
     {
         return new Product();
     }
@@ -92,7 +88,7 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
      *
      * @return BaseForm the form
      */
-    public function getUpdateFormId()
+    public function getUpdateFormId(): string
     {
         return AdminForm::PRODUCT_IMAGE_MODIFICATION;
     }
@@ -100,10 +96,10 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
     /**
      * @return string the path to the upload directory where files are stored, without final slash
      */
-    public function getUploadDir()
+    public function getUploadDir(): string
     {
         $uploadDir = ConfigQuery::read('images_library_path');
-        $uploadDir = $uploadDir === null ? THELIA_LOCAL_DIR.'media'.DS.'images' : THELIA_ROOT.$uploadDir;
+        $uploadDir = null === $uploadDir ? THELIA_LOCAL_DIR.'media'.DS.'images' : THELIA_ROOT.$uploadDir;
 
         return $uploadDir.DS.'product';
     }
@@ -111,18 +107,21 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
     /**
      * @return string the URL to redirect to after update from the back-office
      */
-    public function getRedirectionUrl()
+    public function getRedirectionUrl(): string
     {
         return '/admin/products/update?product_id='.$this->getProductId();
     }
 
     /**
      * Get the Query instance for this object.
-     *
-     * @return ModelCriteria
      */
-    public function getQueryInstance()
+    public function getQueryInstance(): ModelCriteria
     {
         return ProductImageQuery::create();
+    }
+
+    public function getFile(): string
+    {
+        return parent::getFile();
     }
 }

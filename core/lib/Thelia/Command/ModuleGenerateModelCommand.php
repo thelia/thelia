@@ -41,15 +41,14 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
             ->addArgument(
                 'name',
                 InputArgument::REQUIRED,
-                'module name'
+                'module name',
             )
             ->addOption(
                 'generate-sql',
                 null,
                 InputOption::VALUE_NONE,
-                'with this option generate sql file at the same time'
-            )
-        ;
+                'with this option generate sql file at the same time',
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -59,11 +58,11 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
 
         $fs = new Filesystem();
 
-        if ($fs->exists($this->moduleDirectory) === false) {
+        if (false === $fs->exists($this->moduleDirectory)) {
             throw new \RuntimeException(\sprintf('%s module does not exists', $this->module));
         }
 
-        if ($fs->exists($this->moduleDirectory.DS.'Config'.DS.'schema.xml') === false) {
+        if (false === $fs->exists($this->moduleDirectory.DS.'Config'.DS.'schema.xml')) {
             throw new \RuntimeException('schema.xml not found in Config directory. Needed file for generating model');
         }
 
@@ -75,7 +74,7 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
         $formatter = $this->getHelper('formatter');
         $formattedBlock = $formatter->formatBlock(
             'Model generated successfully',
-            'bg=green;fg=black'
+            'bg=green;fg=black',
         );
         $output->writeln($formattedBlock);
 
@@ -96,7 +95,7 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
                 'command' => $command->getName(),
                 'name' => $this->module,
             ]),
-            $output
+            $output,
         );
     }
 
@@ -113,7 +112,7 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
                 '--config-dir' => $propelInitService->getPropelConfigDir(),
                 '--schema-dir' => $schemaDir,
             ],
-            $output
+            $output,
         );
     }
 }

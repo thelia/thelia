@@ -16,144 +16,133 @@ namespace Thelia\Core\Event\Product;
 
 class ProductCreateEvent extends ProductEvent
 {
-    protected $ref;
+    protected ?string $ref = null;
+    protected ?string $title = null;
+    protected ?string $locale = null;
+    protected ?int $default_category = null;
+    protected ?bool $visible = null;
+    protected ?bool $virtual = null;
+    protected ?float $basePrice = null;
+    protected ?float $baseWeight = null;
+    protected ?int $taxRuleId = null;
+    protected ?int $currencyId = null;
+    protected ?int $baseQuantity = null;
+    protected ?int $templateId = null;
 
-    protected $title;
-
-    protected $locale;
-
-    protected $default_category;
-
-    protected $visible;
-
-    protected $virtual;
-
-    protected $basePrice;
-
-    protected $baseWeight;
-
-    protected $taxRuleId;
-
-    protected $currencyId;
-
-    protected $baseQuantity;
-
-    protected $templateId;
-
-    public function getRef()
+    public function getRef(): ?string
     {
         return $this->ref;
     }
 
-    public function setRef($ref): static
+    public function setRef(?string $ref): static
     {
         $this->ref = $ref;
 
         return $this;
     }
 
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    public function setTitle($title): static
+    public function setTitle(?string $title): static
     {
         $this->title = $title;
 
         return $this;
     }
 
-    public function getLocale()
+    public function getLocale(): ?string
     {
         return $this->locale;
     }
 
-    public function setLocale($locale): static
+    public function setLocale(?string $locale): static
     {
         $this->locale = $locale;
 
         return $this;
     }
 
-    public function getDefaultCategory()
+    public function getDefaultCategory(): ?int
     {
         return $this->default_category;
     }
 
-    public function setDefaultCategory($default_category): static
+    public function setDefaultCategory(?int $default_category): static
     {
         $this->default_category = $default_category;
 
         return $this;
     }
 
-    public function getVisible()
+    public function getVisible(): ?bool
     {
         return $this->visible;
     }
 
-    public function setVisible($visible): static
+    public function setVisible(bool|int $visible): static
     {
-        $this->visible = $visible;
+        $this->visible = (bool) $visible;
 
         return $this;
     }
 
-    public function setVirtual($virtual): static
+    public function setVirtual(?bool $virtual): static
     {
         $this->virtual = $virtual;
 
         return $this;
     }
 
-    public function getVirtual()
+    public function getVirtual(): ?bool
     {
         return $this->virtual;
     }
 
-    public function getBasePrice()
+    public function getBasePrice(): ?float
     {
         return $this->basePrice;
     }
 
-    public function setBasePrice($basePrice): static
+    public function setBasePrice(?float $basePrice): static
     {
         $this->basePrice = $basePrice;
 
         return $this;
     }
 
-    public function getBaseWeight()
+    public function getBaseWeight(): ?float
     {
         return $this->baseWeight;
     }
 
-    public function setBaseWeight($baseWeight): static
+    public function setBaseWeight(?float $baseWeight): static
     {
         $this->baseWeight = $baseWeight;
 
         return $this;
     }
 
-    public function getTaxRuleId()
+    public function getTaxRuleId(): ?int
     {
         return $this->taxRuleId;
     }
 
-    public function setTaxRuleId($taxRuleId): static
+    public function setTaxRuleId(?int $taxRuleId): static
     {
         $this->taxRuleId = $taxRuleId;
 
         return $this;
     }
 
-    public function getCurrencyId()
+    public function getCurrencyId(): ?int
     {
         return $this->currencyId;
     }
 
-    public function setCurrencyId($currencyId): static
+    public function setCurrencyId(?int $currencyId): static
     {
         $this->currencyId = $currencyId;
 
@@ -163,13 +152,13 @@ class ProductCreateEvent extends ProductEvent
     /**
      * This method is an alias of setBasePrice and used by the event when binding a form.
      *
-     * @param float $price price for this new product
+     * @param float|null $price price for this new product
      *
      * @return $this
      *
      * @see setBasePrice
      */
-    public function setPrice($price): static
+    public function setPrice(?float $price): static
     {
         return $this->setBasePrice($price);
     }
@@ -177,13 +166,11 @@ class ProductCreateEvent extends ProductEvent
     /**
      * This method is an alias of setBaseWeight and used by the event when binding a form.
      *
-     * @param float $weight
-     *
      * @return $this
      *
      * @see setBaseWeight
      */
-    public function setWeight($weight): static
+    public function setWeight(?float $weight): static
     {
         return $this->setBaseWeight($weight);
     }
@@ -195,7 +182,7 @@ class ProductCreateEvent extends ProductEvent
      *
      * @see setCurrencyId
      */
-    public function setCurrency($currencyId): static
+    public function setCurrency(?int $currencyId): static
     {
         return $this->setCurrencyId($currencyId);
     }
@@ -207,25 +194,20 @@ class ProductCreateEvent extends ProductEvent
      *
      * @see setTaxRuleId
      */
-    public function setTaxRule($taxRuleId): static
+    public function setTaxRule(?int $taxRuleId): static
     {
         return $this->setTaxRuleId($taxRuleId);
     }
 
-    /**
-     * @return int
-     */
-    public function getBaseQuantity()
+    public function getBaseQuantity(): ?int
     {
         return $this->baseQuantity;
     }
 
     /**
-     * @param int $baseQuantity
-     *
      * @return $this
      */
-    public function setBaseQuantity($baseQuantity): static
+    public function setBaseQuantity(?int $baseQuantity): static
     {
         $this->baseQuantity = $baseQuantity;
 
@@ -235,31 +217,26 @@ class ProductCreateEvent extends ProductEvent
     /**
      * This method is an alias of setBaseQuantity and used by the event when binding a form.
      *
-     * @param int $quantity quantity for this new product
+     * @param int|null $quantity quantity for this new product
      *
      * @return $this
      *
      * @see setBaseQuantity
      */
-    public function setQuantity($quantity): static
+    public function setQuantity(?int $quantity): static
     {
         return $this->setBaseQuantity($quantity);
     }
 
-    /**
-     * @return int
-     */
-    public function getTemplateId()
+    public function getTemplateId(): ?int
     {
         return $this->templateId;
     }
 
     /**
-     * @param int $templateId
-     *
      * @return $this
      */
-    public function setTemplateId($templateId): static
+    public function setTemplateId(?int $templateId): static
     {
         $this->templateId = $templateId;
 

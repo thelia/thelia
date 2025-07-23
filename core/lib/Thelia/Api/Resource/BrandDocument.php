@@ -43,14 +43,14 @@ use Thelia\Model\Map\BrandDocumentTableMap;
             controller: PostItemFileController::class,
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
             denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_FILE]],
-            deserialize: false
+            deserialize: false,
         ),
         new GetCollection(
-            uriTemplate: '/admin/brand_documents'
+            uriTemplate: '/admin/brand_documents',
         ),
         new Get(
             uriTemplate: '/admin/brand_documents/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Get(
             uriTemplate: '/admin/brand_documents/{id}/file',
@@ -60,8 +60,8 @@ use Thelia\Model\Map\BrandDocumentTableMap;
                     '200' => [
                         'description' => 'The binary file',
                     ],
-                ]
-            )
+                ],
+            ),
         ),
         new Put(
             uriTemplate: '/admin/brand_documents/{id}',
@@ -69,23 +69,23 @@ use Thelia\Model\Map\BrandDocumentTableMap;
         ),
         new Patch(
             uriTemplate: '/admin/brand_documents/{id}',
-            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
         ),
         new Delete(
-            uriTemplate: '/admin/brand_documents/{id}'
+            uriTemplate: '/admin/brand_documents/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/admin/brand_documents'
+            uriTemplate: '/admin/brand_documents',
         ),
         new Get(
             uriTemplate: '/admin/brand_documents/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
         new Get(
             uriTemplate: '/admin/brand_documents/{id}/file',
@@ -95,8 +95,8 @@ use Thelia\Model\Map\BrandDocumentTableMap;
                     '200' => [
                         'description' => 'The binary file',
                     ],
-                ]
-            )
+                ],
+            ),
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -105,13 +105,13 @@ use Thelia\Model\Map\BrandDocumentTableMap;
     filterClass: OrderFilter::class,
     properties: [
         'position',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
         'visible',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -120,22 +120,16 @@ use Thelia\Model\Map\BrandDocumentTableMap;
             'strategy' => 'exact',
             'fieldPath' => 'brand_document.brand_id',
         ],
-    ]
+    ],
 )]
 class BrandDocument extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     public const GROUP_ADMIN_READ = 'admin:brand_document:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:brand_document:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:brand_document:write';
-
     public const GROUP_ADMIN_WRITE_FILE = 'admin:brand_document:write_file';
-
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:brand_document:write_update';
-
     public const GROUP_FRONT_READ = 'front:brand_document:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:brand_document:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ])]
@@ -150,7 +144,7 @@ class BrandDocument extends AbstractTranslatableResource implements ItemFileReso
         openapiContext: [
             'type' => 'string',
             'format' => 'binary',
-        ]
+        ],
     )]
     public UploadedFile $fileToUpload;
 

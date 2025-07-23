@@ -24,10 +24,8 @@ use Thelia\Core\Translation\Translator;
  */
 class SerializerManager
 {
-    /**
-     * @var array List of handled serializers
-     */
-    protected $serializers = [];
+    /** @var array List of handled serializers */
+    protected array $serializers = [];
 
     /**
      * Reset manager.
@@ -46,7 +44,7 @@ class SerializerManager
      *
      * @return array All serializers
      */
-    public function getSerializers()
+    public function getSerializers(): array
     {
         return $this->serializers;
     }
@@ -57,23 +55,16 @@ class SerializerManager
      * @param string $serializerId   A serializer identifier
      * @param bool   $throwException Throw exception if serializer doesn't exists or not
      *
-     * @throws \InvalidArgumentException if the serializer identifier does not exist
-     *
      * @return bool True if the serializer exists, false otherwise
+     *
+     * @throws \InvalidArgumentException if the serializer identifier does not exist
      */
-    public function has(string $serializerId, bool $throwException = false)
+    public function has(string $serializerId, bool $throwException = false): bool
     {
         $exists = isset($this->serializers[$serializerId]);
 
         if (!$exists && $throwException) {
-            throw new \InvalidArgumentException(
-                Translator::getInstance()->trans(
-                    'The serializer identifier "%serializerId" doesn\’t exist',
-                    [
-                        '%serializerId' => $serializerId,
-                    ]
-                )
-            );
+            throw new \InvalidArgumentException(Translator::getInstance()->trans('The serializer identifier "%serializerId" doesn\’t exist', ['%serializerId' => $serializerId]));
         }
 
         return $exists;
@@ -86,7 +77,7 @@ class SerializerManager
      *
      * @return SerializerInterface Return a serializer
      */
-    public function get(string $serializerId)
+    public function get(string $serializerId): SerializerInterface
     {
         $this->has($serializerId, true);
 
@@ -98,9 +89,9 @@ class SerializerManager
      *
      * @param array $serializers An array of serializer
      *
-     * @throws \Exception
-     *
      * @return $this Return $this, allow chaining
+     *
+     * @throws \Exception
      */
     public function setSerializers(array $serializers): self
     {

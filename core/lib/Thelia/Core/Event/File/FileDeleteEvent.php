@@ -40,7 +40,7 @@ class FileDeleteEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setFileToDelete($fileToDelete): static
+    public function setFileToDelete(FileModelInterface $fileToDelete): static
     {
         $this->fileToDelete = $fileToDelete;
 
@@ -49,10 +49,8 @@ class FileDeleteEvent extends ActionEvent
 
     /**
      * Get Image about to be deleted.
-     *
-     * @return FileModelInterface
      */
-    public function getFileToDelete()
+    public function getFileToDelete(): FileModelInterface
     {
         return $this->fileToDelete;
     }

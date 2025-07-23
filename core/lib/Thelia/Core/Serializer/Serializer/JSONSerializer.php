@@ -48,9 +48,12 @@ class JSONSerializer extends AbstractSerializer
         $fileObject->fwrite('[');
     }
 
-    public function serialize($data)
+    /**
+     * @throws \JsonException
+     */
+    public function serialize(mixed $data): string
     {
-        return json_encode($data);
+        return json_encode($data, \JSON_THROW_ON_ERROR);
     }
 
     public function separator(): string
@@ -63,8 +66,11 @@ class JSONSerializer extends AbstractSerializer
         $fileObject->fwrite(']');
     }
 
-    public function unserialize(\SplFileObject $fileObject): mixed
+    /**
+     * @throws \JsonException
+     */
+    public function unserialize(\SplFileObject $fileObject): array
     {
-        return json_decode(file_get_contents($fileObject->getPathname()), true);
+        return json_decode(file_get_contents($fileObject->getPathname()), true, 512, \JSON_THROW_ON_ERROR);
     }
 }

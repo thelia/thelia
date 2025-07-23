@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -40,11 +41,11 @@ class OrderAddress extends BaseLoop implements PropelSearchLoopInterface
     protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
-            Argument::createIntTypeArgument('id', null, true)
+            Argument::createIntTypeArgument('id', null, true),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = OrderAddressQuery::create();
 
@@ -74,8 +75,7 @@ class OrderAddress extends BaseLoop implements PropelSearchLoopInterface
                 ->set('COUNTRY', $orderAddress->getCountryId())
                 ->set('STATE', $orderAddress->getStateId())
                 ->set('PHONE', $orderAddress->getPhone())
-                ->set('CELLPHONE', $orderAddress->getCellphone())
-            ;
+                ->set('CELLPHONE', $orderAddress->getCellphone());
             $this->addOutputFields($loopResultRow, $orderAddress);
 
             $loopResult->addRow($loopResultRow);

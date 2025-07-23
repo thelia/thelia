@@ -36,6 +36,7 @@ readonly class PropelRemoveProcessor implements ProcessorInterface
         try {
             $propelModel = $data->getPropelModel();
             $resourceAddonDefinitions = $this->apiResourcePropelTransformerService->getResourceAddonDefinitions($data::class);
+
             foreach ($resourceAddonDefinitions as $addonClass) {
                 if (is_subclass_of($addonClass, ResourceAddonInterface::class)) {
                     $addon = (new $addonClass());
@@ -44,6 +45,7 @@ readonly class PropelRemoveProcessor implements ProcessorInterface
             }
 
             $propelModel->delete();
+
             if (!$propelModel->isDeleted()) {
                 throw new \Exception('This item cannot be deleted, possibly because it is the default one.');
             }

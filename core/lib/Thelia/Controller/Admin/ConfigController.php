@@ -49,7 +49,7 @@ class ConfigController extends AbstractCrudController
             AdminResources::CONFIG,
             TheliaEvents::CONFIG_CREATE,
             TheliaEvents::CONFIG_UPDATE,
-            TheliaEvents::CONFIG_DELETE // no position change
+            TheliaEvents::CONFIG_DELETE, // no position change
         );
     }
 
@@ -88,8 +88,7 @@ class ConfigController extends AbstractCrudController
             ->setLocale($formData['locale'])
             ->setTitle($formData['title'])
             ->setHidden($formData['hidden'])
-            ->setSecured($formData['secured'])
-        ;
+            ->setSecured($formData['secured']);
 
         return $createEvent;
     }
@@ -107,8 +106,7 @@ class ConfigController extends AbstractCrudController
             ->setTitle($formData['title'])
             ->setChapo($formData['chapo'])
             ->setDescription($formData['description'])
-            ->setPostscriptum($formData['postscriptum'])
-        ;
+            ->setPostscriptum($formData['postscriptum']);
 
         return $changeEvent;
     }
@@ -151,7 +149,7 @@ class ConfigController extends AbstractCrudController
     protected function getExistingObject(): ?ActiveRecordInterface
     {
         $config = ConfigQuery::create()
-        ->findOneById($this->getRequest()->get('variable_id'));
+            ->findOneById($this->getRequest()->get('variable_id'));
 
         if (null !== $config) {
             $config->setLocale($this->getCurrentEditionLocale());
@@ -176,7 +174,7 @@ class ConfigController extends AbstractCrudController
         return $object->getId();
     }
 
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         return $this->render('variables', ['order' => $currentOrder]);
     }
@@ -190,7 +188,7 @@ class ConfigController extends AbstractCrudController
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.variables.update',
-            ['variable_id' => $this->getRequest()->get('variable_id')]
+            ['variable_id' => $this->getRequest()->get('variable_id')],
         );
     }
 

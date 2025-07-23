@@ -76,6 +76,7 @@ readonly class AddressService
     public function updateAddress(int $addressId, FormInterface $form): void
     {
         $customer = $this->session->getCustomerUser();
+
         if (null === $customer) {
             throw new CustomerException();
         }
@@ -86,7 +87,7 @@ readonly class AddressService
             throw new AddressNotFoundException();
         }
 
-        if ($address->getCustomer()->getId() != $customer->getId()) {
+        if ($address->getCustomer()->getId() !== $customer->getId()) {
             throw new CustomerException();
         }
 
@@ -114,6 +115,7 @@ readonly class AddressService
     {
         $customer = $this->session->getCustomerUser();
         $address = AddressQuery::create()->findPk($addressId);
+
         if (null === $address) {
             throw new AddressNotFoundException();
         }
@@ -145,7 +147,7 @@ readonly class AddressService
             $data['phone'],
             $data['company'] ?? null,
             $data['is_default'] ?? false,
-            $data['state'] ?? null
+            $data['state'] ?? null,
         );
     }
 
@@ -155,15 +157,13 @@ readonly class AddressService
 
         if (null === $addressId) {
             $session = $request->getSession();
-            if (!$session instanceof Session) {
-                return null;
-            }
 
             $addressId = $session->getOrder()->getChoosenDeliveryAddress();
         }
 
         if (null !== $addressId) {
             $address = AddressQuery::create()->findPk($addressId);
+
             if (null !== $address) {
                 return $address;
             }

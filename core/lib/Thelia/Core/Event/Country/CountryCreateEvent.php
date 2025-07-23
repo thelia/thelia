@@ -22,20 +22,16 @@ namespace Thelia\Core\Event\Country;
 class CountryCreateEvent extends CountryEvent
 {
     protected $locale;
-
     protected $title;
-
     protected $isocode;
-
     protected $isoAlpha2;
-
     protected $isoAlpha3;
 
     /** @var bool is visible */
-    protected $visible;
+    protected bool $visible;
 
     /** @var bool has states */
-    protected $hasStates;
+    protected bool $hasStates;
 
     protected $area;
 
@@ -99,54 +95,36 @@ class CountryCreateEvent extends CountryEvent
         return $this->title;
     }
 
-    /**
-     * @param int $area
-     */
-    public function setArea($area): static
+    public function setArea(int $area): static
     {
         $this->area = $area;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getArea()
+    public function getArea(): int
     {
         return $this->area;
     }
 
-    /**
-     * @return bool
-     */
-    public function isVisible()
+    public function isVisible(): bool
     {
         return $this->visible;
     }
 
-    /**
-     * @param bool $visible
-     */
-    public function setVisible($visible): static
+    public function setVisible(bool $visible): static
     {
         $this->visible = $visible;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isHasStates()
+    public function isHasStates(): bool
     {
         return $this->hasStates;
     }
 
-    /**
-     * @param bool $hasStates
-     */
-    public function setHasStates($hasStates): static
+    public function setHasStates(bool $hasStates): static
     {
         $this->hasStates = $hasStates;
 

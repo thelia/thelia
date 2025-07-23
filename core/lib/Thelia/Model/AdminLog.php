@@ -23,21 +23,15 @@ class AdminLog extends BaseAdminLog
 {
     /**
      * A simple helper to insert an entry in the admin log.
-     *
-     * @param string $resource
-     * @param string $action
-     * @param string $message
-     * @param bool   $withRequestContent
-     * @param int    $resourceId
      */
     public static function append(
-        $resource,
-        $action,
-        $message,
+        string $resource,
+        string $action,
+        string $message,
         Request $request,
         ?UserInterface $adminUser = null,
-        $withRequestContent = true,
-        $resourceId = null,
+        bool $withRequestContent = true,
+        ?int $resourceId = null,
     ): void {
         $log = new self();
 

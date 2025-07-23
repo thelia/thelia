@@ -31,7 +31,7 @@ class MoneyFormat extends NumberFormat
      * @param float  $number   the number
      * @param string $decimals number of decimal figures
      */
-    public function formatStandardMoney($number, $decimals = null): string
+    public function formatStandardMoney(float $number, ?string $decimals = null): string
     {
         return parent::formatStandardNumber($number, $decimals);
     }
@@ -46,57 +46,42 @@ class MoneyFormat extends NumberFormat
     ): string {
         $number = $this->preFormat($number, $decimals, $decPoint, $thousandsSep, $removeZeroDecimal);
 
-        if ($symbol !== null) {
+        if (null !== $symbol) {
             return $number.' '.$symbol;
         }
 
         return $number;
     }
 
-    /**
-     * @since 2.3
-     *
-     * @param float    $number
-     * @param int      $decimals
-     * @param string   $decPoint
-     * @param string   $thousandsSep
-     * @param int|null $currencyId
-     * @param bool     $removeZeroDecimal
-     *
-     * @return string
-     */
     public function formatByCurrency(
-        $number,
-        $decimals = null,
-        $decPoint = null,
-        $thousandsSep = null,
-        $currencyId = null,
-        $removeZeroDecimal = false,
-    ) {
+        float $number,
+        ?int $decimals = null,
+        ?string $decPoint = null,
+        ?string $thousandsSep = null,
+        ?int $currencyId = null,
+        bool $removeZeroDecimal = false,
+    ): string {
         $number = $this->preFormat($number, $decimals, $decPoint, $thousandsSep, $removeZeroDecimal);
 
-        $currency = $currencyId !== null ? CurrencyQuery::create()->findPk($currencyId) : $this->request->getSession()->getCurrency();
+        $currency = null !== $currencyId ? CurrencyQuery::create()->findPk($currencyId) : $this->request->getSession()->getCurrency();
 
-        if ($currency !== null && str_contains((string) $currency->getFormat(), '%n')) {
+        if (null !== $currency && str_contains((string) $currency->getFormat(), '%n')) {
             return str_replace(
                 ['%n', '%s', '%c'],
                 [$number, $currency->getSymbol(), $currency->getCode()],
-                $currency->getFormat()
+                $currency->getFormat(),
             );
         }
 
         return $number;
     }
 
-    /**
-     * @param bool $removeZeroDecimal
-     */
     protected function preFormat(
         $number,
         $decimals = null,
         $decPoint = null,
         $thousandsSep = null,
-        $removeZeroDecimal = false,
+        bool $removeZeroDecimal = false,
     ): string {
         $number = preg_replace('/\s+/', '', (string) $number);
 

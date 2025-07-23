@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\ImportExport\Export\Type;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Propel;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
 use Thelia\Model\Product;
@@ -29,7 +30,7 @@ class ProductSEOExport extends JsonFileAbstractExport
 {
     public const FILE_NAME = 'product_seo';
 
-    protected $orderAndAliases = [
+    protected array $orderAndAliases = [
         'product_id' => 'id',
         'product_ref' => 'ref',
         'product_i18n_title' => 'product_title',
@@ -40,7 +41,7 @@ class ProductSEOExport extends JsonFileAbstractExport
         'product_i18n_meta_keywords' => 'meta_keywords',
     ];
 
-    protected function getData()
+    protected function getData(): array|string|ModelCriteria
     {
         $locale = $this->language->getLocale();
 
@@ -57,8 +58,7 @@ class ProductSEOExport extends JsonFileAbstractExport
                     FROM product
                     LEFT JOIN product_i18n ON product_i18n.id = product.id AND product_i18n.locale = :locale
                     LEFT JOIN rewriting_url ON rewriting_url.view = "'.(new Product())->getRewrittenUrlViewName().'" AND rewriting_url.view_id = product.id
-                    ORDER BY product.id'
-        ;
+                    ORDER BY product.id';
         $stmt = $con->prepare($query);
         $stmt->bindValue('locale', $locale);
         $stmt->execute();

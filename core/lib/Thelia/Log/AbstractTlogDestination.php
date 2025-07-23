@@ -35,7 +35,7 @@ abstract class AbstractTlogDestination
     public function setConfig($name, $value, $apply_changes = true)
     {
         foreach ($this->configs as $config) {
-            if ($config->getName() == $name) {
+            if ($config->getName() === $name) {
                 $config->setValue($value);
 
                 // Appliquer les changements
@@ -54,7 +54,7 @@ abstract class AbstractTlogDestination
     public function getConfig($name, $default = false)
     {
         foreach ($this->configs as $config) {
-            if ($config->getName() == $name) {
+            if ($config->getName() === $name) {
                 return $config->getValue();
             }
         }

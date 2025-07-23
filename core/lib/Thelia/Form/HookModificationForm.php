@@ -40,7 +40,7 @@ class HookModificationForm extends HookCreationForm
                 'label_attr' => [
                     'for' => 'by_module',
                     'help' => Translator::getInstance()->trans(
-                        'This hook is specific to a module (delivery/payment modules).'
+                        'This hook is specific to a module (delivery/payment modules).',
                     ),
                 ],
             ])
@@ -50,11 +50,10 @@ class HookModificationForm extends HookCreationForm
                 'label_attr' => [
                     'for' => 'block',
                     'help' => Translator::getInstance()->trans(
-                        'If checked, this hook will be used by a hook block. If not, by hook function.'
+                        'If checked, this hook will be used by a hook block. If not, by hook function.',
                     ),
                 ],
-            ])
-        ;
+            ]);
 
         // Add standard description fields, excluding title and locale, which a re defined in parent class
         $this->addStandardDescFields(['title', 'postscriptum', 'locale']);

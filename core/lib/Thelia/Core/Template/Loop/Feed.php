@@ -34,11 +34,11 @@ class Feed extends BaseLoop implements ArraySearchLoopInterface
     {
         return new ArgumentCollection(
             Argument::createAnyTypeArgument('url', null, true),
-            Argument::createIntTypeArgument('timeout', 10)
+            Argument::createIntTypeArgument('timeout', 10),
         );
     }
 
-    public function buildArray(): mixed
+    public function buildArray(): array
     {
         /** @var AdapterInterface $cacheAdapter */
         $cacheAdapter = $this->container->get('thelia.cache');
@@ -58,6 +58,7 @@ class Feed extends BaseLoop implements ArraySearchLoopInterface
             $cacheAdapter->save($cacheItem);
         }
 
+        /* @var array $itemAsArray */
         return $cacheItem->get();
     }
 
@@ -72,8 +73,7 @@ class Feed extends BaseLoop implements ArraySearchLoopInterface
                 ->set('TITLE', $item->get_title())
                 ->set('AUTHOR', $item->get_author())
                 ->set('DESCRIPTION', $item->get_description())
-                ->set('DATE', $item->get_date('U'))
-            ;
+                ->set('DATE', $item->get_date('U'));
             $this->addOutputFields($loopResultRow, $item);
 
             $loopResult->addRow($loopResultRow);

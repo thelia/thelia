@@ -33,7 +33,6 @@ class AdminLostPassword extends BruteforceForm
                 'label_attr' => [
                     'for' => 'username',
                 ],
-            ])
-        ;
+            ]);
     }
 }

@@ -47,7 +47,7 @@ class Version
      *
      * @return bool true if version matches the constraints
      */
-    public static function test($version, $constraints, $strict = false, string $defaultComparison = '='): bool
+    public static function test(string $version, string $constraints, bool $strict = false, string $defaultComparison = '='): bool
     {
         $constraints = self::parseConstraints($constraints, $defaultComparison);
 
@@ -64,11 +64,11 @@ class Version
     /**
      * @return list<(ConstraintEqual|ConstraintGreater|ConstraintLower|ConstraintNearlyEqual)>
      */
-    private static function parseConstraints($constraints, string $defaultComparison = '='): array
+    private static function parseConstraints(string $constraints, string $defaultComparison = '='): array
     {
         $constraintsList = [];
 
-        foreach (explode(' ', (string) $constraints) as $expression) {
+        foreach (explode(' ', $constraints) as $expression) {
             if (1 === preg_match('/^\d/', $expression)) {
                 $expression = $defaultComparison.$expression;
             }
@@ -108,26 +108,21 @@ class Version
      *               'extra' => 'alphanumeric'
      *               ]
      */
-    public static function parse($version = null): array
+    public static function parse(?string $version = null): array
     {
         if (null === $version) {
             $version = Thelia::THELIA_VERSION;
         }
 
-        $pattern = "`^(?<version>
-            (?<major>[0-9]+)\.
-            (?<minus>[0-9]+)\.
+        $pattern = '`^(?<version>
+            (?<major>[0-9]+)\\.
+            (?<minus>[0-9]+)\\.
             (?<release>[0-9]+)
             -?(?<extra>[a-zA-Z0-9]*) # extra_version will also match empty string
-        )$`x";
+        )$`x';
 
         if (!preg_match($pattern, $version, $match)) {
-            throw new \InvalidArgumentException(
-                \sprintf(
-                    'Invalid version number provided : %s'.\PHP_EOL,
-                    $version
-                )
-            );
+            throw new \InvalidArgumentException(\sprintf('Invalid version number provided : %s'.\PHP_EOL, $version));
         }
 
         return [

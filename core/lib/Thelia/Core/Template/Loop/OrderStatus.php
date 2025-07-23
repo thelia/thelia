@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -53,12 +54,12 @@ class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
                     'manual',
                     'manual_reverse',
                 ],
-                'manual'
-            )
+                'manual',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = OrderStatusQuery::create();
 
@@ -110,8 +111,7 @@ class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('TITLE', $orderStatus->getVirtualColumn('i18n_TITLE'))
                 ->set('CHAPO', $orderStatus->getVirtualColumn('i18n_CHAPO'))
                 ->set('DESCRIPTION', $orderStatus->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set('POSTSCRIPTUM', $orderStatus->getVirtualColumn('i18n_POSTSCRIPTUM'))
-            ;
+                ->set('POSTSCRIPTUM', $orderStatus->getVirtualColumn('i18n_POSTSCRIPTUM'));
             $this->addOutputFields($loopResultRow, $orderStatus);
 
             $loopResult->addRow($loopResultRow);

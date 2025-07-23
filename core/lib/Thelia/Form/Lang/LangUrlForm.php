@@ -60,7 +60,7 @@ class LangUrlForm extends BaseForm
                         'url_id' => $lang->getId(),
                         'url_title' => $lang->getTitle(),
                     ],
-                ]
+                ],
             );
         }
     }

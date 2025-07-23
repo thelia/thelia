@@ -48,6 +48,7 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
 
         if (!isset($context['groups']) && !isset($context['attributes'])) {
             $contextType = isset($context['api_denormalize']) ? 'denormalization_context' : 'normalization_context';
+
             if ($operation instanceof Operation) {
                 $context += 'denormalization_context' === $contextType ? ($operation->getDenormalizationContext() ?? []) : ($operation->getNormalizationContext() ?? []);
             }
@@ -74,7 +75,7 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
             resourceClass: $resourceClass,
             operation: $operation,
             context: $context,
-            options: $options
+            options: $options,
         );
     }
 
@@ -106,14 +107,14 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
         foreach ($reflector->getProperties() as $property) {
             $isInFilters = array_reduce(
                 array_keys($context['filters'] ?? []),
-                function (bool $carry, $filter) use ($property): bool {
+                static function (bool $carry, $filter) use ($property): bool {
                     if ($carry) {
                         return true;
                     }
 
                     return str_contains($filter, $property->getName());
                 },
-                false
+                false,
             );
 
             $groupAttributes = $property->getAttributes(Groups::class, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null;
@@ -125,7 +126,7 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
             if (isset($context['groups'])) {
                 $propertyGroups = $groupAttributes->getArguments()['groups'] ?? $groupAttributes->getArguments()[0] ?? null;
 
-                if (!$isInFilters && array_intersect($propertyGroups, $context['groups']) === []) {
+                if (!$isInFilters && [] === array_intersect($propertyGroups, $context['groups'])) {
                     continue;
                 }
             }
@@ -138,13 +139,13 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
                 }
 
                 // Join only for non collection relation (Many to One or One to One) or if filter is applied to it
-                if ($property->getType()->getName() === 'array' && !$isInFilters) {
+                if ('array' === $property->getType()->getName() && !$isInFilters) {
                     continue;
                 }
 
                 $targetReflector = new \ReflectionClass($targetClass);
 
-                $isNullable = $property->getType()->allowsNull() || $property->getType()->getName() === 'array';
+                $isNullable = $property->getType()->allowsNull() || 'array' === $property->getType()->getName();
                 $isLeftJoin = $wasLeftJoin || $isNullable;
                 $joinFunctionName = 'use'.ucfirst($targetReflector->getShortName()).'Query';
 
@@ -160,10 +161,10 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
 
                 ++$joinCount;
                 /** @var ModelCriteria $relationQuery */
-                $relationQuery = $query->$joinFunctionName($joinAlias, $isLeftJoin ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN);
+                $relationQuery = $query->{$joinFunctionName}($joinAlias, $isLeftJoin ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN);
 
                 foreach ($targetReflector->getProperties() as $targetProperty) {
-                    if ($targetProperty->getName() === 'i18ns') {
+                    if ('i18ns' === $targetProperty->getName()) {
                         continue;
                     }
 
@@ -180,7 +181,7 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
                     if (isset($context['groups'])) {
                         $propertyGroups = $groupAttributes->getArguments()['groups'] ?? $groupAttributes->getArguments()[0] ?? null;
 
-                        if (array_intersect($propertyGroups, $context['groups']) === []) {
+                        if ([] === array_intersect($propertyGroups, $context['groups'])) {
                             continue;
                         }
                     }
@@ -210,7 +211,7 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
                     currentDepth: $currentDepth,
                     parentClass: $resourceClass,
                     parentReflector: $reflector,
-                    parentAlias: $joinAlias
+                    parentAlias: $joinAlias,
                 );
                 $relationQuery->endUse();
             }
@@ -237,7 +238,7 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
         $i18nGroups = $i18nAttributeGroups[0]->getArguments()['groups'] ?? $i18nAttributeGroups[0]->getArguments()[0] ?? null;
 
         // Don't join i18n table if i18ns property is not in current groups
-        if (array_intersect($normalizationContextGroups, $i18nGroups) === []) {
+        if ([] === array_intersect($normalizationContextGroups, $i18nGroups)) {
             return;
         }
 
@@ -249,15 +250,16 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
         }
 
         $i18nFields = array_map(
-            fn (\ReflectionProperty $reflectionProperty): string => $reflectionProperty->getName(),
-            (new \ReflectionClass($i18nResource))->getProperties()
+            static fn (\ReflectionProperty $reflectionProperty): string => $reflectionProperty->getName(),
+            (new \ReflectionClass($i18nResource))->getProperties(),
         );
 
         $tableName = $resourceClass::getPropelRelatedTableMap()->getPhpName();
         $joinMethodName = 'join'.$tableName.'I18n';
+
         foreach ($langs as $lang) {
             $joinAlias = trim($baseJoinAlias.'lang_'.$lang->getLocale(), '_');
-            $query->$joinMethodName($joinAlias);
+            $query->{$joinMethodName}($joinAlias);
             $query->addJoinCondition($joinAlias, $joinAlias.'.locale = ?', $lang->getLocale(), null, \PDO::PARAM_STR);
 
             foreach ($i18nFields as $i18nField) {

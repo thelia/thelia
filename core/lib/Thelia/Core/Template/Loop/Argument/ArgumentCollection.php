@@ -33,17 +33,14 @@ class ArgumentCollection implements \Iterator
         return isset($this->arguments[$key]);
     }
 
-    /**
-     * @return Argument|null
-     */
-    public function get($key)
+    public function get($key): ?Argument
     {
         return $this->hasKey($key) ? $this->arguments[$key] : null;
     }
 
     public function isEmpty(): bool
     {
-        return \count($this->arguments) == 0;
+        return [] === $this->arguments;
     }
 
     public function addArguments(array $argumentList, $force = true): static
@@ -68,8 +65,6 @@ class ArgumentCollection implements \Iterator
 
     /**
      * @param array $argumentNames array with names of arguments to remove
-     *
-     * @since 2.2.0-beta1
      */
     public function removeArguments(array $argumentNames): static
     {
@@ -82,8 +77,6 @@ class ArgumentCollection implements \Iterator
 
     /**
      * @param string $argumentName name of the argument to remove
-     *
-     * @since 2.2.0-beta1
      */
     public function removeArgument(string $argumentName): static
     {
@@ -118,8 +111,6 @@ class ArgumentCollection implements \Iterator
      * Move forward to next element.
      *
      * @see http://php.net/manual/en/iterator.next.php
-     *
-     * @return void any returned value is ignored
      */
     public function next(): void
     {
@@ -151,7 +142,7 @@ class ArgumentCollection implements \Iterator
      */
     public function valid(): bool
     {
-        return $this->key() !== null;
+        return null !== $this->key();
     }
 
     /**
@@ -159,8 +150,6 @@ class ArgumentCollection implements \Iterator
      * Rewind the Iterator to the first element.
      *
      * @see http://php.net/manual/en/iterator.rewind.php
-     *
-     * @return void any returned value is ignored
      */
     public function rewind(): void
     {
@@ -176,6 +165,7 @@ class ArgumentCollection implements \Iterator
         }
 
         $string = '';
+
         foreach ($arguments as $key => $argument) {
             $string .= $key.'='.$argument->getRawValue();
         }

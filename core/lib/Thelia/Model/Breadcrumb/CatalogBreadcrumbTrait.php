@@ -16,7 +16,6 @@ namespace Thelia\Model\Breadcrumb;
 
 use Symfony\Component\Routing\Router;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\Category;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Product;
 use Thelia\Tools\URL;
@@ -41,12 +40,13 @@ trait CatalogBreadcrumbTrait
 
         // Todo refactor this ugly code
         $currentId = $categoryId;
+
         do {
             $category = CategoryQuery::create()
                 ->filterById($currentId)
                 ->findOne();
 
-            if ($category != null) {
+            if (null !== $category) {
                 $results[] = [
                     'ID' => $category->getId(),
                     'TITLE' => $category->setLocale($locale)->getTitle(),
@@ -57,20 +57,14 @@ trait CatalogBreadcrumbTrait
 
                 if ($currentId > 0) {
                     // Prevent circular refererences
-                    if (\in_array($currentId, $ids)) {
-                        throw new \LogicException(
-                            \sprintf(
-                                'Circular reference detected in category ID=%d hierarchy (category ID=%d appears more than one times in path)',
-                                $categoryId,
-                                $currentId
-                            )
-                        );
+                    if (\in_array($currentId, $ids, true)) {
+                        throw new \LogicException(\sprintf('Circular reference detected in category ID=%d hierarchy (category ID=%d appears more than one times in path)', $categoryId, $currentId));
                     }
 
                     $ids[] = $currentId;
                 }
             }
-        } while ($category != null && $currentId > 0 && --$depth > 0);
+        } while (null !== $category && $currentId > 0 && --$depth > 0);
 
         foreach ($results as $result) {
             $breadcrumb[$result['TITLE']] = \sprintf('%s?category_id=%d', $catalogUrl, $result['ID']);
@@ -82,7 +76,7 @@ trait CatalogBreadcrumbTrait
     public function getProductBreadcrumb(Router $router, $tab, $locale)
     {
         if (!method_exists($this, 'getProduct')) {
-            return null;
+            return;
         }
 
         /** @var Product $product */
@@ -96,19 +90,18 @@ trait CatalogBreadcrumbTrait
             '%s?product_id=%d&current_tab=%s',
             $router->generate('admin.products.update', [], Router::ABSOLUTE_URL),
             $product->getId(),
-            $tab
+            $tab,
         );
 
         return $breadcrumb;
     }
 
-    public function getCategoryBreadcrumb(Router $router, $tab, $locale)
+    public function getCategoryBreadcrumb(Router $router, $tab, $locale): array
     {
         if (!method_exists($this, 'getCategory')) {
-            return null;
+            return [];
         }
 
-        /** @var Category $category */
         $category = $this->getCategory();
         $breadcrumb = $this->getBaseBreadcrumb($router, $this->getParentId(), $locale);
 
@@ -119,10 +112,10 @@ trait CatalogBreadcrumbTrait
             $router->generate(
                 'admin.categories.update',
                 [],
-                Router::ABSOLUTE_URL
+                Router::ABSOLUTE_URL,
             ),
             $category->getId(),
-            $tab
+            $tab,
         );
 
         return $breadcrumb;

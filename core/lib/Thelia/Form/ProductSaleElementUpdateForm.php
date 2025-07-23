@@ -142,8 +142,7 @@ class ProductSaleElementUpdateForm extends BaseForm
                 'label_attr' => ['for' => 'ean_code_field'],
                 'allow_add' => true,
                 'allow_delete' => true,
-            ])
-        ;
+            ]);
     }
 
     public static function getName(): string

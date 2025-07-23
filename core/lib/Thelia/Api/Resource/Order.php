@@ -40,27 +40,27 @@ use Thelia\Model\OrderQuery;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/orders'
+            uriTemplate: '/admin/orders',
         ),
         new GetCollection(
-            uriTemplate: '/admin/orders'
+            uriTemplate: '/admin/orders',
         ),
         new Get(
             uriTemplate: '/admin/orders/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/orders/{id}'
+            uriTemplate: '/admin/orders/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/orders/{id}'
+            uriTemplate: '/admin/orders/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/orders/{id}'
+            uriTemplate: '/admin/orders/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
@@ -70,7 +70,7 @@ use Thelia\Model\OrderQuery;
         new Get(
             uriTemplate: '/front/account/orders/{id}',
             normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
-            security: 'object.customer.getId() == user.getId()'
+            security: 'object.customer.getId() == user.getId()',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -88,42 +88,38 @@ use Thelia\Model\OrderQuery;
         'ref' => 'partial',
         'orderStatus.code',
         'customer.id' => 'exact',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: NotInFilter::class,
     properties: [
         'orderStatus.code',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
         'createdAt',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: RangeFilter::class,
     properties: [
         'discount',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: DateFilter::class,
-    properties: ['createdAt' => DateFilter::INCLUDE_NULL_BEFORE_AND_AFTER]
+    properties: ['createdAt' => DateFilter::INCLUDE_NULL_BEFORE_AND_AFTER],
 )]
 class Order implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:order:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:order:write';
-
     public const GROUP_FRONT_READ = 'front:order:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:order:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ,
@@ -254,6 +250,7 @@ class Order implements PropelResourceInterface
     public function getTotalAmount(): ?float
     {
         $propelModel = $this->getPropelModel();
+
         if (!$propelModel instanceof ActiveRecordInterface) {
             $propelModel = OrderQuery::create()->findOneById($this->getId());
             $this->setPropelModel($propelModel);
@@ -268,6 +265,7 @@ class Order implements PropelResourceInterface
         $itemsTax = 0;
         /** @var \Thelia\Model\Order $orderPropelModel */
         $orderPropelModel = $this->getPropelModel();
+
         if (!$orderPropelModel) {
             $orderPropelModel = OrderQuery::create()->findOneById($this->getId());
             $this->setPropelModel($orderPropelModel);
@@ -293,6 +291,7 @@ class Order implements PropelResourceInterface
     {
         /** @var \Thelia\Model\Order $orderPropelModel */
         $orderPropelModel = $this->getPropelModel();
+
         if (!$orderPropelModel) {
             $orderPropelModel = OrderQuery::create()->findOneById($this->getId());
             $this->setPropelModel($orderPropelModel);
@@ -315,6 +314,7 @@ class Order implements PropelResourceInterface
     {
         /** @var \Thelia\Model\Order $orderPropelModel */
         $orderPropelModel = $this->getPropelModel();
+
         if (!$orderPropelModel) {
             $orderPropelModel = OrderQuery::create()->findOneById($this->getId());
             $this->setPropelModel($orderPropelModel);

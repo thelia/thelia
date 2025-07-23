@@ -28,14 +28,10 @@ use Thelia\Core\Archiver\ArchiverManager;
  */
 class RegisterArchiverPass implements CompilerPassInterface
 {
-    /**
-     * @var string Archiver manager service ID
-     */
+    /** @var string Archiver manager service ID */
     public const MANAGER_SERVICE_ID = ArchiverManager::class;
 
-    /**
-     * @var string Archiver tag name
-     */
+    /** @var string Archiver tag name */
     public const ARCHIVER_SERVICE_TAG = 'thelia.archiver';
 
     public function process(ContainerBuilder $container): void
@@ -51,7 +47,7 @@ class RegisterArchiverPass implements CompilerPassInterface
                 'add',
                 [
                     new Reference($serviceId),
-                ]
+                ],
             );
         }
     }

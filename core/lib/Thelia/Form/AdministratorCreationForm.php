@@ -38,7 +38,8 @@ class AdministratorCreationForm extends BaseForm
                 'constraints' => [
                     new NotBlank(),
                     new Callback(
-                        $this->verifyExistingLogin(...)),
+                        $this->verifyExistingLogin(...),
+                    ),
                 ],
                 'label' => $this->translator->trans('Login name'),
                 'label_attr' => [
@@ -51,7 +52,7 @@ class AdministratorCreationForm extends BaseForm
                     new NotBlank(),
                     new Email(),
                     new Callback(
-                        $this->verifyExistingEmail(...)
+                        $this->verifyExistingEmail(...),
                     ),
                 ],
                 'label' => $this->translator->trans('Email address'),
@@ -109,7 +110,7 @@ class AdministratorCreationForm extends BaseForm
                     'label_attr' => [
                         'for' => 'profile',
                     ],
-                ]
+                ],
             )
             ->add(
                 'locale',
@@ -123,9 +124,8 @@ class AdministratorCreationForm extends BaseForm
                     'label_attr' => [
                         'for' => 'locale',
                     ],
-                ]
-            )
-        ;
+                ],
+            );
     }
 
     /**
@@ -148,11 +148,11 @@ class AdministratorCreationForm extends BaseForm
     {
         $data = $context->getRoot()->getData();
 
-        if ($data['password'] === '' && $data['password_confirm'] === '') {
+        if ('' === $data['password'] && '' === $data['password_confirm']) {
             $context->addViolation("password can't be empty");
         }
 
-        if ($data['password'] != $data['password_confirm']) {
+        if ($data['password'] !== $data['password_confirm']) {
             $context->addViolation('password confirmation is not the same as password field');
         }
 

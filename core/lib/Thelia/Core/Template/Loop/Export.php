@@ -23,15 +23,12 @@ use Thelia\Model\ExportQuery;
  */
 class Export extends ImportExportType
 {
-    protected function getBaseUrl()
+    protected function getBaseUrl(): string
     {
         return $this->container->getParameter('export.base_url');
     }
 
-    /**
-     * @return ExportQuery
-     */
-    protected function getQueryModel()
+    protected function getQueryModel(): ExportQuery
     {
         return ExportQuery::create();
     }

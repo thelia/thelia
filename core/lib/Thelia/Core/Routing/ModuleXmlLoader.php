@@ -38,6 +38,7 @@ class ModuleXmlLoader extends Loader
         }
 
         $routes = new RouteCollection();
+
         if (\defined('THELIA_INSTALL_MODE')) {
             return $routes;
         }

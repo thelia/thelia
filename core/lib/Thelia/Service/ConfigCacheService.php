@@ -32,7 +32,7 @@ class ConfigCacheService
             $this->cache->delete(self::CACHE_KEY);
         }
 
-        $value = $this->cache->get(self::CACHE_KEY, function (ItemInterface $item): array {
+        $value = $this->cache->get(self::CACHE_KEY, static function (ItemInterface $item): array {
             $configs = ConfigQuery::create()->find();
             $caches = [];
 

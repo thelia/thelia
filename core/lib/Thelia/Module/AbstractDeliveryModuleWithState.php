@@ -29,27 +29,22 @@ abstract class AbstractDeliveryModuleWithState extends BaseModule implements Del
     // This class is the base class for delivery modules
     // It may contains common methods in the future.
 
-    /**
-     * @return bool
-     */
-    public function handleVirtualProductDelivery()
+    public function handleVirtualProductDelivery(): bool
     {
         return false;
     }
 
     /**
      * Return the first area that matches the given  country for the given module.
-     *
-     * @return Area|null
      */
-    public function getAreaForCountry(Country $country, ?State $state = null)
+    public function getAreaForCountry(Country $country, ?State $state = null): ?Area
     {
         $area = null;
 
         if (null !== $areaDeliveryModule = AreaDeliveryModuleQuery::create()->findByCountryAndModule(
             $country,
             $this->getModuleModel(),
-            $state
+            $state,
         )) {
             $area = $areaDeliveryModule->getArea();
         }
@@ -62,10 +57,11 @@ abstract class AbstractDeliveryModuleWithState extends BaseModule implements Del
         return 'delivery';
     }
 
-    public function buildOrderPostage($untaxedPostage, Country $country, $locale, $taxRuleId = null)
+    public function buildOrderPostage(float $untaxedPostage, Country $country, $locale, $taxRuleId = null)
     {
         $taxRuleQuery = TaxRuleQuery::create();
         $taxRuleId = ($taxRuleId) ?: ConfigQuery::read('taxrule_id_delivery_module');
+
         if ($taxRuleId) {
             $taxRuleQuery->filterById($taxRuleId);
         }

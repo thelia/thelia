@@ -39,8 +39,10 @@ class ModuleAnnotationLoader extends Loader
         $modules = ModuleQuery::create()
             ->filterByActivate(true)
             ->find();
+
         foreach ($modules as $module) {
             $moduleControllerPath = $module->getAbsoluteBaseDir().\DIRECTORY_SEPARATOR.'Controller';
+
             if (!is_dir($moduleControllerPath)) {
                 continue;
             }
@@ -48,6 +50,7 @@ class ModuleAnnotationLoader extends Loader
             $fileLocator = new FileLocator($moduleControllerPath);
             $routeLoader = new AnnotationDirectoryLoader($fileLocator, $loader);
             $moduleRoutes = $routeLoader->load('.', 'annotation');
+
             if (!$moduleRoutes instanceof RouteCollection) {
                 continue;
             }

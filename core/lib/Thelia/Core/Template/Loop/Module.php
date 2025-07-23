@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
 use Thelia\Core\Security\AccessManager;
@@ -70,8 +71,8 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'code',
                 new TypeCollection(
-                    new AlphaNumStringListType()
-                )
+                    new AlphaNumStringListType(),
+                ),
             ),
             new Argument(
                 'module_type',
@@ -80,14 +81,14 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                         BaseModule::CLASSIC_MODULE_TYPE,
                         BaseModule::DELIVERY_MODULE_TYPE,
                         BaseModule::PAYMENT_MODULE_TYPE,
-                    ])
-                )
+                    ]),
+                ),
             ),
             new Argument(
                 'module_category',
                 new TypeCollection(
-                    new EnumListType(explode(',', BaseModule::MODULE_CATEGORIES))
-                )
+                    new EnumListType(explode(',', BaseModule::MODULE_CATEGORIES)),
+                ),
             ),
             new Argument(
                 'order',
@@ -105,18 +106,18 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                         'manual_reverse',
                         'enabled',
                         'enabled_reverse',
-                    ])
+                    ]),
                 ),
-                'manual'
+                'manual',
             ),
             Argument::createIntListTypeArgument('exclude'),
             Argument::createBooleanOrBothTypeArgument('active', BooleanOrBothType::ANY),
             Argument::createBooleanOrBothTypeArgument('hidden', BooleanOrBothType::ANY),
-            Argument::createBooleanOrBothTypeArgument('mandatory', BooleanOrBothType::ANY)
+            Argument::createBooleanOrBothTypeArgument('mandatory', BooleanOrBothType::ANY),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = ModuleQuery::create();
 
@@ -172,19 +173,19 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $active = $this->getActive();
 
-        if ($active !== BooleanOrBothType::ANY) {
+        if (BooleanOrBothType::ANY !== $active) {
             $search->filterByActivate($active ? 1 : 0, Criteria::EQUAL);
         }
 
         $hidden = $this->getHidden();
 
-        if ($hidden !== BooleanOrBothType::ANY) {
+        if (BooleanOrBothType::ANY !== $hidden) {
             $search->filterByHidden($hidden ? 1 : 0, Criteria::EQUAL);
         }
 
         $mandatory = $this->getMandatory();
 
-        if ($mandatory !== BooleanOrBothType::ANY) {
+        if (BooleanOrBothType::ANY !== $mandatory) {
             $search->filterByMandatory($mandatory ? 1 : 0, Criteria::EQUAL);
         }
 
@@ -274,8 +275,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 $hookable = false;
                 $moduleHookCount = ModuleHookQuery::create()
                     ->filterByModuleId($module->getId())
-                    ->count()
-                ;
+                    ->count();
                 $hookable = ($moduleHookCount > 0);
 
                 $loopResultRow->set('HOOKABLE', $hookable ? 1 : 0);
@@ -320,6 +320,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         $routerId = 'router.'.$module->getBaseDir();
+
         if ($this->container->has($routerId)) {
             try {
                 if ($this->container->get($routerId)->match('/admin/module/'.$module->getCode())) {
@@ -348,11 +349,13 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 
         // Make a quick and dirty test on the module's config.xml file
         $configContent = @file_get_contents($module->getAbsoluteConfigPath().DS.'config.xml');
-        if ($configContent && preg_match('/event\s*=\s*[\'"]module.configuration[\'"]/', $configContent) === 1) {
+
+        if ($configContent && 1 === preg_match('/event\s*=\s*[\'"]module.configuration[\'"]/', $configContent)) {
             return true;
         }
 
         $routing = @file_get_contents($module->getAbsoluteConfigPath().DS.'routing.xml');
+
         if ($routing && preg_match('@[\'"]/?admin/module/'.$module->getCode().'[\'"]@', $routing)) {
             return true;
         }

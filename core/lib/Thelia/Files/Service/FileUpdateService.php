@@ -112,7 +112,7 @@ readonly class FileUpdateService
         /** @var FileModelInterface $file */
         $file = $fileModelInstance->getQueryInstance()->findPk($fileId);
 
-        if ($title !== '' && $title !== '0') {
+        if ('' !== $title && '0' !== $title) {
             $file->setLocale($locale);
             $file->setTitle($title);
             $file->save();

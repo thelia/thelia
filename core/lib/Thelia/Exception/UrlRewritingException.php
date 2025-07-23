@@ -17,16 +17,13 @@ namespace Thelia\Exception;
 class UrlRewritingException extends \Exception
 {
     public const UNKNOWN_EXCEPTION = 0;
-
     public const URL_ALREADY_EXISTS = 100;
-
     public const URL_NOT_FOUND = 404;
-
     public const RESOLVER_NULL_SEARCH = 800;
 
     public function __construct($message, $code = null, $previous = null)
     {
-        if ($code === null) {
+        if (null === $code) {
             $code = self::UNKNOWN_EXCEPTION;
         }
 

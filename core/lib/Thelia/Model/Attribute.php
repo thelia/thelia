@@ -22,7 +22,7 @@ class Attribute extends BaseAttribute
 {
     use PositionManagementTrait;
 
-    public function preInsert(?ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): bool
     {
         // Set the current position for the new object
         $this->setPosition($this->getNextPosition());

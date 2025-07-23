@@ -22,45 +22,34 @@ namespace Thelia\Core\Event\Hook;
 class ModuleHookUpdateEvent extends ModuleHookCreateEvent
 {
     protected $module_hook_id;
-
     protected $active;
 
     /**
-     * @param int $module_hook_id
-     *
      * @return $this
      */
-    public function setModuleHookId($module_hook_id): static
+    public function setModuleHookId(int $module_hook_id): static
     {
         $this->module_hook_id = $module_hook_id;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getModuleHookId()
+    public function getModuleHookId(): int
     {
         return $this->module_hook_id;
     }
 
     /**
-     * @param bool $active
-     *
      * @return $this
      */
-    public function setActive($active): static
+    public function setActive(bool $active): static
     {
         $this->active = $active;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function getActive()
+    public function getActive(): bool
     {
         return $this->active;
     }

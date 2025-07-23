@@ -43,6 +43,7 @@ readonly class FilterService
     {
         $filters = $this->getAvailableFilters($resourceType);
         $filterResult = [];
+
         foreach ($filters as $filter) {
             foreach ($tfilters as $tfilter => $tfilterValue) {
                 if (\in_array($tfilter, $filter->getFilterName(), true)) {
@@ -62,6 +63,7 @@ readonly class FilterService
     public function getAvailableFilters(string $resourceType): array
     {
         $filters = [];
+
         foreach ($this->filters as $filter) {
             if (\in_array($resourceType, $filter->getResourceType(), true)) {
                 $filters[] = $filter;
@@ -96,10 +98,12 @@ readonly class FilterService
     public function filterWithTFilter(array $tfilters, string $resource, ?ModelCriteria $query = null, ?int $categoryDepth = null): iterable
     {
         $filters = $this->getAvailableFiltersWithTFilter($resource, $tfilters);
+
         if (!$query instanceof ModelCriteria) {
-            $queryClass = "Thelia\Model\\".ucfirst($resource).'Query';
+            $queryClass = 'Thelia\\Model\\'.ucfirst($resource).'Query';
+
             if (!class_exists($queryClass)) {
-                $queryClass = "Thelia\Model\\".ucfirst(mb_substr($resource, 0, -1)).'Query';
+                $queryClass = 'Thelia\\Model\\'.ucfirst(mb_substr($resource, 0, -1)).'Query';
             }
 
             if (!class_exists($queryClass)) {
@@ -112,6 +116,7 @@ readonly class FilterService
         foreach ($filters as $filter) {
             $filterClass = $filter['filter'];
             $values = $filter['value'];
+
             if (!$filterClass instanceof TheliaFilterInterface) {
                 throw new \RuntimeException(\sprintf('The "%s" filter must implements TheliaFilterInterface.', $filterClass::class));
             }
@@ -137,11 +142,13 @@ readonly class FilterService
     public function getFilters(array $context, string $resource): array
     {
         $request = $this->requestStack->getCurrentRequest();
+
         if (!$request instanceof Request) {
             throw new \InvalidArgumentException('The request is required.');
         }
 
         $isApiRoute = $request->get('isApiRoute', false);
+
         if ($isApiRoute) {
             $tfilters = $request->get('tfilters', []);
             $query = $this->filterTFilterWithRequest(request: $request);
@@ -155,29 +162,32 @@ readonly class FilterService
         $locale ??= $this->langService->getLocale();
         $objects = $query->find();
         $filters = $this->getAvailableFilters($resource);
+
         foreach ($filters as $filter) {
             $values = [];
             $item = null;
+
             foreach ($objects as $item) {
                 if ($filter instanceof CategoryFilter) {
                     $categoryId = $this->retrieveFilterValue(
                         theliaFilterNames: CategoryFilter::getFilterName(),
-                        tfilters: $tfilters
+                        tfilters: $tfilters,
                     );
                     $depth = $tfilters[CategoryFilter::CATEGORY_DEPTH_NAME] ?? 1;
                     $values = $filter->getValue(
                         activeRecord: $item,
                         locale: $locale,
                         valueSearched: $categoryId,
-                        depth : $depth
+                        depth : $depth,
                     );
                     break;
                 }
 
                 $possibleValues = $filter->getValue(
                     activeRecord: $item,
-                    locale: $locale
+                    locale: $locale,
                 );
+
                 if (!$possibleValues) {
                     continue;
                 }
@@ -195,7 +205,7 @@ readonly class FilterService
                 filter: $filter,
                 values: $values,
                 isVisible: $isVisible,
-                position: $position
+                position: $position,
             );
 
             $hasMainResource = (isset($values[0]['mainId'], $values[0]['mainTitle']));
@@ -203,10 +213,11 @@ readonly class FilterService
             if ($hasMainResource) {
                 $values = array_intersect_key($values, array_unique(array_map(
                     static fn ($item): string => $item['id'].'-'.$item['mainId'],
-                    $values
+                    $values,
                 )));
 
                 $splitValues = [];
+
                 foreach ($values as $value) {
                     $splitValues[$value['mainId']][] = $value;
                 }
@@ -227,6 +238,7 @@ readonly class FilterService
                     }
 
                     $title = $value[0]['mainTitle'] ?? '';
+
                     if ($filter instanceof CategoryFilter) {
                         $title = $this->translator->trans(id: 'Category', locale: $locale);
                     }
@@ -250,8 +262,9 @@ readonly class FilterService
                 }
             }
 
-            if (!$hasMainResource && $values !== []) {
+            if (!$hasMainResource && [] !== $values) {
                 $values = array_intersect_key($values, array_unique(array_column($values, 'id')));
+
                 if (!$isVisible) {
                     continue;
                 }
@@ -267,7 +280,7 @@ readonly class FilterService
         }
 
         foreach ($filterObjects as $filterObject) {
-            if ($filterObject->getPosition() === null) {
+            if (null === $filterObject->getPosition()) {
                 $allPosition = array_map(static fn ($filterObject): ?int => $filterObject->getPosition(), $filterObjects);
                 $max = max($allPosition);
                 $filterObject->setPosition($max + 1);
@@ -282,6 +295,7 @@ readonly class FilterService
     private function retrieveFilterValue(array $theliaFilterNames, array $tfilters): string|array|null
     {
         $ids = null;
+
         foreach ($theliaFilterNames as $filterName) {
             if (!isset($tfilters[$filterName])) {
                 continue;
@@ -303,11 +317,13 @@ readonly class FilterService
         $category = CategoryQuery::create()->findPk(key: $categoryId);
         $choiceFiltersCategory = ChoiceFilterQuery::findChoiceFilterByCategory(category: $category, templateId: $templateIdFind)->getData();
         $choiceFiltersTemplate = [];
+
         if ($templateIdFind) {
             $choiceFiltersTemplate = ChoiceFilterQuery::create()->filterByTemplateId($templateIdFind)->find()->getData();
         }
 
         $choiceFilters = $choiceFiltersCategory;
+
         if (empty($choiceFilters)) {
             $choiceFilters = $choiceFiltersTemplate;
         }
@@ -315,6 +331,7 @@ readonly class FilterService
         /** @var ChoiceFilter $choiceFilter */
         foreach ($choiceFilters as $choiceFilter) {
             $otherType = $choiceFilter->getChoiceFilterOther()?->getType();
+
             if (\in_array($otherType, $filter->getFilterName(), true)) {
                 $isVisible = (bool) $choiceFilter->isVisible();
                 $position = $choiceFilter->getPosition();
@@ -325,6 +342,7 @@ readonly class FilterService
             foreach ($values as $index => $value) {
                 if ($filter instanceof TheliaChoiceFilterInterface) {
                     $mainType = $filter->getChoiceFilterType();
+
                     if ($choiceFilter->getAttribute() instanceof $mainType && $choiceFilter->getAttribute()->getId() === $value['mainId']) {
                         $values[$index]['visible'] = (bool) $choiceFilter->isVisible();
                         $values[$index]['position'] = $choiceFilter->getPosition();
@@ -342,12 +360,13 @@ readonly class FilterService
     private function hasFilter(array $theliaFilterNames, array $tfilters): bool
     {
         return !\in_array($this->retrieveFilterValue($theliaFilterNames, $tfilters), ['', '0', null], true)
-            && $this->retrieveFilterValue($theliaFilterNames, $tfilters) !== [];
+            && [] !== $this->retrieveFilterValue($theliaFilterNames, $tfilters);
     }
 
     public function getCategoriesRecursively($categoryId, int $maxDepth, array $categoriesFound = [], int $depth = 1): array
     {
         $categories = CategoryQuery::create()->filterByParent($categoryId)->find();
+
         if ($depth > $maxDepth) {
             return $categoriesFound;
         }
@@ -362,7 +381,7 @@ readonly class FilterService
                 categoryId: $category->getId(),
                 maxDepth: $maxDepth,
                 categoriesFound: $categoriesFound,
-                depth: $depth + 1
+                depth: $depth + 1,
             );
         }
 

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -51,8 +52,8 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'code',
                 new TypeCollection(
-                    new AlphaNumStringListType()
-                )
+                    new AlphaNumStringListType(),
+                ),
             ),
             new Argument(
                 'hook_type',
@@ -62,23 +63,23 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
                         TemplateDefinition::BACK_OFFICE,
                         TemplateDefinition::EMAIL,
                         TemplateDefinition::PDF,
-                    ])
-                )
+                    ]),
+                ),
             ),
             new Argument(
                 'order',
                 new TypeCollection(
                     new EnumListType(['id', 'id_reverse', 'code', 'code_reverse', 'alpha', 'alpha_reverse',
-                        'manual', 'manual_reverse', 'enabled', 'enabled_reverse', 'native', 'native_reverse', ])
+                        'manual', 'manual_reverse', 'enabled', 'enabled_reverse', 'native', 'native_reverse', ]),
                 ),
-                'id'
+                'id',
             ),
             Argument::createIntListTypeArgument('exclude'),
-            Argument::createBooleanOrBothTypeArgument('active', BooleanOrBothType::ANY)
+            Argument::createBooleanOrBothTypeArgument('active', BooleanOrBothType::ANY),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = HookQuery::create();
 
@@ -92,22 +93,26 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         $code = $this->getCode();
+
         if (null !== $code) {
             $search->filterByCode($code, Criteria::IN);
         }
 
         $hookType = $this->getHook_type();
+
         if (null !== $hookType) {
             $search->filterByType($hookType, Criteria::IN);
         }
 
         $exclude = $this->getExclude();
+
         if (null !== $exclude) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
         $active = $this->getActive();
-        if ($active !== BooleanOrBothType::ANY) {
+
+        if (BooleanOrBothType::ANY !== $active) {
             $search->filterByActivate($active ? 1 : 0, Criteria::EQUAL);
         }
 
@@ -177,8 +182,7 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set('ACTIVE', $hook->getActivate())
                     ->set('BY_MODULE', $hook->getByModule())
                     ->set('BLOCK', $hook->getBlock())
-                    ->set('POSITION', $hook->getPosition())
-                ;
+                    ->set('POSITION', $hook->getPosition());
 
                 $this->addOutputFields($loopResultRow, $hook);
                 $loopResult->addRow($loopResultRow);

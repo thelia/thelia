@@ -51,7 +51,7 @@ class AreaController extends AbstractCrudController
             AdminResources::AREA,
             TheliaEvents::AREA_CREATE,
             TheliaEvents::AREA_UPDATE,
-            TheliaEvents::AREA_DELETE
+            TheliaEvents::AREA_DELETE,
         );
     }
 
@@ -161,7 +161,7 @@ class AreaController extends AbstractCrudController
     /**
      * Render the main list template.
      */
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         return $this->render('shipping-configuration');
     }
@@ -175,7 +175,7 @@ class AreaController extends AbstractCrudController
             'shipping-configuration-edit',
             [
                 'area_id' => $this->getAreaId(),
-            ]
+            ],
         );
     }
 
@@ -189,7 +189,7 @@ class AreaController extends AbstractCrudController
             [],
             [
                 'area_id' => $this->getAreaId(),
-            ]
+            ],
         );
     }
 
@@ -213,6 +213,7 @@ class AreaController extends AbstractCrudController
 
         $areaCountryForm = $this->createForm(AdminForm::AREA_COUNTRY);
         $error_msg = null;
+
         try {
             $form = $this->validateForm($areaCountryForm);
 
@@ -231,9 +232,9 @@ class AreaController extends AbstractCrudController
                         '%s %s (ID %s) modified, new country added',
                         ucfirst($this->objectName),
                         $this->getObjectLabel($changedObject),
-                        $this->getObjectId($changedObject)
+                        $this->getObjectId($changedObject),
                     ),
-                    $this->getObjectId($changedObject)
+                    $this->getObjectId($changedObject),
                 );
             }
 
@@ -250,7 +251,7 @@ class AreaController extends AbstractCrudController
         $this->setupFormErrorContext(
             $this->getTranslator()->trans('%obj modification', ['%obj' => $this->objectName]),
             $error_msg,
-            $areaCountryForm
+            $areaCountryForm,
         );
 
         // At this point, the form has errors, and should be redisplayed.
@@ -293,7 +294,7 @@ class AreaController extends AbstractCrudController
         $this->setupFormErrorContext(
             $this->getTranslator()->trans('Failed to delete selected countries'),
             $error_msg,
-            $areaDeleteCountriesForm
+            $areaDeleteCountriesForm,
         );
 
         // At this point, the form has errors, and should be redisplayed.
@@ -302,7 +303,7 @@ class AreaController extends AbstractCrudController
 
     protected function removeOneCountryFromArea(EventDispatcherInterface $eventDispatcher, Area $area, $countryId, $stateId): void
     {
-        if ((int) $stateId === 0) {
+        if (0 === (int) $stateId) {
             $stateId = null;
         }
 
@@ -320,9 +321,9 @@ class AreaController extends AbstractCrudController
                     $this->getObjectLabel($changedObject),
                     $this->getObjectId($changedObject),
                     $countryId,
-                    $area->getId()
+                    $area->getId(),
                 ),
-                $this->getObjectId($changedObject)
+                $this->getObjectId($changedObject),
             );
         }
     }
@@ -338,7 +339,7 @@ class AreaController extends AbstractCrudController
             $eventDispatcher,
             $this->getRequest()->get('area_id', 0),
             $this->getRequest()->get('country_id', 0),
-            $this->getRequest()->get('state_id')
+            $this->getRequest()->get('state_id'),
         );
 
         return $this->redirectToEditionTemplate();
@@ -351,9 +352,7 @@ class AreaController extends AbstractCrudController
             ->findOne();
 
         if (null === $area) {
-            throw new ElementNotFoundException(
-                $this->getTranslator()->trans('Area not found')
-            );
+            throw new ElementNotFoundException($this->getTranslator()->trans('Area not found'));
         }
 
         return $area;

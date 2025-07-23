@@ -24,7 +24,6 @@ use Iterator;
 class FlashMessage implements \Iterator
 {
     private int $position = 0;
-
     protected $collection = [];
 
     public function add($type, $messages): void
@@ -46,7 +45,7 @@ class FlashMessage implements \Iterator
 
     public function isEmpty(): bool
     {
-        return \count($this->collection) == 0;
+        return 0 === \count($this->collection);
     }
 
     public function getCount(): int
@@ -73,8 +72,6 @@ class FlashMessage implements \Iterator
      * Move forward to next element.
      *
      * @see http://php.net/manual/en/iterator.next.php
-     *
-     * @return void any returned value is ignored
      */
     public function next(): void
     {
@@ -114,8 +111,6 @@ class FlashMessage implements \Iterator
      * Rewind the Iterator to the first element.
      *
      * @see http://php.net/manual/en/iterator.rewind.php
-     *
-     * @return void any returned value is ignored
      */
     public function rewind(): void
     {

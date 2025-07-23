@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -60,14 +61,14 @@ class Area extends BaseI18nLoop implements PropelSearchLoopInterface
                     new EnumListType([
                         'id', 'id_reverse',
                         'alpha', 'name', 'name_reverse',
-                    ])
+                    ]),
                 ),
-                'name'
-            )
+                'name',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = AreaQuery::create();
 
@@ -159,8 +160,7 @@ class Area extends BaseI18nLoop implements PropelSearchLoopInterface
             $loopResultRow
                 ->set('ID', $area->getId())
                 ->set('NAME', $area->getName())
-                ->set('POSTAGE', $area->getPostage())
-            ;
+                ->set('POSTAGE', $area->getPostage());
             $this->addOutputFields($loopResultRow, $area);
 
             $loopResult->addRow($loopResultRow);

@@ -31,8 +31,6 @@ class RegisterCouponPass implements CompilerPassInterface
      * You can modify the container here before it is dumped to PHP code.
      *
      * @param ContainerBuilder $container Container
-     *
-     * @api
      */
     public function process(ContainerBuilder $container): void
     {
@@ -48,7 +46,7 @@ class RegisterCouponPass implements CompilerPassInterface
                 'addAvailableCoupon',
                 [
                     new Reference($id),
-                ]
+                ],
             );
         }
     }

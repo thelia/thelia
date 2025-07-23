@@ -28,19 +28,15 @@ class Cart extends BaseCart
     /**
      * Duplicate the current existing cart. Only the token is changed.
      *
-     * @param string $token
-     *
      * @throws \Exception
      * @throws PropelException
-     *
-     * @return Cart|bool
      */
     public function duplicate(
-        $token,
+        string $token,
         ?Customer $customer = null,
         ?Currency $currency = null,
         ?EventDispatcherInterface $dispatcher = null,
-    ) {
+    ): self|bool {
         if (!$dispatcher instanceof EventDispatcherInterface) {
             return false;
         }
@@ -77,8 +73,8 @@ class Cart extends BaseCart
 
             if ($product
                 && $productSaleElements
-                && (int) $product->getVisible() === 1
-                && ($productSaleElements->getQuantity() >= $cartItem->getQuantity() || $product->getVirtual() === 1 || !ConfigQuery::checkAvailableStock())
+                && 1 === (int) $product->getVisible()
+                && ($productSaleElements->getQuantity() >= $cartItem->getQuantity() || 1 === $product->getVirtual() || !ConfigQuery::checkAvailableStock())
             ) {
                 $item = new CartItem();
                 $item->setCart($cart);
@@ -110,16 +106,13 @@ class Cart extends BaseCart
 
     /**
      * Retrieve the last item added in the cart.
-     *
-     * @return CartItem
      */
-    public function getLastCartItemAdded()
+    public function getLastCartItemAdded(): CartItem
     {
         return CartItemQuery::create()
             ->filterByCartId($this->getId())
             ->orderByCreatedAt(Criteria::DESC)
-            ->findOne()
-        ;
+            ->findOne();
     }
 
     /**
@@ -129,13 +122,9 @@ class Cart extends BaseCart
      *
      * /!\ The postage amount is not available so it's the total with or without discount an without postage
      *
-     * @param bool $withDiscount
-     *
      * @throws PropelException
-     *
-     * @return float
      */
-    public function getTaxedAmount(Country $country, $withDiscount = true, ?State $state = null)
+    public function getTaxedAmount(Country $country, bool $withDiscount = true, ?State $state = null): float
     {
         $total = 0;
 
@@ -155,15 +144,11 @@ class Cart extends BaseCart
     }
 
     /**
-     * @param bool $withDiscount
-     *
      * @throws PropelException
-     *
-     * @return float
      *
      * @see getTaxedAmount same as this method but the amount is without taxes
      */
-    public function getTotalAmount($withDiscount = true, ?Country $country = null, ?State $state = null)
+    public function getTotalAmount(bool $withDiscount = true, ?Country $country = null, ?State $state = null): float
     {
         $total = 0;
 
@@ -185,24 +170,17 @@ class Cart extends BaseCart
     /**
      * Return the VAT of all items.
      *
-     * @param Country $taxCountry
-     * @param bool    $withDiscount
-     *
      * @throws PropelException
-     *
-     * @return float|int|string
      */
-    public function getTotalVAT($taxCountry, $taxState = null, $withDiscount = true)
+    public function getTotalVAT(Country $taxCountry, $taxState = null, bool $withDiscount = true): float|int|string
     {
         return $this->getTaxedAmount($taxCountry, $withDiscount, $taxState) - $this->getTotalAmount($withDiscount, $taxCountry, $taxState);
     }
 
     /**
      * @throws PropelException
-     *
-     * @return float
      */
-    public function getDiscountVAT($taxCountry, $taxState = null)
+    public function getDiscountVAT($taxCountry, $taxState = null): float
     {
         return $this->getDiscount(true, $taxCountry, $taxState) - $this->getDiscount(false, $taxCountry, $taxState);
     }
@@ -211,10 +189,8 @@ class Cart extends BaseCart
      * Retrieve the total weight for all products in cart.
      *
      * @throws PropelException
-     *
-     * @return float
      */
-    public function getWeight()
+    public function getWeight(): float
     {
         $weight = 0;
 
@@ -232,10 +208,8 @@ class Cart extends BaseCart
      * Tell if the cart contains only virtual products.
      *
      * @throws PropelException
-     *
-     * @return bool
      */
-    public function isVirtual()
+    public function isVirtual(): bool
     {
         foreach ($this->getCartItems() as $cartItem) {
             if (0 < $cartItem->getProductSaleElements()->getWeight()) {
@@ -253,24 +227,15 @@ class Cart extends BaseCart
         return $this->getCartItems()->count() > 0;
     }
 
-    /**
-     * @param string $discount
-     *
-     * @return BaseCart|Cart
-     */
-    public function setDiscount($discount)
+    public function setDiscount($discount): self
     {
-        return parent::setDiscount(round($discount, 2));
+        return parent::setDiscount(round((float) $discount, 2));
     }
 
     /**
-     * @param bool $withTaxes
-     *
      * @throws PropelException
-     *
-     * @return float|int|string
      */
-    public function getDiscount($withTaxes = true, ?Country $country = null, ?State $state = null)
+    public function getDiscount(bool $withTaxes = true, ?Country $country = null, ?State $state = null): float|int|string
     {
         if ($withTaxes || !$country instanceof Country) {
             return parent::getDiscount();

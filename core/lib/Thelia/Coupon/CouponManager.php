@@ -34,13 +34,13 @@ use Thelia\Model\Order;
 class CouponManager
 {
     /** @var array Available Coupons (Services) */
-    protected $availableCoupons = [];
+    protected array $availableCoupons = [];
 
     /** @var array Available Conditions (Services) */
-    protected $availableConditions = [];
+    protected array $availableConditions = [];
 
-    /**S
-     * Constructor
+    /** S
+     * Constructor.
      *
      * @param FacadeInterface $facade Service container
      */
@@ -54,8 +54,6 @@ class CouponManager
     /**
      * Get Discount for the given Coupons.
      *
-     * @api
-     *
      * @return float checkout discount
      */
     public function getDiscount(): float
@@ -64,7 +62,7 @@ class CouponManager
 
         $coupons = $this->getCurrentCoupons();
 
-        if ($coupons !== []) {
+        if ([] !== $coupons) {
             $couponsKept = $this->sortCoupons($coupons);
 
             $discount = $this->getEffect($couponsKept);
@@ -87,7 +85,7 @@ class CouponManager
      */
     public function getCurrentCoupons(): array
     {
-        $couponCodes = $this->facade->getRequest()?->getSession()?->getConsumedCoupons();
+        $couponCodes = $this->facade->getRequest()->getSession()->getConsumedCoupons();
 
         if (null === $couponCodes) {
             return [];
@@ -104,7 +102,7 @@ class CouponManager
             } catch (\Exception $ex) {
                 // Just ignore the coupon and log the problem, just in case someone realize it.
                 Tlog::getInstance()->warning(
-                    \sprintf('Coupon %s ignored, exception occurred: %s', $couponCode, $ex->getMessage())
+                    \sprintf('Coupon %s ignored, exception occurred: %s', $couponCode, $ex->getMessage()),
                 );
             }
         }
@@ -126,7 +124,7 @@ class CouponManager
     {
         $coupons = $this->getCurrentCoupons();
 
-        if (\count($coupons) == 0) {
+        if ([] === $coupons) {
             return false;
         }
 
@@ -150,7 +148,7 @@ class CouponManager
 
                     /** @var CouponCountry $couponCountry */
                     foreach ($couponCountries as $couponCountry) {
-                        if ($deliveryCountryId == $couponCountry->getCountryId()) {
+                        if ($deliveryCountryId === $couponCountry->getCountryId()) {
                             $countryValid = true;
                             break;
                         }
@@ -172,7 +170,7 @@ class CouponManager
 
                     /** @var CouponModule $couponModule */
                     foreach ($couponModules as $couponModule) {
-                        if ($shippingModuleId == $couponModule->getModuleId()) {
+                        if ($shippingModuleId === $couponModule->getModuleId()) {
                             $moduleValid = true;
                             break;
                         }
@@ -215,6 +213,7 @@ class CouponManager
                     if (isset($couponsKept[0])) {
                         /** @var CouponInterface $previousCoupon */
                         $previousCoupon = $couponsKept[0];
+
                         if ($previousCoupon->isCumulative()) {
                             // Add Coupon
                             $couponsKept[] = $coupon;
@@ -261,6 +260,7 @@ class CouponManager
     protected function getEffect(array $coupons): float
     {
         $discount = 0.00;
+
         /** @var CouponInterface $coupon */
         foreach ($coupons as $coupon) {
             $discount += $coupon->exec();
@@ -281,10 +281,8 @@ class CouponManager
 
     /**
      * Get all available CouponManagers (Services).
-     *
-     * @return array
      */
-    public function getAvailableCoupons()
+    public function getAvailableCoupons(): array
     {
         return $this->availableCoupons;
     }
@@ -301,10 +299,8 @@ class CouponManager
 
     /**
      * Get all available ConstraintManagers (Services).
-     *
-     * @return array
      */
-    public function getAvailableConditions()
+    public function getAvailableConditions(): array
     {
         return $this->availableConditions;
     }
@@ -332,7 +328,7 @@ class CouponManager
      *
      * @return int Usage left after decremental
      */
-    public function decrementQuantity(Coupon $coupon, $customerId = null): int|float|bool
+    public function decrementQuantity(Coupon $coupon, ?int $customerId = null): int|float|bool
     {
         if ($coupon->isUsageUnlimited()) {
             return true;
@@ -344,31 +340,29 @@ class CouponManager
             if ($usageLeft > 0) {
                 // If the coupon usage is per user, add an entry to coupon customer usage count table
                 if ($coupon->getPerCustomerUsageCount()) {
-                    if (null == $customerId) {
+                    if (null === $customerId) {
                         throw new \LogicException('Customer should not be null at this time.');
                     }
 
                     $ccc = CouponCustomerCountQuery::create()
-                            ->filterByCouponId($coupon->getId())
-                            ->filterByCustomerId($customerId)
-                            ->findOne()
-                    ;
+                        ->filterByCouponId($coupon->getId())
+                        ->filterByCustomerId($customerId)
+                        ->findOne();
 
-                    if ($ccc === null) {
+                    if (null === $ccc) {
                         $ccc = new CouponCustomerCount();
 
                         $ccc
-                                ->setCustomerId($customerId)
-                                ->setCouponId($coupon->getId())
-                                ->setCount(0);
+                            ->setCustomerId($customerId)
+                            ->setCouponId($coupon->getId())
+                            ->setCount(0);
                     }
 
                     $newCount = 1 + $ccc->getCount();
 
                     $ccc
-                            ->setCount($newCount)
-                            ->save()
-                    ;
+                        ->setCount($newCount)
+                        ->save();
 
                     return $usageLeft - $newCount;
                 }
@@ -389,10 +383,8 @@ class CouponManager
 
     /**
      * Add a coupon usage, for the case the related order is canceled.
-     *
-     * @param int $customerId
      */
-    public function incrementQuantity(Coupon $coupon, $customerId = null): int|float|bool
+    public function incrementQuantity(Coupon $coupon, ?int $customerId = null): int|float|bool
     {
         if ($coupon->isUsageUnlimited()) {
             return true;
@@ -403,22 +395,21 @@ class CouponManager
 
             // If the coupon usage is per user, remove an entry from coupon customer usage count table
             if ($coupon->getPerCustomerUsageCount()) {
-                if (null == $customerId) {
+                if (null === $customerId) {
                     throw new \LogicException('Customer should not be null at this time.');
                 }
 
                 $ccc = CouponCustomerCountQuery::create()
-                        ->filterByCouponId($coupon->getId())
-                        ->filterByCustomerId($customerId)
-                        ->findOne()
-                ;
+                    ->filterByCouponId($coupon->getId())
+                    ->filterByCustomerId($customerId)
+                    ->findOne();
 
-                if ($ccc !== null && $ccc->getCount() > 0) {
+                if (null !== $ccc && $ccc->getCount() > 0) {
                     $newCount = $ccc->getCount() - 1;
 
                     $ccc
-                            ->setCount($newCount)
-                            ->save();
+                        ->setCount($newCount)
+                        ->save();
 
                     return $usageLeft - $newCount;
                 }

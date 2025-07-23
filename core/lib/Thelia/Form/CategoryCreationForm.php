@@ -34,7 +34,7 @@ class CategoryCreationForm extends BaseForm
                     'label_attr' => [
                         'help' => $titleHelpText,
                     ],
-                ]
+                ],
             )
             ->add(
                 'parent',
@@ -45,14 +45,14 @@ class CategoryCreationForm extends BaseForm
                     'label_attr' => [
                         'help' => $this->translator->trans('Select the parent category of this category.'),
                     ],
-                ]
+                ],
             )
             ->add(
                 'locale',
                 HiddenType::class,
                 [
                     'constraints' => [new NotBlank()],
-                ]
+                ],
             )
             ->add(
                 'visible',
@@ -60,9 +60,8 @@ class CategoryCreationForm extends BaseForm
                 [
                     'required' => false,
                     'label' => $this->translator->trans('This category is online'),
-                ]
-            )
-        ;
+                ],
+            );
     }
 
     protected function buildForm(): void
@@ -70,8 +69,8 @@ class CategoryCreationForm extends BaseForm
         $this->doBuilForm(
             $this->translator->trans(
                 'Enter here the category title in the default language (%title%)',
-                ['%title%' => Lang::getDefaultLanguage()->getTitle()]
-            )
+                ['%title%' => Lang::getDefaultLanguage()->getTitle()],
+            ),
         );
     }
 

@@ -45,44 +45,43 @@ class ExportCommand extends ContainerAwareCommand
             ->addArgument(
                 'ref',
                 InputArgument::OPTIONAL,
-                'Export reference.'
+                'Export reference.',
             )
             ->addArgument(
                 'serializer',
                 InputArgument::OPTIONAL,
-                'Serializer identifier.'
+                'Serializer identifier.',
             )
             ->addArgument(
                 'archiver',
                 InputArgument::OPTIONAL,
-                'Archiver identifier.'
+                'Archiver identifier.',
             )
             ->addOption(
                 'locale',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Locale for export',
-                'en_US'
+                'en_US',
             )
             ->addOption(
                 'list-export',
                 null,
                 InputOption::VALUE_NONE,
-                'List available exports and exit.'
+                'List available exports and exit.',
             )
             ->addOption(
                 'list-serializer',
                 null,
                 InputOption::VALUE_NONE,
-                'List available serializers and exit.'
+                'List available serializers and exit.',
             )
             ->addOption(
                 'list-archiver',
                 null,
                 InputOption::VALUE_NONE,
-                'List available archivers and exit.'
-            )
-        ;
+                'List available archivers and exit.',
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -107,26 +106,25 @@ class ExportCommand extends ContainerAwareCommand
 
         $exportRef = $input->getArgument('ref');
         $serializer = $input->getArgument('serializer');
-        if ($exportRef === null || $serializer === null) {
-            throw new \RuntimeException(
-                'Not enough arguments.'.\PHP_EOL.'If no options are provided, ref and serializer arguments are required.'
-            );
+
+        if (null === $exportRef || null === $serializer) {
+            throw new \RuntimeException('Not enough arguments.'.\PHP_EOL.'If no options are provided, ref and serializer arguments are required.');
         }
 
         /** @var ExportHandler $exportHandler */
         $exportHandler = $this->getContainer()->get('thelia.export.handler');
 
         $export = $exportHandler->getExportByRef($exportRef);
-        if ($export === null) {
-            throw new \RuntimeException(
-                $exportRef." export doesn't exist."
-            );
+
+        if (null === $export) {
+            throw new \RuntimeException($exportRef." export doesn't exist.");
         }
 
         $serializerManager = $this->getContainer()->get(RegisterSerializerPass::MANAGER_SERVICE_ID);
         $serializer = $serializerManager->get($serializer);
 
         $archiver = null;
+
         if ($input->getArgument('archiver')) {
             /** @var ArchiverManager $archiverManager */
             $archiverManager = $this->getContainer()->get(RegisterArchiverPass::MANAGER_SERVICE_ID);
@@ -137,13 +135,13 @@ class ExportCommand extends ContainerAwareCommand
             $export,
             $serializer,
             $archiver,
-            (new LangQuery())->findOneByLocale($input->getOption('locale'))
+            (new LangQuery())->findOneByLocale($input->getOption('locale')),
         );
 
         $formattedLine = $this->getHelper('formatter')->formatBlock(
             'Export finish',
             'fg=black;bg=green',
-            true
+            true,
         );
         $output->writeln($formattedLine);
         $output->writeln('<info>Export available at path:</info>');
@@ -175,8 +173,7 @@ class ExportCommand extends ContainerAwareCommand
                 'Title',
                 'Description',
             ])
-            ->render()
-        ;
+            ->render();
     }
 
     /**
@@ -208,8 +205,7 @@ class ExportCommand extends ContainerAwareCommand
                 'Extension',
                 'MIME type',
             ])
-            ->render()
-        ;
+            ->render();
     }
 
     /**
@@ -241,7 +237,6 @@ class ExportCommand extends ContainerAwareCommand
                 'Extension',
                 'MIME type',
             ])
-            ->render()
-        ;
+            ->render();
     }
 }

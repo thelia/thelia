@@ -45,28 +45,28 @@ class BrandCreationForm extends BaseForm
                 'attr' => [
                     'placeholder' => Translator::getInstance()->trans('The brand name or title'),
                 ],
-            ]
+            ],
         )
-        ->add(
-            'locale',
-            HiddenType::class,
-            [
-                'constraints' => [new NotBlank()],
-                'required' => true,
-            ]
-        )
-        // Is this brand online ?
-        ->add(
-            'visible',
-            CheckboxType::class,
-            [
-                'required' => false,
-                'label' => Translator::getInstance()->trans('This brand is online'),
-                'label_attr' => [
-                    'for' => 'visible_create',
+            ->add(
+                'locale',
+                HiddenType::class,
+                [
+                    'constraints' => [new NotBlank()],
+                    'required' => true,
                 ],
-            ]
-        );
+            )
+        // Is this brand online ?
+            ->add(
+                'visible',
+                CheckboxType::class,
+                [
+                    'required' => false,
+                    'label' => Translator::getInstance()->trans('This brand is online'),
+                    'label_attr' => [
+                        'for' => 'visible_create',
+                    ],
+                ],
+            );
     }
 
     protected function buildForm(): void
@@ -74,8 +74,8 @@ class BrandCreationForm extends BaseForm
         $this->doBuilForm(
             Translator::getInstance()->trans(
                 'Enter here the brand name in the default language (%title%)',
-                ['%title%' => Lang::getDefaultLanguage()->getTitle()]
-            )
+                ['%title%' => Lang::getDefaultLanguage()->getTitle()],
+            ),
         );
     }
 

@@ -33,16 +33,10 @@ use Thelia\Tools\Version\Version;
 #[AsCommand(name: 'generate:sql', description: 'Generate SQL files (insert.sql, update*.sql)')]
 class GenerateSQLCommand extends ContainerAwareCommand
 {
-    /** @var Translator */
-    protected $translator;
-
+    protected Translator $translator;
     protected $parser;
-
-    /** @var \PDO */
-    protected $con;
-
-    /** @var array */
-    protected $locales;
+    protected \PDO $con;
+    protected array $locales;
 
     protected function configure(): void
     {
@@ -51,7 +45,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
                 'locales',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'generate only for only specific locales (separated by a ,) : fr_FR,es_ES or es_ES'
+                'generate only for only specific locales (separated by a ,) : fr_FR,es_ES or es_ES',
             );
     }
 
@@ -129,24 +123,19 @@ class GenerateSQLCommand extends ContainerAwareCommand
             $locale = $file->getBasename('.php');
             $availableLocales[] = $locale;
 
-            if ($localesToKeep === null || $localesToKeep === [] || \in_array($locale, $localesToKeep)) {
+            if (null === $localesToKeep || [] === $localesToKeep || \in_array($locale, $localesToKeep, true)) {
                 $this->locales[] = $locale;
                 $this->translator->addResource(
                     'php',
                     $file->getRealPath(),
                     $locale,
-                    'install'
+                    'install',
                 );
             }
         }
 
-        if ($this->locales === null || $this->locales === []) {
-            throw new \RuntimeException(
-                \sprintf(
-                    'You should at least generate sql for one locale. Available locales : %s',
-                    implode(', ', $availableLocales)
-                )
-            );
+        if (null === $this->locales || [] === $this->locales) {
+            throw new \RuntimeException(\sprintf('You should at least generate sql for one locale. Available locales : %s', implode(', ', $availableLocales)));
         }
     }
 
@@ -172,10 +161,8 @@ class GenerateSQLCommand extends ContainerAwareCommand
      * - `locale`: the locale. eg.: fr_FR
      * - `in_string`: set to 1 not add simple quote around the string. (default = 0)
      * - `use_default`: set to 1 to use the `l` string as a fallback. (default = 0)
-     *
-     * @return string
      */
-    public function translate($params, $smarty)
+    public function translate($params, $smarty): string
     {
         $translation = '';
 
@@ -195,13 +182,14 @@ class GenerateSQLCommand extends ContainerAwareCommand
             [],
             'install',
             $params['locale'],
-            $useDefault
+            $useDefault,
         );
 
-        if (empty($translation)) {
+        if ('' === $translation || '0' === $translation) {
             $translation = ($inString) ? '' : 'NULL';
         } else {
             $translation = $this->con->quote($translation);
+
             // remove quote
             if ($inString) {
                 $translation = substr($translation, 1, -1);

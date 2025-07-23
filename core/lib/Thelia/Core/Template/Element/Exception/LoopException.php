@@ -17,18 +17,14 @@ namespace Thelia\Core\Template\Element\Exception;
 class LoopException extends \RuntimeException
 {
     public const UNKNOWN_EXCEPTION = 0;
-
     public const NOT_TIMESTAMPED = 100;
-
     public const NOT_VERSIONED = 101;
-
     public const MULTIPLE_SEARCH_INTERFACE = 400;
-
     public const SEARCH_INTERFACE_NOT_FOUND = 404;
 
     public function __construct($message, $code = null, $previous = null)
     {
-        if ($code === null) {
+        if (null === $code) {
             $code = self::UNKNOWN_EXCEPTION;
         }
 

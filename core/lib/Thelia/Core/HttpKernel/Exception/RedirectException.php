@@ -31,10 +31,7 @@ class RedirectException extends \RuntimeException
         return $this->url;
     }
 
-    /**
-     * @return int
-     */
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         return $this->statusCode;
     }

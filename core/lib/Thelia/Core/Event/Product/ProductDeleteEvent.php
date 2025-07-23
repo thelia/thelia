@@ -23,10 +23,7 @@ class ProductDeleteEvent extends ProductEvent
     {
     }
 
-    /**
-     * @return int
-     */
-    public function getProductId()
+    public function getProductId(): int
     {
         return $this->product_id;
     }

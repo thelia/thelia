@@ -37,7 +37,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     {
         return new TemplateDefinition(
             ConfigQuery::read('active-mail-template', 'default'),
-            TemplateDefinition::EMAIL
+            TemplateDefinition::EMAIL,
         );
     }
 
@@ -75,7 +75,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     {
         return new TemplateDefinition(
             ConfigQuery::read('active-pdf-template', 'default'),
-            TemplateDefinition::PDF
+            TemplateDefinition::PDF,
         );
     }
 
@@ -86,7 +86,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     {
         return new TemplateDefinition(
             ConfigQuery::read('active-admin-template', 'default'),
-            TemplateDefinition::BACK_OFFICE
+            TemplateDefinition::BACK_OFFICE,
         );
     }
 
@@ -97,7 +97,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     {
         return new TemplateDefinition(
             ConfigQuery::read('active-front-template', 'default'),
-            TemplateDefinition::FRONT_OFFICE
+            TemplateDefinition::FRONT_OFFICE,
         );
     }
 
@@ -164,8 +164,8 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
         if (
             (null === $config = ConfigQuery::create()->findPk($event->getConfigId()))
             || ($config->getValue() === $event->getValue())
-            || ($config->getName() !== TemplateDefinition::BACK_OFFICE_CONFIG_NAME
-             && $config->getName() !== TemplateDefinition::FRONT_OFFICE_CONFIG_NAME)
+            || (TemplateDefinition::BACK_OFFICE_CONFIG_NAME !== $config->getName()
+             && TemplateDefinition::FRONT_OFFICE_CONFIG_NAME !== $config->getName())
         ) {
             return;
         }
@@ -177,6 +177,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     public function enableThemeAsBundle(string $path): void
     {
         $bundleName = $this->composerHelper->findFirstClassBundle($path);
+
         if (null === $bundleName) {
             return;
         }
@@ -192,11 +193,13 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
         $envFilePath = THELIA_ROOT.'.env.local';
 
         $envContent = '';
+
         if (file_exists($envFilePath)) {
             $envContent = file_get_contents($envFilePath);
         }
 
         $pattern = '/^'.preg_quote($envName, '/').'=.*$/m';
+
         if (preg_match($pattern, $envContent)) {
             $envContent = preg_replace($pattern, $envName.'='.$name, $envContent);
             file_put_contents($envFilePath, $envContent);
@@ -219,7 +222,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
         $newSection = \sprintf(
             "\n\n###> thelia/templates ###\n%s=%s\n###< thelia/templates ###\n",
             $envName,
-            $name
+            $name,
         );
         file_put_contents($envFilePath, $newSection, \FILE_APPEND);
     }

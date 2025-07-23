@@ -23,8 +23,6 @@ interface PropelSearchLoopInterface
 {
     /**
      * this method returns a Propel ModelCriteria.
-     *
-     * @return ModelCriteria
      */
-    public function buildModelCriteria();
+    public function buildModelCriteria(): ModelCriteria;
 }

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -68,7 +69,6 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
     use StandardI18nFieldsSearchTrait;
 
     protected $timestampable = true;
-
     protected $versionable = true;
 
     protected function getArgDefinitions(): ArgumentCollection
@@ -99,36 +99,30 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
                         'created', 'created_reverse',
                         'updated', 'updated_reverse',
                         'random',
-                    ])
+                    ]),
                 ),
-                'manual'
+                'manual',
             ),
-            Argument::createIntListTypeArgument('exclude')
+            Argument::createIntListTypeArgument('exclude'),
         );
     }
 
     /**
      * @return array of available field to search in
      */
-    public function getSearchIn()
+    public function getSearchIn(): array
     {
         return $this->getStandardI18nSearchFields();
     }
 
-    /**
-     * @param CategoryQuery $search
-     * @param string        $searchTerm
-     * @param array         $searchIn
-     * @param string        $searchCriteria
-     */
-    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria): void
+    public function doSearch(ModelCriteria $search, string $searchTerm, array $searchIn, string $searchCriteria): void
     {
         $search->_and();
 
         $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria, $searchIn);
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = CategoryQuery::create();
 
@@ -158,9 +152,9 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
 
         $current = $this->getCurrent();
 
-        if ($current === true) {
+        if (true === $current) {
             $search->filterById($this->getCurrentRequest()->get('category_id'));
-        } elseif ($current === false) {
+        } elseif (false === $current) {
             $search->filterById($this->getCurrentRequest()->get('category_id'), Criteria::NOT_IN);
         }
 
@@ -172,37 +166,36 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
 
         $visible = $this->getVisible();
 
-        if ($visible !== BooleanOrBothType::ANY) {
+        if (BooleanOrBothType::ANY !== $visible) {
             $search->filterByVisible($visible ? 1 : 0);
         }
 
         $products = $this->getProduct();
 
-        if ($products != null) {
+        if (null !== $products) {
             $obj = ProductQuery::create()->findPks($products);
 
-            if ($obj != null) {
+            if (null !== $obj) {
                 $search->filterByProduct($obj, Criteria::IN);
             }
         }
 
         $excludeProducts = $this->getExcludeProduct();
 
-        if ($excludeProducts != null) {
+        if (null !== $excludeProducts) {
             $obj = ProductQuery::create()->findPks($excludeProducts);
 
-            if ($obj != null) {
+            if (null !== $obj) {
                 $search->filterByProduct($obj, Criteria::NOT_IN);
             }
         }
 
         $contentId = $this->getContent();
 
-        if ($contentId != null) {
+        if (null !== $contentId) {
             $search->useCategoryAssociatedContentQuery()
                 ->filterByContentId($contentId, Criteria::IN)
-                ->endUse()
-            ;
+                ->endUse();
         }
 
         $templateIdList = $this->getTemplateId();
@@ -331,10 +324,10 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
                     ->findOne();
 
                 $loopResultRow
-                    ->set('HAS_PREVIOUS', $previous != null ? 1 : 0)
-                    ->set('HAS_NEXT', $next != null ? 1 : 0)
-                    ->set('PREVIOUS', $previous != null ? $previous->getId() : -1)
-                    ->set('NEXT', $next != null ? $next->getId() : -1);
+                    ->set('HAS_PREVIOUS', null !== $previous ? 1 : 0)
+                    ->set('HAS_NEXT', null !== $next ? 1 : 0)
+                    ->set('PREVIOUS', null !== $previous ? $previous->getId() : -1)
+                    ->set('NEXT', null !== $next ? $next->getId() : -1);
             }
 
             $this->addOutputFields($loopResultRow, $category);

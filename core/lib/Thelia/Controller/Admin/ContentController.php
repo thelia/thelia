@@ -18,12 +18,12 @@ use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Content\ContentAddFolderEvent;
 use Thelia\Core\Event\Content\ContentCreateEvent;
 use Thelia\Core\Event\Content\ContentDeleteEvent;
-use Thelia\Core\Event\Content\ContentEvent;
 use Thelia\Core\Event\Content\ContentRemoveFolderEvent;
 use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
@@ -57,7 +57,7 @@ class ContentController extends AbstractSeoCrudController
             TheliaEvents::CONTENT_DELETE,
             TheliaEvents::CONTENT_TOGGLE_VISIBILITY,
             TheliaEvents::CONTENT_UPDATE_POSITION,
-            TheliaEvents::CONTENT_UPDATE_SEO
+            TheliaEvents::CONTENT_UPDATE_SEO,
         );
     }
 
@@ -78,7 +78,7 @@ class ContentController extends AbstractSeoCrudController
         if ($folder_id > 0) {
             $event = new ContentAddFolderEvent(
                 $this->getExistingObject(),
-                $folder_id
+                $folder_id,
             );
 
             try {
@@ -108,7 +108,7 @@ class ContentController extends AbstractSeoCrudController
         if ($folder_id > 0) {
             $event = new ContentRemoveFolderEvent(
                 $this->getExistingObject(),
-                $folder_id
+                $folder_id,
             );
 
             try {
@@ -175,8 +175,7 @@ class ContentController extends AbstractSeoCrudController
             ->setLocale($formData['locale'])
             ->setDefaultFolder($formData['default_folder'])
             ->setTitle($formData['title'])
-            ->setVisible($formData['visible'])
-        ;
+            ->setVisible($formData['visible']);
 
         return $contentCreateEvent;
     }
@@ -210,10 +209,8 @@ class ContentController extends AbstractSeoCrudController
 
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
-     *
-     * @param ContentEvent $event
      */
-    protected function eventContainsObject($event): bool
+    protected function eventContainsObject(Event $event): bool
     {
         return $event->hasContent();
     }
@@ -286,12 +283,7 @@ class ContentController extends AbstractSeoCrudController
         return $folderId ?: 0;
     }
 
-    /**
-     * Render the main list template.
-     *
-     * @param int $currentOrder , if any, null otherwise
-     */
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         $this->getListOrderFromSession('content', 'content_order', 'manual');
 
@@ -300,7 +292,7 @@ class ContentController extends AbstractSeoCrudController
             [
                 'content_order' => $currentOrder,
                 'parent' => $this->getFolderId(),
-            ]
+            ],
         );
     }
 
@@ -329,7 +321,7 @@ class ContentController extends AbstractSeoCrudController
         return $this->generateRedirectFromRoute(
             'admin.content.update',
             [],
-            $this->getEditionArguments()
+            $this->getEditionArguments(),
         );
     }
 
@@ -340,7 +332,7 @@ class ContentController extends AbstractSeoCrudController
     {
         return $this->generateRedirectFromRoute(
             'admin.content.default',
-            ['parent' => $this->getFolderId()]
+            ['parent' => $this->getFolderId()],
         );
     }
 
@@ -349,10 +341,10 @@ class ContentController extends AbstractSeoCrudController
      */
     protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): ?Response
     {
-        if ($this->getRequest()->get('save_mode') != 'stay') {
+        if ('stay' !== $this->getRequest()->get('save_mode')) {
             return $this->generateRedirectFromRoute(
                 'admin.folders.default',
-                ['parent' => $this->getFolderId()]
+                ['parent' => $this->getFolderId()],
             );
         }
 
@@ -370,7 +362,7 @@ class ContentController extends AbstractSeoCrudController
     {
         return $this->generateRedirectFromRoute(
             'admin.folders.default',
-            ['parent' => $deleteEvent->getDefaultFolderId()]
+            ['parent' => $deleteEvent->getDefaultFolderId()],
         );
     }
 
@@ -383,7 +375,7 @@ class ContentController extends AbstractSeoCrudController
             // Redirect to parent category list
             return $this->generateRedirectFromRoute(
                 'admin.folders.default',
-                ['parent' => $positionChangeEvent->getReferrerId()]
+                ['parent' => $positionChangeEvent->getReferrerId()],
             );
         }
 
@@ -399,7 +391,7 @@ class ContentController extends AbstractSeoCrudController
             $this->getRequest()->get('content_id'),
             $positionChangeMode,
             $positionValue,
-            $this->getRequest()->get('folder_id')
+            $this->getRequest()->get('folder_id'),
         );
     }
 

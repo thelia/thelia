@@ -130,7 +130,7 @@ class AddressCreateForm extends FirewallForm
                 'constraints' => [
                     new NotBlank(),
                     new Callback(
-                        $this->verifyCity(...)
+                        $this->verifyCity(...),
                     ),
                 ],
                 'label' => Translator::getInstance()->trans('City'),
@@ -142,7 +142,7 @@ class AddressCreateForm extends FirewallForm
                 'constraints' => [
                     new NotBlank(),
                     new Callback(
-                        $this->verifyZipCode(...)
+                        $this->verifyZipCode(...),
                     ),
                 ],
                 'label' => Translator::getInstance()->trans('Zip code'),
@@ -167,7 +167,7 @@ class AddressCreateForm extends FirewallForm
                 'required' => false,
                 'constraints' => [
                     new Callback(
-                        $this->verifyState(...)
+                        $this->verifyState(...),
                     ),
                 ],
                 'choices' => $this->getStatesChoices(),
@@ -226,6 +226,7 @@ class AddressCreateForm extends FirewallForm
             ->find();
 
         $statesChoices = [];
+
         foreach ($states as $state) {
             $statesChoices[$state->getVirtualColumn('title')] = $state->getId();
         }

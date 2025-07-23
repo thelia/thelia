@@ -31,7 +31,7 @@ interface AssetManagerInterface
      * @internal param string $web_assets_directory_base the base directory of the web based asset directory
      * @internal param string $key the assets key : module name or 0 for base template
      */
-    public function prepareAssets($sourceAssetsDirectory, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey);
+    public function prepareAssets(string $sourceAssetsDirectory, string $webAssetsDirectoryBase, $webAssetsTemplate, string $webAssetsKey);
 
     /**
      * Generates assets from $asset_path in $output_path, using $filters.
@@ -57,7 +57,8 @@ interface AssetManagerInterface
         string $outputUrl,
         string $assetType,
         array|string $filters,
-        bool $debug): string;
+        bool $debug,
+    ): string;
 
     /**
      * @return bool true if the AssetManager was started in debug mode

@@ -16,7 +16,6 @@ namespace Thelia\Model;
 
 use Exception;
 use Propel\Runtime\Propel;
-use Propel\Runtime\Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Model\Base\Coupon as BaseCoupon;
 use Thelia\Model\Map\CouponTableMap;
 
@@ -35,44 +34,44 @@ class Coupon extends BaseCoupon
     /**
      * Create or Update this Coupon.
      *
-     * @param string   $code                       Coupon Code
-     * @param string   $title                      Coupon title
-     * @param array    $effects                    Ready to be serialized in JSON effect params
-     * @param string   $type                       Coupon type
-     * @param bool     $isRemovingPostage          Is removing Postage
-     * @param string   $shortDescription           Coupon short description
-     * @param string   $description                Coupon description
-     * @param bool     $isEnabled                  Enable/Disable
-     * @param DateTime $expirationDate             Coupon expiration date
-     * @param bool     $isAvailableOnSpecialOffers Is available on special offers
-     * @param bool     $isCumulative               Is cumulative
-     * @param int      $maxUsage                   Coupon quantity
-     * @param string   $defaultSerializedRule      Serialized default rule added if none found
-     * @param string   $locale                     Coupon Language code ISO (ex: fr_FR)
-     * @param array    $freeShippingForCountries   ID of Countries to which shipping is free
-     * @param array    $freeShippingForMethods     ID of Shipping modules for which shipping is free
-     * @param bool     $perCustomerUsageCount      True if usage coiunt is per customer
+     * @param string    $code                       Coupon Code
+     * @param string    $title                      Coupon title
+     * @param array     $effects                    Ready to be serialized in JSON effect params
+     * @param string    $type                       Coupon type
+     * @param bool      $isRemovingPostage          Is removing Postage
+     * @param string    $shortDescription           Coupon short description
+     * @param string    $description                Coupon description
+     * @param bool      $isEnabled                  Enable/Disable
+     * @param \DateTime $expirationDate             Coupon expiration date
+     * @param bool      $isAvailableOnSpecialOffers Is available on special offers
+     * @param bool      $isCumulative               Is cumulative
+     * @param int       $maxUsage                   Coupon quantity
+     * @param string    $defaultSerializedRule      Serialized default rule added if none found
+     * @param string    $locale                     Coupon Language code ISO (ex: fr_FR)
+     * @param array     $freeShippingForCountries   ID of Countries to which shipping is free
+     * @param array     $freeShippingForMethods     ID of Shipping modules for which shipping is free
+     * @param bool      $perCustomerUsageCount      True if usage coiunt is per customer
      *
      * @throws \Exception
      */
     public function createOrUpdate(
-        $code,
-        $title,
+        string $code,
+        string $title,
         array $effects,
-        $type,
-        $isRemovingPostage,
-        $shortDescription,
-        $description,
-        $isEnabled,
-        $expirationDate,
-        $isAvailableOnSpecialOffers,
-        $isCumulative,
-        $maxUsage,
-        $defaultSerializedRule,
-        $locale,
-        $freeShippingForCountries,
-        $freeShippingForMethods,
-        $perCustomerUsageCount,
+        string $type,
+        bool $isRemovingPostage,
+        ?string $shortDescription,
+        ?string $description,
+        bool $isEnabled,
+        \DateTime $expirationDate,
+        bool $isAvailableOnSpecialOffers,
+        bool $isCumulative,
+        int $maxUsage,
+        string $defaultSerializedRule,
+        string $locale,
+        array $freeShippingForCountries,
+        array $freeShippingForMethods,
+        bool $perCustomerUsageCount,
         $startDate = null,
     ): void {
         $con = Propel::getWriteConnection(CouponTableMap::DATABASE_NAME);
@@ -95,8 +94,7 @@ class Coupon extends BaseCoupon
                 ->setLocale($locale)
                 ->setTitle($title)
                 ->setShortDescription($shortDescription)
-                ->setDescription($description)
-            ;
+                ->setDescription($description);
 
             // If no rule given, set default rule
             if (null === $this->getSerializedConditions()) {
@@ -132,8 +130,7 @@ class Coupon extends BaseCoupon
                 $couponModule
                     ->setCouponId($this->getId())
                     ->setModuleId($moduleId)
-                    ->save()
-                ;
+                    ->save();
             }
 
             $con->commit();
@@ -152,7 +149,7 @@ class Coupon extends BaseCoupon
      *
      * @throws \Exception
      */
-    public function createOrUpdateConditions($serializableConditions, $locale): void
+    public function createOrUpdateConditions(string $serializableConditions, string $locale): void
     {
         $this->setSerializedConditions($serializableConditions);
 
@@ -171,7 +168,7 @@ class Coupon extends BaseCoupon
      *
      * @return $this
      */
-    public function setAmount($amount)
+    public function setAmount(float $amount)
     {
         $effects = $this->unserializeEffects($this->getSerializedEffects());
         $effects['amount'] = (float) $amount;
@@ -182,10 +179,8 @@ class Coupon extends BaseCoupon
 
     /**
      * Get the amount removed from the coupon to the cart.
-     *
-     * @return float
      */
-    public function getAmount()
+    public function getAmount(): float
     {
         // Amount is now optional
         $amount = $this->getEffects()['amount'] ?? 0;
@@ -197,10 +192,8 @@ class Coupon extends BaseCoupon
      * Get the Coupon effects.
      *
      * @throws Exception\InvalidArgumentException
-     *
-     * @return array
      */
-    public function getEffects()
+    public function getEffects(): array
     {
         return $this->unserializeEffects($this->getSerializedEffects());
     }
@@ -210,9 +203,9 @@ class Coupon extends BaseCoupon
      *
      * @param array $effects Effect ready to be serialized
      *
-     * @throws Exception\InvalidArgumentException
-     *
      * @return $this
+     *
+     * @throws Exception\InvalidArgumentException
      */
     public function setEffects(array $effects)
     {
@@ -225,10 +218,8 @@ class Coupon extends BaseCoupon
      * Return unserialized effects.
      *
      * @param string $serializedEffects Serialized effect string to unserialize
-     *
-     * @return array
      */
-    public function unserializeEffects($serializedEffects)
+    public function unserializeEffects(string $serializedEffects): array
     {
         return json_decode($serializedEffects, true);
     }
@@ -237,37 +228,31 @@ class Coupon extends BaseCoupon
      * Return serialized effects.
      *
      * @param array $unserializedEffects Unserialized array string to serialize
-     *
-     * @return string
      */
-    public function serializeEffects(array $unserializedEffects)
+    public function serializeEffects(array $unserializedEffects): string
     {
         return json_encode($unserializedEffects);
     }
 
     /**
      * Return the countries for which free shipping is valid.
-     *
-     * @return array|mixed|ObjectCollection
      */
-    public function getFreeShippingForCountries()
+    public function getFreeShippingForCountries(): mixed
     {
         return CouponCountryQuery::create()->filterByCouponId($this->getId())->find();
     }
 
     /**
      * Return the modules for which free shipping is valid.
-     *
-     * @return array|mixed|ObjectCollection
      */
-    public function getFreeShippingForModules()
+    public function getFreeShippingForModules(): mixed
     {
         return CouponModuleQuery::create()->filterByCouponId($this->getId())->find();
     }
 
     public function isUsageUnlimited()
     {
-        return $this->getMaxUsage() == self::UNLIMITED_COUPON_USE;
+        return self::UNLIMITED_COUPON_USE === $this->getMaxUsage();
     }
 
     /**
@@ -277,16 +262,16 @@ class Coupon extends BaseCoupon
      *
      * @return int the usage left
      */
-    public function getUsagesLeft($customerId = null)
+    public function getUsagesLeft(?int $customerId = null): int
     {
         $usageLeft = $this->getMaxUsage();
 
         // Get usage left for current customer. If the record is not found,
         // it means that the customer has not yes used this coupon.
         if ($this->getPerCustomerUsageCount() && null !== $couponCustomerCount = CouponCustomerCountQuery::create()
-                ->filterByCouponId($this->getId())
-                ->filterByCustomerId($customerId)
-                ->findOne()) {
+            ->filterByCouponId($this->getId())
+            ->filterByCustomerId($customerId)
+            ->findOne()) {
             // The coupon has already been used -> remove this customer's usage count
             $usageLeft -= $couponCustomerCount->getCount();
         }

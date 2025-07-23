@@ -27,11 +27,10 @@ class AttributeModificationForm extends AttributeCreationForm
             ->add('id', HiddenType::class, [
                 'constraints' => [
                     new GreaterThan(
-                        ['value' => 0]
+                        ['value' => 0],
                     ),
                 ],
-            ])
-        ;
+            ]);
 
         // Add standard description fields
         $this->addStandardDescFields();

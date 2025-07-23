@@ -32,15 +32,13 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
 
     /**
      * Calculate next position relative to our parent.
-     *
-     * @param BrandImageQuery $query
      */
-    protected function addCriteriaToPositionQuery($query): void
+    protected function addCriteriaToPositionQuery(BrandImageQuery $query): void
     {
         $query->filterByBrandId($this->getBrandId());
     }
 
-    public function preInsert(?ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): bool
     {
         parent::preInsert($con);
 
@@ -49,27 +47,27 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
         return true;
     }
 
-    public function preDelete(?ConnectionInterface $con = null)
+    public function preDelete(?ConnectionInterface $con = null): bool
     {
         parent::preDelete($con);
 
         $this->reorderBeforeDelete(
             [
                 'brand_id' => $this->getBrandId(),
-            ]
+            ],
         );
 
         return true;
     }
 
-    public function setParentId($parentId)
+    public function setParentId($parentId): static
     {
         $this->setBrandId($parentId);
 
         return $this;
     }
 
-    public function getParentId()
+    public function getParentId(): int
     {
         return $this->getBrandId();
     }
@@ -77,7 +75,7 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
     /**
      * @return FileModelParentInterface the parent file model
      */
-    public function getParentFileModel()
+    public function getParentFileModel(): FileModelParentInterface
     {
         return new Brand();
     }
@@ -87,7 +85,7 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
      *
      * @return BaseForm the form
      */
-    public function getUpdateFormId()
+    public function getUpdateFormId(): string
     {
         return AdminForm::BRAND_IMAGE_MODIFICATION;
     }
@@ -95,10 +93,10 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
     /**
      * @return string the path to the upload directory where files are stored, without final slash
      */
-    public function getUploadDir()
+    public function getUploadDir(): string
     {
         $uploadDir = ConfigQuery::read('images_library_path');
-        $uploadDir = $uploadDir === null ? THELIA_LOCAL_DIR.'media'.DS.'images' : THELIA_ROOT.$uploadDir;
+        $uploadDir = null === $uploadDir ? THELIA_LOCAL_DIR.'media'.DS.'images' : THELIA_ROOT.$uploadDir;
 
         return $uploadDir.DS.'brand';
     }
@@ -106,18 +104,21 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
     /**
      * @return string the URL to redirect to after update from the back-office
      */
-    public function getRedirectionUrl()
+    public function getRedirectionUrl(): string
     {
         return '/admin/brand/update/'.$this->getBrandId();
     }
 
     /**
      * Get the Query instance for this object.
-     *
-     * @return ModelCriteria
      */
-    public function getQueryInstance()
+    public function getQueryInstance(): ModelCriteria
     {
         return BrandImageQuery::create();
+    }
+
+    public function getFile(): string
+    {
+        return parent::getFile();
     }
 }

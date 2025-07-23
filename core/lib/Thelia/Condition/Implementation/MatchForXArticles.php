@@ -53,10 +53,7 @@ class MatchForXArticles extends ConditionAbstract
         $this->checkComparisonOperatorValue($operators, self::CART_QUANTITY);
 
         if ((int) $values[self::CART_QUANTITY] <= 0) {
-            throw new InvalidConditionValueException(
-                self::class,
-                'quantity'
-            );
+            throw new InvalidConditionValueException(self::class, 'quantity');
         }
 
         $this->operators = [
@@ -70,12 +67,12 @@ class MatchForXArticles extends ConditionAbstract
         return $this;
     }
 
-    public function isMatching()
+    public function isMatching(): bool
     {
         return $this->conditionValidator->variableOpComparison(
             $this->facade->getNbArticlesInCart(),
             $this->operators[self::CART_QUANTITY],
-            $this->values[self::CART_QUANTITY]
+            $this->values[self::CART_QUANTITY],
         );
     }
 
@@ -83,7 +80,7 @@ class MatchForXArticles extends ConditionAbstract
     {
         return $this->translator->trans(
             'Cart item count',
-            []
+            [],
         );
     }
 
@@ -91,7 +88,7 @@ class MatchForXArticles extends ConditionAbstract
     {
         return $this->translator->trans(
             'The cart item count should match the condition',
-            []
+            [],
         );
     }
 
@@ -99,7 +96,7 @@ class MatchForXArticles extends ConditionAbstract
     {
         $i18nOperator = Operators::getI18n(
             $this->translator,
-            $this->operators[self::CART_QUANTITY]
+            $this->operators[self::CART_QUANTITY],
         );
 
         return $this->translator->trans(
@@ -107,7 +104,7 @@ class MatchForXArticles extends ConditionAbstract
             [
                 '%operator%' => $i18nOperator,
                 '%quantity%' => $this->values[self::CART_QUANTITY],
-            ]
+            ],
         );
     }
 
@@ -122,7 +119,7 @@ class MatchForXArticles extends ConditionAbstract
         ];
     }
 
-    public function drawBackOfficeInputs()
+    public function drawBackOfficeInputs(): string
     {
         $labelQuantity = $this->facade
             ->getTranslator()
@@ -131,7 +128,7 @@ class MatchForXArticles extends ConditionAbstract
         return $this->drawBackOfficeBaseInputsText($labelQuantity, self::CART_QUANTITY);
     }
 
-    protected function drawBackOfficeBaseInputsText($label, $inputKey)
+    protected function drawBackOfficeBaseInputsText(string $label, string $inputKey): string
     {
         return $this->facade->getParser()->render(
             'coupon/condition-fragments/cart-item-count-condition.html',
@@ -139,7 +136,7 @@ class MatchForXArticles extends ConditionAbstract
                 'label' => $label,
                 'operatorSelectHtml' => $this->drawBackOfficeInputOperators($inputKey),
                 'quantitySelectHtml' => $this->drawBackOfficeInputQuantityValues($inputKey, 20, 1),
-            ]
+            ],
         );
     }
 }

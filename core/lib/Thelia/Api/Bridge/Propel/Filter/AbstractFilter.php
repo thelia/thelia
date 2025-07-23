@@ -98,7 +98,7 @@ abstract class AbstractFilter implements FilterInterface
 
                 return $carry;
             },
-            []
+            [],
         );
 
         if (\count($propertyParts) > 1) {
@@ -111,6 +111,7 @@ abstract class AbstractFilter implements FilterInterface
 
             foreach ($relationProperty->getAttributes(Relation::class) as $relationAttribute) {
                 $targetClass = $relationAttribute->getArguments()['targetResource'];
+
                 if (null === $targetClass) {
                     continue;
                 }
@@ -133,6 +134,7 @@ abstract class AbstractFilter implements FilterInterface
         array $context,
     ): string {
         $resourceClass = $context['resource_class'];
+
         // Check if we are on a localized field
         if (!str_contains($property, '.') && !property_exists($resourceClass, $property) && is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
             return $this->getLocalizedPropertyQueryPath($query, $property, $context);
@@ -144,7 +146,8 @@ abstract class AbstractFilter implements FilterInterface
 
         // Replace last underscore by a dot, because after last underscore it's the mysql field
         $lastUnderscorePosition = strrpos($fieldPath, '_');
-        if ($lastUnderscorePosition !== false) {
+
+        if (false !== $lastUnderscorePosition) {
             $fieldPath[$lastUnderscorePosition] = '.';
         }
 

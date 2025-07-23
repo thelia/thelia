@@ -27,11 +27,8 @@ use Thelia\Tools\URL;
 class RewritingRetriever
 {
     protected $search;
-
     protected RewritingUrlQuery $rewritingUrlQuery;
-
     public $url;
-
     public $rewrittenUrl;
 
     public function __construct()
@@ -44,6 +41,7 @@ class RewritingRetriever
         $this->search = $this->rewritingUrlQuery->getViewUrlQuery($view, $viewLocale, $viewId);
 
         $allParametersWithoutView = [];
+
         if (null !== $viewLocale) {
             $allParametersWithoutView['lang'] = $viewLocale;
         }
@@ -54,19 +52,17 @@ class RewritingRetriever
 
         $this->rewrittenUrl = null;
         $this->url = URL::getInstance()->viewUrl($view, $allParametersWithoutView);
-        if ($this->search !== null) {
+
+        if (null !== $this->search) {
             $this->rewrittenUrl = URL::getInstance()->absoluteUrl(
-                $this->search->getUrl()
+                $this->search->getUrl(),
             );
         }
     }
 
-    /**
-     * @param array $viewOtherParameters
-     */
-    public function loadSpecificUrl(string $view, $viewLocale, $viewId = null, $viewOtherParameters = []): void
+    public function loadSpecificUrl(string $view, $viewLocale, $viewId = null, array $viewOtherParameters = []): void
     {
-        if (empty($viewOtherParameters)) {
+        if ([] === $viewOtherParameters) {
             $this->loadViewUrl($view, $viewLocale, $viewId);
 
             return;
@@ -76,13 +72,15 @@ class RewritingRetriever
 
         $allParametersWithoutView = $viewOtherParameters;
         $allParametersWithoutView['lang'] = $viewLocale;
+
         if (null !== $viewId) {
             $allParametersWithoutView[$view.'_id'] = $viewId;
         }
 
         $this->rewrittenUrl = null;
         $this->url = URL::getInstance()->viewUrl($view, $allParametersWithoutView);
-        if ($this->search !== null) {
+
+        if (null !== $this->search) {
             $this->rewrittenUrl = $this->search->getUrl();
         }
     }

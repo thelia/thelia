@@ -52,59 +52,58 @@ abstract class Operators
      *
      * @param Translator $translator Provide necessary value from Thelia
      * @param string     $operator   Operator const
-     *
-     * @return string
      */
-    public static function getI18n(Translator $translator, $operator)
+    public static function getI18n(Translator $translator, string $operator): string
     {
         $ret = $operator;
+
         switch ($operator) {
             case self::INFERIOR:
                 $ret = $translator->trans(
                     'Less than',
-                    []
+                    [],
                 );
                 break;
             case self::INFERIOR_OR_EQUAL:
                 $ret = $translator->trans(
                     'Less than or equals',
-                    []
+                    [],
                 );
                 break;
             case self::EQUAL:
                 $ret = $translator->trans(
                     'Equal to',
-                    []
+                    [],
                 );
                 break;
             case self::SUPERIOR_OR_EQUAL:
                 $ret = $translator->trans(
                     'Greater than or equals',
-                    []
+                    [],
                 );
                 break;
             case self::SUPERIOR:
                 $ret = $translator->trans(
                     'Greater than',
-                    []
+                    [],
                 );
                 break;
             case self::DIFFERENT:
                 $ret = $translator->trans(
                     'Not equal to',
-                    []
+                    [],
                 );
                 break;
             case self::IN:
                 $ret = $translator->trans(
                     'In',
-                    []
+                    [],
                 );
                 break;
             case self::OUT:
                 $ret = $translator->trans(
                     'Not in',
-                    []
+                    [],
                 );
                 break;
             default:

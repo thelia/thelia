@@ -42,6 +42,7 @@ if (!defined('THELIA_LOCAL_DIR')) {
 
 if (!defined('THELIA_CONF_DIR')) {
     $pathConfDir = THELIA_LOCAL_DIR.'config'.DS;
+
     if (is_dir($pathConfDir)) {
         define('THELIA_CONF_DIR', $pathConfDir);
     } else {

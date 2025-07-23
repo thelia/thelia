@@ -22,28 +22,16 @@ namespace Thelia\Core\Event\Lang;
 class LangCreateEvent extends LangEvent
 {
     protected $title;
-
     protected $code;
-
     protected $locale;
-
     protected $date_time_format;
-
     protected $date_format;
-
     protected $time_format;
-
     protected $decimal_separator;
-
     protected $thousands_separator;
-
     protected $decimals;
-
-    /** @var bool */
-    protected $active;
-
-    /** @var bool */
-    protected $visible;
+    protected bool $active;
+    protected bool $visible;
 
     /**
      * @return $this
@@ -169,41 +157,31 @@ class LangCreateEvent extends LangEvent
     }
 
     /**
-     * @param bool $active
-     *
      * @return $this
      */
-    public function setActive($active): static
+    public function setActive(bool $active): static
     {
         $this->active = $active;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function getActive()
+    public function getActive(): bool
     {
         return $this->active;
     }
 
     /**
-     * @param bool $visible
-     *
      * @return $this
      */
-    public function setVisible($visible): static
+    public function setVisible(bool $visible): static
     {
         $this->visible = $visible;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function getVisible()
+    public function getVisible(): bool
     {
         return $this->visible;
     }

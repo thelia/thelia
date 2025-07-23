@@ -17,9 +17,7 @@ namespace Thelia\Core\Event\Template;
 class TemplateUpdateEvent extends TemplateCreateEvent
 {
     protected $template_id;
-
     protected $feature_list;
-
     protected $attribute_list;
 
     public function __construct($template_id)

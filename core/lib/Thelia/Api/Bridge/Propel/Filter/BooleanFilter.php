@@ -29,6 +29,7 @@ final class BooleanFilter extends AbstractFilter
         }
 
         $fieldPath = $this->getPropertyQueryPath($query, $property, $context);
+
         if (\is_array($this->properties[$property])) {
             $fieldPath = $this->properties[$property]['fieldPath'];
         }
@@ -41,6 +42,7 @@ final class BooleanFilter extends AbstractFilter
         $description = [];
 
         $filterProperties = $this->getProperties();
+
         if (null === $filterProperties) {
             return [];
         }
@@ -49,6 +51,7 @@ final class BooleanFilter extends AbstractFilter
             $propertyName = $this->normalizePropertyName($property);
 
             $reflectionProperty = $this->getReflectionProperty($propertyName, $resourceClass);
+
             if (!$reflectionProperty instanceof \ReflectionProperty) {
                 continue;
             }

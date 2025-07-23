@@ -168,11 +168,9 @@ class PdfEvent extends ActionEvent
     }
 
     /**
-     * @param string $fontName
-     *
      * @return $this
      */
-    public function setFontName($fontName): static
+    public function setFontName(string $fontName): static
     {
         $this->fontName = $fontName;
 
@@ -185,11 +183,9 @@ class PdfEvent extends ActionEvent
     }
 
     /**
-     * @param string $templateName
-     *
      * @return $this
      */
-    public function setTemplateName($templateName): static
+    public function setTemplateName(string $templateName): static
     {
         $this->templateName = $templateName;
 
@@ -202,11 +198,9 @@ class PdfEvent extends ActionEvent
     }
 
     /**
-     * @param string $fileName
-     *
      * @return $this
      */
-    public function setFileName($fileName): static
+    public function setFileName(string $fileName): static
     {
         $this->fileName = $fileName;
 
@@ -219,11 +213,9 @@ class PdfEvent extends ActionEvent
     }
 
     /**
-     * @param string $object
-     *
      * @return $this
      */
-    public function setObject($object): static
+    public function setObject(string $object): static
     {
         $this->object = $object;
 

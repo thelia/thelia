@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\ActionEvent;
@@ -70,7 +71,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
     abstract protected function getObjectId(ActiveRecordInterface $object): int;
 
-    abstract protected function renderListTemplate($currentOrder): Response;
+    abstract protected function renderListTemplate(string $currentOrder): Response;
 
     abstract protected function renderEditionTemplate(): Response;
 
@@ -78,7 +79,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
     abstract protected function redirectToListTemplate(): Response|RedirectResponse;
 
-    protected function eventContainsObject($event): bool
+    protected function eventContainsObject(Event $event): bool
     {
         if (method_exists($event, 'getModel')) {
             return null !== $event->getModel();
@@ -91,7 +92,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * @throws \Exception
      */
-    protected function getObjectFromEvent($event): mixed
+    protected function getObjectFromEvent(Event $event): mixed
     {
         if (method_exists($event, 'getModel')) {
             return $event->getModel();
@@ -100,7 +101,7 @@ abstract class AbstractCrudController extends BaseAdminController
         throw new \Exception("If your event doesn't have  \"getModel\" method you must override \"getObjectFromEvent\" function.");
     }
 
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): ActionEvent
+    protected function createUpdatePositionEvent(int $positionChangeMode, int $positionValue): ActionEvent
     {
         throw new \LogicException('Position Update is not supported for this object');
     }
@@ -130,12 +131,12 @@ abstract class AbstractCrudController extends BaseAdminController
         return null;
     }
 
-    protected function getCurrentListOrder($update_session = true): ?string
+    protected function getCurrentListOrder(): ?string
     {
         return $this->getListOrderFromSession(
             $this->objectName,
             $this->orderRequestParameterName,
-            $this->defaultListOrder
+            $this->defaultListOrder,
         );
     }
 
@@ -184,6 +185,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
             // Create a new event object with the modified fields
             $createEvent = $this->getCreationEvent($data);
+
             if (method_exists($createEvent, 'bindForm')) {
                 $createEvent->bindForm($form);
             } elseif ($createEvent instanceof ActiveRecordEvent) {
@@ -195,9 +197,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
             // Check if object exist
             if (!$this->eventContainsObject($createEvent)) {
-                throw new \LogicException(
-                    $translator->trans('No %obj was created.', ['%obj' => $this->objectName])
-                );
+                throw new \LogicException($translator->trans('No %obj was created.', ['%obj' => $this->objectName]));
             }
 
             // Log object creation
@@ -209,9 +209,9 @@ abstract class AbstractCrudController extends BaseAdminController
                         '%s %s (ID %s) created',
                         ucfirst($this->objectName),
                         $this->getObjectLabel($createdObject),
-                        $this->getObjectId($createdObject)
+                        $this->getObjectId($createdObject),
                     ),
-                    (string) $this->getObjectId($createdObject)
+                    (string) $this->getObjectId($createdObject),
                 );
             }
 
@@ -242,7 +242,7 @@ abstract class AbstractCrudController extends BaseAdminController
             $translator->trans('%obj creation', ['%obj' => $this->objectName]),
             $errorMessage,
             $creationForm,
-            $ex
+            $ex,
         );
 
         return $this->renderList()
@@ -292,6 +292,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
             // Create a new event object with the modified fields
             $changeEvent = $this->getUpdateEvent($data);
+
             if (method_exists($changeEvent, 'bindForm')) {
                 $changeEvent->bindForm($form);
             } elseif ($changeEvent instanceof ActiveRecordEvent) {
@@ -303,9 +304,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
             // Check if object exist
             if (!$this->eventContainsObject($changeEvent)) {
-                throw new \LogicException(
-                    $translator->trans('No %obj was updated.', ['%obj' => $this->objectName])
-                );
+                throw new \LogicException($translator->trans('No %obj was updated.', ['%obj' => $this->objectName]));
             }
 
             // Log object modification
@@ -317,9 +316,9 @@ abstract class AbstractCrudController extends BaseAdminController
                         '%s %s (ID %s) modified',
                         ucfirst($this->objectName),
                         $this->getObjectLabel($changedObject),
-                        $this->getObjectId($changedObject)
+                        $this->getObjectId($changedObject),
                     ),
-                    (string) $this->getObjectId($changedObject)
+                    (string) $this->getObjectId($changedObject),
                 );
             }
 
@@ -329,7 +328,7 @@ abstract class AbstractCrudController extends BaseAdminController
             if (!$response instanceof Response) {
                 // If we have to stay on the same page, do not redirect to the successUrl,
                 // just redirect to the edit page again.
-                if ($request->get('save_mode') === 'stay') {
+                if ('stay' === $request->get('save_mode')) {
                     return $this->redirectToEditionTemplate();
                 }
 
@@ -353,7 +352,7 @@ abstract class AbstractCrudController extends BaseAdminController
             $translator->trans('%obj modification', ['%obj' => $this->objectName]),
             $errorMessage,
             $changeForm,
-            $ex
+            $ex,
         );
 
         return $this->renderEditionTemplate()
@@ -372,9 +371,9 @@ abstract class AbstractCrudController extends BaseAdminController
         try {
             $mode = $request->get('mode');
 
-            if ($mode === 'up') {
+            if ('up' === $mode) {
                 $mode = UpdatePositionEvent::POSITION_UP;
-            } elseif ($mode === 'down') {
+            } elseif ('down' === $mode) {
                 $mode = UpdatePositionEvent::POSITION_DOWN;
             } else {
                 $mode = UpdatePositionEvent::POSITION_ABSOLUTE;
@@ -405,19 +404,19 @@ abstract class AbstractCrudController extends BaseAdminController
         mixed $object,
         ?string $eventName,
         $doFinalRedirect = true,
-    ) {
+    ): RedirectResponse|Response|null {
         // Check current user authorization
         if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
 
-        if ($object !== null) {
+        if (null !== $object) {
             try {
                 $mode = $request->get('mode');
 
-                if ($mode === 'up') {
+                if ('up' === $mode) {
                     $mode = UpdatePositionEvent::POSITION_UP;
-                } elseif ($mode === 'down') {
+                } elseif ('down' === $mode) {
                     $mode = UpdatePositionEvent::POSITION_DOWN;
                 } else {
                     $mode = UpdatePositionEvent::POSITION_ABSOLUTE;
@@ -443,7 +442,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
     public function setToggleVisibilityAction(
         EventDispatcherInterface $eventDispatcher,
-    ) {
+    ): ?Response {
         // Check current user authorization
         if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof Response) {
             return $response;
@@ -475,7 +474,7 @@ abstract class AbstractCrudController extends BaseAdminController
         try {
             // Check token
             $tokenProvider->checkToken(
-                $request->query->get('_token')
+                $request->query->get('_token'),
             );
 
             // Get the currency id, and dispatch the delete request
@@ -491,9 +490,9 @@ abstract class AbstractCrudController extends BaseAdminController
                         '%s %s (ID %s) deleted',
                         ucfirst($this->objectName),
                         $this->getObjectLabel($deletedObject),
-                        $this->getObjectId($deletedObject)
+                        $this->getObjectId($deletedObject),
                     ),
-                    (string) $this->getObjectId($deletedObject)
+                    (string) $this->getObjectId($deletedObject),
                 );
             }
 
@@ -510,12 +509,11 @@ abstract class AbstractCrudController extends BaseAdminController
         $errorMessage = \sprintf(
             "Unable to delete '%s'. Error message: %s",
             $this->objectName,
-            $e->getMessage()
+            $e->getMessage(),
         );
 
         $parserContext
-            ->setGeneralError($errorMessage)
-        ;
+            ->setGeneralError($errorMessage);
 
         return $this->defaultAction();
     }
@@ -527,8 +525,10 @@ abstract class AbstractCrudController extends BaseAdminController
         /** @var Form $field */
         foreach ($fields as $field) {
             $functionName = \sprintf('set%s', Container::camelize($field->getName()));
+
             if (method_exists($propelEvent, $functionName)) {
                 $getFunctionName = \sprintf('get%s', Container::camelize($field->getName()));
+
                 if (method_exists($propelEvent, $getFunctionName)) {
                     if (null === $propelEvent->{$getFunctionName}()) {
                         $propelEvent->{$functionName}($field->getData());

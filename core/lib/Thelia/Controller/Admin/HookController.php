@@ -20,6 +20,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Hook\HookCreateAllEvent;
@@ -59,7 +60,7 @@ class HookController extends AbstractCrudController
             AdminResources::HOOK,
             TheliaEvents::HOOK_CREATE,
             TheliaEvents::HOOK_UPDATE,
-            TheliaEvents::HOOK_DELETE
+            TheliaEvents::HOOK_DELETE,
         );
     }
 
@@ -81,6 +82,7 @@ class HookController extends AbstractCrudController
         $templateType = (int) $this->getRequest()->get('template_type', TemplateDefinition::FRONT_OFFICE);
 
         $json_data = [];
+
         try {
             // parse the current template
             $hookHelper = $this->container->get('thelia.hookHelper');
@@ -92,6 +94,7 @@ class HookController extends AbstractCrudController
             // diff
             $newHooks = [];
             $existingHooks = [];
+
             foreach ($hooks as $hook) {
                 if (\array_key_exists($hook['code'], $allHooks)) {
                     $existingHooks[] = $hook['code'];
@@ -138,7 +141,7 @@ class HookController extends AbstractCrudController
                 if (!$event->hasHook()) {
                     $errors[] = \sprintf(
                         Translator::getInstance()->trans('Failed to create new hook %s'),
-                        $hook['code']
+                        $hook['code'],
                     );
                 }
             }
@@ -154,7 +157,7 @@ class HookController extends AbstractCrudController
                 if (!$event->hasHook()) {
                     $errors[] = \sprintf(
                         Translator::getInstance()->trans('Failed to deactivate hook with id %s'),
-                        $hookId
+                        $hookId,
                     );
                 }
             }
@@ -164,7 +167,7 @@ class HookController extends AbstractCrudController
             'success' => true,
         ];
 
-        if ($errors !== []) {
+        if ([] !== $errors) {
             $response = new JsonResponse(['error' => $errors], Response::HTTP_INTERNAL_SERVER_ERROR);
         } else {
             $response = new JsonResponse($json_data);
@@ -173,7 +176,7 @@ class HookController extends AbstractCrudController
         return $response;
     }
 
-    protected function getDiscoverCreationEvent(array $data, $type): HookCreateAllEvent
+    protected function getDiscoverCreationEvent(array $data, int $type): HookCreateAllEvent
     {
         $event = new HookCreateAllEvent();
 
@@ -183,7 +186,7 @@ class HookController extends AbstractCrudController
             ->setCode($data['code'])
             ->setNative(false)
             ->setActive(true)
-            ->setTitle(($data['title'] != '') ? $data['title'] : $data['code'])
+            ->setTitle(('' !== $data['title']) ? $data['title'] : $data['code'])
             ->setByModule($data['module'])
             ->setBlock($data['block'])
             ->setChapo('')
@@ -221,6 +224,7 @@ class HookController extends AbstractCrudController
             ->find();
 
         $ret = [];
+
         /** @var Hook $hook */
         foreach ($hooks as $hook) {
             $ret[$hook->getCode()] = [
@@ -279,8 +283,6 @@ class HookController extends AbstractCrudController
 
     /**
      * Creates the creation event with the provided form data.
-     *
-     * @param unknown $formData
      */
     protected function getCreationEvent(array $formData): ActionEvent
     {
@@ -291,8 +293,6 @@ class HookController extends AbstractCrudController
 
     /**
      * Creates the update event with the provided form data.
-     *
-     * @param unknown $formData
      */
     protected function getUpdateEvent(array $formData): ActionEvent
     {
@@ -310,6 +310,7 @@ class HookController extends AbstractCrudController
             ->setNative($formData['native'])
             ->setActive($formData['active'])
             ->setTitle($formData['title']);
+
         if ($update) {
             $event
                 ->setByModule($formData['by_module'])
@@ -331,22 +332,16 @@ class HookController extends AbstractCrudController
 
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
-     *
-     * @param unknown $event
      */
-    protected function eventContainsObject($event): bool
+    protected function eventContainsObject(Event $event): bool
     {
         return $event->hasHook();
     }
 
     /**
      * Get the created object from an event.
-     *
-     * @param unknown $event
-     *
-     * @internal param \Thelia\Controller\Admin\unknown $createEvent
      */
-    protected function getObjectFromEvent($event): mixed
+    protected function getObjectFromEvent(Event $event): mixed
     {
         return $event->getHook();
     }
@@ -388,10 +383,8 @@ class HookController extends AbstractCrudController
 
     /**
      * Render the main list template.
-     *
-     * @param unknown $currentOrder , if any, null otherwise
      */
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         return $this->render('hooks', ['order' => $currentOrder]);
     }
@@ -421,7 +414,7 @@ class HookController extends AbstractCrudController
             [],
             [
                 'hook_id' => $this->getRequest()->get('hook_id', 0),
-            ]
+            ],
         );
     }
 
@@ -440,8 +433,10 @@ class HookController extends AbstractCrudController
         }
 
         $content = null;
+
         if (null !== $hook_id = $this->getRequest()->get('hook_id')) {
             $toggleDefaultEvent = new HookToggleNativeEvent($hook_id);
+
             try {
                 $eventDispatcher->dispatch($toggleDefaultEvent, TheliaEvents::HOOK_TOGGLE_NATIVE);
 
@@ -464,8 +459,10 @@ class HookController extends AbstractCrudController
         }
 
         $content = null;
+
         if (null !== $hook_id = $this->getRequest()->get('hook_id')) {
             $toggleDefaultEvent = new HookToggleActivationEvent($hook_id);
+
             try {
                 $eventDispatcher->dispatch($toggleDefaultEvent, TheliaEvents::HOOK_TOGGLE_ACTIVATION);
 

@@ -20,17 +20,13 @@ use Propel\Runtime\Util\PropelModelPager;
 
 abstract class PropelCollectionAbstractExport extends AbstractExport
 {
-    /**
-     * @var PropelModelPager Data to export
-     */
-    private $data;
+    /** @var PropelModelPager Data to export */
+    private PropelModelPager $data;
 
     /**
      * @throws \Exception
-     *
-     * @return array|false|mixed|string
      */
-    public function current()
+    public function current(): mixed
     {
         $data = $this->data->getIterator()->current()->toArray(TableMap::TYPE_COLNAME, true, [], true);
 
@@ -44,16 +40,12 @@ abstract class PropelCollectionAbstractExport extends AbstractExport
 
     /**
      * @throws \Exception
-     *
-     * @return bool|float|int|string|null
      */
-    public function key()
+    public function key(): bool|float|int|string|null
     {
-        if ($this->data->getIterator()->key() !== null) {
+        if (null !== $this->data->getIterator()->key()) {
             return $this->data->getIterator()->key() + ($this->data->getPage() - 1) * 1000;
         }
-
-        return null;
     }
 
     /**
@@ -62,6 +54,7 @@ abstract class PropelCollectionAbstractExport extends AbstractExport
     public function next(): void
     {
         $this->data->getIterator()->next();
+
         if (!$this->valid() && !$this->data->isLastPage()) {
             $this->data = $this->data->getQuery()->paginate($this->data->getNextPage(), 1000);
             $this->data->getIterator()->rewind();
@@ -73,7 +66,7 @@ abstract class PropelCollectionAbstractExport extends AbstractExport
      */
     public function rewind(): void
     {
-        if ($this->data === null) {
+        if (!$this->data instanceof PropelModelPager) {
             $data = $this->getData();
 
             if ($data instanceof ModelCriteria) {
@@ -83,9 +76,7 @@ abstract class PropelCollectionAbstractExport extends AbstractExport
                 return;
             }
 
-            throw new \DomainException(
-                'Data must be an instance of \\Propel\\Runtime\\ActiveQuery\\ModelCriteria'
-            );
+            throw new \DomainException('Data must be an instance of \\Propel\\Runtime\\ActiveQuery\\ModelCriteria');
         }
 
         throw new \LogicException("Export data can't be rewinded");

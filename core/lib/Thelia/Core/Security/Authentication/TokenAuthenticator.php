@@ -26,9 +26,12 @@ class TokenAuthenticator implements AuthenticatorInterface
     /**
      * @see \Thelia\Core\Security\Authentication\AuthenticatorInterface::getAuthentifiedUser()
      */
-    public function getAuthentifiedUser(): UserInterface
+    public function getAuthentifiedUser(): ?UserInterface
     {
         $keyData = $this->userProvider->decodeKey($this->key);
+        if (empty($keyData) || $keyData['username'] === '') {
+            return null;
+        }
 
         return $this->userProvider->getUser($keyData);
     }

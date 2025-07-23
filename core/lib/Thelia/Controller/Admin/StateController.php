@@ -18,6 +18,7 @@ use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\State\StateCreateEvent;
 use Thelia\Core\Event\State\StateDeleteEvent;
@@ -48,7 +49,7 @@ class StateController extends AbstractCrudController
             TheliaEvents::STATE_CREATE,
             TheliaEvents::STATE_UPDATE,
             TheliaEvents::STATE_DELETE,
-            TheliaEvents::STATE_TOGGLE_VISIBILITY
+            TheliaEvents::STATE_TOGGLE_VISIBILITY,
         );
     }
 
@@ -89,8 +90,6 @@ class StateController extends AbstractCrudController
 
     /**
      * Creates the creation event with the provided form data.
-     *
-     * @param unknown $formData
      */
     protected function getCreationEvent(array $formData): ActionEvent
     {
@@ -101,8 +100,6 @@ class StateController extends AbstractCrudController
 
     /**
      * Creates the update event with the provided form data.
-     *
-     * @param unknown $formData
      */
     protected function getUpdateEvent(array $formData): ActionEvent
     {
@@ -118,8 +115,7 @@ class StateController extends AbstractCrudController
             ->setVisible($formData['visible'])
             ->setCountry($formData['country_id'])
             ->setTitle($formData['title'])
-            ->setIsocode($formData['isocode'])
-        ;
+            ->setIsocode($formData['isocode']);
 
         return $event;
     }
@@ -134,10 +130,8 @@ class StateController extends AbstractCrudController
 
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
-     *
-     * @param unknown $event
      */
-    protected function eventContainsObject($event): bool
+    protected function eventContainsObject(Event $event): bool
     {
         return $event->hasState();
     }
@@ -156,8 +150,7 @@ class StateController extends AbstractCrudController
     protected function getExistingObject(): ?ActiveRecordInterface
     {
         $state = StateQuery::create()
-            ->findPk($this->getRequest()->get('state_id', 0))
-        ;
+            ->findPk($this->getRequest()->get('state_id', 0));
 
         if (null !== $state) {
             $state->setLocale($this->getCurrentEditionLocale());
@@ -188,10 +181,8 @@ class StateController extends AbstractCrudController
 
     /**
      * Render the main list template.
-     *
-     * @param unknown $currentOrder , if any, null otherwise
      */
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         return $this->render(
             'states',
@@ -199,7 +190,7 @@ class StateController extends AbstractCrudController
                 'page' => $this->getRequest()->get('page', 1),
                 'page_limit' => $this->getRequest()->get('page_limit', 50),
                 'page_order' => $this->getRequest()->get('page_order', 1),
-            ]
+            ],
         );
     }
 
@@ -230,7 +221,7 @@ class StateController extends AbstractCrudController
             [],
             [
                 'state_id' => $this->getRequest()->get('state_id', 0),
-            ]
+            ],
         );
     }
 

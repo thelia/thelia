@@ -45,8 +45,8 @@ abstract class BaseType implements TypeInterface
                     [
                         '%value' => $value,
                         '%type' => $this->getType(),
-                    ]
-                )
+                    ],
+                ),
             );
         }
     }

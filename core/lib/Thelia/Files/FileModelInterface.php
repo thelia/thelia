@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Files;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Thelia\Form\BaseForm;
 
 interface FileModelInterface
 {
@@ -26,53 +25,49 @@ interface FileModelInterface
      *
      * @return $this
      */
-    public function setParentId($parentId);
+    public function setParentId(int $parentId): static;
 
     /**
      * Get file parent id.
      *
      * @return int parent id
      */
-    public function getParentId();
+    public function getParentId(): int;
 
     /**
      * @return string the file name
      */
-    public function getFile();
+    public function getFile(): string;
 
     /**
      * @param string $file the file name
      */
-    public function setFile($file);
+    public function setFile(string $file);
 
     /**
      * @return FileModelParentInterface the parent file model
      */
-    public function getParentFileModel();
+    public function getParentFileModel(): FileModelParentInterface;
 
     /**
      * Get the ID of the form used to change this object information.
-     *
-     * @return BaseForm the form
      */
-    public function getUpdateFormId();
+    public function getUpdateFormId(): string;
 
     /**
      * @return string the path to the upload directory where files are stored, without final slash
      */
-    public function getUploadDir();
+    public function getUploadDir(): string;
 
     /**
      * @return string the URL to redirect to after update from the back-office
      */
-    public function getRedirectionUrl();
+    public function getRedirectionUrl(): string;
 
     /**
      * Get the Query instance for this object.
-     *
-     * @return ModelCriteria
      */
-    public function getQueryInstance();
+    public function getQueryInstance(): ModelCriteria;
 
     /**
      * Save the model object.
@@ -86,8 +81,6 @@ interface FileModelInterface
 
     /**
      * Get the model object ID.
-     *
-     * @return int
      */
     public function getId();
 
@@ -96,12 +89,10 @@ interface FileModelInterface
      *
      * @param string $title the title in the current locale
      */
-    public function setTitle($title);
+    public function setTitle(string $title);
 
     /**
      * Get the current title.
-     *
-     * @return FileModelInterface
      */
     public function getTitle();
 
@@ -109,44 +100,34 @@ interface FileModelInterface
      * Set the chapo.
      *
      * @param string $chapo the chapo in the current locale
-     *
-     * @return FileModelInterface
      */
-    public function setChapo($chapo);
+    public function setChapo(string $chapo);
 
     /**
      * Set the description.
      *
      * @param string $description the description in the current locale
-     *
-     * @return FileModelInterface
      */
-    public function setDescription($description);
+    public function setDescription(string $description);
 
     /**
      * Set the postscriptum.
      *
      * @param string $postscriptum the postscriptum in the current locale
-     *
-     * @return FileModelInterface
      */
-    public function setPostscriptum($postscriptum);
+    public function setPostscriptum(string $postscriptum);
 
     /**
      * Set the current locale.
      *
      * @param string $locale the locale string
-     *
-     * @return FileModelInterface
      */
-    public function setLocale($locale);
+    public function setLocale(string $locale);
 
     /**
      * Set the current locale.
      *
      * @param bool $visible true if the file is visible, false otherwise
-     *
-     * @return FileModelInterface
      */
-    public function setVisible($visible);
+    public function setVisible(bool $visible);
 }

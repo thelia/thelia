@@ -50,17 +50,15 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
 
     /**
      * @throws PropelException
-     *
-     * @return LoopResult
      */
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var ImportModel|Export $type */
         foreach ($loopResult->getResultDataCollection() as $type) {
             $loopResultRow = new LoopResultRow($type);
 
             $url = URL::getInstance()->absoluteUrl(
-                $this->getBaseUrl().'/'.$type->getId()
+                $this->getBaseUrl().'/'.$type->getId(),
             );
 
             try {
@@ -72,8 +70,7 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
                     ->set('DESCRIPTION', $type->getVirtualColumn('i18n_DESCRIPTION'))
                     ->set('URL', $url)
                     ->set('POSITION', $type->getPosition())
-                    ->set('CATEGORY_ID', $type->getByName($this->getCategoryName()))
-                ;
+                    ->set('CATEGORY_ID', $type->getByName($this->getCategoryName()));
             } catch (\Exception $e) {
                 Tlog::getInstance()->error($e->getMessage());
             }
@@ -87,10 +84,8 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
 
     /**
      * this method returns a Propel ModelCriteria.
-     *
-     * @return ModelCriteria
      */
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         /** @var ImportQuery|ExportQUery $query */
         $query = $this->getQueryModel();
@@ -164,10 +159,8 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
      *       ...
      *   );
      * }
-     *
-     * @return ArgumentCollection
      */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
@@ -176,30 +169,21 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumListType(static::getAllowedOrders())
+                    new EnumListType(static::getAllowedOrders()),
                 ),
-                static::DEFAULT_ORDER
-            )
+                static::DEFAULT_ORDER,
+            ),
         );
     }
 
-    public static function getAllowedOrders()
+    public static function getAllowedOrders(): array
     {
         return ['id', 'id_reverse', 'ref', 'ref_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse'];
     }
 
-    /**
-     * @return string
-     */
-    abstract protected function getBaseUrl();
+    abstract protected function getBaseUrl(): string;
 
-    /**
-     * @return ImportQuery|ExportQUery
-     */
-    abstract protected function getQueryModel();
+    abstract protected function getQueryModel(): ImportQuery|ExportQUery;
 
-    /**
-     * @return string
-     */
-    abstract protected function getCategoryName();
+    abstract protected function getCategoryName(): string;
 }

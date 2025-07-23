@@ -62,8 +62,7 @@ class AreaPostageForm extends BaseForm
                 ],
                 'label_attr' => ['for' => 'area_postage'],
                 'label' => Translator::getInstance()->trans('Postage'),
-            ])
-        ;
+            ]);
     }
 
     /**

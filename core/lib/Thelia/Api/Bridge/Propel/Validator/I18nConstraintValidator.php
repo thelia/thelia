@@ -35,7 +35,8 @@ class I18nConstraintValidator extends ConstraintValidator
 
         $request = $this->requestStack->getCurrentRequest();
         $method = $request?->getMethod();
-        if (!$method || $method === HttpOperation::METHOD_PATCH) {
+
+        if (!$method || HttpOperation::METHOD_PATCH === $method) {
             return;
         }
 
@@ -43,18 +44,21 @@ class I18nConstraintValidator extends ConstraintValidator
 
         /** @var I18nCollection $i18nData */
         $i18nData = $value;
+
         foreach ($i18nData->i18ns as $i18n) {
-            if ($i18n->getTitle() !== null && !empty($i18n->getTitle())) {
+            if (null !== $i18n->getTitle() && !empty($i18n->getTitle())) {
                 ++$titleAndLocaleCount;
             }
         }
 
-        if ($titleAndLocaleCount === 0) {
+        if (0 === $titleAndLocaleCount) {
             $this->context->buildViolation(
                 $this->translator->trans(
                     'The title and locale must be defined at least once.',
-                    [], null, 'en_US'
-                )
+                    [],
+                    null,
+                    'en_US',
+                ),
             )->addViolation();
         }
     }

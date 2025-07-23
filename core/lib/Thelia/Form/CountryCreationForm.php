@@ -32,7 +32,7 @@ class CountryCreationForm extends BaseForm
                         new NotBlank(),
                     ],
                     'label' => $this->translator->trans('Country title'),
-                ]
+                ],
             )
             ->add(
                 'locale',
@@ -41,7 +41,7 @@ class CountryCreationForm extends BaseForm
                     'constraints' => [
                         new NotBlank(),
                     ],
-                ]
+                ],
             )
             ->add(
                 'visible',
@@ -52,7 +52,7 @@ class CountryCreationForm extends BaseForm
                     'label_attr' => [
                         'for' => 'visible_create',
                     ],
-                ]
+                ],
             )
             ->add(
                 'isocode',
@@ -65,7 +65,7 @@ class CountryCreationForm extends BaseForm
                     'label_attr' => [
                         'help' => $this->translator->trans('Check country iso codes <a href="http://en.wikipedia.org/wiki/ISO_3166-1#Current_codes" target="_blank">here</a>.'),
                     ],
-                ]
+                ],
             )
             ->add(
                 'isoalpha2',
@@ -78,7 +78,7 @@ class CountryCreationForm extends BaseForm
                     'label_attr' => [
                         'help' => $this->translator->trans('Check country iso codes <a href="http://en.wikipedia.org/wiki/ISO_3166-1#Current_codes" target="_blank">here</a>.'),
                     ],
-                ]
+                ],
             )
             ->add(
                 'isoalpha3',
@@ -91,7 +91,7 @@ class CountryCreationForm extends BaseForm
                     'label_attr' => [
                         'help' => $this->translator->trans('Check country iso codes <a href="http://en.wikipedia.org/wiki/ISO_3166-1#Current_codes" target="_blank">here</a>.'),
                     ],
-                ]
+                ],
             )
             ->add(
                 'has_states',
@@ -102,9 +102,8 @@ class CountryCreationForm extends BaseForm
                     'label_attr' => [
                         'for' => 'has_states_create',
                     ],
-                ]
-            )
-        ;
+                ],
+            );
     }
 
     public static function getName(): string

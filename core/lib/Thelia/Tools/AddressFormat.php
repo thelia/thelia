@@ -50,20 +50,14 @@ class AddressFormat
 
     /**
      * Format an address.
-     *
-     * @param bool   $html
-     * @param string $htmlTag
-     * @param array  $htmlAttributes
-     *
-     * @return string
      */
     public function format(
         AddressInterface $address,
         $locale = null,
-        $html = true,
-        $htmlTag = 'p',
-        $htmlAttributes = [],
-    ) {
+        bool $html = true,
+        string $htmlTag = 'p',
+        array $htmlAttributes = [],
+    ): string {
         $locale = $this->normalizeLocale($locale);
 
         $addressFormatRepository = new AddressFormatRepository();
@@ -74,7 +68,7 @@ class AddressFormat
             $addressFormatRepository,
             $countryRepository,
             $subdivisionRepository,
-            ['locale' => $locale]
+            ['locale' => $locale],
         );
 
         return $formatter->format($address, ['html' => $html, 'html_tag' => $htmlTag, 'html_attributes' => $htmlAttributes]);
@@ -82,15 +76,8 @@ class AddressFormat
 
     /**
      * Format a Thelia address (Address or OrderAddress).
-     *
-     * @param OrderAddress|OrderAddress $address
-     * @param bool                      $html
-     * @param string                    $htmlTag
-     * @param array                     $htmlAttributes
-     *
-     * @return string
      */
-    public function formatTheliaAddress($address, $locale = null, $html = true, $htmlTag = 'p', $htmlAttributes = [])
+    public function formatTheliaAddress(OrderAddress $address, $locale = null, bool $html = true, string $htmlTag = 'p', array $htmlAttributes = []): string
     {
         $address = $this->mapTheliaAddress($address, $locale);
 
@@ -99,12 +86,8 @@ class AddressFormat
 
     /**
      * Format an address to a postal label.
-     *
-     * @param array $options
-     *
-     * @return string
      */
-    public function postalLabelFormat(AddressInterface $address, $locale = null, $originCountry = null, $options = [])
+    public function postalLabelFormat(AddressInterface $address, $locale = null, $originCountry = null, array $options = []): string
     {
         $locale = $this->normalizeLocale($locale);
 
@@ -114,6 +97,7 @@ class AddressFormat
 
         if (null === $originCountry) {
             $countryId = Country::getShopLocation();
+
             if (null === $country = CountryQuery::create()->findPk($countryId)) {
                 $country = Country::getDefaultCountry();
             }
@@ -127,7 +111,7 @@ class AddressFormat
             $addressFormatRepository,
             $countryRepository,
             $subdivisionRepository,
-            $options
+            $options,
         );
 
         return $formatter->format($address);
@@ -135,13 +119,8 @@ class AddressFormat
 
     /**
      * Format a Thelia address (Address or OrderAddress) to a postal label.
-     *
-     * @param OrderAddress|OrderAddress $address
-     * @param array                     $options
-     *
-     * @return string
      */
-    public function postalLabelFormatTheliaAddress($address, $locale = null, $originCountry = null, $options = [])
+    public function postalLabelFormatTheliaAddress(OrderAddress $address, $locale = null, $originCountry = null, array $options = []): string
     {
         $address = $this->mapTheliaAddress($address, $locale);
 
@@ -150,12 +129,11 @@ class AddressFormat
 
     /**
      * Convert a Thelia address (Address or OrderAddress) to ImmutableAddressInterface.
-     *
-     * @param OrderAddress|OrderAddress $address
      */
-    protected function mapTheliaAddress($address, $locale = null)
+    protected function mapTheliaAddress(OrderAddress $address, $locale = null)
     {
         $country = $address->getCountry();
+
         if (null === $locale) {
             $locale = Lang::getDefaultLanguage()->getLocale();
         }
@@ -169,16 +147,15 @@ class AddressFormat
             ->withLocality($address->getCity())
             ->withOrganization($address->getCompany())
             ->withGivenName($address->getFirstname())
-            ->withFamilyName($address->getLastname())
-        ;
+            ->withFamilyName($address->getLastname());
 
-        if ($country->getHasStates() && (int) $address->getStateId() !== 0) {
+        if ($country->getHasStates() && 0 !== (int) $address->getStateId()) {
             $addressModel = $addressModel->withAdministrativeArea(
                 \sprintf(
                     '%s-%s',
                     $country->getIsoalpha2(),
-                    $address->getState()->getIsocode()
-                )
+                    $address->getState()->getIsocode(),
+                ),
             );
         }
 

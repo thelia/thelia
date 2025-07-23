@@ -62,6 +62,7 @@ class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterf
         }
 
         $value = [];
+
         foreach ($activeRecord->getFeatureProductsJoinFeatureAv() as $featureProduct) {
             $value[] =
                 [
@@ -69,8 +70,7 @@ class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterf
                     'mainId' => $featureProduct->getFeature()->getId(),
                     'id' => $featureProduct->getFeatureAv()->getId(),
                     'title' => $featureProduct->getFeatureAv()->setLocale($locale)->getTitle(),
-                ]
-            ;
+                ];
         }
 
         return $value;

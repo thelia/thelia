@@ -32,7 +32,7 @@ class MetaDataQuery extends BaseMetaDataQuery
      *
      * @return mixed the value affected to this element
      */
-    public static function getVal($metaKey, $elementKey, $elementId, $default = null)
+    public static function getVal(string $metaKey, string $elementKey, int $elementId, $default = null): mixed
     {
         $out = null;
 
@@ -58,7 +58,7 @@ class MetaDataQuery extends BaseMetaDataQuery
      *
      * @return array all meta data affected to this element
      */
-    public static function getAllVal($elementKey, $elementId)
+    public static function getAllVal(string $elementKey, int $elementId): array
     {
         $out = [];
 
@@ -67,6 +67,7 @@ class MetaDataQuery extends BaseMetaDataQuery
                 ->filterByElementKey($elementKey)
                 ->filterByElementId($elementId)
                 ->find();
+
             if (null !== $datas) {
                 /** @var MetaData $data */
                 foreach ($datas as $data) {
@@ -85,14 +86,13 @@ class MetaDataQuery extends BaseMetaDataQuery
      * @param string $elementKey the element Key : product, category, ...
      * @param int    $elementId  the element id
      */
-    public static function setVal($metaKey, $elementKey, $elementId, $value): void
+    public static function setVal(string $metaKey, string $elementKey, int $elementId, $value): void
     {
         $data = self::create()
             ->filterByMetaKey($metaKey)
             ->filterByElementKey($elementKey)
             ->filterByElementId($elementId)
-            ->findOne()
-        ;
+            ->findOne();
 
         if (null === $data) {
             $data = new MetaData();

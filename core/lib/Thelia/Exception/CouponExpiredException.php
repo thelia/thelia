@@ -29,7 +29,7 @@ class CouponExpiredException extends \Exception
      *
      * @param string $couponCode Coupon code
      */
-    public function __construct($couponCode)
+    public function __construct(string $couponCode)
     {
         $message = Translator::getInstance()->trans('Coupon %code is expired.', ['%code' => $couponCode]);
 

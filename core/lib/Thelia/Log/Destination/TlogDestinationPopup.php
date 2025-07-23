@@ -22,13 +22,9 @@ class TlogDestinationPopup extends AbstractTlogDestination
     // Nom des variables de configuration
     // ----------------------------------
     public const VAR_POPUP_WIDTH = 'tlog_destinationpopup_width';
-
     public const VALEUR_POPUP_WIDTH_DEFAUT = '600';
-
     public const VAR_POPUP_HEIGHT = 'tlog_destinationpopup_height';
-
     public const VALEUR_POPUP_HEIGHT_DEFAUT = '600';
-
     public const VAR_POPUP_TPL = 'tlog_destinationpopup_template';
 
     // Ce fichier doit se trouver dans le même répertoire que TlogDestinationPopup.class.php
@@ -52,21 +48,21 @@ class TlogDestinationPopup extends AbstractTlogDestination
                 'Popup windows template',
                 'Put #LOGTEXT in the template text where you want to display logs..',
                 file_get_contents(__DIR__.DS.self::VALEUR_POPUP_TPL_DEFAUT),
-                TlogDestinationConfig::TYPE_TEXTAREA
+                TlogDestinationConfig::TYPE_TEXTAREA,
             ),
             new TlogDestinationConfig(
                 self::VAR_POPUP_HEIGHT,
                 'Height of the popup window',
                 'In pixels',
                 self::VALEUR_POPUP_HEIGHT_DEFAUT,
-                TlogDestinationConfig::TYPE_TEXTFIELD
+                TlogDestinationConfig::TYPE_TEXTFIELD,
             ),
             new TlogDestinationConfig(
                 self::VAR_POPUP_WIDTH,
                 'Width of the popup window',
                 'In pixels',
                 self::VALEUR_POPUP_WIDTH_DEFAUT,
-                TlogDestinationConfig::TYPE_TEXTFIELD
+                TlogDestinationConfig::TYPE_TEXTFIELD,
             ),
         ];
     }
@@ -77,7 +73,7 @@ class TlogDestinationPopup extends AbstractTlogDestination
         $count = 1;
 
         foreach ($this->logs as $line) {
-            $content .= '<div class="'.($count++ % 2 !== 0 ? 'paire' : 'impaire').'">'.htmlspecialchars((string) $line).'</div>';
+            $content .= '<div class="'.(0 !== $count++ % 2 ? 'paire' : 'impaire').'">'.htmlspecialchars((string) $line).'</div>';
         }
 
         $tpl = $this->getConfig(self::VAR_POPUP_TPL);
@@ -97,7 +93,7 @@ class TlogDestinationPopup extends AbstractTlogDestination
             </script>',
             $this->getConfig(self::VAR_POPUP_WIDTH),
             $this->getConfig(self::VAR_POPUP_HEIGHT),
-            str_replace('"', '\\"', $tpl)
+            str_replace('"', '\\"', $tpl),
         );
 
         if (preg_match('|</body>|i', (string) $res)) {

@@ -41,7 +41,7 @@ class AdminLogsController extends BaseAdminController
             $this->getRequest()->request->get('admins', []),
             $this->getRequest()->request->get('fromDate'),
             $this->getRequest()->request->get('toDate'),
-            array_merge((array) $this->getRequest()->request->get('resources', []), (array) $this->getRequest()->request->get('modules', []))
+            array_merge((array) $this->getRequest()->request->get('resources', []), (array) $this->getRequest()->request->get('modules', [])),
         ) as $entry) {
             $entries[] = [
                 'head' => \sprintf(
@@ -50,7 +50,7 @@ class AdminLogsController extends BaseAdminController
                     $entry->getAdminLogin(),
                     $entry->getResource(),
                     $entry->getAction(),
-                    (null !== $entry->getResourceId()) ? ':'.$entry->getResourceId() : ''
+                    (null !== $entry->getResourceId()) ? ':'.$entry->getResourceId() : '',
                 ),
                 'data' => $entry->getMessage(),
             ];
@@ -60,7 +60,7 @@ class AdminLogsController extends BaseAdminController
             'ajax/logger',
             [
                 'entries' => $entries,
-            ]
+            ],
         );
     }
 }

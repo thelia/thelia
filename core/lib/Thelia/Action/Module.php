@@ -58,7 +58,8 @@ class Module extends BaseAction implements EventSubscriberInterface
 
             if (method_exists($moduleInstance, 'setContainer')) {
                 $moduleInstance->setContainer($this->container);
-                if ($module->getActivate() == BaseModule::IS_ACTIVATED) {
+
+                if (BaseModule::IS_ACTIVATED === $module->getActivate()) {
                     $moduleInstance->deActivate($module);
                 } else {
                     $moduleInstance->activate($module);
@@ -73,17 +74,15 @@ class Module extends BaseAction implements EventSubscriberInterface
 
     public function checkToggleActivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (true === $event->isNoCheck()) {
+        if ($event->isNoCheck()) {
             return;
         }
 
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
             try {
-                if ($module->getActivate() == BaseModule::IS_ACTIVATED) {
-                    if ($module->getMandatory() == BaseModule::IS_MANDATORY && $event->getAssumeDeactivate() === false) {
-                        throw new \Exception(
-                            Translator::getInstance()->trans("Can't deactivate a secure module")
-                        );
+                if (BaseModule::IS_ACTIVATED === $module->getActivate()) {
+                    if (BaseModule::IS_MANDATORY === $module->getMandatory() && false === $event->getAssumeDeactivate()) {
+                        throw new \Exception(Translator::getInstance()->trans("Can't deactivate a secure module"));
                     }
 
                     if ($event->isRecursive()) {
@@ -100,6 +99,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                 }
             } catch (\Exception $ex) {
                 $event->stopPropagation();
+
                 throw $ex;
             }
         }
@@ -108,13 +108,11 @@ class Module extends BaseAction implements EventSubscriberInterface
     /**
      * Check if module can be activated : supported version of Thelia, module dependencies.
      *
-     * @param \Thelia\Model\Module $module
+     * @return bool true if the module can be activated, otherwise false
      *
      * @throws \Exception if activation fails
-     *
-     * @return bool true if the module can be activated, otherwise false
      */
-    private function checkActivation($module): bool
+    private function checkActivation(\Thelia\Model\Module $module): bool
     {
         $moduleValidator = new ModuleValidator($module->getAbsoluteBaseDir());
         $moduleValidator->validate(false);
@@ -126,30 +124,26 @@ class Module extends BaseAction implements EventSubscriberInterface
      * Check if module can be deactivated safely because other modules
      * could have dependencies to this module.
      *
-     * @param \Thelia\Model\Module $module
-     *
      * @return bool true if the module can be deactivated, otherwise false
      */
-    private function checkDeactivation($module): bool
+    private function checkDeactivation(\Thelia\Model\Module $module): bool
     {
         $moduleValidator = new ModuleValidator($module->getAbsoluteBaseDir());
 
         $modules = $moduleValidator->getModulesDependOf();
 
-        if ($modules !== []) {
+        if ([] !== $modules) {
             $moduleList = implode(', ', array_column($modules, 'code'));
 
-            $message = (\count($modules) == 1)
+            $message = (1 === \count($modules))
                 ? Translator::getInstance()->trans(
-                    '%s has dependency to module %s. You have to deactivate this module before.'
+                    '%s has dependency to module %s. You have to deactivate this module before.',
                 )
                 : Translator::getInstance()->trans(
-                    '%s have dependencies to module %s. You have to deactivate these modules before.'
+                    '%s have dependencies to module %s. You have to deactivate these modules before.',
                 );
 
-            throw new ModuleException(
-                \sprintf($message, $moduleList, $moduleValidator->getModuleDefinition()->getCode())
-            );
+            throw new ModuleException(\sprintf($message, $moduleList, $moduleValidator->getModuleDefinition()->getCode()));
         }
 
         return true;
@@ -163,10 +157,12 @@ class Module extends BaseAction implements EventSubscriberInterface
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
             $moduleValidator = new ModuleValidator($module->getAbsoluteBaseDir());
             $dependencies = $moduleValidator->getCurrentModuleDependencies();
+
             foreach ($dependencies as $defMod) {
                 $submodule = ModuleQuery::create()
                     ->findOneByCode($defMod['code']);
-                if ($submodule && $submodule->getActivate() != BaseModule::IS_ACTIVATED) {
+
+                if ($submodule && BaseModule::IS_ACTIVATED !== $submodule->getActivate()) {
                     $subevent = new ModuleToggleActivationEvent($submodule->getId());
                     $subevent->setRecursive(true);
                     $dispatcher->dispatch($subevent, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
@@ -183,10 +179,12 @@ class Module extends BaseAction implements EventSubscriberInterface
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
             $moduleValidator = new ModuleValidator($module->getAbsoluteBaseDir());
             $dependencies = $moduleValidator->getModulesDependOf(true);
+
             foreach ($dependencies as $defMod) {
                 $submodule = ModuleQuery::create()
                     ->findOneByCode($defMod['code']);
-                if ($submodule && $submodule->getActivate() == BaseModule::IS_ACTIVATED) {
+
+                if ($submodule && BaseModule::IS_ACTIVATED === $submodule->getActivate()) {
                     $subevent = new ModuleToggleActivationEvent($submodule->getId());
                     $subevent->setRecursive(true);
                     $dispatcher->dispatch($subevent, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
@@ -203,12 +201,7 @@ class Module extends BaseAction implements EventSubscriberInterface
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId(), $con)) {
             try {
                 if (null === $module->getFullNamespace()) {
-                    throw new \LogicException(
-                        Translator::getInstance()->trans(
-                            'Cannot instantiate module "%name%": the namespace is null. Maybe the model is not loaded ?',
-                            ['%name%' => $module->getCode()]
-                        )
-                    );
+                    throw new \LogicException(Translator::getInstance()->trans('Cannot instantiate module "%name%": the namespace is null. Maybe the model is not loaded ?', ['%name%' => $module->getCode()]));
                 }
 
                 // If the module is referenced by an order, display a meaningful error
@@ -217,19 +210,12 @@ class Module extends BaseAction implements EventSubscriberInterface
                 if (OrderQuery::create()->filterByDeliveryModuleId($module->getId())->count() > 0
                     || OrderQuery::create()->filterByPaymentModuleId($module->getId())->count() > 0
                 ) {
-                    throw new \LogicException(
-                        Translator::getInstance()->trans(
-                            'The module "%name%" is currently in use by at least one order, and can\'t be deleted.',
-                            ['%name%' => $module->getCode()]
-                        )
-                    );
+                    throw new \LogicException(Translator::getInstance()->trans('The module "%name%" is currently in use by at least one order, and can\'t be deleted.', ['%name%' => $module->getCode()]));
                 }
 
                 try {
-                    if ($module->getMandatory() == BaseModule::IS_MANDATORY && $event->getAssumeDelete() === false) {
-                        throw new \Exception(
-                            Translator::getInstance()->trans("Can't remove a core module")
-                        );
+                    if (BaseModule::IS_MANDATORY === $module->getMandatory() && false === $event->getAssumeDelete()) {
+                        throw new \Exception(Translator::getInstance()->trans("Can't remove a core module"));
                     }
 
                     // First, try to create an instance
@@ -255,8 +241,8 @@ class Module extends BaseAction implements EventSubscriberInterface
                     Tlog::getInstance()->addWarning(
                         Translator::getInstance()->trans(
                             'Failed to create instance of module "%name%" when trying to delete module. Module directory has probably been deleted',
-                            ['%name%' => $module->getCode()]
-                        )
+                            ['%name%' => $module->getCode()],
+                        ),
                     );
                 } catch (FileNotFoundException) {
                     // The module directory has been deleted.
@@ -264,8 +250,8 @@ class Module extends BaseAction implements EventSubscriberInterface
                     Tlog::getInstance()->addWarning(
                         Translator::getInstance()->trans(
                             'Module "%name%" directory was not found',
-                            ['%name%' => $module->getCode()]
-                        )
+                            ['%name%' => $module->getCode()],
+                        ),
                     );
                 }
 
@@ -277,6 +263,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                 $this->cacheClear($dispatcher);
             } catch (\Exception $e) {
                 $con->rollBack();
+
                 throw $e;
             }
         }
@@ -382,15 +369,7 @@ class Module extends BaseAction implements EventSubscriberInterface
 
         /* call pay method */
         if (null === $paymentModule = ModuleQuery::create()->findPk($order->getPaymentModuleId())) {
-            throw new \RuntimeException(
-                Translator::getInstance()->trans(
-                    'Failed to find a payment Module with ID=%mid for order ID=%oid',
-                    [
-                        '%mid' => $order->getPaymentModuleId(),
-                        '%oid' => $order->getId(),
-                    ]
-                )
-            );
+            throw new \RuntimeException(Translator::getInstance()->trans('Failed to find a payment Module with ID=%mid for order ID=%oid', ['%mid' => $order->getPaymentModuleId(), '%oid' => $order->getId()]));
         }
 
         $paymentModuleInstance = $paymentModule->getPaymentModuleInstance($this->container);
@@ -415,7 +394,7 @@ class Module extends BaseAction implements EventSubscriberInterface
     protected function cacheClear(EventDispatcherInterface $dispatcher): void
     {
         $cacheEvent = new CacheEvent(
-            $this->container->getParameter('kernel.cache_dir')
+            $this->container->getParameter('kernel.cache_dir'),
         );
 
         $dispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);

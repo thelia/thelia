@@ -42,14 +42,14 @@ class Archiver extends BaseLoop implements ArraySearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumType(['alpha', 'alpha_reverse'])
+                    new EnumType(['alpha', 'alpha_reverse']),
                 ),
-                'alpha'
-            )
+                'alpha',
+            ),
         );
     }
 
-    public function buildArray()
+    public function buildArray(): array
     {
         /** @var ArchiverManager $archiverManager */
         $archiverManager = $this->container->get(RegisterArchiverPass::MANAGER_SERVICE_ID);
@@ -57,12 +57,14 @@ class Archiver extends BaseLoop implements ArraySearchLoopInterface
         $availability = $this->getArgValue('available');
 
         $archiverId = $this->getArgValue('archiver');
-        if ($archiverId === null) {
+
+        if (null === $archiverId) {
             $archivers = $archiverManager->getArchivers($availability);
         } else {
             $archivers = [];
             $archiver = $archiverManager->get($archiverId, $availability);
-            if ($archiver !== null) {
+
+            if (null !== $archiver) {
                 $archivers[] = $archiver;
             }
         }

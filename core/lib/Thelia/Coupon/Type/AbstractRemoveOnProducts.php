@@ -26,11 +26,9 @@ use Thelia\Model\CartItem;
 abstract class AbstractRemoveOnProducts extends CouponAbstract implements AmountAndPercentageCouponInterface
 {
     public const CATEGORY_ID = 'category_id';
-
     public const PRODUCTS_LIST = 'products';
 
     public int $category_id = 0;
-
     public array $product_list = [];
 
     /**
@@ -75,7 +73,7 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
             $expirationDate,
             $freeShippingForCountries,
             $freeShippingForModules,
-            $perCustomerUsageCount
+            $perCustomerUsageCount,
         );
 
         $this->product_list = $effects[self::PRODUCTS_LIST] ?? [];
@@ -87,7 +85,7 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
         return $this;
     }
 
-    public function exec(): float|int
+    public function exec(): float
     {
         // This coupon subtracts the specified amount from the order total
         // for each product of the selected products.
@@ -102,7 +100,7 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
             }
         }
 
-        return $discount;
+        return (float) $discount;
     }
 
     public function drawBaseBackOfficeInputs(string $templateName, array $otherFields): string
@@ -126,21 +124,13 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
 
     public function checkBaseCouponFieldValue(string $fieldName, string $fieldValue): string
     {
-        if ($fieldName === self::CATEGORY_ID) {
-            if ($fieldValue === '' || $fieldValue === '0') {
-                throw new \InvalidArgumentException(
-                    Translator::getInstance()->trans(
-                        'Please select a category'
-                    )
-                );
+        if (self::CATEGORY_ID === $fieldName) {
+            if ('' === $fieldValue || '0' === $fieldValue) {
+                throw new \InvalidArgumentException(Translator::getInstance()->trans('Please select a category'));
             }
-        } elseif ($fieldName === self::PRODUCTS_LIST) {
-            if ($fieldValue === '' || $fieldValue === '0') {
-                throw new \InvalidArgumentException(
-                    Translator::getInstance()->trans(
-                        'Please select at least one product'
-                    )
-                );
+        } elseif (self::PRODUCTS_LIST === $fieldName) {
+            if ('' === $fieldValue || '0' === $fieldValue) {
+                throw new \InvalidArgumentException(Translator::getInstance()->trans('Please select at least one product'));
             }
         }
 

@@ -56,7 +56,7 @@ class TemplateController extends AbstractCrudController
             AdminResources::TEMPLATE,
             TheliaEvents::TEMPLATE_CREATE,
             TheliaEvents::TEMPLATE_UPDATE,
-            TheliaEvents::TEMPLATE_DELETE // No position update
+            TheliaEvents::TEMPLATE_DELETE, // No position update
         );
     }
 
@@ -76,8 +76,7 @@ class TemplateController extends AbstractCrudController
 
         $createEvent
             ->setTemplateName($formData['name'])
-            ->setLocale($formData['locale'])
-        ;
+            ->setLocale($formData['locale']);
 
         return $createEvent;
     }
@@ -89,8 +88,7 @@ class TemplateController extends AbstractCrudController
         // Create and dispatch the change event
         $changeEvent
             ->setLocale($formData['locale'])
-            ->setTemplateName($formData['name'])
-        ;
+            ->setTemplateName($formData['name']);
 
         // Add feature and attributes list
         return $changeEvent;
@@ -151,7 +149,7 @@ class TemplateController extends AbstractCrudController
         return $object->getId();
     }
 
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         return $this->render('templates', ['order' => $currentOrder]);
     }
@@ -162,21 +160,17 @@ class TemplateController extends AbstractCrudController
             'template-edit',
             [
                 'template_id' => $this->getRequest()->get('template_id'),
-            ]
+            ],
         );
     }
 
-    /**
-     * @param Request $request
-     * @param int     $id
-     */
-    protected function redirectToEditionTemplate($request = null, $id = null): Response|RedirectResponse
+    protected function redirectToEditionTemplate(?Request $request = null, ?int $id = null): Response|RedirectResponse
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.templates.update',
             [
                 'template_id' => $id ?: $this->getRequest()->get('template_id'),
-            ]
+            ],
         );
     }
 
@@ -193,8 +187,8 @@ class TemplateController extends AbstractCrudController
         if ($deleteEvent->getProductCount() > 0) {
             $this->getParserContext()->setGeneralError(
                 $this->getTranslator()->trans(
-                    'This template is in use in some of your products, and cannot be deleted. Delete it from all your products and try again.'
-                )
+                    'This template is in use in some of your products, and cannot be deleted. Delete it from all your products and try again.',
+                ),
             );
 
             return $this->renderList();
@@ -235,7 +229,7 @@ class TemplateController extends AbstractCrudController
     {
         return $this->render(
             'ajax/template-feature-list',
-            ['template_id' => $this->getRequest()->get('template_id')]
+            ['template_id' => $this->getRequest()->get('template_id')],
         );
     }
 
@@ -243,7 +237,7 @@ class TemplateController extends AbstractCrudController
     {
         return $this->render(
             'ajax/template-attribute-list',
-            ['template_id' => $this->getRequest()->get('template_id')]
+            ['template_id' => $this->getRequest()->get('template_id')],
         );
     }
 
@@ -259,7 +253,7 @@ class TemplateController extends AbstractCrudController
         if ($attribute_id > 0) {
             $event = new TemplateAddAttributeEvent(
                 $this->getExistingObject(),
-                $attribute_id
+                $attribute_id,
             );
 
             try {
@@ -282,7 +276,7 @@ class TemplateController extends AbstractCrudController
 
         $event = new TemplateDeleteAttributeEvent(
             $this->getExistingObject(),
-            (int) $this->getRequest()->get('attribute_id')
+            (int) $this->getRequest()->get('attribute_id'),
         );
 
         try {
@@ -298,19 +292,18 @@ class TemplateController extends AbstractCrudController
     public function updateAttributePositionAction(
         Request $request,
         EventDispatcherInterface $eventDispatcher,
-    ) {
+    ): ?Response {
         // Find attribute_template
         $attributeTemplate = AttributeTemplateQuery::create()
             ->filterByTemplateId($request->get('template_id'))
             ->filterByAttributeId($request->get('attribute_id'))
-            ->findOne()
-        ;
+            ->findOne();
 
         return $this->genericUpdatePositionAction(
             $request,
             $eventDispatcher,
             $attributeTemplate,
-            TheliaEvents::TEMPLATE_CHANGE_ATTRIBUTE_POSITION
+            TheliaEvents::TEMPLATE_CHANGE_ATTRIBUTE_POSITION,
         );
     }
 
@@ -326,7 +319,7 @@ class TemplateController extends AbstractCrudController
         if ($feature_id > 0) {
             $event = new TemplateAddFeatureEvent(
                 $this->getExistingObject(),
-                $feature_id
+                $feature_id,
             );
 
             try {
@@ -349,7 +342,7 @@ class TemplateController extends AbstractCrudController
 
         $event = new TemplateDeleteFeatureEvent(
             $this->getExistingObject(),
-            (int) $this->getRequest()->get('feature_id')
+            (int) $this->getRequest()->get('feature_id'),
         );
 
         try {
@@ -365,19 +358,18 @@ class TemplateController extends AbstractCrudController
     public function updateFeaturePositionAction(
         Request $request,
         EventDispatcherInterface $eventDispatcher,
-    ) {
+    ): ?Response {
         // Find feature_template
         $featureTemplate = FeatureTemplateQuery::create()
             ->filterByTemplateId($request->get('template_id'))
             ->filterByFeatureId($request->get('feature_id'))
-            ->findOne()
-        ;
+            ->findOne();
 
         return $this->genericUpdatePositionAction(
             $request,
             $eventDispatcher,
             $featureTemplate,
-            TheliaEvents::TEMPLATE_CHANGE_FEATURE_POSITION
+            TheliaEvents::TEMPLATE_CHANGE_FEATURE_POSITION,
         );
     }
 }

@@ -16,6 +16,7 @@ namespace Thelia\Core\Template\Element;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Model\Lang;
 use Thelia\Model\Tools\ModelCriteriaTools;
 
 /**
@@ -32,7 +33,7 @@ abstract class BaseI18nLoop extends BaseLoop
      *
      * @return Argument[]
      */
-    protected function getDefaultArgs()
+    protected function getDefaultArgs(): array
     {
         $args = parent::getDefaultArgs();
 
@@ -57,18 +58,19 @@ abstract class BaseI18nLoop extends BaseLoop
         ?string $foreignTable = null,
         string $foreignKey = 'ID',
         bool $forceReturn = false,
-    ) {
+    ): void {
         /* manage translations */
-
+        /** @var Lang $lang */
+        $lang = $this->getCurrentRequest()->getSession()->getLang() ?? Lang::getDefaultLanguage();
         $this->locale = ModelCriteriaTools::getI18n(
             $this->getBackendContext(),
-            $this->getLang(),
+            $lang->getId(),
             $search,
-            $this->getCurrentRequest()->getSession()->getLang()->getLocale(),
+            $lang->getLocale(),
             $columns,
             $foreignTable,
             $foreignKey,
-            $this->getForceReturn()
+            $this->getForceReturn(),
         );
     }
 
@@ -89,13 +91,13 @@ abstract class BaseI18nLoop extends BaseLoop
                         ELSE `default_locale_i18n`.`{$columnName}`
                         END ".$searchCriteria.' ?',
                 $searchTerm,
-                \PDO::PARAM_STR
+                \PDO::PARAM_STR,
             );
         } else {
             $search->where(
                 \sprintf('`requested_locale_i18n`.`%s` %s ?', $columnName, $searchCriteria),
                 $searchTerm,
-                \PDO::PARAM_STR
+                \PDO::PARAM_STR,
             );
         }
     }

@@ -75,6 +75,7 @@ class ModelValidIdType extends BaseType
         }
 
         $choices = [];
+
         foreach ($query->find() as $item) {
             $label = method_exists($item, 'getTitle') ? $item->getTitle() : $item->getId();
             $choices[$label] = $item->getId();

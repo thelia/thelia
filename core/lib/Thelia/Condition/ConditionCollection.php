@@ -27,7 +27,7 @@ use Thelia\Condition\Implementation\ConditionInterface;
 class ConditionCollection implements \Iterator, \Countable, \ArrayAccess, \Stringable
 {
     /** @var ConditionInterface[] */
-    protected $conditions = [];
+    protected array $conditions = [];
 
     /**
      * (PHP 5 &gt;= 5.0.0)
@@ -48,8 +48,6 @@ class ConditionCollection implements \Iterator, \Countable, \ArrayAccess, \Strin
      * Move forward to next element.
      *
      * @see http://php.net/manual/en/iterator.next.php
-     *
-     * @return void any returned value is ignored
      */
     public function next(): void
     {
@@ -81,7 +79,7 @@ class ConditionCollection implements \Iterator, \Countable, \ArrayAccess, \Strin
     {
         $key = key($this->conditions);
 
-        return $key !== null;
+        return null !== $key;
     }
 
     /**
@@ -89,8 +87,6 @@ class ConditionCollection implements \Iterator, \Countable, \ArrayAccess, \Strin
      * Rewind the Iterator to the first element.
      *
      * @see http://php.net/manual/en/iterator.rewind.php
-     *
-     * @return void any returned value is ignored
      */
     public function rewind(): void
     {
@@ -123,7 +119,7 @@ class ConditionCollection implements \Iterator, \Countable, \ArrayAccess, \Strin
      * @return bool true on success or false on failure.
      *              The return value will be casted to boolean if non-boolean was returned.
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         return isset($this->conditions[$offset]);
     }
@@ -156,7 +152,7 @@ class ConditionCollection implements \Iterator, \Countable, \ArrayAccess, \Strin
      * @param mixed $value
      *                      The value to set
      */
-    public function offsetSet($offset, $value): void
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         if (null === $offset) {
             $this->conditions[] = $value;
@@ -174,7 +170,7 @@ class ConditionCollection implements \Iterator, \Countable, \ArrayAccess, \Strin
      * @param mixed $offset
      *                      The offset to unset
      */
-    public function offsetUnset($offset): void
+    public function offsetUnset(mixed $offset): void
     {
         unset($this->conditions[$offset]);
     }
@@ -187,6 +183,7 @@ class ConditionCollection implements \Iterator, \Countable, \ArrayAccess, \Strin
     public function __toString(): string
     {
         $arrayToSerialize = [];
+
         /** @var ConditionInterface $condition */
         foreach ($this as $condition) {
             $arrayToSerialize[] = $condition->getSerializableCondition();

@@ -82,13 +82,13 @@ class CurrencyCreationForm extends BaseForm
                 ],
                 'label' => $this->translator->trans(
                     'Rate from %currencyCode',
-                    ['%currencyCode' => $defaultCurrency->getCode()]
+                    ['%currencyCode' => $defaultCurrency->getCode()],
                 ),
                 'label_attr' => [
                     'for' => 'rate',
                     'help' => $this->translator->trans(
                         'The rate from %currencyCode: Price in %currencyCode x rate = Price in this currency',
-                        ['%currencyCode' => $defaultCurrency->getCode()]
+                        ['%currencyCode' => $defaultCurrency->getCode()],
                     ),
                 ],
                 'attr' => [
@@ -108,8 +108,7 @@ class CurrencyCreationForm extends BaseForm
                 'attr' => [
                     'placeholder' => $this->translator->trans('Code'),
                 ],
-            ])
-        ;
+            ]);
     }
 
     public static function getName(): string
@@ -125,8 +124,8 @@ class CurrencyCreationForm extends BaseForm
             $context->addViolation(
                 Translator::getInstance()->trans(
                     'A currency with code "%name" already exists.',
-                    ['%name' => $value]
-                )
+                    ['%name' => $value],
+                ),
             );
         }
     }

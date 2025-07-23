@@ -87,15 +87,10 @@ class Thelia extends Kernel
     public const THELIA_VERSION = '2.5.5';
 
     protected SchemaLocator $propelSchemaLocator;
-
     protected PropelInitService $propelInitService;
-
     protected ParserResolver $parserResolver;
-
     protected ConnectionInterface $theliaDatabaseConnection;
-
     protected bool $cacheRefresh = false;
-
     protected bool $propelConnectionAvailable;
 
     public function __construct(string $environment, bool $debug)
@@ -130,7 +125,7 @@ class Thelia extends Kernel
                 $container,
                 $eventDispatcher,
                 null,
-                $container->getParameter('kernel.cache_dir')
+                $container->getParameter('kernel.cache_dir'),
             );
             $moduleManagement->updateModules($this->getContainer());
         }
@@ -185,11 +180,11 @@ class Thelia extends Kernel
     {
         $container->parameters()->set(
             'thelia_front_template',
-            ConfigQuery::read(TemplateDefinition::FRONT_OFFICE_CONFIG_NAME, 'default')
+            ConfigQuery::read(TemplateDefinition::FRONT_OFFICE_CONFIG_NAME, 'default'),
         );
         $container->parameters()->set(
             'thelia_admin_template',
-            ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME, 'default')
+            ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME, 'default'),
         );
 
         $container->import(__DIR__.'/../Config/Resources/*.php');
@@ -209,6 +204,7 @@ class Thelia extends Kernel
         $routes->import(__DIR__.'/../Config/Resources/routing/*.php');
 
         $envRouteDir = __DIR__.'/../Config/Resources/routing/'.$this->environment;
+
         if (is_dir($envRouteDir)) {
             $routes->import($envRouteDir.'/*.php');
         }
@@ -223,14 +219,14 @@ class Thelia extends Kernel
         $this->propelSchemaLocator = new SchemaLocator(
             THELIA_CONF_DIR,
             THELIA_MODULE_DIR,
-            THELIA_LOCAL_MODULE_DIR
+            THELIA_LOCAL_MODULE_DIR,
         );
 
         $this->propelInitService = new PropelInitService(
             $this->getEnvironment(),
             $this->isDebug(),
             $this->getKernelParameters(),
-            $this->propelSchemaLocator
+            $this->propelSchemaLocator,
         );
 
         $this->propelConnectionAvailable = $this->initializePropelService(false, $this->cacheRefresh);
@@ -257,6 +253,7 @@ class Thelia extends Kernel
 
             if ($result && $data = $result->fetch(\PDO::FETCH_ASSOC)) {
                 $sessionSqlMode = explode(',', (string) $data['session_sql_mode']);
+
                 if (empty($sessionSqlMode[0])) {
                     unset($sessionSqlMode[0]);
                 }
@@ -266,7 +263,7 @@ class Thelia extends Kernel
                     // MySQL 5.6+ compatibility
                     if (version_compare($data['version'], '5.6.0', '>=')) {
                         // add NO_ENGINE_SUBSTITUTION
-                        if (!\in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode)) {
+                        if (!\in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode, true)) {
                             $sessionSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
                             $canUpdate = true;
                             $logs[] = 'Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.';
@@ -295,7 +292,7 @@ class Thelia extends Kernel
                         $logs[] = 'Remove sql_mode STRICT_TRANS_TABLES. Please configure your MySQL server.';
                     }
 
-                    if (version_compare($data['version'], '10.1.7', '>=') && !\in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode)) {
+                    if (version_compare($data['version'], '10.1.7', '>=') && !\in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode, true)) {
                         $sessionSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
                         $canUpdate = true;
                         $logs[] = 'Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.';
@@ -315,7 +312,7 @@ class Thelia extends Kernel
                     'modes' => array_values($sessionSqlMode),
                     'canUpdate' => $canUpdate,
                     'logs' => $logs,
-                ]).';'
+                ]).';',
             );
         }
 
@@ -334,16 +331,13 @@ class Thelia extends Kernel
     /**
      * @throws \Throwable
      */
-    public function initializePropelService($forcePropelCacheGeneration, &$cacheRefresh): bool
+    public function initializePropelService(bool $forcePropelCacheGeneration, &$cacheRefresh): bool
     {
         $cacheRefresh = false;
 
         return $this->propelInitService->init($forcePropelCacheGeneration, $cacheRefresh);
     }
 
-    /**
-     * @api
-     */
     public function getCacheDir(): string
     {
         if (\defined('THELIA_ROOT')) {
@@ -353,9 +347,6 @@ class Thelia extends Kernel
         return parent::getCacheDir();
     }
 
-    /**
-     * @api
-     */
     public function getLogDir(): string
     {
         if (\defined('THELIA_ROOT')) {
@@ -483,13 +474,13 @@ class Thelia extends Kernel
                 $definition->setClass($module->getFullNamespace())
                     ->addMethodCall(
                         'setContainer',
-                        [new Reference('service_container')]
+                        [new Reference('service_container')],
                     )
                     ->setPublic(true);
 
                 $container->setDefinition(
                     'module.'.$module->getCode(),
-                    $definition
+                    $definition,
                 );
 
                 $compilers = \call_user_func([$module->getFullNamespace(), 'getCompilers']);
@@ -513,6 +504,7 @@ class Thelia extends Kernel
                 }
 
                 $templateBasePath = $module->getAbsoluteTemplateBasePath();
+
                 if (is_dir($templateBasePath)) {
                     $container->loadFromExtension('twig', [
                         'paths' => [
@@ -527,7 +519,7 @@ class Thelia extends Kernel
 
                 Tlog::getInstance()->addError(
                     \sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
-                    $e
+                    $e,
                 );
             }
         }
@@ -547,6 +539,7 @@ class Thelia extends Kernel
         /** @var TemplateHelperInterface $templateHelper */
         $templateHelper = $container->get('thelia.template_helper');
         $modules = ModuleQuery::getActivated();
+
         /** @var Module $module */
         foreach ($modules as $module) {
             try {
@@ -558,7 +551,7 @@ class Thelia extends Kernel
 
                 Tlog::getInstance()->addError(
                     \sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
-                    $e
+                    $e,
                 );
             }
         }
@@ -575,7 +568,7 @@ class Thelia extends Kernel
             // Load parent templates transaltions, the current template translations.
             $templateList = array_merge(
                 $templateDefinition->getParentList(),
-                [$templateDefinition]
+                [$templateDefinition],
             );
 
             /** @var TemplateDefinition $tplDef */
@@ -586,7 +579,7 @@ class Thelia extends Kernel
             }
         }
 
-        if ($translationDirs !== []) {
+        if ([] !== $translationDirs) {
             $this->loadTranslation($container, $translationDirs);
         }
 
@@ -612,7 +605,7 @@ class Thelia extends Kernel
                     ],
                 ],
             ],
-            $extensionConfigs['security'][0]['providers'] ?? []
+            $extensionConfigs['security'][0]['providers'] ?? [],
         );
 
         $extensionConfigs['security'][0]['firewalls'] = array_merge(
@@ -644,7 +637,7 @@ class Thelia extends Kernel
                     'provider' => 'all_users',
                 ],
             ],
-            $extensionConfigs['security'][0]['firewalls'] ?? []
+            $extensionConfigs['security'][0]['firewalls'] ?? [],
         );
 
         $extensionConfigs['security'][0]['access_control'] = array_merge(
@@ -655,7 +648,7 @@ class Thelia extends Kernel
                 ['path' => '^/api/admin', 'roles' => 'ROLE_ADMIN'],
                 ['path' => '^/api/front/account', 'roles' => 'ROLE_CUSTOMER'],
             ],
-            $extensionConfigs['security'][0]['access_control'] ?? []
+            $extensionConfigs['security'][0]['access_control'] ?? [],
         );
 
         $extensionConfigsReflection->setValue($container, $extensionConfigs);
@@ -741,6 +734,7 @@ class Thelia extends Kernel
             TemplateDefinition::PDF => 'getPdfTemplateTranslationDomain',
             TemplateDefinition::EMAIL => 'getEmailTemplateTranslationDomain',
         ];
+
         foreach ($templateTypes as $type => $translationMethod) {
             $templates = $templateHelper->getList($type, $module->getAbsoluteTemplateBasePath());
 
@@ -748,6 +742,7 @@ class Thelia extends Kernel
                 $templateName = $template->getName();
                 $typeName = ucfirst((string) TemplateDefinition::$standardTemplatesSubdirs[$type]);
                 $moduleMethod = 'getAbsolute'.$typeName.'I18nTemplatePath';
+
                 if (!method_exists($moduleMethod, $module::class)) {
                     continue;
                 }
@@ -762,11 +757,13 @@ class Thelia extends Kernel
     {
         $parserResolver = $this->container->get('thelia.parser.resolver');
         $parsers = $parserResolver->getParsers();
+
         if (empty($parsers)) {
             return;
         }
 
         $modules = ModuleQuery::getActivated();
+
         foreach ($parsers as $parser) {
             if (!\is_object($parser)) {
                 continue;
@@ -806,7 +803,7 @@ class Thelia extends Kernel
                     $templateType,
                     $templateDirContent->getFilename(),
                     $templateDirContent->getPathName(),
-                    $code
+                    $code,
                 );
             }
         }

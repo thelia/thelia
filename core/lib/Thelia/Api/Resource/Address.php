@@ -39,36 +39,36 @@ use Thelia\Model\Map\AddressTableMap;
     operations: [
         new Post(
             uriTemplate: '/admin/addresses',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new GetCollection(
-            uriTemplate: '/admin/addresses'
+            uriTemplate: '/admin/addresses',
         ),
         new Get(
             uriTemplate: '/admin/addresses/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/addresses/{id}'
+            uriTemplate: '/admin/addresses/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/addresses/{id}'
+            uriTemplate: '/admin/addresses/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/addresses/{id}'
+            uriTemplate: '/admin/addresses/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, CustomerTitle::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new Post(
             uriTemplate: '/front/account/addresses',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
         new GetCollection(
-            uriTemplate: '/front/account/addresses'
+            uriTemplate: '/front/account/addresses',
         ),
         new Get(
             uriTemplate: '/front/account/addresses/{id}',
@@ -77,15 +77,15 @@ use Thelia\Model\Map\AddressTableMap;
         ),
         new Put(
             uriTemplate: '/front/account/addresses/{id}',
-            security: 'object.customer.getId() == user.getId()'
+            security: 'object.customer.getId() == user.getId()',
         ),
         new Delete(
             uriTemplate: '/front/account/addresses/{id}',
-            security: 'object.customer.getId() == user.getId()'
+            security: 'object.customer.getId() == user.getId()',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_FRONT_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_FRONT_WRITE]],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -93,43 +93,36 @@ use Thelia\Model\Map\AddressTableMap;
         'id',
         'label',
         'customer.id',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: NotInFilter::class,
     properties: [
         'id',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
         'isDefault',
-    ]
+    ],
 )]
 class Address implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:address:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:address:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:address:write';
-
     public const GROUP_FRONT_READ = 'front:address:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:address:read:single';
-
     public const GROUP_FRONT_WRITE = 'front:address:write';
-
     public const GROUP_ADMIN_COMBINED = [
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         Customer::GROUP_ADMIN_READ_SINGLE,
         Customer::GROUP_ADMIN_WRITE,
     ];
-
     public const GROUP_FRONT_COMBINED = [
         self::GROUP_FRONT_READ,
         self::GROUP_FRONT_READ_SINGLE,
@@ -451,14 +444,15 @@ class Address implements PropelResourceInterface
 
         if (isset($resource->country) && null !== ($country = $resource->getCountry()?->getPropelModel()) && $country->getNeedZipCode()) {
             $zipCodeRegExp = $country->getZipCodeRE();
+
             if (null !== $zipCodeRegExp && !preg_match($zipCodeRegExp, $resource->getZipcode())) {
                 $context->addViolation(
                     Translator::getInstance()->trans(
                         'This zip code should respect the following format : %format.',
                         ['%format' => $country->getZipCodeFormat()],
                         null,
-                        'en_US'
-                    )
+                        'en_US',
+                    ),
                 );
             }
         }
@@ -477,8 +471,8 @@ class Address implements PropelResourceInterface
                             "This state doesn't belong to this country.",
                             [],
                             null,
-                            'en_US'
-                        )
+                            'en_US',
+                        ),
                     );
                 }
             } else {
@@ -487,8 +481,8 @@ class Address implements PropelResourceInterface
                         'You should select a state for this country.',
                         [],
                         null,
-                        'en_US'
-                    )
+                        'en_US',
+                    ),
                 );
             }
         }

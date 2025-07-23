@@ -26,10 +26,10 @@ use Symfony\Component\Serializer\Serializer;
 class ResponseRest extends Response
 {
     /** @var Response Response Object */
-    protected $response;
+    protected Response $response;
 
     /** @var string Response format */
-    protected $format;
+    protected string $format;
 
     /**
      * Constructor.
@@ -40,14 +40,12 @@ class ResponseRest extends Response
      * @param array  $headers An array of response headers
      *
      * @throws \InvalidArgumentException When the HTTP status code is not valid
-     *
-     * @api
      */
-    public function __construct($data = null, $format = 'json', int $status = 200, array $headers = [])
+    public function __construct(?array $data = null, string $format = 'json', int $status = 200, array $headers = [])
     {
         parent::__construct('', $status, $headers);
 
-        if ($format == 'text') {
+        if ('text' === $format) {
             if (isset($data)) {
                 $this->setContent($data);
             }
@@ -72,7 +70,7 @@ class ResponseRest extends Response
      *
      * @return $this
      */
-    public function setRestContent($data): static
+    public function setRestContent(array $data): static
     {
         $serializer = $this->getSerializer();
 

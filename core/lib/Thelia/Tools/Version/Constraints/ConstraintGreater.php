@@ -26,7 +26,7 @@ class ConstraintGreater extends BaseConstraint
         $this->operator = $strict ? '>' : '>=';
         $this->expression = substr(
             (string) $expression,
-            \strlen($this->operator)
+            \strlen($this->operator),
         );
     }
 }

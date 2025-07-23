@@ -21,8 +21,6 @@ interface ArraySearchLoopInterface
 {
     /**
      * this method returns an array.
-     *
-     * @return array
      */
-    public function buildArray();
+    public function buildArray(): array;
 }

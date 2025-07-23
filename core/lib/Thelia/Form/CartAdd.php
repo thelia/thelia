@@ -86,15 +86,14 @@ class CartAdd extends BaseForm
                 ],
             ])
             ->add('append', IntegerType::class)
-            ->add('newness', IntegerType::class)
-        ;
+            ->add('newness', IntegerType::class);
     }
 
     public function checkProduct($value, ExecutionContextInterface $context): void
     {
         $product = ProductQuery::create()->findPk($value);
 
-        if (null === $product || $product->getVisible() == 0) {
+        if (null === $product || 0 === $product->getVisible()) {
             throw new ProductNotFoundException(\sprintf(Translator::getInstance()->trans('this product id does not exists : %d'), $value));
         }
     }
@@ -109,7 +108,7 @@ class CartAdd extends BaseForm
                 ->filterByProductId($data['product'])
                 ->count();
 
-            if ($productSaleElements == 0) {
+            if (0 === $productSaleElements) {
                 throw new StockNotFoundException(\sprintf(Translator::getInstance()->trans('This product_sale_elements_id does not exists for this product : %d'), $value));
             }
         }
@@ -129,7 +128,7 @@ class CartAdd extends BaseForm
 
             $product = $productSaleElements->getProduct();
 
-            if ($productSaleElements->getQuantity() < $value && $product->getVirtual() === 0 && ConfigQuery::checkAvailableStock()) {
+            if ($productSaleElements->getQuantity() < $value && 0 === $product->getVirtual() && ConfigQuery::checkAvailableStock()) {
                 $context->addViolation(Translator::getInstance()->trans('quantity value is not valid'));
             }
         }

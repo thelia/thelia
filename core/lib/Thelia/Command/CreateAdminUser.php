@@ -38,44 +38,43 @@ class CreateAdminUser extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Admin login name',
-                null
+                null,
             )
             ->addOption(
                 'first_name',
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'User first name',
-                null
+                null,
             )
             ->addOption(
                 'last_name',
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'User last name',
-                null
+                null,
             )
             ->addOption(
                 'email',
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Admin email address',
-                null
+                null,
             )
             ->addOption(
                 'locale',
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Preferred locale (default: en_US)',
-                null
+                null,
             )
             ->addOption(
                 'password',
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Password',
-                null
-            )
-        ;
+                null,
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -109,8 +108,8 @@ class CreateAdminUser extends ContainerAwareCommand
             $question->setHiddenFallback(false);
         }
 
-        $question->setValidator(function ($value) use (&$errorMessage) {
-            if (trim($value) === '') {
+        $question->setValidator(static function ($value) use (&$errorMessage) {
+            if ('' === trim($value)) {
                 throw new \Exception($errorMessage);
             }
 
@@ -143,7 +142,7 @@ class CreateAdminUser extends ContainerAwareCommand
             $password = $input->getOption('password') ?: $this->enterData($helper, $input, $output, 'Password : ', 'Please enter a password.', true);
             $password_again = $input->getOption('password') ?: $this->enterData($helper, $input, $output, 'Password (again): ', 'Please enter the password again.', true);
 
-            if (!empty($password) && $password == $password_again) {
+            if (!empty($password) && $password === $password_again) {
                 $admin->setPassword($password);
 
                 break;
@@ -166,9 +165,10 @@ class CreateAdminUser extends ContainerAwareCommand
     {
         $question = new Question($this->decorateInfo('Admin login name : '));
 
-        $question->setValidator(function ($answer): string {
+        $question->setValidator(static function ($answer): string {
             $answer = trim($answer);
-            if ($answer === '' || $answer === '0') {
+
+            if ('' === $answer || '0' === $answer) {
                 throw new \RuntimeException('Please enter a login name.');
             }
 
@@ -186,9 +186,10 @@ class CreateAdminUser extends ContainerAwareCommand
     {
         $question = new Question($this->decorateInfo('Admin email or empty value : '));
 
-        $question->setValidator(function ($answer): string {
+        $question->setValidator(static function ($answer): string {
             $answer = trim($answer);
-            if ($answer !== '' && $answer !== '0' && !filter_var($answer, \FILTER_VALIDATE_EMAIL)) {
+
+            if ('' !== $answer && '0' !== $answer && !filter_var($answer, \FILTER_VALIDATE_EMAIL)) {
                 throw new \RuntimeException('Please enter an email or an empty value.');
             }
 
@@ -196,7 +197,7 @@ class CreateAdminUser extends ContainerAwareCommand
                 throw new \RuntimeException('An administrator with this email already exists.');
             }
 
-            return $answer === '' || $answer === '0' ? uniqid('CHANGE_ME_') : $answer;
+            return '' === $answer || '0' === $answer ? uniqid('CHANGE_ME_') : $answer;
         });
 
         return $helper->ask($input, $output, $question);

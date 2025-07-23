@@ -22,9 +22,7 @@ namespace Thelia\Core\Event\Content;
 class ContentUpdateEvent extends ContentCreateEvent
 {
     protected $chapo;
-
     protected $description;
-
     protected $postscriptum;
 
     /**

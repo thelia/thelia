@@ -31,7 +31,7 @@ class LoopCompilerPass implements CompilerPassInterface
 
         $taggedServices = $container->findTaggedServiceIds('thelia.loop');
 
-        foreach ($taggedServices as $serviceId => $tags) {
+        foreach (array_keys($taggedServices) as $serviceId) {
             $definition = $container->getDefinition($serviceId);
             $className = $definition->getClass();
 
@@ -50,6 +50,6 @@ class LoopCompilerPass implements CompilerPassInterface
         $parts = explode('\\', $className);
         $shortClassName = end($parts);
 
-        return strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $shortClassName));
+        return strtolower((string) preg_replace('/([a-z])([A-Z])/', '$1_$2', $shortClassName));
     }
 }

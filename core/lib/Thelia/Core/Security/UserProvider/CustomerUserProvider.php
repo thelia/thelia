@@ -71,7 +71,7 @@ class CustomerUserProvider implements PayloadAwareUserProviderInterface
 
     public function loadUserByIdentifierAndPayload(string $userIdentifier, array $payload): UserInterface
     {
-        if (!isset($payload['type']) || $payload['type'] !== Customer::class) {
+        if (!isset($payload['type']) || Customer::class !== $payload['type']) {
             throw new UnsupportedUserException(\sprintf('User "%s" is not supported on this route.', $userIdentifier));
         }
 

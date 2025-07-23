@@ -29,8 +29,6 @@ class FallbackParserPass implements CompilerPassInterface
 {
     /**
      * You can modify the container here before it is dumped to PHP code.
-     *
-     * @api
      */
     public function process(ContainerBuilder $container): void
     {
@@ -43,7 +41,7 @@ class FallbackParserPass implements CompilerPassInterface
                 'thelia.parser' => new Definition(ParserFallback::class),
                 'thelia.parser.helper' => new Definition(ParserHelperFallback::class),
                 'thelia.parser.asset.resolver' => new Definition(ParserHelperFallback::class),
-            ]
+            ],
         );
     }
 }

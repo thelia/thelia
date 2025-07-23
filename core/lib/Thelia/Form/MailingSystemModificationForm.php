@@ -90,8 +90,7 @@ class MailingSystemModificationForm extends BaseForm
                 'required' => false,
                 'label' => Translator::getInstance()->trans('Source IP'),
                 'label_attr' => ['for' => 'sourceip_field'],
-            ])
-        ;
+            ]);
     }
 
     public static function getName(): string

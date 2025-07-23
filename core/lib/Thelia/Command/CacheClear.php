@@ -40,26 +40,25 @@ class CacheClear extends ContainerAwareCommand
                 'without-assets',
                 null,
                 InputOption::VALUE_NONE,
-                'do not clear the assets cache in the web space'
+                'do not clear the assets cache in the web space',
             )
             ->addOption(
                 'with-images',
                 null,
                 InputOption::VALUE_NONE,
-                'clear images generated in `image_cache_dir_from_web_root` or web/cache/images directory'
+                'clear images generated in `image_cache_dir_from_web_root` or web/cache/images directory',
             )
             ->addOption(
                 'with-documents',
                 null,
                 InputOption::VALUE_NONE,
-                'clear documents generated in `document_cache_dir_from_web_root` or web/cache/documents directory'
-            )
-        ;
+                'clear documents generated in `document_cache_dir_from_web_root` or web/cache/documents directory',
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $cacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
+        $cacheDir = (string) $this->getContainer()->getParameter('kernel.cache_dir');
 
         $this->clearCache($cacheDir, $output);
 
@@ -71,9 +70,9 @@ class CacheClear extends ContainerAwareCommand
             $this->clearCache(
                 THELIA_WEB_DIR.ConfigQuery::read(
                     'image_cache_dir_from_web_root',
-                    'cache'.DS.'images'
+                    'cache'.DS.'images',
                 ),
-                $output
+                $output,
             );
         }
 
@@ -81,16 +80,16 @@ class CacheClear extends ContainerAwareCommand
             $this->clearCache(
                 THELIA_WEB_DIR.ConfigQuery::read(
                     'document_cache_dir_from_web_root',
-                    'cache'.DS.'documents'
+                    'cache'.DS.'documents',
                 ),
-                $output
+                $output,
             );
         }
 
         return 0;
     }
 
-    protected function clearCache($dir, OutputInterface $output): void
+    protected function clearCache(string $dir, OutputInterface $output): void
     {
         $output->writeln(\sprintf('Clearing cache in <info>%s</info> directory', $dir));
 

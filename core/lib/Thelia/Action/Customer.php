@@ -33,6 +33,7 @@ use Thelia\Model\CustomerQuery;
 use Thelia\Model\Event\CustomerEvent;
 use Thelia\Model\LangQuery;
 use Thelia\Service\Model\CustomerService;
+use Thelia\Service\Model\LangService;
 use Thelia\Tools\Password;
 
 /**
@@ -44,8 +45,13 @@ use Thelia\Tools\Password;
  */
 class Customer extends BaseAction implements EventSubscriberInterface
 {
-    public function __construct(protected SecurityContext $securityContext, protected MailerFactory $mailer, protected CustomerService $customerService, protected ?RequestStack $requestStack = null)
-    {
+    public function __construct(
+        protected SecurityContext $securityContext,
+        protected MailerFactory $mailer,
+        protected CustomerService $customerService,
+        protected LangService $langService,
+        protected ?RequestStack $requestStack = null,
+    ) {
     }
 
     /**
@@ -63,13 +69,13 @@ class Customer extends BaseAction implements EventSubscriberInterface
             $this->mailer->sendEmailToCustomer(
                 'customer_account_created',
                 $customer,
-                ['password' => $plainPassword]
+                ['password' => $plainPassword],
             );
         }
 
         $dispatcher->dispatch(
             new CustomerEvent($customer),
-            TheliaEvents::SEND_ACCOUNT_CONFIRMATION_EMAIL
+            TheliaEvents::SEND_ACCOUNT_CONFIRMATION_EMAIL,
         );
     }
 
@@ -80,11 +86,11 @@ class Customer extends BaseAction implements EventSubscriberInterface
     ): void {
         $customer = $event->getModel();
 
-        if (ConfigQuery::isCustomerEmailConfirmationEnable() && $customer->getConfirmationToken() !== null) {
+        if (ConfigQuery::isCustomerEmailConfirmationEnable() && null !== $customer->getConfirmationToken()) {
             $this->mailer->sendEmailToCustomer(
                 'customer_confirmation',
                 $customer,
-                ['customer_id' => $customer->getId()]
+                ['customer_id' => $customer->getId()],
             );
         }
     }
@@ -102,7 +108,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
         $this->createOrUpdateCustomer($customer, $event);
 
-        if ($event->getNotifyCustomerOfAccountModification() && ($plainPassword !== null && $plainPassword !== '' && $plainPassword !== '0' || $emailChanged)) {
+        if ($event->getNotifyCustomerOfAccountModification() && (null !== $plainPassword && '' !== $plainPassword && '0' !== $plainPassword || $emailChanged)) {
             $this->mailer->sendEmailToCustomer('customer_account_changed', $customer, ['password' => $plainPassword]);
         }
     }
@@ -117,39 +123,39 @@ class Customer extends BaseAction implements EventSubscriberInterface
     ): void {
         $customer = $event->getCustomer();
 
-        if ($event->getTitle() !== null) {
+        if (null !== $event->getTitle()) {
             $customer->setTitleId($event->getTitle());
         }
 
-        if ($event->getFirstname() !== null) {
+        if (null !== $event->getFirstname()) {
             $customer->setFirstname($event->getFirstname());
         }
 
-        if ($event->getLastname() !== null) {
+        if (null !== $event->getLastname()) {
             $customer->setLastname($event->getLastname());
         }
 
-        if ($event->getEmail() !== null) {
+        if (null !== $event->getEmail()) {
             $customer->setEmail($event->getEmail(), $event->getEmailUpdateAllowed());
         }
 
-        if ($event->getPassword() !== null) {
+        if (null !== $event->getPassword()) {
             $customer->setPassword($event->getPassword());
         }
 
-        if ($event->getReseller() !== null) {
+        if (null !== $event->getReseller()) {
             $customer->setReseller($event->getReseller());
         }
 
-        if ($event->getSponsor() !== null) {
+        if (null !== $event->getSponsor()) {
             $customer->setSponsor($event->getSponsor());
         }
 
-        if ($event->getDiscount() !== null) {
+        if (null !== $event->getDiscount()) {
             $customer->setDiscount($event->getDiscount());
         }
 
-        if ($event->getLangId() !== null) {
+        if (null !== $event->getLangId()) {
             $customer->setLangId($event->getLangId());
         }
 
@@ -176,11 +182,11 @@ class Customer extends BaseAction implements EventSubscriberInterface
      * @throws PropelException
      */
     private function createOrUpdateCustomer(
-        CustomerModel $customer,
+        ?CustomerModel $customer,
         CustomerCreateOrUpdateEvent $event,
     ): void {
-        $customer->createOrUpdate(
-            $event->getTitle() ?? $this->customerService->getDefaultCustomerTitle()->getId(),
+        $customer?->createOrUpdate(
+            $event->getTitle() ?? $this->customerService->getDefaultCustomerTitle()?->getId(),
             $event->getFirstname(),
             $event->getLastname(),
             $event->getAddress1(),
@@ -190,7 +196,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
             $event->getCellphone(),
             $event->getZipcode(),
             $event->getCity(),
-            $event->getCountry(),
+            (int) $event->getCountry(),
             $event->getEmail(),
             $event->getPassword(),
             $event->getLangId(),
@@ -200,7 +206,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
             $event->getCompany(),
             $event->getRef(),
             $event->getEmailUpdateAllowed(),
-            $event->getState()
+            $event->getState(),
         );
 
         $event->setCustomer($customer);
@@ -209,7 +215,9 @@ class Customer extends BaseAction implements EventSubscriberInterface
     public function login(CustomerLoginEvent $event): void
     {
         $customer = $event->getCustomer();
-
+        if ($customer === null) {
+            return;
+        }
         if (method_exists($customer, 'clearDispatcher')) {
             $customer->clearDispatcher();
         }
@@ -218,10 +226,10 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
         // Set the preferred customer language
         if ($this->requestStack instanceof RequestStack
-            && !empty($customer->getLangId())
+            && $customer->getLangId() !== null
             && (null !== $lang = LangQuery::create()->findPk($customer->getLangId()))
         ) {
-            $this->requestStack->getCurrentRequest()->getSession()->setLang($lang);
+            $this->langService->setLang($lang);
         }
     }
 

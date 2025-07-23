@@ -54,15 +54,8 @@ class ImportHandler
     {
         $import = (new ImportQuery())->findPk($importId);
 
-        if ($import === null && $dispatchException) {
-            throw new \ErrorException(
-                Translator::getInstance()->trans(
-                    'There is no id "%id" in the imports',
-                    [
-                        '%id' => $importId,
-                    ]
-                )
-            );
+        if (null === $import && $dispatchException) {
+            throw new \ErrorException(Translator::getInstance()->trans('There is no id "%id" in the imports', ['%id' => $importId]));
         }
 
         return $import;
@@ -75,15 +68,8 @@ class ImportHandler
     {
         $import = (new ImportQuery())->findOneByRef($importRef);
 
-        if ($import === null && $dispatchException) {
-            throw new \ErrorException(
-                Translator::getInstance()->trans(
-                    'There is no id "%ref" in the imports',
-                    [
-                        '%ref' => $importRef,
-                    ]
-                )
-            );
+        if (null === $import && $dispatchException) {
+            throw new \ErrorException(Translator::getInstance()->trans('There is no id "%ref" in the imports', ['%ref' => $importRef]));
         }
 
         return $import;
@@ -96,15 +82,8 @@ class ImportHandler
     {
         $category = (new ImportCategoryQuery())->findPk($importCategoryId);
 
-        if ($category === null && $dispatchException) {
-            throw new \ErrorException(
-                Translator::getInstance()->trans(
-                    'There is no id "%id" in the import categories',
-                    [
-                        '%id' => $importCategoryId,
-                    ]
-                )
-            );
+        if (null === $category && $dispatchException) {
+            throw new \ErrorException(Translator::getInstance()->trans('There is no id "%id" in the import categories', ['%id' => $importCategoryId]));
         }
 
         return $category;
@@ -121,14 +100,7 @@ class ImportHandler
         $serializer = $this->matchSerializerByExtension($file->getFilename());
 
         if (!$serializer instanceof AbstractSerializer) {
-            throw new FormValidationException(
-                Translator::getInstance()->trans(
-                    'The extension "%extension" is not allowed',
-                    [
-                        '%extension' => pathinfo($file->getFilename(), \PATHINFO_EXTENSION),
-                    ]
-                )
-            );
+            throw new FormValidationException(Translator::getInstance()->trans('The extension "%extension" is not allowed', ['%extension' => pathinfo($file->getFilename(), \PATHINFO_EXTENSION)]));
         }
 
         $importHandleClass = $import->getHandleClass();
@@ -160,7 +132,7 @@ class ImportHandler
     {
         /** @var AbstractArchiver $archiver */
         foreach ($this->archiverManager->getArchivers(true) as $archiver) {
-            if (stripos($fileName, '.'.$archiver->getExtension()) !== false) {
+            if (false !== stripos($fileName, '.'.$archiver->getExtension())) {
                 return $archiver;
             }
         }
@@ -172,7 +144,7 @@ class ImportHandler
     {
         /** @var AbstractSerializer $serializer */
         foreach ($this->serializerManager->getSerializers() as $serializer) {
-            if (stripos((string) $fileName, '.'.$serializer->getExtension()) !== false) {
+            if (false !== stripos((string) $fileName, '.'.$serializer->getExtension())) {
                 return $serializer;
             }
         }
@@ -210,7 +182,8 @@ class ImportHandler
             $import->checkMandatoryColumns($data);
 
             $error = $import->importData($data);
-            if ($error !== null) {
+
+            if (null !== $error) {
                 $errors[] = $error;
             }
         }

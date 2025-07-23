@@ -58,10 +58,7 @@ class StartDate extends ConditionAbstract
 
             // Check that the date is valid
             if (false === $date) {
-                throw new InvalidConditionValueException(
-                    self::class,
-                    self::START_DATE
-                );
+                throw new InvalidConditionValueException(self::class, self::START_DATE);
             }
 
             $timestamp = $date->getTimestamp();
@@ -75,12 +72,12 @@ class StartDate extends ConditionAbstract
         return $this;
     }
 
-    public function isMatching()
+    public function isMatching(): bool
     {
         return $this->conditionValidator->variableOpComparison(
             time(),
             $this->operators[self::START_DATE],
-            $this->values[self::START_DATE]
+            $this->values[self::START_DATE],
         );
     }
 
@@ -88,7 +85,7 @@ class StartDate extends ConditionAbstract
     {
         return $this->translator->trans(
             'Start date',
-            []
+            [],
         );
     }
 
@@ -96,7 +93,7 @@ class StartDate extends ConditionAbstract
     {
         return $this->translator->trans(
             'The coupon is valid after a given date',
-            []
+            [],
         );
     }
 
@@ -112,7 +109,7 @@ class StartDate extends ConditionAbstract
             [
                 '%date%' => $strDate,
             ],
-            'condition'
+            'condition',
         );
     }
 
@@ -132,7 +129,7 @@ class StartDate extends ConditionAbstract
         ];
     }
 
-    public function drawBackOfficeInputs()
+    public function drawBackOfficeInputs(): string
     {
         if (isset($this->values[self::START_DATE])) {
             $date = new \DateTime();

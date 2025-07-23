@@ -37,56 +37,44 @@ class TheliaFormValidator
      * @param BaseForm $aBaseForm      the form
      * @param string   $expectedMethod the expected method, POST or GET, or null for any of them
      *
-     * @throws FormValidationException is the form contains error, or the method is not the right one
-     *
      * @return Form Form the symfony form object
+     *
+     * @throws FormValidationException is the form contains error, or the method is not the right one
      */
-    public function validateForm(BaseForm $aBaseForm, $expectedMethod = null)
+    public function validateForm(BaseForm $aBaseForm, ?string $expectedMethod = null): Form
     {
         $form = $aBaseForm->getForm();
 
-        if ($expectedMethod == null || $aBaseForm->getRequest()->isMethod($expectedMethod)) {
+        if (null === $expectedMethod || $aBaseForm->getRequest()->isMethod($expectedMethod)) {
             $form->handleRequest($aBaseForm->getRequest());
 
             if ($form->isValid()) {
                 if ($aBaseForm instanceof FirewallForm && !$aBaseForm->isFirewallOk($this->environment)) {
-                    throw new FormValidationException(
-                        $this->translator->trans("You've submitted this form too many times. ")
-                        .$this->translator->trans('Further submissions will be ignored during %time',
-                            [
-                                '%time' => $aBaseForm->getWaitingTime(),
-                            ]
-                        )
-                    );
+                    throw new FormValidationException($this->translator->trans("You've submitted this form too many times. ").$this->translator->trans('Further submissions will be ignored during %time', ['%time' => $aBaseForm->getWaitingTime()]));
                 }
 
                 return $form;
             }
 
             $errorMessage = null;
-            if ($form->get('error_message')->getData() != null) {
+
+            if (null !== $form->get('error_message')->getData()) {
                 $errorMessage = $form->get('error_message')->getData();
             } else {
                 $errorMessage = \sprintf(
                     $this->translator->trans(
-                        'Missing or invalid data: %s'
+                        'Missing or invalid data: %s',
                     ),
-                    $this->getErrorMessages($form)
+                    $this->getErrorMessages($form),
                 );
             }
 
             $aBaseForm->setError(true);
+
             throw new FormValidationException($errorMessage);
         }
 
-        throw new FormValidationException(
-            \sprintf(
-                $this->translator->trans(
-                    'Wrong form method, %s expected.'
-                ),
-                $expectedMethod
-            )
-        );
+        throw new FormValidationException(\sprintf($this->translator->trans('Wrong form method, %s expected.'), $expectedMethod));
     }
 
     /**

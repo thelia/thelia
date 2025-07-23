@@ -32,10 +32,10 @@ trait StubClassTrait
         /** @var $this AbstractOMBuilder */
         $fs = new Filesystem();
 
-        if ($this->getPackage() === 'Thelia.Model') {
+        if ('Thelia.Model' === $this->getPackage()) {
             $path = $fs->makePathRelative(
                 THELIA_LIB.'..'.DS.parent::getClassFilePath(),
-                THELIA_ROOT
+                THELIA_ROOT,
             );
         } else {
             $modulePath = file_exists(THELIA_MODULE_DIR.parent::getClassFilePath())
@@ -44,7 +44,7 @@ trait StubClassTrait
 
             $path = $fs->makePathRelative(
                 $modulePath,
-                THELIA_ROOT
+                THELIA_ROOT,
             );
         }
 

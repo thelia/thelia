@@ -31,8 +31,7 @@ class ContentModificationForm extends ContentCreationForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add('id', HiddenType::class, ['constraints' => [new GreaterThan(['value' => 0])]])
-        ;
+            ->add('id', HiddenType::class, ['constraints' => [new GreaterThan(['value' => 0])]]);
 
         // Add standard description fields, excluding title and locale, which a re defined in parent class
         $this->addStandardDescFields(['title', 'locale']);

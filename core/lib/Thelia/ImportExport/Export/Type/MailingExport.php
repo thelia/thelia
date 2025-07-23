@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\ImportExport\Export\Type;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Propel;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
 
@@ -27,7 +28,7 @@ class MailingExport extends JsonFileAbstractExport
 {
     public const FILE_NAME = 'mailing';
 
-    protected $orderAndAliases = [
+    protected array $orderAndAliases = [
         'newsletter_id' => 'Identifier',
         'newsletter_email' => 'Email',
         'newsletter_firstname' => 'FirstName',
@@ -35,7 +36,7 @@ class MailingExport extends JsonFileAbstractExport
         'newsletter_locale' => 'Locale',
     ];
 
-    protected function getData()
+    protected function getData(): array|string|ModelCriteria
     {
         $con = Propel::getConnection();
         $query = 'SELECT
@@ -45,8 +46,7 @@ class MailingExport extends JsonFileAbstractExport
                         newsletter.lastname as "newsletter_lastname",
                         newsletter.locale as "newsletter_locale"
                     FROM newsletter
-                    WHERE newsletter.unsubscribed = 0'
-        ;
+                    WHERE newsletter.unsubscribed = 0';
         $stmt = $con->prepare($query);
         $stmt->execute();
 

@@ -24,14 +24,8 @@ class Message extends BaseMessage
 {
     /**
      * Calculate the message body, given the HTML entered in the back-office, the message layout, and the message template.
-     *
-     * @param ParserInterface $parser
-     * @param string          $message
-     * @param bool            $compressOutput
-     *
-     * @return bool|string
      */
-    protected function getMessageBody($parser, $message, $layout, $template, $compressOutput = true)
+    protected function getMessageBody(ParserInterface $parser, string $message, $layout, $template, bool $compressOutput = true): bool|string
     {
         $body = false;
 
@@ -45,7 +39,7 @@ class Message extends BaseMessage
         }
 
         // We did not get it ? Use the message entered in the back-office
-        if ($body === false) {
+        if (false === $body) {
             $body = $parser->renderString($message, [], $compressOutput);
         }
 
@@ -63,30 +57,28 @@ class Message extends BaseMessage
 
     /**
      * Get the HTML message body.
-     *
-     * @return bool|string
      */
-    public function getHtmlMessageBody(ParserInterface $parser)
+    public function getHtmlMessageBody(ParserInterface $parser): bool|string
     {
         return $this->getMessageBody(
             $parser,
             $this->getHtmlMessage(),
             $this->getHtmlLayoutFileName(),
-            $this->getHtmlTemplateFileName()
+            $this->getHtmlTemplateFileName(),
         );
     }
 
     /**
      * @return string|string[]|null
      */
-    public function getTextMessageBody(ParserInterface $parser)
+    public function getTextMessageBody(ParserInterface $parser): string|array|null
     {
         $message = $this->getMessageBody(
             $parser,
             $this->getTextMessage(),
             $this->getTextLayoutFileName(),
             $this->getTextTemplateFileName(),
-            true // Do not compress the output, and keep empty lines.
+            true, // Do not compress the output, and keep empty lines.
         );
 
         // Replaced all <br> by newlines.
@@ -102,15 +94,13 @@ class Message extends BaseMessage
      *                                  the template file located in the module under
      *                                  `templates/email/default/' directory is used if
      *                                  `$useFallbackTemplate` is set to `true`
-     *
-     * @return Email
      */
-    public function buildMessage(ParserInterface $parser, Email $messageInstance, $useFallbackTemplate = true)
+    public function buildMessage(ParserInterface $parser, Email $messageInstance, bool $useFallbackTemplate = true): Email
     {
         // Set mail template, and save the current template
         $parser->pushTemplateDefinition(
             $parser->getTemplateHelper()->getActiveMailTemplate(),
-            $useFallbackTemplate
+            $useFallbackTemplate,
         );
 
         $subject = $parser->renderString($this->getSubject());

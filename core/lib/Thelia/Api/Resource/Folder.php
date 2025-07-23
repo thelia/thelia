@@ -34,36 +34,36 @@ use Thelia\Model\Tools\UrlRewritingTrait;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/folders'
+            uriTemplate: '/admin/folders',
         ),
         new GetCollection(
-            uriTemplate: '/admin/folders'
+            uriTemplate: '/admin/folders',
         ),
         new Get(
             uriTemplate: '/admin/folders/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/folders/{id}'
+            uriTemplate: '/admin/folders/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/folders/{id}'
+            uriTemplate: '/admin/folders/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/folders/{id}'
+            uriTemplate: '/admin/folders/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/front/folders'
+            uriTemplate: '/front/folders',
         ),
         new Get(
             uriTemplate: '/front/folders/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -73,38 +73,34 @@ use Thelia\Model\Tools\UrlRewritingTrait;
     properties: [
         'id',
         'parent',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: NotInFilter::class,
     properties: [
         'id',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
         'position',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
         'visible',
-    ]
+    ],
 )]
 class Folder extends AbstractTranslatableResource
 {
     use UrlRewritingTrait;
 
     public const GROUP_ADMIN_READ = 'admin:folder:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:folder:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:folder:write';
-
     public const GROUP_FRONT_READ = 'front:folder:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:folder:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ,
@@ -148,7 +144,7 @@ class Folder extends AbstractTranslatableResource
 
     public function isParent(): bool
     {
-        return $this->parent !== 0;
+        return 0 !== $this->parent;
     }
 
     public function setParent(int $parent): self

@@ -24,25 +24,15 @@ use Propel\Runtime\Util\PropelDateTime;
 class SaleUpdateEvent extends SaleCreateEvent
 {
     protected $chapo;
-
     protected $description;
-
     protected $postscriptum;
-
     protected $active;
-
     protected $startDate;
-
     protected $endDate;
-
     protected $priceOffsetType;
-
     protected $displayInitialPrice;
-
     protected $priceOffsets;
-
     protected $products;
-
     protected $productAttributes;
 
     /**
@@ -53,101 +43,76 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @param int $saleId
-     *
      * @return SaleUpdateEvent $this
      */
-    public function setSaleId($saleId): static
+    public function setSaleId(int $saleId): static
     {
         $this->saleId = $saleId;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getSaleId()
+    public function getSaleId(): int
     {
         return $this->saleId;
     }
 
     /**
-     * @param string $chapo
-     *
      * @return SaleUpdateEvent $this
      */
-    public function setChapo($chapo): static
+    public function setChapo(string $chapo): static
     {
         $this->chapo = $chapo;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getChapo()
+    public function getChapo(): string
     {
         return $this->chapo;
     }
 
     /**
-     * @param string $description
-     *
      * @return SaleUpdateEvent $this
      */
-    public function setDescription($description): static
+    public function setDescription(string $description): static
     {
         $this->description = $description;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
 
     /**
-     * @param string $postscriptum
-     *
      * @return SaleUpdateEvent $this
      */
-    public function setPostscriptum($postscriptum): static
+    public function setPostscriptum(string $postscriptum): static
     {
         $this->postscriptum = $postscriptum;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getPostscriptum()
+    public function getPostscriptum(): string
     {
         return $this->postscriptum;
     }
 
     /**
-     * @param bool $active
-     *
      * @return SaleUpdateEvent $this
      */
-    public function setActive($active): static
+    public function setActive(bool $active): static
     {
         $this->active = $active;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function getActive()
+    public function getActive(): bool
     {
         return $this->active;
     }
@@ -157,37 +122,29 @@ class SaleUpdateEvent extends SaleCreateEvent
      *
      * @return SaleUpdateEvent $this
      */
-    public function setEndDate($endDate): static
+    public function setEndDate(mixed $endDate): static
     {
         $this->endDate = PropelDateTime::newInstance($endDate, null, '\DateTime');
 
         return $this;
     }
 
-    /**
-     * @return DateTime|null
-     */
-    public function getEndDate()
+    public function getEndDate(): ?DateTime
     {
         return $this->endDate;
     }
 
     /**
-     * @param int $priceOffsetType
-     *
      * @return SaleUpdateEvent $this
      */
-    public function setPriceOffsetType($priceOffsetType): static
+    public function setPriceOffsetType(int $priceOffsetType): static
     {
         $this->priceOffsetType = $priceOffsetType;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getPriceOffsetType()
+    public function getPriceOffsetType(): int
     {
         return $this->priceOffsetType;
     }
@@ -197,37 +154,29 @@ class SaleUpdateEvent extends SaleCreateEvent
      *
      * @return SaleUpdateEvent $this
      */
-    public function setStartDate($startDate): static
+    public function setStartDate(mixed $startDate): static
     {
         $this->startDate = PropelDateTime::newInstance($startDate, null, '\DateTime');
 
         return $this;
     }
 
-    /**
-     * @return DateTime|null
-     */
-    public function getStartDate()
+    public function getStartDate(): ?DateTime
     {
         return $this->startDate;
     }
 
     /**
-     * @param bool $displayInitialPrice
-     *
      * @return $this
      */
-    public function setDisplayInitialPrice($displayInitialPrice): static
+    public function setDisplayInitialPrice(bool $displayInitialPrice): static
     {
         $this->displayInitialPrice = $displayInitialPrice;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function getDisplayInitialPrice()
+    public function getDisplayInitialPrice(): bool
     {
         return $this->displayInitialPrice;
     }
@@ -237,17 +186,14 @@ class SaleUpdateEvent extends SaleCreateEvent
      *
      * @return $this
      */
-    public function setPriceOffsets($priceOffsets): static
+    public function setPriceOffsets(array $priceOffsets): static
     {
         $this->priceOffsets = $priceOffsets;
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getPriceOffsets()
+    public function getPriceOffsets(): array
     {
         return $this->priceOffsets;
     }
@@ -257,17 +203,14 @@ class SaleUpdateEvent extends SaleCreateEvent
      *
      * @return $this
      */
-    public function setProducts($products): static
+    public function setProducts(array $products): static
     {
         $this->products = $products;
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getProducts()
+    public function getProducts(): array
     {
         return $this->products;
     }
@@ -277,7 +220,7 @@ class SaleUpdateEvent extends SaleCreateEvent
      *
      * @return $this
      */
-    public function setProductAttributes($productAttributes): static
+    public function setProductAttributes(array $productAttributes): static
     {
         $this->productAttributes = $productAttributes;
 
@@ -287,7 +230,7 @@ class SaleUpdateEvent extends SaleCreateEvent
     /**
      * @return array $productAttributes an array of (product_id => array of attribute IDs)
      */
-    public function getProductAttributes()
+    public function getProductAttributes(): array
     {
         return $this->productAttributes;
     }

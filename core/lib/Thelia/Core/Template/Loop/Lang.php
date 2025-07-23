@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -65,12 +66,12 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
                     'alpha', 'alpha_reverse',
                     'position', 'position_reverse',
                 ],
-                'position'
-            )
+                'position',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = LangQuery::create();
 
@@ -154,8 +155,7 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
                 ->set('DECIMAL_SEPARATOR', $result->getDecimalSeparator())
                 ->set('THOUSANDS_SEPARATOR', $result->getThousandsSeparator())
                 ->set('DECIMAL_COUNT', $result->getDecimals())
-                ->set('POSITION', $result->getPosition())
-            ;
+                ->set('POSITION', $result->getPosition());
 
             $this->addOutputFields($loopResultRow, $result);
 

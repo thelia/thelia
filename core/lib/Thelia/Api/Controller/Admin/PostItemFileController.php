@@ -36,7 +36,7 @@ class PostItemFileController
         /** @var ItemFileResourceInterface|PropelResourceInterface $resourceClass */
         $resourceClass = $request->get('_api_resource_class');
 
-        if (!\in_array(ItemFileResourceInterface::class, class_implements($resourceClass))) {
+        if (!\in_array(ItemFileResourceInterface::class, class_implements($resourceClass), true)) {
             throw new \Exception('Resource must implements ItemFileResourceInterface to use the PostItemFileController');
         }
 
@@ -48,6 +48,7 @@ class PostItemFileController
 
         if (\count($violations) > 0) {
             $errors = [];
+
             foreach ($violations as $violation) {
                 $errors[] = $violation->getMessage();
             }

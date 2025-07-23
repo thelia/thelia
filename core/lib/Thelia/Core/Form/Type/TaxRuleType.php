@@ -70,8 +70,7 @@ class TaxRuleType extends AbstractTheliaType
             ])
             ->add('id', 'tax_rule_id', [
                 'constraints' => $this->getConstraints($this->taxRuleIdType, 'update'),
-            ])
-        ;
+            ]);
     }
 
     /**

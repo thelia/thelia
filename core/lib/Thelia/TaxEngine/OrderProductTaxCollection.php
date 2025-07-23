@@ -23,7 +23,6 @@ use Thelia\Model\OrderProductTax;
 class OrderProductTaxCollection implements \Iterator
 {
     private ?int $position = null;
-
     protected $taxes = [];
 
     public function __construct()
@@ -35,7 +34,7 @@ class OrderProductTaxCollection implements \Iterator
 
     public function isEmpty(): bool
     {
-        return \count($this->taxes) == 0;
+        return 0 === \count($this->taxes);
     }
 
     public function addTax(OrderProductTax $tax): static
@@ -69,8 +68,6 @@ class OrderProductTaxCollection implements \Iterator
      * Move forward to next element.
      *
      * @see http://php.net/manual/en/iterator.next.php
-     *
-     * @return void any returned value is ignored
      */
     public function next(): void
     {
@@ -110,8 +107,6 @@ class OrderProductTaxCollection implements \Iterator
      * Rewind the Iterator to the first element.
      *
      * @see http://php.net/manual/en/iterator.rewind.php
-     *
-     * @return void any returned value is ignored
      */
     public function rewind(): void
     {

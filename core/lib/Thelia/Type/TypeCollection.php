@@ -22,7 +22,6 @@ use Iterator;
 class TypeCollection implements \Iterator
 {
     private ?int $position = null;
-
     protected $types = [];
 
     public function __construct()
@@ -34,7 +33,7 @@ class TypeCollection implements \Iterator
 
     public function isEmpty(): bool
     {
-        return \count($this->types) == 0;
+        return 0 === \count($this->types);
     }
 
     public function addType(TypeInterface $type): static
@@ -68,8 +67,6 @@ class TypeCollection implements \Iterator
      * Move forward to next element.
      *
      * @see http://php.net/manual/en/iterator.next.php
-     *
-     * @return void any returned value is ignored
      */
     public function next(): void
     {
@@ -109,8 +106,6 @@ class TypeCollection implements \Iterator
      * Rewind the Iterator to the first element.
      *
      * @see http://php.net/manual/en/iterator.rewind.php
-     *
-     * @return void any returned value is ignored
      */
     public function rewind(): void
     {
@@ -135,8 +130,6 @@ class TypeCollection implements \Iterator
                 return $type->getFormattedValue($value);
             }
         }
-
-        return null;
     }
 
     public function getKey($key)

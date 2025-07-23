@@ -26,59 +26,32 @@ use Thelia\Model\Exception\InvalidArgumentException;
  */
 class CouponCreateOrUpdateEvent extends ActionEvent
 {
-    /** @var ConditionCollection Array of ConditionInterface */
-    protected $conditions;
+    protected ConditionCollection $conditions;
 
-    /** @var float Amount that will be removed from the Checkout (Coupon Effect) */
-    protected $amount = 0;
+    protected float $amount = 0;
 
-    /** @var array Effects ready to be serialized */
-    protected $effects = [];
+    protected array $effects = [];
 
-    /** @var Coupon Coupon model */
-    protected $couponModel;
+    protected Coupon $couponModel;
 
-    /**
-     * Constructor.
-     *
-     * @param string   $code                       Coupon Code
-     * @param string   $serviceId                  Coupon Service id
-     * @param string   $title                      Coupon title
-     * @param array    $effects                    Coupon effects ready to be serialized
-     *                                             'amount' key is mandatory and reflects
-     *                                             the amount deduced from the cart
-     * @param string   $shortDescription           Coupon short description
-     * @param string   $description                Coupon description
-     * @param bool     $isEnabled                  Enable/Disable
-     * @param DateTime $expirationDate             Coupon expiration date
-     * @param bool     $isAvailableOnSpecialOffers Is available on special offers
-     * @param bool     $isCumulative               Is cumulative
-     * @param bool     $isRemovingPostage          Is removing Postage
-     * @param int      $maxUsage                   Coupon quantity
-     * @param string   $locale                     Coupon Language code ISO (ex: fr_FR)
-     * @param array    $freeShippingForCountries   ID of Countries to which shipping is free
-     * @param array    $freeShippingForMethods     ID of Shipping modules for which shipping is free
-     * @param bool     $perCustomerUsageCount      Usage count is per customer
-     * @param DateTime $startDate                  Coupon start date
-     */
     public function __construct(
         protected $code,
         protected $serviceId,
         protected $title,
         array $effects,
-        protected $shortDescription,
-        protected $description,
-        protected $isEnabled,
-        protected DateTime $expirationDate,
-        protected $isAvailableOnSpecialOffers,
-        protected $isCumulative,
-        protected $isRemovingPostage,
+        protected ?string $shortDescription,
+        protected ?string $description,
+        protected bool $isEnabled,
+        protected \DateTime $expirationDate,
+        protected bool $isAvailableOnSpecialOffers,
+        protected bool $isCumulative,
+        protected bool $isRemovingPostage,
         protected $maxUsage,
         protected $locale,
         protected $freeShippingForCountries,
         protected $freeShippingForMethods,
         protected $perCustomerUsageCount,
-        protected ?DateTime $startDate = null,
+        protected ?\DateTime $startDate = null,
     ) {
         $this->setEffects($effects);
     }
@@ -86,7 +59,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /**
      * @param true $perCustomerUsageCount
      */
-    public function setPerCustomerUsageCount($perCustomerUsageCount): static
+    public function setPerCustomerUsageCount(bool $perCustomerUsageCount): static
     {
         $this->perCustomerUsageCount = $perCustomerUsageCount;
 
@@ -96,87 +69,69 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /**
      * @return true
      */
-    public function getPerCustomerUsageCount()
+    public function getPerCustomerUsageCount(): bool
     {
         return $this->perCustomerUsageCount;
     }
 
     /**
-     * @param array $freeShippingForCountries
-     *
      * @return $this
      */
-    public function setFreeShippingForCountries($freeShippingForCountries): static
+    public function setFreeShippingForCountries(array $freeShippingForCountries): static
     {
         $this->freeShippingForCountries = $freeShippingForCountries;
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getFreeShippingForCountries()
+    public function getFreeShippingForCountries(): array
     {
         return $this->freeShippingForCountries;
     }
 
     /**
-     * @param array $freeShippingForMethods
-     *
      * @return $this
      */
-    public function setFreeShippingForMethods($freeShippingForMethods): static
+    public function setFreeShippingForMethods(array $freeShippingForMethods): static
     {
         $this->freeShippingForMethods = $freeShippingForMethods;
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getFreeShippingForMethods()
+    public function getFreeShippingForMethods(): array
     {
         return $this->freeShippingForMethods;
     }
 
     /**
      * Return Coupon code (ex: XMAS).
-     *
-     * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }
 
     /**
      * Return Coupon title (ex: Coupon for XMAS).
-     *
-     * @return string
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
 
     /**
      * Return Coupon short description.
-     *
-     * @return string
      */
-    public function getShortDescription()
+    public function getShortDescription(): ?string
     {
         return $this->shortDescription;
     }
 
     /**
      * Return Coupon description.
-     *
-     * @return string
      */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -185,20 +140,16 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      * If Coupon is cumulative or prevent any accumulation
      * If is cumulative you can sum Coupon effects
      * If not cancel all other Coupon and take the last given.
-     *
-     * @return bool
      */
-    public function isCumulative()
+    public function isCumulative(): bool
     {
         return $this->isCumulative;
     }
 
     /**
      * If Coupon is removing Checkout Postage.
-     *
-     * @return bool
      */
-    public function isRemovingPostage()
+    public function isRemovingPostage(): bool
     {
         return $this->isRemovingPostage;
     }
@@ -208,7 +159,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      *
      * @return float Amount removed from the Total Checkout
      */
-    public function getAmount()
+    public function getAmount(): float
     {
         return $this->effects['amount'];
     }
@@ -216,9 +167,9 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /**
      * Return Coupon start date.
      */
-    public function getStartDate(): ?DateTime
+    public function getStartDate(): ?\DateTime
     {
-        if (!$this->startDate instanceof DateTime) {
+        if (!$this->startDate instanceof \DateTime) {
             return null;
         }
 
@@ -227,30 +178,24 @@ class CouponCreateOrUpdateEvent extends ActionEvent
 
     /**
      * Return Coupon expiration date.
-     *
-     * @return DateTime
      */
-    public function getExpirationDate()
+    public function getExpirationDate(): \DateTime
     {
         return clone $this->expirationDate;
     }
 
     /**
      * If Coupon is available on special offers.
-     *
-     * @return bool
      */
-    public function isAvailableOnSpecialOffers()
+    public function isAvailableOnSpecialOffers(): bool
     {
         return $this->isAvailableOnSpecialOffers;
     }
 
     /**
      * Get if Coupon is enabled or not.
-     *
-     * @return bool
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return $this->isEnabled;
     }
@@ -258,30 +203,24 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /**
      * Return how many time the Coupon can be used again
      * Ex : -1 unlimited.
-     *
-     * @return int
      */
-    public function getMaxUsage()
+    public function getMaxUsage(): int
     {
         return $this->maxUsage;
     }
 
     /**
      * Get Coupon Service id (Type).
-     *
-     * @return string
      */
-    public function getServiceId()
+    public function getServiceId(): string
     {
         return $this->serviceId;
     }
 
     /**
      * Coupon Language code ISO (ex: fr_FR).
-     *
-     * @return string
      */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->locale;
     }
@@ -298,55 +237,44 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     public function setEffects(array $effects): void
     {
         // Amount is now optionnal.
-        $this->amount = $effects['amount'] ?? 0;
+        $this->amount = $effects['amount'] ? (float) $effects['amount'] : .0;
 
         $this->effects = $effects;
     }
 
     /**
      * Get effects ready to be serialized.
-     *
-     * @return array
      */
-    public function getEffects()
+    public function getEffects(): array
     {
         return $this->effects;
     }
 
     /**
      * Get if the Coupon will be available on special offers or not.
-     *
-     * @return bool
      */
-    public function getIsAvailableOnSpecialOffers()
+    public function getIsAvailableOnSpecialOffers(): bool
     {
         return $this->isAvailableOnSpecialOffers;
     }
 
     /**
      * Get if the Coupon effect cancel other Coupon effects.
-     *
-     * @return bool
      */
-    public function getIsCumulative()
+    public function getIsCumulative(): bool
     {
         return $this->isCumulative;
     }
 
     /**
      * Get if Coupon is enabled or not.
-     *
-     * @return bool
      */
-    public function getIsEnabled()
+    public function getIsEnabled(): bool
     {
         return $this->isEnabled;
     }
 
-    /**
-     * @return bool
-     */
-    public function getIsRemovingPostage()
+    public function getIsRemovingPostage(): bool
     {
         return $this->isRemovingPostage;
     }
@@ -367,10 +295,8 @@ class CouponCreateOrUpdateEvent extends ActionEvent
 
     /**
      * Return Coupon Model.
-     *
-     * @return Coupon
      */
-    public function getCouponModel()
+    public function getCouponModel(): Coupon
     {
         return $this->couponModel;
     }
@@ -380,7 +306,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      *
      * @return ConditionCollection|null Array of ConditionInterface
      */
-    public function getConditions()
+    public function getConditions(): ?ConditionCollection
     {
         return $this->conditions;
     }

@@ -48,6 +48,7 @@ readonly class PropelCollectionProvider implements ProviderInterface
         $results = null;
 
         $resultExtensions = [];
+
         foreach ($this->propelCollectionExtensions as $extension) {
             $extension->applyToCollection($query, $resourceClass, $operation, $context);
 
@@ -73,9 +74,9 @@ readonly class PropelCollectionProvider implements ProviderInterface
                 resourceClass: $resourceClass,
                 propelModel: $propelModel,
                 context: $context,
-                langs: $langs
+                langs: $langs,
             ),
-            iterator_to_array($results)
+            iterator_to_array($results),
         );
     }
 }

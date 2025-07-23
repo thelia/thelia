@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -40,11 +41,11 @@ class Profile extends BaseI18nLoop implements PropelSearchLoopInterface
     protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
-            Argument::createIntListTypeArgument('id')
+            Argument::createIntListTypeArgument('id'),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = ProfileQuery::create();
 
@@ -74,8 +75,7 @@ class Profile extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('TITLE', $profile->getVirtualColumn('i18n_TITLE'))
                 ->set('CHAPO', $profile->getVirtualColumn('i18n_CHAPO'))
                 ->set('DESCRIPTION', $profile->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set('POSTSCRIPTUM', $profile->getVirtualColumn('i18n_POSTSCRIPTUM'))
-            ;
+                ->set('POSTSCRIPTUM', $profile->getVirtualColumn('i18n_POSTSCRIPTUM'));
             $this->addOutputFields($loopResultRow, $profile);
 
             $loopResult->addRow($loopResultRow);

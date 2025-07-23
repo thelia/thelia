@@ -46,7 +46,7 @@ readonly class PropelItemProvider implements ProviderInterface
             throw new RuntimeException('Bad provider');
         }
 
-        if ($operation->getProvider() !== self::class) {
+        if (self::class !== $operation->getProvider()) {
             return $this->filtersProvider->provide(operation: $operation, uriVariables: $uriVariables, context: $context);
         }
 
@@ -78,9 +78,11 @@ readonly class PropelItemProvider implements ProviderInterface
         }
 
         $langs = null;
-        if (\in_array($operation::class, [Patch::class, Put::class])) {
+
+        if (\in_array($operation::class, [Patch::class, Put::class], true)) {
             $langs = new Collection();
             $content = json_decode((string) $context['request']->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+
             if (isset($content['i18ns'])) {
                 $langs = LangQuery::create()->filterByLocale(array_keys($content['i18ns']))->find();
             }
@@ -90,7 +92,7 @@ readonly class PropelItemProvider implements ProviderInterface
             resourceClass: $resourceClass,
             propelModel: $propelModel,
             context: $context,
-            langs : $langs
+            langs : $langs,
         );
     }
 }

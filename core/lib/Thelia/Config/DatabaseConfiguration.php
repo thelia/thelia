@@ -48,20 +48,20 @@ class DatabaseConfiguration implements ConfigurationInterface
         $connectionsNode
             ->validate()
             ->ifTrue(
-                fn ($connections): bool => !isset($connections[static::THELIA_CONNECTION_NAME])
+                static fn ($connections): bool => !isset($connections[static::THELIA_CONNECTION_NAME]),
             )
             ->thenInvalid(
-                "The '".static::THELIA_CONNECTION_NAME."' connection must be defined."
+                "The '".static::THELIA_CONNECTION_NAME."' connection must be defined.",
             );
         $databaseNodeBuilder->append($connectionsNode);
 
         $databaseNode
             ->validate()
             ->ifTrue(
-                fn ($database): bool => !empty($database['connection']) && !empty($database['connections'])
+                static fn ($database): bool => !empty($database['connection']) && !empty($database['connections']),
             )
             ->thenInvalid(
-                "The 'database' node must contain either a 'connection' node or a 'connections' node, but not both."
+                "The 'database' node must contain either a 'connection' node or a 'connections' node, but not both.",
             );
 
         return $treeBuilder;
@@ -75,10 +75,11 @@ class DatabaseConfiguration implements ConfigurationInterface
      *
      * @return ArrayNodeDefinition|NodeDefinition connection(s) node
      */
-    public function buildConnectionNode($rootName, $isArray)
+    public function buildConnectionNode(string $rootName, bool $isArray): ArrayNodeDefinition|NodeDefinition
     {
         $treeBuilder = new TreeBuilder($rootName);
         $connectionNode = $treeBuilder->getRootNode();
+
         if ($isArray) {
             /** @var ArrayNodeDefinition $connectionNodePrototype */
             $connectionNodePrototype = $connectionNode->prototype('array');

@@ -20,15 +20,13 @@ class ResolverBuilder extends \Propel\Generator\Builder\ResolverBuilder
 {
     /**
      * Gets the full path to the file for the current class.
-     *
-     * @return string
      */
-    public function getClassFilePath()
+    public function getClassFilePath(): string
     {
         return rtrim((new Filesystem())->makePathRelative(
             THELIA_CACHE_DIR.$_SERVER['APP_ENV'].DS.'propel'.DS.'database'.DS
             .parent::getClassFilePath(),
-            THELIA_ROOT
+            THELIA_ROOT,
         ), '/');
     }
 }

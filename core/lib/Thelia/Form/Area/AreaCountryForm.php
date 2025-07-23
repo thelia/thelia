@@ -43,7 +43,7 @@ class AreaCountryForm extends BaseForm
                         new GreaterThan(['value' => 0]),
                         new NotBlank(),
                     ],
-                ]
+                ],
             )
             ->add(
                 'country_id',
@@ -67,9 +67,8 @@ class AreaCountryForm extends BaseForm
                         'size' => 10,
                         'multiple' => true,
                     ],
-                ]
-            )
-        ;
+                ],
+            );
     }
 
     /**

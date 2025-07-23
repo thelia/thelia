@@ -21,230 +21,135 @@ namespace Thelia\Module\Validator;
  */
 class ModuleDefinition
 {
-    /** @var string */
-    protected $code;
+    protected string $code;
+    protected string $namespace;
+    protected string $type;
+    protected string $logo;
+    protected array $languages = [];
+    protected array $descriptives = [];
+    protected string $theliaVersion;
+    protected string $version;
+    protected array $dependencies = [];
+    protected string $documentation;
+    protected string $stability;
+    protected array $authors = [];
 
-    /** @var string */
-    protected $namespace;
-
-    /** @var string */
-    protected $type;
-
-    /** @var string */
-    protected $logo;
-
-    /** @var array */
-    protected $languages = [];
-
-    /** @var array */
-    protected $descriptives = [];
-
-    /** @var string */
-    protected $theliaVersion;
-
-    /** @var string */
-    protected $version;
-
-    /** @var array */
-    protected $dependencies = [];
-
-    /** @var string */
-    protected $documentation;
-
-    /** @var string */
-    protected $stability;
-
-    /** @var array */
-    protected $authors = [];
-
-    /**
-     * @return array
-     */
-    public function getAuthors()
+    public function getAuthors(): array
     {
         return $this->authors;
     }
 
-    /**
-     * @param array $authors
-     */
-    public function setAuthors($authors): void
+    public function setAuthors(array $authors): void
     {
         $this->authors = $authors;
     }
 
-    /**
-     * @return string
-     */
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }
 
-    /**
-     * @param string $code
-     */
-    public function setCode($code): void
+    public function setCode(string $code): void
     {
         $this->code = $code;
     }
 
-    /**
-     * @return array
-     */
-    public function getDependencies()
+    public function getDependencies(): array
     {
         return $this->dependencies;
     }
 
-    /**
-     * @param array $dependencies
-     */
-    public function setDependencies($dependencies): void
+    public function setDependencies(array $dependencies): void
     {
         $this->dependencies = $dependencies;
     }
 
-    /**
-     * @return array
-     */
-    public function getDescriptives()
+    public function getDescriptives(): array
     {
         return $this->descriptives;
     }
 
-    /**
-     * @param array $descriptives
-     */
-    public function setDescriptives($descriptives): void
+    public function setDescriptives(array $descriptives): void
     {
         $this->descriptives = $descriptives;
     }
 
-    /**
-     * @return string
-     */
-    public function getDocumentation()
+    public function getDocumentation(): string
     {
         return $this->documentation;
     }
 
-    /**
-     * @param string $documentation
-     */
-    public function setDocumentation($documentation): void
+    public function setDocumentation(string $documentation): void
     {
         $this->documentation = $documentation;
     }
 
-    /**
-     * @return array
-     */
-    public function getLanguages()
+    public function getLanguages(): array
     {
         return $this->languages;
     }
 
-    /**
-     * @param array $languages
-     */
-    public function setLanguages($languages): void
+    public function setLanguages(array $languages): void
     {
         $this->languages = $languages;
     }
 
-    /**
-     * @return string
-     */
-    public function getLogo()
+    public function getLogo(): string
     {
         return $this->logo;
     }
 
-    /**
-     * @param string $logo
-     */
-    public function setLogo($logo): void
+    public function setLogo(string $logo): void
     {
         $this->logo = $logo;
     }
 
-    /**
-     * @return string
-     */
-    public function getTheliaVersion()
+    public function getTheliaVersion(): string
     {
         return $this->theliaVersion;
     }
 
-    /**
-     * @param string $theliaVersion
-     */
-    public function setTheliaVersion($theliaVersion): void
+    public function setTheliaVersion(string $theliaVersion): void
     {
         $this->theliaVersion = $theliaVersion;
     }
 
-    /**
-     * @return string
-     */
-    public function getNamespace()
+    public function getNamespace(): string
     {
         return $this->namespace;
     }
 
-    /**
-     * @param string $namespace
-     */
-    public function setNamespace($namespace): void
+    public function setNamespace(string $namespace): void
     {
         $this->namespace = $namespace;
     }
 
-    /**
-     * @return string
-     */
-    public function getStability()
+    public function getStability(): string
     {
         return $this->stability;
     }
 
-    /**
-     * @param string $stability
-     */
-    public function setStability($stability): void
+    public function setStability(string $stability): void
     {
         $this->stability = $stability;
     }
 
-    /**
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * @param string $type
-     */
-    public function setType($type): void
+    public function setType(string $type): void
     {
         $this->type = $type;
     }
 
-    /**
-     * @return string
-     */
-    public function getVersion()
+    public function getVersion(): string
     {
         return $this->version;
     }
 
-    /**
-     * @param string $version
-     */
-    public function setVersion($version): void
+    public function setVersion(string $version): void
     {
         $this->version = $version;
     }

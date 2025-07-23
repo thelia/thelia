@@ -68,6 +68,7 @@ class Address extends BaseAction implements EventSubscriberInterface
     {
         $con = Propel::getWriteConnection(AddressTableMap::DATABASE_NAME);
         $con->beginTransaction();
+
         try {
             $addressModel
                 ->setLabel($event->getLabel())
@@ -94,6 +95,7 @@ class Address extends BaseAction implements EventSubscriberInterface
             $con->commit();
         } catch (PropelException $propelException) {
             $con->rollback();
+
             throw $propelException;
         }
     }

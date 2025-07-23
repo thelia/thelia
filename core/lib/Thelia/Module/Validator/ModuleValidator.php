@@ -33,13 +33,9 @@ use Thelia\Tools\Version\Version;
 class ModuleValidator
 {
     protected ?\SimpleXMLElement $moduleDescriptor = null;
-
     protected ?ModuleDefinition $moduleDefinition = null;
-
     protected ?string $moduleVersion = null;
-
     protected array $errors = [];
-
     protected ?string $moduleDirName = null;
 
     /**
@@ -85,12 +81,7 @@ class ModuleValidator
     public function validate(bool $checkCurrentVersion = true): void
     {
         if (!$this->moduleDescriptor instanceof \SimpleXMLElement) {
-            throw new \Exception(
-                $this->trans(
-                    'The %name module definition has not been initialized.',
-                    ['%name' => $this->moduleDirName]
-                )
-            );
+            throw new \Exception($this->trans('The %name module definition has not been initialized.', ['%name' => $this->moduleDirName]));
         }
 
         $this->checkVersion();
@@ -109,32 +100,19 @@ class ModuleValidator
     protected function checkDirectoryStructure(): void
     {
         if (false === file_exists($this->modulePath)) {
-            throw new FileNotFoundException(
-                $this->trans(
-                    "Module %name directory doesn't exists.",
-                    ['%name' => $this->moduleDirName]
-                )
-            );
+            throw new FileNotFoundException($this->trans("Module %name directory doesn't exists.", ['%name' => $this->moduleDirName]));
         }
 
         $path = \sprintf('%s/Config/module.xml', $this->modulePath);
+
         if (false === file_exists($path)) {
-            throw new FileNotFoundException(
-                $this->trans(
-                    'Module %name should have a module.xml in the Config directory.',
-                    ['%name' => $this->moduleDirName]
-                )
-            );
+            throw new FileNotFoundException($this->trans('Module %name should have a module.xml in the Config directory.', ['%name' => $this->moduleDirName]));
         }
 
         $path = \sprintf('%s/Config/config.xml', $this->modulePath);
+
         if (false === file_exists($path)) {
-            throw new FileNotFoundException(
-                $this->trans(
-                    'Module %name should have a config.xml in the Config directory.',
-                    ['%name' => $this->moduleDirName]
-                )
-            );
+            throw new FileNotFoundException($this->trans('Module %name should have a config.xml in the Config directory.', ['%name' => $this->moduleDirName]));
         }
     }
 
@@ -155,12 +133,7 @@ class ModuleValidator
     public function loadModuleDefinition(): void
     {
         if (!$this->moduleDescriptor instanceof \SimpleXMLElement) {
-            throw new \Exception(
-                $this->trans(
-                    'The %name module descriptor has not been initialized.',
-                    ['%name' => $this->moduleDirName]
-                )
-            );
+            throw new \Exception($this->trans('The %name module descriptor has not been initialized.', ['%name' => $this->moduleDirName]));
         }
 
         $moduleDefinition = new ModuleDefinition();
@@ -171,15 +144,7 @@ class ModuleValidator
         $namespaceComponents = explode('\\', $fullnamespace);
 
         if (empty($namespaceComponents[0])) {
-            throw new ModuleException(
-                $this->trans(
-                    "Unable to get module code from the fullnamespace element of the module descriptor: '%val'",
-                    [
-                        '%name' => $this->moduleDirName,
-                        '%val' => $fullnamespace,
-                    ]
-                )
-            );
+            throw new ModuleException($this->trans("Unable to get module code from the fullnamespace element of the module descriptor: '%val'", ['%name' => $this->moduleDirName, '%val' => $fullnamespace]));
         }
 
         // Assume the module code is the first component of the declared namespace
@@ -211,14 +176,12 @@ class ModuleValidator
         $schemaFile = $this->getModulePath().DS.'Config'.DS.'schema.xml';
         $fs = new Filesystem();
 
-        if ($fs->exists($schemaFile) === false) {
+        if (false === $fs->exists($schemaFile)) {
             return;
         }
 
         if (preg_match('/<behavior.*name="versionable".*\/>/s', (string) preg_replace('/<!--(.|\s)*?-->/', '', file_get_contents($schemaFile)))) {
-            throw new ModuleException(
-                'On Thelia version >= 2.4.0 the behavior "versionnable" is not available for modules, please remove this behavior from your module schema.'
-            );
+            throw new ModuleException('On Thelia version >= 2.4.0 the behavior "versionnable" is not available for modules, please remove this behavior from your module schema.');
         }
     }
 
@@ -226,15 +189,7 @@ class ModuleValidator
     {
         if ($this->moduleDefinition->getTheliaVersion()
             && !Version::test(Thelia::THELIA_VERSION, $this->moduleDefinition->getTheliaVersion(), false, '>=')) {
-            throw new ModuleException(
-                $this->trans(
-                    'The module %name requires Thelia %version or newer',
-                    [
-                        '%name' => $this->moduleDirName,
-                        '%version' => $this->moduleDefinition->getTheliaVersion(),
-                    ]
-                )
-            );
+            throw new ModuleException($this->trans('The module %name requires Thelia %version or newer', ['%name' => $this->moduleDirName, '%version' => $this->moduleDefinition->getTheliaVersion()]));
         }
     }
 
@@ -244,12 +199,7 @@ class ModuleValidator
             ->findOneByFullNamespace($this->moduleDefinition->getNamespace());
 
         if ((null !== $module) && version_compare($module->getVersion(), $this->moduleDefinition->getVersion(), '>=')) {
-            throw new ModuleException(
-                $this->trans(
-                    'The module %name is already installed in the same or greater version.',
-                    ['%name' => $this->moduleDirName]
-                )
-            );
+            throw new ModuleException($this->trans('The module %name is already installed in the same or greater version.', ['%name' => $this->moduleDirName]));
         }
     }
 
@@ -263,7 +213,7 @@ class ModuleValidator
 
             $pass = false;
 
-            if (null !== $module && $module->getActivate() === BaseModule::IS_ACTIVATED && ('' === $dependency[1] || Version::test($module->getVersion(), $dependency[1], false, '>='))) {
+            if (null !== $module && BaseModule::IS_ACTIVATED === $module->getActivate() && ('' === $dependency[1] || Version::test($module->getVersion(), $dependency[1], false, '>='))) {
                 $pass = true;
             }
 
@@ -274,7 +224,7 @@ class ModuleValidator
                         [
                             '%module' => $dependency[0],
                             '%version' => $dependency[1],
-                        ]
+                        ],
                     );
                 } else {
                     $errors[] = \sprintf('%s', $dependency[0]);
@@ -282,10 +232,10 @@ class ModuleValidator
             }
         }
 
-        if ($errors !== []) {
+        if ([] !== $errors) {
             $errorsMessage = $this->trans(
                 'To activate module %name, the following modules should be activated first: %modules',
-                ['%name' => $this->moduleDirName, '%modules' => implode(', ', $errors)]
+                ['%name' => $this->moduleDirName, '%modules' => implode(', ', $errors)],
             );
 
             throw new ModuleException($errorsMessage);
@@ -322,16 +272,14 @@ class ModuleValidator
                 $definition = $validator->getModuleDefinition();
                 $dependencies = $definition->getDependencies();
 
-                if (\count($dependencies) > 0) {
-                    foreach ($dependencies as $dependency) {
-                        if ($dependency[0] == $code) {
-                            $dependantModules[] = [
-                                'code' => $definition->getCode(),
-                                'version' => $dependency[1],
-                            ];
+                foreach ($dependencies as $dependency) {
+                    if ($dependency[0] === $code) {
+                        $dependantModules[] = [
+                            'code' => $definition->getCode(),
+                            'version' => $dependency[1],
+                        ];
 
-                            break;
-                        }
+                        break;
                     }
                 }
             } catch (\Exception) {
@@ -346,9 +294,9 @@ class ModuleValidator
      *
      * @param bool $recursive Whether to also get the dependencies of dependencies, their dependencies, and so on...
      *
-     * @throws FileNotFoundException
-     *
      * @return array Array of dependencies as ["code" => ..., "version" => ...]. No check for duplicates is made.
+     *
+     * @throws FileNotFoundException
      */
     public function getCurrentModuleDependencies(bool $recursive = false): array
     {
@@ -357,11 +305,13 @@ class ModuleValidator
         }
 
         $dependencies = [];
+
         foreach ($this->moduleDescriptor->required->module as $dependency) {
             $dependencyArray = [
                 'code' => (string) $dependency,
                 'version' => (string) $dependency['version'],
             ];
+
             if (!\in_array($dependencyArray, $dependencies, true)) {
                 $dependencies[] = $dependencyArray;
             }
@@ -370,7 +320,7 @@ class ModuleValidator
                 $recursiveModuleValidator = new self(THELIA_MODULE_DIR.'/'.$dependency);
                 array_merge(
                     $dependencies,
-                    $recursiveModuleValidator->getCurrentModuleDependencies(true)
+                    $recursiveModuleValidator->getCurrentModuleDependencies(true),
                 );
             }
         }
@@ -381,7 +331,8 @@ class ModuleValidator
     protected function getModuleLanguages(ModuleDefinition $moduleDefinition): void
     {
         $languages = [];
-        if ($this->getModuleVersion() !== '1') {
+
+        if ('1' !== $this->getModuleVersion()) {
             foreach ($this->moduleDescriptor->languages->language as $language) {
                 $languages[] = (string) $language;
             }
@@ -393,6 +344,7 @@ class ModuleValidator
     protected function getModuleDescriptives(ModuleDefinition $moduleDefinition): void
     {
         $descriptives = [];
+
         foreach ($this->moduleDescriptor->descriptive as $descriptive) {
             $descriptives[(string) $descriptive['locale']] = [
                 'title' => (string) $descriptive->title,
@@ -408,6 +360,7 @@ class ModuleValidator
     protected function getModuleDependencies(ModuleDefinition $moduleDefinition): void
     {
         $dependencies = [];
+
         if (is_countable($this->moduleDescriptor->required) && 0 !== \count($this->moduleDescriptor->required)) {
             foreach ($this->moduleDescriptor->required->module as $dependency) {
                 $dependencies[] = [

@@ -53,7 +53,7 @@ trait PositionManagementTrait
 
         $last = $query->findOne();
 
-        return $last != null ? $last->getPosition() + 1 : 1;
+        return null !== $last ? $last->getPosition() + 1 : 1;
     }
 
     /**
@@ -77,7 +77,7 @@ trait PositionManagementTrait
      *
      * @param bool $up the exchange mode: go up (POSITION_UP) or go down (POSITION_DOWN)
      */
-    protected function movePositionUpOrDown($up = true): void
+    protected function movePositionUpOrDown(bool $up = true): void
     {
         // The current position of the object
         $myPosition = $this->getPosition();
@@ -88,7 +88,7 @@ trait PositionManagementTrait
         $this->addCriteriaToPositionQuery($search);
 
         // Up or down ?
-        if ($up === true) {
+        if (true === $up) {
             // Find the object immediately before me
             $search->filterByPosition(['max' => $myPosition - 1])->orderByPosition(Criteria::DESC);
         } else {
@@ -107,8 +107,7 @@ trait PositionManagementTrait
             try {
                 $this
                     ->setPosition($result->getPosition())
-                    ->save($cnx)
-                ;
+                    ->save($cnx);
 
                 $result->setPosition($myPosition)->save($cnx);
 
@@ -140,7 +139,7 @@ trait PositionManagementTrait
         // The current position
         $current_position = $this->getPosition();
 
-        if ($newPosition != null && $newPosition > 0 && $newPosition != $current_position) {
+        if (null !== $newPosition && $newPosition > 0 && $newPosition !== $current_position) {
             // Find categories to offset
             $search = $this->createQuery();
 
@@ -173,8 +172,7 @@ trait PositionManagementTrait
 
                 $this
                     ->setPosition($newPosition)
-                    ->save($cnx)
-                ;
+                    ->save($cnx);
 
                 $cnx->commit();
             } catch (\Exception) {
@@ -198,7 +196,7 @@ trait PositionManagementTrait
 
         $data[':position'] = $this->getPosition();
 
-        $sql = \sprintf('UPDATE `%s` SET position=(position-1) WHERE '.($whereCriteria !== [] ? implode(' AND ', $whereCriteria) : '1').' AND position>:position', $mapClassName::TABLE_NAME);
+        $sql = \sprintf('UPDATE `%s` SET position=(position-1) WHERE '.([] !== $whereCriteria ? implode(' AND ', $whereCriteria) : '1').' AND position>:position', $mapClassName::TABLE_NAME);
 
         $con = Propel::getConnection($mapClassName::DATABASE_NAME);
         $statement = $con->prepare($sql);

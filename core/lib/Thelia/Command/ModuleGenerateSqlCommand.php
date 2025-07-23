@@ -39,9 +39,8 @@ class ModuleGenerateSqlCommand extends BaseModuleGenerate
             ->addArgument(
                 'name',
                 InputArgument::REQUIRED,
-                'Module name'
-            )
-        ;
+                'Module name',
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -51,11 +50,11 @@ class ModuleGenerateSqlCommand extends BaseModuleGenerate
 
         $fs = new Filesystem();
 
-        if ($fs->exists($this->moduleDirectory) === false) {
+        if (false === $fs->exists($this->moduleDirectory)) {
             throw new \RuntimeException(\sprintf('%s module does not exists', $this->module));
         }
 
-        if ($fs->exists($this->moduleDirectory.DS.'Config'.DS.'schema.xml') === false) {
+        if (false === $fs->exists($this->moduleDirectory.DS.'Config'.DS.'schema.xml')) {
             throw new \RuntimeException('schema.xml not found in Config directory. Needed file for generating model');
         }
 
@@ -71,7 +70,7 @@ class ModuleGenerateSqlCommand extends BaseModuleGenerate
                 '--schema-dir' => $this->moduleDirectory.'/Config',
                 '--config-dir' => $propelInitService->getPropelConfigDir(),
             ],
-            $output
+            $output,
         );
 
         /** @var FormatterHelper $formatter */
@@ -81,7 +80,7 @@ class ModuleGenerateSqlCommand extends BaseModuleGenerate
                 'Sql generated successfully',
                 'File available in your module config directory',
             ],
-            'bg=green;fg=black'
+            'bg=green;fg=black',
         );
         $output->writeln($formattedBlock);
 

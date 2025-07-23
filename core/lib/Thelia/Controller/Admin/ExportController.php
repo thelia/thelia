@@ -43,20 +43,18 @@ class ExportController extends BaseAdminController
      * Handle default action, that is, list available exports.
      *
      * @param string $_view View to render
-     *
-     * @return Response
      */
-    public function indexAction(string $_view = 'export')
+    public function indexAction(string $_view = 'export'): Response
     {
         $authResponse = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::VIEW]);
+
         if ($authResponse instanceof Response) {
             return $authResponse;
         }
 
         $this->getParserContext()
             ->set('category_order', $this->getRequest()->query->get('category_order', 'manual'))
-            ->set('export_order', $this->getRequest()->query->get('export_order', 'manual'))
-        ;
+            ->set('export_order', $this->getRequest()->query->get('export_order', 'manual'));
 
         return $this->render($_view);
     }
@@ -67,6 +65,7 @@ class ExportController extends BaseAdminController
     public function changeExportPositionAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         $authResponse = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE]);
+
         if ($authResponse instanceof Response) {
             return $authResponse;
         }
@@ -77,9 +76,9 @@ class ExportController extends BaseAdminController
             new UpdatePositionEvent(
                 $query->get('id'),
                 $this->matchPositionMode($query->get('mode')),
-                $query->get('value')
+                $query->get('value'),
             ),
-            TheliaEvents::EXPORT_CHANGE_POSITION
+            TheliaEvents::EXPORT_CHANGE_POSITION,
         );
 
         return $this->generateRedirectFromRoute('export.list');
@@ -91,6 +90,7 @@ class ExportController extends BaseAdminController
     public function changeCategoryPositionAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
         $authResponse = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE]);
+
         if ($authResponse instanceof Response) {
             return $authResponse;
         }
@@ -101,9 +101,9 @@ class ExportController extends BaseAdminController
             new UpdatePositionEvent(
                 $query->get('id'),
                 $this->matchPositionMode($query->get('mode')),
-                $query->get('value')
+                $query->get('value'),
             ),
-            TheliaEvents::EXPORT_CATEGORY_CHANGE_POSITION
+            TheliaEvents::EXPORT_CATEGORY_CHANGE_POSITION,
         );
 
         return $this->generateRedirectFromRoute('export.list');
@@ -116,13 +116,13 @@ class ExportController extends BaseAdminController
      *
      * @return int Position mode constant value
      */
-    protected function matchPositionMode($mode): int
+    protected function matchPositionMode(?string $mode): int
     {
-        if ($mode === 'up') {
+        if ('up' === $mode) {
             return UpdatePositionEvent::POSITION_UP;
         }
 
-        if ($mode === 'down') {
+        if ('down' === $mode) {
             return UpdatePositionEvent::POSITION_DOWN;
         }
 
@@ -140,12 +140,14 @@ class ExportController extends BaseAdminController
         $exportHandler = $this->container->get('thelia.export.handler');
 
         $export = $exportHandler->getExport($id);
-        if ($export === null) {
+
+        if (null === $export) {
             return $this->pageNotFound();
         }
 
         // Render standard view or ajax one
         $templateName = 'export-page';
+
         if ($this->getRequest()->isXmlHttpRequest()) {
             $templateName = 'ajax/export-modal';
         }
@@ -157,7 +159,7 @@ class ExportController extends BaseAdminController
                 'hasImages' => $export->hasImages(),
                 'hasDocuments' => $export->hasDocuments(),
                 'useRange' => $export->useRangeDate(),
-            ]
+            ],
         );
     }
 
@@ -172,7 +174,8 @@ class ExportController extends BaseAdminController
         $exportHandler = $this->container->get('thelia.export.handler');
 
         $export = $exportHandler->getExport($id);
-        if ($export === null) {
+
+        if (null === $export) {
             return $this->pageNotFound();
         }
 
@@ -190,6 +193,7 @@ class ExportController extends BaseAdminController
             $serializer = $serializerManager->get($validatedForm->get('serializer')->getData());
 
             $archiver = null;
+
             if ($validatedForm->get('do_compress')->getData()) {
                 /** @var ArchiverManager $archiverManager */
                 $archiverManager = $this->container->get(RegisterArchiverPass::MANAGER_SERVICE_ID);
@@ -197,6 +201,7 @@ class ExportController extends BaseAdminController
             }
 
             $rangeDate = null;
+
             if ($validatedForm->get('range_date_start')->getData()
                 && $validatedForm->get('range_date_end')->getData()
             ) {
@@ -213,13 +218,13 @@ class ExportController extends BaseAdminController
                 $lang,
                 $validatedForm->get('images')->getData(),
                 $validatedForm->get('documents')->getData(),
-                $rangeDate
+                $rangeDate,
             );
 
             $contentType = $exportEvent->getSerializer()->getMimeType();
             $fileExt = $exportEvent->getSerializer()->getExtension();
 
-            if ($exportEvent->getArchiver() !== null) {
+            if (null !== $exportEvent->getArchiver()) {
                 $contentType = $exportEvent->getArchiver()->getMimeType();
                 $fileExt = $exportEvent->getArchiver()->getExtension();
             }
@@ -230,7 +235,7 @@ class ExportController extends BaseAdminController
                     '%s; filename="%s.%s"',
                     ResponseHeaderBag::DISPOSITION_ATTACHMENT,
                     $exportEvent->getExport()->getFileName(),
-                    $fileExt
+                    $fileExt,
                 ),
             ];
 
@@ -242,8 +247,7 @@ class ExportController extends BaseAdminController
         }
 
         $this->getParserContext()
-            ->addForm($form)
-        ;
+            ->addForm($form);
 
         return $this->configureAction($id);
     }

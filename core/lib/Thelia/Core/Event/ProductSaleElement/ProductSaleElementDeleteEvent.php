@@ -27,40 +27,30 @@ class ProductSaleElementDeleteEvent extends ProductSaleElementEvent
         parent::__construct();
     }
 
-    /**
-     * @return int
-     */
-    public function getProductSaleElementId()
+    public function getProductSaleElementId(): int
     {
         return $this->product_sale_element_id;
     }
 
     /**
-     * @param int $product_sale_element_id
-     *
      * @return $this
      */
-    public function setProductSaleElementId($product_sale_element_id): self
+    public function setProductSaleElementId(int $product_sale_element_id): self
     {
         $this->product_sale_element_id = $product_sale_element_id;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getCurrencyId()
+    public function getCurrencyId(): int
     {
         return $this->currency_id;
     }
 
     /**
-     * @param int $currency_id
-     *
      * @return $this
      */
-    public function setCurrencyId($currency_id): self
+    public function setCurrencyId(int $currency_id): self
     {
         $this->currency_id = $currency_id;
 

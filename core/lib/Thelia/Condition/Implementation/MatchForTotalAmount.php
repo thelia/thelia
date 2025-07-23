@@ -87,14 +87,14 @@ class MatchForTotalAmount extends ConditionAbstract
         $condition1 = $this->conditionValidator->variableOpComparison(
             $this->facade->getCartTotalTaxPrice(),
             $this->operators[self::CART_TOTAL],
-            $this->values[self::CART_TOTAL]
+            $this->values[self::CART_TOTAL],
         );
 
         if ($condition1) {
             $condition2 = $this->conditionValidator->variableOpComparison(
                 $this->facade->getCheckoutCurrency(),
                 $this->operators[self::CART_CURRENCY],
-                $this->values[self::CART_CURRENCY]
+                $this->values[self::CART_CURRENCY],
             );
 
             if ($condition2) {
@@ -109,7 +109,7 @@ class MatchForTotalAmount extends ConditionAbstract
     {
         return $this->translator->trans(
             'Cart total amount',
-            []
+            [],
         );
     }
 
@@ -117,7 +117,7 @@ class MatchForTotalAmount extends ConditionAbstract
     {
         return $this->translator->trans(
             'Check the total Cart amount in the given currency',
-            []
+            [],
         );
     }
 
@@ -125,7 +125,7 @@ class MatchForTotalAmount extends ConditionAbstract
     {
         $i18nOperator = Operators::getI18n(
             $this->translator,
-            $this->operators[self::CART_TOTAL]
+            $this->operators[self::CART_TOTAL],
         );
 
         return $this->translator->trans(
@@ -134,7 +134,7 @@ class MatchForTotalAmount extends ConditionAbstract
                 '%operator%' => $i18nOperator,
                 '%amount%' => $this->values[self::CART_TOTAL],
                 '%currency%' => $this->values[self::CART_CURRENCY],
-            ]
+            ],
         );
     }
 
@@ -165,7 +165,7 @@ class MatchForTotalAmount extends ConditionAbstract
         ];
     }
 
-    public function drawBackOfficeInputs()
+    public function drawBackOfficeInputs(): string
     {
         $labelPrice = $this->facade
             ->getTranslator()
@@ -174,7 +174,7 @@ class MatchForTotalAmount extends ConditionAbstract
         return $this->drawBackOfficeBaseInputsText($labelPrice, self::CART_TOTAL);
     }
 
-    protected function drawBackOfficeBaseInputsText($label, $inputKey)
+    protected function drawBackOfficeBaseInputsText(string $label, string $inputKey): string
     {
         return $this->facade->getParser()->render(
             'coupon/condition-fragments/cart-total-amount-condition.html',
@@ -186,7 +186,7 @@ class MatchForTotalAmount extends ConditionAbstract
                 'field_2_name' => self::CART_CURRENCY,
                 'operatorSelectHtml' => $this->drawBackOfficeInputOperators(self::CART_TOTAL),
                 'currencySelectHtml' => $this->drawBackOfficeCurrencyInput(self::CART_CURRENCY),
-            ]
+            ],
         );
     }
 }

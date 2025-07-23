@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\ImportExport\Export\Type;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Propel;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
 use Thelia\Model\ConfigQuery;
@@ -29,14 +30,11 @@ use Thelia\Model\Content;
 class ContentExport extends JsonFileAbstractExport
 {
     public const FILE_NAME = 'content';
-
     public const EXPORT_IMAGE = true;
-
     public const EXPORT_DOCUMENT = true;
-
     public const DIRECTORY_NAME = 'content';
 
-    protected $orderAndAliases = [
+    protected array $orderAndAliases = [
         'content_id' => 'id',
         'content_i18n_title' => 'title',
         'content_i18n_chapo' => 'chapo',
@@ -66,7 +64,7 @@ class ContentExport extends JsonFileAbstractExport
         ];
     }
 
-    protected function getData()
+    protected function getData(): ModelCriteria|array|string
     {
         $locale = $this->language->getLocale();
 
@@ -90,8 +88,7 @@ class ContentExport extends JsonFileAbstractExport
                     LEFT JOIN content_folder ON content_folder.content_id = content.id
                     LEFT JOIN folder_i18n ON folder_i18n.id = content_folder.folder_id AND folder_i18n.locale = :locale
                     LEFT JOIN rewriting_url ON rewriting_url.view = "'.(new Content())->getRewrittenUrlViewName().'" AND rewriting_url.view_id = content.id
-                    GROUP BY content.id'
-        ;
+                    GROUP BY content.id';
         $stmt = $con->prepare($query);
         $stmt->bindValue('locale', $locale);
         $stmt->execute();

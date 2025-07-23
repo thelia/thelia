@@ -53,7 +53,7 @@ class Module extends BaseModule
             '%s'.DS.'%s'.DS.'%s',
             $this->getAbsoluteTemplateBasePath(),
             TemplateDefinition::BACK_OFFICE_SUBDIR,
-            $subdir
+            $subdir,
         );
     }
 
@@ -63,7 +63,7 @@ class Module extends BaseModule
             '%s'.DS.'%s'.DS.'%s',
             $this->getAbsoluteI18nPath(),
             TemplateDefinition::BACK_OFFICE_SUBDIR,
-            $subdir
+            $subdir,
         );
     }
 
@@ -78,7 +78,7 @@ class Module extends BaseModule
             '%s'.DS.'%s'.DS.'%s',
             $this->getAbsoluteTemplateBasePath(),
             TemplateDefinition::FRONT_OFFICE_SUBDIR,
-            $subdir
+            $subdir,
         );
     }
 
@@ -88,7 +88,7 @@ class Module extends BaseModule
             '%s'.DS.'%s'.DS.'%s',
             $this->getAbsoluteI18nPath(),
             TemplateDefinition::FRONT_OFFICE_SUBDIR,
-            $subdir
+            $subdir,
         );
     }
 
@@ -103,7 +103,7 @@ class Module extends BaseModule
             '%s'.DS.'%s'.DS.'%s',
             $this->getAbsoluteTemplateBasePath(),
             TemplateDefinition::PDF_SUBDIR,
-            $subdir
+            $subdir,
         );
     }
 
@@ -113,7 +113,7 @@ class Module extends BaseModule
             '%s'.DS.'%s'.DS.'%s',
             $this->getAbsoluteI18nPath(),
             TemplateDefinition::PDF_SUBDIR,
-            $subdir
+            $subdir,
         );
     }
 
@@ -128,7 +128,7 @@ class Module extends BaseModule
             '%s'.DS.'%s'.DS.'%s',
             $this->getAbsoluteTemplateBasePath(),
             TemplateDefinition::EMAIL_SUBDIR,
-            $subdir
+            $subdir,
         );
     }
 
@@ -138,7 +138,7 @@ class Module extends BaseModule
             '%s'.DS.'%s'.DS.'%s',
             $this->getAbsoluteI18nPath(),
             TemplateDefinition::EMAIL_SUBDIR,
-            $subdir
+            $subdir,
         );
     }
 
@@ -228,7 +228,7 @@ class Module extends BaseModule
      *
      * @return string a path
      */
-    public function getAbsoluteTemplateDirectoryPath($templateSubdirName): string
+    public function getAbsoluteTemplateDirectoryPath(string $templateSubdirName): string
     {
         return $this->getAbsoluteTemplateBasePath().DS.$templateSubdirName;
     }
@@ -265,15 +265,15 @@ class Module extends BaseModule
     /**
      * @param ContainerInterface $container the Thelia container
      *
-     * @throws \InvalidArgumentException if the module could not be found in the container/
-     *
      * @return BaseModuleInterface a module instance
+     *
+     * @throws \InvalidArgumentException if the module could not be found in the container/
      */
     public function getModuleInstance(ContainerInterface $container): BaseModuleInterface
     {
         $instance = $container->get(\sprintf('module.%s', $this->getCode()));
 
-        if ($instance === null) {
+        if (null === $instance) {
             throw new \InvalidArgumentException(\sprintf('Undefined module in container: "%s"', $this->getCode()));
         }
 
@@ -283,17 +283,17 @@ class Module extends BaseModule
     /**
      * @param ContainerInterface $container the Thelia container
      *
-     * @throws \InvalidArgumentException if the module could not be found in the container/
-     *
      * @return BaseModuleInterface a module instance
+     *
+     * @throws \InvalidArgumentException if the module could not be found in the container/
      */
     public function getDeliveryModuleInstance(ContainerInterface $container): BaseModuleInterface
     {
         $instance = $this->getModuleInstance($container);
 
         if (
-            !\in_array(DeliveryModuleInterface::class, class_implements($instance))
-            && !\in_array(DeliveryModuleWithStateInterface::class, class_implements($instance))
+            !\in_array(DeliveryModuleInterface::class, class_implements($instance), true)
+            && !\in_array(DeliveryModuleWithStateInterface::class, class_implements($instance), true)
         ) {
             throw new \InvalidArgumentException(\sprintf('Module "%s" is not a delivery module', $this->getCode()));
         }
@@ -304,9 +304,9 @@ class Module extends BaseModule
     /**
      * @param ContainerInterface $container the Thelia container
      *
-     * @throws \InvalidArgumentException if the module is not found or not a payment module
-     *
      * @return PaymentModuleInterface a payment module instance
+     *
+     * @throws \InvalidArgumentException if the module is not found or not a payment module
      */
     public function getPaymentModuleInstance(ContainerInterface $container): PaymentModuleInterface
     {

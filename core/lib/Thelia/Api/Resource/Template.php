@@ -26,28 +26,26 @@ use Thelia\Model\Map\TemplateTableMap;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/templates'
+            uriTemplate: '/admin/templates',
         ),
         new GetCollection(
-            uriTemplate: '/admin/templates'
+            uriTemplate: '/admin/templates',
         ),
         new Get(
             uriTemplate: '/admin/templates/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Delete(
-            uriTemplate: '/admin/templates/{id}'
+            uriTemplate: '/admin/templates/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 class Template extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:template:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:template:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:template:write';
 
     #[Groups([self::GROUP_ADMIN_READ, Category::GROUP_ADMIN_READ, Category::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_READ, Product::GROUP_ADMIN_WRITE])]

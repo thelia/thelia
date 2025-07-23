@@ -59,6 +59,7 @@ class FileController extends BaseAdminController
         if ($this->getRequest()->isMethod('POST')) {
             /** @var UploadedFile $fileBeingUploaded */
             $fileBeingUploaded = $this->getRequest()->files->get('file');
+
             try {
                 $fileProcessorService->processFile(
                     $eventDispatcher,
@@ -67,7 +68,7 @@ class FileController extends BaseAdminController
                     $parentType,
                     $objectType,
                     $validMimeTypes,
-                    $extBlackList
+                    $extBlackList,
                 );
             } catch (ProcessFileException $e) {
                 return new ResponseRest($e->getMessage(), 'text', $e->getCode());
@@ -94,7 +95,7 @@ class FileController extends BaseAdminController
             $parentType,
             $config['objectType'],
             $config['validMimeTypes'],
-            $config['extBlackList']
+            $config['extBlackList'],
         );
     }
 
@@ -113,7 +114,7 @@ class FileController extends BaseAdminController
             $parentType,
             $config['objectType'],
             $config['validMimeTypes'],
-            $config['extBlackList']
+            $config['extBlackList'],
         );
     }
 
@@ -189,7 +190,7 @@ class FileController extends BaseAdminController
             'breadcrumb' => $image->getBreadcrumb(
                 $this->getRouter($this->getCurrentRouter()),
                 'images',
-                $this->getCurrentEditionLocale()
+                $this->getCurrentEditionLocale(),
             ),
         ]);
     }
@@ -217,7 +218,7 @@ class FileController extends BaseAdminController
             'breadcrumb' => $document->getBreadcrumb(
                 $this->getRouter($this->getCurrentRouter()),
                 'documents',
-                $this->getCurrentEditionLocale()
+                $this->getCurrentEditionLocale(),
             ),
         ]);
     }
@@ -243,7 +244,7 @@ class FileController extends BaseAdminController
                 $parentType,
                 'image',
                 TheliaEvents::IMAGE_UPDATE,
-                $fileUpdateForm
+                $fileUpdateForm,
             );
 
             $this->adminLogAppend(
@@ -253,14 +254,14 @@ class FileController extends BaseAdminController
                     '%s with Ref %s (ID %d) modified',
                     ucfirst('image'),
                     $fileInstance->getTitle(),
-                    $fileInstance->getId()
+                    $fileInstance->getId(),
                 ),
-                (string) $fileInstance->getId()
+                (string) $fileInstance->getId(),
             );
 
-            if ($this->getRequest()->get('save_mode') === 'close') {
+            if ('close' === $this->getRequest()->get('save_mode')) {
                 return $this->generateRedirect(
-                    URL::getInstance()->absoluteUrl($fileInstance->getRedirectionUrl(), ['current_tab' => 'images'])
+                    URL::getInstance()->absoluteUrl($fileInstance->getRedirectionUrl(), ['current_tab' => 'images']),
                 );
             }
 
@@ -312,7 +313,7 @@ class FileController extends BaseAdminController
                 $parentType,
                 'document',
                 TheliaEvents::DOCUMENT_UPDATE,
-                $fileUpdateForm
+                $fileUpdateForm,
             );
 
             $this->adminLogAppend(
@@ -322,14 +323,14 @@ class FileController extends BaseAdminController
                     '%s with Ref %s (ID %d) modified',
                     ucfirst('document'),
                     $fileInstance->getTitle(),
-                    $fileInstance->getId()
+                    $fileInstance->getId(),
                 ),
-                (string) $fileInstance->getId()
+                (string) $fileInstance->getId(),
             );
 
-            if ($this->getRequest()->get('save_mode') === 'close') {
+            if ('close' === $this->getRequest()->get('save_mode')) {
                 return $this->generateRedirect(
-                    URL::getInstance()->absoluteUrl($fileInstance->getRedirectionUrl(), ['current_tab' => 'documents'])
+                    URL::getInstance()->absoluteUrl($fileInstance->getRedirectionUrl(), ['current_tab' => 'documents']),
                 );
             }
 
@@ -375,13 +376,13 @@ class FileController extends BaseAdminController
                 $imageId,
                 $parentType,
                 'image',
-                TheliaEvents::IMAGE_DELETE
+                TheliaEvents::IMAGE_DELETE,
             );
 
             $this->adminLogAppend(
                 $this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT),
                 AccessManager::UPDATE,
-                $message
+                $message,
             );
         } catch (\Exception) {
             return $this->pageNotFound();
@@ -405,13 +406,13 @@ class FileController extends BaseAdminController
                 $documentId,
                 $parentType,
                 'document',
-                TheliaEvents::DOCUMENT_DELETE
+                TheliaEvents::DOCUMENT_DELETE,
             );
 
             $this->adminLogAppend(
                 $this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT),
                 AccessManager::UPDATE,
-                $message
+                $message,
             );
         } catch (\Exception) {
             return $this->pageNotFound();
@@ -438,7 +439,7 @@ class FileController extends BaseAdminController
                 $imageId,
                 'image',
                 TheliaEvents::IMAGE_UPDATE_POSITION,
-                $position
+                $position,
             );
         } catch (\Exception) {
             return $this->pageNotFound();
@@ -465,7 +466,7 @@ class FileController extends BaseAdminController
                 $documentId,
                 'document',
                 TheliaEvents::DOCUMENT_UPDATE_POSITION,
-                $position
+                $position,
             );
         } catch (\Exception) {
             return $this->pageNotFound();
@@ -489,7 +490,7 @@ class FileController extends BaseAdminController
                 $documentId,
                 $parentType,
                 'image',
-                TheliaEvents::IMAGE_TOGGLE_VISIBILITY
+                TheliaEvents::IMAGE_TOGGLE_VISIBILITY,
             );
         } catch (\Exception) {
             return $this->pageNotFound();
@@ -513,7 +514,7 @@ class FileController extends BaseAdminController
                 $documentId,
                 $parentType,
                 'document',
-                TheliaEvents::DOCUMENT_TOGGLE_VISIBILITY
+                TheliaEvents::DOCUMENT_TOGGLE_VISIBILITY,
             );
         } catch (\Exception) {
             return $this->pageNotFound();
@@ -539,11 +540,11 @@ class FileController extends BaseAdminController
             $parentType,
             'image',
             $title,
-            $locale
+            $locale,
         );
 
         return $this->generateRedirect(
-            URL::getInstance()->absoluteUrl($this->getRequest()->request->get('success_url'), ['current_tab' => 'images'])
+            URL::getInstance()->absoluteUrl($this->getRequest()->request->get('success_url'), ['current_tab' => 'images']),
         );
     }
 }

@@ -34,30 +34,30 @@ class NumberFormat
      * @param float  $number   the number
      * @param string $decimals number of decimal figures
      */
-    public function formatStandardNumber($number, $decimals = null): string
+    public function formatStandardNumber(float $number, ?string $decimals = null): string
     {
         $lang = $this->request->getSession()->getLang();
 
-        if ($decimals === null) {
+        if (null === $decimals) {
             $decimals = $lang->getDecimals();
         }
 
-        return number_format((float) $number, (int) $decimals, '.', '');
+        return number_format($number, (int) $decimals, '.', '');
     }
 
     public function format($number, $decimals = null, $decPoint = null, $thousandsSep = null): string
     {
         $lang = $this->request->getSession()->getLang();
 
-        if ($decimals === null) {
+        if (null === $decimals) {
             $decimals = $lang->getDecimals();
         }
 
-        if ($decPoint === null) {
+        if (null === $decPoint) {
             $decPoint = $lang->getDecimalSeparator();
         }
 
-        if ($thousandsSep === null) {
+        if (null === $thousandsSep) {
             $thousandsSep = $lang->getThousandsSeparator();
         }
 

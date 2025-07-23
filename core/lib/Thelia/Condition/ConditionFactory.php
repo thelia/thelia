@@ -26,7 +26,7 @@ use Thelia\Coupon\FacadeInterface;
 class ConditionFactory
 {
     /** @var array ConditionCollection to process */
-    protected $conditions;
+    protected array $conditions;
 
     /**
      * Constructor.
@@ -49,15 +49,16 @@ class ConditionFactory
      */
     public function serializeConditionCollection(ConditionCollection $collection): string
     {
-        if ($collection->count() == 0) {
+        if (0 === $collection->count()) {
             /** @var ConditionInterface $conditionNone */
             $conditionNone = $this->container->get(
-                'thelia.condition.match_for_everyone'
+                'thelia.condition.match_for_everyone',
             );
             $collection[] = $conditionNone;
         }
 
         $serializableConditions = [];
+
         /** @var $condition ConditionInterface */
         foreach ($collection as $condition) {
             $serializableConditions[] = $condition->getSerializableCondition();
@@ -75,7 +76,7 @@ class ConditionFactory
      */
     public function unserializeConditionCollection(string $serializedConditions): ConditionCollection
     {
-        $unserializedConditions = json_decode(base64_decode($serializedConditions));
+        $unserializedConditions = json_decode(base64_decode($serializedConditions, true));
 
         $collection = new ConditionCollection();
 
@@ -87,7 +88,7 @@ class ConditionFactory
                     $conditionManager = $this->build(
                         $condition->conditionServiceId,
                         (array) $condition->operators,
-                        (array) $condition->values
+                        (array) $condition->values,
                     );
                     $collection[] = clone $conditionManager;
                 }
@@ -104,11 +105,11 @@ class ConditionFactory
      * @param array  $operators          Condition Operator (<, >, = )
      * @param array  $values             Values setting this Condition
      *
-     * @throws \InvalidArgumentException
-     *
      * @return ConditionInterface Ready to use Condition or false
+     *
+     * @throws \InvalidArgumentException
      */
-    public function build(string $conditionServiceId, array $operators, array $values)
+    public function build(string $conditionServiceId, array $operators, array $values): ConditionInterface
     {
         $conditionServiceId = urldecode($conditionServiceId);
 
@@ -130,7 +131,7 @@ class ConditionFactory
      *
      * @return array Ready to be drawn condition inputs
      */
-    public function getInputsFromServiceId(string $conditionServiceId)
+    public function getInputsFromServiceId(string $conditionServiceId): array
     {
         if (!$this->container->has($conditionServiceId)) {
             return false;
@@ -149,7 +150,7 @@ class ConditionFactory
      *
      * @return array Ready to be drawn condition inputs
      */
-    public function getInputsFromConditionInterface(ConditionInterface $condition)
+    public function getInputsFromConditionInterface(ConditionInterface $condition): array
     {
         return $condition->getValidators();
     }

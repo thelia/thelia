@@ -16,8 +16,8 @@ namespace Thelia\Action;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
-use Propel\Runtime\Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Product\ProductCloneEvent;
@@ -70,7 +70,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 ->add(AttributeCombinationTableMap::COL_PRODUCT_SALE_ELEMENTS_ID, null, Criteria::ISNULL)
                 ->findOne($con);
 
-            if ($salesElement == null) {
+            if (null === $salesElement) {
                 // Create a new default product sale element
                 $salesElement = $event->getProduct()->createProductSaleElement($con, 0, 0, 0, $event->getCurrencyId(), false);
             } else {
@@ -85,7 +85,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 foreach ($combinationAttributes as $attributeAvId) {
                     $attributeAv = AttributeAvQuery::create()->findPk($attributeAvId);
 
-                    if ($attributeAv !== null) {
+                    if (null !== $attributeAv) {
                         $attributeCombination = new AttributeCombination();
 
                         $attributeCombination
@@ -126,7 +126,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             $event->getProduct()->setTaxRuleId($event->getTaxRuleId())->save($con);
 
             // If product sale element is not defined, create it.
-            if ($salesElement == null) {
+            if (null === $salesElement) {
                 $salesElement = new ProductSaleElements();
 
                 $salesElement->setProduct($event->getProduct());
@@ -140,13 +140,12 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                     ->filterByProduct($event->getProduct())
                     ->filterByIsDefault(true)
                     ->filterById($event->getProductSaleElementId(), Criteria::NOT_EQUAL)
-                    ->update(['IsDefault' => false], $con)
-                ;
-            } elseif ($salesElement->getIsDefault() && ProductSaleElementsQuery::create()
-                    ->filterByProduct($event->getProduct())
-                    ->filterByIsDefault(true)
-                    ->filterById($salesElement->getId(), Criteria::NOT_EQUAL)
-                    ->count() === 0) {
+                    ->update(['IsDefault' => false], $con);
+            } elseif ($salesElement->getIsDefault() && 0 === ProductSaleElementsQuery::create()
+                ->filterByProduct($event->getProduct())
+                ->filterByIsDefault(true)
+                ->filterById($salesElement->getId(), Criteria::NOT_EQUAL)
+                ->count()) {
                 // We will not allow the default PSE to become non default if no other default PSE exists for this product.
                 // Prevent setting the only default PSE to non-default
                 $defaultStatus = true;
@@ -161,8 +160,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 ->setWeight($event->getWeight())
                 ->setIsDefault($defaultStatus)
                 ->setEanCode($event->getEanCode())
-                ->save()
-            ;
+                ->save();
 
             // Update/create price for current currency
             $productPrice = ProductPriceQuery::create()
@@ -171,30 +169,27 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 ->findOne($con);
 
             // If price is not defined, create it.
-            if ($productPrice == null) {
+            if (null === $productPrice) {
                 $productPrice = new ProductPrice();
 
                 $productPrice
                     ->setProductSaleElements($salesElement)
-                    ->setCurrencyId($event->getCurrencyId())
-                ;
+                    ->setCurrencyId($event->getCurrencyId());
             }
 
             // Check if we have to store the price
             $productPrice->setFromDefaultCurrency($event->getFromDefaultCurrency());
 
-            if ($event->getFromDefaultCurrency() == 0) {
+            if (0 === $event->getFromDefaultCurrency()) {
                 // Store the price
                 $productPrice
                     ->setPromoPrice($event->getSalePrice())
-                    ->setPrice($event->getPrice())
-                ;
+                    ->setPrice($event->getPrice());
             } else {
                 // Do not store the price.
                 $productPrice
                     ->setPromoPrice(0)
-                    ->setPrice(0)
-                ;
+                    ->setPrice(0);
             }
 
             $productPrice->save($con);
@@ -226,7 +221,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 // If we are deleting the last PSE of the product, don(t delete it, but insteaf
                 // transform it into a PSE detached for any attribute combination, so that product
                 // prices, weight, stock and attributes will not be lost.
-                if ($product->countSaleElements($con) === 1) {
+                if (1 === $product->countSaleElements($con)) {
                     $pse
                         ->setIsDefault(true)
                         ->save($con);
@@ -237,14 +232,15 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 } else {
                     // Delete the PSE
                     $pse->delete($con);
+
                     // If we deleted the default PSE, make the last created one the default
                     if ($pse->getIsDefault()) {
                         $newDefaultPse = ProductSaleElementsQuery::create()
                             ->filterByProductId($product->getId())
                             ->filterById($pse->getId(), Criteria::NOT_EQUAL)
                             ->orderByCreatedAt(Criteria::DESC)
-                            ->findOne($con)
-                        ;
+                            ->findOne($con);
+
                         if (null !== $newDefaultPse) {
                             $newDefaultPse->setIsDefault(true)->save($con);
                         }
@@ -292,7 +288,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                     $event->getIsnew(),
                     $event->getQuantity(),
                     $event->getEanCode(),
-                    $event->getReference()
+                    $event->getReference(),
                 );
 
                 $isDefault = false;
@@ -318,12 +314,12 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      *
      * @throws PropelException
      */
-    protected function createCombination(ConnectionInterface $con, ProductSaleElements $salesElement, $combinationAttributes): void
+    protected function createCombination(ConnectionInterface $con, ProductSaleElements $salesElement, array $combinationAttributes): void
     {
         foreach ($combinationAttributes as $attributeAvId) {
             $attributeAv = AttributeAvQuery::create()->findPk($attributeAvId);
 
-            if ($attributeAv !== null) {
+            if (null !== $attributeAv) {
                 $attributeCombination = new AttributeCombination();
 
                 $attributeCombination
@@ -335,9 +331,9 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    /*******************
+    /*
      * CLONING PROCESS *
-     *******************/
+     */
     /**
      * Clone product's PSEs and associated datas.
      *
@@ -389,10 +385,8 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
     /**
      * @throws PropelException
-     *
-     * @return int
      */
-    public function createClonePSE(ProductCloneEvent $event, ProductSaleElements $originalProductPSE, $currencyId)
+    public function createClonePSE(ProductCloneEvent $event, ProductSaleElements $originalProductPSE, $currencyId): int
     {
         $attributeCombinationList = AttributeCombinationQuery::create()
             ->filterByProductSaleElementsId($originalProductPSE->getId())
@@ -440,7 +434,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             $originalProductFilePositionQuery = [];
             $originalProductPSEFileId = null;
 
-            if (!\in_array($type, ['image', 'document'])) {
+            if (!\in_array($type, ['image', 'document'], true)) {
                 throw new \Exception(Translator::getInstance()->trans('Cloning files of type %type is not allowed.', ['%type' => $type], 'core'));
             }
 
@@ -461,6 +455,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 ->findPk($originalProductPSEFileId);
 
             $clonedProductFileIdToLinkToPSEQuery = '';
+
             // Get cloned file ID to link to the cloned PSE
             switch ($type) {
                 case 'image':
@@ -478,6 +473,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 ->findOne();
 
             $assoc = null;
+
             // Save association
             switch ($type) {
                 case 'image':
@@ -496,9 +492,9 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    /***************
+    /*
      * END CLONING *
-     ***************/
+     */
 
     public static function getSubscribedEvents(): array
     {

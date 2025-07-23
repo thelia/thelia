@@ -31,29 +31,19 @@ use Thelia\Api\Resource\TranslatableResourceInterface;
 
 final class SearchFilter extends AbstractFilter
 {
-    /**
-     * @var string Exact matching
-     */
+    /** @var string Exact matching */
     public const STRATEGY_EXACT = 'exact';
 
-    /**
-     * @var string The value must be contained in the field
-     */
+    /** @var string The value must be contained in the field */
     public const STRATEGY_PARTIAL = 'partial';
 
-    /**
-     * @var string Finds fields that are starting with the value
-     */
+    /** @var string Finds fields that are starting with the value */
     public const STRATEGY_START = 'start';
 
-    /**
-     * @var string Finds fields that are ending with the value
-     */
+    /** @var string Finds fields that are ending with the value */
     public const STRATEGY_END = 'end';
 
-    /**
-     * @var string Finds fields that are starting with the word
-     */
+    /** @var string Finds fields that are starting with the word */
     public const STRATEGY_WORD_START = 'word_start';
 
     protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
@@ -83,7 +73,7 @@ final class SearchFilter extends AbstractFilter
             strategy: $strategy,
             query: $query,
             fieldPath: $fieldPath,
-            values: $values
+            values: $values,
         );
     }
 
@@ -102,7 +92,7 @@ final class SearchFilter extends AbstractFilter
             $query->addUsingOperator(
                 $fieldPath,
                 1 === \count($values) ? $values[0] : $values,
-                1 === \count($values) ? Criteria::EQUAL : Criteria::IN
+                1 === \count($values) ? Criteria::EQUAL : Criteria::IN,
             );
 
             return;
@@ -112,6 +102,7 @@ final class SearchFilter extends AbstractFilter
 
         foreach ($values as $key => $value) {
             $conditionName = 'cond_'.$key;
+
             switch ($strategy) {
                 case self::STRATEGY_PARTIAL:
                     $query->addCond($conditionName, $fieldPath, '%'.$value.'%', Criteria::LIKE);
@@ -142,6 +133,7 @@ final class SearchFilter extends AbstractFilter
         $description = [];
 
         $filterProperties = $this->getProperties();
+
         if (null === $filterProperties) {
             return [];
         }
@@ -176,6 +168,7 @@ final class SearchFilter extends AbstractFilter
                     'strategy' => $strategy,
                     'is_collection' => str_ends_with($filterParameterName, '[]'),
                 ];
+
                 if ($isLocalized) {
                     $description['locale'] = [
                         'property' => 'locale',
@@ -199,7 +192,7 @@ final class SearchFilter extends AbstractFilter
             }
         }
 
-        if ($values === []) {
+        if ([] === $values) {
             $this->getLogger()->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(\sprintf('At least one value is required, multiple values should be in "%1$s[]=firstvalue&%1$s[]=secondvalue" format', $property)),
             ]);

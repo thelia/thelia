@@ -33,39 +33,39 @@ use Thelia\Model\Map\AttributeAvTableMap;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/attribute_avs'
+            uriTemplate: '/admin/attribute_avs',
         ),
         new GetCollection(
-            uriTemplate: '/admin/attribute_avs'
+            uriTemplate: '/admin/attribute_avs',
         ),
         new Get(
             uriTemplate: '/admin/attribute_avs/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/attribute_avs/{id}'
+            uriTemplate: '/admin/attribute_avs/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/attribute_avs/{id}'
+            uriTemplate: '/admin/attribute_avs/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/attribute_avs/{id}'
+            uriTemplate: '/admin/attribute_avs/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/front/attribute_avs'
+            uriTemplate: '/front/attribute_avs',
         ),
         new Get(
             uriTemplate: '/front/attribute_avs/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]]
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -73,30 +73,26 @@ use Thelia\Model\Map\AttributeAvTableMap;
         'title',
         'id',
         'attribute.id',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: NotInFilter::class,
     properties: [
         'id',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
         'position',
-    ]
+    ],
 )]
 class AttributeAv extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:attribute_av:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:attribute_av:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:attribute_av:write';
-
     public const GROUP_FRONT_READ = 'front:attribute_av:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:attribute_av:read:single';
 
     #[Groups([

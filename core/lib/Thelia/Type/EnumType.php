@@ -35,7 +35,7 @@ class EnumType extends BaseType
 
     public function isValid($value): bool
     {
-        return \in_array($value, $this->values);
+        return \in_array($value, $this->values, false);
     }
 
     public function getFormattedValue($value)

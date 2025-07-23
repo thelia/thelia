@@ -32,7 +32,7 @@ abstract class AbstractTheliaType extends AbstractType
      *
      * Replaces validation groups in constraints
      */
-    protected function replaceGroups($groups, array $constraints)
+    protected function replaceGroups($groups, array $constraints): array
     {
         if (!\is_array($groups)) {
             $groups = [$groups];
@@ -47,13 +47,11 @@ abstract class AbstractTheliaType extends AbstractType
     }
 
     /**
-     * @param string $groups
-     *
      * @return array
      *
      * Get an array with the type's constraints loaded with groups
      */
-    protected function getConstraints(AbstractType $type, $groups = 'Default')
+    protected function getConstraints(AbstractType $type, string $groups = 'Default'): array
     {
         /**
          * Create a resolver to get the options.
@@ -67,11 +65,9 @@ abstract class AbstractTheliaType extends AbstractType
             $options['constraints'] = [];
         }
 
-        /**
+        /*
          * Then replace groups.
          */
-        $constraints = $this->replaceGroups($groups, $options['constraints']);
-
-        return $constraints;
+        return $this->replaceGroups($groups, $options['constraints']);
     }
 }

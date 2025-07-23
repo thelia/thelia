@@ -23,9 +23,7 @@ use Thelia\Core\Archiver\AbstractArchiver;
  */
 class TarArchiver extends AbstractArchiver
 {
-    /**
-     * @var int Compression method
-     */
+    /** @var int Compression method */
     public const COMPRESSION_METHOD = \Phar::NONE;
 
     public function getId(): string

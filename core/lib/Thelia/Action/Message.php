@@ -39,8 +39,7 @@ class Message extends BaseAction implements EventSubscriberInterface
             ->setTitle($event->getTitle())
             ->setSecured($event->getSecured())
 
-            ->save()
-        ;
+            ->save();
 
         $event->setMessage($message);
     }
@@ -83,8 +82,7 @@ class Message extends BaseAction implements EventSubscriberInterface
         if (null !== ($message = MessageQuery::create()->findPk($event->getMessageId()))) {
             $message
 
-                ->delete()
-            ;
+                ->delete();
 
             $event->setMessage($message);
         }

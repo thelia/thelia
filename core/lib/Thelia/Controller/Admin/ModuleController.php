@@ -67,7 +67,7 @@ class ModuleController extends AbstractCrudController
             TheliaEvents::MODULE_UPDATE,
             null,
             null,
-            TheliaEvents::MODULE_UPDATE_POSITION
+            TheliaEvents::MODULE_UPDATE_POSITION,
         );
     }
 
@@ -110,7 +110,7 @@ class ModuleController extends AbstractCrudController
         return new UpdatePositionEvent(
             $this->getRequest()->get('module_id'),
             $positionChangeMode,
-            $positionValue
+            $positionValue,
         );
     }
 
@@ -183,7 +183,7 @@ class ModuleController extends AbstractCrudController
         ];
     }
 
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         // We always return to the feature edition form
         return $this->render(
@@ -191,7 +191,7 @@ class ModuleController extends AbstractCrudController
             [
                 'module_order' => $currentOrder,
                 'module_errors' => $this->moduleErrors,
-            ]
+            ],
         );
     }
 
@@ -206,7 +206,7 @@ class ModuleController extends AbstractCrudController
         return $this->generateRedirectFromRoute(
             'admin.module.update',
             $this->getViewArguments(),
-            $this->getRouteArguments()
+            $this->getRouteArguments(),
         );
     }
 
@@ -248,7 +248,7 @@ class ModuleController extends AbstractCrudController
             'module-configure',
             [
                 'module_code' => $module_code,
-            ]
+            ],
         );
     }
 
@@ -259,14 +259,13 @@ class ModuleController extends AbstractCrudController
         }
 
         $message = null;
+
         try {
             $event = new ModuleToggleActivationEvent($module_id);
             $eventDispatcher->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
 
             if (!$event->getModule() instanceof Module) {
-                throw new \LogicException(
-                    $this->getTranslator()->trans('No %obj was updated.', ['%obj' => 'Module'])
-                );
+                throw new \LogicException($this->getTranslator()->trans('No %obj was updated.', ['%obj' => 'Module']));
             }
         } catch (\Exception $exception) {
             $message = $exception->getMessage();
@@ -299,21 +298,19 @@ class ModuleController extends AbstractCrudController
 
         try {
             $tokenProvider->checkToken(
-                $request->query->get('_token')
+                $request->query->get('_token'),
             );
 
             $module_id = $request->get('module_id');
 
             $deleteEvent = new ModuleDeleteEvent($module_id);
 
-            $deleteEvent->setDeleteData('1' == $request->get('delete-module-data', '0'));
+            $deleteEvent->setDeleteData('1' === $request->get('delete-module-data', '0'));
 
             $eventDispatcher->dispatch($deleteEvent, TheliaEvents::MODULE_DELETE);
 
-            if ($deleteEvent->hasModule() === false) {
-                throw new \LogicException(
-                    Translator::getInstance()->trans('No %obj was updated.', ['%obj' => 'Module'])
-                );
+            if (false === $deleteEvent->hasModule()) {
+                throw new \LogicException(Translator::getInstance()->trans('No %obj was updated.', ['%obj' => 'Module']));
             }
         } catch (\Exception $exception) {
             $message = $exception->getMessage();
@@ -363,8 +360,8 @@ class ModuleController extends AbstractCrudController
                 'module-installed',
                 $this->getTranslator()->trans(
                     'The module %module has been installed successfully.',
-                    ['%module' => $moduleDefinition->getCode()]
-                )
+                    ['%module' => $moduleDefinition->getCode()],
+                ),
             );
 
             return $this->generateRedirectFromRoute('admin.module');
@@ -412,7 +409,7 @@ class ModuleController extends AbstractCrudController
 
                 $content = $this->getTranslator()->trans(
                     'Failed to load descriptor (module.xml) for module ID "%id".',
-                    ['%id' => $module_id]
+                    ['%id' => $module_id],
                 );
             }
         } else {
@@ -446,13 +443,13 @@ class ModuleController extends AbstractCrudController
             if (false !== $xmlData = @simplexml_load_string(file_get_contents($moduleDescriptor))) {
                 $documentationDirectory = (string) $xmlData->documentation;
 
-                if ($documentationDirectory !== '' && $documentationDirectory !== '0') {
+                if ('' !== $documentationDirectory && '0' !== $documentationDirectory) {
                     $finder = Finder::create()->files()->in($module->getAbsoluteBaseDir())->name('/.+\.md$/i');
                 }
             }
 
             // Fallback to readme.md (if any)
-            if (!$finder instanceof Finder || $finder->count() === 0) {
+            if (!$finder instanceof Finder || 0 === $finder->count()) {
                 $finder = Finder::create()->files()->in($module->getAbsoluteBaseDir())->name('/readme\.md/i');
             }
 
@@ -463,7 +460,7 @@ class ModuleController extends AbstractCrudController
                 /** @var \DirectoryIterator $file */
                 foreach ($finder as $file) {
                     if (false !== $mdDocumentation = @file_get_contents($file->getPathname())) {
-                        if ($content === null) {
+                        if (null === $content) {
                             $content = '';
                         }
 
@@ -478,7 +475,7 @@ class ModuleController extends AbstractCrudController
             $content = $this->getTranslator()->trans('Module ID "%id" was not found.', ['%id' => $module_id]);
         }
 
-        if ($content === null) {
+        if (null === $content) {
             $content = $this->getTranslator()->trans('This module has no Markdown documentation.');
         }
 

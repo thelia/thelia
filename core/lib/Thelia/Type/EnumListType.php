@@ -30,17 +30,15 @@ class EnumListType extends BaseType
 
     public function addValue($value): void
     {
-        if (!\in_array($value, $this->values)) {
+        if (!\in_array($value, $this->values, false)) {
             $this->values[] = $value;
         }
     }
 
     /**
      * @param array|\Traversable $values
-     *
-     * @since 2.3.0
      */
-    public function addValues($values): void
+    public function addValues(iterable $values): void
     {
         if (!\is_array($values) && !$values instanceof \Traversable) {
             throw new \InvalidArgumentException('$values must be an array or an instance of \Traversable');
@@ -61,7 +59,6 @@ class EnumListType extends BaseType
         if (null === $values) {
             return false;
         }
-
         foreach (explode(',', $values) as $value) {
             if (!$this->isSingleValueValid($value)) {
                 return false;
@@ -78,7 +75,7 @@ class EnumListType extends BaseType
 
     public function isSingleValueValid($value): bool
     {
-        return \in_array($value, $this->values);
+        return \in_array($value, $this->values, false);
     }
 
     public function getFormOptions(): array

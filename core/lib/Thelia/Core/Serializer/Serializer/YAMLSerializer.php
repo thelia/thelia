@@ -49,7 +49,7 @@ class YAMLSerializer extends AbstractSerializer
         return Yaml::dump([$data]);
     }
 
-    public function unserialize(\SplFileObject $fileObject): mixed
+    public function unserialize(\SplFileObject $fileObject): array
     {
         return Yaml::parse(file_get_contents($fileObject->getPathname()));
     }

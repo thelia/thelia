@@ -33,16 +33,16 @@ class MatchForXArticlesIncludeQuantity extends MatchForXArticles
         return $this->translator->trans('Cart item include quantity count');
     }
 
-    public function isMatching()
+    public function isMatching(): bool
     {
         return $this->conditionValidator->variableOpComparison(
             $this->facade->getNbArticlesInCartIncludeQuantity(),
             $this->operators[self::CART_QUANTITY],
-            $this->values[self::CART_QUANTITY]
+            $this->values[self::CART_QUANTITY],
         );
     }
 
-    public function drawBackOfficeInputs()
+    public function drawBackOfficeInputs(): string
     {
         $labelQuantity = $this->facade->getTranslator()->trans('Cart item include quantity count is');
 
@@ -53,7 +53,7 @@ class MatchForXArticlesIncludeQuantity extends MatchForXArticles
     {
         $i18nOperator = Operators::getI18n(
             $this->translator,
-            $this->operators[self::CART_QUANTITY]
+            $this->operators[self::CART_QUANTITY],
         );
 
         return $this->translator->trans(
@@ -61,7 +61,7 @@ class MatchForXArticlesIncludeQuantity extends MatchForXArticles
             [
                 '%operator%' => $i18nOperator,
                 '%quantity%' => $this->values[self::CART_QUANTITY],
-            ]
+            ],
         );
     }
 }

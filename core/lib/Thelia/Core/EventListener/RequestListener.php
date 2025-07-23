@@ -71,13 +71,13 @@ class RequestListener implements EventSubscriberInterface
             'xlf',
             \sprintf($vendorFormDir.DS.'Resources'.DS.'translations'.DS.'validators.%s.xlf', $lang->getCode()),
             $lang->getLocale(),
-            'validators'
+            'validators',
         );
         $this->translator->addResource(
             'xlf',
             \sprintf($vendorValidatorDir.DS.'Resources'.DS.'translations'.DS.'validators.%s.xlf', $lang->getCode()),
             $lang->getLocale(),
-            'validators'
+            'validators',
         );
     }
 
@@ -106,14 +106,16 @@ class RequestListener implements EventSubscriberInterface
     public function jsonBody(RequestEvent $event): void
     {
         $request = $event->getRequest();
-        if (!\count($request->request->all()) && \in_array($request->getMethod(), ['POST', 'PUT', 'PATCH', 'DELETE']) && 'json' === $request->getFormat($request->headers->get('Content-Type'))) {
+
+        if (!\count($request->request->all()) && \in_array($request->getMethod(), ['POST', 'PUT', 'PATCH', 'DELETE'], true) && 'json' === $request->getFormat($request->headers->get('Content-Type'))) {
             $content = $request->getContent();
+
             if (!empty($content)) {
                 $data = json_decode($content, true);
 
                 if (null === $data) {
                     $event->setResponse(
-                        new JsonResponse(['error' => 'The given data is not a valid json'], Response::HTTP_BAD_REQUEST)
+                        new JsonResponse(['error' => 'The given data is not a valid json'], Response::HTTP_BAD_REQUEST),
                     );
 
                     $event->stopPropagation();
@@ -137,28 +139,27 @@ class RequestListener implements EventSubscriberInterface
         $cookieCustomerName = ConfigQuery::read('customer_remember_me_cookie_name', 'crmcn');
         $cookie = $this->getRememberMeKeyFromCookie(
             $request,
-            $cookieCustomerName
+            $cookieCustomerName,
         );
+        if (null === $cookie) {
+            return;
+        }
+        // try to log
+        $authenticator = new CustomerTokenAuthenticator($cookie);
 
-        if (null !== $cookie) {
-            // try to log
-            $authenticator = new CustomerTokenAuthenticator($cookie);
+        try {
+            // If have found a user, store it in the security context
+            /** @var Customer $user */
+            $user = $authenticator->getAuthentifiedUser();
+            $session->setCustomerUser($user);
 
-            try {
-                // If have found a user, store it in the security context
-                /** @var Customer $user */
-                $user = $authenticator->getAuthentifiedUser();
-
-                $session->setCustomerUser($user);
-
-                $dispatcher->dispatch(
-                    new CustomerLoginEvent($user),
-                    TheliaEvents::CUSTOMER_LOGIN
-                );
-            } catch (TokenAuthenticationException) {
-                // Clear the cookie
-                $this->clearRememberMeCookie($cookieCustomerName);
-            }
+            $dispatcher->dispatch(
+                new CustomerLoginEvent($user),
+                TheliaEvents::CUSTOMER_LOGIN,
+            );
+        } catch (TokenAuthenticationException) {
+            // Clear the cookie
+            $this->clearRememberMeCookie($cookieCustomerName);
         }
     }
 
@@ -168,28 +169,28 @@ class RequestListener implements EventSubscriberInterface
         $cookieAdminName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
         $cookie = $this->getRememberMeKeyFromCookie(
             $request,
-            $cookieAdminName
+            $cookieAdminName,
         );
+        if (null === $cookie) {
+            return;
+        }
+        // try to log
+        $authenticator = new AdminTokenAuthenticator($cookie);
 
-        if (null !== $cookie) {
-            // try to log
-            $authenticator = new AdminTokenAuthenticator($cookie);
+        try {
+            // If have found a user, store it in the security context
+            $user = $authenticator->getAuthentifiedUser();
 
-            try {
-                // If have found a user, store it in the security context
-                $user = $authenticator->getAuthentifiedUser();
+            $session->setAdminUser($user);
 
-                $session->setAdminUser($user);
+            $this->applyUserLocale($user, $session);
 
-                $this->applyUserLocale($user, $session);
+            AdminLog::append('admin', 'LOGIN', 'Authentication successful', $request, $user, false);
+        } catch (TokenAuthenticationException) {
+            AdminLog::append('admin', 'LOGIN', 'Token based authentication failed.', $request);
 
-                AdminLog::append('admin', 'LOGIN', 'Authentication successful', $request, $user, false);
-            } catch (TokenAuthenticationException) {
-                AdminLog::append('admin', 'LOGIN', 'Token based authentication failed.', $request);
-
-                // Clear the cookie
-                $this->clearRememberMeCookie($cookieAdminName);
-            }
+            // Clear the cookie
+            $this->clearRememberMeCookie($cookieAdminName);
         }
     }
 
@@ -199,9 +200,9 @@ class RequestListener implements EventSubscriberInterface
         $locale = $user->getLocale();
 
         if (null === $lang = LangQuery::create()
-                ->filterByActive(true)
-                ->filterByLocale($locale)
-                ->findOne()) {
+            ->filterByActive(true)
+            ->filterByLocale($locale)
+            ->findOne()) {
             $lang = Lang::getDefaultLanguage();
         }
 
@@ -246,16 +247,18 @@ class RequestListener implements EventSubscriberInterface
                     $lang = LangQuery::create()
                         ->filterByUrl(\sprintf('%s://%s', $components['scheme'], $components['host']), ModelCriteria::LIKE)
                         ->findOne();
+
                     if (null !== $lang) {
                         $session->setReturnToUrl($referrer);
 
-                        if (\in_array($view, $catalogViews)) {
+                        if (\in_array($view, $catalogViews, true)) {
                             $session->setReturnToCatalogLastUrl($referrer);
                         }
                     }
                 } elseif (str_contains($referrer, $request->getSchemeAndHttpHost())) {
                     $session->setReturnToUrl($referrer);
-                    if (\in_array($view, $catalogViews)) {
+
+                    if (\in_array($view, $catalogViews, true)) {
                         $session->setReturnToCatalogLastUrl($referrer);
                     }
                 }
@@ -272,6 +275,7 @@ class RequestListener implements EventSubscriberInterface
                 ->filterByVisible(true)
                 ->filterByCode($request->query->get('currency'))
                 ->findOne();
+
             if (null === $currencyToSet) {
                 $currencyToSet = Currency::getDefaultCurrency();
             }

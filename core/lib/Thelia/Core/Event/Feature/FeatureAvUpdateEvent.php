@@ -16,29 +16,22 @@ namespace Thelia\Core\Event\Feature;
 
 class FeatureAvUpdateEvent extends FeatureAvCreateEvent
 {
-    /** @var int */
-    protected $featureAv_id;
-
+    protected int $featureAv_id;
     protected $description;
-
     protected $chapo;
-
     protected $postscriptum;
 
-    /**
-     * @param int $featureAv_id
-     */
-    public function __construct($featureAv_id)
+    public function __construct(int $featureAv_id)
     {
         $this->setFeatureAvId($featureAv_id);
     }
 
-    public function getFeatureAvId()
+    public function getFeatureAvId(): int
     {
         return $this->featureAv_id;
     }
 
-    public function setFeatureAvId($featureAv_id): static
+    public function setFeatureAvId(int $featureAv_id): static
     {
         $this->featureAv_id = $featureAv_id;
 

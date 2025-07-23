@@ -36,7 +36,7 @@ class ModuleImage extends BaseModuleImage implements FileModelInterface
      *
      * @return $this
      */
-    public function setParentId($parentId)
+    public function setParentId(int $parentId): static
     {
         $this->setModuleId($parentId);
 
@@ -48,7 +48,7 @@ class ModuleImage extends BaseModuleImage implements FileModelInterface
      *
      * @return int parent id
      */
-    public function getParentId()
+    public function getParentId(): int
     {
         return $this->getModuleId();
     }
@@ -56,7 +56,7 @@ class ModuleImage extends BaseModuleImage implements FileModelInterface
     /**
      * @return FileModelParentInterface the parent file model
      */
-    public function getParentFileModel()
+    public function getParentFileModel(): FileModelParentInterface
     {
         return new Module();
     }
@@ -66,7 +66,7 @@ class ModuleImage extends BaseModuleImage implements FileModelInterface
      *
      * @return BaseForm the form
      */
-    public function getUpdateFormId()
+    public function getUpdateFormId(): string
     {
         return 'thelia.admin.module.image.modification';
     }
@@ -74,7 +74,7 @@ class ModuleImage extends BaseModuleImage implements FileModelInterface
     /**
      * @return string the path to the upload directory where files are stored, without final slash
      */
-    public function getUploadDir()
+    public function getUploadDir(): string
     {
         return THELIA_LOCAL_DIR.'media'.DS.'images'.DS.'module';
     }
@@ -82,17 +82,15 @@ class ModuleImage extends BaseModuleImage implements FileModelInterface
     /**
      * @return string the URL to redirect to after update from the back-office
      */
-    public function getRedirectionUrl()
+    public function getRedirectionUrl(): string
     {
         return '/admin/module/update/'.$this->getModuleId();
     }
 
     /**
      * Get the Query instance for this object.
-     *
-     * @return ModelCriteria
      */
-    public function getQueryInstance()
+    public function getQueryInstance(): ModelCriteria
     {
         return ModuleImageQuery::create();
     }
@@ -115,11 +113,16 @@ class ModuleImage extends BaseModuleImage implements FileModelInterface
             $router->generate(
                 'admin.module.update',
                 ['module_id' => $module->getId()],
-                Router::ABSOLUTE_URL
+                Router::ABSOLUTE_URL,
             ),
-            $tab
+            $tab,
         );
 
         return $breadcrumb;
+    }
+
+    public function getFile(): string
+    {
+        return parent::getFile();
     }
 }

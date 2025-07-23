@@ -35,7 +35,7 @@ class ModuleConfigQuery extends BaseModuleConfigQuery
      *
      * @return string the variable value
      */
-    public function getConfigValue($moduleId, $variableName, $defaultValue = null, $valueLocale = null)
+    public function getConfigValue(int $moduleId, string $variableName, ?string $defaultValue = null, $valueLocale = null): string
     {
         $value = null;
 
@@ -64,11 +64,11 @@ class ModuleConfigQuery extends BaseModuleConfigQuery
      * @param null   $valueLocale       the locale, or null if not required
      * @param bool   $createIfNotExists if true, the variable will be created if not already defined
      *
-     * @throws \LogicException if variable does not exists and $createIfNotExists is false
-     *
      * @return $this;
+     *
+     * @throws \LogicException if variable does not exists and $createIfNotExists is false
      */
-    public function setConfigValue($moduleId, $variableName, $variableValue, $valueLocale = null, $createIfNotExists = true)
+    public function setConfigValue(int $moduleId, string $variableName, string $variableValue, $valueLocale = null, bool $createIfNotExists = true)
     {
         $configValue = self::create()
             ->filterByModuleId($moduleId)
@@ -81,8 +81,7 @@ class ModuleConfigQuery extends BaseModuleConfigQuery
 
                 $configValue
                     ->setModuleId($moduleId)
-                    ->setName($variableName)
-                ;
+                    ->setName($variableName);
             } else {
                 throw new \LogicException(\sprintf('Module configuration variable %s does not exists. Create it first.', $variableName));
             }
@@ -107,7 +106,7 @@ class ModuleConfigQuery extends BaseModuleConfigQuery
      *
      * @return $this;
      */
-    public function deleteConfigValue($moduleId, $variableName)
+    public function deleteConfigValue(int $moduleId, string $variableName)
     {
         if (null !== $moduleConfig = self::create()
             ->filterByModuleId($moduleId)

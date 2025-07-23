@@ -14,27 +14,22 @@ declare(strict_types=1);
 
 namespace Thelia\Model;
 
-use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Model\Base\OrderCoupon as BaseOrderCoupon;
 
 class OrderCoupon extends BaseOrderCoupon
 {
     /**
      * Return the countries for which free shipping is valid.
-     *
-     * @return array|mixed|ObjectCollection
      */
-    public function getFreeShippingForCountries()
+    public function getFreeShippingForCountries(): mixed
     {
         return OrderCouponCountryQuery::create()->filterByOrderCoupon($this)->find();
     }
 
     /**
      * Return the modules for which free shipping is valid.
-     *
-     * @return array|mixed|ObjectCollection
      */
-    public function getFreeShippingForModules()
+    public function getFreeShippingForModules(): mixed
     {
         return OrderCouponModuleQuery::create()->filterByOrderCoupon($this)->find();
     }

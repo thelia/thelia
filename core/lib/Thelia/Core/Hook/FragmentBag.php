@@ -24,9 +24,7 @@ use Iterator;
 class FragmentBag implements \Iterator
 {
     private int $position = 0;
-
-    /** @var array */
-    protected $fragments = [];
+    protected array $fragments = [];
 
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
@@ -47,8 +45,6 @@ class FragmentBag implements \Iterator
      * Move forward to next element.
      *
      * @see http://php.net/manual/en/iterator.next.php
-     *
-     * @return void any returned value is ignored
      */
     public function next(): void
     {
@@ -88,8 +84,6 @@ class FragmentBag implements \Iterator
      * Rewind the Iterator to the first element.
      *
      * @see http://php.net/manual/en/iterator.rewind.php
-     *
-     * @return void any returned value is ignored
      */
     public function rewind(): void
     {
@@ -98,8 +92,6 @@ class FragmentBag implements \Iterator
 
     /**
      * Clears all parameters.
-     *
-     * @api
      */
     public function clear(): void
     {
@@ -109,7 +101,7 @@ class FragmentBag implements \Iterator
 
     public function isEmpty(): bool
     {
-        return \count($this->fragments) == 0;
+        return [] === $this->fragments;
     }
 
     public function getCount(): int
@@ -132,8 +124,6 @@ class FragmentBag implements \Iterator
      * Gets the all keys fragment.
      *
      * @return array An array of parameters
-     *
-     * @api
      */
     public function keys(): array
     {

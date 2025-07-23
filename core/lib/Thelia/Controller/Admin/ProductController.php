@@ -20,6 +20,7 @@ use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
@@ -36,7 +37,6 @@ use Thelia\Core\Event\Product\ProductDeleteAccessoryEvent;
 use Thelia\Core\Event\Product\ProductDeleteCategoryEvent;
 use Thelia\Core\Event\Product\ProductDeleteContentEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
-use Thelia\Core\Event\Product\ProductEvent;
 use Thelia\Core\Event\Product\ProductSetTemplateEvent;
 use Thelia\Core\Event\Product\ProductToggleVisibilityEvent;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
@@ -115,7 +115,7 @@ class ProductController extends AbstractSeoCrudController
             TheliaEvents::PRODUCT_DELETE,
             TheliaEvents::PRODUCT_TOGGLE_VISIBILITY,
             TheliaEvents::PRODUCT_UPDATE_POSITION,
-            TheliaEvents::PRODUCT_UPDATE_SEO
+            TheliaEvents::PRODUCT_UPDATE_SEO,
         );
     }
 
@@ -128,7 +128,7 @@ class ProductController extends AbstractSeoCrudController
             'ajax/product-attributes-tab',
             [
                 'product_id' => $this->getRequest()->get('product_id', 0),
-            ]
+            ],
         );
     }
 
@@ -143,7 +143,7 @@ class ProductController extends AbstractSeoCrudController
                 'product_id' => $this->getRequest()->get('product_id', 0),
                 'folder_id' => $this->getRequest()->get('folder_id', 0),
                 'accessory_category_id' => $this->getRequest()->get('accessory_category_id', 0),
-            ]
+            ],
         );
     }
 
@@ -173,8 +173,7 @@ class ProductController extends AbstractSeoCrudController
             ->setCurrencyId($formData['currency'])
             ->setTaxRuleId($formData['tax_rule'])
             ->setBaseQuantity($formData['quantity'])
-            ->setTemplateId($formData['template_id'])
-        ;
+            ->setTemplateId($formData['template_id']);
 
         return $createEvent;
     }
@@ -194,8 +193,7 @@ class ProductController extends AbstractSeoCrudController
             ->setVirtual($formData['virtual'])
             ->setDefaultCategory($formData['default_category'])
             ->setBrandId($formData['brand_id'])
-            ->setVirtualDocumentId($formData['virtual_document_id'])
-        ;
+            ->setVirtualDocumentId($formData['virtual_document_id']);
 
         // Create and dispatch the change event
         return $changeEvent;
@@ -207,7 +205,7 @@ class ProductController extends AbstractSeoCrudController
             $this->getRequest()->get('product_id'),
             $positionChangeMode,
             $positionValue,
-            $this->getRequest()->get('category_id')
+            $this->getRequest()->get('category_id'),
         );
     }
 
@@ -216,34 +214,23 @@ class ProductController extends AbstractSeoCrudController
         return new ProductDeleteEvent($this->getRequest()->get('product_id', 0));
     }
 
-    /**
-     * @param ProductEvent $event
-     */
-    protected function eventContainsObject($event): bool
+    protected function eventContainsObject(Event $event): bool
     {
         return $event->hasProduct();
     }
 
-    /**
-     * @param ProductPrice        $productPrice
-     * @param ProductSaleElements $saleElement
-     * @param Currency            $defaultCurrency
-     * @param Currency            $currentCurrency
-     */
-    protected function updatePriceFromDefaultCurrency($productPrice, $saleElement, $defaultCurrency, $currentCurrency): void
+    protected function updatePriceFromDefaultCurrency(ProductPrice $productPrice, ProductSaleElements $saleElement, Currency $defaultCurrency, Currency $currentCurrency): void
     {
         // Get price for default currency
         $priceForDefaultCurrency = ProductPriceQuery::create()
-        ->filterByCurrency($defaultCurrency)
-        ->filterByProductSaleElements($saleElement)
-        ->findOne()
-        ;
+            ->filterByCurrency($defaultCurrency)
+            ->filterByProductSaleElements($saleElement)
+            ->findOne();
 
-        if ($priceForDefaultCurrency !== null) {
+        if (null !== $priceForDefaultCurrency) {
             $productPrice
-            ->setPrice($priceForDefaultCurrency->getPrice() * $currentCurrency->getRate())
-            ->setPromoPrice($priceForDefaultCurrency->getPromoPrice() * $currentCurrency->getRate())
-            ;
+                ->setPrice($priceForDefaultCurrency->getPrice() * $currentCurrency->getRate())
+                ->setPromoPrice($priceForDefaultCurrency->getPromoPrice() * $currentCurrency->getRate());
         }
     }
 
@@ -286,16 +273,15 @@ class ProductController extends AbstractSeoCrudController
             $productPrice = ProductPriceQuery::create()
                 ->filterByCurrency($currentCurrency)
                 ->filterByProductSaleElements($saleElement)
-                ->findOne()
-            ;
+                ->findOne();
 
             // No one exists ?
-            if ($productPrice === null) {
+            if (null === $productPrice) {
                 $productPrice = new ProductPrice();
 
                 // If the current currency is not the default one, calculate the price
                 // using default currency price and current currency rate
-                if ($currentCurrency->getId() != $defaultCurrency->getId()) {
+                if ($currentCurrency->getId() !== $defaultCurrency->getId()) {
                     $productPrice->setFromDefaultCurrency(true);
                 }
             }
@@ -305,7 +291,7 @@ class ProductController extends AbstractSeoCrudController
                 $this->updatePriceFromDefaultCurrency($productPrice, $saleElement, $defaultCurrency, $currentCurrency);
             }
 
-            $isDefaultPse = \count($saleElement->getAttributeCombinations()) == 0;
+            $isDefaultPse = 0 === \count($saleElement->getAttributeCombinations());
 
             // If this PSE has no combination -> this is the default one
             // affect it to the thelia.admin.product_sale_element.update form
@@ -375,7 +361,8 @@ class ProductController extends AbstractSeoCrudController
         // Virtual document
         if (\array_key_exists('product_sale_element_id', $defaultPseData)) {
             $virtualDocumentId = (int) MetaDataQuery::getVal('virtual', MetaData::PSE_KEY, $defaultPseData['product_sale_element_id']);
-            if ($virtualDocumentId !== 0) {
+
+            if (0 !== $virtualDocumentId) {
                 $data['virtual_document_id'] = $virtualDocumentId;
             }
         }
@@ -384,10 +371,7 @@ class ProductController extends AbstractSeoCrudController
         return $this->createForm(AdminForm::PRODUCT_MODIFICATION, FormType::class, $data);
     }
 
-    /**
-     * @param ProductEvent $event
-     */
-    protected function getObjectFromEvent($event): mixed
+    protected function getObjectFromEvent(Event $event): mixed
     {
         return $event->hasProduct() ? $event->getProduct() : null;
     }
@@ -437,7 +421,7 @@ class ProductController extends AbstractSeoCrudController
         // Trouver le category_id, soit depuis la reques, souit depuis le produit courant
         $category_id = $this->getRequest()->get('category_id');
 
-        if ($category_id == null) {
+        if (null === $category_id) {
             $product = $this->getExistingObject();
 
             if ($product instanceof ActiveRecordInterface) {
@@ -445,10 +429,10 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        return $category_id != null ? $category_id : 0;
+        return $category_id ?? 0;
     }
 
-    protected function renderListTemplate($currentOrder): Response
+    protected function renderListTemplate(string $currentOrder): Response
     {
         $this->getListOrderFromSession('product', 'product_order', 'manual');
 
@@ -458,7 +442,7 @@ class ProductController extends AbstractSeoCrudController
                 'product_order' => $currentOrder,
                 'category_id' => $this->getCategoryId(),
                 'page' => $this->getRequest()->get('page', 1),
-            ]
+            ],
         );
     }
 
@@ -469,7 +453,7 @@ class ProductController extends AbstractSeoCrudController
             [
                 'category_id' => $this->getCategoryId(),
                 'page' => $this->getRequest()->get('page', 1),
-            ]
+            ],
         );
     }
 
@@ -511,7 +495,7 @@ class ProductController extends AbstractSeoCrudController
     {
         return $this->generateRedirectFromRoute(
             'admin.products.default',
-            ['category_id' => $this->getCategoryId()]
+            ['category_id' => $this->getCategoryId()],
         );
     }
 
@@ -519,7 +503,7 @@ class ProductController extends AbstractSeoCrudController
     {
         return $this->generateRedirectFromRoute(
             'admin.categories.default',
-            ['category_id' => $this->getCategoryId()]
+            ['category_id' => $this->getCategoryId()],
         );
     }
 
@@ -539,7 +523,7 @@ class ProductController extends AbstractSeoCrudController
                 ->findOne();
 
             if (null !== $defaultPSE) {
-                if ($virtualDocumentId !== 0) {
+                if (0 !== $virtualDocumentId) {
                     $assocEvent = new MetaDataCreateOrUpdateEvent('virtual', MetaData::PSE_KEY, $defaultPSE->getId(), $virtualDocumentId);
                     $eventDispatcher->dispatch($assocEvent, TheliaEvents::META_DATA_UPDATE);
                 } else {
@@ -566,8 +550,7 @@ class ProductController extends AbstractSeoCrudController
             ->filterByProductId($productId)
             ->filterByVisible(0)
             ->orderByPosition()
-            ->find()
-        ;
+            ->find();
 
         $results = [];
 
@@ -578,7 +561,7 @@ class ProductController extends AbstractSeoCrudController
                     'id' => $document->getId(),
                     'title' => $document->getTitle(),
                     'file' => $document->getFile(),
-                    'selected' => ($document->getId() == $selectedId),
+                    'selected' => ($document->getId() === $selectedId),
                 ];
             }
         }
@@ -594,14 +577,14 @@ class ProductController extends AbstractSeoCrudController
 
         $folders = FolderQuery::create()->filterById($folderId)->find();
 
-        if ($folders !== null) {
+        if (null !== $folders) {
             $list = ContentQuery::create()
                 ->joinWithI18n($this->getCurrentEditionLocale())
                 ->filterByFolder($folders, Criteria::IN)
                 ->filterById(ProductAssociatedContentQuery::create()->filterByProductId($productId)->select('content_id')->find(), Criteria::NOT_IN)
                 ->find();
 
-            if ($list !== null) {
+            if (null !== $list) {
                 /** @var Content $item */
                 foreach ($list as $item) {
                     $result[] = ['id' => $item->getId(), 'title' => $item->getTitle()];
@@ -624,7 +607,7 @@ class ProductController extends AbstractSeoCrudController
         if ($content_id > 0) {
             $event = new ProductAddContentEvent(
                 $this->getExistingObject(),
-                $content_id
+                $content_id,
             );
 
             try {
@@ -650,7 +633,7 @@ class ProductController extends AbstractSeoCrudController
         if ($content_id > 0) {
             $event = new ProductDeleteContentEvent(
                 $this->getExistingObject(),
-                $content_id
+                $content_id,
             );
 
             try {
@@ -672,14 +655,14 @@ class ProductController extends AbstractSeoCrudController
 
         $categories = CategoryQuery::create()->filterById($categoryId)->find();
 
-        if ($categories !== null) {
+        if (null !== $categories) {
             $list = ProductQuery::create()
-            ->joinWithI18n($this->getCurrentEditionLocale())
-            ->filterByCategory($categories, Criteria::IN)
-            ->filterById(AccessoryQuery::create()->filterByProductId($productId)->select('accessory')->find(), Criteria::NOT_IN)
-            ->find();
+                ->joinWithI18n($this->getCurrentEditionLocale())
+                ->filterByCategory($categories, Criteria::IN)
+                ->filterById(AccessoryQuery::create()->filterByProductId($productId)->select('accessory')->find(), Criteria::NOT_IN)
+                ->find();
 
-            if ($list !== null) {
+            if (null !== $list) {
                 /** @var Product $item */
                 foreach ($list as $item) {
                     $result[] = ['id' => $item->getId(), 'title' => $item->getTitle()];
@@ -702,7 +685,7 @@ class ProductController extends AbstractSeoCrudController
         if ($accessory_id > 0) {
             $event = new ProductAddAccessoryEvent(
                 $this->getExistingObject(),
-                $accessory_id
+                $accessory_id,
             );
 
             try {
@@ -728,7 +711,7 @@ class ProductController extends AbstractSeoCrudController
         if ($accessory_id > 0) {
             $event = new ProductDeleteAccessoryEvent(
                 $this->getExistingObject(),
-                $accessory_id
+                $accessory_id,
             );
 
             try {
@@ -748,14 +731,14 @@ class ProductController extends AbstractSeoCrudController
     public function updateAccessoryPositionAction(
         Request $request,
         EventDispatcherInterface $eventDispatcher,
-    ) {
+    ): ?Response {
         $accessory = AccessoryQuery::create()->findPk($request->get('accessory_id'));
 
         return $this->genericUpdatePositionAction(
             $request,
             $eventDispatcher,
             $accessory,
-            TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION
+            TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION,
         );
     }
 
@@ -765,25 +748,21 @@ class ProductController extends AbstractSeoCrudController
     public function updateContentPositionAction(
         Request $request,
         EventDispatcherInterface $eventDispatcher,
-    ) {
+    ): ?Response {
         $content = ProductAssociatedContentQuery::create()->findPk($request->get('content_id'));
 
         return $this->genericUpdatePositionAction(
             $request,
             $eventDispatcher,
             $content,
-            TheliaEvents::PRODUCT_UPDATE_CONTENT_POSITION
+            TheliaEvents::PRODUCT_UPDATE_CONTENT_POSITION,
         );
     }
 
     /**
      * Change product template for a given product.
-     *
-     * @param int $productId
-     *
-     * @return mixed
      */
-    public function setProductTemplateAction(EventDispatcherInterface $eventDispatcher, $productId): Response|RedirectResponse
+    public function setProductTemplateAction(EventDispatcherInterface $eventDispatcher, int $productId): Response|RedirectResponse
     {
         // Check current user authorization
         if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
@@ -792,12 +771,12 @@ class ProductController extends AbstractSeoCrudController
 
         $product = ProductQuery::create()->findPk($productId);
 
-        if ($product != null) {
+        if (null !== $product) {
             $template_id = (int) $this->getRequest()->get('template_id', 0);
 
             $eventDispatcher->dispatch(
                 new ProductSetTemplateEvent($product, $template_id, $this->getCurrentEditionCurrency()->getId()),
-                TheliaEvents::PRODUCT_SET_TEMPLATE
+                TheliaEvents::PRODUCT_SET_TEMPLATE,
             );
         }
 
@@ -807,20 +786,18 @@ class ProductController extends AbstractSeoCrudController
     /**
      * Update product attributes and features.
      *
-     * @param int $productId
+     * @return RedirectResponse
      *
      * @throws PropelException
-     *
-     * @return RedirectResponse
      */
-    public function updateAttributesAndFeaturesAction(EventDispatcherInterface $eventDispatcher, $productId): Response|RedirectResponse
+    public function updateAttributesAndFeaturesAction(EventDispatcherInterface $eventDispatcher, int $productId): Response|RedirectResponse
     {
         $product = ProductQuery::create()->findPk($productId);
 
-        if ($product != null) {
+        if (null !== $product) {
             $featureTemplate = FeatureTemplateQuery::create()->filterByTemplateId($product->getTemplateId())->find();
 
-            if ($featureTemplate !== null) {
+            if (null !== $featureTemplate) {
                 // Get all features for the template attached to this product
                 $allFeatures = FeatureQuery::create()
                     ->filterByFeatureTemplate($featureTemplate)
@@ -873,7 +850,7 @@ class ProductController extends AbstractSeoCrudController
                 // Delete features which don't have any values
                 /** @var Feature $feature */
                 foreach ($allFeatures as $feature) {
-                    if (!\in_array($feature->getId(), $updatedFeatures)) {
+                    if (!\in_array($feature->getId(), $updatedFeatures, true)) {
                         $event = new FeatureProductDeleteEvent($productId, $feature->getId());
 
                         $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE);
@@ -884,7 +861,7 @@ class ProductController extends AbstractSeoCrudController
 
         // If we have to stay on the same page, do not redirect to the successUrl,
         // just redirect to the edit page again.
-        if ($this->getRequest()->get('save_mode') == 'stay') {
+        if ('stay' === $this->getRequest()->get('save_mode')) {
             return $this->redirectToEditionTemplate();
         }
 
@@ -904,7 +881,7 @@ class ProductController extends AbstractSeoCrudController
         if ($category_id > 0) {
             $event = new ProductAddCategoryEvent(
                 $this->getExistingObject(),
-                $category_id
+                $category_id,
             );
 
             try {
@@ -930,7 +907,7 @@ class ProductController extends AbstractSeoCrudController
         if ($category_id > 0) {
             $event = new ProductDeleteCategoryEvent(
                 $this->getExistingObject(),
-                $category_id
+                $category_id,
             );
 
             try {
@@ -953,13 +930,13 @@ class ProductController extends AbstractSeoCrudController
         // Get attribute for this product
         $attribute = AttributeQuery::create()->findPk($attributeId);
 
-        if ($attribute !== null) {
+        if (null !== $attribute) {
             $values = AttributeAvQuery::create()
                 ->joinWithI18n($this->getCurrentEditionLocale())
                 ->filterByAttribute($attribute)
                 ->find();
 
-            if ($values !== null) {
+            if (null !== $values) {
                 /** @var AttributeAv $value */
                 foreach ($values as $value) {
                     $result[] = ['id' => $value->getId(), 'title' => $value->getTitle()];
@@ -977,7 +954,7 @@ class ProductController extends AbstractSeoCrudController
         // Get attribute for this product
         $attributeAv = AttributeAvQuery::create()->joinWithI18n($this->getCurrentEditionLocale())->findPk($attributeAvId);
 
-        if ($attributeAv !== null) {
+        if (null !== $attributeAv) {
             $addIt = true;
 
             $attribute = AttributeQuery::create()
@@ -990,11 +967,11 @@ class ProductController extends AbstractSeoCrudController
             foreach ($combinationArray as $id) {
                 $attrAv = AttributeAvQuery::create()->joinWithI18n($this->getCurrentEditionLocale())->findPk($id);
 
-                if ($attrAv !== null) {
-                    if ($attrAv->getId() == $attributeAv->getId()) {
+                if (null !== $attrAv) {
+                    if ($attrAv->getId() === $attributeAv->getId()) {
                         $result['error'] = $this->getTranslator()->trans(
                             'A value for attribute "%name" is already present in the combination',
-                            ['%name' => $attribute->getTitle().' : '.$attributeAv->getTitle()]
+                            ['%name' => $attribute->getTitle().' : '.$attributeAv->getTitle()],
                         );
 
                         $addIt = false;
@@ -1029,7 +1006,7 @@ class ProductController extends AbstractSeoCrudController
         $event = new ProductSaleElementCreateEvent(
             $this->getExistingObject(),
             $this->getRequest()->get('combination_attributes', []),
-            $this->getCurrentEditionCurrency()->getId()
+            $this->getCurrentEditionCurrency()->getId(),
         );
 
         try {
@@ -1054,7 +1031,7 @@ class ProductController extends AbstractSeoCrudController
 
         $event = new ProductSaleElementDeleteEvent(
             $this->getRequest()->get('product_sale_element_id', 0),
-            $this->getCurrentEditionCurrency()->getId()
+            $this->getCurrentEditionCurrency()->getId(),
         );
 
         try {
@@ -1076,37 +1053,36 @@ class ProductController extends AbstractSeoCrudController
     {
         $event = new ProductSaleElementUpdateEvent(
             $this->getExistingObject(),
-            $data['product_sale_element_id']
+            $data['product_sale_element_id'],
         );
 
         $event
             ->setReference($data['reference'])
             ->setPrice($data['price'])
             ->setCurrencyId($data['currency'])
-            ->setWeight($data['weight'])
+            ->setWeight($data['weight'] ?? 0)
             ->setQuantity($data['quantity'])
-            ->setSalePrice($data['sale_price'])
-            ->setOnsale($data['onsale'])
-            ->setIsnew($data['isnew'])
-            ->setIsdefault($data['isdefault'])
+            ->setSalePrice((float) $data['sale_price'])
+            ->setOnsale($data['onsale'] ?? 0)
+            ->setIsnew($data['isnew'] ?? 0)
+            ->setIsdefault($data['isdefault'] ? (bool) $data['isdefault'] : false)
             ->setEanCode($data['ean_code'])
             ->setTaxRuleId($data['tax_rule'])
-            ->setFromDefaultCurrency($data['use_exchange_rate'])
-        ;
+            ->setFromDefaultCurrency($data['use_exchange_rate']);
 
         $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT);
 
         // Log object modification
-        if (null !== $changedObject = $event->getProductSaleElement()) {
+        if (($changedObject = $event->getProductSaleElement()) instanceof ProductSaleElementsModel) {
             $this->adminLogAppend(
                 $this->resourceCode,
                 AccessManager::UPDATE,
                 \sprintf(
                     'Product Sale Element (ID %s) for product reference %s modified',
                     $changedObject->getId(),
-                    $event->getProduct()->getRef()
+                    $event->getProduct()->getRef(),
                 ),
-                $changedObject->getId()
+                $changedObject->getId(),
             );
         }
     }
@@ -1149,7 +1125,7 @@ class ProductController extends AbstractSeoCrudController
                     $tmp_data['sale_price'] = $data['sale_price'][$idx];
                     $tmp_data['onsale'] = isset($data['onsale'][$idx]) ? 1 : 0;
                     $tmp_data['isnew'] = isset($data['isnew'][$idx]) ? 1 : 0;
-                    $tmp_data['isdefault'] = $data['default_pse'] == $pse_id;
+                    $tmp_data['isdefault'] = $data['default_pse'] === $pse_id;
                     $tmp_data['ean_code'] = $data['ean_code'][$idx];
 
                     $this->processSingleProductSaleElementUpdate($eventDispatcher, $tmp_data);
@@ -1160,7 +1136,7 @@ class ProductController extends AbstractSeoCrudController
             }
 
             // If we have to stay on the same page, do not redirect to the successUrl, just redirect to the edit page again.
-            if ($this->getRequest()->get('save_mode') == 'stay') {
+            if ('stay' === $this->getRequest()->get('save_mode')) {
                 return $this->redirectToEditionTemplate();
             }
 
@@ -1178,7 +1154,7 @@ class ProductController extends AbstractSeoCrudController
             $this->getTranslator()->trans('ProductSaleElement modification'),
             $error_msg,
             $changeForm,
-            $ex
+            $ex,
         );
 
         // At this point, the form has errors, and should be redisplayed.
@@ -1192,7 +1168,7 @@ class ProductController extends AbstractSeoCrudController
     {
         return $this->processProductSaleElementUpdate(
             $eventDispatcher,
-            $this->createForm(AdminForm::PRODUCT_SALE_ELEMENT_UPDATE)
+            $this->createForm(AdminForm::PRODUCT_SALE_ELEMENT_UPDATE),
         );
     }
 
@@ -1203,7 +1179,7 @@ class ProductController extends AbstractSeoCrudController
     {
         return $this->processProductSaleElementUpdate(
             $eventDispatcher,
-            $this->createForm(AdminForm::PRODUCT_DEFAULT_SALE_ELEMENT_UPDATE)
+            $this->createForm(AdminForm::PRODUCT_DEFAULT_SALE_ELEMENT_UPDATE),
         );
     }
 
@@ -1212,7 +1188,7 @@ class ProductController extends AbstractSeoCrudController
     {
         $current = array_shift($input);
 
-        if ($input !== []) {
+        if ([] !== $input) {
             foreach ($current as $element) {
                 $tmp[] = $element;
                 $this->combine($input, $output, $tmp);
@@ -1271,19 +1247,18 @@ class ProductController extends AbstractSeoCrudController
             $event = new ProductCombinationGenerationEvent(
                 $this->getExistingObject(),
                 $data['currency'],
-                $combinations
+                $combinations,
             );
 
             $event
-                ->setReference($data['reference'] == null ? '' : $data['reference'])
-                ->setPrice($data['price'] == null ? 0 : $data['price'])
-                ->setWeight($data['weight'] == null ? 0 : $data['weight'])
-                ->setQuantity($data['quantity'] == null ? 0 : $data['quantity'])
-                ->setSalePrice($data['sale_price'] == null ? 0 : $data['sale_price'])
-                ->setOnsale($data['onsale'] == null ? false : $data['onsale'])
-                ->setIsnew($data['isnew'] == null ? false : $data['isnew'])
-                ->setEanCode($data['ean_code'] == null ? '' : $data['ean_code'])
-            ;
+                ->setReference($data['reference'] ?? '')
+                ->setPrice($data['price'] ?? 0)
+                ->setWeight($data['weight'] ?? 0)
+                ->setQuantity($data['quantity'] ?? 0)
+                ->setSalePrice($data['sale_price'] ?? 0)
+                ->setOnsale($data['onsale'] ?? false)
+                ->setIsnew($data['isnew'] ?? false)
+                ->setEanCode($data['ean_code'] ?? '');
 
             $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_COMBINATION_GENERATION);
 
@@ -1293,9 +1268,9 @@ class ProductController extends AbstractSeoCrudController
                 AccessManager::CREATE,
                 \sprintf(
                     'Combination generation for product reference %s',
-                    $event->getProduct()->getRef()
+                    $event->getProduct()->getRef(),
                 ),
-                $event->getProduct()->getId()
+                $event->getProduct()->getId(),
             );
 
             // Redirect to the success URL
@@ -1312,7 +1287,7 @@ class ProductController extends AbstractSeoCrudController
             $this->getTranslator()->trans('Combination builder'),
             $error_msg,
             $changeForm,
-            $ex
+            $ex,
         );
 
         // At this point, the form has errors, and should be redisplayed.
@@ -1321,8 +1296,6 @@ class ProductController extends AbstractSeoCrudController
 
     /**
      * Invoked through Ajax; this method calculates the taxed price from the untaxed price, and vice versa.
-     *
-     * @since version 2.2
      */
     public function priceCalculator(): JsonResponse
     {
@@ -1334,15 +1307,15 @@ class ProductController extends AbstractSeoCrudController
         $convert = (int) $this->getRequest()->query->get('convert_from_default_currency', 0);
 
         if (null !== $product = ProductQuery::create()->findPk($product_id)) {
-            if ($action == 'to_tax') {
+            if ('to_tax' === $action) {
                 $return_price = $this->computePrice($price, 'without_tax', $product);
-            } elseif ($action == 'from_tax') {
+            } elseif ('from_tax' === $action) {
                 $return_price = $this->computePrice($price, 'with_tax', $product);
             } else {
                 $return_price = $price;
             }
 
-            if ($convert != 0) {
+            if (0 !== $convert) {
                 $return_price = $price * Currency::getDefaultCurrency()->getRate();
             }
         }
@@ -1370,12 +1343,12 @@ class ProductController extends AbstractSeoCrudController
 
             $calculator->loadTaxRuleWithoutProduct(
                 $taxRule,
-                Country::getShopLocation()
+                Country::getShopLocation(),
             );
 
-            if ($action == 'to_tax') {
+            if ('to_tax' === $action) {
                 $return_price = $calculator->getTaxedPrice($price);
-            } elseif ($action == 'from_tax') {
+            } elseif ('from_tax' === $action) {
                 $return_price = $calculator->getUntaxedPrice($price);
             } else {
                 $return_price = $price;
@@ -1401,14 +1374,13 @@ class ProductController extends AbstractSeoCrudController
 
         if (null !== $pse = ProductSaleElementsQuery::create()->findPk($product_sale_element_id)) {
             if ($currency_id > 0
-                && $currency_id != Currency::getDefaultCurrency()->getId()
+                && $currency_id !== Currency::getDefaultCurrency()->getId()
                 && null !== $currency = CurrencyQuery::create()->findPk($currency_id)) {
                 // Get the default currency price
                 $productPrice = ProductPriceQuery::create()
                     ->filterByCurrency(Currency::getDefaultCurrency())
                     ->filterByProductSaleElementsId($product_sale_element_id)
-                    ->findOne()
-                ;
+                    ->findOne();
 
                 // Calculate the converted price
                 if (null !== $productPrice) {
@@ -1433,41 +1405,34 @@ class ProductController extends AbstractSeoCrudController
 
     /**
      * Calculate taxed/untexted price for a product.
-     *
-     * @param bool $convert
      */
-    protected function computePrice($price, $price_type, Product $product, $convert = false): float
+    protected function computePrice($price, $price_type, Product $product, bool $convert = false): float
     {
         $calc = new Calculator();
+        $calc->load($product, Country::getShopLocation());
 
-        $calc->load(
-            $product,
-            Country::getShopLocation()
-        );
+        // Calculer le prix selon le type demandé
+        $return_price = match ($price_type) {
+            'without_tax' => $calc->getUntaxedPrice((float) $price),
+            'with_tax' => $calc->getTaxedPrice((float) $price),
+            default => (float) $price,
+        };
 
-        if ($price_type == 'without_tax') {
-            $return_price = $calc->getTaxedPrice($price);
-        } elseif ($price_type == 'with_tax') {
-            $return_price = $calc->getUntaxedPrice($price);
-        } else {
-            $return_price = $price;
+        if ($convert) {
+            $defaultCurrency = Currency::getDefaultCurrency();
+
+            if ($defaultCurrency) {
+                $return_price *= $defaultCurrency->getRate();
+            }
         }
 
-        if ($convert != 0) {
-            $return_price = $price * Currency::getDefaultCurrency()->getRate();
-        }
-
-        return (float) $return_price;
+        return $return_price;
     }
 
     /**
-     * @param int    $pseId
-     * @param string $type
-     * @param int    $typeId
-     *
      * @return mixed|Response
      */
-    public function productSaleElementsProductImageDocumentAssociation(EventDispatcherInterface $eventDispatcher, $pseId, $type, $typeId): Response|JsonResponse
+    public function productSaleElementsProductImageDocumentAssociation(EventDispatcherInterface $eventDispatcher, int $pseId, string $type, int $typeId): Response|JsonResponse
     {
         /*
          * Check user's auth
@@ -1508,36 +1473,21 @@ class ProductController extends AbstractSeoCrudController
         $pse = ProductSaleElementsQuery::create()->findPk($pseId);
 
         if (null === $pse) {
-            throw new \Exception(
-                $this->getTranslator()->trans(
-                    "The product sale elements id %id doesn't exists",
-                    [
-                        '%id' => $pseId,
-                    ]
-                )
-            );
+            throw new \Exception($this->getTranslator()->trans("The product sale elements id %id doesn't exists", ['%id' => $pseId]));
         }
 
         $assoc = null;
 
-        if ($type === 'image') {
+        if ('image' === $type) {
             $image = ProductImageQuery::create()->findPk($typeId);
 
             if (null === $image) {
-                throw new \Exception(
-                    $this->getTranslator()->trans(
-                        "The product image id %id doesn't exists",
-                        [
-                            '%id' => $typeId,
-                        ]
-                    )
-                );
+                throw new \Exception($this->getTranslator()->trans("The product image id %id doesn't exists", ['%id' => $typeId]));
             }
 
             $assoc = ProductSaleElementsProductImageQuery::create()
                 ->filterByProductSaleElementsId($pseId)
-                ->findOneByProductImageId($typeId)
-            ;
+                ->findOneByProductImageId($typeId);
 
             if (null === $assoc) {
                 $assoc = new ProductSaleElementsProductImage();
@@ -1545,32 +1495,23 @@ class ProductController extends AbstractSeoCrudController
                 $assoc
                     ->setProductSaleElementsId($pseId)
                     ->setProductImageId($typeId)
-                    ->save()
-                ;
+                    ->save();
             } else {
                 $assoc->delete();
             }
 
             $responseData['product_image_id'] = $typeId;
             $responseData['is-associated'] = (int) (!$assoc->isDeleted());
-        } elseif ($type === 'document') {
+        } elseif ('document' === $type) {
             $image = ProductDocumentQuery::create()->findPk($typeId);
 
             if (null === $image) {
-                throw new \Exception(
-                    $this->getTranslator()->trans(
-                        "The product document id %id doesn't exists",
-                        [
-                            '%id' => $pseId,
-                        ]
-                    )
-                );
+                throw new \Exception($this->getTranslator()->trans("The product document id %id doesn't exists", ['%id' => $pseId]));
             }
 
             $assoc = ProductSaleElementsProductDocumentQuery::create()
                 ->filterByProductSaleElementsId($pseId)
-                ->findOneByProductDocumentId($typeId)
-            ;
+                ->findOneByProductDocumentId($typeId);
 
             if (null === $assoc) {
                 $assoc = new ProductSaleElementsProductDocument();
@@ -1578,26 +1519,18 @@ class ProductController extends AbstractSeoCrudController
                 $assoc
                     ->setProductSaleElementsId($pseId)
                     ->setProductDocumentId($typeId)
-                    ->save()
-                ;
+                    ->save();
             } else {
                 $assoc->delete();
             }
 
             $responseData['product_document_id'] = $typeId;
             $responseData['is-associated'] = (int) (!$assoc->isDeleted());
-        } elseif ($type === 'virtual') {
+        } elseif ('virtual' === $type) {
             $image = ProductDocumentQuery::create()->findPk($typeId);
 
             if (null === $image) {
-                throw new \Exception(
-                    $this->getTranslator()->trans(
-                        "The product document id %id doesn't exists",
-                        [
-                            '%id' => $pseId,
-                        ]
-                    )
-                );
+                throw new \Exception($this->getTranslator()->trans("The product document id %id doesn't exists", ['%id' => $pseId]));
             }
 
             $documentId = (int) MetaDataQuery::getVal('virtual', MetaData::PSE_KEY, $pseId);
@@ -1622,12 +1555,12 @@ class ProductController extends AbstractSeoCrudController
     {
         $types = ['image', 'document', 'virtual'];
 
-        if (!\in_array($type, $types)) {
+        if (!\in_array($type, $types, true)) {
             return $this->getTranslator()->trans(
                 'The type %type is not valid',
                 [
                     '%type' => $type,
-                ]
+                ],
             );
         }
 
@@ -1654,7 +1587,7 @@ class ProductController extends AbstractSeoCrudController
                 "The product sale elements id %id doesn't exist",
                 [
                     '%id' => $pse->getId(),
-                ]
+                ],
             );
         }
 
@@ -1677,9 +1610,10 @@ class ProductController extends AbstractSeoCrudController
                 $data = [];
         }
 
-        if ($data === [] && null === $errorMessage) {
+        if ([] === $data && null === $errorMessage) {
             $errorMessage = $this->getTranslator()->trans('There are no files to associate.');
-            if ($type === 'virtual') {
+
+            if ('virtual' === $type) {
                 $errorMessage .= $this->getTranslator()->trans(' note: only non-visible documents can be associated.');
             }
         }
@@ -1688,8 +1622,7 @@ class ProductController extends AbstractSeoCrudController
             ->set('items', $data)
             ->set('type', $type)
             ->set('error_message', $errorMessage)
-            ->set('modal_title', $modalTitle)
-        ;
+            ->set('modal_title', $modalTitle);
 
         return $this->render('ajax/pse-image-document-assoc-modal');
     }
@@ -1710,14 +1643,12 @@ class ProductController extends AbstractSeoCrudController
         ]);
 
         $images = $imageLoop
-            ->exec($imagePagination)
-        ;
+            ->exec($imagePagination);
 
         $imageAssoc = ProductSaleElementsProductImageQuery::create()
             ->filterByProductSaleElementsId($pse->getId())
             ->find()
-            ->toArray()
-        ;
+            ->toArray();
 
         $data = [];
 
@@ -1756,16 +1687,14 @@ class ProductController extends AbstractSeoCrudController
         ]);
 
         $documents = $documentLoop
-            ->exec($documentPagination)
-        ;
+            ->exec($documentPagination);
 
         $documentAssoc = ProductSaleElementsProductDocumentQuery::create()
             ->useProductSaleElementsQuery()
-                ->filterById($pse->getId())
+            ->filterById($pse->getId())
             ->endUse()
             ->find()
-            ->toArray()
-        ;
+            ->toArray();
 
         $data = [];
 
@@ -1805,8 +1734,7 @@ class ProductController extends AbstractSeoCrudController
         ]);
 
         $documents = $documentLoop
-            ->exec($documentPagination)
-        ;
+            ->exec($documentPagination);
 
         $documentId = (int) MetaDataQuery::getVal('virtual', 'pse', $pse->getId());
 
@@ -1844,7 +1772,7 @@ class ProductController extends AbstractSeoCrudController
             $this->getSecurityContext(),
             $this->getTranslator(),
             $this->container->getParameter('Thelia.parser.loops'),
-            $this->container->getParameter('kernel.environment')
+            $this->container->getParameter('kernel.environment'),
         );
 
         return $instance;
@@ -1876,8 +1804,6 @@ class ProductController extends AbstractSeoCrudController
 
     /**
      * @throws \Exception
-     *
-     * @return mixed
      */
     public function cloneAction(EventDispatcherInterface $eventDispatcher): Response|RedirectResponse
     {
@@ -1900,20 +1826,20 @@ class ProductController extends AbstractSeoCrudController
             $productCloneEvent = new ProductCloneEvent(
                 $form->getData()['newRef'],
                 $lang,
-                $originalProduct
+                $originalProduct,
             );
             $eventDispatcher->dispatch($productCloneEvent, TheliaEvents::PRODUCT_CLONE);
 
             return $this->generateRedirectFromRoute(
                 'admin.products.update',
-                ['product_id' => $productCloneEvent->getClonedProduct()->getId()]
+                ['product_id' => $productCloneEvent->getClonedProduct()->getId()],
             );
         } catch (FormValidationException $formValidationException) {
             $this->setupFormErrorContext(
                 $this->getTranslator()->trans('Product clone'),
                 $formValidationException->getMessage(),
                 $cloneProductForm,
-                $formValidationException
+                $formValidationException,
             );
 
             return $this->redirectToEditionTemplate();
@@ -1946,9 +1872,9 @@ class ProductController extends AbstractSeoCrudController
     }
 
     /**
-     * @throws PropelException
-     *
      * @return mixed|Response
+     *
+     * @throws PropelException
      */
     public function searchProductAction(): Response
     {
@@ -1959,7 +1885,8 @@ class ProductController extends AbstractSeoCrudController
         $productsI18nQuery = ProductI18nQuery::create()->filterByTitle($search, Criteria::LIKE);
 
         $category_id = $this->getRequest()->query->get('category_id');
-        if ($category_id != null) {
+
+        if (null !== $category_id) {
             $productsI18nQuery
                 ->useProductQuery()
                 ->useProductCategoryQuery()

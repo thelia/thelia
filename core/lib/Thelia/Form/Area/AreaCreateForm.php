@@ -43,9 +43,8 @@ class AreaCreateForm extends BaseForm
                     'attr' => [
                         'placeholder' => Translator::getInstance()->trans('A name such as Europe or Overseas'),
                     ],
-                ]
-            )
-        ;
+                ],
+            );
     }
 
     /**

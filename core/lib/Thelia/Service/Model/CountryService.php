@@ -46,6 +46,7 @@ readonly class CountryService
             ->filterByByDefault(1)
             ->limit(1)
             ->findOne();
+
         if (null === $country) {
             throw new \RuntimeException('No default country found');
         }

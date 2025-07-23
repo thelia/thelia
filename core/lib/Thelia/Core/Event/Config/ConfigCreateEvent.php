@@ -17,15 +17,10 @@ namespace Thelia\Core\Event\Config;
 class ConfigCreateEvent extends ConfigEvent
 {
     protected $event_name;
-
     protected $value;
-
     protected $locale;
-
     protected $title;
-
     protected $hidden;
-
     protected $secured;
 
     // Use event_name to prevent conflict with Event::name property.

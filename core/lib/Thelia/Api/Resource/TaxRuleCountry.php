@@ -24,16 +24,16 @@ use Thelia\Model\Map\TaxRuleTableMap;
 #[ApiResource(
     operations: [
         new Get(
-            uriTemplate: '/admin/tax_rules_country/{id}'
+            uriTemplate: '/admin/tax_rules_country/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new Get(
-            uriTemplate: '/front/tax_rules_country/{id}'
+            uriTemplate: '/front/tax_rules_country/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -43,13 +43,9 @@ class TaxRuleCountry implements PropelResourceInterface
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:tax_rule_country:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:tax_rule_country:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:tax_rule_country:write';
-
     public const GROUP_FRONT_READ = 'front:tax_rule_country:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:tax_rule_country:read:single';
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]

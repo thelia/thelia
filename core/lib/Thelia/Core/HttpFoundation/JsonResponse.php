@@ -48,8 +48,7 @@ final class JsonResponse extends BaseJsonResponse
     public static function createNotFoundError($resource): self
     {
         $errorMessage = Translator::getInstance()
-            ->trans('The resource %res has not been found', ['%res' => $resource])
-        ;
+            ->trans('The resource %res has not been found', ['%res' => $resource]);
 
         return self::createError($errorMessage, 404);
     }

@@ -44,8 +44,7 @@ class Brand extends BaseAction implements EventSubscriberInterface
             ->setVisible($event->getVisible())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
-            ->save()
-        ;
+            ->save();
 
         $event->setBrand($brand);
     }
@@ -58,14 +57,13 @@ class Brand extends BaseAction implements EventSubscriberInterface
         if (null !== $brand = BrandQuery::create()->findPk($event->getBrandId())) {
             $brand
                 ->setVisible($event->getVisible())
-                ->setLogoImageId((int) $event->getLogoImageId() == 0 ? null : $event->getLogoImageId())
+                ->setLogoImageId(0 === $event->getLogoImageId() ? null : $event->getLogoImageId())
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setDescription($event->getDescription())
                 ->setChapo($event->getChapo())
                 ->setPostscriptum($event->getPostscriptum())
-                ->save()
-            ;
+                ->save();
 
             $event->setBrand($brand);
         }
@@ -90,10 +88,8 @@ class Brand extends BaseAction implements EventSubscriberInterface
 
     /**
      * Change Brand SEO.
-     *
-     * @return object
      */
-    public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher): object
     {
         return $this->genericUpdateSeo(BrandQuery::create(), $event, $dispatcher);
     }
@@ -117,13 +113,13 @@ class Brand extends BaseAction implements EventSubscriberInterface
      */
     public function viewCheck(ViewCheckEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if ($event->getView() == 'brand') {
+        if ('brand' === $event->getView()) {
             $brand = BrandQuery::create()
                 ->filterById($event->getViewId())
                 ->filterByVisible(1)
                 ->count();
 
-            if ($brand == 0) {
+            if (0 === $brand) {
                 $dispatcher->dispatch($event, TheliaEvents::VIEW_BRAND_ID_NOT_VISIBLE);
             }
         }

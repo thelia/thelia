@@ -61,8 +61,7 @@ class ProductCreationForm extends BaseForm
             ->add('virtual', IntegerType::class, [
                 'label' => Translator::getInstance()->trans('This product does not have a physical presence'),
                 'label_attr' => ['for' => 'virtual_field'],
-            ])
-        ;
+            ]);
 
         if (!$change_mode) {
             $this->formBuilder
@@ -98,8 +97,7 @@ class ProductCreationForm extends BaseForm
                     'label' => Translator::getInstance()->trans('Template'),
                     'label_attr' => ['for' => 'template_field'],
                     'required' => false,
-                ])
-            ;
+                ]);
         }
     }
 
@@ -111,8 +109,8 @@ class ProductCreationForm extends BaseForm
             $context->addViolation(
                 Translator::getInstance()->trans(
                     'A product with reference %ref already exists. Please choose another reference.',
-                    ['%ref' => $value]
-                )
+                    ['%ref' => $value],
+                ),
             );
         }
     }

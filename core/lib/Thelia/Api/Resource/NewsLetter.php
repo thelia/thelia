@@ -31,49 +31,47 @@ use Thelia\Model\Map\NewsletterTableMap;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/news_letters'
+            uriTemplate: '/admin/news_letters',
         ),
         new GetCollection(
-            uriTemplate: '/admin/news_letters'
+            uriTemplate: '/admin/news_letters',
         ),
         new Get(
             uriTemplate: '/admin/news_letters/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/news_letters/{id}'
+            uriTemplate: '/admin/news_letters/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/news_letters/{id}'
+            uriTemplate: '/admin/news_letters/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/news_letters/{id}'
+            uriTemplate: '/admin/news_letters/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )] // todo custom route for front
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
         'id',
         'email',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
     properties: [
         'unsubscribed',
-    ]
+    ],
 )]
 class NewsLetter implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:news_letters:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:news_letters:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:news_letters:write';
 
     #[Groups([self::GROUP_ADMIN_READ])]

@@ -31,13 +31,13 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
      *
      * @return Response the HTTP response
      */
-    public function generateGatewayFormResponse($order, $gateway_url, $form_data)
+    public function generateGatewayFormResponse(Order $order, string $gateway_url, array $form_data): Response
     {
         /** @var ParserInterface $parser */
         $parser = $this->getContainer()->get('thelia.parser');
 
         $parser->setTemplateDefinition(
-            $parser->getTemplateHelper()->getActiveFrontTemplate()
+            $parser->getTemplateHelper()->getActiveFrontTemplate(),
         );
 
         $renderedTemplate = $parser->render(
@@ -47,7 +47,7 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
                 'cart_count' => $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems()->count(),
                 'gateway_url' => $gateway_url,
                 'payment_form_data' => $form_data,
-            ]
+            ],
         );
 
         return new Response($renderedTemplate);
@@ -60,7 +60,7 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
      *
      * @return string the order payment success page URL
      */
-    public function getPaymentSuccessPageUrl($order_id)
+    public function getPaymentSuccessPageUrl(int $order_id): string
     {
         $frontOfficeRouter = $this->getContainer()->get('router.front');
 
@@ -68,8 +68,8 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
             $frontOfficeRouter->generate(
                 'order.placed',
                 ['order_id' => $order_id],
-                Router::ABSOLUTE_URL
-            )
+                Router::ABSOLUTE_URL,
+            ),
         );
     }
 
@@ -81,7 +81,7 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
      *
      * @return string the order payment failure page URL
      */
-    public function getPaymentFailurePageUrl($order_id, $message)
+    public function getPaymentFailurePageUrl(int $order_id, ?string $message): string
     {
         $frontOfficeRouter = $this->getContainer()->get('router.front');
 
@@ -92,26 +92,24 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
                     'order_id' => $order_id,
                     'message' => $message,
                 ],
-                Router::ABSOLUTE_URL
-            )
+                Router::ABSOLUTE_URL,
+            ),
         );
     }
 
     /**
      * @inherited
      */
-    public function manageStockOnCreation()
+    public function manageStockOnCreation(): bool
     {
         return true;
     }
 
-    public function getMinimumAmount()
+    public function getMinimumAmount(): void
     {
-        return null;
     }
 
-    public function getMaximumAmount()
+    public function getMaximumAmount(): void
     {
-        return null;
     }
 }

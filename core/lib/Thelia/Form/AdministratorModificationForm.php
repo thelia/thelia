@@ -33,14 +33,13 @@ class AdministratorModificationForm extends AdministratorCreationForm
                 'constraints' => [
                     new NotBlank(),
                     new Callback(
-                        $this->verifyAdministratorId(...)
+                        $this->verifyAdministratorId(...),
                     ),
                 ],
                 'attr' => [
                     'id' => 'administrator_update_id',
                 ],
-            ])
-        ;
+            ]);
 
         $this->formBuilder->get('password')->setRequired(false);
         $this->formBuilder->get('password_confirm')->setRequired(false);
@@ -70,7 +69,7 @@ class AdministratorModificationForm extends AdministratorCreationForm
 
         $administrator = AdminQuery::create()->findOneByLogin($value);
 
-        if (null !== $administrator && $administrator->getId() != $data['id']) {
+        if (null !== $administrator && $administrator->getId() !== $data['id']) {
             $context->addViolation($this->translator->trans('This administrator login already exists'));
         }
     }
@@ -81,7 +80,7 @@ class AdministratorModificationForm extends AdministratorCreationForm
 
         $administrator = AdminQuery::create()->findOneByEmail($value);
 
-        if (null !== $administrator && $administrator->getId() != $data['id']) {
+        if (null !== $administrator && $administrator->getId() !== $data['id']) {
             $context->addViolation($this->translator->trans('An administrator with this email address already exists'));
         }
     }
@@ -91,11 +90,11 @@ class AdministratorModificationForm extends AdministratorCreationForm
         $data = $context->getRoot()->getData();
 
         if (!empty($data['password'])) {
-            if ($data['password'] != $data['password_confirm']) {
+            if ($data['password'] !== $data['password_confirm']) {
                 $context->addViolation(Translator::getInstance()->trans('password confirmation is not the same as password field'));
             }
 
-            if ($data['password'] !== '' && \strlen((string) $data['password']) < 4) {
+            if ('' !== $data['password'] && \strlen((string) $data['password']) < 4) {
                 $context->addViolation(Translator::getInstance()->trans('password must be composed of at least 4 characters'));
             }
         }

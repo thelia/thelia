@@ -27,8 +27,6 @@ class CurrencyConverterProviderPass implements CompilerPassInterface
 {
     /**
      * You can modify the container here before it is dumped to PHP code.
-     *
-     * @api
      */
     public function process(ContainerBuilder $container): void
     {
@@ -46,7 +44,7 @@ class CurrencyConverterProviderPass implements CompilerPassInterface
             $providers[$priority] = $id;
         }
 
-        if ($providers !== []) {
+        if ([] !== $providers) {
             $service = array_pop($providers);
             $currencyConverter->addMethodCall('setProvider', [new Reference($service)]);
         } else {

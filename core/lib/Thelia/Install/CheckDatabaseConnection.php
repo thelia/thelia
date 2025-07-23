@@ -29,12 +29,10 @@ class CheckDatabaseConnection extends BaseInstall
     protected $validationMessages = [];
 
     /** @var bool If permissions are OK */
-    protected $isValid = true;
+    protected bool $isValid = true;
 
-    /**
-     * @var \PDO instance
-     */
-    protected $connection;
+    /** @var \PDO instance */
+    protected \PDO $connection;
 
     /**
      * Constructor.
@@ -47,17 +45,15 @@ class CheckDatabaseConnection extends BaseInstall
      * @param Translator $translator    Translator Service
      *                                  necessary for install wizard
      */
-    public function __construct(protected $host, protected $user, protected $password, protected $port, $verifyInstall = true, protected ?Translator $translator = null)
+    public function __construct(protected $host, protected $user, protected $password, protected $port, bool $verifyInstall = true, protected ?Translator $translator = null)
     {
         parent::__construct($verifyInstall);
     }
 
     /**
      * Perform database connection check.
-     *
-     * @return bool
      */
-    public function exec()
+    public function exec(): bool
     {
         $dsn = 'mysql:host=%s;port=%s';
 
@@ -65,7 +61,7 @@ class CheckDatabaseConnection extends BaseInstall
             $this->connection = new \PDO(
                 \sprintf($dsn, $this->host, $this->port),
                 $this->user,
-                $this->password
+                $this->password,
             );
         } catch (\PDOException) {
             $this->validationMessages = 'Wrong connection information';
@@ -76,7 +72,7 @@ class CheckDatabaseConnection extends BaseInstall
         return $this->isValid;
     }
 
-    public function getConnection()
+    public function getConnection(): \PDO
     {
         return $this->connection;
     }

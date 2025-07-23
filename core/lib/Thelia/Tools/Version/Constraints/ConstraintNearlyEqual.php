@@ -26,7 +26,7 @@ class ConstraintNearlyEqual extends BaseConstraint
         $this->expression = str_replace('~', '', $expression);
     }
 
-    public function normalize($version, $strict = false)
+    public function normalize($version, $strict = false): string
     {
         if (!$strict) {
             $version = $this->normalizePrecision($version, false);

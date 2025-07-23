@@ -21,11 +21,8 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 class RangeFilter extends AbstractFilter
 {
     public const PARAMETER_GREATER_THAN = 'gt';
-
     public const PARAMETER_GREATER_THAN_OR_EQUAL = 'gte';
-
     public const PARAMETER_LESS_THAN = 'lt';
-
     public const PARAMETER_LESS_THAN_OR_EQUAL = 'lte';
 
     protected function filterProperty(string $property, $values, ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
@@ -39,8 +36,10 @@ class RangeFilter extends AbstractFilter
 
         $conditions = [];
         $fieldPath = $this->getPropertyQueryPath($query, $property, $context);
+
         foreach ($values as $key => $value) {
             $conditionName = 'cond_'.$key;
+
             switch ($key) {
                 case self::PARAMETER_GREATER_THAN:
                     $query->addCond($conditionName, $fieldPath, $value, Criteria::GREATER_THAN);
@@ -67,15 +66,18 @@ class RangeFilter extends AbstractFilter
     public function getDescription(string $resourceClass): array
     {
         $filterProperties = $this->getProperties();
+
         if (null === $filterProperties) {
             return [];
         }
 
         $description = [];
+
         foreach (array_keys($filterProperties) as $property) {
             $propertyName = $this->normalizePropertyName($property);
 
             $reflectionProperty = $this->getReflectionProperty($propertyName, $resourceClass);
+
             if (!$reflectionProperty instanceof \ReflectionProperty) {
                 continue;
             }

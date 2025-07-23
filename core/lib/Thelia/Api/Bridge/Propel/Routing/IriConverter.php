@@ -46,6 +46,7 @@ class IriConverter implements IriConverterInterface
     public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = []): ?string
     {
         $resourceClass = $resource;
+
         if (\is_object($resource)) {
             $resourceClass = $resource::class;
         }
@@ -58,17 +59,17 @@ class IriConverter implements IriConverterInterface
             $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(null, false, true);
         }
 
-        if (\is_object($resource) && $compositeIdentifiers !== [] && $operation instanceof Operation) {
+        if (\is_object($resource) && [] !== $compositeIdentifiers && $operation instanceof Operation) {
             try {
                 $identifiers = array_reduce(
                     $compositeIdentifiers[0]->getArguments()[0],
-                    function (array $carry, $identifier) use ($resource) {
+                    static function (array $carry, $identifier) use ($resource) {
                         $getter = 'get'.ucfirst($identifier);
-                        $carry[$identifier] = $resource->$getter()->getId();
+                        $carry[$identifier] = $resource->{$getter}()->getId();
 
                         return $carry;
                     },
-                    []
+                    [],
                 );
 
                 return $this->router->generate($operation->getName(), $identifiers, $operation->getUrlGenerationStrategy() ?? $referenceType);

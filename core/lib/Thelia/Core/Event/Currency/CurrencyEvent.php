@@ -54,11 +54,9 @@ class CurrencyEvent extends ActionEvent
     }
 
     /**
-     * @param int $currencyId
-     *
      * @return $this
      */
-    public function setCurrencyId($currencyId): static
+    public function setCurrencyId(int $currencyId): static
     {
         $this->currencyId = $currencyId;
 

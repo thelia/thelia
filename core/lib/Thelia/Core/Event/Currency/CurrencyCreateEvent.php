@@ -17,15 +17,10 @@ namespace Thelia\Core\Event\Currency;
 class CurrencyCreateEvent extends CurrencyEvent
 {
     protected $currency_name;
-
     protected $locale;
-
     protected $symbol;
-
     protected $format;
-
     protected $code;
-
     protected $rate;
 
     // Use currency_name to prevent conflict with Event::name property.

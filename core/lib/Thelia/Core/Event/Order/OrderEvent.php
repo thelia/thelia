@@ -23,52 +23,21 @@ use Thelia\Model\Order;
  */
 class OrderEvent extends ActionEvent
 {
-    /** @var Order */
-    protected $order;
-
-    /** @var Order */
-    protected $placedOrder;
-
-    /** @var int|null */
-    protected $invoiceAddress;
-
-    /** @var int|null */
-    protected $deliveryAddress;
-
-    /** @var int|null */
-    protected $deliveryModule;
-
-    /** @var int|null */
-    protected $paymentModule;
-
-    /** @var float|null */
-    protected $postage;
-
-    /** @var float */
-    protected $postageTax = 0.0;
-
-    /** @var string|null */
-    protected $postageTaxRuleTitle;
-
-    /** @var string|null */
-    protected $ref;
-
-    /** @var int|null */
-    protected $status;
-
-    /** @var string|null */
-    protected $deliveryRef;
-
-    /** @var int|null */
-    protected $cartItemId;
-
-    /** @var string|null */
-    protected $transactionRef;
-
-    /**
-     * @var Response
-     */
-    protected $response;
+    protected Order $order;
+    protected Order $placedOrder;
+    protected ?int $invoiceAddress = null;
+    protected ?int $deliveryAddress = null;
+    protected ?int $deliveryModule = null;
+    protected ?int $paymentModule = null;
+    protected ?float $postage = null;
+    protected float $postageTax = 0.0;
+    protected ?string $postageTaxRuleTitle = null;
+    protected ?string $ref = null;
+    protected ?int $status = null;
+    protected ?string $deliveryRef = null;
+    protected ?int $cartItemId = null;
+    protected ?string $transactionRef = null;
+    protected Response $response;
 
     public function __construct(Order $order)
     {
@@ -86,21 +55,16 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @param int $cartItemId
-     *
      * @return $this
      */
-    public function setCartItemId($cartItemId): self
+    public function setCartItemId(int $cartItemId): self
     {
         $this->cartItemId = $cartItemId;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getCartItemId()
+    public function getCartItemId(): int
     {
         return $this->cartItemId;
     }
@@ -120,7 +84,7 @@ class OrderEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setInvoiceAddress($address): self
+    public function setInvoiceAddress(int $address): self
     {
         $this->invoiceAddress = $address;
 
@@ -132,7 +96,7 @@ class OrderEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setDeliveryAddress($address): self
+    public function setDeliveryAddress(int $address): self
     {
         $this->deliveryAddress = $address;
 
@@ -144,7 +108,7 @@ class OrderEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setDeliveryModule($module): self
+    public function setDeliveryModule(int $module): self
     {
         $this->deliveryModule = $module;
 
@@ -156,7 +120,7 @@ class OrderEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setPaymentModule($module): self
+    public function setPaymentModule(int $module): self
     {
         $this->paymentModule = $module;
 
@@ -168,7 +132,7 @@ class OrderEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setPostage($postage): self
+    public function setPostage(float $postage): self
     {
         $this->postage = $postage;
 
@@ -180,7 +144,7 @@ class OrderEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setRef($ref): self
+    public function setRef(string $ref): self
     {
         $this->ref = $ref;
 
@@ -192,7 +156,7 @@ class OrderEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setStatus($status): self
+    public function setStatus(int $status): self
     {
         $this->status = $status;
 
@@ -204,7 +168,7 @@ class OrderEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setDeliveryRef($deliveryRef): self
+    public function setDeliveryRef(string $deliveryRef): self
     {
         $this->deliveryRef = $deliveryRef;
 
@@ -214,29 +178,25 @@ class OrderEvent extends ActionEvent
     /**
      * @return Order the order
      */
-    public function getOrder()
+    public function getOrder(): Order
     {
         return $this->order;
     }
 
     /**
-     * @throws \LogicException if the method is called before payment
-     *
      * @return Order the placed order, valid only after order payment
+     *
+     * @throws \LogicException if the method is called before payment
      */
-    public function getPlacedOrder()
+    public function getPlacedOrder(): Order
     {
-        if (null === $this->placedOrder) {
-            throw new \LogicException('The placed order is defined only after dispatching of the ORDER_PAY event');
-        }
-
         return $this->placedOrder;
     }
 
     /**
      * @return int|null the invoice address ID
      */
-    public function getInvoiceAddress()
+    public function getInvoiceAddress(): ?int
     {
         return $this->invoiceAddress;
     }
@@ -244,7 +204,7 @@ class OrderEvent extends ActionEvent
     /**
      * @return int|null the delivery addres ID
      */
-    public function getDeliveryAddress()
+    public function getDeliveryAddress(): ?int
     {
         return $this->deliveryAddress;
     }
@@ -252,7 +212,7 @@ class OrderEvent extends ActionEvent
     /**
      * @return int|null the delivery module ID
      */
-    public function getDeliveryModule()
+    public function getDeliveryModule(): ?int
     {
         return $this->deliveryModule;
     }
@@ -260,7 +220,7 @@ class OrderEvent extends ActionEvent
     /**
      * @return int|null the payment module ID
      */
-    public function getPaymentModule()
+    public function getPaymentModule(): ?int
     {
         return $this->paymentModule;
     }
@@ -268,7 +228,7 @@ class OrderEvent extends ActionEvent
     /**
      * @return float|null the postage amount
      */
-    public function getPostage()
+    public function getPostage(): ?float
     {
         return $this->postage;
     }
@@ -276,7 +236,7 @@ class OrderEvent extends ActionEvent
     /**
      * @return string|null the order reference
      */
-    public function getRef()
+    public function getRef(): ?string
     {
         return $this->ref;
     }
@@ -284,7 +244,7 @@ class OrderEvent extends ActionEvent
     /**
      * @return int|null the order status ID
      */
-    public function getStatus()
+    public function getStatus(): ?int
     {
         return $this->status;
     }
@@ -292,7 +252,7 @@ class OrderEvent extends ActionEvent
     /**
      * @return string|null the delivery reference
      */
-    public function getDeliveryRef()
+    public function getDeliveryRef(): ?string
     {
         return $this->deliveryRef;
     }
@@ -312,7 +272,7 @@ class OrderEvent extends ActionEvent
     /**
      * @return Response the payment request response
      */
-    public function getResponse()
+    public function getResponse(): Response
     {
         return $this->response;
     }
@@ -322,10 +282,10 @@ class OrderEvent extends ActionEvent
      */
     public function hasResponse(): bool
     {
-        return null !== $this->response;
+        return $this->response instanceof Response;
     }
 
-    public function getPostageTax()
+    public function getPostageTax(): float
     {
         return $this->postageTax;
     }
@@ -333,14 +293,14 @@ class OrderEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setPostageTax($postageTax): self
+    public function setPostageTax(float $postageTax): self
     {
         $this->postageTax = $postageTax;
 
         return $this;
     }
 
-    public function getPostageTaxRuleTitle()
+    public function getPostageTaxRuleTitle(): ?string
     {
         return $this->postageTaxRuleTitle;
     }
@@ -348,31 +308,22 @@ class OrderEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setPostageTaxRuleTitle($postageTaxRuleTitle): self
+    public function setPostageTaxRuleTitle(?string $postageTaxRuleTitle): self
     {
         $this->postageTaxRuleTitle = $postageTaxRuleTitle;
 
         return $this;
     }
 
-    /**
-     * @since 2.4.0
-     *
-     * @return string|null
-     */
-    public function getTransactionRef()
+    public function getTransactionRef(): ?string
     {
         return $this->transactionRef;
     }
 
     /**
-     * @since 2.4.0
-     *
-     * @param string|null $transactionRef
-     *
      * @return $this
      */
-    public function setTransactionRef($transactionRef): self
+    public function setTransactionRef(?string $transactionRef): self
     {
         $this->transactionRef = $transactionRef;
 

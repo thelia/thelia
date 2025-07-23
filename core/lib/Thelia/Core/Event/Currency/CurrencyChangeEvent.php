@@ -24,8 +24,7 @@ use Thelia\Model\Currency;
  */
 class CurrencyChangeEvent extends CurrencyEvent
 {
-    /** @var Request */
-    protected $request;
+    protected Request $request;
 
     public function __construct(?Currency $currency = null, ?Request $request = null)
     {
@@ -43,10 +42,7 @@ class CurrencyChangeEvent extends CurrencyEvent
         return $this;
     }
 
-    /**
-     * @return Request
-     */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }

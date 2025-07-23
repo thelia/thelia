@@ -32,71 +32,68 @@ use Thelia\Model\Map\OrderStatusTableMap;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/order_statutes'
+            uriTemplate: '/admin/order_statutes',
         ),
         new GetCollection(
-            uriTemplate: '/admin/order_statutes'
+            uriTemplate: '/admin/order_statutes',
         ),
         new Get(
             uriTemplate: '/admin/order_statutes/{id}',
             uriVariables: ['id'],
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Get(
             uriTemplate: '/admin/order_statutes/code/{code}',
             uriVariables: ['code'],
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/order_statutes/{id}'
+            uriTemplate: '/admin/order_statutes/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/order_statutes/{id}'
+            uriTemplate: '/admin/order_statutes/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/order_statutes/{id}'
+            uriTemplate: '/admin/order_statutes/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new Get(
             uriTemplate: '/front/order_statutes/{id}',
-            uriVariables: ['id']
+            uriVariables: ['id'],
         ),
         new Get(
             uriTemplate: '/front/order_statutes/code/{code}',
-            uriVariables: ['code']
+            uriVariables: ['code'],
         ),
         new GetCollection(
-            uriTemplate: '/front/order_statutes'
+            uriTemplate: '/front/order_statutes',
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]]
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
         'id' => 'exact',
         'code' => 'exact',
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
         'position',
-    ]
+    ],
 )]
 class OrderStatus extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:order_status:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order_status:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:order_status:write';
-
     public const GROUP_FRONT_READ = 'front:order_status:read';
 
     #[Groups([

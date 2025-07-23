@@ -26,26 +26,10 @@ use Thelia\Model\Lang;
 abstract class AbstractImport implements \Iterator
 {
     private ?array $data = null;
-
-    /**
-     * @var File
-     */
-    protected $file;
-
-    /**
-     * @var Lang A language model
-     */
-    protected $language;
-
-    /**
-     * @var array Mandatory columns
-     */
-    protected $mandatoryColumns = [];
-
-    /**
-     * @var int Imported row count
-     */
-    protected $importedRows = 0;
+    protected File $file;
+    protected Lang $language;
+    protected array $mandatoryColumns = [];
+    protected int $importedRows = 0;
 
     #[\ReturnTypeWillChange]
     public function current(): mixed
@@ -71,7 +55,7 @@ abstract class AbstractImport implements \Iterator
 
     public function valid(): bool
     {
-        return key($this->data) !== null;
+        return null !== key($this->data);
     }
 
     /**
@@ -79,7 +63,7 @@ abstract class AbstractImport implements \Iterator
      *
      * @return array Parsed data
      */
-    public function getData()
+    public function getData(): array
     {
         return $this->data;
     }
@@ -100,10 +84,8 @@ abstract class AbstractImport implements \Iterator
 
     /**
      * Get file.
-     *
-     * @return File
      */
-    public function getFile()
+    public function getFile(): File
     {
         return $this->file;
     }
@@ -125,7 +107,7 @@ abstract class AbstractImport implements \Iterator
      *
      * @return Lang A language model
      */
-    public function getLang()
+    public function getLang(): Lang
     {
         return $this->language;
     }
@@ -155,15 +137,8 @@ abstract class AbstractImport implements \Iterator
     {
         $diff = array_diff($this->mandatoryColumns, array_keys($data));
 
-        if ($diff !== []) {
-            throw new \UnexpectedValueException(
-                Translator::getInstance()->trans(
-                    'The following columns are missing: %columns',
-                    [
-                        '%columns' => implode(', ', $diff),
-                    ]
-                )
-            );
+        if ([] !== $diff) {
+            throw new \UnexpectedValueException(Translator::getInstance()->trans('The following columns are missing: %columns', ['%columns' => implode(', ', $diff)]));
         }
     }
 
@@ -172,7 +147,7 @@ abstract class AbstractImport implements \Iterator
      *
      * @return int Imported rows count
      */
-    public function getImportedRows()
+    public function getImportedRows(): int
     {
         return $this->importedRows;
     }
@@ -184,7 +159,7 @@ abstract class AbstractImport implements \Iterator
      *
      * @return $this Return $this, allow chaining
      */
-    public function setImportedRows($importedRows)
+    public function setImportedRows(int $importedRows)
     {
         $this->importedRows = $importedRows;
 
@@ -198,5 +173,5 @@ abstract class AbstractImport implements \Iterator
      *
      * @return string|null String with error, null otherwise
      */
-    abstract public function importData(array $data);
+    abstract public function importData(array $data): ?string;
 }

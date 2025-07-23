@@ -52,18 +52,18 @@ class ModuleActivateCommand extends BaseModuleGenerate
                 'with-dependencies',
                 null,
                 InputOption::VALUE_NONE,
-                'activate module recursively'
+                'activate module recursively',
             )
             ->addOption(
                 'silent',
                 's',
                 InputOption::VALUE_NONE,
-                "Don't throw exception on error"
+                "Don't throw exception on error",
             )
             ->addArgument(
                 'module',
                 InputArgument::REQUIRED,
-                'module to activate'
+                'module to activate',
             );
     }
 
@@ -89,7 +89,7 @@ class ModuleActivateCommand extends BaseModuleGenerate
                 }
             }
 
-            if ($module->getActivate() === BaseModule::IS_ACTIVATED) {
+            if (BaseModule::IS_ACTIVATED === $module->getActivate()) {
                 $output->writeln(\sprintf('<error>module %s is already activated</error>', $moduleCode));
 
                 return Command::FAILURE;
@@ -97,17 +97,14 @@ class ModuleActivateCommand extends BaseModuleGenerate
 
             try {
                 $event = new ModuleToggleActivationEvent($module->getId());
+
                 if ($input->getOption('with-dependencies')) {
                     $event->setRecursive(true);
                 }
 
                 $this->eventDispatcher->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
             } catch (\Exception $e) {
-                throw new \RuntimeException(\sprintf(
-                    'Activation fail with Exception : [%d] %s',
-                    $e->getCode(),
-                    $e->getMessage()
-                ), $e->getCode(), $e);
+                throw new \RuntimeException(\sprintf('Activation fail with Exception : [%d] %s', $e->getCode(), $e->getMessage()), $e->getCode(), $e);
             }
 
             // impossible to change output class in CommandTester...

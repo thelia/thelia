@@ -73,7 +73,7 @@ trait UrlRewritingTrait
 
         $con->getEventDispatcher()->dispatch(
             $generateEvent,
-            TheliaEvents::GENERATE_REWRITTENURL
+            TheliaEvents::GENERATE_REWRITTENURL,
         );
 
         if ($generateEvent->isRewritten()) {
@@ -82,7 +82,7 @@ trait UrlRewritingTrait
 
         $title = $this->getTitle();
 
-        if (null == $title) {
+        if (null === $title) {
             throw new \RuntimeException('Impossible to create an url if title is null');
         }
 
@@ -96,6 +96,7 @@ trait UrlRewritingTrait
 
         try {
             $i = 0;
+
             while (URL::getInstance()->resolve($urlFilePart)) {
                 ++$i;
                 $urlFilePart = \sprintf('%s-%d.html', $cleanString, $i);
@@ -106,8 +107,7 @@ trait UrlRewritingTrait
                 ->setView($this->getRewrittenUrlViewName())
                 ->setViewId($this->getId())
                 ->setViewLocale($locale)
-                ->save()
-            ;
+                ->save();
         }
 
         return $urlFilePart;
@@ -125,8 +125,7 @@ trait UrlRewritingTrait
             ->filterByView($this->getRewrittenUrlViewName())
             ->filterByViewId($this->getId())
             ->filterByRedirected(null)
-            ->findOne()
-        ;
+            ->findOne();
 
         return $rewritingUrl ? $rewritingUrl->getUrl() : null;
     }
@@ -149,15 +148,16 @@ trait UrlRewritingTrait
      *
      * @param string $locale a valid locale (e.g. en_US)
      *
-     * @throws UrlRewritingException
-     * @throws UrlRewritingException
-     *
      * @return $this
+     *
+     * @throws UrlRewritingException
+     * @throws UrlRewritingException
      */
     public function setRewrittenUrl(string $locale, ?string $url)
     {
         $currentUrl = $this->getRewrittenUrl($locale);
-        if ($currentUrl == $url || null === $url) {
+
+        if ($currentUrl === $url || null === $url) {
             /* no url update */
 
             return $this;
@@ -171,9 +171,9 @@ trait UrlRewritingTrait
             /* we can reassign redirected url */
             if (null === $resolver->redirectedToUrl) {
                 /* if it's an url related to the current object */
-                if ($resolver->view == $this->getRewrittenUrlViewName() && $resolver->viewId == $this->getId()) {
+                if ($resolver->view === $this->getRewrittenUrlViewName() && $resolver->viewId === $this->getId()) {
                     /* if it's an url related to this product for another locale */
-                    if ($resolver->locale != $locale) {
+                    if ($resolver->locale !== $locale) {
                         throw new UrlRewritingException(Translator::getInstance()->trans('URL_ALREADY_EXISTS'), UrlRewritingException::URL_ALREADY_EXISTS);
                     }
 
@@ -181,14 +181,14 @@ trait UrlRewritingTrait
                     if (\count($resolver->otherParameters) > 0) {
                         throw new UrlRewritingException(Translator::getInstance()->trans('URL_ALREADY_EXISTS'), UrlRewritingException::URL_ALREADY_EXISTS);
                     }
-                } elseif ($resolver->view !== 'obsolete-rewritten-url') {
+                } elseif ('obsolete-rewritten-url' !== $resolver->view) {
                     /* Already related to another object and not an obsolete-rewritten-url */
                     throw new UrlRewritingException(Translator::getInstance()->trans('URL_ALREADY_EXISTS'), UrlRewritingException::URL_ALREADY_EXISTS);
                 }
             }
         } catch (UrlRewritingException $urlRewritingException) {
             /* It's all good if URL is not found */
-            if ($urlRewritingException->getCode() !== UrlRewritingException::URL_NOT_FOUND) {
+            if (UrlRewritingException::URL_NOT_FOUND !== $urlRewritingException->getCode()) {
                 throw $urlRewritingException;
             }
         }
@@ -201,8 +201,7 @@ trait UrlRewritingTrait
                 ->setViewId($this->getId())
                 ->setViewLocale($locale)
                 ->setRedirected(null)
-                ->save()
-            ;
+                ->save();
 
             /* erase additional arguments if any : only happens in case it erases a deprecated url */
             RewritingArgumentQuery::create()->filterByRewritingUrl($rewritingUrl)->deleteAll();
@@ -213,8 +212,7 @@ trait UrlRewritingTrait
                 ->setView($this->getRewrittenUrlViewName())
                 ->setViewId($this->getId())
                 ->setViewLocale($locale)
-                ->save()
-            ;
+                ->save();
         }
 
         /* deprecate the old one if needed */

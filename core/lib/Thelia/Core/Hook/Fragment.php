@@ -44,8 +44,6 @@ class Fragment
         if (\array_key_exists($key, $this->data)) {
             return $this->data[$key];
         }
-
-        return null;
     }
 
     public function __get($key)
@@ -65,7 +63,7 @@ class Fragment
 
     public function filter(array $fields, $default = null): void
     {
-        if ($fields === []) {
+        if ([] === $fields) {
             return;
         }
 

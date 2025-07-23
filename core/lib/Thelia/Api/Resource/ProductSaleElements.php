@@ -32,36 +32,36 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/product_sale_elements'
+            uriTemplate: '/admin/product_sale_elements',
         ),
         new GetCollection(
-            uriTemplate: '/admin/product_sale_elements'
+            uriTemplate: '/admin/product_sale_elements',
         ),
         new Get(
             uriTemplate: '/admin/product_sale_elements/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/product_sale_elements/{id}'
+            uriTemplate: '/admin/product_sale_elements/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/product_sale_elements/{id}'
+            uriTemplate: '/admin/product_sale_elements/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/product_sale_elements/{id}'
+            uriTemplate: '/admin/product_sale_elements/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/front/product_sale_elements'
+            uriTemplate: '/front/product_sale_elements',
         ),
         new Get(
             uriTemplate: '/front/product_sale_elements/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -74,7 +74,7 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
             'strategy' => 'exact',
             'fieldPath' => 'product_sale_elements.product_id',
         ],
-    ]
+    ],
 )]
 #[ApiFilter(
     filterClass: BooleanFilter::class,
@@ -82,20 +82,16 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
         'isDefault',
         'promo',
         'newness',
-    ]
+    ],
 )] // todo add visible filter from product
 class ProductSaleElements implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
     public const GROUP_ADMIN_READ = 'admin:product_sale_elements:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:product_sale_elements:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:product_sale_elements:write';
-
     public const GROUP_FRONT_READ = 'front:product_sale_elements:read';
-
     public const GROUP_FRONT_READ_SINGLE = 'front:product_sale_elements:read:single';
 
     #[Groups([

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -57,9 +58,7 @@ use Thelia\Type\TypeCollection;
 class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInterface
 {
     protected $countable = true;
-
     protected $timestampable = true;
-
     protected $versionable = false;
 
     protected function getArgDefinitions(): ArgumentCollection
@@ -75,24 +74,24 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 'customer',
                 new TypeCollection(
                     new IntType(),
-                    new EnumType(['current', '*'])
+                    new EnumType(['current', '*']),
                 ),
-                'current'
+                'current',
             ),
             new Argument(
                 'status',
                 new TypeCollection(
                     new IntListType(),
-                    new EnumType(['*'])
-                )
+                    new EnumType(['*']),
+                ),
             ),
             Argument::createIntListTypeArgument('exclude_status'),
             new Argument(
                 'status_code',
                 new TypeCollection(
                     new AnyListType(),
-                    new EnumType(['*'])
-                )
+                    new EnumType(['*']),
+                ),
             ),
             Argument::createAnyListTypeArgument('exclude_status_code'),
             new Argument(
@@ -107,11 +106,11 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                             'company', 'company-reverse',
                             'customer-name', 'customer-name-reverse',
                             'status', 'status-reverse',
-                        ]
-                    )
+                        ],
+                    ),
                 ),
-                'create-date-reverse'
-            )
+                'create-date-reverse',
+            ),
         );
     }
 
@@ -130,13 +129,12 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
     }
 
     /**
-     * @param OrderQuery $search
-     *
      * @throws PropelException
      */
-    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria): void
+    public function doSearch(ModelCriteria $search, $searchTerm, $searchIn, $searchCriteria): void
     {
         $search->_and();
+
         foreach ($searchIn as $index => $searchInElement) {
             if ($index > 0) {
                 $search->_or();
@@ -157,37 +155,37 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                     break;
                 case 'customer_ref':
                     $search->filterByCustomer(
-                        CustomerQuery::create()->filterByRef($searchTerm, $searchCriteria)->find()
+                        CustomerQuery::create()->filterByRef($searchTerm, $searchCriteria)->find(),
                     );
                     break;
                 case 'customer_firstname':
                     $search->filterByOrderAddressRelatedByInvoiceOrderAddressId(
-                        OrderAddressQuery::create()->filterByFirstname($searchTerm, $searchCriteria)->find()
+                        OrderAddressQuery::create()->filterByFirstname($searchTerm, $searchCriteria)->find(),
                     );
                     $search->_or();
                     $search->filterByOrderAddressRelatedByDeliveryOrderAddressId(
-                        OrderAddressQuery::create()->filterByFirstname($searchTerm, $searchCriteria)->find()
+                        OrderAddressQuery::create()->filterByFirstname($searchTerm, $searchCriteria)->find(),
                     );
                     break;
                 case 'customer_lastname':
                     $search->filterByOrderAddressRelatedByInvoiceOrderAddressId(
-                        OrderAddressQuery::create()->filterByLastname($searchTerm, $searchCriteria)->find()
+                        OrderAddressQuery::create()->filterByLastname($searchTerm, $searchCriteria)->find(),
                     );
                     $search->_or();
                     $search->filterByOrderAddressRelatedByDeliveryOrderAddressId(
-                        OrderAddressQuery::create()->filterByLastname($searchTerm, $searchCriteria)->find()
+                        OrderAddressQuery::create()->filterByLastname($searchTerm, $searchCriteria)->find(),
                     );
                     break;
                 case 'customer_email':
                     $search->filterByCustomer(
-                        CustomerQuery::create()->filterByEmail($searchTerm, $searchCriteria)->find()
+                        CustomerQuery::create()->filterByEmail($searchTerm, $searchCriteria)->find(),
                     );
                     break;
             }
         }
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = OrderQuery::create();
 
@@ -213,20 +211,21 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
 
         $customer = $this->getCustomer();
 
-        if ($customer === 'current') {
+        if ('current' === $customer) {
             $currentCustomer = $this->securityContext->getCustomerUser();
-            if ($currentCustomer === null) {
-                return null;
+
+            if (null === $currentCustomer) {
+                return $search;
             }
 
             $search->filterByCustomerId($currentCustomer->getId(), Criteria::EQUAL);
-        } elseif ($customer !== '*') {
+        } elseif ('*' !== $customer) {
             $search->filterByCustomerId($customer, Criteria::EQUAL);
         }
 
         $status = $this->getStatus();
 
-        if (null !== $status && $status !== '*') {
+        if (null !== $status && '*' !== $status) {
             $search->filterByStatusId($status, Criteria::IN);
         }
 
@@ -236,7 +235,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
 
         $statusCode = $this->getStatusCode();
 
-        if (null !== $statusCode && $statusCode !== '*') {
+        if (null !== $statusCode && '*' !== $statusCode) {
             $search
                 ->useOrderStatusQuery()
                 ->filterByCode($statusCode, Criteria::IN)
@@ -400,10 +399,10 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                     ->findOne();
 
                 $loopResultRow
-                    ->set('HAS_PREVIOUS', $previous !== null ? 1 : 0)
-                    ->set('HAS_NEXT', $next !== null ? 1 : 0)
-                    ->set('PREVIOUS', $previous !== null ? $previous->getId() : -1)
-                    ->set('NEXT', $next !== null ? $next->getId() : -1);
+                    ->set('HAS_PREVIOUS', null !== $previous ? 1 : 0)
+                    ->set('HAS_NEXT', null !== $next ? 1 : 0)
+                    ->set('PREVIOUS', null !== $previous ? $previous->getId() : -1)
+                    ->set('NEXT', null !== $next ? $next->getId() : -1);
             }
 
             $this->addOutputFields($loopResultRow, $order);

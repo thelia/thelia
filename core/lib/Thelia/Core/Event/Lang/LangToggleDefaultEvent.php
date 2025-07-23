@@ -29,21 +29,16 @@ class LangToggleDefaultEvent extends LangEvent
     }
 
     /**
-     * @param int $lang_id
-     *
      * @return $this
      */
-    public function setLangId($lang_id): static
+    public function setLangId(int $lang_id): static
     {
         $this->lang_id = $lang_id;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getLangId()
+    public function getLangId(): int
     {
         return $this->lang_id;
     }

@@ -21,232 +21,163 @@ namespace Thelia\Core\Event\Hook;
  */
 class HookCreateAllEvent extends HookEvent
 {
-    /** @var string */
-    protected $locale;
-
-    /** @var string */
-    protected $code;
-
-    /** @var int */
-    protected $type;
-
-    /** @var bool */
-    protected $native;
-
-    /** @var bool */
-    protected $active;
-
-    /** @var bool */
-    protected $by_module;
-
-    /** @var bool */
-    protected $block;
-
-    /** @var string */
-    protected $title;
-
-    /** @var string */
-    protected $chapo;
-
-    /** @var string */
-    protected $description;
+    protected string $locale;
+    protected string $code;
+    protected int $type;
+    protected bool $native;
+    protected bool $active;
+    protected bool $by_module;
+    protected bool $block;
+    protected string $title;
+    protected string $chapo;
+    protected string $description;
 
     /**
-     * @param string $locale
-     *
      * @return $this
      */
-    public function setLocale($locale): static
+    public function setLocale(string $locale): static
     {
         $this->locale = $locale;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->locale;
     }
 
     /**
-     * @param bool $native
-     *
      * @return $this
      */
-    public function setNative($native): static
+    public function setNative(bool $native): static
     {
         $this->native = $native;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function getNative()
+    public function getNative(): bool
     {
         return $this->native;
     }
 
     /**
-     * @param string $title
-     *
      * @return $this
      */
-    public function setTitle($title): static
+    public function setTitle(string $title): static
     {
         $this->title = $title;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
 
     /**
-     * @param int $type
-     *
      * @return $this
      */
-    public function setType($type): static
+    public function setType(int $type): static
     {
         $this->type = $type;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getType()
+    public function getType(): int
     {
         return $this->type;
     }
 
     /**
-     * @param bool $active
-     *
      * @return $this
      */
-    public function setActive($active): static
+    public function setActive(bool $active): static
     {
         $this->active = $active;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function getActive()
+    public function getActive(): bool
     {
         return $this->active;
     }
 
     /**
-     * @param string $code
-     *
      * @return $this
      */
-    public function setCode($code): static
+    public function setCode(string $code): static
     {
         $this->code = $code;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }
 
     /**
-     * @param bool $block
-     *
      * @return $this
      */
-    public function setBlock($block): static
+    public function setBlock(bool $block): static
     {
         $this->block = $block;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function getBlock()
+    public function getBlock(): bool
     {
         return $this->block;
     }
 
     /**
-     * @param bool $by_module
-     *
      * @return $this
      */
-    public function setByModule($by_module): static
+    public function setByModule(bool $by_module): static
     {
         $this->by_module = $by_module;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function getByModule()
+    public function getByModule(): bool
     {
         return $this->by_module;
     }
 
     /**
-     * @param string $chapo
-     *
      * @return $this
      */
-    public function setChapo($chapo): static
+    public function setChapo(string $chapo): static
     {
         $this->chapo = $chapo;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getChapo()
+    public function getChapo(): string
     {
         return $this->chapo;
     }
 
     /**
-     * @param string $description
-     *
      * @return $this
      */
-    public function setDescription($description): static
+    public function setDescription(string $description): static
     {
         $this->description = $description;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }

@@ -34,7 +34,7 @@ class ArchiverManager
 
     public function getArchivers(?bool $isAvailable = null): array
     {
-        if ($isAvailable === null) {
+        if (null === $isAvailable) {
             return $this->archivers;
         }
 
@@ -58,14 +58,7 @@ class ArchiverManager
         $exists = isset($this->archivers[$archiverId]);
 
         if (!$exists && $throwException) {
-            throw new \InvalidArgumentException(
-                Translator::getInstance()->trans(
-                    'The archiver identifier "%archiverId" doesn\’t exist',
-                    [
-                        '%archiverId' => $archiverId,
-                    ]
-                )
-            );
+            throw new \InvalidArgumentException(Translator::getInstance()->trans('The archiver identifier "%archiverId" doesn\’t exist', ['%archiverId' => $archiverId]));
         }
 
         return $exists;
@@ -75,7 +68,7 @@ class ArchiverManager
     {
         $this->has($archiverId, true);
 
-        if ($isAvailable === null) {
+        if (null === $isAvailable) {
             return $this->archivers[$archiverId];
         }
 

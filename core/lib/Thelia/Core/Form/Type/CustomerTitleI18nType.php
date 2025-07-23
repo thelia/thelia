@@ -54,8 +54,7 @@ class CustomerTitleI18nType extends AbstractTheliaType
                 'constraints' => [
                     new Length(['max' => 45]),
                 ],
-            ])
-        ;
+            ]);
     }
 
     /**

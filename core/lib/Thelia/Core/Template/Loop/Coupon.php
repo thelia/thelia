@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\ConditionInterface;
@@ -69,15 +70,15 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                             'expiration-date', 'expiration-date-reverse',
                             'days-left', 'days-left-reverse',
                             'usages-left', 'usages-left-reverse',
-                        ]
-                    )
+                        ],
+                    ),
                 ),
-                'code'
-            )
+                'code',
+            ),
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = CouponQuery::create();
 
@@ -101,7 +102,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $inUse = $this->getInUse();
 
-        if ($inUse !== null) {
+        if (null !== $inUse) {
             // Get the code of coupons currently in use
             $consumedCoupons = $this->getCurrentRequest()->getSession()->getConsumedCoupons();
 
@@ -184,7 +185,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
             $loopResultRow = new LoopResultRow($coupon);
 
             $conditions = $conditionFactory->unserializeConditionCollection(
-                $coupon->getSerializedConditions()
+                $coupon->getSerializedConditions(),
             );
 
             /** @var CouponInterface $couponManager */
@@ -204,10 +205,11 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 $coupon->getExpirationDate(),
                 $coupon->getFreeShippingForCountries(),
                 $coupon->getFreeShippingForModules(),
-                $coupon->getPerCustomerUsageCount()
+                $coupon->getPerCustomerUsageCount(),
             );
 
             $cleanedConditions = [];
+
             /** @var ConditionInterface $condition */
             foreach ($conditions as $condition) {
                 $temp = [
@@ -218,12 +220,14 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
             }
 
             $freeShippingForCountriesIds = [];
+
             /** @var CouponCountry $couponCountry */
             foreach ($coupon->getFreeShippingForCountries() as $couponCountry) {
                 $freeShippingForCountriesIds[] = $couponCountry->getCountryId();
             }
 
             $freeShippingForModulesIds = [];
+
             /** @var CouponModule $couponModule */
             foreach ($coupon->getFreeShippingForModules() as $couponModule) {
                 $freeShippingForModulesIds[] = $couponModule->getModuleId();
@@ -257,8 +261,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('SERVICE_ID', $couponManager->getServiceId())
                 ->set('FREE_SHIPPING_FOR_COUNTRIES_LIST', implode(',', $freeShippingForCountriesIds))
                 ->set('FREE_SHIPPING_FOR_MODULES_LIST', implode(',', $freeShippingForModulesIds))
-                ->set('DISCOUNT_AMOUNT', $discount)
-            ;
+                ->set('DISCOUNT_AMOUNT', $discount);
             $this->addOutputFields($loopResultRow, $coupon);
 
             $loopResult->addRow($loopResultRow);

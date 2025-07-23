@@ -21,20 +21,11 @@ namespace Thelia\Core\Event\Country;
  */
 class CountryUpdateEvent extends CountryCreateEvent
 {
-    /** @var bool */
-    protected $needZipCode;
-
-    /** @var string */
-    protected $zipCodeFormat;
-
-    /** @var string */
-    protected $chapo;
-
-    /** @var string */
-    protected $description;
-
-    /** @var string */
-    protected $postscriptum;
+    protected bool $needZipCode;
+    protected string $zipCodeFormat;
+    protected string $chapo;
+    protected string $description;
+    protected string $postscriptum;
 
     public function __construct(protected int $country_id)
     {
@@ -47,10 +38,7 @@ class CountryUpdateEvent extends CountryCreateEvent
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getChapo()
+    public function getChapo(): string
     {
         return $this->chapo;
     }
@@ -62,7 +50,7 @@ class CountryUpdateEvent extends CountryCreateEvent
         return $this;
     }
 
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -74,7 +62,7 @@ class CountryUpdateEvent extends CountryCreateEvent
         return $this;
     }
 
-    public function getPostscriptum()
+    public function getPostscriptum(): string
     {
         return $this->postscriptum;
     }
@@ -94,40 +82,30 @@ class CountryUpdateEvent extends CountryCreateEvent
         return $this->country_id;
     }
 
-    /**
-     * @return string
-     */
-    public function isNeedZipCode()
+    public function isNeedZipCode(): string
     {
         return $this->needZipCode;
     }
 
     /**
-     * @param bool $needZipCode
-     *
      * @return $this
      */
-    public function setNeedZipCode($needZipCode): static
+    public function setNeedZipCode(bool $needZipCode): static
     {
         $this->needZipCode = $needZipCode;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getZipCodeFormat()
+    public function getZipCodeFormat(): string
     {
         return $this->zipCodeFormat;
     }
 
     /**
-     * @param string $zipCodeFormat
-     *
      * @return $this
      */
-    public function setZipCodeFormat($zipCodeFormat): static
+    public function setZipCodeFormat(string $zipCodeFormat): static
     {
         $this->zipCodeFormat = $zipCodeFormat;
 

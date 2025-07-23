@@ -32,17 +32,19 @@ class DepthProductFilter extends AbstractFilter
 
     protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
-        if ($property !== self::DEPTH) {
+        if (self::DEPTH !== $property) {
             return;
         }
 
         $categoryId = $context['filters']['productCategories.category.id'] ?? null;
+
         if (!$categoryId || !is_numeric($categoryId) || !$value || !is_numeric($value)) {
             return;
         }
 
         $categoriesWithDepth = $this->filterService->getCategoriesRecursively(categoryId: $categoryId, maxDepth: (int) $value);
         $idCategories = [];
+
         foreach ($categoriesWithDepth as $categories) {
             foreach ($categories as $category) {
                 $idCategories[] = $category->getId();

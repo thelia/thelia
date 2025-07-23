@@ -24,6 +24,7 @@ return static function (ContainerConfigurator $container): void {
         ],
         'defaults' => [
             'pagination_client_items_per_page' => true,
+            'stateless' => false,
         ],
         'mapping' => [
             'paths' => [],
@@ -56,7 +57,7 @@ return static function (ContainerConfigurator $container): void {
         ],
     ]);
 
-    if ($container->env() === 'prod') {
+    if ('prod' === $container->env()) {
         $container->extension('api_platform', [
             'enable_swagger_ui' => false,
             'enable_docs' => false,

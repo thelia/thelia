@@ -16,336 +16,224 @@ namespace Thelia\Model;
 
 class PickupLocationAddress
 {
-    /** @var int */
-    protected $id;
+    protected int $id;
 
-    /** @var bool */
-    protected $isDefault;
+    protected bool $isDefault;
 
-    /** @var string */
-    protected $label;
+    protected string $label;
 
-    /** @var string */
-    protected $title;
+    protected string $title;
 
-    /** @var string */
-    protected $firstName;
+    protected string $firstName;
 
-    /** @var string */
-    protected $lastName;
+    protected string $lastName;
 
-    /** @var string */
-    protected $cellphoneNumber;
+    protected string $cellphoneNumber;
 
-    /** @var string */
-    protected $phoneNumber;
+    protected string $phoneNumber;
 
-    /** @var string */
-    protected $company;
+    protected string $company;
 
-    /** @var string */
-    protected $address1;
+    protected string $address1;
 
-    /** @var string */
-    protected $address2;
+    protected string $address2;
 
-    /** @var string */
-    protected $address3;
+    protected string $address3;
 
-    /** @var string */
-    protected $zipCode;
+    protected string $zipCode;
 
-    /** @var string */
-    protected $city;
+    protected string $city;
 
-    /** @var string */
-    protected $countryCode;
+    protected string $countryCode;
 
-    /** @var array */
-    protected $additionalData;
+    protected array $additionalData;
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @param int $id
-     */
-    public function setId($id): static
+    public function setId(int $id): static
     {
         $this->id = $id;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isDefault()
+    public function isDefault(): bool
     {
         return $this->isDefault;
     }
 
-    /**
-     * @param bool $isDefault
-     */
-    public function setIsDefault($isDefault): static
+    public function setIsDefault(bool $isDefault): static
     {
         $this->isDefault = $isDefault;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLabel()
+    public function getLabel(): string
     {
         return $this->label;
     }
 
-    /**
-     * @param string $label
-     */
-    public function setLabel($label): static
+    public function setLabel(string $label): static
     {
         $this->label = $label;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
 
-    /**
-     * @param string $title
-     */
-    public function setTitle($title): static
+    public function setTitle(string $title): static
     {
         $this->title = $title;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getFirstName()
+    public function getFirstName(): string
     {
         return $this->firstName;
     }
 
-    /**
-     * @param string $firstName
-     */
-    public function setFirstName($firstName): static
+    public function setFirstName(string $firstName): static
     {
         $this->firstName = $firstName;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLastName()
+    public function getLastName(): string
     {
         return $this->lastName;
     }
 
-    /**
-     * @param string $lastName
-     */
-    public function setLastName($lastName): static
+    public function setLastName(string $lastName): static
     {
         $this->lastName = $lastName;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getCellphoneNumber()
+    public function getCellphoneNumber(): string
     {
         return $this->cellphoneNumber;
     }
 
-    /**
-     * @param string $cellphoneNumber
-     */
-    public function setCellphoneNumber($cellphoneNumber): static
+    public function setCellphoneNumber(string $cellphoneNumber): static
     {
         $this->cellphoneNumber = $cellphoneNumber;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getPhoneNumber()
+    public function getPhoneNumber(): string
     {
         return $this->phoneNumber;
     }
 
-    /**
-     * @param string $phoneNumber
-     */
-    public function setPhoneNumber($phoneNumber): static
+    public function setPhoneNumber(string $phoneNumber): static
     {
         $this->phoneNumber = $phoneNumber;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getCompany()
+    public function getCompany(): string
     {
         return $this->company;
     }
 
-    /**
-     * @param string $company
-     */
-    public function setCompany($company): static
+    public function setCompany(string $company): static
     {
         $this->company = $company;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getAddress1()
+    public function getAddress1(): string
     {
         return $this->address1;
     }
 
-    /**
-     * @param string $address1
-     */
-    public function setAddress1($address1): static
+    public function setAddress1(string $address1): static
     {
         $this->address1 = $address1;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getAddress2()
+    public function getAddress2(): string
     {
         return $this->address2;
     }
 
-    /**
-     * @param string $address2
-     */
-    public function setAddress2($address2): static
+    public function setAddress2(string $address2): static
     {
         $this->address2 = $address2;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getAddress3()
+    public function getAddress3(): string
     {
         return $this->address3;
     }
 
-    /**
-     * @param string $address3
-     */
-    public function setAddress3($address3): static
+    public function setAddress3(string $address3): static
     {
         $this->address3 = $address3;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getZipCode()
+    public function getZipCode(): string
     {
         return $this->zipCode;
     }
 
-    /**
-     * @param string $zipCode
-     */
-    public function setZipCode($zipCode): static
+    public function setZipCode(string $zipCode): static
     {
         $this->zipCode = $zipCode;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getCity()
+    public function getCity(): string
     {
         return $this->city;
     }
 
-    /**
-     * @param string $city
-     */
-    public function setCity($city): static
+    public function setCity(string $city): static
     {
         $this->city = $city;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getCountryCode()
+    public function getCountryCode(): string
     {
         return $this->countryCode;
     }
 
-    /**
-     * @param string $countryCode
-     */
-    public function setCountryCode($countryCode): static
+    public function setCountryCode(string $countryCode): static
     {
         $this->countryCode = $countryCode;
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getAdditionalData()
+    public function getAdditionalData(): array
     {
         return $this->additionalData;
     }
 
-    /**
-     * @param array $additionalData
-     */
-    public function setAdditionalData($additionalData): static
+    public function setAdditionalData(array $additionalData): static
     {
         $this->additionalData = $additionalData;
 

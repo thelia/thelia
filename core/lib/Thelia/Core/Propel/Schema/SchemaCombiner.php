@@ -19,19 +19,11 @@ namespace Thelia\Core\Propel\Schema;
  */
 class SchemaCombiner
 {
-    /**
-     * XML header version attribute for the generated schema documents.
-     *
-     * @var string
-     */
-    protected static $GLOBAL_SCHEMA_XML_VERSION = '1.0';
+    /** XML header version attribute for the generated schema documents. */
+    protected static string $GLOBAL_SCHEMA_XML_VERSION = '1.0';
 
-    /**
-     * XML header encoding attribute for the generated schema documents.
-     *
-     * @var string
-     */
-    protected static $GLOBAL_SCHEMA_XML_ENCODING = 'UTF-8';
+    /** XML header encoding attribute for the generated schema documents. */
+    protected static string $GLOBAL_SCHEMA_XML_ENCODING = 'UTF-8';
 
     /**
      * Map of [database attributes inheritable by tables => corresponding table attribute].
@@ -39,10 +31,8 @@ class SchemaCombiner
      * Since we are merging tables from various schema files that all define part of a database and can have different
      * database attribute for their own tables, we have to copy these attributes to the tables themselves (if they are
      * not already defined on the table).
-     *
-     * @var array
      */
-    protected static $DATABASE_INHERITABLE_ATTRIBUTES = [
+    protected static array $DATABASE_INHERITABLE_ATTRIBUTES = [
         'defaultIdMethod' => 'idMethod',
         'defaultAccessorVisibility' => 'defaultAccessorVisibility',
         'defaultMutatorVisibility' => 'defaultMutatorVisibility',
@@ -59,28 +49,16 @@ class SchemaCombiner
      *
      * @var string[]
      */
-    protected $databases = [];
+    protected array $databases = [];
 
-    /**
-     * Map of [database name => global database \DOMElement for that database].
-     *
-     * @var array
-     */
-    protected $globalDatabaseElements = [];
+    /** Map of [database name => global database \DOMElement for that database]. */
+    protected array $globalDatabaseElements = [];
 
-    /**
-     * Map of [database name => [source database \DOMElement combined for this database]].
-     *
-     * @var array
-     */
-    protected $sourceDatabaseElements = [];
+    /** Map of [database name => [source database \DOMElement combined for this database]]. */
+    protected array $sourceDatabaseElements = [];
 
-    /**
-     * Map of [database name => [external-schema database \DOMElement included for this database]].
-     *
-     * @var array
-     */
-    protected $externalSchemaDatabaseElements = [];
+    /** Map of [database name => [external-schema database \DOMElement included for this database]]. */
+    protected array $externalSchemaDatabaseElements = [];
 
     /**
      * @param \DOMDocument[] $schemaDocuments         schema documents to combine
@@ -95,7 +73,7 @@ class SchemaCombiner
     /**
      * @return string[] combined databases
      */
-    public function getDatabases()
+    public function getDatabases(): array
     {
         return $this->databases;
     }
@@ -105,9 +83,9 @@ class SchemaCombiner
      *
      * @throws \InvalidArgumentException if the database is not in the combined databases
      */
-    protected function assertDatabase($database): void
+    protected function assertDatabase(string $database): void
     {
-        if (!\in_array($database, $this->databases)) {
+        if (!\in_array($database, $this->databases, true)) {
             throw new \InvalidArgumentException(\sprintf("Database '%s' is not in the combined databases.", $database));
         }
     }
@@ -127,7 +105,7 @@ class SchemaCombiner
      *
      * @return \DOMDocument combined schema document for this database
      */
-    public function getCombinedDocument($database): ?\DOMDocument
+    public function getCombinedDocument(string $database): ?\DOMDocument
     {
         $this->assertDatabase($database);
 
@@ -142,7 +120,7 @@ class SchemaCombiner
      *
      * @return \DOMDocument[] source schema documents that were combined for this database
      */
-    public function getSourceDocuments($database): array
+    public function getSourceDocuments(string $database): array
     {
         $this->assertDatabase($database);
 
@@ -154,7 +132,7 @@ class SchemaCombiner
      *
      * @return \DOMDocument[] external schema documents that were included for this database
      */
-    public function getExternalSchemaDocuments($database): array
+    public function getExternalSchemaDocuments(string $database): array
     {
         $this->assertDatabase($database);
 
@@ -212,6 +190,7 @@ class SchemaCombiner
 
         // return the documents, not the database elements
         $globalSchemaDocuments = [];
+
         /**
          * @var string      $database
          * @var \DOMElement $globalDatabaseElement
@@ -232,6 +211,7 @@ class SchemaCombiner
     {
         // removing the elements in the foreach itself will break the iterator, remove them later
         $externalSchemaElementsToDelete = [];
+
         /** @var \DOMElement $externalSchemaElement */
         foreach ($databaseElement->getElementsByTagName('external-schema') as $externalSchemaElement) {
             $externalSchemaElementsToDelete[] = $externalSchemaElement;
@@ -240,7 +220,7 @@ class SchemaCombiner
         foreach ($externalSchemaElementsToDelete as $externalSchemaElement) {
             // add a removal notice
             $externalSchemaRemovalNoticeComment = $databaseElement->ownerDocument->createComment(
-                \sprintf("external-schema reference to '%s' removed", $externalSchemaElement->getAttribute('filename'))
+                \sprintf("external-schema reference to '%s' removed", $externalSchemaElement->getAttribute('filename')),
             );
             $databaseElement->appendChild($externalSchemaRemovalNoticeComment);
 
@@ -256,6 +236,7 @@ class SchemaCombiner
     protected function inheritDatabaseAttributes(\DOMElement $databaseElement): void
     {
         $attributesToInherit = [];
+
         foreach (static::$DATABASE_INHERITABLE_ATTRIBUTES as $databaseAttribute => $tableAttribute) {
             if (!$databaseElement->hasAttribute($databaseAttribute)) {
                 continue;
@@ -279,11 +260,11 @@ class SchemaCombiner
                 // add an inheritance notice
                 $databaseAttributeInheritanceNoticeComment = $tableElement->ownerDocument->createComment(
                     \sprintf("Attribute '%s'", $tableAttribute)
-                    .\sprintf(" inherited from parent database attribute '%s'", $databaseAttribute)
+                    .\sprintf(" inherited from parent database attribute '%s'", $databaseAttribute),
                 );
                 $tableElement->insertBefore(
                     $databaseAttributeInheritanceNoticeComment,
-                    $tableElement->firstChild
+                    $tableElement->firstChild,
                 );
 
                 $tableElement->setAttribute($tableAttribute, $attributesToInherit[$tableAttribute]);
@@ -313,7 +294,7 @@ class SchemaCombiner
 
             // add a prefixing notice
             $tablePrefixingNoticeComment = $tableElement->ownerDocument->createComment(
-                "Table name prefixed with parent database 'tablePrefix'"
+                "Table name prefixed with parent database 'tablePrefix'",
             );
             $tableElement->appendChild($tablePrefixingNoticeComment);
 
@@ -327,13 +308,14 @@ class SchemaCombiner
      *
      * @param \DOMElement $databaseElement database element
      *
-     * @throws \LogicException if the database element is unnamed
-     *
      * @return string database name
+     *
+     * @throws \LogicException if the database element is unnamed
      */
-    protected function getDatabaseFromDatabaseElement(\DOMElement $databaseElement)
+    protected function getDatabaseFromDatabaseElement(\DOMElement $databaseElement): string
     {
         $database = $databaseElement->getAttribute('name');
+
         if (empty($database)) {
             throw new \LogicException('Unnamed database node.');
         }
@@ -346,9 +328,9 @@ class SchemaCombiner
      *
      * @param string $database database
      */
-    protected function initGlobalDatabaseElement($database): void
+    protected function initGlobalDatabaseElement(string $database): void
     {
-        if (\in_array($database, $this->databases)) {
+        if (\in_array($database, $this->databases, true)) {
             return;
         }
 
@@ -359,7 +341,7 @@ class SchemaCombiner
         $databaseElement->setAttribute('name', $database);
 
         $identifierQuotingNoticeComment = $databaseElement->ownerDocument->createComment(
-            "Attribute 'identifierQuoting' generated"
+            "Attribute 'identifierQuoting' generated",
         );
         $databaseElement->appendChild($identifierQuotingNoticeComment);
         $databaseElement->setAttribute('identifierQuoting', 'true');
@@ -387,7 +369,7 @@ class SchemaCombiner
 
         // add a source schema start marker
         $fileStartMarkerComment = $globalDatabaseElement->ownerDocument->createComment(
-            \sprintf("Start of schema from '%s'", $sourceDatabaseElement->ownerDocument->baseURI)
+            \sprintf("Start of schema from '%s'", $sourceDatabaseElement->ownerDocument->baseURI),
         );
         $globalDatabaseElement->appendChild($fileStartMarkerComment);
 
@@ -399,7 +381,7 @@ class SchemaCombiner
 
         // and a source schema end marker
         $fileEndMarkerComment = $globalDatabaseElement->ownerDocument->createComment(
-            \sprintf("End of schema from '%s'", $sourceDatabaseElement->ownerDocument->baseURI)
+            \sprintf("End of schema from '%s'", $sourceDatabaseElement->ownerDocument->baseURI),
         );
         $globalDatabaseElement->appendChild($fileEndMarkerComment);
 
@@ -421,14 +403,14 @@ class SchemaCombiner
 
         // add an inclusion notice
         $externalSchemaIncludeComment = $globalDatabaseElement->ownerDocument->createComment(
-            'External schema included in the combining process'
+            'External schema included in the combining process',
         );
         $globalDatabaseElement->appendChild($externalSchemaIncludeComment);
 
         // include the external schema
         $externalSchemaInclude = $globalDatabaseElement->ownerDocument->createElement(
             'external-schema',
-            $externalDatabaseElement->ownerDocument->baseURI
+            $externalDatabaseElement->ownerDocument->baseURI,
         );
         $globalDatabaseElement->appendChild($externalSchemaInclude);
 

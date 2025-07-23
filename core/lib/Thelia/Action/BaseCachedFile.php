@@ -16,6 +16,7 @@ namespace Thelia\Action;
 
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Thelia\Core\Event\CachedFileEvent;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
@@ -42,8 +43,7 @@ use Thelia\Tools\URL;
  */
 abstract class BaseCachedFile extends BaseAction
 {
-    /** @var string|null */
-    protected $cdnBaseUrl;
+    protected ?string $cdnBaseUrl;
 
     public function __construct(protected FileManager $fileManager)
     {
@@ -53,7 +53,7 @@ abstract class BaseCachedFile extends BaseAction
     /**
      * @return string root of the file cache directory in web space
      */
-    abstract protected function getCacheDirFromWebRoot();
+    abstract protected function getCacheDirFromWebRoot(): string;
 
     /**
      * @param string $url the fully qualified CDN URL that will be used to create doucments URL
@@ -106,7 +106,7 @@ abstract class BaseCachedFile extends BaseAction
      *
      * @return string the absolute URL to the cached file
      */
-    protected function getCacheFileURL(string $subdir, string $safe_filename)
+    protected function getCacheFileURL(string $subdir, string $safe_filename): string
     {
         $path = $this->getCachePathFromWebRoot($subdir);
 
@@ -123,14 +123,14 @@ abstract class BaseCachedFile extends BaseAction
      *
      * @return string the cache directory path relative to Web Root
      */
-    protected function getCacheFilePath(string $subdir, string $filename, bool $forceOriginalFile = false, ?string $hashed_options = null)
+    protected function getCacheFilePath(string $subdir, string $filename, bool $forceOriginalFile = false, ?string $hashed_options = null): string
     {
         $path = $this->getCachePath($subdir);
 
-        $safe_filename = preg_replace("[^:alnum:\-\._]", '-', strtolower(basename($filename)));
+        $safe_filename = preg_replace('[^:alnum:\\-\\._]', '-', strtolower(basename($filename)));
 
         // Keep original safe name if no tranformations are applied
-        if ($forceOriginalFile || $hashed_options == null) {
+        if ($forceOriginalFile || null === $hashed_options) {
             return \sprintf('%s/%s', $path, $safe_filename);
         }
 
@@ -144,11 +144,11 @@ abstract class BaseCachedFile extends BaseAction
      *
      * @return string the cache directory path relative to Web Root
      */
-    protected function getCachePathFromWebRoot(?string $subdir = null)
+    protected function getCachePathFromWebRoot(?string $subdir = null): string
     {
         $cache_dir_from_web_root = $this->getCacheDirFromWebRoot();
 
-        if ($subdir != null) {
+        if (null !== $subdir) {
             $safe_subdir = basename($subdir);
 
             $path = \sprintf('%s/%s', $cache_dir_from_web_root, $safe_subdir);
@@ -166,12 +166,12 @@ abstract class BaseCachedFile extends BaseAction
      * @param string|null $subdir               the subdirectory related to cache base, or null to get the cache base directory
      * @param bool        $create_if_not_exists create the directory if it is not found
      *
+     * @return string the absolute cache directory path
+     *
      * @throws \RuntimeException         if cache directory cannot be created
      * @throws \InvalidArgumentException ii path is invalid, e.g. not in the cache dir
-     *
-     * @return string the absolute cache directory path
      */
-    protected function getCachePath(?string $subdir = null, bool $create_if_not_exists = true)
+    protected function getCachePath(?string $subdir = null, bool $create_if_not_exists = true): string
     {
         $cache_base = $this->getCachePathFromWebRoot($subdir);
 
@@ -180,7 +180,7 @@ abstract class BaseCachedFile extends BaseAction
         $path = \sprintf('%s/%s', $web_root, $cache_base);
 
         // Create directory (recursively) if it does not exists.
-        if ($create_if_not_exists && !is_dir($path) && !@mkdir($path, 0777, true)) {
+        if ($create_if_not_exists && !is_dir($path) && !@mkdir($path, 0o777, true)) {
             throw new \RuntimeException(\sprintf('Failed to create %s file in cache directory', $path));
         }
 
@@ -214,14 +214,7 @@ abstract class BaseCachedFile extends BaseAction
             $event->setModel($model);
 
             if (!$nbModifiedLines) {
-                throw new FileException(
-                    \sprintf(
-                        'File "%s" (type %s) with parent id %s failed to be saved',
-                        $event->getParentName(),
-                        $model::class,
-                        $event->getParentId()
-                    )
-                );
+                throw new FileException(\sprintf('File "%s" (type %s) with parent id %s failed to be saved', $event->getParentName(), $model::class, $event->getParentId()));
             }
 
             $newUploadedFile = $this->fileManager->copyUploadedFile($event->getModel(), $event->getUploadedFile());
@@ -245,7 +238,7 @@ abstract class BaseCachedFile extends BaseAction
     public function updateFile(FileCreateOrUpdateEvent $event): void
     {
         // Copy and save file
-        if ($event->getUploadedFile()) {
+        if ($event->getUploadedFile() instanceof UploadedFile) {
             // Remove old picture file from file storage
             $url = $event->getModel()->getUploadDir().'/'.$event->getOldModel()->getFile();
             unlink(str_replace('..', '', $url));

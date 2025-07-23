@@ -24,8 +24,8 @@ class Config extends BaseConfig
             ['.', '-'],
             '_',
             strtoupper(
-                $this->getName()
-            )
+                $this->getName(),
+            ),
         );
     }
 

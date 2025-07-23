@@ -40,7 +40,7 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
         return new ArgumentCollection(
             Argument::createIntTypeArgument('folder', null, true),
             Argument::createIntTypeArgument('depth', \PHP_INT_MAX),
-            Argument::createBooleanOrBothTypeArgument('visible', true, false)
+            Argument::createBooleanOrBothTypeArgument('visible', true, false),
         );
     }
 
@@ -62,13 +62,13 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
 
             $search->filterById($currentId);
 
-            if ($visible !== BooleanOrBothType::ANY) {
+            if (BooleanOrBothType::ANY !== $visible) {
                 $search->filterByVisible($visible);
             }
 
             $folder = $search->findOne();
 
-            if ($folder != null) {
+            if (null !== $folder) {
                 $results[] = [
                     'ID' => $folder->getId(),
                     'TITLE' => $folder->getVirtualColumn('i18n_TITLE'),
@@ -80,20 +80,14 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
 
                 if ($currentId > 0) {
                     // Prevent circular refererences
-                    if (\in_array($currentId, $ids)) {
-                        throw new \LogicException(
-                            \sprintf(
-                                'Circular reference detected in folder ID=%d hierarchy (folder ID=%d appears more than one times in path)',
-                                $originalId,
-                                $currentId
-                            )
-                        );
+                    if (\in_array($currentId, $ids, true)) {
+                        throw new \LogicException(\sprintf('Circular reference detected in folder ID=%d hierarchy (folder ID=%d appears more than one times in path)', $originalId, $currentId));
                     }
 
                     $ids[] = $currentId;
                 }
             }
-        } while ($folder != null && $currentId > 0 && --$depth > 0);
+        } while (null !== $folder && $currentId > 0 && --$depth > 0);
 
         // Reverse list and build the final result
         return array_reverse($results);
@@ -103,6 +97,7 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
     {
         foreach ($loopResult->getResultDataCollection() as $result) {
             $loopResultRow = new LoopResultRow($result);
+
             foreach ($result as $output => $outputValue) {
                 $loopResultRow->set($output, $outputValue);
             }

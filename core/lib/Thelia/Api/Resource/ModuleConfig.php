@@ -31,27 +31,27 @@ use Thelia\Model\Map\ModuleConfigTableMap;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/module_configs'
+            uriTemplate: '/admin/module_configs',
         ),
         new GetCollection(
-            uriTemplate: '/admin/module_configs'
+            uriTemplate: '/admin/module_configs',
         ),
         new Get(
             uriTemplate: '/admin/module_configs/{id}',
-            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
         new Put(
-            uriTemplate: '/admin/module_configs/{id}'
+            uriTemplate: '/admin/module_configs/{id}',
         ),
         new Patch(
-            uriTemplate: '/admin/module_configs/{id}'
+            uriTemplate: '/admin/module_configs/{id}',
         ),
         new Delete(
-            uriTemplate: '/admin/module_configs/{id}'
+            uriTemplate: '/admin/module_configs/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -62,14 +62,12 @@ use Thelia\Model\Map\ModuleConfigTableMap;
             'strategy' => 'exact',
             'fieldPath' => 'module_config.module_id',
         ],
-    ]
+    ],
 )]
 class ModuleConfig extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:module_config:read';
-
     public const GROUP_ADMIN_READ_SINGLE = 'admin:module_config:read:single';
-
     public const GROUP_ADMIN_WRITE = 'admin:module_config:write';
 
     #[Groups([self::GROUP_ADMIN_READ])]

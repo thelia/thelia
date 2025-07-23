@@ -28,7 +28,7 @@ class I18nDenormalizer extends AbstractItemNormalizer
 
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
-        return $type === I18n::class;
+        return I18n::class === $type;
     }
 
     public function denormalize(mixed $data, string $class, ?string $format = null, array $context = []): mixed
@@ -43,8 +43,10 @@ class I18nDenormalizer extends AbstractItemNormalizer
         }
 
         $operation = $context['operation'] ?? null;
+
         if ($operation instanceof HttpOperation) {
             $modelClass = $operation->getClass();
+
             if (method_exists($modelClass, 'getI18nResourceClass')) {
                 $context['resource_class'] = $class = $modelClass::getI18nResourceClass();
             }
