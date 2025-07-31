@@ -157,8 +157,10 @@ readonly class AddressService
 
         if (null === $addressId) {
             $session = $request->getSession();
-
-            $addressId = $session->getOrder()->getChoosenDeliveryAddress();
+            if (!$session instanceof Session) {
+                return null;
+            }
+            $addressId = $session->getSessionCart($this->dispatcher)->getAddressDeliveryId();
         }
 
         if (null !== $addressId) {

@@ -17,21 +17,21 @@ namespace Thelia\Service\Model;
 use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
+use RuntimeException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Thelia\Core\Event\Cart\CartCheckoutEvent;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
-use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Coupon\CouponManager;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
-use Thelia\Model\AddressQuery;
 use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
@@ -48,12 +48,13 @@ readonly class CartService
 {
     public function __construct(
         private EventDispatcherInterface $eventDispatcher,
-        private TranslatorInterface $translator,
-        private ContainerInterface $container,
-        private RequestStack $requestStack,
-        private CouponManager $couponManager,
-        private Session $session,
-    ) {
+        private TranslatorInterface      $translator,
+        private ContainerInterface       $container,
+        private RequestStack             $requestStack,
+        private CouponManager            $couponManager,
+        private Session                  $session
+    )
+    {
     }
 
     public function addItem(Form $form, bool $validatedForm = false): void
@@ -63,13 +64,13 @@ readonly class CartService
 
         try {
             if ($validatedForm && !$form->isValid()) {
-                throw new \RuntimeException('Failed to validate form');
+                throw new RuntimeException('Failed to validate form');
             }
 
             $cartEvent = $this->getCartEvent();
             $cartEvent->bindForm($form);
             $eventDispatcher->dispatch($cartEvent, TheliaEvents::CART_ADDITEM);
-            $this->afterModifyCart($eventDispatcher);
+            $this->afterModifyCart();
         } catch (PropelException $e) {
             Tlog::getInstance()->error(\sprintf('Failed to add item to cart with message : %s', $e->getMessage()));
             $message = $this->translator->trans(
@@ -80,7 +81,7 @@ readonly class CartService
         }
 
         if ($message) {
-            throw new \RuntimeException($message);
+            throw new RuntimeException($message);
         }
     }
 
@@ -92,11 +93,10 @@ readonly class CartService
 
         try {
             $eventDispatcher->dispatch($cartEvent, TheliaEvents::CART_DELETEITEM);
-            $this->afterModifyCart($eventDispatcher);
-        } catch (\Exception $exception) {
-            Tlog::getInstance()->error(\sprintf('error during deleting cartItem with message : %s', $exception->getMessage()));
-
-            throw new \RuntimeException('Failed to delete cartItem', $exception->getCode(), $exception);
+            $this->afterModifyCart();
+        } catch (Exception $e) {
+            Tlog::getInstance()->error(sprintf('error during deleting cartItem with message : %s', $e->getMessage()));
+            throw new RuntimeException('Failed to delete cartItem');
         }
     }
 
@@ -109,15 +109,87 @@ readonly class CartService
 
         try {
             $eventDispatcher->dispatch($cartEvent, TheliaEvents::CART_UPDATEITEM);
-            $this->afterModifyCart($eventDispatcher);
-        } catch (\Exception $exception) {
-            Tlog::getInstance()->error(\sprintf('Failed to change cart item quantity: %s', $exception->getMessage()));
+            $this->afterModifyCart();
+        } catch (Exception $exception) {
+            Tlog::getInstance()->error(sprintf('Failed to change cart item quantity: %s', $exception->getMessage()));
 
-            throw new \RuntimeException('Failed to change cart item quantity', $exception->getCode(), $exception);
+            throw new RuntimeException('Failed to change cart item quantity');
         }
     }
 
-    public function getCart(): ?Cart
+    public function handlePostageOnCart(): void
+    {
+        try {
+            $this->eventDispatcher->dispatch(new CartCheckoutEvent($this->getCart()), TheliaEvents::CART_SET_POSTAGE);
+        } catch (Exception $e) {
+            $this->clearCartPostage();
+
+            Tlog::getInstance()->error(sprintf('Failed to set postage : %s', $e->getMessage()));
+            throw new RuntimeException('Failed to set postage');
+        }
+    }
+
+    public function setDeliveryModule(?int $deliveryModuleId = null): void
+    {
+        try {
+            $cartCheckoutEvent = new CartCheckoutEvent($this->getCart());
+            if ($deliveryModuleId) {
+                $cartCheckoutEvent->setDeliveryModuleId($deliveryModuleId);
+            }
+            $this->eventDispatcher->dispatch($cartCheckoutEvent, TheliaEvents::CART_SET_DELIVERY_MODULE);
+
+        } catch (Exception $e) {
+            Tlog::getInstance()->error(sprintf('Failed to set delivery module : %s', $e->getMessage()));
+            throw new RuntimeException('Failed to set delivery module');
+        }
+    }
+
+    public function setDeliveryAddress(?int $deliveryAddressId = null): void
+    {
+        try {
+            $cartCheckoutEvent = new CartCheckoutEvent($this->getCart());
+            if ($deliveryAddressId) {
+                $cartCheckoutEvent->setDeliveryAddressId($deliveryAddressId);
+            }
+            $this->eventDispatcher->dispatch($cartCheckoutEvent, TheliaEvents::CART_SET_DELIVERY_ADDRESS);
+
+        } catch (Exception $e) {
+            Tlog::getInstance()->error(sprintf('Failed to set delivery address : %s', $e->getMessage()));
+            throw new RuntimeException('Failed to set delivery address');
+        }
+    }
+
+    public function setInvoiceAddress(?int $invoiceAddressId = null): void
+    {
+        try {
+            $cartCheckoutEvent = new CartCheckoutEvent($this->getCart());
+            if ($invoiceAddressId) {
+                $cartCheckoutEvent->setInvoiceAddressId($invoiceAddressId);
+            }
+            $this->eventDispatcher->dispatch($cartCheckoutEvent, TheliaEvents::CART_SET_INVOICE_ADDRESS);
+
+        } catch (Exception $e) {
+            Tlog::getInstance()->error(sprintf('Failed to set invoice address : %s', $e->getMessage()));
+            throw new RuntimeException('Failed to set invoice address');
+        }
+    }
+
+    public function setPaymentModule(?int $paymentModuleId = null): void
+    {
+        try {
+            $cartCheckoutEvent = new CartCheckoutEvent($this->getCart());
+            if ($paymentModuleId) {
+                $cartCheckoutEvent->setPaymentModuleId($paymentModuleId);
+            }
+            $this->eventDispatcher->dispatch($cartCheckoutEvent, TheliaEvents::CART_SET_PAYMENT_MODULE);
+
+        } catch (Exception $e) {
+            Tlog::getInstance()->error(sprintf('Failed to set payment module : %s', $e->getMessage()));
+            throw new RuntimeException('Failed to set payment module');
+        }
+    }
+
+    public function getCart(): Cart
     {
         return $this->requestStack->getCurrentRequest()?->getSession()->getSessionCart($this->eventDispatcher);
     }
@@ -127,58 +199,39 @@ readonly class CartService
         $this->requestStack->getCurrentRequest()?->getSession()->clearSessionCart($this->eventDispatcher);
     }
 
+    protected function clearCartPostage(): void
+    {
+        $this->getCart()
+            ->setPostage(null)
+            ->setPostageTax(null)
+            ->setPostageTaxRuleTitle(null)
+            ->save();
+    }
+
     /**
      * @throws PropelException
      */
-    protected function afterModifyCart(EventDispatcherInterface $eventDispatcher): void
+    protected function afterModifyCart(): void
     {
-        /** @var Session $session */
-        $session = $this->requestStack->getCurrentRequest()?->getSession();
-
-        if (null === $session) {
-            return;
-        }
-
-        $order = $session->getOrder();
-
-        if (null === $order) {
-            return;
-        }
-
-        $deliveryModule = $order->getModuleRelatedByDeliveryModuleId();
-        $deliveryAddress = AddressQuery::create()->findPk($order->getChoosenDeliveryAddress());
-
-        if (null === $deliveryModule || null === $deliveryAddress) {
-            return;
-        }
-
-        $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
-        $orderEvent = new OrderEvent($order);
-
         try {
-            $deliveryPostageEvent = new DeliveryPostageEvent(
-                $moduleInstance,
-                $session->getSessionCart($eventDispatcher),
-                $deliveryAddress,
-            );
-            $eventDispatcher->dispatch(
-                $deliveryPostageEvent,
-                TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
-            );
-            $postage = $deliveryPostageEvent->getPostage();
-
-            if ($postage instanceof OrderPostage) {
-                $orderEvent->setPostage($postage->getAmount());
-                $orderEvent->setPostageTax($postage->getAmountTax());
-                $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
-            }
-
-            $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_POSTAGE);
-        } catch (\Exception) {
-            // The postage has been chosen, but changes in the cart causes an exception.
+            $this->handlePostageOnCart();
+        } catch (Exception) {
+            // The postage has been chosen, but changes in the cart cause an exception.
             // Reset the postage data in the order
-            $orderEvent->setDeliveryModule(0);
-            $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_DELIVERY_MODULE);
+            $this->setDeliveryModule();
+        $this->getCart()
+            ->setPostage(null)
+            ->setPostageTax(null)
+            ->setPostageTaxRuleTitle(null)
+        ->save();
+    }
+
+    protected function afterModifyCart(): void
+    {
+            $this->handlePostageOnCart();
+        } catch (Exception) {
+            // The postage has been chosen, but changes in the cart cause an exception.
+            $this->setDeliveryModule();
         }
     }
 
@@ -270,7 +323,7 @@ readonly class CartService
         ];
     }
 
-    private function isCouponRemovingPostage(int $countryId, int $deliveryModuleId): bool
+    public function isCouponRemovingPostage(int $countryId, int $deliveryModuleId): bool
     {
         $couponsKept = $this->couponManager->getCouponsKept();
 
@@ -284,7 +337,7 @@ readonly class CartService
                 continue;
             }
 
-            // Check if delivery country is on the list of countries for which delivery is free
+            // Check if the delivery country is on the list of countries for which delivery is free
             // If the list is empty, the shipping is free for all countries.
             $couponCountries = $coupon->getFreeShippingForCountries();
 
@@ -303,8 +356,7 @@ readonly class CartService
                     continue;
                 }
             }
-
-            // Check if shipping method is on the list of methods for which delivery is free
+            // Check if the shipping method is on the list of methods for which delivery is free
             // If the list is empty, the shipping is free for all methods.
             $couponModules = $coupon->getFreeShippingForModules();
 
@@ -324,7 +376,7 @@ readonly class CartService
                 }
             }
 
-            // All conditions are met, the shipping is free !
+            // All conditions are met, the shipping is free!
             return true;
         }
 

@@ -14,18 +14,26 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
+use Exception;
 use Propel\Runtime\Exception\PropelException;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Core\Event\Cart\CartCheckoutEvent;
 use Thelia\Core\Event\Cart\CartCreateEvent;
 use Thelia\Core\Event\Cart\CartDuplicationEvent;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Cart\CartPersistEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\Currency\CurrencyChangeEvent;
+use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Security\SecurityContext;
+use Thelia\Log\Tlog;
+use Thelia\Model\AddressQuery;
 use Thelia\Model\Base\CustomerQuery;
 use Thelia\Model\Base\ProductSaleElementsQuery;
 use Thelia\Model\Cart as CartModel;
@@ -35,6 +43,8 @@ use Thelia\Model\CartQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Customer as CustomerModel;
+use Thelia\Model\ModuleQuery;
+use Thelia\Model\OrderPostage;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\Tools\ProductPriceTools;
 use Thelia\Tools\TokenProvider;
@@ -49,9 +59,88 @@ use Thelia\Tools\TokenProvider;
 class Cart extends BaseAction implements EventSubscriberInterface
 {
     public function __construct(
-        protected Request $request,
-        protected TokenProvider $tokenProvider,
-    ) {
+        protected RequestStack       $requestStack,
+        protected TokenProvider      $tokenProvider,
+        protected SecurityContext    $securityContext,
+        protected ContainerInterface $container
+    )
+    {
+    }
+
+    /**
+     * @throws PropelException
+     */
+    public function setDeliveryAddress(CartCheckoutEvent $event): void
+    {
+        $cart = $event->getCart();
+        $addressId = $event->getDeliveryAddressId();
+
+        if (!$this->validateAddressOwnership($cart, $event->getDeliveryAddressId())) {
+            return;
+        }
+
+        $cart->setAddressDeliveryId($addressId)->save();
+    }
+
+    /**
+     * @throws PropelException
+     */
+    public function setInvoiceAddress(CartCheckoutEvent $event): void
+    {
+        $cart = $event->getCart();
+        $addressId = $event->getInvoiceAddressId();
+
+        if (!$this->validateAddressOwnership($cart, $event->getInvoiceAddressId())) {
+            return;
+        }
+
+        $cart->setAddressInvoiceId($addressId)->save();
+    }
+
+    /**
+     * @throws PropelException
+     */
+    public function setDeliveryModule(CartCheckoutEvent $event): void
+    {
+        $cart = $event->getCart();
+        $cart->setDeliveryModuleId($event->getDeliveryModuleId())->save();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function calculatePostage(CartCheckoutEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    {
+        $cart = $event->getCart();
+        $deliveryModuleId = $cart?->getDeliveryModuleId();
+        $deliveryAddressId = $cart?->getAddressDeliveryId();
+
+        if (!$deliveryModuleId || !$deliveryAddressId) {
+            $cart->setPostageTax(null)
+                ->setPostage(null)
+                ->setPostageTaxRuleTitle(null)
+                ->save();
+
+            return;
+        }
+
+        if (!$this->validateAddressOwnership($cart, $deliveryAddressId)) {
+            return;
+        }
+
+        $postage = $this->getPostageByDeliveryModuleId($cart, $dispatcher, $deliveryModuleId, $deliveryAddressId);
+
+        $cart->setPostageTax($postage->getAmountTax())
+            ->setPostage($postage->getUntaxedAmount())
+            ->setPostageTaxRuleTitle($postage->getTaxRuleTitle())
+            ->save();
+    }
+
+    public function setPaymentModule(CartCheckoutEvent $event): void
+    {
+        $cart = $event->getCart();
+        $cart->setPaymentModuleId($event->getPaymentModuleId());
+        $cart->save();
     }
 
     public function persistCart(CartPersistEvent $event): void
@@ -334,6 +423,24 @@ class Cart extends BaseAction implements EventSubscriberInterface
         return $cart;
     }
 
+    protected function validateAddressOwnership(CartModel $cart, int $addressId): bool
+    {
+        if (!$customerId = $cart->getCustomerId()) {
+            return false;
+        }
+
+        $address = AddressQuery::create()
+            ->filterByCustomerId($customerId)
+            ->filterById($addressId)
+            ->findOne();
+
+        if (!$address) {
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * The cart token is saved in a cookie so we try to retrieve it. Then the customer is checked.
      *
@@ -390,7 +497,58 @@ class Cart extends BaseAction implements EventSubscriberInterface
         return $cart;
     }
 
-    protected function dispatchNewCart(EventDispatcherInterface $dispatcher): CartModel
+    /**
+     * @throws PropelException
+     */
+    protected function getPostageByDeliveryModuleId(
+        CartModel                $cart,
+        EventDispatcherInterface $dispatcher,
+        int                      $moduleId,
+        int                      $deliveryAddressId
+    ): OrderPostage
+    {
+        if (!$customer = $this->securityContext->getCustomerUser()) {
+            throw new Exception('Customer not found !');
+        }
+
+        $deliveryModule = ModuleQuery::create()->filterById($moduleId)->findOne();
+        $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
+
+        $deliveryAddress = AddressQuery::create()
+            ->useCustomerQuery()
+            ->filterById($customer->getId())
+            ->endUse()
+            ->filterById($deliveryAddressId)->findOne();
+
+        if (!$deliveryAddress) {
+            throw new Exception('Delivery address not found !');
+        }
+
+        if (true === $cart->isVirtual() && false === $moduleInstance->handleVirtualProductDelivery()) {
+            throw new Exception('Virtual product delivery failed ! ');
+        }
+
+        $country = $deliveryAddress->getCountry();
+        $state = $deliveryAddress->getState();
+
+        $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, $deliveryAddress, $country, $state);
+
+        $dispatcher->dispatch(
+            $deliveryPostageEvent,
+            TheliaEvents::MODULE_DELIVERY_GET_POSTAGE
+        );
+
+        if ($deliveryPostageEvent->getPostage()) {
+            return $deliveryPostageEvent->getPostage();
+        }
+
+        return new OrderPostage();
+    }
+
+    /**
+     * @return CartModel
+     */
+    protected function dispatchNewCart(EventDispatcherInterface $dispatcher)
     {
         $cartCreateEvent = new CartCreateEvent();
 
@@ -461,6 +619,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
+            TheliaEvents::CART_SET_DELIVERY_ADDRESS => ['setDeliveryAddress', 128],
+            TheliaEvents::CART_SET_DELIVERY_MODULE => ['setDeliveryModule', 128],
+            TheliaEvents::CART_SET_POSTAGE => ['calculatePostage', 128],
+            TheliaEvents::CART_SET_INVOICE_ADDRESS => ['setInvoiceAddress', 128],
+            TheliaEvents::CART_SET_PAYMENT_MODULE => ['setPaymentModule', 128],
             TheliaEvents::CART_PERSIST => ['persistCart', 128],
             TheliaEvents::CART_RESTORE_CURRENT => ['restoreCurrentCart', 128],
             TheliaEvents::CART_CREATE_NEW => ['createEmptyCart', 128],

@@ -19,12 +19,12 @@ use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Exception\UnmatchableConditionException;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\Cart;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponCustomerCount;
 use Thelia\Model\CouponCustomerCountQuery;
 use Thelia\Model\CouponModule;
-use Thelia\Model\Order;
 
 /**
  * Manage how Coupons could interact with a Checkout.
@@ -120,7 +120,7 @@ class CouponManager
      *
      * @param Order $order the order for which we have to check if postage is free
      */
-    public function isCouponRemovingPostage(Order $order): bool
+    public function isCouponRemovingPostage(Cart $cart): bool
     {
         $coupons = $this->getCurrentCoupons();
 
@@ -138,7 +138,7 @@ class CouponManager
                 $couponCountries = $coupon->getFreeShippingForCountries();
 
                 if (!$couponCountries->isEmpty()) {
-                    if (null === $deliveryAddress = AddressQuery::create()->findPk($order->getChoosenDeliveryAddress())) {
+                    if (null === $deliveryAddress = AddressQuery::create()->findPk($cart->getAddressDeliveryId())) {
                         continue;
                     }
 
@@ -166,7 +166,7 @@ class CouponManager
                 if (!$couponModules->isEmpty()) {
                     $moduleValid = false;
 
-                    $shippingModuleId = $order->getDeliveryModuleId();
+                    $shippingModuleId = $cart->getDeliveryModuleId();
 
                     /** @var CouponModule $couponModule */
                     foreach ($couponModules as $couponModule) {

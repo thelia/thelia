@@ -108,4 +108,22 @@ ALTER TABLE `address`
     MODIFY COLUMN `address3` VARCHAR(255) NULL;
 
 
+--
+-- Migration : Ajout des champs de postage et modules de paiement/livraison à la table cart
+-- Ajoute les colonnes postage, postage_tax, payment_module_id et delivery_module_id
+--
+
+ALTER TABLE `cart`
+    ADD COLUMN `postage_tax_rule_title` VARCHAR(255) DEFAULT NULL after address_invoice_id,
+    ADD COLUMN `postage_tax` DECIMAL(10,2) DEFAULT NULL after address_invoice_id,
+    ADD COLUMN `postage` DECIMAL(10,2) DEFAULT NULL after address_invoice_id,
+    ADD COLUMN `payment_module_id` INT DEFAULT NULL after address_invoice_id,
+    ADD COLUMN `delivery_module_id` INT DEFAULT NULL after address_invoice_id,
+    ADD CONSTRAINT `fk_cart_payment_module_id`
+        FOREIGN KEY (`payment_module_id`) REFERENCES `module`(`id`)
+            ON DELETE SET NULL ON UPDATE CASCADE,
+    ADD CONSTRAINT `fk_cart_delivery_module_id`
+        FOREIGN KEY (`delivery_module_id`) REFERENCES `module`(`id`)
+            ON DELETE SET NULL ON UPDATE CASCADE;
+
 SET FOREIGN_KEY_CHECKS = 1;

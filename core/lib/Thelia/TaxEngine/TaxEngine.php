@@ -14,9 +14,11 @@ declare(strict_types=1);
 
 namespace Thelia\TaxEngine;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\Cart;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Customer;
@@ -29,50 +31,53 @@ use Thelia\Model\State;
  */
 class TaxEngine
 {
-    protected $taxCountry;
-    protected $taxState;
+    protected ?Country $taxCountry = null;
+    protected ?State $taxState = null;
 
-    public function __construct(protected RequestStack $requestStack)
+    public function __construct(
+        protected RequestStack $requestStack,
+        protected EventDispatcherInterface $dispatcher,
+    )
     {
     }
 
     /**
-     * Find Tax Country Id
+     * Find Tax Country ID
      * First look for a picked delivery address country
      * Then look at the current customer default address country
      * Else look at the default website country.
      */
     public function getDeliveryCountry(): Country
     {
-        if (null !== $this->taxCountry) {
-            return $this->taxCountry;
+        /** @var Cart $cart */
+        $cart = $this->getSession()->getSessionCart($this->dispatcher);
+        $currentDeliveryAddress = null;
+
+        if ($cart) {
+            $currentDeliveryAddress = AddressQuery::create()->findPk($cart->getAddressDeliveryId());
         }
 
-        /* is there a logged in customer ? */
-        /** @var Customer $customer */
-        if (null !== $customer = $this->getSession()?->getCustomerUser()) {
-            if (
-                null !== $this->getSession()?->getOrder()
-                    && null !== $this->getSession()?->getOrder()->getChoosenDeliveryAddress()
-                    && null !== $currentDeliveryAddress = AddressQuery::create()->findPk($this->getSession()?->getOrder()->getChoosenDeliveryAddress())
-            ) {
-                $this->taxCountry = $currentDeliveryAddress->getCountry();
-                $this->taxState = $currentDeliveryAddress->getState();
-            } else {
-                $customerDefaultAddress = $customer->getDefaultAddress();
+        if (!$currentDeliveryAddress) {
+            /** @var Customer $customer */
+            $customer = $this->getSession()?->getCustomerUser();
+
+            if (!$customer) {
+                $this->taxCountry = CountryQuery::create()->findOneByByDefault(1);
+                $this->taxState = null;
+
+                return $this->taxCountry;
+            }
+
+            if ($customerDefaultAddress = $customer->getDefaultAddress()) {
                 $this->taxCountry = $customerDefaultAddress->getCountry();
                 $this->taxState = $customerDefaultAddress->getState();
             }
+
+            return $this->taxCountry;
         }
 
-        if (null === $this->taxCountry) {
-            $this->taxCountry = CountryQuery::create()->findOneByByDefault(1);
-            $this->taxState = null;
-        }
-
-        if (null === $this->taxCountry) {
-            throw new \LogicException('No country found for tax calculation.');
-        }
+        $this->taxCountry = $currentDeliveryAddress->getCountry();
+        $this->taxState = $currentDeliveryAddress->getState();
 
         return $this->taxCountry;
     }

@@ -95,7 +95,14 @@ class CustomerCreateForm extends AddressCreateForm
                 'label_attr' => [
                     'for' => 'lang_id',
                 ],
-            ]);
+            ])
+            ->add('title', IntegerType::class, [
+                'required' => false,
+            ])
+            ->add('cellphone', IntegerType::class, [
+                'required' => false,
+            ])
+        ;
 
         // confirm email
         if (0 !== (int) ConfigQuery::read('customer_confirm_email', 0)) {
