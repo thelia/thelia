@@ -17,37 +17,52 @@ namespace Thelia\Module;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Template\Parser\ParserResolver;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Model\Order;
 use Thelia\Tools\URL;
+use TheliaSmarty\Template\SmartyParser;
+use TwigEngine\Template\TwigParser;
 
 abstract class AbstractPaymentModule extends BaseModule implements PaymentModuleInterface
 {
     /**
      * Render the payment gateway template. The module should provide the gateway URL and the form fields names and values.
      *
-     * @param Order  $order       the order
+     * @param Order $order the order
      * @param string $gateway_url the payment gateway URL
-     * @param array  $form_data   an associative array of form data, that will be rendered as hiddent fields
+     * @param array $form_data an associative array of form data, that will be rendered as hiddent fields
      *
      * @return Response the HTTP response
      */
     public function generateGatewayFormResponse(Order $order, string $gateway_url, array $form_data): Response
     {
-        /** @var ParserInterface $parser */
-        $parser = $this->getContainer()->get('thelia.parser');
+        /** @var ParserResolver $parserResolver */
+        $parserResolver = $this->getContainer()->get('thelia.parser.resolver');
 
-        $parser->setTemplateDefinition(
-            $parser->getTemplateHelper()->getActiveFrontTemplate(),
+        /** @var TemplateHelperInterface $templateHelper */
+        $templateHelper = $this->getContainer()->get('thelia.template_helper');
+
+        $parser = $parserResolver->getParser(
+            $templateHelper->getActiveFrontTemplate()->getAbsolutePath(),
+            null
         );
 
+        $parser->setTemplateDefinition($templateHelper->getActiveFrontTemplate());
+
+        if ($parser instanceof SmartyParser) {
+            $realTemplateName = 'order-payment-gateway.html';
+        } else{
+            $realTemplateName = 'order-payment-gateway.html.twig';
+        }
+
         $renderedTemplate = $parser->render(
-            'order-payment-gateway.html',
-            [
+            $realTemplateName, [
                 'order_id' => $order->getId(),
                 'cart_count' => $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems()->count(),
                 'gateway_url' => $gateway_url,
-                'payment_form_data' => $form_data,
-            ],
+                'payment_form_data' => $form_data
+            ]
         );
 
         return new Response($renderedTemplate);
@@ -76,8 +91,8 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
     /**
      * Redirect the customer to the failure payment page. if $message is null, a generic message is displayed.
      *
-     * @param int         $order_id the order ID
-     * @param string|null $message  an error message
+     * @param int $order_id the order ID
+     * @param string|null $message an error message
      *
      * @return string the order payment failure page URL
      */
