@@ -238,12 +238,14 @@ class ModuleManagement
         $checkModule = ModuleQuery::create()->findOneByFullNamespace(
             $moduleValidator->getModuleDefinition()?->getNamespace() ?? '',
         );
-
         if ($checkModule) {
             return $checkModule;
         }
 
         $moduleDefinition = $moduleValidator->getModuleDefinition();
+        if (null === $moduleDefinition) {
+            throw new InvalidModuleException((array) 'Module definition is not valid or not found in ');
+        }
 
         $moduleInstallEvent = new ModuleInstallEvent();
         $moduleInstallEvent
@@ -251,6 +253,11 @@ class ModuleManagement
             ->setModuleDefinition($moduleDefinition);
 
         $this->eventDispatcher->dispatch($moduleInstallEvent, TheliaEvents::MODULE_INSTALL);
+
+        $toggleEvent = new ModuleToggleActivationEvent($moduleInstallEvent->getModule()->getId());
+        $toggleEvent->setNoCheck(false);
+        $toggleEvent->setRecursive(true);
+        $this->eventDispatcher->dispatch($toggleEvent, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
 
         return $moduleInstallEvent->getModule();
     }
@@ -307,12 +314,17 @@ class ModuleManagement
         foreach ($composerModuleDTOS as $composerModuleDTO) {
             $output?->writeln(
                 \sprintf(
-                    '<fg=gray>Installing module %s from %s</>',
-                    $composerModuleDTO->getName(),
-                    $composerModuleDTO->getPath()
+                    '<fg=gray>Installing module %s</>',
+                    $composerModuleDTO->getName()
                 )
             );
             $module = $this->installModule($composerModuleDTO->getPath());
+            $output?->writeln(
+                \sprintf(
+                    '<fg=gray>Module %s installed.</>',
+                    $module->getCode()
+                )
+            );
             $cacheEvent = new CacheEvent($this->kernelCacheDir);
             $this->eventDispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
 
@@ -329,6 +341,7 @@ class ModuleManagement
             try {
                 $event = new ModuleToggleActivationEvent($module->getId());
                 $event->setRecursive(true);
+                $event->setNoCheck(false);
 
                 $this->eventDispatcher->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
                 $modulesInstalled[] = $module;
@@ -338,7 +351,19 @@ class ModuleManagement
                         $module->getCode()
                     )
                 );
-            } catch (\Exception) {
+            } catch (\Exception $e) {
+                Tlog::getInstance()->addError(
+                    \sprintf('Failed to activate module %s', $module->getCode()),
+                    $e
+                );
+                $output?->writeln(
+                    \sprintf(
+                        '<fg=red>Failed to activate module %s: %s %s</>',
+                        $module->getCode(),
+                        $e->getMessage(),
+                        $e->getTraceAsString()
+                    )
+                );
                 continue;
             }
         }

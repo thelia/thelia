@@ -90,13 +90,14 @@ class Module extends BaseAction implements EventSubscriberInterface
                     }
 
                     $this->checkDeactivation($module);
-                } else {
-                    if ($event->isRecursive()) {
-                        $this->recursiveActivation($event, $eventName, $dispatcher);
-                    }
 
-                    $this->checkActivation($module);
+                    return;
                 }
+                if ($event->isRecursive()) {
+                    $this->recursiveActivation($event, $eventName, $dispatcher);
+                }
+
+                $this->checkActivation($module);
             } catch (\Exception $ex) {
                 $event->stopPropagation();
 
@@ -151,22 +152,33 @@ class Module extends BaseAction implements EventSubscriberInterface
 
     /**
      * Get dependencies of the current module and activate it if needed.
+     * @throws \Exception
      */
     public function recursiveActivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
-            $moduleValidator = new ModuleValidator($module->getAbsoluteBaseDir());
-            $dependencies = $moduleValidator->getCurrentModuleDependencies();
+        if (null === $module = ModuleQuery::create()->findPk($event->getModuleId())) {
+            return;
+        }
+        $moduleValidator = new ModuleValidator($module->getAbsoluteBaseDir());
+        $dependencies = $moduleValidator->getCurrentModuleDependencies();
+        foreach ($dependencies as $defMod) {
+            $submodule = ModuleQuery::create()
+                ->findOneByCode($defMod['code']);
 
-            foreach ($dependencies as $defMod) {
-                $submodule = ModuleQuery::create()
-                    ->findOneByCode($defMod['code']);
+            if (!$submodule) {
+                $absolutePathToSubModule = $module->getAbsoluteBaseDir().DS.'..'.DS.$defMod['code'];
+                $moduleInstallEvent = (new ModuleInstallEvent())
+                    ->setModulePath($absolutePathToSubModule)
+                    ->setModuleDefinition((new ModuleValidator($absolutePathToSubModule))->getModuleDefinition());
 
-                if ($submodule && BaseModule::IS_ACTIVATED !== $submodule->getActivate()) {
-                    $subevent = new ModuleToggleActivationEvent($submodule->getId());
-                    $subevent->setRecursive(true);
-                    $dispatcher->dispatch($subevent, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
-                }
+                $this->install($moduleInstallEvent, $eventName, $dispatcher);
+                $submodule = $moduleInstallEvent->getModule();
+            }
+
+            if ($submodule && BaseModule::IS_ACTIVATED !== $submodule->getActivate()) {
+                $subevent = new ModuleToggleActivationEvent($submodule->getId());
+                $subevent->setRecursive(true);
+                $dispatcher->dispatch($subevent, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
             }
         }
     }

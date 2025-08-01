@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Event\Module;
 
+use Thelia\Model\ModuleQuery;
+
 /**
  * Class ModuleDeleteEvent.
  *
@@ -21,10 +23,17 @@ namespace Thelia\Core\Event\Module;
  */
 class ModuleDeleteEvent extends ModuleEvent
 {
-    protected $delete_data;
+    protected bool $delete_data = false;
 
-    public function __construct(protected int $module_id, protected bool $assume_delete = false)
-    {
+    public function __construct(
+        protected int $module_id,
+        protected bool $assume_delete = false,
+    ) {
+        $module = ModuleQuery::create()->findPk($module_id);
+        if (null === $module) {
+            throw new \InvalidArgumentException(\sprintf('Module with id %d does not exist.', $module_id));
+        }
+        parent::__construct($module);
     }
 
     public function setModuleId(int $module_id): void
