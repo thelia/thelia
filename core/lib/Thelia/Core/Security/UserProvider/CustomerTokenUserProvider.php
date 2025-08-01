@@ -22,10 +22,13 @@ class CustomerTokenUserProvider extends TokenUserProvider
 {
     public function getUser(array $dataArray): UserInterface
     {
-        return CustomerQuery::create()
+        if (null === $customer = CustomerQuery::create()
             ->filterByEmail($dataArray['username'], Criteria::EQUAL)
             ->filterByRememberMeSerial($dataArray['serial'], Criteria::EQUAL)
             ->filterByRememberMeToken($dataArray['token'], Criteria::EQUAL)
-            ->findOne();
+            ->findOne()) {
+            throw new \InvalidArgumentException('No user found with this token (maybe try to delete your cookies)');
+        }
+        return $customer;
     }
 }
