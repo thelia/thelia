@@ -94,7 +94,9 @@
                                     <td><a href="{url path='/admin/customer/update' customer_id=$ID}">{$REF}</a></td>
 
                                     <td>
+                                        {loop name="address" type="address" customer=$ID backend_context="1" default="true"}
                                         {$COMPANY|default:null}
+                                        {/loop}
                                     </td>
 
                                     <td class="object-title">
@@ -194,7 +196,7 @@
                             </thead>
 
                             <tbody>
-                            {loop type="order" name="order-search" backend_context=1 customer="*" search_term=$searchTerm search_in="ref,customer_ref,customer_firstname,customer_lastname,customer_email,invoice_ref,transaction_ref,delivery_ref" limit=26}
+                            {loop type="order" name="order-search" backend_context=1 customer="*" search_mode="sentence" search_term=$searchTerm search_in="ref,customer_ref,customer_firstname,customer_lastname,customer_email,invoice_ref,transaction_ref,delivery_ref" limit=26}
                                 {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
                                 {assign "orderInvoiceFirstName" $FIRSTNAME}
                                 {assign "orderInvoiceLastName" $LASTNAME}
