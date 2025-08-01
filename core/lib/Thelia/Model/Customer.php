@@ -374,6 +374,6 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
 
     public function getId(): int
     {
-        return parent::getId();
+        return parent::getId() ?? 0;
     }
 }
