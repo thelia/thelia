@@ -25,8 +25,8 @@ class HookCreateEvent extends HookEvent
     protected string $code;
     protected int $type;
     protected string $title;
-    protected int $native;
-    protected int $active;
+    protected bool $native;
+    protected bool $active;
 
     /**
      * @return $this
@@ -46,14 +46,14 @@ class HookCreateEvent extends HookEvent
     /**
      * @return $this
      */
-    public function setNative(int $native): self
+    public function setNative(bool $native): self
     {
         $this->native = $native;
 
         return $this;
     }
 
-    public function getNative(): int
+    public function getNative(): bool
     {
         return $this->native;
     }
@@ -91,14 +91,14 @@ class HookCreateEvent extends HookEvent
     /**
      * @return $this
      */
-    public function setActive(int $active): self
+    public function setActive(bool $active): self
     {
         $this->active = $active;
 
         return $this;
     }
 
-    public function getActive(): int
+    public function getActive(): bool
     {
         return $this->active;
     }

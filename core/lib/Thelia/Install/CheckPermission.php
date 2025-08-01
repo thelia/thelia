@@ -264,7 +264,6 @@ class CheckPermission extends BaseInstall
     protected function verifyServerMemoryValues(string $key, int $necessaryValueInBytes): bool
     {
         $serverValueInBytes = $this->returnBytes(\ini_get($key));
-
         if (-1 === $serverValueInBytes) {
             return true;
         }
@@ -276,10 +275,8 @@ class CheckPermission extends BaseInstall
      * Return bytes from memory .ini value.
      *
      * @param string $val .ini value
-     *
-     * @return int
      */
-    protected function returnBytes(string $val): string|int
+    protected function returnBytes(string $val): int
     {
         $val = trim($val);
         $last = strtolower($val[\strlen($val) - 1]);
@@ -297,7 +294,7 @@ class CheckPermission extends BaseInstall
                 $val = (int) $val * 1024;
         }
 
-        return $val;
+        return (int) $val;
     }
 
     /**

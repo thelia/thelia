@@ -20,12 +20,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
+use Thelia\Tools\URL;
 
 /**
  * Command.
@@ -35,16 +37,21 @@ use Thelia\Model\LangQuery;
  */
 abstract class ContainerAwareCommand extends Command implements ContainerAwareInterface
 {
-    private ContainerInterface $container;
+    private ?ContainerInterface $container = null;
 
     protected function getContainer(): ContainerInterface
     {
+        if (null === $this->container) {
+            throw new \LogicException('Container is not set.');
+        }
+
         return $this->container;
     }
 
     /**
      * @see ContainerAwareInterface::setContainer()
      */
+    #[Required]
     public function setContainer(?ContainerInterface $container = null): void
     {
         $this->container = $container;
@@ -58,7 +65,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
         try {
             Translator::getInstance();
         } catch (\Exception) {
-            $this->container->get('thelia.translator');
+            $container->get('thelia.translator');
         }
 
         return $container->get('event_dispatcher');
@@ -73,14 +80,17 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
 
         $request = Request::create($this->getBaseUrl($lang));
         $request->setSession(new Session(new MockArraySessionStorage()));
-        $container->get('request_stack')->push($request);
+        $container->get('request_stack')?->push($request);
 
         $requestContext = new RequestContext();
         $requestContext->fromRequest($request);
 
         $url = $container->get('thelia.url.manager');
+        if (!$url instanceof URL) {
+            throw new \LogicException('Thelia URL manager is not available.');
+        }
         $url->setRequestContext($requestContext);
-        $this->getContainer()->get('router.admin')->setContext($requestContext);
+        $this->getContainer()->get('router.admin')?->setContext($requestContext);
     }
 
     protected function getBaseUrl(?Lang $lang = null): string
@@ -89,7 +99,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
 
         if (1 === (int) ConfigQuery::read('one_domain_foreach_lang')) {
             if (!$lang instanceof Lang) {
-                $lang = LangQuery::create()->findOneByByDefault(true);
+                $lang = LangQuery::create()->findOneByByDefault(1);
             }
 
             $baseUrl = $lang->getUrl();

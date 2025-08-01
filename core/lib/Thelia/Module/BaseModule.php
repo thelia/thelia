@@ -580,11 +580,10 @@ class BaseModule implements BaseModuleInterface
                 foreach ($updateData as $locale => $data) {
                     $event
                         ->setCode($hookModel->getCode())
-                        ->setNative($hookModel->getNative())
                         ->setByModule($hookModel->getByModule())
-                        ->setActive($hookModel->getActivate())
+                        ->setActive((int) $hookModel->getActivate())
                         ->setBlock($hookModel->getBlock())
-                        ->setNative($hookModel->getNative())
+                        ->setNative((int) $hookModel->getNative())
                         ->setType($hookModel->getType())
                         ->setLocale($locale)
                         ->setChapo($data['chapo'])
@@ -644,7 +643,7 @@ class BaseModule implements BaseModuleInterface
             ->setType($hook['type'])
             ->setCode($hook['code'])
             ->setNative(false)
-            ->setByModule(isset($hook['module']) && (bool) $hook['module'])
+            ->setByModule(isset($hook['module']) && (int) $hook['module'])
             ->setActive(isset($hook['active']) && (bool) $hook['active']);
 
         /*

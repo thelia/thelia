@@ -28,7 +28,7 @@ use Thelia\Log\Tlog;
  */
 class Database
 {
-    protected \PDO $connection;
+    protected ConnectionInterface|\PDO $connection;
 
     /**
      * Create a new instance, using the provided connection information, either none for
@@ -87,11 +87,9 @@ class Database
             }
         }
 
-        $size = \count($sql);
-
-        for ($i = 0; $i < $size; ++$i) {
-            if (!empty($sql[$i])) {
-                $this->execute($sql[$i]);
+        foreach ($sql as $iValue) {
+            if (!empty($iValue)) {
+                $this->execute($iValue);
             }
         }
     }
@@ -109,13 +107,12 @@ class Database
         $stmt = $this->connection->prepare($sql);
 
         if (false === $stmt) {
-            throw new \RuntimeException(\sprintf('Failed to prepare statement for %s: ', $sql).print_r($this->connection->errorInfo(), 1));
+            throw new \RuntimeException(\sprintf('Failed to prepare statement for %s: ', $sql).print_r($this->connection->errorInfo(), true));
         }
 
         $success = $stmt->execute($args);
-
-        if (false === $success || 0 !== $stmt->errorCode()) {
-            throw new \RuntimeException(\sprintf("Failed to execute SQL '%s', arguments:", $sql).print_r($args, 1).', error:'.print_r($stmt->errorInfo(), 1));
+        if (false === $success || '00000' !== $stmt->errorCode()) {
+            throw new \RuntimeException(\sprintf("Failed to execute SQL '%s', arguments:", $sql).print_r($args, true).', error:'.print_r($stmt->errorInfo(), true));
         }
 
         return $stmt;
@@ -135,19 +132,16 @@ class Database
                 throw new \RuntimeException('You can not use "|" as delimiter: '.$v);
             }
 
-            $stored = str_replace(';', '|', $m[2][$k]);
-            $stored = str_replace($m[1][$k], ";\n", $stored);
+            $stored = str_replace([';', $m[1][$k]], ['|', ";\n"], $m[2][$k]);
             $sql = str_replace($v, $stored, $sql);
         }
 
         $query = [];
 
         $tab = explode(";\n", $sql);
-        $size = \count($tab);
 
-        for ($i = 0; $i < $size; ++$i) {
-            $queryTemp = str_replace('-CODE-', ";',", $tab[$i]);
-            $queryTemp = str_replace('|', ';', $queryTemp);
+        foreach ($tab as $iValue) {
+            $queryTemp = str_replace(['-CODE-', '|'], [";',", ';'], $iValue);
             $query[] = $queryTemp;
         }
 
@@ -157,7 +151,7 @@ class Database
     /**
      * Backup the db OR just a table.
      */
-    public function backupDb(string $filename, string $tables = '*'): void
+    public function backupDb(string $filename, string|array $tables = '*'): void
     {
         $data = [];
 
@@ -211,7 +205,7 @@ class Database
                     for ($j = 0; $j < $fieldCount; ++$j) {
                         $row[$j] = addslashes((string) $row[$j]);
                         $row[$j] = str_replace("\n", '\\n', $row[$j]);
-                        $data[] = isset($row[$j]) ? '"'.$row[$j].'"' : '""';
+                        $data[] = '"'.$row[$j].'"';
 
                         if ($j < ($fieldCount - 1)) {
                             $data[] = ',';
@@ -246,7 +240,7 @@ class Database
      */
     private function writeFilename(string $filename, array $data): void
     {
-        $f = fopen($filename, 'w+');
+        $f = fopen($filename, 'wb+');
 
         fwrite($f, implode('', $data));
         fclose($f);

@@ -29,8 +29,8 @@ class HookCreateAllEvent extends HookEvent
     protected bool $by_module;
     protected bool $block;
     protected string $title;
-    protected string $chapo;
-    protected string $description;
+    protected ?string $chapo;
+    protected ?string $description;
 
     /**
      * @return $this
@@ -155,14 +155,14 @@ class HookCreateAllEvent extends HookEvent
     /**
      * @return $this
      */
-    public function setChapo(string $chapo): static
+    public function setChapo(?string $chapo): static
     {
         $this->chapo = $chapo;
 
         return $this;
     }
 
-    public function getChapo(): string
+    public function getChapo(): ?string
     {
         return $this->chapo;
     }
@@ -170,14 +170,14 @@ class HookCreateAllEvent extends HookEvent
     /**
      * @return $this
      */
-    public function setDescription(string $description): static
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
 
         return $this;
     }
 
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }

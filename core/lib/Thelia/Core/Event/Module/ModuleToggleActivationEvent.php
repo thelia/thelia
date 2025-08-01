@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Event\Module;
 
+use Thelia\Model\ModuleQuery;
+
 /**
  * Class ModuleToggleActivationEvent.
  *
@@ -21,30 +23,33 @@ namespace Thelia\Core\Event\Module;
  */
 class ModuleToggleActivationEvent extends ModuleEvent
 {
-    protected bool $noCheck;
-    protected bool $recursive;
+    protected bool $noCheck = true;
+    protected bool $recursive = false;
 
-    /**
-     * @param int  $module_id
-     * @param bool $assume_deactivate
-     */
-    public function __construct(protected $module_id, protected $assume_deactivate = false)
-    {
+    public function __construct(
+        protected int $moduleId,
+        protected bool $assumeDeactivate = false,
+    ) {
+        $module = ModuleQuery::create()->findPk($moduleId);
+        if (null === $module) {
+            throw new \InvalidArgumentException(\sprintf('Module with ID %d does not exist.', $moduleId));
+        }
+        parent::__construct($module);
     }
 
     /**
      * @return $this
      */
-    public function setModuleId(int $module_id): self
+    public function setModuleId(int $moduleId): self
     {
-        $this->module_id = $module_id;
+        $this->moduleId = $moduleId;
 
         return $this;
     }
 
     public function getModuleId(): int
     {
-        return $this->module_id;
+        return $this->moduleId;
     }
 
     public function isNoCheck(): bool
@@ -79,15 +84,15 @@ class ModuleToggleActivationEvent extends ModuleEvent
 
     public function getAssumeDeactivate(): bool
     {
-        return $this->assume_deactivate;
+        return $this->assumeDeactivate;
     }
 
     /**
      * @return $this;
      */
-    public function setAssumeDeactivate($assume_deactivate): self
+    public function setAssumeDeactivate($assumeDeactivate): self
     {
-        $this->assume_deactivate = $assume_deactivate;
+        $this->assumeDeactivate = $assumeDeactivate;
 
         return $this;
     }
