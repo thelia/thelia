@@ -19,6 +19,7 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoiceFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
+use Thelia\Api\Resource\FilterValue;
 use Thelia\Model\Feature;
 use Thelia\Model\FeatureAvQuery;
 use Thelia\Model\Map\FeatureProductTableMap;
@@ -35,24 +36,43 @@ class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterf
         return ['feature'];
     }
 
-    public function filter(ModelCriteria $query, $value): void
+    public function filter(ModelCriteria $query, $value, bool $isMinOrMaxFilter = false, ?int $categoryDepth = null): void
     {
-        if (!\is_array($value)) {
-            $value = [$value];
+        if (!$isMinOrMaxFilter) {
+            foreach ($value as $featureId => $childValue) {
+                foreach ($childValue as $type => $featureAvId) {
+                    $count = FeatureAvQuery::create()
+                        ->filterById($featureAvId, Criteria::IN)
+                        ->withColumn('COUNT(DISTINCT feature_id)', 'distinct_feature_count')
+                        ->select(['distinct_feature_count'])
+                        ->findOne();
+
+                    $query
+                        ->useFeatureProductQuery()
+                        ->filterByFeatureAvId($featureAvId, Criteria::IN)
+                        ->endUse()
+                        ->groupBy(FeatureProductTableMap::COL_PRODUCT_ID)
+                        ->having('COUNT(DISTINCT '.FeatureProductTableMap::COL_FEATURE_ID.') = ?', $count);
+                }
+            }
+
+            return;
         }
+        foreach ($value as $featureId => $childValue) {
+            foreach ($childValue as $type => $limit) {
+                $operator = $type === 'min' ? Criteria::GREATER_EQUAL : Criteria::LESS_EQUAL;
 
-        $count = FeatureAvQuery::create()
-            ->filterById($value, Criteria::IN)
-            ->withColumn('COUNT(DISTINCT feature_id)', 'distinct_feature_count')
-            ->select(['distinct_feature_count'])
-            ->findOne();
-
-        $query
-            ->useFeatureProductQuery()
-            ->filterByFeatureAvId($value, Criteria::IN)
-            ->endUse()
-            ->groupBy(FeatureProductTableMap::COL_PRODUCT_ID)
-            ->having('COUNT(DISTINCT '.FeatureProductTableMap::COL_FEATURE_ID.') = ?', $count);
+                $query
+                    ->useFeatureProductQuery()
+                    ->filterByFeatureId($featureId)
+                        ->useFeatureAvQuery()
+                            ->useI18nQuery()
+                                ->where(\sprintf('CAST(feature_av_i18n.title AS UNSIGNED) %s ?', $operator), (int) $limit)
+                            ->endUse()
+                        ->endUse()
+                    ->endUse();
+            }
+        }
     }
 
     public function getValue(ActiveRecordInterface $activeRecord, string $locale, $valueSearched = null, ?int $depth = 1): ?array
@@ -65,12 +85,11 @@ class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterf
 
         foreach ($activeRecord->getFeatureProductsJoinFeatureAv() as $featureProduct) {
             $value[] =
-                [
-                    'mainTitle' => $featureProduct->getFeature()->setLocale($locale)->getTitle(),
-                    'mainId' => $featureProduct->getFeature()->getId(),
-                    'id' => $featureProduct->getFeatureAv()->getId(),
-                    'title' => $featureProduct->getFeatureAv()->setLocale($locale)->getTitle(),
-                ];
+                (new FilterValue())
+                    ->setMainTitle($featureProduct->getFeature()->setLocale($locale)->getTitle())
+                    ->setMainId($featureProduct->getFeature()->getId())
+                    ->setId($featureProduct->getFeatureAv()->getId())
+                    ->setTitle($featureProduct->getFeatureAv()->setLocale($locale)->getTitle());
         }
 
         return $value;

@@ -17,6 +17,7 @@ namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
+use Thelia\Api\Resource\FilterValue;
 use Thelia\Model\Brand;
 
 class BrandFilter implements TheliaFilterInterface
@@ -31,9 +32,13 @@ class BrandFilter implements TheliaFilterInterface
         return ['brand'];
     }
 
-    public function filter(ModelCriteria $query, $value): void
+    public function filter(ModelCriteria $query, $value, bool $isMinOrMaxFilter = false, ?int $categoryDepth = null): void
     {
-        $query->filterByBrandId($value);
+        foreach ($value as $id => $childValue) {
+            foreach ($childValue as $type => $brandId) {
+                $query->filterByBrandId($brandId);
+            }
+        }
     }
 
     public function getValue(ActiveRecordInterface $activeRecord, string $locale, $valueSearched = null, ?int $depth = 1): ?array
@@ -45,10 +50,9 @@ class BrandFilter implements TheliaFilterInterface
         }
 
         return [
-            [
-                'id' => $brand->getId(),
-                'title' => $brand->setLocale($locale)->getTitle(),
-            ],
+            (new FilterValue())
+                ->setId($brand->getId())
+                ->setTitle($brand->setLocale($locale)->getTitle()),
         ];
     }
 }
