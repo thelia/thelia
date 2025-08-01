@@ -25,7 +25,7 @@ interface TheliaFilterInterface
 
     public static function getFilterName(): array;
 
-    public function filter(ModelCriteria $query, $value): void;
+    public function filter(ModelCriteria $query, $value, bool $isMinOrMaxFilter = false, ?int $categoryDepth = null): void;
 
     public function getValue(ActiveRecordInterface $activeRecord, string $locale, $valueSearched = null, ?int $depth = 1): ?array;
 }

@@ -3500,6 +3500,7 @@ CREATE TABLE `choice_filter`
     `template_id` INTEGER,
     `position` INTEGER DEFAULT 0 NOT NULL,
     `visible` TINYINT(1),
+    `type` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),

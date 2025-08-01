@@ -1945,6 +1945,7 @@
     <column name="template_id" required="false" type="INTEGER"  />
     <column defaultValue="0" name="position" required="true" type="INTEGER" />
     <column name="visible" type="BOOLEAN" />
+    <column name="type" size="255" type="VARCHAR" />
 
     <foreign-key foreignTable="attribute" onDelete="CASCADE" onUpdate="RESTRICT" >
       <reference foreign="id" local="attribute_id" />

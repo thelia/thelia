@@ -17,10 +17,8 @@ namespace Thelia\Api\Resource;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
-use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\State\Provider\TFiltersProvider;
-use Thelia\Model\Map\ChoiceFilterTableMap;
 
 #[ApiResource(
     operations: [
@@ -44,10 +42,8 @@ use Thelia\Model\Map\ChoiceFilterTableMap;
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
-class Filter implements PropelResourceInterface
+class Filter
 {
-    use PropelResourceTrait;
-
     public const GROUP_FRONT_READ = 'front:filter:read';
 
     #[Groups([self::GROUP_FRONT_READ])]
@@ -60,13 +56,15 @@ class Filter implements PropelResourceInterface
     private string $type;
 
     #[Groups([self::GROUP_FRONT_READ])]
-    private string $inputType;
+    private string $fieldType;
 
     #[Groups([self::GROUP_FRONT_READ])]
     private ?int $position = null;
 
     #[Groups([self::GROUP_FRONT_READ])]
     private array $values;
+
+    private bool $visible;
 
     public function getId(): ?int
     {
@@ -80,14 +78,14 @@ class Filter implements PropelResourceInterface
         return $this;
     }
 
-    public function getInputType(): string
+    public function getFieldType(): string
     {
-        return $this->inputType;
+        return $this->fieldType;
     }
 
-    public function setInputType(string $inputType): self
+    public function setFieldType(string $fieldType): self
     {
-        $this->inputType = $inputType;
+        $this->fieldType = $fieldType;
 
         return $this;
     }
@@ -140,8 +138,15 @@ class Filter implements PropelResourceInterface
         return $this;
     }
 
-    public static function getPropelRelatedTableMap(): ?TableMap
+    public function isVisible(): bool
     {
-        return ChoiceFilterTableMap::getTableMap();
+        return $this->visible;
+    }
+
+    public function setVisible(bool $visible): self
+    {
+        $this->visible = $visible;
+
+        return $this;
     }
 }

@@ -18,6 +18,7 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\FilterService;
+use Thelia\Api\Resource\FilterValue;
 use Thelia\Model\CategoryQuery;
 
 class CategoryFilter implements TheliaFilterInterface
@@ -28,23 +29,28 @@ class CategoryFilter implements TheliaFilterInterface
     {
     }
 
-    public function filter(ModelCriteria $query, $value, ?int $categoryDepth = null): void
+    public function filter(ModelCriteria $query, $value, bool $isMinOrMaxFilter = false, ?int $categoryDepth = null): void
     {
-        if (!\is_array($value)) {
-            $value = [$value];
-        }
-
-        if ($categoryDepth) {
-            $categories = $this->filterService->getCategoriesRecursively($value, $categoryDepth);
-
-            foreach ($categories as $categoryList) {
-                foreach ($categoryList as $category) {
-                    $value[] = $category->getId();
+        foreach ($value as $id => $childValue) {
+            foreach ($childValue as $type => $categoryId) {
+                if (!\is_array($categoryId)) {
+                    $categoryId = [$categoryId];
                 }
+
+                if ($categoryDepth) {
+                    $categories = $this->filterService->getCategoriesRecursively($categoryId, $categoryDepth);
+
+                    foreach ($categories as $categoryList) {
+                        foreach ($categoryList as $category) {
+                            $categoryId[] = $category->getId();
+                        }
+                    }
+                }
+
+                $query->useProductCategoryQuery()->filterByCategoryId($categoryId)->endUse();
             }
         }
 
-        $query->useProductCategoryQuery()->filterByCategoryId($value)->endUse();
     }
 
     public function getResourceType(): array
@@ -85,13 +91,12 @@ class CategoryFilter implements TheliaFilterInterface
             foreach ($categoriesWithDepth as $depthIndex => $categories) {
                 foreach ($categories as $category) {
                     $value[] =
-                        [
-                            'mainTitle' => $mainCategory->setLocale($locale)->getTitle(),
-                            'mainId' => $mainCategory->getId(),
-                            'id' => $category->getId(),
-                            'depth' => $depthIndex,
-                            'title' => $category->setLocale($locale)->getTitle(),
-                        ];
+                        (new FilterValue())
+                            ->setMainTitle($mainCategory->setLocale($locale)->getTitle())
+                            ->setMainId($mainCategory->getId())
+                            ->setId($category->getId())
+                            ->setDepth($depthIndex)
+                            ->setTitle($category->setLocale($locale)->getTitle());
                 }
             }
         }

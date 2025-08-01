@@ -21,7 +21,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\CategoryFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoiceFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Type\CheckboxType;
 use Thelia\Api\Resource\Filter;
+use Thelia\Api\Resource\FilterValue;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ChoiceFilter;
@@ -33,6 +35,8 @@ readonly class FilterService
     public function __construct(
         #[TaggedIterator('api.thelia.filter')]
         private readonly iterable $filters,
+        #[TaggedIterator('api.thelia.filter.type')]
+        private readonly iterable $filterTypes,
         private readonly LangService $langService,
         private readonly RequestStack $requestStack,
         private readonly Translator $translator,
@@ -76,7 +80,7 @@ readonly class FilterService
     public function filterTFilterWithRequest($request, ?ModelCriteria $query = null): iterable
     {
         $tfilters = $request->get('tfilters', []);
-        $categoryDepth = $request->get(CategoryFilter::CATEGORY_DEPTH_NAME, null);
+        $categoryDepth = (int) $request->get(CategoryFilter::CATEGORY_DEPTH_NAME, null);
         $pathInfo = $request->getPathInfo();
         $segments = explode('/', (string) $pathInfo);
         $resource = end($segments);
@@ -87,7 +91,7 @@ readonly class FilterService
     public function filterTFilterWithContext(?array $context = null, ?ModelCriteria $query = null): iterable
     {
         $tfilters = $context['filters']['tfilters'] ?? [];
-        $categoryDepth = $context['filters'][CategoryFilter::CATEGORY_DEPTH_NAME] ?? null;
+        $categoryDepth = (int) ($context['filters'][CategoryFilter::CATEGORY_DEPTH_NAME] ?? null);
         $pathInfo = $context['path_info'];
         $segments = explode('/', (string) $pathInfo);
         $resource = end($segments);
@@ -124,15 +128,12 @@ readonly class FilterService
             if (\is_string($values)) {
                 $values = explode(',', $values);
             }
-
-            if (\is_array($values)) {
-                $values = array_map(static fn ($value): int => (int) $value, $values);
-            }
+            $isMinOrMaxFilter = $this->isMinOrMaxFilter($values);
 
             if ($filterClass instanceof CategoryFilter) {
-                $filterClass->filter($query, $values, $categoryDepth);
+                $filterClass->filter(query: $query, value: $values, categoryDepth: $categoryDepth);
             } else {
-                $filterClass->filter($query, $values);
+                $filterClass->filter(query: $query, value: $values, isMinOrMaxFilter: $isMinOrMaxFilter);
             }
         }
 
@@ -160,125 +161,81 @@ readonly class FilterService
         $filterObjects = [];
         $locale = $context['filters']['locale'] ?? $request->get('locale');
         $locale ??= $this->langService->getLocale();
-        $objects = $query->find();
         $filters = $this->getAvailableFilters($resource);
 
         foreach ($filters as $filter) {
-            $values = [];
-            $item = null;
-
-            foreach ($objects as $item) {
-                if ($filter instanceof CategoryFilter) {
-                    $categoryId = $this->retrieveFilterValue(
-                        theliaFilterNames: CategoryFilter::getFilterName(),
-                        tfilters: $tfilters,
-                    );
-                    $depth = $tfilters[CategoryFilter::CATEGORY_DEPTH_NAME] ?? 1;
-                    $values = $filter->getValue(
-                        activeRecord: $item,
-                        locale: $locale,
-                        valueSearched: $categoryId,
-                        depth : $depth,
-                    );
-                    break;
-                }
-
-                $possibleValues = $filter->getValue(
-                    activeRecord: $item,
-                    locale: $locale,
-                );
-
-                if (!$possibleValues) {
-                    continue;
-                }
-
-                foreach ($possibleValues as $value) {
-                    $values[] = $value;
-                }
-            }
-
-            $id = null;
-            $isVisible = true;
-            $position = null;
-            $this->choiceFiltersManagement(
-                tfilters: $tfilters,
+            $values = $this->getValues(
+                query: $query,
                 filter: $filter,
-                values: $values,
-                isVisible: $isVisible,
-                position: $position,
+                tfilters: $tfilters,
+                locale: $locale
             );
-
-            $hasMainResource = (isset($values[0]['mainId'], $values[0]['mainTitle']));
-
+            if ($values === []) {
+                continue;
+            }
+            $hasMainResource = $this->hasMainResource($values);
             if ($hasMainResource) {
-                $values = array_intersect_key($values, array_unique(array_map(
-                    static fn ($item): string => $item['id'].'-'.$item['mainId'],
-                    $values,
-                )));
+                $values = array_intersect_key(
+                    $values, array_unique(
+                        array_map(
+                            static fn (FilterValue $filterValue): string => $filterValue->getId().'-'.$filterValue->getMainId(),
+                            $values,
+                        )
+                    )
+                );
 
                 $splitValues = [];
 
+                /** @var FilterValue $value */
                 foreach ($values as $value) {
-                    $splitValues[$value['mainId']][] = $value;
+                    $splitValues[$value->getMainId()][] = $value;
                 }
 
                 foreach ($splitValues as $value) {
-                    if (isset($value[0]['visible']) && $value[0]['position']) {
-                        $position = $value[0]['position'];
-                        $isVisible = $value[0]['visible'];
-                        $value = array_map(static function (array $val): array {
-                            unset($val['visible'], $val['position']);
-
-                            return $val;
-                        }, $value);
-                    }
-
-                    if (!$isVisible) {
+                    $filterDto = $this->createFilterDto(
+                        tfilters: $tfilters,
+                        filter: $filter,
+                        values: $value,
+                        locale: $locale
+                    );
+                    if (!$filterDto || !$filterDto->isVisible()) {
                         continue;
                     }
-
-                    $title = $value[0]['mainTitle'] ?? '';
-
-                    if ($filter instanceof CategoryFilter) {
-                        $title = $this->translator->trans(id: 'Category', locale: $locale);
-                    }
-
-                    $filterDto = new Filter();
-                    $filterDto
-                        ->setId($value[0]['mainId'] ?? null)
-                        ->setTitle($title)
-                        ->setType($filter::getFilterName()[0])
-                        ->setInputType('checkbox')
-                        ->setPosition($position);
-
-                    $value = array_map(static function (array $val): array {
-                        unset($val['mainId'], $val['mainTitle']);
-
-                        return $val;
-                    }, $value);
-
-                    $filterDto->setValues($value);
                     $filterObjects[] = $filterDto;
                 }
             }
+            if (!$hasMainResource) {
+                $values = array_values(
+                    array_reduce(
+                        $values,
+                        static function ($carry, $item) {
+                            $carry[$item->getId()] = $item;
 
-            if (!$hasMainResource && [] !== $values) {
-                $values = array_intersect_key($values, array_unique(array_column($values, 'id')));
+                            return $carry;
+                        },
+                        []
+                    )
+                );
 
-                if (!$isVisible) {
+                $filterDto = $this->createFilterDto(
+                    tfilters: $tfilters,
+                    filter: $filter,
+                    values: $values,
+                    locale: $locale,
+                );
+
+                if (!$filterDto && !$filterDto->isVisible()) {
                     continue;
                 }
-
-                $filterObjects[] = (new Filter())
-                    ->setId($id)
-                    ->setTitle($filter::getFilterName()[0] ?? '')
-                    ->setType($filter::getFilterName()[0] ?? '')
-                    ->setInputType('checkbox')
-                    ->setPosition($position)
-                    ->setValues(array_values($values));
+                $filterObjects[] = $filterDto;
             }
         }
 
+        return $this->managePosition($filterObjects);
+    }
+
+    private function managePosition(array $filterObjects): array
+    {
         foreach ($filterObjects as $filterObject) {
             if (null === $filterObject->getPosition()) {
                 $allPosition = array_map(static fn ($filterObject): ?int => $filterObject->getPosition(), $filterObjects);
@@ -292,6 +249,44 @@ readonly class FilterService
         return $filterObjects;
     }
 
+    private function getValues($query, $filter, $tfilters, $locale): array
+    {
+        $objects = $query->find();
+        $values = [];
+
+        foreach ($objects as $item) {
+            if ($filter instanceof CategoryFilter) {
+                $categoryId = $this->retrieveFilterValue(
+                    theliaFilterNames: CategoryFilter::getFilterName(),
+                    tfilters: $tfilters,
+                );
+                $depth = $tfilters[CategoryFilter::CATEGORY_DEPTH_NAME] ?? 1;
+                $values = $filter->getValue(
+                    activeRecord: $item,
+                    locale: $locale,
+                    valueSearched: $categoryId,
+                    depth: $depth,
+                );
+                break;
+            }
+
+            $possibleValues = $filter->getValue(
+                activeRecord: $item,
+                locale: $locale,
+            );
+
+            if (!$possibleValues) {
+                continue;
+            }
+
+            foreach ($possibleValues as $value) {
+                $values[] = $value;
+            }
+        }
+
+        return $values;
+    }
+
     private function retrieveFilterValue(array $theliaFilterNames, array $tfilters): string|array|null
     {
         $ids = null;
@@ -303,14 +298,17 @@ readonly class FilterService
 
             $ids = $tfilters[$filterName];
         }
+        while (\is_array($ids) && \count($ids) === 1) {
+            $ids = reset($ids);
+        }
 
         return $ids;
     }
 
-    private function choiceFiltersManagement(array $tfilters, TheliaFilterInterface $filter, array &$values, bool &$isVisible, ?int &$position): void
+    private function createFilterDto(array $tfilters, TheliaFilterInterface $filter, array $values, string $locale): ?Filter
     {
         if (!$this->hasFilter(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters)) {
-            return;
+            return null;
         }
 
         $categoryId = $this->retrieveFilterValue(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters);
@@ -333,28 +331,87 @@ readonly class FilterService
             $otherType = $choiceFilter->getChoiceFilterOther()?->getType();
 
             if (\in_array($otherType, $filter->getFilterName(), true)) {
-                $isVisible = (bool) $choiceFilter->isVisible();
-                $position = $choiceFilter->getPosition();
-
-                return;
+                return $this->hydrateFilterDto(
+                    filter: $filter,
+                    values: $values,
+                    locale: $locale,
+                    choiceFilter: $choiceFilter,
+                );
             }
 
-            foreach ($values as $index => $value) {
+            /**
+             * @var FilterValue $value
+             */
+            foreach ($values as $value) {
                 if ($filter instanceof TheliaChoiceFilterInterface) {
                     $mainType = $filter->getChoiceFilterType();
 
-                    if ($choiceFilter->getAttribute() instanceof $mainType && $choiceFilter->getAttribute()->getId() === $value['mainId']) {
-                        $values[$index]['visible'] = (bool) $choiceFilter->isVisible();
-                        $values[$index]['position'] = $choiceFilter->getPosition();
+                    if ($choiceFilter->getAttribute() instanceof $mainType && $choiceFilter->getAttribute()->getId() === $value->getMainId()) {
+                        return $this->hydrateFilterDto(
+                            filter: $filter,
+                            values: $values,
+                            locale: $locale,
+                            choiceFilter: $choiceFilter,
+                        );
                     }
 
-                    if ($choiceFilter->getFeature() instanceof $mainType && $choiceFilter->getFeature()->getId() === $value['mainId']) {
-                        $values[$index]['visible'] = (bool) $choiceFilter->isVisible();
-                        $values[$index]['position'] = $choiceFilter->getPosition();
+                    if ($choiceFilter->getFeature() instanceof $mainType && $choiceFilter->getFeature()->getId() === $value->getMainId()) {
+                        return $this->hydrateFilterDto(
+                            filter: $filter,
+                            values: $values,
+                            locale: $locale,
+                            choiceFilter: $choiceFilter,
+                        );
                     }
                 }
             }
         }
+
+        return $this->hydrateFilterDto(
+            filter: $filter,
+            values: $values,
+            locale: $locale
+        );
+    }
+
+    private function hydrateFilterDto(
+        TheliaFilterInterface $filter,
+        array $values,
+        ?string $locale,
+        ?ChoiceFilter $choiceFilter = null,
+    ): Filter {
+        $mainTitle = null;
+        $mainId = null;
+        /** @var FilterValue $value */
+        foreach ($values as $value) {
+            $mainTitle = $value->getMainTitle();
+            $mainId = $value->getMainId();
+            break;
+        }
+        if (!$mainTitle) {
+            $mainTitle = $filter::getFilterName()[0];
+        }
+        if ($filter instanceof CategoryFilter) {
+            $mainTitle = $this->translator->trans(id: 'Category', locale: $locale);
+        }
+        $position = null;
+        $isVisible = true;
+        $fieldType = CheckboxType::getName();
+        if ($choiceFilter) {
+            $position = $choiceFilter->getPosition();
+            $fieldType = $choiceFilter->getType();
+            $isVisible = (bool) $choiceFilter->isVisible();
+        }
+        $filterDto = new Filter();
+        $filterDto->setVisible($isVisible);
+        $filterDto->setPosition($position);
+        $filterDto->setFieldType($fieldType);
+        $filterDto->setType($filter::getFilterName()[0]);
+        $filterDto->setId($mainId);
+        $filterDto->setTitle($mainTitle);
+        $filterDto->setValues($values);
+
+        return $filterDto;
     }
 
     private function hasFilter(array $theliaFilterNames, array $tfilters): bool
@@ -386,5 +443,37 @@ readonly class FilterService
         }
 
         return $categoriesFound;
+    }
+
+    public function getFilterTypes(): array
+    {
+        $filters = [];
+        foreach ($this->filterTypes as $filterType) {
+            $filters[] = $filterType->getName();
+        }
+
+        return $filters;
+    }
+
+    private function hasMainResource(array $values): bool
+    {
+        /** @var FilterValue $value */
+        foreach ($values as $value) {
+            return $value->getMainId() && $value->getMainTitle();
+        }
+    }
+
+    private function isMinOrMaxFilter(array $values): bool
+    {
+        foreach ($values as $value) {
+            if (!\is_array($value)) {
+                return false;
+            }
+            if (\array_key_exists('min', $value) || \array_key_exists('max', $value)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
