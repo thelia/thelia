@@ -94,7 +94,7 @@ class SetTemplate extends ContainerAwareCommand
         $this->eventDispatcher->dispatch(new CacheEvent($this->kernelCacheDir), TheliaEvents::CACHE_CLEAR);
 
         $output->writeln('<fg=green>Template successfully changed.</>');
-        $moduledInstalled = $this->moduleManager->installModulesFromTemplatePath($path);
+        $moduledInstalled = $this->moduleManager->installModulesFromTemplatePath($path, $output);
         $output->writeln(\sprintf('<fg=blue>%d modules installed and activated.</>', \count($moduledInstalled)));
         $this->theliaTemplateHelper->enableThemeAsBundle($path);
 

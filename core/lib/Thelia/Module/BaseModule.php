@@ -581,9 +581,9 @@ class BaseModule implements BaseModuleInterface
                     $event
                         ->setCode($hookModel->getCode())
                         ->setByModule($hookModel->getByModule())
-                        ->setActive((int) $hookModel->getActivate())
+                        ->setActive($hookModel->getActivate())
                         ->setBlock($hookModel->getBlock())
-                        ->setNative((int) $hookModel->getNative())
+                        ->setNative($hookModel->getNative())
                         ->setType($hookModel->getType())
                         ->setLocale($locale)
                         ->setChapo($data['chapo'])

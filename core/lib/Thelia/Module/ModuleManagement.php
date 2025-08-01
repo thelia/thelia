@@ -18,6 +18,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
@@ -291,8 +292,10 @@ class ModuleManagement
     /**
      * @throws \JsonException
      */
-    public function installModulesFromTemplatePath(string $path): array
-    {
+    public function installModulesFromTemplatePath(
+        string $path,
+        ?OutputInterface $output = null,
+    ): array {
         $modulesInstalled = [];
 
         if (!file_exists($path.DS.'composer.json')) {
@@ -302,11 +305,24 @@ class ModuleManagement
         $composerModuleDTOS = $this->listModulesFromTemplatePath($path);
 
         foreach ($composerModuleDTOS as $composerModuleDTO) {
+            $output?->writeln(
+                \sprintf(
+                    '<fg=gray>Installing module %s from %s</>',
+                    $composerModuleDTO->getName(),
+                    $composerModuleDTO->getPath()
+                )
+            );
             $module = $this->installModule($composerModuleDTO->getPath());
             $cacheEvent = new CacheEvent($this->kernelCacheDir);
             $this->eventDispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
 
             if (BaseModule::IS_ACTIVATED === $module->getActivate()) {
+                $output?->writeln(
+                    \sprintf(
+                        '<fg=gray>Module %s is already activated.</>',
+                        $module->getCode()
+                    )
+                );
                 continue;
             }
 
@@ -316,6 +332,12 @@ class ModuleManagement
 
                 $this->eventDispatcher->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
                 $modulesInstalled[] = $module;
+                $output?->writeln(
+                    \sprintf(
+                        '<fg=gray>Module %s successfully installed and activated.</>',
+                        $module->getCode()
+                    )
+                );
             } catch (\Exception) {
                 continue;
             }
