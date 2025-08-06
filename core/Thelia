@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 declare(strict_types=1);
@@ -12,65 +13,34 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
-use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Dotenv\Dotenv;
-use Symfony\Component\ErrorHandler\Debug;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpKernel\Kernel;
 use Thelia\Core\Application;
 use Thelia\Core\Thelia;
 use Thelia\Install\KernelInstall;
-use Thelia\Install\Exception\AlreadyInstallException;
-
-if (!in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
-    echo 'Warning: The console should be invoked via the CLI version of PHP, not the ' . \PHP_SAPI . ' SAPI' . \PHP_EOL;
-}
-
-set_time_limit(0);
 
 if (!isset($bootstrapFile)) {
-    $bootstrapFile = dirname(__DIR__) . '/vendor/autoload.php';
+    $bootstrapFile = dirname(__DIR__) . '/vendor/autoload_runtime.php';
 }
 
-require $bootstrapFile;
-
-if (!class_exists(Application::class) || !class_exists(Dotenv::class)) {
-    throw new LogicException('You need to add "symfony/framework-bundle" and "symfony/dotenv" as Composer dependencies.');
+if (!is_dir(dirname(__DIR__).'/vendor')) {
+    throw new LogicException('Dependencies are missing. Try running "composer install".');
 }
 
-$input = new ArgvInput();
-
-if (null !== $askedEnv = $input->getParameterOption(['--env', '-e'], null, true)) {
-    putenv('APP_ENV=' . $_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = $askedEnv);
+if (!is_file($bootstrapFile)) {
+    throw new LogicException('Symfony Runtime is missing. Try running "composer require symfony/runtime".');
 }
 
-(new Dotenv())->bootEnv(THELIA_ROOT . '.env', 'dev', []);
-$env = $_ENV['APP_ENV'];
+require_once $bootstrapFile;
 
-if ($input->hasParameterOption('--no-debug', true)) {
-    putenv('APP_DEBUG=' . $_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = '0');
+if (!class_exists(Application::class)) {
+    throw new LogicException('You need to add "symfony/framework-bundle"  as Composer dependencies.');
 }
 
-if ($_SERVER['APP_DEBUG']) {
-    umask(0o000);
-
-    if (class_exists(Debug::class)) {
-        Debug::enable();
+return static function (array $context) {
+    if (!Thelia::isInstalled()) {
+        $kernel = new KernelInstall($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+    } else {
+        $kernel = new App\Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
     }
-}
-
-if (!Thelia::isInstalled()) {
-    $kernel = new KernelInstall($env, (bool) $_SERVER['APP_DEBUG']);
-    $application = new Application($kernel);
-    $application->run($input);
-    exit;
-}
-try {
-    $thelia = new App\Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
-    $application = new Application($thelia);
-    $application->run($input);
-} catch(AlreadyInstallException $e) {
-    echo 'Thelia is already installed. If you want to reinstall it, please empty your database et remove database environment variable from your en file.' . PHP_EOL;
-}
+    return new Application($kernel);
+};
