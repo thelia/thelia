@@ -18,9 +18,9 @@ class AttributeDeleteEvent extends AttributeEvent
 {
     protected int $attribute_id;
 
-    public function __construct(int $attribute_id)
+    public function __construct(int $attributeId)
     {
-        $this->setAttributeId($attribute_id);
+        $this->setAttributeId($attributeId);
     }
 
     public function getAttributeId(): int

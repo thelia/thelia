@@ -101,7 +101,7 @@ class ProductSaleElementsType extends AbstractTheliaType
                 'required' => false,
             ])
             ->add('attribute_av', CollectionType::class, [
-                'type' => AttributeAvIdType::class,
+                'entry_type' => AttributeAvIdType::class,
                 'required' => false,
                 'allow_add' => true,
             ])

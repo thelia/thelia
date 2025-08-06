@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Count;
@@ -40,7 +42,7 @@ class TaxRuleType extends AbstractTheliaType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('default', 'checkbox')
+            ->add('default', CheckboxType::class)
             ->add('country', 'collection', [
                 'type' => 'country_id',
                 'allow_add' => true,
@@ -50,7 +52,7 @@ class TaxRuleType extends AbstractTheliaType
                     new Count(['min' => 1]),
                 ],
             ])
-            ->add('tax', 'collection', [
+            ->add('tax', CollectionType::class, [
                 'type' => 'tax_id',
                 'allow_add' => true,
                 'allow_delete' => true,

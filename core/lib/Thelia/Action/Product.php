@@ -599,7 +599,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             foreach ($pseToDelete->getData() as $pseId) {
                 $this->eventDispatcher->dispatch(
                     new ProductSaleElementDeleteEvent(
-                        $pseId,
+                        (int) $pseId,
                         CurrencyModel::getDefaultCurrency()->getId(),
                     ),
                     TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT,
@@ -814,7 +814,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         foreach ($pseToDelete->getData() as $pseId) {
             $dispatcher->dispatch(
                 new ProductSaleElementDeleteEvent(
-                    $pseId,
+                    (int) $pseId,
                     $currencyId,
                 ),
                 TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT,

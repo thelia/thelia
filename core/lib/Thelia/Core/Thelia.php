@@ -77,7 +77,6 @@ use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
-use Thelia\Module\ModuleManagement;
 use Thelia\TaxEngine\TaxTypeInterface;
 
 class Thelia extends Kernel

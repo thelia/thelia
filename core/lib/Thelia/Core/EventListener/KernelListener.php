@@ -98,7 +98,7 @@ class KernelListener
         $this->eventDispatcher->dispatch($event, TheliaKernelEvents::SESSION);
         self::$session = $event->getSession();
         $session = self::$session;
-        if(!$session->isStarted()) {
+        if (!$session->isStarted()) {
             $session->start();
         }
 

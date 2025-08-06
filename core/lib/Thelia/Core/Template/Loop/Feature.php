@@ -79,7 +79,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
     /**
      * @throws PropelException
      */
-    public function buildModelCriteria(): ModelCriteria|FeatureQuery
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = FeatureQuery::create();
 

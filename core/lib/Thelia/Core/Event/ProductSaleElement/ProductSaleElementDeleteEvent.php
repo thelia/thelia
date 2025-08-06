@@ -18,11 +18,8 @@ class ProductSaleElementDeleteEvent extends ProductSaleElementEvent
 {
     /**
      * ProductSaleElementDeleteEvent constructor.
-     *
-     * @param int $product_sale_element_id
-     * @param int $currency_id
      */
-    public function __construct(protected $product_sale_element_id, protected $currency_id)
+    public function __construct(protected int $product_sale_element_id, protected int $currency_id)
     {
         parent::__construct();
     }

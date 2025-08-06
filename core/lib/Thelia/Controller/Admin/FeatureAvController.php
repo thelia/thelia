@@ -76,7 +76,7 @@ class FeatureAvController extends AbstractCrudController
 
     protected function getUpdateEvent(array $formData): ActionEvent
     {
-        $changeEvent = new FeatureAvUpdateEvent($formData['id']);
+        $changeEvent = new FeatureAvUpdateEvent((int) $formData['id']);
 
         $changeEvent
             ->setLocale($formData['locale'])

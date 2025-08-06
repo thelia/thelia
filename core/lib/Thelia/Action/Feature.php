@@ -41,7 +41,7 @@ class Feature extends BaseAction implements EventSubscriberInterface
 
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
-
+            ->setVisible(true)
             ->save();
 
         $event->setFeature($feature);

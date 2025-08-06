@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
@@ -33,7 +32,7 @@ use Thelia\Model\ConfigQuery;
 class SessionListener implements EventSubscriberInterface
 {
     public function __construct(
-        protected string $sessionSavePath
+        protected string $sessionSavePath,
     ) {
     }
 

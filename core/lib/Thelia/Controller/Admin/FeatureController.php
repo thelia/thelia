@@ -81,7 +81,7 @@ class FeatureController extends AbstractCrudController
 
     protected function getUpdateEvent(array $formData): ActionEvent
     {
-        $changeEvent = new FeatureUpdateEvent($formData['id']);
+        $changeEvent = new FeatureUpdateEvent((int) $formData['id']);
 
         // Create and dispatch the change event
         $changeEvent

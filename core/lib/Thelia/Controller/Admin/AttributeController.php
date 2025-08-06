@@ -81,7 +81,7 @@ class AttributeController extends AbstractCrudController
 
     protected function getUpdateEvent(array $formData): ActionEvent
     {
-        $changeEvent = new AttributeUpdateEvent($formData['id']);
+        $changeEvent = new AttributeUpdateEvent((int) $formData['id']);
 
         $changeEvent
             ->setLocale($formData['locale'])

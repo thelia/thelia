@@ -128,6 +128,9 @@ readonly class FilterService
             if (\is_string($values)) {
                 $values = explode(',', $values);
             }
+            if (!\is_array($values) || empty($values)) {
+                continue;
+            }
             $isMinOrMaxFilter = $this->isMinOrMaxFilter($values);
 
             if ($filterClass instanceof CategoryFilter) {

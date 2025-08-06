@@ -1030,7 +1030,7 @@ class ProductController extends AbstractSeoCrudController
         }
 
         $event = new ProductSaleElementDeleteEvent(
-            $this->getRequest()->get('product_sale_element_id', 0),
+            (int) $this->getRequest()->get('product_sale_element_id', 0),
             $this->getCurrentEditionCurrency()->getId(),
         );
 
