@@ -33,8 +33,7 @@ use Thelia\Model\ConfigQuery;
 class SessionListener implements EventSubscriberInterface
 {
     public function __construct(
-        protected string $sessionSavePath,
-        protected RequestStack $requestStack,
+        protected string $sessionSavePath
     ) {
     }
 
@@ -69,9 +68,6 @@ class SessionListener implements EventSubscriberInterface
         $storage = new NativeSessionStorage($options, $handler);
 
         $event->setSession($this->getSession($storage));
-
-        $request = $this->requestStack->getCurrentRequest();
-        $request?->setSession($event->getSession());
     }
 
     public function testSession(SessionEvent $event): void

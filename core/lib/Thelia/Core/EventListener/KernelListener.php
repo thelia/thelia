@@ -33,7 +33,7 @@ use Thelia\Service\Model\LangService;
 
 class KernelListener
 {
-    protected static Session $session;
+    protected static ?Session $session = null;
 
     public function __construct(
         protected HttpKernelInterface $app,
@@ -80,6 +80,9 @@ class KernelListener
     #[AsEventListener(event: KernelEvents::REQUEST, priority: \PHP_INT_MAX)]
     public function initializeSession(RequestEvent $event): void
     {
+        if (self::$session !== null) {
+            return;
+        }
         $isApiRoute = preg_match('/^\/api\//', $event->getRequest()->getPathInfo());
 
         if ($isApiRoute) {
@@ -95,8 +98,9 @@ class KernelListener
         $this->eventDispatcher->dispatch($event, TheliaKernelEvents::SESSION);
         self::$session = $event->getSession();
         $session = self::$session;
-
-        $session->start();
+        if(!$session->isStarted()) {
+            $session->start();
+        }
 
         $request->setSession($session);
     }

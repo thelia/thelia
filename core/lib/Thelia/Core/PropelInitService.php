@@ -282,7 +282,7 @@ class PropelInitService
      *
      * @internal
      */
-    public function init(bool $force = false, bool &$cacheRefresh = false): bool
+    public function init(bool $force = false): bool
     {
         $flockFactory = new LockFactory(new FlockStore());
 
@@ -308,10 +308,6 @@ class PropelInitService
             $buildPropelModels = $this->buildPropelModels();
 
             require $this->getPropelInitFile();
-
-            if ($buildPropelGlobalSchema || $buildPropelModels) {
-                $cacheRefresh = true;
-            }
 
             $theliaDatabaseConnection = Propel::getConnection('TheliaMain');
             $theliaDatabaseConnection->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);

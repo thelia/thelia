@@ -90,7 +90,6 @@ class Thelia extends Kernel
     protected PropelInitService $propelInitService;
     protected ParserResolver $parserResolver;
     protected ConnectionInterface $theliaDatabaseConnection;
-    protected bool $cacheRefresh = false;
     protected bool $propelConnectionAvailable;
 
     public function __construct(string $environment, bool $debug)
@@ -118,17 +117,6 @@ class Thelia extends Kernel
 
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = $this->getContainer()->get('event_dispatcher');
-
-        if ($this->cacheRefresh) {
-            $container = $this->getContainer();
-            $moduleManagement = new ModuleManagement(
-                $container,
-                $eventDispatcher,
-                null,
-                $container->getParameter('kernel.cache_dir'),
-            );
-            $moduleManagement->updateModules($this->getContainer());
-        }
 
         if ($this->propelConnectionAvailable) {
             $this->theliaDatabaseConnection->setEventDispatcher($eventDispatcher);
@@ -229,7 +217,7 @@ class Thelia extends Kernel
             $this->propelSchemaLocator,
         );
 
-        $this->propelConnectionAvailable = $this->initializePropelService(false, $this->cacheRefresh);
+        $this->propelConnectionAvailable = $this->initializePropelService(false);
 
         if ($this->propelConnectionAvailable) {
             $this->theliaDatabaseConnection = Propel::getConnection('TheliaMain');
@@ -331,11 +319,9 @@ class Thelia extends Kernel
     /**
      * @throws \Throwable
      */
-    public function initializePropelService(bool $forcePropelCacheGeneration, &$cacheRefresh): bool
+    public function initializePropelService(bool $forcePropelCacheGeneration): bool
     {
-        $cacheRefresh = false;
-
-        return $this->propelInitService->init($forcePropelCacheGeneration, $cacheRefresh);
+        return $this->propelInitService->init($forcePropelCacheGeneration);
     }
 
     public function getCacheDir(): string
