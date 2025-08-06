@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Event;
 
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Thelia\Core\HttpFoundation\Session\Session;
 
 /**
  * Class SessionEvent.
@@ -23,15 +23,13 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class SessionEvent extends ActionEvent
 {
-    protected $session;
+    protected ?Session $session = null;
 
-    /**
-     * @param string $cacheDir the cache directory for the current request
-     * @param bool   $debug    debug for the current request
-     * @param string $env      environment for the current request
-     */
-    public function __construct(protected $cacheDir, protected $debug, protected $env)
-    {
+    public function __construct(
+        protected string $cacheDir,
+        protected bool $debug,
+        protected string $env,
+    ) {
     }
 
     /**
@@ -58,12 +56,12 @@ class SessionEvent extends ActionEvent
     /**
      * @param mixed $session
      */
-    public function setSession(SessionInterface $session): void
+    public function setSession(Session $session): void
     {
         $this->session = $session;
     }
 
-    public function getSession()
+    public function getSession(): Session
     {
         return $this->session;
     }

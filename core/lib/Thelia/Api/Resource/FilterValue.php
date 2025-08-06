@@ -41,8 +41,10 @@ class FilterValue
     public function setDepth(?int $depth): self
     {
         $this->depth = $depth;
+
         return $this;
     }
+
     public function getMainId(): ?int
     {
         return $this->mainId;
@@ -72,9 +74,10 @@ class FilterValue
         return $this->id;
     }
 
-    public function setId(int $id): FilterValue
+    public function setId(int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 

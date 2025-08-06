@@ -14,12 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Core\HttpFoundation\Session;
 
-use _PHPStan_ac6dae9b0\Symfony\Contracts\Service\Attribute\Required;
-use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
-use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 use Thelia\Core\Event\Cart\CartCreateEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -39,16 +36,7 @@ class Session extends BaseSession
     protected static ?Cart $transientCart = null;
 
     #[Required]
-    protected ?LangService $langService = null;
-
-    public function __construct(
-        ?SessionStorageInterface $storage = null,
-        ?AttributeBagInterface $attributes = null,
-        ?FlashBagInterface $flashes = null,
-        ?callable $usageReporter = null,
-    ) {
-        parent::__construct($storage, $attributes, $flashes, $usageReporter);
-    }
+    public ?LangService $langService = null;
 
     public function getLang(bool $forceDefault = true): ?Lang
     {

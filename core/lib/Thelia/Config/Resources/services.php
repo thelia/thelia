@@ -40,7 +40,7 @@ return static function (ContainerConfigurator $configurator): void {
         ->bind('$kernelEnvironment', '%kernel.environment%')
         ->bind('$environment', '%kernel.environment%')
         ->bind('$env', '%kernel.environment%')
-        ->bind('$sessionSavePath', '%session.save_path%')
+        ->bind('$sessionSavePath', '%kernel.project_dir%/var/sessions/%kernel.environment%')
         ->bind('$theliaParserLoops', '%Thelia.parser.loops%')
         ->bind('$formDefinition', '%Thelia.parser.forms%')
         ->bind('$propelCollectionExtensions', tagged_iterator('thelia.api.propel.query_extension.collection'))

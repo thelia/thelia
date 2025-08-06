@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
@@ -31,32 +32,46 @@ use Thelia\Model\ConfigQuery;
  */
 class SessionListener implements EventSubscriberInterface
 {
-    public function __construct(protected $sessionSavePath)
-    {
+    public function __construct(
+        protected string $sessionSavePath,
+        protected RequestStack $requestStack,
+    ) {
     }
 
     public function prodSession(SessionEvent $event): void
     {
+        if (headers_sent()) {
+            return;
+        }
         if (\PHP_SESSION_ACTIVE === session_status()) {
             session_write_close();
         }
 
-        $storage = new NativeSessionStorage(
-            ['cookie_lifetime' => ConfigQuery::read('session_config.lifetime', 0)],
-        );
+        $lifetime = (int) ConfigQuery::read('session_config.lifetime', 0);
+        $customSavePath = ConfigQuery::read('session_config.save_path', $this->sessionSavePath);
 
-        $sessionSavePath = ConfigQuery::read('session_config.save_path');
-
-        if (null === $sessionSavePath) {
-            $sessionSavePath = $this->sessionSavePath;
+        if ($lifetime > 0) {
+            ini_set('session.gc_maxlifetime', (string) $lifetime);
+            ini_set('session.cookie_lifetime', (string) $lifetime);
         }
 
-        $storage->setSaveHandler(
-            new NativeFileSessionHandler(
-                $sessionSavePath,
-            ),
-        );
+        if ($customSavePath && session_save_path() !== $customSavePath) {
+            ini_set('session.save_path', $customSavePath);
+        }
+
+        $handler = new NativeFileSessionHandler($customSavePath);
+        $options = [
+            'gc_maxlifetime' => $lifetime,
+            'cookie_lifetime' => $lifetime,
+            'save_path' => $customSavePath,
+        ];
+
+        $storage = new NativeSessionStorage($options, $handler);
+
         $event->setSession($this->getSession($storage));
+
+        $request = $this->requestStack->getCurrentRequest();
+        $request?->setSession($event->getSession());
     }
 
     public function testSession(SessionEvent $event): void
@@ -81,7 +96,7 @@ class SessionListener implements EventSubscriberInterface
     {
         return [
             TheliaKernelEvents::SESSION => [
-                ['prodSession', 0],
+                ['prodSession', 255],
                 ['testSession', 128],
             ],
         ];

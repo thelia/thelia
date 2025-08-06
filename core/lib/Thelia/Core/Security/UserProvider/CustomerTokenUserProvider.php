@@ -29,6 +29,7 @@ class CustomerTokenUserProvider extends TokenUserProvider
             ->findOne()) {
             throw new \InvalidArgumentException('No user found with this token (maybe try to delete your cookies)');
         }
+
         return $customer;
     }
 }

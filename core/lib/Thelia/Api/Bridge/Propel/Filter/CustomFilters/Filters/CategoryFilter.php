@@ -50,7 +50,6 @@ class CategoryFilter implements TheliaFilterInterface
                 $query->useProductCategoryQuery()->filterByCategoryId($categoryId)->endUse();
             }
         }
-
     }
 
     public function getResourceType(): array

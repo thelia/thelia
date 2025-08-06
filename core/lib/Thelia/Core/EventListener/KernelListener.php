@@ -40,9 +40,9 @@ class KernelListener
         protected Translator $translator,
         protected EventDispatcherInterface $eventDispatcher,
         protected LangService $langService,
-        protected $cacheDir,
-        protected $debug,
-        protected $env,
+        protected string $cacheDir,
+        protected bool $debug,
+        protected string $env,
     ) {
     }
 
@@ -87,7 +87,11 @@ class KernelListener
         }
 
         $request = $event->getRequest();
-        $event = new SessionEvent($this->cacheDir, $this->debug, $this->env);
+        $event = new SessionEvent(
+            $this->cacheDir,
+            $this->debug,
+            $this->env
+        );
         $this->eventDispatcher->dispatch($event, TheliaKernelEvents::SESSION);
         self::$session = $event->getSession();
         $session = self::$session;

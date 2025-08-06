@@ -152,6 +152,7 @@ class Module extends BaseAction implements EventSubscriberInterface
 
     /**
      * Get dependencies of the current module and activate it if needed.
+     *
      * @throws \Exception
      */
     public function recursiveActivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
