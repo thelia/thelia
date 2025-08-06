@@ -224,7 +224,7 @@ readonly class FilterService
                     locale: $locale,
                 );
 
-                if (!$filterDto && !$filterDto->isVisible()) {
+                if (!$filterDto || !$filterDto->isVisible()) {
                     continue;
                 }
                 $filterObjects[] = $filterDto;
