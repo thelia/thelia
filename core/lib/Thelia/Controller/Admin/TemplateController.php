@@ -96,7 +96,7 @@ class TemplateController extends AbstractCrudController
 
     protected function getDeleteEvent(): TemplateDeleteEvent
     {
-        return new TemplateDeleteEvent($this->getRequest()->get('template_id'));
+        return new TemplateDeleteEvent((int) $this->getRequest()->get('template_id'));
     }
 
     protected function eventContainsObject($event): bool
