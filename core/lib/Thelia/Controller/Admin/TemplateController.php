@@ -149,7 +149,7 @@ class TemplateController extends AbstractCrudController
         return $object->getId();
     }
 
-    protected function renderListTemplate(string $currentOrder): Response
+    protected function renderListTemplate(?string $currentOrder): Response
     {
         return $this->render('templates', ['order' => $currentOrder]);
     }
