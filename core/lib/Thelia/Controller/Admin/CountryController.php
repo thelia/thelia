@@ -120,7 +120,7 @@ class CountryController extends AbstractCrudController
      */
     protected function getUpdateEvent(array $formData): ActionEvent
     {
-        $event = new CountryUpdateEvent($formData['id']);
+        $event = new CountryUpdateEvent((int) $formData['id']);
 
         $event = $this->hydrateEvent($event, $formData);
 

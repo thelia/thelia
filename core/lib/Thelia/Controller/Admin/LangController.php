@@ -116,7 +116,7 @@ class LangController extends BaseAdminController
         try {
             $form = $this->validateForm($langForm);
 
-            $event = new LangUpdateEvent($form->get('id')->getData());
+            $event = new LangUpdateEvent((int) $form->get('id')->getData());
             $event = $this->hydrateEvent($event, $form);
 
             $eventDispatcher->dispatch($event, TheliaEvents::LANG_UPDATE);

@@ -296,7 +296,7 @@ class HookController extends AbstractCrudController
      */
     protected function getUpdateEvent(array $formData): ActionEvent
     {
-        $event = new HookUpdateEvent($formData['id']);
+        $event = new HookUpdateEvent((int) $formData['id']);
 
         return $this->hydrateEvent($event, $formData, true);
     }
