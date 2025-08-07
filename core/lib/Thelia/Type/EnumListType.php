@@ -59,7 +59,7 @@ class EnumListType extends BaseType
         if (null === $values) {
             return false;
         }
-        foreach (explode(',', $values) as $value) {
+        foreach (explode(',', (string) $values) as $value) {
             if (!$this->isSingleValueValid($value)) {
                 return false;
             }

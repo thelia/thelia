@@ -130,8 +130,8 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
                 $totalTaxedPrice = round($taxedPrice, 2) * $orderProduct->getQuantity();
                 $totalTaxedPromoPrice = round($taxedPromoPrice, 2) * $orderProduct->getQuantity();
             } else {
-                $tax = round($tax, 2);
-                $promoTax = round($promoTax, 2);
+                $tax = round((float) $tax, 2);
+                $promoTax = round((float) $promoTax, 2);
 
                 $totalTax = $tax * $orderProduct->getQuantity();
                 $totalPromoTax = $promoTax * $orderProduct->getQuantity();

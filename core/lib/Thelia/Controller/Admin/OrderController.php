@@ -81,7 +81,7 @@ class OrderController extends BaseAdminController
             }
 
             $event = new OrderEvent($order);
-            $event->setStatus($statusId);
+            $event->setStatus((int) $statusId);
 
             $eventDispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
         } catch (\Exception $exception) {

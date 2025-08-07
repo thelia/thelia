@@ -21,19 +21,19 @@ use Thelia\Model\Base\OrderProduct as BaseOrderProduct;
 
 class OrderProduct extends BaseOrderProduct
 {
-    protected int $cartItemId;
+    protected ?int $cartItemId = null;
 
     /**
      * @return $this
      */
-    public function setCartItemId($cartItemId)
+    public function setCartItemId(?int $cartItemId)
     {
         $this->cartItemId = $cartItemId;
 
         return $this;
     }
 
-    public function getCartItemId()
+    public function getCartItemId(): ?int
     {
         return $this->cartItemId;
     }

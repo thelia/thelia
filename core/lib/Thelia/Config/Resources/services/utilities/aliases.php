@@ -22,7 +22,7 @@ use Thelia\TaxEngine\TaxEngine;
 return static function (ContainerConfigurator $configurator): void {
     $services = $configurator->services();
 
-    $services->alias('thelia.taxEngine', TaxEngine::class);
+    $services->alias('thelia.taxEngine', TaxEngine::class)->public();
     $services->alias('thelia.hookHelper', HookHelper::class);
     $services->alias('mailer', MailerFactory::class);
     $services->alias(ContainerInterface::class, 'service_container');

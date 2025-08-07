@@ -138,12 +138,13 @@ class ConfigQuery extends BaseConfigQuery
      */
     public static function getStoreCountry(): ?int
     {
-        return self::read('store_country', null);
+        $value = self::read('store_country');
+        return null === $value ? null : (int) $value;
     }
 
     public static function getNotifyNewsletterSubscription(): bool
     {
-        return '0' !== self::read('notify_newsletter_subscription', 0);
+        return '0' !== self::read('notify_newsletter_subscription', false);
     }
 
     public static function isCustomerEmailConfirmationEnable(): bool

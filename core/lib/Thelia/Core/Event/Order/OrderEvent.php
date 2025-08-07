@@ -23,7 +23,7 @@ use Thelia\Model\Order;
  */
 class OrderEvent extends ActionEvent
 {
-    protected Order $order;
+    protected ?Order $order;
     protected Order $placedOrder;
     protected ?int $invoiceAddress = null;
     protected ?int $deliveryAddress = null;
@@ -39,7 +39,7 @@ class OrderEvent extends ActionEvent
     protected ?string $transactionRef = null;
     protected Response $response;
 
-    public function __construct(Order $order)
+    public function __construct(?Order $order)
     {
         $this->setOrder($order);
     }
@@ -47,7 +47,7 @@ class OrderEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setOrder(Order $order): self
+    public function setOrder(?Order $order): self
     {
         $this->order = $order;
 
@@ -57,14 +57,14 @@ class OrderEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setCartItemId(int $cartItemId): self
+    public function setCartItemId(?int $cartItemId): self
     {
         $this->cartItemId = $cartItemId;
 
         return $this;
     }
 
-    public function getCartItemId(): int
+    public function getCartItemId(): ?int
     {
         return $this->cartItemId;
     }
@@ -178,7 +178,7 @@ class OrderEvent extends ActionEvent
     /**
      * @return Order the order
      */
-    public function getOrder(): Order
+    public function getOrder(): ?Order
     {
         return $this->order;
     }

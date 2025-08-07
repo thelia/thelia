@@ -128,7 +128,7 @@ class Order extends BaseOrder
 
     public function generateRef()
     {
-        return \sprintf('ORD%s', str_pad($this->getId(), 12, 0, \STR_PAD_LEFT));
+        return \sprintf('ORD%s', str_pad((string) $this->getId(), 12, '0', \STR_PAD_LEFT));
     }
 
     /**
@@ -313,7 +313,9 @@ class Order extends BaseOrder
      */
     public function getUntaxedPostage(): float|int
     {
-        return 0 < $this->getPostageTax() ? $this->getPostage() - $this->getPostageTax() : $this->getPostage();
+        return 0 < $this->getPostageTax()
+            ? $this->getPostage() - $this->getPostageTax()
+            : (float) $this->getPostage();
     }
 
     /**
