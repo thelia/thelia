@@ -18,7 +18,7 @@ use Thelia\Log\Tlog;
 
 class ImageException extends \RuntimeException
 {
-    public function __construct($message, $code = null, $previous = null)
+    public function __construct($message, $code = 0, $previous = null)
     {
         Tlog::getInstance()->addError($message);
 

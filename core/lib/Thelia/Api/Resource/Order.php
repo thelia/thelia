@@ -320,7 +320,7 @@ class Order implements PropelResourceInterface
             $this->setPropelModel($orderPropelModel);
         }
 
-        return round($orderPropelModel->getPostage(), 2);
+        return round((float) $orderPropelModel->getPostage(), 2);
     }
 
     public function getId(): ?int
