@@ -297,7 +297,7 @@ class Order implements PropelResourceInterface
             $this->setPropelModel($orderPropelModel);
         }
 
-        return round($orderPropelModel->getDiscount(), 2);
+        return round((float) $orderPropelModel->getDiscount(), 2);
     }
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
