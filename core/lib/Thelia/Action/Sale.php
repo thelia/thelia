@@ -455,7 +455,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::SALE_CREATE => ['create', 128],

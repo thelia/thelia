@@ -101,7 +101,7 @@ class Country extends BaseAction implements EventSubscriberInterface
         $event->setCountry($country);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::COUNTRY_CREATE => ['create', 128],

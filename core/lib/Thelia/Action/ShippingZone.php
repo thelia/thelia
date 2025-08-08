@@ -50,7 +50,7 @@ class ShippingZone extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::SHIPPING_ZONE_ADD_AREA => ['addArea', 128],

@@ -88,7 +88,7 @@ class Message extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::MESSAGE_CREATE => ['create', 128],

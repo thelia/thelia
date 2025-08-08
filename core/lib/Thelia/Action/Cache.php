@@ -82,7 +82,7 @@ class Cache extends BaseAction implements EventSubscriberInterface
         $fs->remove($dir);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::CACHE_CLEAR => ['cacheClear', 128],

@@ -79,7 +79,7 @@ class Area extends BaseAction implements EventSubscriberInterface
             ->save();
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::AREA_ADD_COUNTRY => ['addCountry', 128],

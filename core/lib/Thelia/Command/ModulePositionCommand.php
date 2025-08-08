@@ -66,7 +66,7 @@ class ModulePositionCommand extends ContainerAwareCommand
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $argsList = $input->getArgument('modules');
         array_walk($argsList, [$this, 'checkModuleArgument']);

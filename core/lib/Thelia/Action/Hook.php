@@ -153,7 +153,7 @@ class Hook extends BaseAction implements EventSubscriberInterface
         $this->dispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::HOOK_CREATE => ['create', 128],

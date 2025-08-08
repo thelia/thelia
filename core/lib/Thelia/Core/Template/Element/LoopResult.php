@@ -139,6 +139,7 @@ class LoopResult implements \Iterator, \JsonSerializable
      *
      * @return \Thelia\Core\Template\Element\LoopResultRow
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return $this->collection[$this->position];
@@ -165,6 +166,7 @@ class LoopResult implements \Iterator, \JsonSerializable
      *
      * @return mixed scalar on success, or null on failure
      */
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return $this->position;
@@ -214,7 +216,8 @@ class LoopResult implements \Iterator, \JsonSerializable
         ];
     }
 
-    public function jsonSerialize()
+    #[\ReturnTypeWillChange]
+    public function jsonSerialize(): array
     {
         $return = [];
         foreach ($this->collection as $collection) {

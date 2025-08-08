@@ -17,13 +17,16 @@ namespace Thelia\Type;
  */
 class IntListType extends BaseType
 {
-    public function getType()
+    public function getType(): string
     {
         return 'Int list type';
     }
 
     public function isValid($values)
     {
+        if (null === $values) {
+            return false;
+        }
         foreach (explode(',', $values) as $value) {
             if (filter_var($value, \FILTER_VALIDATE_INT) === false) {
                 return false;

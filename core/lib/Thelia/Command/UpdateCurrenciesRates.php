@@ -35,7 +35,7 @@ class UpdateCurrenciesRates extends ContainerAwareCommand
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /* @var EventDispatcherInterface $dispatcher */
         try {

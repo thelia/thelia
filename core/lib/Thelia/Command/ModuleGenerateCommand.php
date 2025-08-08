@@ -46,7 +46,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->module = $this->formatModuleName($input->getArgument('name'));
         $this->moduleDirectory = THELIA_MODULE_DIR.$this->module;

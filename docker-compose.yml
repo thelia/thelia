@@ -1,6 +1,6 @@
 services:
   mariadb:
-    image: mariadb:10.3
+    image: mariadb:11.2
     container_name: docker-thelia-mariadb
     working_dir: /application
     volumes:
@@ -31,6 +31,7 @@ services:
     volumes:
       - .:/application
       - .docker/php-fpm/php-ini-overrides.ini:/usr/local/etc/php/conf.d/99-overrides.ini
+      - .docker/php-fpm/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini
     environment:
       - PHP_IDE_CONFIG
       - XDEBUG_CONFIG

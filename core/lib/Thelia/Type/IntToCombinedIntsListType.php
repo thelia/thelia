@@ -24,6 +24,9 @@ class IntToCombinedIntsListType extends BaseType
 
     public function isValid($values)
     {
+        if (null === $values) {
+            return false;
+        }
         foreach (explode(',', $values) as $intToCombinedInts) {
             $parts = explode(':', $intToCombinedInts);
             if (\count($parts) != 2) {

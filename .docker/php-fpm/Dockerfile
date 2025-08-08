@@ -37,6 +37,7 @@ RUN apk add --no-cache freetype libpng libjpeg-turbo freetype-dev libpng-dev lib
   apk del --no-cache freetype-dev libpng-dev libjpeg-turbo-dev
 
 # XDebug extension
+#RUN apk add --update linux-headers
 #RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
 #  && pecl install xdebug \
 #  && docker-php-ext-enable xdebug \

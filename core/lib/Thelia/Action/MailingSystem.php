@@ -47,7 +47,7 @@ class MailingSystem extends BaseAction implements EventSubscriberInterface
         $this->configCache->initCacheConfigs(true);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::MAILING_SYSTEM_UPDATE => ['update', 128],

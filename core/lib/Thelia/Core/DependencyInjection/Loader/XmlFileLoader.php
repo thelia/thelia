@@ -322,6 +322,11 @@ class XmlFileLoader extends FileLoader
             $definition->setFile((string) $service->file);
         }
 
+        if (isset($service['decorates'])) {
+            $priority = isset($service['decoration-priority']) ? $this->getAttributeAsPhp($service, 'decorates') : 0;
+            $definition->setDecoratedService((string) $this->getAttributeAsPhp($service, 'decorates'), null, (int) $priority);
+        }
+
         $definition->setArguments($this->getArgumentsAsPhp($service, 'argument'));
         $definition->setProperties($this->getArgumentsAsPhp($service, 'property'));
         if (!empty($this->getArgumentsAsPhp($service, 'factory'))) {

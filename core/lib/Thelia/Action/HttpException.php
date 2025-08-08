@@ -40,6 +40,10 @@ class HttpException extends BaseAction implements EventSubscriberInterface
 
     public function checkHttpException(ExceptionEvent $event): void
     {
+        if ($event->getRequest()->get('isApiRoute', false)) {
+            return;
+        }
+
         $exception = $event->getThrowable();
         if ($exception instanceof NotFoundHttpException) {
             $this->display404($event);
@@ -101,7 +105,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
         );
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::EXCEPTION => ['checkHttpException', 128],

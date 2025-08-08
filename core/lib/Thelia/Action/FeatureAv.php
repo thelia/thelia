@@ -86,7 +86,7 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
         $this->genericUpdatePosition(FeatureAvQuery::create(), $event, $dispatcher);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::FEATURE_AV_CREATE => ['create', 128],

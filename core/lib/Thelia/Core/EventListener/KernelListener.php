@@ -114,7 +114,7 @@ class KernelListener implements EventSubscriberInterface
 
     protected function initParam(TheliaRequest $request)
     {
-        if (null === $request->getSession()) {
+        if (!$request->hasSession() || null === $request->getSession()) {
             return null;
         }
 
@@ -229,7 +229,9 @@ class KernelListener implements EventSubscriberInterface
 
     public function sessionInit(RequestEvent $event): void
     {
-        if ($event->getRequestType() === HttpKernelInterface::MAIN_REQUEST) {
+        $isApiRoute = preg_match('/^\/api\//', $event->getRequest()->getPathInfo());
+        $event->getRequest()->request->set('isApiRoute', $isApiRoute);
+        if (!$isApiRoute && $event->getRequestType() === HttpKernelInterface::MAIN_REQUEST) {
             $request = $event->getRequest();
             if (null === $session = self::$session) {
                 $event = new SessionEvent($this->cacheDir, $this->debug, $this->env);

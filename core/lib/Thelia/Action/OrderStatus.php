@@ -72,7 +72,7 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
         $event->setOrderStatus($orderStatus);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::ORDER_STATUS_CREATE => ['create', 128],

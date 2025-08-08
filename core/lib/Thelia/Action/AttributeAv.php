@@ -83,7 +83,7 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
         $this->genericUpdatePosition(AttributeAvQuery::create(), $event);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::ATTRIBUTE_AV_CREATE => ['create', 128],

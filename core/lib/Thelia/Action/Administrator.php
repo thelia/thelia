@@ -124,7 +124,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::ADMINISTRATOR_CREATE => ['create', 128],
