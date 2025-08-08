@@ -63,6 +63,10 @@
                                     </th>
 
                                     <th class="object-title">
+                                        {intl l='Paid status'}
+                                    </th>
+
+                                    <th class="object-title">
                                         {intl l='Orders'}
                                     </th>
 
@@ -89,6 +93,9 @@
                                         </td>
                                         <td>
                                             <a class="label" style="background-color: {$COLOR};" href="{url path="/admin/configuration/order-status/update/%id" id=$ID}">{$TITLE}</a>
+                                        </td>
+                                        <td>
+                                            {if $PAID_STATUS}{intl l='Yes'}{else}{intl l='No'}{/if}
                                         </td>
                                         <td>
                                             <a href="{url path="/admin/orders" status=$ID}">
@@ -170,19 +177,28 @@
         {/custom_render_form_field}
 
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
             {custom_render_form_field field="code"}
                 <div class="input-group">
                     <input type="text" class="form-control" {form_field_attributes field="code"}>
                 </div>
             {/custom_render_form_field}
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
             {custom_render_form_field field="color"}
                 <div class="input-group">
                     <input type="color" class="form-control" style="width: 100px;" {form_field_attributes field="color"}>
                 </div>
             {/custom_render_form_field}
+            </div>
+			<div class="col-md-4">
+                {form_field field="paid_status"}
+                    <label>
+                        <b> {$label}</b><br />
+                        <input type="checkbox" class="form-control" {form_field_attributes field="paid_status"} value="1">
+                    </label>
+                    <span class="help-block">{$label_attr.help}</span>
+                {/form_field}
             </div>
         </div>
 
