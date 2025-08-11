@@ -473,7 +473,7 @@ DROP TABLE IF EXISTS `customer`;
 CREATE TABLE `customer`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `title_id` INTEGER NOT NULL,
+    `title_id` INTEGER,
     `lang_id` INTEGER,
     `ref` VARCHAR(50),
     `firstname` VARCHAR(255) NOT NULL,
@@ -488,6 +488,7 @@ CREATE TABLE `customer`
     `remember_me_serial` VARCHAR(255),
     `enable` TINYINT DEFAULT 0,
     `confirmation_token` VARCHAR(255),
+    `confirmation_token_expires_at` DATETIME NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -1289,6 +1290,11 @@ CREATE TABLE `cart`
     `customer_id` INTEGER,
     `address_delivery_id` INTEGER,
     `address_invoice_id` INTEGER,
+    `delivery_module_id` INTEGER,
+    `payment_module_id` INTEGER,
+    `postage` DECIMAL(10, 2),
+    `postage_tax` DECIMAL(10, 2),
+    `postage_tax_rule_title` VARCHAR(255),
     `currency_id` INTEGER,
     `discount` DECIMAL(16,6) DEFAULT 0.000000,
     `created_at` DATETIME,
@@ -1318,7 +1324,17 @@ CREATE TABLE `cart`
         FOREIGN KEY (`currency_id`)
         REFERENCES `currency` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_cart_delivery_module_id`
+        FOREIGN KEY (`delivery_module_id`)
+        REFERENCES `module` (`id`)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE,
+    CONSTRAINT `fk_cart_payment_module_id`
+        FOREIGN KEY (`payment_module_id`)
+        REFERENCES `module` (`id`)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------

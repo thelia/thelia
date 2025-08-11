@@ -71,12 +71,10 @@ use Thelia\Model\Map\CustomerTableMap;
             uriTemplate: '/front/customers',
         ),
         new Get(
-            uriTemplate: '/front/account/customers/{id}',
-            security: 'object.getId() == user.getId()',
+            uriTemplate: '/front/account/customers/{id}'
         ),
         new Put(
-            uriTemplate: '/front/account/customers/{id}',
-            security: 'object.getId() == user.getId()',
+            uriTemplate: '/front/account/customers/{id}'
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ_SINGLE]],

@@ -28,7 +28,6 @@ use Thelia\Model\Map\ModuleTableMap;
     operations: [
         new GetCollection(
             uriTemplate: '/front/delivery_modules',
-            provider: DeliveryModuleProvider::class,
             openapiContext: [
                 'parameters' => [
                     [
@@ -39,8 +38,17 @@ use Thelia\Model\Map\ModuleTableMap;
                             'type' => 'integer',
                         ],
                     ],
+                    [
+                        'name' => 'only_valid',
+                        'in' => 'query',
+                        'required' => false,
+                        'schema' => [
+                            'type' => 'boolean',
+                        ],
+                    ],
                 ],
             ],
+            provider: DeliveryModuleProvider::class,
         ),
         new Get(
             uriTemplate: '/front/delivery_modules/{id}',

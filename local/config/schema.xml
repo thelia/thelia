@@ -408,6 +408,7 @@
     <column name="remember_me_serial" size="255" type="VARCHAR" />
     <column defaultValue="0" name="enable" type="TINYINT" />
     <column name="confirmation_token" size="255" type="VARCHAR" />
+    <column name="confirmation_token_expires_at" type="DATE" />
     <foreign-key foreignTable="customer_title" name="fk_customer_customer_title_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="title_id" />
     </foreign-key>
@@ -1085,9 +1086,19 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="token" size="255" type="VARCHAR" />
     <column name="customer_id" type="INTEGER" />
+
     <column name="address_delivery_id" type="INTEGER" />
     <column name="address_invoice_id" type="INTEGER" />
+
+    <column name="payment_module_id" type="INTEGER" />
+    <column name="delivery_module_id" type="INTEGER" />
+
+    <column defaultValue="0.000000" name="postage" required="true" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="0.000000" name="postage_tax" required="true" scale="6" size="16" type="DECIMAL" />
+    <column name="postage_tax_rule_title" size="255" type="VARCHAR" />
+
     <column name="currency_id" type="INTEGER" />
+
     <column defaultValue="0.000000" name="discount" scale="6" size="16" type="DECIMAL" />
     <foreign-key foreignTable="customer" name="fk_cart_customer_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="customer_id" />
@@ -1098,9 +1109,16 @@
     <foreign-key foreignTable="address" name="fk_cart_address_invoice_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="address_invoice_id" />
     </foreign-key>
+    <foreign-key foreignTable="module" name="fk_cart_payment_module_id" onDelete="CASCADE">
+      <reference foreign="id" local="payment_module_id" />
+    </foreign-key>
+    <foreign-key foreignTable="module" name="fk_cart_delivery_module_id" onDelete="CASCADE">
+      <reference foreign="id" local="delivery_module_id" />
+    </foreign-key>
     <foreign-key foreignTable="currency" name="fk_cart_currency_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="currency_id" />
     </foreign-key>
+
     <index name="idx_cart_customer_id">
       <index-column name="customer_id" />
     </index>

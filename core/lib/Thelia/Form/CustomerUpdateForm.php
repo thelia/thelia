@@ -44,6 +44,13 @@ class CustomerUpdateForm extends BaseForm
                 'update_logged_in_user',
                 IntegerType::class,// In a front office context, update the in-memory logged-in user data
             )
+            ->add('title', TextType::class, [
+                'label' => Translator::getInstance()->trans('Title'),
+                'label_attr' => [
+                    'for' => 'title',
+                ],
+                'required' => false,
+            ])
             ->add('company', TextType::class, [
                 'label' => Translator::getInstance()->trans('Company'),
                 'label_attr' => [
