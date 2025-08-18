@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -41,26 +43,23 @@ readonly class DeliveryService
 
     public function __construct(
         private EventDispatcherInterface $dispatcher,
-        private ContainerInterface       $container,
-        private DataAccessService        $dataAccessService,
-        private Session                  $session,
-        private CartService              $cartService
-    )
-    {
-    }
+        private ContainerInterface $container,
+        private DataAccessService $dataAccessService,
+        private Session $session,
+        private CartService $cartService,
+    ) {}
 
     /**
      * @throws PropelException
      */
     public function getDeliveryModuleResource(
-        Module   $theliaDeliveryModule,
-        Cart     $cart,
+        Module $theliaDeliveryModule,
+        Cart $cart,
         ?Address $address,
-        Country  $country,
-        ?State   $state,
-        bool     $onlyValid = false
-    ): ?DeliveryModule
-    {
+        Country $country,
+        ?State $state,
+        bool $onlyValid = false,
+    ): ?DeliveryModule {
         $areaDeliveryModule = AreaDeliveryModuleQuery::create()
             ->findByCountryAndModule($country, $theliaDeliveryModule, $state);
         $isCartVirtual = $cart->isVirtual();
@@ -132,6 +131,7 @@ readonly class DeliveryService
     public function setDeliveryData(string $key, mixed $value): self
     {
         $this->session->set(self::SESSION_PREFIX . $key, $value);
+
         return $this;
     }
 
@@ -163,6 +163,7 @@ readonly class DeliveryService
                 $this->session->remove($key);
             }
         }
+
         return $this;
     }
 

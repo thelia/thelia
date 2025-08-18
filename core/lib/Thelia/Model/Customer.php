@@ -156,20 +156,19 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
     }
 
     public function createOrUpdateMinimal(
-        int    $titleId,
+        int $titleId,
         string $firstname,
         string $lastname,
         string $email,
         string $plainPassword,
-        bool   $forceEmailUpdate = false,
-        int    $langId = null,
-        bool   $reseller = false,
-        string $sponsor = null,
-        float  $discount = null,
-        string $ref = null,
-        bool   $enabled = false
-    ): void
-    {
+        bool $forceEmailUpdate = false,
+        ?int $langId = null,
+        bool $reseller = false,
+        ?string $sponsor = null,
+        ?float $discount = null,
+        ?string $ref = null,
+        bool $enabled = false,
+    ): void {
         $this
             ->setTitleId($titleId)
             ->setFirstname($firstname)
@@ -257,7 +256,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         return \sprintf('CUS%s', str_pad((string) $id, 12, '0', \STR_PAD_LEFT));
     }
 
-    public function getDefaultAddress(): Address
+    public function getDefaultAddress(): ?Address
     {
         return AddressQuery::create()
             ->filterByCustomer($this)
@@ -374,7 +373,6 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
     }
 
     /**
-     * @return string
      * @throws PropelException
      */
     public function getLocale(): string
@@ -448,7 +446,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         }
 
         [$hash, $salt] = explode('.', $storedToken, 2);
-        $expectedHash = hash('sha256', $inputCode . $salt);
+        $expectedHash = hash('sha256', $inputCode.$salt);
 
         if (!hash_equals($hash, $expectedHash)) {
             throw new \Exception('Activation code error');
@@ -477,16 +475,16 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
      */
     private function generateValidationCode(): array
     {
-        $code = str_pad((string)random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $code = str_pad((string) random_int(0, 999999), 6, '0', \STR_PAD_LEFT);
 
         $salt = bin2hex(random_bytes(16));
-        $hash = hash('sha256', $code . $salt);
+        $hash = hash('sha256', $code.$salt);
 
-        $tokenForDb = $hash . '.' . $salt;
+        $tokenForDb = $hash.'.'.$salt;
 
         return [
             'code' => $code,
-            'hash' => $tokenForDb
+            'hash' => $tokenForDb,
         ];
     }
 }

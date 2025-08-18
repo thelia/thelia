@@ -35,14 +35,13 @@ use Thelia\Service\Model\DeliveryService;
 class DeliveryModuleProvider implements ProviderInterface
 {
     public function __construct(
-        private readonly Request                  $request,
-        private readonly Session                  $session,
-        private readonly SecurityContext          $securityContext,
-        private readonly AddressService           $addressService,
+        private readonly Request $request,
+        private readonly Session $session,
+        private readonly SecurityContext $securityContext,
+        private readonly AddressService $addressService,
         private readonly EventDispatcherInterface $dispatcher,
-        private readonly DeliveryService          $deliveryModuleService,
-    )
-    {
+        private readonly DeliveryService $deliveryModuleService,
+    ) {
     }
 
     /**
@@ -85,7 +84,7 @@ class DeliveryModuleProvider implements ProviderInterface
                 $deliveryAddress,
                 $country,
                 $state,
-                $context['filters']['only_valid'] ?? false
+                (bool) $context['filters']['only_valid'] ?? false
             );
 
             if ($deliveryModuleResource) {

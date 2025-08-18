@@ -14,9 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
-use Exception;
 use Propel\Runtime\Exception\PropelException;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -32,7 +30,6 @@ use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
-use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Base\CustomerQuery;
 use Thelia\Model\Base\ProductSaleElementsQuery;
@@ -59,12 +56,11 @@ use Thelia\Tools\TokenProvider;
 class Cart extends BaseAction implements EventSubscriberInterface
 {
     public function __construct(
-        protected RequestStack       $requestStack,
-        protected TokenProvider      $tokenProvider,
-        protected SecurityContext    $securityContext,
-        protected ContainerInterface $container
-    ) {
-    }
+        protected RequestStack $requestStack,
+        protected TokenProvider $tokenProvider,
+        protected SecurityContext $securityContext,
+        protected ContainerInterface $container,
+    ) {}
 
     /**
      * @throws PropelException
@@ -309,11 +305,13 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         // Do not try to find a cartItem if one exists in the event, as previous event handlers
         // mays have put it in th event.
-        if (!$event->getCartItem() instanceof CartItem && null !== $foundItem = CartItemQuery::create()
+        if (
+            !$event->getCartItem() instanceof CartItem && null !== $foundItem = CartItemQuery::create()
             ->filterByCartId($event->getCart()->getId())
             ->filterByProductId($event->getProduct())
             ->filterByProductSaleElementsId($event->getProductSaleElementsId())
-            ->findOne()) {
+            ->findOne()
+        ) {
             $event->setCartItem($foundItem);
         }
     }
@@ -449,14 +447,13 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * @throws PropelException
      */
     protected function getPostageByDeliveryModuleId(
-        CartModel                $cart,
+        CartModel $cart,
         EventDispatcherInterface $dispatcher,
-        int                      $moduleId,
-        int                      $deliveryAddressId
-    ): OrderPostage
-    {
+        int $moduleId,
+        int $deliveryAddressId,
+    ): OrderPostage {
         if (!$customer = $this->securityContext->getCustomerUser()) {
-            throw new Exception('Customer not found !');
+            throw new \Exception('Customer not found !');
         }
 
         $deliveryModule = ModuleQuery::create()->filterById($moduleId)->findOne();
@@ -469,11 +466,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->filterById($deliveryAddressId)->findOne();
 
         if (!$deliveryAddress) {
-            throw new Exception('Delivery address not found !');
+            throw new \Exception('Delivery address not found !');
         }
 
         if (true === $cart->isVirtual() && false === $moduleInstance->handleVirtualProductDelivery()) {
-            throw new Exception('Virtual product delivery failed ! ');
+            throw new \Exception('Virtual product delivery failed ! ');
         }
 
         $country = $deliveryAddress->getCountry();
@@ -565,9 +562,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         return [
             TheliaEvents::CART_SET_DELIVERY_ADDRESS => ['setDeliveryAddress', 128],
-            TheliaEvents::CART_SET_DELIVERY_MODULE => ['setDeliveryModule', 128],
-            TheliaEvents::CART_SET_POSTAGE => ['calculatePostage', 128],
-            TheliaEvents::CART_SET_INVOICE_ADDRESS => ['setInvoiceAddress', 128],
+            //TheliaEvents::CART_SET_DELIVERY_MODULE => ['setDeliveryModule', 128],
+            //TheliaEvents::CART_SET_POSTAGE => ['calculatePostage', 128],
+            //TheliaEvents::CART_SET_INVOICE_ADDRESS => ['setInvoiceAddress', 128],
             TheliaEvents::CART_SET_PAYMENT_MODULE => ['setPaymentModule', 128],
             TheliaEvents::CART_PERSIST => ['persistCart', 128],
             TheliaEvents::CART_RESTORE_CURRENT => ['restoreCurrentCart', 128],
