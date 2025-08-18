@@ -80,7 +80,7 @@ class Template extends BaseAction implements EventSubscriberInterface
 
             $attrList = AttributeTemplateQuery::create()->findByTemplateId($source->getId());
 
-            /** @var $feat AttributeTemplate */
+            /** @var AttributeTemplate $feat */
             foreach ($attrList as $feat) {
                 $dispatcher->dispatch(
                     new TemplateAddAttributeEvent($clone, $feat->getAttributeId()),
@@ -90,7 +90,7 @@ class Template extends BaseAction implements EventSubscriberInterface
 
             $featList = FeatureTemplateQuery::create()->findByTemplateId($source->getId());
 
-            /** @var $feat FeatureTemplate */
+            /** @var FeatureTemplate $feat */
             foreach ($featList as $feat) {
                 $dispatcher->dispatch(
                     new TemplateAddFeatureEvent($clone, $feat->getFeatureId()),

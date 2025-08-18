@@ -60,7 +60,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
         protected TokenProvider $tokenProvider,
         protected SecurityContext $securityContext,
         protected ContainerInterface $container,
-    ) {}
+    ) {
+    }
 
     /**
      * @throws PropelException
@@ -562,9 +563,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         return [
             TheliaEvents::CART_SET_DELIVERY_ADDRESS => ['setDeliveryAddress', 128],
-            //TheliaEvents::CART_SET_DELIVERY_MODULE => ['setDeliveryModule', 128],
-            //TheliaEvents::CART_SET_POSTAGE => ['calculatePostage', 128],
-            //TheliaEvents::CART_SET_INVOICE_ADDRESS => ['setInvoiceAddress', 128],
+            // TheliaEvents::CART_SET_DELIVERY_MODULE => ['setDeliveryModule', 128],
+            // TheliaEvents::CART_SET_POSTAGE => ['calculatePostage', 128],
+            // TheliaEvents::CART_SET_INVOICE_ADDRESS => ['setInvoiceAddress', 128],
             TheliaEvents::CART_SET_PAYMENT_MODULE => ['setPaymentModule', 128],
             TheliaEvents::CART_PERSIST => ['persistCart', 128],
             TheliaEvents::CART_RESTORE_CURRENT => ['restoreCurrentCart', 128],

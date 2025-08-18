@@ -29,7 +29,7 @@ trait StubClassTrait
      */
     public function getClassFilePath(): string
     {
-        /** @var $this AbstractOMBuilder */
+        /** @var AbstractOMBuilder $this */
         $fs = new Filesystem();
 
         if ('Thelia.Model' === $this->getPackage()) {

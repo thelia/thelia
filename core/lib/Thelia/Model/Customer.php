@@ -58,17 +58,17 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
      * @throws PropelException
      */
     public function createOrUpdate(
-        int $titleId,
-        string $firstname,
-        string $lastname,
-        string $address1,
+        ?int $titleId,
+        ?string $firstname,
+        ?string $lastname,
+        ?string $address1,
         ?string $address2,
         ?string $address3,
         ?string $phone,
         ?string $cellphone,
-        string $zipcode,
-        string $city,
-        int $countryId,
+        ?string $zipcode,
+        ?string $city,
+        ?int $countryId,
         ?string $email = null,
         ?string $plainPassword = null,
         ?int $lang = null,
@@ -155,7 +155,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         }
     }
 
-    public function createOrUpdateMinimal(
+    public function createOrUpdateWithoutAddress(
         int $titleId,
         string $firstname,
         string $lastname,

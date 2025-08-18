@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -12,7 +14,6 @@
 
 namespace Thelia\Service\Model;
 
-use Exception;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -28,22 +29,19 @@ class CheckoutService
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,
-        private CartService              $cartService,
-    )
-    {
+        private CartService $cartService,
+    ) {
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function pay(
         int $deliveryAddressId,
         int $invoiceAddressId,
         int $deliveryModuleId,
         int $paymentModuleId,
-
-    ): ?Response
-    {
+    ): ?Response {
         $this->validateForOrder();
 
         $cart = $this->cartService->getCart();
@@ -53,7 +51,7 @@ class CheckoutService
             ->setInvoiceOrderAddressId($invoiceAddressId)
             ->setPaymentModuleId($paymentModuleId)
             ->setDeliveryModuleId($deliveryModuleId)
-            ->setPostage((float)$cart->getPostage() + (float)$cart->getPostageTax())
+            ->setPostage((float) $cart->getPostage() + (float) $cart->getPostageTax())
             ->setPostageTax($cart->getPostageTax())
             ->setPostageTaxRuleTitle($cart->getPostageTaxRuleTitle());
 

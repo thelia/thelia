@@ -52,11 +52,13 @@ abstract class ActionEvent extends Event
         }
     }
 
-    public function bindArray(array $data): void
+    public function bindArray(array $data): self
     {
         foreach ($data as $fieldName => $fieldValue) {
             $this->bindField($fieldName, $fieldValue);
         }
+
+        return $this;
     }
 
     public function resetStopPropagation(): void
@@ -69,7 +71,7 @@ abstract class ActionEvent extends Event
 
     private function bindField(string $fieldName, mixed $fieldValue): void
     {
-        $setterMethodName = sprintf('set%s', Container::camelize($fieldName));
+        $setterMethodName = \sprintf('set%s', Container::camelize($fieldName));
 
         if (!method_exists($this, $setterMethodName)) {
             $this->__set($fieldName, $fieldValue);
@@ -82,7 +84,7 @@ abstract class ActionEvent extends Event
 
     private function bindFormField(string $fieldName, mixed $fieldValue): void
     {
-        $setterMethodName = sprintf('set%s', Container::camelize($fieldName));
+        $setterMethodName = \sprintf('set%s', Container::camelize($fieldName));
 
         if (!method_exists($this, $setterMethodName)) {
             $this->__set($fieldName, $fieldValue);
@@ -95,7 +97,7 @@ abstract class ActionEvent extends Event
 
     private function callSetterIfAllowed(string $setterMethodName, string $fieldName, mixed $fieldValue): void
     {
-        $getterMethodName = sprintf('get%s', Container::camelize($fieldName));
+        $getterMethodName = \sprintf('get%s', Container::camelize($fieldName));
 
         if (!method_exists($this, $getterMethodName)) {
             $this->{$setterMethodName}($fieldValue);

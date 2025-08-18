@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -27,7 +29,7 @@ readonly class DataProviderService
     public function fetchData(
         Operation $operation,
         array $uriVariables,
-        array $context
+        array $context,
     ): object|array|null {
         return $this->callableProvider->provide(
             $operation,

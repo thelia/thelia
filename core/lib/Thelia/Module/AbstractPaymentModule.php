@@ -21,7 +21,6 @@ use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Model\Order;
 use Thelia\Tools\URL;
 use TheliaSmarty\Template\SmartyParser;
-use TwigEngine\Template\TwigParser;
 
 abstract class AbstractPaymentModule extends BaseModule implements PaymentModuleInterface
 {
@@ -51,7 +50,7 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
 
         if ($parser instanceof SmartyParser) {
             $realTemplateName = 'order-payment-gateway.html';
-        } else{
+        } else {
             $realTemplateName = 'order-payment-gateway.html.twig';
         }
 

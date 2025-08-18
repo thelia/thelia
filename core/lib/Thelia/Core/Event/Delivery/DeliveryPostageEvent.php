@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Event\Delivery;
 
-use Thelia\Core\Enum\DeliveryMode;
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Core\Enum\DeliveryMode;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Address;
@@ -43,7 +43,7 @@ class DeliveryPostageEvent extends ActionEvent
         protected Cart $cart,
         protected ?Address $address = null,
         protected ?Country $country = null,
-        protected ?State $state = null
+        protected ?State $state = null,
     ) {
     }
 
@@ -175,33 +175,26 @@ class DeliveryPostageEvent extends ActionEvent
     {
         if ($deliveryMode === null) {
             $this->deliveryMode = null;
+
             return $this;
         }
 
         if ($deliveryMode instanceof DeliveryMode) {
             $this->deliveryMode = $deliveryMode;
+
             return $this;
         }
 
-        if (is_string($deliveryMode)) {
+        if (\is_string($deliveryMode)) {
             $this->deliveryMode = DeliveryMode::fromString($deliveryMode);
 
             if ($this->deliveryMode === null) {
-                throw new \Exception(
-                    Translator::getInstance()->trans(
-                        'A delivery module can only be of type "%allowed_types%".',
-                        ['%allowed_types%' => implode('", "', array_column(DeliveryMode::cases(), 'value'))]
-                    )
-                );
+                throw new \Exception(Translator::getInstance()->trans('A delivery module can only be of type "%allowed_types%".', ['%allowed_types%' => implode('", "', array_column(DeliveryMode::cases(), 'value'))]));
             }
 
             return $this;
         }
 
-        throw new \Exception(
-            Translator::getInstance()->trans(
-                'Delivery mode must be a DeliveryMode enum, string, or null.'
-            )
-        );
+        throw new \Exception(Translator::getInstance()->trans('Delivery mode must be a DeliveryMode enum, string, or null.'));
     }
 }

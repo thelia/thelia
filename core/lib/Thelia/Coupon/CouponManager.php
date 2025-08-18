@@ -41,9 +41,8 @@ class CouponManager
 
     public function __construct(
         protected FacadeInterface $facade,
-        protected CouponFactory $couponFactory
-    )
-    {
+        protected CouponFactory $couponFactory,
+    ) {
     }
 
     /**
@@ -112,8 +111,6 @@ class CouponManager
 
     /**
      * Check if there is a Coupon removing Postage.
-     *
-     * @param Order $order the order for which we have to check if postage is free
      */
     public function isCouponRemovingPostage(Cart $cart): bool
     {

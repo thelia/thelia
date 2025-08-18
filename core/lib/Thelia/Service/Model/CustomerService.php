@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Service\Model;
 
-use Exception;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -31,21 +30,18 @@ use Thelia\Core\Security\Token\CookieTokenProvider;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\CustomerLogin;
-use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\CustomerTitle;
 use Thelia\Model\CustomerTitleQuery;
-use Thelia\Model\Event\CustomerEvent;
 
 class CustomerService
 {
     public function __construct(
         private readonly EventDispatcherInterface $dispatcher,
-        private readonly RequestStack             $requestStack
-    )
-    {
+        private readonly RequestStack $requestStack,
+    ) {
     }
 
     public function createCustomerMinimal(FormInterface $form): Customer
@@ -142,13 +138,13 @@ class CustomerService
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function customerActivationByCode(string $email, int $code): void
     {
         $customer = CustomerQuery::create()->findOneByEmail($email);
         if (!$customer) {
-            throw new Exception('Customer not found');
+            throw new \Exception('Customer not found');
         }
 
         $customer->verifyActivationCode($code);

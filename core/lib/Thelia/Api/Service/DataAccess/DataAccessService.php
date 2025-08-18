@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -20,7 +22,7 @@ class DataAccessService
 {
     public function __construct(
         private readonly LoopDataAccessService $loopDataAccessService,
-        private readonly ResourceService       $resourceService
+        private readonly ResourceService $resourceService,
     ) {
     }
 
@@ -28,7 +30,7 @@ class DataAccessService
      * @throws ExceptionInterface
      * @throws ResourceClassNotFoundException
      */
-    public function resources(string $path, array $parameters = [],?string $format = null): object|array|null
+    public function resources(string $path, array $parameters = [], ?string $format = null): object|array|null
     {
         return $this->resourceService->resources($path, $parameters, $format);
     }

@@ -21,7 +21,6 @@ use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
-use TheliaSmarty\Template\SmartyHelper;
 
 /**
  * Class HookHelper.

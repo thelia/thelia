@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -32,7 +34,7 @@ class CustomerCreateOrUpdateMinimalEvent extends ActionEvent
 
     protected ?Customer $customer = null;
 
-    public function __construct(Customer $customer = null)
+    public function __construct(?Customer $customer = null)
     {
         $this->customer = $customer;
     }

@@ -127,10 +127,9 @@ class Cart extends BaseCart
     public function getTaxedAmount(
         Country $country,
         bool $withDiscount = true,
-        State $state = null,
-        bool $withPostage = false
-    ): float
-    {
+        ?State $state = null,
+        bool $withPostage = false,
+    ): float {
         $total = 0;
 
         foreach ($this->getCartItems() as $cartItem) {
@@ -159,11 +158,10 @@ class Cart extends BaseCart
      */
     public function getTotalAmount(
         bool $withDiscount = true,
-        Country $country = null,
-        State $state = null,
-        bool $withPostage = false
-    ): float
-    {
+        ?Country $country = null,
+        ?State $state = null,
+        bool $withPostage = false,
+    ): float {
         $total = 0;
 
         foreach ($this->getCartItems() as $cartItem) {
@@ -262,7 +260,7 @@ class Cart extends BaseCart
         return round(Calculator::getUntaxedCartDiscount($this, $country, $state), 2);
     }
 
-    public function getTaxedPostage():float
+    public function getTaxedPostage(): float
     {
         return (float) $this->getPostage() + (float) $this->getPostageTax();
     }

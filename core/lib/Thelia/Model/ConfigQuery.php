@@ -139,6 +139,7 @@ class ConfigQuery extends BaseConfigQuery
     public static function getStoreCountry(): ?int
     {
         $value = self::read('store_country');
+
         return null === $value ? null : (int) $value;
     }
 

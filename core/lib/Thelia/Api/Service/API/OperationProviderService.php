@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -40,12 +42,13 @@ class OperationProviderService
     {
         $uriVariables = $operation->getUriVariables() ?? [];
         $identifiers = [];
-        foreach($uriVariables as $parameterName => $uriVariableDefinition) {
+        foreach ($uriVariables as $parameterName => $uriVariableDefinition) {
             if (!isset($route[$parameterName]) && !isset($route['id'])) {
-                throw new InvalidIdentifierException(sprintf('Parameter "%s" not found, check the identifiers configuration.', $parameterName));
+                throw new InvalidIdentifierException(\sprintf('Parameter "%s" not found, check the identifiers configuration.', $parameterName));
             }
             $identifiers[$parameterName] = $route[$parameterName] ?? $route['id'];
         }
+
         return $this->getOperationUriVariables($operation, $identifiers, $resourceClass);
     }
 }

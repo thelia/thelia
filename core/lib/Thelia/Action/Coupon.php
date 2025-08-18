@@ -54,14 +54,13 @@ use Thelia\Model\OrderCouponQuery;
 class Coupon extends BaseAction implements EventSubscriberInterface
 {
     public function __construct(
-        protected RequestStack             $requestStack,
-        protected CouponFactory            $couponFactory,
-        protected CouponManager            $couponManager,
-        protected MatchForEveryone         $noConditionRule,
-        protected ConditionFactory         $conditionFactory,
-        protected EventDispatcherInterface $dispatcher
-    )
-    {
+        protected RequestStack $requestStack,
+        protected CouponFactory $couponFactory,
+        protected CouponManager $couponManager,
+        protected MatchForEveryone $noConditionRule,
+        protected ConditionFactory $conditionFactory,
+        protected EventDispatcherInterface $dispatcher,
+    ) {
     }
 
     /**

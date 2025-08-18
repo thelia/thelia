@@ -17,7 +17,6 @@ namespace Thelia\Service\Model;
 use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
-use RuntimeException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -68,7 +67,7 @@ readonly class CartService
 
         try {
             if ($validatedForm && !$form->isValid()) {
-                throw new RuntimeException('Failed to validate form');
+                throw new \RuntimeException('Failed to validate form');
             }
 
             $cartEvent = $this->getCartEvent();
@@ -85,7 +84,7 @@ readonly class CartService
         }
 
         if ($message) {
-            throw new RuntimeException($message);
+            throw new \RuntimeException($message);
         }
     }
 
@@ -98,9 +97,9 @@ readonly class CartService
         try {
             $eventDispatcher->dispatch($cartEvent, TheliaEvents::CART_DELETEITEM);
             $this->afterModifyCart();
-        } catch (Exception $e) {
-            Tlog::getInstance()->error(sprintf('error during deleting cartItem with message : %s', $e->getMessage()));
-            throw new RuntimeException('Failed to delete cartItem');
+        } catch (\Exception $e) {
+            Tlog::getInstance()->error(\sprintf('error during deleting cartItem with message : %s', $e->getMessage()));
+            throw new \RuntimeException('Failed to delete cartItem');
         }
     }
 
@@ -114,9 +113,9 @@ readonly class CartService
         try {
             $eventDispatcher->dispatch($cartEvent, TheliaEvents::CART_UPDATEITEM);
             $this->afterModifyCart();
-        } catch (Exception $e) {
-            Tlog::getInstance()->error(sprintf('Failed to change cart item quantity: %s', $e->getMessage()));
-            throw new RuntimeException('Failed to change cart item quantity');
+        } catch (\Exception $e) {
+            Tlog::getInstance()->error(\sprintf('Failed to change cart item quantity: %s', $e->getMessage()));
+            throw new \RuntimeException('Failed to change cart item quantity');
         }
     }
 
@@ -124,11 +123,11 @@ readonly class CartService
     {
         try {
             $this->eventDispatcher->dispatch(new CartCheckoutEvent($this->getCart()), TheliaEvents::CART_SET_POSTAGE);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->clearCartPostage();
 
-            Tlog::getInstance()->error(sprintf('Failed to set postage : %s', $e->getMessage()));
-            throw new RuntimeException('Failed to set postage');
+            Tlog::getInstance()->error(\sprintf('Failed to set postage : %s', $e->getMessage()));
+            throw new \RuntimeException('Failed to set postage');
         }
     }
 
@@ -140,9 +139,9 @@ readonly class CartService
             $this->eventDispatcher->dispatch($cartCheckoutEvent, TheliaEvents::CART_SET_DELIVERY_MODULE);
 
             $this->handlePostageOnCart();
-        } catch (Exception $e) {
-            Tlog::getInstance()->error(sprintf('Failed to set delivery module : %s', $e->getMessage()));
-            throw new RuntimeException('Failed to set delivery module');
+        } catch (\Exception $e) {
+            Tlog::getInstance()->error(\sprintf('Failed to set delivery module : %s', $e->getMessage()));
+            throw new \RuntimeException('Failed to set delivery module');
         }
     }
 
@@ -155,10 +154,9 @@ readonly class CartService
             $this->eventDispatcher->dispatch($cartCheckoutEvent, TheliaEvents::CART_SET_DELIVERY_ADDRESS);
 
             $this->handlePostageOnCart();
-
-        } catch (Exception $e) {
-            Tlog::getInstance()->error(sprintf('Failed to set delivery address : %s', $e->getMessage()));
-            throw new RuntimeException('Failed to set delivery address');
+        } catch (\Exception $e) {
+            Tlog::getInstance()->error(\sprintf('Failed to set delivery address : %s', $e->getMessage()));
+            throw new \RuntimeException('Failed to set delivery address');
         }
     }
 
@@ -168,10 +166,9 @@ readonly class CartService
             $cartCheckoutEvent = new CartCheckoutEvent($this->getCart());
             $cartCheckoutEvent->setInvoiceAddressId($invoiceAddressId);
             $this->eventDispatcher->dispatch($cartCheckoutEvent, TheliaEvents::CART_SET_INVOICE_ADDRESS);
-
-        } catch (Exception $e) {
-            Tlog::getInstance()->error(sprintf('Failed to set invoice address : %s', $e->getMessage()));
-            throw new RuntimeException('Failed to set invoice address');
+        } catch (\Exception $e) {
+            Tlog::getInstance()->error(\sprintf('Failed to set invoice address : %s', $e->getMessage()));
+            throw new \RuntimeException('Failed to set invoice address');
         }
     }
 
@@ -181,10 +178,9 @@ readonly class CartService
             $cartCheckoutEvent = new CartCheckoutEvent($this->getCart());
             $cartCheckoutEvent->setPaymentModuleId($paymentModuleId);
             $this->eventDispatcher->dispatch($cartCheckoutEvent, TheliaEvents::CART_SET_PAYMENT_MODULE);
-
-        } catch (Exception $e) {
-            Tlog::getInstance()->error(sprintf('Failed to set payment module : %s', $e->getMessage()));
-            throw new RuntimeException('Failed to set payment module');
+        } catch (\Exception $e) {
+            Tlog::getInstance()->error(\sprintf('Failed to set payment module : %s', $e->getMessage()));
+            throw new \RuntimeException('Failed to set payment module');
         }
     }
 
@@ -193,7 +189,7 @@ readonly class CartService
         $request = $this->requestStack->getCurrentRequest();
 
         if (!$request) {
-            throw new RuntimeException('Request not set !');
+            throw new \RuntimeException('Request not set !');
         }
 
         return $request->getSession()->getSessionCart($this->eventDispatcher);
@@ -285,7 +281,6 @@ readonly class CartService
         }
     }
 
-
     public function clearCartPostage(): void
     {
         $this->getCart()
@@ -302,7 +297,7 @@ readonly class CartService
     {
         try {
             $this->handlePostageOnCart();
-        } catch (Exception) {
+        } catch (\Exception) {
             // The postage has been chosen, but changes in the cart cause an exception.
             // Reset the postage data in the order
             $this->setDeliveryModule(null);
@@ -314,7 +309,7 @@ readonly class CartService
         $session = $this->requestStack->getCurrentRequest()?->getSession();
 
         if (!$session instanceof Session) {
-            throw new RuntimeException('Failed to get cart event : no session found.');
+            throw new \RuntimeException('Failed to get cart event : no session found.');
         }
 
         $cart = $session->getSessionCart($this->eventDispatcher);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -12,7 +14,6 @@
 
 namespace Thelia\Api\Service\API;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Thelia\Api\Resource\TranslatableResourceInterface;
@@ -35,7 +36,7 @@ readonly class ResourceService
     ) {
     }
 
-    public function resources(string $path, array $parameters = [],?string $format = null): object|array|null
+    public function resources(string $path, array $parameters = [], ?string $format = null): object|array|null
     {
         $apiRequest = $this->requestBuilder->createApiRequest($this->requestStack, $path);
         $route = $this->routeMatcher->matchRoute($this->router, $apiRequest);
@@ -59,10 +60,10 @@ readonly class ResourceService
         $normalizedData = $this->normalizer->normalizeData($result, $context, $format);
         if ($this->isTranslatableResult($result)) {
             // can't use Serializer in this use case, so need to manually add publicUrl
-            if ($format === null){
+            if ($format === null) {
                 $normalizedData = $this->addPublicUrl($result, $normalizedData, $currentLocale);
             }
-            if ($format === 'jsonld'){
+            if ($format === 'jsonld') {
                 $normalizedData = $this->addPublicUrlWithJsonLd($result, $normalizedData, $currentLocale);
             }
         }
@@ -77,10 +78,11 @@ readonly class ResourceService
         }
         $locale = $this->localeService->getLocale();
         $parameters['locale'] = $locale;
+
         return $parameters;
     }
 
-    private function formatI18ns(array $datas, string $locale = null): array
+    private function formatI18ns(array $datas, ?string $locale = null): array
     {
         foreach ($datas as $key => $data) {
             if ($key === 'i18ns' && isset($datas['i18ns'][$locale])) {

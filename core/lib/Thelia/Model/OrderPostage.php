@@ -33,7 +33,7 @@ class OrderPostage
     /**
      * Convert a amount or OrderPostage object to an OrderPostage object.
      */
-    public static function loadFromPostage(OrderPostage|float $postage): OrderPostage
+    public static function loadFromPostage(self|float $postage): self
     {
         return $postage instanceof self ? $postage : new self($postage);
     }

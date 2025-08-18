@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -15,7 +17,6 @@ namespace Thelia\Api\Service\API;
 use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,7 +37,7 @@ readonly class MetadataService
         #[Autowire(service: 'security.authentication.trust_resolver')]
         private readonly ?AuthenticationTrustResolverInterface $authenticationTrustResolver = null,
         #[Autowire(service: 'security.authorization_checker')]
-        private readonly ?AuthorizationCheckerInterface $authorizationChecker = null
+        private readonly ?AuthorizationCheckerInterface $authorizationChecker = null,
     ) {
     }
 
@@ -45,7 +46,7 @@ readonly class MetadataService
      */
     public function getOperation(
         string $resourceClass,
-        string $routeName
+        string $routeName,
     ): ?Operation {
         $metadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
         foreach ($metadata as $resourceMetadata) {
@@ -65,7 +66,7 @@ readonly class MetadataService
         string $path,
         string $method,
         Operation $operation,
-        array $context
+        array $context,
     ): bool {
         $expression = $operation->getSecurity();
         if (null !== $expression && null === $this->authenticationTrustResolver) {
@@ -83,6 +84,7 @@ readonly class MetadataService
                 'user' => $user,
                 'auth_checker' => $this->authorizationChecker, // needed for the is_granted expression function
             ]);
+
             return (bool) $this->expressionLanguage->evaluate($expression, $variables);
         }
         $request = Request::create($path, $method);

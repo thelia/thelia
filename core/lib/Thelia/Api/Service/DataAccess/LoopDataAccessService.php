@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -43,7 +45,7 @@ class LoopDataAccessService
         protected TranslatorInterface $translator,
         protected bool $kernelDebug,
         protected array $theliaParserLoops,
-        protected string $kernelEnvironment
+        protected string $kernelEnvironment,
     ) {
         $this->request = $requestStack->getCurrentRequest();
         $this->setLoopList($theliaParserLoops);
@@ -51,7 +53,7 @@ class LoopDataAccessService
 
     public function theliaCount(
         string $loopType,
-        array $params
+        array $params,
     ): int {
         try {
             return $this->createLoopInstance($loopType, $params)->count();
@@ -65,13 +67,11 @@ class LoopDataAccessService
     public function theliaLoop(
         string $loopName,
         string $loopType,
-        array $params
+        array $params,
     ): array {
         // Check if a loop with the same name exists in the current scope, and abort if it's the case.
         if (\array_key_exists($loopName, $this->variableStack)) {
-            throw new \InvalidArgumentException(
-                $this->translator->trans("A loop named '%name' already exists in the current scope.", ['%name' => $loopName])
-            );
+            throw new \InvalidArgumentException($this->translator->trans("A loop named '%name' already exists in the current scope.", ['%name' => $loopName]));
         }
 
         try {
@@ -108,9 +108,7 @@ class LoopDataAccessService
     protected function createLoopInstance(string $loopType, array $params): LoopInterface
     {
         if (!isset($this->loopDefinition[$loopType])) {
-            throw new ElementNotFoundException(
-                $this->translator->trans("Loop type '%type' is not defined.", ['%type' => $loopType])
-            );
+            throw new ElementNotFoundException($this->translator->trans("Loop type '%type' is not defined.", ['%type' => $loopType]));
         }
 
         $serviceId = $this->loopDefinition[$loopType];
@@ -142,12 +140,7 @@ class LoopDataAccessService
     public function registerLoop($className, $name = null): void
     {
         if (\array_key_exists($name, $this->loopDefinition)) {
-            throw new \InvalidArgumentException(
-                $this->translator->trans("The loop name '%name' is already defined in %className class", [
-                    '%name' => $name,
-                    '%className' => $className,
-                ])
-            );
+            throw new \InvalidArgumentException($this->translator->trans("The loop name '%name' is already defined in %className class", ['%name' => $name, '%className' => $className]));
         }
 
         $this->loopDefinition[$name] = $className;

@@ -35,10 +35,9 @@ class TaxEngine
     protected ?State $taxState = null;
 
     public function __construct(
-        protected RequestStack             $requestStack,
+        protected RequestStack $requestStack,
         protected EventDispatcherInterface $dispatcher,
-    )
-    {
+    ) {
     }
 
     /**
@@ -77,6 +76,7 @@ class TaxEngine
         if ($customerDefaultAddress = $customer->getDefaultAddress()) {
             $this->taxCountry = $customerDefaultAddress->getCountry();
             $this->taxState = $customerDefaultAddress->getState();
+
             return $this->taxCountry;
         }
 

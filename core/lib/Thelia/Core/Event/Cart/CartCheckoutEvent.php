@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -50,9 +52,10 @@ class CartCheckoutEvent extends ActionEvent
         return $this->postage;
     }
 
-    public function setPostage(?OrderPostage $postage): CartCheckoutEvent
+    public function setPostage(?OrderPostage $postage): self
     {
         $this->postage = $postage;
+
         return $this;
     }
 
@@ -61,9 +64,10 @@ class CartCheckoutEvent extends ActionEvent
         return $this->deliveryModuleId;
     }
 
-    public function setDeliveryModuleId(?int $deliveryModuleId): CartCheckoutEvent
+    public function setDeliveryModuleId(?int $deliveryModuleId): self
     {
         $this->deliveryModuleId = $deliveryModuleId;
+
         return $this;
     }
 
@@ -72,9 +76,10 @@ class CartCheckoutEvent extends ActionEvent
         return $this->deliveryAddressId;
     }
 
-    public function setDeliveryAddressId(?int $deliveryAddressId): CartCheckoutEvent
+    public function setDeliveryAddressId(?int $deliveryAddressId): self
     {
         $this->deliveryAddressId = $deliveryAddressId;
+
         return $this;
     }
 
@@ -83,9 +88,10 @@ class CartCheckoutEvent extends ActionEvent
         return $this->invoiceAddressId;
     }
 
-    public function setInvoiceAddressId(?int $invoiceAddressId): CartCheckoutEvent
+    public function setInvoiceAddressId(?int $invoiceAddressId): self
     {
         $this->invoiceAddressId = $invoiceAddressId;
+
         return $this;
     }
 
@@ -94,9 +100,10 @@ class CartCheckoutEvent extends ActionEvent
         return $this->paymentModuleId;
     }
 
-    public function setPaymentModuleId(?int $paymentModuleId): CartCheckoutEvent
+    public function setPaymentModuleId(?int $paymentModuleId): self
     {
         $this->paymentModuleId = $paymentModuleId;
+
         return $this;
     }
 
@@ -110,12 +117,14 @@ class CartCheckoutEvent extends ActionEvent
     public function setExtendedData(string $key, mixed $value): static
     {
         $this->extendedData[$key] = $value;
+
         return $this;
     }
 
     public function removeExtendedData(string $key): static
     {
         unset($this->extendedData[$key]);
+
         return $this;
     }
 }

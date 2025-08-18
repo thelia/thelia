@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -19,7 +21,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 readonly class AccessCheckerService
 {
     public function __construct(
-        private MetadataService $metadataService
+        private MetadataService $metadataService,
     ) {
     }
 
@@ -27,7 +29,7 @@ readonly class AccessCheckerService
         string $resourceClass,
         string $path,
         Operation $operation,
-        array $context
+        array $context,
     ): void {
         if (!$this->metadataService->canUserAccessResource($resourceClass, $path, Request::METHOD_GET, $operation, $context)) {
             throw new AccessDeniedHttpException('Access Denied on '.$path);

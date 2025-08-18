@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -16,13 +18,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
-use Thelia\Model\ProductPriceQuery;
-use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\AttributeQuery;
+use Thelia\Model\Lang;
+use Thelia\Model\ProductPriceQuery;
+use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\TaxEngine\TaxEngine;
 use TheliaSmarty\Events\PseByProductEvent;
-use Thelia\Model\Lang;
 
 class ProductSaleElementsAccessService
 {
@@ -106,7 +108,7 @@ class ProductSaleElementsAccessService
 
             $attributes[$atributeId] = [
                 'label' => $attribute->getTitle(),
-                'id' => $attribute->getId()
+                'id' => $attribute->getId(),
             ];
         }
 
@@ -114,7 +116,7 @@ class ProductSaleElementsAccessService
             $attributeAv = AttributeAvQuery::create()->joinWithI18n($locale)->findOneById($attributeAvId);
             $attributes[$attributeAv->getAttributeId()]['values'][] = [
                 'id' => $attributeAv->getId(),
-                'label' => $attributeAv->getTitle()
+                'label' => $attributeAv->getTitle(),
             ];
         }
 

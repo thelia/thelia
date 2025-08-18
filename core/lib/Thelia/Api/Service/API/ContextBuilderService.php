@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -21,7 +23,7 @@ readonly class ContextBuilderService
         Operation $operation,
         string $resourceClass,
         array $uriVariables,
-        array $parameters
+        array $parameters,
     ): array {
         $parameters = $this->convertParameterKeysToArrays($parameters);
 

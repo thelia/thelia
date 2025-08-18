@@ -34,7 +34,6 @@ use Thelia\Model\CustomerQuery;
 use Thelia\Model\Event\CustomerEvent;
 use Thelia\Model\LangQuery;
 use Thelia\Service\Model\CustomerService;
-use Thelia\Service\Model\LangService;
 use Thelia\Tools\Password;
 
 /**
@@ -51,7 +50,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
         protected MailerFactory $mailer,
         protected RequestStack $requestStack,
         protected EventDispatcherInterface $dispatcher,
-        protected CustomerService $customerService
+        protected CustomerService $customerService,
     ) {
     }
 
@@ -83,7 +82,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     {
         $customer = new CustomerModel();
 
-        $customer->createOrUpdateMinimal(
+        $customer->createOrUpdateWithoutAddress(
             titleId: $event->getTitle(),
             firstname: $event->getFirstname(),
             lastname: $event->getLastname(),
@@ -118,7 +117,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
                 $customer,
                 [
                     'customer_id' => $customer->getId(),
-                    'validation_code' => $validationCode
+                    'validation_code' => $validationCode,
                 ]
             );
         }
