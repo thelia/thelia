@@ -20,6 +20,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\Event\DeliveryModuleOptionEvent;
 use Thelia\Api\Resource\DeliveryModule;
 use Thelia\Api\Resource\ModuleI18n;
+use Thelia\Api\Service\DataAccess\DataAccessService;
 use Thelia\Api\State\Collection\DeliveryModuleCollection;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -35,7 +36,6 @@ use Thelia\Model\ModuleQuery;
 use Thelia\Model\State;
 use Thelia\Module\BaseModule;
 use Thelia\Module\Exception\DeliveryException;
-use TwigEngine\Service\DataAccess\DataAccessService;
 
 readonly class DeliveryService
 {
@@ -47,7 +47,8 @@ readonly class DeliveryService
         private DataAccessService $dataAccessService,
         private Session $session,
         private CartService $cartService,
-    ) {}
+    ) {
+    }
 
     /**
      * @throws PropelException
@@ -130,14 +131,14 @@ readonly class DeliveryService
 
     public function setDeliveryData(string $key, mixed $value): self
     {
-        $this->session->set(self::SESSION_PREFIX . $key, $value);
+        $this->session->set(self::SESSION_PREFIX.$key, $value);
 
         return $this;
     }
 
     public function getDeliveryData(string $key, mixed $default = null): mixed
     {
-        return $this->session->get(self::SESSION_PREFIX . $key, $default);
+        return $this->session->get(self::SESSION_PREFIX.$key, $default);
     }
 
     public function getAllDeliveryData(): array
