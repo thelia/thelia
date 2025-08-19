@@ -14,12 +14,15 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageFactoryInterface;
 use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
+use Thelia\Core\HttpFoundation\Session\SessionStorageFactory;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Service\ConfigCacheService;
+use Thelia\Core\HttpFoundation\Session\SessionFactory;
 
 return static function (ContainerConfigurator $configurator): void {
     // Import service configurations
@@ -56,6 +59,19 @@ return static function (ContainerConfigurator $configurator): void {
         )
         ->autowire()
         ->autoconfigure();
+
+    $serviceConfigurator->set(SessionStorageFactory::class)
+        ->args(['%kernel.project_dir%/var/sessions/%kernel.environment%'])
+        ->autowire()
+        ->autoconfigure();
+
+    $serviceConfigurator->alias(SessionStorageFactoryInterface::class, SessionStorageFactory::class);
+    $serviceConfigurator->alias('session.storage.factory', SessionStorageFactory::class);
+    $serviceConfigurator->set(SessionFactory::class)
+        ->autowire()
+        ->autoconfigure();
+
+    $serviceConfigurator->alias('session.factory', SessionFactory::class);
 
     if (!isset($_SERVER['MAILER_DSN'])) {
         $dsn = 'smtp://localhost:25';

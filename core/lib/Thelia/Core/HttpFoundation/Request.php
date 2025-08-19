@@ -15,9 +15,10 @@ declare(strict_types=1);
 namespace Thelia\Core\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Request as BaseRequest;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Controller\Front\BaseFrontController;
-use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\EventListener\KernelListener;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -117,12 +118,9 @@ class Request extends BaseRequest
         return BaseFrontController::CONTROLLER_TYPE === $this->controllerType;
     }
 
-    public function getSession(): Session
+    public function getSession(): SessionInterface
     {
-        if (!$this->hasSession()) {
-            $this->setSession(new Session());
-        }
-
-        return $this->session;
+        return parent::getSession();
     }
+
 }

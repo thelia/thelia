@@ -33,11 +33,11 @@ trait ParserTemplateTrait
     public TemplateHelperInterface $templateHelper;
 
     #[Required]
-    public Request $request;
+    public RequestStack $requestStack;
 
     public function getRequest(): Request
     {
-        return $this->request;
+        return $this->requestStack->getCurrentRequest();
     }
 
     public function pushTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false): void

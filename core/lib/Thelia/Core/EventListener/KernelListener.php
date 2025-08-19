@@ -17,53 +17,32 @@ namespace Thelia\Core\EventListener;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\Event\IsAdminEnvEvent;
-use Thelia\Core\Event\SessionEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpFoundation\Session\Session;
-use Thelia\Core\TheliaKernelEvents;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\Lang;
+use Thelia\Log\Tlog;
 use Thelia\Service\Model\LangService;
+use Thelia\Service\SessionManager;
 
 class KernelListener
 {
-    protected static ?Session $session = null;
+    public static ?Session $session = null;
 
     public function __construct(
         protected HttpKernelInterface $app,
         protected Translator $translator,
         protected EventDispatcherInterface $eventDispatcher,
         protected LangService $langService,
+        protected SessionManager $sessionManager,
         protected string $cacheDir,
         protected bool $debug,
         protected string $env,
     ) {
-    }
-
-    #[AsEventListener(event: KernelEvents::REQUEST, priority: \PHP_INT_MAX)]
-    public function sessionHandler(RequestEvent $event): void
-    {
-        if (self::$session !== null) {
-            return;
-        }
-
-        $request = $event->getRequest();
-
-        $sessionEvent = new SessionEvent(
-            $this->cacheDir,
-            $this->debug,
-            $this->env,
-            $request
-        );
-        $this->eventDispatcher->dispatch($sessionEvent, TheliaKernelEvents::SESSION);
-        self::$session = $sessionEvent->getSession();
-        $request->setSession(self::$session);
     }
 
     #[AsEventListener(event: KernelEvents::REQUEST, priority: \PHP_INT_MAX - 1)]
@@ -76,55 +55,43 @@ class KernelListener
         }
     }
 
-    #[AsEventListener(event: KernelEvents::REQUEST, priority: \PHP_INT_MAX - 1)]
-    public function initializeLanguageAndAdmin(RequestEvent $event): ?Response
+    #[AsEventListener(event: KernelEvents::REQUEST, priority: 127)]
+    public function warmupSession(RequestEvent $event): void
     {
-        if (HttpKernelInterface::MAIN_REQUEST !== $event->getRequestType()) {
-            return null;
+        if (!$this->sessionManager->sessionIsStartable($event)) {
+
+            return;
         }
         $request = $event->getRequest();
 
-        if (!$request instanceof TheliaRequest) {
-            return null;
+        $session = $request->getSession();
+        if (!$session->isStarted()) {
+            $session->start();
         }
+    }
 
-        if (!$request->hasSession() || !($session = $request->getSession()) instanceof SessionInterface) {
+    #[AsEventListener(event: KernelEvents::REQUEST, priority: 80)]
+    public function initializeLanguageAndAdmin(RequestEvent $event): ?Response
+    {
+        if (!$this->sessionManager->sessionIsStartable($event)) {
             return null;
         }
+        /** @var Request $request */
+        $request = $event->getRequest();
+        /** @var Session $session */
+        $session = $request->getSession();
 
         $isAdminEvent = new IsAdminEnvEvent($request);
         TheliaRequest::$isAdminEnv = $isAdminEvent->isAdminEnv();
         $this->eventDispatcher->dispatch($isAdminEvent, IsAdminEnvEvent::class);
 
-        $response = $this->handleLang($session, $request);
+        $response = $this->langService->handleLang($session, $request);
 
         if ($response instanceof Response) {
             return $response;
         }
 
         $this->langService->syncMultiDomainLanguage($request);
-
-        return null;
-    }
-
-    protected function handleLang(Session $session, Request $request): Response|Lang|null
-    {
-        if (true === TheliaRequest::$isAdminEnv) {
-            $lang = $this->langService->resolveAdminLanguageFromRequest($request);
-            $session->setAdminLang($lang);
-
-            return $lang;
-        }
-
-        $langOrResponse = $this->langService->resolveFrontLanguageFromRequest($request);
-
-        if ($langOrResponse instanceof Response) {
-            return $langOrResponse;
-        }
-
-        if ($langOrResponse instanceof Lang) {
-            $this->langService->setLang($langOrResponse);
-        }
 
         return null;
     }
