@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Core\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
@@ -29,18 +30,20 @@ use Thelia\Model\ConfigQuery;
  *
  * @author manuel raynaud <manu@raynaud.io>
  */
-class SessionListener implements EventSubscriberInterface
+class SessionListener
 {
     public function __construct(
         protected string $sessionSavePath,
     ) {
     }
 
+    #[AsEventListener(event: TheliaKernelEvents::SESSION, priority: 255)]
     public function prodSession(SessionEvent $event): void
     {
-        if (headers_sent()) {
+        if (!$this->canSetSession($event)) {
             return;
         }
+
         if (\PHP_SESSION_ACTIVE === session_status()) {
             session_write_close();
         }
@@ -69,6 +72,7 @@ class SessionListener implements EventSubscriberInterface
         $event->setSession($this->getSession($storage));
     }
 
+    #[AsEventListener(event: TheliaKernelEvents::SESSION, priority: 128)]
     public function testSession(SessionEvent $event): void
     {
         if ('test' === $event->getEnv()) {
@@ -83,17 +87,16 @@ class SessionListener implements EventSubscriberInterface
         return new Session($storage);
     }
 
-    /**
-     * {@inheritdoc}
-     * api.
-     */
-    public static function getSubscribedEvents(): array
+    private function canSetSession(SessionEvent $event): bool
     {
-        return [
-            TheliaKernelEvents::SESSION => [
-                ['prodSession', 255],
-                ['testSession', 128],
-            ],
-        ];
+        $request = $event->getRequest();
+        if ($request->get('isApiRoute', false) || $request->hasSession(true)) {
+            return false;
+        }
+        if (null !== $request->attributes->get('_live_action')) {
+            return false;
+        }
+
+        return !headers_sent();
     }
 }

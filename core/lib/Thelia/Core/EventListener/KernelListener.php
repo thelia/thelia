@@ -46,6 +46,36 @@ class KernelListener
     ) {
     }
 
+    #[AsEventListener(event: KernelEvents::REQUEST, priority: \PHP_INT_MAX)]
+    public function sessionHandler(RequestEvent $event): void
+    {
+        if (self::$session !== null) {
+            return;
+        }
+
+        $request = $event->getRequest();
+
+        $sessionEvent = new SessionEvent(
+            $this->cacheDir,
+            $this->debug,
+            $this->env,
+            $request
+        );
+        $this->eventDispatcher->dispatch($sessionEvent, TheliaKernelEvents::SESSION);
+        self::$session = $sessionEvent->getSession();
+        $request->setSession(self::$session);
+    }
+
+    #[AsEventListener(event: KernelEvents::REQUEST, priority: \PHP_INT_MAX - 1)]
+    public function checkIsApiRoute(RequestEvent $event): void
+    {
+        $isApiRoute = preg_match('/^\/api\//', $event->getRequest()->getPathInfo());
+
+        if ($isApiRoute) {
+            $event->getRequest()->request->set('isApiRoute', $isApiRoute);
+        }
+    }
+
     #[AsEventListener(event: KernelEvents::REQUEST, priority: \PHP_INT_MAX - 1)]
     public function initializeLanguageAndAdmin(RequestEvent $event): ?Response
     {
@@ -62,9 +92,9 @@ class KernelListener
             return null;
         }
 
-        $event = new IsAdminEnvEvent($request);
-        TheliaRequest::$isAdminEnv = $event->isAdminEnv();
-        $this->eventDispatcher->dispatch($event, IsAdminEnvEvent::class);
+        $isAdminEvent = new IsAdminEnvEvent($request);
+        TheliaRequest::$isAdminEnv = $isAdminEvent->isAdminEnv();
+        $this->eventDispatcher->dispatch($isAdminEvent, IsAdminEnvEvent::class);
 
         $response = $this->handleLang($session, $request);
 
@@ -75,34 +105,6 @@ class KernelListener
         $this->langService->syncMultiDomainLanguage($request);
 
         return null;
-    }
-
-    #[AsEventListener(event: KernelEvents::REQUEST, priority: \PHP_INT_MAX)]
-    public function initializeSession(RequestEvent $event): void
-    {
-        if (self::$session !== null) {
-            return;
-        }
-        $isApiRoute = preg_match('/^\/api\//', $event->getRequest()->getPathInfo());
-
-        if ($isApiRoute) {
-            $event->getRequest()->request->set('isApiRoute', $isApiRoute);
-        }
-
-        $request = $event->getRequest();
-        $event = new SessionEvent(
-            $this->cacheDir,
-            $this->debug,
-            $this->env
-        );
-        $this->eventDispatcher->dispatch($event, TheliaKernelEvents::SESSION);
-        self::$session = $event->getSession();
-        $session = self::$session;
-        if (!$session->isStarted()) {
-            $session->start();
-        }
-
-        $request->setSession($session);
     }
 
     protected function handleLang(Session $session, Request $request): Response|Lang|null

@@ -147,7 +147,7 @@ class CustomerService
             throw new \Exception('Customer not found');
         }
 
-        $customer->verifyActivationCode($code);
+        $customer->verifyActivationCode((string) $code);
 
         $customer->setEnable(1)->save();
     }

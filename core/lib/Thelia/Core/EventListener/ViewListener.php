@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,13 +38,10 @@ use Thelia\Exception\OrderException;
  *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class ViewListener implements EventSubscriberInterface
+class ViewListener
 {
     public const IGNORE_THELIA_VIEW = 'ignore_thelia_view';
 
-    /**
-     * ViewListener constructor.
-     */
     public function __construct(
         protected ParserResolver $parserResolver,
         protected TemplateHelperInterface $templateHelper,
@@ -53,11 +50,7 @@ class ViewListener implements EventSubscriberInterface
     ) {
     }
 
-    /**
-     * Launch the parser defined on the constructor and get the result.
-     *
-     * The result is transform id needed into a Response object
-     */
+    #[AsEventListener(event: KernelEvents::VIEW, priority: 0)]
     public function onKernelView(ViewEvent $event): void
     {
         $request = $event->getRequest();
@@ -100,6 +93,7 @@ class ViewListener implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(event: KernelEvents::VIEW, priority: 5)]
     public function beforeKernelView(ViewEvent $event): void
     {
         $request = $event->getRequest();
@@ -127,15 +121,5 @@ class ViewListener implements EventSubscriberInterface
         $viewId = $request->query->getInt($paramName) ?: $request->request->getInt($paramName);
 
         return $viewId ?: null;
-    }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            KernelEvents::VIEW => [
-                ['onKernelView', 0],
-                ['beforeKernelView', 5],
-            ],
-        ];
     }
 }

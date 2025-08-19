@@ -17,10 +17,13 @@ namespace Thelia\Core\EventListener;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTCreatedEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Events;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 
-class JwtListener implements EventSubscriberInterface
+class JwtListener
 {
+    #[AsEventListener(event: Events::JWT_CREATED)]
     public function onJWTCreated(JWTCreatedEvent $event): void
     {
         $user = $event->getUser();
@@ -33,12 +36,5 @@ class JwtListener implements EventSubscriberInterface
         $payload['type'] = $user::class;
 
         $event->setData($payload);
-    }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            Events::JWT_CREATED => 'onJWTCreated',
-        ];
     }
 }

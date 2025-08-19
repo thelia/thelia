@@ -58,5 +58,6 @@ return static function (ContainerConfigurator $container): void {
     $services->set('validators.translator', RequestListener::class)
         ->arg(0, service('thelia.translator'))
         ->arg(1, service('event_dispatcher'))
+        ->arg(2, service('request'))
         ->tag('kernel.event_subscriber');
 };

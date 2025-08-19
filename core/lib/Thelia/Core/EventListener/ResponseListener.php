@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Core\EventListener;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -25,8 +25,10 @@ use Thelia\Model\ConfigQuery;
  *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class ResponseListener implements EventSubscriberInterface
+class ResponseListener
 {
+
+    #[AsEventListener(event: KernelEvents::RESPONSE, priority: 128)]
     public function beforeResponse(ResponseEvent $event): void
     {
         if (!$event->getRequest()->hasSession(true) || !$event->getRequest()->getSession()->isStarted()) {
@@ -54,16 +56,5 @@ class ResponseListener implements EventSubscriberInterface
 
             $session->set('cart_use_cookie', null);
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     * api.
-     */
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            KernelEvents::RESPONSE => ['beforeResponse', 128],
-        ];
     }
 }
