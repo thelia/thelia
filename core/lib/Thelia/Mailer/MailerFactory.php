@@ -17,8 +17,9 @@ namespace Thelia\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
-use Thelia\Core\Translation\Translator;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
@@ -34,8 +35,11 @@ use Thelia\Model\MessageQuery;
  */
 class MailerFactory
 {
-    public function __construct(private readonly ParserInterface $parser, private readonly MailerInterface $mailer)
-    {
+    public function __construct(
+        private readonly TemplateHelperInterface $templateHelper,
+        private readonly ParserResolver $parserResolver,
+        private readonly MailerInterface $mailer,
+    ) {
     }
 
     public function send(Email $message): void
@@ -96,73 +100,82 @@ class MailerFactory
     /**
      * Send a message to the customer.
      *
-     * @param array  $from              From addresses. An array of (email-address => name)
-     * @param array  $to                To addresses. An array of (email-address => name)
-     * @param array  $messageParameters an array of (name => value) parameters that will be available in the message
-     * @param string $locale            if null, the default store locale is used
-     * @param array  $cc                Cc addresses. An array of (email-address => name) [optional]
-     * @param array  $bcc               Bcc addresses. An array of (email-address => name) [optional]
-     * @param array  $replyTo           Reply to addresses. An array of (email-address => name) [optional]
+     * @param array       $from              From addresses. An array of (email-address => name)
+     * @param array       $to                To addresses. An array of (email-address => name)
+     * @param array       $messageParameters an array of (name => value) parameters that will be available in the message
+     * @param string|null $locale            if null, the default store locale is used
+     * @param array       $cc                Cc addresses. An array of (email-address => name) [optional]
+     * @param array       $bcc               Bcc addresses. An array of (email-address => name) [optional]
+     * @param array       $replyTo           Reply to addresses. An array of (email-address => name) [optional]
      */
-    public function sendEmailMessage(string $messageCode, array $from, array $to, array $messageParameters = [], ?string $locale = null, array $cc = [], array $bcc = [], array $replyTo = []): void
-    {
+    public function sendEmailMessage(
+        string $messageCode,
+        array $from,
+        array $to,
+        array $messageParameters = [],
+        ?string $locale = null,
+        array $cc = [],
+        array $bcc = [],
+        array $replyTo = [],
+    ): void {
         $storeEmail = ConfigQuery::getStoreEmail();
 
-        if (!empty($storeEmail)) {
-            if ([] !== $to) {
-                try {
-                    $instance = $this->createEmailMessage($messageCode, $from, $to, $messageParameters, $locale, $cc, $bcc, $replyTo);
-
-                    $this->send($instance);
-                } catch (\Exception $ex) {
-                    Tlog::getInstance()->addError(
-                        \sprintf('Error while sending email message %s: ', $messageCode).$ex->getMessage(),
-                    );
-                }
-            } else {
-                Tlog::getInstance()->addWarning(\sprintf('Message %s not sent: recipient list is empty.', $messageCode));
-            }
-        } else {
+        if (empty($storeEmail)) {
             Tlog::getInstance()->addError(\sprintf("Can't send email message %s: store email address is not defined.", $messageCode));
+
+            return;
+        }
+        if ([] === $to) {
+            Tlog::getInstance()->addWarning(\sprintf('Message %s not sent: recipient list is empty.', $messageCode));
+
+            return;
+        }
+
+        try {
+            $instance = $this->createEmailMessage($messageCode, $from, $to, $messageParameters, $locale, $cc, $bcc, $replyTo);
+
+            $this->send($instance);
+        } catch (\Exception $ex) {
+            Tlog::getInstance()->addError(
+                \sprintf('Error while sending email message %s: ', $messageCode).$ex->getMessage(),
+            );
         }
     }
 
     /**
      * Create a SwiftMessage instance from a given message code.
      *
-     * @param array  $from              From addresses. An array of (email-address => name)
-     * @param array  $to                To addresses. An array of (email-address => name)
-     * @param array  $messageParameters an array of (name => value) parameters that will be available in the message
-     * @param string $locale            if null, the default store locale is used
-     * @param array  $cc                Cc addresses. An array of (email-address => name) [optional]
-     * @param array  $bcc               Bcc addresses. An array of (email-address => name) [optional]
-     * @param array  $replyTo           Reply to addresses. An array of (email-address => name) [optional]
+     * @param string $messageCode
+     * @param array $from From addresses. An array of (email-address => name)
+     * @param array $to To addresses. An array of (email-address => name)
+     * @param array $messageParameters an array of (name => value) parameters that will be available in the message
+     * @param string|null $locale if null, the default store locale is used
+     * @param array $cc Cc addresses. An array of (email-address => name) [optional]
+     * @param array $bcc Bcc addresses. An array of (email-address => name) [optional]
+     * @param array $replyTo Reply to addresses. An array of (email-address => name) [optional]
      *
+     * @return Email
      * @throws \Exception
      */
     public function createEmailMessage(string $messageCode, array $from, array $to, array $messageParameters = [], ?string $locale = null, array $cc = [], array $bcc = [], array $replyTo = []): Email
     {
         $message = MessageQuery::getFromName($messageCode);
 
-        if (null === $message) {
-            throw new \RuntimeException(Translator::getInstance()->trans("Failed to load message with code '%code%', propably because it does'nt exists.", ['%code%' => $messageCode]));
-        }
-
         if (null === $locale) {
             $locale = Lang::getDefaultLanguage()->getLocale();
         }
 
         $message->setLocale($locale);
-
+        $parser = $this->getParser($messageCode);
         // Assign parameters
         foreach ($messageParameters as $name => $value) {
-            $this->parser->assign($name, $value);
+            $parser->assign($name, $value);
         }
 
         // As the parser uses the lang stored in the session, temporarly set the required language into the session.
         // This is required in the back office when sending emails to customers, that may use a different locale than
         // the current one.
-        $session = $this->parser->getRequest()->getSession();
+        $session = $parser->getRequest()->getSession();
 
         $currentLang = $session->getLang();
 
@@ -174,7 +187,7 @@ class MailerFactory
 
         $this->setupMessageHeaders($email, $from, $to, $cc, $bcc, $replyTo);
 
-        $message->buildMessage($this->parser, $email);
+        $message->buildMessage($parser, $email);
 
         $session->setLang($currentLang);
 
@@ -259,5 +272,20 @@ class MailerFactory
         foreach ($replyTo as $address => $name) {
             $email->addReplyTo(new Address($address, $name));
         }
+    }
+
+    /**
+     * @throws \Exception
+     */
+    protected function getParser(string $template): ParserInterface
+    {
+        $path = $this->templateHelper->getActiveMailTemplate()->getAbsolutePath();
+        $parser = $this->parserResolver->getParser($path, $template);
+
+        $parser->setTemplateDefinition(
+            $parser->getTemplateDefinition() ?: $this->templateHelper->getActiveMailTemplate()
+        );
+
+        return $parser;
     }
 }

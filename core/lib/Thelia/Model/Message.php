@@ -24,9 +24,15 @@ class Message extends BaseMessage
 {
     /**
      * Calculate the message body, given the HTML entered in the back-office, the message layout, and the message template.
+     * @throws \Exception
      */
-    protected function getMessageBody(ParserInterface $parser, string $message, $layout, $template, bool $compressOutput = true): bool|string
-    {
+    protected function getMessageBody(
+        ParserInterface $parser,
+        ?string $message,
+        $layout,
+        $template,
+        bool $compressOutput = true,
+    ): bool|string {
         $body = false;
 
         // Try to get the body from template file, if a file is defined
@@ -94,6 +100,8 @@ class Message extends BaseMessage
      *                                  the template file located in the module under
      *                                  `templates/email/default/' directory is used if
      *                                  `$useFallbackTemplate` is set to `true`
+     *
+     * @throws \Exception
      */
     public function buildMessage(ParserInterface $parser, Email $messageInstance, bool $useFallbackTemplate = true): Email
     {
@@ -106,6 +114,10 @@ class Message extends BaseMessage
         $subject = $parser->renderString($this->getSubject());
         $htmlMessage = $this->getHtmlMessageBody($parser);
         $textMessage = $this->getTextMessageBody($parser);
+
+        if (empty($htmlMessage) && empty($textMessage)) {
+            throw new \RuntimeException('Message body is empty for message ID: '.$this->getId());
+        }
 
         $messageInstance->subject($subject);
         $messageInstance->text($textMessage);
