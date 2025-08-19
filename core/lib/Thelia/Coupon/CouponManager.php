@@ -19,12 +19,12 @@ use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Exception\UnmatchableConditionException;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\Cart;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponCustomerCount;
 use Thelia\Model\CouponCustomerCountQuery;
 use Thelia\Model\CouponModule;
-use Thelia\Model\Order;
 
 /**
  * Manage how Coupons could interact with a Checkout.
@@ -37,17 +37,11 @@ class CouponManager
     protected array $availableCoupons = [];
 
     /** @var array Available Conditions (Services) */
-    protected array $availableConditions = [];
+    protected $availableConditions = [];
 
-    /** S
-     * Constructor.
-     *
-     * @param FacadeInterface $facade Service container
-     */
     public function __construct(
-        /** @var FacadeInterface Provides necessary value from Thelia */
         protected FacadeInterface $facade,
-        private readonly CouponFactory $couponFactory,
+        protected CouponFactory $couponFactory,
     ) {
     }
 
@@ -117,10 +111,8 @@ class CouponManager
 
     /**
      * Check if there is a Coupon removing Postage.
-     *
-     * @param Order $order the order for which we have to check if postage is free
      */
-    public function isCouponRemovingPostage(Order $order): bool
+    public function isCouponRemovingPostage(Cart $cart): bool
     {
         $coupons = $this->getCurrentCoupons();
 
@@ -138,7 +130,7 @@ class CouponManager
                 $couponCountries = $coupon->getFreeShippingForCountries();
 
                 if (!$couponCountries->isEmpty()) {
-                    if (null === $deliveryAddress = AddressQuery::create()->findPk($order->getChoosenDeliveryAddress())) {
+                    if (null === $deliveryAddress = AddressQuery::create()->findPk($cart->getAddressDeliveryId())) {
                         continue;
                     }
 
@@ -166,7 +158,7 @@ class CouponManager
                 if (!$couponModules->isEmpty()) {
                     $moduleValid = false;
 
-                    $shippingModuleId = $order->getDeliveryModuleId();
+                    $shippingModuleId = $cart->getDeliveryModuleId();
 
                     /** @var CouponModule $couponModule */
                     foreach ($couponModules as $couponModule) {

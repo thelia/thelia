@@ -111,17 +111,17 @@ class AddressCreateOrUpdateEvent extends ActionEvent
         return $this->address1;
     }
 
-    public function getAddress2(): string
+    public function getAddress2(): ?string
     {
         return $this->address2;
     }
 
-    public function getAddress3(): string
+    public function getAddress3(): ?string
     {
         return $this->address3;
     }
 
-    public function getCellphone(): string
+    public function getCellphone(): ?string
     {
         return $this->cellphone;
     }
@@ -161,12 +161,12 @@ class AddressCreateOrUpdateEvent extends ActionEvent
         return $this->lastname;
     }
 
-    public function getPhone(): string
+    public function getPhone(): ?string
     {
         return $this->phone;
     }
 
-    public function getTitle(): int
+    public function getTitle(): ?int
     {
         return $this->title;
     }
@@ -178,7 +178,7 @@ class AddressCreateOrUpdateEvent extends ActionEvent
 
     public function getIsDefault(): int
     {
-        return $this->isDefault;
+        return $this->isDefault ? 1 : 0;
     }
 
     public function setCustomer(Customer $customer): void

@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Thelia\Api\Bridge\Propel\Service\Resource\DeliveryModuleApiService;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
@@ -27,9 +26,11 @@ use Thelia\Model\Address;
 use Thelia\Model\Cart;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Module;
+use Thelia\Model\ModuleQuery;
 use Thelia\Model\StateQuery;
+use Thelia\Module\BaseModule;
 use Thelia\Service\Model\AddressService;
-use Thelia\Service\Model\DeliveryModuleService;
+use Thelia\Service\Model\DeliveryService;
 
 class DeliveryModuleProvider implements ProviderInterface
 {
@@ -39,8 +40,7 @@ class DeliveryModuleProvider implements ProviderInterface
         private readonly SecurityContext $securityContext,
         private readonly AddressService $addressService,
         private readonly EventDispatcherInterface $dispatcher,
-        private readonly DeliveryModuleService $deliveryModuleService,
-        private readonly DeliveryModuleApiService $deliveryModuleApiService,
+        private readonly DeliveryService $deliveryModuleService,
     ) {
     }
 
@@ -69,26 +69,27 @@ class DeliveryModuleProvider implements ProviderInterface
             ? $deliveryAddress->getState()
             : StateQuery::create()->filterByCountryId($country->getId())->findOne();
 
-        $modules = $this->deliveryModuleService->getDeliveryModules();
+        $modules = ModuleQuery::create()
+            ->filterByActivate(1)
+            ->filterByType(BaseModule::DELIVERY_MODULE_TYPE)
+            ->find();
+
         $deliveryModules = [];
 
         /** @var Module $module */
         foreach ($modules as $module) {
-            $deliveryModules[] = $this->deliveryModuleApiService->getDeliveryModuleResource(
+            $deliveryModuleResource = $this->deliveryModuleService->getDeliveryModuleResource(
                 $module,
                 $cart,
                 $deliveryAddress,
                 $country,
                 $state,
+                (bool) $context['filters']['only_valid'] ?? false
             );
-        }
 
-        if ($context['filters']['by_code'] ?? null === '1') {
-            $deliveryModules = array_reduce($deliveryModules, static function (array $carry, $item) {
-                $carry[$item->getDeliveryMode()][] = $item;
-
-                return $carry;
-            }, []);
+            if ($deliveryModuleResource) {
+                $deliveryModules[] = $deliveryModuleResource;
+            }
         }
 
         return $deliveryModules;

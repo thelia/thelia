@@ -17,29 +17,28 @@ namespace Thelia\Core\EventListener;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\Event\IsAdminEnvEvent;
-use Thelia\Core\Event\SessionEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpFoundation\Session\Session;
-use Thelia\Core\TheliaKernelEvents;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\Lang;
+use Thelia\Log\Tlog;
 use Thelia\Service\Model\LangService;
+use Thelia\Service\SessionManager;
 
 class KernelListener
 {
-    protected static ?Session $session = null;
+    public static ?Session $session = null;
 
     public function __construct(
         protected HttpKernelInterface $app,
         protected Translator $translator,
         protected EventDispatcherInterface $eventDispatcher,
         protected LangService $langService,
+        protected SessionManager $sessionManager,
         protected string $cacheDir,
         protected bool $debug,
         protected string $env,
@@ -47,82 +46,52 @@ class KernelListener
     }
 
     #[AsEventListener(event: KernelEvents::REQUEST, priority: \PHP_INT_MAX - 1)]
-    public function initializeLanguageAndAdmin(RequestEvent $event): ?Response
+    public function checkIsApiRoute(RequestEvent $event): void
     {
-        if (HttpKernelInterface::MAIN_REQUEST !== $event->getRequestType()) {
-            return null;
+        $isApiRoute = preg_match('/^\/api\//', $event->getRequest()->getPathInfo());
+
+        if ($isApiRoute) {
+            $event->getRequest()->request->set('isApiRoute', $isApiRoute);
+        }
+    }
+
+    #[AsEventListener(event: KernelEvents::REQUEST, priority: 127)]
+    public function warmupSession(RequestEvent $event): void
+    {
+        if (!$this->sessionManager->sessionIsStartable($event)) {
+
+            return;
         }
         $request = $event->getRequest();
 
-        if (!$request instanceof TheliaRequest) {
+        $session = $request->getSession();
+        if (!$session->isStarted()) {
+            $session->start();
+        }
+    }
+
+    #[AsEventListener(event: KernelEvents::REQUEST, priority: 80)]
+    public function initializeLanguageAndAdmin(RequestEvent $event): ?Response
+    {
+        if (!$this->sessionManager->sessionIsStartable($event)) {
             return null;
         }
+        /** @var Request $request */
+        $request = $event->getRequest();
+        /** @var Session $session */
+        $session = $request->getSession();
 
-        if (!$request->hasSession() || !($session = $request->getSession()) instanceof SessionInterface) {
-            return null;
-        }
+        $isAdminEvent = new IsAdminEnvEvent($request);
+        TheliaRequest::$isAdminEnv = $isAdminEvent->isAdminEnv();
+        $this->eventDispatcher->dispatch($isAdminEvent, IsAdminEnvEvent::class);
 
-        $event = new IsAdminEnvEvent($request);
-        TheliaRequest::$isAdminEnv = $event->isAdminEnv();
-        $this->eventDispatcher->dispatch($event, IsAdminEnvEvent::class);
-
-        $response = $this->handleLang($session, $request);
+        $response = $this->langService->handleLang($session, $request);
 
         if ($response instanceof Response) {
             return $response;
         }
 
         $this->langService->syncMultiDomainLanguage($request);
-
-        return null;
-    }
-
-    #[AsEventListener(event: KernelEvents::REQUEST, priority: \PHP_INT_MAX)]
-    public function initializeSession(RequestEvent $event): void
-    {
-        if (self::$session !== null) {
-            return;
-        }
-        $isApiRoute = preg_match('/^\/api\//', $event->getRequest()->getPathInfo());
-
-        if ($isApiRoute) {
-            $event->getRequest()->request->set('isApiRoute', $isApiRoute);
-        }
-
-        $request = $event->getRequest();
-        $event = new SessionEvent(
-            $this->cacheDir,
-            $this->debug,
-            $this->env
-        );
-        $this->eventDispatcher->dispatch($event, TheliaKernelEvents::SESSION);
-        self::$session = $event->getSession();
-        $session = self::$session;
-        if (!$session->isStarted()) {
-            $session->start();
-        }
-
-        $request->setSession($session);
-    }
-
-    protected function handleLang(Session $session, Request $request): Response|Lang|null
-    {
-        if (true === TheliaRequest::$isAdminEnv) {
-            $lang = $this->langService->resolveAdminLanguageFromRequest($request);
-            $session->setAdminLang($lang);
-
-            return $lang;
-        }
-
-        $langOrResponse = $this->langService->resolveFrontLanguageFromRequest($request);
-
-        if ($langOrResponse instanceof Response) {
-            return $langOrResponse;
-        }
-
-        if ($langOrResponse instanceof Lang) {
-            $this->langService->setLang($langOrResponse);
-        }
 
         return null;
     }

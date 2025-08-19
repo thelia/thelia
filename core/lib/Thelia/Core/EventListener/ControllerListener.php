@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\EventListener;
 
+use Lexik\Bundle\JWTAuthenticationBundle\Events;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -27,12 +29,13 @@ use Thelia\Exception\AdminAccessDenied;
  *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class ControllerListener implements EventSubscriberInterface
+class ControllerListener
 {
     public function __construct(protected SecurityContext $securityContext)
     {
     }
 
+    #[AsEventListener(event: KernelEvents::CONTROLLER, priority: 128)]
     public function adminFirewall(ControllerEvent $event): void
     {
         $controller = $event->getController();
@@ -45,14 +48,5 @@ class ControllerListener implements EventSubscriberInterface
         ) {
             throw new AdminAccessDenied(Translator::getInstance()->trans("You're not currently connected to the administration panel. Please log in to access this page"));
         }
-    }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            KernelEvents::CONTROLLER => [
-                ['adminFirewall', 128],
-            ],
-        ];
     }
 }

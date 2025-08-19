@@ -21,12 +21,12 @@ namespace Thelia\Model;
  */
 class OrderPostage
 {
-    /**
-     * @param float  $amount
-     * @param float  $amountTax
-     * @param string $taxRuleTitle
-     */
-    public function __construct(protected $amount = 0.0, protected $amountTax = 0.0, protected $taxRuleTitle = '')
+    protected ?float $amount = null;
+    protected ?float $amountTax = null;
+    protected ?float $untaxedAmount = null;
+    protected ?string $taxRuleTitle = null;
+
+    public function __construct(?string $amount = null, ?string $amountTax = null, ?string $taxRuleTitle = null)
     {
     }
 
@@ -38,34 +38,44 @@ class OrderPostage
         return $postage instanceof self ? $postage : new self($postage);
     }
 
-    public function getAmount(): float
+    public function getAmount(): ?float
     {
         return $this->amount;
     }
 
-    public function setAmount(float $amount): void
+    public function setAmount(?float $amount = null): void
     {
         $this->amount = $amount;
     }
 
-    public function getAmountTax(): float
+    public function getAmountTax(): ?float
     {
         return $this->amountTax;
     }
 
-    public function setAmountTax(float $amountTax): void
+    public function setAmountTax(?float $amountTax = null): void
     {
         // We have to round the postage tax to prevent small delta amounts in tax calculations.
         $this->amountTax = round($amountTax, 2);
     }
 
-    public function getTaxRuleTitle(): string
+    public function getTaxRuleTitle(): ?string
     {
         return $this->taxRuleTitle;
     }
 
-    public function setTaxRuleTitle(string $taxRuleTitle): void
+    public function setTaxRuleTitle(?string $taxRuleTitle = null): void
     {
         $this->taxRuleTitle = $taxRuleTitle;
+    }
+
+    public function getUntaxedAmount(): ?float
+    {
+        return $this->untaxedAmount ?: $this->amount - $this->amountTax;
+    }
+
+    public function setUntaxedAmount(float $untaxedAmount): void
+    {
+        $this->untaxedAmount = $untaxedAmount;
     }
 }

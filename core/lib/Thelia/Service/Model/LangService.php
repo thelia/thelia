@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\Admin;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
@@ -56,6 +57,30 @@ readonly class LangService
         $request->getSession()->setLang($lang);
         $request->setLocale($lang->getLocale());
     }
+
+
+    public function handleLang(Session $session, Request $request): Response|Lang|null
+    {
+        if (true === TheliaRequest::$isAdminEnv) {
+            $lang = $this->resolveAdminLanguageFromRequest($request);
+            $session->setAdminLang($lang);
+
+            return $lang;
+        }
+
+        $langOrResponse = $this->resolveFrontLanguageFromRequest($request);
+
+        if ($langOrResponse instanceof Response) {
+            return $langOrResponse;
+        }
+
+        if ($langOrResponse instanceof Lang) {
+            $this->setLang($langOrResponse);
+        }
+
+        return null;
+    }
+
 
     public function resolveFrontLanguageFromRequest(TheliaRequest $request): Lang|Response
     {

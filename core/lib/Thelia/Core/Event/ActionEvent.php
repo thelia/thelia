@@ -48,22 +48,17 @@ abstract class ActionEvent extends Event
 
         /** @var Form $field */
         foreach ($fields as $field) {
-            $functionName = \sprintf('set%s', Container::camelize($field->getName()));
-
-            if (method_exists($this, $functionName)) {
-                $getFunctionName = \sprintf('get%s', Container::camelize($field->getName()));
-
-                if (method_exists($this, $getFunctionName)) {
-                    if (null === $this->{$getFunctionName}()) {
-                        $this->{$functionName}($field->getData());
-                    }
-                } else {
-                    $this->{$functionName}($field->getData());
-                }
-            } else {
-                $this->{$field->getName()} = $field->getData();
-            }
+            $this->bindFormField($field->getName(), $field->getData());
         }
+    }
+
+    public function bindArray(array $data): self
+    {
+        foreach ($data as $fieldName => $fieldValue) {
+            $this->bindField($fieldName, $fieldValue);
+        }
+
+        return $this;
     }
 
     public function resetStopPropagation(): void
@@ -72,5 +67,46 @@ abstract class ActionEvent extends Event
         $property = $reflection->getProperty('propagationStopped');
         $property->setAccessible(true);
         $property->setValue($this, false);
+    }
+
+    private function bindField(string $fieldName, mixed $fieldValue): void
+    {
+        $setterMethodName = \sprintf('set%s', Container::camelize($fieldName));
+
+        if (!method_exists($this, $setterMethodName)) {
+            $this->__set($fieldName, $fieldValue);
+
+            return;
+        }
+
+        $this->callSetterIfAllowed($setterMethodName, $fieldName, $fieldValue);
+    }
+
+    private function bindFormField(string $fieldName, mixed $fieldValue): void
+    {
+        $setterMethodName = \sprintf('set%s', Container::camelize($fieldName));
+
+        if (!method_exists($this, $setterMethodName)) {
+            $this->__set($fieldName, $fieldValue);
+
+            return;
+        }
+
+        $this->callSetterIfAllowed($setterMethodName, $fieldName, $fieldValue);
+    }
+
+    private function callSetterIfAllowed(string $setterMethodName, string $fieldName, mixed $fieldValue): void
+    {
+        $getterMethodName = \sprintf('get%s', Container::camelize($fieldName));
+
+        if (!method_exists($this, $getterMethodName)) {
+            $this->{$setterMethodName}($fieldValue);
+
+            return;
+        }
+
+        if (null === $this->{$getterMethodName}()) {
+            $this->{$setterMethodName}($fieldValue);
+        }
     }
 }

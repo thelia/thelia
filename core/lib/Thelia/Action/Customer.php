@@ -20,6 +20,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
+use Thelia\Core\Event\Customer\CustomerCreateOrUpdateMinimalEvent;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
 use Thelia\Core\Event\LostPasswordEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -33,7 +34,6 @@ use Thelia\Model\CustomerQuery;
 use Thelia\Model\Event\CustomerEvent;
 use Thelia\Model\LangQuery;
 use Thelia\Service\Model\CustomerService;
-use Thelia\Service\Model\LangService;
 use Thelia\Tools\Password;
 
 /**
@@ -48,19 +48,18 @@ class Customer extends BaseAction implements EventSubscriberInterface
     public function __construct(
         protected SecurityContext $securityContext,
         protected MailerFactory $mailer,
+        protected RequestStack $requestStack,
+        protected EventDispatcherInterface $dispatcher,
         protected CustomerService $customerService,
-        protected LangService $langService,
-        protected ?RequestStack $requestStack = null,
     ) {
     }
 
     /**
      * @throws PropelException
      */
-    public function create(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    public function create(CustomerCreateOrUpdateEvent $event): void
     {
         $customer = new CustomerModel();
-
         $plainPassword = $event->getPassword();
 
         $this->createOrUpdateCustomer($customer, $event);
@@ -73,24 +72,53 @@ class Customer extends BaseAction implements EventSubscriberInterface
             );
         }
 
-        $dispatcher->dispatch(
+        $this->dispatcher->dispatch(
             new CustomerEvent($customer),
-            TheliaEvents::SEND_ACCOUNT_CONFIRMATION_EMAIL,
+            TheliaEvents::SEND_ACCOUNT_CONFIRMATION_EMAIL
         );
     }
 
-    public function customerConfirmationEmail(
-        CustomerEvent $event,
-        $eventName,
-        EventDispatcherInterface $dispatcher,
-    ): void {
+    public function createMinimal(CustomerCreateOrUpdateMinimalEvent $event): void
+    {
+        $customer = new CustomerModel();
+
+        $customer->createOrUpdateWithoutAddress(
+            titleId: $event->getTitle(),
+            firstname: $event->getFirstname(),
+            lastname: $event->getLastname(),
+            email: $event->getEmail(),
+            plainPassword: $event->getPassword(),
+            forceEmailUpdate: $event->isForceEmailUpdate(),
+            langId: $event->getLangId(),
+            reseller: $event->isReseller(),
+            sponsor: $event->getSponsor(),
+            discount: $event->getDiscount(),
+            ref: $event->getRef(),
+            enabled: $event->isEnabled()
+        );
+
+        $this->dispatcher->dispatch(
+            new CustomerEvent($customer),
+            TheliaEvents::SEND_ACCOUNT_CONFIRMATION_EMAIL,
+        );
+
+        $event->setCustomer($customer);
+    }
+
+    public function customerConfirmationEmail(CustomerEvent $event): void
+    {
         $customer = $event->getModel();
 
-        if (ConfigQuery::isCustomerEmailConfirmationEnable() && null !== $customer->getConfirmationToken()) {
+        if (ConfigQuery::isCustomerEmailConfirmationEnable() && $customer->getConfirmationToken() !== null) {
+            $validationCode = $customer->_validationCodeForEmail ?? '------';
+
             $this->mailer->sendEmailToCustomer(
                 'customer_confirmation',
                 $customer,
-                ['customer_id' => $customer->getId()],
+                [
+                    'customer_id' => $customer->getId(),
+                    'validation_code' => $validationCode,
+                ]
             );
         }
     }
@@ -116,11 +144,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
     /**
      * @throws PropelException
      */
-    public function updateProfile(
-        CustomerCreateOrUpdateEvent $event,
-        $eventName,
-        EventDispatcherInterface $dispatcher,
-    ): void {
+    public function updateProfile(CustomerCreateOrUpdateEvent $event): void
+    {
         $customer = $event->getCustomer();
 
         if (null !== $event->getTitle()) {
@@ -261,6 +286,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     {
         return [
             TheliaEvents::CUSTOMER_CREATEACCOUNT => ['create', 128],
+            TheliaEvents::CREATE_CUSTOMER_MINIMAL => ['createMinimal', 128],
             TheliaEvents::CUSTOMER_UPDATEACCOUNT => ['modify', 128],
             TheliaEvents::CUSTOMER_UPDATEPROFILE => ['updateProfile', 128],
             TheliaEvents::CUSTOMER_LOGOUT => ['logout', 128],

@@ -124,8 +124,12 @@ class Cart extends BaseCart
      *
      * @throws PropelException
      */
-    public function getTaxedAmount(Country $country, bool $withDiscount = true, ?State $state = null): float
-    {
+    public function getTaxedAmount(
+        Country $country,
+        bool $withDiscount = true,
+        ?State $state = null,
+        bool $withPostage = false,
+    ): float {
         $total = 0;
 
         foreach ($this->getCartItems() as $cartItem) {
@@ -140,6 +144,10 @@ class Cart extends BaseCart
             }
         }
 
+        if ($withPostage) {
+            $total += $this->getTaxedPostage();
+        }
+
         return round($total, 2);
     }
 
@@ -148,8 +156,12 @@ class Cart extends BaseCart
      *
      * @see getTaxedAmount same as this method but the amount is without taxes
      */
-    public function getTotalAmount(bool $withDiscount = true, ?Country $country = null, ?State $state = null): float
-    {
+    public function getTotalAmount(
+        bool $withDiscount = true,
+        ?Country $country = null,
+        ?State $state = null,
+        bool $withPostage = false,
+    ): float {
         $total = 0;
 
         foreach ($this->getCartItems() as $cartItem) {
@@ -164,6 +176,10 @@ class Cart extends BaseCart
             }
         }
 
+        if ($withPostage) {
+            $total += (float) $this->getPostage();
+        }
+
         return round($total, 2);
     }
 
@@ -172,9 +188,9 @@ class Cart extends BaseCart
      *
      * @throws PropelException
      */
-    public function getTotalVAT(Country $taxCountry, $taxState = null, bool $withDiscount = true): float|int|string
+    public function getTotalVAT($taxCountry, $taxState = null, $withDiscount = true, $withPostage = false): float|int|string
     {
-        return $this->getTaxedAmount($taxCountry, $withDiscount, $taxState) - $this->getTotalAmount($withDiscount, $taxCountry, $taxState);
+        return $this->getTaxedAmount($taxCountry, $withDiscount, $taxState, $withPostage) - $this->getTotalAmount($withDiscount, $taxCountry, $taxState, $withPostage);
     }
 
     /**
@@ -242,5 +258,10 @@ class Cart extends BaseCart
         }
 
         return round(Calculator::getUntaxedCartDiscount($this, $country, $state), 2);
+    }
+
+    public function getTaxedPostage(): float
+    {
+        return (float) $this->getPostage() + (float) $this->getPostageTax();
     }
 }

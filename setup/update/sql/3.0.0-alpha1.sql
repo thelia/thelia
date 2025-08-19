@@ -109,4 +109,29 @@ ALTER TABLE `address`
 
 ALTER TABLE `choice_filter` ADD COLUMN `type` VARCHAR(255);
 
+--
+-- Migration : Ajout des champs de postage et modules de paiement/livraison à la table cart
+-- Ajoute les colonnes postage, postage_tax, payment_module_id et delivery_module_id
+--
+
+ALTER TABLE `cart`
+    ADD COLUMN `postage_tax_rule_title` VARCHAR(255) DEFAULT NULL after address_invoice_id,
+    ADD COLUMN `postage_tax` DECIMAL(10,2) DEFAULT NULL after address_invoice_id,
+    ADD COLUMN `postage` DECIMAL(10,2) DEFAULT NULL after address_invoice_id,
+    ADD COLUMN `payment_module_id` INT DEFAULT NULL after address_invoice_id,
+    ADD COLUMN `delivery_module_id` INT DEFAULT NULL after address_invoice_id,
+    ADD CONSTRAINT `fk_cart_payment_module_id`
+        FOREIGN KEY (`payment_module_id`) REFERENCES `module`(`id`)
+            ON DELETE SET NULL ON UPDATE CASCADE,
+    ADD CONSTRAINT `fk_cart_delivery_module_id`
+        FOREIGN KEY (`delivery_module_id`) REFERENCES `module`(`id`)
+            ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE customer ADD COLUMN confirmation_token_expires_at DATETIME NULL after confirmation_token;
+ALTER TABLE customer_version ADD COLUMN confirmation_token_expires_at DATETIME NULL after confirmation_token;
+
+INSERT INTO `message` (`name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
+    ('customer_send_code', NULL, NULL, 'customer_send_code.txt', NULL, 'customer_send_code.html', NOW(), NOW());
+
+
 SET FOREIGN_KEY_CHECKS = 1;

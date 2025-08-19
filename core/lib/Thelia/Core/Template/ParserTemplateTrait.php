@@ -15,9 +15,9 @@ declare(strict_types=1);
 namespace Thelia\Core\Template;
 
 use Imagine\Exception\InvalidArgumentException;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Service\Attribute\Required;
+use Thelia\Core\HttpFoundation\Request;
 
 /**
  * @mixin ParserInterface
@@ -35,7 +35,7 @@ trait ParserTemplateTrait
     #[Required]
     public RequestStack $requestStack;
 
-    public function getRequest(): ?Request
+    public function getRequest(): Request
     {
         return $this->requestStack->getCurrentRequest();
     }

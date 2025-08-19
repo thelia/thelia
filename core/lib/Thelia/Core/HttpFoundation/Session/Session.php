@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\HttpFoundation\Session;
 
 use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
+use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 use Thelia\Core\Event\Cart\CartCreateEvent;
@@ -29,6 +30,7 @@ use Thelia\Model\Currency;
 use Thelia\Model\Lang;
 use Thelia\Model\Order;
 use Thelia\Service\Model\LangService;
+use Thelia\Service\SessionManager;
 use Thelia\Tools\URL;
 
 class Session extends BaseSession
@@ -299,4 +301,10 @@ class Session extends BaseSession
 
         return $this;
     }
+
+    public function getStorage(): SessionStorageInterface
+    {
+        return $this->storage;
+    }
+
 }

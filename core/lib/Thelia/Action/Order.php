@@ -175,8 +175,8 @@ class Order extends BaseAction implements EventSubscriberInterface
                     ->findPk($placedOrder->getDeliveryOrderAddressId())
                     ->getCountry();
         } else {
-            $deliveryAddress = AddressQuery::create()->findPk($sessionOrder->getChoosenDeliveryAddress());
-            $invoiceAddress = AddressQuery::create()->findPk($sessionOrder->getChoosenInvoiceAddress());
+            $deliveryAddress = AddressQuery::create()->findPk($cart->getAddressDeliveryId());
+            $invoiceAddress = AddressQuery::create()->findPk($cart->getAddressInvoiceId());
 
             /* hard save the delivery and invoice addresses */
             $deliveryOrderAddress = new OrderAddress();

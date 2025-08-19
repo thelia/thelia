@@ -19,10 +19,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -426,5 +428,20 @@ abstract class BaseController implements ControllerInterface
     public function getContainer(): ContainerInterface
     {
         return $this->container;
+    }
+
+    protected function addFlash(string $type, mixed $message): void
+    {
+        try {
+            $session = $this->container->get('request_stack')?->getSession();
+        } catch (SessionNotFoundException $e) {
+            throw new \LogicException('You cannot use the addFlash method if sessions are disabled. Enable them in "config/packages/framework.yaml".', 0, $e);
+        }
+
+        if (!$session instanceof FlashBagAwareSessionInterface) {
+            throw new \LogicException(\sprintf('You cannot use the addFlash method because class "%s" doesn\'t implement "%s".', get_debug_type($session), FlashBagAwareSessionInterface::class));
+        }
+
+        $session->getFlashBag()->add($type, $message);
     }
 }

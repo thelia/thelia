@@ -50,9 +50,6 @@ class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
         return $this->loginForm->get($this->options['username_field_name'])->getData();
     }
 
-    /**
-     * @see \Thelia\Core\Security\Authentication\AuthenticatorInterface::getAuthentifiedUser()
-     */
     public function getAuthentifiedUser()
     {
         if ($this->request->isMethod($this->options['required_method'])) {

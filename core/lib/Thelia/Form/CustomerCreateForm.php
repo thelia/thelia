@@ -95,6 +95,12 @@ class CustomerCreateForm extends AddressCreateForm
                 'label_attr' => [
                     'for' => 'lang_id',
                 ],
+            ])
+            ->add('title', IntegerType::class, [
+                'required' => false,
+            ])
+            ->add('cellphone', IntegerType::class, [
+                'required' => false,
             ]);
 
         // confirm email

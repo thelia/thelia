@@ -37,17 +37,7 @@ class Order extends BaseOrder
 
     protected bool $disableVersioning = false;
 
-    /**
-     * @param int $choosenDeliveryAddress the choosen delivery address ID
-     *
-     * @return $this
-     */
-    public function setChoosenDeliveryAddress(int $choosenDeliveryAddress)
-    {
-        $this->choosenDeliveryAddress = $choosenDeliveryAddress;
-
-        return $this;
-    }
+    protected ?Cart $cart = null;
 
     /**
      * @return $this
@@ -74,10 +64,26 @@ class Order extends BaseOrder
     }
 
     /**
+     * @param int $choosenDeliveryAddress the choosen delivery address ID
+     *
+     * @deprecated Use the cart model
+     *
+     * @return $this
+     */
+    public function setChoosenDeliveryAddress($choosenDeliveryAddress)
+    {
+        return $this;
+    }
+
+    /**
      * @return int|null the choosen delivery address ID
+     *
+     * @deprecated Use the cart model
      */
     public function getChoosenDeliveryAddress(): ?int
     {
+        $this->choosenDeliveryAddress = $this->getCart()?->getAddressDeliveryId();
+
         return $this->choosenDeliveryAddress;
     }
 
@@ -85,6 +91,8 @@ class Order extends BaseOrder
      * @param int $choosenInvoiceAddress the choosen invoice address
      *
      * @return $this
+     *
+     * @deprecated Use the cart model
      */
     public function setChoosenInvoiceAddress(int $choosenInvoiceAddress)
     {
@@ -95,9 +103,13 @@ class Order extends BaseOrder
 
     /**
      * @return int|null the choosen invoice address ID
+     *
+     * @deprecated Use the cart model
      */
     public function getChoosenInvoiceAddress(): ?int
     {
+        $this->choosenDeliveryAddress = $this->getCart()?->getAddressInvoiceId();
+
         return $this->choosenInvoiceAddress;
     }
 
@@ -540,5 +552,14 @@ class Order extends BaseOrder
         );
 
         return $event->getManageStock() ?? $paymentModule->manageStockOnCreation();
+    }
+
+    protected function getCart(): ?Cart
+    {
+        if (!$cartId = $this->getCartId()) {
+            return null;
+        }
+
+        return CartQuery::create()->filterById($cartId)->findOne();
     }
 }

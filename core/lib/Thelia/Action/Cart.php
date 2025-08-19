@@ -15,17 +15,22 @@ declare(strict_types=1);
 namespace Thelia\Action;
 
 use Propel\Runtime\Exception\PropelException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Core\Event\Cart\CartCheckoutEvent;
 use Thelia\Core\Event\Cart\CartCreateEvent;
 use Thelia\Core\Event\Cart\CartDuplicationEvent;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Cart\CartPersistEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\Currency\CurrencyChangeEvent;
+use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Security\SecurityContext;
+use Thelia\Model\AddressQuery;
 use Thelia\Model\Base\CustomerQuery;
 use Thelia\Model\Base\ProductSaleElementsQuery;
 use Thelia\Model\Cart as CartModel;
@@ -35,6 +40,8 @@ use Thelia\Model\CartQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Customer as CustomerModel;
+use Thelia\Model\ModuleQuery;
+use Thelia\Model\OrderPostage;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\Tools\ProductPriceTools;
 use Thelia\Tools\TokenProvider;
@@ -49,9 +56,33 @@ use Thelia\Tools\TokenProvider;
 class Cart extends BaseAction implements EventSubscriberInterface
 {
     public function __construct(
-        protected Request $request,
+        protected RequestStack $requestStack,
         protected TokenProvider $tokenProvider,
+        protected SecurityContext $securityContext,
+        protected ContainerInterface $container,
     ) {
+    }
+
+    /**
+     * @throws PropelException
+     */
+    public function setDeliveryAddress(CartCheckoutEvent $event): void
+    {
+        $cart = $event->getCart();
+        $addressId = $event->getDeliveryAddressId();
+
+        if ($addressId && !$this->validateAddressOwnership($cart, $event->getDeliveryAddressId())) {
+            return;
+        }
+
+        $cart->setAddressDeliveryId($addressId)->save();
+    }
+
+    public function setPaymentModule(CartCheckoutEvent $event): void
+    {
+        $cart = $event->getCart();
+        $cart->setPaymentModuleId($event->getPaymentModuleId());
+        $cart->save();
     }
 
     public function persistCart(CartPersistEvent $event): void
@@ -275,11 +306,13 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         // Do not try to find a cartItem if one exists in the event, as previous event handlers
         // mays have put it in th event.
-        if (!$event->getCartItem() instanceof CartItem && null !== $foundItem = CartItemQuery::create()
+        if (
+            !$event->getCartItem() instanceof CartItem && null !== $foundItem = CartItemQuery::create()
             ->filterByCartId($event->getCart()->getId())
             ->filterByProductId($event->getProduct())
             ->filterByProductSaleElementsId($event->getProductSaleElementsId())
-            ->findOne()) {
+            ->findOne()
+        ) {
             $event->setCartItem($foundItem);
         }
     }
@@ -292,10 +325,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         $cookieName = ConfigQuery::read('cart.cookie_name', 'thelia_cart');
         $persistentCookie = ConfigQuery::read('cart.use_persistent_cookie', 1);
+        $request = $this->requestStack->getCurrentRequest();
 
         $cart = null;
 
-        if ($this->request->cookies->has($cookieName) && $persistentCookie) {
+        if ($request->cookies->has($cookieName) && $persistentCookie) {
             $cart = $this->managePersistentCart($cartRestoreEvent, $cookieName, $dispatcher);
         } elseif (!$persistentCookie) {
             $cart = $this->manageNonPersistentCookie($cartRestoreEvent, $dispatcher);
@@ -334,6 +368,24 @@ class Cart extends BaseAction implements EventSubscriberInterface
         return $cart;
     }
 
+    protected function validateAddressOwnership(CartModel $cart, int $addressId): bool
+    {
+        if (!$customerId = $cart->getCustomerId()) {
+            return false;
+        }
+
+        $address = AddressQuery::create()
+            ->filterByCustomerId($customerId)
+            ->filterById($addressId)
+            ->findOne();
+
+        if (!$address) {
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * The cart token is saved in a cookie so we try to retrieve it. Then the customer is checked.
      *
@@ -342,8 +394,10 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     protected function managePersistentCart(CartRestoreEvent $cartRestoreEvent, string $cookieName, EventDispatcherInterface $dispatcher): CartModel
     {
+        $request = $this->requestStack->getCurrentRequest();
+
         // The cart cookie exists -> get the cart token
-        $token = $this->request->cookies->get($cookieName);
+        $token = $request->cookies->get($cookieName);
 
         // Check if a cart exists for this token
         if (null !== $cart = CartQuery::create()->findOneByToken($token)) {
@@ -388,6 +442,53 @@ class Cart extends BaseAction implements EventSubscriberInterface
         }
 
         return $cart;
+    }
+
+    /**
+     * @throws PropelException
+     */
+    protected function getPostageByDeliveryModuleId(
+        CartModel $cart,
+        EventDispatcherInterface $dispatcher,
+        int $moduleId,
+        int $deliveryAddressId,
+    ): OrderPostage {
+        if (!$customer = $this->securityContext->getCustomerUser()) {
+            throw new \Exception('Customer not found !');
+        }
+
+        $deliveryModule = ModuleQuery::create()->filterById($moduleId)->findOne();
+        $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
+
+        $deliveryAddress = AddressQuery::create()
+            ->useCustomerQuery()
+            ->filterById($customer->getId())
+            ->endUse()
+            ->filterById($deliveryAddressId)->findOne();
+
+        if (!$deliveryAddress) {
+            throw new \Exception('Delivery address not found !');
+        }
+
+        if (true === $cart->isVirtual() && false === $moduleInstance->handleVirtualProductDelivery()) {
+            throw new \Exception('Virtual product delivery failed ! ');
+        }
+
+        $country = $deliveryAddress->getCountry();
+        $state = $deliveryAddress->getState();
+
+        $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, $deliveryAddress, $country, $state);
+
+        $dispatcher->dispatch(
+            $deliveryPostageEvent,
+            TheliaEvents::MODULE_DELIVERY_GET_POSTAGE
+        );
+
+        if ($deliveryPostageEvent->getPostage()) {
+            return $deliveryPostageEvent->getPostage();
+        }
+
+        return new OrderPostage();
     }
 
     protected function dispatchNewCart(EventDispatcherInterface $dispatcher): CartModel
@@ -461,6 +562,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
+            TheliaEvents::CART_SET_DELIVERY_ADDRESS => ['setDeliveryAddress', 128],
+            // TheliaEvents::CART_SET_DELIVERY_MODULE => ['setDeliveryModule', 128],
+            // TheliaEvents::CART_SET_POSTAGE => ['calculatePostage', 128],
+            // TheliaEvents::CART_SET_INVOICE_ADDRESS => ['setInvoiceAddress', 128],
+            TheliaEvents::CART_SET_PAYMENT_MODULE => ['setPaymentModule', 128],
             TheliaEvents::CART_PERSIST => ['persistCart', 128],
             TheliaEvents::CART_RESTORE_CURRENT => ['restoreCurrentCart', 128],
             TheliaEvents::CART_CREATE_NEW => ['createEmptyCart', 128],
@@ -475,6 +581,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
     protected function getSession(): Session
     {
-        return $this->request->getSession();
+        /** @var Session $session */
+        $session = $this->requestStack->getCurrentRequest()->getSession();
+
+        return $session;
     }
 }

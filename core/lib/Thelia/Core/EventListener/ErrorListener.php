@@ -22,22 +22,38 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\TheliaKernelEvents;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 /**
  * Class ErrorListener.
  *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class ErrorListener implements EventSubscriberInterface
+class ErrorListener
 {
-    public function __construct(protected $env, protected ParserInterface $parser, protected SecurityContext $securityContext, protected EventDispatcherInterface $eventDispatcher)
-    {
+    private ParserInterface $parser;
+
+    /**
+     * @throws \Exception
+     */
+    public function __construct(
+        protected $env,
+        protected ParserResolver $parserResolver,
+        protected SecurityContext $securityContext,
+        protected EventDispatcherInterface $eventDispatcher,
+    ) {
+        $this->parser = $this->parserResolver->getParserByCurrentRequest();
     }
 
+    /**
+     * @throws \Exception
+     */
+    #[AsEventListener(event: TheliaKernelEvents::THELIA_HANDLE_ERROR, priority: 0)]
     public function defaultErrorFallback(ExceptionEvent $event): void
     {
         $this->parser->assign('status_code', 500);
@@ -59,6 +75,7 @@ class ErrorListener implements EventSubscriberInterface
         $event->setResponse($response);
     }
 
+    #[AsEventListener(event: KernelEvents::EXCEPTION, priority: 0)]
     public function handleException(ExceptionEvent $event): void
     {
         if ($event->getRequest()->get('_api_operation_name', false)) {
@@ -74,6 +91,7 @@ class ErrorListener implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(event: KernelEvents::EXCEPTION, priority: 0)]
     public function logException(ExceptionEvent $event): void
     {
         // Log exception in the Thelia log
@@ -96,6 +114,7 @@ class ErrorListener implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(event: KernelEvents::EXCEPTION, priority: 100)]
     public function authenticationException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
@@ -107,21 +126,4 @@ class ErrorListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     * api.
-     */
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            KernelEvents::EXCEPTION => [
-                ['logException', 0],
-                ['handleException', 0],
-                ['authenticationException', 100],
-            ],
-            TheliaKernelEvents::THELIA_HANDLE_ERROR => [
-                ['defaultErrorFallback', 0],
-            ],
-        ];
-    }
 }

@@ -59,7 +59,7 @@ class ConditionFactory
 
         $serializableConditions = [];
 
-        /** @var $condition ConditionInterface */
+        /** @var ConditionInterface $condition */
         foreach ($collection as $condition) {
             $serializableConditions[] = $condition->getSerializableCondition();
         }

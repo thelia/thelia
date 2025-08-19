@@ -16,9 +16,11 @@ namespace Thelia\Module;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Router;
-use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Template\Parser\ParserResolver;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Model\Order;
 use Thelia\Tools\URL;
+use TheliaSmarty\Template\SmartyParser;
 
 abstract class AbstractPaymentModule extends BaseModule implements PaymentModuleInterface
 {
@@ -33,21 +35,32 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
      */
     public function generateGatewayFormResponse(Order $order, string $gateway_url, array $form_data): Response
     {
-        /** @var ParserInterface $parser */
-        $parser = $this->getContainer()->get('thelia.parser');
+        /** @var ParserResolver $parserResolver */
+        $parserResolver = $this->getContainer()->get('thelia.parser.resolver');
 
-        $parser->setTemplateDefinition(
-            $parser->getTemplateHelper()->getActiveFrontTemplate(),
+        /** @var TemplateHelperInterface $templateHelper */
+        $templateHelper = $this->getContainer()->get('thelia.template_helper');
+
+        $parser = $parserResolver->getParser(
+            $templateHelper->getActiveFrontTemplate()->getAbsolutePath(),
+            null
         );
 
+        $parser->setTemplateDefinition($templateHelper->getActiveFrontTemplate());
+
+        if ($parser instanceof SmartyParser) {
+            $realTemplateName = 'order-payment-gateway.html';
+        } else {
+            $realTemplateName = 'order-payment-gateway.html.twig';
+        }
+
         $renderedTemplate = $parser->render(
-            'order-payment-gateway.html',
-            [
+            $realTemplateName, [
                 'order_id' => $order->getId(),
                 'cart_count' => $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems()->count(),
                 'gateway_url' => $gateway_url,
                 'payment_form_data' => $form_data,
-            ],
+            ]
         );
 
         return new Response($renderedTemplate);

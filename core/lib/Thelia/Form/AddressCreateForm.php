@@ -184,7 +184,7 @@ class AddressCreateForm extends FirewallForm
                 ],
                 'required' => false,
             ])
-            ->add('cellphone', TextType::class, [
+            ->add('cellphone', TelType::class, [
                 'label' => Translator::getInstance()->trans('Cellphone'),
                 'label_attr' => [
                     'for' => 'cellphone',
@@ -197,6 +197,12 @@ class AddressCreateForm extends FirewallForm
                 'label_attr' => [
                     'for' => 'default_address',
                 ],
+                'required' => false,
+            ])
+            ->add('title', IntegerType::class, [
+                'required' => false,
+            ])
+            ->add('cellphone', IntegerType::class, [
                 'required' => false,
             ]);
     }

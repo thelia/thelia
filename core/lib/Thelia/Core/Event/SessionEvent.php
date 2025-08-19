@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Event;
 
+use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 
 /**
@@ -29,6 +30,7 @@ class SessionEvent extends ActionEvent
         protected string $cacheDir,
         protected bool $debug,
         protected string $env,
+        protected Request $request,
     ) {
     }
 
@@ -61,8 +63,13 @@ class SessionEvent extends ActionEvent
         $this->session = $session;
     }
 
-    public function getSession(): Session
+    public function getSession(): ?Session
     {
         return $this->session;
+    }
+
+    public function getRequest(): Request
+    {
+        return $this->request;
     }
 }

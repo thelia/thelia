@@ -51,18 +51,22 @@ class RequestListener implements EventSubscriberInterface
 {
     use RememberMeTrait;
 
-    public function __construct(private Translator $translator, protected EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        private readonly Translator $translator,
+        protected EventDispatcherInterface $eventDispatcher,
+        private readonly \Thelia\Core\HttpFoundation\Request $request,
+    ) {
     }
 
     public function registerValidatorTranslator(RequestEvent $event): void
     {
-        /** @var \Thelia\Core\HttpFoundation\Request $request */
-        $request = $event->getRequest();
-
-        $lang = !$request->get('isApiRoute', false) && $request->hasSession(true)
-            ? $request->getSession()->getLang()
-            : Lang::getDefaultLanguage();
+        $lang = Lang::getDefaultLanguage();
+        if (!$this->request->get('isApiRoute', false) && $this->request->hasSession(true)) {
+            $lang = $this->request->getSession()->getLang();
+            if (null === $lang) {
+                $lang = Lang::getDefaultLanguage();
+            }
+        }
 
         $vendorFormDir = THELIA_VENDOR.'symfony'.DS.'form';
         $vendorValidatorDir = THELIA_VENDOR.'symfony'.DS.'validator';

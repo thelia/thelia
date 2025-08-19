@@ -119,6 +119,9 @@ final class TheliaEvents
     /** sent on customer account creation. */
     public const CUSTOMER_CREATEACCOUNT = 'action.createCustomer';
 
+    /** sent on customer account simple creation. */
+    public const CREATE_CUSTOMER_MINIMAL = 'action.create.customer.minimal';
+
     /** sent on customer account update. */
     public const CUSTOMER_UPDATEACCOUNT = 'action.updateCustomer';
 
@@ -237,10 +240,18 @@ final class TheliaEvents
     /** before updating a cart item in database */
     public const CART_ITEM_UPDATE_BEFORE = 'action.cart.item.update.before';
 
+    /** Cart delivery part event */
+    public const CART_SET_DELIVERY_ADDRESS = 'action.cart.setDeliveryAddress';
+    public const CART_SET_DELIVERY_MODULE = 'action.cart.setDeliveryModule';
+    public const CART_SET_POSTAGE = 'action.cart.setPostage';
+    public const CART_SET_INVOICE_ADDRESS = 'action.cart.setInvoiceAddress';
+    public const CART_SET_PAYMENT_MODULE = 'action.cart.setPaymentModule';
+
     /** Order linked event. */
     public const ORDER_SET_DELIVERY_ADDRESS = 'action.order.setDeliveryAddress';
 
     public const ORDER_SET_DELIVERY_MODULE = 'action.order.setDeliveryModule';
+    /** @deprecated Use CART_SET_POSTAGE  */
     public const ORDER_SET_POSTAGE = 'action.order.setPostage';
     public const ORDER_SET_INVOICE_ADDRESS = 'action.order.setInvoiceAddress';
     public const ORDER_SET_PAYMENT_MODULE = 'action.order.setPaymentModule';

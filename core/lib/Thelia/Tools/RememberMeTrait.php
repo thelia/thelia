@@ -32,9 +32,7 @@ trait RememberMeTrait
      */
     protected function getRememberMeKeyFromCookie(Request $request, $cookieName): ?string
     {
-        $ctp = new CookieTokenProvider();
-
-        return $ctp->getKeyFromCookie($request, $cookieName);
+        return (new CookieTokenProvider())->getKeyFromCookie($request, $cookieName);
     }
 
     /**

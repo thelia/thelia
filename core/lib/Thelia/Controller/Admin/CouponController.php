@@ -603,7 +603,7 @@ class CouponController extends BaseAdminController
     {
         $cleanedConditions = [];
 
-        /** @var $condition ConditionInterface */
+        /** @var ConditionInterface $condition */
         foreach ($conditions as $index => $condition) {
             $temp = [
                 'serviceId' => $condition->getServiceId(),

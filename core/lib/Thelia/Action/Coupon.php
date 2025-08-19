@@ -59,6 +59,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         protected CouponManager $couponManager,
         protected MatchForEveryone $noConditionRule,
         protected ConditionFactory $conditionFactory,
+        protected EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -243,14 +244,31 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $event->setCouponModel($coupon);
     }
 
-    public function testFreePostage(OrderEvent $event): void
+    public function checkFreePostage(OrderEvent $event): void
     {
-        $order = $event->getOrder();
+        /** @var \Thelia\Model\Cart $cart */
+        $cart = $this->requestStack->getCurrentRequest()->getSession()->getSessionCart($this->dispatcher);
 
-        if ($this->couponManager->isCouponRemovingPostage($order)) {
-            $order->setPostage(0);
+        if ($this->couponManager->isCouponRemovingPostage($cart)) {
+            $cart->setPostage(null)
+                ->setPostageTax(null)
+                ->setPostageTaxRuleTitle(null)
+                ->save();
 
-            $event->setOrder($order);
+            $event->stopPropagation();
+        }
+    }
+
+    public function forceFreePostage(mixed $event): void
+    {
+        /** @var \Thelia\Model\Cart $cart */
+        $cart = $this->requestStack->getCurrentRequest()->getSession()->getSessionCart($this->dispatcher);
+
+        if ($this->couponManager->isCouponRemovingPostage($cart)) {
+            $cart->setPostage(null)
+                ->setPostageTax(null)
+                ->setPostageTaxRuleTitle(null)
+                ->save();
 
             $event->stopPropagation();
         }
@@ -283,11 +301,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                         ->setCode($couponModel->getCode())
                         ->setType($couponModel->getType())
                         ->setAmount($couponCode->exec())
-
                         ->setTitle($couponModel->getTitle())
                         ->setShortDescription($couponModel->getShortDescription())
                         ->setDescription($couponModel->getDescription())
-
                         ->setStartDate($couponModel->getStartDate())
                         ->setExpirationDate($couponModel->getExpirationDate())
                         ->setIsCumulative($couponModel->getIsCumulative())
@@ -393,7 +409,8 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             TheliaEvents::COUPON_CONSUME => ['consume', 128],
             TheliaEvents::COUPON_CLEAR_ALL => ['clearAllCoupons', 128],
             TheliaEvents::COUPON_CONDITION_UPDATE => ['updateCondition', 128],
-            TheliaEvents::ORDER_SET_POSTAGE => ['testFreePostage', 132],
+            TheliaEvents::ORDER_SET_POSTAGE => ['forceFreePostage', 132],
+            TheliaEvents::CART_SET_POSTAGE => ['forceFreePostage', 132],
             TheliaEvents::ORDER_BEFORE_PAYMENT => ['afterOrder', 128],
             TheliaEvents::ORDER_UPDATE_STATUS => ['orderStatusChange', 10],
             TheliaEvents::CART_ADDITEM => ['updateOrderDiscount', 10],
@@ -409,6 +426,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      */
     protected function getSession(): Session
     {
-        return $this->requestStack->getCurrentRequest()->getSession();
+        /** @var Session $session */
+        $session = $this->requestStack->getCurrentRequest()->getSession();
+
+        return $session;
     }
 }

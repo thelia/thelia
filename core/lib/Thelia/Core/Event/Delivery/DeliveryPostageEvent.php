@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Event\Delivery;
 
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Core\Enum\DeliveryMode;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Address;
@@ -32,18 +33,18 @@ use Thelia\Module\BaseModuleInterface;
 class DeliveryPostageEvent extends ActionEvent
 {
     protected bool $validModule = false;
-    protected ?OrderPostage $postage = null;
-    protected ?DateTime $deliveryDate = null;
-    protected string $deliveryMode;
+    protected OrderPostage $postage;
+    protected ?\DateTime $deliveryDate;
+    protected ?DeliveryMode $deliveryMode;
     protected array $additionalData = [];
 
-    /**
-     * DeliveryPostageEvent constructor.
-     *
-     * @param BaseModuleInterface $module
-     */
-    public function __construct(protected $module, protected Cart $cart, protected ?Address $address = null, protected ?Country $country = null, protected ?State $state = null)
-    {
+    public function __construct(
+        protected $module,
+        protected Cart $cart,
+        protected ?Address $address = null,
+        protected ?Country $country = null,
+        protected ?State $state = null,
+    ) {
     }
 
     public function getCart(): Cart
@@ -162,7 +163,7 @@ class DeliveryPostageEvent extends ActionEvent
         return $this->getAddress() instanceof Address ? $this->getAddress()->getState() : $this->state;
     }
 
-    public function getDeliveryMode(): string
+    public function getDeliveryMode(): ?DeliveryMode
     {
         return $this->deliveryMode;
     }
@@ -170,14 +171,30 @@ class DeliveryPostageEvent extends ActionEvent
     /**
      * @throws \Exception
      */
-    public function setDeliveryMode($deliveryMode): static
+    public function setDeliveryMode($deliveryMode): self
     {
-        if (!\in_array($deliveryMode, ['delivery', 'pickup', 'localPickup'], true)) {
-            throw new \Exception(Translator::getInstance()->trans('A delivery module can only be of type "delivery", "pickup" or "localPickup".'));
+        if ($deliveryMode === null) {
+            $this->deliveryMode = null;
+
+            return $this;
         }
 
-        $this->deliveryMode = $deliveryMode;
+        if ($deliveryMode instanceof DeliveryMode) {
+            $this->deliveryMode = $deliveryMode;
 
-        return $this;
+            return $this;
+        }
+
+        if (\is_string($deliveryMode)) {
+            $this->deliveryMode = DeliveryMode::fromString($deliveryMode);
+
+            if ($this->deliveryMode === null) {
+                throw new \Exception(Translator::getInstance()->trans('A delivery module can only be of type "%allowed_types%".', ['%allowed_types%' => implode('", "', array_column(DeliveryMode::cases(), 'value'))]));
+            }
+
+            return $this;
+        }
+
+        throw new \Exception(Translator::getInstance()->trans('Delivery mode must be a DeliveryMode enum, string, or null.'));
     }
 }

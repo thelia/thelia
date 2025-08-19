@@ -36,6 +36,8 @@ use Thelia\Model\Map\CustomerTableMap;
  */
 class Customer extends BaseCustomer implements UserInterface, SecurityUserInterface, PasswordAuthenticatedUserInterface
 {
+    public string $_validationCodeForEmail;
+
     /**
      * @param int    $titleId          customer title id (from customer_title table)
      * @param string $firstname        customer first name
@@ -56,17 +58,17 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
      * @throws PropelException
      */
     public function createOrUpdate(
-        int $titleId,
-        string $firstname,
-        string $lastname,
-        string $address1,
+        ?int $titleId,
+        ?string $firstname,
+        ?string $lastname,
+        ?string $address1,
         ?string $address2,
         ?string $address3,
         ?string $phone,
         ?string $cellphone,
-        string $zipcode,
-        string $city,
-        int $countryId,
+        ?string $zipcode,
+        ?string $city,
+        ?int $countryId,
         ?string $email = null,
         ?string $plainPassword = null,
         ?int $lang = null,
@@ -120,7 +122,8 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
                 $this->addAddress($address);
 
                 if (ConfigQuery::isCustomerEmailConfirmationEnable()) {
-                    $this->setConfirmationToken(bin2hex(random_bytes(32)));
+                    $validationCode = $this->setConfirmationTokenWithExpiry();
+                    $this->_validationCodeForEmail = $validationCode;
                 }
             } else {
                 $address = $this->getDefaultAddress();
@@ -150,6 +153,44 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
 
             throw $propelException;
         }
+    }
+
+    public function createOrUpdateWithoutAddress(
+        int $titleId,
+        string $firstname,
+        string $lastname,
+        string $email,
+        string $plainPassword,
+        bool $forceEmailUpdate = false,
+        ?int $langId = null,
+        bool $reseller = false,
+        ?string $sponsor = null,
+        ?float $discount = null,
+        ?string $ref = null,
+        bool $enabled = false,
+    ): void {
+        $this
+            ->setTitleId($titleId)
+            ->setFirstname($firstname)
+            ->setLastname($lastname)
+            ->setEmail($email, $forceEmailUpdate)
+            ->setPassword($plainPassword)
+            ->setReseller($reseller)
+            ->setSponsor($sponsor)
+            ->setDiscount($discount)
+            ->setRef($ref)
+            ->setEnable($enabled);
+
+        if (ConfigQuery::isCustomerEmailConfirmationEnable()) {
+            $validationCode = $this->setConfirmationTokenWithExpiry();
+            $this->_validationCodeForEmail = $validationCode;
+        }
+
+        if (null !== $langId) {
+            $this->setLangId($langId);
+        }
+
+        $this->save();
     }
 
     /**
@@ -215,7 +256,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         return \sprintf('CUS%s', str_pad((string) $id, 12, '0', \STR_PAD_LEFT));
     }
 
-    public function getDefaultAddress(): Address
+    public function getDefaultAddress(): ?Address
     {
         return AddressQuery::create()
             ->filterByCustomer($this)
@@ -375,5 +416,75 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
     public function getId(): int
     {
         return parent::getId() ?? 0;
+    }
+
+    public function setConfirmationTokenWithExpiry(int $expirationHours = 24): string
+    {
+        $codeData = $this->generateValidationCode();
+
+        $this->setConfirmationToken($codeData['hash']);
+
+        $expiryDate = new \DateTime();
+        $expiryDate->add(new \DateInterval("PT{$expirationHours}H"));
+        $this->setConfirmationTokenExpiresAt($expiryDate);
+
+        return $codeData['code'];
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function verifyActivationCode(string $inputCode): void
+    {
+        if ($this->isConfirmationTokenExpired()) {
+            throw new \Exception('Activation code expired');
+        }
+
+        $storedToken = $this->getConfirmationToken();
+        if (!$storedToken || !str_contains($storedToken, '.')) {
+            throw new \Exception('Activation code error');
+        }
+
+        [$hash, $salt] = explode('.', $storedToken, 2);
+        $expectedHash = hash('sha256', $inputCode.$salt);
+
+        if (!hash_equals($hash, $expectedHash)) {
+            throw new \Exception('Activation code error');
+        }
+    }
+
+    public function isConfirmationTokenExpired(): bool
+    {
+        $expiresAt = $this->getConfirmationTokenExpiresAt();
+
+        if (!$expiresAt) {
+            return true;
+        }
+
+        return new \DateTime() > $expiresAt;
+    }
+
+    public function clearConfirmationToken(): void
+    {
+        $this->setConfirmationToken(null);
+        $this->setConfirmationTokenExpiresAt(null);
+    }
+
+    /***
+     * @return array ['code' => string, 'hash' => string]
+     */
+    private function generateValidationCode(): array
+    {
+        $code = str_pad((string) random_int(0, 999999), 6, '0', \STR_PAD_LEFT);
+
+        $salt = bin2hex(random_bytes(16));
+        $hash = hash('sha256', $code.$salt);
+
+        $tokenForDb = $hash.'.'.$salt;
+
+        return [
+            'code' => $code,
+            'hash' => $tokenForDb,
+        ];
     }
 }
