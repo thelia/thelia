@@ -22,7 +22,7 @@ if (!isset($bootstrapFile)) {
     $bootstrapFile = dirname(__DIR__) . '/vendor/autoload_runtime.php';
 }
 
-if (!is_dir(dirname(__DIR__).'/vendor')) {
+if (!is_dir(dirname($bootstrapFile))) {
     throw new LogicException('Dependencies are missing. Try running "composer install".');
 }
 
