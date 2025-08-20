@@ -25,6 +25,7 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Model\Map\StateI18nTableMap;
 use Thelia\Model\StateQuery;
 use Thelia\Service\Model\CountryService;
+use Thelia\Service\Model\CustomerTitleService;
 
 /**
  * Class AddressCreateForm.
@@ -36,7 +37,8 @@ class AddressCreateForm extends FirewallForm
     use AddressCountryValidationTrait;
 
     public function __construct(
-        private CountryService $countryService,
+        protected CountryService $countryService,
+        protected CustomerTitleService $customerTitleService,
     ) {
     }
 
@@ -69,11 +71,14 @@ class AddressCreateForm extends FirewallForm
                     'for' => 'address_label',
                 ],
             ])
-            ->add('title', IntegerType::class, [
+            ->add('title', ChoiceType::class, [
                 'constraints' => [
                     new NotBlank(),
                 ],
+                'choices' => $this->customerTitleService->getTitleAsFormChoices(),
                 'label' => Translator::getInstance()->trans('Title'),
+                'expanded' => false,
+                'multiple' => false,
                 'label_attr' => [
                     'for' => 'title',
                 ],

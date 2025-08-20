@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -96,8 +97,17 @@ class CustomerCreateForm extends AddressCreateForm
                     'for' => 'lang_id',
                 ],
             ])
-            ->add('title', IntegerType::class, [
-                'required' => false,
+            ->add('title', ChoiceType::class, [
+                'constraints' => [
+                    new NotBlank(),
+                ],
+                'choices' => $this->customerTitleService->getTitleAsFormChoices(),
+                'label' => Translator::getInstance()->trans('Title'),
+                'expanded' => false,
+                'multiple' => false,
+                'label_attr' => [
+                    'for' => 'title',
+                ],
             ])
             ->add('cellphone', IntegerType::class, [
                 'required' => false,
