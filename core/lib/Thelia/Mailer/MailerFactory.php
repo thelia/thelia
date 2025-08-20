@@ -145,16 +145,14 @@ class MailerFactory
     /**
      * Create a SwiftMessage instance from a given message code.
      *
-     * @param string $messageCode
-     * @param array $from From addresses. An array of (email-address => name)
-     * @param array $to To addresses. An array of (email-address => name)
-     * @param array $messageParameters an array of (name => value) parameters that will be available in the message
-     * @param string|null $locale if null, the default store locale is used
-     * @param array $cc Cc addresses. An array of (email-address => name) [optional]
-     * @param array $bcc Bcc addresses. An array of (email-address => name) [optional]
-     * @param array $replyTo Reply to addresses. An array of (email-address => name) [optional]
+     * @param array       $from              From addresses. An array of (email-address => name)
+     * @param array       $to                To addresses. An array of (email-address => name)
+     * @param array       $messageParameters an array of (name => value) parameters that will be available in the message
+     * @param string|null $locale            if null, the default store locale is used
+     * @param array       $cc                Cc addresses. An array of (email-address => name) [optional]
+     * @param array       $bcc               Bcc addresses. An array of (email-address => name) [optional]
+     * @param array       $replyTo           Reply to addresses. An array of (email-address => name) [optional]
      *
-     * @return Email
      * @throws \Exception
      */
     public function createEmailMessage(string $messageCode, array $from, array $to, array $messageParameters = [], ?string $locale = null, array $cc = [], array $bcc = [], array $replyTo = []): Email

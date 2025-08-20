@@ -27,7 +27,6 @@ use Thelia\Model\ConfigQuery;
  */
 class ResponseListener
 {
-
     #[AsEventListener(event: KernelEvents::RESPONSE, priority: 128)]
     public function beforeResponse(ResponseEvent $event): void
     {

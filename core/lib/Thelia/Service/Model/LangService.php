@@ -58,7 +58,6 @@ readonly class LangService
         $request->setLocale($lang->getLocale());
     }
 
-
     public function handleLang(Session $session, Request $request): Response|Lang|null
     {
         if (true === TheliaRequest::$isAdminEnv) {
@@ -80,7 +79,6 @@ readonly class LangService
 
         return null;
     }
-
 
     public function resolveFrontLanguageFromRequest(TheliaRequest $request): Lang|Response
     {

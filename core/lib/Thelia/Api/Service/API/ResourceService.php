@@ -57,13 +57,14 @@ readonly class ResourceService
             $this->accessChecker->checkUserAccess($resourceClass, $path, $operation, $context);
         } catch (\Exception $e) {
             Tlog::getInstance()->error(
-                sprintf(
+                \sprintf(
                     'Error while checking access for resource "%s" at path "%s": %s',
                     $resourceClass,
                     $path,
                     $e->getMessage()
                 )
             );
+
             return null;
         }
         $normalizedData = $this->normalizer->normalizeData($result, $context, $format);

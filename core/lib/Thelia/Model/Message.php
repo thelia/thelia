@@ -24,6 +24,7 @@ class Message extends BaseMessage
 {
     /**
      * Calculate the message body, given the HTML entered in the back-office, the message layout, and the message template.
+     *
      * @throws \Exception
      */
     protected function getMessageBody(

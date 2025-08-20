@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -27,7 +27,6 @@ use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\TheliaKernelEvents;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
-use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 /**
  * Class ErrorListener.
@@ -125,5 +124,4 @@ class ErrorListener
             );
         }
     }
-
 }

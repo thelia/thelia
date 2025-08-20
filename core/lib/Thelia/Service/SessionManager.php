@@ -16,7 +16,6 @@ namespace Thelia\Service;
 
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
-use Thelia\Log\Tlog;
 
 class SessionManager
 {
@@ -50,6 +49,7 @@ class SessionManager
         if (!$request->hasSession()) {
             return false;
         }
+
         return true;
     }
 }

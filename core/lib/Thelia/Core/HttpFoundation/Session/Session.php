@@ -30,7 +30,6 @@ use Thelia\Model\Currency;
 use Thelia\Model\Lang;
 use Thelia\Model\Order;
 use Thelia\Service\Model\LangService;
-use Thelia\Service\SessionManager;
 use Thelia\Tools\URL;
 
 class Session extends BaseSession
@@ -306,5 +305,4 @@ class Session extends BaseSession
     {
         return $this->storage;
     }
-
 }
