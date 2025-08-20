@@ -28,23 +28,6 @@ class AddressCreateOrUpdateEvent extends ActionEvent
     protected Customer $customer;
     protected Address $address;
 
-    /**
-     * @param string      $label
-     * @param int         $title
-     * @param string|null $company
-     * @param string      $firstname
-     * @param string      $lastname
-     * @param string      $address1
-     * @param string      $address2
-     * @param string      $address3
-     * @param string      $zipcode
-     * @param string      $city
-     * @param int         $country
-     * @param int         $state
-     * @param string      $cellphone
-     * @param string      $phone
-     * @param int         $isDefault
-     */
     public function __construct(
         /**
          * @var string address label

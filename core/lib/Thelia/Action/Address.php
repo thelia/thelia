@@ -82,7 +82,7 @@ class Address extends BaseAction implements EventSubscriberInterface
                 ->setCity($event->getCity())
                 ->setCountryId($event->getCountry())
                 ->setStateId($event->getState())
-                ->setCellphone($event->getCellphone())
+                ->setCellphone((string) $event->getCellphone())
                 ->setPhone($event->getPhone())
                 ->setCompany($event->getCompany())
                 ->save();

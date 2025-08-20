@@ -30,6 +30,7 @@ use Thelia\Form\AddressCreateForm;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Log\Tlog;
+use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Event\AddressEvent;
@@ -112,7 +113,7 @@ class AddressController extends AbstractCrudController
     /**
      * Fills in the form data array.
      */
-    protected function createFormDataArray(unknown $object): array
+    protected function createFormDataArray(Address $object): array
     {
         return [
             'label' => $object->getLabel(),
@@ -169,7 +170,7 @@ class AddressController extends AbstractCrudController
             $formData['zipcode'],
             $formData['city'],
             $formData['country'],
-            $formData['cellphone'],
+            $formData['cellphone'] ? (string) $formData['cellphone'] : null,
             $formData['phone'],
             $formData['company'],
             $formData['is_default'],

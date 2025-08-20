@@ -55,6 +55,9 @@ class ErrorListener
     #[AsEventListener(event: TheliaKernelEvents::THELIA_HANDLE_ERROR, priority: 0)]
     public function defaultErrorFallback(ExceptionEvent $event): void
     {
+        if (!$event->isMainRequest()) {
+            return;
+        }
         $this->parser->assign('status_code', 500);
         $this->parser->assign('exception_message', $event->getThrowable()->getMessage());
 
@@ -77,6 +80,9 @@ class ErrorListener
     #[AsEventListener(event: KernelEvents::EXCEPTION, priority: 0)]
     public function handleException(ExceptionEvent $event): void
     {
+        if (!$event->isMainRequest()) {
+            return;
+        }
         if ($event->getRequest()->get('_api_operation_name', false)) {
             return;
         }
@@ -93,6 +99,9 @@ class ErrorListener
     #[AsEventListener(event: KernelEvents::EXCEPTION, priority: 0)]
     public function logException(ExceptionEvent $event): void
     {
+        if (!$event->isMainRequest()) {
+            return;
+        }
         // Log exception in the Thelia log
         $exception = $event->getThrowable();
 
@@ -116,6 +125,9 @@ class ErrorListener
     #[AsEventListener(event: KernelEvents::EXCEPTION, priority: 100)]
     public function authenticationException(ExceptionEvent $event): void
     {
+        if (!$event->isMainRequest()) {
+            return;
+        }
         $exception = $event->getThrowable();
 
         if ($exception instanceof AuthenticationException) {
