@@ -18,7 +18,6 @@ use Symfony\Component\HttpFoundation\Request as BaseRequest;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Controller\Front\BaseFrontController;
-use Thelia\Core\EventListener\KernelListener;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -123,4 +122,29 @@ class Request extends BaseRequest
         return parent::getSession();
     }
 
+    public static function createFromBase(BaseRequest $request): self
+    {
+        $theliaRequest = new self(
+            $request->query->all(),
+            $request->request->all(),
+            $request->attributes->all(),
+            $request->cookies->all(),
+            $request->files->all(),
+            $request->server->all(),
+            $request->getContent()
+        );
+
+        if ($request->hasSession()) {
+            $theliaRequest->setSession($request->getSession());
+        }
+
+        $theliaRequest->setMethod($request->getMethod());
+        $theliaRequest->setLocale($request->getLocale());
+        $format = $request->getRequestFormat(null);
+        if ($format !== null) {
+            $theliaRequest->setRequestFormat($format);
+        }
+
+        return $theliaRequest;
+    }
 }

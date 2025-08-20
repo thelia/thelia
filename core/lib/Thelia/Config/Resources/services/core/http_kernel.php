@@ -66,6 +66,5 @@ return static function (ContainerConfigurator $configurator): void {
     $services->set('argument_resolver.variadic', VariadicValueResolver::class)
         ->tag('controller.argument_value_resolver', ['priority' => -150]);
 
-    // Request and response services
-    $services->alias('request', Request::class);
+    $services->alias('request_thelia', Request::class);
 };

@@ -16,13 +16,14 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageFactoryInterface;
 use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\SessionFactory;
 use Thelia\Core\HttpFoundation\Session\SessionStorageFactory;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Service\ConfigCacheService;
-use Thelia\Core\HttpFoundation\Session\SessionFactory;
 
 return static function (ContainerConfigurator $configurator): void {
     // Import service configurations
@@ -48,7 +49,8 @@ return static function (ContainerConfigurator $configurator): void {
         ->bind('$formDefinition', '%Thelia.parser.forms%')
         ->bind('$propelCollectionExtensions', tagged_iterator('thelia.api.propel.query_extension.collection'))
         ->bind('$propelItemExtensions', tagged_iterator('thelia.api.propel.query_extension.item'))
-        ->bind('$apiResourceAddons', '%Thelia.api.resource.addons%');
+        ->bind('$apiResourceAddons', '%Thelia.api.resource.addons%')
+        ->bind(Request::class, expr('service("request_stack").getCurrentRequest()'));
 
     $serviceConfigurator->load('Thelia\\', THELIA_LIB)
         ->exclude(

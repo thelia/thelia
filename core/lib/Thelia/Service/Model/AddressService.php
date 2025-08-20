@@ -151,13 +151,18 @@ readonly class AddressService
         );
     }
 
-    public function getDeliveryAddress(Request $request, SecurityContext $securityContext): ?Address
-    {
+    public function getDeliveryAddress(
+        Request $request,
+        SecurityContext $securityContext,
+    ): ?Address {
+        if (null === $request) {
+            return null;
+        }
         $addressId = $request->get('addressId');
 
         if (null === $addressId) {
             $session = $request->getSession();
-            $addressId = $session->getSessionCart($this->dispatcher)->getAddressDeliveryId();
+            $addressId = $session->getSessionCart($this->dispatcher)?->getAddressDeliveryId();
         }
 
         if (null !== $addressId) {

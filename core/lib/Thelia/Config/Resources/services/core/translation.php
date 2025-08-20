@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Thelia\Core\EventListener\RequestListener;
 use Thelia\Core\Translation\Translator;
 
 return static function (ContainerConfigurator $container): void {
@@ -54,10 +53,4 @@ return static function (ContainerConfigurator $container): void {
 
     $services->set('translation.loader.ini', '%translation.loader.ini.class%')
         ->tag('translation.loader', ['alias' => 'ini']);
-
-    $services->set('validators.translator', RequestListener::class)
-        ->arg(0, service('thelia.translator'))
-        ->arg(1, service('event_dispatcher'))
-        ->arg(2, service('request'))
-        ->tag('kernel.event_subscriber');
 };

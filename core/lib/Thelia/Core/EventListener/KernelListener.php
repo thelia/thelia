@@ -25,7 +25,6 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Translation\Translator;
-use Thelia\Log\Tlog;
 use Thelia\Service\Model\LangService;
 use Thelia\Service\SessionManager;
 
@@ -55,11 +54,10 @@ class KernelListener
         }
     }
 
-    #[AsEventListener(event: KernelEvents::REQUEST, priority: 127)]
+    #[AsEventListener(event: KernelEvents::REQUEST, priority: 130)]
     public function warmupSession(RequestEvent $event): void
     {
         if (!$this->sessionManager->sessionIsStartable($event)) {
-
             return;
         }
         $request = $event->getRequest();
