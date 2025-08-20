@@ -178,10 +178,10 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->setLocale($event->getLang())
             ->setVisible(0)
             ->setQuantity(0)
-            ->setVirtual($event->getOriginalProduct()->getVirtual())
+            ->setVirtual((bool) $event->getOriginalProduct()->getVirtual())
             ->setTaxRuleId($event->getOriginalProduct()->getTaxRuleId())
             ->setDefaultCategory($event->getOriginalProduct()->getDefaultCategoryId())
-            ->setBasePrice($originalProductDefaultPrice->getPrice())
+            ->setBasePrice((float) $originalProductDefaultPrice->getPrice())
             ->setCurrencyId($originalProductDefaultPrice->getCurrencyId())
             ->setBaseWeight($event->getOriginalProduct()->getDefaultSaleElements()->getWeight());
 
@@ -202,7 +202,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             $clonedProductUpdateEvent
                 ->setRef($event->getClonedProduct()->getRef())
                 ->setVisible($event->getClonedProduct()->getVisible())
-                ->setVirtual($event->getClonedProduct()->getVirtual())
+                ->setVirtual((bool) $event->getClonedProduct()->getVirtual())
 
                 ->setLocale($originalProductI18n->getLocale())
                 ->setTitle($originalProductI18n->getTitle())
@@ -210,7 +210,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->setDescription($originalProductI18n->getDescription())
                 ->setPostscriptum($originalProductI18n->getPostscriptum())
 
-                ->setBasePrice($originalProductDefaultPrice->getPrice())
+                ->setBasePrice((float) $originalProductDefaultPrice->getPrice())
                 ->setCurrencyId($originalProductDefaultPrice->getCurrencyId())
                 ->setBaseWeight($event->getOriginalProduct()->getDefaultSaleElements()->getWeight())
                 ->setTaxRuleId($event->getOriginalProduct()->getTaxRuleId())
