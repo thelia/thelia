@@ -17,6 +17,7 @@ namespace Thelia\Api\Service\API;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Thelia\Api\Resource\TranslatableResourceInterface;
+use Thelia\Log\Tlog;
 use Thelia\Service\Model\LangService;
 
 readonly class ResourceService
@@ -55,7 +56,15 @@ readonly class ResourceService
             $context['extra_variables']['object'] = $result;
             $this->accessChecker->checkUserAccess($resourceClass, $path, $operation, $context);
         } catch (\Exception $e) {
-            dd($path, $context, $e);
+            Tlog::getInstance()->error(
+                sprintf(
+                    'Error while checking access for resource "%s" at path "%s": %s',
+                    $resourceClass,
+                    $path,
+                    $e->getMessage()
+                )
+            );
+            return null;
         }
         $normalizedData = $this->normalizer->normalizeData($result, $context, $format);
         if ($this->isTranslatableResult($result)) {
