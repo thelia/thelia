@@ -79,7 +79,7 @@ class DeliveryModuleProvider implements ProviderInterface
         /** @var Module $module */
         foreach ($modules as $module) {
             /** @var ?int $filterOnlyValid */
-            $filterOnlyValid = $context['filters']['only_valid'];
+            $filterOnlyValid = $context['filters']['only_valid'] ?? false;
             $deliveryModuleResource = $this->deliveryModuleService->getDeliveryModuleResource(
                 $module,
                 $cart,
