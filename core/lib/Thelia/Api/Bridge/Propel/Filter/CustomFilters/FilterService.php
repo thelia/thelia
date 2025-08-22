@@ -290,7 +290,7 @@ readonly class FilterService
         return $values;
     }
 
-    private function retrieveFilterValue(array $theliaFilterNames, array $tfilters): string|array|null
+    private function retrieveFilterValue(array $theliaFilterNames, array $tfilters): string|array|null|int
     {
         $ids = null;
 
