@@ -139,7 +139,8 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
                 }
 
                 // Join only for non collection relation (Many to One or One to One) or if filter is applied to it
-                if ('array' === $property->getType()->getName() && !$isInFilters) {
+                $forcedJoin = (isset($relationAttribute->getArguments()['forceJoin']) && $relationAttribute->getArguments()['forceJoin']);
+                if (!$isInFilters && !$forcedJoin && ($property->getType()->getName() === 'array')) {
                     continue;
                 }
 

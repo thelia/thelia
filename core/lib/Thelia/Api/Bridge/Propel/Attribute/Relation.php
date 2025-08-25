@@ -21,6 +21,8 @@ class Relation
         private readonly string $targetResource,
         private readonly ?string $relationAlias = null,
         private readonly ?array $propertyGroups = [],
+        private readonly ?bool $forceJoin = null,
+        private readonly ?array $excludedGroups = [],
     ) {
     }
 }

@@ -53,6 +53,21 @@ class NotInFilter extends AbstractFilter
             throw new \InvalidArgumentException(\sprintf('The "NotIn" filter expects an array for the property "%s".', $property));
         }
 
+        $fieldPath = $this->getPropertyQueryPath($query, $property, $context);
+        $asColumns = array_map(
+            static function ($column) {
+                return str_replace('`', '', $column);
+            }
+            ,$query->getAsColumns()
+        );
+        if (in_array($fieldPath, $asColumns, true)) {
+            $query->addUsingOperator(
+                $fieldPath,
+                1 === \count($value) ? $value[0] : $value,
+                1 === \count($value) ? Criteria::NOT_EQUAL : Criteria::NOT_IN
+            );
+            return;
+        }
         if (!property_exists($resourceClass, $property)) {
             throw new \RuntimeException(\sprintf('Property "%s" does not exist in class "%s".', $property, $resourceClass));
         }

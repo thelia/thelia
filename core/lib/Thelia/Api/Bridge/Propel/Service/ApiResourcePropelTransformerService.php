@@ -476,6 +476,17 @@ readonly class ApiResourcePropelTransformerService
         Collection $langs,
     ): void {
         foreach ($reflector->getProperties() as $property) {
+            if (
+                !$this->checkGroupsSerialization(property: $property, context: $context)
+                && $this->isGroupsExcluded(property: $property, context: $context)
+            ) {
+                // This condition prevents circular references during resource serialization,
+                // avoiding infinite recursion. To make this work, you need to use the
+                // `excludedGroups` attribute on the related resource (e.g.:
+                // #[Relation(targetResource: SelectionContainer::class, excludedGroups: [SelectionContainer::GROUP_READ])])
+                // to exclude problematic serialization groups and break the circular dependency.
+                continue;
+            }
             $defaultGetter = 'get'.ucfirst($property->getName());
             $propelGetter = $this->determinePropelGetterName($property, Column::class, 'propelFieldName', $defaultGetter);
             $propelGetter = $this->determinePropelGetterName($property, Relation::class, 'relationAlias', $propelGetter);
@@ -626,21 +637,9 @@ readonly class ApiResourcePropelTransformerService
             /** @var \ReflectionProperty $i18nField */
             foreach ($i18nFields as $i18nField) {
                 $i18nFieldName = $i18nField->getName();
-                $groupAttributes = $i18nField->getAttributes(Groups::class, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null;
 
-                if (null === $groupAttributes) {
+                if (!$this->checkGroupsSerialization(property: $i18nField, context: $context)) {
                     continue;
-                }
-
-                // @TODO : wait an official fix or rebuild full context array https://github.com/api-platform/api-platform/issues/2594
-                if (isset($context['groups'])) {
-                    $propertyGroups = $groupAttributes->getArguments()['groups'] ?? $groupAttributes->getArguments()[0] ?? null;
-
-                    $matchingGroups = array_intersect($propertyGroups, $context['groups']);
-
-                    if ([] === $matchingGroups) {
-                        continue;
-                    }
                 }
 
                 $fieldValue = null;
@@ -749,5 +748,35 @@ readonly class ApiResourcePropelTransformerService
                 $query->{$filterMethod}($value);
             }
         }
+    }
+
+    private function checkGroupsSerialization(\ReflectionProperty $property, array $context): bool
+    {
+        // @TODO : wait an official fix or rebuild full context array https://github.com/api-platform/api-platform/issues/2594
+        return $this->matchGroupsFromAttribute($property, Groups::class, 'groups', $context);
+    }
+
+    private function isGroupsExcluded(\ReflectionProperty $property, array $context): bool
+    {
+        return $this->matchGroupsFromAttribute($property, Relation::class, 'excludedGroups', $context);
+    }
+
+    private function matchGroupsFromAttribute(
+        \ReflectionProperty $property,
+        string $attributeClass,
+        string $groupKey,
+        array $context,
+    ): bool {
+        $attribute = $property->getAttributes($attributeClass, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null;
+
+        if (null === $attribute || !isset($context['groups'])) {
+            return false;
+        }
+
+        $arguments = $attribute->getArguments();
+
+        $propertyGroups = $arguments[$groupKey] ?? $arguments[0][$groupKey] ?? $arguments[0] ?? [];
+
+        return !empty(array_intersect($propertyGroups, $context['groups']));
     }
 }
