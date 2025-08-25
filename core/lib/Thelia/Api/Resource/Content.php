@@ -73,28 +73,14 @@ use Thelia\Model\Tools\UrlRewritingTrait;
     filterClass: SearchFilter::class,
     properties: [
         'id',
-        'contentFolders.folder.id' => [
-            'strategy' => 'exact',
-            'fieldPath' => 'content_folder.folder_id',
-        ],
-        'contentFolders.content.id' => [
-            'strategy' => 'exact',
-            'fieldPath' => 'content_folder.content_id',
-        ],
+        'contentFolders.folder.id',
     ],
 )]
 #[ApiFilter(
     filterClass: NotInFilter::class,
     properties: [
         'id',
-        'contentFolders.folder.id' => [
-            'strategy' => 'exact',
-            'fieldPath' => 'content_folder.folder_id',
-        ],
-        'contentFolders.content.id' => [
-            'strategy' => 'exact',
-            'fieldPath' => 'content_folder.content_id',
-        ],
+        'contentFolders.folder.id',
     ],
 )]
 #[ApiFilter(
