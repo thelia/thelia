@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Archiver\AbstractArchiver;
+use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\Event\TheliaEvents;
@@ -26,6 +27,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Serializer\AbstractSerializer;
+use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\LangQuery;
@@ -133,7 +135,11 @@ class ImportController extends BaseAdminController
      *
      * @param int $id An import identifier
      */
-    public function configureAction(int $id): Response
+    public function configureAction(
+        int $id,
+        SerializerManager $serializerManager,
+        ArchiverManager $archiverManager
+    ): Response
     {
         /** @var Importhandler $importHandler */
         $importHandler = $this->container->get('thelia.import.handler');
@@ -148,13 +154,13 @@ class ImportController extends BaseAdminController
         $mimeTypes = [];
 
         /** @var AbstractSerializer $serializer */
-        foreach ($this->container->get(RegisterSerializerPass::MANAGER_SERVICE_ID)->getSerializers() as $serializer) {
+        foreach ($serializerManager->getSerializers() as $serializer) {
             $extensions[] = $serializer->getExtension();
             $mimeTypes[] = $serializer->getMimeType();
         }
 
         /** @var AbstractArchiver $archiver */
-        foreach ($this->container->get(RegisterArchiverPass::MANAGER_SERVICE_ID)->getArchivers(true) as $archiver) {
+        foreach ($archiverManager->getArchivers(true) as $archiver) {
             $extensions[] = $archiver->getExtension();
             $mimeTypes[] = $archiver->getMimeType();
         }
@@ -181,7 +187,11 @@ class ImportController extends BaseAdminController
      *
      * @param int $id An import identifier
      */
-    public function importAction(int $id): Response|RedirectResponse
+    public function importAction(
+        int $id,
+        SerializerManager $serializerManager,
+        ArchiverManager $archiverManager
+    ): Response|RedirectResponse
     {
         /** @var Importhandler $importHandler */
         $importHandler = $this->container->get('thelia.import.handler');
@@ -240,6 +250,6 @@ class ImportController extends BaseAdminController
         $this->getParserContext()
             ->addForm($form);
 
-        return $this->configureAction($id);
+        return $this->configureAction($id, $serializerManager, $archiverManager);
     }
 }
