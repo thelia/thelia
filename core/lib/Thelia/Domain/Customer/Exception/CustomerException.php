@@ -19,6 +19,6 @@ namespace Thelia\Domain\Customer\Exception;
  *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class CustomerException extends \RuntimeException
+final class CustomerException extends \RuntimeException
 {
 }

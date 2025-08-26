@@ -26,8 +26,8 @@ use Thelia\Core\Event\LostPasswordEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Translation\Translator;
-use Thelia\Domain\Customer\CustomerService;
 use Thelia\Domain\Customer\Exception\CustomerException;
+use Thelia\Domain\Customer\Service\CustomerTitleService;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer as CustomerModel;
@@ -50,7 +50,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
         protected MailerFactory $mailer,
         protected RequestStack $requestStack,
         protected EventDispatcherInterface $dispatcher,
-        protected CustomerService $customerService,
+        protected CustomerTitleService $customerTitleService,
     ) {
     }
 
@@ -136,7 +136,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
         $this->createOrUpdateCustomer($customer, $event);
 
-        if ($event->getNotifyCustomerOfAccountModification() && (null !== $plainPassword && '' !== $plainPassword && '0' !== $plainPassword || $emailChanged)) {
+        if ($event->getNotifyCustomerOfAccountModification()
+            && ((null !== $plainPassword && '' !== $plainPassword && '0' !== $plainPassword) || $emailChanged)) {
             $this->mailer->sendEmailToCustomer('customer_account_changed', $customer, ['password' => $plainPassword]);
         }
     }
@@ -211,7 +212,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
         CustomerCreateOrUpdateEvent $event,
     ): void {
         $customer?->createOrUpdate(
-            $event->getTitle() ?? $this->customerService->getDefaultCustomerTitle()?->getId(),
+            $event->getTitle() ?? $this->customerTitleService->getDefaultCustomerTitle()?->getId(),
             $event->getFirstname(),
             $event->getLastname(),
             $event->getAddress1(),

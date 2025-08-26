@@ -28,7 +28,7 @@ use Thelia\Condition\Implementation\MatchForXArticlesIncludeQuantity;
 use Thelia\Condition\Implementation\StartDate;
 use Thelia\Domain\Promotion\Coupon\BaseFacade;
 use Thelia\Domain\Promotion\Coupon\CouponFactory;
-use Thelia\Domain\Promotion\Coupon\CouponManager;
+use Thelia\Domain\Promotion\Coupon\Service\CouponManager;
 use Thelia\Domain\Promotion\Coupon\Type\FreeProduct;
 use Thelia\Domain\Promotion\Coupon\Type\RemoveAmountOnAttributeValues;
 use Thelia\Domain\Promotion\Coupon\Type\RemoveAmountOnCategories;

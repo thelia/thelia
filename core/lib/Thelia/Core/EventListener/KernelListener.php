@@ -26,7 +26,7 @@ use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\HttpFoundation\Session\SessionManager;
 use Thelia\Core\Translation\Translator;
-use Thelia\Domain\Localization\LangService;
+use Thelia\Domain\Localization\Service\LangService;
 
 class KernelListener
 {

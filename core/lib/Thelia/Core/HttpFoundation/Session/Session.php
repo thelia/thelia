@@ -23,7 +23,7 @@ use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\User\UserInterface;
-use Thelia\Domain\Localization\LangService;
+use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Model\Admin;
 use Thelia\Model\Cart;
 use Thelia\Model\CartQuery;

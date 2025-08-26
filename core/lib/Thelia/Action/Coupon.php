@@ -31,7 +31,7 @@ use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Promotion\Coupon\CouponFactory;
-use Thelia\Domain\Promotion\Coupon\CouponManager;
+use Thelia\Domain\Promotion\Coupon\Service\CouponManager;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon as CouponModel;
 use Thelia\Model\CouponCountry;

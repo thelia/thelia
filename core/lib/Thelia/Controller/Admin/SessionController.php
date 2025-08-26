@@ -24,7 +24,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Authentication\AdminUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\User\UserInterface;
-use Thelia\Domain\Localization\LangService;
+use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Form\AdminLogin;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;

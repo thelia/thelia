@@ -27,7 +27,7 @@ use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Routing\Rewriting\Exception\UrlRewritingException;
 use Thelia\Core\Routing\Rewriting\RewritingResolver;
-use Thelia\Domain\Localization\LangService;
+use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;

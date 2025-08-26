@@ -12,9 +12,10 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Domain\Customer;
+namespace Thelia\Domain\Customer\Service;
 
-use Thelia\Domain\Localization\LangService;
+use Thelia\Domain\Localization\Service\LangService;
+use Thelia\Model\CustomerTitle;
 use Thelia\Model\CustomerTitleQuery;
 
 class CustomerTitleService
@@ -38,5 +39,12 @@ class CustomerTitleService
         }
 
         return $choices;
+    }
+
+    public function getDefaultCustomerTitle(): ?CustomerTitle
+    {
+        return CustomerTitleQuery::create()
+            ->filterByByDefault(1)
+            ->findOne();
     }
 }

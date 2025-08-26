@@ -57,7 +57,7 @@ interface CouponInterface
      *                                                     on special offer price
      * @param bool             $isEnabled                  False if Coupon is disabled by admin
      * @param int              $maxUsage                   How many usage left
-     * @param Datetime         $expirationDate             When the Code is expiring
+     * @param DateTime         $expirationDate             When the Code is expiring
      * @param ObjectCollection $freeShippingForCountries   list of countries which shipping is free. All if empty
      * @param ObjectCollection $freeShippingForModules     list of modules for which shipping is free. All if empty
      * @param bool             $perCustomerUsageCount      true if usage count is per customer only

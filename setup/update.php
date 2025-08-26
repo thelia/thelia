@@ -76,7 +76,7 @@ $thelia->boot();
  */
 
 try {
-    $update = new \Thelia\Core\Install\Update(false);
+    $update = new Thelia\Core\Install\Update(false);
 } catch (UpdateException $ex) {
     cliOutput($ex->getMessage(), 'error');
     exit(2);

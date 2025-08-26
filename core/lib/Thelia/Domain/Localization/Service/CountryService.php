@@ -12,7 +12,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Domain\Localization;
+namespace Thelia\Domain\Localization\Service;
 
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\Country;

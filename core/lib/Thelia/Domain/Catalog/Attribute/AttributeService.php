@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Catalog\Attribute;
 
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Domain\Localization\LangService;
+use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Model\Attribute;
 use Thelia\Model\AttributeAv;
 use Thelia\Model\Product;

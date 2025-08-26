@@ -12,10 +12,12 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Domain\Promotion\Coupon;
+namespace Thelia\Domain\Promotion\Coupon\Service;
 
 use Thelia\Condition\Exception\UnmatchableConditionException;
 use Thelia\Condition\Implementation\ConditionInterface;
+use Thelia\Domain\Promotion\Coupon\CouponFactory;
+use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;

@@ -28,7 +28,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Domain\Promotion\Coupon\CouponFactory;
-use Thelia\Domain\Promotion\Coupon\CouponManager;
+use Thelia\Domain\Promotion\Coupon\Service\CouponManager;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;

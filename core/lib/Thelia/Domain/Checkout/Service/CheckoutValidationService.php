@@ -1,0 +1,44 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Thelia\Domain\Checkout\Service;
+
+use Propel\Runtime\Exception\PropelException;
+use Thelia\Domain\Cart\CartService;
+use Thelia\Domain\Checkout\Exception\EmptyCartException;
+use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
+use Thelia\Domain\Checkout\Exception\InvalidPaymentException;
+use Thelia\Domain\Checkout\Exception\MissingAddressException;
+
+readonly class CheckoutValidationService
+{
+    public function __construct(private CartService $cartService)
+    {
+    }
+
+    /**
+     * @throws EmptyCartException
+     * @throws MissingAddressException
+     * @throws InvalidDeliveryException
+     * @throws InvalidPaymentException
+     * @throws PropelException
+     */
+    public function validateForOrder(): void
+    {
+        $this->cartService->checkCartNotEmpty();
+        $this->cartService->checkValidDelivery();
+        $this->cartService->checkInvoiceAddress();
+        $this->cartService->checkValidPayment();
+    }
+}

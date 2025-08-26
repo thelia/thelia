@@ -85,6 +85,44 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $cart->save();
     }
 
+    public function setDeliveryModule(CartCheckoutEvent $event): void
+    {
+        $cart = $event->getCart();
+        $cart->setDeliveryModuleId($event->getDeliveryModuleId());
+        $cart->save();
+    }
+
+    public function calculatePostage(CartCheckoutEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    {
+        $cart = $event->getCart();
+        $moduleId = $event->getDeliveryModuleId();
+        $deliveryAddressId = $event->getDeliveryAddressId();
+
+        if (null === $moduleId || null === $deliveryAddressId) {
+            return;
+        }
+
+        try {
+            $postage = $this->getPostageByDeliveryModuleId($cart, $dispatcher, $moduleId, $deliveryAddressId);
+            $cart->setOrderPostage($postage);
+        } catch (\Exception $e) {
+            // If an exception is thrown here, we just ignore it.
+            // The delivery module will not be set on the cart.
+        }
+    }
+
+    public function setInvoiceAddress(CartCheckoutEvent $event): void
+    {
+        $cart = $event->getCart();
+        $addressId = $event->getInvoiceAddressId();
+
+        if ($addressId && !$this->validateAddressOwnership($cart, $event->getInvoiceAddressId())) {
+            return;
+        }
+
+        $cart->setAddressInvoiceId($addressId)->save();
+    }
+
     public function persistCart(CartPersistEvent $event): void
     {
         $cart = $event->getCart();
@@ -563,9 +601,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         return [
             TheliaEvents::CART_SET_DELIVERY_ADDRESS => ['setDeliveryAddress', 128],
-            // TheliaEvents::CART_SET_DELIVERY_MODULE => ['setDeliveryModule', 128],
-            // TheliaEvents::CART_SET_POSTAGE => ['calculatePostage', 128],
-            // TheliaEvents::CART_SET_INVOICE_ADDRESS => ['setInvoiceAddress', 128],
+            TheliaEvents::CART_SET_DELIVERY_MODULE => ['setDeliveryModule', 128],
+            TheliaEvents::CART_SET_POSTAGE => ['calculatePostage', 128],
+            TheliaEvents::CART_SET_INVOICE_ADDRESS => ['setInvoiceAddress', 128],
             TheliaEvents::CART_SET_PAYMENT_MODULE => ['setPaymentModule', 128],
             TheliaEvents::CART_PERSIST => ['persistCart', 128],
             TheliaEvents::CART_RESTORE_CURRENT => ['restoreCurrentCart', 128],
@@ -582,7 +620,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
     protected function getSession(): Session
     {
         /** @var Session $session */
-        $session = $this->requestStack->getCurrentRequest()->getSession();
+        $session = $this->requestStack->getCurrentRequest()?->getSession();
+
+        if (null === $session) {
+            throw new \RuntimeException('No session available');
+        }
 
         return $session;
     }
