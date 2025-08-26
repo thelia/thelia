@@ -28,6 +28,7 @@ use Thelia\Core\Event\Sale\SaleDeleteEvent;
 use Thelia\Core\Event\Sale\SaleToggleActivityEvent;
 use Thelia\Core\Event\Sale\SaleUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Taxation\TaxEngine\Calculator;
 use Thelia\Model\Country as CountryModel;
 use Thelia\Model\Map\SaleTableMap;
 use Thelia\Model\ProductPriceQuery;
@@ -39,7 +40,6 @@ use Thelia\Model\SaleOffsetCurrencyQuery;
 use Thelia\Model\SaleProduct;
 use Thelia\Model\SaleProductQuery;
 use Thelia\Model\SaleQuery;
-use Thelia\TaxEngine\Calculator;
 
 /**
  * Class Sale.

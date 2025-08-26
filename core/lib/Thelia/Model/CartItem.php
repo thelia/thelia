@@ -20,8 +20,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Cart\CartItemEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Taxation\TaxEngine\Calculator;
 use Thelia\Model\Base\CartItem as BaseCartItem;
-use Thelia\TaxEngine\Calculator;
 
 class CartItem extends BaseCartItem
 {

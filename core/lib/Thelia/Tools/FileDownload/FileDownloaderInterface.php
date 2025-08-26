@@ -16,7 +16,7 @@ namespace Thelia\Tools\FileDownload;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Translator;
-use Thelia\Exception\FileNotFoundException;
+use Thelia\Core\File\Exception\FileNotFoundException;
 
 /**
  * Class FileDownloader.

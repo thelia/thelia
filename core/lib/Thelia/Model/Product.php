@@ -18,12 +18,12 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
-use Thelia\Files\FileModelParentInterface;
+use Thelia\Core\File\FileModelParentInterface;
+use Thelia\Domain\Taxation\TaxEngine\Calculator;
 use Thelia\Model\Base\Product as BaseProduct;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Tools\UrlRewritingTrait;
-use Thelia\TaxEngine\Calculator;
 
 class Product extends BaseProduct implements FileModelParentInterface
 {

@@ -16,6 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageFactoryInterface;
 use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
+use Thelia\Core\Cache\ConfigCacheService;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\SessionFactory;
 use Thelia\Core\HttpFoundation\Session\SessionStorageFactory;
@@ -23,7 +24,6 @@ use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
-use Thelia\Service\ConfigCacheService;
 
 return static function (ContainerConfigurator $configurator): void {
     // Import service configurations

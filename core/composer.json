@@ -93,6 +93,16 @@
         "symfony/debug-bundle": "6.4.*",
         "thelia/web-profiler-module": "dev-twig"
     },
+    "extra": {
+        "symfony": {
+            "allow-contrib": true,
+            "require": "6.4.*",
+            "endpoint": [
+                "https://api.github.com/repos/thelia/thelia-recipes/contents/index.json?ref=main",
+                "flex://defaults"
+            ]
+        }
+    },
     "bin": [
         "Thelia"
     ],

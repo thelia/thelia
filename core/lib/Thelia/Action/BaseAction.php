@@ -19,7 +19,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ToggleVisibilityEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
-use Thelia\Exception\UrlRewritingException;
+use Thelia\Core\Routing\Rewriting\Exception\UrlRewritingException;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Tools\PositionManagementTrait;
 

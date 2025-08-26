@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Thelia\Api\Resource\CartItem;
 use Thelia\Core\HttpFoundation\Session\Session;
-use Thelia\TaxEngine\TaxEngine;
+use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 
 class CartItemNormalizer extends AbstractItemNormalizer
 {

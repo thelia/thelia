@@ -27,14 +27,14 @@ use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\Module\ModuleInstallEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\DTO\ComposerTheliaModuleDTO;
-use Thelia\Exception\InvalidModuleException;
+use Thelia\Domain\Module\Composer\ComposerHelper;
+use Thelia\Domain\Module\Composer\DTO\ComposerTheliaModuleDTO;
+use Thelia\Domain\Module\Exception\InvalidModuleException;
 use Thelia\Log\Tlog;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\Validator\ModuleValidator;
-use Thelia\Service\Composer\ComposerHelper;
 
 class ModuleManagement
 {

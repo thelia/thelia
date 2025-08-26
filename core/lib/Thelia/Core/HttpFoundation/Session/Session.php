@@ -23,13 +23,13 @@ use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\User\UserInterface;
+use Thelia\Domain\Localization\LangService;
 use Thelia\Model\Admin;
 use Thelia\Model\Cart;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\Lang;
 use Thelia\Model\Order;
-use Thelia\Service\Model\LangService;
 use Thelia\Tools\URL;
 
 class Session extends BaseSession

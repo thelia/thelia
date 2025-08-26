@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
-use Thelia\Install\Exception\UpdateException;
+use Thelia\Core\Install\Exception\UpdateException;
 
 if (\PHP_SAPI !== 'cli') {
     throw new Exception('this script can only be launched with cli sapi');
@@ -76,7 +76,7 @@ $thelia->boot();
  */
 
 try {
-    $update = new Thelia\Install\Update(false);
+    $update = new \Thelia\Core\Install\Update(false);
 } catch (UpdateException $ex) {
     cliOutput($ex->getMessage(), 'error');
     exit(2);

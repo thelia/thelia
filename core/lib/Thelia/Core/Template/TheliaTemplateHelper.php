@@ -19,8 +19,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\Config\ConfigUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Module\Composer\ComposerHelper;
 use Thelia\Model\ConfigQuery;
-use Thelia\Service\Composer\ComposerHelper;
 
 class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberInterface
 {

@@ -29,7 +29,7 @@ use Thelia\Core\Event\ViewCheckEvent;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
-use Thelia\Exception\OrderException;
+use Thelia\Domain\Order\Exception\OrderException;
 
 /**
  * ViewSubscriber Main class subscribing to view http response.

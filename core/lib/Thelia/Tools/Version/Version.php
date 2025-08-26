@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tools\Version;
 
-use Thelia\Core\Thelia;
+use Thelia\Core\TheliaKernel;
 use Thelia\Tools\Version\Constraints\ConstraintEqual;
 use Thelia\Tools\Version\Constraints\ConstraintGreater;
 use Thelia\Tools\Version\Constraints\ConstraintInterface;
@@ -111,7 +111,7 @@ class Version
     public static function parse(?string $version = null): array
     {
         if (null === $version) {
-            $version = Thelia::THELIA_VERSION;
+            $version = TheliaKernel::THELIA_VERSION;
         }
 
         $pattern = '`^(?<version>

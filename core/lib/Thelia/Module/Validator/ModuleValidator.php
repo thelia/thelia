@@ -15,10 +15,10 @@ declare(strict_types=1);
 namespace Thelia\Module\Validator;
 
 use Symfony\Component\Filesystem\Filesystem;
-use Thelia\Core\Thelia;
+use Thelia\Core\File\Exception\FileNotFoundException;
+use Thelia\Core\TheliaKernel;
 use Thelia\Core\Translation\Translator;
-use Thelia\Exception\FileNotFoundException;
-use Thelia\Exception\ModuleException;
+use Thelia\Domain\Module\Exception\ModuleException;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
@@ -188,7 +188,7 @@ class ModuleValidator
     protected function checkVersion(): void
     {
         if ($this->moduleDefinition->getTheliaVersion()
-            && !Version::test(Thelia::THELIA_VERSION, $this->moduleDefinition->getTheliaVersion(), false, '>=')) {
+            && !Version::test(TheliaKernel::THELIA_VERSION, $this->moduleDefinition->getTheliaVersion(), false, '>=')) {
             throw new ModuleException($this->trans('The module %name requires Thelia %version or newer', ['%name' => $this->moduleDirName, '%version' => $this->moduleDefinition->getTheliaVersion()]));
         }
     }

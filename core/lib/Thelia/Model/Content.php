@@ -17,7 +17,7 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
-use Thelia\Files\FileModelParentInterface;
+use Thelia\Core\File\FileModelParentInterface;
 use Thelia\Model\Base\Content as BaseContent;
 use Thelia\Model\Map\ContentTableMap;
 use Thelia\Model\Tools\PositionManagementTrait;

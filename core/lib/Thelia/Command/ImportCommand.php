@@ -21,9 +21,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\File\File;
+use Thelia\Domain\DataTransfer\ImportHandler;
 use Thelia\Model\ImportQuery;
 use Thelia\Model\LangQuery;
-use Thelia\Service\DataTransfer\ImportHandler;
 
 /**
  * Class ImportCommand.

@@ -19,9 +19,9 @@ use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\UrlValidator;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Routing\Rewriting\RewritingResolver;
+use Thelia\Core\Routing\Rewriting\RewritingRetriever;
 use Thelia\Model\ConfigQuery;
-use Thelia\Service\Rewriting\RewritingResolver;
-use Thelia\Service\Rewriting\RewritingRetriever;
 
 class URL
 {

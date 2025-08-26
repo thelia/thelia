@@ -24,9 +24,9 @@ use Thelia\Core\Event\IsAdminEnvEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\HttpFoundation\Session\SessionManager;
 use Thelia\Core\Translation\Translator;
-use Thelia\Service\Model\LangService;
-use Thelia\Service\SessionManager;
+use Thelia\Domain\Localization\LangService;
 
 class KernelListener
 {

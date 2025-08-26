@@ -27,7 +27,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
-use Thelia\Core\Thelia;
+use Thelia\Core\TheliaKernel;
 use Thelia\Log\Tlog;
 use Thelia\Model\Export;
 use Thelia\Model\ExportCategory;
@@ -103,7 +103,7 @@ class XmlFileLoader extends FileLoader
 
     public function propelOnlyRun(callable $method, $arg): void
     {
-        if (Thelia::isInstalled()) {
+        if (TheliaKernel::isInstalled()) {
             \call_user_func($method, $arg);
         }
     }

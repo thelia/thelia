@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Model;
 
+use Thelia\Domain\Taxation\TaxEngine\Calculator;
+use Thelia\Domain\Taxation\TaxEngine\OrderProductTaxCollection;
 use Thelia\Model\Base\TaxRule as BaseTaxRule;
-use Thelia\TaxEngine\Calculator;
-use Thelia\TaxEngine\OrderProductTaxCollection;
 
 class TaxRule extends BaseTaxRule
 {

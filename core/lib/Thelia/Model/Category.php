@@ -19,7 +19,7 @@ use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Files\FileModelParentInterface;
+use Thelia\Core\File\FileModelParentInterface;
 use Thelia\Model\Base\Category as BaseCategory;
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Tools\UrlRewritingTrait;

@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Condition\Implementation;
 
+use Thelia\Condition\Exception\InvalidConditionValueException;
 use Thelia\Condition\Operators;
-use Thelia\Coupon\FacadeInterface;
-use Thelia\Exception\InvalidConditionValueException;
+use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 
 /**
  * Check a Checkout against its Product number.

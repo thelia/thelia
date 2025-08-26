@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace Thelia\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Thelia\Core\Cache\ConfigCacheService;
 use Thelia\Model\Event\ConfigEvent;
-use Thelia\Service\ConfigCacheService;
 
 readonly class ModelConfigListener
 {

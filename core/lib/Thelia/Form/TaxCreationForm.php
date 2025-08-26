@@ -21,8 +21,8 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Taxation\TaxEngine\TaxTypeRequirementDefinition;
 use Thelia\Model\Tax;
-use Thelia\TaxEngine\TaxTypeRequirementDefinition;
 use Thelia\Type\TypeInterface;
 
 /**

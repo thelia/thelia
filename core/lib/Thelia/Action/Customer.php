@@ -26,14 +26,14 @@ use Thelia\Core\Event\LostPasswordEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Translation\Translator;
-use Thelia\Exception\CustomerException;
+use Thelia\Domain\Customer\CustomerService;
+use Thelia\Domain\Customer\Exception\CustomerException;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Event\CustomerEvent;
 use Thelia\Model\LangQuery;
-use Thelia\Service\Model\CustomerService;
 use Thelia\Tools\Password;
 
 /**

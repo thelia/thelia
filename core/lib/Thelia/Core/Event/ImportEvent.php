@@ -16,7 +16,7 @@ namespace Thelia\Core\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Core\Serializer\SerializerInterface;
-use Thelia\ImportExport\Import\AbstractImport;
+use Thelia\Domain\DataTransfer\Import\AbstractImport;
 
 /**
  * Class ImportEvent.

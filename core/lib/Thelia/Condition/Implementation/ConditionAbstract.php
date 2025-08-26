@@ -15,12 +15,12 @@ declare(strict_types=1);
 namespace Thelia\Condition\Implementation;
 
 use Thelia\Condition\ConditionEvaluator;
+use Thelia\Condition\Exception\InvalidConditionOperatorException;
+use Thelia\Condition\Exception\InvalidConditionValueException;
 use Thelia\Condition\Operators;
 use Thelia\Condition\SerializableCondition;
 use Thelia\Core\Translation\Translator;
-use Thelia\Coupon\FacadeInterface;
-use Thelia\Exception\InvalidConditionOperatorException;
-use Thelia\Exception\InvalidConditionValueException;
+use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Exception\NotImplementedException;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;

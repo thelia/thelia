@@ -25,7 +25,7 @@ use Thelia\Core\Routing\ModuleAttributeLoader;
 use Thelia\Core\Routing\ModuleXmlLoader;
 use Thelia\Core\Routing\RewritingRouter;
 use Thelia\Core\Routing\TemplateAttributeLoader;
-use Thelia\Service\Model\LangService;
+use Thelia\Domain\Localization\LangService;
 
 return static function (ContainerConfigurator $container): void {
     $services = $container->services();

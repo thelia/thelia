@@ -22,8 +22,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Filesystem\Filesystem;
-use Thelia\Install\CheckPermission;
-use Thelia\Install\Database;
+use Thelia\Core\Install\CheckPermission;
+use Thelia\Core\Install\Database;
 use Thelia\Tools\TokenProvider;
 
 /**

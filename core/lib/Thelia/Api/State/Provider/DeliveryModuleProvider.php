@@ -22,6 +22,8 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Adressing\AddressService;
+use Thelia\Domain\Shipping\DeliveryService;
 use Thelia\Model\Address;
 use Thelia\Model\Cart;
 use Thelia\Model\CountryQuery;
@@ -29,8 +31,6 @@ use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\StateQuery;
 use Thelia\Module\BaseModule;
-use Thelia\Service\Model\AddressService;
-use Thelia\Service\Model\DeliveryService;
 
 class DeliveryModuleProvider implements ProviderInterface
 {

@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Files\FileModelInterface;
+use Thelia\Core\File\FileModelInterface;
 use Thelia\Model\ConfigQuery;
 
 readonly class ItemFileResourceService

@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Condition\Implementation;
 
+use Thelia\Condition\Exception\UnmatchableConditionException;
 use Thelia\Core\Translation\Translator;
-use Thelia\Exception\UnmatchableConditionException;
 use Thelia\Model\Customer;
 
 /**

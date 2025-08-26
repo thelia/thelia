@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace Thelia\Condition\Implementation;
 
+use Thelia\Condition\Exception\InvalidConditionOperatorException;
+use Thelia\Condition\Exception\InvalidConditionValueException;
 use Thelia\Condition\SerializableCondition;
-use Thelia\Coupon\FacadeInterface;
-use Thelia\Exception\InvalidConditionOperatorException;
-use Thelia\Exception\InvalidConditionValueException;
+use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 
 /**
  * Manage how the application checks its state in order to check if it matches the implemented condition.

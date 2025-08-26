@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Module;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Domain\Taxation\TaxEngine\Calculator;
 use Thelia\Model\Area;
 use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\ConfigQuery;
@@ -22,7 +23,6 @@ use Thelia\Model\Country;
 use Thelia\Model\OrderPostage;
 use Thelia\Model\State;
 use Thelia\Model\TaxRuleQuery;
-use Thelia\TaxEngine\Calculator;
 
 abstract class AbstractDeliveryModuleWithState extends BaseModule implements DeliveryModuleWithStateInterface
 {

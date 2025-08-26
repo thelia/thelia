@@ -25,13 +25,13 @@ use Symfony\Component\Routing\RouterInterface;
 use Thelia\Controller\Front\DefaultController;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
-use Thelia\Exception\UrlRewritingException;
+use Thelia\Core\Routing\Rewriting\Exception\UrlRewritingException;
+use Thelia\Core\Routing\Rewriting\RewritingResolver;
+use Thelia\Domain\Localization\LangService;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 use Thelia\Model\RewritingUrlQuery;
-use Thelia\Service\Model\LangService;
-use Thelia\Service\Rewriting\RewritingResolver;
 use Thelia\Tools\URL;
 
 /**

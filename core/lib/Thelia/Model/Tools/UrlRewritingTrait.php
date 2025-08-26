@@ -18,13 +18,13 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Event\GenerateRewrittenUrlEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Routing\Rewriting\Exception\UrlRewritingException;
+use Thelia\Core\Routing\Rewriting\RewritingResolver;
 use Thelia\Core\Translation\Translator;
-use Thelia\Exception\UrlRewritingException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\RewritingArgumentQuery;
 use Thelia\Model\RewritingUrl;
 use Thelia\Model\RewritingUrlQuery;
-use Thelia\Service\Rewriting\RewritingResolver;
 use Thelia\Tools\URL;
 
 /**

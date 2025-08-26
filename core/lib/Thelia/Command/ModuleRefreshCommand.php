@@ -17,7 +17,7 @@ namespace Thelia\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Thelia\Exception\InvalidModuleException;
+use Thelia\Domain\Module\Exception\InvalidModuleException;
 use Thelia\Module\ModuleManagement;
 
 /**

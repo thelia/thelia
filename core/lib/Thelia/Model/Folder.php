@@ -17,7 +17,7 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Files\FileModelParentInterface;
+use Thelia\Core\File\FileModelParentInterface;
 use Thelia\Model\Base\Folder as BaseFolder;
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Tools\UrlRewritingTrait;
