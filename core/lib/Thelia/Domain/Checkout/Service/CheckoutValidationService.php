@@ -16,14 +16,16 @@ namespace Thelia\Domain\Checkout\Service;
 
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Domain\Cart\CartService;
+use Thelia\Domain\Cart\Service\CartGuard;
 use Thelia\Domain\Checkout\Exception\EmptyCartException;
 use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
 use Thelia\Domain\Checkout\Exception\InvalidPaymentException;
 use Thelia\Domain\Checkout\Exception\MissingAddressException;
+use Thelia\Model\Cart;
 
 readonly class CheckoutValidationService
 {
-    public function __construct(private CartService $cartService)
+    public function __construct(private CartGuard $cartGuard)
     {
     }
 
@@ -34,11 +36,11 @@ readonly class CheckoutValidationService
      * @throws InvalidPaymentException
      * @throws PropelException
      */
-    public function validateForOrder(): void
+    public function validateForOrder(Cart $cart): void
     {
-        $this->cartService->checkCartNotEmpty();
-        $this->cartService->checkValidDelivery();
-        $this->cartService->checkInvoiceAddress();
-        $this->cartService->checkValidPayment();
+        $this->cartGuard->checkCartNotEmpty($cart);
+        $this->cartGuard->checkValidDelivery($cart);
+        $this->cartGuard->checkInvoiceAddress($cart);
+        $this->cartGuard->checkValidPayment($cart);
     }
 }

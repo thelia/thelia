@@ -24,7 +24,7 @@ readonly class CustomerContext
     ) {
     }
 
-    public function getCustomer(): ?Customer
+    public function getCustomerFromSession(): ?Customer
     {
         $request = $this->requestStack->getCurrentRequest();
 

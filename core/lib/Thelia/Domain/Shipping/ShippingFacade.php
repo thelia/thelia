@@ -19,10 +19,12 @@ use Propel\Runtime\Exception\PropelException;
 use Thelia\Api\Resource\DeliveryModule as DeliveryModuleResource;
 use Thelia\Api\State\Collection\DeliveryModuleCollection;
 use Thelia\Domain\Cart\Service\CartRetriever;
+use Thelia\Domain\Shipping\DTO\DeliveryModuleWithOptionDTO;
 use Thelia\Domain\Shipping\DTO\PostageEstimateView;
 use Thelia\Domain\Shipping\Service\DeliveryModuleEligibilityChecker;
 use Thelia\Domain\Shipping\Service\DeliveryModuleLookupService;
 use Thelia\Domain\Shipping\Service\DeliveryModuleResourceBuilder;
+use Thelia\Domain\Shipping\Service\DeliveryOptionsProvider;
 use Thelia\Domain\Shipping\Service\DeliverySessionStorage;
 use Thelia\Domain\Shipping\Service\DeliverySetupService;
 use Thelia\Domain\Shipping\Service\PostageEstimator;
@@ -44,7 +46,8 @@ final readonly class ShippingFacade
         private DeliverySetupService $deliverySetupService,
         private PostageEstimator $postageEstimator,
         private DeliveryModuleEligibilityChecker $eligibilityChecker,
-        private CartRetriever $cartRetriever,
+        private DeliveryOptionsProvider $deliveryOptionsProvider,
+        private DeliveryModuleResourceBuilder $deliveryModuleResourceBuilder,
     ) {
     }
 
@@ -182,21 +185,39 @@ final readonly class ShippingFacade
     }
 
     /**
-     * @return array<int, Module> List of valid delivery modules
+     * @return array<int, DeliveryModuleWithOptionDTO> List of valid delivery modules
      */
     public function listValidMethods(
         Cart $cart,
         ?Country $country = null,
         ?State $state = null,
-        ?int $addressId = null,
+        ?int $addressId = null
     ): array {
         [$address, $country, $state] = $this->resolveAddressContext($cart, $country, $state, $addressId);
-
+        $country = $this->handleCountry($cart, $country);
         $validModules = [];
         $modules = $this->getActiveDeliveryModules();
+
         foreach ($modules as $module) {
             if ($this->eligibilityChecker->isEligible($module, $cart, $country, $state)) {
-                $validModules[] = $module;
+                $resourceDeliveryModule = $this->deliveryModuleResourceBuilder->build(
+                    $module,
+                    $cart,
+                    $address,
+                    $country,
+                    $state,
+                    true
+                );
+                $validModules[] = new DeliveryModuleWithOptionDTO(
+                    $resourceDeliveryModule,
+                    $this->deliveryOptionsProvider->getOptions(
+                        $module,
+                        $address,
+                        $cart,
+                        $country,
+                        $state
+                    )
+                );
             }
         }
 
@@ -253,7 +274,7 @@ final readonly class ShippingFacade
             ->getData();
     }
 
-    private function handleCountry(Cart $cart, ?Country $country): ?Country
+    private function handleCountry(Cart $cart, ?Country $country): Country
     {
         if ($country === null) {
             $addressDeliveryId = $cart->getAddressDeliveryId();

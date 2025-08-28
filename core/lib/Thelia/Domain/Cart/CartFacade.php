@@ -21,6 +21,7 @@ use Thelia\Domain\Cart\Service\CartItemService;
 use Thelia\Domain\Cart\Service\CartRetriever;
 use Thelia\Domain\Cart\Service\CartSelectionService;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
+use Thelia\Domain\Customer\CustomerFacade;
 use Thelia\Domain\Shipping\Service\PostageHandler;
 use Thelia\Model\Cart;
 use Thelia\Model\Customer;
@@ -31,7 +32,7 @@ final readonly class CartFacade
         private CartItemService $cartItemService,
         private CartSelectionService $cartSelectionService,
         private PostageHandler $postageHandler,
-        private CartRetriever $cartRetriever,
+        private CartRetriever $cartRetriever
     ) {
     }
 
@@ -107,7 +108,7 @@ final readonly class CartFacade
     /**
      * Front helper: get cart from session (can be null).
      */
-    public function getFromSession(): ?Cart
+    public function getCartFromSession(): ?Cart
     {
         return $this->cartRetriever->fromSession();
     }
@@ -120,6 +121,16 @@ final readonly class CartFacade
     public function getOrCreateForCustomer(Customer $customer): Cart
     {
         return $this->cartRetriever->fromSessionOrCreateNew($customer);
+    }
+
+    /**
+     * Front helper: get or create a cart from the current session.
+     *
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function getOrCreateFromSession(): Cart
+    {
+        return $this->cartRetriever->fromSessionOrCreateNew();
     }
 
     /**

@@ -18,6 +18,7 @@ use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Domain\Customer\Service\CustomerContext;
 use Thelia\Log\Tlog;
 use Thelia\Model\Cart;
 use Thelia\Model\CartQuery;
@@ -28,6 +29,7 @@ class CartRetriever
     public function __construct(
         protected RequestStack $requestStack,
         protected EventDispatcherInterface $eventDispatcher,
+        protected CustomerContext $customerContext,
     ) {
     }
 
@@ -35,13 +37,16 @@ class CartRetriever
      * @throws PropelException
      */
     public function fromSessionOrCreateNew(
-        Customer $customer,
+        ?Customer $customer = null,
     ): Cart {
         $cart = $this->fromSession();
 
         if (null === $cart) {
+            if (null === $customer) {
+                $customer = $this->customerContext->getCustomerFromSession();
+            }
             $cart = new Cart();
-            $cart->setCustomerId($customer->getId());
+            $cart->setCustomerId($customer?->getId());
             $cart->save();
         }
 

@@ -78,7 +78,7 @@ readonly class CustomerFacade
      */
     public function getCurrentCustomer(): ?Customer
     {
-        return $this->customerContext->getCustomer();
+        return $this->customerContext->getCustomerFromSession();
     }
 
     /**

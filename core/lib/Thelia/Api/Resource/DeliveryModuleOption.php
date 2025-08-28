@@ -90,6 +90,13 @@ class DeliveryModuleOption
     #[Groups([DeliveryModule::GROUP_FRONT_READ])]
     private ?float $postageUntaxed = null;
 
+    #[ApiProperty(
+        description: 'Untaxed postage cost',
+        example: 4.79,
+    )]
+    #[Groups([DeliveryModule::GROUP_FRONT_READ])]
+    private ?string $deliveryMode = null;
+
     // Getters and setters for each property
     public function getCode(): string
     {
@@ -210,4 +217,16 @@ class DeliveryModuleOption
 
         return $this;
     }
+
+    public function getDeliveryMode(): ?string
+    {
+        return $this->deliveryMode;
+    }
+
+    public function setDeliveryMode(?string $deliveryMode): void
+    {
+        $this->deliveryMode = $deliveryMode;
+    }
+
+
 }
