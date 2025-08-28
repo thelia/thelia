@@ -14,50 +14,50 @@ declare(strict_types=1);
 
 namespace Thelia\Controller\Front;
 
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
+use Thelia\Core\TheliaHttpKernel;
+use Thelia\Core\View\ViewRenderer;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
 
 /**
- * This is the defualt Thelia controller, which is called when no controller was found to process the request.
+ * This is the default Thelia controller, which is called when no controller was found to process the request.
  *
  * @author Manuel Raynaud <mraynadu@openstudio.fr>
  */
 class DefaultController extends BaseFrontController
 {
-    /**
-     * This is the default Thelia behaviour if no action is defined.
-     *
-     * If the request contains a 'view' parameter, this view will be displayed.
-     * If the request contains a '_view' attribute (set in the route definition, for example), this view will be displayed.
-     * Otherwise, we will use the "index" view.
-     *
-     * Additionaly, if the URL rewriting is enabled, the method will check if a redirect to the pâge rewritten URL should
-     * be done.
-     *
-     * @throw RedirectException if a redirection to the rewritted URL shoud be done.
-     */
-    public function noAction(Request $request): void
+    public function noAction(Request $request, ViewRenderer $viewRenderer): Response
     {
-        if ($view = $request->query->get('view') ?? $request->request->has('view')) {
-            $request->attributes->set('_view', $view);
-
-            return;
+        if (true === $request->attributes->get(TheliaHttpKernel::IGNORE_THELIA_VIEW, false)) {
+            return new Response('', Response::HTTP_NO_CONTENT);
         }
 
-        if (null === $request->attributes->get('_view')) {
-            $request->attributes->set('_view', 'index');
+        $view = $request->attributes->get('_view');
+        if (null === $view || '' === $view) {
+            $viewFromQuery = $request->query->get('view');
+            $viewFromBody = $request->request->get('view');
+            $view = $viewFromQuery ?: ($viewFromBody ?: 'index');
+            $request->attributes->set('_view', $view);
+        }
+
+        // Init {view}_id if missing
+        if (!$request->attributes->has($view.'_id')) {
+            $id = $request->query->getInt($view.'_id') ?: $request->request->getInt($view.'_id');
+            if ($id) {
+                $request->attributes->set($view.'_id', $id);
+            }
         }
 
         if (ConfigQuery::isRewritingEnable() && false === $request->attributes->get('_rewritten', false)) {
-            /* Does the query GET parameters match a rewritten URL ? */
-            $rewrittenUrl = URL::getInstance()->retrieveCurrent($request);
-
-            if (null !== $rewrittenUrl->rewrittenUrl) {
-                /* 301 redirection to rewritten URL */
-                throw new RedirectException($rewrittenUrl->rewrittenUrl, 301);
+            $rewritten = URL::getInstance()->retrieveCurrent($request);
+            if (null !== $rewritten->rewrittenUrl) {
+                throw new RedirectException($rewritten->rewrittenUrl, 301);
             }
         }
+
+        return $viewRenderer->render($request);
     }
 }

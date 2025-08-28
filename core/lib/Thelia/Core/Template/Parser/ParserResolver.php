@@ -16,8 +16,8 @@ namespace Thelia\Core\Template\Parser;
 
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
@@ -70,7 +70,7 @@ class ParserResolver
         }
 
         $view = $request->attributes->get('_view');
-        $templateDefinition = $request->fromAdmin()
+        $templateDefinition = $this->templateHelper->isAdmin($request)
             ? $this->templateHelper->getActiveAdminTemplate()
             : $this->templateHelper->getActiveFrontTemplate();
 

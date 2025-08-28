@@ -16,6 +16,7 @@ namespace Thelia\Core\Template;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\Config\ConfigUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -232,5 +233,15 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
         return [
             TheliaEvents::CONFIG_SETVALUE => ['clearCache', 130],
         ];
+    }
+
+    public function isAdmin(?Request $request): bool
+    {
+        if (null === $request) {
+            return false;
+        }
+        $match = preg_match('#/admin/?.*#', $request->getPathInfo());
+
+        return false !== $match && 0 !== $match;
     }
 }

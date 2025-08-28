@@ -14,7 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Model;
 
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Log\Tlog;
 use Thelia\Model\Base\AdminLog as BaseAdminLog;
@@ -28,11 +29,14 @@ class AdminLog extends BaseAdminLog
         string $resource,
         string $action,
         string $message,
-        Request $request,
+        SymfonyRequest $request,
         ?UserInterface $adminUser = null,
         bool $withRequestContent = true,
         ?int $resourceId = null,
     ): void {
+        if (!$request instanceof TheliaRequest) {
+            return;
+        }
         $log = new self();
 
         $log

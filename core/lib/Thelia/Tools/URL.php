@@ -14,11 +14,13 @@ declare(strict_types=1);
 
 namespace Thelia\Tools;
 
+use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\UrlValidator;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Routing\Rewriting\Exception\UrlRewritingException;
 use Thelia\Core\Routing\Rewriting\RewritingResolver;
 use Thelia\Core\Routing\Rewriting\RewritingRetriever;
 use Thelia\Model\ConfigQuery;
@@ -292,6 +294,9 @@ class URL
 
     /**
      * Retrieve a rewritten URL from the current GET parameters or use toString method.
+     *
+     * @throws PropelException
+     * @throws UrlRewritingException
      */
     public function resolve($url): RewritingResolver
     {

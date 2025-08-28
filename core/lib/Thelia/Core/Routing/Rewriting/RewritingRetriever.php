@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Routing\Rewriting;
 
+use Thelia\Model\RewritingUrl;
 use Thelia\Model\RewritingUrlQuery;
 use Thelia\Tools\URL;
 
@@ -26,10 +27,10 @@ use Thelia\Tools\URL;
  */
 class RewritingRetriever
 {
-    protected $search;
+    protected ?RewritingUrl $search = null;
     protected RewritingUrlQuery $rewritingUrlQuery;
-    public $url;
-    public $rewrittenUrl;
+    public ?string $url = null;
+    public ?string $rewrittenUrl = null;
 
     public function __construct()
     {

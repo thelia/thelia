@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Controller\BaseController;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Core\Template\ParserInterface;
@@ -104,6 +105,10 @@ class BaseAdminController extends BaseController
 
     protected function checkAuth(mixed $resources, mixed $modules, mixed $accesses): ?Response
     {
+        $request = $this->requestStack->getMainRequest();
+        if (!$request instanceof Request) {
+            return null;
+        }
         $resources = \is_array($resources) ? $resources : [$resources];
         $modules = \is_array($modules) ? $modules : [$modules];
         $accesses = \is_array($accesses) ? $accesses : [$accesses];

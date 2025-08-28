@@ -18,7 +18,9 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Controller\Admin\BaseAdminController;
+use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\TheliaHttpKernel;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\AdminAccessDenied;
 
@@ -36,6 +38,10 @@ class ControllerListener
     #[AsEventListener(event: KernelEvents::CONTROLLER, priority: 128)]
     public function adminFirewall(ControllerEvent $event): void
     {
+        $request = $event->getRequest();
+        if (!$request instanceof TheliaRequest || true === $request->attributes->get(TheliaHttpKernel::IGNORE_THELIA_VIEW, false)) {
+            return;
+        }
         $controller = $event->getController();
 
         // check if an admin is logged in
