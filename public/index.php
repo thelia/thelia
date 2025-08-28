@@ -13,22 +13,9 @@ declare(strict_types=1);
  */
 
 use App\Kernel;
-use Symfony\Component\HttpFoundation\Request as SfRequest;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 
 require dirname(__DIR__).'/vendor/autoload_runtime.php';
-
-SfRequest::setFactory(
-    static fn (
-        array $query = [],
-        array $request = [],
-        array $attributes = [],
-        array $cookies = [],
-        array $files = [],
-        array $server = [],
-        $content = null,
-    ) => new TheliaRequest($query, $request, $attributes, $cookies, $files, $server, $content)
-);
 
 return static function (array $context): Kernel {
     $thelia = new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);

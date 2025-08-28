@@ -145,7 +145,7 @@ readonly class FilterService
 
     public function getFilters(array $context, string $resource): array
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getMainRequest();
 
         if (!$request instanceof Request) {
             throw new \InvalidArgumentException('The request is required.');

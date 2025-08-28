@@ -56,7 +56,7 @@ class BaseFacade implements FacadeInterface
         protected ConditionEvaluator $conditionEvaluator,
         protected EventDispatcherInterface $eventDispatcher,
     ) {
-        $this->request = $requestStack->getCurrentRequest();
+        $this->request = $requestStack->getMainRequest();
     }
 
     /**
@@ -222,7 +222,7 @@ class BaseFacade implements FacadeInterface
     {
         if (!$this->request instanceof \Symfony\Component\HttpFoundation\Request) {
             // If the request is not set, we try to get it from the RequestStack again.
-            $this->request = $this->requestStack->getCurrentRequest();
+            $this->request = $this->requestStack->getMainRequest();
             if (!$this->request instanceof \Symfony\Component\HttpFoundation\Request) {
                 throw new \LogicException('Request is not set. Please ensure that the RequestStack is properly configured.');
             }

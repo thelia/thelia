@@ -21,7 +21,6 @@ use Thelia\Domain\Cart\Service\CartItemService;
 use Thelia\Domain\Cart\Service\CartRetriever;
 use Thelia\Domain\Cart\Service\CartSelectionService;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
-use Thelia\Domain\Customer\CustomerFacade;
 use Thelia\Domain\Shipping\Service\PostageHandler;
 use Thelia\Model\Cart;
 use Thelia\Model\Customer;
@@ -32,7 +31,7 @@ final readonly class CartFacade
         private CartItemService $cartItemService,
         private CartSelectionService $cartSelectionService,
         private PostageHandler $postageHandler,
-        private CartRetriever $cartRetriever
+        private CartRetriever $cartRetriever,
     ) {
     }
 

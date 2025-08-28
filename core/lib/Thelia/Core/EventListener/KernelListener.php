@@ -54,7 +54,7 @@ class KernelListener
         }
     }
 
-    #[AsEventListener(event: KernelEvents::REQUEST, priority: 130)]
+    #[AsEventListener(event: KernelEvents::REQUEST, priority: \PHP_INT_MAX - 2)]
     public function warmupSession(RequestEvent $event): void
     {
         if (!$this->sessionManager->sessionIsStartable($event)) {
@@ -68,7 +68,7 @@ class KernelListener
         }
     }
 
-    #[AsEventListener(event: KernelEvents::REQUEST, priority: 80)]
+    #[AsEventListener(event: KernelEvents::REQUEST, priority: 128)]
     public function initializeLanguageAndAdmin(RequestEvent $event): ?Response
     {
         if (!$this->sessionManager->sessionIsStartable($event)) {

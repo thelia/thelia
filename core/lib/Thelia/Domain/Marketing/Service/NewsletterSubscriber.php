@@ -33,7 +33,7 @@ readonly class NewsletterSubscriber
     public function subscribe(
         Customer $customer,
     ): void {
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getMainRequest();
         if (!$request instanceof Request) {
             throw new \RuntimeException('Current request is not an instance of Thelia\Core\HttpFoundation\Request');
         }

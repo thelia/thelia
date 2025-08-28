@@ -363,7 +363,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         $cookieName = ConfigQuery::read('cart.cookie_name', 'thelia_cart');
         $persistentCookie = ConfigQuery::read('cart.use_persistent_cookie', 1);
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getMainRequest();
 
         $cart = null;
 
@@ -432,7 +432,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     protected function managePersistentCart(CartRestoreEvent $cartRestoreEvent, string $cookieName, EventDispatcherInterface $dispatcher): CartModel
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getMainRequest();
 
         // The cart cookie exists -> get the cart token
         $token = $request->cookies->get($cookieName);
@@ -620,7 +620,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     protected function getSession(): Session
     {
         /** @var Session $session */
-        $session = $this->requestStack->getCurrentRequest()?->getSession();
+        $session = $this->requestStack->getMainRequest()?->getSession();
 
         if (null === $session) {
             throw new \RuntimeException('No session available');

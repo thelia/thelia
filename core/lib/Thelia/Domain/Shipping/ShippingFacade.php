@@ -18,7 +18,6 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Api\Resource\DeliveryModule as DeliveryModuleResource;
 use Thelia\Api\State\Collection\DeliveryModuleCollection;
-use Thelia\Domain\Cart\Service\CartRetriever;
 use Thelia\Domain\Shipping\DTO\DeliveryModuleWithOptionDTO;
 use Thelia\Domain\Shipping\DTO\PostageEstimateView;
 use Thelia\Domain\Shipping\Service\DeliveryModuleEligibilityChecker;
@@ -191,7 +190,7 @@ final readonly class ShippingFacade
         Cart $cart,
         ?Country $country = null,
         ?State $state = null,
-        ?int $addressId = null
+        ?int $addressId = null,
     ): array {
         [$address, $country, $state] = $this->resolveAddressContext($cart, $country, $state, $addressId);
         $country = $this->handleCountry($cart, $country);

@@ -31,8 +31,9 @@ final readonly class SessionFactory implements SessionFactoryInterface
 
     public function createSession(): SessionInterface
     {
-        $request = $this->requestStack->getCurrentRequest();
-        $storage = $this->storageFactory->createStorage($request);
+        $mainRequest = $this->requestStack->getMainRequest();
+
+        $storage = $this->storageFactory->createStorage($mainRequest);
 
         return new Session($storage);
     }

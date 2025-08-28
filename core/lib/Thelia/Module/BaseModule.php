@@ -173,7 +173,7 @@ class BaseModule implements BaseModuleInterface
     {
         if (false === $this->hasRequest()) {
             // Try to get request from container.
-            $this->setRequest($this->getContainer()->get('request_stack')?->getCurrentRequest());
+            $this->setRequest($this->getContainer()->get('request_stack')?->getMainRequest());
         }
 
         if (false === $this->hasRequest()) {

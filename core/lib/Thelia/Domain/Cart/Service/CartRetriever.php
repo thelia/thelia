@@ -17,12 +17,13 @@ namespace Thelia\Domain\Cart\Service;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Core\Event\Cart\CartPersistEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Customer\Service\CustomerContext;
 use Thelia\Log\Tlog;
 use Thelia\Model\Cart;
 use Thelia\Model\CartQuery;
-use Thelia\Model\Customer;
 
 class CartRetriever
 {
@@ -30,42 +31,47 @@ class CartRetriever
         protected RequestStack $requestStack,
         protected EventDispatcherInterface $eventDispatcher,
         protected CustomerContext $customerContext,
+        protected CartContext $cartContext,
     ) {
     }
 
     /**
      * @throws PropelException
      */
-    public function fromSessionOrCreateNew(
-        ?Customer $customer = null,
-    ): Cart {
+    public function fromSessionOrCreateNew(): Cart
+    {
         $cart = $this->fromSession();
-
-        if (null === $cart) {
-            if (null === $customer) {
-                $customer = $this->customerContext->getCustomerFromSession();
-            }
-            $cart = new Cart();
-            $cart->setCustomerId($customer?->getId());
-            $cart->save();
+        if (null === $cart->getId()) {
+            Tlog::getInstance()->error('Cart created without id.');
+            $cartPersistEvent = new CartPersistEvent($cart);
+            $this->eventDispatcher->dispatch($cartPersistEvent, TheliaEvents::CART_PERSIST);
         }
+        $request = $this->requestStack->getMainRequest();
+        Tlog::getInstance()->error('Cart ID in session: '.($cart->getId() ?? 'null'));
+        Tlog::getInstance()->error('Request class is '.($request::class ?: 'no request'));
+        $trace = debug_backtrace();
+        $messageLog = '';
+        foreach ($trace as $index => $frame) {
+            $file = $frame['file'] ?? 'unknown file';
+            $line = $frame['line'] ?? 'unknown line';
+            $function = $frame['function'] ?? 'unknown function';
+            $messageLog .= "#$index $file($line): $function()\n";
+        }
+        Tlog::getInstance()->error($messageLog);
 
         return $cart;
     }
 
-    public function fromSession(): ?Cart
+    public function fromSession(): Cart
     {
-        $session = $this->requestStack->getCurrentRequest()?->getSession();
+        $session = $this->requestStack->getMainRequest()?->getSession();
 
         if (!$session instanceof Session) {
-            Tlog::getInstance()->error(
-                'Failed to get cart event : no session available in the current request.'
-            );
-
-            return null;
+            throw new \LogicException('Failed to get cart event : no session available in the current request.');
         }
+        $cart = $session->getSessionCart($this->eventDispatcher);
 
-        return $session->getSessionCart($this->eventDispatcher);
+        return $cart;
     }
 
     public function fromId(int $cartId): ?Cart

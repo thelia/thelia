@@ -36,7 +36,7 @@ class Payment extends BaseSpecificModule
 
     public function parseResults(LoopResult $loopResult): LoopResult
     {
-        $cart = $this->getCurrentRequest()->getSession()->getSessionCart($this->dispatcher);
+        $cart = $this->getMainRequest()->getSession()->getSessionCart($this->dispatcher);
 
         /** @var Module $paymentModule */
         foreach ($loopResult->getResultDataCollection() as $paymentModule) {

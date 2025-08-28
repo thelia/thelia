@@ -21,8 +21,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
+use Symfony\Component\HttpKernel\Exception\ControllerDoesNotReturnResponseException;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 
 /**
  * @author Manuel Raynaud <manu@raynaud.io>
@@ -66,8 +68,12 @@ class TheliaHttpKernel extends HttpKernel
      */
     public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): Response
     {
+        if (!$request instanceof TheliaRequest) {
+            return parent::handle($request, $type, $catch);
+        }
         $this->container->get('request.context')?->fromRequest($request);
 
         return parent::handle($request, $type, $catch);
+
     }
 }

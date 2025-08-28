@@ -31,7 +31,7 @@ class TheliaFilter extends AbstractFilter
         $request = $context['request'] ?? null;
 
         if (!$request) {
-            $request = $this->requestStack->getCurrentRequest();
+            $request = $this->requestStack->getMainRequest();
         }
 
         if (!$request || (!isset($context['filters']['tfilters']) && \count($request->get('tfilters', [])) < 1)) {

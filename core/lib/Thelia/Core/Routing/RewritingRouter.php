@@ -52,7 +52,9 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
 
     public function match(string $pathinfo): array
     {
-        return $this->matchRequest(Request::create($pathinfo));
+        $request = Request::create($pathinfo);
+
+        return $this->matchRequest($request);
     }
 
     /**
@@ -60,6 +62,10 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
      */
     public function matchRequest(Request $request): array
     {
+        if (!$request instanceof TheliaRequest) {
+            throw new ResourceNotFoundException();
+        }
+
         if (!ConfigQuery::isRewritingEnable()) {
             throw new ResourceNotFoundException();
         }

@@ -36,7 +36,7 @@ class ProductSaleElementsAccessService
         private readonly SecurityContext $securityContext,
         private readonly EventDispatcherInterface $eventDispatcher,
     ) {
-        $this->request = $requestStack->getCurrentRequest();
+        $this->request = $requestStack->getMainRequest();
     }
 
     public function psesByProduct($productId)

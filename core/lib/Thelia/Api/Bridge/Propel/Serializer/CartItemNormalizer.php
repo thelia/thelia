@@ -64,7 +64,7 @@ class CartItemNormalizer extends AbstractItemNormalizer
 
     public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        $this->requestStack->getCurrentRequest()->setSession($this->session); // Todo : Quick fix for Call to undefined method Symfony\Component\HttpFoundation\Session\Session::getMethod
+        $this->requestStack->getMainRequest()->setSession($this->session); // Todo : Quick fix for Call to undefined method Symfony\Component\HttpFoundation\Session\Session::getMethod
         $propelCartItem = $object->getPropelModel();
         $country = $this->taxEngine->getDeliveryCountry();
         /* @var CartItem $object */

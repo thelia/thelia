@@ -60,7 +60,7 @@ return static function (ContainerConfigurator $configurator): void {
         ->public();
 
     $services->set(FileUpdateService::class)
-        ->factory([service('request_stack'), 'getCurrentRequest'])
+        ->factory([service('request_stack'), 'getMainRequest'])
         ->args([
             service('thelia.file_manager'),
             service('translator'),

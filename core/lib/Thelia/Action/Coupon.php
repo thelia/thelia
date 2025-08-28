@@ -162,7 +162,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
     public function updateOrderDiscount(Event $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        $session = $this->requestStack->getCurrentRequest()->getSession();
+        $session = $this->requestStack->getMainRequest()->getSession();
 
         if (!$session instanceof Session || !$session->isStarted()) {
             return;
@@ -247,7 +247,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     public function checkFreePostage(OrderEvent $event): void
     {
         /** @var \Thelia\Model\Cart $cart */
-        $cart = $this->requestStack->getCurrentRequest()->getSession()->getSessionCart($this->dispatcher);
+        $cart = $this->requestStack->getMainRequest()->getSession()->getSessionCart($this->dispatcher);
 
         if ($this->couponManager->isCouponRemovingPostage($cart)) {
             $cart->setPostage(null)
@@ -262,7 +262,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     public function forceFreePostage(mixed $event): void
     {
         /** @var \Thelia\Model\Cart $cart */
-        $cart = $this->requestStack->getCurrentRequest()->getSession()->getSessionCart($this->dispatcher);
+        $cart = $this->requestStack->getMainRequest()->getSession()->getSessionCart($this->dispatcher);
 
         if ($this->couponManager->isCouponRemovingPostage($cart)) {
             $cart->setPostage(null)
@@ -427,7 +427,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     protected function getSession(): Session
     {
         /** @var Session $session */
-        $session = $this->requestStack->getCurrentRequest()->getSession();
+        $session = $this->requestStack->getMainRequest()->getSession();
 
         return $session;
     }

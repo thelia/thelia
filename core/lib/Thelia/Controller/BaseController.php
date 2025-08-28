@@ -161,7 +161,7 @@ abstract class BaseController implements ControllerInterface
 
     protected function getRequest(): Request
     {
-        return $this->requestStack->getCurrentRequest();
+        return $this->requestStack->getMainRequest();
     }
 
     protected function getSession(): SessionInterface
@@ -271,7 +271,7 @@ abstract class BaseController implements ControllerInterface
         if ($form instanceof BaseForm) {
             $url = $form->getFormDefinedUrl($parameterName);
         } else {
-            $url = $this->requestStack->getCurrentRequest()?->get($parameterName);
+            $url = $this->requestStack->getMainRequest()?->get($parameterName);
         }
 
         return $url;
@@ -391,7 +391,7 @@ abstract class BaseController implements ControllerInterface
 
     protected function checkXmlHttpRequest(): void
     {
-        if (false === $this->requestStack->getCurrentRequest()?->isXmlHttpRequest() && false === $this->isDebug()) {
+        if (false === $this->requestStack->getMainRequest()?->isXmlHttpRequest() && false === $this->isDebug()) {
             $this->accessDenied();
         }
     }

@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException as BaseHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
@@ -45,7 +46,8 @@ class HttpException extends BaseAction implements EventSubscriberInterface
 
     public function checkHttpException(ExceptionEvent $event): void
     {
-        if ($event->getRequest()->get('isApiRoute', false)) {
+        $request = $event->getRequest();
+        if (!$request instanceof Request || $request->get('isApiRoute', false)) {
             return;
         }
 

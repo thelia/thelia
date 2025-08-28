@@ -165,19 +165,19 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $current = $this->getCurrent();
 
         if (true === $current) {
-            $search->filterById($this->getCurrentRequest()->get('content_id'));
+            $search->filterById($this->getMainRequest()->get('content_id'));
         } elseif (false === $current) {
-            $search->filterById($this->getCurrentRequest()->get('content_id'), Criteria::NOT_IN);
+            $search->filterById($this->getMainRequest()->get('content_id'), Criteria::NOT_IN);
         }
 
         $current_folder = $this->getCurrentFolder();
 
         if (true === $current_folder) {
-            $current = ContentQuery::create()->findPk($this->getCurrentRequest()->get('content_id'));
+            $current = ContentQuery::create()->findPk($this->getMainRequest()->get('content_id'));
 
             $search->filterByFolder($current->getFolders(), Criteria::IN);
         } elseif (false === $current_folder) {
-            $current = ContentQuery::create()->findPk($this->getCurrentRequest()->get('content_id'));
+            $current = ContentQuery::create()->findPk($this->getMainRequest()->get('content_id'));
 
             $search->filterByFolder($current->getFolders(), Criteria::NOT_IN);
         }

@@ -56,7 +56,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
     public function buildArray(): array
     {
         /** @var CartModel $cart */
-        $cart = $this->getCurrentRequest()->getSession()->getSessionCart($this->getDispatcher());
+        $cart = $this->getMainRequest()->getSession()->getSessionCart($this->getDispatcher());
 
         if (null === $cart) {
             return [];
@@ -81,7 +81,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
     public function parseResults(LoopResult $loopResult): LoopResult
     {
         $taxCountry = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
-        $locale = $this->getCurrentRequest()->getSession()->getLang()->getLocale();
+        $locale = $this->getMainRequest()->getSession()->getLang()->getLocale();
         $checkAvailability = ConfigQuery::checkAvailableStock();
         $defaultAvailability = (int) ConfigQuery::read('default-available-stock', 100);
 
@@ -97,7 +97,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             $loopResultRow->set('REF', $product->getRef());
             $loopResultRow->set('QUANTITY', $cartItem->getQuantity());
             $loopResultRow->set('PRODUCT_ID', $product->getId());
-            $loopResultRow->set('PRODUCT_URL', $product->getUrl($this->getCurrentRequest()->getSession()->getLang()->getLocale()));
+            $loopResultRow->set('PRODUCT_URL', $product->getUrl($this->getMainRequest()->getSession()->getLang()->getLocale()));
 
             if (!$checkAvailability || 1 === $product->getVirtual()) {
                 $loopResultRow->set('STOCK', $defaultAvailability);

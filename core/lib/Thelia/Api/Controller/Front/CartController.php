@@ -35,7 +35,7 @@ readonly class CartController
         EventDispatcherInterface $eventDispatcher,
         Session $session,
     ): PropelResourceInterface {
-        $request = $requestStack->getCurrentRequest();
+        $request = $requestStack->getMainRequest();
         $request->setSession($session);
 
         $cart = $session->getSessionCart($eventDispatcher);

@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Domain\Checkout\Service;
 
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Domain\Cart\CartService;
 use Thelia\Domain\Cart\Service\CartGuard;
 use Thelia\Domain\Checkout\Exception\EmptyCartException;
 use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;

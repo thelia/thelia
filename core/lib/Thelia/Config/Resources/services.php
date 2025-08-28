@@ -50,7 +50,7 @@ return static function (ContainerConfigurator $configurator): void {
         ->bind('$propelCollectionExtensions', tagged_iterator('thelia.api.propel.query_extension.collection'))
         ->bind('$propelItemExtensions', tagged_iterator('thelia.api.propel.query_extension.item'))
         ->bind('$apiResourceAddons', '%Thelia.api.resource.addons%')
-        ->bind(Request::class, expr('service("request_stack").getCurrentRequest()'));
+        ->bind(Request::class, expr('service("request_stack").getMainRequest()'));
 
     $serviceConfigurator->load('Thelia\\', THELIA_LIB)
         ->exclude(

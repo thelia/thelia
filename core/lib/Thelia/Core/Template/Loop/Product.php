@@ -565,7 +565,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 throw new \InvalidArgumentException('Cannot found currency id: `'.$currency.'` in product_sale_elements loop');
             }
         } else {
-            $currency = $this->getCurrentRequest()->getSession()->getCurrency();
+            $currency = $this->getMainRequest()->getSession()->getCurrency();
         }
 
         $defaultCurrency = CurrencyModel::getDefaultCurrency();
@@ -687,9 +687,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $current = $this->getCurrent();
 
         if (true === $current) {
-            $search->filterById($this->getCurrentRequest()->get('product_id'), Criteria::EQUAL);
+            $search->filterById($this->getMainRequest()->get('product_id'), Criteria::EQUAL);
         } elseif (false === $current) {
-            $search->filterById($this->getCurrentRequest()->get('product_id'), Criteria::NOT_IN);
+            $search->filterById($this->getMainRequest()->get('product_id'), Criteria::NOT_IN);
         }
 
         $brand_id = $this->getBrand();
@@ -720,7 +720,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         if (true === $current_category) {
             $search->filterByCategory(
                 CategoryQuery::create()->filterByProduct(
-                    ProductCategoryQuery::create()->findPk($this->getCurrentRequest()->get('product_id')),
+                    ProductCategoryQuery::create()->findPk($this->getMainRequest()->get('product_id')),
                     Criteria::IN,
                 )->find(),
                 Criteria::IN,
@@ -728,7 +728,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         } elseif (false === $current_category) {
             $search->filterByCategory(
                 CategoryQuery::create()->filterByProduct(
-                    ProductCategoryQuery::create()->findPk($this->getCurrentRequest()->get('product_id')),
+                    ProductCategoryQuery::create()->findPk($this->getMainRequest()->get('product_id')),
                     Criteria::IN,
                 )->find(),
                 Criteria::NOT_IN,

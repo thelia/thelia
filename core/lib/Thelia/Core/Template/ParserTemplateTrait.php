@@ -37,7 +37,7 @@ trait ParserTemplateTrait
 
     public function getRequest(): Request
     {
-        return $this->requestStack->getCurrentRequest();
+        return $this->requestStack->getMainRequest();
     }
 
     public function pushTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false): void

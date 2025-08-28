@@ -47,7 +47,7 @@ class LoopDataAccessService
         protected array $theliaParserLoops,
         protected string $kernelEnvironment,
     ) {
-        $this->request = $requestStack->getCurrentRequest();
+        $this->request = $requestStack->getMainRequest();
         $this->setLoopList($theliaParserLoops);
     }
 

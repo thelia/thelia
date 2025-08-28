@@ -36,7 +36,7 @@ readonly class LangService
 
     public function getLang(): ?Lang
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getMainRequest();
 
         if (!$request instanceof Request) {
             return null;
@@ -47,7 +47,7 @@ readonly class LangService
 
     public function setLang(Lang $lang): void
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getMainRequest();
 
         if (!$request instanceof Request) {
             return;

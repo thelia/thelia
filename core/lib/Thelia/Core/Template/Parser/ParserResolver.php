@@ -63,7 +63,7 @@ class ParserResolver
      */
     public function getParserByCurrentRequest(): ?ParserInterface
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getMainRequest();
 
         if (!$request instanceof Request) {
             return null;

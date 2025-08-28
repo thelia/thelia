@@ -105,11 +105,11 @@ class ErrorListener
         // Log exception in the Thelia log
         $exception = $event->getThrowable();
 
-        $logMessage = '';
-
+        $request = $event->getRequest();
+        $logMessage = 'Uncaught exception on '.$request->getMethod().' '.$request->getUri();
         do {
             $logMessage .=
-                ('' !== $logMessage && '0' !== $logMessage ? \PHP_EOL.'Caused by' : 'Uncaught exception')
+                ('' !== $logMessage && '0' !== $logMessage ? \PHP_EOL.'Caused by ' : 'Uncaught exception ')
                 .$exception->getMessage()
                 .\PHP_EOL
                 .'Stack Trace: '.$exception->getTraceAsString();

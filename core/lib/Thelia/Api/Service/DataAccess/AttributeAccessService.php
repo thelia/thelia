@@ -433,7 +433,7 @@ class AttributeAccessService
 
     public function getRequest(): Request
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getMainRequest();
         if (null === $request) {
             throw new \RuntimeException('No request available');
         }

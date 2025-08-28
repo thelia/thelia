@@ -104,6 +104,6 @@ class TaxEngine
 
     protected function getSession(): ?SessionInterface
     {
-        return $this->requestStack?->getCurrentRequest()?->getSession();
+        return $this->requestStack?->getMainRequest()?->getSession();
     }
 }

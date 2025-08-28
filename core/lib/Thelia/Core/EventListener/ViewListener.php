@@ -26,6 +26,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\ViewCheckEvent;
+use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
@@ -55,10 +56,9 @@ class ViewListener
     {
         $request = $event->getRequest();
 
-        if ($request->attributes->has(self::IGNORE_THELIA_VIEW)) {
+        if (!$request instanceof TheliaRequest || $request->attributes->has(self::IGNORE_THELIA_VIEW)) {
             return;
         }
-
         try {
             $view = $request->attributes->get('_view');
             $templatePath = $this->templateHelper->getActiveFrontTemplate()->getAbsolutePath();

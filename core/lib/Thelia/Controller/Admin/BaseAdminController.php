@@ -45,7 +45,7 @@ class BaseAdminController extends BaseController
                 return $this->render($template);
             }
 
-            if (null !== $view = $this->requestStack->getCurrentRequest()?->get('view')) {
+            if (null !== $view = $this->requestStack->getMainRequest()?->get('view')) {
                 return $this->render($view);
             }
         } catch (\Exception $exception) {
@@ -66,7 +66,7 @@ class BaseAdminController extends BaseController
             $resource,
             $action,
             $message,
-            $this->requestStack->getCurrentRequest(),
+            $this->requestStack->getMainRequest(),
             $this->securityContext->getAdminUser(),
             true,
             (int) $resourceId,
@@ -171,7 +171,7 @@ class BaseAdminController extends BaseController
     protected function forward(string $controller, array $path = [], array $query = []): Response
     {
         $path['_controller'] = $controller;
-        $subRequest = $this->requestStack->getCurrentRequest()?->duplicate($query, null, $path);
+        $subRequest = $this->requestStack->getMainRequest()?->duplicate($query, null, $path);
 
         return $this->container->get('http_kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
     }
@@ -179,7 +179,7 @@ class BaseAdminController extends BaseController
     protected function getCurrentEditionCurrency()
     {
         // Return the new language if a change is required.
-        if (null !== ($edit_currency_id = $this->requestStack->getCurrentRequest()?->get('edit_currency_id')) && null !== $edit_currency = CurrencyQuery::create()->findOneById($edit_currency_id)) {
+        if (null !== ($edit_currency_id = $this->requestStack->getMainRequest()?->get('edit_currency_id')) && null !== $edit_currency = CurrencyQuery::create()->findOneById($edit_currency_id)) {
             return $edit_currency;
         }
 
@@ -190,7 +190,7 @@ class BaseAdminController extends BaseController
     protected function getCurrentEditionLang()
     {
         // Return the new language if a change is required.
-        if (null !== ($edit_language_id = $this->requestStack->getCurrentRequest()?->get('edit_language_id')) && null !== $edit_language = LangQuery::create()->findOneById($edit_language_id)) {
+        if (null !== ($edit_language_id = $this->requestStack->getMainRequest()?->get('edit_language_id')) && null !== $edit_language = LangQuery::create()->findOneById($edit_language_id)) {
             return $edit_language;
         }
 
@@ -231,7 +231,7 @@ class BaseAdminController extends BaseController
         }
 
         // Find the current order
-        $order = $this->requestStack->getCurrentRequest()?->get(
+        $order = $this->requestStack->getMainRequest()?->get(
             $requestParameterName,
             $this->getSession()->get($orderSessionIdentifier, $defaultListOrder),
         );

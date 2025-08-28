@@ -40,7 +40,7 @@ final readonly class CustomerGetCollectionExtension implements QueryCollectionEx
             return;
         }
 
-        $patterns = $this->accessMap->getPatterns($this->requestStack->getCurrentRequest());
+        $patterns = $this->accessMap->getPatterns($this->requestStack->getMainRequest());
 
         if (!isset($patterns[0][0]) || 'ROLE_CUSTOMER' !== $patterns[0][0]) {
             return;

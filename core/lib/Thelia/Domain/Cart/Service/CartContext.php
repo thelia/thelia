@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Cart\Service;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\Cart;
@@ -23,13 +23,13 @@ class CartContext
 {
     public function __construct(
         protected RequestStack $requestStack,
-        protected EventDispatcher $eventDispatcher,
+        protected EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
     public function clearCartSession(): void
     {
-        $session = $this->requestStack->getCurrentRequest()?->getSession();
+        $session = $this->requestStack->getMainRequest()?->getSession();
         if ($session instanceof Session) {
             $session->clearSessionCart($this->eventDispatcher);
         }
@@ -37,7 +37,7 @@ class CartContext
 
     public function addCartSession(Cart $cart): void
     {
-        $session = $this->requestStack->getCurrentRequest()?->getSession();
+        $session = $this->requestStack->getMainRequest()?->getSession();
         if ($session instanceof Session) {
             $session->setSessionCart($cart);
         }

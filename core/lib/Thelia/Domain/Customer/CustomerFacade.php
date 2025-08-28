@@ -49,7 +49,7 @@ readonly class CustomerFacade
      */
     public function login(CustomerLogin $customerLoginForm): void
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getMainRequest();
 
         $authenticator = new CustomerUsernamePasswordFormAuthenticator($request, $customerLoginForm);
 
