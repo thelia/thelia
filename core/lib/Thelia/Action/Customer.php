@@ -26,8 +26,11 @@ use Thelia\Core\Event\LostPasswordEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Cart\Service\CartContext;
+use Thelia\Domain\Cart\Service\CartRetriever;
 use Thelia\Domain\Customer\Exception\CustomerException;
 use Thelia\Domain\Customer\Service\CustomerTitleService;
+use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer as CustomerModel;
@@ -51,6 +54,9 @@ class Customer extends BaseAction implements EventSubscriberInterface
         protected RequestStack $requestStack,
         protected EventDispatcherInterface $dispatcher,
         protected CustomerTitleService $customerTitleService,
+        protected LangService $langService,
+        protected CartRetriever $cartRetriever,
+        protected CartContext $cartContext,
     ) {
     }
 
@@ -241,9 +247,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
     public function login(CustomerLoginEvent $event): void
     {
         $customer = $event->getCustomer();
-        if ($customer === null) {
-            return;
-        }
         if (method_exists($customer, 'clearDispatcher')) {
             $customer->clearDispatcher();
         }
@@ -257,6 +260,13 @@ class Customer extends BaseAction implements EventSubscriberInterface
         ) {
             $this->langService->setLang($lang);
         }
+        $cart = $this->cartRetriever->fromSession();
+        if (null !== $cart) {
+            $cart->setCustomerId($customer->getId());
+            $cart->save();
+            $this->cartContext->addCartSession($cart);
+        }
+
     }
 
     /**

@@ -17,6 +17,7 @@ namespace Thelia\Domain\Cart;
 use Thelia\Domain\Cart\DTO\CartItemAddDTO;
 use Thelia\Domain\Cart\DTO\CartItemDeleteDTO;
 use Thelia\Domain\Cart\DTO\CartItemUpdateQuantityDTO;
+use Thelia\Domain\Cart\Exception\NotEnoughStockException;
 use Thelia\Domain\Cart\Service\CartItemService;
 use Thelia\Domain\Cart\Service\CartRetriever;
 use Thelia\Domain\Cart\Service\CartSelectionService;
@@ -53,6 +54,7 @@ final readonly class CartFacade
 
     /**
      * Update an item quantity in cart and refresh shipping if needed.
+     * @throws NotEnoughStockException
      */
     public function updateItemQuantity(CartItemUpdateQuantityDTO $dto): void
     {

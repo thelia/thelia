@@ -41,23 +41,10 @@ class CartRetriever
     public function fromSessionOrCreateNew(): Cart
     {
         $cart = $this->fromSession();
-        if (null === $cart->getId()) {
-            Tlog::getInstance()->error('Cart created without id.');
+        if (null === $cart?->getId()) {
             $cartPersistEvent = new CartPersistEvent($cart);
             $this->eventDispatcher->dispatch($cartPersistEvent, TheliaEvents::CART_PERSIST);
         }
-        $request = $this->requestStack->getMainRequest();
-        Tlog::getInstance()->error('Cart ID in session: '.($cart->getId() ?? 'null'));
-        Tlog::getInstance()->error('Request class is '.($request::class ?: 'no request'));
-        $trace = debug_backtrace();
-        $messageLog = '';
-        foreach ($trace as $index => $frame) {
-            $file = $frame['file'] ?? 'unknown file';
-            $line = $frame['line'] ?? 'unknown line';
-            $function = $frame['function'] ?? 'unknown function';
-            $messageLog .= "#$index $file($line): $function()\n";
-        }
-        Tlog::getInstance()->error($messageLog);
 
         return $cart;
     }
@@ -69,9 +56,7 @@ class CartRetriever
         if (!$session instanceof Session) {
             throw new \LogicException('Failed to get cart event : no session available in the current request.');
         }
-        $cart = $session->getSessionCart($this->eventDispatcher);
-
-        return $cart;
+        return $session->getSessionCart($this->eventDispatcher);
     }
 
     public function fromId(int $cartId): ?Cart

@@ -30,6 +30,7 @@ use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Cart\Exception\NotEnoughStockException;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Base\CustomerQuery;
 use Thelia\Model\Base\ProductSaleElementsQuery;
@@ -220,6 +221,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * Modify article's quantity.
      *
      * don't use Form here just test the Request.
+     * @throws PropelException
+     * @throws NotEnoughStockException
      */
     public function changeItem(CartEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -283,6 +286,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Exception
      * @throws PropelException
+     * @throws NotEnoughStockException
      */
     protected function updateQuantity(EventDispatcherInterface $dispatcher, CartItem $cartItem, float $quantity): CartItem
     {

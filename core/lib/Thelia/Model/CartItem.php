@@ -20,6 +20,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Cart\CartItemEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Cart\Exception\NotEnoughStockException;
 use Thelia\Domain\Taxation\TaxEngine\Calculator;
 use Thelia\Model\Base\CartItem as BaseCartItem;
 
@@ -88,6 +90,7 @@ class CartItem extends BaseCartItem
      * @return $this
      *
      * @throws PropelException
+     * @throws NotEnoughStockException
      */
     public function updateQuantity($value)
     {
@@ -102,7 +105,10 @@ class CartItem extends BaseCartItem
             $product = $productSaleElements->getProduct();
 
             if (0 === $product->getVirtual() && $productSaleElements->getQuantity() < $value) {
-                $value = $currentQuantity;
+                $this->setQuantity($currentQuantity);
+                throw new NotEnoughStockException(
+                    Translator::getInstance()->trans('Not enough stock for product '.$product->getRef())
+                );
             }
         }
 
