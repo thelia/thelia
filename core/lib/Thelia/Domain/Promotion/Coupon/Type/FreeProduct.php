@@ -196,7 +196,7 @@ class FreeProduct extends AbstractRemoveOnProducts
                 $cartEvent->setAppend(false);
                 $cartEvent->setQuantity(1);
                 $cartEvent->setProductSaleElementsId($freeProduct->getDefaultSaleElements()->getId());
-                $cartEvent->setProduct($this->offeredProductId);
+                $cartEvent->setProductId($this->offeredProductId);
                 $this->facade->getDispatcher()->dispatch($cartEvent, TheliaEvents::CART_ADDITEM);
                 // Store the final cart item ID.
                 $this->setRelatedCartItem($eligibleProduct, $cartEvent->getCartItem()->getId());

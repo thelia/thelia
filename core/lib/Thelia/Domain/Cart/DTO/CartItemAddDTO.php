@@ -33,8 +33,8 @@ readonly class CartItemAddDTO implements DTOEventActionInterface, CartDTOInterfa
     {
         return [
             'cart' => $this->cart,
-            'product_id' => $this->productId,
-            'product_sale_element_id' => $this->productSaleElementId,
+            'productId' => $this->productId,
+            'productSaleElementsId' => $this->productSaleElementId,
             'quantity' => $this->quantity,
             'append' => $this->append,
             'newness' => $this->newness,

@@ -159,7 +159,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         }
 
         $productSaleElementsId = $event->getProductSaleElementsId();
-        $productId = $event->getProduct();
+        $productId = $event->getProductId();
 
         // Search for an identical item in the cart
         $findItemEvent = clone $event;
@@ -347,7 +347,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         if (
             !$event->getCartItem() instanceof CartItem && null !== $foundItem = CartItemQuery::create()
             ->filterByCartId($event->getCart()->getId())
-            ->filterByProductId($event->getProduct())
+            ->filterByProductId($event->getProductId())
             ->filterByProductSaleElementsId($event->getProductSaleElementsId())
             ->findOne()
         ) {
