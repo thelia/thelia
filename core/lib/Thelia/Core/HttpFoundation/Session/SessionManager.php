@@ -35,6 +35,11 @@ class SessionManager
 {
     use RememberMeTrait;
 
+    public function __construct(
+        private readonly SessionFactory $sessionFactory,
+    ) {
+    }
+
     public function sessionIsStartable(RequestEvent $event): bool
     {
         if (!$event->isMainRequest()) {
@@ -59,10 +64,6 @@ class SessionManager
         }
 
         if (!$request instanceof TheliaRequest) {
-            return false;
-        }
-
-        if (!$request->hasSession()) {
             return false;
         }
 

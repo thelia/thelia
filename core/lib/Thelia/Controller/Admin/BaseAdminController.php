@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Controller\BaseController;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Core\Template\ParserInterface;
@@ -286,7 +287,7 @@ class BaseAdminController extends BaseController
         } catch (AuthenticationException $ex) {
             // User is not authenticated, and templates requires authentication -> redirect to login page
             // We user login_tpl as a path, not a template.
-            $content = new RedirectResponse(URL::getInstance()->absoluteUrl($ex->getLoginTemplate()));
+            throw new RedirectException(URL::getInstance()->absoluteUrl($ex->getLoginTemplate()));
         } catch (AuthorizationException) {
             // User is not allowed to perform the required action. Return the error page instead of the requested page.
             $content = $this->errorPage($this->translator->trans('Sorry, you are not allowed to perform this action.'), 403);

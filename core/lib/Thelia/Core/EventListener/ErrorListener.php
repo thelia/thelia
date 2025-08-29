@@ -102,24 +102,59 @@ class ErrorListener
         if (!$event->isMainRequest()) {
             return;
         }
-        // Log exception in the Thelia log
-        $exception = $event->getThrowable();
+
+        $throwable = $event->getThrowable();
+        $root = $throwable; // keep original reference
 
         $request = $event->getRequest();
-        $logMessage = 'Uncaught exception on '.$request->getMethod().' '.$request->getUri();
+
+        $logMessage = \sprintf(
+            "Uncaught exception on %s %s\n%s: %s in %s:%d (code %s)",
+            $request->getMethod(),
+            $request->getUri(),
+            $root::class,
+            $root->getMessage(),
+            $root->getFile(),
+            $root->getLine(),
+            $root->getCode()
+        );
+
+        // Append chained exceptions with their own stack
+        $e = $root;
         do {
-            $logMessage .=
-                ('' !== $logMessage && '0' !== $logMessage ? \PHP_EOL.'Caused by ' : 'Uncaught exception ')
-                .$exception->getMessage()
-                .\PHP_EOL
-                .'Stack Trace: '.$exception->getTraceAsString();
-        } while (($exception = $exception->getPrevious()) instanceof \Throwable);
+            $logMessage .= \sprintf(
+                "\n--- Caused by %s: %s in %s:%d (code %s)\nStack trace:\n%s",
+                $e::class,
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine(),
+                $e->getCode(),
+                $e->getTraceAsString()
+            );
+        } while ($e = $e->getPrevious());
 
         Tlog::getInstance()->error($logMessage);
+    }
 
-        if (null !== $exception) {
-            Tlog::getInstance()->error($exception->getTraceAsString());
+    /**
+     * Limit request payload size to avoid huge logs.
+     */
+    private function truncateArray(array $data, int $maxLength = 2048): array
+    {
+        $encoded = json_encode($data, \JSON_UNESCAPED_SLASHES | \JSON_PARTIAL_OUTPUT_ON_ERROR);
+        if ($encoded !== null && \strlen($encoded) > $maxLength) {
+            // naive truncation: preserve start/end
+            $half = (int) ($maxLength / 2);
+            $encoded = substr($encoded, 0, $half).'…[truncated]…'.substr($encoded, -$half);
         }
+
+        // Try to decode back, fallback to a wrapper if decode fails
+        $decoded = json_decode((string) $encoded, true);
+        if (\is_array($decoded)) {
+            return $decoded;
+        }
+
+        return ['raw_truncated' => $encoded];
     }
 
     #[AsEventListener(event: KernelEvents::EXCEPTION, priority: 100)]

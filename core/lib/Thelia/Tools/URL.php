@@ -337,7 +337,6 @@ class URL
     private function getViewLocale(Request $request): ?string
     {
         $viewLocale = $request->query->get('lang', null);
-
         if (null === $viewLocale) {
             // fallback for old parameter
             $viewLocale = $request->query->get('locale', null);
@@ -345,7 +344,7 @@ class URL
 
         if (null === $viewLocale && $request->getSession() instanceof SessionInterface) {
             // fallback to session or default language
-            $viewLocale = $request->getSession()->getLang()->getLocale();
+            $viewLocale = $request->getSession()->getLang()?->getLocale();
         }
 
         return $viewLocale;
