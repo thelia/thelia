@@ -221,6 +221,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * Modify article's quantity.
      *
      * don't use Form here just test the Request.
+     *
      * @throws PropelException
      * @throws NotEnoughStockException
      */

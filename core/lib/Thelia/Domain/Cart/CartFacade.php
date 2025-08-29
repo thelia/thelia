@@ -54,6 +54,7 @@ final readonly class CartFacade
 
     /**
      * Update an item quantity in cart and refresh shipping if needed.
+     *
      * @throws NotEnoughStockException
      */
     public function updateItemQuantity(CartItemUpdateQuantityDTO $dto): void

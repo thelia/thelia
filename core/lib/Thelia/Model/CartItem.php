@@ -106,9 +106,7 @@ class CartItem extends BaseCartItem
 
             if (0 === $product->getVirtual() && $productSaleElements->getQuantity() < $value) {
                 $this->setQuantity($currentQuantity);
-                throw new NotEnoughStockException(
-                    Translator::getInstance()->trans('Not enough stock for product '.$product->getRef())
-                );
+                throw new NotEnoughStockException(Translator::getInstance()->trans('Not enough stock for product '.$product->getRef()));
             }
         }
 

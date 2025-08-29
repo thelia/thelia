@@ -56,6 +56,7 @@ class CartRetriever
         if (!$session instanceof Session) {
             throw new \LogicException('Failed to get cart event : no session available in the current request.');
         }
+
         return $session->getSessionCart($this->eventDispatcher);
     }
 

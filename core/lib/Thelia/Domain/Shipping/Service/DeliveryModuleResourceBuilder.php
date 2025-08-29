@@ -47,8 +47,7 @@ final readonly class DeliveryModuleResourceBuilder
 
         $postage = $this->postageQuerier->query($module, $cart, $address, $country, $state);
         $isValid = $eligible && $postage['valid'];
-
-        if (!$isValid && $onlyValid) {
+        if (!$isValid && $isValid) {
             return null;
         }
 

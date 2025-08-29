@@ -55,7 +55,6 @@ final readonly class DeliveryPostageQuerier
                 'valid' => false,
             ];
         }
-
         $valid = $deliveryPostageEvent->isValidModule();
         $postage = $valid && $deliveryPostageEvent->getPostage() instanceof OrderPostage ? $deliveryPostageEvent->getPostage() : null;
         $deliveryMode = $deliveryPostageEvent->getDeliveryMode()?->value;

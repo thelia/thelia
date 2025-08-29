@@ -266,7 +266,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
             $cart->save();
             $this->cartContext->addCartSession($cart);
         }
-
     }
 
     /**

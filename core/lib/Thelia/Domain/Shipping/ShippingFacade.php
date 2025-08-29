@@ -198,26 +198,27 @@ final readonly class ShippingFacade
         $modules = $this->getActiveDeliveryModules();
 
         foreach ($modules as $module) {
-            if ($this->eligibilityChecker->isEligible($module, $cart, $country, $state)) {
-                $resourceDeliveryModule = $this->deliveryModuleResourceBuilder->build(
-                    $module,
-                    $cart,
-                    $address,
-                    $country,
-                    $state,
-                    true
-                );
-                $validModules[] = new DeliveryModuleWithOptionDTO(
-                    $resourceDeliveryModule,
-                    $this->deliveryOptionsProvider->getOptions(
-                        $module,
-                        $address,
-                        $cart,
-                        $country,
-                        $state
-                    )
-                );
+            if (!$this->eligibilityChecker->isEligible($module, $cart, $country, $state)) {
+                continue;
             }
+            $resourceDeliveryModule = $this->deliveryModuleResourceBuilder->build(
+                $module,
+                $cart,
+                $address,
+                $country,
+                $state,
+                true
+            );
+            $validModules[] = new DeliveryModuleWithOptionDTO(
+                $resourceDeliveryModule,
+                $this->deliveryOptionsProvider->getOptions(
+                    $module,
+                    $address,
+                    $cart,
+                    $country,
+                    $state
+                )
+            );
         }
 
         return $validModules;
