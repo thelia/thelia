@@ -329,6 +329,10 @@ readonly class FilterService
             $choiceFilters = $choiceFiltersTemplate;
         }
 
+        if (empty($choiceFilters) && $templateIdFind === null) {
+            return null;
+        }
+
         /** @var ChoiceFilter $choiceFilter */
         foreach ($choiceFilters as $choiceFilter) {
             $otherType = $choiceFilter->getChoiceFilterOther()?->getType();
