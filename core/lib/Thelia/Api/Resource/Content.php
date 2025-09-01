@@ -115,7 +115,6 @@ class Content extends AbstractTranslatableResource
         ContentDocument::GROUP_ADMIN_READ_SINGLE,
         ProductAssociatedContent::GROUP_ADMIN_READ,
         Product::GROUP_FRONT_READ_SINGLE,
-        Product::GROUP_FRONT_READ_SINGLE,
         Folder::GROUP_FRONT_READ,
         Folder::GROUP_ADMIN_READ_SINGLE,
     ])]

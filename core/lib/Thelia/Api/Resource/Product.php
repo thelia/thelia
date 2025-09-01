@@ -229,7 +229,7 @@ class Product extends AbstractTranslatableResource
     public array $featureProducts = [];
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
-    #[Relation(targetResource: ProductAssociatedContent::class)]
+    #[Relation(targetResource: ProductAssociatedContent::class, excludedGroups: [ProductImage::GROUP_ADMIN_READ, ProductImage::GROUP_FRONT_READ])]
     public array $productAssociatedContents;
 
     #[I18nConstraint(groups: [self::GROUP_ADMIN_WRITE])]

@@ -50,7 +50,7 @@ class ContentFolder implements PropelResourceInterface
     public const GROUP_FRONT_READ = 'front:content_folder:read';
     public const GROUP_FRONT_READ_SINGLE = 'front:content_folder:read:single';
 
-    #[Relation(targetResource: Content::class)]
+    #[Relation(targetResource: Content::class, excludedGroups: [Product::GROUP_ADMIN_READ, Product::GROUP_FRONT_READ])]
     #[Groups([
         self::GROUP_ADMIN_READ,
         self::GROUP_FRONT_READ,

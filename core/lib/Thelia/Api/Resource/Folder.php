@@ -131,7 +131,7 @@ class Folder extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt = null;
 
-    #[Relation(targetResource: ContentFolder::class, excludedGroups: [Content::GROUP_ADMIN_READ, Content::GROUP_FRONT_READ])]
+    #[Relation(targetResource: ContentFolder::class, excludedGroups: [Content::GROUP_ADMIN_READ, Content::GROUP_FRONT_READ, Product::GROUP_ADMIN_READ, Product::GROUP_FRONT_READ])]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
     public array $contentFolders = [];
 
