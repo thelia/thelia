@@ -114,7 +114,7 @@ class SystemLogController extends BaseAdminController
             ConfigQuery::write(Tlog::VAR_PREFIXE, $data['format']);
             ConfigQuery::write(Tlog::VAR_SHOW_REDIRECT, $data['show_redirections']);
             ConfigQuery::write(Tlog::VAR_FILES, $data['files']);
-            ConfigQuery::write(Tlog::VAR_IP, $data['ip_addresses']);
+            ConfigQuery::write(Tlog::VAR_IP, $data['ip_addresses'] ?? '');
 
             // Save destination configuration
             $destinations = $this->getRequest()->get('destinations');
