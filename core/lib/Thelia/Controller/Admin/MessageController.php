@@ -82,7 +82,7 @@ class MessageController extends AbstractCrudController
 
     protected function getUpdateEvent(array $formData): ActionEvent
     {
-        $changeEvent = new MessageUpdateEvent($formData['id']);
+        $changeEvent = new MessageUpdateEvent((int) $formData['id']);
 
         // Create and dispatch the change event
         $changeEvent
@@ -167,7 +167,7 @@ class MessageController extends AbstractCrudController
         return $object->getId();
     }
 
-    protected function renderListTemplate(string $currentOrder): Response
+    protected function renderListTemplate(?string $currentOrder): Response
     {
         return $this->render('messages');
     }
@@ -259,7 +259,7 @@ class MessageController extends AbstractCrudController
             $this->pageNotFound();
         }
 
-        $parser = $this->getParser($this->getTemplateHelper()->getActiveMailTemplate());
+        $parser = $this->getParser($this->getTemplateHelper()->getActiveMailTemplate()->getPath());
 
         foreach ($this->getRequest()->query->all() as $key => $value) {
             $parser->assign($key, $value);
