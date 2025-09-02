@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
@@ -50,7 +49,11 @@ class SystemLogConfigurationForm extends BaseForm
                     'for' => 'format_field',
                 ],
             ])
-            ->add('show_redirections', IntegerType::class, [
+            ->add('show_redirections', ChoiceType::class, [
+                'choices' => [
+                    'Yes' => 1,
+                    'No' => 0,
+                ],
                 'constraints' => [new NotBlank()],
                 'label' => Translator::getInstance()->trans('Show redirections *'),
                 'label_attr' => [
