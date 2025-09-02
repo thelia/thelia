@@ -55,17 +55,15 @@ class NotInFilter extends AbstractFilter
 
         $fieldPath = $this->getPropertyQueryPath($query, $property, $context);
         $asColumns = array_map(
-            static function ($column) {
-                return str_replace('`', '', $column);
-            }
-            ,$query->getAsColumns()
+            static fn ($column) => str_replace('`', '', $column), $query->getAsColumns()
         );
-        if (in_array($fieldPath, $asColumns, true)) {
+        if (\in_array($fieldPath, $asColumns, true)) {
             $query->addUsingOperator(
                 $fieldPath,
                 1 === \count($value) ? $value[0] : $value,
                 1 === \count($value) ? Criteria::NOT_EQUAL : Criteria::NOT_IN
             );
+
             return;
         }
         if (!property_exists($resourceClass, $property)) {

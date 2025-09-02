@@ -75,7 +75,8 @@ class ChoiceFilterController extends BaseAdminController
 
             $choiceFilter
                 ->setVisible((int) $filter['visible'])
-                ->setPosition((int) $filter['position']);
+                ->setPosition((int) $filter['position'])
+                ->setType($filter['display_type']);
 
             if ('attribute' === $filter['type']) {
                 $choiceFilter

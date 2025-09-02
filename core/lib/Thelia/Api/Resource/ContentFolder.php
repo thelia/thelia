@@ -50,15 +50,32 @@ class ContentFolder implements PropelResourceInterface
     public const GROUP_FRONT_READ = 'front:content_folder:read';
     public const GROUP_FRONT_READ_SINGLE = 'front:content_folder:read:single';
 
-    #[Relation(targetResource: Content::class)]
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    #[Relation(targetResource: Content::class, excludedGroups: [Product::GROUP_ADMIN_READ, Product::GROUP_FRONT_READ])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        Folder::GROUP_FRONT_READ,
+        Folder::GROUP_ADMIN_READ_SINGLE,
+    ])]
     public Content $content;
 
     #[Relation(targetResource: Folder::class)]
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Content::GROUP_FRONT_READ])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        Content::GROUP_FRONT_READ,
+        Content::GROUP_ADMIN_READ_SINGLE,
+    ])]
     public Folder $folder;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Content::GROUP_FRONT_READ])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        Content::GROUP_FRONT_READ,
+        Content::GROUP_ADMIN_READ_SINGLE,
+        Folder::GROUP_FRONT_READ,
+        Folder::GROUP_ADMIN_READ_SINGLE,
+    ])]
     public bool $defaultFolder = false;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]

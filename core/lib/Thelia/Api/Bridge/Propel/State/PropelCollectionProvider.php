@@ -18,8 +18,10 @@ use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\Util\PropelModelPager;
 use Thelia\Api\Bridge\Propel\Extension\QueryResultCollectionExtensionInterface;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
+use Thelia\Api\Bridge\Propel\State\Pagination\PropelPaginator;
 use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Model\LangQuery;
 
@@ -69,6 +71,19 @@ readonly class PropelCollectionProvider implements ProviderInterface
 
         $langs = LangQuery::create()->filterByActive(1)->find();
 
+        if ($results instanceof PropelModelPager) {
+            $resources = array_map(
+                fn ($propelModel): PropelResourceInterface => $this->apiResourcePropelTransformerService->modelToResource(
+                    resourceClass: $resourceClass,
+                    propelModel: $propelModel,
+                    context: $context,
+                    langs: $langs,
+                ),
+                iterator_to_array($results->getResults())
+            );
+
+            return new PropelPaginator($results, $resources);
+        }
         return array_map(
             fn ($propelModel): PropelResourceInterface => $this->apiResourcePropelTransformerService->modelToResource(
                 resourceClass: $resourceClass,

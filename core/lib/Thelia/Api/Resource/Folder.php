@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
@@ -73,12 +74,14 @@ use Thelia\Model\Tools\UrlRewritingTrait;
     properties: [
         'id',
         'parent',
+        'contentFolders.content.id',
     ],
 )]
 #[ApiFilter(
     filterClass: NotInFilter::class,
     properties: [
         'id',
+        'parent',
     ],
 )]
 #[ApiFilter(
@@ -109,6 +112,7 @@ class Folder extends AbstractTranslatableResource
         FolderDocument::GROUP_ADMIN_READ_SINGLE,
         self::GROUP_FRONT_READ,
         Content::GROUP_FRONT_READ,
+        Content::GROUP_ADMIN_READ_SINGLE,
     ])]
     public ?int $id = null;
 
@@ -126,6 +130,10 @@ class Folder extends AbstractTranslatableResource
 
     #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt = null;
+
+    #[Relation(targetResource: ContentFolder::class, excludedGroups: [Content::GROUP_ADMIN_READ, Content::GROUP_FRONT_READ, Product::GROUP_ADMIN_READ, Product::GROUP_FRONT_READ])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
+    public array $contentFolders = [];
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
@@ -198,6 +206,18 @@ class Folder extends AbstractTranslatableResource
     public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getContentFolders(): array
+    {
+        return $this->contentFolders;
+    }
+
+    public function setContentFolders(array $contentFolders): self
+    {
+        $this->contentFolders = $contentFolders;
 
         return $this;
     }

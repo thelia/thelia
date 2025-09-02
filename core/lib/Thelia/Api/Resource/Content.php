@@ -73,28 +73,13 @@ use Thelia\Model\Tools\UrlRewritingTrait;
     filterClass: SearchFilter::class,
     properties: [
         'id',
-        'contentFolders.folder.id' => [
-            'strategy' => 'exact',
-            'fieldPath' => 'content_folder.folder_id',
-        ],
-        'contentFolders.content.id' => [
-            'strategy' => 'exact',
-            'fieldPath' => 'content_folder.content_id',
-        ],
+        'contentFolders.folder.id',
     ],
 )]
 #[ApiFilter(
     filterClass: NotInFilter::class,
     properties: [
         'id',
-        'contentFolders.folder.id' => [
-            'strategy' => 'exact',
-            'fieldPath' => 'content_folder.folder_id',
-        ],
-        'contentFolders.content.id' => [
-            'strategy' => 'exact',
-            'fieldPath' => 'content_folder.content_id',
-        ],
     ],
 )]
 #[ApiFilter(
@@ -130,7 +115,8 @@ class Content extends AbstractTranslatableResource
         ContentDocument::GROUP_ADMIN_READ_SINGLE,
         ProductAssociatedContent::GROUP_ADMIN_READ,
         Product::GROUP_FRONT_READ_SINGLE,
-        Product::GROUP_FRONT_READ_SINGLE,
+        Folder::GROUP_FRONT_READ,
+        Folder::GROUP_ADMIN_READ_SINGLE,
     ])]
     public ?int $id = null;
 
@@ -140,7 +126,7 @@ class Content extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public ?int $position = null;
 
-    #[Relation(targetResource: ContentFolder::class)]
+    #[Relation(targetResource: ContentFolder::class, excludedGroups: [Folder::GROUP_ADMIN_READ, Folder::GROUP_FRONT_READ])]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
     public array $contentFolders = [];
 
