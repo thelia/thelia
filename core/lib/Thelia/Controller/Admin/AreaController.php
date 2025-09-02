@@ -161,7 +161,7 @@ class AreaController extends AbstractCrudController
     /**
      * Render the main list template.
      */
-    protected function renderListTemplate(string $currentOrder): Response
+    protected function renderListTemplate(?string $currentOrder): Response
     {
         return $this->render('shipping-configuration');
     }
@@ -234,7 +234,7 @@ class AreaController extends AbstractCrudController
                         $this->getObjectLabel($changedObject),
                         $this->getObjectId($changedObject),
                     ),
-                    $this->getObjectId($changedObject),
+                    (string)$this->getObjectId($changedObject),
                 );
             }
 
