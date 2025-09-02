@@ -16,12 +16,14 @@ namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TelType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\AddressQuery;
 use Thelia\Model\Map\StateI18nTableMap;
 use Thelia\Model\StateQuery;
 use Thelia\Service\Model\CountryService;
@@ -39,8 +41,7 @@ class AddressCreateForm extends FirewallForm
     public function __construct(
         protected CountryService $countryService,
         protected CustomerTitleService $customerTitleService,
-    ) {
-    }
+    ) {}
 
     /**
      * in this function you add all the fields you need for your Form.
@@ -61,6 +62,17 @@ class AddressCreateForm extends FirewallForm
      */
     protected function buildForm(): void
     {
+
+        $data = $this->formBuilder->getData();
+        $customerId = $this->getRequest()->getSession()->getCustomerUser()?->getId();
+        $addressCount = $customerId !== null ? AddressQuery::create()->findByCustomerId($customerId)->count() : 0;
+        $labelData = isset($data['label']) ? $data['label'] : Translator::getInstance()->trans('Main address');
+
+        if ($addressCount > 1 && !isset($data['label'])) {
+            $labelData = Translator::getInstance()->trans('Address #%', ['%' => $addressCount + 1]);
+        }
+
+
         $this->formBuilder
             ->add('label', TextType::class, [
                 'constraints' => [
@@ -70,6 +82,7 @@ class AddressCreateForm extends FirewallForm
                 'label_attr' => [
                     'for' => 'address_label',
                 ],
+                'data' => $labelData
             ])
             ->add('title', ChoiceType::class, [
                 'constraints' => [
@@ -180,6 +193,7 @@ class AddressCreateForm extends FirewallForm
                 'label_attr' => [
                     'for' => 'state',
                 ],
+                'placeholder' => Translator::getInstance()->trans('Select your state'),
             ])
             // Phone
             ->add('phone', TelType::class, [
@@ -195,21 +209,23 @@ class AddressCreateForm extends FirewallForm
                     'for' => 'cellphone',
                 ],
                 'required' => false,
-            ])
-            // Default address
-            ->add('is_default', CheckboxType::class, [
-                'label' => Translator::getInstance()->trans('Make this address as my primary address'),
-                'label_attr' => [
-                    'for' => 'default_address',
-                ],
-                'required' => false,
-            ])
-            ->add('title', IntegerType::class, [
-                'required' => false,
-            ])
-            ->add('cellphone', IntegerType::class, [
-                'required' => false,
             ]);
+        // Default address
+
+        $isDefaultAttr = [
+            'label' => Translator::getInstance()->trans('Make this address as my primary address'),
+            'label_attr' => [
+                'for' => 'default_address',
+            ],
+            'required' => false,
+        ];
+
+        if ($addressCount === 0 || isset($data['isDefault'])) {
+            $isDefaultAttr['disabled'] = true;
+            $isDefaultAttr['data'] = true;
+        }
+
+        $this->formBuilder->add('is_default', CheckboxType::class, $isDefaultAttr);
     }
 
     /**
