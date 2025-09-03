@@ -29,7 +29,7 @@ class CartCheckoutEventBuilder implements BuilderEventActionInterface
     {
         $this->validateClass($data);
 
-        return new CartCheckoutEvent($data->getCart());
+        return (new CartCheckoutEvent($data->getCart()))->bindArray($data->toArray());
     }
 
     public function getSupportedDTOClasses(): array
