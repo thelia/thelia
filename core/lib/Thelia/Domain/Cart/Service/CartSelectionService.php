@@ -40,7 +40,7 @@ class CartSelectionService
     public function setDeliveryAddress(CheckoutDTO $checkoutDTO): void
     {
         $cartCheckoutEvent = $this->cartCheckoutEventBuilder->buildEvent($checkoutDTO);
-        $this->eventDispatcher->dispatch($cartCheckoutEvent, TheliaEvents::CART_SET_DELIVERY_MODULE);
+        $this->eventDispatcher->dispatch($cartCheckoutEvent, TheliaEvents::CART_SET_DELIVERY_ADDRESS);
 
         $this->postageHandler->handlePostageOnCart($checkoutDTO->getCart());
     }

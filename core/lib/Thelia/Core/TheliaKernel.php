@@ -79,6 +79,7 @@ use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
+use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 
 class TheliaKernel extends Kernel
 {
@@ -151,6 +152,12 @@ class TheliaKernel extends Kernel
      */
     public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): Response
     {
+        if (!$request instanceof TheliaRequest) {
+            $request->attributes->set(TheliaHttpKernel::IGNORE_THELIA_VIEW, true);
+
+            $request = TheliaRequest::createFromBase($request);
+        }
+
         if (!$this->booted) {
             $container = $this->container ?? $this->preBoot();
 

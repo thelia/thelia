@@ -69,11 +69,6 @@ class TheliaHttpKernel extends HttpKernel
      */
     public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): Response
     {
-        if (!$request instanceof TheliaRequest) {
-            $request->attributes->set(self::IGNORE_THELIA_VIEW, true);
-
-            return parent::handle($request, $type, $catch);
-        }
         $this->container->get('request.context')?->fromRequest($request);
 
         return parent::handle($request, $type, $catch);

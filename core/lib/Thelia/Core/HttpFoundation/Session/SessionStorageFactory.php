@@ -32,10 +32,6 @@ final readonly class SessionStorageFactory implements SessionStorageFactoryInter
 
     public function createStorage(?Request $request): SessionStorageInterface
     {
-        if (headers_sent()) {
-            return new MockArraySessionStorage();
-        }
-
         $env = \is_string($_SERVER['APP_ENV'] ?? null) ? $_SERVER['APP_ENV'] : 'prod';
 
         if ('test' === $env) {

@@ -240,14 +240,4 @@ class RequestListener
         $request->getSession()->setCurrency($currencyToSet);
         $this->eventDispatcher->dispatch(new CurrencyChangeEvent($currencyToSet, $request), TheliaEvents::CHANGE_DEFAULT_CURRENCY);
     }
-
-    private function getRequest(): Request
-    {
-        $request = $this->requestStack->getMainRequest();
-        if (!$request instanceof Request) {
-            throw new \RuntimeException('No current request available in RequestListener');
-        }
-
-        return $request;
-    }
 }

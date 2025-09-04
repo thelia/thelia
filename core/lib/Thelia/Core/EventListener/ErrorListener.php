@@ -24,6 +24,7 @@ use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\TheliaHttpKernel;
 use Thelia\Core\TheliaKernelEvents;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
@@ -55,7 +56,7 @@ class ErrorListener
     #[AsEventListener(event: TheliaKernelEvents::THELIA_HANDLE_ERROR, priority: 0)]
     public function defaultErrorFallback(ExceptionEvent $event): void
     {
-        if (!$event->isMainRequest()) {
+        if (!$this->isAuthorizedToSeeErrorDetails($event)) {
             return;
         }
         $this->parser->assign('status_code', 500);
@@ -80,10 +81,7 @@ class ErrorListener
     #[AsEventListener(event: KernelEvents::EXCEPTION, priority: 0)]
     public function handleException(ExceptionEvent $event): void
     {
-        if (!$event->isMainRequest()) {
-            return;
-        }
-        if ($event->getRequest()->get('_api_operation_name', false)) {
+        if (!$this->isAuthorizedToSeeErrorDetails($event)) {
             return;
         }
 
@@ -99,7 +97,7 @@ class ErrorListener
     #[AsEventListener(event: KernelEvents::EXCEPTION, priority: 0)]
     public function logException(ExceptionEvent $event): void
     {
-        if (!$event->isMainRequest()) {
+        if (!$this->isAuthorizedToSeeErrorDetails($event)) {
             return;
         }
 
@@ -160,7 +158,7 @@ class ErrorListener
     #[AsEventListener(event: KernelEvents::EXCEPTION, priority: 100)]
     public function authenticationException(ExceptionEvent $event): void
     {
-        if (!$event->isMainRequest()) {
+        if (!$this->isAuthorizedToSeeErrorDetails($event)) {
             return;
         }
         $exception = $event->getThrowable();
@@ -170,5 +168,14 @@ class ErrorListener
                 new RedirectResponse($exception->getLoginTemplate()),
             );
         }
+    }
+
+    private function isAuthorizedToSeeErrorDetails(ExceptionEvent $event): bool
+    {
+        $request = $event->getRequest();
+
+        return $event->isMainRequest()
+            && !$request->attributes->get(TheliaHttpKernel::IGNORE_THELIA_VIEW, false)
+            && !$request->get('_api_operation_name', false);
     }
 }
