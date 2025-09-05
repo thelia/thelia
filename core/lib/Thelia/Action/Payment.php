@@ -48,8 +48,8 @@ class Payment implements EventSubscriberInterface
 
         // call legacy module method
         $event->setValidModule($module->isValidPayment())
-            ->setMinimumAmount($module->getMinimumAmount())
-            ->setMaximumAmount($module->getMaximumAmount());
+            ->setMinimumAmount((float) $module->getMinimumAmount())
+            ->setMaximumAmount((float) $module->getMaximumAmount());
     }
 
     public static function getSubscribedEvents(): array

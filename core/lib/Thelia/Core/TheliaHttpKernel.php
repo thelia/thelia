@@ -23,7 +23,6 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 
 /**
  * @author Manuel Raynaud <manu@raynaud.io>

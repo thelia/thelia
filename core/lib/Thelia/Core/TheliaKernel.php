@@ -61,6 +61,7 @@ use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\DependencyInjection\TheliaContainer;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Hook\BaseHookInterface;
+use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\Propel\PropelInitService;
 use Thelia\Core\Propel\Schema\SchemaLocator;
 use Thelia\Core\Security\UserProvider\AdminUserProvider;
@@ -79,7 +80,6 @@ use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
-use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 
 class TheliaKernel extends Kernel
 {
