@@ -121,11 +121,13 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
         return true;
     }
 
-    public function getMinimumAmount(): void
+    public function getMinimumAmount(): int
     {
+        return 0;
     }
 
-    public function getMaximumAmount(): void
+    public function getMaximumAmount(): int
     {
+        return 10000000;
     }
 }

@@ -49,14 +49,20 @@ class KernelListener
     #[AsEventListener(event: KernelEvents::REQUEST, priority: \PHP_INT_MAX)]
     public function initializeSession(RequestEvent $event): void
     {
+        if (headers_sent()) {
+            return;
+        }
         $request = $event->getRequest();
         if (!$request instanceof TheliaRequest) {
             $request = TheliaRequest::createFromBase($request);
         }
-        if (!$request->hasSession()) {
-            $session = $this->sessionFactory->createSession();
-            $request->setSession($session);
+
+        if ($request->hasSession()) {
+            return;
         }
+
+        $session = $this->sessionFactory->createSession();
+        $request->setSession($session);
     }
 
     #[AsEventListener(event: KernelEvents::REQUEST, priority: \PHP_INT_MAX - 1)]
