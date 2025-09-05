@@ -32,7 +32,7 @@ use Thelia\Model\Order;
 class VirtualProductOrderHandleEvent extends ActionEvent
 {
     /** @var string the path of the file */
-    protected string $path;
+    protected ?string $path = null;
 
     /** @var bool is virtual product is really virtual */
     protected bool $virtual = true;
@@ -63,12 +63,12 @@ class VirtualProductOrderHandleEvent extends ActionEvent
         return $this;
     }
 
-    public function getPath(): string
+    public function getPath(): ?string
     {
         return $this->path;
     }
 
-    public function setPath(string $path): static
+    public function setPath(?string $path): static
     {
         $this->path = $path;
 
