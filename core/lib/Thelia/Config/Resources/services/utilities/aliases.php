@@ -16,8 +16,8 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Hook\HookHelper;
+use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Mailer\MailerFactory;
-use Thelia\TaxEngine\TaxEngine;
 
 return static function (ContainerConfigurator $configurator): void {
     $services = $configurator->services();

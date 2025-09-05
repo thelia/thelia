@@ -24,12 +24,12 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
-use Thelia\Exception\TaxEngineException;
+use Thelia\Domain\Taxation\TaxEngine\Exception\TaxEngineException;
+use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\ProductSaleElementsQuery;
-use Thelia\TaxEngine\TaxEngine;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\EnumListType;
 use Thelia\Type\IntToCombinedIntsListType;
@@ -217,7 +217,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                 throw new \InvalidArgumentException('Cannot found currency id: `'.$currency.'` in product_sale_elements loop');
             }
         } else {
-            $currency = $this->getCurrentRequest()->getSession()->getCurrency();
+            $currency = $this->getMainRequest()->getSession()->getCurrency();
         }
 
         $defaultCurrency = CurrencyModel::getDefaultCurrency();

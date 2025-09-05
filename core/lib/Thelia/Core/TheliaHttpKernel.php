@@ -32,6 +32,8 @@ class TheliaHttpKernel extends HttpKernel
     protected static $session;
     protected ContainerInterface $container;
 
+    public const IGNORE_THELIA_VIEW = 'ignore_thelia_view';
+
     public function __construct(
         EventDispatcherInterface $dispatcher,
         ContainerInterface $container,

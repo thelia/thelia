@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Condition\Implementation;
 
-use Thelia\Coupon\FacadeInterface;
+use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 
 /**
  * Allow every one, perform no check.

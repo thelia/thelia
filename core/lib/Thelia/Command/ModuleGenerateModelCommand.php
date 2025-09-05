@@ -23,7 +23,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Thelia\Core\PropelInitService;
+use Thelia\Core\Propel\PropelInitService;
 
 /**
  * generate class model for a specific module.

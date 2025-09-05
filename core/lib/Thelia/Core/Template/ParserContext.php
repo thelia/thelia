@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Form\TheliaFormFactory;
 use Thelia\Core\Form\TheliaFormValidator;
 use Thelia\Core\HttpFoundation\Session\Session;
-use Thelia\Core\Thelia;
+use Thelia\Core\TheliaKernel;
 use Thelia\Form\BaseForm;
 
 /**
@@ -45,10 +45,10 @@ class ParserContext implements \IteratorAggregate
         private readonly TheliaFormValidator $formValidator,
     ) {
         // Setup basic variables
-        $this->set('THELIA_VERSION', Thelia::THELIA_VERSION);
+        $this->set('THELIA_VERSION', TheliaKernel::THELIA_VERSION);
 
         // Purge outdated error form contexts
-        if ($this->requestStack->getCurrentRequest() instanceof Request) {
+        if ($this->requestStack->getMainRequest() instanceof Request) {
             $this->cleanOutdatedFormErrorInformation();
         }
     }
@@ -147,7 +147,7 @@ class ParserContext implements \IteratorAggregate
             'data' => $this->cleanFormData($form->getForm()->getData()),
             'hasError' => $form->hasError(),
             'errorMessage' => $form->getErrorMessage(),
-            'method' => $this->requestStack->getCurrentRequest()->getMethod(),
+            'method' => $this->requestStack->getMainRequest()?->getMethod(),
             'timestamp' => time(),
             'validation_groups' => $form->getForm()->getConfig()->getOption('validation_groups'),
             'field_errors' => $formFieldErrors,
@@ -258,7 +258,7 @@ class ParserContext implements \IteratorAggregate
      */
     protected function cleanOutdatedFormErrorInformation(): static
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getMainRequest();
 
         if (
             !$request->hasSession(true)
@@ -320,6 +320,6 @@ class ParserContext implements \IteratorAggregate
 
     public function getSession(): Session
     {
-        return $this->requestStack->getCurrentRequest()->getSession();
+        return $this->requestStack->getMainRequest()->getSession();
     }
 }

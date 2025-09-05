@@ -20,8 +20,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartDuplicationEvent;
 use Thelia\Core\Event\Cart\CartItemDuplicationItem;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Taxation\TaxEngine\Calculator;
 use Thelia\Model\Base\Cart as BaseCart;
-use Thelia\TaxEngine\Calculator;
 
 class Cart extends BaseCart
 {

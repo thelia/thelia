@@ -16,7 +16,7 @@ namespace Thelia\Api\State\Provider;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use Thelia\Service\Model\PaymentModuleService;
+use Thelia\Domain\Module\Payment\PaymentModuleService;
 
 readonly class PaymentModuleProvider implements ProviderInterface
 {

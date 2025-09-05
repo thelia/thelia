@@ -148,9 +148,9 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
         $current = $this->getCurrent();
 
         if (true === $current) {
-            $search->filterById($this->getCurrentRequest()->get('brand_id'));
+            $search->filterById($this->getMainRequest()->get('brand_id'));
         } elseif (false === $current) {
-            $search->filterById($this->getCurrentRequest()->get('brand_id'), Criteria::NOT_IN);
+            $search->filterById($this->getMainRequest()->get('brand_id'), Criteria::NOT_IN);
         }
 
         $orders = $this->getOrder();

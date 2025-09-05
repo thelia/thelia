@@ -699,7 +699,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     protected function getSession(): SessionInterface
     {
         /** @var Request $request */
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getMainRequest();
 
         return $request->getSession();
     }

@@ -18,10 +18,10 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Thelia\Core\Event\Tax\TaxEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Exception\TaxEngineException;
+use Thelia\Domain\Taxation\TaxEngine\Exception\TaxEngineException;
+use Thelia\Domain\Taxation\TaxEngine\TaxTypeInterface;
 use Thelia\Model\Base\Tax as BaseTax;
 use Thelia\Model\Map\TaxTableMap;
-use Thelia\TaxEngine\TaxTypeInterface;
 
 class Tax extends BaseTax
 {

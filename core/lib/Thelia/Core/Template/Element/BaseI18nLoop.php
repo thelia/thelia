@@ -61,7 +61,7 @@ abstract class BaseI18nLoop extends BaseLoop
     ): void {
         /* manage translations */
         /** @var Lang $lang */
-        $lang = $this->getCurrentRequest()->getSession()->getLang() ?? Lang::getDefaultLanguage();
+        $lang = $this->getMainRequest()->getSession()->getLang() ?? Lang::getDefaultLanguage();
         $this->locale = ModelCriteriaTools::getI18n(
             $this->getBackendContext(),
             $lang->getId(),

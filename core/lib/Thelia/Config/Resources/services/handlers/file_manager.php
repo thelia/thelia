@@ -14,11 +14,11 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Thelia\Files\Service\FileDeleteService;
-use Thelia\Files\Service\FilePositionService;
-use Thelia\Files\Service\FileProcessorService;
-use Thelia\Files\Service\FileUpdateService;
-use Thelia\Files\Service\FileVisibilityService;
+use Thelia\Core\File\Service\FileDeleteService;
+use Thelia\Core\File\Service\FilePositionService;
+use Thelia\Core\File\Service\FileProcessorService;
+use Thelia\Core\File\Service\FileUpdateService;
+use Thelia\Core\File\Service\FileVisibilityService;
 use Thelia\Model\BrandDocument;
 use Thelia\Model\BrandImage;
 use Thelia\Model\CategoryDocument;
@@ -60,7 +60,7 @@ return static function (ContainerConfigurator $configurator): void {
         ->public();
 
     $services->set(FileUpdateService::class)
-        ->factory([service('request_stack'), 'getCurrentRequest'])
+        ->factory([service('request_stack'), 'getMainRequest'])
         ->args([
             service('thelia.file_manager'),
             service('translator'),

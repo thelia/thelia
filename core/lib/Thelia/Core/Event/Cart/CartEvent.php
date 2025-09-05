@@ -24,7 +24,7 @@ class CartEvent extends ActionEvent
     protected ?bool $append = null;
     protected ?bool $newness = null;
     protected ?int $productSaleElementsId = null;
-    protected ?int $product = null;
+    protected ?int $productId = null;
     protected ?CartItem $cartItem = null;
     protected ?int $cartItemId = null;
 
@@ -95,11 +95,11 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * @param int $product the product ID
+     * @param int $productId the product ID
      */
-    public function setProduct(int|string $product): static
+    public function setProductId(int|string $productId): static
     {
-        $this->product = (int) $product;
+        $this->productId = (int) $productId;
 
         return $this;
     }
@@ -107,9 +107,9 @@ class CartEvent extends ActionEvent
     /**
      * @return int the product ID
      */
-    public function getProduct(): ?int
+    public function getProductId(): ?int
     {
-        return $this->product;
+        return $this->productId;
     }
 
     public function setProductSaleElementsId(int|string $productSaleElementsId): static

@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Files\FileModelParentInterface;
+use Thelia\Core\File\FileModelParentInterface;
 use Thelia\Model\Base\Brand as BaseBrand;
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Tools\UrlRewritingTrait;

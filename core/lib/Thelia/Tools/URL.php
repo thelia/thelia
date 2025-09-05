@@ -14,14 +14,16 @@ declare(strict_types=1);
 
 namespace Thelia\Tools;
 
+use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\UrlValidator;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Routing\Rewriting\Exception\UrlRewritingException;
+use Thelia\Core\Routing\Rewriting\RewritingResolver;
+use Thelia\Core\Routing\Rewriting\RewritingRetriever;
 use Thelia\Model\ConfigQuery;
-use Thelia\Service\Rewriting\RewritingResolver;
-use Thelia\Service\Rewriting\RewritingRetriever;
 
 class URL
 {
@@ -292,6 +294,9 @@ class URL
 
     /**
      * Retrieve a rewritten URL from the current GET parameters or use toString method.
+     *
+     * @throws PropelException
+     * @throws UrlRewritingException
      */
     public function resolve($url): RewritingResolver
     {
@@ -332,7 +337,6 @@ class URL
     private function getViewLocale(Request $request): ?string
     {
         $viewLocale = $request->query->get('lang', null);
-
         if (null === $viewLocale) {
             // fallback for old parameter
             $viewLocale = $request->query->get('locale', null);
@@ -340,7 +344,7 @@ class URL
 
         if (null === $viewLocale && $request->getSession() instanceof SessionInterface) {
             // fallback to session or default language
-            $viewLocale = $request->getSession()->getLang()->getLocale();
+            $viewLocale = $request->getSession()->getLang()?->getLocale();
         }
 
         return $viewLocale;

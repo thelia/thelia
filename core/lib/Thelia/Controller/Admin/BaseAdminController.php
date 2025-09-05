@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Controller\BaseController;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Core\Template\ParserInterface;
@@ -45,7 +47,7 @@ class BaseAdminController extends BaseController
                 return $this->render($template);
             }
 
-            if (null !== $view = $this->requestStack->getCurrentRequest()?->get('view')) {
+            if (null !== $view = $this->requestStack->getMainRequest()?->get('view')) {
                 return $this->render($view);
             }
         } catch (\Exception $exception) {
@@ -66,7 +68,7 @@ class BaseAdminController extends BaseController
             $resource,
             $action,
             $message,
-            $this->requestStack->getCurrentRequest(),
+            $this->requestStack->getMainRequest(),
             $this->securityContext->getAdminUser(),
             true,
             (int) $resourceId,
@@ -104,6 +106,10 @@ class BaseAdminController extends BaseController
 
     protected function checkAuth(mixed $resources, mixed $modules, mixed $accesses): ?Response
     {
+        $request = $this->requestStack->getMainRequest();
+        if (!$request instanceof Request) {
+            return null;
+        }
         $resources = \is_array($resources) ? $resources : [$resources];
         $modules = \is_array($modules) ? $modules : [$modules];
         $accesses = \is_array($accesses) ? $accesses : [$accesses];
@@ -171,7 +177,7 @@ class BaseAdminController extends BaseController
     protected function forward(string $controller, array $path = [], array $query = []): Response
     {
         $path['_controller'] = $controller;
-        $subRequest = $this->requestStack->getCurrentRequest()?->duplicate($query, null, $path);
+        $subRequest = $this->requestStack->getMainRequest()?->duplicate($query, null, $path);
 
         return $this->container->get('http_kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
     }
@@ -179,7 +185,7 @@ class BaseAdminController extends BaseController
     protected function getCurrentEditionCurrency()
     {
         // Return the new language if a change is required.
-        if (null !== ($edit_currency_id = $this->requestStack->getCurrentRequest()?->get('edit_currency_id')) && null !== $edit_currency = CurrencyQuery::create()->findOneById($edit_currency_id)) {
+        if (null !== ($edit_currency_id = $this->requestStack->getMainRequest()?->get('edit_currency_id')) && null !== $edit_currency = CurrencyQuery::create()->findOneById($edit_currency_id)) {
             return $edit_currency;
         }
 
@@ -190,7 +196,7 @@ class BaseAdminController extends BaseController
     protected function getCurrentEditionLang()
     {
         // Return the new language if a change is required.
-        if (null !== ($edit_language_id = $this->requestStack->getCurrentRequest()?->get('edit_language_id')) && null !== $edit_language = LangQuery::create()->findOneById($edit_language_id)) {
+        if (null !== ($edit_language_id = $this->requestStack->getMainRequest()?->get('edit_language_id')) && null !== $edit_language = LangQuery::create()->findOneById($edit_language_id)) {
             return $edit_language;
         }
 
@@ -231,7 +237,7 @@ class BaseAdminController extends BaseController
         }
 
         // Find the current order
-        $order = $this->requestStack->getCurrentRequest()?->get(
+        $order = $this->requestStack->getMainRequest()?->get(
             $requestParameterName,
             $this->getSession()->get($orderSessionIdentifier, $defaultListOrder),
         );
@@ -281,7 +287,7 @@ class BaseAdminController extends BaseController
         } catch (AuthenticationException $ex) {
             // User is not authenticated, and templates requires authentication -> redirect to login page
             // We user login_tpl as a path, not a template.
-            $content = new RedirectResponse(URL::getInstance()->absoluteUrl($ex->getLoginTemplate()));
+            throw new RedirectException(URL::getInstance()->absoluteUrl($ex->getLoginTemplate()));
         } catch (AuthorizationException) {
             // User is not allowed to perform the required action. Return the error page instead of the requested page.
             $content = $this->errorPage($this->translator->trans('Sorry, you are not allowed to perform this action.'), 403);

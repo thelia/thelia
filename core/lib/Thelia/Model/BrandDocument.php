@@ -16,8 +16,8 @@ namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Files\FileModelInterface;
-use Thelia\Files\FileModelParentInterface;
+use Thelia\Core\File\FileModelInterface;
+use Thelia\Core\File\FileModelParentInterface;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\BrandDocument as BaseBrandDocument;
 use Thelia\Model\Breadcrumb\BrandBreadcrumbTrait;

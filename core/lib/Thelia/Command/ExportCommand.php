@@ -26,9 +26,9 @@ use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Serializer\SerializerManager;
+use Thelia\Domain\DataTransfer\ExportHandler;
 use Thelia\Model\ExportQuery;
 use Thelia\Model\LangQuery;
-use Thelia\Service\DataTransfer\ExportHandler;
 
 /**
  * Class ExportCommand.

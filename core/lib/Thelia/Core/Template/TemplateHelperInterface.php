@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Template;
 
+use Symfony\Component\HttpFoundation\Request;
+
 interface TemplateHelperInterface
 {
     public function getActiveMailTemplate(): TemplateDefinition;
@@ -45,4 +47,6 @@ interface TemplateHelperInterface
      * @return TemplateDefinition[] of \Thelia\Core\Template\TemplateDefinition
      */
     public function getList(int $templateType, string $base = THELIA_TEMPLATE_DIR): array;
+
+    public function isAdmin(?Request $request): bool;
 }

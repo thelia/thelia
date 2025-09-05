@@ -33,7 +33,7 @@ class I18nConstraintValidator extends ConstraintValidator
             throw new \RuntimeException('I18nConstraint attribute should be used on'.I18nCollection::class);
         }
 
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getMainRequest();
         $method = $request?->getMethod();
 
         if (!$method || HttpOperation::METHOD_PATCH === $method) {

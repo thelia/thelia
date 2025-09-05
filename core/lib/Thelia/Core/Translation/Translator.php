@@ -52,7 +52,7 @@ class Translator extends BaseTranslator
 
     public function getLocale(): string
     {
-        $currentRequest = $this->requestStack->getCurrentRequest();
+        $currentRequest = $this->requestStack->getMainRequest();
 
         if ($currentRequest instanceof Request) {
             $session = $currentRequest->getSession();

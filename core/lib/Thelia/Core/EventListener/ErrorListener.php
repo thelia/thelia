@@ -24,6 +24,7 @@ use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\TheliaHttpKernel;
 use Thelia\Core\TheliaKernelEvents;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
@@ -55,7 +56,7 @@ class ErrorListener
     #[AsEventListener(event: TheliaKernelEvents::THELIA_HANDLE_ERROR, priority: 0)]
     public function defaultErrorFallback(ExceptionEvent $event): void
     {
-        if (!$event->isMainRequest()) {
+        if (!$this->isAuthorizedToSeeErrorDetails($event)) {
             return;
         }
         $this->parser->assign('status_code', 500);
@@ -80,10 +81,7 @@ class ErrorListener
     #[AsEventListener(event: KernelEvents::EXCEPTION, priority: 0)]
     public function handleException(ExceptionEvent $event): void
     {
-        if (!$event->isMainRequest()) {
-            return;
-        }
-        if ($event->getRequest()->get('_api_operation_name', false)) {
+        if (!$this->isAuthorizedToSeeErrorDetails($event)) {
             return;
         }
 
@@ -99,33 +97,68 @@ class ErrorListener
     #[AsEventListener(event: KernelEvents::EXCEPTION, priority: 0)]
     public function logException(ExceptionEvent $event): void
     {
-        if (!$event->isMainRequest()) {
+        if (!$this->isAuthorizedToSeeErrorDetails($event)) {
             return;
         }
-        // Log exception in the Thelia log
-        $exception = $event->getThrowable();
 
-        $logMessage = '';
+        $throwable = $event->getThrowable();
+        $root = $throwable; // keep original reference
 
+        $request = $event->getRequest();
+
+        $logMessage = \sprintf(
+            "Uncaught exception on %s %s\n%s: %s in %s:%d (code %s)",
+            $request->getMethod(),
+            $request->getUri(),
+            $root::class,
+            $root->getMessage(),
+            $root->getFile(),
+            $root->getLine(),
+            $root->getCode()
+        );
+
+        // Append chained exceptions with their own stack
+        $e = $root;
         do {
-            $logMessage .=
-                ('' !== $logMessage && '0' !== $logMessage ? \PHP_EOL.'Caused by' : 'Uncaught exception')
-                .$exception->getMessage()
-                .\PHP_EOL
-                .'Stack Trace: '.$exception->getTraceAsString();
-        } while (($exception = $exception->getPrevious()) instanceof \Throwable);
+            $logMessage .= \sprintf(
+                "\n--- Caused by %s: %s in %s:%d (code %s)\nStack trace:\n%s",
+                $e::class,
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine(),
+                $e->getCode(),
+                $e->getTraceAsString()
+            );
+        } while ($e = $e->getPrevious());
 
         Tlog::getInstance()->error($logMessage);
+    }
 
-        if (null !== $exception) {
-            Tlog::getInstance()->error($exception->getTraceAsString());
+    /**
+     * Limit request payload size to avoid huge logs.
+     */
+    private function truncateArray(array $data, int $maxLength = 2048): array
+    {
+        $encoded = json_encode($data, \JSON_UNESCAPED_SLASHES | \JSON_PARTIAL_OUTPUT_ON_ERROR);
+        if ($encoded !== null && \strlen($encoded) > $maxLength) {
+            // naive truncation: preserve start/end
+            $half = (int) ($maxLength / 2);
+            $encoded = substr($encoded, 0, $half).'…[truncated]…'.substr($encoded, -$half);
         }
+
+        // Try to decode back, fallback to a wrapper if decode fails
+        $decoded = json_decode((string) $encoded, true);
+        if (\is_array($decoded)) {
+            return $decoded;
+        }
+
+        return ['raw_truncated' => $encoded];
     }
 
     #[AsEventListener(event: KernelEvents::EXCEPTION, priority: 100)]
     public function authenticationException(ExceptionEvent $event): void
     {
-        if (!$event->isMainRequest()) {
+        if (!$this->isAuthorizedToSeeErrorDetails($event)) {
             return;
         }
         $exception = $event->getThrowable();
@@ -135,5 +168,14 @@ class ErrorListener
                 new RedirectResponse($exception->getLoginTemplate()),
             );
         }
+    }
+
+    private function isAuthorizedToSeeErrorDetails(ExceptionEvent $event): bool
+    {
+        $request = $event->getRequest();
+
+        return $event->isMainRequest()
+            && !$request->attributes->get(TheliaHttpKernel::IGNORE_THELIA_VIEW, false)
+            && !$request->get('_api_operation_name', false);
     }
 }

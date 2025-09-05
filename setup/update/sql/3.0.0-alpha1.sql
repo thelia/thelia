@@ -133,5 +133,7 @@ ALTER TABLE customer_version ADD COLUMN confirmation_token_expires_at DATETIME N
 INSERT INTO `message` (`name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
     ('customer_send_code', NULL, NULL, 'customer_send_code.txt', NULL, 'customer_send_code.html', NOW(), NOW());
 
+UPDATE `tax` SET `type` = 'Thelia\\Domain\\Taxation\\TaxEngine\\TaxType\\PricePercentTaxType'
+             WHERE `type` = 'Thelia\\TaxEngine\\TaxType\\PricePercentTaxType';
 
 SET FOREIGN_KEY_CHECKS = 1;

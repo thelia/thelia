@@ -1831,8 +1831,8 @@ INSERT INTO `country_area` (`country_id`, `area_id`, `created_at`, `updated_at`)
 
 INSERT INTO `tax` (`id`, `type`, `serialized_requirements`, `created_at`, `updated_at`)
 VALUES
-(1, 'Thelia\\TaxEngine\\TaxType\\PricePercentTaxType', 'eyJwZXJjZW50IjoiMjAifQ==', NOW(), NOW()),
-(2, 'Thelia\\TaxEngine\\TaxType\\PricePercentTaxType', 'eyJwZXJjZW50IjoiMTAifQ==', NOW(), NOW());
+(1, 'Thelia\\Domain\\Taxation\\TaxEngine\\TaxType\\PricePercentTaxType', 'eyJwZXJjZW50IjoiMjAifQ==', NOW(), NOW()),
+(2, 'Thelia\\Domain\\Taxation\\TaxEngine\\TaxType\\PricePercentTaxType', 'eyJwZXJjZW50IjoiMTAifQ==', NOW(), NOW());
 
 
 INSERT INTO `tax_rule` (`id`, `is_default`, `created_at`, `updated_at`)

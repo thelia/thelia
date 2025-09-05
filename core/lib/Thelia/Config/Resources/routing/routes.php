@@ -16,12 +16,12 @@ use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Thelia\Controller\Front\DefaultController;
 
 return static function (RoutingConfigurator $routes): void {
-    $routes->add('index', '/')
-        ->controller([DefaultController::class, 'noAction']);
-
     $routes->add('api_front_login_check', '/api/front/login');
 
     $routes->add('api_admin_login_check', '/api/admin/login');
+    $routes->add('index', '/')
+        ->controller([DefaultController::class, 'noAction'])
+        ->methods(['GET']);
 
     $routes->import('.', 'module_attribute');
     $routes->import('.', 'template_attribute');

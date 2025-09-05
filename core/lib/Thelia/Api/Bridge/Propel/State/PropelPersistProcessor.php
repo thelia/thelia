@@ -174,7 +174,7 @@ readonly class PropelPersistProcessor implements ProcessorInterface
         PropelResourceInterface $data,
     ): array {
         $resourceAddons = [];
-        $jsonData = json_decode((string) $this->requestStack->getCurrentRequest()?->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $jsonData = json_decode((string) $this->requestStack->getMainRequest()?->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         $resourceAddonDefinitions = $this->apiResourcePropelTransformerService->getResourceAddonDefinitions($data::class);
 
         foreach ($resourceAddonDefinitions as $addonShortName => $addonClass) {

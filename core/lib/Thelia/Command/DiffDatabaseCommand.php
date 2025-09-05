@@ -22,7 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use Thelia\Core\PropelInitService;
+use Thelia\Core\Propel\PropelInitService;
 
 /**
  * Generate a SQL diff between the current database structure and the current global schema, using the Propel migration

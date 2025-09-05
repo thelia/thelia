@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace Thelia\Core\Event\Tax;
 
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Domain\Taxation\TaxEngine\TaxTypeInterface;
 use Thelia\Model\Tax;
-use Thelia\TaxEngine\TaxTypeInterface;
 
 class TaxEvent extends ActionEvent
 {

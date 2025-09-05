@@ -18,34 +18,15 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\Routing\Loader\XmlFileLoader;
 use Thelia\Controller\Admin\BaseAdminController;
-use Thelia\Controller\Front\DefaultController;
-use Thelia\Core\EventListener\ViewListener;
 use Thelia\Core\Routing\ModuleAnnotationLoader;
 use Thelia\Core\Routing\ModuleAttributeLoader;
 use Thelia\Core\Routing\ModuleXmlLoader;
 use Thelia\Core\Routing\RewritingRouter;
 use Thelia\Core\Routing\TemplateAttributeLoader;
-use Thelia\Service\Model\LangService;
+use Thelia\Domain\Localization\Service\LangService;
 
 return static function (ContainerConfigurator $container): void {
     $services = $container->services();
-
-    $services->set(ViewListener::class)
-        ->args([
-            service('thelia.parser.resolver'),
-            service('thelia.template_helper'),
-            service('request_stack'),
-            service('event_dispatcher'),
-            service('router.chainRequest'),
-        ])
-        ->tag('kernel.event_subscriber');
-
-    // Alias for ViewListener
-    $services->alias('thelia.listener.view', ViewListener::class);
-
-    // Default controller
-    $services->set('controller.default', DefaultController::class)
-        ->public();
 
     // Base admin controller
     $services->set('thelia.admin.base_controller', BaseAdminController::class)

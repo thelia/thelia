@@ -15,9 +15,9 @@ declare(strict_types=1);
 namespace Thelia\Command;
 
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Core\Propel\PropelInitService;
 use Thelia\Core\Propel\Schema\SchemaCombiner;
 use Thelia\Core\Propel\Schema\SchemaLocator;
-use Thelia\Core\PropelInitService;
 use Thelia\Module\Validator\ModuleValidator;
 
 /**

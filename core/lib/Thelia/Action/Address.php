@@ -20,10 +20,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Customer\Service\CustomerTitleService;
 use Thelia\Model\Address as AddressModel;
 use Thelia\Model\Event\AddressEvent;
 use Thelia\Model\Map\AddressTableMap;
-use Thelia\Service\Model\CustomerService;
 
 /**
  * Class Address.
@@ -32,7 +32,7 @@ use Thelia\Service\Model\CustomerService;
  */
 class Address extends BaseAction implements EventSubscriberInterface
 {
-    public function __construct(private readonly CustomerService $customerService)
+    public function __construct(private readonly CustomerTitleService $customerTitleService)
     {
     }
 
@@ -72,7 +72,7 @@ class Address extends BaseAction implements EventSubscriberInterface
         try {
             $addressModel
                 ->setLabel($event->getLabel())
-                ->setTitleId($event->getTitle() ?? $this->customerService->getDefaultCustomerTitle()->getId())
+                ->setTitleId($event->getTitle() ?? $this->customerTitleService->getDefaultCustomerTitle()?->getId())
                 ->setFirstname($event->getFirstname())
                 ->setLastname($event->getLastname())
                 ->setAddress1($event->getAddress1())

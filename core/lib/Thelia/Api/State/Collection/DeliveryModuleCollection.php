@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Api\State\Collection;
 
-use Thelia\Core\Enum\DeliveryMode;
+use Thelia\Domain\Checkout\Enum\DeliveryMode;
 
 class DeliveryModuleCollection
 {

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Module;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
@@ -75,13 +76,14 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
      */
     public function getPaymentSuccessPageUrl(int $order_id): string
     {
+        /** @var Router $frontOfficeRouter */
         $frontOfficeRouter = $this->getContainer()->get('router.front');
 
         return URL::getInstance()->absoluteUrl(
             $frontOfficeRouter->generate(
                 'order.placed',
                 ['order_id' => $order_id],
-                Router::ABSOLUTE_URL,
+                UrlGeneratorInterface::ABSOLUTE_URL,
             ),
         );
     }
@@ -96,6 +98,7 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
      */
     public function getPaymentFailurePageUrl(int $order_id, ?string $message): string
     {
+        /** @var Router $frontOfficeRouter */
         $frontOfficeRouter = $this->getContainer()->get('router.front');
 
         return URL::getInstance()->absoluteUrl(
@@ -105,7 +108,7 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
                     'order_id' => $order_id,
                     'message' => $message,
                 ],
-                Router::ABSOLUTE_URL,
+                UrlGeneratorInterface::ABSOLUTE_URL,
             ),
         );
     }
@@ -118,11 +121,13 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
         return true;
     }
 
-    public function getMinimumAmount(): void
+    public function getMinimumAmount(): int
     {
+        return 0;
     }
 
-    public function getMaximumAmount(): void
+    public function getMaximumAmount(): int
     {
+        return 10000000;
     }
 }

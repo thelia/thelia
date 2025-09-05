@@ -18,7 +18,7 @@ use Thelia\Core\Template\Parser\ParserFallback;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TheliaTemplateHelper;
-use Thelia\Service\Composer\ComposerHelper;
+use Thelia\Domain\Module\Composer\ComposerHelper;
 
 return static function (ContainerConfigurator $configurator): void {
     $services = $configurator->services();

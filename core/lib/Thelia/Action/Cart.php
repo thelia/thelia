@@ -30,6 +30,7 @@ use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Cart\Exception\NotEnoughStockException;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Base\CustomerQuery;
 use Thelia\Model\Base\ProductSaleElementsQuery;
@@ -85,6 +86,44 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $cart->save();
     }
 
+    public function setDeliveryModule(CartCheckoutEvent $event): void
+    {
+        $cart = $event->getCart();
+        $cart->setDeliveryModuleId($event->getDeliveryModuleId());
+        $cart->save();
+    }
+
+    public function calculatePostage(CartCheckoutEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    {
+        $cart = $event->getCart();
+        $moduleId = $event->getDeliveryModuleId();
+        $deliveryAddressId = $event->getDeliveryAddressId();
+
+        if (null === $moduleId || null === $deliveryAddressId) {
+            return;
+        }
+
+        try {
+            $postage = $this->getPostageByDeliveryModuleId($cart, $dispatcher, $moduleId, $deliveryAddressId);
+            $cart->setOrderPostage($postage);
+        } catch (\Exception $e) {
+            // If an exception is thrown here, we just ignore it.
+            // The delivery module will not be set on the cart.
+        }
+    }
+
+    public function setInvoiceAddress(CartCheckoutEvent $event): void
+    {
+        $cart = $event->getCart();
+        $addressId = $event->getInvoiceAddressId();
+
+        if ($addressId && !$this->validateAddressOwnership($cart, $event->getInvoiceAddressId())) {
+            return;
+        }
+
+        $cart->setAddressInvoiceId($addressId)->save();
+    }
+
     public function persistCart(CartPersistEvent $event): void
     {
         $cart = $event->getCart();
@@ -121,7 +160,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         }
 
         $productSaleElementsId = $event->getProductSaleElementsId();
-        $productId = $event->getProduct();
+        $productId = $event->getProductId();
 
         // Search for an identical item in the cart
         $findItemEvent = clone $event;
@@ -182,6 +221,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * Modify article's quantity.
      *
      * don't use Form here just test the Request.
+     *
+     * @throws PropelException
+     * @throws NotEnoughStockException
      */
     public function changeItem(CartEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -245,6 +287,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Exception
      * @throws PropelException
+     * @throws NotEnoughStockException
      */
     protected function updateQuantity(EventDispatcherInterface $dispatcher, CartItem $cartItem, float $quantity): CartItem
     {
@@ -309,7 +352,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         if (
             !$event->getCartItem() instanceof CartItem && null !== $foundItem = CartItemQuery::create()
             ->filterByCartId($event->getCart()->getId())
-            ->filterByProductId($event->getProduct())
+            ->filterByProductId($event->getProductId())
             ->filterByProductSaleElementsId($event->getProductSaleElementsId())
             ->findOne()
         ) {
@@ -325,7 +368,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         $cookieName = ConfigQuery::read('cart.cookie_name', 'thelia_cart');
         $persistentCookie = ConfigQuery::read('cart.use_persistent_cookie', 1);
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getMainRequest();
 
         $cart = null;
 
@@ -394,7 +437,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     protected function managePersistentCart(CartRestoreEvent $cartRestoreEvent, string $cookieName, EventDispatcherInterface $dispatcher): CartModel
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getMainRequest();
 
         // The cart cookie exists -> get the cart token
         $token = $request->cookies->get($cookieName);
@@ -563,9 +606,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         return [
             TheliaEvents::CART_SET_DELIVERY_ADDRESS => ['setDeliveryAddress', 128],
-            // TheliaEvents::CART_SET_DELIVERY_MODULE => ['setDeliveryModule', 128],
-            // TheliaEvents::CART_SET_POSTAGE => ['calculatePostage', 128],
-            // TheliaEvents::CART_SET_INVOICE_ADDRESS => ['setInvoiceAddress', 128],
+            TheliaEvents::CART_SET_DELIVERY_MODULE => ['setDeliveryModule', 128],
+            TheliaEvents::CART_SET_POSTAGE => ['calculatePostage', 128],
+            TheliaEvents::CART_SET_INVOICE_ADDRESS => ['setInvoiceAddress', 128],
             TheliaEvents::CART_SET_PAYMENT_MODULE => ['setPaymentModule', 128],
             TheliaEvents::CART_PERSIST => ['persistCart', 128],
             TheliaEvents::CART_RESTORE_CURRENT => ['restoreCurrentCart', 128],
@@ -582,7 +625,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
     protected function getSession(): Session
     {
         /** @var Session $session */
-        $session = $this->requestStack->getCurrentRequest()->getSession();
+        $session = $this->requestStack->getMainRequest()?->getSession();
+
+        if (null === $session) {
+            throw new \RuntimeException('No session available');
+        }
 
         return $session;
     }

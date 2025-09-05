@@ -18,7 +18,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
-use Thelia\Exception\ModuleException;
+use Thelia\Domain\Module\Exception\ModuleException;
 use Thelia\Model\Module;
 
 interface BaseModuleInterface

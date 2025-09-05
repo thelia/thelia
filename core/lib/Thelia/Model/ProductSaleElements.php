@@ -15,9 +15,9 @@ declare(strict_types=1);
 namespace Thelia\Model;
 
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Domain\Taxation\TaxEngine\Calculator;
 use Thelia\Model\Base\ProductSaleElements as BaseProductSaleElements;
 use Thelia\Model\Tools\ProductPriceTools;
-use Thelia\TaxEngine\Calculator;
 
 class ProductSaleElements extends BaseProductSaleElements
 {

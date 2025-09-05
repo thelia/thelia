@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Controller\Admin;
 
-use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -28,9 +27,9 @@ use Thelia\Core\Event\Coupon\CouponDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Coupon\CouponFactory;
-use Thelia\Coupon\CouponManager;
-use Thelia\Coupon\Type\CouponInterface;
+use Thelia\Domain\Promotion\Coupon\CouponFactory;
+use Thelia\Domain\Promotion\Coupon\Service\CouponManager;
+use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;

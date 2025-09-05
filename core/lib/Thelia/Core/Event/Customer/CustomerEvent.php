@@ -36,7 +36,7 @@ class CustomerEvent extends ActionEvent
         return $this;
     }
 
-    public function getCustomer(): ?Customer
+    public function getCustomer(): Customer
     {
         return $this->customer;
     }

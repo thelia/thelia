@@ -18,12 +18,12 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\AttributeQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElementsQuery;
-use Thelia\TaxEngine\TaxEngine;
 use TheliaSmarty\Events\PseByProductEvent;
 
 class ProductSaleElementsAccessService
@@ -36,7 +36,7 @@ class ProductSaleElementsAccessService
         private readonly SecurityContext $securityContext,
         private readonly EventDispatcherInterface $eventDispatcher,
     ) {
-        $this->request = $requestStack->getCurrentRequest();
+        $this->request = $requestStack->getMainRequest();
     }
 
     public function psesByProduct($productId)

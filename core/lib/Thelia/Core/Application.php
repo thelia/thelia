@@ -31,7 +31,7 @@ class Application extends BaseApplication
 {
     public function __construct(public KernelInterface $kernel)
     {
-        parent::__construct('Thelia', Thelia::THELIA_VERSION);
+        parent::__construct('Thelia', TheliaKernel::THELIA_VERSION);
 
         $this->kernel->boot();
 
@@ -61,7 +61,7 @@ class Application extends BaseApplication
 
     protected function registerCommands(): void
     {
-        if (!Thelia::isInstalled()) {
+        if (!TheliaKernel::isInstalled()) {
             $this->add(new Install());
 
             return;

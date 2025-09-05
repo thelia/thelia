@@ -23,18 +23,19 @@ use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\User\UserInterface;
+use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Model\Admin;
 use Thelia\Model\Cart;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\Lang;
 use Thelia\Model\Order;
-use Thelia\Service\Model\LangService;
 use Thelia\Tools\URL;
 
 class Session extends BaseSession
 {
     protected static ?Cart $transientCart = null;
+    public const SESSION_CART_ID_NAME = 'thelia.cart_id';
 
     #[Required]
     public ?LangService $langService = null;
@@ -203,40 +204,42 @@ class Session extends BaseSession
     {
         if (!$cart instanceof Cart || $cart->isNew()) {
             self::$transientCart = $cart;
-            $this->remove('thelia.cart_id');
-        } else {
-            self::$transientCart = null;
-            $this->set('thelia.cart_id', $cart->getId());
+            $this->remove(self::SESSION_CART_ID_NAME);
+
+            return $this;
         }
+        self::$transientCart = null;
+        $this->set(self::SESSION_CART_ID_NAME, $cart->getId());
 
         return $this;
     }
 
-    public function getSessionCart(?EventDispatcherInterface $dispatcher = null): ?Cart
+    /**
+     * Will return the Cart stored in session,
+     * try to restore if exists in context or create a new one if none is found (not persisted).
+     */
+    public function getSessionCart(EventDispatcherInterface $dispatcher): Cart
     {
-        $cartId = $this->get('thelia.cart_id');
+        $cartId = $this->get(self::SESSION_CART_ID_NAME);
         $cart = null !== $cartId
             ? CartQuery::create()->findPk($cartId)
             : self::$transientCart;
 
-        if (null === $cart || !$this->isValidCart($cart)) {
-            if (!$dispatcher instanceof EventDispatcherInterface) {
-                throw new \InvalidArgumentException('In this context (no cart in session), an EventDispatcher should be provided to Session::getSessionCart().');
-            }
-
-            $cartEvent = new CartRestoreEvent();
-
-            if (null !== $cart) {
-                $cartEvent->setCart($cart);
-            }
-
-            $dispatcher->dispatch($cartEvent, TheliaEvents::CART_RESTORE_CURRENT);
-
-            if (null === $cart = $cartEvent->getCart()) {
-                throw new \LogicException('Unable to get a Cart.');
-            }
-            $this->setSessionCart($cart);
+        if (null !== $cart && $this->isValidCart($cart)) {
+            return $cart;
         }
+        $cartEvent = new CartRestoreEvent();
+
+        if (null !== $cart) {
+            $cartEvent->setCart($cart);
+        }
+
+        $dispatcher->dispatch($cartEvent, TheliaEvents::CART_RESTORE_CURRENT);
+        if (null === $cart = $cartEvent->getCart()) {
+            throw new \LogicException('Unable to get a Cart.');
+        }
+
+        $this->setSessionCart($cart);
 
         return $cart;
     }

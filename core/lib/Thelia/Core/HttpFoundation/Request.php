@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Core\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Request as BaseRequest;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Model\ConfigQuery;
@@ -115,11 +114,6 @@ class Request extends BaseRequest
     public function fromFront(): bool
     {
         return BaseFrontController::CONTROLLER_TYPE === $this->controllerType;
-    }
-
-    public function getSession(): SessionInterface
-    {
-        return parent::getSession();
     }
 
     public static function createFromBase(BaseRequest $request): self

@@ -17,8 +17,8 @@ namespace Thelia\Api\Service\API;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Thelia\Api\Resource\TranslatableResourceInterface;
+use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Log\Tlog;
-use Thelia\Service\Model\LangService;
 
 readonly class ResourceService
 {

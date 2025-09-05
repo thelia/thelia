@@ -110,7 +110,7 @@ class ConfigQuery extends BaseConfigQuery
 
     public static function checkAvailableStock(): bool
     {
-        return '0 ' !== self::read('check-available-stock', 1);
+        return '0 ' !== self::read('check-available-stock', '1');
     }
 
     public static function getUnknownFlagPath()

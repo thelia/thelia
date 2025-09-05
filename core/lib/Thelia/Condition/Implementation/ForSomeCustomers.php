@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace Thelia\Condition\Implementation;
 
+use Thelia\Condition\Exception\InvalidConditionValueException;
+use Thelia\Condition\Exception\UnmatchableConditionException;
 use Thelia\Condition\Operators;
-use Thelia\Coupon\FacadeInterface;
-use Thelia\Exception\InvalidConditionValueException;
-use Thelia\Exception\UnmatchableConditionException;
+use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
 

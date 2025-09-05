@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Thelia\Api\Resource\CartItem;
 use Thelia\Core\HttpFoundation\Session\Session;
-use Thelia\TaxEngine\TaxEngine;
+use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 
 class CartItemNormalizer extends AbstractItemNormalizer
 {
@@ -64,7 +64,7 @@ class CartItemNormalizer extends AbstractItemNormalizer
 
     public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        $this->requestStack->getCurrentRequest()->setSession($this->session); // Todo : Quick fix for Call to undefined method Symfony\Component\HttpFoundation\Session\Session::getMethod
+        $this->requestStack->getMainRequest()->setSession($this->session); // Todo : Quick fix for Call to undefined method Symfony\Component\HttpFoundation\Session\Session::getMethod
         $propelCartItem = $object->getPropelModel();
         $country = $this->taxEngine->getDeliveryCountry();
         /* @var CartItem $object */

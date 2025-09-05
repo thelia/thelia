@@ -15,9 +15,9 @@ declare(strict_types=1);
 namespace Thelia\Core\Event\Delivery;
 
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Core\Enum\DeliveryMode;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Checkout\Enum\DeliveryMode;
 use Thelia\Model\Address;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;

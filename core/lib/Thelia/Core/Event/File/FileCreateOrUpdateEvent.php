@@ -16,7 +16,7 @@ namespace Thelia\Core\Event\File;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Thelia\Core\Event\ActionEvent;
-use Thelia\Files\FileModelInterface;
+use Thelia\Core\File\FileModelInterface;
 
 /**
  * Event fired when a file is created or updated.

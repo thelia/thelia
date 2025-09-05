@@ -99,14 +99,16 @@ abstract class ActionEvent extends Event
     {
         $getterMethodName = \sprintf('get%s', Container::camelize($fieldName));
 
-        if (!method_exists($this, $getterMethodName)) {
+        if (method_exists($this, $getterMethodName) && $this->{$getterMethodName}() !== $fieldValue) {
             $this->{$setterMethodName}($fieldValue);
 
             return;
         }
 
-        if (null === $this->{$getterMethodName}()) {
+        try {
             $this->{$setterMethodName}($fieldValue);
+        } catch (\TypeError) {
+            // Do nothing, just ignore the error
         }
     }
 }

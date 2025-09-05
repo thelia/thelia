@@ -16,8 +16,8 @@ namespace Thelia\Tools\FileDownload;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Translator;
+use Thelia\Core\File\Exception\FileNotFoundException;
 use Thelia\Core\Translation\Translator as TheliaTranslator;
-use Thelia\Exception\FileNotFoundException;
 use Thelia\Exception\HttpUrlException;
 use Thelia\Log\Tlog;
 use Thelia\Tools\URL;

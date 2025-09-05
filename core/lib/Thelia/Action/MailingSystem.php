@@ -16,11 +16,11 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Cache\ConfigCacheService;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\MailingSystem\MailingSystemEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\ConfigQuery;
-use Thelia\Service\ConfigCacheService;
 
 class MailingSystem extends BaseAction implements EventSubscriberInterface
 {

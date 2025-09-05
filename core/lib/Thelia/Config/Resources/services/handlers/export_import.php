@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Thelia\Service\DataTransfer\ExportHandler;
-use Thelia\Service\DataTransfer\ImportHandler;
+use Thelia\Domain\DataTransfer\ExportHandler;
+use Thelia\Domain\DataTransfer\ImportHandler;
 
 return static function (ContainerConfigurator $configurator): void {
     $services = $configurator->services();

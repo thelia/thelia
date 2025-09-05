@@ -13,10 +13,9 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-use Symfony\Component\Dotenv\Dotenv;
 use Thelia\Core\Application;
-use Thelia\Core\Thelia;
-use Thelia\Install\KernelInstall;
+use Thelia\Core\Install\KernelInstall;
+use Thelia\Core\TheliaKernel;
 
 if (!isset($bootstrapFile)) {
     $bootstrapFile = dirname(__DIR__) . '/vendor/autoload_runtime.php';
@@ -37,7 +36,7 @@ if (!class_exists(Application::class)) {
 }
 
 return static function (array $context) {
-    if (!Thelia::isInstalled()) {
+    if (!TheliaKernel::isInstalled()) {
         $kernel = new KernelInstall($context['APP_ENV'], (bool) $context['APP_DEBUG']);
     } else {
         $kernel = new App\Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);

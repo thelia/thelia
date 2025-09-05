@@ -21,7 +21,7 @@ readonly class RequestBuilderService
 {
     public function createApiRequest(RequestStack $requestStack, string $path): Request
     {
-        $currentRequest = $requestStack->getCurrentRequest();
+        $currentRequest = $requestStack->getMainRequest();
         if (null === $currentRequest) {
             throw new \RuntimeException('No current request found');
         }

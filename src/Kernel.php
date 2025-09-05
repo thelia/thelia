@@ -16,9 +16,9 @@ namespace App;
 
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
-use Thelia\Core\Thelia;
+use Thelia\Core\TheliaKernel;
 
-class Kernel extends Thelia
+class Kernel extends TheliaKernel
 {
     protected function configureContainer(ContainerConfigurator $container): void
     {

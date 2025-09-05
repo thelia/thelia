@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentLocatorsPass;
+use Thelia\Core\Cache\ConfigCacheService;
 use Thelia\Core\DependencyInjection\Compiler\CurrencyConverterProviderPass;
 use Thelia\Core\DependencyInjection\Compiler\FallbackParserPass;
 use Thelia\Core\DependencyInjection\Compiler\LoopCompilerPass;
@@ -33,7 +34,6 @@ use Thelia\Core\DependencyInjection\Compiler\RegisterHookListenersPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterRouterPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\DependencyInjection\Compiler\TranslatorPass;
-use Thelia\Service\ConfigCacheService;
 
 /**
  * First Bundle use in Thelia

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Routing;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -25,13 +26,13 @@ use Symfony\Component\Routing\RouterInterface;
 use Thelia\Controller\Front\DefaultController;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
-use Thelia\Exception\UrlRewritingException;
+use Thelia\Core\Routing\Rewriting\Exception\UrlRewritingException;
+use Thelia\Core\Routing\Rewriting\RewritingResolver;
+use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 use Thelia\Model\RewritingUrlQuery;
-use Thelia\Service\Model\LangService;
-use Thelia\Service\Rewriting\RewritingResolver;
 use Thelia\Tools\URL;
 
 /**
@@ -52,130 +53,160 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
 
     public function match(string $pathinfo): array
     {
-        return $this->matchRequest(Request::create($pathinfo));
+        $request = Request::create($pathinfo);
+
+        return $this->matchRequest($request);
     }
 
     /**
      * @throws UrlRewritingException
+     * @throws PropelException
      */
     public function matchRequest(Request $request): array
     {
-        if (!ConfigQuery::isRewritingEnable()) {
+        if (!$this->isSupportedRequest($request)) {
             throw new ResourceNotFoundException();
         }
+        \assert($request instanceof TheliaRequest);
 
+        $pathInfo = $request->getRealPathInfo();
+        $resolver = $this->resolveRewritingData($pathInfo);
+
+        $this->maybeRedirectForRequestedLocale($request, $resolver);
+        $this->ensureActiveLocaleOrRedirect($resolver);
+        $this->maybeRedirectForManualRedirect($resolver);
+
+        $this->applyRewritingAttributes($request, $resolver);
+
+        return $this->defaultRouteParams();
+    }
+
+    protected function isSupportedRequest(Request $request): bool
+    {
+        return $request instanceof TheliaRequest && ConfigQuery::isRewritingEnable();
+    }
+
+    /**
+     * @throws PropelException
+     * @throws UrlRewritingException
+     */
+    protected function resolveRewritingData(string $pathInfo): RewritingResolver
+    {
         $urlTool = URL::getInstance();
 
-        $pathInfo = $request instanceof TheliaRequest
-            ? $request->getRealPathInfo()
-            : $request->getPathInfo();
-
         try {
-            $rewrittenUrlData = $urlTool->resolve($pathInfo);
-        } catch (UrlRewritingException $urlRewritingException) {
-            throw match ($urlRewritingException->getCode()) {
+            return $urlTool->resolve($pathInfo);
+        } catch (UrlRewritingException $e) {
+            throw match ($e->getCode()) {
                 UrlRewritingException::URL_NOT_FOUND => new ResourceNotFoundException(),
-                default => $urlRewritingException,
+                default => $e,
             };
         }
+    }
 
-        // Check if there is a "lang" parameter in the request
+    protected function maybeRedirectForRequestedLocale(Request $request, RewritingResolver $resolver): void
+    {
         $requestedLocale = $request->get('lang');
 
-        if (null !== $requestedLocale) {
-            // Find the requested language by locale if it's active
-            $requestedLang = LangQuery::create()
-                ->filterByActive(true)
-                ->findOneByLocale($requestedLocale);
-
-            if (null !== $requestedLang && $requestedLang->getLocale() !== $rewrittenUrlData->locale) {
-                // Retrieve the localized URL and perform a redirection
-                $localizedUrl = $urlTool->retrieve(
-                    $rewrittenUrlData->view,
-                    $rewrittenUrlData->viewId,
-                    $requestedLang->getLocale(),
-                )->toString();
-
-                $this->redirect($urlTool->absoluteUrl($localizedUrl), 301);
-            }
+        if (null === $requestedLocale) {
+            return;
         }
 
-        // If the rewritten URL locale is disabled, redirect to the URL in the default language
-        if (null === LangQuery::create()
+        $requestedLang = LangQuery::create()
             ->filterByActive(true)
-            ->filterByLocale($rewrittenUrlData->locale)
-            ->findOne()) {
-            $lang = Lang::getDefaultLanguage();
+            ->findOneByLocale($requestedLocale);
 
-            $localizedUrl = $urlTool->retrieve(
-                $rewrittenUrlData->view,
-                $rewrittenUrlData->viewId,
-                $lang->getLocale(),
-            )->toString();
+        if (null !== $requestedLang && $requestedLang->getLocale() !== $resolver->locale) {
+            $localizedUrl = URL::getInstance()
+                ->retrieve($resolver->view, $resolver->viewId, $requestedLang->getLocale())
+                ->toString();
 
-            $this->redirect($urlTool->absoluteUrl($localizedUrl), 301);
+            $this->redirect(URL::getInstance()->absoluteUrl($localizedUrl), 301);
+        }
+    }
+
+    protected function ensureActiveLocaleOrRedirect(RewritingResolver $resolver): void
+    {
+        $active = LangQuery::create()
+            ->filterByActive(true)
+            ->filterByLocale($resolver->locale)
+            ->findOne();
+
+        if (null !== $active) {
+            return;
         }
 
-        /* is the URL redirected ? */
-        if (null !== $rewrittenUrlData->redirectedToUrl) {
-            $redirect = RewritingUrlQuery::create()
-                ->filterByView($rewrittenUrlData->view)
-                ->filterByViewId($rewrittenUrlData->viewId)
-                ->filterByViewLocale($rewrittenUrlData->locale)
-                ->filterByRedirected(null, Criteria::ISNULL)
-                ->findOne();
+        $default = Lang::getDefaultLanguage();
 
-            $this->redirect($urlTool->absoluteUrl($redirect?->getUrl()), 301);
+        $localizedUrl = URL::getInstance()
+            ->retrieve($resolver->view, $resolver->viewId, $default->getLocale())
+            ->toString();
+
+        $this->redirect(URL::getInstance()->absoluteUrl($localizedUrl), 301);
+    }
+
+    protected function maybeRedirectForManualRedirect(RewritingResolver $resolver): void
+    {
+        if (null === $resolver->redirectedToUrl) {
+            return;
         }
 
-        /* define GET arguments in request */
+        $redirect = RewritingUrlQuery::create()
+            ->filterByView($resolver->view)
+            ->filterByViewId($resolver->viewId)
+            ->filterByViewLocale($resolver->locale)
+            ->filterByRedirected(null, Criteria::ISNULL)
+            ->findOne();
 
-        if (null !== $rewrittenUrlData->view) {
-            $request->attributes->set('_view', $rewrittenUrlData->view);
+        $this->redirect(URL::getInstance()->absoluteUrl($redirect?->getUrl()), 301);
+    }
 
-            if (null !== $rewrittenUrlData->viewId) {
-                $request->query->set($rewrittenUrlData->view.'_id', $rewrittenUrlData->viewId);
+    private function applyRewritingAttributes(Request $request, RewritingResolver $resolver): void
+    {
+        if (null !== $resolver->view) {
+            $request->attributes->set('_view', $resolver->view);
+
+            if (null !== $resolver->viewId) {
+                $request->query->set($resolver->view.'_id', $resolver->viewId);
             }
         }
 
-        if (null !== $rewrittenUrlData->locale) {
-            $this->manageLocale($rewrittenUrlData, $request);
+        if (null !== $resolver->locale && $request instanceof TheliaRequest) {
+            $this->manageLocale($resolver, $request);
         }
 
-        foreach ($rewrittenUrlData->otherParameters as $parameter => $value) {
+        foreach ($resolver->otherParameters as $parameter => $value) {
             $request->query->set($parameter, $value);
         }
-
-        return $this->defaultActionOptions();
     }
 
-    private function defaultActionOptions(): array
-    {
-        return [
-            '_controller' => DefaultController::class.'::noAction',
-            '_route' => 'rewrite',
-            '_rewritten' => true,
-        ];
-    }
-
-    protected function manageLocale(RewritingResolver $rewrittenUrlData, TheliaRequest $request): void
+    protected function manageLocale(RewritingResolver $resolver, TheliaRequest $request): void
     {
         $lang = LangQuery::create()
             ->filterByActive(true)
-            ->findOneByLocale($rewrittenUrlData->locale);
+            ->findOneByLocale($resolver->locale);
 
-        $langSession = $request->getSession()->getLang();
+        $currentLang = $request->getSession()->getLang();
 
-        if ($lang->getLocale() !== $langSession?->getLocale()) {
+        if ($lang->getLocale() !== $currentLang?->getLocale()) {
             if (ConfigQuery::isMultiDomainActivated()) {
                 $this->redirect(
-                    \sprintf('%s/%s', $lang->getUrl(), $rewrittenUrlData->rewrittenUrl),
+                    \sprintf('%s/%s', $lang->getUrl(), $resolver->rewrittenUrl),
                     301,
                 );
             } else {
                 $this->langService->setLang($lang);
             }
         }
+    }
+
+    private function defaultRouteParams(): array
+    {
+        return [
+            '_controller' => DefaultController::class.'::noAction',
+            '_route' => 'rewrite',
+            '_rewritten' => true,
+        ];
     }
 
     protected function redirect($url, $status = 302): void

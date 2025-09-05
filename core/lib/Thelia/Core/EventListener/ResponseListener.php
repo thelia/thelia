@@ -36,24 +36,27 @@ class ResponseListener
 
         $session = $event->getRequest()->getSession();
 
-        if (null !== $id = $session->get('cart_use_cookie')) {
-            $response = $event->getResponse();
-            $cookieName = ConfigQuery::read('cart.cookie_name', 'thelia_cart');
-
-            if (empty($id)) {
-                $response->headers->clearCookie($cookieName, '/');
-            } else {
-                $response->headers->setCookie(
-                    new Cookie(
-                        ConfigQuery::read('cart.cookie_name', 'thelia_cart'),
-                        $id,
-                        time() + ConfigQuery::read('cart.cookie_lifetime', 60 * 60 * 24 * 365),
-                        '/',
-                    ),
-                );
-            }
-
-            $session->set('cart_use_cookie', null);
+        if (null === $id = $session->get('cart_use_cookie')) {
+            return;
         }
+
+        $response = $event->getResponse();
+        $cookieName = ConfigQuery::read('cart.cookie_name', 'thelia_cart');
+
+        $session->set('cart_use_cookie', null);
+        if (empty($id)) {
+            $response->headers->clearCookie($cookieName, '/');
+
+            return;
+        }
+
+        $response->headers->setCookie(
+            new Cookie(
+                ConfigQuery::read('cart.cookie_name', 'thelia_cart'),
+                $id,
+                time() + ConfigQuery::read('cart.cookie_lifetime', 60 * 60 * 24 * 365),
+                '/',
+            ),
+        );
     }
 }

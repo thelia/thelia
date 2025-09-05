@@ -22,25 +22,22 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Adressing\Service\AddressService;
+use Thelia\Domain\Shipping\ShippingFacade;
 use Thelia\Model\Address;
 use Thelia\Model\Cart;
 use Thelia\Model\CountryQuery;
-use Thelia\Model\Module;
-use Thelia\Model\ModuleQuery;
 use Thelia\Model\StateQuery;
-use Thelia\Module\BaseModule;
-use Thelia\Service\Model\AddressService;
-use Thelia\Service\Model\DeliveryService;
 
-class DeliveryModuleProvider implements ProviderInterface
+readonly class DeliveryModuleProvider implements ProviderInterface
 {
     public function __construct(
-        private readonly Request $request,
-        private readonly Session $session,
-        private readonly SecurityContext $securityContext,
-        private readonly AddressService $addressService,
-        private readonly EventDispatcherInterface $dispatcher,
-        private readonly DeliveryService $deliveryModuleService,
+        private Request $request,
+        private Session $session,
+        private SecurityContext $securityContext,
+        private AddressService $addressService,
+        private EventDispatcherInterface $dispatcher,
+        private ShippingFacade $shippingFacade,
     ) {
     }
 
@@ -69,31 +66,6 @@ class DeliveryModuleProvider implements ProviderInterface
             ? $deliveryAddress->getState()
             : StateQuery::create()->filterByCountryId($country->getId())->findOne();
 
-        $modules = ModuleQuery::create()
-            ->filterByActivate(1)
-            ->filterByType(BaseModule::DELIVERY_MODULE_TYPE)
-            ->find();
-
-        $deliveryModules = [];
-
-        /** @var Module $module */
-        foreach ($modules as $module) {
-            /** @var ?int $filterOnlyValid */
-            $filterOnlyValid = $context['filters']['only_valid'] ?? false;
-            $deliveryModuleResource = $this->deliveryModuleService->getDeliveryModuleResource(
-                $module,
-                $cart,
-                $deliveryAddress,
-                $country,
-                $state,
-                $filterOnlyValid !== null && (bool) $filterOnlyValid
-            );
-
-            if ($deliveryModuleResource) {
-                $deliveryModules[] = $deliveryModuleResource;
-            }
-        }
-
-        return $deliveryModules;
+        return $this->shippingFacade->listValidMethodsAsResourceApi($cart, $country, $state, $deliveryAddress?->getId());
     }
 }

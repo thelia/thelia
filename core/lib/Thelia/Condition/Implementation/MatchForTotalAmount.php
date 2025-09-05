@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Condition\Implementation;
 
 use Thelia\Condition\Operators;
-use Thelia\Coupon\FacadeInterface;
+use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 

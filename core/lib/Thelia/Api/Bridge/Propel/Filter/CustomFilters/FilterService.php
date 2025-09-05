@@ -25,10 +25,10 @@ use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Type\CheckboxType;
 use Thelia\Api\Resource\Filter;
 use Thelia\Api\Resource\FilterValue;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ChoiceFilter;
 use Thelia\Model\ChoiceFilterQuery;
-use Thelia\Service\Model\LangService;
 
 readonly class FilterService
 {
@@ -145,7 +145,7 @@ readonly class FilterService
 
     public function getFilters(array $context, string $resource): array
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getMainRequest();
 
         if (!$request instanceof Request) {
             throw new \InvalidArgumentException('The request is required.');

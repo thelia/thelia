@@ -52,6 +52,7 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Document;
 use Thelia\Core\Template\Loop\Image;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Domain\Taxation\TaxEngine\Calculator;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
@@ -93,7 +94,6 @@ use Thelia\Model\ProductSaleElementsProductImage;
 use Thelia\Model\ProductSaleElementsProductImageQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\TaxRuleQuery;
-use Thelia\TaxEngine\Calculator;
 use Thelia\Type\BooleanOrBothType;
 
 /**
@@ -373,7 +373,7 @@ class ProductController extends AbstractSeoCrudController
 
     protected function getObjectFromEvent(Event $event): mixed
     {
-        return $event->hasProduct() ? $event->getProduct() : null;
+        return $event->hasProduct() ? $event->getProductId() : null;
     }
 
     protected function getExistingObject(): ?ActiveRecordInterface

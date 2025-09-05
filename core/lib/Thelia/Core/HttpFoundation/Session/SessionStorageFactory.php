@@ -16,7 +16,6 @@ namespace Thelia\Core\HttpFoundation\Session;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageFactoryInterface;
@@ -32,10 +31,6 @@ final readonly class SessionStorageFactory implements SessionStorageFactoryInter
 
     public function createStorage(?Request $request): SessionStorageInterface
     {
-        if (headers_sent()) {
-            return new MockArraySessionStorage();
-        }
-
         $env = \is_string($_SERVER['APP_ENV'] ?? null) ? $_SERVER['APP_ENV'] : 'prod';
 
         if ('test' === $env) {

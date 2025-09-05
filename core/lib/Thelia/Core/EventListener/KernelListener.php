@@ -24,9 +24,10 @@ use Thelia\Core\Event\IsAdminEnvEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\HttpFoundation\Session\SessionFactory;
+use Thelia\Core\HttpFoundation\Session\SessionManager;
 use Thelia\Core\Translation\Translator;
-use Thelia\Service\Model\LangService;
-use Thelia\Service\SessionManager;
+use Thelia\Domain\Localization\Service\LangService;
 
 class KernelListener
 {
@@ -38,10 +39,30 @@ class KernelListener
         protected EventDispatcherInterface $eventDispatcher,
         protected LangService $langService,
         protected SessionManager $sessionManager,
+        protected SessionFactory $sessionFactory,
         protected string $cacheDir,
         protected bool $debug,
         protected string $env,
     ) {
+    }
+
+    #[AsEventListener(event: KernelEvents::REQUEST, priority: \PHP_INT_MAX)]
+    public function initializeSession(RequestEvent $event): void
+    {
+        if (headers_sent()) {
+            return;
+        }
+        $request = $event->getRequest();
+        if (!$request instanceof TheliaRequest) {
+            $request = TheliaRequest::createFromBase($request);
+        }
+
+        if ($request->hasSession()) {
+            return;
+        }
+
+        $session = $this->sessionFactory->createSession();
+        $request->setSession($session);
     }
 
     #[AsEventListener(event: KernelEvents::REQUEST, priority: \PHP_INT_MAX - 1)]
@@ -54,7 +75,7 @@ class KernelListener
         }
     }
 
-    #[AsEventListener(event: KernelEvents::REQUEST, priority: 130)]
+    #[AsEventListener(event: KernelEvents::REQUEST, priority: \PHP_INT_MAX - 2)]
     public function warmupSession(RequestEvent $event): void
     {
         if (!$this->sessionManager->sessionIsStartable($event)) {
@@ -68,7 +89,7 @@ class KernelListener
         }
     }
 
-    #[AsEventListener(event: KernelEvents::REQUEST, priority: 80)]
+    #[AsEventListener(event: KernelEvents::REQUEST, priority: 128)]
     public function initializeLanguageAndAdmin(RequestEvent $event): ?Response
     {
         if (!$this->sessionManager->sessionIsStartable($event)) {

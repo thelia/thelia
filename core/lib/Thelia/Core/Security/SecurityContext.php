@@ -33,7 +33,7 @@ class SecurityContext
 
     private function getSession(): Session
     {
-        return $this->requestStack->getCurrentRequest()->getSession();
+        return $this->requestStack->getMainRequest()->getSession();
     }
 
     /**

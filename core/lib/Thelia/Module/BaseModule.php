@@ -32,7 +32,8 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Translation\Translator;
-use Thelia\Exception\ModuleException;
+use Thelia\Domain\Module\Exception\ModuleException;
+use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Log\Tlog;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
@@ -49,7 +50,6 @@ use Thelia\Model\ModuleI18nQuery;
 use Thelia\Model\ModuleImage;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
-use Thelia\TaxEngine\TaxEngine;
 use Thelia\Tools\Image;
 
 class BaseModule implements BaseModuleInterface
@@ -173,7 +173,7 @@ class BaseModule implements BaseModuleInterface
     {
         if (false === $this->hasRequest()) {
             // Try to get request from container.
-            $this->setRequest($this->getContainer()->get('request_stack')?->getCurrentRequest());
+            $this->setRequest($this->getContainer()->get('request_stack')?->getMainRequest());
         }
 
         if (false === $this->hasRequest()) {

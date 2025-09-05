@@ -46,7 +46,7 @@ class TokenProvider
             return;
         }
 
-        $session = $this->requestStack->getCurrentRequest()?->getSession();
+        $session = $this->requestStack->getMainRequest()?->getSession();
 
         if ($session instanceof SessionInterface) {
             $this->token = $session->get($this->tokenName);
@@ -60,7 +60,7 @@ class TokenProvider
     {
         if (null === $this->token) {
             $this->token = $this->getToken();
-            $session = $this->requestStack->getCurrentRequest()?->getSession();
+            $session = $this->requestStack->getMainRequest()?->getSession();
 
             if ($session instanceof SessionInterface) {
                 $session->set($this->tokenName, $this->token);

@@ -65,7 +65,7 @@ class TheliaFormFactory
         $form = $this->container->has($formId) ? $this->container->get($formId) : new $formId();
 
         $form->init(
-            $this->requestStack->getCurrentRequest(),
+            $this->requestStack->getMainRequest(),
             $this->eventDispatcher,
             $this->translator,
             $this->formFactoryBuilder,

@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Event\File;
 
 use Thelia\Core\Event\ActionEvent;
-use Thelia\Files\FileModelInterface;
+use Thelia\Core\File\FileModelInterface;
 
 /**
  * Event fired when a file is about to be deleted.
