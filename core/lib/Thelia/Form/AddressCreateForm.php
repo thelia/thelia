@@ -16,18 +16,16 @@ namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TelType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Customer\Service\CustomerTitleService;
+use Thelia\Domain\Localization\Service\CountryService;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Map\StateI18nTableMap;
 use Thelia\Model\StateQuery;
-use Thelia\Service\Model\CountryService;
-use Thelia\Service\Model\CustomerTitleService;
 
 /**
  * Class AddressCreateForm.
