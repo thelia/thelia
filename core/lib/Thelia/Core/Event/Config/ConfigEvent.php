@@ -22,8 +22,11 @@ use Thelia\Model\Config;
  */
 class ConfigEvent extends ActionEvent
 {
-    public function __construct(protected ?Config $config = null)
+    protected ?Config $config = null;
+
+    public function __construct(?Config $config)
     {
+        $this->config = $config;
     }
 
     public function hasConfig(): bool
