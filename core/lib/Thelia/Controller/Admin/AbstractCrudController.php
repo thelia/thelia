@@ -308,7 +308,7 @@ abstract class AbstractCrudController extends BaseAdminController
             }
 
             // Log object modification
-            if (null !== $changedObject = $this->getObjectFromEvent($changeEvent)) {
+            if (($changedObject = $this->getObjectFromEvent($changeEvent)) instanceof ActiveRecordInterface) {
                 $this->adminLogAppend(
                     $this->resourceCode,
                     AccessManager::UPDATE,
