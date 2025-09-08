@@ -33,7 +33,7 @@ final readonly class SessionStorageFactory implements SessionStorageFactoryInter
     {
         $env = \is_string($_SERVER['APP_ENV'] ?? null) ? $_SERVER['APP_ENV'] : 'prod';
 
-        if ('test' === $env) {
+        if ('test' === $env || headers_sent()) {
             return new MockFileSessionStorage($this->defaultSavePath);
         }
 
