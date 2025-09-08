@@ -29,6 +29,11 @@ use Thelia\Module\ModuleManagement;
 #[AsCommand(name: 'module:refresh', description: 'Refresh modules list')]
 class ModuleRefreshCommand extends ContainerAwareCommand
 {
+    public function __construct(protected ModuleManagement $moduleManagement)
+    {
+        parent::__construct();
+    }
+
     protected function configure(): void
     {
     }
@@ -36,8 +41,7 @@ class ModuleRefreshCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
-            $moduleManagement = new ModuleManagement($this->getContainer());
-            $moduleManagement->updateModules($this->getContainer());
+            $this->moduleManagement->updateModules($this->getContainer());
         } catch (InvalidModuleException $ime) {
             throw new \RuntimeException(\sprintf('One or more modules could not be refreshed : %s', $ime->getErrorsAsString("\n")), $ime->getCode(), $ime);
         } catch (\Exception $e) {

@@ -69,9 +69,9 @@ final readonly class CheckoutFacade
      *
      * @throws \Exception If underlying services raise domain exceptions
      */
-    public function validateForOrder(): void
+    public function validateForOrder(Cart $cart): void
     {
-        $this->validationService->validateForOrder();
+        $this->validationService->validateForOrder($cart);
     }
 
     /**
