@@ -72,6 +72,10 @@ class CategoryFilter implements TheliaFilterInterface
             return [];
         }
 
+        if (is_int($valueSearched)){
+            $valueSearched = [$valueSearched];
+        }
+
         $value = [];
 
         foreach ($valueSearched as $categoryId) {
