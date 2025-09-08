@@ -95,7 +95,7 @@ class ConfigController extends AbstractCrudController
 
     protected function getUpdateEvent(array $formData): ActionEvent
     {
-        $changeEvent = new ConfigUpdateEvent($formData['id']);
+        $changeEvent = new ConfigUpdateEvent((int) $formData['id']);
 
         $changeEvent
             ->setEventName($formData['name'])
