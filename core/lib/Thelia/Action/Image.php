@@ -117,7 +117,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
         if (!file_exists($cacheFilePath)) {
             if (!file_exists($sourceFile)) {
-                throw new ImageException(\sprintf('Source image file %s does not exists.', $sourceFile));
+                return;
             }
 
             // Create a cached version of the original image in the web space, if not exists

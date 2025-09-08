@@ -23,17 +23,17 @@ class CachedFileEvent extends ActionEvent
     protected string $cache_subdirectory;
 
     /** @var string The absolute URL of the cached file (in the web space) */
-    protected string $file_url;
+    protected ?string $file_url = null;
 
     /** @var string The absolute path of the cached file */
     protected string $cache_filepath;
 
-    public function getFileUrl(): string
+    public function getFileUrl(): ?string
     {
         return $this->file_url;
     }
 
-    public function setFileUrl(string $file_url): static
+    public function setFileUrl(?string $file_url): static
     {
         $this->file_url = $file_url;
 
