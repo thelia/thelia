@@ -703,4 +703,9 @@ abstract class BaseLoop implements LoopInterface
     {
         return $this->requestStack->getMainRequest();
     }
+
+    public function getCurrentRequest(): \Symfony\Component\HttpFoundation\Request
+    {
+        return $this->requestStack->getCurrentRequest();
+    }
 }
