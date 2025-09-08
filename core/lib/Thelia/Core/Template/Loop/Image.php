@@ -365,8 +365,8 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set('IMAGE_PATH', $event->getCacheFilepath())
                     ->set('PROCESSING_ERROR', false)
                     ->set('IS_SVG', 'svg' === $imageExt)
-                    ->set('IMAGE_HEIGHT', $event->getImageObject()->getSize()->getHeight())
-                    ->set('IMAGE_WIDTH', $event->getImageObject()->getSize()->getWidth());
+                    ->set('IMAGE_HEIGHT', $event->getImageObject()?->getSize()->getHeight())
+                    ->set('IMAGE_WIDTH', $event->getImageObject()?->getSize()->getWidth());
 
                 if ($this->getBase64()) {
                     $loopResultRow->set('IMAGE_BASE64', $this->toBase64($event->getCacheFilepath()));

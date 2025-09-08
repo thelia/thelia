@@ -26,7 +26,7 @@ class CachedFileEvent extends ActionEvent
     protected ?string $file_url = null;
 
     /** @var string The absolute path of the cached file */
-    protected string $cache_filepath;
+    protected ?string $cache_filepath = null;
 
     public function getFileUrl(): ?string
     {
@@ -40,12 +40,12 @@ class CachedFileEvent extends ActionEvent
         return $this;
     }
 
-    public function getCacheFilepath(): string
+    public function getCacheFilepath(): ?string
     {
         return $this->cache_filepath;
     }
 
-    public function setCacheFilepath(string $cache_filepath): static
+    public function setCacheFilepath(?string $cache_filepath): static
     {
         $this->cache_filepath = $cache_filepath;
 

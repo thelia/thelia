@@ -20,10 +20,10 @@ use Thelia\Core\Event\CachedFileEvent;
 class ImageEvent extends CachedFileEvent
 {
     /** @var string The absolute path of the cached image file */
-    protected string $cache_filepath;
+    protected ?string $cache_filepath = null;
 
     /** @var string The absolute URL of the cached version of the original image (in the web space) */
-    protected string $original_file_url;
+    protected ?string $original_file_url = null;
 
     /** @var string The absolute path of the cached version of the original image file */
     protected string $cache_original_filepath;
@@ -45,7 +45,7 @@ class ImageEvent extends CachedFileEvent
     /** the quality of the result image, from 0 (!) to 100 */
     protected ?int $quality = null;
 
-    protected ImageInterface $imageObject;
+    protected ?ImageInterface $imageObject = null;
     protected bool $allowZoom;
     protected ?string $format = null;
 
@@ -55,7 +55,7 @@ class ImageEvent extends CachedFileEvent
     public function isOriginalImage(): bool
     {
         return (!isset($this->width) || 0 === $this->width) && (!isset($this->height) || 0 === $this->height) /* && empty($this->resize_mode) && empty($this->background_color) not significant */
-        && [] === $this->effects && (!isset($this->rotation) || 0 === $this->rotation) && (!isset($this->quality) || 0 === $this->quality);
+            && [] === $this->effects && (!isset($this->rotation) || 0 === $this->rotation) && (!isset($this->quality) || 0 === $this->quality);
     }
 
     /**
@@ -169,7 +169,7 @@ class ImageEvent extends CachedFileEvent
         return $this;
     }
 
-    public function getOriginalFileUrl(): string
+    public function getOriginalFileUrl(): ?string
     {
         return $this->original_file_url;
     }
@@ -193,14 +193,14 @@ class ImageEvent extends CachedFileEvent
         return $this;
     }
 
-    public function setImageObject(ImageInterface $imageObject): self
+    public function setImageObject(?ImageInterface $imageObject): self
     {
         $this->imageObject = $imageObject;
 
         return $this;
     }
 
-    public function getImageObject(): ImageInterface
+    public function getImageObject(): ?ImageInterface
     {
         return $this->imageObject;
     }
