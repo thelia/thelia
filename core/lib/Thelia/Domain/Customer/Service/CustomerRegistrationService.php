@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateMinimalEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Customer\DTO\CustomerRegisterDTO;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerTitleQuery;
 
@@ -32,7 +33,7 @@ readonly class CustomerRegistrationService
         CustomerRegisterDTO $customerRegisterDTO,
     ): Customer {
         $customerCreateEvent = $this->createEventInstance($customerRegisterDTO->toArray());
-        $customerCreateEvent->setEnabled(false);
+        $customerCreateEvent->setEnabled(false === ConfigQuery::isCustomerEmailConfirmationEnable());
         $this->eventDispatcher->dispatch($customerCreateEvent, TheliaEvents::CREATE_CUSTOMER_MINIMAL);
         $newCustomer = $customerCreateEvent->getCustomer();
 
