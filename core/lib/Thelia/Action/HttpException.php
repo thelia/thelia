@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException as BaseHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Parser\ParserResolver;
@@ -52,6 +53,10 @@ class HttpException extends BaseAction implements EventSubscriberInterface
         }
 
         $exception = $event->getThrowable();
+
+        if ($exception instanceof UnprocessableEntityHttpException && $request->attributes->has('_live_component')) {
+            return;
+        }
 
         if ($exception instanceof NotFoundHttpException) {
             $this->display404($event);
