@@ -101,7 +101,7 @@ final readonly class CheckoutFacade
      */
     public function pay(CheckoutDTO $dto): ?Response
     {
-        $this->validateForOrder();
+        $this->validateForOrder($dto->getCart());
 
         return $this->paymentService->pay(
             $dto->getCart(),
