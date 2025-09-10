@@ -153,8 +153,6 @@ class TheliaKernel extends Kernel
     public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): Response
     {
         if (!$request instanceof TheliaRequest) {
-            $request->attributes->set(TheliaHttpKernel::IGNORE_THELIA_VIEW, true);
-
             $request = TheliaRequest::createFromBase($request);
         }
 

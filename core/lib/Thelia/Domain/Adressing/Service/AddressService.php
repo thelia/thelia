@@ -27,16 +27,14 @@ use Thelia\Domain\Customer\Exception\CustomerException;
 use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Customer;
-use Thelia\Model\CustomerQuery;
 use Thelia\Model\Event\AddressEvent;
 
 readonly class AddressService
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,
-        private Session                  $session,
-    )
-    {
+        private Session $session,
+    ) {
     }
 
     public function mapModelToFormData(Address $address): array
@@ -54,7 +52,7 @@ readonly class AddressService
             'country' => $address->getCountryId(),
             'state' => $address->getStateId(),
             'phone' => $address->getPhone(),
-            'is_default' => (bool)$address->getIsDefault(),
+            'is_default' => (bool) $address->getIsDefault(),
         ];
     }
 
@@ -146,7 +144,7 @@ readonly class AddressService
             $data['zipcode'],
             $data['city'],
             $data['country'],
-            $data['cellphone'] ? (string)$data['cellphone'] : null,
+            $data['cellphone'] ? (string) $data['cellphone'] : null,
             $data['phone'],
             $data['company'] ?? null,
             $data['is_default'] ?? false,
@@ -155,10 +153,9 @@ readonly class AddressService
     }
 
     public function getDeliveryAddress(
-        Request         $request,
+        Request $request,
         SecurityContext $securityContext,
-    ): ?Address
-    {
+    ): ?Address {
         if (null === $request) {
             return null;
         }

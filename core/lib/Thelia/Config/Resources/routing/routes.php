@@ -20,7 +20,7 @@ return static function (RoutingConfigurator $routes): void {
 
     $routes->add('api_admin_login_check', '/api/admin/login');
     $routes->add('index', '/')
-        ->controller([DefaultController::class, 'noAction'])
+        ->controller([DefaultController::class, 'indexAction'])
         ->methods(['GET']);
 
     $routes->import('.', 'module_attribute');

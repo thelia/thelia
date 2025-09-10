@@ -29,7 +29,7 @@ use Thelia\Tools\URL;
  */
 class DefaultController extends BaseFrontController
 {
-    public function noAction(Request $request, ViewRenderer $viewRenderer): void
+    public function noAction(Request $request): void
     {
         if (true === $request->attributes->get(TheliaHttpKernel::IGNORE_THELIA_VIEW, false)) {
             return;
@@ -57,5 +57,12 @@ class DefaultController extends BaseFrontController
                 throw new RedirectException($rewritten->rewrittenUrl, 301);
             }
         }
+    }
+
+    public function indexAction(Request $request, ViewRenderer $viewRenderer): Response
+    {
+        $this->noAction($request);
+
+        return $viewRenderer->render($request);
     }
 }

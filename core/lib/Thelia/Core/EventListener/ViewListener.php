@@ -23,7 +23,6 @@ use Thelia\Core\View\ViewRenderer;
 /**
  * ViewSubscriber Main class subscribing to view http response.
  *
- *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ViewListener

@@ -64,7 +64,7 @@ class CategoryFilter implements TheliaFilterInterface
 
     public function getValue(ActiveRecordInterface $activeRecord, string $locale, $valueSearched = null, ?int $depth = 1): ?array
     {
-        if (\is_string($valueSearched) || is_int($valueSearched)) {
+        if (\is_string($valueSearched) || \is_int($valueSearched)) {
             $valueSearched = explode(',', (string) $valueSearched);
         }
 

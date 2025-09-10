@@ -84,6 +84,7 @@ readonly class PropelCollectionProvider implements ProviderInterface
 
             return new PropelPaginator($results, $resources);
         }
+
         return array_map(
             fn ($propelModel): PropelResourceInterface => $this->apiResourcePropelTransformerService->modelToResource(
                 resourceClass: $resourceClass,

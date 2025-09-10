@@ -13,16 +13,7 @@ declare(strict_types=1);
  */
 
 use App\Kernel;
-use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 
-require dirname(__DIR__).'/vendor/autoload_runtime.php';
+require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
 
-return static function (array $context): Kernel {
-    $thelia = new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
-    $request = TheliaRequest::createFromGlobals();
-    $response = $thelia->handle($request);
-    $response->send();
-    $thelia->terminate($request, $response);
-
-    return $thelia;
-};
+return fn (array $context) => new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);

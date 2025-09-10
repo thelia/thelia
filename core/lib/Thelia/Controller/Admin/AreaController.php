@@ -234,7 +234,7 @@ class AreaController extends AbstractCrudController
                         $this->getObjectLabel($changedObject),
                         $this->getObjectId($changedObject),
                     ),
-                    (string)$this->getObjectId($changedObject),
+                    (string) $this->getObjectId($changedObject),
                 );
             }
 

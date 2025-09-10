@@ -20,8 +20,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Archiver\AbstractArchiver;
 use Thelia\Core\Archiver\ArchiverManager;
-use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
-use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
@@ -138,9 +136,8 @@ class ImportController extends BaseAdminController
     public function configureAction(
         int $id,
         SerializerManager $serializerManager,
-        ArchiverManager $archiverManager
-    ): Response
-    {
+        ArchiverManager $archiverManager,
+    ): Response {
         /** @var Importhandler $importHandler */
         $importHandler = $this->container->get('thelia.import.handler');
 
@@ -190,9 +187,8 @@ class ImportController extends BaseAdminController
     public function importAction(
         int $id,
         SerializerManager $serializerManager,
-        ArchiverManager $archiverManager
-    ): Response|RedirectResponse
-    {
+        ArchiverManager $archiverManager,
+    ): Response|RedirectResponse {
         /** @var Importhandler $importHandler */
         $importHandler = $this->container->get('thelia.import.handler');
 

@@ -39,7 +39,8 @@ class AddressCreateForm extends FirewallForm
     public function __construct(
         protected CountryService $countryService,
         protected CustomerTitleService $customerTitleService,
-    ) {}
+    ) {
+    }
 
     /**
      * in this function you add all the fields you need for your Form.
@@ -60,16 +61,14 @@ class AddressCreateForm extends FirewallForm
      */
     protected function buildForm(): void
     {
-
         $data = $this->formBuilder->getData();
         $customerId = $this->getRequest()->getSession()->getCustomerUser()?->getId();
         $addressCount = $customerId !== null ? AddressQuery::create()->findByCustomerId($customerId)->count() : 0;
-        $labelData = isset($data['label']) ? $data['label'] : Translator::getInstance()->trans('Main address');
+        $labelData = $data['label'] ?? Translator::getInstance()->trans('Main address');
 
         if ($addressCount > 1 && !isset($data['label'])) {
             $labelData = Translator::getInstance()->trans('Address #%', ['%' => $addressCount + 1]);
         }
-
 
         $this->formBuilder
             ->add('label', TextType::class, [
@@ -80,7 +79,7 @@ class AddressCreateForm extends FirewallForm
                 'label_attr' => [
                     'for' => 'address_label',
                 ],
-                'data' => $labelData
+                'data' => $labelData,
             ])
             ->add('title', ChoiceType::class, [
                 'constraints' => [
