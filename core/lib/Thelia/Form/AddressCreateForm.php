@@ -186,7 +186,7 @@ class AddressCreateForm extends FirewallForm
                         $this->verifyState(...),
                     ),
                 ],
-                'choices' => $this->getStatesChoices(),
+                'choices' => $this->getStatesChoices(null),
                 'label' => Translator::getInstance()->trans('State *'),
                 'label_attr' => [
                     'for' => 'state',
@@ -241,9 +241,10 @@ class AddressCreateForm extends FirewallForm
         return $session?->getLang()->getLocale();
     }
 
-    protected function getStatesChoices(): array
+    protected function getStatesChoices(?int $countryId): array
     {
         $states = StateQuery::create()
+            ->filterByCountryId($countryId)
             ->useStateI18nQuery()
             ->filterByLocale($this->getLocale())
             ->withColumn(StateI18nTableMap::COL_TITLE, 'title')

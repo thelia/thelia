@@ -37,6 +37,7 @@ use Thelia\Model\Map\CustomerTableMap;
 class Customer extends BaseCustomer implements UserInterface, SecurityUserInterface, PasswordAuthenticatedUserInterface
 {
     public string $_validationCodeForEmail;
+    public const CODE_LENGTH = 6;
 
     /**
      * @param int    $titleId          customer title id (from customer_title table)
@@ -475,7 +476,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
      */
     private function generateValidationCode(): array
     {
-        $code = str_pad((string) random_int(0, 999999), 6, '0', \STR_PAD_LEFT);
+        $code = str_pad((string) random_int(0, 999999), self::CODE_LENGTH, '0', \STR_PAD_LEFT);
 
         $salt = bin2hex(random_bytes(16));
         $hash = hash('sha256', $code.$salt);
