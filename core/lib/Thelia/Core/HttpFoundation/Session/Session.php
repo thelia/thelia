@@ -250,7 +250,9 @@ class Session extends BaseSession
 
         $dispatcher->dispatch($event, TheliaEvents::CART_CREATE_NEW);
 
-        throw new \LogicException('Unable to get a new empty Cart.');
+        if (null === $event->getCart()) {
+            throw new \LogicException('Unable to get a new empty Cart.');
+        }
     }
 
     protected function isValidCart(Cart $cart): bool

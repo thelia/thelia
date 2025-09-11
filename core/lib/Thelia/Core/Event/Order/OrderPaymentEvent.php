@@ -25,7 +25,7 @@ use Thelia\Model\Order;
  */
 class OrderPaymentEvent extends ActionEvent
 {
-    protected Response $response;
+    protected ?Response $response = null;
 
     public function __construct(protected Order $order)
     {

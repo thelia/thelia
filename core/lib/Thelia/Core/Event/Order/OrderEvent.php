@@ -37,7 +37,7 @@ class OrderEvent extends ActionEvent
     protected ?string $deliveryRef = null;
     protected ?int $cartItemId = null;
     protected ?string $transactionRef = null;
-    protected Response $response;
+    protected ?Response $response = null;
 
     public function __construct(?Order $order)
     {
