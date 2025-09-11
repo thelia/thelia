@@ -12,7 +12,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Domain\Adressing\Service;
+namespace Thelia\Domain\Addressing\Service;
 
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Form\FormInterface;
@@ -22,7 +22,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
-use Thelia\Domain\Adressing\Exception\AddressNotFoundException;
+use Thelia\Domain\Addressing\Exception\AddressNotFoundException;
 use Thelia\Domain\Customer\Exception\CustomerException;
 use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;

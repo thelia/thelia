@@ -14,11 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Controller\Front;
 
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\TheliaHttpKernel;
-use Thelia\Core\View\ViewRenderer;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
 
@@ -57,12 +55,5 @@ class DefaultController extends BaseFrontController
                 throw new RedirectException($rewritten->rewrittenUrl, 301);
             }
         }
-    }
-
-    public function indexAction(Request $request, ViewRenderer $viewRenderer): Response
-    {
-        $this->noAction($request);
-
-        return $viewRenderer->render($request);
     }
 }

@@ -28,7 +28,9 @@
         "symfony/flex": "^2.4",
         "thelia/flexy": "dev-twig",
         "ext-simplexml": "*",
-        "ext-dom": "*"
+        "ext-dom": "*",
+        "twig/html-extra": "^3.21",
+        "thelia/page-module": "dev-twig"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "3.*",

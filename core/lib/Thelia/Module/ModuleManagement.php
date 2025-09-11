@@ -88,10 +88,6 @@ class ModuleManagement
             if ([] !== $errors) {
                 throw new InvalidModuleException($errors);
             }
-
-            if ([] !== $modulesUpdated) {
-                $this->cacheClear();
-            }
         } catch (DirectoryNotFoundException) {
             // No module installed
         }
@@ -129,7 +125,6 @@ class ModuleManagement
         } else {
             $action = 'none';
         }
-
         $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
         $con->beginTransaction();
 
@@ -193,7 +188,7 @@ class ModuleManagement
         return $this->descriptorValidator;
     }
 
-    protected function cacheClear(): void
+    public function cacheClear(): void
     {
         $cacheEvent = new CacheEvent($this->kernelCacheDir);
         $this->eventDispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);

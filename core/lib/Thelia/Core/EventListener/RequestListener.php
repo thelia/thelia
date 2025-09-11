@@ -18,7 +18,6 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\InputBag;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -43,10 +42,11 @@ use Thelia\Model\LangQuery;
  */
 class RequestListener
 {
+    use SessionGuardTrait;
+
     public function __construct(
         private readonly Translator $translator,
         protected EventDispatcherInterface $eventDispatcher,
-        private readonly RequestStack $requestStack,
         private readonly SessionManager $sessionManager,
     ) {
     }
@@ -54,8 +54,13 @@ class RequestListener
     #[AsEventListener(event: KernelEvents::REQUEST, priority: 128)]
     public function registerValidatorTranslator(RequestEvent $event): void
     {
-        $lang = Lang::getDefaultLanguage();
+        /** @var Request $request */
         $request = $event->getRequest();
+        if (!$this->isSessionUsable($request)) {
+            return;
+        }
+
+        $lang = Lang::getDefaultLanguage();
         if (!$request->get('isApiRoute', false) && $request->hasSession(true)) {
             $lang = $request->getSession()->getLang();
             if (null === $lang) {
@@ -83,9 +88,10 @@ class RequestListener
     #[AsEventListener(event: KernelEvents::REQUEST, priority: 128)]
     public function rememberMeLoader(RequestEvent $event): void
     {
+        /** @var Request $request */
         $request = $event->getRequest();
 
-        if (!$request->hasSession() || !$request->getSession()->isStarted()) {
+        if (!$this->isSessionUsable($request)) {
             return;
         }
 
@@ -154,12 +160,13 @@ class RequestListener
     #[AsEventListener(event: KernelEvents::RESPONSE, priority: 128)]
     public function registerPreviousUrl(ResponseEvent $event): void
     {
+        /** @var Request $request */
         $request = $event->getRequest();
+
         if (
-            $request->isXmlHttpRequest()
-            || !$request->hasSession(true)
+            !$this->isSessionUsable($request)
+            || $request->isXmlHttpRequest()
             || !$event->getResponse()->isSuccessful()
-            || !$request->getSession()->isStarted()
         ) {
             return;
         }
@@ -222,9 +229,10 @@ class RequestListener
     #[AsEventListener(event: KernelEvents::REQUEST, priority: 256)]
     public function checkCurrency(RequestEvent $event): void
     {
+        /** @var Request $request */
         $request = $event->getRequest();
 
-        if (!$request->hasSession() || !$request->query->has('currency')) {
+        if (!$this->isSessionUsable($request) || !$request->query->has('currency')) {
             return;
         }
 

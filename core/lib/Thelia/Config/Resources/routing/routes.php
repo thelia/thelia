@@ -19,9 +19,9 @@ return static function (RoutingConfigurator $routes): void {
     $routes->add('api_front_login_check', '/api/front/login');
 
     $routes->add('api_admin_login_check', '/api/admin/login');
+
     $routes->add('index', '/')
-        ->controller([DefaultController::class, 'indexAction'])
-        ->methods(['GET']);
+        ->controller([DefaultController::class, 'noAction']);
 
     $routes->import('.', 'module_attribute');
     $routes->import('.', 'template_attribute');
