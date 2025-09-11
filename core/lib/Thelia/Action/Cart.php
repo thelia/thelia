@@ -105,7 +105,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         try {
             $postage = $this->getPostageByDeliveryModuleId($cart, $dispatcher, $moduleId, $deliveryAddressId);
-            $cart->setOrderPostage($postage);
+            $cart
+                ->setPostage($postage->getAmount() - $postage->getAmountTax())
+                ->setPostageTax($postage->getAmountTax())
+                ->setPostageTaxRuleTitle($postage->getTaxRuleTitle())
+                ->save();
+
         } catch (\Exception $e) {
             // If an exception is thrown here, we just ignore it.
             // The delivery module will not be set on the cart.

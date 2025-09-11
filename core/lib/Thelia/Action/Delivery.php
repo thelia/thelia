@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
+use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
@@ -28,16 +29,23 @@ use Thelia\Module\DeliveryModuleWithStateInterface;
  */
 class Delivery implements EventSubscriberInterface
 {
+    public function __construct(protected EventDispatcherInterface $dispatcher)
+    {
+    }
+
     /**
-     * Get postage from module using the classical module functions.
+     * Get postage from the module using the classical module functions.
+     *
+     * @throws PropelException
+     * @throws \Exception
      */
-    public function getPostage(DeliveryPostageEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    public function getPostage(DeliveryPostageEvent $event): void
     {
         /** @var AbstractDeliveryModule $module */
         $module = $event->getModule();
 
         // dispatch event to target specific module
-        $dispatcher->dispatch(
+        $this->dispatcher->dispatch(
             $event,
             TheliaEvents::getModuleEvent(
                 TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
@@ -49,7 +57,7 @@ class Delivery implements EventSubscriberInterface
             return;
         }
 
-        // Add state param to isValidDelivery only if module handle state
+        // Add state param to isValidDelivery only if the module handles state
         $isValidModule = $module instanceof DeliveryModuleWithStateInterface
             ? $module->isValidDelivery($event->getCountry(), $event->getState())
             : $module->isValidDelivery($event->getCountry());
@@ -58,7 +66,7 @@ class Delivery implements EventSubscriberInterface
             ->setDeliveryMode($module->getDeliveryMode());
 
         if ($event->isValidModule()) {
-            // Add state param to getPostage only if module handle state
+            // Add state param to getPostage only if the module handles state
             $modulePostage = $module instanceof DeliveryModuleWithStateInterface
                 ? $module->getPostage($event->getCountry(), $event->getState())
                 : $module->getPostage($event->getCountry());

@@ -59,22 +59,33 @@ abstract class AbstractDeliveryModuleWithState extends BaseModule implements Del
 
     public function buildOrderPostage(float $untaxedPostage, Country $country, $locale, $taxRuleId = null)
     {
-        $taxRuleQuery = TaxRuleQuery::create();
+        $taxRule = null;
+
         $taxRuleId = ($taxRuleId) ?: ConfigQuery::read('taxrule_id_delivery_module');
 
         if ($taxRuleId) {
-            $taxRuleQuery->filterById($taxRuleId);
+            $taxRule = TaxRuleQuery::create()
+                ->filterById($taxRuleId)
+                ->orderByIsDefault(Criteria::DESC)
+                ->findOne();
         }
 
-        $taxRule = $taxRuleQuery->orderByIsDefault(Criteria::DESC)->findOne();
-
         $orderPostage = new OrderPostage();
-        $taxCalculator = new Calculator();
-        $taxCalculator->loadTaxRuleWithoutProduct($taxRule, $country);
 
-        $orderPostage->setAmount($taxCalculator->getTaxedPrice($untaxedPostage));
-        $orderPostage->setAmountTax($taxCalculator->getTaxAmountFromUntaxedPrice($untaxedPostage));
-        $orderPostage->setTaxRuleTitle($taxRule->setLocale($locale)->getTitle());
+        if ($taxRule) {
+            $taxCalculator = new Calculator();
+            $taxCalculator->loadTaxRuleWithoutProduct($taxRule, $country);
+
+            $orderPostage->setAmount($taxCalculator->getTaxedPrice($untaxedPostage));
+            $orderPostage->setAmountTax($taxCalculator->getTaxAmountFromUntaxedPrice($untaxedPostage));
+            $orderPostage->setTaxRuleTitle($taxRule->setLocale($locale)->getTitle());
+
+            return $orderPostage;
+        }
+
+        $orderPostage->setAmount($untaxedPostage);
+        $orderPostage->setAmountTax(0);
+        $orderPostage->setTaxRuleTitle(null);
 
         return $orderPostage;
     }

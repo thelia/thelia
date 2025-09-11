@@ -33,7 +33,7 @@ use Thelia\Module\BaseModuleInterface;
 class DeliveryPostageEvent extends ActionEvent
 {
     protected bool $validModule = false;
-    protected OrderPostage $postage;
+    protected ?OrderPostage $postage = null;
     protected ?\DateTime $deliveryDate;
     protected ?DeliveryMode $deliveryMode;
     protected array $additionalData = [];
