@@ -100,7 +100,7 @@ class AttributeAvController extends AbstractCrudController
 
     protected function getDeleteEvent(): AttributeAvDeleteEvent
     {
-        return new AttributeAvDeleteEvent($this->getRequest()->get('attributeav_id'));
+        return new AttributeAvDeleteEvent((int) $this->getRequest()->get('attributeav_id'));
     }
 
     protected function eventContainsObject($event): bool

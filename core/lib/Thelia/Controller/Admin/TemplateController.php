@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Propel\Runtime\Event\ActiveRecordEvent;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -182,7 +183,7 @@ class TemplateController extends AbstractCrudController
     /**
      * Process delete failure, which may occurs if template is in use.
      */
-    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent): ?Response
+    protected function performAdditionalDeleteAction(ActionEvent|ActiveRecordEvent|null $deleteEvent): ?Response
     {
         if ($deleteEvent->getProductCount() > 0) {
             $this->getParserContext()->setGeneralError(

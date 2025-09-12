@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Propel\Runtime\Event\ActiveRecordEvent;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -95,10 +96,8 @@ class AttributeController extends AbstractCrudController
 
     /**
      * Process the attributes values (fix it in future version to integrate it in the attribute form as a collection).
-     *
-     * @see \Thelia\Controller\Admin\AbstractCrudController::performAdditionalUpdateAction()
      */
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): null
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent|ActiveRecordEvent|null $updateEvent): null
     {
         $attr_values = $this->getRequest()->get('attribute_values');
 
@@ -127,7 +126,7 @@ class AttributeController extends AbstractCrudController
 
     protected function getDeleteEvent(): AttributeDeleteEvent
     {
-        return new AttributeDeleteEvent($this->getRequest()->get('attribute_id'));
+        return new AttributeDeleteEvent((int) $this->getRequest()->get('attribute_id'));
     }
 
     protected function eventContainsObject($event): bool

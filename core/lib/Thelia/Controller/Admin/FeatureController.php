@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Propel\Runtime\Event\ActiveRecordEvent;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -99,7 +100,7 @@ class FeatureController extends AbstractCrudController
      *
      * @see \Thelia\Controller\Admin\AbstractCrudController::performAdditionalUpdateAction()
      */
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): null
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent|ActiveRecordEvent|null $updateEvent): null
     {
         $attr_values = $this->getRequest()->get('feature_values');
 

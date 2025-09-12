@@ -16,6 +16,7 @@ namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Propel\Runtime\Event\ActiveRecordEvent;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -491,7 +492,7 @@ class ProductController extends AbstractSeoCrudController
         return $this->nullResponse();
     }
 
-    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent): ?Response
+    protected function performAdditionalDeleteAction(ActionEvent|ActiveRecordEvent|null $deleteEvent): ?Response
     {
         return $this->generateRedirectFromRoute(
             'admin.products.default',
@@ -507,10 +508,7 @@ class ProductController extends AbstractSeoCrudController
         );
     }
 
-    /**
-     * @return Response
-     */
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): null
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent|ActiveRecordEvent|null $updateEvent): ?Response
     {
         // Associate the file if it's a virtual product
         // and with only 1 PSE

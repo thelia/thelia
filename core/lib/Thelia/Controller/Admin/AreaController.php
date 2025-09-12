@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Propel\Runtime\Event\ActiveRecordEvent;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -94,7 +95,7 @@ class AreaController extends AbstractCrudController
     /**
      * Creates the creation event with the provided form data.
      */
-    protected function getCreationEvent(array $formData): ActionEvent
+    protected function getCreationEvent(array $formData): ActiveRecordEvent
     {
         $area = new Area();
         $event = new AreaEvent($area);
@@ -105,7 +106,7 @@ class AreaController extends AbstractCrudController
     /**
      * Creates the update event with the provided form data.
      */
-    protected function getUpdateEvent(array $formData): ActionEvent
+    protected function getUpdateEvent(array $formData): ActiveRecordEvent
     {
         $area = $this->findAreaOrFail($formData['area_id']);
         $event = new AreaEvent($area);
@@ -115,7 +116,7 @@ class AreaController extends AbstractCrudController
         return $event;
     }
 
-    private function hydrateEvent(AreaEvent $event, array $formData): AreaEvent
+    private function hydrateEvent(AreaEvent $event, array $formData): ActiveRecordEvent
     {
         $event->getModel()->setName($formData['name']);
 

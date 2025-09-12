@@ -16,6 +16,7 @@ namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Propel\Runtime\Event\ActiveRecordEvent;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -270,7 +271,7 @@ class CategoryController extends AbstractSeoCrudController
         return $this->nullResponse();
     }
 
-    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent): ?Response
+    protected function performAdditionalDeleteAction(ActionEvent|ActiveRecordEvent|null $deleteEvent): ?Response
     {
         // Redirect to parent category list
         $category_id = $deleteEvent->getCategory()->getParent();
@@ -278,7 +279,7 @@ class CategoryController extends AbstractSeoCrudController
         return $this->redirectToListTemplateWithId($category_id);
     }
 
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): ?Response
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent|ActiveRecordEvent|null $updateEvent): ?Response
     {
         $response = null;
 

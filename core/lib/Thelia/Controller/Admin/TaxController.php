@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Propel\Runtime\Event\ActiveRecordEvent;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -183,12 +184,8 @@ class TaxController extends AbstractCrudController
 
     /**
      * Put in this method post object creation processing if required.
-     *
-     * @param ActionEvent $createEvent the create event
-     *
-     * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalCreateAction(ActionEvent $createEvent): ?Response
+    protected function performAdditionalCreateAction(ActionEvent|ActiveRecordEvent|null $createEvent): ?Response
     {
         return $this->generateRedirectFromRoute(
             'admin.configuration.taxes.update',

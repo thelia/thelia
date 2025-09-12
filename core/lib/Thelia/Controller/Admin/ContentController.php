@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Propel\Runtime\Event\ActiveRecordEvent;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -339,7 +340,7 @@ class ContentController extends AbstractSeoCrudController
     /**
      * @return Response|void
      */
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): ?Response
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent|ActiveRecordEvent|null $updateEvent): ?Response
     {
         if ('stay' !== $this->getRequest()->get('save_mode')) {
             return $this->generateRedirectFromRoute(
@@ -353,12 +354,8 @@ class ContentController extends AbstractSeoCrudController
 
     /**
      * Put in this method post object delete processing if required.
-     *
-     * @param ActionEvent $deleteEvent the delete event
-     *
-     * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent): ?Response
+    protected function performAdditionalDeleteAction(ActionEvent|ActiveRecordEvent|null $deleteEvent): ?Response
     {
         return $this->generateRedirectFromRoute(
             'admin.folders.default',

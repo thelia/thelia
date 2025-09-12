@@ -59,9 +59,9 @@ abstract class AbstractCrudController extends BaseAdminController
 
     abstract protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm;
 
-    abstract protected function getCreationEvent(array $formData): ?ActionEvent;
+    abstract protected function getCreationEvent(array $formData): ActionEvent|ActiveRecordEvent|null;
 
-    abstract protected function getUpdateEvent(array $formData): ?ActionEvent;
+    abstract protected function getUpdateEvent(array $formData): ActionEvent|ActiveRecordEvent|null;
 
     abstract protected function getDeleteEvent(): ActiveRecordEvent|ActionEvent|null;
 
@@ -111,17 +111,17 @@ abstract class AbstractCrudController extends BaseAdminController
         throw new \LogicException('Toggle Visibility is not supported for this object');
     }
 
-    protected function performAdditionalCreateAction(ActionEvent $createEvent): ?Response
+    protected function performAdditionalCreateAction(ActionEvent|ActiveRecordEvent|null $createEvent): ?Response
     {
         return null;
     }
 
-    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent $updateEvent): ?Response
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent|ActiveRecordEvent|null $updateEvent): ?Response
     {
         return null;
     }
 
-    protected function performAdditionalDeleteAction(ActionEvent $deleteEvent): ?Response
+    protected function performAdditionalDeleteAction(ActionEvent|ActiveRecordEvent|null $deleteEvent): ?Response
     {
         return null;
     }
@@ -422,7 +422,7 @@ abstract class AbstractCrudController extends BaseAdminController
                     $mode = UpdatePositionEvent::POSITION_ABSOLUTE;
                 }
 
-                 $position = (int) $request->get('position');
+                $position = (int) $request->get('position');
 
                 $event = new UpdatePositionEvent((int) $object->getId(), $mode, $position);
 
