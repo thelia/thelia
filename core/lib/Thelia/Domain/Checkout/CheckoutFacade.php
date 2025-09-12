@@ -18,8 +18,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Thelia\Domain\Cart\Service\CartSelectionService;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
 use Thelia\Domain\Checkout\Service\CheckoutPaymentService;
+use Thelia\Domain\Checkout\Service\CheckoutResetService;
 use Thelia\Domain\Checkout\Service\CheckoutValidationService;
-use Thelia\Domain\Shipping\Service\PostageHandler;
 use Thelia\Model\Cart;
 
 final readonly class CheckoutFacade
@@ -27,8 +27,8 @@ final readonly class CheckoutFacade
     public function __construct(
         private CartSelectionService $cartSelectionService,
         private CheckoutValidationService $validationService,
+        private CheckoutResetService $checkoutResetService,
         private CheckoutPaymentService $paymentService,
-        private PostageHandler $postageHandler,
     ) {
     }
 
@@ -77,16 +77,9 @@ final readonly class CheckoutFacade
     /**
      * Reset checkout selections on the given cart and clear postage.
      */
-    public function resetCheckout(Cart $cart): void
+    public function resetCheckout(): void
     {
-        $cart
-            ->setDeliveryModuleId(null)
-            ->setAddressDeliveryId(null)
-            ->setAddressInvoiceId(null)
-            ->setPaymentModuleId(null)
-            ->save();
-
-        $this->postageHandler->clearCartPostage($cart);
+        $this->checkoutResetService->reset();
     }
 
     /**

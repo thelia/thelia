@@ -108,6 +108,23 @@ final readonly class CartFacade
     }
 
     /**
+     * Reset all delivery data for a given cart.
+     */
+    public function reset(): void
+    {
+        $this->cartRetriever->fromSession()
+            ?->setDeliveryModuleId(null)
+            ?->setAddressDeliveryId(null)
+            ?->setAddressInvoiceId(null)
+            ?->setDeliveryModuleId(null)
+            ?->setPaymentModuleId(null)
+            ?->setPostage(null)
+            ?->setPostageTax(null)
+            ?->setPostageTaxRuleTitle(null)
+            ->save();
+    }
+
+    /**
      * Front helper: get cart from session (can be null).
      */
     public function getCartFromSession(): ?Cart

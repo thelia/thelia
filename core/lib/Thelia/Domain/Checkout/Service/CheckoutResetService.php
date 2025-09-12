@@ -14,26 +14,20 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Checkout\Service;
 
-use Thelia\Domain\Cart\CartService;
+use Thelia\Domain\Cart\CartFacade;
+use Thelia\Domain\Shipping\ShippingFacade;
 
 readonly class CheckoutResetService
 {
-    public function __construct(private CartService $cartService)
-    {
+    public function __construct(
+        private CartFacade $cartFacade,
+        private ShippingFacade $shippingFacade,
+    ) {
     }
 
     public function reset(): void
     {
-        $cart = $this->cartService->getCart();
-
-        $cart
-            ->setDeliveryModuleId(null)
-            ->setAddressDeliveryId(null)
-            ->setAddressInvoiceId(null)
-            ->setDeliveryModuleId(null)
-            ->setPaymentModuleId(null)
-            ->save();
-
-        $this->cartService->clearCartPostage();
+        $this->cartFacade->reset();
+        $this->shippingFacade->clearDeliveryData();
     }
 }
