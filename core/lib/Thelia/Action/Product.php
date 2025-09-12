@@ -632,17 +632,17 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Changes accessry position, selecting absolute ou relative change.
      */
-    public function updateAccessoryPosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): object
+    public function updateAccessoryPosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        return $this->genericUpdatePosition(AccessoryQuery::create(), $event, $dispatcher);
+        $this->genericUpdatePosition(AccessoryQuery::create(), $event, $dispatcher);
     }
 
     /**
      * Changes position, selecting absolute ou relative change.
      */
-    public function updateContentPosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): object
+    public function updateContentPosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        return $this->genericUpdatePosition(ProductAssociatedContentQuery::create(), $event, $dispatcher);
+        $this->genericUpdatePosition(ProductAssociatedContentQuery::create(), $event, $dispatcher);
     }
 
     /**

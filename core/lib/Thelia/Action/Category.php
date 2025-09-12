@@ -166,6 +166,7 @@ class Category extends BaseAction implements EventSubscriberInterface
             $content
                 ->setCategory($event->getCategory())
                 ->setContentId($event->getContentId())
+                ->setPosition(1)
                 ->save();
         }
     }
