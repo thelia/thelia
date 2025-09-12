@@ -1308,9 +1308,9 @@ class ProductController extends AbstractSeoCrudController
 
         if (null !== $product = ProductQuery::create()->findPk($product_id)) {
             if ('to_tax' === $action) {
-                $return_price = $this->computePrice($price, 'without_tax', $product);
-            } elseif ('from_tax' === $action) {
                 $return_price = $this->computePrice($price, 'with_tax', $product);
+            } elseif ('from_tax' === $action) {
+                $return_price = $this->computePrice($price, 'without_tax', $product);
             } else {
                 $return_price = $price;
             }
