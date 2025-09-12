@@ -74,9 +74,9 @@ class ExportController extends BaseAdminController
 
         $eventDispatcher->dispatch(
             new UpdatePositionEvent(
-                $query->get('id'),
+                (int) $query->get('id'),
                 $this->matchPositionMode($query->get('mode')),
-                $query->get('value'),
+                (int) $query->get('value'),
             ),
             TheliaEvents::EXPORT_CHANGE_POSITION,
         );
@@ -99,9 +99,9 @@ class ExportController extends BaseAdminController
 
         $eventDispatcher->dispatch(
             new UpdatePositionEvent(
-                $query->get('id'),
+                (int) $query->get('id'),
                 $this->matchPositionMode($query->get('mode')),
-                $query->get('value'),
+                (int) $query->get('value'),
             ),
             TheliaEvents::EXPORT_CATEGORY_CHANGE_POSITION,
         );

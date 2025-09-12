@@ -116,10 +116,10 @@ class AttributeController extends AbstractCrudController
         return null;
     }
 
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
+    protected function createUpdatePositionEvent(int $positionChangeMode, ?int $positionValue = null): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('attribute_id'),
+            (int) $this->getRequest()->get('attribute_id'),
             $positionChangeMode,
             $positionValue,
         );

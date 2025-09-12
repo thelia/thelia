@@ -73,9 +73,9 @@ class ImportController extends BaseAdminController
 
         $eventDispatcher->dispatch(
             new UpdatePositionEvent(
-                $query->get('id'),
+                (int) $query->get('id'),
                 $this->matchPositionMode($query->get('mode')),
-                $query->get('value'),
+                (int) $query->get('value'),
             ),
             TheliaEvents::IMPORT_CHANGE_POSITION,
         );
@@ -98,9 +98,9 @@ class ImportController extends BaseAdminController
 
         $eventDispatcher->dispatch(
             new UpdatePositionEvent(
-                $query->get('id'),
+                (int) $query->get('id'),
                 $this->matchPositionMode($query->get('mode')),
-                $query->get('value'),
+                (int) $query->get('value'),
             ),
             TheliaEvents::IMPORT_CATEGORY_CHANGE_POSITION,
         );

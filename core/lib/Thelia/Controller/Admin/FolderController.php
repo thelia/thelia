@@ -154,10 +154,10 @@ class FolderController extends AbstractSeoCrudController
     /**
      * @return UpdatePositionEvent|void
      */
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
+    protected function createUpdatePositionEvent(int $positionChangeMode, ?int $positionValue = null): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('folder_id'),
+            (int) $this->getRequest()->get('folder_id'),
             $positionChangeMode,
             $positionValue,
         );

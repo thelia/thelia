@@ -105,10 +105,10 @@ class ModuleController extends AbstractCrudController
         return null;
     }
 
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
+    protected function createUpdatePositionEvent(int $positionChangeMode, ?int $positionValue = null): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('module_id'),
+            (int) $this->getRequest()->get('module_id'),
             $positionChangeMode,
             $positionValue,
         );

@@ -255,10 +255,10 @@ class OrderStatusController extends AbstractCrudController
     /**
      * @return UpdatePositionEvent|void
      */
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
+    protected function createUpdatePositionEvent(int $positionChangeMode, ?int $positionValue = null): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('order_status_id'),
+            (int) $this->getRequest()->get('order_status_id'),
             $positionChangeMode,
             $positionValue,
         );

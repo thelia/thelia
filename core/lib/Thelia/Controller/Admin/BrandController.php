@@ -258,10 +258,10 @@ class BrandController extends AbstractSeoCrudController
         return new BrandToggleVisibilityEvent($this->getExistingObject());
     }
 
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
+    protected function createUpdatePositionEvent(int $positionChangeMode, ?int $positionValue = null): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('brand_id'),
+            (int) $this->getRequest()->get('brand_id'),
             $positionChangeMode,
             $positionValue,
         );

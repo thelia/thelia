@@ -379,7 +379,7 @@ abstract class AbstractCrudController extends BaseAdminController
                 $mode = UpdatePositionEvent::POSITION_ABSOLUTE;
             }
 
-            $position = $request->get('position');
+            $position = (int) $request->get('position');
 
             $event = $this->createUpdatePositionEvent($mode, $position);
 
@@ -424,7 +424,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
                 $position = $request->get('position');
 
-                $event = new UpdatePositionEvent($object->getId(), $mode, $position);
+                $event = new UpdatePositionEvent((int) $object->getId(), $mode, $position);
 
                 $eventDispatcher->dispatch($event, $eventName);
             } catch (\Exception $ex) {

@@ -96,10 +96,10 @@ class CurrencyController extends AbstractCrudController
         return $changeEvent;
     }
 
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
+    protected function createUpdatePositionEvent(int $positionChangeMode, ?int $positionValue = null): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('currency_id'),
+            (int) $this->getRequest()->get('currency_id'),
             $positionChangeMode,
             $positionValue,
         );

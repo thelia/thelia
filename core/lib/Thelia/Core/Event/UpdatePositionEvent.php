@@ -20,26 +20,15 @@ class UpdatePositionEvent extends ActionEvent
     public const POSITION_DOWN = 2;
     public const POSITION_ABSOLUTE = 3;
 
-    protected int $objectId;
-
-    /** @deprecated since 2.3, will be removed in 2.5, because this variable is not used */
-    protected $object;
-
     /**
      * UpdatePositionEvent constructor.
-     *
-     * @param int $objectId
-     * @param int $mode
      */
-    public function __construct(/**
-     * @deprecated since 2.3, will be removed in 2.5, this variable has been replaced by $objectId
-     */
-        protected $object_id,
-        protected $mode,
-        protected $position = null,
-        protected $referrerId = null,
+    public function __construct(
+        protected ?int $objectId,
+        protected int $mode,
+        protected ?int $position = null,
+        protected ?int $referrerId = null,
     ) {
-        $this->objectId = $this->object_id;
     }
 
     public function getMode(): int
@@ -47,9 +36,6 @@ class UpdatePositionEvent extends ActionEvent
         return $this->mode;
     }
 
-    /**
-     * @return $this
-     */
     public function setMode(int $mode): static
     {
         $this->mode = $mode;
@@ -62,9 +48,6 @@ class UpdatePositionEvent extends ActionEvent
         return $this->position;
     }
 
-    /**
-     * @return $this
-     */
     public function setPosition(int $position): static
     {
         $this->position = $position;
@@ -77,12 +60,8 @@ class UpdatePositionEvent extends ActionEvent
         return $this->objectId;
     }
 
-    /**
-     * @return $this
-     */
-    public function setObjectId(int $objectId): static
+    public function setObjectId(?int $objectId = null): static
     {
-        $this->object_id = $objectId;
         $this->objectId = $objectId;
 
         return $this;

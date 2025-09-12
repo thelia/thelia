@@ -385,13 +385,13 @@ class ContentController extends AbstractSeoCrudController
     /**
      * @return UpdatePositionEvent|void
      */
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
+    protected function createUpdatePositionEvent(int $positionChangeMode, ?int $positionValue = null): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('content_id'),
+            (int) $this->getRequest()->get('content_id'),
             $positionChangeMode,
             $positionValue,
-            $this->getRequest()->get('folder_id'),
+            (int) $this->getRequest()->get('folder_id'),
         );
     }
 

@@ -92,7 +92,7 @@ class AttributeAvController extends AbstractCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('attributeav_id'),
+            (int) $this->getRequest()->get('attributeav_id'),
             $positionChangeMode,
             $positionValue,
         );

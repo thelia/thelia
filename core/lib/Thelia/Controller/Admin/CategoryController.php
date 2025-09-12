@@ -104,10 +104,10 @@ class CategoryController extends AbstractSeoCrudController
         return $changeEvent;
     }
 
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
+    protected function createUpdatePositionEvent(int $positionChangeMode, ?int $positionValue = null): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('category_id'),
+            (int) $this->getRequest()->get('category_id'),
             $positionChangeMode,
             $positionValue,
         );

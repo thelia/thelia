@@ -117,10 +117,10 @@ class FeatureController extends AbstractCrudController
         return null;
     }
 
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue): UpdatePositionEvent
+    protected function createUpdatePositionEvent(int $positionChangeMode, ?int $positionValue = null): UpdatePositionEvent
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('feature_id'),
+            (int) $this->getRequest()->get('feature_id'),
             $positionChangeMode,
             $positionValue,
         );
