@@ -17,10 +17,6 @@
         {
             "type": "path",
             "url": "core/"
-        },
-        {
-          "type": "path",
-          "url": "templates/frontOffice/flexy/"
         }
     ],
     "require": {
