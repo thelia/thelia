@@ -148,7 +148,7 @@
             ],
             "templates/frontOffice/{$name}": [
                "type:thelia-flexy"
-            ],
+            ]
         }
     },
     "config": {
