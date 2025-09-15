@@ -238,6 +238,7 @@ class FileController extends BaseAdminController
         $fileUpdateForm = $this->createForm($fileModelInstance->getUpdateFormId());
 
         try {
+            $this->validateForm($fileUpdateForm);
             $fileInstance = $fileUpdateService->updateFile(
                 $eventDispatcher,
                 $imageId,
@@ -283,12 +284,18 @@ class FileController extends BaseAdminController
                 ->addForm($fileUpdateForm)
                 ->setGeneralError($message);
         }
+        $image = $fileManager->getModelInstance('image', $parentType)->getQueryInstance()->findPk($imageId);
 
         return $this->render('image-edit', [
             'imageId' => $imageId,
             'imageType' => $parentType,
-            'redirectUrl' => $fileManager->getModelInstance('image', $parentType)->getQueryInstance()->findPk($imageId)->getRedirectionUrl(),
+            'redirectUrl' => $image->getRedirectionUrl(),
             'formId' => $fileModelInstance->getUpdateFormId(),
+            'breadcrumb' => $image->getBreadcrumb(
+                $this->getRouter($this->getCurrentRouter()),
+                'images',
+                $this->getCurrentEditionLocale(),
+            ),
         ]);
     }
 

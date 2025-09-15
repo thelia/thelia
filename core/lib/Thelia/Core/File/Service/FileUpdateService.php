@@ -15,11 +15,12 @@ declare(strict_types=1);
 namespace Thelia\Core\File\Service;
 
 use Propel\Runtime\Exception\PropelException;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\File\FileManager;
 use Thelia\Core\File\FileModelInterface;
+use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
@@ -28,7 +29,8 @@ readonly class FileUpdateService
 {
     public function __construct(
         private FileManager $fileManager,
-        private Request $request,
+        private RequestStack $requestStack,
+        private LangService $langService,
     ) {
     }
 
@@ -56,14 +58,12 @@ readonly class FileUpdateService
 
         $oldFile = clone $file;
         $data = $fileUpdateForm->getForm()->getData();
-
         $event = new FileCreateOrUpdateEvent(0);
 
         if (\array_key_exists('visible', $data)) {
-            $file->setVisible($data['visible'] ? 1 : 0);
+            $file->setVisible((bool) $data['visible']);
         }
-
-        $file->setLocale($data['locale']);
+        $file->setLocale($data['locale'] ?? $this->langService->getLocale());
 
         if (\array_key_exists('title', $data)) {
             $file->setTitle($data['title']);
@@ -88,7 +88,7 @@ readonly class FileUpdateService
         $event->setModel($file);
         $event->setOldModel($oldFile);
 
-        $files = $this->request->files;
+        $files = $this->requestStack->getMainRequest()->files;
         $fileForm = $files->get($fileUpdateForm::getName());
 
         if (isset($fileForm['file'])) {

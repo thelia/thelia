@@ -52,7 +52,7 @@ use Thelia\Type\TypeCollection;
  * @method int         getFolder()
  * @method int         getContent()
  * @method string      getSource()
- * @method int         getSourceId()
+ * @method ?string     getSourceId()
  * @method string      getQueryNamespace()
  * @method bool        getAllowZoom()
  * @method bool        getIgnoreProcessingErrors()
@@ -184,7 +184,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
      *
      * @return ModelCriteria the propel Query object
      */
-    protected function getSearchQuery(?string &$objectType, ?string &$objectId): ModelCriteria
+    protected function getSearchQuery(?string &$objectType, string|int|null &$objectId): ModelCriteria
     {
         $search = null;
 
@@ -199,7 +199,8 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 throw new \InvalidArgumentException("If 'source' argument is specified, 'id' or 'source_id' argument should be specified");
             }
 
-            $search = $this->createSearchQuery($source, (int) $sourceId);
+            $sourceId = (int) ($sourceId ?? $id);
+            $search = $this->createSearchQuery($source, $sourceId);
 
             $objectType = $source;
             $objectId = $sourceId;

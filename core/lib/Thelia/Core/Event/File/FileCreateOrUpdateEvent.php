@@ -25,9 +25,9 @@ use Thelia\Core\File\FileModelInterface;
  */
 class FileCreateOrUpdateEvent extends ActionEvent
 {
-    protected FileModelInterface $model;
-    protected FileModelInterface $oldModel;
-    protected UploadedFile $uploadedFile;
+    protected ?FileModelInterface $model = null;
+    protected ?FileModelInterface $oldModel = null;
+    protected ?UploadedFile $uploadedFile = null;
     protected ?string $parentName = null;
 
     public function __construct(protected ?int $parentId)
@@ -51,7 +51,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
     /**
      * Get file being saved.
      */
-    public function getModel(): FileModelInterface
+    public function getModel(): ?FileModelInterface
     {
         return $this->model;
     }
@@ -133,7 +133,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
     /**
      * Get old model value.
      */
-    public function getOldModel(): FileModelInterface
+    public function getOldModel(): ?FileModelInterface
     {
         return $this->oldModel;
     }

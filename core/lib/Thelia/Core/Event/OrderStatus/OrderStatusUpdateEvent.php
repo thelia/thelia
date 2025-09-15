@@ -23,8 +23,6 @@ class OrderStatusUpdateEvent extends OrderStatusEvent
 {
     /**
      * OrderStatusUpdateEvent constructor.
-     *
-     * @param int $id
      */
     public function __construct(protected int $id)
     {

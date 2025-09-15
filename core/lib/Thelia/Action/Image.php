@@ -343,9 +343,9 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     protected function applyResize(
         ImagineInterface $imagine,
         ImageInterface $image,
-        int $dest_width,
-        int $dest_height,
-        int $resize_mode,
+        ?int $dest_width,
+        ?int $dest_height,
+        ?int $resize_mode,
         ?ColorInterface $bg_color,
         bool $allow_zoom = false,
     ): ImageInterface {

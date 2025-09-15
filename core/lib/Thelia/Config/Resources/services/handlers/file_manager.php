@@ -14,42 +14,15 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Thelia\Core\File\FileManager;
 use Thelia\Core\File\Service\FileDeleteService;
 use Thelia\Core\File\Service\FilePositionService;
 use Thelia\Core\File\Service\FileProcessorService;
 use Thelia\Core\File\Service\FileUpdateService;
 use Thelia\Core\File\Service\FileVisibilityService;
-use Thelia\Model\BrandDocument;
-use Thelia\Model\BrandImage;
-use Thelia\Model\CategoryDocument;
-use Thelia\Model\CategoryImage;
-use Thelia\Model\ContentDocument;
-use Thelia\Model\ContentImage;
-use Thelia\Model\FolderDocument;
-use Thelia\Model\FolderImage;
-use Thelia\Model\ModuleImage;
-use Thelia\Model\ProductDocument;
-use Thelia\Model\ProductImage;
 
 return static function (ContainerConfigurator $configurator): void {
     $services = $configurator->services();
-    $parameters = $configurator->parameters();
-
-    // Liste des classes de modèles qui supportent la gestion d'images ou de documents
-    $parameters->set('file_model.classes', [
-        'document.product' => ProductDocument::class,
-        'image.product' => ProductImage::class,
-        'document.category' => CategoryDocument::class,
-        'image.category' => CategoryImage::class,
-        'document.content' => ContentDocument::class,
-        'image.content' => ContentImage::class,
-        'document.folder' => FolderDocument::class,
-        'image.folder' => FolderImage::class,
-        'document.brand' => BrandDocument::class,
-        'image.brand' => BrandImage::class,
-        'image.module' => ModuleImage::class,
-    ]);
-
     // Register file services
     $services->set(FileProcessorService::class)
         ->args([
@@ -60,11 +33,6 @@ return static function (ContainerConfigurator $configurator): void {
         ->public();
 
     $services->set(FileUpdateService::class)
-        ->factory([service('request_stack'), 'getMainRequest'])
-        ->args([
-            service('thelia.file_manager'),
-            service('translator'),
-        ])
         ->public();
 
     $services->set(FileDeleteService::class)
@@ -90,6 +58,8 @@ return static function (ContainerConfigurator $configurator): void {
             service('thelia.admin.resources'),
         ])
         ->public();
+
+    $services->set(FileManager::class)->public();
 
     // Create aliases for services
     $services->alias('thelia.file.processor', FileProcessorService::class);
