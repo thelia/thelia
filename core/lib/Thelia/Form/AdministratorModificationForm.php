@@ -69,7 +69,7 @@ class AdministratorModificationForm extends AdministratorCreationForm
 
         $administrator = AdminQuery::create()->findOneByLogin($value);
 
-        if (null !== $administrator && $administrator->getId() !== $data['id']) {
+        if (null !== $administrator && $administrator->getId() !== (int) $data['id']) {
             $context->addViolation($this->translator->trans('This administrator login already exists'));
         }
     }
@@ -80,7 +80,7 @@ class AdministratorModificationForm extends AdministratorCreationForm
 
         $administrator = AdminQuery::create()->findOneByEmail($value);
 
-        if (null !== $administrator && $administrator->getId() !== $data['id']) {
+        if (null !== $administrator && $administrator->getId() !== (int) $data['id']) {
             $context->addViolation($this->translator->trans('An administrator with this email address already exists'));
         }
     }
