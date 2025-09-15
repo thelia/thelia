@@ -231,7 +231,7 @@ class CurrencyController extends AbstractCrudController
         $changeEvent = new CurrencyUpdateEvent((int) $this->getRequest()->get('currency_id', 0));
 
         // Create and dispatch the change event
-        $changeEvent->setIsDefault(true)->setVisible(1);
+        $changeEvent->setIsDefault(1)->setVisible(1);
 
         try {
             $eventDispatcher->dispatch($changeEvent, TheliaEvents::CURRENCY_SET_DEFAULT);

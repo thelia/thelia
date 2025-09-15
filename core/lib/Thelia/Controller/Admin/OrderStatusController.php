@@ -117,7 +117,7 @@ class OrderStatusController extends AbstractCrudController
      */
     protected function getUpdateEvent(array $formData): ActionEvent
     {
-        $orderStatusUpdateEvent = new OrderStatusUpdateEvent($formData['id']);
+        $orderStatusUpdateEvent = new OrderStatusUpdateEvent((int) $formData['id']);
 
         $orderStatusUpdateEvent
             ->setLocale($formData['locale'])

@@ -23,9 +23,9 @@ class CountryUpdateEvent extends CountryCreateEvent
 {
     protected bool $needZipCode;
     protected string $zipCodeFormat;
-    protected string $chapo;
-    protected string $description;
-    protected string $postscriptum;
+    protected ?string $chapo = null;
+    protected ?string $description = null;
+    protected ?string $postscriptum = null;
 
     public function __construct(protected int $country_id)
     {
@@ -38,7 +38,7 @@ class CountryUpdateEvent extends CountryCreateEvent
         return $this;
     }
 
-    public function getChapo(): string
+    public function getChapo(): ?string
     {
         return $this->chapo;
     }
@@ -50,7 +50,7 @@ class CountryUpdateEvent extends CountryCreateEvent
         return $this;
     }
 
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -62,7 +62,7 @@ class CountryUpdateEvent extends CountryCreateEvent
         return $this;
     }
 
-    public function getPostscriptum(): string
+    public function getPostscriptum(): ?string
     {
         return $this->postscriptum;
     }
@@ -82,14 +82,11 @@ class CountryUpdateEvent extends CountryCreateEvent
         return $this->country_id;
     }
 
-    public function isNeedZipCode(): string
+    public function isNeedZipCode(): ?bool
     {
         return $this->needZipCode;
     }
 
-    /**
-     * @return $this
-     */
     public function setNeedZipCode(bool $needZipCode): static
     {
         $this->needZipCode = $needZipCode;
@@ -102,9 +99,6 @@ class CountryUpdateEvent extends CountryCreateEvent
         return $this->zipCodeFormat;
     }
 
-    /**
-     * @return $this
-     */
     public function setZipCodeFormat(string $zipCodeFormat): static
     {
         $this->zipCodeFormat = $zipCodeFormat;

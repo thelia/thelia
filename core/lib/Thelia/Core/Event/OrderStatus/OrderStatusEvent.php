@@ -26,9 +26,9 @@ class OrderStatusEvent extends ActionEvent
 {
     protected string $code;
     protected string $title;
-    protected string $description;
-    protected string $chapo;
-    protected string $postscriptum;
+    protected ?string $description = null;
+    protected ?string $chapo = null;
+    protected ?string $postscriptum = null;
     protected string $color;
     protected string $locale = 'en_US';
     protected OrderStatus $orderStatus;
@@ -111,36 +111,36 @@ class OrderStatusEvent extends ActionEvent
         return $this;
     }
 
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function setDescription(string $description): static
+    public function setDescription(?string $description = null): static
     {
         $this->description = $description;
 
         return $this;
     }
 
-    public function getChapo(): string
+    public function getChapo(): ?string
     {
         return $this->chapo;
     }
 
-    public function setChapo(string $chapo): static
+    public function setChapo(?string $chapo = null): static
     {
         $this->chapo = $chapo;
 
         return $this;
     }
 
-    public function getPostscriptum(): string
+    public function getPostscriptum(): ?string
     {
         return $this->postscriptum;
     }
 
-    public function setPostscriptum(string $postscriptum): static
+    public function setPostscriptum(?string $postscriptum = null): static
     {
         $this->postscriptum = $postscriptum;
 

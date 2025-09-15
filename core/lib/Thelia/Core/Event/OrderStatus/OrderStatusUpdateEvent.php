@@ -26,7 +26,7 @@ class OrderStatusUpdateEvent extends OrderStatusEvent
      *
      * @param int $id
      */
-    public function __construct(protected $id)
+    public function __construct(protected int $id)
     {
     }
 
@@ -35,9 +35,9 @@ class OrderStatusUpdateEvent extends OrderStatusEvent
         return $this->id;
     }
 
-    public function setId(int $id): static
+    public function setId(int|string $id): static
     {
-        $this->id = $id;
+        $this->id = (int) $id;
 
         return $this;
     }
