@@ -103,7 +103,7 @@ class LangController extends BaseAdminController
         ]);
     }
 
-    public function processUpdateAction(EventDispatcherInterface $eventDispatcher, $lang_id): Response|RedirectResponse|null
+    public function processUpdateAction(EventDispatcherInterface $eventDispatcher, int $lang_id): Response|RedirectResponse|null
     {
         if (($response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) instanceof Response) {
             return $response;
@@ -166,7 +166,7 @@ class LangController extends BaseAdminController
             ->setDecimals($form->get('decimals')->getData());
     }
 
-    public function toggleDefaultAction(EventDispatcherInterface $eventDispatcher, $lang_id): Response|JsonResponse|RedirectResponse
+    public function toggleDefaultAction(EventDispatcherInterface $eventDispatcher, int $lang_id): Response|JsonResponse|RedirectResponse
     {
         return $this->toggleLangDispatch(
             $eventDispatcher,
@@ -175,7 +175,7 @@ class LangController extends BaseAdminController
         );
     }
 
-    public function toggleActiveAction(EventDispatcherInterface $eventDispatcher, $lang_id): Response|JsonResponse|RedirectResponse
+    public function toggleActiveAction(EventDispatcherInterface $eventDispatcher, int $lang_id): Response|JsonResponse|RedirectResponse
     {
         return $this->toggleLangDispatch(
             $eventDispatcher,
@@ -184,7 +184,7 @@ class LangController extends BaseAdminController
         );
     }
 
-    public function toggleVisibleAction(EventDispatcherInterface $eventDispatcher, $lang_id): Response|JsonResponse|RedirectResponse
+    public function toggleVisibleAction(EventDispatcherInterface $eventDispatcher, int $lang_id): Response|JsonResponse|RedirectResponse
     {
         return $this->toggleLangDispatch(
             $eventDispatcher,
@@ -267,7 +267,7 @@ class LangController extends BaseAdminController
                 $this->getRequest()->query->get('_token'),
             );
 
-            $deleteEvent = new LangDeleteEvent($this->getRequest()->get('language_id', 0));
+            $deleteEvent = new LangDeleteEvent((int) $this->getRequest()->get('language_id', 0));
 
             $eventDispatcher->dispatch($deleteEvent, TheliaEvents::LANG_DELETE);
 

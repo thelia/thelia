@@ -62,7 +62,7 @@ class BaseAdminController extends BaseController
         return self::CONTROLLER_TYPE;
     }
 
-    protected function adminLogAppend(string $resource, string $action, string $message, ?string $resourceId = null): void
+    protected function adminLogAppend(string $resource, string $action, string $message, ?int $resourceId = null): void
     {
         AdminLog::append(
             $resource,
@@ -71,7 +71,7 @@ class BaseAdminController extends BaseController
             $this->requestStack->getMainRequest(),
             $this->securityContext->getAdminUser(),
             true,
-            (int) $resourceId,
+            $resourceId,
         );
     }
 
@@ -120,7 +120,7 @@ class BaseAdminController extends BaseController
         }
 
         // Log the problem
-        $this->adminLogAppend(implode(',', $resources), implode(',', $accesses), 'User is not granted for resources %s with accesses %s', implode(', ', $resources));
+        $this->adminLogAppend(implode(',', $resources), implode(',', $accesses), 'User is not granted for resources %s with accesses %s');
 
         return $this->errorPage($this->translator->trans("Sorry, you're not allowed to perform this action"), 403);
     }

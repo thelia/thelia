@@ -62,7 +62,7 @@ class AddressController extends AbstractCrudController
             return $response;
         }
 
-        $address_id = $this->getRequest()->request->get('address_id');
+        $address_id = (int) $this->getRequest()->request->get('address_id');
 
         try {
             $address = AddressQuery::create()->findPk($address_id);

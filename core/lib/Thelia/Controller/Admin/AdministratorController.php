@@ -162,10 +162,10 @@ class AdministratorController extends AbstractCrudController
     protected function getObjectId(ActiveRecordInterface $object): int
     {
         if ($object instanceof Admin) {
-            return (string) $object->getId();
+            return $object->getId();
         }
 
-        return (string) $object;
+        return (int) $object;
     }
 
     protected function renderListTemplate(string $currentOrder): Response

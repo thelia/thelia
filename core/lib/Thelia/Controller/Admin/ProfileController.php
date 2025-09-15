@@ -161,7 +161,7 @@ class ProfileController extends AbstractCrudController
         return $profile;
     }
 
-    protected function getObjectLabel(?ActiveRecordInterface $object): string
+    protected function getObjectLabel(?ActiveRecordInterface $object): ?string
     {
         if ($object instanceof Profile) {
             return $object->getTitle();
@@ -173,10 +173,10 @@ class ProfileController extends AbstractCrudController
     protected function getObjectId(ActiveRecordInterface $object): int
     {
         if ($object instanceof Profile) {
-            return (string) $object->getId();
+            return (int) $object->getId();
         }
 
-        return (string) $object;
+        return (int) $object;
     }
 
     protected function getViewArguments(): array

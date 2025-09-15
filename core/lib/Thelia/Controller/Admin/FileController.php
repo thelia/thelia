@@ -256,7 +256,7 @@ class FileController extends BaseAdminController
                     $fileInstance->getTitle(),
                     $fileInstance->getId(),
                 ),
-                (string) $fileInstance->getId(),
+                $fileInstance->getId(),
             );
 
             if ('close' === $this->getRequest()->get('save_mode')) {
@@ -325,7 +325,7 @@ class FileController extends BaseAdminController
                     $fileInstance->getTitle(),
                     $fileInstance->getId(),
                 ),
-                (string) $fileInstance->getId(),
+                $fileInstance->getId(),
             );
 
             if ('close' === $this->getRequest()->get('save_mode')) {

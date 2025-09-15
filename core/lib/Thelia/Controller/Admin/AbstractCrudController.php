@@ -211,7 +211,7 @@ abstract class AbstractCrudController extends BaseAdminController
                         $this->getObjectLabel($createdObject),
                         $this->getObjectId($createdObject),
                     ),
-                    (string) $this->getObjectId($createdObject),
+                    $this->getObjectId($createdObject),
                 );
             }
 
@@ -318,7 +318,7 @@ abstract class AbstractCrudController extends BaseAdminController
                         $this->getObjectLabel($changedObject),
                         $this->getObjectId($changedObject),
                     ),
-                    (string) $this->getObjectId($changedObject),
+                    $this->getObjectId($changedObject),
                 );
             }
 
@@ -492,7 +492,7 @@ abstract class AbstractCrudController extends BaseAdminController
                         $this->getObjectLabel($deletedObject),
                         $this->getObjectId($deletedObject),
                     ),
-                    (string) $this->getObjectId($deletedObject),
+                    $this->getObjectId($deletedObject),
                 );
             }
 
