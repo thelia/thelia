@@ -111,7 +111,7 @@ readonly class ResourceService
 
     private function isTranslatableResult(mixed $result): bool
     {
-        if (!\is_array($result)) {
+        if (!\is_array($result) && !$result instanceof \ArrayIterator) {
             return is_a($result, TranslatableResourceInterface::class);
         }
 

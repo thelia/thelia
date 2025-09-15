@@ -110,7 +110,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 ->setPostageTax($postage->getAmountTax())
                 ->setPostageTaxRuleTitle($postage->getTaxRuleTitle())
                 ->save();
-
         } catch (\Exception $e) {
             // If an exception is thrown here, we just ignore it.
             // The delivery module will not be set on the cart.
