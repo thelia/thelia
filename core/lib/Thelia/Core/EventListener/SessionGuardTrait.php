@@ -14,7 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\EventListener;
 
-use Thelia\Core\HttpFoundation\Request;
+
+use Symfony\Component\HttpFoundation\Request;
 
 trait SessionGuardTrait
 {
