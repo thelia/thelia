@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\Exception\CustomerNotConfirmedException;
 use Thelia\Core\Security\Exception\WrongPasswordException;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Customer\DTO\CustomerRegisterDTO;
 use Thelia\Domain\Customer\Exception\CustomerNotEnabledException;
 use Thelia\Domain\Customer\Service\CustomerAuthenticator;
@@ -35,7 +36,7 @@ readonly class CustomerFacade
         private CustomerRememberMeService $customerRememberMeService,
         private RequestStack $requestStack,
         private CustomerRegistrationService $customerRegistrationService,
-        private CustomerContext $customerContext,
+        private SecurityContext $securityContext,
         private CustomerCodeManager $customerCodeManager,
     ) {
     }
@@ -78,7 +79,7 @@ readonly class CustomerFacade
      */
     public function getCurrentCustomer(): ?Customer
     {
-        return $this->customerContext->getCustomerFromSession();
+        return $this->securityContext->getCustomerUser();
     }
 
     /**
