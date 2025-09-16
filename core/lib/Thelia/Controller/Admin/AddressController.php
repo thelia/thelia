@@ -181,9 +181,10 @@ class AddressController extends AbstractCrudController
 
     protected function getDeleteEvent(): ActionEvent
     {
+        /** @var Address $address */
         $address = $this->getExistingObject();
 
-        return new AddressCreateOrUpdateEvent(
+        $addressCreateOrUpdateEvent = new AddressCreateOrUpdateEvent(
             $address->getLabel(),
             $address->getTitleId(),
             $address->getFirstname(),
@@ -200,6 +201,10 @@ class AddressController extends AbstractCrudController
             false, // is_default is not used for delete
             $address->getStateId(),
         );
+
+        $addressCreateOrUpdateEvent->setAddress($address);
+
+        return $addressCreateOrUpdateEvent;
     }
 
     protected function eventContainsObject(Event $event): bool

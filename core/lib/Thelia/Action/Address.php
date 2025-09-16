@@ -18,6 +18,7 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Customer\Service\CustomerTitleService;
@@ -50,9 +51,9 @@ class Address extends BaseAction implements EventSubscriberInterface
         $this->createOrUpdate($addressModel, $event, $dispatcher);
     }
 
-    public function delete(AddressEvent $event): void
+    public function delete(AddressCreateOrUpdateEvent $event): void
     {
-        $address = $event->getModel();
+        $address = $event->getAddress();
 
         $address->delete();
     }
