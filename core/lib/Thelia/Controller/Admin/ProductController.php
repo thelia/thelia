@@ -374,7 +374,7 @@ class ProductController extends AbstractSeoCrudController
 
     protected function getObjectFromEvent(Event $event): mixed
     {
-        return $event->hasProduct() ? $event->getProductId() : null;
+        return $event->hasProduct() ? $event->getProduct() : null;
     }
 
     protected function getExistingObject(): ?ActiveRecordInterface
