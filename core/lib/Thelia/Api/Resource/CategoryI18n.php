@@ -24,6 +24,7 @@ class CategoryI18n extends I18n
         Category::GROUP_ADMIN_WRITE,
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_FRONT_READ,
     ])]
     protected ?string $title = null;
 
@@ -33,6 +34,7 @@ class CategoryI18n extends I18n
         Category::GROUP_ADMIN_WRITE,
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_FRONT_READ
     ])]
     protected ?string $chapo = null;
 
@@ -42,6 +44,7 @@ class CategoryI18n extends I18n
         Category::GROUP_ADMIN_WRITE,
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_FRONT_READ
     ])]
     protected ?string $description = null;
 
