@@ -292,7 +292,6 @@ abstract class AbstractCrudController extends BaseAdminController
 
             // Create a new event object with the modified fields
             $changeEvent = $this->getUpdateEvent($data);
-
             if (method_exists($changeEvent, 'bindForm')) {
                 $changeEvent->bindForm($form);
             } elseif ($changeEvent instanceof ActiveRecordEvent) {
@@ -341,10 +340,6 @@ abstract class AbstractCrudController extends BaseAdminController
             // Form cannot be validated
             $errorMessage = $this->createStandardFormValidationErrorMessage($ex);
             $errorCode = 500;
-        } catch (\Exception $ex) {
-            // Any other error
-            $errorMessage = $ex->getMessage();
-            $errorCode = 400;
         }
 
         // At this point, the form has errors, and should be redisplayed.

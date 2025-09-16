@@ -72,7 +72,7 @@ class Category extends BaseAction implements EventSubscriberInterface
                 ->setPostscriptum($event->getPostscriptum())
 
                 ->setParent($event->getParent())
-                ->setVisible($event->getVisible())
+                ->setVisible($event->getVisible() ?? 0)
 
                 ->save();
 

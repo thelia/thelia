@@ -209,6 +209,9 @@ final readonly class ShippingFacade
                 $state,
                 true
             );
+            if (null === $resourceDeliveryModule) {
+                continue;
+            }
             $validModules[] = new DeliveryModuleWithOptionDTO(
                 $resourceDeliveryModule,
                 $this->deliveryOptionsProvider->getOptions(
