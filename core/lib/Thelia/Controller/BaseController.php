@@ -237,7 +237,6 @@ abstract class BaseController implements ControllerInterface
             $pdfEvent->setObject($order);
 
             $eventDispatcher->dispatch($pdfEvent, TheliaEvents::GENERATE_PDF);
-
             if ($pdfEvent->hasPdf()) {
                 return $this->pdfResponse($pdfEvent->getPdf(), $order->getRef(), 200, $browser);
             }

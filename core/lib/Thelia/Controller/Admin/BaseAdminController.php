@@ -23,6 +23,7 @@ use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
@@ -161,13 +162,16 @@ class BaseAdminController extends BaseController
         $this->getParserContext()->setGeneralError($error_message);
     }
 
-    protected function getParser(?string $template = null): ParserInterface
+    protected function getParser(?string $template = null, ?TemplateDefinition $templateDefinition = null): ParserInterface
     {
         $path = $this->templateHelper->getActiveAdminTemplate()->getAbsolutePath();
         $parser = $this->parserResolver->getParser($path, $template);
+
+        $templateDefinitionToUse = $templateDefinition;
+        $templateDefinitionToUse = $templateDefinitionToUse ?: $parser->getTemplateDefinition();
         // Define the template that should be used
         $parser->setTemplateDefinition(
-            $parser->getTemplateDefinition() ?: $this->templateHelper->getActiveAdminTemplate(),
+            $templateDefinitionToUse ?: $this->templateHelper->getActiveAdminTemplate(),
             $this->useFallbackTemplate,
         );
 
@@ -256,9 +260,13 @@ class BaseAdminController extends BaseController
         return new Response($response, $status);
     }
 
-    protected function renderRaw(string $templateName, array $args = [], $templateDir = null): string
+    protected function renderRaw(string $templateName, array $args = [], string|TemplateDefinition|null $templateDir = null): string
     {
-        $parser = $this->getParser($templateDir.'/'.$templateName);
+        if ($templateDir instanceof TemplateDefinition) {
+            $parser = $this->getParser($templateDir->getAbsolutePath().DS.$templateName, $templateDir);
+        } else {
+            $parser = $this->getParser($templateDir.DS.$templateName);
+        }
 
         // Add the template standard extension
         $templateName .= '.'.$parser->getFileExtension();

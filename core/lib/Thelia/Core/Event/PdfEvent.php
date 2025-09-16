@@ -34,7 +34,6 @@ class PdfEvent extends ActionEvent
      * @param string $fontName     Default font name
      * @param string $templateName
      * @param string $fileName
-     * @param string $object
      */
     public function __construct(protected $content, protected $orientation = 'P', protected $format = 'A4', protected $lang = 'fr', protected $unicode = true, protected $encoding = 'UTF-8', protected array $marges = [0, 0, 0, 0], protected $fontName = 'freesans', protected $templateName = null, protected $fileName = null, protected $object = null)
     {
@@ -215,7 +214,7 @@ class PdfEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setObject(string $object): static
+    public function setObject(mixed $object): static
     {
         $this->object = $object;
 
