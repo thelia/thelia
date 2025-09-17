@@ -130,7 +130,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
      * This method checks the $obj parameter, and create a 2.3.0-alpha1 compatible return value if $obj is expressed using
      * the 2.2.x form.
      */
-    protected function getArrayFromJson22Compat(array $obj): array
+    protected function getArrayFromJson22Compat(string $obj): array
     {
         $obj = $this->getArrayFromJson($obj);
 
