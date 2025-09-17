@@ -22,8 +22,11 @@ use Thelia\Model\Category;
  */
 class CategoryEvent extends ActionEvent
 {
-    public function __construct(public ?Category $category = null)
+    protected ?Category $category = null;
+
+    public function __construct(?Category $category = null)
     {
+        $this->category = $category;
     }
 
     public function hasCategory(): bool

@@ -34,7 +34,7 @@ return [
     'A descriptive title' => 'Un titre descriptif',
     'A message with name "%name" already exists.' => 'Un message avec le nom "%name" existe déjà.',
     'A name such as Europe or Overseas' => 'Un nom comme Europe ou Outre-Mer',
-    'A product with reference %ref already exists. Please choose another reference.' => 'Un produit portant la référfence %ref existe déja. Merci de choisir une autre référence.',
+    'A product with reference %ref already exists. Please choose another reference.' => 'Un produit portant la référence %ref existe déja. Merci de choisir une autre référence.',
     'A short description, used when a summary or an introduction is required' => 'Une courte description, utilisée lorsqu\'un résumé ou une introduction est requise',
     'A short text, used when an additional or supplemental information is required.' => 'Un texte court, utilisé quand une conclusion ou une information complémentaire est nécessaire.',
     "A user already exists with this email address. Please login or if you've forgotten your password, go to Reset Your Password." => 'Un utilisateur existe déjà avec cette adresse e-mail. Connectez-vous ou demandez une ré-initialisation de votre mot de passe.',

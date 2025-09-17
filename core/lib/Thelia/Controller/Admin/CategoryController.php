@@ -170,7 +170,7 @@ class CategoryController extends AbstractSeoCrudController
     {
         \assert($object instanceof Category);
 
-        return $object->getTitle();
+        return (string) $object->getTitle();
     }
 
     /**
@@ -274,9 +274,9 @@ class CategoryController extends AbstractSeoCrudController
     protected function performAdditionalDeleteAction(ActionEvent|ActiveRecordEvent|null $deleteEvent): ?Response
     {
         // Redirect to parent category list
-        $category_id = $deleteEvent->getCategory()->getParent();
+        $category_id = $deleteEvent->getCategory()?->getParent();
 
-        return $this->redirectToListTemplateWithId($category_id);
+        return $this->redirectToListTemplateWithId($category_id ?? 0);
     }
 
     protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent|ActiveRecordEvent|null $updateEvent): ?Response

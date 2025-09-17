@@ -173,7 +173,7 @@ class ProductController extends AbstractSeoCrudController
             ->setBaseWeight($formData['weight'])
             ->setCurrencyId($formData['currency'])
             ->setTaxRuleId($formData['tax_rule'])
-            ->setBaseQuantity($formData['quantity'])
+            ->setBaseQuantity((int) $formData['quantity'])
             ->setTemplateId($formData['template_id']);
 
         return $createEvent;
