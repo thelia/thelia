@@ -74,7 +74,7 @@ interface CouponInterface
         bool $isAvailableOnSpecialOffers,
         bool $isEnabled,
         int $maxUsage,
-        DateTime $expirationDate,
+        \DateTime $expirationDate,
         ObjectCollection $freeShippingForCountries,
         ObjectCollection $freeShippingForModules,
         bool $perCustomerUsageCount,

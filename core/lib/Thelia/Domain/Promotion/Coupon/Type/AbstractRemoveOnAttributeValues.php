@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Domain\Promotion\Coupon\Type;
 
 use Thelia\Core\Translation\Translator;
-use Thelia\Coupon\Type\DateTime;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Model\AttributeCombination;
 use Thelia\Model\CartItem;
@@ -55,7 +54,7 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
         $isAvailableOnSpecialOffers,
         $isEnabled,
         $maxUsage,
-        DateTime $expirationDate,
+        \DateTime $expirationDate,
         $freeShippingForCountries,
         $freeShippingForModules,
         $perCustomerUsageCount,
@@ -77,10 +76,13 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
             $freeShippingForModules,
             $perCustomerUsageCount,
         );
+        $attributeAvList = $effects[self::ATTRIBUTES_AV_LIST] ?? [];
+        if (!\is_array($attributeAvList)) {
+            $attributeAvList = [$attributeAvList];
+        }
+        $this->attributeAvList = $attributeAvList;
 
-        $this->attributeAvList = $effects[self::ATTRIBUTES_AV_LIST] ?? [];
-
-        $this->attribute = $effects[self::ATTRIBUTE] ?? 0;
+        $this->attribute = (int) ($effects[self::ATTRIBUTE] ?? 0);
 
         $this->setFieldsValue($effects);
 

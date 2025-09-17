@@ -34,7 +34,7 @@ trait AmountCouponTrait
 
     public function setFieldsValue(array $effects): void
     {
-        $this->amount = $effects[$this->getAmountFieldName()];
+        $this->amount = (float) $effects[$this->getAmountFieldName()];
     }
 
     public function getCartItemDiscount(CartItem $cartItem): float

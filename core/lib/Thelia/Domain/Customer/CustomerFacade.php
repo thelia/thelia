@@ -23,7 +23,6 @@ use Thelia\Domain\Customer\DTO\CustomerRegisterDTO;
 use Thelia\Domain\Customer\Exception\CustomerNotEnabledException;
 use Thelia\Domain\Customer\Service\CustomerAuthenticator;
 use Thelia\Domain\Customer\Service\CustomerCodeManager;
-use Thelia\Domain\Customer\Service\CustomerContext;
 use Thelia\Domain\Customer\Service\CustomerRegistrationService;
 use Thelia\Domain\Customer\Service\CustomerRememberMeService;
 use Thelia\Form\CustomerLogin;

@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Promotion\Coupon\Type;
 
-use Thelia\Coupon\Type\DateTime;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Model\CartItem;
 
@@ -51,7 +50,7 @@ abstract class AbstractRemove extends CouponAbstract implements AmountAndPercent
         $isAvailableOnSpecialOffers,
         $isEnabled,
         $maxUsage,
-        DateTime $expirationDate,
+        \DateTime $expirationDate,
         $freeShippingForCountries,
         $freeShippingForModules,
         $perCustomerUsageCount,

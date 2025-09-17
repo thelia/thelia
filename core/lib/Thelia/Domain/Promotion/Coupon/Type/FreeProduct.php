@@ -33,8 +33,8 @@ class FreeProduct extends AbstractRemoveOnProducts
     public const OFFERED_CATEGORY_ID = 'offered_category_id';
 
     protected string $serviceId = 'thelia.coupon.type.free_product';
-    protected int $offeredProductId;
-    protected int $offeredCategoryId;
+    protected ?int $offeredProductId = null;
+    protected ?int $offeredCategoryId = null;
 
     /**
      * This constant is user to mark a free product as in the process of being added to the cart,
@@ -44,8 +44,12 @@ class FreeProduct extends AbstractRemoveOnProducts
 
     public function setFieldsValue(array $effects): void
     {
-        $this->offeredProductId = $effects[self::OFFERED_PRODUCT_ID];
-        $this->offeredCategoryId = $effects[self::OFFERED_CATEGORY_ID];
+        $this->offeredProductId = $effects[self::OFFERED_PRODUCT_ID]
+            ? (int) $effects[self::OFFERED_PRODUCT_ID]
+            : null;
+        $this->offeredCategoryId = $effects[self::OFFERED_CATEGORY_ID]
+            ? (int) $effects[self::OFFERED_CATEGORY_ID]
+            : null;
     }
 
     public function getCartItemDiscount(CartItem $cartItem): float
@@ -181,7 +185,9 @@ class FreeProduct extends AbstractRemoveOnProducts
             $freeProductCartItem = $this->getRelatedCartItem($eligibleProduct);
 
             // We add the free product it only if it not yet in the cart.
-            if (false === $freeProductCartItem && null !== $freeProduct = ProductQuery::create()->findPk($this->offeredProductId)) {
+            if (false === $freeProductCartItem
+                && null !== $this->offeredProductId
+                && null !== $freeProduct = ProductQuery::create()->findPk($this->offeredProductId)) {
                 // Store in the session that the free product is added to the cart,
                 // so that we don't enter the following infinite loop :
                 //

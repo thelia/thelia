@@ -93,8 +93,9 @@ class Coupon extends BaseCoupon
                 ->setPerCustomerUsageCount($perCustomerUsageCount)
                 ->setLocale($locale)
                 ->setTitle($title)
-                ->setShortDescription($shortDescription)
-                ->setDescription($description);
+                ->setIsUsed(0)
+                ->setShortDescription($shortDescription ?? '')
+                ->setDescription($description ?? '');
 
             // If no rule given, set default rule
             if (null === $this->getSerializedConditions()) {

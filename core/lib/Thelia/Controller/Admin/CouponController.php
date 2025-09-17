@@ -518,7 +518,7 @@ class CouponController extends BaseAdminController
             if ('stay' === $this->getRequest()->get('save_mode')) {
                 $response = new RedirectResponse(str_replace(
                     '{id}',
-                    $couponEvent->getCouponModel()->getId(),
+                    (string) $couponEvent->getCouponModel()->getId(),
                     $couponForm->getSuccessUrl(),
                 ));
             } else {
@@ -530,11 +530,6 @@ class CouponController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Invalid data entered
             $message = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
-            // Any other error
-            $message = $this->getTranslator()->trans('Sorry, an error occurred: %err', ['%err' => $ex->getMessage()]);
-
-            $this->logError($action, $message, $ex);
         }
 
         if (false !== $message) {
@@ -698,6 +693,7 @@ class CouponController extends BaseAdminController
 
         /** @var CouponInterface $coupon */
         $coupon = $this->container->get($serviceId);
+
         $couponEvent = new CouponCreateOrUpdateEvent(
             $data['code'],
             $serviceId,

@@ -44,8 +44,8 @@ return static function (ContainerConfigurator $configurator): void {
 
     // Base services
     $services->alias('thelia.facade', BaseFacade::class)->public();
-    $services->alias('thelia.coupon.manager', CouponManager::class);
-    $services->alias('thelia.coupon.factory', CouponFactory::class);
+    $services->alias('thelia.coupon.manager', CouponManager::class)->public();
+    $services->alias('thelia.coupon.factory', CouponFactory::class)->public();
     $services->alias('thelia.condition.factory', ConditionFactory::class)->public();
 
     // Coupon types only aliases for BC (autoconfigured by CouponInterface)

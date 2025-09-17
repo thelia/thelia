@@ -91,7 +91,7 @@ class ModuleController extends AbstractCrudController
         $event = new ModuleEvent();
 
         $event->setLocale($formData['locale']);
-        $event->setId($formData['id']);
+        $event->setId((int) $formData['id']);
         $event->setTitle($formData['title']);
         $event->setChapo($formData['chapo']);
         $event->setDescription($formData['description']);

@@ -237,7 +237,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     public function setEffects(array $effects): void
     {
         // Amount is now optionnal.
-        $this->amount = $effects['amount'] ? (float) $effects['amount'] : .0;
+        $this->amount = isset($effects['amount']) ? (float) $effects['amount'] : .0;
 
         $this->effects = $effects;
     }

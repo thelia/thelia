@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Domain\Promotion\Coupon\Type;
 
 use Thelia\Core\Translation\Translator;
-use Thelia\Coupon\Type\DateTime;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Model\CartItem;
 use Thelia\Model\Category;
@@ -53,7 +52,7 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
         $isAvailableOnSpecialOffers,
         $isEnabled,
         $maxUsage,
-        DateTime $expirationDate,
+        \DateTime $expirationDate,
         $freeShippingForCountries,
         $freeShippingForModules,
         $perCustomerUsageCount,
@@ -75,12 +74,12 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
             $freeShippingForModules,
             $perCustomerUsageCount,
         );
-
-        $this->category_list = $effects[self::CATEGORIES_LIST] ?? [];
-
-        if (!\is_array($this->category_list)) {
-            $this->category_list = [$this->category_list];
+        $categoryList = $effects[self::CATEGORIES_LIST] ?? [];
+        if (!\is_array($categoryList)) {
+            $categoryList = [$categoryList];
         }
+
+        $this->category_list = $categoryList;
 
         $this->setFieldsValue($effects);
 

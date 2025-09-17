@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -42,6 +44,13 @@ class ModuleModificationForm extends BaseForm
                     'id' => 'module_update_id',
                 ],
             ]);
+        $this->formBuilder->get('id')->addEventListener(
+            FormEvents::SUBMIT,
+            function (FormEvent $event): void {
+                $value = $event->getData();
+                $event->setData($value === null || $value === '' ? null : (int) $value);
+            }
+        );
     }
 
     /**

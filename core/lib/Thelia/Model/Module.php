@@ -16,6 +16,7 @@ namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Core\File\FileModelParentInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Model\Base\Module as BaseModule;
 use Thelia\Model\Tools\PositionManagementTrait;
@@ -24,7 +25,7 @@ use Thelia\Module\DeliveryModuleInterface;
 use Thelia\Module\DeliveryModuleWithStateInterface;
 use Thelia\Module\PaymentModuleInterface;
 
-class Module extends BaseModule
+class Module extends BaseModule implements FileModelParentInterface
 {
     use PositionManagementTrait;
 
@@ -351,5 +352,10 @@ class Module extends BaseModule
         return is_dir(THELIA_LOCAL_MODULE_DIR.$this->getBaseDir())
             ? THELIA_LOCAL_MODULE_DIR
             : THELIA_MODULE_DIR;
+    }
+
+    public function getTitle()
+    {
+        return $this->getCode();
     }
 }

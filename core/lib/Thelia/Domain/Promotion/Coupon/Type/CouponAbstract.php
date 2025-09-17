@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Promotion\Coupon\Type;
 
+use Propel\Runtime\Collection\ObjectCollection;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionEvaluator;
@@ -58,8 +59,8 @@ abstract class CouponAbstract implements CouponInterface
     protected string $shortDescription;
     protected string $description;
     protected bool $isEnabled = false;
-    protected DateTime $startDate;
-    protected DateTime $expirationDate;
+    protected \DateTime $startDate;
+    protected \DateTime $expirationDate;
     protected bool $isCumulative = false;
     protected bool $isRemovingPostage = false;
     protected int $maxUsage = -1;
@@ -104,15 +105,15 @@ abstract class CouponAbstract implements CouponInterface
         $isAvailableOnSpecialOffers,
         $isEnabled,
         $maxUsage,
-        DateTime $expirationDate,
+        \DateTime $expirationDate,
         $freeShippingForCountries,
         $freeShippingForModules,
         $perCustomerUsageCount,
     ): static {
         $this->code = $code;
-        $this->title = $title;
-        $this->shortDescription = $shortDescription;
-        $this->description = $description;
+        $this->title = $title ?? '';
+        $this->shortDescription = $shortDescription ?? '';
+        $this->description = $description ?? '';
 
         $this->isCumulative = $isCumulative;
         $this->isRemovingPostage = $isRemovingPostage;
@@ -125,10 +126,16 @@ abstract class CouponAbstract implements CouponInterface
 
         $this->effects = $effects;
         // Amount is now optional.
-        $this->amount = $effects[self::AMOUNT_FIELD_NAME] ?? 0;
+        $this->amount = isset($effects[self::AMOUNT_FIELD_NAME])
+            ? (float) $effects[self::AMOUNT_FIELD_NAME]
+            : .0;
 
-        $this->freeShippingForCountries = $freeShippingForCountries;
-        $this->freeShippingForModules = $freeShippingForModules;
+        $this->freeShippingForCountries = $freeShippingForCountries instanceof ObjectCollection
+            ? $freeShippingForCountries->toArray()
+            : $freeShippingForCountries;
+        $this->freeShippingForModules = $freeShippingForModules instanceof ObjectCollection
+            ? $freeShippingForModules->toArray()
+            : $freeShippingForModules;
         $this->perCustomerUsageCount = $perCustomerUsageCount;
 
         return $this;
@@ -335,7 +342,9 @@ abstract class CouponAbstract implements CouponInterface
         if (isset($couponSpecificData[$fieldName])) {
             return $this->checkCouponFieldValue(
                 $fieldName,
-                $couponSpecificData[$fieldName],
+                \is_array($couponSpecificData[$fieldName])
+                    ? $couponSpecificData[$fieldName][0]
+                    : $couponSpecificData[$fieldName]
             );
         }
 
