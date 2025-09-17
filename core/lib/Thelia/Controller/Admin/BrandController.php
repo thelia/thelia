@@ -140,7 +140,7 @@ class BrandController extends AbstractSeoCrudController
      */
     protected function getDeleteEvent(): BrandDeleteEvent
     {
-        return new BrandDeleteEvent($this->getRequest()->get('brand_id'));
+        return new BrandDeleteEvent((int) $this->getRequest()->get('brand_id'));
     }
 
     /**
