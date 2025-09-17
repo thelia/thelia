@@ -80,14 +80,14 @@ class ProductUpdateEvent extends ProductCreateEvent
     /**
      * @return $this
      */
-    public function setBrandId(int $brand_id): static
+    public function setBrandId(?int $brand_id): static
     {
         $this->brand_id = $brand_id;
 
         return $this;
     }
 
-    public function getBrandId(): int
+    public function getBrandId(): ?int
     {
         return $this->brand_id;
     }

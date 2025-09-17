@@ -54,15 +54,15 @@ class SaleUpdateEvent extends SaleCreateEvent
 
     public function getSaleId(): int
     {
-        return $this->saleId;
+        return (int) $this->saleId;
     }
 
     /**
      * @return SaleUpdateEvent $this
      */
-    public function setChapo(string $chapo): static
+    public function setChapo(?string $chapo): static
     {
-        $this->chapo = $chapo;
+        $this->chapo = $chapo ?? '';
 
         return $this;
     }
@@ -75,9 +75,9 @@ class SaleUpdateEvent extends SaleCreateEvent
     /**
      * @return SaleUpdateEvent $this
      */
-    public function setDescription(string $description): static
+    public function setDescription(?string $description): static
     {
-        $this->description = $description;
+        $this->description = $description ?? '';
 
         return $this;
     }
@@ -90,9 +90,9 @@ class SaleUpdateEvent extends SaleCreateEvent
     /**
      * @return SaleUpdateEvent $this
      */
-    public function setPostscriptum(string $postscriptum): static
+    public function setPostscriptum(?string $postscriptum): static
     {
-        $this->postscriptum = $postscriptum;
+        $this->postscriptum = $postscriptum ?? '';
 
         return $this;
     }

@@ -40,6 +40,6 @@ class SaleDeleteEvent extends SaleEvent
 
     public function getSaleId(): int
     {
-        return $this->saleId;
+        return (int) $this->saleId;
     }
 }

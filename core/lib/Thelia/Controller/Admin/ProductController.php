@@ -190,8 +190,8 @@ class ProductController extends AbstractSeoCrudController
             ->setChapo($formData['chapo'])
             ->setDescription($formData['description'])
             ->setPostscriptum($formData['postscriptum'])
-            ->setVisible($formData['visible'])
-            ->setVirtual($formData['virtual'])
+            ->setVisible($formData['visible'] ?? false)
+            ->setVirtual($formData['virtual'] ?? false)
             ->setDefaultCategory($formData['default_category'])
             ->setBrandId($formData['brand_id'])
             ->setVirtualDocumentId($formData['virtual_document_id']);
@@ -1641,7 +1641,7 @@ class ProductController extends AbstractSeoCrudController
         ]);
 
         $images = $imageLoop
-            ->exec($imagePagination);
+            ->exec(null);
 
         $imageAssoc = ProductSaleElementsProductImageQuery::create()
             ->filterByProductSaleElementsId($pse->getId())

@@ -81,6 +81,9 @@ class SaleController extends AbstractCrudController
      */
     protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
+        if (!$object instanceof Sale) {
+            throw new \InvalidArgumentException(\sprintf('The object must be an instance of %s', Sale::class));
+        }
         // Find all categories of the selected products
         $saleProducts = $object->getSaleProductList();
         $categories = [];
@@ -96,7 +99,7 @@ class SaleController extends AbstractCrudController
 
         // Transform the selected attributes list (product_id => array of attributes av id) into
         // product_id => comma separated list of attributes av id, to math the collection type (text)
-        $saleProductsAttributesAvs = $sale->getSaleProductsAttributeList();
+        $saleProductsAttributesAvs = $object->getSaleProductsAttributeList();
 
         $product_attributes = [];
 
@@ -106,19 +109,19 @@ class SaleController extends AbstractCrudController
 
         // Prepare the data that will hydrate the form
         $data = [
-            'id' => $sale->getId(),
-            'locale' => $sale->getLocale(),
-            'title' => $sale->getTitle(),
-            'label' => $sale->getSaleLabel(),
-            'chapo' => $sale->getChapo(),
-            'description' => $sale->getDescription(),
-            'postscriptum' => $sale->getPostscriptum(),
-            'active' => $sale->getActive(),
-            'display_initial_price' => $sale->getDisplayInitialPrice(),
-            'start_date' => $sale->getStartDate($dateFormat),
-            'end_date' => $sale->getEndDate($dateFormat),
-            'price_offset_type' => $sale->getPriceOffsetType(),
-            'price_offset' => $sale->getPriceOffsets(),
+            'id' => $object->getId(),
+            'locale' => $object->getLocale(),
+            'title' => $object->getTitle(),
+            'label' => $object->getSaleLabel(),
+            'chapo' => $object->getChapo(),
+            'description' => $object->getDescription(),
+            'postscriptum' => $object->getPostscriptum(),
+            'active' => $object->getActive(),
+            'display_initial_price' => $object->getDisplayInitialPrice(),
+            'start_date' => $object->getStartDate($dateFormat),
+            'end_date' => $object->getEndDate($dateFormat),
+            'price_offset_type' => $object->getPriceOffsetType(),
+            'price_offset' => $object->getPriceOffsets(),
             'categories' => $categories,
             'products' => $products,
             'product_attributes' => $product_attributes,
@@ -171,9 +174,9 @@ class SaleController extends AbstractCrudController
             ->setLocale($formData['locale'])
             ->setTitle($formData['title'])
             ->setSaleLabel($formData['label'])
-            ->setChapo($formData['chapo'])
-            ->setDescription($formData['description'])
-            ->setPostscriptum($formData['postscriptum']);
+            ->setChapo($formData['chapo'] ?? '')
+            ->setDescription($formData['description'] ?? '')
+            ->setPostscriptum($formData['postscriptum'] ?? '');
 
         return $saleUpdateEvent;
     }

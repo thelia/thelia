@@ -415,11 +415,11 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             ->setOnsale($originalProductPSE->getPromo())
             ->setIsnew($originalProductPSE->getNewness())
             ->setEanCode($originalProductPSE->getEanCode())
-            ->setTaxRuleId($event->getOriginalProduct()->getTaxRuleId())
+            ->setTaxRuleId((int) $event->getOriginalProduct()->getTaxRuleId())
 
-            ->setPrice($originalProductPSEPrice->getPrice())
-            ->setSalePrice($originalProductPSEPrice->getPromoPrice())
-            ->setCurrencyId($originalProductPSEPrice->getCurrencyId());
+            ->setPrice((float) $originalProductPSEPrice->getPrice())
+            ->setSalePrice((float) $originalProductPSEPrice->getPromoPrice())
+            ->setCurrencyId((int) $originalProductPSEPrice->getCurrencyId());
 
         $this->eventDispatcher->dispatch($clonedProductUpdatePSEEvent, TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT);
     }

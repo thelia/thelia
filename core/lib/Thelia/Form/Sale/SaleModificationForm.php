@@ -217,8 +217,11 @@ class SaleModificationForm extends SaleCreationForm
     /**
      * Validate a date entered with the current edition Language date format.
      */
-    public function checkDate(string $value, ExecutionContextInterface $context): void
+    public function checkDate(?string $value, ExecutionContextInterface $context): void
     {
+        if (null === $value) {
+            return;
+        }
         $format = self::PHP_DATE_FORMAT;
 
         if (!empty($value) && false === \DateTime::createFromFormat($format, $value)) {

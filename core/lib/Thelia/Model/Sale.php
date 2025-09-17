@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Model;
 
+use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Model\Base\Sale as BaseSale;
 
 class Sale extends BaseSale
@@ -61,11 +62,14 @@ class Sale extends BaseSale
     /**
      * Return the products included in this sale.
      *
-     * @return array an array of Products
+     * @return SaleProduct[]
      */
-    public function getSaleProductList(): array
+    public function getSaleProductList(): ObjectCollection
     {
-        return SaleProductQuery::create()->filterBySaleId($this->getId())->groupByProductId()->find();
+        return SaleProductQuery::create()
+            ->filterBySaleId($this->getId())
+            ->groupByProductId()
+            ->find();
     }
 
     /**

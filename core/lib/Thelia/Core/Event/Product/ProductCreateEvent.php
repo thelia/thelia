@@ -82,16 +82,16 @@ class ProductCreateEvent extends ProductEvent
         return $this->visible;
     }
 
-    public function setVisible(bool|int $visible): static
+    public function setVisible(bool|int|null $visible): static
     {
         $this->visible = (bool) $visible;
 
         return $this;
     }
 
-    public function setVirtual(?bool $virtual): static
+    public function setVirtual(bool|int|null $virtual): static
     {
-        $this->virtual = $virtual;
+        $this->virtual = (bool) $virtual;
 
         return $this;
     }
