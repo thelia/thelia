@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Propel\Runtime\Event\ActiveRecordEvent;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -89,7 +90,7 @@ class CustomerController extends AbstractCrudController
         return $event;
     }
 
-    protected function getDeleteEvent(): ActionEvent
+    protected function getDeleteEvent(): ActiveRecordEvent
     {
         return new CustomerEvent($this->getExistingObject());
     }
