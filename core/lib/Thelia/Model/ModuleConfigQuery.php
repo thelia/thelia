@@ -35,7 +35,7 @@ class ModuleConfigQuery extends BaseModuleConfigQuery
      *
      * @return string the variable value
      */
-    public function getConfigValue(int $moduleId, string $variableName, ?string $defaultValue = null, $valueLocale = null): string
+    public function getConfigValue(int $moduleId, string $variableName, ?string $defaultValue = null, $valueLocale = null): ?string
     {
         $value = null;
 
