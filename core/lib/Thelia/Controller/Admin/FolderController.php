@@ -122,7 +122,7 @@ class FolderController extends AbstractSeoCrudController
      */
     protected function getUpdateEvent(array $formData): ActionEvent
     {
-        $updateEvent = new FolderUpdateEvent($formData['id']);
+        $updateEvent = new FolderUpdateEvent((int) $formData['id']);
 
         $updateEvent
             ->setLocale($formData['locale'])
@@ -141,7 +141,7 @@ class FolderController extends AbstractSeoCrudController
      */
     protected function getDeleteEvent(): FolderDeleteEvent
     {
-        return new FolderDeleteEvent($this->getRequest()->get('folder_id'));
+        return new FolderDeleteEvent((int) $this->getRequest()->get('folder_id'));
     }
 
     /**
