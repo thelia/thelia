@@ -136,4 +136,7 @@ INSERT INTO `message` (`name`, `secured`, `text_layout_file_name`, `text_templat
 UPDATE `tax` SET `type` = 'Thelia\\Domain\\Taxation\\TaxEngine\\TaxType\\PricePercentTaxType'
              WHERE `type` = 'Thelia\\TaxEngine\\TaxType\\PricePercentTaxType';
 
+ALTER TABLE config
+    MODIFY COLUMN `value` TEXT NULL;
+
 SET FOREIGN_KEY_CHECKS = 1;
