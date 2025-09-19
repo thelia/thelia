@@ -28,22 +28,4 @@ return static function (RoutingConfigurator $routes): void {
     $routes->import('.', 'template_attribute');
     $routes->import('.', 'module_annotation');
     $routes->import('.', 'module_xml');
-
-    if ('prod' === $routes->env()) {
-        $routes->add('api_doc', '/api/docs')
-            ->controller([RedirectController::class, 'urlRedirectAction'])
-            ->defaults([
-                'path' => '/',
-                'permanent' => false,
-                'code' => 404,
-            ]);
-
-        $routes->add('swagger_ui', '/docs')
-            ->controller([RedirectController::class, 'urlRedirectAction'])
-            ->defaults([
-                'path' => '/',
-                'permanent' => false,
-                'code' => 404,
-            ]);
-    }
 };
