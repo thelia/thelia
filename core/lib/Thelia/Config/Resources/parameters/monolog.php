@@ -20,18 +20,22 @@ return static function (ContainerConfigurator $configurator): void {
 
         'handlers' => [
             'main' => [
+                'type' => 'fingers_crossed',
+                'action_level' => 'error',
+                'handler' => 'main_stream',
+                'excluded_http_codes' => [404, 405],
+            ],
+            'main_stream' => [
                 'type' => 'stream',
                 'path' => '%kernel.logs_dir%/%kernel.environment%.log',
                 'level' => 'debug',
                 'channels' => ['!deprecation'],
             ],
-
             'console' => [
                 'type' => 'console',
                 'process_psr_3_messages' => false,
                 'channels' => ['!event', '!doctrine', '!deprecation'],
             ],
-
             'deprecations_rotating' => [
                 'type' => 'rotating_file',
                 'path' => '%kernel.logs_dir%/deprecations-%kernel.environment%.log',
