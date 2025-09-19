@@ -68,6 +68,13 @@ readonly class ApiResourcePropelTransformerService
             $langs = LangQuery::create()->filterByActive(1)->find();
         }
 
+        // Init internal recursion-control context
+        $context['__visited'] = $context['__visited'] ?? [];
+        $context['__path'] = $context['__path'] ?? [];
+        $context['__depth'] = $context['__depth'] ?? 0;
+        $context['enable_max_depth'] = $context['enable_max_depth'] ?? true;
+        $context['max_depth'] = $context['max_depth'] ?? 10;
+
         $baseModel ??= $propelModel;
 
         $modelToResourceEvent = new ModelToResourceEvent($baseModel, $parentModel);
@@ -78,6 +85,18 @@ readonly class ApiResourcePropelTransformerService
         $apiResource = new $resourceClass();
         $reflector = new \ReflectionClass($resourceClass);
 
+        $visitKey = $this->makeVisitKey($resourceClass, $propelModel, $context);
+        $alreadyVisited = isset($context['__visited'][$visitKey]);
+        $shouldDescend = $withRelation && !$alreadyVisited;
+
+        if ($context['enable_max_depth'] && $context['__depth'] >= $context['max_depth']) {
+            $shouldDescend = false;
+        }
+
+        $context['__visited'][$visitKey] = true;
+        $context['__path'][] = $resourceClass;
+        $context['__depth']++;
+
         $this->processPropertiesRessource(
             apiResource: $apiResource,
             reflector: $reflector,
@@ -86,7 +105,7 @@ readonly class ApiResourcePropelTransformerService
             parentModel: $parentModel,
             baseModel: $baseModel,
             context: $context,
-            withRelation: $withRelation,
+            withRelation: $shouldDescend,
             withAddon: $withAddon,
             langs: $langs,
         );
@@ -778,5 +797,25 @@ readonly class ApiResourcePropelTransformerService
         $propertyGroups = $arguments[$groupKey] ?? $arguments[0][$groupKey] ?? $arguments[0] ?? [];
 
         return !empty(array_intersect($propertyGroups, $context['groups']));
+    }
+
+    /**
+     * @throws \JsonException
+     */
+    private function makeVisitKey(string $resourceClass, ActiveRecordInterface $model, array $context): string
+    {
+        if (method_exists($model, 'getId')) {
+            $id = $model->getId();
+        } elseif (method_exists($model, 'getPrimaryKey')) {
+            $pk = $model->getPrimaryKey();
+            $id = is_array($pk) ? json_encode($pk) : (string) $pk;
+        } else {
+            $id = 'obj#'.spl_object_id($model);
+        }
+
+        $groups = $context['groups'] ?? [];
+        $groupsHash = md5(is_array($groups) ? json_encode($groups, JSON_THROW_ON_ERROR) : (string) $groups);
+
+        return $resourceClass.'#'.$id.'@'.$groupsHash;
     }
 }
