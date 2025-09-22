@@ -37,7 +37,7 @@ abstract class FirewallForm extends BaseForm
     // 1 hour
     public const DEFAULT_ATTEMPTS = 6;
 
-    public function isFirewallOk($env)
+    public function isFirewallOk($env): bool
     {
         if ('prod' === $env && $this->isFirewallActive()) {
             /**
@@ -77,31 +77,27 @@ abstract class FirewallForm extends BaseForm
     }
 
     /**
-     * @return int
-     *
-     * The time (in hours) to wait if the attempts have been exceeded
+     * The time (in hours) to wait if the attempts have been exceeded.
      */
     public function getConfigTime(): int
     {
-        return ConfigQuery::read('form_firewall_time_to_wait', static::DEFAULT_TIME_TO_WAIT);
+        return (int) ConfigQuery::read('form_firewall_time_to_wait', static::DEFAULT_TIME_TO_WAIT);
     }
 
     /**
-     * @return int
-     *
-     * The number of allowed attempts
+     * The number of allowed attempts.
      */
     public function getConfigAttempts(): int
     {
-        return ConfigQuery::read('form_firewall_attempts', static::DEFAULT_ATTEMPTS);
+        return (int) ConfigQuery::read('form_firewall_attempts', static::DEFAULT_ATTEMPTS);
     }
 
-    public function isFirewallActive()
+    public function isFirewallActive(): bool
     {
-        return ConfigQuery::read('form_firewall_active', true);
+        return (bool) ConfigQuery::read('form_firewall_active', true);
     }
 
-    public function getWaitingTime()
+    public function getWaitingTime(): string
     {
         $translator = Translator::getInstance();
         $minutes = $this->getConfigTime();
