@@ -41,7 +41,7 @@ class Tax extends BaseAction implements EventSubscriberInterface
         $tax
 
             ->setRequirements($event->getRequirements())
-            ->setType($event->getType())
+            ->setType(TaxModel::unescapeTypeName($event->getType()))
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
             ->setDescription($event->getDescription());
@@ -57,7 +57,7 @@ class Tax extends BaseAction implements EventSubscriberInterface
             $tax
 
                 ->setRequirements($event->getRequirements())
-                ->setType($event->getType())
+                ->setType(TaxModel::unescapeTypeName($event->getType()))
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setDescription($event->getDescription());
