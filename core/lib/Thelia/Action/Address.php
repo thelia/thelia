@@ -50,9 +50,10 @@ class Address extends BaseAction implements EventSubscriberInterface
         $this->createOrUpdate($addressModel, $event, $dispatcher);
     }
 
-    public function delete(AddressCreateOrUpdateEvent $event): void
+    public function delete(AddressEvent $event): void
     {
-        $address = $event->getAddress();
+        /** @var AddressEvent $address */
+        $address = $event->getModel();
 
         $address->delete();
     }

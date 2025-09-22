@@ -139,4 +139,30 @@ UPDATE `tax` SET `type` = 'Thelia\\Domain\\Taxation\\TaxEngine\\TaxType\\PricePe
 ALTER TABLE config
     MODIFY COLUMN `value` TEXT NULL;
 
+
+ALTER TABLE `cart` DROP FOREIGN KEY `fk_cart_address_delivery_id`;
+ALTER TABLE `cart` DROP FOREIGN KEY `fk_cart_address_invoice_id`;
+ALTER TABLE `cart` DROP FOREIGN KEY `fk_cart_payment_module_id`;
+ALTER TABLE `cart` DROP FOREIGN KEY `fk_cart_delivery_module_id`;
+
+ALTER TABLE `cart`
+    ADD CONSTRAINT `fk_cart_address_delivery_id`
+        FOREIGN KEY (`address_delivery_id`) REFERENCES `address` (`id`)
+            ON DELETE SET NULL ON UPDATE RESTRICT;
+
+ALTER TABLE `cart`
+    ADD CONSTRAINT `fk_cart_address_invoice_id`
+        FOREIGN KEY (`address_invoice_id`) REFERENCES `address` (`id`)
+            ON DELETE SET NULL ON UPDATE RESTRICT;
+
+ALTER TABLE `cart`
+    ADD CONSTRAINT `fk_cart_payment_module_id`
+        FOREIGN KEY (`payment_module_id`) REFERENCES `module` (`id`)
+            ON DELETE SET NULL;
+
+ALTER TABLE `cart`
+    ADD CONSTRAINT `fk_cart_delivery_module_id`
+        FOREIGN KEY (`delivery_module_id`) REFERENCES `module` (`id`)
+            ON DELETE SET NULL;
+
 SET FOREIGN_KEY_CHECKS = 1;

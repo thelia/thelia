@@ -1103,16 +1103,16 @@
     <foreign-key foreignTable="customer" name="fk_cart_customer_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="customer_id" />
     </foreign-key>
-    <foreign-key foreignTable="address" name="fk_cart_address_delivery_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+    <foreign-key foreignTable="address" name="fk_cart_address_delivery_id" onDelete="SET NULL">
       <reference foreign="id" local="address_delivery_id" />
     </foreign-key>
-    <foreign-key foreignTable="address" name="fk_cart_address_invoice_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+    <foreign-key foreignTable="address" name="fk_cart_address_invoice_id" onDelete="SET NULL">
       <reference foreign="id" local="address_invoice_id" />
     </foreign-key>
-    <foreign-key foreignTable="module" name="fk_cart_payment_module_id" onDelete="CASCADE">
+    <foreign-key foreignTable="module" name="fk_cart_payment_module_id" onDelete="SET NULL">
       <reference foreign="id" local="payment_module_id" />
     </foreign-key>
-    <foreign-key foreignTable="module" name="fk_cart_delivery_module_id" onDelete="CASCADE">
+    <foreign-key foreignTable="module" name="fk_cart_delivery_module_id" onDelete="SET NULL">
       <reference foreign="id" local="delivery_module_id" />
     </foreign-key>
     <foreign-key foreignTable="currency" name="fk_cart_currency_id" onDelete="CASCADE" onUpdate="RESTRICT">

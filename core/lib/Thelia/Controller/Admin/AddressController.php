@@ -179,32 +179,12 @@ class AddressController extends AbstractCrudController
         );
     }
 
-    protected function getDeleteEvent(): ActionEvent
+    protected function getDeleteEvent(): ActiveRecordEvent
     {
         /** @var Address $address */
         $address = $this->getExistingObject();
 
-        $addressCreateOrUpdateEvent = new AddressCreateOrUpdateEvent(
-            $address->getLabel(),
-            $address->getTitleId(),
-            $address->getFirstname(),
-            $address->getLastname(),
-            $address->getAddress1(),
-            $address->getAddress2(),
-            $address->getAddress3(),
-            $address->getZipcode(),
-            $address->getCity(),
-            $address->getCountryId(),
-            $address->getCellphone(),
-            $address->getPhone(),
-            $address->getCompany(),
-            false, // is_default is not used for delete
-            $address->getStateId(),
-        );
-
-        $addressCreateOrUpdateEvent->setAddress($address);
-
-        return $addressCreateOrUpdateEvent;
+        return new AddressEvent($address);
     }
 
     protected function eventContainsObject(Event $event): bool
