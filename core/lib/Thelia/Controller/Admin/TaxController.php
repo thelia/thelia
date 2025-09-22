@@ -61,7 +61,7 @@ class TaxController extends AbstractCrudController
         $event->setLocale($formData['locale']);
         $event->setTitle($formData['title']);
         $event->setDescription($formData['description']);
-        $event->setType(Tax::unescapeTypeName($formData['type']));
+        $event->setType($formData['type']);
         $event->setRequirements($this->getRequirements($formData['type'], $formData));
 
         return $event;
@@ -75,7 +75,7 @@ class TaxController extends AbstractCrudController
         $event->setId($formData['id']);
         $event->setTitle($formData['title']);
         $event->setDescription($formData['description']);
-        $event->setType(Tax::unescapeTypeName($formData['type']));
+        $event->setType($formData['type']);
         $event->setRequirements($this->getRequirements($formData['type'], $formData));
 
         return $event;
