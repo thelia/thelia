@@ -24,6 +24,7 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Install\CheckPermission;
 use Thelia\Core\Install\Database;
+use Thelia\Domain\Module\Composer\ComposerHelper;
 use Thelia\Tools\TokenProvider;
 
 /**
@@ -74,7 +75,36 @@ class Install extends ContainerAwareCommand
                 InputOption::VALUE_OPTIONAL,
                 'database port',
                 '3306',
-            );
+            )
+            ->addOption(
+                'frontoffice_theme',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'frontoffice theme',
+                'flexy',
+            )
+            ->addOption(
+                'backoffice_theme',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'backoffice theme',
+                'default',
+            )
+            ->addOption(
+                'pdf_theme',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'pdf theme',
+                'default',
+            )
+            ->addOption(
+                'email_theme',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'email theme',
+                'default',
+            )
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -129,6 +159,8 @@ class Install extends ContainerAwareCommand
             '<info>Config file created with success. Your thelia is installed</info>',
             '',
         ]);
+
+        $this->handleThemesBundle($input, $output);
 
         return Command::SUCCESS;
     }
@@ -319,5 +351,95 @@ class Install extends ContainerAwareCommand
         });
 
         return $helper->ask($input, $output, $question);
+    }
+
+    private function handleThemesBundle(InputInterface $input, OutputInterface $output): void
+    {
+        $themes = [
+            'frontOffice' => (string) $input->getOption('frontoffice_theme'),
+            'backOffice' => (string) $input->getOption('backoffice_theme'),
+            'pdf' => (string) $input->getOption('pdf_theme'),
+            'email' => (string) $input->getOption('email_theme'),
+        ];
+
+        foreach ($themes as $type => $name) {
+            if ('' !== $name) {
+                $this->maybeRemoveBundleForTheme($type, $name);
+            }
+        }
+    }
+
+    private function maybeRemoveBundleForTheme(string $type, string $themeName): void
+    {
+        $pathsToCheck = [];
+
+        $vendorPath = THELIA_VENDOR_ROOT.$themeName;
+        if (is_dir($vendorPath)) {
+            $pathsToCheck[] = $vendorPath;
+        }
+
+        $templatePath = THELIA_TEMPLATE_DIR.$type.DS.$themeName;
+        if (is_dir($templatePath)) {
+            $pathsToCheck[] = $templatePath;
+        }
+
+        if ([] === $pathsToCheck) {
+            return;
+        }
+
+        $helper = new ComposerHelper();
+        $seen = [];
+
+        foreach ($pathsToCheck as $path) {
+            $bundleFqcn = $helper->findFirstClassBundle($path);
+
+            if (null === $bundleFqcn) {
+                continue;
+            }
+
+            if (isset($seen[$bundleFqcn])) {
+                continue;
+            }
+
+            $this->removeBundleFromSymfonyBundles($bundleFqcn);
+            $seen[$bundleFqcn] = true;
+        }
+    }
+
+    private function removeBundleFromSymfonyBundles(string $bundleFqcn): void
+    {
+        $bundlesPath = THELIA_ROOT.'config'.DS.'bundles.php';
+
+        if (!file_exists($bundlesPath)) {
+            return;
+        }
+
+        $bundles = require $bundlesPath;
+
+        if (isset($bundles[$bundleFqcn])) {
+            unset($bundles[$bundleFqcn]);
+            $this->dumpBundlesPhp($bundles, $bundlesPath);
+        }
+    }
+
+    private function dumpBundlesPhp(array $bundles, string $bundlesPath): void
+    {
+        ksort($bundles);
+
+        $lines = ["<?php\n", "return [\n"];
+
+        foreach ($bundles as $fqcn => $envs) {
+            $envParts = [];
+
+            foreach ($envs as $env => $enabled) {
+                $envParts[] = \sprintf("'%s' => ", $env).($enabled ? 'true' : 'false');
+            }
+
+            $lines[] = \sprintf('    %s::class => [', $fqcn).implode(', ', $envParts)."],\n";
+        }
+
+        $lines[] = "];\n";
+
+        file_put_contents($bundlesPath, implode('', $lines));
     }
 }

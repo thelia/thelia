@@ -106,7 +106,6 @@
                 "vendor/thelia/modules"
             ],
             "App\\": "src/",
-            "FlexyBundle\\": "templates/frontOffice/flexy/src/",
             "Thelia\\": "core/lib/Thelia"
         },
         "files": [

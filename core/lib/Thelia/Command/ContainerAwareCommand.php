@@ -35,7 +35,7 @@ use Thelia\Tools\URL;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Gilles Bourgeat <gbourgeat@openstudio.fr>
  */
-abstract class ContainerAwareCommand extends Command implements ContainerAwareInterface
+abstract class ContainerAwareCommand extends Command
 {
     private ?ContainerInterface $container = null;
 
