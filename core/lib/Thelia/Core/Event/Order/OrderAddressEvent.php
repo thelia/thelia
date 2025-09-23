@@ -56,11 +56,11 @@ class OrderAddressEvent extends ActionEvent
          */
         protected $address1,
         /**
-         * @var string address line 2
+         * @var ?string address line 2
          */
         protected $address2,
         /**
-         * @var string address line 3
+         * @var ?string address line 3
          */
         protected $address3,
         /**
@@ -72,7 +72,7 @@ class OrderAddressEvent extends ActionEvent
          */
         protected $city,
         /**
-         * @var int country id
+         * @var mixed country id
          */
         protected $country,
         /**
@@ -99,12 +99,12 @@ class OrderAddressEvent extends ActionEvent
         return $this->address1;
     }
 
-    public function getAddress2(): string
+    public function getAddress2(): ?string
     {
         return $this->address2;
     }
 
-    public function getAddress3(): string
+    public function getAddress3(): ?string
     {
         return $this->address3;
     }
@@ -119,7 +119,7 @@ class OrderAddressEvent extends ActionEvent
         return $this->company;
     }
 
-    public function getCountry(): int
+    public function getCountry(): mixed
     {
         return $this->country;
     }

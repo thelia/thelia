@@ -96,7 +96,7 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
                     ->set('TITLE', $orderCoupon->getTitle())
                     ->set('SHORT_DESCRIPTION', $orderCoupon->getShortDescription())
                     ->set('DESCRIPTION', $orderCoupon->getDescription())
-                    ->set('EXPIRATION_DATE', $orderCoupon->getExpirationDate($order->getLangId()))
+                    ->set('EXPIRATION_DATE', $orderCoupon->getExpirationDate($order->getLang()->getDateFormat()))
                     ->set('IS_CUMULATIVE', $orderCoupon->getIsCumulative())
                     ->set('IS_REMOVING_POSTAGE', $orderCoupon->getIsRemovingPostage())
                     ->set('IS_AVAILABLE_ON_SPECIAL_OFFERS', $orderCoupon->getIsAvailableOnSpecialOffers())
