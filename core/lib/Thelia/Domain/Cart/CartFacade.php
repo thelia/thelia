@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Cart;
 
+use Propel\Runtime\Collection\Collection;
 use Thelia\Domain\Cart\DTO\CartItemAddDTO;
 use Thelia\Domain\Cart\DTO\CartItemDeleteDTO;
 use Thelia\Domain\Cart\DTO\CartItemUpdateQuantityDTO;
@@ -110,18 +111,21 @@ final readonly class CartFacade
     /**
      * Reset all delivery data for a given cart.
      */
-    public function reset(): void
+    public function reset(bool $resetCartItems = false): void
     {
-        $this->cartRetriever->fromSession()
-            ?->setDeliveryModuleId(null)
-            ?->setAddressDeliveryId(null)
-            ?->setAddressInvoiceId(null)
-            ?->setDeliveryModuleId(null)
-            ?->setPaymentModuleId(null)
-            ?->setPostage(null)
-            ?->setPostageTax(null)
-            ?->setPostageTaxRuleTitle(null)
-            ->save();
+        $cart = $this->cartRetriever->fromSession();
+        $cart->setDeliveryModuleId(null)
+            ->setAddressDeliveryId(null)
+            ->setAddressInvoiceId(null)
+            ->setDeliveryModuleId(null)
+            ->setPaymentModuleId(null)
+            ->setPostage(null)
+            ->setPostageTax(null)
+            ->setPostageTaxRuleTitle(null);
+        if ($resetCartItems) {
+            $cart->setCartItems(new Collection());
+        }
+        $cart->save();
     }
 
     /**
