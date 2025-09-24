@@ -172,7 +172,7 @@ class CustomerController extends AbstractCrudController
             $data['address2'],
             $data['address3'],
             $data['phone'],
-            $data['cellphone'] ?? null,
+            isset($data['cellphone']) ? (string) $data['cellphone'] : null,
             $data['zipcode'],
             $data['city'],
             $data['country'],
