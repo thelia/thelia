@@ -144,7 +144,7 @@ readonly class AddressService
             $data['zipcode'],
             $data['city'],
             $data['country'],
-            $data['cellphone'] ? (string) $data['cellphone'] : null,
+            isset($data['cellphone']) ? (string) $data['cellphone'] : null,
             $data['phone'],
             $data['company'] ?? null,
             $data['is_default'] ?? false,
