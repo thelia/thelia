@@ -184,7 +184,7 @@ class CustomerController extends AbstractCrudController
             $data['discount'] ? (float) $data['discount'] : null,
             $data['company'] ?? null,
             null,
-            $data['state'],
+            isset($data['state']) ? (int) $data['state'] : null,
         );
     }
 
