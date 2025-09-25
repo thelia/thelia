@@ -354,8 +354,8 @@ class Module extends BaseModule implements FileModelParentInterface
             : THELIA_MODULE_DIR;
     }
 
-    public function getTitle()
+    public function getTitle(): ?string
     {
-        return $this->getCode();
+        return $this->getCurrentTranslation()->getTitle();
     }
 }

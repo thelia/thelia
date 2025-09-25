@@ -121,6 +121,9 @@ class ModuleController extends AbstractCrudController
 
     protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
+        if (!$object instanceof Module) {
+            throw new \InvalidArgumentException('Object must be an instance of Module');
+        }
         $object->setLocale($this->getCurrentEditionLocale());
         $data = [
             'id' => $object->getId(),
