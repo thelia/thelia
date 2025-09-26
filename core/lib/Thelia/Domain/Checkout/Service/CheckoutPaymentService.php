@@ -45,7 +45,9 @@ readonly class CheckoutPaymentService
             ->setDeliveryModuleId($deliveryModuleId)
             ->setPostage((float) $cart->getPostage() + (float) $cart->getPostageTax())
             ->setPostageTax($cart->getPostageTax())
-            ->setPostageTaxRuleTitle($cart->getPostageTaxRuleTitle());
+            ->setPostageTaxRuleTitle($cart->getPostageTaxRuleTitle())
+            ->setCustomerId($cart->getCustomerId())
+            ->setCartId($cart->getId());
 
         $orderEvent = new OrderEvent($newOrder);
 

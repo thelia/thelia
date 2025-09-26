@@ -38,6 +38,7 @@ use Thelia\Mailer\MailerFactory;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Attribute;
 use Thelia\Model\AttributeAv;
+use Thelia\Model\Base\CartQuery;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency as CurrencyModel;
@@ -310,8 +311,8 @@ class Order extends BaseAction implements EventSubscriberInterface
                 ->setQuantity($cartItem->getQuantity())
                 ->setPrice($cartItem->getPrice())
                 ->setPromoPrice($cartItem->getPromoPrice())
-                ->setWasNew($pse->getNewness())
-                ->setWasInPromo($cartItem->getPromo())
+                ->setWasNew($pse->getNewness() ?? 0)
+                ->setWasInPromo($cartItem->getPromo() ?? 0)
                 ->setWeight($pse->getWeight())
                 ->setTaxRuleTitle($taxRuleI18n->getTitle())
                 ->setTaxRuleDescription($taxRuleI18n->getDescription())
@@ -389,15 +390,18 @@ class Order extends BaseAction implements EventSubscriberInterface
         $session = $this->getSession();
 
         $order = $event->getOrder();
+        if (!$order instanceof OrderModel) {
+            throw new TheliaProcessException('Order is not defined');
+        }
         ModuleQuery::create()->findPk($order->getPaymentModuleId());
 
         $placedOrder = $this->createOrder(
             $dispatcher,
             $event->getOrder(),
-            $session->getCurrency(),
-            $session->getLang(),
-            $session->getSessionCart($dispatcher),
-            $this->securityContext->getCustomerUser(),
+            $session?->getCurrency() ?? CurrencyModel::getDefaultCurrency(),
+            $session?->getLang() ?? LangModel::getDefaultLanguage(),
+            $session?->getSessionCart($dispatcher) ?? CartQuery::create()->findPk($order->getCartId()),
+            $session ? $this->securityContext->getCustomerUser() : $order->getCustomer(),
         );
 
         $dispatcher->dispatch(new OrderEvent($placedOrder), TheliaEvents::ORDER_BEFORE_PAYMENT);
@@ -444,10 +448,10 @@ class Order extends BaseAction implements EventSubscriberInterface
     {
         $this->mailer->sendEmailToCustomer(
             'order_confirmation',
-            $event->getOrder()->getCustomer(),
+            $event->getOrder()?->getCustomer(),
             [
-                'order_id' => $event->getOrder()->getId(),
-                'order_ref' => $event->getOrder()->getRef(),
+                'order_id' => $event->getOrder()?->getId(),
+                'order_ref' => $event->getOrder()?->getRef(),
             ],
         );
     }
@@ -696,11 +700,11 @@ class Order extends BaseAction implements EventSubscriberInterface
      *
      * @return Session
      */
-    protected function getSession(): SessionInterface
+    protected function getSession(): ?SessionInterface
     {
         /** @var Request $request */
         $request = $this->requestStack->getMainRequest();
 
-        return $request->getSession();
+        return $request?->getSession();
     }
 }

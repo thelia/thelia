@@ -95,3 +95,5 @@ if (!defined('THELIA_SETUP_DIRECTORY')) {
 if (!defined('THELIA_SETUP_WIZARD_DIRECTORY')) {
     define('THELIA_SETUP_WIZARD_DIRECTORY', THELIA_ROOT.'public'.DS.'install'.DS);
 }
+
+require_once __DIR__.DS.'/../vendor/autoload_runtime.php';

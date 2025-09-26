@@ -44,7 +44,7 @@ class Order extends BaseOrder
      */
     public function setDisableVersioning(bool $disableVersioning)
     {
-        $this->disableVersioning = (bool) $disableVersioning;
+        $this->disableVersioning = $disableVersioning;
 
         return $this;
     }

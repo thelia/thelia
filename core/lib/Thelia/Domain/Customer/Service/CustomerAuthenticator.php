@@ -20,6 +20,7 @@ use Thelia\Core\Event\DefaultActionEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Customer\Exception\CustomerNotEnabledException;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 
 readonly class CustomerAuthenticator
@@ -35,7 +36,7 @@ readonly class CustomerAuthenticator
      */
     public function processLogin(Customer $customer): void
     {
-        if (!$customer->getEnable()) {
+        if (ConfigQuery::isCustomerEmailConfirmationEnable() && !$customer->getEnable()) {
             throw new CustomerNotEnabledException(Translator::getInstance()->trans('Customer account is disabled'));
         }
 
