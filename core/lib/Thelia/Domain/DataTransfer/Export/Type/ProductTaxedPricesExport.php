@@ -107,8 +107,8 @@ class ProductTaxedPricesExport extends JsonFileAbstractExport
 
             $this->calculator->loadTaxRuleWithoutCountry($taxRule, $product);
 
-            $data['product_price_price'] = $this->calculator->getTaxedPrice($data['product_price_price']);
-            $data['product_price_promo_price'] = $this->calculator->getTaxedPrice($data['product_price_promo_price']);
+            $data['product_price_price'] = $this->calculator->getTaxedPrice((float) $data['product_price_price']);
+            $data['product_price_promo_price'] = $this->calculator->getTaxedPrice((float) $data['product_price_promo_price']);
         }
 
         return $data;
