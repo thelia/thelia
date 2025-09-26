@@ -357,6 +357,7 @@ class TheliaKernel extends Kernel
         $this->loadService($container);
 
         $this->loadAutoConfigureInterfaces($container);
+        $this->loadUtilsXmlConfiguration($container);
         $this->loadModulesConfiguration($container);
 
         $container->set('thelia.propel.schema.locator', $this->propelSchemaLocator);
@@ -442,6 +443,25 @@ class TheliaKernel extends Kernel
         $fileLocator = new FileLocator(__DIR__.'/../Config/Resources');
         $phpLoader = new PhpFileLoader($container, $fileLocator);
         $phpLoader->load('services.php');
+    }
+
+    private function loadUtilsXmlConfiguration(ContainerBuilder $container): void
+    {
+        if (\defined('THELIA_INSTALL_MODE')) {
+            return;
+        }
+        $fileLocator = new FileLocator(__DIR__.'/../Config/Resources');
+
+        $loader = new XmlFileLoader($container, $fileLocator);
+        $finder = Finder::create()
+            ->name('*.xml')
+            ->depth(0)
+            ->in(__DIR__.'/../Config/Resources');
+
+        /** @var \SplFileInfo $file */
+        foreach ($finder as $file) {
+            $loader->load($file->getBaseName());
+        }
     }
 
     /**

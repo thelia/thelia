@@ -28,7 +28,7 @@
     </export_categories>
 
     <exports>
-        <export id="thelia.export.mailing" category_id="thelia.export.customer" class="Thelia\ImportExport\Export\Type\MailingExport">
+        <export id="thelia.export.mailing" category_id="thelia.export.customer" class="Thelia\Domain\DataTransfer\Export\Type\MailingExport">
             <export_descriptive locale="fr_FR">
                 <title>Mailing</title>
                 <description>Exporter le nom, prénom et adresse mail des abonnés à la newsletter</description>
@@ -39,7 +39,7 @@
             </export_descriptive>
         </export>
 
-        <export id="thelia.export.complete" category_id="thelia.export.customer" class="Thelia\ImportExport\Export\Type\CustomerExport">
+        <export id="thelia.export.complete" category_id="thelia.export.customer" class="Thelia\Domain\DataTransfer\Export\Type\CustomerExport">
             <export_descriptive locale="fr_FR">
                 <title>Clients</title>
                 <description>Exporter toutes les informations à propos de vos clients</description>
@@ -50,7 +50,7 @@
             </export_descriptive>
         </export>
 
-        <export id="thelia.export.prices" class="Thelia\ImportExport\Export\Type\ProductPricesExport" category_id="thelia.export.products">
+        <export id="thelia.export.prices" class="Thelia\Domain\DataTransfer\Export\Type\ProductPricesExport" category_id="thelia.export.products">
             <export_descriptive locale="fr_FR">
                 <title>Prix des produits Hors-Taxes</title>
                 <description>Exporter le prix hors taxes de vos produits</description>
@@ -61,7 +61,7 @@
             </export_descriptive>
         </export>
 
-        <export id="thelia.export.taxed_prices" class="Thelia\ImportExport\Export\Type\ProductTaxedPricesExport" category_id="thelia.export.products">
+        <export id="thelia.export.taxed_prices" class="Thelia\Domain\DataTransfer\Export\Type\ProductTaxedPricesExport" category_id="thelia.export.products">
             <export_descriptive locale="fr_FR">
                 <title>Prix des produits TTC</title>
                 <description>Exporter le prix TTC de vos produits</description>
@@ -72,7 +72,7 @@
             </export_descriptive>
         </export>
 
-        <export id="thelia.export.product_seo" class="Thelia\ImportExport\Export\Type\ProductSEOExport" category_id="thelia.export.products">
+        <export id="thelia.export.product_seo" class="Thelia\Domain\DataTransfer\Export\Type\ProductSEOExport" category_id="thelia.export.products">
             <export_descriptive locale="en_US">
                 <title>Product SEO information</title>
                 <description>
@@ -88,7 +88,7 @@
             </export_descriptive>
         </export>
 
-        <export id="thelia.export.content" class="Thelia\ImportExport\Export\Type\ContentExport" category_id="thelia.export.content">
+        <export id="thelia.export.content" class="Thelia\Domain\DataTransfer\Export\Type\ContentExport" category_id="thelia.export.content">
             <export_descriptive locale="en_US">
                 <title>Contents and folder</title>
                 <description>
@@ -103,7 +103,7 @@
             </export_descriptive>
         </export>
 
-        <export id="thelia.export.orders" class="Thelia\ImportExport\Export\Type\OrderExport" category_id="thelia.export.orders">
+        <export id="thelia.export.orders" class="Thelia\Domain\DataTransfer\Export\Type\OrderExport" category_id="thelia.export.orders">
             <export_descriptive locale="en_US">
                 <title>Full orders</title>
                 <description>
@@ -118,7 +118,7 @@
             </export_descriptive>
         </export>
 
-        <export id="thelia.export.product_i18n" class="Thelia\ImportExport\Export\Type\ProductI18nExport" category_id="thelia.export.products">
+        <export id="thelia.export.product_i18n" class="Thelia\Domain\DataTransfer\Export\Type\ProductI18nExport" category_id="thelia.export.products">
             <export_descriptive locale="en_US">
                 <title>Product I18n information</title>
                 <description>

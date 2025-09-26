@@ -15,7 +15,7 @@
     </import_categories>
 
     <imports>
-        <import id="thelia.import.stock" class="Thelia\ImportExport\Import\Type\ProductStockImport" category_id="thelia.import.products">
+        <import id="thelia.import.stock" class="Thelia\Domain\DataTransfer\Import\Type\ProductStockImport" category_id="thelia.import.products">
             <import_descriptive locale="fr_FR">
                 <title>Importer votre stock</title>
                 <description>
@@ -43,7 +43,7 @@
             </import_descriptive>
         </import>
 
-        <import id="thelia.import.price" class="Thelia\ImportExport\Import\Type\ProductPricesImport" category_id="thelia.import.products">
+        <import id="thelia.import.price" class="Thelia\Domain\DataTransfer\Import\Type\ProductPricesImport" category_id="thelia.import.products">
             <import_descriptive locale="fr_FR">
                 <title>Importer vos prix Hors-Taxes</title>
                 <description>

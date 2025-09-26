@@ -250,7 +250,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses multiple definitions.
      */
-    protected function parseHooks(\SimpleXMLElement $xml, string $file, string $type): void
+    protected function parseHooks(\SimpleXMLElement $xml, string $file, ?string $type): void
     {
         if (false === $hooks = $xml->xpath('//config:hooks/config:hook')) {
             return;
@@ -261,7 +261,7 @@ class XmlFileLoader extends FileLoader
         }
     }
 
-    protected function parseHook(string $id, $hook, string $file, $type): void
+    protected function parseHook(string $id, $hook, string $file, ?string $type): void
     {
         if (!isset($hook['class'])) {
             $hook['class'] = self::DEFAULT_HOOK_CLASS;

@@ -69,11 +69,11 @@ readonly class ApiResourcePropelTransformerService
         }
 
         // Init internal recursion-control context
-        $context['__visited'] = $context['__visited'] ?? [];
-        $context['__path'] = $context['__path'] ?? [];
-        $context['__depth'] = $context['__depth'] ?? 0;
-        $context['enable_max_depth'] = $context['enable_max_depth'] ?? true;
-        $context['max_depth'] = $context['max_depth'] ?? 10;
+        $context['__visited'] ??= [];
+        $context['__path'] ??= [];
+        $context['__depth'] ??= 0;
+        $context['enable_max_depth'] ??= true;
+        $context['max_depth'] ??= 10;
 
         $baseModel ??= $propelModel;
 
@@ -95,7 +95,7 @@ readonly class ApiResourcePropelTransformerService
 
         $context['__visited'][$visitKey] = true;
         $context['__path'][] = $resourceClass;
-        $context['__depth']++;
+        ++$context['__depth'];
 
         $this->processPropertiesRessource(
             apiResource: $apiResource,
@@ -808,13 +808,13 @@ readonly class ApiResourcePropelTransformerService
             $id = $model->getId();
         } elseif (method_exists($model, 'getPrimaryKey')) {
             $pk = $model->getPrimaryKey();
-            $id = is_array($pk) ? json_encode($pk) : (string) $pk;
+            $id = \is_array($pk) ? json_encode($pk) : (string) $pk;
         } else {
             $id = 'obj#'.spl_object_id($model);
         }
 
         $groups = $context['groups'] ?? [];
-        $groupsHash = md5(is_array($groups) ? json_encode($groups, JSON_THROW_ON_ERROR) : (string) $groups);
+        $groupsHash = md5(\is_array($groups) ? json_encode($groups, \JSON_THROW_ON_ERROR) : (string) $groups);
 
         return $resourceClass.'#'.$id.'@'.$groupsHash;
     }
