@@ -17,7 +17,6 @@ namespace Thelia\Model;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Export\AbstractExport;
-use Thelia\Domain\DataTransfer\Export\ExportHandler;
 use Thelia\Model\Base\Export as BaseExport;
 use Thelia\Model\Tools\PositionManagementTrait;
 
@@ -25,12 +24,12 @@ class Export extends BaseExport
 {
     use PositionManagementTrait;
 
-    protected static AbstractExport $cache;
+    protected static ?AbstractExport $cache = null;
 
     /**
      * @throws \ErrorException
      */
-    public function getHandleClassInstance(): ExportHandler
+    public function getHandleClassInstance(): AbstractExport
     {
         $class = $this->getHandleClass();
 

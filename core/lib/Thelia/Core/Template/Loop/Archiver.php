@@ -16,7 +16,6 @@ namespace Thelia\Core\Template\Loop;
 
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ArchiverManager;
-use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -34,6 +33,11 @@ use Thelia\Type\TypeCollection;
  */
 class Archiver extends BaseLoop implements ArraySearchLoopInterface
 {
+    public function __construct(
+        protected ArchiverManager $archiverManager,
+    ) {
+    }
+
     protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
@@ -52,17 +56,15 @@ class Archiver extends BaseLoop implements ArraySearchLoopInterface
     public function buildArray(): array
     {
         /** @var ArchiverManager $archiverManager */
-        $archiverManager = $this->container->get(RegisterArchiverPass::MANAGER_SERVICE_ID);
-
         $availability = $this->getArgValue('available');
 
         $archiverId = $this->getArgValue('archiver');
 
         if (null === $archiverId) {
-            $archivers = $archiverManager->getArchivers($availability);
+            $archivers = $this->archiverManager->getArchivers($availability);
         } else {
             $archivers = [];
-            $archiver = $archiverManager->get($archiverId, $availability);
+            $archiver = $this->archiverManager->get($archiverId, $availability);
 
             if (null !== $archiver) {
                 $archivers[] = $archiver;

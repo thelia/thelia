@@ -16,6 +16,7 @@ namespace Thelia\Domain\DataTransfer\Export;
 
 use Propel\Runtime\Connection\StatementInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\DataTransfer\Exception\DataTransferNoDataFoundException;
 
 /**
  * Class JsonFileAbstractExport.
@@ -29,13 +30,13 @@ abstract class JsonFileAbstractExport extends AbstractExport
 
     public function current(): mixed
     {
+        $dataCurrent = $this->data->current();
+        if (empty($dataCurrent)) {
+            return [];
+        }
         $result = json_decode($this->data->current(), true, 512, \JSON_THROW_ON_ERROR);
 
-        if (null !== $result) {
-            return $result;
-        }
-
-        return [];
+        return $result ?? [];
     }
 
     public function key(): mixed
@@ -112,7 +113,7 @@ abstract class JsonFileAbstractExport extends AbstractExport
         $filename = THELIA_CACHE_DIR.'/export/'.$exportName.'.json';
 
         if (0 === $statement->rowCount()) {
-            throw new \Exception(Translator::getInstance()->trans('No data found for your export.'));
+            throw new DataTransferNoDataFoundException(Translator::getInstance()->trans('No data found for your export.'));
         }
 
         if (file_exists($filename)) {

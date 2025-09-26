@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Template\Loop;
 
-use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
@@ -34,6 +33,11 @@ use Thelia\Type\TypeCollection;
  */
 class Serializer extends BaseLoop implements ArraySearchLoopInterface
 {
+    public function __construct(
+        protected SerializerManager $serializerManager,
+    ) {
+    }
+
     protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
@@ -51,10 +55,8 @@ class Serializer extends BaseLoop implements ArraySearchLoopInterface
     public function buildArray(): array
     {
         /** @var SerializerManager $serializerManager */
-        $serializerManager = $this->container->get(RegisterSerializerPass::MANAGER_SERVICE_ID);
-
         $serializerId = $this->getArgValue('serializer');
-        $serializers = null === $serializerId ? $serializerManager->getSerializers() : [$serializerManager->get($serializerId)];
+        $serializers = null === $serializerId ? $this->serializerManager->getSerializers() : [$this->serializerManager->get($serializerId)];
 
         match ($this->getArgValue('order')) {
             'alpha' => ksort($serializers),

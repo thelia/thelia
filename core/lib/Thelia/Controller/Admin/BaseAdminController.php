@@ -25,7 +25,6 @@ use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Form\BaseForm;
-use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\AdminLog;
 use Thelia\Model\ConfigQuery;
@@ -126,7 +125,7 @@ class BaseAdminController extends BaseController
         return $this->errorPage($this->translator->trans("Sorry, you're not allowed to perform this action"), 403);
     }
 
-    protected function createStandardFormValidationErrorMessage(FormValidationException $exception): string
+    protected function createStandardFormValidationErrorMessage(\Exception $exception): string
     {
         return $this->translator->trans(
             'Please check your input: %error',

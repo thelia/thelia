@@ -21,12 +21,12 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
-use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Serializer\SerializerManager;
+use Thelia\Domain\DataTransfer\Exception\DataTransferNoDataFoundException;
 use Thelia\Domain\DataTransfer\Exporthandler;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
@@ -168,8 +168,10 @@ class ExportController extends BaseAdminController
      *
      * @param int $id An export identifier
      */
-    public function exportAction(int $id): Response|BinaryFileResponse
-    {
+    public function exportAction(
+        int $id,
+        SerializerManager $serializerManager,
+    ): Response|BinaryFileResponse {
         /** @var Exporthandler $exportHandler */
         $exportHandler = $this->container->get('thelia.export.handler');
 
@@ -189,7 +191,6 @@ class ExportController extends BaseAdminController
             $lang = (new LangQuery())->findPk($validatedForm->get('language')->getData());
 
             /** @var SerializerManager $serializerManager */
-            $serializerManager = $this->container->get(RegisterSerializerPass::MANAGER_SERVICE_ID);
             $serializer = $serializerManager->get($validatedForm->get('serializer')->getData());
 
             $archiver = null;
@@ -240,10 +241,8 @@ class ExportController extends BaseAdminController
             ];
 
             return new BinaryFileResponse($exportEvent->getFilePath(), Response::HTTP_OK, $header, false);
-        } catch (FormValidationException $e) {
+        } catch (FormValidationException|DataTransferNoDataFoundException $e) {
             $form->setErrorMessage($this->createStandardFormValidationErrorMessage($e));
-        } catch (\Exception $e) {
-            $this->getParserContext()->setGeneralError($e->getMessage());
         }
 
         $this->getParserContext()
