@@ -74,7 +74,7 @@ class ConfigQuery extends BaseConfigQuery
             $config->setHidden($hidden ? 1 : 0);
         }
 
-        $config->setValue($value);
+        $config->setValue($value ?? '');
         $config->save();
     }
 

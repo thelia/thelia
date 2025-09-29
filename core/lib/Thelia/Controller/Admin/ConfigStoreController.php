@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
+use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -114,7 +115,7 @@ class ConfigStoreController extends BaseAdminController
             // Update store
             foreach ($data as $name => $value) {
                 if (!\array_key_exists($name, $storeMediaList) && !$configStoreForm->isTemplateDefinedHiddenFieldName($name)) {
-                    ConfigQuery::write($name, $value, false);
+                    ConfigQuery::write($name, $value ?? '', false);
                 }
             }
 
@@ -125,7 +126,7 @@ class ConfigStoreController extends BaseAdminController
             } else {
                 $response = $this->generateSuccessRedirect($configStoreForm);
             }
-        } catch (\Exception $exception) {
+        } catch (FormValidationException $exception) {
             $error_msg = $exception->getMessage();
         }
 
