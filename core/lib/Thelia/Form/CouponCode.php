@@ -31,9 +31,6 @@ use Thelia\Model\CouponQuery;
  */
 class CouponCode extends BaseForm
 {
-    /**
-     * Build form.
-     */
     protected function buildForm(): void
     {
         $this->formBuilder
@@ -61,9 +58,6 @@ class CouponCode extends BaseForm
         }
     }
 
-    /**
-     * Form name.
-     */
     public static function getName(): string
     {
         return 'thelia_coupon_code';

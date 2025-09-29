@@ -251,10 +251,10 @@ class Cart extends BaseCart
     /**
      * @throws PropelException
      */
-    public function getDiscount(bool $withTaxes = true, ?Country $country = null, ?State $state = null): float|int|string
+    public function getDiscount(bool $withTaxes = true, ?Country $country = null, ?State $state = null): float
     {
         if ($withTaxes || !$country instanceof Country) {
-            return parent::getDiscount();
+            return (float) parent::getDiscount();
         }
 
         return round(Calculator::getUntaxedCartDiscount($this, $country, $state), 2);

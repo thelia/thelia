@@ -59,15 +59,15 @@ return static function (ContainerConfigurator $configurator): void {
     $services->alias('thelia.coupon.type.remove_percentage_on_attribute_av', RemovePercentageOnAttributeValues::class)->public();
     $services->alias('thelia.coupon.type.free_product', FreeProduct::class)->public();
 
-    $services->alias('thelia.condition.validator', ConditionEvaluator::class);
-    $services->alias('thelia.condition.match_for_everyone', MatchForEveryone::class);
-    $services->alias('thelia.condition.match_for_total_amount', MatchForTotalAmount::class);
-    $services->alias('thelia.condition.match_for_x_articles', MatchForXArticles::class);
-    $services->alias('thelia.condition.match_for_x_articles_include_quantity', MatchForXArticlesIncludeQuantity::class);
-    $services->alias('thelia.condition.match_delivery_countries', MatchDeliveryCountries::class);
-    $services->alias('thelia.condition.match_billing_countries', MatchBillingCountries::class);
-    $services->alias('thelia.condition.start_date', StartDate::class);
-    $services->alias('thelia.condition.cart_contains_categories', CartContainsCategories::class);
-    $services->alias('thelia.condition.cart_contains_products', CartContainsProducts::class);
-    $services->alias('thelia.condition.for_some_customers', ForSomeCustomers::class);
+    $services->alias('thelia.condition.validator', ConditionEvaluator::class)->public();
+    $services->alias('thelia.condition.match_for_everyone', MatchForEveryone::class)->public();
+    $services->alias('thelia.condition.match_for_total_amount', MatchForTotalAmount::class)->public();
+    $services->alias('thelia.condition.match_for_x_articles', MatchForXArticles::class)->public();
+    $services->alias('thelia.condition.match_for_x_articles_include_quantity', MatchForXArticlesIncludeQuantity::class)->public();
+    $services->alias('thelia.condition.match_delivery_countries', MatchDeliveryCountries::class)->public();
+    $services->alias('thelia.condition.match_billing_countries', MatchBillingCountries::class)->public();
+    $services->alias('thelia.condition.start_date', StartDate::class)->public();
+    $services->alias('thelia.condition.cart_contains_categories', CartContainsCategories::class)->public();
+    $services->alias('thelia.condition.cart_contains_products', CartContainsProducts::class)->public();
+    $services->alias('thelia.condition.for_some_customers', ForSomeCustomers::class)->public();
 };
