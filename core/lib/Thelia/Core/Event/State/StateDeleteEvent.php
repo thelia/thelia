@@ -35,6 +35,6 @@ class StateDeleteEvent extends StateEvent
 
     public function getStateId(): int
     {
-        return $this->state_id;
+        return (int) $this->state_id;
     }
 }
