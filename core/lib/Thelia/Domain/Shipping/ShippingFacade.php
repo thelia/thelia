@@ -273,6 +273,7 @@ final readonly class ShippingFacade
         return ModuleQuery::create()
             ->filterByActivate(1)
             ->filterByType(BaseModule::DELIVERY_MODULE_TYPE, Criteria::EQUAL)
+            ->orderByPosition()
             ->find()
             ->getData();
     }
