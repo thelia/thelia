@@ -260,6 +260,7 @@ class MessageController extends AbstractCrudController
         }
 
         $parser = $this->getParser($this->getTemplateHelper()->getActiveMailTemplate()->getPath());
+        $parser->setTemplateDefinition($this->getTemplateHelper()->getActiveMailTemplate());
 
         foreach ($this->getRequest()->query->all() as $key => $value) {
             $parser->assign($key, $value);
