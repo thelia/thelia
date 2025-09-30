@@ -125,17 +125,17 @@ class Folder extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public ?int $position = null;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $createdAt = null;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $updatedAt = null;
 
     #[Relation(targetResource: ContentFolder::class, excludedGroups: [Content::GROUP_ADMIN_READ, Content::GROUP_FRONT_READ, Product::GROUP_ADMIN_READ, Product::GROUP_FRONT_READ])]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
     public array $contentFolders = [];
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int

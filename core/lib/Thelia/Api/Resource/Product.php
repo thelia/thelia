@@ -198,10 +198,10 @@ class Product extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public bool $virtual = false;
 
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
     public ?\DateTime $createdAt = null;
 
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
     public ?\DateTime $updatedAt = null;
 
     #[Relation(targetResource: ProductCategory::class)]
