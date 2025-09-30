@@ -220,12 +220,12 @@ class CartItem extends BaseCartItem
 
     public function getTotalPrice(): float
     {
-        return round($this->getPrice(), 2) * $this->getQuantity();
+        return round((float) $this->getPrice(), 2) * $this->getQuantity();
     }
 
     public function getTotalPromoPrice(): float
     {
-        return round($this->getPromoPrice(), 2) * $this->getQuantity();
+        return round((float) $this->getPromoPrice(), 2) * $this->getQuantity();
     }
 
     public function getTotalRealPrice(): float
