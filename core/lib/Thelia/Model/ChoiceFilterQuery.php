@@ -97,7 +97,11 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
         if (0 !== (int) $category->getParent()) {
             $category = CategoryQuery::create()->filterById($category->getParent())->findOne();
 
-            if (null !== $category->getDefaultTemplateId()) {
+            if (null === $category) {
+                return $categories;
+            }
+
+            if (null !== $category?->getDefaultTemplateId()) {
                 $categories[] = $category;
             }
 
