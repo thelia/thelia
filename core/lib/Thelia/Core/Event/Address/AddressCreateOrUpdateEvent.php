@@ -126,7 +126,7 @@ class AddressCreateOrUpdateEvent extends ActionEvent
 
     public function getState(): ?int
     {
-        return $this->state;
+        return $this->state ? (int) $this->state : null;
     }
 
     public function getFirstname(): string

@@ -148,7 +148,7 @@ readonly class AddressService
             $data['phone'],
             $data['company'] ?? null,
             $data['is_default'] ?? false,
-            $data['state'] ?? null,
+            isset($data['state']) ? (int) $data['state'] : null,
         );
     }
 
