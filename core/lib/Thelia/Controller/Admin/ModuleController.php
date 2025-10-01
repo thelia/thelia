@@ -304,7 +304,7 @@ class ModuleController extends AbstractCrudController
                 $request->query->get('_token'),
             );
 
-            $module_id = $request->get('module_id');
+            $module_id = (int) $request->get('module_id');
 
             $deleteEvent = new ModuleDeleteEvent($module_id);
 
