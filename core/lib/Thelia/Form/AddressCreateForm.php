@@ -173,7 +173,7 @@ class AddressCreateForm extends FirewallForm
                 'label' => Translator::getInstance()->trans('Country'),
                 'expanded' => false,
                 'multiple' => false,
-                'data' => $this->countryService->getDefaultCountry()->getId(),
+                'data' => $data['country'] ?? $this->countryService->getDefaultCountry()->getId(),
                 'label_attr' => [
                     'for' => 'country',
                 ],
