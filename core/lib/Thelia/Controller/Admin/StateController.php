@@ -77,7 +77,7 @@ class StateController extends AbstractCrudController
     protected function hydrateObjectForm(ParserContext $parserContext, ActiveRecordInterface $object): BaseForm
     {
         $data = [
-            'id' => $object->getId(),
+            'id' => (int) $object->getId(),
             'locale' => $object->getLocale(),
             'visible' => (bool) $object->getVisible(),
             'country_id' => $object->getCountryId(),
@@ -103,7 +103,7 @@ class StateController extends AbstractCrudController
      */
     protected function getUpdateEvent(array $formData): ActionEvent
     {
-        $event = new StateUpdateEvent($formData['id']);
+        $event = new StateUpdateEvent((int) $formData['id']);
 
         return $this->hydrateEvent($event, $formData);
     }
@@ -125,7 +125,7 @@ class StateController extends AbstractCrudController
      */
     protected function getDeleteEvent(): StateDeleteEvent
     {
-        return new StateDeleteEvent($this->getRequest()->get('state_id'));
+        return new StateDeleteEvent((int) $this->getRequest()->get('state_id'));
     }
 
     /**
@@ -205,7 +205,7 @@ class StateController extends AbstractCrudController
     protected function getEditionArgument(): array
     {
         return [
-            'state_id' => $this->getRequest()->get('state_id', 0),
+            'state_id' => (int) $this->getRequest()->get('state_id', 0),
             'page' => $this->getRequest()->get('page', 1),
             'page_order' => $this->getRequest()->get('page_order', 1),
         ];
@@ -220,7 +220,7 @@ class StateController extends AbstractCrudController
             'admin.configuration.states.update',
             [],
             [
-                'state_id' => $this->getRequest()->get('state_id', 0),
+                'state_id' => (int) $this->getRequest()->get('state_id', 0),
             ],
         );
     }
