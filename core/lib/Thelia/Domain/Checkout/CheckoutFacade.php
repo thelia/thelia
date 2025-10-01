@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Checkout;
 
+use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Domain\Cart\Service\CartSelectionService;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
@@ -21,6 +22,7 @@ use Thelia\Domain\Checkout\Service\CheckoutPaymentService;
 use Thelia\Domain\Checkout\Service\CheckoutResetService;
 use Thelia\Domain\Checkout\Service\CheckoutValidationService;
 use Thelia\Model\Cart;
+use Thelia\Model\Order;
 
 final readonly class CheckoutFacade
 {
@@ -103,5 +105,15 @@ final readonly class CheckoutFacade
             $dto->getDeliveryModuleId() ?? $dto->getCart()->getDeliveryModuleId(),
             $dto->getPaymentModuleId() ?? $dto->getCart()->getPaymentModuleId(),
         );
+    }
+
+    /**
+     * Cancel the current order.
+     *
+     * @throws PropelException|\InvalidArgumentException
+     */
+    public function cancelOrder(int $orderId): Order
+    {
+        return $this->paymentService->cancel($orderId);
     }
 }

@@ -49,14 +49,8 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
 
         $parser->setTemplateDefinition($templateHelper->getActiveFrontTemplate());
 
-        if ($parser instanceof SmartyParser) {
-            $realTemplateName = 'order-payment-gateway.html';
-        } else {
-            $realTemplateName = 'order-payment-gateway.html.twig';
-        }
-
         $renderedTemplate = $parser->render(
-            $realTemplateName, [
+            'checkout-gateway', [
                 'order_id' => $order->getId(),
                 'cart_count' => $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems()->count(),
                 'gateway_url' => $gateway_url,
@@ -77,12 +71,14 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
     public function getPaymentSuccessPageUrl(int $order_id): string
     {
         /** @var Router $frontOfficeRouter */
-        $frontOfficeRouter = $this->getContainer()->get('router.front');
+        $frontOfficeRouter = $this->container->get('router');
 
         return URL::getInstance()->absoluteUrl(
-            $frontOfficeRouter->generate(
-                'order.placed',
-                ['order_id' => $order_id],
+            $frontOfficeRouter?->generate(
+                'checkout_confirm',
+                [
+                    'order_id' => $order_id,
+                ],
                 UrlGeneratorInterface::ABSOLUTE_URL,
             ),
         );
@@ -99,11 +95,11 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
     public function getPaymentFailurePageUrl(int $order_id, ?string $message): string
     {
         /** @var Router $frontOfficeRouter */
-        $frontOfficeRouter = $this->getContainer()->get('router.front');
+        $frontOfficeRouter = $this->container->get('router');
 
         return URL::getInstance()->absoluteUrl(
-            $frontOfficeRouter->generate(
-                'order.failed',
+            $frontOfficeRouter?->generate(
+                'checkout_failed',
                 [
                     'order_id' => $order_id,
                     'message' => $message,
