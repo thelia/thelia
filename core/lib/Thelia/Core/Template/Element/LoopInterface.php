@@ -37,5 +37,5 @@ interface LoopInterface
 
     public function count();
 
-    public function exec(PropelModelPager $pagination): LoopResult;
+    public function exec(PropelModelPager &$pagination): LoopResult;
 }

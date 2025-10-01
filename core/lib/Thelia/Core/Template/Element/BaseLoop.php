@@ -465,7 +465,7 @@ abstract class BaseLoop implements LoopInterface
         return $count;
     }
 
-    public function exec(?PropelModelPager $pagination): LoopResult
+    public function exec(?PropelModelPager &$pagination): LoopResult
     {
         $hash = $this->args->getHash();
 
