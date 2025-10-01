@@ -25,7 +25,7 @@ class ProductDeleteEvent extends ProductEvent
 
     public function getProductId(): int
     {
-        return $this->product_id;
+        return (int) $this->product_id;
     }
 
     /**
@@ -33,7 +33,7 @@ class ProductDeleteEvent extends ProductEvent
      */
     public function setProductId($product_id): static
     {
-        $this->product_id = $product_id;
+        $this->product_id = (int) $product_id;
 
         return $this;
     }
