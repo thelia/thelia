@@ -60,8 +60,6 @@ readonly class CheckoutPaymentService
 
         $placedOrder = $orderEvent->getPlacedOrder();
 
-        $this->dispatcher->dispatch($orderEvent, TheliaEvents::ORDER_CART_CLEAR);
-
         if ((null !== $placedOrder->getId()) && $orderEvent->hasResponse()) {
             return $orderEvent->getResponse();
         }
