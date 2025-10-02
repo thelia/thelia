@@ -50,6 +50,139 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
         parent::__construct();
     }
 
+    public function setTitle(?int $title): self
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function setFirstname(?string $firstname): self
+    {
+        $this->firstname = $firstname;
+
+        return $this;
+    }
+
+    public function setLastname(?string $lastname): self
+    {
+        $this->lastname = $lastname;
+
+        return $this;
+    }
+
+    public function setAddress1(?string $address1): self
+    {
+        $this->address1 = $address1;
+
+        return $this;
+    }
+
+    public function setAddress2(?string $address2): self
+    {
+        $this->address2 = $address2;
+
+        return $this;
+    }
+
+    public function setAddress3(?string $address3): self
+    {
+        $this->address3 = $address3;
+
+        return $this;
+    }
+
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function setCellphone(?string $cellphone): self
+    {
+        $this->cellphone = $cellphone;
+
+        return $this;
+    }
+
+    public function setZipcode(?string $zipcode): self
+    {
+        $this->zipcode = $zipcode;
+
+        return $this;
+    }
+
+    public function setCity(?string $city): self
+    {
+        $this->city = $city;
+
+        return $this;
+    }
+
+    public function setCountry(?string $country): self
+    {
+        $this->country = $country;
+
+        return $this;
+    }
+
+    public function setEmail(?string $email): self
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    public function setLangId(?int $langId): self
+    {
+        $this->langId = $langId;
+
+        return $this;
+    }
+
+    public function setReseller(?bool $reseller): self
+    {
+        $this->reseller = $reseller;
+
+        return $this;
+    }
+
+    public function setSponsor(?int $sponsor): self
+    {
+        $this->sponsor = $sponsor;
+
+        return $this;
+    }
+
+    public function setDiscount(?float $discount): self
+    {
+        $this->discount = $discount;
+
+        return $this;
+    }
+
+    public function setCompany(?string $company): self
+    {
+        $this->company = $company;
+
+        return $this;
+    }
+
+    public function setRef(?string $ref): self
+    {
+        $this->ref = $ref;
+
+        return $this;
+    }
+
+    public function setState(?int $state): self
+    {
+        $this->state = $state;
+
+        return $this;
+    }
+
     public function getCompany(): ?string
     {
         return $this->company;
