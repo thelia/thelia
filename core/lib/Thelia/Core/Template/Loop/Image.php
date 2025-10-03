@@ -128,7 +128,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
      *
      * @return ModelCriteria the propel Query object
      */
-    protected function createSearchQuery(string $source, int $object_id): ModelCriteria
+    protected function createSearchQuery(string $source, mixed $object_id): ModelCriteria
     {
         $object = ucfirst($source);
 
@@ -144,10 +144,13 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         // xxxImageQuery::create()
         $method = new \ReflectionMethod($queryClass, 'create');
         $search = $method->invoke(null);
+
         // Static !
-        // $query->filterByXXX(id)
-        $method = new \ReflectionMethod($queryClass, $filterMethod);
-        $method->invoke($search, $object_id);
+        if (null !== $object_id) {
+            // $query->filterByXXX(id)
+            $method = new \ReflectionMethod($queryClass, $filterMethod);
+            $method->invoke($search, $object_id);
+        }
 
         $orders = $this->getOrder();
 
