@@ -99,6 +99,8 @@ abstract class ActionEvent extends Event
     {
         $getterMethodName = \sprintf('get%s', Container::camelize($fieldName));
 
+        $fieldValue = $this->castValueBySetterDefinition($setterMethodName, $fieldValue);
+
         if (method_exists($this, $getterMethodName) && $this->{$getterMethodName}() !== $fieldValue) {
             $this->{$setterMethodName}($fieldValue);
 
@@ -111,4 +113,46 @@ abstract class ActionEvent extends Event
             // Do nothing, just ignore the error
         }
     }
+
+    private function castValueBySetterDefinition(string $setterMethodName, mixed $fieldValue): mixed
+    {
+        $reflection = new \ReflectionMethod($this, $setterMethodName);
+        $parameters = $reflection->getParameters();
+
+        if (\count($parameters) !== 1) {
+            return $fieldValue;
+        }
+
+        $param = $parameters[0];
+        $type = $param->getType();
+
+        if (!$type instanceof \ReflectionNamedType) {
+            return $fieldValue;
+        }
+
+        $typeName = $type->getName();
+        $allowsNull = $type->allowsNull();
+
+        if ($fieldValue === null && $allowsNull) {
+            return null;
+        }
+
+        switch ($typeName) {
+            case 'int':
+                $fieldValue = (int) $fieldValue;
+                break;
+            case 'float':
+                $fieldValue = (float) $fieldValue;
+                break;
+            case 'bool':
+                $fieldValue = (bool) $fieldValue;
+                break;
+            case 'string':
+                $fieldValue = (string) $fieldValue;
+                break;
+        }
+
+        return $fieldValue;
+    }
+
 }
