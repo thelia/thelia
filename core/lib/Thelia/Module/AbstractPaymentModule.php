@@ -21,7 +21,6 @@ use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Model\Order;
 use Thelia\Tools\URL;
-use TheliaSmarty\Template\SmartyParser;
 
 abstract class AbstractPaymentModule extends BaseModule implements PaymentModuleInterface
 {

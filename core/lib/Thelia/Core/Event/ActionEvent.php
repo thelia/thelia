@@ -154,5 +154,4 @@ abstract class ActionEvent extends Event
 
         return $fieldValue;
     }
-
 }
