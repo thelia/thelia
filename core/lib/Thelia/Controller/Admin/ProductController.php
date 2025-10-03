@@ -15,9 +15,11 @@ declare(strict_types=1);
 namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Event\ActiveRecordEvent;
 use Propel\Runtime\Exception\PropelException;
+use Propel\Runtime\Util\PropelModelPager;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -1640,8 +1642,9 @@ class ProductController extends AbstractSeoCrudController
             'resize_mode' => 'borders',
         ]);
 
-        $images = $imageLoop
-            ->exec(null);
+        $propelModelPager = new PropelModelPager(new ModelCriteria(), 50);
+
+        $images = $imageLoop->exec($propelModelPager);
 
         $imageAssoc = ProductSaleElementsProductImageQuery::create()
             ->filterByProductSaleElementsId($pse->getId())
