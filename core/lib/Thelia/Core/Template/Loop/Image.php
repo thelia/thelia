@@ -202,7 +202,6 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 throw new \InvalidArgumentException("If 'source' argument is specified, 'id' or 'source_id' argument should be specified");
             }
 
-            $sourceId = (int) ($sourceId ?? $id);
             $search = $this->createSearchQuery($source, $sourceId);
 
             $objectType = $source;
