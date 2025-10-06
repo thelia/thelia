@@ -22,6 +22,7 @@ use Thelia\Domain\Cart\DTO\CartItemUpdateQuantityDTO;
 use Thelia\Domain\Cart\EventBuilder\CartEventBuilder;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
 use Thelia\Domain\Shipping\Service\PostageHandler;
+use Thelia\Model\CartItem;
 
 readonly class CartItemService
 {
@@ -32,11 +33,12 @@ readonly class CartItemService
     ) {
     }
 
-    public function addItem(CartItemAddDTO $cartAddDTO): void
+    public function addItem(CartItemAddDTO $cartAddDTO): CartItem
     {
         $cartEvent = $this->cartEventBuilder->buildEvent($cartAddDTO);
         $this->eventDispatcher->dispatch($cartEvent, TheliaEvents::CART_ADDITEM);
         $this->postageHandler->handlePostageOnCart($cartAddDTO->getCart());
+        return $cartEvent->getCartItem();
     }
 
     public function deleteItem(CartItemDeleteDTO $cartDeleteItemDTO): void
@@ -49,10 +51,12 @@ readonly class CartItemService
     /**
      * @throws NotEnoughStockException
      */
-    public function updateQuantityItem(CartItemUpdateQuantityDTO $cartItemUpdateQuantityDTO): void
+    public function updateQuantityItem(CartItemUpdateQuantityDTO $cartItemUpdateQuantityDTO): CartItem
     {
         $cartEvent = $this->cartEventBuilder->buildEvent($cartItemUpdateQuantityDTO);
         $this->eventDispatcher->dispatch($cartEvent, TheliaEvents::CART_UPDATEITEM);
         $this->postageHandler->handlePostageOnCart($cartItemUpdateQuantityDTO->getCart());
+
+        return $cartEvent->getCartItem();
     }
 }

@@ -25,6 +25,7 @@ use Thelia\Domain\Cart\Service\CartSelectionService;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
 use Thelia\Domain\Shipping\Service\PostageHandler;
 use Thelia\Model\Cart;
+use Thelia\Model\CartItem;
 use Thelia\Model\Customer;
 
 final readonly class CartFacade
@@ -40,9 +41,9 @@ final readonly class CartFacade
     /**
      * Add an item to cart and refresh shipping if needed.
      */
-    public function addItem(CartItemAddDTO $dto): void
+    public function addItem(CartItemAddDTO $dto): CartItem
     {
-        $this->cartItemService->addItem($dto);
+        return $this->cartItemService->addItem($dto);
     }
 
     /**
@@ -58,9 +59,9 @@ final readonly class CartFacade
      *
      * @throws NotEnoughStockException
      */
-    public function updateItemQuantity(CartItemUpdateQuantityDTO $dto): void
+    public function updateItemQuantity(CartItemUpdateQuantityDTO $dto): CartItem
     {
-        $this->cartItemService->updateQuantityItem($dto);
+        return $this->cartItemService->updateQuantityItem($dto);
     }
 
     /**
