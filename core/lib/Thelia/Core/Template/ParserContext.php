@@ -227,6 +227,8 @@ class ParserContext implements \IteratorAggregate
                     $form->setErrorMessage($formInfo['errorMessage']);
                 }
 
+                $this->getSession()->setFormErrorInformation([]);
+
                 return $form;
             }
         }
