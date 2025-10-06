@@ -23,21 +23,6 @@ class OrderAddressEvent extends ActionEvent
     protected OrderAddress $orderAddress;
     protected Order $order;
 
-    /**
-     * @param int         $title
-     * @param string|null $company
-     * @param string      $firstname
-     * @param string      $lastname
-     * @param string      $address1
-     * @param string      $address2
-     * @param string      $address3
-     * @param string      $zipcode
-     * @param string      $city
-     * @param int         $country
-     * @param int|null    $state
-     * @param string      $phone
-     * @param string      $cellphone
-     */
     public function __construct(
         /**
          * @var int title id
@@ -139,12 +124,12 @@ class OrderAddressEvent extends ActionEvent
         return $this->lastname;
     }
 
-    public function getPhone(): string
+    public function getPhone(): ?string
     {
         return $this->phone;
     }
 
-    public function getCellphone(): string
+    public function getCellphone(): ?string
     {
         return $this->cellphone;
     }
