@@ -14,26 +14,29 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Event\Config;
 
+use Thelia\Model\ConfigQuery;
+
 class ConfigUpdateEvent extends ConfigCreateEvent
 {
-    protected int $config_id;
+    protected int $configId;
     protected $description;
     protected $chapo;
     protected $postscriptum;
 
-    public function __construct(int $config_id)
+    public function __construct(int $configId)
     {
-        $this->setConfigId($config_id);
+        $this->setConfigId($configId);
+        parent::__construct(ConfigQuery::create()->findPk($configId));
     }
 
     public function getConfigId(): int
     {
-        return $this->config_id;
+        return $this->configId;
     }
 
-    public function setConfigId(int $config_id): static
+    public function setConfigId(int $configId): static
     {
-        $this->config_id = $config_id;
+        $this->configId = $configId;
 
         return $this;
     }
