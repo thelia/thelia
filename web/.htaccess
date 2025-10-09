@@ -39,55 +39,89 @@ AddDefaultCharset UTF-8
 </IfModule>
 
 <IfModule mod_expires.c>
-  ExpiresActive on
-  ExpiresByType image/gif "access plus 1 year"
-  ExpiresByType image/jpeg "access plus 1 year"
-  ExpiresByType image/png "access plus 1 year"
-  ExpiresByType image/x-icon "access plus 1 year"
-  ExpiresByType application/x-javascript "access plus 1 year"
-  ExpiresByType application/javascript "access plus 1 year"
-  ExpiresByType image/webp "access plus 1 year"
-  ExpiresByType image/svg+xml "access plus 1 year"
-  ExpiresByType text/css "access plus 1 year"
-  <FilesMatch "\.(ttf|otf|eot|svg|woff|woff2)$" >
-    ExpiresDefault "access plus 1 year"
-  </FilesMatch>
+    ExpiresActive on
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+    ExpiresByType application/x-javascript "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType text/css "access plus 1 year"
+    <FilesMatch "\.(ttf|otf|eot|svg|woff|woff2)$" >
+        ExpiresDefault "access plus 1 year"
+    </FilesMatch>
 </IfModule>
 
 <IfModule mod_deflate.c>
-# Compress HTML
-AddOutputFilterByType DEFLATE text/html
+    # Compress HTML
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/css
 
-# Compress Text Files
-AddOutputFilterByType DEFLATE text/plain
+    # Compress JavaScript
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
 
-# Compress CSS
-AddOutputFilterByType DEFLATE text/css
+    # Compress Images
+    AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE image/x-icon
 
-# Compress JavaScript
-AddOutputFilterByType DEFLATE application/javascript
-AddOutputFilterByType DEFLATE text/javascript
-AddOutputFilterByType DEFLATE application/x-javascript
+    # Compress Fonts
+    AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
+    AddOutputFilterByType DEFLATE application/x-font
+    AddOutputFilterByType DEFLATE application/x-font-opentype
+    AddOutputFilterByType DEFLATE application/x-font-otf
+    AddOutputFilterByType DEFLATE application/x-font-truetype
+    AddOutputFilterByType DEFLATE application/x-font-ttf
+    AddOutputFilterByType DEFLATE font/opentype
+    AddOutputFilterByType DEFLATE font/otf
+    AddOutputFilterByType DEFLATE font/ttf
 
-# Compress Images
-AddOutputFilterByType DEFLATE image/svg+xml
-AddOutputFilterByType DEFLATE image/x-icon
+    # Compress XML Files
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE text/xml
+</IfModule>
 
-# Compress Fonts
-AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
-AddOutputFilterByType DEFLATE application/x-font
-AddOutputFilterByType DEFLATE application/x-font-opentype
-AddOutputFilterByType DEFLATE application/x-font-otf
-AddOutputFilterByType DEFLATE application/x-font-truetype
-AddOutputFilterByType DEFLATE application/x-font-ttf
-AddOutputFilterByType DEFLATE font/opentype
-AddOutputFilterByType DEFLATE font/otf
-AddOutputFilterByType DEFLATE font/ttf
+<IfModule mod_brotli.c>
+    BrotliCompressionQuality 5
 
-# Compress XML Files
-AddOutputFilterByType DEFLATE application/rss+xml
-AddOutputFilterByType DEFLATE application/xhtml+xml
-AddOutputFilterByType DEFLATE application/xml
-AddOutputFilterByType DEFLATE text/xml
+    # Compress HTML
+    AddOutputFilterByType BROTLI_COMPRESS text/html
 
+    # Compress Text Files
+    AddOutputFilterByType BROTLI_COMPRESS text/plain
+
+    # Compress CSS
+    AddOutputFilterByType BROTLI_COMPRESS text/css
+
+    # Compress JavaScript
+    AddOutputFilterByType BROTLI_COMPRESS application/javascript
+    AddOutputFilterByType BROTLI_COMPRESS text/javascript
+    AddOutputFilterByType BROTLI_COMPRESS application/x-javascript
+
+    # Compress Images vector
+    AddOutputFilterByType BROTLI_COMPRESS image/svg+xml
+    AddOutputFilterByType BROTLI_COMPRESS image/x-icon
+
+    # Compress Fonts
+    AddOutputFilterByType BROTLI_COMPRESS application/vnd.ms-fontobject
+    AddOutputFilterByType BROTLI_COMPRESS application/x-font
+    AddOutputFilterByType BROTLI_COMPRESS application/x-font-opentype
+    AddOutputFilterByType BROTLI_COMPRESS application/x-font-otf
+    AddOutputFilterByType BROTLI_COMPRESS application/x-font-truetype
+    AddOutputFilterByType BROTLI_COMPRESS application/x-font-ttf
+    AddOutputFilterByType BROTLI_COMPRESS font/opentype
+    AddOutputFilterByType BROTLI_COMPRESS font/otf
+    AddOutputFilterByType BROTLI_COMPRESS font/ttf
+
+    # Compress XML Files
+    AddOutputFilterByType BROTLI_COMPRESS application/rss+xml
+    AddOutputFilterByType BROTLI_COMPRESS application/xhtml+xml
+    AddOutputFilterByType BROTLI_COMPRESS application/xml
+    AddOutputFilterByType BROTLI_COMPRESS text/xml
 </IfModule>
