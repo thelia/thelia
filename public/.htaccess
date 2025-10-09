@@ -91,3 +91,42 @@ AddOutputFilterByType DEFLATE application/xml
 AddOutputFilterByType DEFLATE text/xml
 
 </IfModule>
+
+<IfModule mod_brotli.c>
+    BrotliCompressionQuality 5
+
+    # Compress HTML
+    AddOutputFilterByType BROTLI_COMPRESS text/html
+
+    # Compress Text Files
+    AddOutputFilterByType BROTLI_COMPRESS text/plain
+
+    # Compress CSS
+    AddOutputFilterByType BROTLI_COMPRESS text/css
+
+    # Compress JavaScript
+    AddOutputFilterByType BROTLI_COMPRESS application/javascript
+    AddOutputFilterByType BROTLI_COMPRESS text/javascript
+    AddOutputFilterByType BROTLI_COMPRESS application/x-javascript
+
+    # Compress Images vector
+    AddOutputFilterByType BROTLI_COMPRESS image/svg+xml
+    AddOutputFilterByType BROTLI_COMPRESS image/x-icon
+
+    # Compress Fonts
+    AddOutputFilterByType BROTLI_COMPRESS application/vnd.ms-fontobject
+    AddOutputFilterByType BROTLI_COMPRESS application/x-font
+    AddOutputFilterByType BROTLI_COMPRESS application/x-font-opentype
+    AddOutputFilterByType BROTLI_COMPRESS application/x-font-otf
+    AddOutputFilterByType BROTLI_COMPRESS application/x-font-truetype
+    AddOutputFilterByType BROTLI_COMPRESS application/x-font-ttf
+    AddOutputFilterByType BROTLI_COMPRESS font/opentype
+    AddOutputFilterByType BROTLI_COMPRESS font/otf
+    AddOutputFilterByType BROTLI_COMPRESS font/ttf
+
+    # Compress XML Files
+    AddOutputFilterByType BROTLI_COMPRESS application/rss+xml
+    AddOutputFilterByType BROTLI_COMPRESS application/xhtml+xml
+    AddOutputFilterByType BROTLI_COMPRESS application/xml
+    AddOutputFilterByType BROTLI_COMPRESS text/xml
+</IfModule>
