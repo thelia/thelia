@@ -70,7 +70,7 @@ class Session extends BaseSession
 
         $adminUser = $this->getAdminUser();
 
-        if ($adminUser instanceof Admin) {
+        if ($adminUser instanceof Admin && null !== $this->langService) {
             $lang = $this->langService->resolveAdminLanguageFromAdmin($adminUser);
             $this->setAdminLang($lang);
 
