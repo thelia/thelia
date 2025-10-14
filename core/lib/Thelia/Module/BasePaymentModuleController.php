@@ -57,7 +57,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
 
             $this->log->setPrefix('#LEVEL: #DATE #HOUR: ');
             $this->log->setDestinations(TlogDestinationFile::class);
-            $this->log->setConfig(TlogDestinationFile::class, 0, $logFilePath);
+            $this->log->setConfig(TlogDestinationFile::class, '', $logFilePath);
             $this->log->setLevel(Tlog::INFO);
         }
 
