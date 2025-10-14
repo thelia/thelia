@@ -16,6 +16,7 @@ namespace Thelia\Core\Event\Cart;
 
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Cart;
+use Thelia\Model\CartAddress;
 use Thelia\Model\OrderPostage;
 
 class CartCheckoutEvent extends ActionEvent
@@ -29,6 +30,7 @@ class CartCheckoutEvent extends ActionEvent
     protected ?int $paymentModuleId = null;
 
     protected ?OrderPostage $postage = null;
+    protected ?CartAddress $cartAddress = null;
 
     protected array $extendedData = [];
 
@@ -124,6 +126,18 @@ class CartCheckoutEvent extends ActionEvent
     public function removeExtendedData(string $key): static
     {
         unset($this->extendedData[$key]);
+
+        return $this;
+    }
+
+    public function getCartAddress(): ?CartAddress
+    {
+        return $this->cartAddress;
+    }
+
+    public function setCartAddress(?CartAddress $cartAddress): self
+    {
+        $this->cartAddress = $cartAddress;
 
         return $this;
     }

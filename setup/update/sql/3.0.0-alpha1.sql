@@ -165,4 +165,66 @@ ALTER TABLE `cart`
         FOREIGN KEY (`delivery_module_id`) REFERENCES `module` (`id`)
             ON DELETE SET NULL;
 
+CREATE TABLE `cart_address`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `customer_title_id` INTEGER,
+    `company` VARCHAR(255),
+    `firstname` VARCHAR(255) NOT NULL,
+    `lastname` VARCHAR(255) NOT NULL,
+    `address1` VARCHAR(255) NOT NULL,
+    `address2` VARCHAR(255),
+    `address3` VARCHAR(255),
+    `zipcode` VARCHAR(10) NOT NULL,
+    `city` VARCHAR(255) NOT NULL,
+    `phone` VARCHAR(20),
+    `cellphone` VARCHAR(20),
+    `country_id` INTEGER NOT NULL,
+    `state_id` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `fk_cart_address_customer_title_id_idx` (`customer_title_id`),
+    INDEX `fk_cart_address_country_id_idx` (`country_id`),
+    INDEX `fk_cart_address_state_id_idx` (`state_id`),
+    CONSTRAINT `fk_cart_address_customer_title_id`
+    FOREIGN KEY (`customer_title_id`)
+    REFERENCES `customer_title` (`id`)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT,
+    CONSTRAINT `fk_cart_address_country_id`
+    FOREIGN KEY (`country_id`)
+    REFERENCES `country` (`id`)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT,
+    CONSTRAINT `fk_cart_address_state_id`
+    FOREIGN KEY (`state_id`)
+    REFERENCES `state` (`id`)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT
+    ) ENGINE=InnoDB CHARACTER SET='utf8';
+
+
+ALTER TABLE `cart`
+DROP FOREIGN KEY fk_cart_address_delivery_id,
+    DROP FOREIGN KEY fk_cart_address_invoice_id,
+DROP INDEX idx_cart_address_delivery_id,
+    DROP INDEX idx_cart_address_invoice_id;
+
+ALTER TABLE `cart`
+    ADD INDEX idx_cart_address_delivery_id (address_delivery_id),
+    ADD INDEX idx_cart_address_invoice_id (address_invoice_id);
+
+ALTER TABLE `cart`
+    ADD CONSTRAINT fk_cart_address_delivery_id
+    FOREIGN KEY (address_delivery_id)
+    REFERENCES cart_address (id)
+    ON UPDATE RESTRICT
+       ON DELETE RESTRICT,
+              ADD CONSTRAINT fk_cart_address_invoice_id
+              FOREIGN KEY (address_invoice_id)
+              REFERENCES cart_address (id)
+          ON UPDATE RESTRICT
+             ON DELETE RESTRICT;
+
 SET FOREIGN_KEY_CHECKS = 1;

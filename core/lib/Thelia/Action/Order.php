@@ -676,9 +676,10 @@ class Order extends BaseAction implements EventSubscriberInterface
     {
         return [
             TheliaEvents::ORDER_SET_DELIVERY_ADDRESS => ['setDeliveryAddress', 128],
+            TheliaEvents::ORDER_SET_INVOICE_ADDRESS => ['setInvoiceAddress', 128],
+            TheliaEvents::ORDER_UPDATE_ADDRESS => ['updateAddress', 128],
             TheliaEvents::ORDER_SET_DELIVERY_MODULE => ['setDeliveryModule', 128],
             TheliaEvents::ORDER_SET_POSTAGE => ['setPostage', 128],
-            TheliaEvents::ORDER_SET_INVOICE_ADDRESS => ['setInvoiceAddress', 128],
             TheliaEvents::ORDER_SET_PAYMENT_MODULE => ['setPaymentModule', 128],
             TheliaEvents::ORDER_PAY => ['create', 128],
             TheliaEvents::ORDER_PAY_GET_TOTAL => ['getOrderPayTotal', 128],
@@ -689,7 +690,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ORDER_UPDATE_STATUS => ['updateStatus', 128],
             TheliaEvents::ORDER_UPDATE_DELIVERY_REF => ['updateDeliveryRef', 128],
             TheliaEvents::ORDER_UPDATE_TRANSACTION_REF => ['updateTransactionRef', 128],
-            TheliaEvents::ORDER_UPDATE_ADDRESS => ['updateAddress', 128],
+
             TheliaEvents::ORDER_CREATE_MANUAL => ['createManual', 128],
             TheliaEvents::ORDER_GET_STOCK_UPDATE_OPERATION_ON_ORDER_STATUS_CHANGE => ['getStockUpdateOnOrderStatusChange', 128],
         ];

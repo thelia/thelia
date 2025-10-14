@@ -242,9 +242,11 @@ final class TheliaEvents
 
     /** Cart delivery part event */
     public const CART_SET_DELIVERY_ADDRESS = 'action.cart.setDeliveryAddress';
+    public const CART_SET_DELIVERY_ADDRESS_MANUAL = 'action.cart.setDeliveryAddressManual';
     public const CART_SET_DELIVERY_MODULE = 'action.cart.setDeliveryModule';
     public const CART_SET_POSTAGE = 'action.cart.setPostage';
     public const CART_SET_INVOICE_ADDRESS = 'action.cart.setInvoiceAddress';
+    public const CART_SET_INVOICE_ADDRESS_MANUAL = 'action.cart.setInvoiceAddressManual';
     public const CART_SET_PAYMENT_MODULE = 'action.cart.setPaymentModule';
 
     /** Order linked event. */

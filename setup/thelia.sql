@@ -1302,8 +1302,8 @@ CREATE TABLE `cart`
     PRIMARY KEY (`id`),
     UNIQUE INDEX `token_UNIQUE` (`token`),
     INDEX `idx_cart_customer_id` (`customer_id`),
-    INDEX `idx_cart_address_delivery_id` (`address_delivery_id`),
-    INDEX `idx_cart_address_invoice_id` (`address_invoice_id`),
+    INDEX `idx_cart_address_delivery_id` (`cart_address_delivery_id`),
+    INDEX `idx_cart_address_invoice_id` (`cart_address_invoice_id`),
     INDEX `idx_cart_currency_id` (`currency_id`),
     CONSTRAINT `fk_cart_customer_id`
         FOREIGN KEY (`customer_id`)
@@ -1311,12 +1311,12 @@ CREATE TABLE `cart`
         ON UPDATE RESTRICT
         ON DELETE CASCADE,
     CONSTRAINT `fk_cart_address_delivery_id`
-        FOREIGN KEY (`address_delivery_id`)
-        REFERENCES `address` (`id`)
+        FOREIGN KEY (`cart_address_delivery_id`)
+        REFERENCES `cart_address` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT,
     CONSTRAINT `fk_cart_address_invoice_id`
-        FOREIGN KEY (`address_invoice_id`)
+        FOREIGN KEY (`cart_address_invoice_id`)
         REFERENCES `address` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT,
@@ -1336,6 +1336,51 @@ CREATE TABLE `cart`
         ON DELETE SET NULL
         ON UPDATE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- cart_address
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `cart_address`;
+
+CREATE TABLE `cart_address`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `customer_title_id` INTEGER,
+    `company` VARCHAR(255),
+    `firstname` VARCHAR(255) NOT NULL,
+    `lastname` VARCHAR(255) NOT NULL,
+    `address1` VARCHAR(255) NOT NULL,
+    `address2` VARCHAR(255),
+    `address3` VARCHAR(255),
+    `zipcode` VARCHAR(10) NOT NULL,
+    `city` VARCHAR(255) NOT NULL,
+    `phone` VARCHAR(20),
+    `cellphone` VARCHAR(20),
+    `country_id` INTEGER NOT NULL,
+    `state_id` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `fk_cart_address_customer_title_id_idx` (`customer_title_id`),
+    INDEX `fk_cart_address_country_id_idx` (`country_id`),
+    INDEX `fk_cart_address_state_id_idx` (`state_id`),
+    CONSTRAINT `fk_cart_address_customer_title_id`
+    FOREIGN KEY (`customer_title_id`)
+    REFERENCES `customer_title` (`id`)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT,
+    CONSTRAINT `fk_cart_address_country_id`
+    FOREIGN KEY (`country_id`)
+    REFERENCES `country` (`id`)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT,
+    CONSTRAINT `fk_cart_address_state_id`
+    FOREIGN KEY (`state_id`)
+    REFERENCES `state` (`id`)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT
+    ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
 -- cart_item

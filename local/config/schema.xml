@@ -1103,10 +1103,10 @@
     <foreign-key foreignTable="customer" name="fk_cart_customer_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="customer_id" />
     </foreign-key>
-    <foreign-key foreignTable="address" name="fk_cart_address_delivery_id" onDelete="SET NULL">
+    <foreign-key foreignTable="cart_address" name="fk_cart_address_delivery_id" onDelete="SET NULL">
       <reference foreign="id" local="address_delivery_id" />
     </foreign-key>
-    <foreign-key foreignTable="address" name="fk_cart_address_invoice_id" onDelete="SET NULL">
+    <foreign-key foreignTable="cart_address" name="fk_cart_address_invoice_id" onDelete="SET NULL">
       <reference foreign="id" local="address_invoice_id" />
     </foreign-key>
     <foreign-key foreignTable="module" name="fk_cart_payment_module_id" onDelete="SET NULL">
@@ -1134,6 +1134,41 @@
     <unique name="token_UNIQUE">
       <unique-column name="token" />
     </unique>
+    <behavior name="timestampable" />
+  </table>
+  <table name="cart_address" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="customer_title_id" type="INTEGER" />
+    <column name="company" size="255" type="VARCHAR" />
+    <column name="firstname" required="true" size="255" type="VARCHAR" />
+    <column name="lastname" required="true" size="255" type="VARCHAR" />
+    <column name="address1" required="true" size="255" type="VARCHAR" />
+    <column name="address2" size="255" type="VARCHAR" />
+    <column name="address3" size="255" type="VARCHAR" />
+    <column name="zipcode" required="true" size="10" type="VARCHAR" />
+    <column name="city" required="true" size="255" type="VARCHAR" />
+    <column name="phone" size="20" type="VARCHAR" />
+    <column name="cellphone" size="20" type="VARCHAR" />
+    <column name="country_id" required="true" type="INTEGER" />
+    <column name="state_id" type="INTEGER" />
+    <foreign-key foreignTable="customer_title" name="fk_cart_address_customer_title_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_title_id" />
+    </foreign-key>
+    <foreign-key foreignTable="country" name="fk_cart_address_country_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="country_id" />
+    </foreign-key>
+    <foreign-key foreignTable="state" name="fk_cart_address_state_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="state_id" />
+    </foreign-key>
+    <index name="fk_cart_address_customer_title_id_idx">
+      <index-column name="customer_title_id" />
+    </index>
+    <index name="fk_cart_address_country_id_idx">
+      <index-column name="country_id" />
+    </index>
+    <index name="fk_cart_address_state_id_idx">
+      <index-column name="state_id" />
+    </index>
     <behavior name="timestampable" />
   </table>
   <table name="cart_item" namespace="Thelia\Model">
