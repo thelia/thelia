@@ -185,7 +185,7 @@ class AddressCreateForm extends FirewallForm
                         $this->verifyState(...),
                     ),
                 ],
-                'choices' => $this->getStatesChoices(null),
+                'choices' => $this->getStatesChoices($data['country'] ?? $this->countryService->getDefaultCountry()->getId()),
                 'label' => Translator::getInstance()->trans('State *'),
                 'label_attr' => [
                     'for' => 'state',
