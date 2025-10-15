@@ -39,17 +39,19 @@ class Order extends BaseOrder
 
     protected ?Cart $cart = null;
 
+    protected $postage_tax = '0.00';
+
     /**
      * @return $this
      */
-    public function setDisableVersioning(bool $disableVersioning)
+    public function setDisableVersioning(bool $disableVersioning): static
     {
         $this->disableVersioning = $disableVersioning;
 
         return $this;
     }
 
-    public function isVersioningDisable()
+    public function isVersioningDisable(): bool
     {
         return $this->disableVersioning;
     }
@@ -70,7 +72,7 @@ class Order extends BaseOrder
      *
      * @return $this
      */
-    public function setChoosenDeliveryAddress($choosenDeliveryAddress)
+    public function setChoosenDeliveryAddress($choosenDeliveryAddress): static
     {
         return $this;
     }
@@ -94,7 +96,7 @@ class Order extends BaseOrder
      *
      * @deprecated Use the cart model
      */
-    public function setChoosenInvoiceAddress(int $choosenInvoiceAddress)
+    public function setChoosenInvoiceAddress(int $choosenInvoiceAddress): static
     {
         $this->choosenInvoiceAddress = $choosenInvoiceAddress;
 
@@ -217,7 +219,7 @@ class Order extends BaseOrder
             $stmt = $con->prepare($query);
 
             if (false === $stmt->execute([':order_id' => $this->getId()])) {
-                throw new TheliaProcessException(\sprintf('Failed to get order total and order tax: %s (%s)', $stmt->errorInfo(), $stmt->errorCode()));
+                throw new TheliaProcessException(\sprintf('Failed to get order total and order tax: %s (%s)', implode(', ', $stmt->errorInfo()), $stmt->errorCode()));
             }
 
             $queryResult[$id] = $stmt->fetch(\PDO::FETCH_OBJ);
@@ -326,7 +328,7 @@ class Order extends BaseOrder
     public function getUntaxedPostage(): float|int
     {
         return 0 < $this->getPostageTax()
-            ? $this->getPostage() - $this->getPostageTax()
+            ? ((float) $this->getPostage() - (float) $this->getPostageTax())
             : (float) $this->getPostage();
     }
 
@@ -561,5 +563,10 @@ class Order extends BaseOrder
         }
 
         return CartQuery::create()->filterById($cartId)->findOne();
+    }
+
+    public function setPostageTax($v): static
+    {
+        return parent::setPostageTax($v ?? 0);
     }
 }

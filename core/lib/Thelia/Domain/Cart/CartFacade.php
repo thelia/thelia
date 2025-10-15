@@ -121,7 +121,7 @@ final readonly class CartFacade
             ->setDeliveryModuleId(null)
             ->setPaymentModuleId(null)
             ->setPostage(null)
-            ->setPostageTax(null)
+            ->setPostageTax(0.0)
             ->setPostageTaxRuleTitle(null);
         if ($resetCartItems) {
             $cart->setCartItems(new Collection());
@@ -162,12 +162,16 @@ final readonly class CartFacade
      */
     public function getDeliveryAddressId(): ?int
     {
-        return $this->cartRetriever->fromSession()?->getAddressDeliveryId();
+        return $this->cartRetriever->fromSession()
+            ?->getCartAddressRelatedByAddressDeliveryId()
+            ?->getAddressId();
     }
 
     public function getInvoiceAddressId(): ?int
     {
-        return $this->cartRetriever->fromSession()?->getAddressInvoiceId();
+        return $this->cartRetriever->fromSession()
+            ?->getCartAddressRelatedByAddressInvoiceId()
+            ?->getAddressId();
     }
 
     public function getDeliveryModuleId(): ?int

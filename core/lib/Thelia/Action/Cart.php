@@ -87,7 +87,10 @@ class Cart extends BaseAction implements EventSubscriberInterface
         if (!$address) {
             return;
         }
-        $cartAddress = $this->cartAddressService->getOrCreateCartAddressFromAddress($address, $addressId);
+        $cartAddress = $this->cartAddressService->getOrCreateCartAddressFromAddress(
+            $address,
+            $cart->getCartAddressRelatedByAddressDeliveryId()
+        );
 
         $cart
             ->setAddressDeliveryId($cartAddress->getId())
@@ -140,7 +143,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
             $postage = $this->getPostageByDeliveryModuleId($cart, $dispatcher, $moduleId, $deliveryAddressId);
             $cart
                 ->setPostage($postage->getAmount() - $postage->getAmountTax())
-                ->setPostageTax($postage->getAmountTax())
+                ->setPostageTax($postage->getAmountTax() ?? .0)
                 ->setPostageTaxRuleTitle($postage->getTaxRuleTitle())
                 ->save();
         } catch (\Exception $e) {
@@ -167,7 +170,10 @@ class Cart extends BaseAction implements EventSubscriberInterface
             return;
         }
 
-        $cartAddress = $this->cartAddressService->getOrCreateCartAddressFromAddress($address, $addressId);
+        $cartAddress = $this->cartAddressService->getOrCreateCartAddressFromAddress(
+            $address,
+            $cart->getCartAddressRelatedByAddressInvoiceId()
+        );
 
         $cart
             ->setAddressInvoiceId($cartAddress->getId())

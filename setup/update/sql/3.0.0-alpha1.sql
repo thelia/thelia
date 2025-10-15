@@ -169,6 +169,7 @@ CREATE TABLE `cart_address`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `customer_title_id` INTEGER,
+    `address_id` INTEGER,
     `company` VARCHAR(255),
     `firstname` VARCHAR(255) NOT NULL,
     `lastname` VARCHAR(255) NOT NULL,
@@ -185,6 +186,7 @@ CREATE TABLE `cart_address`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `fk_cart_address_customer_title_id_idx` (`customer_title_id`),
+    INDEX `fk_addres_id_idx` (`customer_title_id`),
     INDEX `fk_cart_address_country_id_idx` (`country_id`),
     INDEX `fk_cart_address_state_id_idx` (`state_id`),
     CONSTRAINT `fk_cart_address_customer_title_id`
@@ -201,7 +203,12 @@ CREATE TABLE `cart_address`
     FOREIGN KEY (`state_id`)
     REFERENCES `state` (`id`)
     ON UPDATE RESTRICT
-    ON DELETE RESTRICT
+    ON DELETE RESTRICT,
+    CONSTRAINT `fk_address_id`
+    FOREIGN KEY (`address_id`)
+    REFERENCES `address` (`id`)
+    ON UPDATE RESTRICT
+    ON DELETE SET NULL
     ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 

@@ -19,14 +19,15 @@ use Thelia\Domain\Checkout\Exception\EmptyCartException;
 use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
 use Thelia\Domain\Checkout\Exception\InvalidPaymentException;
 use Thelia\Domain\Checkout\Exception\MissingAddressException;
-use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart;
+use Thelia\Model\CartAddressQuery;
 use Thelia\Model\ModuleQuery;
 
 class CartGuard
 {
     /**
-     * @throws EmptyCartException|PropelException
+     * @throws EmptyCartException
+     * @throws PropelException
      */
     public function checkCartNotEmpty(?Cart $cart): void
     {
@@ -44,7 +45,7 @@ class CartGuard
             throw new MissingAddressException('Delivery address is required');
         }
 
-        $address = AddressQuery::create()->findPk($cart->getAddressDeliveryId());
+        $address = CartAddressQuery::create()->findPk($cart->getAddressDeliveryId());
         if (!$address) {
             throw new MissingAddressException('Delivery address not found');
         }
@@ -59,7 +60,7 @@ class CartGuard
             throw new MissingAddressException('Invoice address is required');
         }
 
-        $address = AddressQuery::create()->findPk($cart->getAddressInvoiceId());
+        $address = CartAddressQuery::create()->findPk($cart->getAddressInvoiceId());
         if (!$address) {
             throw new MissingAddressException('Invoice address not found');
         }

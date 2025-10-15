@@ -17,7 +17,6 @@ namespace Thelia\Domain\Cart\Service;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Model\Address;
 use Thelia\Model\CartAddress;
-use Thelia\Model\CartAddressQuery;
 
 class CartAddressService
 {
@@ -26,14 +25,13 @@ class CartAddressService
      */
     public function getOrCreateCartAddressFromAddress(
         Address $address,
-        ?int $cartAddressId = null,
+        ?CartAddress $cartAddress = null,
     ): CartAddress {
-        $cartAddress = $cartAddressId
-            ? CartAddressQuery::create()->findPk($cartAddressId)
-            : new CartAddress();
+        $cartAddress ??= new CartAddress();
 
         $cartAddress
             ->setCustomerTitleId($address->getTitleId())
+            ->setAddressId($address->getId())
             ->setCompany($address->getCompany())
             ->setFirstname($address->getFirstname())
             ->setLastname($address->getLastname())
