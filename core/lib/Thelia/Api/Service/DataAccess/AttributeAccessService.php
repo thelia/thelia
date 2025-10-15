@@ -48,7 +48,7 @@ class AttributeAccessService
         private readonly SecurityContext $securityContext,
         private readonly TaxEngine $taxEngine,
         private readonly EventDispatcherInterface $dispatcher,
-        private readonly CouponManager $couponManager,
+        private readonly CouponManager $couponManager, private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -297,7 +297,7 @@ class AttributeAccessService
     public function attributeCoupon(string $attributeName): mixed
     {
         /** @var Cart $cart */
-        $cart = $this->getSession()->getSessionCart();
+        $cart = $this->getSession()->getSessionCart($this->eventDispatcher);
 
         switch ($attributeName) {
             case 'has_coupons':
@@ -368,13 +368,13 @@ class AttributeAccessService
         $data = self::$dataAccessCache[$cacheKey] ?? null;
 
         if ($data === null) {
-            $lang = $this->getSession()->getLang()->getId();
+            $lang = $this->getSession()->getLang()?->getId();
 
             ModelCriteriaTools::getI18n(
                 false,
                 $lang,
                 $search,
-                $this->getSession()->getLang()->getLocale(),
+                $this->getSession()->getLang()?->getLocale(),
                 $columns,
                 $foreignTable,
                 $foreignKey,
@@ -416,7 +416,7 @@ class AttributeAccessService
             if ($return instanceof \DateTime) {
                 $format = DateTimeFormat::getInstance($this->getRequest())->getFormat();
 
-                return $return->format($format);
+                return $return->format((string) $format);
             }
 
             return $return;

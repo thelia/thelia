@@ -27,7 +27,7 @@ class DateTimeFormat
         return new self($request);
     }
 
-    public function getFormat($output = null)
+    public function getFormat($output = null): ?string
     {
         $lang = $this->request->getSession()->getLang();
 

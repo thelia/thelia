@@ -31,6 +31,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
+use Thelia\Domain\Cart\Service\CartAddressService;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Base\CustomerQuery;
 use Thelia\Model\Base\ProductSaleElementsQuery;
@@ -61,6 +62,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         protected TokenProvider $tokenProvider,
         protected SecurityContext $securityContext,
         protected ContainerInterface $container,
+        protected CartAddressService $cartAddressService,
     ) {
     }
 
@@ -71,12 +73,46 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         $cart = $event->getCart();
         $addressId = $event->getDeliveryAddressId();
+        if (!$addressId) {
+            $cart->setAddressDeliveryId(null)
+                ->save();
 
-        if ($addressId && !$this->validateAddressOwnership($cart, $event->getDeliveryAddressId())) {
             return;
         }
+        $address = AddressQuery::create()
+            ->filterByCustomerId($cart->getCustomerId())
+            ->filterById($addressId)
+            ->findOne();
 
-        $cart->setAddressDeliveryId($addressId)->save();
+        if (!$address) {
+            return;
+        }
+        $cartAddress = $this->cartAddressService->getOrCreateCartAddressFromAddress(
+            $address,
+            $cart->getCartAddressRelatedByAddressDeliveryId()
+        );
+
+        $cart
+            ->setAddressDeliveryId($cartAddress->getId())
+            ->save();
+    }
+
+    public function setDeliveryAddressManual(CartCheckoutEvent $event): void
+    {
+        $cart = $event->getCart();
+        $cartAddress = $event->getCartAddress();
+        if (null === $cartAddress) {
+            $cart->setAddressDeliveryId(null)
+                ->save();
+
+            return;
+        }
+        if ($cartAddress->getId() === null) {
+            $cartAddress->save();
+        }
+        $cart
+            ->setAddressDeliveryId($cartAddress->getId())
+            ->save();
     }
 
     public function setPaymentModule(CartCheckoutEvent $event): void
@@ -107,7 +143,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
             $postage = $this->getPostageByDeliveryModuleId($cart, $dispatcher, $moduleId, $deliveryAddressId);
             $cart
                 ->setPostage($postage->getAmount() - $postage->getAmountTax())
-                ->setPostageTax($postage->getAmountTax())
+                ->setPostageTax($postage->getAmountTax() ?? .0)
                 ->setPostageTaxRuleTitle($postage->getTaxRuleTitle())
                 ->save();
         } catch (\Exception $e) {
@@ -120,12 +156,46 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         $cart = $event->getCart();
         $addressId = $event->getInvoiceAddressId();
+        if (!$addressId) {
+            $cart->setAddressInvoiceId(null)
+                ->save();
 
-        if ($addressId && !$this->validateAddressOwnership($cart, $event->getInvoiceAddressId())) {
+            return;
+        }
+        $address = AddressQuery::create()
+            ->filterByCustomerId($cart->getCustomerId())
+            ->filterById($addressId)
+            ->findOne();
+        if (!$address) {
             return;
         }
 
-        $cart->setAddressInvoiceId($addressId)->save();
+        $cartAddress = $this->cartAddressService->getOrCreateCartAddressFromAddress(
+            $address,
+            $cart->getCartAddressRelatedByAddressInvoiceId()
+        );
+
+        $cart
+            ->setAddressInvoiceId($cartAddress->getId())
+            ->save();
+    }
+
+    public function setInvoiceAddressManual(CartCheckoutEvent $event): void
+    {
+        $cart = $event->getCart();
+        $cartAddress = $event->getCartAddress();
+        if (null === $cartAddress) {
+            $cart->setAddressInvoiceId(null)
+                ->save();
+
+            return;
+        }
+        if ($cartAddress->getId() === null) {
+            $cartAddress->save();
+        }
+        $cart
+            ->setAddressInvoiceId($cartAddress->getId())
+            ->save();
     }
 
     public function persistCart(CartPersistEvent $event): void
@@ -610,9 +680,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         return [
             TheliaEvents::CART_SET_DELIVERY_ADDRESS => ['setDeliveryAddress', 128],
+            TheliaEvents::CART_SET_DELIVERY_ADDRESS_MANUAL => ['setDeliveryAddressManual', 128],
             TheliaEvents::CART_SET_DELIVERY_MODULE => ['setDeliveryModule', 128],
             TheliaEvents::CART_SET_POSTAGE => ['calculatePostage', 128],
             TheliaEvents::CART_SET_INVOICE_ADDRESS => ['setInvoiceAddress', 128],
+            TheliaEvents::CART_SET_INVOICE_ADDRESS_MANUAL => ['setInvoiceAddressManual', 128],
             TheliaEvents::CART_SET_PAYMENT_MODULE => ['setPaymentModule', 128],
             TheliaEvents::CART_PERSIST => ['persistCart', 128],
             TheliaEvents::CART_RESTORE_CURRENT => ['restoreCurrentCart', 128],

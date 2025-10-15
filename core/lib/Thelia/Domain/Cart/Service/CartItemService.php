@@ -38,6 +38,7 @@ readonly class CartItemService
         $cartEvent = $this->cartEventBuilder->buildEvent($cartAddDTO);
         $this->eventDispatcher->dispatch($cartEvent, TheliaEvents::CART_ADDITEM);
         $this->postageHandler->handlePostageOnCart($cartAddDTO->getCart());
+
         return $cartEvent->getCartItem();
     }
 
