@@ -106,8 +106,7 @@
                 "vendor/thelia/modules"
             ],
             "App\\": "src/",
-            "Thelia\\": "core/lib/Thelia",
-            "FlexyBundle\\": "templates/frontOffice/flexy/src"
+            "Thelia\\": "core/lib/Thelia"
         },
         "files": [
             "core/bootstrap.php"
