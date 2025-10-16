@@ -40,17 +40,8 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
     public const CODE_LENGTH = 6;
 
     /**
-     * @param int    $titleId          customer title id (from customer_title table)
-     * @param string $firstname        customer first name
-     * @param string $lastname         customer last name
-     * @param string $address1         customer address
-     * @param string $address2         customer adress complement 1
-     * @param string $address3         customer adress complement 2
-     * @param string $phone            customer phone number
-     * @param string $cellphone        customer cellphone number
-     * @param string $zipcode          customer zipcode
-     * @param int    $countryId        customer country id (from Country table)
-     * @param string $email            customer email, must be unique
+     * Create or update a customer and its main address. Create a new address if none exists.
+     *
      * @param string $plainPassword    customer plain password, hash is made calling setPassword method. Not mandatory parameter but an exception is thrown if customer is new without password
      * @param bool   $forceEmailUpdate true if the email address could be updated
      * @param int    $stateId          customer state id (from State table)
@@ -100,51 +91,32 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         $con->beginTransaction();
 
         try {
+            $address = $this->getDefaultAddress();
             if ($this->isNew()) {
-                $address = new Address();
-
-                $address
-                    ->setLabel(Translator::getInstance()->trans('Main address'))
-                    ->setCompany($company)
-                    ->setTitleId($titleId)
-                    ->setFirstname($firstname)
-                    ->setLastname($lastname)
-                    ->setAddress1($address1)
-                    ->setAddress2($address2)
-                    ->setAddress3($address3)
-                    ->setPhone($phone)
-                    ->setCellphone($cellphone)
-                    ->setZipcode($zipcode)
-                    ->setCity($city)
-                    ->setCountryId($countryId)
-                    ->setStateId($stateId)
-                    ->setIsDefault(1);
-
-                $this->addAddress($address);
-
                 if (ConfigQuery::isCustomerEmailConfirmationEnable()) {
-                    $validationCode = $this->setConfirmationTokenWithExpiry();
-                    $this->_validationCodeForEmail = $validationCode;
+                    $this->_validationCodeForEmail = $this->setConfirmationTokenWithExpiry();
                 }
-            } else {
-                $address = $this->getDefaultAddress();
 
-                $address
-                    ->setCompany($company)
-                    ->setTitleId($titleId)
-                    ->setFirstname($firstname)
-                    ->setLastname($lastname)
-                    ->setAddress1($address1)
-                    ->setAddress2($address2 ?? '')
-                    ->setAddress3($address3 ?? '')
-                    ->setPhone($phone)
-                    ->setCellphone($cellphone)
-                    ->setZipcode($zipcode)
-                    ->setCity($city)
-                    ->setCountryId($countryId)
-                    ->setStateId($stateId)
-                    ->save($con);
+                $address = (new Address())
+                    ->setLabel(Translator::getInstance()->trans('Main address'))
+                    ->setIsDefault(1);
+                $this->addAddress($address);
             }
+
+            $address
+                ->setCompany($company)
+                ->setTitleId($titleId)
+                ->setFirstname($firstname)
+                ->setLastname($lastname)
+                ->setAddress1($address1)
+                ->setAddress2($address2)
+                ->setAddress3($address3)
+                ->setPhone($phone)
+                ->setCellphone($cellphone)
+                ->setZipcode($zipcode)
+                ->setCity($city)
+                ->setCountryId($countryId)
+                ->setStateId($stateId);
 
             $this->save($con);
 

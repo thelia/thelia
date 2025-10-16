@@ -132,7 +132,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     /**
      * @throws PropelException
      */
-    public function modify(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    public function modify(CustomerCreateOrUpdateEvent $event): void
     {
         $plainPassword = $event->getPassword();
 
@@ -217,6 +217,9 @@ class Customer extends BaseAction implements EventSubscriberInterface
         ?CustomerModel $customer,
         CustomerCreateOrUpdateEvent $event,
     ): void {
+        if (null === $customer) {
+            $customer = new CustomerModel();
+        }
         $customer?->createOrUpdate(
             $event->getTitle() ?? $this->customerTitleService->getDefaultCustomerTitle()?->getId(),
             $event->getFirstname(),
