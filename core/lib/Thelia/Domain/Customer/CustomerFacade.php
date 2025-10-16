@@ -25,6 +25,7 @@ use Thelia\Domain\Customer\Service\CustomerAuthenticator;
 use Thelia\Domain\Customer\Service\CustomerCodeManager;
 use Thelia\Domain\Customer\Service\CustomerRegistrationService;
 use Thelia\Domain\Customer\Service\CustomerRememberMeService;
+use Thelia\Domain\Customer\Service\CustomerUpdateService;
 use Thelia\Form\CustomerLogin;
 use Thelia\Model\Customer;
 
@@ -37,6 +38,7 @@ readonly class CustomerFacade
         private CustomerRegistrationService $customerRegistrationService,
         private SecurityContext $securityContext,
         private CustomerCodeManager $customerCodeManager,
+        private CustomerUpdateService $customerUpdateService,
     ) {
     }
 
@@ -96,6 +98,14 @@ readonly class CustomerFacade
     public function register(CustomerRegisterDTO $customerRegisterDTO): Customer
     {
         return $this->customerRegistrationService->registerCustomer($customerRegisterDTO);
+    }
+
+    /**
+     * Update an existing customer account (front profile update flow).
+     */
+    public function update(CustomerRegisterDTO $customerRegisterDTO, Customer $customer): void
+    {
+        $this->customerUpdateService->updateCustomer($customerRegisterDTO, $customer);
     }
 
     /**
