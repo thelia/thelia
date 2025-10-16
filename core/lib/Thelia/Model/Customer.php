@@ -41,6 +41,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
 
     /**
      * Create or update a customer and its main address. Create a new address if none exists.
+     *
      * @param string $plainPassword    customer plain password, hash is made calling setPassword method. Not mandatory parameter but an exception is thrown if customer is new without password
      * @param bool   $forceEmailUpdate true if the email address could be updated
      * @param int    $stateId          customer state id (from State table)
