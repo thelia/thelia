@@ -290,6 +290,8 @@ abstract class BaseLoop implements LoopInterface
                             '%name' => $loopName,
                         ]
                     );
+                } else {
+                    $argument->setValue($value);
                 }
             } elseif ($value !== null && !$argument->type->isValid($value)) {
                 /* check type */
