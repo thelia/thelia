@@ -24,8 +24,10 @@ use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Core\Event\Product\ProductCombinationGenerationEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementDeleteEvent;
+use Thelia\Core\Event\ProductSaleElement\ProductSaleElementToggleVisibilityEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Template\Loop\ProductSaleElementsDocument;
 use Thelia\Core\Template\Loop\ProductSaleElementsImage;
 use Thelia\Core\Translation\Translator;
@@ -142,10 +144,10 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                     ->filterById($event->getProductSaleElementId(), Criteria::NOT_EQUAL)
                     ->update(['IsDefault' => false], $con);
             } elseif ($salesElement->getIsDefault() && 0 === ProductSaleElementsQuery::create()
-                ->filterByProduct($event->getProduct())
-                ->filterByIsDefault(true)
-                ->filterById($salesElement->getId(), Criteria::NOT_EQUAL)
-                ->count()) {
+                    ->filterByProduct($event->getProduct())
+                    ->filterByIsDefault(true)
+                    ->filterById($salesElement->getId(), Criteria::NOT_EQUAL)
+                    ->count()) {
                 // We will not allow the default PSE to become non default if no other default PSE exists for this product.
                 // Prevent setting the only default PSE to non-default
                 $defaultStatus = true;
@@ -284,8 +286,8 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                     $event->getSalePrice(),
                     $event->getCurrencyId(),
                     $isDefault,
-                    (bool) $event->getOnsale(),
-                    (bool) $event->getIsnew(),
+                    (bool)$event->getOnsale(),
+                    (bool)$event->getIsnew(),
                     $event->getQuantity(),
                     $event->getEanCode(),
                     $event->getReference(),
@@ -308,9 +310,9 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     /**
      * Create a combination for a given product sale element.
      *
-     * @param ConnectionInterface $con                   the Propel connection
-     * @param ProductSaleElements $salesElement          the product sale element
-     * @param array               $combinationAttributes an array oif attributes av IDs
+     * @param ConnectionInterface $con the Propel connection
+     * @param ProductSaleElements $salesElement the product sale element
+     * @param array $combinationAttributes an array oif attributes av IDs
      *
      * @throws PropelException
      */
@@ -351,7 +353,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
         /**
          * Handle PSEs.
          *
-         * @var int                 $key
+         * @var int $key
          * @var ProductSaleElements $originalProductPSE
          */
         foreach ($originalProductPSEs as $key => $originalProductPSE) {
@@ -406,20 +408,18 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
         $clonedProductUpdatePSEEvent = new ProductSaleElementUpdateEvent($event->getClonedProduct(), $clonedProductPSEId);
         $clonedProductUpdatePSEEvent
-            ->setReference($event->getClonedProduct()->getRef().'-'.($key + 1))
+            ->setReference($event->getClonedProduct()->getRef() . '-' . ($key + 1))
             ->setIsdefault($originalProductPSE->getIsDefault())
             ->setFromDefaultCurrency(0)
-
             ->setWeight($originalProductPSE->getWeight())
             ->setQuantity($originalProductPSE->getQuantity())
             ->setOnsale($originalProductPSE->getPromo())
             ->setIsnew($originalProductPSE->getNewness())
             ->setEanCode($originalProductPSE->getEanCode())
-            ->setTaxRuleId((int) $event->getOriginalProduct()->getTaxRuleId())
-
-            ->setPrice((float) $originalProductPSEPrice->getPrice())
-            ->setSalePrice((float) $originalProductPSEPrice->getPromoPrice())
-            ->setCurrencyId((int) $originalProductPSEPrice->getCurrencyId());
+            ->setTaxRuleId((int)$event->getOriginalProduct()->getTaxRuleId())
+            ->setPrice((float)$originalProductPSEPrice->getPrice())
+            ->setSalePrice((float)$originalProductPSEPrice->getPromoPrice())
+            ->setCurrencyId((int)$originalProductPSEPrice->getCurrencyId());
 
         $this->eventDispatcher->dispatch($clonedProductUpdatePSEEvent, TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT);
     }
@@ -496,12 +496,32 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      * END CLONING *
      */
 
+    /**
+     * @throws PropelException
+     */
+    public function toggle(ProductSaleElementToggleVisibilityEvent $event): void
+    {
+        $pseId = $event->getProductSaleElementId();
+        if(!$pse = ProductSaleElementsQuery::create()->findPk($pseId)) {
+            throw new \Exception(Translator::getInstance()->trans('Product sale element not found'));
+        }
+
+        $pse->setVisible(!$pse->getVisible())->save();
+    }
+
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    {
+        $this->genericUpdatePosition(ProductSaleElementsQuery::create(), $event, $dispatcher);
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT => ['create', 128],
             TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT => ['update', 128],
             TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT => ['delete', 128],
+            TheliaEvents::PRODUCT_PRODUCT_SALE_ELEMENT_TOGGLE_VISIBILITY => ['toggle', 128],
+            TheliaEvents::PRODUCT_PRODUCT_SALE_ELEMENT_UPDATE_POSITION => ['updatePosition', 128],
             TheliaEvents::PRODUCT_COMBINATION_GENERATION => ['generateCombinations', 128],
             TheliaEvents::PSE_CLONE => ['clonePSE', 128],
         ];

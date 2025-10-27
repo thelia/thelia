@@ -61,7 +61,8 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
 
     public function __construct(
         protected readonly TaxEngine $taxEngine,
-    ) {
+    )
+    {
     }
 
     protected function getArgDefinitions(): ArgumentCollection
@@ -95,10 +96,12 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                             'created', 'created_reverse',
                             'updated', 'updated_reverse',
                             'random',
+                            'position',
+                            'position-reverse',
                         ],
                     ),
                 ),
-                'random',
+                'position',
             ),
         );
     }
@@ -138,9 +141,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         $visible = $this->getVisible();
 
         if (BooleanOrBothType::ANY !== $visible) {
-            $search->useProductQuery()
-                ->filterByVisible($visible)
-                ->endUse();
+            $search->filterByVisible($visible);
         }
 
         $default = $this->getDefault();
@@ -201,6 +202,12 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                 case 'updated_reverse':
                     $search->addDescendingOrderByColumn('updated_at');
                     break;
+                case 'position':
+                    $search->orderByPosition();
+                    break;
+                case 'position_reverse':
+                    $search->orderByPosition(Criteria::DESC);
+                    break;
                 case 'random':
                     $search->clearOrderByColumns();
                     $search->addAscendingOrderByColumn('RAND()');
@@ -214,7 +221,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             $currency = CurrencyQuery::create()->findPk($currencyId);
 
             if (null === $currency) {
-                throw new \InvalidArgumentException('Cannot found currency id: `'.$currency.'` in product_sale_elements loop');
+                throw new \InvalidArgumentException('Cannot found currency id: `' . $currency . '` in product_sale_elements loop');
             }
         } else {
             $currency = $this->getMainRequest()->getSession()->getCurrency();
@@ -226,17 +233,17 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         $search->joinProductPrice('price', Criteria::LEFT_JOIN)
             ->addJoinCondition('price', '`price`.`currency_id` = ?', $currency->getId(), null, \PDO::PARAM_INT);
 
-        $search->joinProductPrice('price'.$defaultCurrencySuffix, Criteria::LEFT_JOIN)
-            ->addJoinCondition('price_default_currency', '`price'.$defaultCurrencySuffix.'`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
+        $search->joinProductPrice('price' . $defaultCurrencySuffix, Criteria::LEFT_JOIN)
+            ->addJoinCondition('price_default_currency', '`price' . $defaultCurrencySuffix . '`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
 
         /**
          * rate value is checked as a float in overloaded getRate method.
          */
-        $priceSelectorAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PRICE * '.$currency->getRate().' ELSE `price`.PRICE END';
-        $promoPriceSelectorAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PROMO_PRICE  * '.$currency->getRate().' ELSE `price`.PROMO_PRICE END';
+        $priceSelectorAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PRICE * ' . $currency->getRate() . ' ELSE `price`.PRICE END';
+        $promoPriceSelectorAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PROMO_PRICE  * ' . $currency->getRate() . ' ELSE `price`.PROMO_PRICE END';
         $search->withColumn($priceSelectorAsSQL, 'price_PRICE')
             ->withColumn($promoPriceSelectorAsSQL, 'price_PROMO_PRICE')
-            ->withColumn('CASE WHEN '.ProductSaleElementsTableMap::COL_PROMO.' = 1 THEN '.$promoPriceSelectorAsSQL.' ELSE '.$priceSelectorAsSQL.' END', 'price_FINAL_PRICE');
+            ->withColumn('CASE WHEN ' . ProductSaleElementsTableMap::COL_PROMO . ' = 1 THEN ' . $promoPriceSelectorAsSQL . ' ELSE ' . $priceSelectorAsSQL . ' END', 'price_FINAL_PRICE');
 
         $search->groupById();
 
@@ -286,6 +293,8 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                 ->set('ID', $PSEValue->getId())
                 ->set('QUANTITY', $PSEValue->getQuantity())
                 ->set('IS_PROMO', 1 === $PSEValue->getPromo() ? 1 : 0)
+                ->set('VISIBLE', $PSEValue->getVisible())
+                ->set('POSITION', $PSEValue->getPosition())
                 ->set('IS_NEW', 1 === $PSEValue->getNewness() ? 1 : 0)
                 ->set('IS_DEFAULT', $PSEValue->getIsDefault() ? 1 : 0)
                 ->set('WEIGHT', $PSEValue->getWeight())

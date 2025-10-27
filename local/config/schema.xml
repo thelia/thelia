@@ -333,6 +333,8 @@
     <column name="product_id" required="true" type="INTEGER" />
     <column name="ref" required="true" size="255" type="VARCHAR" />
     <column name="quantity" required="true" type="FLOAT" />
+    <column name="position" type="INTEGER" />
+    <column name="visible" type="BOOLEAN" default="true" />
     <column defaultValue="0" name="promo" type="TINYINT" />
     <column defaultValue="0" name="newness" type="TINYINT" />
     <column defaultValue="0" name="weight" type="FLOAT" />

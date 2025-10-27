@@ -234,4 +234,7 @@ ALTER TABLE `cart`
           ON UPDATE RESTRICT
              ON DELETE RESTRICT;
 
+ALTER TABLE `product_sale_elements` ADD COLUMN `position` INT NOT NULL DEFAULT 0 AFTER `quantity`;
+ALTER TABLE `product_sale_elements` ADD COLUMN `visible` BOOLEAN NOT NULL DEFAULT TRUE AFTER `quantity`;
+
 SET FOREIGN_KEY_CHECKS = 1;

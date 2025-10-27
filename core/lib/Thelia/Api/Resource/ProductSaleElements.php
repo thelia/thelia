@@ -26,6 +26,7 @@ use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
+use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 
@@ -82,8 +83,16 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
         'isDefault',
         'promo',
         'newness',
+        'visible'
     ],
-)] // todo add visible filter from product
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'ref',
+        'position',
+    ],
+)]
 class ProductSaleElements implements PropelResourceInterface
 {
     use PropelResourceTrait;
@@ -137,6 +146,22 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_FRONT_READ,
     ])]
     public int $quantity;
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        self::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_ADMIN_WRITE,
+        CartItem::GROUP_ADMIN_READ,
+        CartItem::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ,
+    ])]
+    public ?bool $visible = null;
+
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
+    public ?int $position = null;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -283,6 +308,30 @@ class ProductSaleElements implements PropelResourceInterface
     public function setPromo(?bool $promo): self
     {
         $this->promo = $promo;
+
+        return $this;
+    }
+
+    public function isVisible(): ?bool
+    {
+        return $this->visible;
+    }
+
+    public function setVisible(?bool $visible): self
+    {
+        $this->visible = $visible;
+
+        return $this;
+    }
+
+    public function getPosition(): ?int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(?int $position): self
+    {
+        $this->position = $position;
 
         return $this;
     }

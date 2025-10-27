@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -102,6 +103,14 @@ class ProductSaleElementUpdateForm extends BaseForm
                     'constraints' => [new NotBlank()],
                 ],
             ])
+            ->add(
+                'visible',
+                CheckboxType::class,
+                [
+                    'constraints' => [],
+                    'required' => false
+                ],
+            )
             ->add('sale_price', CollectionType::class, [
                 'label' => Translator::getInstance()->trans('Sale price excluding taxes'),
                 'label_attr' => ['for' => 'price_with_tax_field'],

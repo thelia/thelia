@@ -426,6 +426,14 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::loadConvertedPrices</default>
     </route>
 
+    <route id="admin.product.product-sale-element-visibility" path="/admin/product/product-sale-element-visibility">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::toggleProductSaleElementVisibility</default>
+    </route>
+
+    <route id="admin.product.product-sale-element-position" path="/admin/product/product-sale-element-position">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::updateProductSalementPosition</default>
+    </route>
+
     <!-- accessories -->
 
     <route id="admin.products.accessories.add" path="/admin/products/accessory/add">

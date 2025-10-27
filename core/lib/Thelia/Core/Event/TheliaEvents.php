@@ -165,6 +165,9 @@ final class TheliaEvents
     public const PRODUCT_ADD_PRODUCT_SALE_ELEMENT = 'action.addProductSaleElement';
     public const PRODUCT_DELETE_PRODUCT_SALE_ELEMENT = 'action.deleteProductSaleElement';
     public const PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT = 'action.updateProductSaleElement';
+
+    public const PRODUCT_PRODUCT_SALE_ELEMENT_TOGGLE_VISIBILITY = 'action.toggleProductSaleElementVisibility';
+    public const PRODUCT_PRODUCT_SALE_ELEMENT_UPDATE_POSITION = 'action.updateProductSaleElementPosition';
     public const PRODUCT_COMBINATION_GENERATION = 'action.productCombinationGeneration';
     public const PRODUCT_SET_TEMPLATE = 'action.productSetTemplate';
     public const PRODUCT_ADD_ACCESSORY = 'action.productAddProductAccessory';

@@ -14,13 +14,17 @@ declare(strict_types=1);
 
 namespace Thelia\Model;
 
+use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Domain\Taxation\TaxEngine\Calculator;
 use Thelia\Model\Base\ProductSaleElements as BaseProductSaleElements;
+use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Tools\ProductPriceTools;
 
 class ProductSaleElements extends BaseProductSaleElements
 {
+    use PositionManagementTrait;
+
     /**
      * @throws PropelException
      */
@@ -121,5 +125,33 @@ class ProductSaleElements extends BaseProductSaleElements
         }
 
         return new ProductPriceTools((float) $price, (float) $promoPrice);
+    }
+
+    protected function addCriteriaToPositionQuery($query): void
+    {
+        /* @var $query ProductSaleElementsQuery */
+        $query->filterByProductId($this->getProductId());
+    }
+
+    public function preInsert(?ConnectionInterface $con = null): bool
+    {
+        $this->setPosition($this->getNextPosition());
+
+        parent::preInsert($con);
+
+        return true;
+    }
+
+    public function preDelete(?ConnectionInterface $con = null): bool
+    {
+        parent::preDelete($con);
+
+        $this->reorderBeforeDelete(
+            [
+                'id' => $this->getId(),
+            ]
+        );
+
+        return true;
     }
 }
