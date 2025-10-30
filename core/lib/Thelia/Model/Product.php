@@ -211,7 +211,7 @@ class Product extends BaseProduct implements FileModelParentInterface
         bool $isNew = false,
         int $quantity = 0,
         string $eanCode = '',
-        bool $ref = false,
+        bool|string $ref = false,
     ): ProductSaleElements {
         // Create an empty product sale element
         $saleElements = new ProductSaleElements();

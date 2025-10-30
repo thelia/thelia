@@ -278,19 +278,23 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
             // Create all combinations
             foreach ($event->getCombinations() as $combinationAttributesAvIds) {
+                $product = $event->getProduct();
+                if (!$product instanceof \Thelia\Model\Product) {
+                    continue;
+                }
                 // Create the PSE
-                $saleElement = $event->getProduct()->createProductSaleElement(
+                $saleElement = $product->createProductSaleElement(
                     $con,
                     $event->getWeight(),
                     $event->getPrice(),
                     $event->getSalePrice(),
                     $event->getCurrencyId(),
                     $isDefault,
-                    (bool)$event->getOnsale(),
-                    (bool)$event->getIsnew(),
-                    $event->getQuantity(),
+                    (bool) $event->getOnsale(),
+                    (bool) $event->getIsnew(),
+                    $event->getQuantity() ? (int) $event->getQuantity() : null,
                     $event->getEanCode(),
-                    $event->getReference(),
+                    $event->getReference() ?? $product->getRef(),
                 );
 
                 $isDefault = false;
@@ -310,9 +314,9 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     /**
      * Create a combination for a given product sale element.
      *
-     * @param ConnectionInterface $con the Propel connection
-     * @param ProductSaleElements $salesElement the product sale element
-     * @param array $combinationAttributes an array oif attributes av IDs
+     * @param ConnectionInterface $con                   the Propel connection
+     * @param ProductSaleElements $salesElement          the product sale element
+     * @param array               $combinationAttributes an array oif attributes av IDs
      *
      * @throws PropelException
      */
@@ -353,7 +357,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
         /**
          * Handle PSEs.
          *
-         * @var int $key
+         * @var int                 $key
          * @var ProductSaleElements $originalProductPSE
          */
         foreach ($originalProductPSEs as $key => $originalProductPSE) {
@@ -408,7 +412,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
         $clonedProductUpdatePSEEvent = new ProductSaleElementUpdateEvent($event->getClonedProduct(), $clonedProductPSEId);
         $clonedProductUpdatePSEEvent
-            ->setReference($event->getClonedProduct()->getRef() . '-' . ($key + 1))
+            ->setReference($event->getClonedProduct()->getRef().'-'.($key + 1))
             ->setIsdefault($originalProductPSE->getIsDefault())
             ->setFromDefaultCurrency(0)
             ->setWeight($originalProductPSE->getWeight())
@@ -416,10 +420,10 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             ->setOnsale($originalProductPSE->getPromo())
             ->setIsnew($originalProductPSE->getNewness())
             ->setEanCode($originalProductPSE->getEanCode())
-            ->setTaxRuleId((int)$event->getOriginalProduct()->getTaxRuleId())
-            ->setPrice((float)$originalProductPSEPrice->getPrice())
-            ->setSalePrice((float)$originalProductPSEPrice->getPromoPrice())
-            ->setCurrencyId((int)$originalProductPSEPrice->getCurrencyId());
+            ->setTaxRuleId((int) $event->getOriginalProduct()->getTaxRuleId())
+            ->setPrice((float) $originalProductPSEPrice->getPrice())
+            ->setSalePrice((float) $originalProductPSEPrice->getPromoPrice())
+            ->setCurrencyId((int) $originalProductPSEPrice->getCurrencyId());
 
         $this->eventDispatcher->dispatch($clonedProductUpdatePSEEvent, TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT);
     }
@@ -502,7 +506,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     public function toggle(ProductSaleElementToggleVisibilityEvent $event): void
     {
         $pseId = $event->getProductSaleElementId();
-        if(!$pse = ProductSaleElementsQuery::create()->findPk($pseId)) {
+        if (!$pse = ProductSaleElementsQuery::create()->findPk($pseId)) {
             throw new \Exception(Translator::getInstance()->trans('Product sale element not found'));
         }
 
