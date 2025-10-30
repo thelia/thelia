@@ -18,25 +18,25 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class FolderI18n extends I18n
 {
-    #[Groups([Folder::GROUP_ADMIN_READ, Folder::GROUP_ADMIN_WRITE])]
+    #[Groups([Folder::GROUP_ADMIN_READ, Folder::GROUP_ADMIN_WRITE, Folder::GROUP_FRONT_READ])]
     protected ?string $title = null;
 
-    #[Groups([Folder::GROUP_ADMIN_READ, Folder::GROUP_ADMIN_WRITE])]
+    #[Groups([Folder::GROUP_ADMIN_READ, Folder::GROUP_ADMIN_WRITE, Folder::GROUP_FRONT_READ])]
     protected ?string $description = null;
 
-    #[Groups([Folder::GROUP_ADMIN_READ, Folder::GROUP_ADMIN_WRITE])]
+    #[Groups([Folder::GROUP_ADMIN_READ, Folder::GROUP_ADMIN_WRITE, Folder::GROUP_FRONT_READ])]
     protected ?string $chapo = null;
 
-    #[Groups([Folder::GROUP_ADMIN_READ, Folder::GROUP_ADMIN_WRITE])]
+    #[Groups([Folder::GROUP_ADMIN_READ, Folder::GROUP_ADMIN_WRITE, Folder::GROUP_FRONT_READ])]
     protected ?string $postscriptum = null;
 
-    #[Groups([Folder::GROUP_ADMIN_READ, Folder::GROUP_ADMIN_WRITE])]
+    #[Groups([Folder::GROUP_ADMIN_READ, Folder::GROUP_ADMIN_WRITE, Folder::GROUP_FRONT_READ])]
     protected ?string $metaTitle = null;
 
-    #[Groups([Folder::GROUP_ADMIN_READ, Folder::GROUP_ADMIN_WRITE])]
+    #[Groups([Folder::GROUP_ADMIN_READ, Folder::GROUP_ADMIN_WRITE, Folder::GROUP_FRONT_READ])]
     protected ?string $metaDescription = null;
 
-    #[Groups([Folder::GROUP_ADMIN_READ, Folder::GROUP_ADMIN_WRITE])]
+    #[Groups([Folder::GROUP_ADMIN_READ, Folder::GROUP_ADMIN_WRITE, Folder::GROUP_FRONT_READ])]
     protected ?string $metaKeywords = null;
 
     public function getTitle(): ?string
