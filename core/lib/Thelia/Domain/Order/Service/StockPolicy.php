@@ -23,7 +23,7 @@ readonly class StockPolicy
         return $checkAvailableStock && $useStock;
     }
 
-    public function assertStockIsAvailable(int $requestedQuantity, int $availableQuantity, string $message): void
+    public function assertStockIsAvailable(float $requestedQuantity, float $availableQuantity, string $message): void
     {
         if ($requestedQuantity > $availableQuantity) {
             throw new TheliaProcessException($message);
@@ -35,7 +35,7 @@ readonly class StockPolicy
         return $useStock && $manageStockOnCreation;
     }
 
-    public function computeNewQuantity(int $currentQuantity, int $requestedQuantity, int $allowNegativeStock): int
+    public function computeNewQuantity(float $currentQuantity, float $requestedQuantity, int $allowNegativeStock): float
     {
         $newQuantity = $currentQuantity - $requestedQuantity;
         if ($newQuantity < 0 && 0 === $allowNegativeStock) {

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Shipping\Service;
 
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Cart\Service\CartAddressService;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\ModuleQuery;
@@ -22,7 +23,10 @@ use Thelia\Module\BaseModule;
 
 final readonly class DeliverySetupService
 {
-    public function __construct(private PostageEstimator $postageEstimator)
+    public function __construct(
+        private PostageEstimator $postageEstimator,
+        private CartAddressService $cartAddressService,
+    )
     {
     }
 
@@ -34,13 +38,13 @@ final readonly class DeliverySetupService
             return;
         }
 
-        $defaultAddress = $customer->getDefaultAddress();
+        $defaultCartAddress = $this->cartAddressService->getOrCreateCartAddressFromAddress($customer->getDefaultAddress());
 
-        if (null === $defaultAddress) {
+        if (null === $defaultCartAddress) {
             throw new \RuntimeException(Translator::getInstance()->trans('Customer default address is null'));
         }
 
-        $cart->setAddressDeliveryId($defaultAddress->getId())->save();
+        $cart->setAddressDeliveryId($defaultCartAddress->getId())->save();
     }
 
     public function setupVirtualDelivery(Cart $cart): void

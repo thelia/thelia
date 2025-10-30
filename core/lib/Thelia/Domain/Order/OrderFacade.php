@@ -136,8 +136,8 @@ readonly class OrderFacade
                 $taxDetails = $this->taxProvider->computeTaxesForCartItem(
                     $product,
                     $taxCountry,
-                    $cartItem->getPrice(),
-                    $cartItem->getPromoPrice(),
+                    (float) $cartItem->getPrice(),
+                    (float) $cartItem->getPromoPrice(),
                     $lang->getLocale()
                 );
 
