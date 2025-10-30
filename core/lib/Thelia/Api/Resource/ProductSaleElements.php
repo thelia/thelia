@@ -83,7 +83,7 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
         'isDefault',
         'promo',
         'newness',
-        'visible'
+        'visible',
     ],
 )]
 #[ApiFilter(

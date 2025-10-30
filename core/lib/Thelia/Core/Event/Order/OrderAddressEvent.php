@@ -25,7 +25,7 @@ class OrderAddressEvent extends ActionEvent
 
     public function __construct(
         /**
-         * @var null|int|string title id
+         * @var int|string|null title id
          */
         protected $title,
         /**
@@ -73,7 +73,7 @@ class OrderAddressEvent extends ActionEvent
          */
         protected $cellphone = null,
         /**
-         * @var null|int|string state id
+         * @var int|string|null state id
          */
         protected $state = null,
     ) {
@@ -109,7 +109,7 @@ class OrderAddressEvent extends ActionEvent
         return $this->country;
     }
 
-    public function getState(): null|int|string
+    public function getState(): int|string|null
     {
         return $this->state;
     }
@@ -134,7 +134,7 @@ class OrderAddressEvent extends ActionEvent
         return $this->cellphone;
     }
 
-    public function getTitle(): null|int|string
+    public function getTitle(): int|string|null
     {
         return $this->title;
     }

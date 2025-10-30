@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Event\ProductSaleElement;
 
-
 class ProductSaleElementToggleVisibilityEvent extends ProductSaleElementEvent
 {
     public function __construct(protected int $product_sale_element_id)
@@ -30,6 +29,7 @@ class ProductSaleElementToggleVisibilityEvent extends ProductSaleElementEvent
     public function setProductSaleElementId(int $product_sale_element_id): self
     {
         $this->product_sale_element_id = $product_sale_element_id;
+
         return $this;
     }
 }

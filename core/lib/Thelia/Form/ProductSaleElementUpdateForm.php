@@ -108,7 +108,7 @@ class ProductSaleElementUpdateForm extends BaseForm
                 CheckboxType::class,
                 [
                     'constraints' => [],
-                    'required' => false
+                    'required' => false,
                 ],
             )
             ->add('sale_price', CollectionType::class, [
