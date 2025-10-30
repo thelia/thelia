@@ -54,7 +54,7 @@ class ProductSaleElementsAccessService
             $discount = $this->securityContext->getCustomerUser()->getDiscount();
         }
 
-        foreach (ProductSaleElementsQuery::create()->orderByPosition()->findByProductId($productId) as $pse) {
+        foreach (ProductSaleElementsQuery::create()->filterByVisible(true)->orderByPosition()->findByProductId($productId) as $pse) {
             $attributes = [];
             $price = ProductPriceQuery::create()->filterByProductSaleElements($pse)->findOne();
 
