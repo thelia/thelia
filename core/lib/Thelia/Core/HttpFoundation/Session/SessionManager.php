@@ -94,7 +94,7 @@ class SessionManager
                 new CustomerLoginEvent($user),
                 TheliaEvents::CUSTOMER_LOGIN,
             );
-        } catch (TokenAuthenticationException) {
+        } catch (\Exception) {
             // Clear the cookie
             $this->clearRememberMeCookie($cookieCustomerName);
         }
