@@ -398,6 +398,8 @@ CREATE TABLE `product_sale_elements`
     `product_id` INTEGER NOT NULL,
     `ref` VARCHAR(255) NOT NULL,
     `quantity` FLOAT NOT NULL,
+    `position` INT NOT NULL DEFAULT 0,
+    `visible` BOOLEAN NOT NULL DEFAULT TRUE,
     `promo` TINYINT DEFAULT 0,
     `newness` TINYINT DEFAULT 0,
     `weight` FLOAT DEFAULT 0,
@@ -455,7 +457,7 @@ CREATE TABLE `config`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(255) NOT NULL,
-    `value` TEXT NOT NULL,
+    `value` TEXT NULL,
     `secured` TINYINT DEFAULT 1 NOT NULL,
     `hidden` TINYINT DEFAULT 1 NOT NULL,
     `created_at` DATETIME,
