@@ -125,7 +125,7 @@ class SessionManager
             $this->applyUserLocale($user, $session);
 
             AdminLog::append('admin', 'LOGIN', 'Authentication successful', $request, $user, false);
-        } catch (TokenAuthenticationException) {
+        } catch (\Exception) {
             AdminLog::append('admin', 'LOGIN', 'Token based authentication failed.', $request);
 
             // Clear the cookie
