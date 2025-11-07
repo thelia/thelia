@@ -20,12 +20,12 @@ use Thelia\Model\CustomerQuery;
 
 class CustomerTokenUserProvider extends TokenUserProvider
 {
-    public function getUser(array $dataArray): UserInterface
+    public function getUser(array $key): UserInterface
     {
         if (null === $customer = CustomerQuery::create()
-            ->filterByEmail($dataArray['username'], Criteria::EQUAL)
-            ->filterByRememberMeSerial($dataArray['serial'], Criteria::EQUAL)
-            ->filterByRememberMeToken($dataArray['token'], Criteria::EQUAL)
+            ->filterByEmail($key['username'], Criteria::EQUAL)
+            ->filterByRememberMeSerial($key['serial'], Criteria::EQUAL)
+            ->filterByRememberMeToken($key['token'], Criteria::EQUAL)
             ->findOne()) {
             throw new \InvalidArgumentException('No user found with this token (maybe try to delete your cookies)');
         }

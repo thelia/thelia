@@ -20,12 +20,16 @@ use Thelia\Model\AdminQuery;
 
 class AdminTokenUserProvider extends TokenUserProvider
 {
-    public function getUser(array $dataArray): UserInterface
+    public function getUser(array $key): UserInterface
     {
-        return AdminQuery::create()
-            ->filterByLogin($dataArray['username'], Criteria::EQUAL)
-            ->filterByRememberMeSerial($dataArray['serial'], Criteria::EQUAL)
-            ->filterByRememberMeToken($dataArray['token'], Criteria::EQUAL)
-            ->findOne();
+        if (null === $admin = AdminQuery::create()
+            ->filterByLogin($key['username'], Criteria::EQUAL)
+            ->filterByRememberMeSerial($key['serial'], Criteria::EQUAL)
+            ->filterByRememberMeToken($key['token'], Criteria::EQUAL)
+            ->findOne()) {
+            throw new \InvalidArgumentException('No admin found with this token (maybe try to delete your cookies)');
+        }
+
+        return $admin;
     }
 }

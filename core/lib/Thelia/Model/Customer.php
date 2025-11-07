@@ -316,7 +316,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
 
     public function checkPassword(string $password): bool
     {
-        return password_verify($password, $this->password);
+        return password_verify($password, $this->getPassword());
     }
 
     public function eraseCredentials(): void
