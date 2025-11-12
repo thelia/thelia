@@ -120,7 +120,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         // Tell coupons to clear any data they may have stored
         $this->couponManager->clear();
 
-        $this->getSession()->setConsumedCoupons([]);
+        $this->getSession()?->setConsumedCoupons([]);
 
         $this->updateOrderDiscount($event, $eventName, $dispatcher);
     }
@@ -133,25 +133,20 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     public function consume(CouponConsumeEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $totalDiscount = 0;
-        $isValid = false;
 
-        /** @var CouponInterface $coupon */
         $coupon = $this->couponFactory->buildCouponFromCode($event->getCode());
 
-        if ($coupon) {
-            $isValid = $coupon->isMatching();
+        $isValid = $coupon->isMatching();
+        if ($isValid) {
+            $this->couponManager->pushCouponInSession($event->getCode());
+            $totalDiscount = $this->couponManager->getDiscount();
 
-            if ($isValid) {
-                $this->couponManager->pushCouponInSession($event->getCode());
-                $totalDiscount = $this->couponManager->getDiscount();
+            $this->getSession()?->getSessionCart($dispatcher)
+                ->setDiscount($totalDiscount)
+                ->save();
 
-                $this->getSession()?->getSessionCart($dispatcher)
-                    ->setDiscount($totalDiscount)
-                    ->save();
-
-                $this->getSession()?->getOrder()
-                    ->setDiscount($totalDiscount);
-            }
+            $this->getSession()?->getOrder()
+                ->setDiscount($totalDiscount);
         }
 
         $event->setIsValid($isValid);
@@ -180,15 +175,14 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * Call the Model and delegate the create or delete action
      * Feed the Event with the updated model.
      *
-     * @param CouponModel               $coupon Model to save
-     * @param CouponCreateOrUpdateEvent $event  Event containing data
+     * @param CouponModel $coupon Model to save
+     * @param CouponCreateOrUpdateEvent $event Event containing data
+     * @throws \Exception
      */
     protected function createOrUpdate(CouponModel $coupon, CouponCreateOrUpdateEvent $event, EventDispatcherInterface $dispatcher): void
     {
         // Set default condition if none found
-        /** @var ConditionInterface $noConditionRule */
         $noConditionRule = $this->noConditionRule;
-        /** @var ConditionFactory $conditionFactory */
         $conditionFactory = $this->conditionFactory;
         $couponRuleCollection = new ConditionCollection();
         $couponRuleCollection[] = $noConditionRule;
@@ -224,12 +218,12 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * Call the Model and delegate the create or delete action
      * Feed the Event with the updated model.
      *
-     * @param CouponModel               $coupon Model to save
-     * @param CouponCreateOrUpdateEvent $event  Event containing data
+     * @param CouponModel $coupon Model to save
+     * @param CouponCreateOrUpdateEvent $event Event containing data
+     * @throws \Exception
      */
     protected function createOrUpdateCondition(CouponModel $coupon, CouponCreateOrUpdateEvent $event, EventDispatcherInterface $dispatcher): void
     {
-        /** @var ConditionFactory $conditionFactory */
         $conditionFactory = $this->conditionFactory;
 
         $coupon->createOrUpdateConditions(
@@ -275,73 +269,74 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      */
     public function afterOrder(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        /** @var CouponInterface[] $consumedCoupons */
         $consumedCoupons = $this->couponManager->getCouponsKept();
 
-        if (\is_array($consumedCoupons) && [] !== $consumedCoupons) {
-            $con = Propel::getWriteConnection(OrderCouponTableMap::DATABASE_NAME);
-            $con->beginTransaction();
+        if ([] === $consumedCoupons) {
+            return;
+        }
+        $con = Propel::getWriteConnection(OrderCouponTableMap::DATABASE_NAME);
+        $con->beginTransaction();
 
-            try {
-                foreach ($consumedCoupons as $couponCode) {
-                    $couponQuery = CouponQuery::create();
-                    $couponModel = $couponQuery->findOneByCode($couponCode->getCode());
-                    $couponModel->setLocale($this->getSession()?->getLang()?->getLocale());
+        try {
+            foreach ($consumedCoupons as $couponCode) {
+                $couponQuery = CouponQuery::create();
+                $couponModel = $couponQuery->findOneByCode($couponCode->getCode());
+                $couponModel->setLocale($this->getSession()?->getLang()?->getLocale());
 
-                    /* decrease coupon quantity */
-                    $this->couponManager->decrementQuantity($couponModel, $event->getOrder()?->getCustomerId());
+                /* decrease coupon quantity */
+                $this->couponManager->decrementQuantity($couponModel, $event->getOrder()?->getCustomerId());
 
-                    /* memorize coupon */
-                    $orderCoupon = new OrderCoupon();
-                    $orderCoupon->setOrder($event->getOrder())
-                        ->setCode($couponModel->getCode())
-                        ->setType($couponModel->getType())
-                        ->setAmount($couponCode->exec())
-                        ->setTitle($couponModel->getTitle())
-                        ->setShortDescription($couponModel->getShortDescription())
-                        ->setDescription($couponModel->getDescription())
-                        ->setStartDate($couponModel->getStartDate())
-                        ->setExpirationDate($couponModel->getExpirationDate())
-                        ->setIsCumulative($couponModel->getIsCumulative())
-                        ->setIsRemovingPostage($couponModel->getIsRemovingPostage())
-                        ->setIsAvailableOnSpecialOffers($couponModel->getIsAvailableOnSpecialOffers())
-                        ->setSerializedConditions($couponModel->getSerializedConditions())
-                        ->setPerCustomerUsageCount($couponModel->getPerCustomerUsageCount());
-                    $orderCoupon->save();
+                /* memorize coupon */
+                $orderCoupon = new OrderCoupon();
+                $orderCoupon->setOrder($event->getOrder())
+                    ->setCode($couponModel->getCode())
+                    ->setType($couponModel->getType())
+                    ->setAmount($couponCode->exec())
+                    ->setTitle($couponModel->getTitle())
+                    ->setShortDescription($couponModel->getShortDescription())
+                    ->setDescription($couponModel->getDescription())
+                    ->setStartDate($couponModel->getStartDate())
+                    ->setExpirationDate($couponModel->getExpirationDate())
+                    ->setIsCumulative($couponModel->getIsCumulative())
+                    ->setIsRemovingPostage($couponModel->getIsRemovingPostage())
+                    ->setIsAvailableOnSpecialOffers($couponModel->getIsAvailableOnSpecialOffers())
+                    ->setSerializedConditions($couponModel->getSerializedConditions())
+                    ->setPerCustomerUsageCount($couponModel->getPerCustomerUsageCount());
+                $orderCoupon->save();
 
-                    // Copy order coupon free shipping data for countries and modules
-                    $couponCountries = CouponCountryQuery::create()->filterByCouponId($couponModel->getId())->find();
+                // Copy order coupon free shipping data for countries and modules
+                $couponCountries = CouponCountryQuery::create()->filterByCouponId($couponModel->getId())->find();
 
-                    /** @var CouponCountry $couponCountry */
-                    foreach ($couponCountries as $couponCountry) {
-                        $occ = new OrderCouponCountry();
+                /** @var CouponCountry $couponCountry */
+                foreach ($couponCountries as $couponCountry) {
+                    $occ = new OrderCouponCountry();
 
-                        $occ
-                            ->setCouponId($orderCoupon->getId())
-                            ->setCountryId($couponCountry->getCountryId())
-                            ->save();
-                    }
-
-                    $couponModules = CouponModuleQuery::create()->filterByCouponId($couponModel->getId())->find();
-
-                    /** @var CouponModule $couponModule */
-                    foreach ($couponModules as $couponModule) {
-                        $ocm = new OrderCouponModule();
-
-                        $ocm
-                            ->setCouponId($orderCoupon->getId())
-                            ->setModuleId($couponModule->getModuleId())
-                            ->save();
-                    }
+                    $occ
+                        ->setCouponId($orderCoupon->getId())
+                        ->setCountryId($couponCountry->getCountryId())
+                        ->save();
                 }
 
-                $con->commit();
-            } catch (\Exception  $ex) {
-                $con->rollBack();
+                $couponModules = CouponModuleQuery::create()->filterByCouponId($couponModel->getId())->find();
 
-                throw $ex;
+                /** @var CouponModule $couponModule */
+                foreach ($couponModules as $couponModule) {
+                    $ocm = new OrderCouponModule();
+
+                    $ocm
+                        ->setCouponId($orderCoupon->getId())
+                        ->setModuleId($couponModule->getModuleId())
+                        ->save();
+                }
             }
+
+            $con->commit();
+        } catch (\Exception  $ex) {
+            $con->rollBack();
+
+            throw $ex;
         }
+
 
         // Clear all coupons.
         $dispatcher->dispatch(new Event(), TheliaEvents::COUPON_CLEAR_ALL);

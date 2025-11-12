@@ -53,23 +53,25 @@ class Module extends BaseAction implements EventSubscriberInterface
 
     public function toggleActivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
-            $moduleInstance = $module->createInstance();
-
-            if (method_exists($moduleInstance, 'setContainer')) {
-                $moduleInstance->setContainer($this->container);
-
-                if (BaseModule::IS_ACTIVATED === $module->getActivate()) {
-                    $moduleInstance->deActivate($module);
-                } else {
-                    $moduleInstance->activate($module);
-                }
-            }
-
-            $event->setModule($module);
-
-            $this->cacheClear($dispatcher);
+        if (null === $module = ModuleQuery::create()->findPk($event->getModuleId())) {
+            return;
         }
+        $moduleInstance = $module->createInstance();
+
+        if (method_exists($moduleInstance, 'setContainer')) {
+            $moduleInstance->setContainer($this->container);
+
+            if (BaseModule::IS_ACTIVATED === $module->getActivate()) {
+                $moduleInstance->deActivate($module);
+            } else {
+                $moduleInstance->activate($module);
+            }
+        }
+
+        $event->setModule($module);
+
+        $this->cacheClear($dispatcher);
+
     }
 
     public function checkToggleActivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
@@ -78,32 +80,34 @@ class Module extends BaseAction implements EventSubscriberInterface
             return;
         }
 
-        if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
-            try {
-                if (BaseModule::IS_ACTIVATED === $module->getActivate()) {
-                    if (BaseModule::IS_MANDATORY === $module->getMandatory() && false === $event->getAssumeDeactivate()) {
-                        throw new \Exception(Translator::getInstance()->trans("Can't deactivate a secure module"));
-                    }
-
-                    if ($event->isRecursive()) {
-                        $this->recursiveDeactivation($event, $eventName, $dispatcher);
-                    }
-
-                    $this->checkDeactivation($module);
-
-                    return;
-                }
-                if ($event->isRecursive()) {
-                    $this->recursiveActivation($event, $eventName, $dispatcher);
-                }
-
-                $this->checkActivation($module);
-            } catch (\Exception $ex) {
-                $event->stopPropagation();
-
-                throw $ex;
-            }
+        if (null === $module = ModuleQuery::create()->findPk($event->getModuleId())) {
+            return;
         }
+        try {
+            if (BaseModule::IS_ACTIVATED === $module->getActivate()) {
+                if (BaseModule::IS_MANDATORY === $module->getMandatory() && false === $event->getAssumeDeactivate()) {
+                    throw new \Exception(Translator::getInstance()->trans("Can't deactivate a secure module"));
+                }
+
+                if ($event->isRecursive()) {
+                    $this->recursiveDeactivation($event, $eventName, $dispatcher);
+                }
+
+                $this->checkDeactivation($module);
+
+                return;
+            }
+            if ($event->isRecursive()) {
+                $this->recursiveActivation($event, $eventName, $dispatcher);
+            }
+
+            $this->checkActivation($module);
+        } catch (\Exception $ex) {
+            $event->stopPropagation();
+
+            throw $ex;
+        }
+
     }
 
     /**
@@ -189,19 +193,20 @@ class Module extends BaseAction implements EventSubscriberInterface
      */
     public function recursiveDeactivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
-            $moduleValidator = new ModuleValidator($module->getAbsoluteBaseDir());
-            $dependencies = $moduleValidator->getModulesDependOf(true);
+        if (null === $module = ModuleQuery::create()->findPk($event->getModuleId())) {
+            return;
+        }
+        $moduleValidator = new ModuleValidator($module->getAbsoluteBaseDir());
+        $dependencies = $moduleValidator->getModulesDependOf(true);
 
-            foreach ($dependencies as $defMod) {
-                $submodule = ModuleQuery::create()
-                    ->findOneByCode($defMod['code']);
+        foreach ($dependencies as $defMod) {
+            $submodule = ModuleQuery::create()
+                ->findOneByCode($defMod['code']);
 
-                if ($submodule && BaseModule::IS_ACTIVATED === $submodule->getActivate()) {
-                    $subevent = new ModuleToggleActivationEvent($submodule->getId());
-                    $subevent->setRecursive(true);
-                    $dispatcher->dispatch($subevent, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
-                }
+            if ($submodule && BaseModule::IS_ACTIVATED === $submodule->getActivate()) {
+                $subevent = new ModuleToggleActivationEvent($submodule->getId());
+                $subevent->setRecursive(true);
+                $dispatcher->dispatch($subevent, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
             }
         }
     }
@@ -211,92 +216,95 @@ class Module extends BaseAction implements EventSubscriberInterface
         $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
         $con->beginTransaction();
 
-        if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId(), $con)) {
-            try {
-                if (null === $module->getFullNamespace()) {
-                    throw new \LogicException(Translator::getInstance()->trans('Cannot instantiate module "%name%": the namespace is null. Maybe the model is not loaded ?', ['%name%' => $module->getCode()]));
-                }
-
-                // If the module is referenced by an order, display a meaningful error
-                // instead of 'delete cannot delete' caused by a constraint violation.
-                // FIXME: we hav to find a way to delete modules used by order.
-                if (OrderQuery::create()->filterByDeliveryModuleId($module->getId())->count() > 0
-                    || OrderQuery::create()->filterByPaymentModuleId($module->getId())->count() > 0
-                ) {
-                    throw new \LogicException(Translator::getInstance()->trans('The module "%name%" is currently in use by at least one order, and can\'t be deleted.', ['%name%' => $module->getCode()]));
-                }
-
-                try {
-                    if (BaseModule::IS_MANDATORY === $module->getMandatory() && false === $event->getAssumeDelete()) {
-                        throw new \Exception(Translator::getInstance()->trans("Can't remove a core module"));
-                    }
-
-                    // First, try to create an instance
-                    $instance = $module->createInstance();
-
-                    // Then, if module is activated, check if we can deactivate it
-                    if ($module->getActivate()) {
-                        // check for modules that depend of this one
-                        $this->checkDeactivation($module);
-                    }
-
-                    $instance->setContainer($this->container);
-
-                    $path = $module->getAbsoluteBaseDir();
-
-                    $instance->destroy($con, $event->getDeleteData());
-
-                    $fs = new Filesystem();
-                    $fs->remove($path);
-                } catch (\ReflectionException) {
-                    // Happens probably because the module directory has been deleted.
-                    // Log a warning, and delete the database entry.
-                    Tlog::getInstance()->addWarning(
-                        Translator::getInstance()->trans(
-                            'Failed to create instance of module "%name%" when trying to delete module. Module directory has probably been deleted',
-                            ['%name%' => $module->getCode()],
-                        ),
-                    );
-                } catch (FileNotFoundException) {
-                    // The module directory has been deleted.
-                    // Log a warning, and delete the database entry.
-                    Tlog::getInstance()->addWarning(
-                        Translator::getInstance()->trans(
-                            'Module "%name%" directory was not found',
-                            ['%name%' => $module->getCode()],
-                        ),
-                    );
-                }
-
-                $module->delete($con);
-
-                $con->commit();
-
-                $event->setModule($module);
-                $this->cacheClear($dispatcher);
-            } catch (\Exception $e) {
-                $con->rollBack();
-
-                throw $e;
-            }
+        if (null === $module = ModuleQuery::create()->findPk($event->getModuleId(), $con)) {
+            return;
         }
+        try {
+            if (null === $module->getFullNamespace()) {
+                throw new \LogicException(Translator::getInstance()->trans('Cannot instantiate module "%name%": the namespace is null. Maybe the model is not loaded ?', ['%name%' => $module->getCode()]));
+            }
+
+            // If the module is referenced by an order, display a meaningful error
+            // instead of 'delete cannot delete' caused by a constraint violation.
+            // FIXME: we hav to find a way to delete modules used by order.
+            if (OrderQuery::create()->filterByDeliveryModuleId($module->getId())->count() > 0
+                || OrderQuery::create()->filterByPaymentModuleId($module->getId())->count() > 0
+            ) {
+                throw new \LogicException(Translator::getInstance()->trans('The module "%name%" is currently in use by at least one order, and can\'t be deleted.', ['%name%' => $module->getCode()]));
+            }
+
+            try {
+                if (BaseModule::IS_MANDATORY === $module->getMandatory() && false === $event->getAssumeDelete()) {
+                    throw new \Exception(Translator::getInstance()->trans("Can't remove a core module"));
+                }
+
+                // First, try to create an instance
+                $instance = $module->createInstance();
+
+                // Then, if module is activated, check if we can deactivate it
+                if ($module->getActivate()) {
+                    // check for modules that depend of this one
+                    $this->checkDeactivation($module);
+                }
+
+                $instance->setContainer($this->container);
+
+                $path = $module->getAbsoluteBaseDir();
+
+                $instance->destroy($con, $event->getDeleteData());
+
+                $fs = new Filesystem();
+                $fs->remove($path);
+            } catch (\ReflectionException) {
+                // Happens probably because the module directory has been deleted.
+                // Log a warning, and delete the database entry.
+                Tlog::getInstance()->addWarning(
+                    Translator::getInstance()->trans(
+                        'Failed to create instance of module "%name%" when trying to delete module. Module directory has probably been deleted',
+                        ['%name%' => $module->getCode()],
+                    ),
+                );
+            } catch (FileNotFoundException) {
+                // The module directory has been deleted.
+                // Log a warning, and delete the database entry.
+                Tlog::getInstance()->addWarning(
+                    Translator::getInstance()->trans(
+                        'Module "%name%" directory was not found',
+                        ['%name%' => $module->getCode()],
+                    ),
+                );
+            }
+
+            $module->delete($con);
+
+            $con->commit();
+
+            $event->setModule($module);
+            $this->cacheClear($dispatcher);
+        } catch (\Exception $e) {
+            $con->rollBack();
+
+            throw $e;
+        }
+
     }
 
     public function update(ModuleEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $module = ModuleQuery::create()->findPk($event->getId())) {
-            $module
-
-                ->setLocale($event->getLocale())
-                ->setTitle($event->getTitle())
-                ->setChapo($event->getChapo())
-                ->setDescription($event->getDescription())
-                ->setPostscriptum($event->getPostscriptum());
-
-            $module->save();
-
-            $event->setModule($module);
+        if (null === $module = ModuleQuery::create()->findPk($event->getId())) {
+            return;
         }
+        $module
+
+            ->setLocale($event->getLocale())
+            ->setTitle($event->getTitle())
+            ->setChapo($event->getChapo())
+            ->setDescription($event->getDescription())
+            ->setPostscriptum($event->getPostscriptum());
+
+        $module->save();
+
+        $event->setModule($module);
     }
 
     /**
@@ -343,18 +351,18 @@ class Module extends BaseAction implements EventSubscriberInterface
         }
 
         // move new module
-        $modulePath = \sprintf('%s%s', THELIA_MODULE_DIR, $event->getModuleDefinition()->getCode());
+        $modulePathNewModule = \sprintf('%s%s', THELIA_MODULE_DIR, $event->getModuleDefinition()->getCode());
 
         try {
-            $fs->mirror($event->getModulePath(), $modulePath);
+            $fs->mirror($event->getModulePath(), $modulePathNewModule);
         } catch (IOException $ioException) {
-            if (!$fs->exists($modulePath)) {
+            if (!$fs->exists($modulePathNewModule)) {
                 throw $ioException;
             }
         }
 
         // Update the module
-        $moduleDescriptorFile = \sprintf('%s%s%s%s%s', $modulePath, DS, 'Config', DS, 'module.xml');
+        $moduleDescriptorFile = \sprintf('%s%s%s%s%s', $modulePathNewModule, DS, 'Config', DS, 'module.xml');
         $eventDispatcher = $this->container->get('event_dispatcher');
         $moduleManagement = new ModuleManagement($this->container, $eventDispatcher);
         $file = new \SplFileInfo($moduleDescriptorFile);

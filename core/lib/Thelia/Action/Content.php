@@ -65,30 +65,32 @@ class Content extends BaseAction implements EventSubscriberInterface
      */
     public function update(ContentUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $content = ContentQuery::create()->findPk($event->getContentId())) {
-            $con = Propel::getWriteConnection(ContentTableMap::DATABASE_NAME);
-            $con->beginTransaction();
-
-            try {
-                $content
-                    ->setVisible($event->getVisible())
-                    ->setLocale($event->getLocale())
-                    ->setTitle($event->getTitle())
-                    ->setDescription($event->getDescription())
-                    ->setChapo($event->getChapo())
-                    ->setPostscriptum($event->getPostscriptum())
-                    ->save($con);
-
-                $content->setDefaultFolder($event->getDefaultFolder());
-
-                $event->setContent($content);
-                $con->commit();
-            } catch (PropelException $e) {
-                $con->rollBack();
-
-                throw $e;
-            }
+        if (null === $content = ContentQuery::create()->findPk($event->getContentId())) {
+            return;
         }
+        $con = Propel::getWriteConnection(ContentTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+
+        try {
+            $content
+                ->setVisible($event->getVisible())
+                ->setLocale($event->getLocale())
+                ->setTitle($event->getTitle())
+                ->setDescription($event->getDescription())
+                ->setChapo($event->getChapo())
+                ->setPostscriptum($event->getPostscriptum())
+                ->save($con);
+
+            $content->setDefaultFolder($event->getDefaultFolder());
+
+            $event->setContent($content);
+            $con->commit();
+        } catch (PropelException $e) {
+            $con->rollBack();
+
+            throw $e;
+        }
+
     }
 
     /**
@@ -114,6 +116,10 @@ class Content extends BaseAction implements EventSubscriberInterface
     {
         $content = $event->getContent();
 
+        if (null === $content) {
+            return;
+        }
+
         $content
 
             ->setVisible(!$content->getVisible())
@@ -124,46 +130,48 @@ class Content extends BaseAction implements EventSubscriberInterface
 
     public function delete(ContentDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $content = ContentQuery::create()->findPk($event->getContentId())) {
-            $con = Propel::getWriteConnection(ContentTableMap::DATABASE_NAME);
-            $con->beginTransaction();
-
-            try {
-                $fileList = ['images' => [], 'documentList' => []];
-
-                $defaultFolderId = $content->getDefaultFolderId();
-
-                // Get content's files to delete after content deletion
-                $fileList['images']['list'] = ContentImageQuery::create()
-                    ->findByContentId($event->getContentId());
-                $fileList['images']['type'] = TheliaEvents::IMAGE_DELETE;
-
-                $fileList['documentList']['list'] = ContentDocumentQuery::create()
-                    ->findByContentId($event->getContentId());
-                $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
-
-                // Delete content
-                $content
-                    ->delete($con);
-
-                $event->setDefaultFolderId($defaultFolderId);
-                $event->setContent($content);
-
-                // Dispatch delete content's files event
-                foreach ($fileList as $fileTypeList) {
-                    foreach ($fileTypeList['list'] as $fileToDelete) {
-                        $fileDeleteEvent = new FileDeleteEvent($fileToDelete);
-                        $dispatcher->dispatch($fileDeleteEvent, $fileTypeList['type']);
-                    }
-                }
-
-                $con->commit();
-            } catch (\Exception $e) {
-                $con->rollback();
-
-                throw $e;
-            }
+        if (null === $content = ContentQuery::create()->findPk($event->getContentId())) {
+            return;
         }
+        $con = Propel::getWriteConnection(ContentTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+
+        try {
+            $fileList = ['images' => [], 'documentList' => []];
+
+            $defaultFolderId = $content->getDefaultFolderId();
+
+            // Get content's files to delete after content deletion
+            $fileList['images']['list'] = ContentImageQuery::create()
+                ->findByContentId($event->getContentId());
+            $fileList['images']['type'] = TheliaEvents::IMAGE_DELETE;
+
+            $fileList['documentList']['list'] = ContentDocumentQuery::create()
+                ->findByContentId($event->getContentId());
+            $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
+
+            // Delete content
+            $content
+                ->delete($con);
+
+            $event->setDefaultFolderId($defaultFolderId);
+            $event->setContent($content);
+
+            // Dispatch delete content's files event
+            foreach ($fileList as $fileTypeList) {
+                foreach ($fileTypeList['list'] as $fileToDelete) {
+                    $fileDeleteEvent = new FileDeleteEvent($fileToDelete);
+                    $dispatcher->dispatch($fileDeleteEvent, $fileTypeList['type']);
+                }
+            }
+
+            $con->commit();
+        } catch (\Exception $e) {
+            $con->rollback();
+
+            throw $e;
+        }
+
     }
 
     /**
@@ -174,17 +182,18 @@ class Content extends BaseAction implements EventSubscriberInterface
         if (ContentFolderQuery::create()
             ->filterByContent($event->getContent())
             ->filterByFolderId($event->getFolderId())
-            ->count() <= 0
+            ->count() > 0
         ) {
-            $contentFolder = (new ContentFolder())
-                ->setFolderId($event->getFolderId())
-                ->setContent($event->getContent())
-                ->setDefaultFolder(false);
-
-            $contentFolder
-                ->setPosition($contentFolder->getNextPosition())
-                ->save();
+            return;
         }
+        $contentFolder = (new ContentFolder())
+            ->setFolderId($event->getFolderId())
+            ->setContent($event->getContent())
+            ->setDefaultFolder(false);
+
+        $contentFolder
+            ->setPosition($contentFolder->getNextPosition())
+            ->save();
     }
 
     public function removeFolder(ContentRemoveFolderEvent $event): void
@@ -204,16 +213,18 @@ class Content extends BaseAction implements EventSubscriberInterface
      */
     public function viewCheck(ViewCheckEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if ('content' === $event->getView()) {
-            $content = ContentQuery::create()
-                ->filterById($event->getViewId())
-                ->filterByVisible(1)
-                ->count();
-
-            if (0 === $content) {
-                $dispatcher->dispatch($event, TheliaEvents::VIEW_CONTENT_ID_NOT_VISIBLE);
-            }
+        if ('content' !== $event->getView()) {
+            return;
         }
+        $content = ContentQuery::create()
+            ->filterById($event->getViewId())
+            ->filterByVisible(1)
+            ->count();
+
+        if (0 === $content) {
+            $dispatcher->dispatch($event, TheliaEvents::VIEW_CONTENT_ID_NOT_VISIBLE);
+        }
+
     }
 
     /**

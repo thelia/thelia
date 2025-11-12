@@ -62,22 +62,23 @@ class Category extends BaseAction implements EventSubscriberInterface
      */
     public function update(CategoryUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $category = CategoryQuery::create()->findPk($event->getCategoryId())) {
-            $category
-                ->setDefaultTemplateId(0 === $event->getDefaultTemplateId() ? null : $event->getDefaultTemplateId())
-                ->setLocale($event->getLocale())
-                ->setTitle($event->getTitle())
-                ->setDescription($event->getDescription())
-                ->setChapo($event->getChapo())
-                ->setPostscriptum($event->getPostscriptum())
-
-                ->setParent($event->getParent())
-                ->setVisible($event->getVisible() ?? 0)
-
-                ->save();
-
-            $event->setCategory($category);
+        if (null === $category = CategoryQuery::create()->findPk($event->getCategoryId())) {
+            return;
         }
+        $category
+            ->setDefaultTemplateId(0 === $event->getDefaultTemplateId() ? null : $event->getDefaultTemplateId())
+            ->setLocale($event->getLocale())
+            ->setTitle($event->getTitle())
+            ->setDescription($event->getDescription())
+            ->setChapo($event->getChapo())
+            ->setPostscriptum($event->getPostscriptum())
+
+            ->setParent($event->getParent())
+            ->setVisible($event->getVisible() ?? 0)
+
+            ->save();
+
+        $event->setCategory($category);
     }
 
     /**
@@ -95,43 +96,45 @@ class Category extends BaseAction implements EventSubscriberInterface
      */
     public function delete(CategoryDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $category = CategoryQuery::create()->findPk($event->getCategoryId())) {
-            $con = Propel::getWriteConnection(CategoryTableMap::DATABASE_NAME);
-            $con->beginTransaction();
-
-            try {
-                $fileList = ['images' => [], 'documentList' => []];
-
-                // Get category's files to delete after category deletion
-                $fileList['images']['list'] = CategoryImageQuery::create()
-                    ->findByCategoryId($event->getCategoryId());
-                $fileList['images']['type'] = TheliaEvents::IMAGE_DELETE;
-
-                $fileList['documentList']['list'] = CategoryDocumentQuery::create()
-                    ->findByCategoryId($event->getCategoryId());
-                $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
-
-                // Delete category
-                $category
-                    ->delete($con);
-
-                $event->setCategory($category);
-
-                // Dispatch delete category's files event
-                foreach ($fileList as $fileTypeList) {
-                    foreach ($fileTypeList['list'] as $fileToDelete) {
-                        $fileDeleteEvent = new FileDeleteEvent($fileToDelete);
-                        $dispatcher->dispatch($fileDeleteEvent, $fileTypeList['type']);
-                    }
-                }
-
-                $con->commit();
-            } catch (\Exception $e) {
-                $con->rollback();
-
-                throw $e;
-            }
+        if (null === $category = CategoryQuery::create()->findPk($event->getCategoryId())) {
+            return;
         }
+        $con = Propel::getWriteConnection(CategoryTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+
+        try {
+            $fileList = ['images' => [], 'documentList' => []];
+
+            // Get category's files to delete after category deletion
+            $fileList['images']['list'] = CategoryImageQuery::create()
+                ->findByCategoryId($event->getCategoryId());
+            $fileList['images']['type'] = TheliaEvents::IMAGE_DELETE;
+
+            $fileList['documentList']['list'] = CategoryDocumentQuery::create()
+                ->findByCategoryId($event->getCategoryId());
+            $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
+
+            // Delete category
+            $category
+                ->delete($con);
+
+            $event->setCategory($category);
+
+            // Dispatch delete category's files event
+            foreach ($fileList as $fileTypeList) {
+                foreach ($fileTypeList['list'] as $fileToDelete) {
+                    $fileDeleteEvent = new FileDeleteEvent($fileToDelete);
+                    $dispatcher->dispatch($fileDeleteEvent, $fileTypeList['type']);
+                }
+            }
+
+            $con->commit();
+        } catch (\Exception $e) {
+            $con->rollback();
+
+            throw $e;
+        }
+
     }
 
     /**
@@ -140,6 +143,9 @@ class Category extends BaseAction implements EventSubscriberInterface
     public function toggleVisibility(CategoryToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $category = $event->getCategory();
+        if (null === $category) {
+            return;
+        }
 
         $category
             ->setVisible(!(bool) $category->getVisible())
@@ -160,15 +166,16 @@ class Category extends BaseAction implements EventSubscriberInterface
     {
         if (CategoryAssociatedContentQuery::create()
             ->filterByContentId($event->getContentId())
-            ->filterByCategory($event->getCategory())->count() <= 0) {
-            $content = new CategoryAssociatedContent();
-
-            $content
-                ->setCategory($event->getCategory())
-                ->setContentId($event->getContentId())
-                ->setPosition(1)
-                ->save();
+            ->filterByCategory($event->getCategory())->count() > 0) {
+            return;
         }
+        $content = new CategoryAssociatedContent();
+
+        $content
+            ->setCategory($event->getCategory())
+            ->setContentId($event->getContentId())
+            ->setPosition(1)
+            ->save();
     }
 
     public function removeContent(CategoryDeleteContentEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
@@ -188,22 +195,23 @@ class Category extends BaseAction implements EventSubscriberInterface
      */
     public function viewCheck(ViewCheckEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if ('category' === $event->getView()) {
-            $category = CategoryQuery::create()
-                ->filterById($event->getViewId())
-                ->filterByVisible(1)
-                ->count();
+        if ('category' !== $event->getView()) {
+            return;
+        }
+        $category = CategoryQuery::create()
+            ->filterById($event->getViewId())
+            ->filterByVisible(1)
+            ->count();
 
-            if (0 === $category) {
-                $dispatcher->dispatch($event, TheliaEvents::VIEW_CATEGORY_ID_NOT_VISIBLE);
-            }
+        if (0 === $category) {
+            $dispatcher->dispatch($event, TheliaEvents::VIEW_CATEGORY_ID_NOT_VISIBLE);
         }
     }
 
     /**
      * @throws NotFoundHttpException
      */
-    public function viewcategoryIdNotVisible(ViewCheckEvent $event): void
+    public function viewCategoryIdNotVisible(ViewCheckEvent $event): void
     {
         throw new NotFoundHttpException();
     }
@@ -223,7 +231,7 @@ class Category extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CATEGORY_REMOVE_CONTENT => ['removeContent', 128],
 
             TheliaEvents::VIEW_CHECK => ['viewCheck', 128],
-            TheliaEvents::VIEW_CATEGORY_ID_NOT_VISIBLE => ['viewcategoryIdNotVisible', 128],
+            TheliaEvents::VIEW_CATEGORY_ID_NOT_VISIBLE => ['viewCategoryIdNotVisible', 128],
         ];
     }
 }

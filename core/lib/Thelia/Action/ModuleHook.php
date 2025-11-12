@@ -71,20 +71,16 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
 
     protected function isModuleActive($module_id)
     {
-        if (null !== $module = ModuleQuery::create()->findPk($module_id)) {
-            return $module->getActivate();
-        }
-
-        return false;
+        return null !== ($module = ModuleQuery::create()->findPk($module_id))
+            ? $module->getActivate()
+            : false;
     }
 
     protected function isHookActive($hook_id)
     {
-        if (null !== $hook = HookQuery::create()->findPk($hook_id)) {
-            return $hook->getActivate();
-        }
-
-        return false;
+        return null !== ($hook = HookQuery::create()->findPk($hook_id))
+            ? $hook->getActivate()
+            : false;
     }
 
     protected function getLastPositionInHook($hook_id): int
@@ -127,43 +123,47 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
 
     public function updateModuleHook(ModuleHookUpdateEvent $event): void
     {
-        if (null !== $moduleHook = ModuleHookQuery::create()->findPk($event->getModuleHookId())) {
-            // todo: test if classname and method exists
-            $moduleHook
-                ->setHookId($event->getHookId())
-                ->setModuleId($event->getModuleId())
-                ->setClassname($event->getClassname())
-                ->setMethod($event->getMethod())
-                ->setActive($event->getActive())
-                ->setHookActive($this->isHookActive($event->getHookId()))
-                ->setTemplates($event->getTemplates())
-                ->save();
-
-            $event->setModuleHook($moduleHook);
-
-            $this->cacheClear();
+        if (null === $moduleHook = ModuleHookQuery::create()->findPk($event->getModuleHookId())) {
+            return;
         }
+        // todo: test if classname and method exists
+        $moduleHook
+            ->setHookId($event->getHookId())
+            ->setModuleId($event->getModuleId())
+            ->setClassname($event->getClassname())
+            ->setMethod($event->getMethod())
+            ->setActive($event->getActive())
+            ->setHookActive($this->isHookActive($event->getHookId()))
+            ->setTemplates($event->getTemplates())
+            ->save();
+
+        $event->setModuleHook($moduleHook);
+
+        $this->cacheClear();
+
     }
 
     public function deleteModuleHook(ModuleHookDeleteEvent $event): void
     {
-        if (null !== $moduleHook = ModuleHookQuery::create()->findPk($event->getModuleHookId())) {
-            $moduleHook->delete();
-            $event->setModuleHook($moduleHook);
-
-            // Prevent hook recreation by RegisterListenersPass::registerHook()
-            // We store the method here to be able to retreive it when
-            // we need to get all hook declared by a module
-            $imh = new IgnoredModuleHook();
-            $imh
-                ->setModuleId($moduleHook->getModuleId())
-                ->setHookId($moduleHook->getHookId())
-                ->setMethod($moduleHook->getMethod())
-                ->setClassname($moduleHook->getClassname())
-                ->save();
-
-            $this->cacheClear();
+        if (null === $moduleHook = ModuleHookQuery::create()->findPk($event->getModuleHookId())) {
+            return;
         }
+        $moduleHook->delete();
+        $event->setModuleHook($moduleHook);
+
+        // Prevent hook recreation by RegisterListenersPass::registerHook()
+        // We store the method here to be able to retreive it when
+        // we need to get all hook declared by a module
+        $imh = new IgnoredModuleHook();
+        $imh
+            ->setModuleId($moduleHook->getModuleId())
+            ->setHookId($moduleHook->getHookId())
+            ->setMethod($moduleHook->getMethod())
+            ->setClassname($moduleHook->getClassname())
+            ->save();
+
+        $this->cacheClear();
+
     }
 
     public function toggleModuleHookActivation(ModuleHookToggleActivationEvent $event): ModuleHookToggleActivationEvent
@@ -197,24 +197,29 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
 
     public function updateHook(HookUpdateEvent $event): void
     {
-        if ($event->hasHook()) {
-            $hook = $event->getHook();
-            ModuleHookQuery::create()
-                ->filterByHookId($hook->getId())
-                ->update(['HookActive' => $hook->getActivate()]);
-            $this->cacheClear();
+        if (!$event->hasHook()) {
+            return;
         }
+        $hook = $event->getHook();
+        ModuleHookQuery::create()
+            ->filterByHookId($hook->getId())
+            ->update(['HookActive' => $hook->getActivate()]);
+        $this->cacheClear();
     }
 
     public function toggleHookActivation(HookToggleActivationEvent $event): void
     {
-        if ($event->hasHook()) {
-            $hook = $event->getHook();
-            ModuleHookQuery::create()
-                ->filterByHookId($hook->getId())
-                ->update(['HookActive' => $hook->getActivate()]);
-            $this->cacheClear();
+        if (!$event->hasHook()) {
+            return;
         }
+        $hook = $event->getHook();
+        if (null === $hook) {
+            return;
+        }
+        ModuleHookQuery::create()
+            ->filterByHookId($hook->getId())
+            ->update(['HookActive' => $hook->getActivate()]);
+        $this->cacheClear();
     }
 
     protected function cacheClear(): void

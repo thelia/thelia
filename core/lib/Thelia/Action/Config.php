@@ -60,19 +60,20 @@ class Config extends BaseAction implements EventSubscriberInterface
      */
     public function modify(ConfigUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $config = ConfigQuery::create()->findPk($event->getConfigId())) {
-            $config
-                ->setName($event->getEventName())
-                ->setValue($event->getValue())
-                ->setHidden($event->getHidden())
-                ->setSecured($event->getSecured())
-                ->setLocale($event->getLocale())
-                ->setTitle($event->getTitle())
-                ->setDescription($event->getDescription())
-                ->setChapo($event->getChapo())
-                ->setPostscriptum($event->getPostscriptum())
-                ->save();
+        if (null === $config = ConfigQuery::create()->findPk($event->getConfigId())) {
+            return;
         }
+        $config
+            ->setName($event->getEventName())
+            ->setValue($event->getValue())
+            ->setHidden($event->getHidden())
+            ->setSecured($event->getSecured())
+            ->setLocale($event->getLocale())
+            ->setTitle($event->getTitle())
+            ->setDescription($event->getDescription())
+            ->setChapo($event->getChapo())
+            ->setPostscriptum($event->getPostscriptum())
+            ->save();
     }
 
     /**

@@ -53,20 +53,21 @@ class Lang extends BaseAction implements EventSubscriberInterface
      */
     public function update(LangUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $lang = LangQuery::create()->findPk($event->getId())) {
-            $lang->setTitle($event->getTitle())
-                ->setLocale($event->getLocale())
-                ->setCode($event->getCode())
-                ->setDateTimeFormat($event->getDateTimeFormat())
-                ->setDateFormat($event->getDateFormat())
-                ->setTimeFormat($event->getTimeFormat())
-                ->setDecimalSeparator($event->getDecimalSeparator())
-                ->setThousandsSeparator($event->getThousandsSeparator())
-                ->setDecimals($event->getDecimals())
-                ->save();
-
-            $event->setLang($lang);
+        if (null === $lang = LangQuery::create()->findPk($event->getId())) {
+            return;
         }
+        $lang->setTitle($event->getTitle())
+            ->setLocale($event->getLocale())
+            ->setCode($event->getCode())
+            ->setDateTimeFormat($event->getDateTimeFormat())
+            ->setDateFormat($event->getDateFormat())
+            ->setTimeFormat($event->getTimeFormat())
+            ->setDecimalSeparator($event->getDecimalSeparator())
+            ->setThousandsSeparator($event->getThousandsSeparator())
+            ->setDecimals($event->getDecimals())
+            ->save();
+
+        $event->setLang($lang);
     }
 
     /**
@@ -74,11 +75,12 @@ class Lang extends BaseAction implements EventSubscriberInterface
      */
     public function toggleDefault(LangToggleDefaultEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
-            $lang->toggleDefault();
-
-            $event->setLang($lang);
+        if (null === $lang = LangQuery::create()->findPk($event->getLangId())) {
+            return;
         }
+        $lang->toggleDefault();
+
+        $event->setLang($lang);
     }
 
     /**
@@ -86,21 +88,22 @@ class Lang extends BaseAction implements EventSubscriberInterface
      */
     public function toggleActive(LangToggleActiveEvent $event): void
     {
-        if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
-            if ($lang->getByDefault()) {
-                throw new \RuntimeException(Translator::getInstance()->trans('Cannot disable the default language'));
-            }
-
-            $lang->setActive($lang->getActive() ? 0 : 1);
-
-            if (!$lang->getActive()) {
-                $lang->setVisible(0);
-            }
-
-            $lang->save();
-
-            $event->setLang($lang);
+        if (null === $lang = LangQuery::create()->findPk($event->getLangId())) {
+            return;
         }
+        if ($lang->getByDefault()) {
+            throw new \RuntimeException(Translator::getInstance()->trans('Cannot disable the default language'));
+        }
+
+        $lang->setActive($lang->getActive() ? 0 : 1);
+
+        if (!$lang->getActive()) {
+            $lang->setVisible(0);
+        }
+
+        $lang->save();
+
+        $event->setLang($lang);
     }
 
     /**
@@ -108,21 +111,22 @@ class Lang extends BaseAction implements EventSubscriberInterface
      */
     public function toggleVisible(LangToggleVisibleEvent $event): void
     {
-        if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
-            if ($lang->getByDefault()) {
-                throw new \RuntimeException(Translator::getInstance()->trans('Cannot hide the default language'));
-            }
-
-            $lang->setVisible($lang->getVisible() ? 0 : 1);
-
-            if (!$lang->getActive() && $lang->getVisible()) {
-                $lang->setActive(1);
-            }
-
-            $lang->save();
-
-            $event->setLang($lang);
+        if (null === $lang = LangQuery::create()->findPk($event->getLangId())) {
+            return;
         }
+        if ($lang->getByDefault()) {
+            throw new \RuntimeException(Translator::getInstance()->trans('Cannot hide the default language'));
+        }
+
+        $lang->setVisible($lang->getVisible() ? 0 : 1);
+
+        if (!$lang->getActive() && $lang->getVisible()) {
+            $lang->setActive(1);
+        }
+
+        $lang->save();
+
+        $event->setLang($lang);
     }
 
     /**
@@ -152,29 +156,31 @@ class Lang extends BaseAction implements EventSubscriberInterface
      */
     public function delete(LangDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
-            if ($lang->getByDefault()) {
-                throw new \RuntimeException(Translator::getInstance()->trans('It is not allowed to delete the default language'));
-            }
-
-            $lang
-                ->delete();
-
-            /** @var Session $session */
-            $session = $this->requestStack->getMainRequest()->getSession();
-
-            // If we've just deleted the current admin edition language, set it to the default one.
-            if ($lang->getId() === $session->getAdminEditionLang()->getId()) {
-                $session->setAdminEditionLang(LangModel::getDefaultLanguage());
-            }
-
-            // If we've just deleted the current admin language, set it to the default one.
-            if ($lang->getId() === $session->getLang()->getId()) {
-                $session->setLang(LangModel::getDefaultLanguage());
-            }
-
-            $event->setLang($lang);
+        if (null === $lang = LangQuery::create()->findPk($event->getLangId())) {
+            return;
         }
+        if ($lang->getByDefault()) {
+            throw new \RuntimeException(Translator::getInstance()->trans('It is not allowed to delete the default language'));
+        }
+
+        $lang
+            ->delete();
+
+        /** @var Session $session */
+        $session = $this->requestStack->getMainRequest()?->getSession();
+
+        // If we've just deleted the current admin edition language, set it to the default one.
+        if ($lang->getId() === $session->getAdminEditionLang()->getId()) {
+            $session->setAdminEditionLang(LangModel::getDefaultLanguage());
+        }
+
+        // If we've just deleted the current admin language, set it to the default one.
+        if ($lang->getId() === $session->getLang()?->getId()) {
+            $session->setLang(LangModel::getDefaultLanguage());
+        }
+
+        $event->setLang($lang);
+
     }
 
     /**

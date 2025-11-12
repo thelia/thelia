@@ -61,33 +61,35 @@ class Hook extends BaseAction implements EventSubscriberInterface
 
     public function update(HookUpdateEvent $event): void
     {
-        if (null !== $hook = HookQuery::create()->findPk($event->getHookId())) {
-            $hook
-                ->setLocale($event->getLocale())
-                ->setCode($event->getCode())
-                ->setType($event->getType())
-                ->setNative($event->getNative())
-                ->setActivate($event->getActive())
-                ->setBlock($event->getBlock())
-                ->setByModule($event->getByModule())
-                ->setTitle($event->getTitle())
-                ->setChapo($event->getChapo())
-                ->setDescription($event->getDescription())
-                ->save();
-
-            $event->setHook($hook);
-            $this->cacheClear();
+        if (null === $hook = HookQuery::create()->findPk($event->getHookId())) {
+            return;
         }
+        $hook
+            ->setLocale($event->getLocale())
+            ->setCode($event->getCode())
+            ->setType($event->getType())
+            ->setNative($event->getNative())
+            ->setActivate($event->getActive())
+            ->setBlock($event->getBlock())
+            ->setByModule($event->getByModule())
+            ->setTitle($event->getTitle())
+            ->setChapo($event->getChapo())
+            ->setDescription($event->getDescription())
+            ->save();
+
+        $event->setHook($hook);
+        $this->cacheClear();
     }
 
     public function delete(HookDeleteEvent $event): void
     {
-        if (null !== $hook = HookQuery::create()->findPk($event->getHookId())) {
-            $hook->delete();
-            $event->setHook($hook);
-
-            $this->cacheClear();
+        if (null === $hook = HookQuery::create()->findPk($event->getHookId())) {
+            return;
         }
+        $hook->delete();
+        $event->setHook($hook);
+
+        $this->cacheClear();
     }
 
     public function createAll(HookCreateAllEvent $event): void
@@ -112,34 +114,37 @@ class Hook extends BaseAction implements EventSubscriberInterface
 
     public function deactivation(HookDeactivationEvent $event): void
     {
-        if (null !== $hook = HookQuery::create()->findPk($event->getHookId())) {
-            $hook
-                ->setActivate(false)
-                ->save();
-            $event->setHook($hook);
+        if (null === $hook = HookQuery::create()->findPk($event->getHookId())) {
+            return;
         }
+        $hook
+            ->setActivate(false)
+            ->save();
+        $event->setHook($hook);
     }
 
     public function toggleNative(HookToggleNativeEvent $event): void
     {
-        if (null !== $hook = HookQuery::create()->findPk($event->getHookId())) {
-            $hook
-                ->setNative(!$hook->getNative())
-                ->save();
-            $event->setHook($hook);
+        if (null === $hook = HookQuery::create()->findPk($event->getHookId())) {
+            return;
         }
+        $hook
+            ->setNative(!$hook->getNative())
+            ->save();
+        $event->setHook($hook);
     }
 
     public function toggleActivation(HookToggleActivationEvent $event): void
     {
-        if (null !== $hook = HookQuery::create()->findPk($event->getHookId())) {
-            $hook
-                ->setActivate(!$hook->getActivate())
-                ->save();
-            $event->setHook($hook);
-
-            $this->cacheClear();
+        if (null === $hook = HookQuery::create()->findPk($event->getHookId())) {
+            return;
         }
+        $hook
+            ->setActivate(!$hook->getActivate())
+            ->save();
+        $event->setHook($hook);
+
+        $this->cacheClear();
     }
 
     protected function cacheClear(): void

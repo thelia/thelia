@@ -34,7 +34,6 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
         $feature = new FeatureAvModel();
 
         $feature
-
             ->setFeatureId($event->getFeatureId())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
@@ -49,19 +48,18 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
      */
     public function update(FeatureAvUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $feature = FeatureAvQuery::create()->findPk($event->getFeatureAvId())) {
-            $feature
-
-                ->setLocale($event->getLocale())
-                ->setTitle($event->getTitle())
-                ->setDescription($event->getDescription())
-                ->setChapo($event->getChapo())
-                ->setPostscriptum($event->getPostscriptum())
-
-                ->save();
-
-            $event->setFeatureAv($feature);
+        if (null === $feature = FeatureAvQuery::create()->findPk($event->getFeatureAvId())) {
+            return;
         }
+        $feature
+            ->setLocale($event->getLocale())
+            ->setTitle($event->getTitle())
+            ->setDescription($event->getDescription())
+            ->setChapo($event->getChapo())
+            ->setPostscriptum($event->getPostscriptum())
+            ->save();
+
+        $event->setFeatureAv($feature);
     }
 
     /**
@@ -69,13 +67,13 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
      */
     public function delete(FeatureAvDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== ($feature = FeatureAvQuery::create()->findPk($event->getFeatureAvId()))) {
-            $feature
-
-                ->delete();
-
-            $event->setFeatureAv($feature);
+        if (null === ($feature = FeatureAvQuery::create()->findPk($event->getFeatureAvId()))) {
+            return;
         }
+        $feature
+            ->delete();
+
+        $event->setFeatureAv($feature);
     }
 
     /**

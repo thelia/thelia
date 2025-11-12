@@ -123,9 +123,11 @@ class Folder extends BaseAction implements EventSubscriberInterface
     public function toggleVisibility(FolderToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $folder = $event->getFolder();
+        if (null === $folder) {
+            return;
+        }
 
         $folder
-
             ->setVisible(!$folder->getVisible())
             ->save();
 
@@ -154,15 +156,16 @@ class Folder extends BaseAction implements EventSubscriberInterface
      */
     public function viewCheck(ViewCheckEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if ('folder' === $event->getView()) {
-            $folder = FolderQuery::create()
-                ->filterById($event->getViewId())
-                ->filterByVisible(1)
-                ->count();
+        if ('folder' !== $event->getView()) {
+            return;
+        }
+        $folder = FolderQuery::create()
+            ->filterById($event->getViewId())
+            ->filterByVisible(1)
+            ->count();
 
-            if (0 === $folder) {
-                $dispatcher->dispatch($event, TheliaEvents::VIEW_FOLDER_ID_NOT_VISIBLE);
-            }
+        if (0 === $folder) {
+            $dispatcher->dispatch($event, TheliaEvents::VIEW_FOLDER_ID_NOT_VISIBLE);
         }
     }
 

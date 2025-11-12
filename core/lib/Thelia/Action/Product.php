@@ -331,46 +331,48 @@ class Product extends BaseAction implements EventSubscriberInterface
      */
     public function update(ProductUpdateEvent $event): void
     {
-        if (null !== $product = ProductQuery::create()->findPk($event->getProductId())) {
-            $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
-            $con->beginTransaction();
-
-            try {
-                $prevRef = $product->getRef();
-
-                $product
-                    ->setRef($event->getRef())
-                    ->setLocale($event->getLocale())
-                    ->setTitle($event->getTitle())
-                    ->setDescription($event->getDescription())
-                    ->setChapo($event->getChapo())
-                    ->setPostscriptum($event->getPostscriptum())
-                    ->setVisible($event->getVisible() ? 1 : 0)
-                    ->setVirtual($event->getVirtual() ? 1 : 0)
-                    ->setBrandId($event->getBrandId() <= 0 ? null : $event->getBrandId())
-
-                    ->save($con);
-
-                // Update default PSE (if product has no attributes and the product's ref change)
-                $defaultPseRefChange = $prevRef !== $product->getRef()
-                    && 0 === $product->getDefaultSaleElements()->countAttributeCombinations();
-
-                if ($defaultPseRefChange) {
-                    $defaultPse = $product->getDefaultSaleElements();
-                    $defaultPse->setRef($product->getRef())->save();
-                }
-
-                // Update default category (if required)
-                $product->setDefaultCategory($event->getDefaultCategory());
-
-                $event->setProduct($product);
-                $con->commit();
-            } catch (PropelException $e) {
-                $con->rollBack();
-
-                throw $e;
-            }
+        if (null === $product = ProductQuery::create()->findPk($event->getProductId())) {
+            return;
         }
+        $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+
+        try {
+            $prevRef = $product->getRef();
+
+            $product
+                ->setRef($event->getRef())
+                ->setLocale($event->getLocale())
+                ->setTitle($event->getTitle())
+                ->setDescription($event->getDescription())
+                ->setChapo($event->getChapo())
+                ->setPostscriptum($event->getPostscriptum())
+                ->setVisible($event->getVisible() ? 1 : 0)
+                ->setVirtual($event->getVirtual() ? 1 : 0)
+                ->setBrandId($event->getBrandId() <= 0 ? null : $event->getBrandId())
+
+                ->save($con);
+
+            // Update default PSE (if product has no attributes and the product's ref change)
+            $defaultPseRefChange = $prevRef !== $product->getRef()
+                && 0 === $product->getDefaultSaleElements()->countAttributeCombinations();
+
+            if ($defaultPseRefChange) {
+                $defaultPse = $product->getDefaultSaleElements();
+                $defaultPse->setRef($product->getRef())->save();
+            }
+
+            // Update default category (if required)
+            $product->setDefaultCategory($event->getDefaultCategory());
+
+            $event->setProduct($product);
+            $con->commit();
+        } catch (PropelException $e) {
+            $con->rollBack();
+
+            throw $e;
+        }
+
     }
 
     public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher): mixed
@@ -385,43 +387,45 @@ class Product extends BaseAction implements EventSubscriberInterface
      */
     public function delete(ProductDeleteEvent $event): void
     {
-        if (null !== $product = ProductQuery::create()->findPk($event->getProductId())) {
-            $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
-            $con->beginTransaction();
-
-            try {
-                $fileList = ['images' => [], 'documentList' => []];
-
-                // Get product's files to delete after product deletion
-                $fileList['images']['list'] = ProductImageQuery::create()
-                    ->findByProductId($event->getProductId());
-                $fileList['images']['type'] = TheliaEvents::IMAGE_DELETE;
-
-                $fileList['documentList']['list'] = ProductDocumentQuery::create()
-                    ->findByProductId($event->getProductId());
-                $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
-
-                // Delete product
-                $product
-                    ->delete($con);
-
-                $event->setProduct($product);
-
-                // Dispatch delete product's files event
-                foreach ($fileList as $fileTypeList) {
-                    foreach ($fileTypeList['list'] as $fileToDelete) {
-                        $fileDeleteEvent = new FileDeleteEvent($fileToDelete);
-                        $this->eventDispatcher->dispatch($fileDeleteEvent, $fileTypeList['type']);
-                    }
-                }
-
-                $con->commit();
-            } catch (\Exception $e) {
-                $con->rollBack();
-
-                throw $e;
-            }
+        if (null === $product = ProductQuery::create()->findPk($event->getProductId())) {
+            return;
         }
+        $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+
+        try {
+            $fileList = ['images' => [], 'documentList' => []];
+
+            // Get product's files to delete after product deletion
+            $fileList['images']['list'] = ProductImageQuery::create()
+                ->findByProductId($event->getProductId());
+            $fileList['images']['type'] = TheliaEvents::IMAGE_DELETE;
+
+            $fileList['documentList']['list'] = ProductDocumentQuery::create()
+                ->findByProductId($event->getProductId());
+            $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
+
+            // Delete product
+            $product
+                ->delete($con);
+
+            $event->setProduct($product);
+
+            // Dispatch delete product's files event
+            foreach ($fileList as $fileTypeList) {
+                foreach ($fileTypeList['list'] as $fileToDelete) {
+                    $fileDeleteEvent = new FileDeleteEvent($fileToDelete);
+                    $this->eventDispatcher->dispatch($fileDeleteEvent, $fileTypeList['type']);
+                }
+            }
+
+            $con->commit();
+        } catch (\Exception $e) {
+            $con->rollBack();
+
+            throw $e;
+        }
+
     }
 
     /**
@@ -430,6 +434,9 @@ class Product extends BaseAction implements EventSubscriberInterface
     public function toggleVisibility(ProductToggleVisibilityEvent $event): void
     {
         $product = $event->getProduct();
+        if (null === $product) {
+            return;
+        }
 
         $product
             ->setVisible(!(bool) $product->getVisible())

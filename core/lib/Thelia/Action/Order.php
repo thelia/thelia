@@ -278,45 +278,47 @@ class Order extends BaseAction implements EventSubscriberInterface
         // The new order status
         $newStatus = $event->getNewOrderStatus();
 
-        if ($newStatus->getId() !== $order->getStatusId()) {
-            // We have to change the stock in the following cases :
-            // 1) The order is currently paid, and will become unpaid (get products back in stock unconditionnaly)
-            // 2) The order is currently unpaid, and will become paid (remove products from stock, except if was done at order creation $manageStockOnCreation == false)
-            // 3) The order is currently NOT PAID, and will become canceled or the like (get products back in stock if it was done at order creation $manageStockOnCreation == true)
-
-            // We consider the ManageStockOnCreation flag only if the order status as not yet changed.
-            // Count distinct order statuses (e.g. NOT_PAID to something else) in the order version table.
-            if (OrderVersionQuery::create()->groupByStatusId()->filterById($order->getId())->count() > 1) {
-                // A status change occured. Ignore $manageStockOnCreation
-                $manageStockOnCreation = false;
-            } else {
-                // A status has not yet occured. Consider the ManageStockOnCreation flag
-                $manageStockOnCreation = $order->isStockManagedOnOrderCreation($dispatcher);
-            }
-
-            if (($order->isPaid(false) && $newStatus->isNotPaid(false)) // Case 1
-                || ($order->isNotPaid(true) && $newStatus->isNotPaid(false) && true === $manageStockOnCreation) // Case 3
-            ) {
-                $event->setOperation($event::INCREASE_STOCK);
-            }
-
-            if ($order->isNotPaid(false) // Case 2
-                && $newStatus->isPaid(false)
-                && false === $manageStockOnCreation) {
-                $event->setOperation($event::DECREASE_STOCK);
-            }
-
-            Tlog::getInstance()->addInfo(
-                'Checking stock operation for status change of order : '.$order->getRef()
-                .', version: '.$order->getVersion()
-                .', manageStockOnCreation: '.($manageStockOnCreation ? 0 : 1)
-                .', paid:'.($order->isPaid(false) ? 1 : 0)
-                .', is not paid:'.($order->isNotPaid(false) ? 1 : 0)
-                .', new status paid:'.($newStatus->isPaid(false) ? 1 : 0)
-                .', new status is not paid:'.($newStatus->isNotPaid(false) ? 1 : 0)
-                .' = operation: '.$event->getOperation(),
-            );
+        if ($newStatus->getId() === $order->getStatusId()) {
+            return;
         }
+        // We have to change the stock in the following cases :
+        // 1) The order is currently paid, and will become unpaid (get products back in stock unconditionnaly)
+        // 2) The order is currently unpaid, and will become paid (remove products from stock, except if was done at order creation $manageStockOnCreation == false)
+        // 3) The order is currently NOT PAID, and will become canceled or the like (get products back in stock if it was done at order creation $manageStockOnCreation == true)
+
+        // We consider the ManageStockOnCreation flag only if the order status as not yet changed.
+        // Count distinct order statuses (e.g. NOT_PAID to something else) in the order version table.
+        if (OrderVersionQuery::create()->groupByStatusId()->filterById($order->getId())->count() > 1) {
+            // A status change occured. Ignore $manageStockOnCreation
+            $manageStockOnCreation = false;
+        } else {
+            // A status has not yet occured. Consider the ManageStockOnCreation flag
+            $manageStockOnCreation = $order->isStockManagedOnOrderCreation($dispatcher);
+        }
+
+        if (($order->isPaid(false) && $newStatus->isNotPaid(false)) // Case 1
+            || ($order->isNotPaid(true) && $newStatus->isNotPaid(false) && true === $manageStockOnCreation) // Case 3
+        ) {
+            $event->setOperation($event::INCREASE_STOCK);
+        }
+
+        if ($order->isNotPaid(false) // Case 2
+            && $newStatus->isPaid(false)
+            && false === $manageStockOnCreation) {
+            $event->setOperation($event::DECREASE_STOCK);
+        }
+
+        Tlog::getInstance()->addInfo(
+            'Checking stock operation for status change of order : '.$order->getRef()
+            .', version: '.$order->getVersion()
+            .', manageStockOnCreation: '.($manageStockOnCreation ? 0 : 1)
+            .', paid:'.($order->isPaid(false) ? 1 : 0)
+            .', is not paid:'.($order->isNotPaid(false) ? 1 : 0)
+            .', new status paid:'.($newStatus->isPaid(false) ? 1 : 0)
+            .', new status is not paid:'.($newStatus->isNotPaid(false) ? 1 : 0)
+            .' = operation: '.$event->getOperation(),
+        );
+
     }
 
     /**
@@ -329,44 +331,48 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     protected function updateQuantity(ModelOrder $order, int $newStatus, EventDispatcherInterface $dispatcher): void
     {
-        if ($newStatus !== $order->getStatusId() && null !== $newStatusModel = OrderStatusQuery::create()->findPk($newStatus)) {
-            $operationEvent = new GetStockUpdateOperationOnOrderStatusChangeEvent($order, $newStatusModel);
-            $dispatcher->dispatch(
-                $operationEvent,
-                TheliaEvents::ORDER_GET_STOCK_UPDATE_OPERATION_ON_ORDER_STATUS_CHANGE,
-            );
+        if ($newStatus === $order->getStatusId() || null === $newStatusModel = OrderStatusQuery::create()->findPk($newStatus)) {
+            return;
+        }
+        $operationEvent = new GetStockUpdateOperationOnOrderStatusChangeEvent($order, $newStatusModel);
+        $dispatcher->dispatch(
+            $operationEvent,
+            TheliaEvents::ORDER_GET_STOCK_UPDATE_OPERATION_ON_ORDER_STATUS_CHANGE,
+        );
 
-            if ($operationEvent->getOperation() !== $operationEvent::DO_NOTHING) {
-                $orderProductList = $order->getOrderProducts();
+        if ($operationEvent->getOperation() === $operationEvent::DO_NOTHING) {
+            return;
+        }
+        $orderProductList = $order->getOrderProducts();
 
-                /** @var OrderProduct $orderProduct */
-                foreach ($orderProductList as $orderProduct) {
-                    $productSaleElementsId = $orderProduct->getProductSaleElementsId();
+        /** @var OrderProduct $orderProduct */
+        foreach ($orderProductList as $orderProduct) {
+            $productSaleElementsId = $orderProduct->getProductSaleElementsId();
 
-                    /** @var ProductSaleElements $productSaleElements */
-                    if (null !== $productSaleElements = ProductSaleElementsQuery::create()->findPk($productSaleElementsId)) {
-                        $offset = 0;
+            /** @var ProductSaleElements $productSaleElements */
+            if (null !== $productSaleElements = ProductSaleElementsQuery::create()->findPk($productSaleElementsId)) {
+                $offset = 0;
 
-                        if ($operationEvent->getOperation() === $operationEvent::INCREASE_STOCK) {
-                            $offset = $orderProduct->getQuantity();
-                        } elseif ($operationEvent->getOperation() === $operationEvent::DECREASE_STOCK) {
-                            /* Check if we have enough stock */
-                            if ($orderProduct->getQuantity() > $productSaleElements->getQuantity() && true === ConfigQuery::checkAvailableStock()) {
-                                throw new TheliaProcessException($productSaleElements->getRef().' : Not enough stock 2');
-                            }
-
-                            $offset = -$orderProduct->getQuantity();
-                        }
-
-                        Tlog::getInstance()->addError('Product stock: '.$productSaleElements->getQuantity().' -> '.($productSaleElements->getQuantity() + $offset));
-
-                        $productSaleElements
-                            ->setQuantity($productSaleElements->getQuantity() + $offset)
-                            ->save();
+                if ($operationEvent->getOperation() === $operationEvent::INCREASE_STOCK) {
+                    $offset = $orderProduct->getQuantity();
+                } elseif ($operationEvent->getOperation() === $operationEvent::DECREASE_STOCK) {
+                    /* Check if we have enough stock */
+                    if ($orderProduct->getQuantity() > $productSaleElements->getQuantity() && true === ConfigQuery::checkAvailableStock()) {
+                        throw new TheliaProcessException($productSaleElements->getRef().' : Not enough stock 2');
                     }
+
+                    $offset = -$orderProduct->getQuantity();
                 }
+
+                Tlog::getInstance()->addError('Product stock: '.$productSaleElements->getQuantity().' -> '.($productSaleElements->getQuantity() + $offset));
+
+                $productSaleElements
+                    ->setQuantity($productSaleElements->getQuantity() + $offset)
+                    ->save();
             }
         }
+
+
     }
 
     /**

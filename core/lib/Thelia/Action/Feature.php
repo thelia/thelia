@@ -57,19 +57,20 @@ class Feature extends BaseAction implements EventSubscriberInterface
      */
     public function update(FeatureUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $feature = FeatureQuery::create()->findPk($event->getFeatureId())) {
-            $feature
-
-                ->setLocale($event->getLocale())
-                ->setTitle($event->getTitle())
-                ->setDescription($event->getDescription())
-                ->setChapo($event->getChapo())
-                ->setPostscriptum($event->getPostscriptum())
-
-                ->save();
-
-            $event->setFeature($feature);
+        if (null === $feature = FeatureQuery::create()->findPk($event->getFeatureId())) {
+            return;
         }
+        $feature
+
+            ->setLocale($event->getLocale())
+            ->setTitle($event->getTitle())
+            ->setDescription($event->getDescription())
+            ->setChapo($event->getChapo())
+            ->setPostscriptum($event->getPostscriptum())
+
+            ->save();
+
+        $event->setFeature($feature);
     }
 
     /**
@@ -77,13 +78,12 @@ class Feature extends BaseAction implements EventSubscriberInterface
      */
     public function delete(FeatureDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== ($feature = FeatureQuery::create()->findPk($event->getFeatureId()))) {
-            $feature
-
-                ->delete();
-
-            $event->setFeature($feature);
+        if (null === ($feature = FeatureQuery::create()->findPk($event->getFeatureId()))) {
+            return;
         }
+        $feature->delete();
+
+        $event->setFeature($feature);
     }
 
     /**
@@ -101,12 +101,13 @@ class Feature extends BaseAction implements EventSubscriberInterface
         foreach ($templates as $template) {
             $feature_template = new FeatureTemplate();
 
-            if (null === FeatureTemplateQuery::create()->filterByFeature($feature)->filterByTemplate($template)->findOne()) {
-                $feature_template
-                    ->setFeature($feature)
-                    ->setTemplate($template)
-                    ->save();
+            if (null !== FeatureTemplateQuery::create()->filterByFeature($feature)->filterByTemplate($template)->findOne()) {
+                continue;
             }
+            $feature_template
+                ->setFeature($feature)
+                ->setTemplate($template)
+                ->save();
         }
     }
 

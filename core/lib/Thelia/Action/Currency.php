@@ -64,20 +64,19 @@ class Currency extends BaseAction implements EventSubscriberInterface
      */
     public function update(CurrencyUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $currency = CurrencyQuery::create()->findPk($event->getCurrencyId())) {
-            $currency
-
-                ->setLocale($event->getLocale())
-                ->setName($event->getCurrencyName())
-                ->setSymbol($event->getSymbol())
-                ->setFormat($event->getFormat())
-                ->setRate($event->getRate())
-                ->setCode(strtoupper((string) $event->getCode()))
-
-                ->save();
-
-            $event->setCurrency($currency);
+        if (null === $currency = CurrencyQuery::create()->findPk($event->getCurrencyId())) {
+            return;
         }
+        $currency
+            ->setLocale($event->getLocale())
+            ->setName($event->getCurrencyName())
+            ->setSymbol($event->getSymbol())
+            ->setFormat($event->getFormat())
+            ->setRate($event->getRate())
+            ->setCode(strtoupper((string) $event->getCode()))
+            ->save();
+
+        $event->setCurrency($currency);
     }
 
     /**
@@ -85,25 +84,26 @@ class Currency extends BaseAction implements EventSubscriberInterface
      */
     public function setDefault(CurrencyUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $currency = CurrencyQuery::create()->findPk($event->getCurrencyId())) {
-            // Reset default status
-            CurrencyQuery::create()->filterByByDefault(true)->update(['ByDefault' => false]);
-
-            $currency
-
-                ->setVisible($event->getVisible())
-                ->setByDefault($event->getIsDefault())
-                ->save();
-
-            // Update rates when setting a new default currency
-            if (0 !== $event->getIsDefault()) {
-                $updateRateEvent = new CurrencyUpdateRateEvent();
-
-                $dispatcher->dispatch($updateRateEvent, TheliaEvents::CURRENCY_UPDATE_RATES);
-            }
-
-            $event->setCurrency($currency);
+        if (null === $currency = CurrencyQuery::create()->findPk($event->getCurrencyId())) {
+            return;
         }
+        // Reset default status
+        CurrencyQuery::create()->filterByByDefault(true)->update(['ByDefault' => false]);
+
+        $currency
+            ->setVisible($event->getVisible())
+            ->setByDefault($event->getIsDefault())
+            ->save();
+
+        // Update rates when setting a new default currency
+        if (0 !== $event->getIsDefault()) {
+            $updateRateEvent = new CurrencyUpdateRateEvent();
+
+            $dispatcher->dispatch($updateRateEvent, TheliaEvents::CURRENCY_UPDATE_RATES);
+        }
+
+        $event->setCurrency($currency);
+
     }
 
     public function setVisible(CurrencyUpdateEvent $event): void
@@ -118,17 +118,16 @@ class Currency extends BaseAction implements EventSubscriberInterface
      */
     public function delete(CurrencyDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== ($currency = CurrencyQuery::create()->findPk($event->getCurrencyId()))) {
-            if ($currency->getByDefault()) {
-                throw new \RuntimeException(Translator::getInstance()->trans('It is not allowed to delete the default currency'));
-            }
-
-            $currency
-
-                ->delete();
-
-            $event->setCurrency($currency);
+        if (null === ($currency = CurrencyQuery::create()->findPk($event->getCurrencyId()))) {
+            return;
         }
+        if ($currency->getByDefault()) {
+            throw new \RuntimeException(Translator::getInstance()->trans('It is not allowed to delete the default currency'));
+        }
+
+        $currency->delete();
+
+        $event->setCurrency($currency);
     }
 
     public function updateRates(CurrencyUpdateRateEvent $event): void

@@ -58,27 +58,30 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
 
     public function unsubscribe(NewsletterEvent $event): void
     {
-        if (null !== $nl = NewsletterQuery::create()->findPk($event->getId())) {
-            $nl
-                ->setUnsubscribed(true)
-                ->save();
-
-            $event->setNewsletter($nl);
+        if (null === $nl = NewsletterQuery::create()->findPk($event->getId())) {
+            return;
         }
+        $nl
+            ->setUnsubscribed(true)
+            ->save();
+
+        $event->setNewsletter($nl);
+
     }
 
     public function update(NewsletterEvent $event): void
     {
-        if (null !== $nl = NewsletterQuery::create()->findPk($event->getId())) {
-            $nl->setEmail($event->getEmail())
-                ->setFirstname($event->getFirstname())
-                ->setLastname($event->getLastname())
-                ->setUnsubscribed(false)
-                ->setLocale($event->getLocale())
-                ->save();
-
-            $event->setNewsletter($nl);
+        if (null === $nl = NewsletterQuery::create()->findPk($event->getId())) {
+            return;
         }
+        $nl->setEmail($event->getEmail())
+            ->setFirstname($event->getFirstname())
+            ->setLastname($event->getLastname())
+            ->setUnsubscribed(false)
+            ->setLocale($event->getLocale())
+            ->save();
+
+        $event->setNewsletter($nl);
     }
 
     public function confirmSubscription(NewsletterEvent $event): void

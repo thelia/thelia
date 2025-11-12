@@ -49,29 +49,29 @@ class Message extends BaseAction implements EventSubscriberInterface
      */
     public function modify(MessageUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $message = MessageQuery::create()->findPk($event->getMessageId())) {
-            $message
-
-                ->setName($event->getMessageName())
-                ->setSecured($event->getSecured())
-
-                ->setLocale($event->getLocale())
-
-                ->setTitle($event->getTitle())
-                ->setSubject($event->getSubject())
-
-                ->setHtmlMessage($event->getHtmlMessage())
-                ->setTextMessage($event->getTextMessage())
-
-                ->setHtmlLayoutFileName($event->getHtmlLayoutFileName())
-                ->setHtmlTemplateFileName($event->getHtmlTemplateFileName())
-                ->setTextLayoutFileName($event->getTextLayoutFileName())
-                ->setTextTemplateFileName($event->getTextTemplateFileName())
-
-                ->save();
-
-            $event->setMessage($message);
+        if (null === $message = MessageQuery::create()->findPk($event->getMessageId())) {
+            return;
         }
+        $message
+            ->setName($event->getMessageName())
+            ->setSecured($event->getSecured())
+
+            ->setLocale($event->getLocale())
+
+            ->setTitle($event->getTitle())
+            ->setSubject($event->getSubject())
+
+            ->setHtmlMessage($event->getHtmlMessage())
+            ->setTextMessage($event->getTextMessage())
+
+            ->setHtmlLayoutFileName($event->getHtmlLayoutFileName())
+            ->setHtmlTemplateFileName($event->getHtmlTemplateFileName())
+            ->setTextLayoutFileName($event->getTextLayoutFileName())
+            ->setTextTemplateFileName($event->getTextTemplateFileName())
+
+            ->save();
+
+        $event->setMessage($message);
     }
 
     /**
@@ -79,13 +79,14 @@ class Message extends BaseAction implements EventSubscriberInterface
      */
     public function delete(MessageDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== ($message = MessageQuery::create()->findPk($event->getMessageId()))) {
-            $message
-
-                ->delete();
-
-            $event->setMessage($message);
+        if (null === ($message = MessageQuery::create()->findPk($event->getMessageId()))) {
+            return;
         }
+        $message
+
+            ->delete();
+
+        $event->setMessage($message);
     }
 
     public static function getSubscribedEvents(): array

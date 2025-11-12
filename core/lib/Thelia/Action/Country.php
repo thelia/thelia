@@ -51,41 +51,44 @@ class Country extends BaseAction implements EventSubscriberInterface
 
     public function update(CountryUpdateEvent $event): void
     {
-        if (null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
-            $country
-                ->setVisible($event->isVisible())
-                ->setIsocode($event->getIsocode())
-                ->setIsoalpha2($event->getIsoAlpha2())
-                ->setIsoalpha3($event->getIsoAlpha3())
-                ->setHasStates($event->isHasStates())
-                ->setNeedZipCode($event->isNeedZipCode())
-                ->setZipCodeFormat($event->getZipCodeFormat())
-                ->setLocale($event->getLocale())
-                ->setTitle($event->getTitle())
-                ->setChapo($event->getChapo())
-                ->setDescription($event->getDescription())
-                ->save();
-
-            $event->setCountry($country);
+        if (null === $country = CountryQuery::create()->findPk($event->getCountryId())) {
+            return;
         }
+        $country
+            ->setVisible($event->isVisible())
+            ->setIsocode($event->getIsocode())
+            ->setIsoalpha2($event->getIsoAlpha2())
+            ->setIsoalpha3($event->getIsoAlpha3())
+            ->setHasStates($event->isHasStates())
+            ->setNeedZipCode($event->isNeedZipCode())
+            ->setZipCodeFormat($event->getZipCodeFormat())
+            ->setLocale($event->getLocale())
+            ->setTitle($event->getTitle())
+            ->setChapo($event->getChapo())
+            ->setDescription($event->getDescription())
+            ->save();
+
+        $event->setCountry($country);
     }
 
     public function delete(CountryDeleteEvent $event): void
     {
-        if (null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
-            $country->delete();
-
-            $event->setCountry($country);
+        if (null === $country = CountryQuery::create()->findPk($event->getCountryId())) {
+            return;
         }
+        $country->delete();
+
+        $event->setCountry($country);
     }
 
     public function toggleDefault(CountryToggleDefaultEvent $event): void
     {
-        if (null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
-            $country->toggleDefault();
-
-            $event->setCountry($country);
+        if (null === $country = CountryQuery::create()->findPk($event->getCountryId())) {
+            return;
         }
+        $country->toggleDefault();
+
+        $event->setCountry($country);
     }
 
     /**
@@ -94,9 +97,11 @@ class Country extends BaseAction implements EventSubscriberInterface
     public function toggleVisibility(CountryToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $country = $event->getCountry();
+        if (null === $country) {
+            return;
+        }
 
         $country
-
             ->setVisible(!$country->getVisible())
             ->save();
 

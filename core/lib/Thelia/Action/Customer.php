@@ -284,15 +284,16 @@ class Customer extends BaseAction implements EventSubscriberInterface
      */
     public function lostPassword(LostPasswordEvent $event): void
     {
-        if (null !== $customer = CustomerQuery::create()->filterByEmail($event->getEmail())->findOne()) {
-            $password = Password::generateRandom(8);
-
-            $customer
-                ->setPassword($password)
-                ->save();
-
-            $this->mailer->sendEmailToCustomer('lost_password', $customer, ['password' => $password]);
+        if (null === $customer = CustomerQuery::create()->filterByEmail($event->getEmail())->findOne()) {
+            return;
         }
+        $password = Password::generateRandom(8);
+
+        $customer
+            ->setPassword($password)
+            ->save();
+
+        $this->mailer->sendEmailToCustomer('lost_password', $customer, ['password' => $password]);
     }
 
     public static function getSubscribedEvents(): array

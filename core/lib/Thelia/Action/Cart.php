@@ -441,14 +441,14 @@ class Cart extends BaseAction implements EventSubscriberInterface
     public function restoreCurrentCart(CartRestoreEvent $cartRestoreEvent, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $cookieName = ConfigQuery::read('cart.cookie_name', 'thelia_cart');
-        $persistentCookie = ConfigQuery::read('cart.use_persistent_cookie', 1);
+        $persistentCookie = (int) ConfigQuery::read('cart.use_persistent_cookie', 1);
         $request = $this->requestStack->getMainRequest();
 
         $cart = null;
 
-        if ($request->cookies->has($cookieName) && $persistentCookie) {
+        if ($request?->cookies->has($cookieName) && $persistentCookie === 1) {
             $cart = $this->managePersistentCart($cartRestoreEvent, $cookieName, $dispatcher);
-        } elseif (!$persistentCookie) {
+        } elseif (1 !== $persistentCookie) {
             $cart = $this->manageNonPersistentCookie($cartRestoreEvent, $dispatcher);
         }
 
@@ -509,22 +509,22 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * @throws \Exception
      * @throws PropelException
      */
-    protected function managePersistentCart(CartRestoreEvent $cartRestoreEvent, string $cookieName, EventDispatcherInterface $dispatcher): CartModel
+    protected function managePersistentCart(CartRestoreEvent $cartRestoreEvent, string $cookieName, EventDispatcherInterface $dispatcher): ?CartModel
     {
         $request = $this->requestStack->getMainRequest();
 
         // The cart cookie exists -> get the cart token
-        $token = $request->cookies->get($cookieName);
-
+        $token = $request?->cookies->get($cookieName);
+        $cart = null;
         // Check if a cart exists for this token
-        if (null !== $cart = CartQuery::create()->findOneByToken($token)) {
+        if ($token && null !== $cart = CartQuery::create()->findOneByToken($token)) {
             $cart = $this->manageCartDuplicationAtCustomerLogin($cart, $dispatcher);
         }
 
         return $cart;
     }
 
-    protected function manageCartDuplicationAtCustomerLogin(CartModel $cart, EventDispatcherInterface $dispatcher)
+    protected function manageCartDuplicationAtCustomerLogin(CartModel $cart, EventDispatcherInterface $dispatcher): CartModel
     {
         /** @var CustomerModel $customer */
         if (null !== $customer = $this->getSession()->getCustomerUser()) {
