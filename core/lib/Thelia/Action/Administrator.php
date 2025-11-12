@@ -51,33 +51,35 @@ class Administrator extends BaseAction implements EventSubscriberInterface
 
     public function update(AdministratorEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $administrator = AdminQuery::create()->findPk($event->getId())) {
-            $administrator
-                ->setFirstname($event->getFirstname())
-                ->setLastname($event->getLastname())
-                ->setLogin($event->getLogin())
-                ->setEmail($event->getEmail())
-                ->setProfileId($event->getProfile())
-                ->setLocale($event->getLocale());
-
-            if ('' !== $event->getPassword()) {
-                $administrator->setPassword($event->getPassword());
-            }
-
-            $administrator->save();
-
-            $event->setAdministrator($administrator);
+        if (null === $administrator = AdminQuery::create()->findPk($event->getId())) {
+            return;
         }
+        $administrator
+            ->setFirstname($event->getFirstname())
+            ->setLastname($event->getLastname())
+            ->setLogin($event->getLogin())
+            ->setEmail($event->getEmail())
+            ->setProfileId($event->getProfile())
+            ->setLocale($event->getLocale());
+
+        if ('' !== $event->getPassword()) {
+            $administrator->setPassword($event->getPassword());
+        }
+
+        $administrator->save();
+
+        $event->setAdministrator($administrator);
     }
 
     public function delete(AdministratorEvent $event): void
     {
-        if (null !== $administrator = AdminQuery::create()->findPk($event->getId())) {
-            $administrator
-                ->delete();
-
-            $event->setAdministrator($administrator);
+        if (null === $administrator = AdminQuery::create()->findPk($event->getId())) {
+            return;
         }
+        $administrator
+            ->delete();
+
+        $event->setAdministrator($administrator);
     }
 
     public function updatePassword(AdministratorUpdatePasswordEvent $event): void
@@ -93,26 +95,29 @@ class Administrator extends BaseAction implements EventSubscriberInterface
     public function createPassword(AdministratorEvent $event): void
     {
         $admin = $event->getAdministrator();
+        if (null === $admin) {
+            return;
+        }
 
         $email = $admin->getEmail();
-
-        if (!empty($email)) {
-            $renewToken = $this->tokenProvider->getToken();
-
-            $admin
-                ->setPasswordRenewToken($renewToken)
-                ->save();
-
-            $this->mailer->sendEmailMessage(
-                'new_admin_password',
-                [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
-                [$email => $admin->getFirstname().' '.$admin->getLastname()],
-                [
-                    'token' => $renewToken,
-                    'admin' => $admin,
-                ],
-            );
+        if (empty($email)) {
+            return;
         }
+
+        $renewToken = $this->tokenProvider->getToken();
+        $admin
+            ->setPasswordRenewToken($renewToken)
+            ->save();
+
+        $this->mailer->sendEmailMessage(
+            'new_admin_password',
+            [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
+            [$email => $admin->getFirstname().' '.$admin->getLastname()],
+            [
+                'token' => $renewToken,
+                'admin' => $admin,
+            ],
+        );
     }
 
     public static function getSubscribedEvents(): array

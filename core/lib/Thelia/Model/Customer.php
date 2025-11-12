@@ -109,8 +109,8 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
                 ->setFirstname($firstname)
                 ->setLastname($lastname)
                 ->setAddress1($address1)
-                ->setAddress2($address2)
-                ->setAddress3($address3)
+                ->setAddress2($address2 ?? '')
+                ->setAddress3($address3 ?? '')
                 ->setPhone($phone)
                 ->setCellphone($cellphone)
                 ->setZipcode($zipcode)
@@ -118,6 +118,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
                 ->setCountryId($countryId)
                 ->setStateId($stateId);
 
+            $address->save($con);
             $this->save($con);
 
             $con->commit();

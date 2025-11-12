@@ -52,7 +52,7 @@ class Address extends BaseAction implements EventSubscriberInterface
 
     public function delete(AddressEvent $event): void
     {
-        /** @var AddressEvent $address */
+        /** @var AddressModel $address */
         $address = $event->getModel();
 
         $address->delete();

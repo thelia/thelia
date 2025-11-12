@@ -275,7 +275,6 @@ abstract class AbstractCrudController extends BaseAdminController
         if (($response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) instanceof Response) {
             return $response;
         }
-
         // Create the Form from the request
         $changeForm = $this->getUpdateForm();
 
@@ -293,7 +292,6 @@ abstract class AbstractCrudController extends BaseAdminController
             } elseif ($changeEvent instanceof ActiveRecordEvent) {
                 $this->bindFormToPropelEvent($changeEvent, $form);
             }
-
             // Dispatch Update Event
             $eventDispatcher->dispatch($changeEvent, $this->updateEventIdentifier);
 

@@ -48,18 +48,19 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
      */
     public function update(AttributeAvUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $attribute = AttributeAvQuery::create()->findPk($event->getAttributeAvId())) {
-            $attribute
-                ->setLocale($event->getLocale())
-                ->setTitle($event->getTitle())
-                ->setDescription($event->getDescription())
-                ->setChapo($event->getChapo())
-                ->setPostscriptum($event->getPostscriptum())
-
-                ->save();
-
-            $event->setAttributeAv($attribute);
+        if (null === $attribute = AttributeAvQuery::create()->findPk($event->getAttributeAvId())) {
+            return;
         }
+        $attribute
+            ->setLocale($event->getLocale())
+            ->setTitle($event->getTitle())
+            ->setDescription($event->getDescription())
+            ->setChapo($event->getChapo())
+            ->setPostscriptum($event->getPostscriptum())
+
+            ->save();
+
+        $event->setAttributeAv($attribute);
     }
 
     /**
@@ -67,17 +68,15 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
      */
     public function delete(AttributeAvDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== ($attribute = AttributeAvQuery::create()->findPk($event->getAttributeAvId()))) {
-            $attribute
-                ->delete();
-
-            $event->setAttributeAv($attribute);
+        if (null === ($attribute = AttributeAvQuery::create()->findPk($event->getAttributeAvId()))) {
+            return;
         }
+        $attribute
+            ->delete();
+
+        $event->setAttributeAv($attribute);
     }
 
-    /**
-     * Changes position, selecting absolute ou relative change.
-     */
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->genericUpdatePosition(AttributeAvQuery::create(), $event);

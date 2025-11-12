@@ -54,19 +54,20 @@ class Brand extends BaseAction implements EventSubscriberInterface
      */
     public function update(BrandUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $brand = BrandQuery::create()->findPk($event->getBrandId())) {
-            $brand
-                ->setVisible($event->getVisible())
-                ->setLogoImageId(0 === $event->getLogoImageId() ? null : $event->getLogoImageId())
-                ->setLocale($event->getLocale())
-                ->setTitle($event->getTitle())
-                ->setDescription($event->getDescription())
-                ->setChapo($event->getChapo())
-                ->setPostscriptum($event->getPostscriptum())
-                ->save();
-
-            $event->setBrand($brand);
+        if (null === $brand = BrandQuery::create()->findPk($event->getBrandId())) {
+            return;
         }
+        $brand
+            ->setVisible($event->getVisible())
+            ->setLogoImageId(0 === $event->getLogoImageId() ? null : $event->getLogoImageId())
+            ->setLocale($event->getLocale())
+            ->setTitle($event->getTitle())
+            ->setDescription($event->getDescription())
+            ->setChapo($event->getChapo())
+            ->setPostscriptum($event->getPostscriptum())
+            ->save();
+
+        $event->setBrand($brand);
     }
 
     /**
@@ -78,6 +79,9 @@ class Brand extends BaseAction implements EventSubscriberInterface
     public function toggleVisibility(BrandToggleVisibilityEvent $event): void
     {
         $brand = $event->getBrand();
+        if (null === $brand) {
+            return;
+        }
 
         $brand
             ->setVisible(!$brand->getVisible())
@@ -96,11 +100,12 @@ class Brand extends BaseAction implements EventSubscriberInterface
 
     public function delete(BrandDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $brand = BrandQuery::create()->findPk($event->getBrandId())) {
-            $brand->delete();
-
-            $event->setBrand($brand);
+        if (null === $brand = BrandQuery::create()->findPk($event->getBrandId())) {
+            return;
         }
+        $brand->delete();
+
+        $event->setBrand($brand);
     }
 
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
@@ -113,15 +118,16 @@ class Brand extends BaseAction implements EventSubscriberInterface
      */
     public function viewCheck(ViewCheckEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if ('brand' === $event->getView()) {
-            $brand = BrandQuery::create()
-                ->filterById($event->getViewId())
-                ->filterByVisible(1)
-                ->count();
+        if ('brand' !== $event->getView()) {
+            return;
+        }
+        $brand = BrandQuery::create()
+            ->filterById($event->getViewId())
+            ->filterByVisible(1)
+            ->count();
 
-            if (0 === $brand) {
-                $dispatcher->dispatch($event, TheliaEvents::VIEW_BRAND_ID_NOT_VISIBLE);
-            }
+        if (0 === $brand) {
+            $dispatcher->dispatch($event, TheliaEvents::VIEW_BRAND_ID_NOT_VISIBLE);
         }
     }
 

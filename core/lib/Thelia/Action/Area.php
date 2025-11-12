@@ -87,7 +87,6 @@ class Area extends BaseAction implements EventSubscriberInterface
         return [
             TheliaEvents::AREA_ADD_COUNTRY => ['addCountry', 128],
             TheliaEvents::AREA_REMOVE_COUNTRY => ['removeCountry', 128],
-            TheliaEvents::AREA_POSTAGE_UPDATE => ['updatePostage', 128],
             TheliaEvents::AREA_DELETE => ['delete', 128],
             TheliaEvents::AREA_CREATE => ['save', 128],
             TheliaEvents::AREA_UPDATE => ['save', 128],

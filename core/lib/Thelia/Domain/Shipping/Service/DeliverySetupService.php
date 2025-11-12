@@ -26,8 +26,7 @@ final readonly class DeliverySetupService
     public function __construct(
         private PostageEstimator $postageEstimator,
         private CartAddressService $cartAddressService,
-    )
-    {
+    ) {
     }
 
     public function setCustomerDefaultDeliveryAddress(Cart $cart): void

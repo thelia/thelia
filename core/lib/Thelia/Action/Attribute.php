@@ -55,18 +55,19 @@ class Attribute extends BaseAction implements EventSubscriberInterface
      */
     public function update(AttributeUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== $attribute = AttributeQuery::create()->findPk($event->getAttributeId())) {
-            $attribute
-                ->setLocale($event->getLocale())
-                ->setTitle($event->getTitle())
-                ->setDescription($event->getDescription())
-                ->setChapo($event->getChapo())
-                ->setPostscriptum($event->getPostscriptum())
-
-                ->save();
-
-            $event->setAttribute($attribute);
+        if (null === $attribute = AttributeQuery::create()->findPk($event->getAttributeId())) {
+            return;
         }
+        $attribute
+            ->setLocale($event->getLocale())
+            ->setTitle($event->getTitle())
+            ->setDescription($event->getDescription())
+            ->setChapo($event->getChapo())
+            ->setPostscriptum($event->getPostscriptum())
+
+            ->save();
+
+        $event->setAttribute($attribute);
     }
 
     /**
@@ -74,12 +75,13 @@ class Attribute extends BaseAction implements EventSubscriberInterface
      */
     public function delete(AttributeDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (null !== ($attribute = AttributeQuery::create()->findPk($event->getAttributeId()))) {
-            $attribute
-                ->delete();
-
-            $event->setAttribute($attribute);
+        if (null === ($attribute = AttributeQuery::create()->findPk($event->getAttributeId()))) {
+            return;
         }
+        $attribute
+            ->delete();
+
+        $event->setAttribute($attribute);
     }
 
     /**
@@ -124,7 +126,6 @@ class Attribute extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ATTRIBUTE_UPDATE => ['update', 128],
             TheliaEvents::ATTRIBUTE_DELETE => ['delete', 128],
             TheliaEvents::ATTRIBUTE_UPDATE_POSITION => ['updatePosition', 128],
-
             TheliaEvents::ATTRIBUTE_REMOVE_FROM_ALL_TEMPLATES => ['removeFromAllTemplates', 128],
             TheliaEvents::ATTRIBUTE_ADD_TO_ALL_TEMPLATES => ['addToAllTemplates', 128],
         ];

@@ -77,8 +77,6 @@ abstract class BaseCachedFile extends BaseAction
 
     /**
      * Recursively clears the specified directory.
-     *
-     * @param string $path the directory path
      */
     protected function clearDirectory(string $path): void
     {
@@ -180,7 +178,7 @@ abstract class BaseCachedFile extends BaseAction
         $path = \sprintf('%s/%s', $web_root, $cache_base);
 
         // Create directory (recursively) if it does not exists.
-        if ($create_if_not_exists && !is_dir($path) && !@mkdir($path, 0o777, true)) {
+        if ($create_if_not_exists && !is_dir($path) && !mkdir($path, 0o777, true) && !is_dir($path)) {
             throw new \RuntimeException(\sprintf('Failed to create %s file in cache directory', $path));
         }
 
@@ -204,7 +202,11 @@ abstract class BaseCachedFile extends BaseAction
     public function saveFile(FileCreateOrUpdateEvent $event): void
     {
         $model = $event->getModel();
-        $model->setFile(\sprintf('tmp/%s', $event->getUploadedFile()->getFilename()));
+        if (null === $model) {
+            return;
+        }
+
+        $model->setFile(\sprintf('tmp/%s', $event->getUploadedFile()?->getFilename()));
 
         $con = Propel::getWriteConnection(ProductImageTableMap::DATABASE_NAME);
         $con->beginTransaction();
@@ -237,21 +239,29 @@ abstract class BaseCachedFile extends BaseAction
      */
     public function updateFile(FileCreateOrUpdateEvent $event): void
     {
-        // Copy and save file
-        if ($event->getUploadedFile() instanceof UploadedFile) {
-            // Remove old picture file from file storage
-            $url = $event->getModel()->getUploadDir().'/'.$event->getOldModel()->getFile();
-            unlink(str_replace('..', '', $url));
-            $event->getModel()->setFile('')->save();
+        $model = $event->getModel();
+        $oldModel = $event->getOldModel();
+        if (null === $model || null === $oldModel) {
+            return;
+        }
 
-            $newUploadedFile = $this->fileManager->copyUploadedFile($event->getModel(), $event->getUploadedFile());
+        $uploadedFile = $event->getUploadedFile();
+
+        // Copy and save file
+        if ($uploadedFile instanceof UploadedFile) {
+            // Remove old picture file from file storage
+            $url = $model->getUploadDir().'/'.$oldModel->getFile();
+            unlink(str_replace('..', '', $url));
+            $model->setFile('')->save();
+
+            $newUploadedFile = $this->fileManager->copyUploadedFile($model, $uploadedFile);
             $event->setUploadedFile($newUploadedFile);
         }
 
         // Update image modifications
-        $event->getModel()->save();
+        $model->save();
 
-        $event->setModel($event->getModel());
+        $event->setModel($model);
     }
 
     /**
