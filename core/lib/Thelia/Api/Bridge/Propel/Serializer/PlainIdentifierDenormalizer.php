@@ -111,12 +111,16 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
                 && (
                     (
                         \is_array($data[$property->getName()])
-                        && array_filter($data[$property->getName()], static fn ($value): bool => (\is_string($value) || \is_int($value)) && !str_contains($value, '/'))
+                        && array_filter($data[$property->getName()], static fn ($value): bool => (\is_string($value) && !str_contains($value, '/')) || \is_int($value))
                         && Collection::class === $property->getType()->getName()
                     )
                     || (
-                        (\is_string($data[$property->getName()]) || \is_int($data[$property->getName()]))
+                        \is_string($data[$property->getName()])
                         && !str_contains($data[$property->getName()], '/')
+                        && $this->resourceClassResolver->isResourceClass($property->getType()->getName())
+                    )
+                    || (
+                        \is_int($data[$property->getName()])
                         && $this->resourceClassResolver->isResourceClass($property->getType()->getName())
                     )
                 ),

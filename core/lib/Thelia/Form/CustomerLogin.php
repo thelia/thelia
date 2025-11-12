@@ -72,7 +72,7 @@ class CustomerLogin extends BruteforceForm
                 'label_attr' => [
                     'for' => 'password',
                 ],
-                'required' => false,
+                'required' => true,
             ])
             ->add('remember_me', CheckboxType::class, [
                 'value' => 'yes',
