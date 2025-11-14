@@ -268,7 +268,6 @@ class LangController extends BaseAdminController
         $error_msg = false;
 
         try {
-
             $deleteEvent = new LangDeleteEvent($this->getRequest()->get('language_id', 0));
 
             $eventDispatcher->dispatch($deleteEvent, TheliaEvents::LANG_DELETE);

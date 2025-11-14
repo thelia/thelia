@@ -36,7 +36,6 @@ class OrderFilter extends AbstractFilter
 
     protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
     {
-
         if (
             !$this->isPropertyEnabled($property, $resourceClass)
         ) {
