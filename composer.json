@@ -153,12 +153,10 @@
             "Thelia\\Config\\InitConfig::initConfig"
         ],
         "post-install-cmd": [
-            "@cache-clear",
-            "@assets-install"
+            "@cache-clear"
         ],
         "post-update-cmd": [
-            "@cache-clear",
-            "@assets-install"
+            "@cache-clear"
         ]
     },
     "minimum-stability": "dev",
