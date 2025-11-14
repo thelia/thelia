@@ -74,7 +74,8 @@
         "phpstan/phpdoc-parser": "^1.4",
         "symfony/property-info": "6.4.*",
         "symfony/runtime": "6.4.*",
-        "lexik/jwt-authentication-bundle": "^2.16"
+        "lexik/jwt-authentication-bundle": "^2.16",
+        "symfony/monolog-bundle": "^3.10"
     },
     "require-dev": {
         "thelia/hooktest-module": "~1.1",

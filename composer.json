@@ -92,7 +92,8 @@
         "symfony/property-info": "6.4.*",
         "symfony/runtime": "6.4.*",
         "lexik/jwt-authentication-bundle": "^2.20",
-        "symfony/debug-bundle": "6.4.*"
+        "symfony/debug-bundle": "6.4.*",
+        "symfony/monolog-bundle": "^3.10"
     },
     "require-dev": {
         "thelia/hooktest-module": "~1.1",
@@ -145,8 +146,9 @@
         "cache-clear": [
             "rm -Rf var/cache/*"
         ],
-        "assets-install": [
-            "php Thelia assets:install web"
+        "api-install": [
+            "php Thelia assets:install web",
+            "php bin/console lexik:jwt:generate-keypair --skip-if-exists"
         ],
         "post-autoload-dump": [
             "Thelia\\Config\\InitConfig::initConfig"
