@@ -88,6 +88,12 @@
             "bootstrap.php"
         ]
     },
+    "extra": {
+        "symfony": {
+            "allow-contrib": true,
+            "require": "6.4.*"
+        }
+    },
     "config": {
         "allow-plugins": {
             "symfony/flex": true,

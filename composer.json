@@ -161,8 +161,9 @@
         }
     },
     "extra": {
-        "branch-alias": {
-            "dev-master": "2.4-dev"
+        "symfony": {
+            "allow-contrib": true,
+            "require": "6.4.*"
         }
     },
     "config": {
