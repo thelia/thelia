@@ -46,7 +46,7 @@
         {/loop}
 
         {loop type="module-config" name="dummy" module="tinymce" variable="force_pasting_as_text" default_value="0"}
-            {if $VALUE != 0}
+            {if $VALUE}
                 // Force pasting as text
                 paste_auto_cleanup_on_paste : true,
                 paste_remove_styles: true,

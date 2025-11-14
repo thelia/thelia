@@ -45,7 +45,21 @@
             {/form_field}
 
             {form_field field='reference'}
+                {if $value!=$product_ref}
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group {if $error}has-error{/if}">
+                            <label for="{$label_attr.for|default:null}" class="control-label">{$label} : </label>
+
+                            <div class="form-group">
+                                <input type="text" id="{$label_attr.for|default:null}" name="{$name}" class="form-control" value="{if $value}{$value}{else}{$product_ref}{/if}" title="{$label}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {else}
                 <input type="hidden" name="{$name}" value="{$value}" />
+                {/if}
             {/form_field}
 
 	        {form_field field='success_url'}
