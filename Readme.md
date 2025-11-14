@@ -19,11 +19,11 @@ A repository containing all thelia modules is available at this address : https:
 Compatibility
 ------------
 
-|         |   Thelia 2.3    |      Thelia 2.4 |    Thelia 2.5 |
-|---------|:---------------:|----------------:|--------------:|
-| PHP     | 5.5 5.6 7.0 7.1 | 7.0 7.1 7.2 7.3 |       8.1 8.2 |
-| MySQL   |     5.5 5.6     |     5.5 5.6 5.7 |   5.6 5.7 8.0 |
-| Symfony |       2.8       |             2.8 |       6.0 6.3 |
+|         |   Thelia 2.3    |      Thelia 2.4 |  Thelia 2.5 |  Thelia 2.6 |
+|---------|:---------------:|----------------:|------------:|------------:|
+| PHP     | 5.5 5.6 7.0 7.1 | 7.0 7.1 7.2 7.3 |     8.2 8.3 |     8.2 8.3 |
+| MySQL   |     5.5 5.6     |     5.5 5.6 5.7 | 5.6 5.7 8.0 | 5.6 5.7 8.0 |
+| Symfony |       2.8       |             2.8 |         6.4 |         6.4 |
 
 Requirements
 ------------
@@ -91,7 +91,7 @@ You can get the sources from git and then let composer install dependencies, or 
 ``` bash
 $ git clone --recursive https://github.com/thelia/thelia path
 $ cd path
-$ git checkout 2.5.5
+$ git checkout 2.6.0
 $ curl -sS https://getcomposer.org/installer | php
 $ php composer.phar install
 ```
@@ -100,7 +100,7 @@ $ php composer.phar install
 
 ``` bash
 $ curl -sS https://getcomposer.org/installer | php
-$ php composer.phar create-project thelia/thelia path/ 2.5.5
+$ php composer.phar create-project thelia/thelia path/ 2.6.0
 ```
 
 If something goes wrong during the install process, you can restart Thelia install wizard with

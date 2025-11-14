@@ -1,3 +1,37 @@
+# 2.6.0
+- #3364 Prepare Thelia version 2.5.5 to 2.6.0
+- #3363 fix: add umask permission in FileManager + improve session handling in TokenProvider
+- #3362 feat: add symfony/monolog-bundle to composer.json
+- #3360 fix: update composer.json to require Symfony 6.4 and allow contributions
+- #3359 Fix argument set to null if empty('')
+- #3358 Fix precedence of event variable values
+- #3357 Fix test for pasting as text
+- #3349 Adding default rules for Apache mod_brotli
+- #3348 Bump axios from 1.7.4 to 1.12.0 in /templates/frontOffice/modern
+- #3340 Update Readme.md
+- #3339 Bump tmp from 0.2.1 to 0.2.4 in /templates/frontOffice/modern
+- #3337 Api Platform
+- #3336 fix: remove force error reporting
+- #3334 Update CouponManager.php
+- #3332 Bump form-data from 4.0.0 to 4.0.4 in /templates/frontOffice/modern
+- #3326 Fix missing delivery module in insert.sql.tpl
+- #3316 Update search.html
+- #3315 Image data is no longer always returned in an ImageEvent
+- #3314 Update OrderProduct.php
+- #3312 Bump http-proxy-middleware from 2.0.7 to 2.0.9 in /templates/frontOffice/modern
+- #3310 Clone function issue
+- #3309 Update orders.html
+- #3308 Bump @babel/runtime-corejs3 from 7.19.0 to 7.26.10 in /templates/frontOffice/modern
+- #3307 Bump @babel/helpers from 7.22.10 to 7.26.10 in /templates/frontOffice/modern
+- #3305 An admin not logged in to the BO is redirected to the requested page after logging in
+- #3304 Fix/array search loop pagination
+- #3303 Fix/GitHub api call
+- #3302 Uses actions/cache@v4 instead of v2
+- #3296 Give the possibility to modify the PDF filename
+- #3295 Bump serialize-javascript from 6.0.0 to 6.0.2 in /templates/frontOffice/modern
+- #3268 Prepare Thelia version 2.5.4 to 2.5.5
+- #3267 Fix wrong .env location in TinyMCE filemanager config
+
 # 2.5.5
 - #3267 Fix wrong .env location in TinyMCE filemanager config
 - #3263 fix: better get current locale
