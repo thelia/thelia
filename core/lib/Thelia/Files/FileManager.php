@@ -58,7 +58,7 @@ class FileManager
      *
      * @throws FileException if the file type is not supported, or if the class does not implements FileModelInterface
      *
-     * @return FileModelInterface a file model interface instance
+     * @return \Thelia\Files\FileModelInterface a file model interface instance
      */
     public function getModelInstance($fileType, $parentType)
     {
@@ -72,7 +72,7 @@ class FileManager
 
         $instance = new $className();
 
-        if (!$instance instanceof FileModelInterface) {
+        if (!$instance instanceof \Thelia\Files\FileModelInterface) {
             throw new FileException(
                 sprintf(
                     "Wrong class type for file type '%s', parent type '%s'. Class '%s' should implements FileModelInterface",
@@ -101,8 +101,8 @@ class FileManager
     /**
      * Copy UploadedFile into the server storage directory.
      *
-     * @param FileModelInterface $model        Model saved
-     * @param UploadedFile       $uploadedFile Ready to be uploaded file
+     * @param \Thelia\Files\FileModelInterface $model        Model saved
+     * @param UploadedFile                     $uploadedFile Ready to be uploaded file
      *
      * @throws \Thelia\Exception\ImageException
      *
@@ -122,7 +122,7 @@ class FileManager
         $filePath = $directory.DS.$fileName;
 
         $fileSystem->rename($uploadedFile->getPathname(), $filePath);
-        $fileSystem->chmod($filePath, 0660);
+        @chmod($filePath, 0666 & ~umask());
         $newUploadedFile = new UploadedFile($filePath, $fileName);
         $model->setFile($fileName);
 
@@ -142,8 +142,8 @@ class FileManager
     /**
      * Save file into the database.
      *
-     * @param int                $parentId  the parent object ID
-     * @param FileModelInterface $fileModel the file model object (image or document) to save
+     * @param int                              $parentId  the parent object ID
+     * @param \Thelia\Files\FileModelInterface $fileModel the file model object (image or document) to save
      *
      * @throws \Thelia\Exception\ImageException
      *
@@ -174,8 +174,8 @@ class FileManager
     /**
      * Save file into the database.
      *
-     * @param FileCreateOrUpdateEvent $event      the event
-     * @param FileModelInterface      $imageModel the file model object (image or document) to save
+     * @param FileCreateOrUpdateEvent          $event      the event
+     * @param \Thelia\Files\FileModelInterface $imageModel the file model object (image or document) to save
      *
      * @return int number of modified rows in database
      */
@@ -187,8 +187,8 @@ class FileManager
     /**
      * Save file into the database.
      *
-     * @param FileCreateOrUpdateEvent $event         the event
-     * @param FileModelInterface      $documentModel the file model object (image or document) to save
+     * @param FileCreateOrUpdateEvent          $event         the event
+     * @param \Thelia\Files\FileModelInterface $documentModel the file model object (image or document) to save
      *
      * @return int number of modified rows in database
      */
@@ -216,7 +216,7 @@ class FileManager
     /**
      * Delete image from file storage and database.
      *
-     * @param FileModelInterface $model File being deleted
+     * @param \Thelia\Files\FileModelInterface $model File being deleted
      */
     public function deleteFile(FileModelInterface $model): void
     {

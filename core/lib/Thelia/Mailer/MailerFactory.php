@@ -156,7 +156,7 @@ class MailerFactory
         }
 
         if ($locale === null) {
-            $locale = Lang::getDefaultLanguage()->getLocale();
+            $locale = Lang::getDefaultLanguage()?->getLocale();
         }
 
         $message->setLocale($locale);
@@ -171,10 +171,10 @@ class MailerFactory
         // the current one.
         $session = $this->parser->getRequest()->getSession();
 
-        $currentLang = $session->getLang();
+        $currentLang = $session?->getLang();
 
         if (null !== $requiredLang = LangQuery::create()->findOneByLocale($locale)) {
-            $session->setLang($requiredLang);
+            $session?->setLang($requiredLang);
         }
 
         $email = (new Email());
@@ -183,7 +183,7 @@ class MailerFactory
 
         $message->buildMessage($this->parser, $email);
 
-        $session->setLang($currentLang);
+        $session?->setLang($currentLang);
 
         return $email;
     }
