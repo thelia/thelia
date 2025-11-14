@@ -268,10 +268,6 @@ class LangController extends BaseAdminController
         $error_msg = false;
 
         try {
-            $this->getTokenProvider()->checkToken(
-                $this->getRequest()->query->get('_token')
-            );
-
             $deleteEvent = new LangDeleteEvent($this->getRequest()->get('language_id', 0));
 
             $eventDispatcher->dispatch($deleteEvent, TheliaEvents::LANG_DELETE);
@@ -416,10 +412,6 @@ class LangController extends BaseAdminController
         }
 
         $errorMessage = null;
-
-        $this->getTokenProvider()->checkToken(
-            $this->getRequest()->query->get('_token')
-        );
 
         try {
             $eventDispatcher->dispatch($event, $eventName);

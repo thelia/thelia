@@ -870,7 +870,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         throw new NotFoundHttpException();
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::PRODUCT_CREATE => ['create', 128],

@@ -30,7 +30,10 @@ return static function (ContainerConfigurator $configurator): void {
         ->bind('$kernelEnvironment', '%kernel.environment%')
         ->bind('$sessionSavePath', '%session.save_path%')
         ->bind('$theliaParserLoops', '%Thelia.parser.loops%')
-        ->bind('$formDefinition', '%Thelia.parser.forms%');
+        ->bind('$formDefinition', '%Thelia.parser.forms%')
+        ->bind('$propelCollectionExtensions', tagged_iterator('thelia.api.propel.query_extension.collection'))
+        ->bind('$propelItemExtensions', tagged_iterator('thelia.api.propel.query_extension.item'))
+        ->bind('$apiResourceAddons', '%Thelia.api.resource.addons%');
 
     $serviceConfigurator->load('Thelia\\', THELIA_LIB)
         ->exclude(
@@ -73,12 +76,19 @@ return static function (ContainerConfigurator $configurator): void {
     }
 
     if (\defined('THELIA_INSTALL_MODE') === false) {
+        $apiResourcePaths = [
+            THELIA_LIB.'/Api/Resource',
+        ];
         $modules = ModuleQuery::getActivated();
         /** @var Module $module */
         foreach ($modules as $module) {
             try {
                 \call_user_func([$module->getFullNamespace(), 'configureContainer'], $configurator);
                 \call_user_func([$module->getFullNamespace(), 'configureServices'], $serviceConfigurator);
+                $apiModulePath = $module->getAbsoluteBaseDir().'/Api/Resource';
+                if (is_dir($apiModulePath)) {
+                    $apiResourcePaths[] = $apiModulePath;
+                }
             } catch (\Exception $e) {
                 if ($_SERVER['APP_DEBUG']) {
                     throw $e;
@@ -89,6 +99,8 @@ return static function (ContainerConfigurator $configurator): void {
                 );
             }
         }
+
+        $configurator->extension('api_platform', ['mapping' => ['paths' => $apiResourcePaths]]);
     }
 
     $serviceConfigurator->get(ConfigCacheService::class)

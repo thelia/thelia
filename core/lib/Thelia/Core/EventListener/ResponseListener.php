@@ -27,6 +27,10 @@ class ResponseListener implements EventSubscriberInterface
 {
     public function beforeResponse(ResponseEvent $event): void
     {
+        if (!$event->getRequest()->hasSession(true) || !$event->getRequest()->getSession()->isStarted()) {
+            return;
+        }
+
         $session = $event->getRequest()->getSession();
 
         if (null !== $id = $session->get('cart_use_cookie')) {
@@ -54,7 +58,7 @@ class ResponseListener implements EventSubscriberInterface
      * {@inheritdoc}
      * api.
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::RESPONSE => ['beforeResponse', 128],

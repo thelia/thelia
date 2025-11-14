@@ -17,6 +17,15 @@
         <server name="APP_ENV" value="test" force="true" />
         <env name="APP_SECRET" value="287f2178af9e0c250e8219a9df833504"/>
         <!-- ###- symfony/framework-bundle ### -->
+        <!-- ###+ lexik/jwt-authentication-bundle ### -->
+        <env name="JWT_SECRET_KEY" value="%kernel.project_dir%/config/jwt/private.pem"/>
+        <env name="JWT_PUBLIC_KEY" value="%kernel.project_dir%/config/jwt/public.pem"/>
+        <env name="JWT_PASSPHRASE" value="d9c9dae1108ffafd6d58289a4dfa0fc39ffb341b5dedaf448a1abbf8a4f3c878"/>
+        <!-- ###- lexik/jwt-authentication-bundle ### -->
+
+        <!-- ###+ nelmio/cors-bundle ### -->
+        <env name="CORS_ALLOW_ORIGIN" value="'^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$'"/>
+        <!-- ###- nelmio/cors-bundle ### -->
     </php>
 
     <testsuites>

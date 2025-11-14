@@ -14,7 +14,7 @@
         "wiki": "http://doc.thelia.net"
     },
     "require": {
-        "php": ">= 8.1",
+        "php": ">= 8.2",
         "ext-pdo": "*",
         "ext-json": "*",
         "ext-intl": "*",
@@ -47,6 +47,7 @@
         "symfony/stopwatch": "6.4.*",
         "symfony/twig-bundle": "6.4.*",
         "symfony/web-profiler-bundle": "6.4.*",
+        "symfony/deprecation-contracts": ">=3.1 <3.6",
         "thelia/currency-converter": "~1.0",
         "ptachoire/cssembed": "1.0.*",
         "simplepie/simplepie": "1.5.*",
@@ -64,7 +65,7 @@
         "symfony/psr-http-message-bridge": "^2.1",
         "symfony/flex": "^2.4",
         "doctrine/cache": "~1.0",
-        "assetic/framework": "~3.0.0",
+        "assetic/framework": "~3.1",
         "spipu/html2pdf": "~5.2.5",
         "symfony/mailer": "6.4.*",
         "symfony/webpack-encore-bundle": "^1.14",
@@ -80,7 +81,18 @@
         "thelia/thelia-blocks-module": "^2.0.3-beta",
         "thelia/thelia-library-module": "^1.1.7",
         "thelia/product-loop-attribute-filter-module": "~2.0.0",
-        "doctrine/annotations": "^2.0"
+        "doctrine/annotations": "^2.0",
+        "api-platform/core": "^3.2.9",
+        "nelmio/cors-bundle": "^2.2",
+        "symfony/asset": "6.4.*",
+        "symfony/proxy-manager-bridge": "6.4.*",
+        "symfony/security-bundle": "6.4.*",
+        "phpdocumentor/reflection-docblock": "^5.3",
+        "phpstan/phpdoc-parser": "^1.4",
+        "symfony/property-info": "6.4.*",
+        "symfony/runtime": "6.4.*",
+        "lexik/jwt-authentication-bundle": "^2.20",
+        "symfony/debug-bundle": "6.4.*"
     },
     "require-dev": {
         "thelia/hooktest-module": "~1.1",
@@ -128,15 +140,22 @@
             "@test-functional"
         ],
         "ci": [
-            "@cs-diff",
-            "@phpstan"
+            "@cs-diff"
         ],
-        "auto-scripts": {
-            "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd"
-        },
+        "cache-clear": [
+            "rm -Rf var/cache/*"
+        ],
+        "assets-install": [
+            "php Thelia assets:install web"
+        ],
         "post-autoload-dump": [
             "Thelia\\Config\\InitConfig::initConfig"
+        ],
+        "post-install-cmd": [
+            "@cache-clear"
+        ],
+        "post-update-cmd": [
+            "@cache-clear"
         ]
     },
     "minimum-stability": "dev",

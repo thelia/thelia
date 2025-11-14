@@ -27,6 +27,7 @@ use Propel\Runtime\DataFetcher\PDODataFetcher;
 use Propel\Runtime\Propel;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -45,6 +46,10 @@ use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\Component\VarExporter\VarExporter;
 use Symfony\Contracts\EventDispatcher\Event;
+use Thelia\Api\Bridge\Propel\Extension\QueryCollectionExtensionInterface;
+use Thelia\Api\Bridge\Propel\Extension\QueryItemExtensionInterface;
+use Thelia\Api\Bridge\Propel\Filter\FilterInterface;
+use Thelia\Api\Resource\ResourceAddonInterface;
 use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Controller\ControllerInterface;
 use Thelia\Core\Archiver\ArchiverInterface;
@@ -53,6 +58,8 @@ use Thelia\Core\DependencyInjection\TheliaContainer;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Hook\BaseHookInterface;
 use Thelia\Core\Propel\Schema\SchemaLocator;
+use Thelia\Core\Security\UserProvider\AdminUserProvider;
+use Thelia\Core\Security\UserProvider\CustomerUserProvider;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Template\Element\LoopInterface;
 use Thelia\Core\Template\TemplateDefinition;
@@ -148,6 +155,12 @@ class Thelia extends Kernel
 
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
+        $routes->import(__DIR__.'/../Config/Resources/routing/*.yaml');
+
+        $envRouteDir = __DIR__.'/../Config/Resources/routing/'.$this->environment;
+        if (is_dir($envRouteDir)) {
+            $routes->import($envRouteDir.'/*.yaml');
+        }
     }
 
     public static function isInstalled()
@@ -274,9 +287,6 @@ class Thelia extends Kernel
         }
 
         parent::initializeContainer();
-
-        $this->getContainer()->set('thelia.propel.schema.locator', $this->propelSchemaLocator);
-        $this->getContainer()->set('thelia.propel.init', $this->propelInitService);
     }
 
     /**
@@ -284,6 +294,10 @@ class Thelia extends Kernel
      */
     public function boot(): void
     {
+        if (!$this->booted) {
+            $this->container ?? $this->preBoot();
+        }
+
         parent::boot();
 
         if ($this->cacheRefresh) {
@@ -404,9 +418,13 @@ class Thelia extends Kernel
         }
 
         $this->initializeBundles();
+
         $this->initializeContainer();
 
         $container = $this->container;
+
+        $this->getContainer()->set('thelia.propel.schema.locator', $this->propelSchemaLocator);
+        $this->getContainer()->set('thelia.propel.init', $this->propelInitService);
 
         if ($container->hasParameter('kernel.trusted_hosts') && $trustedHosts = $container->getParameter('kernel.trusted_hosts')) {
             Request::setTrustedHosts($trustedHosts);
@@ -456,6 +474,11 @@ class Thelia extends Kernel
             ContainerAwareInterface::class => 'thelia.command',
             ControllerInterface::class => 'controller.service_arguments',
             TaxTypeInterface::class => 'thelia.taxType',
+
+            QueryCollectionExtensionInterface::class => 'thelia.api.propel.query_extension.collection',
+            QueryItemExtensionInterface::class => 'thelia.api.propel.query_extension.item',
+            FilterInterface::class => 'thelia.api.propel.filter',
+            ResourceAddonInterface::class => 'thelia.api.resource.addon',
         ];
 
         foreach ($autoconfiguredInterfaces as $interfaceClass => $tag) {
@@ -617,6 +640,76 @@ class Thelia extends Kernel
                 $this->loadTranslation($container, $translationDirs);
             }
         }
+
+        $this->loadDefaultSecurityConfig($container);
+    }
+
+    private function loadDefaultSecurityConfig(Container $container): void
+    {
+        $extensionConfigsReflection = new \ReflectionProperty(ContainerBuilder::class, 'extensionConfigs');
+        $extensionConfigs = $extensionConfigsReflection->getValue($container);
+
+        $extensionConfigs['security'][0]['providers'] = array_merge(
+            [
+                'admin_provider' => [
+                    'id' => AdminUserProvider::class,
+                ],
+                'customer_provider' => [
+                    'id' => CustomerUserProvider::class,
+                ],
+                'all_users' => [
+                    'chain' => [
+                        'providers' => ['admin_provider', 'customer_provider'],
+                    ],
+                ],
+            ],
+            $extensionConfigs['security'][0]['providers'] ?? []
+        );
+
+        $extensionConfigs['security'][0]['firewalls'] = array_merge(
+            [
+                'frontLogin' => [
+                    'pattern' => '^/api/front/login',
+                    'stateless' => true,
+                    'provider' => 'customer_provider',
+                    'json_login' => [
+                        'check_path' => '/api/front/login',
+                        'success_handler' => 'lexik_jwt_authentication.handler.authentication_success',
+                        'failure_handler' => 'lexik_jwt_authentication.handler.authentication_failure',
+                    ],
+                ],
+                'adminLogin' => [
+                    'pattern' => '^/api/admin/login',
+                    'stateless' => true,
+                    'provider' => 'admin_provider',
+                    'json_login' => [
+                        'check_path' => '/api/admin/login',
+                        'success_handler' => 'lexik_jwt_authentication.handler.authentication_success',
+                        'failure_handler' => 'lexik_jwt_authentication.handler.authentication_failure',
+                    ],
+                ],
+                'api' => [
+                    'pattern' => '^/api',
+                    'stateless' => true,
+                    'jwt' => [],
+                    'provider' => 'all_users',
+                ],
+            ],
+            $extensionConfigs['security'][0]['firewalls'] ?? []
+        );
+
+        $extensionConfigs['security'][0]['access_control'] = array_merge(
+            [
+                ['path' => '^/api/front/login', 'roles' => 'PUBLIC_ACCESS'],
+                ['path' => '^/api/admin/login', 'roles' => 'PUBLIC_ACCESS'],
+                ['path' => '^/api/docs', 'roles' => 'PUBLIC_ACCESS'],
+                ['path' => '^/api/admin', 'roles' => 'ROLE_ADMIN'],
+                ['path' => '^/api/front/account', 'roles' => 'ROLE_CUSTOMER'],
+            ],
+            $extensionConfigs['security'][0]['access_control'] ?? []
+        );
+
+        $extensionConfigsReflection->setValue($container, $extensionConfigs);
     }
 
     /**
@@ -783,12 +876,13 @@ class Thelia extends Kernel
     public function registerBundles(): iterable
     {
         $contents = [
-            Bundle\TheliaBundle::class => ['all' => true],
         ];
 
         if (file_exists(THELIA_ROOT.'config/bundles.php')) {
             $contents = array_merge($contents, require THELIA_ROOT.'config/bundles.php');
         }
+
+        $contents[Bundle\TheliaBundle::class] = ['all' => true];
 
         foreach ($contents as $class => $envs) {
             if ($envs[$this->environment] ?? $envs['all'] ?? false) {

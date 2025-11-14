@@ -12,8 +12,6 @@
 
 namespace Thelia\Core\Security\User;
 
-use Thelia\Core\Security\Role\Role;
-
 /**
  * This interface should be implemented by user classes.
  *
@@ -58,8 +56,6 @@ interface UserInterface
      *     return array('USER');
      * }
      * </code>
-     *
-     * @return Role[] The user roles
      */
     public function getRoles();
 
