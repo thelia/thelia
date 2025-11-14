@@ -12,7 +12,7 @@ jobs:
       PHP_CS_FIXER_IGNORE_ENV: 1
     services:
       mysql:
-        image: mariadb:11.2
+        image: mariadb:10.6
         env:
           MYSQL_ROOT_PASSWORD: thelia
           MYSQL_DATABASE: thelia
