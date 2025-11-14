@@ -114,7 +114,7 @@ abstract class BaseHook implements BaseHookInterface
 
             // Concatenate arguments and template variables,
             // giving the precedence to arguments.
-            $allArguments = $event->getTemplateVars() + $event->getArguments();
+            $allArguments = array_merge($event->getTemplateVars(), $event->getArguments());
 
             foreach ($templates as $template) {
                 [$type, $filepath] = $this->getTemplateParams($template);
