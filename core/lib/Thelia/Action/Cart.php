@@ -581,7 +581,10 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->useCustomerQuery()
             ->filterById($customer->getId())
             ->endUse()
-            ->filterById($deliveryAddressId)->findOne();
+            ->useCartAddressQuery()
+                ->filterById($deliveryAddressId)
+            ->endUse()
+            ->findOne();
 
         if (!$deliveryAddress) {
             throw new \Exception('Delivery address not found !');
