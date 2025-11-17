@@ -70,7 +70,6 @@
         "spipu/html2pdf": "~5.2.5",
         "symfony/mailer": "6.4.*",
         "symfony/webpack-encore-bundle": "^1.14",
-        "composer/composer": "~2.7.0",
         "thelia/open-api-module": "^2.1.6",
         "thelia/smarty-redirection-module": "~2.0.0",
         "thelia/choice-filter-module": "^2.1",
@@ -102,11 +101,12 @@
         "phpunit/phpunit": "9.5.*",
         "symfony/browser-kit": "6.4.*",
         "symfony/phpunit-bridge": "6.4.*",
-        "phpstan/phpstan": "1.8.2",
+        "phpstan/phpstan": "1.11.*",
         "phpstan/extension-installer": "1.1.0",
         "symfony/css-selector": "6.4.*",
         "friendsofphp/php-cs-fixer": "3.41.*",
-        "symfony/debug-bundle": "6.4.*"
+        "symfony/debug-bundle": "6.4.*",
+        "composer/composer": "~2.9.0"
     },
     "scripts": {
         "cs-diff": [
