@@ -273,6 +273,6 @@ class ProductDocument extends AbstractTranslatableResource implements ItemFileRe
 
     public function getItemId(): string
     {
-        return $this->getProduct()->getId();
+        return (string) $this->getProduct()->getId();
     }
 }

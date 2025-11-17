@@ -68,14 +68,14 @@ class Accessory extends Product
         if ($orderByAccessory !== false) {
             $search->orderByPosition(Criteria::ASC);
             $order[$orderByAccessory] = 'given_id';
-            $this->args->get('order')->setValue(implode(',', $order));
+            $this->args->get('order')?->setValue(implode(',', $order));
         }
         if ($orderByAccessoryReverse !== false) {
             $search->orderByPosition(Criteria::DESC);
             $order[$orderByAccessoryReverse] = 'given_id';
-            $this->args->get('order')->setValue(implode(',', $order));
+            $this->args->get('order')?->setValue(implode(',', $order));
         }
-
+        /** @var \Thelia\Model\Accessory[] $accessories */
         $accessories = $this->searchPropel($search);
 
         $accessoryIdList = [0];
@@ -94,15 +94,15 @@ class Accessory extends Product
 
         /* if an Id list is receive, loop will only match accessories from this list */
         if ($receivedIdList === null) {
-            $this->args->get('id')->setValue(implode(',', $accessoryIdList));
+            $this->args->get('id')?->setValue(implode(',', $accessoryIdList));
         } else {
-            $this->args->get('id')->setValue(implode(',', array_intersect($receivedIdList, $accessoryIdList)));
+            $this->args->get('id')?->setValue(implode(',', array_intersect($receivedIdList, $accessoryIdList)));
         }
 
         return parent::buildModelCriteria();
     }
 
-    public function parseResults(LoopResult $results)
+    public function parseResults(LoopResult $results): LoopResult
     {
         $results = parent::parseResults($results);
 

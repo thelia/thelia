@@ -291,7 +291,7 @@ class ProductSaleElementsProductImage extends AbstractTranslatableResource imple
 
     public function getItemId(): string
     {
-        return $this->getProduct()->getId();
+        return (string) $this->getProductSaleElements()->getId();
     }
 
     public static function getI18nResourceClass(): string

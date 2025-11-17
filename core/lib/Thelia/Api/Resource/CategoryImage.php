@@ -293,6 +293,6 @@ class CategoryImage extends AbstractTranslatableResource implements ItemFileReso
 
     public function getItemId(): string
     {
-        return $this->getCategory()->getId();
+        return (string) $this->getCategory()->getId();
     }
 }

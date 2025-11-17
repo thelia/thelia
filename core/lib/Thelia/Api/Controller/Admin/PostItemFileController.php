@@ -20,7 +20,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Bridge\Propel\Service\ItemFileResourceService;
 use Thelia\Api\Resource\ItemFileResourceInterface;
-use Thelia\Api\Resource\PropelResourceInterface;
 
 #[AsController]
 class PostItemFileController
@@ -31,12 +30,16 @@ class PostItemFileController
         ApiResourcePropelTransformerService $apiResourceService,
         ValidatorInterface $validator,
     ) {
-        /** @var ItemFileResourceInterface|PropelResourceInterface $resourceClass */
+        /** @var ?string $resourceClass */
         $resourceClass = $request->get('_api_resource_class');
+        if (null === $resourceClass) {
+            throw new \Exception('No resource class found in the request to use the PostItemFileController');
+        }
 
-        if (!\in_array(ItemFileResourceInterface::class, class_implements($resourceClass))) {
+        if (!\in_array(ItemFileResourceInterface::class, class_implements($resourceClass), true)) {
             throw new \Exception('Resource must implements ItemFileResourceInterface to use the PostItemFileController');
         }
+
         /** @var UploadedFile $file */
         $file = $request->files->get('fileToUpload');
 
@@ -50,7 +53,7 @@ class PostItemFileController
             }
             throw new \Exception('Validation error: '.implode(', ', $errors));
         }
-
+        /** @var ItemFileResourceInterface $resourceClass */
         $itemType = $resourceClass::getItemType();
         $fileType = $resourceClass::getFileType();
         $itemId = $request->get($itemType);

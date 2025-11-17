@@ -32,9 +32,8 @@ class TokenProvider
     public function __construct(
         protected RequestStack $requestStack,
         protected TranslatorInterface $translator,
-        ?string $tokenName = null
-    )
-    {
+        string $tokenName = null
+    ) {
         $this->setSessionFromRequest();
         $this->tokenName = $tokenName;
 
@@ -53,7 +52,6 @@ class TokenProvider
             $this->session = null;
         }
     }
-
 
     /**
      * @throws RandomException
@@ -109,6 +107,7 @@ class TokenProvider
      * Same method as getToken but can be called statically.
      *
      * @alias getToken
+     *
      * @throws RandomException
      */
     public static function generateToken(): string

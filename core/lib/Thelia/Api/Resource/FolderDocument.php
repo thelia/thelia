@@ -248,6 +248,6 @@ class FolderDocument extends AbstractTranslatableResource implements ItemFileRes
 
     public function getItemId(): string
     {
-        return $this->getFolder()->getId();
+        return (string) $this->getFolder()->getId();
     }
 }

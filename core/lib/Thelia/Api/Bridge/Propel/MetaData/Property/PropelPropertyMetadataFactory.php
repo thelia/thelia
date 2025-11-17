@@ -26,7 +26,7 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
     public function __construct(
         #[AutowireDecorated]
         private readonly PropertyMetadataFactoryInterface $decorated,
-        private ApiResourcePropelTransformerService $apiResourcePropelTransformerService
+        private readonly ApiResourcePropelTransformerService $apiResourcePropelTransformerService
     ) {
     }
 
@@ -36,9 +36,10 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 
         if (class_exists($resourceClass) && property_exists($resourceClass, $property)) {
             $reflection = new \ReflectionProperty($resourceClass, $property);
-            if (null !== $reflection->getType()) {
-                $propertyClass = $reflection->getType()->getName();
-                if (class_exists($propertyClass) && \in_array('BackedEnum', class_implements($reflection->getType()->getName()))) {
+            $type = $reflection->getType();
+            if (null !== $type) {
+                $propertyClass = $type->getName();
+                if (class_exists($propertyClass) && \in_array('BackedEnum', class_implements($type->getName()), true)) {
                     $values = array_column($propertyClass::cases(), 'value');
                     $propertyMetadata = $propertyMetadata->withOpenapiContext([
                         'type' => 'string',
@@ -70,7 +71,7 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
                 'example' => [
                     'en_US' => array_reduce(
                         $i18nReflect->getProperties(),
-                        function (array $carry, \ReflectionProperty $property) {
+                        static function (array $carry, \ReflectionProperty $property) {
                             if ('id' === $property->getName()) {
                                 return $carry;
                             }
@@ -83,7 +84,7 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
                     ),
                     'fr_FR' => array_reduce(
                         $i18nReflect->getProperties(),
-                        function (array $carry, \ReflectionProperty $property) {
+                        static function (array $carry, \ReflectionProperty $property) {
                             if ('id' === $property->getName()) {
                                 return $carry;
                             }

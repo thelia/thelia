@@ -36,20 +36,26 @@ final class CustomerGetCollectionExtension implements QueryCollectionExtensionIn
         if (!$user instanceof Customer) {
             return;
         }
-        $patterns = $this->accessMap->getPatterns($this->requestStack->getCurrentRequest());
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request) {
+            return;
+        }
+
+        $patterns = $this->accessMap->getPatterns($request);
 
         if (!isset($patterns[0][0]) || $patterns[0][0] !== 'ROLE_CUSTOMER') {
             return;
         }
 
-        if (isset($operation->getExtraProperties()['usesForCustomer'])) {
-            foreach ($operation->getExtraProperties()['usesForCustomer'] as $joinTable) {
+        $usesForCustomer = $operation?->getExtraProperties()['usesForCustomer'] ?? null;
+        if (null !== $usesForCustomer) {
+            foreach ($usesForCustomer as $joinTable) {
                 $use = 'use'.ucwords(strtolower($joinTable)).'Query';
                 $query = $query->$use();
             }
             $query->filterByCustomer($user);
             $endUse = 'endUse';
-            foreach ($operation->getExtraProperties()['usesForCustomer'] as $joinTable) {
+            foreach ($usesForCustomer as $joinTable) {
                 $query = $query->$endUse();
             }
 

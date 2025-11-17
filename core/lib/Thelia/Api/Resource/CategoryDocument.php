@@ -263,7 +263,7 @@ class CategoryDocument extends AbstractTranslatableResource implements ItemFileR
 
     public function getItemId(): string
     {
-        return $this->getCategory()->getId();
+        return (string) $this->getCategory()->getId();
     }
 
     public static function getPropelRelatedTableMap(): ?TableMap

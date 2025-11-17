@@ -267,6 +267,6 @@ class FolderImage extends AbstractTranslatableResource implements ItemFileResour
 
     public function getItemId(): string
     {
-        return $this->getFolder()->getId();
+        return (string) $this->getFolder()->getId();
     }
 }

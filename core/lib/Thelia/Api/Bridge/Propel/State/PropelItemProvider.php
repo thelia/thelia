@@ -43,7 +43,10 @@ readonly class PropelItemProvider implements ProviderInterface
         }
 
         /** @var ModelCriteria $queryClass */
-        $queryClass = $resourceClass::getPropelRelatedTableMap()->getClassName().'Query';
+        $queryClass = $resourceClass::getPropelRelatedTableMap()?->getClassName().'Query';
+        if (!class_exists($queryClass) || !method_exists($queryClass, 'create')) {
+            return null;
+        }
 
         /** @var ModelCriteria $query */
         $query = $queryClass::create();

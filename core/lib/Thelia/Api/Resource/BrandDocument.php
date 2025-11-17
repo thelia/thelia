@@ -273,6 +273,6 @@ class BrandDocument extends AbstractTranslatableResource implements ItemFileReso
 
     public function getItemId(): string
     {
-        return $this->getBrand()->getId();
+        return (string) $this->getBrand()->getId();
     }
 }

@@ -122,7 +122,11 @@ class FileManager
         $filePath = $directory.DS.$fileName;
 
         $fileSystem->rename($uploadedFile->getPathname(), $filePath);
-        @chmod($filePath, 0666 & ~umask());
+
+        $u = umask();
+        umask($u);
+        chmod($filePath, 0666 & ~$u);
+
         $newUploadedFile = new UploadedFile($filePath, $fileName);
         $model->setFile($fileName);
 
