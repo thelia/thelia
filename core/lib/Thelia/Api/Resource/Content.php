@@ -229,17 +229,21 @@ class Content extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public function getPublicUrl()
     {
-        /** @var \Thelia\Model\Content $propelModel */
+        /** @var \Thelia\Model\Category $propelModel */
         $propelModel = $this->getPropelModel();
 
-        return $this->getUrl($propelModel->getLocale());
+        if (!$locale = $propelModel?->getLocale()) {
+            $locale = $this->getDefaultLocale();
+        }
+
+        return $this->getUrl($locale);
     }
 
     public function getRewrittenUrlViewName(): string
     {
-        /** @var \Thelia\Model\Content $propelModel */
+        /** @var \Thelia\Model\Category $propelModel */
         $propelModel = $this->getPropelModel();
 
-        return $propelModel->getRewrittenUrlViewName();
+        return $propelModel?->getRewrittenUrlViewName() ?: '';
     }
 }

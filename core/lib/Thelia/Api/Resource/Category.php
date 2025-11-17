@@ -268,7 +268,11 @@ class Category extends AbstractTranslatableResource
         /** @var \Thelia\Model\Category $propelModel */
         $propelModel = $this->getPropelModel();
 
-        return $this->getUrl($propelModel->getLocale());
+        if (!$locale = $propelModel?->getLocale()) {
+            $locale = $this->getDefaultLocale();
+        }
+
+        return $this->getUrl($locale);
     }
 
     public function getRewrittenUrlViewName(): string
@@ -276,6 +280,6 @@ class Category extends AbstractTranslatableResource
         /** @var \Thelia\Model\Category $propelModel */
         $propelModel = $this->getPropelModel();
 
-        return $propelModel->getRewrittenUrlViewName();
+        return $propelModel?->getRewrittenUrlViewName() ?: '';
     }
 }
