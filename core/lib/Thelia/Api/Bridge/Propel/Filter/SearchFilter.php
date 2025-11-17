@@ -152,7 +152,10 @@ final class SearchFilter extends AbstractFilter
 
             $reflectionProperty = $this->getReflectionProperty($propertyName, $resourceClass);
 
-            if (null === $reflectionProperty && is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
+            if (null === $reflectionProperty
+                && is_subclass_of($resourceClass, TranslatableResourceInterface::class)
+                && method_exists($resourceClass, 'getI18nResourceClass')
+            ) {
                 $isLocalized = true;
                 $reflectionProperty = $this->getReflectionProperty($propertyName, $resourceClass::getI18nResourceClass());
             }

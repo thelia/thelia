@@ -563,7 +563,8 @@ readonly class ApiResourcePropelTransformerService
             if (!method_exists($resourceClass, 'getI18nResourceClass')) {
                 continue;
             }
-            $i18nResource = new ($resourceClass::getI18nResourceClass());
+            $i18nResourceClass = $resourceClass::getI18nResourceClass();
+            $i18nResource = new $i18nResourceClass();
 
             $i18nFields = array_map(
                 static function (\ReflectionProperty $reflectionProperty) {

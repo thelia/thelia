@@ -36,17 +36,19 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 
         if (class_exists($resourceClass) && property_exists($resourceClass, $property)) {
             $reflection = new \ReflectionProperty($resourceClass, $property);
+            /** @var ?\ReflectionType $type */
             $type = $reflection->getType();
-            if (null !== $type) {
-                $propertyClass = $type->getName();
-                if (class_exists($propertyClass) && \in_array('BackedEnum', class_implements($type->getName()), true)) {
-                    $values = array_column($propertyClass::cases(), 'value');
-                    $propertyMetadata = $propertyMetadata->withOpenapiContext([
-                        'type' => 'string',
-                        'enum' => $values,
-                        'example' => $values[0],
-                    ]);
-                }
+            $propertyClass = $reflection->getName();
+            if (null !== $type
+                && class_exists($propertyClass)
+                && \in_array('BackedEnum', class_implements($propertyClass), true)
+            ) {
+                $values = array_column($propertyClass::cases(), 'value');
+                $propertyMetadata = $propertyMetadata->withOpenapiContext([
+                    'type' => 'string',
+                    'enum' => $values,
+                    'example' => $values[0],
+                ]);
             }
         }
 
@@ -63,7 +65,8 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
         }
 
         if ('i18ns' === $property && is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
-            $i18nReflect = new \ReflectionClass($resourceClass::getI18nResourceClass());
+            $i18nResourceClass = $resourceClass::getI18nResourceClass();
+            $i18nReflect = new \ReflectionClass($i18nResourceClass);
 
             // Todo check Groups to better fit example with reality
             $propertyMetadata = $propertyMetadata->withOpenapiContext([
