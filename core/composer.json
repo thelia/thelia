@@ -68,6 +68,7 @@
         "doctrine/doctrine-bundle": "^2.6",
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.11",
+        "doctrine/annotations": "^2.0",
         "symfony/proxy-manager-bridge": "6.4.*",
         "symfony/security-bundle": "6.4.*",
         "phpdocumentor/reflection-docblock": "^5.3",
