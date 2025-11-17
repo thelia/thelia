@@ -294,6 +294,6 @@ class ModuleImage extends AbstractTranslatableResource implements ItemFileResour
 
     public function getItemId(): string
     {
-        return $this->getModule()->getId();
+        return (string) $this->getModule()->getId();
     }
 }

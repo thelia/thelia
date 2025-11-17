@@ -12,6 +12,7 @@
 
 namespace Thelia\Tools;
 
+use Random\RandomException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -26,28 +27,24 @@ class TokenProvider
 {
     protected ?string $token = null;
     protected ?SessionInterface $session = null;
-    protected ?RequestStack $requestStack = null;
-    protected ?TranslatorInterface $translator;
     protected ?string $tokenName;
 
     public function __construct(
-        RequestStack $requestStack,
-        TranslatorInterface $translator,
-        $tokenName)
-    {
-        $this->requestStack = $requestStack;
+        protected RequestStack $requestStack,
+        protected TranslatorInterface $translator,
+        string $tokenName = null
+    ) {
         $this->setSessionFromRequest();
-        $this->translator = $translator;
         $this->tokenName = $tokenName;
 
-        if (null !== $this->session) {
+        if (null !== $this->session && null !== $this->tokenName) {
             $this->token = $this->session->get($this->tokenName);
         }
     }
 
     private function setSessionFromRequest(): void
     {
-        $currentRequest = $this->requestStack->getCurrentRequest();
+        $currentRequest = $this->requestStack?->getCurrentRequest();
         if ($currentRequest && $currentRequest->hasSession()) {
             $session = $this->requestStack->getSession();
             $this->session = $session->isStarted() ? $session : null;
@@ -57,13 +54,16 @@ class TokenProvider
     }
 
     /**
-     * @return string
+     * @throws RandomException
      */
-    public function assignToken()
+    public function assignToken(): ?string
     {
-        if (null === $this->token) {
-            $this->token = $this->getToken();
+        if (null !== $this->token) {
+            return $this->token;
+        }
 
+        $this->token = $this->getToken();
+        if (null !== $this->tokenName) {
             $this->session?->set($this->tokenName, $this->token);
         }
 
@@ -71,13 +71,9 @@ class TokenProvider
     }
 
     /**
-     * @param string $entryValue
-     *
-     * @throws \Thelia\Core\Security\Exception\TokenAuthenticationException
-     *
-     * @return bool
+     * @throws TokenAuthenticationException
      */
-    public function checkToken($entryValue)
+    public function checkToken(?string $entryValue): bool
     {
         if (null === $this->token) {
             throw new TokenAuthenticationException(
@@ -100,9 +96,9 @@ class TokenProvider
     }
 
     /**
-     * @return string
+     * @throws RandomException
      */
-    public function getToken()
+    public function getToken(): string
     {
         return self::generateToken();
     }
@@ -112,9 +108,9 @@ class TokenProvider
      *
      * @alias getToken
      *
-     * @return string
+     * @throws RandomException
      */
-    public static function generateToken()
+    public static function generateToken(): string
     {
         return md5(random_bytes(32));
     }

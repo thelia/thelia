@@ -55,6 +55,7 @@ readonly class PropelPersistProcessor implements ProcessorInterface
             $this->beforeSave($data, $operation, $propelModel);
             $implementsItemFileResource =
                 \in_array(ItemFileResourceInterface::class, class_implements($data), true)
+                && method_exists($operation, 'getController')
                 && $operation->getController() === PostItemFileController::class;
 
             if ($implementsItemFileResource) {
@@ -116,33 +117,38 @@ readonly class PropelPersistProcessor implements ProcessorInterface
         foreach ($reflector->getProperties() as $property) {
             $propelGetter = 'get'.ucfirst($property->getName());
             foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
-                if (isset($relationAttribute->getArguments()['targetResource'])) {
-                    $reflectorChild = new \ReflectionClass($relationAttribute->getArguments()['targetResource']);
-                    $compositeIdentifiers = $this->apiResourcePropelTransformerService->getResourceCompositeIdentifierValues(reflector: $reflectorChild, param: 'keys');
+                if (!isset($relationAttribute->getArguments()['targetResource'])) {
+                    continue;
+                }
+                $reflectorChild = new \ReflectionClass($relationAttribute->getArguments()['targetResource']);
+                $compositeIdentifiers = $this->apiResourcePropelTransformerService->getResourceCompositeIdentifierValues(reflector: $reflectorChild, param: 'keys');
 
-                    if ($compositeIdentifiers === [] || !$propelModel->$propelGetter() instanceof Collection) {
+                if ($compositeIdentifiers === [] || !$propelModel->$propelGetter() instanceof Collection) {
+                    continue;
+                }
+
+                foreach ($propelModel->$propelGetter()->getData() as $item) {
+                    /** @var ModelCriteria $queryClass */
+                    $queryClass = $item::class.'Query';
+
+                    if (!class_exists($queryClass) || !method_exists($queryClass, 'create')) {
                         continue;
                     }
 
-                    foreach ($propelModel->$propelGetter()->getData() as $item) {
-                        /** @var ModelCriteria $queryClass */
-                        $queryClass = $item::class.'Query';
+                    /** @var ModelCriteria $query */
+                    $query = $queryClass::create();
 
-                        /** @var ModelCriteria $query */
-                        $query = $queryClass::create();
-
-                        foreach ($compositeIdentifiers as $compositeIdentifier) {
-                            $filter = 'filterBy'.ucfirst($compositeIdentifier).'Id';
-                            $getter = 'get'.ucfirst($compositeIdentifier).'Id';
-                            if (!method_exists($item, $getter) || !method_exists($query, $filter)) {
-                                return;
-                            }
-                            $id = $item->$getter();
-                            $query->$filter($id);
+                    foreach ($compositeIdentifiers as $compositeIdentifier) {
+                        $filter = 'filterBy'.ucfirst($compositeIdentifier).'Id';
+                        $getter = 'get'.ucfirst($compositeIdentifier).'Id';
+                        if (!method_exists($item, $getter) || !method_exists($query, $filter)) {
+                            return;
                         }
-                        if ($query->findOne() !== null) {
-                            $item->setNew(false);
-                        }
+                        $id = $item->$getter();
+                        $query->$filter($id);
+                    }
+                    if ($query->findOne() !== null) {
+                        $item->setNew(false);
                     }
                 }
             }

@@ -13,6 +13,7 @@
         "ext-json": "*",
         "ext-intl": "*",
         "ext-curl": "*",
+        "ext-random": "*",
         "psr/log": "1.1.*",
         "symfony/config": "6.4.*",
         "symfony/console": "6.4.*",

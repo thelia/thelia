@@ -26,7 +26,7 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
     public function __construct(
         #[AutowireDecorated]
         private readonly PropertyMetadataFactoryInterface $decorated,
-        private ApiResourcePropelTransformerService $apiResourcePropelTransformerService
+        private readonly ApiResourcePropelTransformerService $apiResourcePropelTransformerService
     ) {
     }
 
@@ -36,16 +36,19 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 
         if (class_exists($resourceClass) && property_exists($resourceClass, $property)) {
             $reflection = new \ReflectionProperty($resourceClass, $property);
-            if (null !== $reflection->getType()) {
-                $propertyClass = $reflection->getType()->getName();
-                if (class_exists($propertyClass) && \in_array('BackedEnum', class_implements($reflection->getType()->getName()))) {
-                    $values = array_column($propertyClass::cases(), 'value');
-                    $propertyMetadata = $propertyMetadata->withOpenapiContext([
-                        'type' => 'string',
-                        'enum' => $values,
-                        'example' => $values[0],
-                    ]);
-                }
+            /** @var ?\ReflectionType $type */
+            $type = $reflection->getType();
+            $propertyClass = $reflection->getName();
+            if (null !== $type
+                && class_exists($propertyClass)
+                && \in_array('BackedEnum', class_implements($propertyClass), true)
+            ) {
+                $values = array_column($propertyClass::cases(), 'value');
+                $propertyMetadata = $propertyMetadata->withOpenapiContext([
+                    'type' => 'string',
+                    'enum' => $values,
+                    'example' => $values[0],
+                ]);
             }
         }
 
@@ -62,7 +65,8 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
         }
 
         if ('i18ns' === $property && is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
-            $i18nReflect = new \ReflectionClass($resourceClass::getI18nResourceClass());
+            $i18nResourceClass = $resourceClass::getI18nResourceClass();
+            $i18nReflect = new \ReflectionClass($i18nResourceClass);
 
             // Todo check Groups to better fit example with reality
             $propertyMetadata = $propertyMetadata->withOpenapiContext([
@@ -70,7 +74,7 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
                 'example' => [
                     'en_US' => array_reduce(
                         $i18nReflect->getProperties(),
-                        function (array $carry, \ReflectionProperty $property) {
+                        static function (array $carry, \ReflectionProperty $property) {
                             if ('id' === $property->getName()) {
                                 return $carry;
                             }
@@ -83,7 +87,7 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
                     ),
                     'fr_FR' => array_reduce(
                         $i18nReflect->getProperties(),
-                        function (array $carry, \ReflectionProperty $property) {
+                        static function (array $carry, \ReflectionProperty $property) {
                             if ('id' === $property->getName()) {
                                 return $carry;
                             }

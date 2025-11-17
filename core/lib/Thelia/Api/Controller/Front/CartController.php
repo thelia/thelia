@@ -42,8 +42,8 @@ readonly class CartController
         if (null === $cart) {
             throw new NotFoundHttpException('Cart not found.');
         }
-        $operation = $request->get('_api_operation');
+        $operation = $request?->get('_api_operation');
 
-        return $apiResourcePropelTransformerService->modelToResource(Cart::class, $cart, $operation->getNormalizationContext());
+        return $apiResourcePropelTransformerService->modelToResource(Cart::class, $cart, $operation?->getNormalizationContext());
     }
 }

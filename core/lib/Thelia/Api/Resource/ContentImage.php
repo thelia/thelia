@@ -293,6 +293,6 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
 
     public function getItemId(): string
     {
-        return $this->getContent()->getId();
+        return (string) $this->getContent()->getId();
     }
 }

@@ -273,6 +273,6 @@ class ContentDocument extends AbstractTranslatableResource implements ItemFileRe
 
     public function getItemId(): string
     {
-        return $this->getContent()->getId();
+        return (string) $this->getContent()->getId();
     }
 }

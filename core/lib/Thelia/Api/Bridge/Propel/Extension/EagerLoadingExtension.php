@@ -243,7 +243,8 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         }
 
         $langs = LangQuery::create()->filterByActive(1)->find();
-        $i18nResource = new ($resourceClass::getI18nResourceClass());
+        $i18nResourceClass = $resourceClass::getI18nResourceClass();
+        $i18nResource = new $i18nResourceClass();
 
         if (!$i18nResource instanceof I18n) {
             throw new RuntimeException($i18nResource::class.' should extend '.I18n::class.' to be used as i18n resource');

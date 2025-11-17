@@ -1,4 +1,5 @@
 # 2.6.0
+- #3367 Fixes scrutinizer issues
 - #3364 Prepare Thelia version 2.5.5 to 2.6.0
 - #3363 fix: add umask permission in FileManager + improve session handling in TokenProvider
 - #3362 feat: add symfony/monolog-bundle to composer.json

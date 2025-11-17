@@ -13,6 +13,8 @@
 namespace Thelia\Service\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
@@ -30,18 +32,20 @@ use Thelia\Module\Exception\DeliveryException;
 
 class CartService
 {
-    public function __construct(private CouponManager $couponManager, private Session $session)
-    {
+    public function __construct(
+        private CouponManager $couponManager,
+        private Session $session,
+        private ContainerInterface $container,
+        private EventDispatcherInterface $dispatcher,
+    ) {
     }
 
     /**
      * Return the minimum expected postage for a cart in a given country.
      *
      * @throws \Propel\Runtime\Exception\PropelException
-     *
-     * @return array
      */
-    public function getEstimatedPostageForCountry(Cart $cart, Country $country, State $state = null)
+    public function getEstimatedPostageForCountry(Cart $cart, Country $country, State $state = null): array
     {
         $orderSession = $this->session->getOrder();
         $deliveryModules = [];
@@ -86,7 +90,7 @@ class CartService
                 if ($deliveryPostageEvent->isValidModule()) {
                     $modulePostage = $deliveryPostageEvent->getPostage();
 
-                    if (null === $postage || $postage > $modulePostage->getAmount()) {
+                    if ($modulePostage && (null === $postage || $postage > $modulePostage->getAmount())) {
                         $postage = $modulePostage->getAmount() - $modulePostage->getAmountTax();
                         $postageTax = $modulePostage->getAmountTax();
                     }

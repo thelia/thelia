@@ -28,6 +28,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Thelia\Api\Resource\Cart;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Model\CountryQuery;
 use Thelia\Service\Model\CartService;
 use Thelia\TaxEngine\TaxEngine;
 
@@ -55,13 +56,13 @@ class CartDenormalizer extends AbstractItemNormalizer
 
     public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        $this->requestStack->getCurrentRequest()->setSession($this->session); // Todo : Quick fix for Call to undefined method Symfony\Component\HttpFoundation\Session\Session::getMethod
+        $this->requestStack->getCurrentRequest()?->setSession($this->session); // Todo : Quick fix for Call to undefined method Symfony\Component\HttpFoundation\Session\Session::getMethod
         $propelCart = $object->getPropelModel();
         $country = $this->taxEngine->getDeliveryCountry();
         $state = $this->taxEngine->getDeliveryState();
         $postageInfo = $this->cartService->getEstimatedPostageForCountry(
             cart: $propelCart,
-            country: $country,
+            country: $country ?? CountryQuery::create()->findOneByByDefault(1),
             state: $state
         );
         $estimatedPostage = $postageInfo['postage'];

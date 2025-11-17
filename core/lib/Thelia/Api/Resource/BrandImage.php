@@ -288,7 +288,7 @@ class BrandImage extends AbstractTranslatableResource implements ItemFileResourc
 
     public function getItemId(): string
     {
-        return $this->getBrand()->getId();
+        return (string) $this->getBrand()->getId();
     }
 
     public static function getPropelRelatedTableMap(): ?TableMap
