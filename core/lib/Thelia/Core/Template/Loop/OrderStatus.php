@@ -46,6 +46,7 @@ class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
             Argument::createAnyTypeArgument('code'),
+            Argument::createAnyTypeArgument('paid'),
             Argument::createEnumListTypeArgument(
                 'order',
                 [
@@ -72,6 +73,10 @@ class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
 
         if (null !== $code = $this->getCode()) {
             $search->filterByCode($code, Criteria::EQUAL);
+        }
+
+        if (null !== $paid = $this->getPaid()) {
+            $search->filterByPaidStatus($paid, Criteria::EQUAL);
         }
 
         $orders = $this->getOrder();
@@ -108,6 +113,7 @@ class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('COLOR', $orderStatus->getColor())
                 ->set('POSITION', $orderStatus->getPosition())
                 ->set('PROTECTED_STATUS', $orderStatus->getProtectedStatus())
+                ->set('PAID_STATUS', $orderStatus->getPaidStatus())
                 ->set('TITLE', $orderStatus->getVirtualColumn('i18n_TITLE'))
                 ->set('CHAPO', $orderStatus->getVirtualColumn('i18n_CHAPO'))
                 ->set('DESCRIPTION', $orderStatus->getVirtualColumn('i18n_DESCRIPTION'))
