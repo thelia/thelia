@@ -66,7 +66,6 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
             ->save();
 
         $event->setNewsletter($nl);
-
     }
 
     public function update(NewsletterEvent $event): void

@@ -71,7 +71,6 @@ class Module extends BaseAction implements EventSubscriberInterface
         $event->setModule($module);
 
         $this->cacheClear($dispatcher);
-
     }
 
     public function checkToggleActivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
@@ -107,7 +106,6 @@ class Module extends BaseAction implements EventSubscriberInterface
 
             throw $ex;
         }
-
     }
 
     /**
@@ -286,7 +284,6 @@ class Module extends BaseAction implements EventSubscriberInterface
 
             throw $e;
         }
-
     }
 
     public function update(ModuleEvent $event, $eventName, EventDispatcherInterface $dispatcher): void

@@ -180,7 +180,6 @@ class Lang extends BaseAction implements EventSubscriberInterface
         }
 
         $event->setLang($lang);
-
     }
 
     /**

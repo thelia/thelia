@@ -140,7 +140,6 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
         $event->setModuleHook($moduleHook);
 
         $this->cacheClear();
-
     }
 
     public function deleteModuleHook(ModuleHookDeleteEvent $event): void
@@ -163,7 +162,6 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
             ->save();
 
         $this->cacheClear();
-
     }
 
     public function toggleModuleHookActivation(ModuleHookToggleActivationEvent $event): ModuleHookToggleActivationEvent

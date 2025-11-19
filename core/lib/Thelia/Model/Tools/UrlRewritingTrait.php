@@ -41,6 +41,7 @@ trait UrlRewritingTrait
     protected function getDefaultLocale(): string
     {
         $defaultLang = Lang::getDefaultLanguage();
+
         return $defaultLang->getLocale();
     }
 

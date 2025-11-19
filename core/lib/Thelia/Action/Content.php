@@ -90,7 +90,6 @@ class Content extends BaseAction implements EventSubscriberInterface
 
             throw $e;
         }
-
     }
 
     /**
@@ -171,7 +170,6 @@ class Content extends BaseAction implements EventSubscriberInterface
 
             throw $e;
         }
-
     }
 
     /**
@@ -224,7 +222,6 @@ class Content extends BaseAction implements EventSubscriberInterface
         if (0 === $content) {
             $dispatcher->dispatch($event, TheliaEvents::VIEW_CONTENT_ID_NOT_VISIBLE);
         }
-
     }
 
     /**

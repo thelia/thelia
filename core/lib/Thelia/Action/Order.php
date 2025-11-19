@@ -320,7 +320,6 @@ class Order extends BaseAction implements EventSubscriberInterface
             .', new status is not paid:'.($newStatus->isNotPaid(false) ? 1 : 0)
             .' = operation: '.$event->getOperation(),
         );
-
     }
 
     /**
@@ -373,8 +372,6 @@ class Order extends BaseAction implements EventSubscriberInterface
                     ->save();
             }
         }
-
-
     }
 
     /**

@@ -22,7 +22,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionFactory;
-use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Condition\Implementation\MatchForEveryone;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
@@ -32,7 +31,6 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Promotion\Coupon\CouponFactory;
 use Thelia\Domain\Promotion\Coupon\Service\CouponManager;
-use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon as CouponModel;
 use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponCountryQuery;
@@ -175,8 +173,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * Call the Model and delegate the create or delete action
      * Feed the Event with the updated model.
      *
-     * @param CouponModel $coupon Model to save
-     * @param CouponCreateOrUpdateEvent $event Event containing data
+     * @param CouponModel               $coupon Model to save
+     * @param CouponCreateOrUpdateEvent $event  Event containing data
+     *
      * @throws \Exception
      */
     protected function createOrUpdate(CouponModel $coupon, CouponCreateOrUpdateEvent $event, EventDispatcherInterface $dispatcher): void
@@ -218,8 +217,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * Call the Model and delegate the create or delete action
      * Feed the Event with the updated model.
      *
-     * @param CouponModel $coupon Model to save
-     * @param CouponCreateOrUpdateEvent $event Event containing data
+     * @param CouponModel               $coupon Model to save
+     * @param CouponCreateOrUpdateEvent $event  Event containing data
+     *
      * @throws \Exception
      */
     protected function createOrUpdateCondition(CouponModel $coupon, CouponCreateOrUpdateEvent $event, EventDispatcherInterface $dispatcher): void
@@ -336,7 +336,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
             throw $ex;
         }
-
 
         // Clear all coupons.
         $dispatcher->dispatch(new Event(), TheliaEvents::COUPON_CLEAR_ALL);

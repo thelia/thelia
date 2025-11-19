@@ -234,7 +234,7 @@ class FeatureController extends AbstractCrudController
     /**
      * Add or Remove from all product templates.
      */
-    protected function addRemoveFromAllTemplates(EventDispatcherInterface $eventDispatcher, object $eventType): Response
+    protected function addRemoveFromAllTemplates(EventDispatcherInterface $eventDispatcher, string $eventType): Response
     {
         // Check current user authorization
         if (($response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) instanceof Response) {
@@ -245,7 +245,7 @@ class FeatureController extends AbstractCrudController
             if (($object = $this->getExistingObject()) instanceof ActiveRecordInterface) {
                 $event = new FeatureEvent($object);
 
-                $eventDispatcher->dispatch($eventType, $event);
+                $eventDispatcher->dispatch($event, $eventType);
             }
         } catch (\Exception $exception) {
             // Any error

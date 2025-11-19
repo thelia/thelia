@@ -372,7 +372,6 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             throw $e;
         }
-
     }
 
     public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher): mixed
@@ -425,7 +424,6 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             throw $e;
         }
-
     }
 
     /**

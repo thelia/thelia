@@ -134,7 +134,6 @@ class Category extends BaseAction implements EventSubscriberInterface
 
             throw $e;
         }
-
     }
 
     /**

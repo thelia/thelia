@@ -103,7 +103,6 @@ class Currency extends BaseAction implements EventSubscriberInterface
         }
 
         $event->setCurrency($currency);
-
     }
 
     public function setVisible(CurrencyUpdateEvent $event): void
