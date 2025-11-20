@@ -151,7 +151,7 @@ class ModuleHookCreationForm extends BaseForm
                     $title = $module->setLocale('en_US')->getTitle();
                 }
 
-                $title = $module->getCode() . ' - ' . $title;
+                $title = $module->getCode().' - '.$title;
 
                 $choices[$title] = $module->getId();
             }
