@@ -167,7 +167,9 @@ class Order extends BaseAction implements EventSubscriberInterface
             $session ? $this->securityContext->getCustomerUser() : $order->getCustomer(),
         );
 
-        $dispatcher->dispatch(new OrderEvent($placedOrder), TheliaEvents::ORDER_BEFORE_PAYMENT);
+        $placedOrderEvent = new OrderEvent($placedOrder);
+        $dispatcher->dispatch($placedOrderEvent, TheliaEvents::ORDER_BEFORE_PAYMENT);
+        $dispatcher->dispatch($placedOrderEvent, TheliaEvents::ORDER_CART_CLEAR);
 
         /* but memorize placed order */
         $event->setOrder(new OrderModel());
