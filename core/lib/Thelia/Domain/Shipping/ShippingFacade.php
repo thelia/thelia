@@ -255,7 +255,11 @@ final readonly class ShippingFacade
             return [null, null, null];
         }
 
-        $address = AddressQuery::create()->findPk($resolvedAddressId);
+        $address = AddressQuery::create()
+            ->useCartAddressQuery()
+            ->filterById($resolvedAddressId)
+            ->endUse()
+            ->findOne();
         if (null === $address) {
             return [null, null, null];
         }
@@ -283,7 +287,11 @@ final readonly class ShippingFacade
         if ($country === null) {
             $addressDeliveryId = $cart->getAddressDeliveryId();
             if ($addressDeliveryId !== null) {
-                $addressDelivery = AddressQuery::create()->findPk($addressDeliveryId);
+                $addressDelivery = AddressQuery::create()
+                    ->useCartAddressQuery()
+                    ->filterById($addressDeliveryId)
+                    ->endUse()
+                    ->findOne();
                 $country = $addressDelivery?->getCountry();
             }
         }
