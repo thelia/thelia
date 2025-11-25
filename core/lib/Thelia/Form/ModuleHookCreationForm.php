@@ -137,6 +137,7 @@ class ModuleHookCreationForm extends BaseForm
     {
         $choices = [];
         $modules = ModuleQuery::getActivated();
+        $locale = $this->getRequest()->getSession()->getLang()->getLocale();
 
         /** @var Module $module */
         foreach ($modules as $module) {
@@ -144,11 +145,19 @@ class ModuleHookCreationForm extends BaseForm
             if (ModuleHookQuery::create()->filterByModuleId($module->getId())->count() > 0
                 || IgnoredModuleHookQuery::create()->filterByModuleId($module->getId())->count() > 0
             ) {
-                $choices[$module->getTitle()] = $module->getId();
+                $title = $module->setLocale($locale)->getTitle();
+
+                if (empty($title)) {
+                    $title = $module->setLocale('en_US')->getTitle();
+                }
+
+                $title = $module->getCode().' - '.$title;
+
+                $choices[$title] = $module->getId();
             }
         }
 
-        asort($choices);
+        ksort($choices);
 
         return $choices;
     }
