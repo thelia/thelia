@@ -242,12 +242,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         $cartItem = $findItemEvent->getCartItem();
 
-        if ($cartItem instanceof CartItem) {
-            if ($append) {
-                $cartItem->addQuantity($quantity)->save();
-            } else {
-                $cartItem->setQuantity($quantity)->save();
-            }
+        if ($cartItem instanceof CartItem && $append) {
+            $cartItem->addQuantity($quantity)->save();
         } else {
             $productSaleElements = ProductSaleElementsQuery::create()->findPk($productSaleElementsId);
 
