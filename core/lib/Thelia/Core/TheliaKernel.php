@@ -85,7 +85,7 @@ class TheliaKernel extends Kernel
 {
     use MicroKernelTrait;
 
-    public const THELIA_VERSION = '2.5.5';
+    public const THELIA_VERSION = '2.6.0';
 
     protected SchemaLocator $propelSchemaLocator;
     protected PropelInitService $propelInitService;
