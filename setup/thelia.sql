@@ -1304,8 +1304,8 @@ CREATE TABLE `cart`
     PRIMARY KEY (`id`),
     UNIQUE INDEX `token_UNIQUE` (`token`),
     INDEX `idx_cart_customer_id` (`customer_id`),
-    INDEX `idx_cart_address_delivery_id` (`cart_address_delivery_id`),
-    INDEX `idx_cart_address_invoice_id` (`cart_address_invoice_id`),
+    INDEX `idx_cart_address_delivery_id` (`address_delivery_id`),
+    INDEX `idx_cart_address_invoice_id` (`address_invoice_id`),
     INDEX `idx_cart_currency_id` (`currency_id`),
     CONSTRAINT `fk_cart_customer_id`
         FOREIGN KEY (`customer_id`)
@@ -1313,12 +1313,12 @@ CREATE TABLE `cart`
         ON UPDATE RESTRICT
         ON DELETE CASCADE,
     CONSTRAINT `fk_cart_address_delivery_id`
-        FOREIGN KEY (`cart_address_delivery_id`)
+        FOREIGN KEY (`address_delivery_id`)
         REFERENCES `cart_address` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT,
     CONSTRAINT `fk_cart_address_invoice_id`
-        FOREIGN KEY (`cart_address_invoice_id`)
+        FOREIGN KEY (`address_invoice_id`)
         REFERENCES `address` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT,
