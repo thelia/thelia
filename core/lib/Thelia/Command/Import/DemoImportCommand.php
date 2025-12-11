@@ -89,7 +89,7 @@ use Thelia\Tools\URL;
 )]
 class DemoImportCommand extends Command
 {
-    private const DATA_DIR = THELIA_ROOT.'core/lib/Thelia/Command/Import/data/';
+    private const DATA_DIR = THELIA_LIB.'Command/Import/data/';
     private const IMAGES_DIR = self::DATA_DIR.'images/';
 
     public function __construct(
