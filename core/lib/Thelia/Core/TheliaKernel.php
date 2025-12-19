@@ -387,7 +387,28 @@ class TheliaKernel extends Kernel
 
     public static function isInstalled(): bool
     {
-        return file_exists(THELIA_CONF_DIR.'database.yml') || (!empty($_SERVER['DATABASE_HOST']));
+        $confExists = !empty($_SERVER['DATABASE_HOST']);
+        if (!$confExists) {
+            return false;
+        }
+
+        try {
+            $connection = new \PDO(
+                \sprintf('mysql:host=%s;dbname=%s;port=%s',
+                    $_SERVER['DATABASE_HOST'],
+                    $_SERVER['DATABASE_NAME'],
+                    $_SERVER['DATABASE_PORT']
+                ),
+                $_SERVER['DATABASE_USER'],
+                $_SERVER['DATABASE_PASSWORD']
+            );
+            $result = $connection->query('SELECT id FROM `config`');
+            $hasConfigTable = $result && (false !== $result->fetch(\PDO::FETCH_ASSOC));
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        return $hasConfigTable;
     }
 
     private function loadAutoConfigureInterfaces(ContainerBuilder $container): void

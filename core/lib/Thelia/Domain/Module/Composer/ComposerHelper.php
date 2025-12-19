@@ -113,6 +113,88 @@ class ComposerHelper
         }
     }
 
+    public function findInstalledPackagePathByTypeAndInstallerName(string $packageType, string $installerName): ?string
+    {
+        $installedJsonPath = THELIA_ROOT.'vendor/composer/installed.json';
+
+        if (!is_file($installedJsonPath)) {
+            return null;
+        }
+
+        try {
+            $installed = json_decode((string) file_get_contents($installedJsonPath), true, 512, \JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return null;
+        }
+
+        $packages = $installed['packages'] ?? $installed;
+
+        if (!\is_array($packages)) {
+            return null;
+        }
+
+        foreach ($packages as $package) {
+            if (!\is_array($package)) {
+                continue;
+            }
+
+            if ((($package['type'] ?? null) !== $packageType)
+                && isset($package['keywords'])
+                && \is_array($package['keywords'])
+                && !\in_array($packageType, $package['keywords'], true)
+            ) {
+                continue;
+            }
+
+            $extra = $package['extra'] ?? null;
+            if (!\is_array($extra)) {
+                continue;
+            }
+
+            if (($extra['installer-name'] ?? null) !== $installerName) {
+                continue;
+            }
+
+            $installPath = $package['install-path'] ?? null;
+            if (!\is_string($installPath) || '' === trim($installPath)) {
+                continue;
+            }
+
+            $resolvedPath = $this->resolveInstalledJsonPath($installPath);
+
+            return is_dir($resolvedPath) ? $resolvedPath : null;
+        }
+
+        return null;
+    }
+
+    private function resolveInstalledJsonPath(string $installPath): string
+    {
+        $baseDir = THELIA_ROOT.'vendor/composer';
+
+        if ($this->isAbsolutePath($installPath)) {
+            return $installPath;
+        }
+
+        $fullPath = $baseDir.DS.$installPath;
+        $realPath = realpath($fullPath);
+
+        return false === $realPath ? $fullPath : $realPath;
+    }
+
+    private function isAbsolutePath(string $path): bool
+    {
+        if ('' === $path) {
+            return false;
+        }
+
+        if ('/' === $path[0] || '\\' === $path[0]) {
+            return true;
+        }
+
+        return (bool) preg_match('/^[A-Za-z]:[\\\\\\/]/', $path);
+    }
+
     private function dumpBundlesPhp(array $bundles): string
     {
         $lines = ["<?php\n", "return [\n"];

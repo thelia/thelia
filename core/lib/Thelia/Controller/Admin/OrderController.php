@@ -223,7 +223,7 @@ class OrderController extends BaseAdminController
             return $response;
         }
 
-        return $this->generateBackOfficeOrderPdf($eventDispatcher, $order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'), "1" === $browser);
+        return $this->generateBackOfficeOrderPdf($eventDispatcher, $order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'), '1' === $browser);
     }
 
     public function generateDeliveryPdf(EventDispatcherInterface $eventDispatcher, int $order_id, $browser): Response|RedirectResponse
@@ -232,7 +232,7 @@ class OrderController extends BaseAdminController
             return $response;
         }
 
-        return $this->generateBackOfficeOrderPdf($eventDispatcher, $order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'), "1" === $browser);
+        return $this->generateBackOfficeOrderPdf($eventDispatcher, $order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'), '1' === $browser);
     }
 
     private function generateBackOfficeOrderPdf(EventDispatcherInterface $eventDispatcher, int $orderId, string $fileName, bool $browser): RedirectResponse|Response

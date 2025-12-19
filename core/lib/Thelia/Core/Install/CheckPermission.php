@@ -47,8 +47,8 @@ class CheckPermission extends BaseInstall
     ];
 
     protected $phpExpectedVerions = [
-        'min' => '7.2',
-        'max' => '8.0',
+        'min' => '8.2',
+        'max' => '8.3',
     ];
     protected $extensions = [
         'curl',

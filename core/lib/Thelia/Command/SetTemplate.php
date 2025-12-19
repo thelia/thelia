@@ -24,6 +24,7 @@ use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TheliaTemplateHelper;
+use Thelia\Domain\Module\Composer\ComposerHelper;
 use Thelia\Module\ModuleManagement;
 
 #[AsCommand(name: 'template:set', description: 'set template')]
@@ -33,6 +34,7 @@ class SetTemplate extends ContainerAwareCommand
         private readonly ModuleManagement $moduleManager,
         private readonly TheliaTemplateHelper $theliaTemplateHelper,
         private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly ComposerHelper $composerHelper,
         private readonly string $kernelCacheDir,
         ?string $name = null,
     ) {
@@ -51,7 +53,8 @@ class SetTemplate extends ContainerAwareCommand
                 'name',
                 InputArgument::REQUIRED,
                 'template name',
-            );
+            )
+        ;
     }
 
     /**
@@ -71,10 +74,18 @@ class SetTemplate extends ContainerAwareCommand
         $path = THELIA_TEMPLATE_DIR.$type.DS.$name;
 
         if (!is_dir($path)) {
-            $pathVendor = THELIA_VENDOR_ROOT.$name;
+            $packageType = $this->getComposerPackageTypeForTemplateType($type);
 
-            if (!is_dir($pathVendor)) {
-                $output->writeln(\sprintf('<error>Template %s not found.</error>', $pathVendor));
+            $pathVendor = $this->composerHelper->findInstalledPackagePathByTypeAndInstallerName($packageType, $name);
+
+            if (null === $pathVendor) {
+                $output->writeln(\sprintf(
+                    '<error>Template "%s" not found. Expected "%s" or an installed Composer package of type "%s" with installer-name "%s".</error>',
+                    $name,
+                    $path,
+                    $packageType,
+                    $name,
+                ));
 
                 return self::FAILURE;
             }
@@ -122,5 +133,16 @@ class SetTemplate extends ContainerAwareCommand
         $output->writeln('<fg=green>Autoload dump completed successfully</>');
 
         return null;
+    }
+
+    private function getComposerPackageTypeForTemplateType(string $type): string
+    {
+        return match ($type) {
+            'frontOffice' => 'thelia-frontoffice-template',
+            'backOffice' => 'thelia-backoffice-template',
+            'pdf' => 'thelia-pdf-template',
+            'email' => 'thelia-email-template',
+            default => throw new \InvalidArgumentException(\sprintf('Unsupported template type "%s".', $type)),
+        };
     }
 }

@@ -323,6 +323,8 @@ class ModuleManagement
             $cacheEvent = new CacheEvent($this->kernelCacheDir);
             $this->eventDispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
 
+            $modulesInstalled[] = $module;
+
             if (BaseModule::IS_ACTIVATED === $module->getActivate()) {
                 $output?->writeln(
                     \sprintf(
@@ -339,7 +341,7 @@ class ModuleManagement
                 $event->setNoCheck(false);
 
                 $this->eventDispatcher->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
-                $modulesInstalled[] = $module;
+
                 $output?->writeln(
                     \sprintf(
                         '<fg=gray>Module %s successfully installed and activated.</>',
