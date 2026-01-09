@@ -144,7 +144,7 @@ class Order implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $createdAt = null;
 
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
