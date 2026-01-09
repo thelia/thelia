@@ -100,6 +100,7 @@ use Thelia\Model\OrderQuery;
     filterClass: OrderFilter::class,
     properties: [
         'createdAt',
+        'updatedAt',
     ],
 )]
 #[ApiFilter(
@@ -110,7 +111,10 @@ use Thelia\Model\OrderQuery;
 )]
 #[ApiFilter(
     filterClass: DateFilter::class,
-    properties: ['createdAt' => DateFilter::INCLUDE_NULL_BEFORE_AND_AFTER],
+    properties: [
+        'createdAt' => DateFilter::INCLUDE_NULL_BEFORE_AND_AFTER,
+        'updatedAt' => DateFilter::INCLUDE_NULL_BEFORE_AND_AFTER,
+    ],
 )]
 class Order implements PropelResourceInterface
 {
