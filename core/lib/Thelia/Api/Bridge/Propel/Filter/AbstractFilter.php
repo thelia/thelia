@@ -148,17 +148,17 @@ abstract class AbstractFilter implements FilterInterface
             return strtolower($tableName.'.'.$column);
         }
 
-        // For relation properties (e.g., 'attribute.id'), build alias consistently with EagerLoadingExtension
-        // EagerLoadingExtension uses: strtolower(ResourceClassName) + '_' + strtolower(propertyName)
+        // For relation properties (e.g., 'attribute.id' or 'contentFolders.folder.id'),
         $resourceReflector = new \ReflectionClass($resourceClass);
         $baseAlias = strtolower($resourceReflector->getShortName()).'_';
 
         $propertyParts = explode('.', $property);
-        $relationProperty = array_shift($propertyParts);
-        $field = implode('.', $propertyParts);
 
-        // Build the join alias the same way EagerLoadingExtension does
-        $joinAlias = trim($baseAlias.strtolower($relationProperty), '_');
+        // The last part is the field name, all previous parts are relation names
+        $field = array_pop($propertyParts);
+
+        // Build the join alias by concatenating all relation parts
+        $joinAlias = trim($baseAlias.strtolower(implode('_', $propertyParts)), '_');
 
         // Transform php field to DB column name
         $column = strtolower((string) preg_replace('/(?<!^)[A-Z]/', '_$0', $field));
