@@ -140,24 +140,30 @@ abstract class AbstractFilter implements FilterInterface
             return $this->getLocalizedPropertyQueryPath($query, $property, $context);
         }
 
-        $fieldPath = $query->getTableMap()->getName().'.'.$property;
-        // Replace all dot by underscore to build relation alias
-        $fieldPath = str_replace('.', '_', $fieldPath);
+        // For non-relation properties, use table name directly
+        if (!str_contains($property, '.')) {
+            $tableName = $query->getTableMap()->getName();
+            $column = strtolower((string) preg_replace('/(?<!^)[A-Z]/', '_$0', $property));
 
-        // Replace last underscore by a dot, because after last underscore it's the mysql field
-        $lastUnderscorePosition = strrpos($fieldPath, '_');
-
-        if (false !== $lastUnderscorePosition) {
-            $fieldPath[$lastUnderscorePosition] = '.';
+            return strtolower($tableName.'.'.$column);
         }
 
-        $tableAlias = strtok($fieldPath, '.');
+        // For relation properties (e.g., 'attribute.id'), build alias consistently with EagerLoadingExtension
+        // EagerLoadingExtension uses: strtolower(ResourceClassName) + '_' + strtolower(propertyName)
+        $resourceReflector = new \ReflectionClass($resourceClass);
+        $baseAlias = strtolower($resourceReflector->getShortName()).'_';
+
+        $propertyParts = explode('.', $property);
+        $relationProperty = array_shift($propertyParts);
+        $field = implode('.', $propertyParts);
+
+        // Build the join alias the same way EagerLoadingExtension does
+        $joinAlias = trim($baseAlias.strtolower($relationProperty), '_');
 
         // Transform php field to DB column name
-        $field = strtok('');
         $column = strtolower((string) preg_replace('/(?<!^)[A-Z]/', '_$0', $field));
 
-        return strtolower($tableAlias.'.'.$column);
+        return strtolower($joinAlias.'.'.$column);
     }
 
     protected function getLocalizedPropertyQueryPath(
