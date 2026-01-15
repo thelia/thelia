@@ -83,8 +83,8 @@ readonly class PropelPersistProcessor implements ProcessorInterface
             throw $exception;
         }
 
-        /** @var Post $postOperation */
-        $postOperation = $context['operation'] ?? null;
+        /** @var ?Post $postOperation */
+        $postOperation = $context['operation'] ?? $operation;
 
         if (null !== $postOperation) {
             $data = $this->apiResourcePropelTransformerService->modelToResource(
