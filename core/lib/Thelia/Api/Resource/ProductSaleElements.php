@@ -118,7 +118,7 @@ class ProductSaleElements implements PropelResourceInterface
     public ?int $id = null;
 
     #[Relation(targetResource: Product::class)]
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
     public Product $product;
 
     #[Groups([
