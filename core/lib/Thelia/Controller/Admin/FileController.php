@@ -231,9 +231,15 @@ class FileController extends BaseAdminController
             $defaultTitle = $fileBeingUploaded->getClientOriginalName();
         }
 
+        $locale = $this->getCurrentEditionLocale();
+
+        if (null === $locale) {
+            $locale = Lang::getDefaultLanguage()->getLocale();
+        }
+
         $fileModel
             ->setParentId($parentId)
-            ->setLocale(Lang::getDefaultLanguage()->getLocale())
+            ->setLocale($locale)
             ->setTitle($defaultTitle)
         ;
 
@@ -496,6 +502,7 @@ class FileController extends BaseAdminController
             }
 
             $file->setLocale($data['locale']);
+            $oldFile->setLocale($data['locale']);
 
             if (\array_key_exists('title', $data)) {
                 $file->setTitle($data['title']);
@@ -510,12 +517,15 @@ class FileController extends BaseAdminController
                 $file->setPostscriptum($data['postscriptum']);
             }
 
+            $oldFileFile = $oldFile->getFile();
+
             if (isset($data['file'])) {
                 $file->setFile($data['file']);
             }
 
             $event->setModel($file);
             $event->setOldModel($oldFile);
+            $event->getOldModel()->setFile($oldFileFile);
 
             $files = $this->getRequest()->files;
 

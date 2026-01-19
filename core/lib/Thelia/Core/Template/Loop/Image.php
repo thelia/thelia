@@ -24,6 +24,8 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImage;
 use Thelia\Type\BooleanOrBothType;
@@ -341,13 +343,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 $event->setFormat($format);
             }
 
-            // Put source image file path
-            $sourceFilePath = sprintf(
-                '%s/%s/%s',
-                $baseSourceFilePath,
-                $this->objectType,
-                $result->getFile()
-            );
+            $sourceFilePath = $this->formatSourceFilePath($baseSourceFilePath, $result);
 
             $event->setSourceFilepath($sourceFilePath);
             $event->setCacheSubdirectory($this->objectType);
@@ -453,5 +449,47 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         $imgData = base64_encode(file_get_contents($path));
 
         return $src = 'data: '.mime_content_type($path).';base64,'.$imgData;
+    }
+
+    /**
+     * @param string $baseSourceFilePath
+     * @param ProductImage $result
+     * @return string
+     */
+    private function formatSourceFilePath(string $baseSourceFilePath, $result): string
+    {
+        $lang = $this->getLang();
+
+        if (null !== $lang) {
+            $locale = LangQuery::create()->findOneById($lang)?->getLocale();
+            $file = $result->setLocale($locale)->getFile();
+
+            if ($file) {
+                return sprintf(
+                    '%s/%s/%s',
+                    $baseSourceFilePath,
+                    $this->objectType,
+                    $result->setLocale($locale)->getFile()
+                );
+            }
+
+            if (ConfigQuery::getDefaultLangWhenNoTranslationAvailable() == Lang::REPLACE_BY_DEFAULT_LANGUAGE) {
+                $locale = Lang::getDefaultLanguage()->getLocale();
+
+                return sprintf(
+                    '%s/%s/%s',
+                    $baseSourceFilePath,
+                    $this->objectType,
+                    $result->setLocale($locale)->getFile()
+                );
+            }
+        }
+
+        return sprintf(
+            '%s/%s/%s',
+            $baseSourceFilePath,
+            $this->objectType,
+            $result->getFile()
+        );
     }
 }
