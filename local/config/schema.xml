@@ -1190,7 +1190,7 @@
     </index>
     <behavior name="timestampable" />
     <behavior name="i18n">
-      <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+      <parameter name="i18n_columns" value="file, title, description, chapo, postscriptum" />
     </behavior>
   </table>
   <table name="folder_image" namespace="Thelia\Model">
@@ -1215,7 +1215,7 @@
     </index>
     <behavior name="timestampable" />
     <behavior name="i18n">
-      <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+      <parameter name="i18n_columns" value="file, title, description, chapo, postscriptum" />
     </behavior>
   </table>
   <table name="content_image" namespace="Thelia\Model">
@@ -1240,7 +1240,7 @@
     </index>
     <behavior name="timestampable" />
     <behavior name="i18n">
-      <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+      <parameter name="i18n_columns" value="file, title, description, chapo, postscriptum" />
     </behavior>
   </table>
   <table name="category_document" namespace="Thelia\Model">
@@ -1410,7 +1410,7 @@
     </index>
     <behavior name="timestampable" />
     <behavior name="i18n">
-      <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+      <parameter name="i18n_columns" value="file, title, description, chapo, postscriptum" />
     </behavior>
   </table>
   <table name="order_product_tax" namespace="Thelia\Model">
@@ -1599,7 +1599,7 @@
     </index>
     <behavior name="timestampable" />
     <behavior name="i18n">
-      <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+      <parameter name="i18n_columns" value="file, title, description, chapo, postscriptum" />
     </behavior>
   </table>
   <table name="form_firewall" namespace="Thelia\Model">
