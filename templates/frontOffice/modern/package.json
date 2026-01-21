@@ -71,7 +71,7 @@
     "eslint-config-react-app": "^7.0.1",
     "infinite-scroll": "^4.0.1",
     "leaflet": "^1.7.1",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "lodash-es": "^4.17.20",
     "mmenu-light": "^3.0.8",
     "react": "^18.2.0",
