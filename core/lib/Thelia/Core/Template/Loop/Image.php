@@ -452,9 +452,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * @param string $baseSourceFilePath
      * @param ProductImage $result
-     * @return string
      */
     private function formatSourceFilePath(string $baseSourceFilePath, $result): string
     {
@@ -468,7 +466,6 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
     /**
      * @param ProductImage $result
-     * @return string
      */
     private function getSourceFilePath($result): ?string
     {
