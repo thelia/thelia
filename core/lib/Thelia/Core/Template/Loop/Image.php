@@ -458,38 +458,46 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
      */
     private function formatSourceFilePath(string $baseSourceFilePath, $result): string
     {
-        $lang = $this->getLang();
-
-        if (null !== $lang) {
-            $locale = LangQuery::create()->findOneById($lang)?->getLocale();
-            $file = $result->setLocale($locale)->getFile();
-
-            if ($file) {
-                return sprintf(
-                    '%s/%s/%s',
-                    $baseSourceFilePath,
-                    $this->objectType,
-                    $result->setLocale($locale)->getFile()
-                );
-            }
-
-            if (ConfigQuery::getDefaultLangWhenNoTranslationAvailable() == Lang::REPLACE_BY_DEFAULT_LANGUAGE) {
-                $locale = Lang::getDefaultLanguage()->getLocale();
-
-                return sprintf(
-                    '%s/%s/%s',
-                    $baseSourceFilePath,
-                    $this->objectType,
-                    $result->setLocale($locale)->getFile()
-                );
-            }
-        }
-
         return sprintf(
             '%s/%s/%s',
             $baseSourceFilePath,
             $this->objectType,
-            $result->getFile()
+            $this->getSourceFilePath($result)
         );
+    }
+
+    /**
+     * @param ProductImage $result
+     * @return string|null
+     */
+    private function getSourceFilePath($result): ?string
+    {
+        // return the file path of the image in the source language
+        if (null !== $lang = $this->getLang()) {
+            $locale = LangQuery::create()->findOneById($lang)?->getLocale();
+
+            if (null !== $file = $result->setLocale($locale)->getFile()) {
+                return $file;
+            }
+        }
+
+        // return the file path of the image the current session language
+        if (null !== $locale = $this->getCurrentRequest()->getSession()?->getLang()?->getLocale()) {
+            if (null !== $file = $result->setLocale($locale)->getFile()) {
+                return $file;
+            }
+        }
+
+        // return the file path of the image in the default language
+        if (ConfigQuery::getDefaultLangWhenNoTranslationAvailable() == Lang::REPLACE_BY_DEFAULT_LANGUAGE) {
+            $locale = Lang::getDefaultLanguage()->getLocale();
+
+            if (null !== $file = $result->setLocale($locale)->getFile()) {
+                return $file;
+            }
+        }
+
+        // return the file path of the image
+        return $result->getFile();
     }
 }
