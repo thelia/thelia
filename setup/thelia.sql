@@ -658,7 +658,6 @@ CREATE TABLE `product_image`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `product_id` INTEGER NOT NULL,
-    `file` VARCHAR(255) NOT NULL,
     `visible` TINYINT DEFAULT 1 NOT NULL,
     `position` INTEGER,
     `created_at` DATETIME,
@@ -1399,7 +1398,6 @@ CREATE TABLE `category_image`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `category_id` INTEGER NOT NULL,
-    `file` VARCHAR(255) NOT NULL,
     `visible` TINYINT DEFAULT 1 NOT NULL,
     `position` INTEGER,
     `created_at` DATETIME,
@@ -1424,7 +1422,6 @@ CREATE TABLE `folder_image`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `folder_id` INTEGER NOT NULL,
-    `file` VARCHAR(255) NOT NULL,
     `visible` TINYINT DEFAULT 1 NOT NULL,
     `position` INTEGER,
     `created_at` DATETIME,
@@ -1449,7 +1446,6 @@ CREATE TABLE `content_image`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `content_id` INTEGER NOT NULL,
-    `file` VARCHAR(255) NOT NULL,
     `visible` TINYINT DEFAULT 1 NOT NULL,
     `position` INTEGER,
     `created_at` DATETIME,
@@ -1667,7 +1663,6 @@ CREATE TABLE `module_image`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `module_id` INTEGER NOT NULL,
-    `file` VARCHAR(255) NOT NULL,
     `visible` TINYINT DEFAULT 1 NOT NULL,
     `position` INTEGER,
     `created_at` DATETIME,
@@ -1933,7 +1928,6 @@ CREATE TABLE `brand_image`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `brand_id` INTEGER NOT NULL,
-    `file` VARCHAR(255) NOT NULL,
     `visible` TINYINT DEFAULT 1 NOT NULL,
     `position` INTEGER,
     `created_at` DATETIME,
@@ -2671,6 +2665,7 @@ CREATE TABLE `product_image_i18n`
 (
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `file` VARCHAR(255) NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -2856,6 +2851,7 @@ CREATE TABLE `category_image_i18n`
 (
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `file` VARCHAR(255) NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -2877,6 +2873,7 @@ CREATE TABLE `folder_image_i18n`
 (
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `file` VARCHAR(255) NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -2898,6 +2895,7 @@ CREATE TABLE `content_image_i18n`
 (
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `file` VARCHAR(255) NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -3000,6 +2998,7 @@ CREATE TABLE `module_image_i18n`
 (
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `file` VARCHAR(255) NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -3066,6 +3065,7 @@ CREATE TABLE `brand_image_i18n`
 (
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `file` VARCHAR(255) NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,

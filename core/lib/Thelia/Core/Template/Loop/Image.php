@@ -24,6 +24,8 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImage;
 use Thelia\Type\BooleanOrBothType;
@@ -341,13 +343,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 $event->setFormat($format);
             }
 
-            // Put source image file path
-            $sourceFilePath = sprintf(
-                '%s/%s/%s',
-                $baseSourceFilePath,
-                $this->objectType,
-                $result->getFile()
-            );
+            $sourceFilePath = $this->formatSourceFilePath($baseSourceFilePath, $result);
 
             $event->setSourceFilepath($sourceFilePath);
             $event->setCacheSubdirectory($this->objectType);
@@ -453,5 +449,57 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         $imgData = base64_encode(file_get_contents($path));
 
         return $src = 'data: '.mime_content_type($path).';base64,'.$imgData;
+    }
+
+    /**
+     * @param ProductImage $result
+     */
+    private function formatSourceFilePath(string $baseSourceFilePath, $result): string
+    {
+        return sprintf(
+            '%s/%s/%s',
+            $baseSourceFilePath,
+            $this->objectType,
+            $this->getSourceFilePath($result)
+        );
+    }
+
+    /**
+     * @param ProductImage $result
+     */
+    private function getSourceFilePath($result): ?string
+    {
+        // return the file path of the image in the source language
+        if (null !== $lang = $this->getLang()) {
+            $locale = LangQuery::create()->findOneById($lang)?->getLocale();
+
+            if (null !== $file = $result->setLocale($locale)->getFile()) {
+                return $file;
+            }
+        }
+
+        // if backend context, don't go further, return the file path of the image
+        if ($this->getBackendContext()) {
+            return $result->getFile();
+        }
+
+        // return the file path of the image the current session language
+        if (null !== $locale = $this->getCurrentRequest()->getSession()?->getLang()?->getLocale()) {
+            if (null !== $file = $result->setLocale($locale)->getFile()) {
+                return $file;
+            }
+        }
+
+        // return the file path of the image in the default language
+        if (ConfigQuery::getDefaultLangWhenNoTranslationAvailable() == Lang::REPLACE_BY_DEFAULT_LANGUAGE) {
+            $locale = Lang::getDefaultLanguage()->getLocale();
+
+            if (null !== $file = $result->setLocale($locale)->getFile()) {
+                return $file;
+            }
+        }
+
+        // return the file path of the image
+        return $result->getFile();
     }
 }
