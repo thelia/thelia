@@ -468,7 +468,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
     /**
      * @param ProductImage $result
-     * @return string|null
+     * @return string
      */
     private function getSourceFilePath($result): ?string
     {
@@ -479,6 +479,11 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             if (null !== $file = $result->setLocale($locale)->getFile()) {
                 return $file;
             }
+        }
+
+        // if backend context, don't go further, return the file path of the image
+        if ($this->getBackendContext()) {
+            return $result->getFile();
         }
 
         // return the file path of the image the current session language
