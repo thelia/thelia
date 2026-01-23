@@ -6,6 +6,35 @@ UPDATE `config` SET `value`='6' WHERE `name`='thelia_minus_version';
 UPDATE `config` SET `value`='1' WHERE `name`='thelia_release_version';
 UPDATE `config` SET `value`='' WHERE `name`='thelia_extra_version';
 
+
+# ======================================================================================================================
+# store informations IN config
+# ======================================================================================================================
+
+SET @locale := (
+  SELECT locale
+  FROM lang
+  WHERE by_default = 1
+  LIMIT 1
+);
+
+UPDATE config
+SET name = CONCAT(name, '_', @locale)
+WHERE name IN (
+    'store_name',
+    'store_description',
+    'store_email',
+    'store_notification_emails',
+    'store_business_id',
+    'store_phone',
+    'store_fax',
+    'store_address1',
+    'store_address2',
+    'store_address3',
+    'store_zipcode',
+    'store_city'
+);
+
 # ======================================================================================================================
 # Add file IN product_image_i18n
 # ======================================================================================================================

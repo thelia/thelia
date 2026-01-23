@@ -464,12 +464,16 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public function sendNotificationEmail(OrderEvent $event): void
     {
+        $locale = $event->getOrder()->getLang()->getLocale();
+
         $this->mailer->sendEmailToShopManagers(
             'order_notification',
             [
                 'order_id' => $event->getOrder()->getId(),
                 'order_ref' => $event->getOrder()->getRef(),
-            ]
+            ],
+            [],
+            $locale
         );
     }
 

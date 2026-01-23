@@ -307,6 +307,8 @@ class MessageController extends AbstractCrudController
 
                 $data = $form->getData();
 
+                $locale = $this->getRequest()->getSession()?->getLang()?->getLocale();
+
                 $messageParameters = [];
 
                 foreach ($this->getRequest()->request->all() as $key => $value) {
@@ -315,7 +317,7 @@ class MessageController extends AbstractCrudController
 
                 $this->getMailer()->sendEmailMessage(
                     $message->getName(),
-                    [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
+                    [ConfigQuery::getStoreEmail($locale) => ConfigQuery::getStoreName($locale)],
                     [$data['recipient_email'] => $data['recipient_email']],
                     $messageParameters,
                     $this->getCurrentEditionLocale()

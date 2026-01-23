@@ -49,14 +49,16 @@ class ContactController extends BaseFrontController
             $email = $translator?->trans('Sender\'s e-mail address: %email%', ['%email%' => $event->getEmail()]);
             $message = $translator?->trans('Message content: %message%', ['%message%' => $event->getMessage()]);
 
+            $locale = $this->getRequest()->getSession()->getLang()->getLocale();
+
             $messageContent =
                 "<p>$name</p>\n".
                 "<p>$email</p>\n".
                 "<p>$message</p>";
 
             $mailer->sendSimpleEmailMessage(
-                [ConfigQuery::getStoreEmail() => $event->getName()],
-                [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
+                [ConfigQuery::getStoreEmail($locale) => $event->getName()],
+                [ConfigQuery::getStoreEmail($locale) => ConfigQuery::getStoreName($locale)],
                 $event->getSubject(),
                 $messageContent,
                 strip_tags($messageContent),
