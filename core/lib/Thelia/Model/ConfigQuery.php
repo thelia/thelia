@@ -117,21 +117,21 @@ class ConfigQuery extends BaseConfigQuery
         return self::read('unknown-flag-path', '/assets/img/flags/unknown.png');
     }
 
-    public static function getStoreEmail(?string $locale = null)
+    public static function getStoreEmail(string $locale = null)
     {
         $locale = $locale ?? LangQuery::create()->findOneByByDefault(1)->getLocale();
 
         return self::read('store_email_'.$locale, null);
     }
 
-    public static function getStoreName(?string $locale = null)
+    public static function getStoreName(string $locale = null)
     {
         $locale = $locale ?? LangQuery::create()->findOneByByDefault(1)->getLocale();
 
         return self::read('store_name_'.$locale, '');
     }
 
-    public static function getStoreDescription(?string $locale = null)
+    public static function getStoreDescription(string $locale = null)
     {
         $locale = $locale ?? LangQuery::create()->findOneByByDefault(1)->getLocale();
 
@@ -171,7 +171,7 @@ class ConfigQuery extends BaseConfigQuery
     /**
      * @return array a list of email addresses to send the shop's notifications
      */
-    public static function getNotificationEmailsList(?string $locale = null)
+    public static function getNotificationEmailsList(string $locale = null)
     {
         $contactEmail = self::getStoreEmail($locale);
 

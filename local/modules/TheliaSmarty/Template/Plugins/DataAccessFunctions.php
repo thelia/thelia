@@ -855,7 +855,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
             $uploadDir .= DS.'store';
 
-            $imageFileName = ConfigQuery::read($configKey . '_' . $locale);
+            $imageFileName = ConfigQuery::read($configKey.'_'.$locale);
 
             if ($imageFileName === null) {
                 $imageFileName = ConfigQuery::read($configKey);

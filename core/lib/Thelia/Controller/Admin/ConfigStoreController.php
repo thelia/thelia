@@ -47,16 +47,16 @@ class ConfigStoreController extends BaseAdminController
     {
         $file = $form->get($inputName)->getData();
 
-        $locale = "";
+        $locale = '';
 
         if (null !== $lang = $this->getCurrentEditionLang()) {
-            $locale = "_" . $lang->getLocale();
+            $locale = '_'.$lang->getLocale();
         }
 
         if ($file != null) {
             // Delete the old file
             $fs = new \Symfony\Component\Filesystem\Filesystem();
-            $oldFileName = ConfigQuery::read($configKey . $locale);
+            $oldFileName = ConfigQuery::read($configKey.$locale);
 
             if ($oldFileName === null) {
                 $oldFileName = ConfigQuery::read($configKey);
@@ -72,7 +72,7 @@ class ConfigStoreController extends BaseAdminController
             // Write the new file
             $newFileName = uniqid().'-'.$file->getClientOriginalName();
             $file->move($storeMediaUploadDir, $newFileName);
-            ConfigQuery::write($configKey . $locale, $newFileName, false);
+            ConfigQuery::write($configKey.$locale, $newFileName, false);
         }
     }
 
@@ -118,7 +118,7 @@ class ConfigStoreController extends BaseAdminController
             // Update store
             foreach ($data as $name => $value) {
                 if (!\array_key_exists($name, $storeMediaList) && !$configStoreForm->isTemplateDefinedHiddenFieldName($name)) {
-                    ConfigQuery::write($name ."_" . $locale, $value, false);
+                    ConfigQuery::write($name.'_'.$locale, $value, false);
                 }
             }
 
