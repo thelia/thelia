@@ -47,10 +47,20 @@ class ConfigStoreController extends BaseAdminController
     {
         $file = $form->get($inputName)->getData();
 
+        $locale = '';
+
+        if (null !== $lang = $this->getCurrentEditionLang()) {
+            $locale = '_'.$lang->getLocale();
+        }
+
         if ($file != null) {
             // Delete the old file
             $fs = new \Symfony\Component\Filesystem\Filesystem();
-            $oldFileName = ConfigQuery::read($configKey);
+            $oldFileName = ConfigQuery::read($configKey.$locale);
+
+            if ($oldFileName === null) {
+                $oldFileName = ConfigQuery::read($configKey);
+            }
 
             if ($oldFileName !== null) {
                 $oldFilePath = $storeMediaUploadDir.DS.$oldFileName;
@@ -62,7 +72,7 @@ class ConfigStoreController extends BaseAdminController
             // Write the new file
             $newFileName = uniqid().'-'.$file->getClientOriginalName();
             $file->move($storeMediaUploadDir, $newFileName);
-            ConfigQuery::write($configKey, $newFileName, false);
+            ConfigQuery::write($configKey.$locale, $newFileName, false);
         }
     }
 
@@ -103,17 +113,22 @@ class ConfigStoreController extends BaseAdminController
 
             $data = $form->getData();
 
+            $locale = $this->getCurrentEditionLocale();
+
             // Update store
             foreach ($data as $name => $value) {
                 if (!\array_key_exists($name, $storeMediaList) && !$configStoreForm->isTemplateDefinedHiddenFieldName($name)) {
-                    ConfigQuery::write($name, $value, false);
+                    ConfigQuery::write($name.'_'.$locale, $value, false);
                 }
             }
 
             $this->adminLogAppend(AdminResources::STORE, AccessManager::UPDATE, 'Store configuration changed');
 
             if ($this->getRequest()->get('save_mode') == 'stay') {
-                $response = $this->generateRedirectFromRoute('admin.configuration.store.default');
+                $response = $this->generateRedirectFromRoute(
+                    'admin.configuration.store.default',
+                    ['edit_language_id' => $this->getCurrentEditionLang()->getId()]
+                );
             } else {
                 $response = $this->generateSuccessRedirect($configStoreForm);
             }

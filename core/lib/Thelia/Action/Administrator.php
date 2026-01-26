@@ -105,6 +105,8 @@ class Administrator extends BaseAction implements EventSubscriberInterface
 
         $email = $admin->getEmail();
 
+        $locale = $event->getLocale();
+
         if (!empty($email)) {
             $renewToken = $this->tokenProvider->getToken();
 
@@ -114,7 +116,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
 
             $this->mailer->sendEmailMessage(
                 'new_admin_password',
-                [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
+                [ConfigQuery::getStoreEmail($locale) => ConfigQuery::getStoreName($locale)],
                 [$email => $admin->getFirstname().' '.$admin->getLastname()],
                 [
                     'token' => $renewToken,

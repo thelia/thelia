@@ -117,19 +117,25 @@ class ConfigQuery extends BaseConfigQuery
         return self::read('unknown-flag-path', '/assets/img/flags/unknown.png');
     }
 
-    public static function getStoreEmail()
+    public static function getStoreEmail(string $locale = null)
     {
-        return self::read('store_email', null);
+        $locale = $locale ?? LangQuery::create()->findOneByByDefault(1)->getLocale();
+
+        return self::read('store_email_'.$locale, null);
     }
 
-    public static function getStoreName()
+    public static function getStoreName(string $locale = null)
     {
-        return self::read('store_name', '');
+        $locale = $locale ?? LangQuery::create()->findOneByByDefault(1)->getLocale();
+
+        return self::read('store_name_'.$locale, '');
     }
 
-    public static function getStoreDescription()
+    public static function getStoreDescription(string $locale = null)
     {
-        return self::read('store_description', '');
+        $locale = $locale ?? LangQuery::create()->findOneByByDefault(1)->getLocale();
+
+        return self::read('store_description_'.$locale, '');
     }
 
     /**
@@ -165,11 +171,11 @@ class ConfigQuery extends BaseConfigQuery
     /**
      * @return array a list of email addresses to send the shop's notifications
      */
-    public static function getNotificationEmailsList()
+    public static function getNotificationEmailsList(string $locale = null)
     {
-        $contactEmail = self::getStoreEmail();
+        $contactEmail = self::getStoreEmail($locale);
 
-        $list = preg_split('/[,;]/', self::read('store_notification_emails', $contactEmail));
+        $list = preg_split('/[,;]/', self::read("store_notification_emails_$locale", $contactEmail));
 
         $arr = [];
 

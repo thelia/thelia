@@ -34,6 +34,7 @@ use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\FolderQuery;
+use Thelia\Model\LangQuery;
 use Thelia\Model\MetaDataQuery;
 use Thelia\Model\ModuleConfigQuery;
 use Thelia\Model\ModuleQuery;
@@ -820,6 +821,14 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         $type = $this->getParam($params, 'type', null);
         $allowedTypes = ['favicon', 'logo', 'banner'];
 
+        $lang = LangQuery::create()->findOneByByDefault(1);
+
+        if (null !== $langId = $this->getRequest()->get('edit_language_id', null)) {
+            $lang = LangQuery::create()->findOneById($langId);
+        }
+
+        $locale = $lang->getLocale();
+
         if ($type !== null && \in_array($type, $allowedTypes)) {
             switch ($type) {
                 case 'favicon':
@@ -846,7 +855,11 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
             $uploadDir .= DS.'store';
 
-            $imageFileName = ConfigQuery::read($configKey);
+            $imageFileName = ConfigQuery::read($configKey.'_'.$locale);
+
+            if ($imageFileName === null) {
+                $imageFileName = ConfigQuery::read($configKey);
+            }
 
             $skipImageTransform = false;
 

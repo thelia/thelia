@@ -53,9 +53,11 @@ class MailerFactory
         // Always add the customer ID to the parameters
         $messageParameters['customer_id'] = $customer->getId();
 
+        $locale = $customer?->getCustomerLang()?->getLocale();
+
         $this->sendEmailMessage(
             $messageCode,
-            [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
+            [ConfigQuery::getStoreEmail($locale) => ConfigQuery::getStoreName($locale)],
             [$customer->getEmail() => $customer->getFirstname().' '.$customer->getLastname()],
             $messageParameters,
             $customer->getCustomerLang()->getLocale()
@@ -69,12 +71,12 @@ class MailerFactory
      * @param array  $messageParameters an array of (name => value) parameters that will be available in the message
      * @param array  $replyTo           Reply to addresses. An array of (email-address => name) [optional]
      */
-    public function sendEmailToShopManagers($messageCode, $messageParameters = [], $replyTo = []): void
+    public function sendEmailToShopManagers($messageCode, $messageParameters = [], $replyTo = [], ?string $locale): void
     {
-        $storeName = ConfigQuery::getStoreName();
+        $storeName = ConfigQuery::getStoreName($locale);
 
         // Build the list of email recipients
-        $recipients = ConfigQuery::getNotificationEmailsList();
+        $recipients = ConfigQuery::getNotificationEmailsList($locale);
 
         $to = [];
 
@@ -84,7 +86,7 @@ class MailerFactory
 
         $this->sendEmailMessage(
             $messageCode,
-            [ConfigQuery::getStoreEmail() => $storeName],
+            [ConfigQuery::getStoreEmail($locale) => $storeName],
             $to,
             $messageParameters,
             null,
@@ -108,7 +110,7 @@ class MailerFactory
      */
     public function sendEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null, $cc = [], $bcc = [], $replyTo = []): void
     {
-        $storeEmail = ConfigQuery::getStoreEmail();
+        $storeEmail = ConfigQuery::getStoreEmail($locale);
 
         if (!empty($storeEmail)) {
             if (!empty($to)) {

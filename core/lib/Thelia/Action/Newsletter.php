@@ -92,9 +92,11 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
      */
     public function confirmSubscription(NewsletterEvent $event): void
     {
+        $locale = $event->getLocale();
+
         $this->mailer->sendEmailMessage(
             'newsletter_subscription_confirmation',
-            [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
+            [ConfigQuery::getStoreEmail($locale) => ConfigQuery::getStoreName($locale)],
             [$event->getEmail() => $event->getFirstname().' '.$event->getLastname()],
             [
                 'email' => $event->getEmail(),
