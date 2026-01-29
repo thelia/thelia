@@ -107,7 +107,11 @@ class CouponController extends BaseAdminController
         $args['formAction'] = 'admin/coupon/create';
 
         // Setup empty data if form is already in parser context
-        $this->getParserContext()->addForm($this->createForm(AdminForm::COUPON_CREATION));
+        $this->getParserContext()->addForm($this->createForm(
+            AdminForm::COUPON_CREATION,
+            FormType::class,
+            ['locale' => $this->getCurrentEditionLocale()]
+        ));
 
         return $this->render(
             'coupon-create',

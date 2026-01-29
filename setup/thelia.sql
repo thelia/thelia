@@ -1319,7 +1319,7 @@ CREATE TABLE `cart`
         ON DELETE RESTRICT,
     CONSTRAINT `fk_cart_address_invoice_id`
         FOREIGN KEY (`address_invoice_id`)
-        REFERENCES `address` (`id`)
+        REFERENCES `cart_address` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT,
     CONSTRAINT `fk_cart_currency_id`
