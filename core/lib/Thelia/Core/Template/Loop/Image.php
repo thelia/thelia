@@ -473,14 +473,13 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         if (null !== $lang = $this->getLang()) {
             $locale = LangQuery::create()->findOneById($lang)?->getLocale();
 
+            if ($this->getBackendContext()) {
+                return $result->setLocale($locale)->getFile();
+            }
+
             if (null !== $file = $result->setLocale($locale)->getFile()) {
                 return $file;
             }
-        }
-
-        // if backend context, don't go further, return the file path of the image
-        if ($this->getBackendContext()) {
-            return $result->getFile();
         }
 
         // return the file path of the image the current session language
