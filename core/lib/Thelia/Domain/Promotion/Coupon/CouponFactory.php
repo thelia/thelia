@@ -109,7 +109,7 @@ class CouponFactory
         $isRemovingPostage = 1 === $model->getIsRemovingPostage();
 
         if (!$this->container->has($model->getType())) {
-            return false;
+            throw new \InvalidArgumentException(\sprintf('Coupon type "%s" is not registered.', $model->getType()));
         }
 
         /** @var CouponInterface $couponManager */
