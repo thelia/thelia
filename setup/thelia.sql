@@ -3378,6 +3378,7 @@ CREATE TABLE `customer_version`
     `confirmation_token` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
+    `confirmation_token_expires_at` DATETIME NULL,
     `version` INTEGER DEFAULT 0 NOT NULL,
     `version_created_at` DATETIME,
     `version_created_by` VARCHAR(100),
