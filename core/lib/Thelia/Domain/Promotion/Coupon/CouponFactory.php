@@ -59,7 +59,7 @@ class CouponFactory
         $couponModel = $this->facade->findOneCouponByCode($couponCode);
 
         // check if coupon is enabled
-        if ($couponModel === null || $couponModel->getIsEnabled()) {
+        if ($couponModel === null || !$couponModel->getIsEnabled()) {
             throw new InactiveCouponException($couponCode);
         }
 
