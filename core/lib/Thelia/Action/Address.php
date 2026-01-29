@@ -84,7 +84,7 @@ class Address extends BaseAction implements EventSubscriberInterface
                 ->setCountryId($event->getCountry())
                 ->setStateId($event->getState() ? (int) $event->getState() : null)
                 ->setCellphone((string) $event->getCellphone())
-                ->setPhone($event->getPhone())
+                ->setPhone((string) $event->getPhone())
                 ->setCompany($event->getCompany())
                 ->save();
 

@@ -74,7 +74,7 @@ class AddressCreateOrUpdateEvent extends ActionEvent
          */
         protected $cellphone,
         /**
-         * @var string phone
+         * @var ?string phone
          */
         protected $phone,
         /**

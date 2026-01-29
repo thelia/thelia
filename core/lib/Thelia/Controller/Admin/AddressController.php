@@ -172,7 +172,7 @@ class AddressController extends AbstractCrudController
             $formData['city'],
             $formData['country'],
             $formData['cellphone'] ? (string) $formData['cellphone'] : null,
-            $formData['phone'],
+            $formData['phone'] ? (string) $formData['phone'] : null,
             $formData['company'],
             $formData['is_default'],
             isset($formData['state']) ? (int) $formData['state'] : null,
