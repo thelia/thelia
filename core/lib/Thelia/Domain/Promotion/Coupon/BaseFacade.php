@@ -181,11 +181,9 @@ class BaseFacade implements FacadeInterface
     }
 
     /**
-     * Find one Coupon in the database from its code.
-     *
      * @param string $code Coupon code
      */
-    public function findOneCouponByCode(string $code): Coupon
+    public function findOneCouponByCode(string $code): ?Coupon
     {
         return CouponQuery::create()->findOneByCode($code);
     }

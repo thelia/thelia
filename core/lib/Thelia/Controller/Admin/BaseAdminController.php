@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Controller\BaseController;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
@@ -198,13 +199,16 @@ class BaseAdminController extends BaseController
 
     protected function getCurrentEditionLang()
     {
+        $mainRequest = $this->requestStack->getMainRequest();
         // Return the new language if a change is required.
-        if (null !== ($edit_language_id = $this->requestStack->getMainRequest()?->get('edit_language_id')) && null !== $edit_language = LangQuery::create()->findOneById($edit_language_id)) {
+        if (null !== ($edit_language_id = $mainRequest?->get('edit_language_id'))
+            && null !== $edit_language = LangQuery::create()->findOneById($edit_language_id)) {
             return $edit_language;
         }
+        /** @var Session $session */
+        $session = $this->getSession();
 
-        // Otherwise return the lang stored in session.
-        return $this->getSession()->getAdminEditionLang();
+        return $session->getAdminLang() ?? $session->getAdminEditionLang();
     }
 
     protected function getCurrentEditionLocale()

@@ -98,7 +98,7 @@ interface FacadeInterface
      *
      * @param string $code Coupon code
      */
-    public function findOneCouponByCode(string $code): Coupon;
+    public function findOneCouponByCode(string $code): ?Coupon;
 
     /**
      * Return platform TranslatorInterface.

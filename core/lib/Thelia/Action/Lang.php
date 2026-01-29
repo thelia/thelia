@@ -163,8 +163,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
             throw new \RuntimeException(Translator::getInstance()->trans('It is not allowed to delete the default language'));
         }
 
-        $lang
-            ->delete();
+        $lang->delete();
 
         /** @var Session $session */
         $session = $this->requestStack->getMainRequest()?->getSession();
