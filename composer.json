@@ -16,7 +16,12 @@
     "repositories": [
         {
             "type": "path",
-            "url": "core/"
+            "url": "core/",
+            "options": {
+                "versions": {
+                    "thelia/core": "dev-twig"
+                }
+            }
         }
     ],
     "require": {
