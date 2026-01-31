@@ -12,29 +12,31 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Domain\Catalog\Brand\DTO;
+namespace Thelia\Domain\Catalog\Currency\DTO;
 
 use Thelia\Domain\Shared\Contract\DTOEventActionInterface;
 
-readonly class BrandSeoDTO implements DTOEventActionInterface
+readonly class CurrencyCreateDTO implements DTOEventActionInterface
 {
     public function __construct(
+        public string $name,
+        public string $code,
+        public string $symbol,
         public string $locale,
-        public ?string $url = null,
-        public ?string $metaTitle = null,
-        public ?string $metaDescription = null,
-        public ?string $metaKeywords = null,
+        public float $rate = 1.0,
+        public ?string $format = null,
     ) {
     }
 
     public function toArray(): array
     {
         return [
+            'name' => $this->name,
+            'code' => $this->code,
+            'symbol' => $this->symbol,
             'locale' => $this->locale,
-            'url' => $this->url,
-            'meta_title' => $this->metaTitle,
-            'meta_description' => $this->metaDescription,
-            'meta_keywords' => $this->metaKeywords,
+            'rate' => $this->rate,
+            'format' => $this->format,
         ];
     }
 }

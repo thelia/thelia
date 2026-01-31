@@ -12,12 +12,12 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Domain\Catalog\Brand\Exception;
+namespace Thelia\Domain\Catalog\Tax\Exception;
 
-class BrandNotFoundException extends \DomainException
+class TaxRuleNotFoundException extends \DomainException
 {
-    public static function withId(int $brandId): self
+    public static function withId(int $taxRuleId): self
     {
-        return new self(\sprintf('Brand with ID %d not found', $brandId));
+        return new self(\sprintf('TaxRule with ID %d not found', $taxRuleId));
     }
 }

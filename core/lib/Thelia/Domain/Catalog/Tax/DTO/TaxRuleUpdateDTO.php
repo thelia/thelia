@@ -12,20 +12,19 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Domain\Catalog\Brand\DTO;
+namespace Thelia\Domain\Catalog\Tax\DTO;
 
 use Thelia\Domain\Shared\Contract\DTOEventActionInterface;
 
-readonly class BrandUpdateDTO implements DTOEventActionInterface
+readonly class TaxRuleUpdateDTO implements DTOEventActionInterface
 {
     public function __construct(
         public string $title,
         public string $locale,
-        public bool $visible = true,
-        public ?string $chapo = null,
         public ?string $description = null,
-        public ?string $postscriptum = null,
-        public ?int $logoImageId = null,
+        public array $countryList = [],
+        public array $countryDeletedList = [],
+        public array $taxList = [],
     ) {
     }
 
@@ -34,11 +33,10 @@ readonly class BrandUpdateDTO implements DTOEventActionInterface
         return [
             'title' => $this->title,
             'locale' => $this->locale,
-            'visible' => $this->visible,
-            'chapo' => $this->chapo,
             'description' => $this->description,
-            'postscriptum' => $this->postscriptum,
-            'logo_image_id' => $this->logoImageId,
+            'country_list' => $this->countryList,
+            'country_deleted_list' => $this->countryDeletedList,
+            'tax_list' => $this->taxList,
         ];
     }
 }
