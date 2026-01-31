@@ -48,7 +48,8 @@
             "APP_ENV=test php -d post_max_size=20M"
         ],
         "thelia-install": [
-            "@phpc Thelia thelia:install -n --database_host=db --database_username=db --database_password=db --database_name=db--database_port=3306 -frontoffice_theme=flexy --backoffice_theme=default --pdf_theme=default --email_theme=default"
+            "rm -f .env.test.local",
+            "@phpc Thelia thelia:install -n --database_host=db --database_username=db --database_password=db --database_name=test --database_port=3306 --frontoffice_theme=flexy --backoffice_theme=default --pdf_theme=default --email_theme=default"
         ],
         "demo-database": [
             "@thelia-install",

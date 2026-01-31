@@ -307,31 +307,13 @@ class ModuleManagement
         $composerModuleDTOS = $this->listModulesFromTemplatePath($path);
 
         foreach ($composerModuleDTOS as $composerModuleDTO) {
-            $output?->writeln(
-                \sprintf(
-                    '<fg=gray>Installing module %s</>',
-                    $composerModuleDTO->getName()
-                )
-            );
             $module = $this->installModule($composerModuleDTO->getPath());
-            $output?->writeln(
-                \sprintf(
-                    '<fg=gray>Module %s installed.</>',
-                    $module->getCode()
-                )
-            );
             $cacheEvent = new CacheEvent($this->kernelCacheDir);
             $this->eventDispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
 
             $modulesInstalled[] = $module;
 
             if (BaseModule::IS_ACTIVATED === $module->getActivate()) {
-                $output?->writeln(
-                    \sprintf(
-                        '<fg=gray>Module %s is already activated.</>',
-                        $module->getCode()
-                    )
-                );
                 continue;
             }
 

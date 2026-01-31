@@ -18,14 +18,16 @@ use Symfony\Component\Dotenv\Dotenv;
 /** @var ClassLoader $loader */
 $loader = require dirname(__DIR__).'/vendor/autoload.php';
 
-$propelCacheDir = dirname(__DIR__).'/var/cache/dev/propel/model';
+$propelCacheDir = dirname(__DIR__).'/var/cache/test/propel/model';
 if (is_dir($propelCacheDir)) {
     $loader->addPsr4('', $propelCacheDir);
-    $loader->addPsr4('TheliaMain\\', dirname(__DIR__).'/var/cache/dev/propel/database/TheliaMain');
+    $loader->addPsr4('TheliaMain\\', dirname(__DIR__).'/var/cache/test/propel/database/TheliaMain');
 }
 
-if (file_exists(dirname(__DIR__).'/config/bootstrap.php')) {
-    require dirname(__DIR__).'/config/bootstrap.php';
-} elseif (method_exists(Dotenv::class, 'bootEnv')) {
+if (method_exists(Dotenv::class, 'bootEnv')) {
     (new Dotenv())->bootEnv(dirname(__DIR__).'/.env');
+}
+
+if ($_SERVER['APP_DEBUG']) {
+    umask(0o000);
 }

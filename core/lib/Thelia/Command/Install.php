@@ -38,6 +38,12 @@ use Thelia\Tools\TokenProvider;
 #[AsCommand(name: 'thelia:install', description: 'Install thelia using cli tools. For now Thelia only use mysql database')]
 class Install extends ContainerAwareCommand
 {
+    public function __construct(
+        private readonly string $environment,
+    ) {
+        parent::__construct();
+    }
+
     protected function configure(): void
     {
         $this
@@ -145,6 +151,9 @@ class Install extends ContainerAwareCommand
         ];
 
         while (false === $connection = $this->tryConnection($connectionInfo, $output)) {
+            if (!$input->isInteractive()) {
+                throw new \RuntimeException('Database connection failed in non-interactive mode. Please check your database credentials (--database_host, --database_username, --database_password, --database_name, --database_port).');
+            }
             $connectionInfo = $this->getConnectionInfo($input, $output);
         }
 
@@ -240,12 +249,15 @@ class Install extends ContainerAwareCommand
     {
         $fs = new Filesystem();
 
-        if (!$fs->exists(THELIA_ROOT.'.env.local')) {
-            $fs->touch(THELIA_ROOT.'.env.local');
+        $envFile = 'test' === $this->environment ? '.env.test.local' : '.env.local';
+        $envFilePath = THELIA_ROOT.$envFile;
+
+        if (!$fs->exists($envFilePath)) {
+            $fs->touch($envFilePath);
         }
 
         file_put_contents(
-            THELIA_ROOT.'.env.local',
+            $envFilePath,
             \sprintf(
                 "\n###> thelia/database-configuration ###\nDATABASE_HOST=%s\nDATABASE_PORT=%s\nDATABASE_NAME=%s\nDATABASE_USER=%s\nDATABASE_PASSWORD=%s\n###< thelia/database-configuration ###",
                 $connectionInfo['host'],
