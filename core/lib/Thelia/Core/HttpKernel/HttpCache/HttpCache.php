@@ -44,7 +44,7 @@ class HttpCache extends BaseHttpCache implements HttpKernelInterface
 
     public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): Response
     {
-        if (!($request instanceof TheliaRequest)) {
+        if (!$request instanceof TheliaRequest) {
             $request = TheliaRequest::create(
                 $request->getUri(),
                 $request->getMethod(),

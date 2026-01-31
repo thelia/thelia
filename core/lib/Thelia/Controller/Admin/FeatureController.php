@@ -98,7 +98,7 @@ class FeatureController extends AbstractCrudController
     /**
      * Process the features values (fix it in future version to integrate it in the feature form as a collection).
      *
-     * @see \Thelia\Controller\Admin\AbstractCrudController::performAdditionalUpdateAction()
+     * @see AbstractCrudController::performAdditionalUpdateAction()
      */
     protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, ActionEvent|ActiveRecordEvent|null $updateEvent): null
     {

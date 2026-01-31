@@ -333,7 +333,7 @@ abstract class BaseController implements ControllerInterface
      *                                             it does not match the requirement
      * @throws \InvalidArgumentException           When the router doesn't exist
      *
-     * @see \Thelia\Controller\BaseController::getRouteFromRouter()
+     * @see BaseController::getRouteFromRouter()
      */
     protected function getRoute(string $routeId, array $parameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_URL): string
     {

@@ -46,7 +46,7 @@ class ModuleModificationForm extends BaseForm
             ]);
         $this->formBuilder->get('id')->addEventListener(
             FormEvents::SUBMIT,
-            function (FormEvent $event): void {
+            static function (FormEvent $event): void {
                 $value = $event->getData();
                 $event->setData($value === null || $value === '' ? null : (int) $value);
             }

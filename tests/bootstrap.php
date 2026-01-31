@@ -12,9 +12,17 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
+use Composer\Autoload\ClassLoader;
 use Symfony\Component\Dotenv\Dotenv;
 
-require dirname(__DIR__).'/vendor/autoload.php';
+/** @var ClassLoader $loader */
+$loader = require dirname(__DIR__).'/vendor/autoload.php';
+
+$propelCacheDir = dirname(__DIR__).'/var/cache/dev/propel/model';
+if (is_dir($propelCacheDir)) {
+    $loader->addPsr4('', $propelCacheDir);
+    $loader->addPsr4('TheliaMain\\', dirname(__DIR__).'/var/cache/dev/propel/database/TheliaMain');
+}
 
 if (file_exists(dirname(__DIR__).'/config/bootstrap.php')) {
     require dirname(__DIR__).'/config/bootstrap.php';
