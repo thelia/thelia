@@ -191,8 +191,8 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
      * @return int Lang id
      *
      * @deprecated 2.3.0 It's not the good way to get lang identifier
-     * @see \Thelia\Model\Customer::getLangId()
-     * @see \Thelia\Model\Customer::getLangModel()
+     * @see Customer::getLangId()
+     * @see Customer::getLangModel()
      */
     public function getLang(): int
     {
@@ -207,8 +207,8 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
      * @return $this Return $this, allow chaining
      *
      * @deprecated 2.3.0 It's not the good way to set lang identifier
-     * @see \Thelia\Model\Customer::setLangId()
-     * @see \Thelia\Model\Customer::setLangModel()
+     * @see Customer::setLangId()
+     * @see Customer::setLangModel()
      */
     public function setLang(int $langId)
     {

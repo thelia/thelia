@@ -62,7 +62,7 @@ class Application extends BaseApplication
     protected function registerCommands(): void
     {
         if (!TheliaKernel::isInstalled()) {
-            $this->add(new Install());
+            $this->add(new Install($this->kernel->getEnvironment()));
 
             return;
         }

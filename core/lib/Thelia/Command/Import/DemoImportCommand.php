@@ -113,7 +113,7 @@ class DemoImportCommand extends Command
         if (\PHP_SAPI !== 'cli') {
             throw new \RuntimeException('This command must be run in CLI');
         }
-        if ($this->env !== 'dev') {
+        if (!\in_array($this->env, ['dev', 'test'])) {
             throw new \RuntimeException('This command is only available in dev environment');
         }
 

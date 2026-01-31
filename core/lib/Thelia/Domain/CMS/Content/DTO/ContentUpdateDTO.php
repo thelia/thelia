@@ -1,0 +1,44 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Thelia\Domain\CMS\Content\DTO;
+
+use Thelia\Domain\Shared\Contract\DTOEventActionInterface;
+
+readonly class ContentUpdateDTO implements DTOEventActionInterface
+{
+    public function __construct(
+        public string $title,
+        public string $locale,
+        public int $defaultFolderId = 0,
+        public bool $visible = true,
+        public ?string $chapo = null,
+        public ?string $description = null,
+        public ?string $postscriptum = null,
+    ) {
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'title' => $this->title,
+            'locale' => $this->locale,
+            'default_folder' => $this->defaultFolderId,
+            'visible' => $this->visible,
+            'chapo' => $this->chapo,
+            'description' => $this->description,
+            'postscriptum' => $this->postscriptum,
+        ];
+    }
+}

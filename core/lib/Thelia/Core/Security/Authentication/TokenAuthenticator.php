@@ -24,7 +24,7 @@ class TokenAuthenticator implements AuthenticatorInterface
     }
 
     /**
-     * @see \Thelia\Core\Security\Authentication\AuthenticatorInterface::getAuthentifiedUser()
+     * @see AuthenticatorInterface::getAuthentifiedUser()
      */
     public function getAuthentifiedUser(): ?UserInterface
     {

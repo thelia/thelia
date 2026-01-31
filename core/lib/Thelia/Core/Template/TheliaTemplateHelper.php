@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Template;
 
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,6 +29,8 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     public function __construct(
         protected string $kernelCacheDir,
         protected ComposerHelper $composerHelper,
+        #[Autowire('%kernel.environment%')]
+        protected string $environment = 'dev',
     ) {
     }
 
@@ -191,7 +194,8 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     {
         ConfigQuery::write($configType, $name);
         $envName = mb_strtoupper(str_replace('-', '_', $configType));
-        $envFilePath = THELIA_ROOT.'.env.local';
+        $envFile = 'test' === $this->environment ? '.env.test.local' : '.env.local';
+        $envFilePath = THELIA_ROOT.$envFile;
 
         $envContent = '';
 
