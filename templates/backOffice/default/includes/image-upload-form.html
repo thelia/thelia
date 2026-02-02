@@ -14,14 +14,71 @@ Parameters:
 
 <div class="image-manager form-container" >
 
-    {include
-        file = "includes/inner-form-toolbar.html"
-        hide_submit_buttons = true
-        hide_save_buttons = true
-        hide_save_and_close_button = true
-        current_tab = "images"
-        page_url  = "{url path='/admin/products/update' product_id=$parentId}"
-    }
+
+    {if $imageType == "category"}
+        {include
+            file = "includes/inner-form-toolbar.html"
+            hide_submit_buttons = true
+            hide_save_buttons = true
+            hide_save_and_close_button = true
+            current_tab = "images"
+            page_url  = {url path='/admin/categories/update' category_id=$parentId}
+        }
+    {elseif $imageType == "product"}
+        {include
+            file = "includes/inner-form-toolbar.html"
+            hide_submit_buttons = true
+            hide_save_buttons = true
+            hide_save_and_close_button = true
+            current_tab = "images"
+            page_url  = {url path='/admin/products/update' product_id=$parentId}
+        }
+    {elseif $imageType == "content"}
+        {include
+            file = "includes/inner-form-toolbar.html"
+            hide_submit_buttons = true
+            hide_save_buttons = true
+            hide_save_and_close_button = true
+            current_tab = "images"
+            page_url  = {url path="/admin/content/update/$parentId"}
+        }
+    {elseif $imageType == "module"}
+        {include
+            file = "includes/inner-form-toolbar.html"
+            hide_submit_buttons = true
+            hide_save_buttons = true
+            hide_save_and_close_button = true
+            current_tab = "images"
+            page_url  = {url path="/admin/module/update/$parentId"}
+        }
+    {elseif $imageType == "brand"}
+        {include
+            file="includes/inner-form-toolbar.html"
+            hide_submit_buttons=true
+            hide_save_buttons=true
+            hide_save_and_close_button=true
+            current_tab="images"
+            page_url={url path="/admin/brand/update/$parentId"}
+        }
+    {elseif $imageType == "folder"}
+        {include
+            file="includes/inner-form-toolbar.html"
+            hide_submit_buttons=true
+            hide_save_buttons=true
+            hide_save_and_close_button=true
+            current_tab="images"
+            page_url={url path="/admin/folders/update/$parentId"}
+        }
+    {else}
+        {include
+            file="includes/inner-form-toolbar.html"
+            hide_submit_buttons=true
+            hide_save_buttons=true
+            hide_save_and_close_button=true
+            current_tab="images"
+            page_url={navigate to="current"}
+        }
+    {/if}
 
     <div class="inner-toolbar">
         <div class="inner-actions">
