@@ -46,7 +46,7 @@ class ImageEvent extends CachedFileEvent
     protected ?int $quality = null;
 
     protected ?ImageInterface $imageObject = null;
-    protected bool $allowZoom;
+    protected bool $allowZoom = false;
     protected ?string $format = null;
 
     /**
@@ -109,7 +109,7 @@ class ImageEvent extends CachedFileEvent
         return $this;
     }
 
-    public function getResizeMode(): string
+    public function getResizeMode(): ?string
     {
         return $this->resize_mode;
     }
@@ -145,7 +145,7 @@ class ImageEvent extends CachedFileEvent
         return $this;
     }
 
-    public function getRotation(): int
+    public function getRotation(): ?int
     {
         return $this->rotation;
     }
