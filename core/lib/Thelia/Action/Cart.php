@@ -176,7 +176,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         );
 
         $cart
-            ->setAddressInvoiceId($cartAddress->getId())
+            ->setAddressInvoiceId($cartAddress->getAddress()?->getId())
             ->save();
     }
 
