@@ -187,7 +187,7 @@ class CreateAdminUser extends ContainerAwareCommand
         $question = new Question($this->decorateInfo('Admin email or empty value : '));
 
         $question->setValidator(static function ($answer): string {
-            $answer = trim($answer);
+            $answer = trim($answer ?? '');
 
             if ('' !== $answer && '0' !== $answer && !filter_var($answer, \FILTER_VALIDATE_EMAIL)) {
                 throw new \RuntimeException('Please enter an email or an empty value.');
@@ -197,7 +197,7 @@ class CreateAdminUser extends ContainerAwareCommand
                 throw new \RuntimeException('An administrator with this email already exists.');
             }
 
-            return '' === $answer || '0' === $answer ? uniqid('CHANGE_ME_') : $answer;
+            return '' === $answer || '0' === $answer ? uniqid('CHANGE_ME_', true) : $answer;
         });
 
         return $helper->ask($input, $output, $question);
