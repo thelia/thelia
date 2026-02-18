@@ -31,6 +31,7 @@ use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Api\Bridge\Propel\Filter\DateFilter;
 use Thelia\Api\Bridge\Propel\Validator\I18nConstraint;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Map\ProductTableMap;
@@ -103,6 +104,13 @@ use Thelia\Model\ProductQuery;
     properties: [
         'id',
         'ref',
+    ]
+)]
+#[ApiFilter(
+    filterClass: DateFilter::class,
+    properties: [
+        'createdAt' => 'include_null_before_and_after',
+        'updatedAt' => 'include_null_before_and_after',
     ]
 )]
 class Product extends AbstractTranslatableResource
