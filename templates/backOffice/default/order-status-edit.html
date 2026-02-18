@@ -100,19 +100,28 @@
                                                     <div class="row">
                                                         <div class="col-md-8">
                                                             <div class="row">
-                                                                <div class="col-md-6">
+                                                                <div class="col-md-4">
                                                                     {custom_render_form_field field="code"}
                                                                         <div class="input-group">
                                                                             <input type="text" {if $PROTECTED_STATUS}disabled{/if} class="form-control" {form_field_attributes field="code"}>
                                                                         </div>
                                                                     {/custom_render_form_field}
                                                                 </div>
-                                                                <div class="col-md-6">
+                                                                <div class="col-md-4">
                                                                     {custom_render_form_field field="color"}
                                                                         <div class="input-group">
                                                                             <input type="color" class="form-control" style="width: 100px;" {form_field_attributes field="color"}>
                                                                         </div>
                                                                     {/custom_render_form_field}
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    {form_field field="paid_status"}
+                                                                        <label>
+                                                                            <b> {$label}</b><br />
+                                                                            <input type="checkbox" {if $PROTECTED_STATUS}disabled{/if} {if $PAID_STATUS}checked="checked"{/if} class="form-control" {form_field_attributes field="paid_status"} value="1">
+                                                                        </label>
+                                                                        <span class="help-block">{$label_attr.help}</span>
+                                                                    {/form_field}
                                                                 </div>
                                                             </div>
                                                             {include file="includes/standard-description-form-fields.html"}
