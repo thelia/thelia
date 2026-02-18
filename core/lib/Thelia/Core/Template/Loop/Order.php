@@ -315,8 +315,6 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
      */
     public function parseResults(LoopResult $loopResult)
     {
-        $lastLegacyOrderId = ConfigQuery::read('last_legacy_rounding_order_id', 0);
-
         /** @var \Thelia\Model\Order $order */
         foreach ($loopResult->getResultDataCollection() as $order) {
             $tax = $itemsTax = 0;
@@ -325,11 +323,10 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
             $itemsAmount = $order->getTotalAmount($itemsTax, false, false);
 
             // Legacy orders have no discount tax calculation
-            if ($order->getId() <= $lastLegacyOrderId) {
-                $discountWithoutTax = $order->getDiscount();
-            } else {
-                $discountWithoutTax = Calculator::getUntaxedOrderDiscount($order);
-            }
+            $discountWithoutTax = ConfigQuery::isOrderWithLegacyRounding($order->getId()) ?
+                $order->getDiscount() :
+                Calculator::getUntaxedOrderDiscount($order)
+            ;
 
             $hasVirtualDownload = $order->hasVirtualProduct();
 

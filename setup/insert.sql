@@ -82,7 +82,6 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (71, 'cdn.documents-base-url', '', 0, 0, NOW(), NOW()),
 (72, 'cdn.assets-base-url', '', 0, 0, NOW(), NOW()),
 (73, 'allow_module_zip_install', '1', 0, 0, NOW(), NOW())
-
 ;
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `hidden`, `mandatory`, `created_at`, `updated_at`) VALUES
@@ -2079,6 +2078,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (71, 'de_DE', NULL, NULL, NULL, NULL),
     (72, 'de_DE', NULL, NULL, NULL, NULL),
     (73, 'de_DE', 'Modulinstallation aus ZIP-Dateien zulassen.', NULL, NULL, NULL),
+    (74, 'de_DE', NULL, NULL, NULL, NULL),
     (1, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
     (2, 'en_US', 'Name of the active front-office template', NULL, NULL, NULL),
     (3, 'en_US', 'Name of the active back-office template', NULL, NULL, NULL),
@@ -2138,6 +2138,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (71, 'en_US', NULL, NULL, NULL, NULL),
     (72, 'en_US', NULL, NULL, NULL, NULL),
     (73, 'en_US', 'Allow module installation from ZIP files.', NULL, NULL, NULL),
+    (74, 'en_US', NULL, NULL, NULL, NULL),    
     (1, 'es_ES', 'Comprobar disponibilidad de stock de producto (1) o ignorar (0) cuando se muestra o cambia cantidad en pedido', NULL, NULL, NULL),
     (2, 'es_ES', 'Nombre de la plantilla activa de recepción', NULL, NULL, NULL),
     (3, 'es_ES', 'Nombe de la plantilla del administrador activo', NULL, NULL, NULL),
@@ -2197,6 +2198,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (71, 'es_ES', NULL, NULL, NULL, NULL),
     (72, 'es_ES', NULL, NULL, NULL, NULL),
     (73, 'es_ES', 'Permitir la instalación del módulo desde archivos ZIP.', NULL, NULL, NULL),
+    (74, 'es_ES', NULL, NULL, NULL, NULL),    
     (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l\'ignorer (0) lors de l\'affichage et la modification des quantités commandées', NULL, NULL, NULL),
     (2, 'fr_FR', 'Nom du modèle de front-office actif', NULL, NULL, NULL),
     (3, 'fr_FR', 'Nom du modèle de back-office actif', NULL, NULL, NULL),
@@ -2256,7 +2258,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (71, 'fr_FR', NULL, NULL, NULL, NULL),
     (72, 'fr_FR', NULL, NULL, NULL, NULL),
     (73, 'fr_FR', 'Autoriser l\'installation des modules par fichier ZIP.', NULL, NULL, NULL),
-    (1, 'it_IT', NULL, NULL, NULL, NULL),
+    (74, 'fr_FR', NULL, NULL, NULL, NULL),    (1, 'it_IT', NULL, NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
     (4, 'it_IT', NULL, NULL, NULL, NULL),
@@ -2315,7 +2317,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (71, 'it_IT', NULL, NULL, NULL, NULL),
     (72, 'it_IT', NULL, NULL, NULL, NULL),
     (73, 'it_IT', NULL, NULL, NULL, NULL),
-    (1, 'ru_RU', 'Проверять доступный запас товара (1) или игнорировать его (0) при отображении и изменении количества в заказе', NULL, NULL, NULL),
+    (74, 'it_IT', NULL, NULL, NULL, NULL),    (1, 'ru_RU', 'Проверять доступный запас товара (1) или игнорировать его (0) при отображении и изменении количества в заказе', NULL, NULL, NULL),
     (2, 'ru_RU', 'Имя активного шаблона магазина', NULL, NULL, NULL),
     (3, 'ru_RU', 'Имя активного шаблона админки', NULL, NULL, NULL),
     (4, 'ru_RU', 'Имя активного шаблона для PDF', NULL, NULL, NULL),
@@ -2373,8 +2375,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (70, 'ru_RU', NULL, NULL, NULL, NULL),
     (71, 'ru_RU', NULL, NULL, NULL, NULL),
     (72, 'ru_RU', NULL, NULL, NULL, NULL),
-    (73, 'ru_RU', NULL, NULL, NULL, NULL)
-;
+    (73, 'ru_RU', NULL, NULL, NULL, NULL),
+    (74, 'ru_RU', NULL, NULL, NULL, NULL);
 
 INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
     (1, 'cs_CZ', NULL, NULL, NULL, NULL),

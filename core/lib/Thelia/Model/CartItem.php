@@ -230,7 +230,7 @@ class CartItem extends BaseCartItem
      */
     public function getTotalTaxedPrice(Country $country, State $state = null)
     {
-        return round($this->getTaxedPrice($country, $state), 2) * $this->getQuantity();
+        return $this->roundPriceWithQuantity($this->getTaxedPrice($country, $state));
     }
 
     /**
@@ -240,7 +240,7 @@ class CartItem extends BaseCartItem
      */
     public function getTotalTaxedPromoPrice(Country $country, State $state = null)
     {
-        return round($this->getTaxedPromoPrice($country, $state), 2) * $this->getQuantity();
+        return $this->roundPriceWithQuantity($this->getTaxedPromoPrice($country, $state));
     }
 
     /**
@@ -250,7 +250,7 @@ class CartItem extends BaseCartItem
      */
     public function getTotalPrice()
     {
-        return round($this->getPrice(), 2) * $this->getQuantity();
+        return $this->roundPriceWithQuantity($this->getPrice());
     }
 
     /**
@@ -260,7 +260,7 @@ class CartItem extends BaseCartItem
      */
     public function getTotalPromoPrice()
     {
-        return round($this->getPromoPrice(), 2) * $this->getQuantity();
+        return $this->roundPriceWithQuantity($this->getPromoPrice());
     }
 
     /**
@@ -270,6 +270,20 @@ class CartItem extends BaseCartItem
      */
     public function getTotalRealPrice()
     {
-        return round($this->getRealPrice(), 2) * $this->getQuantity();
+        return $this->roundPriceWithQuantity($this->getRealPrice());
+    }
+
+    /**
+     * Round a price according to the current rounding configuration.
+     */
+    protected function roundPriceWithQuantity(float $price): float
+    {
+        static $isRoundingModeSumOfRoundings;
+
+        if (null === $isRoundingModeSumOfRoundings) {
+            $isRoundingModeSumOfRoundings = ConfigQuery::isRoundingModeSumOfRoundings();
+        }
+
+        return $this->getQuantity() * ($isRoundingModeSumOfRoundings ? round($price, 2) : $price);
     }
 }

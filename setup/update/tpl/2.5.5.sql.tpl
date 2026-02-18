@@ -13,11 +13,9 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (@max_id + 1, 'order_rounding_mode', '1', 0, 0, NOW(), NOW());
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
-    (@max_id + 1, 'cs_CZ', NULL, NULL, NULL, NULL),
-        (@max_id + 1, 'de_DE', NULL, NULL, NULL, NULL),
-        (@max_id + 1, 'en_US', NULL, NULL, NULL, NULL),
-        (@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL),
-        (@max_id + 1, 'fr_FR', NULL, NULL, NULL, NULL),
-        (@max_id + 1, 'it_IT', NULL, NULL, NULL, NULL),
-        (@max_id + 1, 'ru_RU', NULL, NULL, NULL, NULL)
+{foreach $locales as $locale}
+    (@max_id + 1, '{$locale}', {intl l='Rounding mode for calculating the order total (1: sums of roundings, 2: rounding of sums).' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},
+    {/if}
+{/foreach}
+
 SET FOREIGN_KEY_CHECKS = 1;
