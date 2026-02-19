@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Core\Event\Maintenance\MaintenancePurgeEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Maintenance\Service\MaintenancePurgeService;
 use Thelia\Model\AdminLogQuery;
 use Thelia\Model\CartQuery;
 use Thelia\Model\ConfigQuery;
@@ -38,6 +39,11 @@ class MaintenancePurgeCommand extends ContainerAwareCommand
             );
     }
 
+    public function __construct(protected MaintenancePurgeService $maintenancePurgeService)
+    {
+        parent::__construct();
+    }
+
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('<info>Starting maintenance purge...</info>');
@@ -48,7 +54,7 @@ class MaintenancePurgeCommand extends ContainerAwareCommand
                 60
             );
 
-            $deletedCartNoOrder = $this->purgeCartsWithoutOrder($cartNoOrderDays);
+            $deletedCartNoOrder = $this->maintenancePurgeService->purgeCartsWithoutOrder($cartNoOrderDays);
 
             $output->writeln(sprintf(
                 '<comment>Carts without order (>%d days):</comment> <info>%d deleted</info>',
@@ -61,7 +67,7 @@ class MaintenancePurgeCommand extends ContainerAwareCommand
                 30
             );
 
-            $deletedAnonymousCarts = $this->purgeAnonymousCarts($cartAnonymousDays);
+            $deletedAnonymousCarts = $this->maintenancePurgeService->purgeAnonymousCarts($cartAnonymousDays);
 
             $output->writeln(sprintf(
                 '<comment>Anonymous carts (>%d days):</comment> <info>%d deleted</info>',
@@ -74,7 +80,7 @@ class MaintenancePurgeCommand extends ContainerAwareCommand
                 180
             );
 
-            $deletedAdminLogs = $this->purgeAdminLogs($adminLogsDays);
+            $deletedAdminLogs = $this->maintenancePurgeService->purgeAdminLogs($adminLogsDays);
 
             $output->writeln(sprintf(
                 '<comment>Admin logs (>%d days):</comment> <info>%d deleted</info>',
@@ -97,66 +103,5 @@ class MaintenancePurgeCommand extends ContainerAwareCommand
         }
 
         return 0;
-    }
-
-    /**
-     * Delete carts older than $days days that have no associated order.
-     * @throws PropelException
-     */
-    private function purgeCartsWithoutOrder(int $days): int
-    {
-        $threshold = $this->getThresholdDate($days);
-
-        // Retrieve IDs of carts that DO have an associated order
-        $cartIdsWithOrder = OrderQuery::create()
-            ->select('CartId')
-            ->find()
-            ->toArray();
-
-        $query = CartQuery::create()->filterByCreatedAt($threshold, Criteria::LESS_THAN);
-
-        if (!empty($cartIdsWithOrder)) {
-            $query->filterById($cartIdsWithOrder, Criteria::NOT_IN);
-        }
-
-        // Only target carts with an identified customer
-        $query->filterByCustomerId(null, Criteria::ISNOTNULL);
-
-        return $query->delete();
-    }
-
-    /**
-     * Delete anonymous carts (customer_id IS NULL) older than $days days.
-     * @throws PropelException
-     */
-    private function purgeAnonymousCarts(int $days): int
-    {
-        $threshold = $this->getThresholdDate($days);
-
-        return CartQuery::create()
-            ->filterByCustomerId(null, Criteria::ISNULL)
-            ->filterByCreatedAt($threshold, Criteria::LESS_THAN)
-            ->delete();
-    }
-
-    /**
-     * Delete admin log entries older than $days days.
-     * @throws PropelException
-     */
-    private function purgeAdminLogs(int $days): int
-    {
-        $threshold = $this->getThresholdDate($days);
-
-        return AdminLogQuery::create()
-            ->filterByCreatedAt($threshold, Criteria::LESS_THAN)
-            ->delete();
-    }
-
-    /**
-     * Return a \DateTime set to midnight, $days days ago.
-     */
-    private function getThresholdDate(int $days): \DateTime
-    {
-        return (new \DateTime())->modify(sprintf('-%d days', $days));
     }
 }
