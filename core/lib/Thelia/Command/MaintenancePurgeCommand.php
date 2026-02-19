@@ -12,17 +12,12 @@
 
 namespace Thelia\Command;
 
-use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Core\Event\Maintenance\MaintenancePurgeEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Maintenance\Service\MaintenancePurgeService;
-use Thelia\Model\AdminLogQuery;
-use Thelia\Model\CartQuery;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\OrderQuery;
 
 class MaintenancePurgeCommand extends ContainerAwareCommand
 {
