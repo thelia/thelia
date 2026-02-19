@@ -101,6 +101,7 @@ class Attribute extends AbstractTranslatableResource
         Product::GROUP_ADMIN_READ_SINGLE,
         ProductSaleElements::GROUP_ADMIN_READ_SINGLE,
         AttributeCombination::GROUP_ADMIN_WRITE,
+        Template::GROUP_ADMIN_READ_SINGLE,
     ])]
     public ?int $id = null;
 

@@ -33,6 +33,7 @@ use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\ProductFilter\DepthProductFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\ProductFilter\ProductPriceOrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\TheliaFilter;
+use Thelia\Api\Bridge\Propel\Filter\DateFilter;
 use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\RangeFilter;
@@ -141,6 +142,13 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         'productSaleElements.weight',
         'productSaleElements.quantity',
     ],
+)]
+#[ApiFilter(
+    filterClass: DateFilter::class,
+    properties: [
+        'createdAt' => 'include_null_before_and_after',
+        'updatedAt' => 'include_null_before_and_after',
+    ]
 )]
 class Product extends AbstractTranslatableResource
 {
