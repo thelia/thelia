@@ -17,7 +17,6 @@ class MaintenancePurgeService
     {
         $threshold = $this->getThresholdDate($days);
 
-        // Retrieve IDs of carts that DO have an associated order
         $cartIdsWithOrder = OrderQuery::create()
             ->select('CartId')
             ->find()
@@ -29,7 +28,6 @@ class MaintenancePurgeService
             $query->filterById($cartIdsWithOrder, Criteria::NOT_IN);
         }
 
-        // Only target carts with an identified customer
         $query->filterByCustomerId(null, Criteria::ISNOTNULL);
 
         return $query->delete();
