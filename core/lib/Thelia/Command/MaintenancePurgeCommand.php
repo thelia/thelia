@@ -16,7 +16,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Core\Event\Maintenance\MaintenancePurgeEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Domain\Maintenance\Service\MaintenancePurgeService;
+use Thelia\Domain\Admin\Service\AdminLogPurger;
+use Thelia\Domain\Cart\Service\CartPurger;
 use Thelia\Model\ConfigQuery;
 
 class MaintenancePurgeCommand extends ContainerAwareCommand
@@ -34,7 +35,7 @@ class MaintenancePurgeCommand extends ContainerAwareCommand
             );
     }
 
-    public function __construct(protected MaintenancePurgeService $maintenancePurgeService)
+    public function __construct(protected AdminLogPurger $adminLogPurger, protected CartPurger $cartPurger)
     {
         parent::__construct();
     }
@@ -49,7 +50,7 @@ class MaintenancePurgeCommand extends ContainerAwareCommand
                 60
             );
 
-            $deletedCartNoOrder = $this->maintenancePurgeService->purgeCartsWithoutOrder($cartNoOrderDays);
+            $deletedCartNoOrder = $this->cartPurger->purgeCartsWithoutOrder($cartNoOrderDays);
 
             $output->writeln(sprintf(
                 '<comment>Carts without order (>%d days):</comment> <info>%d deleted</info>',
@@ -62,7 +63,7 @@ class MaintenancePurgeCommand extends ContainerAwareCommand
                 30
             );
 
-            $deletedAnonymousCarts = $this->maintenancePurgeService->purgeAnonymousCarts($cartAnonymousDays);
+            $deletedAnonymousCarts = $this->cartPurger->purgeAnonymousCarts($cartAnonymousDays);
 
             $output->writeln(sprintf(
                 '<comment>Anonymous carts (>%d days):</comment> <info>%d deleted</info>',
@@ -75,7 +76,7 @@ class MaintenancePurgeCommand extends ContainerAwareCommand
                 180
             );
 
-            $deletedAdminLogs = $this->maintenancePurgeService->purgeAdminLogs($adminLogsDays);
+            $deletedAdminLogs = $this->adminLogPurger->purgeAdminLogs($adminLogsDays);
 
             $output->writeln(sprintf(
                 '<comment>Admin logs (>%d days):</comment> <info>%d deleted</info>',
