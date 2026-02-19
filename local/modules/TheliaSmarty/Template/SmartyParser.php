@@ -530,6 +530,12 @@ class SmartyParser extends \Smarty implements ParserInterface
      */
     public function render($realTemplateName, array $parameters = [], $compressOutput = true)
     {
+        if (preg_match('/^[A-Za-z0-9_\-]{2,}:(?!\/\/)/', $realTemplateName)) {
+            throw new ResourceNotFoundException(
+                Translator::getInstance()->trans('Template file %file cannot be found.', ['%file' => $realTemplateName])
+            );
+        }
+
         if (false === $this->templateExists($realTemplateName) || false === $this->checkTemplate($realTemplateName)) {
             throw new ResourceNotFoundException(Translator::getInstance()->trans('Template file %file cannot be found.', ['%file' => $realTemplateName]));
         }
