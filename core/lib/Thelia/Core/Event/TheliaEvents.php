@@ -607,4 +607,10 @@ final class TheliaEvents
     public const ORDER_STATUS_UPDATE_POSITION = 'action.updateOrderStatusPosition';
 
     // -- END ORDER STATUS EVENTS -----------------------------------------------
+
+    // -- MAINTENANCE EVENTS ---------------------------------------------------
+
+    public const MAINTENANCE_PURGE = 'action.maintenance.purge';
+
+    // -- END MAINTENANCE EVENTS -----------------------------------------------
 }
