@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Model\Map\TemplateTableMap;
 
 #[ApiResource(
@@ -49,6 +50,22 @@ class Template extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ, Category::GROUP_ADMIN_READ, Category::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_READ, Product::GROUP_ADMIN_WRITE])]
     public ?int $id = null;
 
+    #[Relation(targetResource: FeatureTemplate::class)]
+    #[Groups([
+        self::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+    ])]
+    public ?array $featureTemplates = null;
+
+    #[Relation(targetResource: AttributeTemplate::class)]
+    #[Groups([
+        self::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+    ])]
+    public ?array $attributeTemplates = null;
+
     #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $createdAt;
 
@@ -66,6 +83,30 @@ class Template extends AbstractTranslatableResource
     public function setId(?int $id): self
     {
         $this->id = $id;
+
+        return $this;
+    }
+
+    public function getFeatureTemplates(): array
+    {
+        return $this->featureTemplates ?? [];
+    }
+
+    public function setFeatureTemplates(?array $featureTemplates): self
+    {
+        $this->featureTemplates = $featureTemplates;
+
+        return $this;
+    }
+
+    public function getAttributeTemplates(): array
+    {
+        return $this->attributeTemplates ?? [];
+    }
+
+    public function setAttributeTemplates(?array $attributeTemplates): self
+    {
+        $this->attributeTemplates = $attributeTemplates;
 
         return $this;
     }
