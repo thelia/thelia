@@ -15,6 +15,8 @@ namespace Thelia\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
@@ -176,7 +178,7 @@ class MailerFactory
         $currentLang = $session?->getLang();
 
         if (null !== $requiredLang = LangQuery::create()->findOneByLocale($locale)) {
-            $session?->setLang($requiredLang);
+            $this->setLanguageSession($session, $requiredLang);
         }
 
         $email = (new Email());
@@ -185,7 +187,7 @@ class MailerFactory
 
         $message->buildMessage($this->parser, $email);
 
-        $session?->setLang($currentLang);
+        $this->setLanguageSession($session, $currentLang);
 
         return $email;
     }
@@ -268,6 +270,19 @@ class MailerFactory
         // Add reply to addresses
         foreach ($replyTo as $address => $name) {
             $email->addReplyTo(new Address($address, $name));
+        }
+    }
+
+    protected function setLanguageSession(?Session $session, Lang $lang): void
+    {
+        if ($session === null) {
+            return;
+        }
+
+        if (Request::$isAdminEnv) {
+            $session->setAdminLang($lang);
+        } else {
+            $session->setLang($lang);
         }
     }
 }
