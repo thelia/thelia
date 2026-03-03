@@ -903,6 +903,7 @@ CREATE TABLE `order_status`
     `color` CHAR(7),
     `position` INTEGER,
     `protected_status` TINYINT(1) DEFAULT 0,
+    `paid_status` TINYINT(1) DEFAULT 0,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
