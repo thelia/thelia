@@ -146,7 +146,7 @@ class Order extends BaseOrder
     public function getTotalAmount(&$tax = 0, $includePostage = true, $includeDiscount = true)
     {
         // To prevent price changes in pre-2.4 orders, use the legacy calculation method
-        if ($this->getId() <= ConfigQuery::read('last_legacy_rounding_order_id', 0)) {
+        if (ConfigQuery::isRoundingModeRoundingOfSums($this->getId())) {
             return $this->getTotalAmountLegacy($tax, $includePostage, $includeDiscount);
         }
 
@@ -242,10 +242,10 @@ class Order extends BaseOrder
     }
 
     /**
-     * This is thge legacy way of computing this order amount with taxes. The tax amount is returned in the $tax parameter.
+     * This is the legacy way of computing this order amount with taxes. The tax amount is returned in the $tax parameter.
      *
      * The order amount is only available once the order is persisted in database.
-     * During invoice process, use all cart methods instead of order methods (the order doest not exists at this moment)
+     * During the invoice process, use all cart methods instead of order methods (the order does not exist at this moment)
      *
      * @param float|int $tax             (output only) returns the tax amount for this order
      * @param bool      $includePostage  if true, the postage cost is included to the total
