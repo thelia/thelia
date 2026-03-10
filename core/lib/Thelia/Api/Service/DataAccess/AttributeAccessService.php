@@ -389,6 +389,7 @@ class AttributeAccessService
             throw new NotFoundHttpException();
         }
         $noGetterData = array_map(static fn ($column) => $data->getVirtualColumn('i18n_'.$column), $columns);
+        $noGetterData = array_combine($columns, $noGetterData);
 
         return $this->dataAccess($objectLabel, $attributeName, $data, $noGetterData);
     }
