@@ -132,46 +132,47 @@ class File extends BaseAction implements EventSubscriberInterface
                 $locale = $lang->getLocale();
                 $srcPath = $originalProductFile->getUploadDir().DS.$originalProductFile->setLocale($locale)->getFile();
 
-                if (file_exists($srcPath)) {
-                    $ext = pathinfo($srcPath, \PATHINFO_EXTENSION);
-                    $fileName = $clonedProduct->getRef().'_'.$lang->getCode().'.'.$ext;
-
-                    // Copy a temporary file of the source file as it will be deleted by IMAGE_SAVE or DOCUMENT_SAVE event
-                    $srcTmp = $srcPath.'.tmp';
-                    copy($srcPath, $srcTmp);
-
-                    // Get file mimeType
-                    $finfo = new \finfo();
-                    $fileMimeType = $finfo->file($srcPath, \FILEINFO_MIME_TYPE);
-
-                    // Get original product image I18n
-                    $originalProductFileI18n = ProductImageI18nQuery::create()
-                        ->filterByLocale($locale)
-                        ->findOneById($originalProductFile->getId());
-
-                    // Clone file's I18n
-                    $clonedProductFile
-                        ->setLocale($originalProductFileI18n->getLocale())
-                        ->setTitle($originalProductFileI18n->getTitle())
-                        ->setDescription($originalProductFileI18n->getDescription())
-                        ->setChapo($originalProductFileI18n->getChapo())
-                        ->setPostscriptum($originalProductFileI18n->getPostscriptum());
-
-                    $clonedProductCopiedFile = new UploadedFile($srcPath, $fileName, $fileMimeType);
-
-                    $clonedProductCreateFileEvent = new FileCreateOrUpdateEvent($clonedProduct->getId());
-                    $clonedProductCreateFileEvent
-                        ->setModel($clonedProductFile)
-                        ->setUploadedFile($clonedProductCopiedFile)
-                        ->setParentName($clonedProductFile->getTitle());
-
-                    $dispatcher->dispatch($clonedProductCreateFileEvent, TheliaEvents::IMAGE_SAVE);
-
-                    // Set a temporary source file as the original one
-                    rename($srcTmp, $srcPath);
-                } else {
+                if (!file_exists($srcPath)) {
                     Tlog::getInstance()->addWarning("Failed to find media file $srcPath");
+                    continue;
                 }
+
+                $ext = pathinfo($srcPath, \PATHINFO_EXTENSION);
+                $fileName = $clonedProduct->getRef().'_'.$lang->getCode().'.'.$ext;
+
+                // Copy a temporary file of the source file as it will be deleted by IMAGE_SAVE or DOCUMENT_SAVE event
+                $srcTmp = $srcPath.'.tmp';
+                copy($srcPath, $srcTmp);
+
+                // Get file mimeType
+                $finfo = new \finfo();
+                $fileMimeType = $finfo->file($srcPath, \FILEINFO_MIME_TYPE);
+
+                // Get original product image I18n
+                $originalProductFileI18n = ProductImageI18nQuery::create()
+                    ->filterByLocale($locale)
+                    ->findOneById($originalProductFile->getId());
+
+                // Clone file's I18n
+                $clonedProductFile
+                    ->setLocale($originalProductFileI18n->getLocale())
+                    ->setTitle($originalProductFileI18n->getTitle())
+                    ->setDescription($originalProductFileI18n->getDescription())
+                    ->setChapo($originalProductFileI18n->getChapo())
+                    ->setPostscriptum($originalProductFileI18n->getPostscriptum());
+
+                $clonedProductCopiedFile = new UploadedFile($srcPath, $fileName, $fileMimeType);
+
+                $clonedProductCreateFileEvent = new FileCreateOrUpdateEvent($clonedProduct->getId());
+                $clonedProductCreateFileEvent
+                    ->setModel($clonedProductFile)
+                    ->setUploadedFile($clonedProductCopiedFile)
+                    ->setParentName($clonedProductFile->getTitle());
+
+                $dispatcher->dispatch($clonedProductCreateFileEvent, TheliaEvents::IMAGE_SAVE);
+
+                // Set a temporary source file as the original one
+                rename($srcTmp, $srcPath);
             }
         }
     }
