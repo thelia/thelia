@@ -142,6 +142,12 @@ class File extends BaseAction implements EventSubscriberInterface
 
                 // Copy a temporary file of the source file as it will be deleted by IMAGE_SAVE or DOCUMENT_SAVE event
                 $srcTmp = $srcPath.'.tmp';
+
+                // is a directory if no file found in the image_i18n table
+                if (is_dir($srcPath)) {
+                    continue;
+                }
+
                 copy($srcPath, $srcTmp);
 
                 // Get file mimeType
