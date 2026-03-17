@@ -86,6 +86,7 @@ use Thelia\Model\Tools\UrlRewritingTrait;
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
+        'id',
         'ref',
         'productCategories.category.id',
         'title' => 'word_start',
