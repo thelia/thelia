@@ -39,7 +39,8 @@ readonly class PropelRemoveProcessor implements ProcessorInterface
 
             foreach ($resourceAddonDefinitions as $addonClass) {
                 if (is_subclass_of($addonClass, ResourceAddonInterface::class)) {
-                    $addon = (new $addonClass());
+                    $addon = (new $addonClass())
+                        ->setContext($context);
                     $addon->doDelete($propelModel, $data);
                 }
             }

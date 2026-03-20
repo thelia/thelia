@@ -22,6 +22,8 @@ use Propel\Runtime\Map\TableMap;
 
 trait ResourceAddonTrait
 {
+    private array $context = [];
+
     public static function getAddonName(): string
     {
         return (new \ReflectionClass(static::class))->getShortName();
@@ -49,6 +51,18 @@ trait ResourceAddonTrait
         foreach ($tableMap->getColumns() as $column) {
             $query->withColumn($column->getFullyQualifiedName(), $addonName.'_'.$column->getName());
         }
+    }
+
+    public function setContext(array $context = []): ResourceAddonInterface
+    {
+        $this->context = $context;
+
+        return $this;
+    }
+
+    public function getContext(): array
+    {
+        return $this->context;
     }
 
     public function buildFromModel(ActiveRecordInterface $activeRecord, PropelResourceInterface $abstractPropelResource): ResourceAddonInterface
