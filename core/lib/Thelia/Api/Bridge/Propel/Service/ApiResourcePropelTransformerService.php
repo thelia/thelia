@@ -128,7 +128,9 @@ readonly class ApiResourcePropelTransformerService
         if ($withAddon) {
             foreach ($this->getResourceAddonDefinitions($resourceClass) as $addonShortName => $addonClass) {
                 if (is_subclass_of($addonClass, ResourceAddonInterface::class)) {
-                    $addon = (new $addonClass())->buildFromModel($propelModel, $apiResource);
+                    $addon = (new $addonClass())
+                        ->setContext($context)
+                        ->buildFromModel($propelModel, $apiResource);
                     $apiResource->setResourceAddon($addonShortName, $addon);
                 }
             }

@@ -30,6 +30,10 @@ interface ResourceAddonInterface
 
     public static function extendQuery(ModelCriteria $query, ?Operation $operation = null, array $context = []): void;
 
+    public function setContext(array $context = []): ResourceAddonInterface;
+
+    public function getContext(): array;
+
     public function buildFromModel(ActiveRecordInterface $activeRecord, PropelResourceInterface $abstractPropelResource): self;
 
     public function buildFromArray(array $data, PropelResourceInterface $abstractPropelResource): self;
