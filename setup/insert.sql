@@ -752,7 +752,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (1422, 'order-status.form.creation', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1423, 'order-status.form.modification', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1424, 'order-status.js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(1425, 'item.edition.images', 2, 0, 0, 1, 1, 1, NOW(), NOW());
+(1425, 'item.edition.images', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1426, 'attribute-edit-form.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW())
+;
 
 -- Insert pdf hooks
 INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
