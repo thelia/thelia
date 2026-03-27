@@ -602,7 +602,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                                 $offset = -$orderProduct->getQuantity();
                             }
 
-                            Tlog::getInstance()->addError('Product stock: '.$productSaleElements->getQuantity().' -> '.($productSaleElements->getQuantity() + $offset));
+                            Tlog::getInstance()->addDebug('Product stock: '.$productSaleElements->getQuantity().' -> '.($productSaleElements->getQuantity() + $offset));
 
                             $productSaleElements
                                 ->setQuantity($productSaleElements->getQuantity() + $offset)
