@@ -16,6 +16,7 @@ namespace Thelia\Api\Service\DataAccess;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\Attribute\AttributeAvProductEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
@@ -120,6 +121,7 @@ class ProductSaleElementsAccessService
             ];
         }
 
-        return $attributes;
+        $event = $this->eventDispatcher->dispatch(new AttributeAvProductEvent($attributes));
+        return $event->getAttributes();
     }
 }
