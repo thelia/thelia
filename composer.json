@@ -57,7 +57,6 @@
         "smarty/smarty": "~4.5.0",
         "commerceguys/addressing": "1.1.*",
         "symfony/cache": "6.4.*",
-        "symfony/polyfill-php73": "^1.0",
         "symfony/lock": "6.4.*",
         "thelia/propel": "dev-thelia-2.5",
         "symfony/mime": "6.4.*",
