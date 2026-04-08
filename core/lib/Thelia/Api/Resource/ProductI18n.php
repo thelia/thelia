@@ -28,6 +28,15 @@ class ProductI18n extends I18n
     #[Groups([Product::GROUP_ADMIN_READ, Product::GROUP_FRONT_READ, Product::GROUP_ADMIN_WRITE])]
     protected ?string $postscriptum;
 
+    #[Groups([Product::GROUP_ADMIN_READ, Product::GROUP_FRONT_READ, Product::GROUP_ADMIN_WRITE])]
+    protected ?string $metaTitle;
+
+    #[Groups([Product::GROUP_ADMIN_READ, Product::GROUP_FRONT_READ, Product::GROUP_ADMIN_WRITE])]
+    protected ?string $metaDescription;
+
+    #[Groups([Product::GROUP_ADMIN_READ, Product::GROUP_FRONT_READ, Product::GROUP_ADMIN_WRITE])]
+    protected ?string $metaKeywords;
+
     public function getTitle(): string
     {
         return $this->title;
@@ -72,6 +81,42 @@ class ProductI18n extends I18n
     public function setPostscriptum(?string $postscriptum): self
     {
         $this->postscriptum = $postscriptum;
+
+        return $this;
+    }
+
+    public function getMetaTitle(): ?string
+    {
+        return $this->metaTitle;
+    }
+
+    public function setMetaTitle(?string $meta_title): self
+    {
+        $this->metaTitle = $meta_title;
+
+        return $this;
+    }
+
+    public function getMetaDescription(): ?string
+    {
+        return $this->metaDescription;
+    }
+
+    public function setMetaDescription(?string $meta_description): self
+    {
+        $this->metaDescription = $meta_description;
+
+        return $this;
+    }
+
+    public function getMetaKeywords(): ?string
+    {
+        return $this->metaKeywords;
+    }
+
+    public function setMetaKeywords(?string $meta_keywords): self
+    {
+        $this->metaKeywords = $meta_keywords;
 
         return $this;
     }
