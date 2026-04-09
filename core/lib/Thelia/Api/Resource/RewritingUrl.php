@@ -52,9 +52,9 @@ class RewritingUrl implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
-    public const GROUP_ADMIN_READ = 'admin:product:read';
-    public const GROUP_ADMIN_READ_SINGLE = 'admin:product:read:single';
-    public const GROUP_ADMIN_WRITE = 'admin:product:write';
+    public const GROUP_ADMIN_READ = 'admin:rewriting_url:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:rewriting_url:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:rewriting_url:write';
 
     #[Groups([self::GROUP_ADMIN_READ])]
     public ?int $id = null;

@@ -13,7 +13,11 @@
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
@@ -21,9 +25,23 @@ use Thelia\Model\Map\ProductAssociatedContentTableMap;
 
 #[ApiResource(
     operations: [
+        new Post(
+            uriTemplate: '/admin/product_associated_contents'
+        ),
         new Get(
             uriTemplate: '/admin/product_associated_contents/{id}',
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]]
+        ),
+        new Put(
+            uriTemplate: '/admin/product_associated_contents/{id}',
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
+        ),
+        new Patch(
+            uriTemplate: '/admin/product_associated_contents/{id}',
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]]
+        ),
+        new Delete(
+            uriTemplate: '/admin/product_associated_contents/{id}'
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
@@ -45,6 +63,7 @@ class ProductAssociatedContent implements PropelResourceInterface
     public const GROUP_ADMIN_READ = 'admin:product_associated_content:read';
     public const GROUP_ADMIN_READ_SINGLE = 'admin:product_associated_content:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:product_associated_content:write';
+    public const GROUP_ADMIN_WRITE_UPDATE = 'admin:product_associated_content:write:update';
 
     public const GROUP_FRONT_READ = 'front:product_associated_content:read';
     public const GROUP_FRONT_READ_SINGLE = 'front:product_associated_content:read:single';

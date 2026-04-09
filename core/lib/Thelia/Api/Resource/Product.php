@@ -127,9 +127,12 @@ class Product extends AbstractTranslatableResource
         [
             self::GROUP_ADMIN_READ,
             self::GROUP_FRONT_READ,
+            Accessory::GROUP_ADMIN_READ,
+            Accessory::GROUP_ADMIN_WRITE,
             ProductCategory::GROUP_ADMIN_READ,
             OrderProduct::GROUP_ADMIN_READ,
             ProductAssociatedContent::GROUP_ADMIN_READ,
+            ProductAssociatedContent::GROUP_ADMIN_WRITE,
             FeatureProduct::GROUP_ADMIN_READ_SINGLE,
             ProductSaleElements::GROUP_ADMIN_READ,
             ProductSaleElements::GROUP_ADMIN_WRITE,

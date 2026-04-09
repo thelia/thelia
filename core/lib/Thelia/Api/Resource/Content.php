@@ -79,6 +79,7 @@ class Content extends AbstractTranslatableResource
         ContentImage::GROUP_FRONT_READ_SINGLE,
         ContentDocument::GROUP_ADMIN_READ_SINGLE,
         ProductAssociatedContent::GROUP_ADMIN_READ,
+        ProductAssociatedContent::GROUP_ADMIN_WRITE,
     ])]
     public ?int $id = null;
 
