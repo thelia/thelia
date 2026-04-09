@@ -91,6 +91,7 @@ class Accessory implements PropelResourceInterface
     public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -102,6 +103,7 @@ class Accessory implements PropelResourceInterface
     public function setProduct(Product $product): self
     {
         $this->product = $product;
+
         return $this;
     }
 
@@ -113,6 +115,7 @@ class Accessory implements PropelResourceInterface
     public function setAccessory(Product $accessory): self
     {
         $this->accessory = $accessory;
+
         return $this;
     }
 
@@ -124,6 +127,7 @@ class Accessory implements PropelResourceInterface
     public function setPosition(?int $position): self
     {
         $this->position = $position;
+
         return $this;
     }
 
