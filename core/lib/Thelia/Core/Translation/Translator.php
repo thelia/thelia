@@ -23,7 +23,7 @@ class Translator extends BaseTranslator
     public const GLOBAL_FALLBACK_DOMAIN = 'global';
     public const GLOBAL_FALLBACK_KEY = '%s.%s';
 
-    protected static self $instance;
+    protected static ?self $instance = null;
 
     public function __construct(protected RequestStack $requestStack)
     {
