@@ -44,6 +44,7 @@ final class ModuleSchemaApplyCommand extends Command
         1060, // Duplicate column name
         1061, // Duplicate key name
         1068, // Multiple primary key defined
+        1826, // Duplicate FK constraint name (MySQL 8.0+)
     ];
 
     protected function configure(): void
@@ -206,9 +207,7 @@ final class ModuleSchemaApplyCommand extends Command
         if (is_dir($updateDir)) {
             $updateFiles = glob($updateDir.'/*.sql');
             if (false !== $updateFiles && [] !== $updateFiles) {
-                usort($updateFiles, static function (string $a, string $b): int {
-                    return version_compare(basename($a, '.sql'), basename($b, '.sql'));
-                });
+                usort($updateFiles, static fn (string $a, string $b): int => version_compare(basename($a, '.sql'), basename($b, '.sql')));
                 $files = array_merge($files, $updateFiles);
             }
         }
@@ -244,7 +243,7 @@ final class ModuleSchemaApplyCommand extends Command
                 try {
                     $pdo->exec($statement);
                 } catch (\PDOException $e) {
-                    if (\in_array((int) $e->errorInfo[1], self::IGNORABLE_MYSQL_CODES, true)) {
+                    if ($this->isIgnorableError($e)) {
                         ++$skipped;
                         continue;
                     }
@@ -267,6 +266,23 @@ final class ModuleSchemaApplyCommand extends Command
         }
 
         return true;
+    }
+
+    private function isIgnorableError(\PDOException $e): bool
+    {
+        $mysqlCode = (int) ($e->errorInfo[1] ?? 0);
+
+        if (\in_array($mysqlCode, self::IGNORABLE_MYSQL_CODES, true)) {
+            return true;
+        }
+
+        // MySQL 1005 "Can't create table" with InnoDB errno 121 = duplicate FK constraint name.
+        // Common when TheliaMain.sql and update/*.sql define overlapping constraints.
+        if (1005 === $mysqlCode && str_contains($e->getMessage(), 'errno: 121')) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

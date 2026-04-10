@@ -34,7 +34,7 @@ class URL
     public const PATH_TO_FILE = true;
     public const WITH_INDEX_PAGE = false;
 
-    protected static self $instance;
+    protected static ?self $instance = null;
 
     /** @var string a cache for the base URL scheme */
     private ?string $baseUrlScheme = null;

@@ -1,0 +1,171 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/*
+ * Prepares a clean test database without booting the Symfony kernel.
+ *
+ * Usage:
+ *   php bin/test-prepare
+ *   ddev exec php bin/test-prepare
+ *
+ * Steps:
+ *   1. Create database (if not exists)
+ *   2. Apply core schema (thelia.sql) + reference data (insert.sql)
+ *   3. Register and activate all available modules
+ *   4. Apply module schemas (TheliaMain.sql + update/*.sql)
+ */
+
+require dirname(__DIR__).'/vendor/autoload.php';
+
+use Symfony\Component\Dotenv\Dotenv;
+use Thelia\Core\Install\Database;
+
+(new Dotenv())->bootEnv(dirname(__DIR__).'/.env');
+
+$host     = $_SERVER['DATABASE_HOST'] ?? '';
+$port     = $_SERVER['DATABASE_PORT'] ?? '3306';
+$user     = $_SERVER['DATABASE_USER'] ?? '';
+$password = $_SERVER['DATABASE_PASSWORD'] ?? '';
+$dbName   = $_SERVER['DATABASE_NAME'] ?? '';
+
+if ('' === $host || '' === $dbName) {
+    fwrite(STDERR, "ERROR: DATABASE_HOST and DATABASE_NAME must be set.\n");
+    exit(1);
+}
+
+if (!preg_match('/^[a-zA-Z0-9_\-]+$/', $dbName)) {
+    fwrite(STDERR, "ERROR: DATABASE_NAME contains invalid characters: {$dbName}\n");
+    exit(1);
+}
+
+// ── Step 1: Create database ──────────────────────────────────────────
+
+echo "Creating database \"{$dbName}\"...\n";
+
+$pdo = new PDO("mysql:host={$host};port={$port}", $user, $password, [
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+]);
+$pdo->exec("CREATE DATABASE IF NOT EXISTS `{$dbName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+
+// ── Step 2: Core schema + reference data ─────────────────────────────
+
+$pdo = new PDO("mysql:host={$host};dbname={$dbName};port={$port}", $user, $password, [
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+]);
+
+$database = new Database($pdo);
+$setupDir = THELIA_SETUP_DIRECTORY;
+
+echo "Applying core schema...\n";
+$database->insertSql(null, [$setupDir.'thelia.sql']);
+$database->insertSql(null, [$setupDir.'insert.sql']);
+
+// ── Step 3: Register modules ─────────────────────────────────────────
+
+echo "Registering modules...\n";
+
+$moduleDirs = array_filter([THELIA_MODULE_DIR, THELIA_LOCAL_MODULE_DIR], 'is_dir');
+$position = 0;
+
+$insertModule = $pdo->prepare(
+    'INSERT INTO `module` (`code`, `version`, `type`, `category`, `activate`, `position`, `full_namespace`, `mandatory`, `hidden`, `created_at`)
+     VALUES (:code, :version, 1, :category, 1, :position, :namespace, :mandatory, :hidden, NOW())
+     ON DUPLICATE KEY UPDATE `activate` = 1, `full_namespace` = VALUES(`full_namespace`), `version` = VALUES(`version`)'
+);
+
+foreach ($moduleDirs as $baseDir) {
+    foreach (new DirectoryIterator($baseDir) as $entry) {
+        if (!$entry->isDir() || $entry->isDot()) {
+            continue;
+        }
+
+        $moduleXml = $entry->getPathname().'/Config/module.xml';
+        if (!file_exists($moduleXml)) {
+            continue;
+        }
+
+        $xml = @simplexml_load_file($moduleXml);
+        if (false === $xml) {
+            continue;
+        }
+
+        $code = $entry->getFilename();
+        $namespace = (string) ($xml->fullnamespace ?? $code.'\\'.$code);
+        $version = (string) ($xml->version ?? '0.0.1');
+        $category = (string) ($xml->type ?? 'classic');
+        $mandatory = (int) ($xml->mandatory ?? 0);
+        $hidden = (int) ($xml->hidden ?? 0);
+
+        $insertModule->execute([
+            'code' => $code,
+            'version' => $version,
+            'category' => $category,
+            'position' => ++$position,
+            'namespace' => $namespace,
+            'mandatory' => $mandatory,
+            'hidden' => $hidden,
+        ]);
+    }
+}
+
+echo "  {$position} module(s) registered\n";
+
+// ── Step 4: Apply module schemas ─────────────────────────────────────
+
+echo "Applying module schemas...\n";
+
+$ignorableCodes = [1050, 1060, 1061, 1068, 1826];
+$moduleCount = 0;
+
+foreach ($moduleDirs as $baseDir) {
+    foreach (new DirectoryIterator($baseDir) as $entry) {
+        if (!$entry->isDir() || $entry->isDot()) {
+            continue;
+        }
+
+        $mainSql = $entry->getPathname().'/Config/TheliaMain.sql';
+        if (!file_exists($mainSql)) {
+            continue;
+        }
+
+        $moduleName = $entry->getFilename();
+        $files = [$mainSql];
+
+        $updateDir = $entry->getPathname().'/Config/update';
+        if (is_dir($updateDir)) {
+            $updates = glob($updateDir.'/*.sql') ?: [];
+            usort($updates, static fn (string $a, string $b) => version_compare(basename($a, '.sql'), basename($b, '.sql')));
+            $files = array_merge($files, $updates);
+        }
+
+        foreach ($files as $file) {
+            $sql = file_get_contents($file);
+            foreach (array_filter(explode(";\n", $sql)) as $statement) {
+                $statement = trim($statement);
+                if ('' === $statement) {
+                    continue;
+                }
+                try {
+                    $pdo->exec($statement);
+                } catch (PDOException $e) {
+                    $code = (int) ($e->errorInfo[1] ?? 0);
+                    if (in_array($code, $ignorableCodes, true)) {
+                        continue;
+                    }
+                    if (1005 === $code && str_contains($e->getMessage(), 'errno: 121')) {
+                        continue;
+                    }
+                    // Non-fatal: log and continue to next statement
+                    fwrite(STDERR, "  WARN {$moduleName}/".basename($file).": {$e->getMessage()}\n");
+                }
+            }
+        }
+
+        ++$moduleCount;
+    }
+}
+
+echo "  {$moduleCount} module schema(s) applied\n";
+echo "\nDone: database \"{$dbName}\" is ready.\n";

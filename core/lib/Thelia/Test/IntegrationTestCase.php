@@ -17,19 +17,19 @@ namespace Thelia\Test;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\TheliaKernel;
 use Thelia\Core\Translation\Translator;
 
 /**
  * Base class for Thelia integration tests.
  *
- * Boots the kernel, initializes Translator, and wraps each test in a
- * transaction rolled back in tearDown() for full isolation.
+ * Boots the kernel, initializes singletons (Translator, URL), pushes a
+ * minimal Request, and wraps each test in a transaction rolled back in
+ * tearDown() for full isolation.
  *
  * Prerequisites (run before the test suite):
- *   bin/console thelia:database:create --env=test
- *   bin/console thelia:database:populate --env=test
- *   bin/console cache:warmup --env=test
+ *   php bin/test-prepare
  *
  * Constraints:
  *   - Auto-increment values are NOT rolled back: never hardcode IDs.
@@ -48,16 +48,30 @@ abstract class IntegrationTestCase extends KernelTestCase
 
         if (!TheliaKernel::isInstalled()) {
             $this->markTestSkipped(
-                'Test database not available. Run: '
-                .'bin/console thelia:database:create --env=test '
-                .'&& bin/console thelia:database:populate --env=test',
+                'Test database not available. Run: php bin/test-prepare',
             );
         }
 
+        $container = static::getContainer();
+
+        // Initialize singletons that business code accesses statically
         try {
             Translator::getInstance();
         } catch (\RuntimeException) {
-            static::getContainer()->get('thelia.translator');
+            $container->get('thelia.translator');
+        }
+
+        try {
+            \Thelia\Tools\URL::getInstance();
+        } catch (\RuntimeException) {
+            $container->get('thelia.url.manager');
+        }
+
+        // Push a minimal Request so that modules accessing the request stack
+        // (e.g. CustomerFamily, OpenApi) don't crash on null.
+        $requestStack = $container->get('request_stack');
+        if (null === $requestStack->getCurrentRequest()) {
+            $requestStack->push(Request::create('http://localhost'));
         }
 
         if ($this->useTransaction) {
@@ -79,7 +93,9 @@ abstract class IntegrationTestCase extends KernelTestCase
 
     /**
      * @template T of object
+     *
      * @param class-string<T> $id
+     *
      * @return T
      */
     protected function getService(string $id): object

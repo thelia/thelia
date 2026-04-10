@@ -41,7 +41,7 @@ use Thelia\Model\TaxRuleQuery;
  */
 final class FixtureFactory
 {
-    private int $counter = 0;
+    private static int $counter = 0;
 
     public function __construct(
         private readonly ConnectionInterface $connection,
@@ -50,7 +50,7 @@ final class FixtureFactory
 
     private function next(): int
     {
-        return ++$this->counter;
+        return ++self::$counter;
     }
 
     // ------------------------------------------------------------------
@@ -170,19 +170,27 @@ final class FixtureFactory
     public function product(
         Category $category,
         TaxRule $taxRule,
+        Currency $currency,
         array $overrides = [],
     ): Product {
         $n = $this->next();
 
         $product = new Product();
-        $product->setRef($overrides['ref'] ?? 'PROD-'.$n);
-        $product->setTaxRuleId($taxRule->getId());
-        $product->setVisible($overrides['visible'] ?? 1);
-        $product->setPosition($overrides['position'] ?? $n);
-        $product->save($this->connection);
+        $product
+            ->setRef($overrides['ref'] ?? 'PROD-'.$n)
+            ->setVisible($overrides['visible'] ?? 1)
+            ->setPosition($overrides['position'] ?? $n);
 
-        $product->addCategory($category);
-        $product->save($this->connection);
+        // Product::create() handles the full creation in a transaction:
+        // persist the product, assign default category, create default PSE + price.
+        $product->create(
+            $category->getId(),
+            $overrides['basePrice'] ?? 10.0,
+            $currency->getId(),
+            $taxRule->getId(),
+            $overrides['baseWeight'] ?? 0.0,
+            $overrides['baseQuantity'] ?? 0,
+        );
 
         return $product;
     }
