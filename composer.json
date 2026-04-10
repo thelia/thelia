@@ -73,6 +73,18 @@
         "unit": [
             "@phpc ./vendor/bin/phpunit --configuration phpunit.xml.dist --testsuit unit"
         ],
+        "test:prepare": [
+            "@phpc bin/console thelia:database:create --env=test",
+            "@phpc bin/console thelia:database:populate --env=test",
+            "@phpc bin/console module:schema:apply --all --env=test",
+            "@phpc bin/console cache:warmup --env=test"
+        ],
+        "test:unit": [
+            "@phpc ./vendor/bin/phpunit --configuration phpunit.xml.dist --testsuite unit"
+        ],
+        "test:integration": [
+            "@phpc ./vendor/bin/phpunit --configuration phpunit.xml.dist --testsuite functional"
+        ],
         "test": [
             "@cache-clear",
             "@demo-database",
