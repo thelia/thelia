@@ -36,8 +36,6 @@ use Thelia\Model\ConfigQuery;
  */
 class ErrorListener
 {
-    private ParserInterface $parser;
-
     /**
      * @throws \Exception
      */
@@ -47,7 +45,15 @@ class ErrorListener
         protected SecurityContext $securityContext,
         protected EventDispatcherInterface $eventDispatcher,
     ) {
-        $this->parser = $this->parserResolver->getParserByCurrentRequest();
+    }
+
+    private function getParser(): ?ParserInterface
+    {
+        try {
+            return $this->parserResolver->getParserByCurrentRequest();
+        } catch (\Exception) {
+            return null;
+        }
     }
 
     /**
@@ -59,19 +65,25 @@ class ErrorListener
         if (!$this->isAuthorizedToSeeErrorDetails($event)) {
             return;
         }
-        $this->parser->assign('status_code', 500);
-        $this->parser->assign('exception_message', $event->getThrowable()->getMessage());
+        $parser = $this->getParser();
 
-        if (!$this->parser->hasTemplateDefinition()) {
-            $this->parser->setTemplateDefinition(
+        if (null === $parser) {
+            return;
+        }
+
+        $parser->assign('status_code', 500);
+        $parser->assign('exception_message', $event->getThrowable()->getMessage());
+
+        if (!$parser->hasTemplateDefinition()) {
+            $parser->setTemplateDefinition(
                 $this->securityContext->hasAdminUser() ?
-                    $this->parser->getTemplateHelper()->getActiveAdminTemplate() :
-                    $this->parser->getTemplateHelper()->getActiveFrontTemplate(),
+                    $parser->getTemplateHelper()->getActiveAdminTemplate() :
+                    $parser->getTemplateHelper()->getActiveFrontTemplate(),
             );
         }
 
         $response = new Response(
-            $this->parser->render(ConfigQuery::getErrorMessagePageName()),
+            $parser->render(ConfigQuery::getErrorMessagePageName()),
             Response::HTTP_INTERNAL_SERVER_ERROR,
         );
 

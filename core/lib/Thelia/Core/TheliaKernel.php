@@ -93,6 +93,8 @@ class TheliaKernel extends Kernel
     protected ConnectionInterface $theliaDatabaseConnection;
     protected bool $propelConnectionAvailable;
 
+    private static ?bool $installed = null;
+
     public function __construct(string $environment, bool $debug)
     {
         $loader = new ClassLoader();
@@ -311,7 +313,11 @@ class TheliaKernel extends Kernel
 
         $cache = require $this->getCacheDir().DS.'check_mysql_configurations.php';
 
-        if (!empty($cache['canUpdate']) && null === $con->query("SET SESSION sql_mode='".implode(',', $cache['modes'])."';")) {
+        if (empty($cache['canUpdate'])) {
+            return;
+        }
+
+        if (null === $con->query("SET SESSION sql_mode='".implode(',', $cache['modes'])."';")) {
             throw new \RuntimeException('Failed to set MySQL global and session sql_mode');
         }
     }
@@ -358,11 +364,15 @@ class TheliaKernel extends Kernel
 
         $this->loadAutoConfigureInterfaces($container);
         $this->loadUtilsXmlConfiguration($container);
-        $this->loadModulesConfiguration($container);
+
+        // Single query for the entire build, shared across sub-methods
+        $activatedModules = \defined('THELIA_INSTALL_MODE') ? [] : ModuleQuery::getActivated();
+
+        $this->loadModulesConfiguration($container, $activatedModules);
 
         $container->set('thelia.propel.schema.locator', $this->propelSchemaLocator);
         $container->set('thelia.propel.init', $this->propelInitService);
-        $this->registerTemplateClassLoader($container);
+        $this->registerTemplateClassLoader($container, $activatedModules);
 
         return $container;
     }
@@ -387,8 +397,13 @@ class TheliaKernel extends Kernel
 
     public static function isInstalled(): bool
     {
-        $confExists = !empty($_SERVER['DATABASE_HOST']);
-        if (!$confExists) {
+        if (self::$installed === true) {
+            return true;
+        }
+
+        // Do not cache a false from missing DATABASE_HOST: the env can be
+        // populated mid-process (thelia:install → publishDatabaseEnvironmentForCurrentProcess).
+        if (empty($_SERVER['DATABASE_HOST'])) {
             return false;
         }
 
@@ -403,12 +418,16 @@ class TheliaKernel extends Kernel
                 $_SERVER['DATABASE_PASSWORD']
             );
             $result = $connection->query('SELECT id FROM `config`');
-            $hasConfigTable = $result && (false !== $result->fetch(\PDO::FETCH_ASSOC));
+            $found = $result && (false !== $result->fetch(\PDO::FETCH_ASSOC));
+
+            if ($found) {
+                self::$installed = true;
+            }
+
+            return $found;
         } catch (\Exception $e) {
             return false;
         }
-
-        return $hasConfigTable;
     }
 
     private function loadAutoConfigureInterfaces(ContainerBuilder $container): void
@@ -488,13 +507,11 @@ class TheliaKernel extends Kernel
     /**
      * @throws \Exception
      */
-    private function loadModulesConfiguration(ContainerBuilder $container): void
+    private function loadModulesConfiguration(ContainerBuilder $container, iterable $modules): void
     {
         if (\defined('THELIA_INSTALL_MODE')) {
             return;
         }
-
-        $modules = ModuleQuery::getActivated();
 
         /** @var Module $module */
         foreach ($modules as $module) {
@@ -560,7 +577,7 @@ class TheliaKernel extends Kernel
     /**
      * @throws \Exception
      */
-    private function registerTemplateClassLoader(ContainerBuilder $container): void
+    private function registerTemplateClassLoader(ContainerBuilder $container, iterable $modules): void
     {
         if (\defined('THELIA_INSTALL_MODE')) {
             return;
@@ -570,7 +587,6 @@ class TheliaKernel extends Kernel
 
         /** @var TemplateHelperInterface $templateHelper */
         $templateHelper = $container->get('thelia.template_helper');
-        $modules = ModuleQuery::getActivated();
 
         /** @var Module $module */
         foreach ($modules as $module) {
@@ -794,50 +810,62 @@ class TheliaKernel extends Kernel
             return;
         }
 
-        $modules = ModuleQuery::getActivated();
+        $templateDirs = $this->getModuleTemplateDirs();
 
         foreach ($parsers as $parser) {
             if (!\is_object($parser)) {
                 continue;
             }
 
-            foreach ($modules as $module) {
-                $this->addTemplatesFromModule($parser, $module);
+            foreach ($templateDirs as [$templateType, $dirName, $dirPath, $moduleCode]) {
+                $parser->addTemplateDirectory($templateType, $dirName, $dirPath, $moduleCode);
             }
         }
     }
 
-    private function addTemplatesFromModule(ParserInterface $parser, Module $module): void
+    /**
+     * @return list<array{int, string, string, string}>
+     */
+    private function getModuleTemplateDirs(): array
     {
-        $stdTpls = TemplateDefinition::getStandardTemplatesSubdirsIterator();
+        $cacheFile = $this->getCacheDir().DS.'module_template_dirs.php';
 
-        foreach ($stdTpls as $templateType => $templateSubdirName) {
-            $templateDirectory = $module->getAbsoluteTemplateDirectoryPath($templateSubdirName);
+        if (file_exists($cacheFile)) {
+            return require $cacheFile;
+        }
 
-            try {
-                $this->addTemplatesFromDirectory($parser, $module, $templateType, $templateDirectory);
-            } catch (\UnexpectedValueException) {
-                // The directory does not exist, ignore it.
+        $dirs = [];
+        $modules = ModuleQuery::getActivated();
+
+        foreach ($modules as $module) {
+            $code = ucfirst($module->getCode());
+            $stdTpls = TemplateDefinition::getStandardTemplatesSubdirsIterator();
+
+            foreach ($stdTpls as $templateType => $templateSubdirName) {
+                $templateDirectory = $module->getAbsoluteTemplateDirectoryPath($templateSubdirName);
+
+                try {
+                    $browser = new \DirectoryIterator($templateDirectory);
+                    foreach ($browser as $item) {
+                        if ($item->isDir() && !$item->isDot()) {
+                            $dirs[] = [$templateType, $item->getFilename(), $item->getPathName(), $code];
+                        }
+                    }
+                } catch (\UnexpectedValueException) {
+                    // Directory does not exist, skip
+                }
             }
         }
-    }
 
-    private function addTemplatesFromDirectory(ParserInterface $parser, Module $module, int $templateType, string $templateDirectory): void
-    {
-        $code = ucfirst($module->getCode());
-        $templateDirBrowser = new \DirectoryIterator($templateDirectory);
+        (new Filesystem())->dumpFile(
+            $cacheFile,
+            '<?php return '.VarExporter::export($dirs).';',
+        );
 
-        $contents[TheliaBundle::class] = ['all' => true];
-
-        foreach ($templateDirBrowser as $templateDirContent) {
-            if ($templateDirContent->isDir() && !$templateDirContent->isDot()) {
-                $parser->addTemplateDirectory(
-                    $templateType,
-                    $templateDirContent->getFilename(),
-                    $templateDirContent->getPathName(),
-                    $code,
-                );
-            }
+        if (\function_exists('opcache_invalidate')) {
+            opcache_invalidate($cacheFile, true);
         }
+
+        return $dirs;
     }
 }

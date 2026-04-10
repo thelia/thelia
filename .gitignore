@@ -115,3 +115,4 @@ templates/pdf/
 ###> liip/imagine-bundle ###
 /public/media/cache/
 ###< liip/imagine-bundle ###
+.grepai/

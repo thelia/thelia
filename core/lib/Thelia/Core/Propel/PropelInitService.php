@@ -133,7 +133,7 @@ class PropelInitService
             'resolver' => ResolverBuilder::class,
         ];
 
-        $configOptions['propel']['paths']['migrationDir'] = $this->getPropelConfigDir();
+        $propelConfig['propel']['paths']['migrationDir'] = $this->getPropelConfigDir();
 
         $propelConfigCache->write(
             Yaml::dump($propelConfig),
@@ -285,11 +285,24 @@ class PropelInitService
      */
     public function init(bool $force = false): bool
     {
-        $flockFactory = new LockFactory(new FlockStore());
+        if (!$force && !TheliaKernel::isInstalled()) {
+            return false;
+        }
 
-        $lock = $flockFactory->createLock('propel-cache-generation');
+        // Fast path: if cache is complete, load runtime without acquiring lock
+        if (!$force && $this->isCacheComplete()) {
+            try {
+                $this->loadPropelRuntime();
 
-        // Acquire a blocking cache generation lock
+                return true;
+            } catch (\Throwable $throwable) {
+                // Cache files exist but are corrupt/inconsistent — fall through to slow path
+                (new Filesystem())->remove($this->getPropelCacheDir());
+            }
+        }
+
+        // Slow path: acquire lock for cache generation
+        $lock = (new LockFactory(new FlockStore()))->createLock('propel-cache-generation');
         $lock->acquire(true);
 
         try {
@@ -301,34 +314,53 @@ class PropelInitService
                 return false;
             }
 
-            $this->buildPropelConfig();
+            // Re-check after lock (another process may have generated the cache)
+            if (!$force && $this->isCacheComplete()) {
+                $this->loadPropelRuntime();
 
-            $this->buildPropelInitFile();
-
-            $buildPropelGlobalSchema = $this->buildPropelGlobalSchema();
-            $buildPropelModels = $this->buildPropelModels();
-
-            require $this->getPropelInitFile();
-
-            $theliaDatabaseConnection = Propel::getConnection('TheliaMain');
-            $theliaDatabaseConnection->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
-
-            if ($this->debug) {
-                Propel::getServiceContainer()->setLogger('defaultLogger', Tlog::getInstance());
-                $theliaDatabaseConnection->useDebug(true);
+                return true;
             }
+
+            $this->buildPropelConfig();
+            $this->buildPropelInitFile();
+            $this->buildPropelGlobalSchema();
+            $this->buildPropelModels();
+            $this->loadPropelRuntime();
         } catch (\Throwable $throwable) {
-            $fs = new Filesystem();
-            $fs->remove(THELIA_CACHE_DIR.$this->environment);
-            $fs->remove($this->getPropelModelDir());
+            // Only remove the Propel cache dir, not the entire environment cache
+            (new Filesystem())->remove($this->getPropelCacheDir());
 
             throw $throwable;
         } finally {
-            // Release cache generation lock
             $lock->release();
         }
 
         return true;
+    }
+
+    private function isCacheComplete(): bool
+    {
+        $hashFile = $this->getPropelCacheDir().'hash';
+        $modelHashFile = $this->getPropelModelDir().'hash';
+
+        return file_exists($this->getPropelInitFile())
+            && is_dir($this->getPropelSchemaDir())
+            && file_exists($hashFile)
+            && file_exists($modelHashFile)
+            && file_get_contents($hashFile) === file_get_contents($modelHashFile);
+    }
+
+    private function loadPropelRuntime(): void
+    {
+        require_once $this->getPropelInitFile();
+
+        $theliaDatabaseConnection = Propel::getConnection('TheliaMain');
+        $theliaDatabaseConnection->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
+
+        if ($this->debug) {
+            Propel::getServiceContainer()->setLogger('defaultLogger', Tlog::getInstance());
+            $theliaDatabaseConnection->useDebug(true);
+        }
     }
 
     public function getPropelCacheDir(): string
