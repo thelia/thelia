@@ -15,8 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Core\Propel;
 
 use Propel\Generator\Command\ConfigConvertCommand;
-use Propel\Generator\Command\MigrationDiffCommand;
-use Propel\Generator\Command\MigrationUpCommand;
 use Propel\Generator\Command\ModelBuildCommand;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
@@ -243,35 +241,6 @@ class PropelInitService
         return true;
     }
 
-    public function migrate(): void
-    {
-        $this->runCommand(
-            new MigrationUpCommand(),
-            [
-                '--config-dir' => $this->getPropelConfigDir(),
-                '--output-dir' => THELIA_CACHE_DIR.'propel-migrations'.DS,
-            ],
-        );
-
-        $this->runCommand(
-            new MigrationDiffCommand(),
-            [
-                '--config-dir' => $this->getPropelConfigDir(),
-                '--schema-dir' => $this->getPropelSchemaDir(),
-                '--skip-removed-table' => true,
-                '--output-dir' => THELIA_CACHE_DIR.'propel-migrations'.DS,
-            ],
-        );
-
-        $this->runCommand(
-            new MigrationUpCommand(),
-            [
-                '--config-dir' => $this->getPropelConfigDir(),
-                '--output-dir' => THELIA_CACHE_DIR.'propel-migrations'.DS,
-            ],
-        );
-    }
-
     /**
      * Initialize the Propel environment and connection.
      *
@@ -365,7 +334,7 @@ class PropelInitService
 
     public function getPropelCacheDir(): string
     {
-        return THELIA_CACHE_DIR.$this->environment.DS.'propel'.DS;
+        return THELIA_ROOT.'var'.DS.'propel'.DS.$this->environment.DS;
     }
 
     public function getPropelConfigDir(): string
@@ -391,11 +360,6 @@ class PropelInitService
     public function getPropelModelDir(): string
     {
         return $this->getPropelCacheDir().'model'.DS;
-    }
-
-    public function getPropelDatabaseDir(): string
-    {
-        return $this->getPropelCacheDir().'database'.DS;
     }
 
     public function getPropelMigrationDir(): string

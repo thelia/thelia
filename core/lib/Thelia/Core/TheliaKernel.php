@@ -99,9 +99,9 @@ class TheliaKernel extends Kernel
     {
         $loader = new ClassLoader();
 
-        $loader->addPsr4('', THELIA_ROOT.\sprintf('var/cache/%s/propel/model', $environment));
+        $loader->addPsr4('', THELIA_ROOT.\sprintf('var/propel/%s/model', $environment));
 
-        $loader->addPsr4('TheliaMain\\', THELIA_ROOT.\sprintf('var/cache/%s/propel/database/TheliaMain', $environment));
+        $loader->addPsr4('TheliaMain\\', THELIA_ROOT.\sprintf('var/propel/%s/database/TheliaMain', $environment));
         $loader->register();
 
         parent::__construct($environment, $debug);
