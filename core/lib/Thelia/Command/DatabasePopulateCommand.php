@@ -48,8 +48,8 @@ final class DatabasePopulateCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $schemaOnly = $input->getOption('schema-only');
-        $seedOnly = $input->getOption('seed-only');
+        $schemaOnly = (bool) $input->getOption('schema-only');
+        $seedOnly = (bool) $input->getOption('seed-only');
 
         if ($schemaOnly && $seedOnly) {
             $io->error('Options --schema-only and --seed-only are mutually exclusive.');
@@ -69,7 +69,7 @@ final class DatabasePopulateCommand extends Command
             return Command::FAILURE;
         }
 
-        $dsn = \sprintf('mysql:host=%s;dbname=%s;port=%s', $host, $port, $dbName);
+        $dsn = \sprintf('mysql:host=%s;dbname=%s;port=%s', $host, $dbName, $port);
 
         try {
             $pdo = new \PDO($dsn, $user, $password, [
@@ -120,7 +120,14 @@ final class DatabasePopulateCommand extends Command
 
         foreach ($files as $file) {
             $io->text(\sprintf('Executing %s...', basename($file)));
-            $database->insertSql(null, [$file]);
+
+            try {
+                $database->insertSql(null, [$file]);
+            } catch (\RuntimeException $e) {
+                $io->error(\sprintf('Failed to execute %s: %s', basename($file), $e->getMessage()));
+
+                return Command::FAILURE;
+            }
         }
 
         $io->success(\sprintf('Database "%s" populated successfully.', $dbName));

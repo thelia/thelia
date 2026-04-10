@@ -58,9 +58,11 @@ final class ModuleSchemaApplyCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+
+        /** @var string|null $module */
         $module = $input->getArgument('module');
-        $all = $input->getOption('all');
-        $dryRun = $input->getOption('dry-run');
+        $all = (bool) $input->getOption('all');
+        $dryRun = (bool) $input->getOption('dry-run');
 
         if (!$module && !$all) {
             $io->error('Provide a module name or use --all.');
@@ -86,7 +88,7 @@ final class ModuleSchemaApplyCommand extends Command
             return Command::FAILURE;
         }
 
-        $dsn = \sprintf('mysql:host=%s;dbname=%s;port=%s', $host, $port, $dbName);
+        $dsn = \sprintf('mysql:host=%s;dbname=%s;port=%s', $host, $dbName, $port);
 
         try {
             $pdo = new \PDO($dsn, $user, $password, [
@@ -283,6 +285,10 @@ final class ModuleSchemaApplyCommand extends Command
         preg_match_all('#DELIMITER (.+?)\n(.+?)DELIMITER ;#s', $sql, $m);
 
         foreach ($m[0] as $k => $v) {
+            if ('|' === $m[1][$k]) {
+                throw new \RuntimeException('Cannot use "|" as SQL delimiter: '.$v);
+            }
+
             $stored = str_replace([';', $m[1][$k]], ['|', ";\n"], $m[2][$k]);
             $sql = str_replace($v, $stored, $sql);
         }

@@ -48,6 +48,12 @@ final class DatabaseCreateCommand extends Command
             return Command::FAILURE;
         }
 
+        if (!preg_match('/^[a-zA-Z0-9_\-]+$/', $dbName)) {
+            $io->error(\sprintf('DATABASE_NAME contains invalid characters: "%s"', $dbName));
+
+            return Command::FAILURE;
+        }
+
         $dsn = \sprintf('mysql:host=%s;port=%s', $host, $port);
 
         try {

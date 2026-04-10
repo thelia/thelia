@@ -14,10 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Test;
 
+use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Admin;
-use Thelia\Model\AdminQuery;
 use Thelia\Model\Category;
-use Thelia\Model\CategoryQuery;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Currency;
@@ -28,7 +27,6 @@ use Thelia\Model\CustomerTitleQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 use Thelia\Model\Product;
-use Thelia\Model\ProductQuery;
 use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleQuery;
 
@@ -38,11 +36,17 @@ use Thelia\Model\TaxRuleQuery;
  * Reference entities (Lang, Currency, etc.) use findOrCreate: they return
  * existing seed data when available, avoiding duplicates.
  *
- * Structural/business entities use an internal counter for unique fields.
+ * All writes go through the injected connection so that
+ * IntegrationTestCase's transaction rollback catches them.
  */
 final class FixtureFactory
 {
     private int $counter = 0;
+
+    public function __construct(
+        private readonly ConnectionInterface $connection,
+    ) {
+    }
 
     private function next(): int
     {
@@ -55,7 +59,7 @@ final class FixtureFactory
 
     public function lang(array $overrides = []): Lang
     {
-        $existing = LangQuery::create()->findOne();
+        $existing = LangQuery::create()->findOne($this->connection);
         if (null !== $existing && [] === $overrides) {
             return $existing;
         }
@@ -73,14 +77,14 @@ final class FixtureFactory
         $lang->setDecimalSeparator($overrides['decimalSeparator'] ?? '.');
         $lang->setThousandsSeparator($overrides['thousandsSeparator'] ?? ',');
         $lang->setDecimals($overrides['decimals'] ?? '2');
-        $lang->save();
+        $lang->save($this->connection);
 
         return $lang;
     }
 
     public function currency(array $overrides = []): Currency
     {
-        $existing = CurrencyQuery::create()->findOne();
+        $existing = CurrencyQuery::create()->findOne($this->connection);
         if (null !== $existing && [] === $overrides) {
             return $existing;
         }
@@ -91,14 +95,14 @@ final class FixtureFactory
         $currency->setRate($overrides['rate'] ?? 1.0);
         $currency->setVisible($overrides['visible'] ?? 1);
         $currency->setByDefault($overrides['byDefault'] ?? 0);
-        $currency->save();
+        $currency->save($this->connection);
 
         return $currency;
     }
 
     public function customerTitle(array $overrides = []): CustomerTitle
     {
-        $existing = CustomerTitleQuery::create()->findOne();
+        $existing = CustomerTitleQuery::create()->findOne($this->connection);
         if (null !== $existing && [] === $overrides) {
             return $existing;
         }
@@ -107,14 +111,14 @@ final class FixtureFactory
         $title = new CustomerTitle();
         $title->setPosition($overrides['position'] ?? (string) $n);
         $title->setByDefault($overrides['byDefault'] ?? 0);
-        $title->save();
+        $title->save($this->connection);
 
         return $title;
     }
 
     public function country(array $overrides = []): Country
     {
-        $existing = CountryQuery::create()->findOne();
+        $existing = CountryQuery::create()->findOne($this->connection);
         if (null !== $existing && [] === $overrides) {
             return $existing;
         }
@@ -125,21 +129,21 @@ final class FixtureFactory
         $country->setIsoalpha3($overrides['isoalpha3'] ?? 'FRA');
         $country->setVisible($overrides['visible'] ?? 1);
         $country->setShopCountry($overrides['shopCountry'] ?? true);
-        $country->save();
+        $country->save($this->connection);
 
         return $country;
     }
 
     public function taxRule(array $overrides = []): TaxRule
     {
-        $existing = TaxRuleQuery::create()->findOne();
+        $existing = TaxRuleQuery::create()->findOne($this->connection);
         if (null !== $existing && [] === $overrides) {
             return $existing;
         }
 
         $taxRule = new TaxRule();
         $taxRule->setIsDefault($overrides['isDefault'] ?? false);
-        $taxRule->save();
+        $taxRule->save($this->connection);
 
         return $taxRule;
     }
@@ -154,7 +158,7 @@ final class FixtureFactory
         $category->setParent($overrides['parent'] ?? 0);
         $category->setVisible($overrides['visible'] ?? 1);
         $category->setPosition($overrides['position'] ?? $this->next());
-        $category->save();
+        $category->save($this->connection);
 
         return $category;
     }
@@ -175,11 +179,10 @@ final class FixtureFactory
         $product->setTaxRuleId($taxRule->getId());
         $product->setVisible($overrides['visible'] ?? 1);
         $product->setPosition($overrides['position'] ?? $n);
-        $product->save();
+        $product->save($this->connection);
 
-        // Assign to default category
         $product->addCategory($category);
-        $product->save();
+        $product->save($this->connection);
 
         return $product;
     }
@@ -191,13 +194,12 @@ final class FixtureFactory
         $n = $this->next();
 
         $customer = new Customer();
-        $customer->createOrUpdateWithoutAddress(
-            titleId: $title->getId(),
-            firstname: $overrides['firstname'] ?? 'John',
-            lastname: $overrides['lastname'] ?? 'Doe',
-            email: $overrides['email'] ?? 'customer-'.$n.'@test.com',
-            plainPassword: $overrides['password'] ?? 'password',
-        );
+        $customer->setTitleId($title->getId());
+        $customer->setFirstname($overrides['firstname'] ?? 'John');
+        $customer->setLastname($overrides['lastname'] ?? 'Doe');
+        $customer->setEmail($overrides['email'] ?? 'customer-'.$n.'@test.com');
+        $customer->setPassword($overrides['password'] ?? 'password');
+        $customer->save($this->connection);
 
         return $customer;
     }
@@ -213,7 +215,7 @@ final class FixtureFactory
         $admin->setPassword($overrides['password'] ?? 'password');
         $admin->setLocale($overrides['locale'] ?? 'en_US');
         $admin->setEmail($overrides['email'] ?? 'admin-'.$n.'@test.com');
-        $admin->save();
+        $admin->save($this->connection);
 
         return $admin;
     }

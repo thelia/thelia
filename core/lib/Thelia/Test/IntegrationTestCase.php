@@ -77,6 +77,11 @@ abstract class IntegrationTestCase extends KernelTestCase
         parent::tearDown();
     }
 
+    /**
+     * @template T of object
+     * @param class-string<T> $id
+     * @return T
+     */
     protected function getService(string $id): object
     {
         return static::getContainer()->get($id);
@@ -85,5 +90,10 @@ abstract class IntegrationTestCase extends KernelTestCase
     protected function getPropelConnection(): ConnectionInterface
     {
         return Propel::getConnection('TheliaMain');
+    }
+
+    protected function createFixtureFactory(): FixtureFactory
+    {
+        return new FixtureFactory($this->getPropelConnection());
     }
 }
