@@ -16,7 +16,6 @@ namespace Thelia\Api\Resource;
 
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Map\TableMap;
-use Symfony\Component\Serializer\Annotation\Ignore;
 
 interface PropelResourceInterface
 {
@@ -32,6 +31,5 @@ interface PropelResourceInterface
 
     public function setResourceAddon(string $addonName, ?ResourceAddonInterface $addon): self;
 
-    #[Ignore]
     public static function getPropelRelatedTableMap(): ?TableMap;
 }

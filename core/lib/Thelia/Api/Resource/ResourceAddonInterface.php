@@ -18,14 +18,11 @@ use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Map\TableMap;
-use Symfony\Component\Serializer\Annotation\Ignore;
 
 interface ResourceAddonInterface
 {
-    #[Ignore]
     public static function getResourceParent(): string;
 
-    #[Ignore]
     public static function getPropelRelatedTableMap(): ?TableMap;
 
     public static function extendQuery(ModelCriteria $query, ?Operation $operation = null, array $context = []): void;

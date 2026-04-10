@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\Ignore;
 use Thelia\Api\State\Provider\PaymentModuleProvider;
 use Thelia\Model\Map\ModuleTableMap;
 
@@ -169,7 +168,6 @@ class PaymentModule extends AbstractTranslatableResource
         return $this;
     }
 
-    #[Ignore]
     public static function getPropelRelatedTableMap(): ?TableMap
     {
         return new ModuleTableMap();
