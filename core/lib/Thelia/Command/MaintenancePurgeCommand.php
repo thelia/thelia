@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -52,7 +54,7 @@ class MaintenancePurgeCommand extends ContainerAwareCommand
 
             $deletedCartNoOrder = $this->cartPurger->purgeCartsWithoutOrder($cartNoOrderDays);
 
-            $output->writeln(sprintf(
+            $output->writeln(\sprintf(
                 '<comment>Carts without order (>%d days):</comment> <info>%d deleted</info>',
                 $cartNoOrderDays,
                 $deletedCartNoOrder
@@ -65,7 +67,7 @@ class MaintenancePurgeCommand extends ContainerAwareCommand
 
             $deletedAnonymousCarts = $this->cartPurger->purgeAnonymousCarts($cartAnonymousDays);
 
-            $output->writeln(sprintf(
+            $output->writeln(\sprintf(
                 '<comment>Anonymous carts (>%d days):</comment> <info>%d deleted</info>',
                 $cartAnonymousDays,
                 $deletedAnonymousCarts
@@ -78,7 +80,7 @@ class MaintenancePurgeCommand extends ContainerAwareCommand
 
             $deletedAdminLogs = $this->adminLogPurger->purgeAdminLogs($adminLogsDays);
 
-            $output->writeln(sprintf(
+            $output->writeln(\sprintf(
                 '<comment>Admin logs (>%d days):</comment> <info>%d deleted</info>',
                 $adminLogsDays,
                 $deletedAdminLogs
@@ -93,7 +95,7 @@ class MaintenancePurgeCommand extends ContainerAwareCommand
 
             $output->writeln('<info>Maintenance purge completed successfully.</info>');
         } catch (\Exception $ex) {
-            $output->writeln(sprintf('<error>Error: %s</error>', $ex->getMessage()));
+            $output->writeln(\sprintf('<error>Error: %s</error>', $ex->getMessage()));
 
             return 1;
         }

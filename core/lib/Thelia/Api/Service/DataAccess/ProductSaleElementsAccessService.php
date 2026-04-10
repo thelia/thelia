@@ -122,6 +122,7 @@ class ProductSaleElementsAccessService
         }
 
         $event = $this->eventDispatcher->dispatch(new AttributeAvProductEvent($attributes));
+
         return $event->getAttributes();
     }
 }

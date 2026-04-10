@@ -30,7 +30,7 @@ interface ResourceAddonInterface
 
     public static function extendQuery(ModelCriteria $query, ?Operation $operation = null, array $context = []): void;
 
-    public function setContext(array $context = []): ResourceAddonInterface;
+    public function setContext(array $context = []): self;
 
     public function getContext(): array;
 

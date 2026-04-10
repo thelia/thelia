@@ -69,7 +69,6 @@ use Thelia\Core\Security\UserProvider\CustomerUserProvider;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Template\Element\LoopInterface;
 use Thelia\Core\Template\Parser\ParserResolver;
-use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
