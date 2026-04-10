@@ -1,0 +1,388 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/*
+ * Installs Thelia without booting the Symfony kernel.
+ *
+ * Phases 1-6 run standalone (PDO + filesystem only).
+ * Phase 7+ delegates to bin/console in subprocesses — by that point the
+ * database is populated, modules are registered, and the kernel can boot.
+ *
+ * Usage:
+ *   php bin/install                                       (reads env vars)
+ *   php bin/install --with-demo --with-admin              (non-interactive)
+ *   ddev exec php bin/install
+ *
+ * Required env vars: DATABASE_HOST, DATABASE_PORT, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD
+ * Optional env vars: ACTIVE_FRONT_TEMPLATE, ACTIVE_ADMIN_TEMPLATE, ACTIVE_PDF_TEMPLATE, ACTIVE_EMAIL_TEMPLATE
+ */
+
+require dirname(__DIR__).'/vendor/autoload.php';
+
+use Symfony\Component\Dotenv\Dotenv;
+use Thelia\Core\Install\CheckPermission;
+use Thelia\Core\Install\Database;
+use Thelia\Tools\TokenProvider;
+
+(new Dotenv())->bootEnv(dirname(__DIR__).'/.env');
+
+$appEnv = $_SERVER['APP_ENV'] ?? 'dev';
+
+$options = getopt('', [
+    'frontoffice_theme:',
+    'backoffice_theme:',
+    'pdf_theme:',
+    'email_theme:',
+    'with-demo',
+    'with-admin',
+    'admin_login:',
+    'admin_password:',
+    'admin_first_name:',
+    'admin_last_name:',
+    'admin_email:',
+]);
+
+$host     = $_SERVER['DATABASE_HOST'] ?? '';
+$port     = $_SERVER['DATABASE_PORT'] ?? '3306';
+$user     = $_SERVER['DATABASE_USER'] ?? '';
+$password = $_SERVER['DATABASE_PASSWORD'] ?? '';
+$dbName   = $_SERVER['DATABASE_NAME'] ?? '';
+
+if ('' === $host || '' === $dbName) {
+    fwrite(STDERR, "ERROR: DATABASE_HOST and DATABASE_NAME must be set.\n");
+    exit(1);
+}
+
+if (!preg_match('/^[a-zA-Z0-9_\-]+$/', $dbName)) {
+    fwrite(STDERR, "ERROR: DATABASE_NAME contains invalid characters: {$dbName}\n");
+    exit(1);
+}
+
+// ── Phase 1: Check permissions ───────────────────────────────────────
+
+echo "Checking permissions...\n";
+
+$check = new CheckPermission(verifyInstall: false);
+if (!$check->exec()) {
+    foreach ($check->getValidationMessages() as $msg) {
+        if (!$msg['status']) {
+            fwrite(STDERR, "  FAIL: {$msg['text']} — {$msg['hint']}\n");
+        }
+    }
+    fwrite(STDERR, "ERROR: Permission checks failed.\n");
+    exit(1);
+}
+
+echo "  OK\n";
+
+// ── Phase 2: Create database ─────────────────────────────────────────
+
+echo "Creating database \"{$dbName}\"...\n";
+
+$pdo = new PDO("mysql:host={$host};port={$port}", $user, $password, [
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+]);
+$pdo->exec("CREATE DATABASE IF NOT EXISTS `{$dbName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+
+// ── Phase 3: Apply core schema + reference data ──────────────────────
+
+echo "Applying core schema...\n";
+
+$pdo = new PDO("mysql:host={$host};dbname={$dbName};port={$port}", $user, $password, [
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+]);
+
+$database = new Database($pdo);
+$setupDir = THELIA_SETUP_DIRECTORY;
+
+$database->insertSql(null, [$setupDir.'thelia.sql']);
+$database->insertSql(null, [$setupDir.'insert.sql']);
+
+// ── Phase 4: Generate form secret ────────────────────────────────────
+
+$secret = TokenProvider::generateToken();
+$stmt = $pdo->prepare("UPDATE `config` SET `value` = ? WHERE `name` = 'form.secret'");
+$stmt->execute([$secret]);
+
+// ── Phase 5: Write env file ──────────────────────────────────────────
+
+$envFile = 'test' === $appEnv ? '.env.test.local' : '.env.local';
+$envFilePath = THELIA_ROOT.$envFile;
+
+echo "Writing {$envFile}...\n";
+
+$envContent = sprintf(
+    "\n###> thelia/database-configuration ###\nDATABASE_HOST=%s\nDATABASE_PORT=%s\nDATABASE_NAME=%s\nDATABASE_USER=%s\nDATABASE_PASSWORD=%s\n###< thelia/database-configuration ###\n",
+    $host,
+    $port,
+    $dbName,
+    $user,
+    $password,
+);
+
+// Remove existing database block if present, then append
+if (file_exists($envFilePath)) {
+    $existing = file_get_contents($envFilePath);
+    $existing = preg_replace('/\n?###> thelia\/database-configuration ###.*?###< thelia\/database-configuration ###\n?/s', '', $existing);
+    file_put_contents($envFilePath, $existing.$envContent);
+} else {
+    file_put_contents($envFilePath, $envContent);
+}
+
+// Publish env vars for the current process (subsequent phases read them)
+$_SERVER['DATABASE_HOST'] = $host;
+$_SERVER['DATABASE_PORT'] = $port;
+$_SERVER['DATABASE_NAME'] = $dbName;
+$_SERVER['DATABASE_USER'] = $user;
+$_SERVER['DATABASE_PASSWORD'] = $password;
+
+// ── Phase 6: Register and activate modules ───────────────────────────
+
+echo "Registering modules...\n";
+
+$moduleDirs = array_filter([THELIA_MODULE_DIR, THELIA_LOCAL_MODULE_DIR], 'is_dir');
+$position = 0;
+$ignorableCodes = [1050, 1060, 1061, 1068, 1826];
+
+$insertModule = $pdo->prepare(
+    'INSERT INTO `module` (`code`, `version`, `type`, `category`, `activate`, `position`, `full_namespace`, `mandatory`, `hidden`, `created_at`)
+     VALUES (:code, :version, 1, :category, 1, :position, :namespace, :mandatory, :hidden, NOW())
+     ON DUPLICATE KEY UPDATE `activate` = 1, `full_namespace` = VALUES(`full_namespace`), `version` = VALUES(`version`)'
+);
+
+foreach ($moduleDirs as $baseDir) {
+    foreach (new DirectoryIterator($baseDir) as $entry) {
+        if (!$entry->isDir() || $entry->isDot()) {
+            continue;
+        }
+
+        $moduleXml = $entry->getPathname().'/Config/module.xml';
+        if (!file_exists($moduleXml)) {
+            continue;
+        }
+
+        $xml = @simplexml_load_file($moduleXml);
+        if (false === $xml) {
+            continue;
+        }
+
+        $code = $entry->getFilename();
+        $namespace = (string) ($xml->fullnamespace ?? $code.'\\'.$code);
+        $version = (string) ($xml->version ?? '0.0.1');
+        $category = (string) ($xml->type ?? 'classic');
+        $mandatory = (int) ($xml->mandatory ?? 0);
+        $hidden = (int) ($xml->hidden ?? 0);
+
+        $insertModule->execute([
+            'code' => $code,
+            'version' => $version,
+            'category' => $category,
+            'position' => ++$position,
+            'namespace' => $namespace,
+            'mandatory' => $mandatory,
+            'hidden' => $hidden,
+        ]);
+
+        // Apply module schema if present
+        $mainSql = $entry->getPathname().'/Config/TheliaMain.sql';
+        if (!file_exists($mainSql)) {
+            continue;
+        }
+
+        $files = [$mainSql];
+        $updateDir = $entry->getPathname().'/Config/update';
+        if (is_dir($updateDir)) {
+            $updates = glob($updateDir.'/*.sql') ?: [];
+            usort($updates, static fn (string $a, string $b) => version_compare(basename($a, '.sql'), basename($b, '.sql')));
+            $files = array_merge($files, $updates);
+        }
+
+        foreach ($files as $file) {
+            $sql = file_get_contents($file);
+            foreach (array_filter(explode(";\n", $sql)) as $statement) {
+                $statement = trim($statement);
+                if ('' === $statement) {
+                    continue;
+                }
+                try {
+                    $pdo->exec($statement);
+                } catch (PDOException $e) {
+                    $code = (int) ($e->errorInfo[1] ?? 0);
+                    if (in_array($code, $ignorableCodes, true)) {
+                        continue;
+                    }
+                    if (1005 === $code && str_contains($e->getMessage(), 'errno: 121')) {
+                        continue;
+                    }
+                    fwrite(STDERR, "  WARN {$entry->getFilename()}/".basename($file).": {$e->getMessage()}\n");
+                }
+            }
+        }
+    }
+}
+
+echo "  {$position} module(s) registered\n";
+
+// ── Phase 7: Apply templates (kernel-dependent, subprocess) ──────────
+
+$themes = [
+    'frontOffice' => $options['frontoffice_theme'] ?? $_SERVER['ACTIVE_FRONT_TEMPLATE'] ?? 'flexy',
+    'backOffice'  => $options['backoffice_theme'] ?? $_SERVER['ACTIVE_ADMIN_TEMPLATE'] ?? 'default',
+    'pdf'         => $options['pdf_theme'] ?? $_SERVER['ACTIVE_PDF_TEMPLATE'] ?? 'default',
+    'email'       => $options['email_theme'] ?? $_SERVER['ACTIVE_EMAIL_TEMPLATE'] ?? 'default',
+];
+
+// Pre-set template config in DB so the kernel doesn't try to load a
+// non-existent "default" template directory during boot.
+$configMap = [
+    'frontOffice' => 'active-front-template',
+    'backOffice'  => 'active-admin-template',
+    'pdf'         => 'active-pdf-template',
+    'email'       => 'active-mail-template',
+];
+
+$updateConfig = $pdo->prepare("UPDATE `config` SET `value` = :value WHERE `name` = :name");
+foreach ($themes as $type => $name) {
+    if (isset($configMap[$type]) && '' !== trim($name)) {
+        $updateConfig->execute(['value' => trim($name), 'name' => $configMap[$type]]);
+    }
+}
+
+// Remove bundles for themes that are NOT selected (same logic as Install::handleThemesBundle)
+removeBundlesForNonSelectedThemes($themes);
+
+echo "Applying templates...\n";
+
+foreach ($themes as $type => $name) {
+    $name = trim($name);
+    if ('' === $name) {
+        continue;
+    }
+
+    echo "  template:set {$type} = {$name}\n";
+    $exitCode = runConsole(['template:set', $type, $name]);
+    if (0 !== $exitCode) {
+        fwrite(STDERR, "  WARNING: template:set returned non-zero for {$type}/{$name}\n");
+    }
+}
+
+// ── Phase 8: Optional demo import ────────────────────────────────────
+
+if (isset($options['with-demo'])) {
+    echo "Importing demo data...\n";
+    runConsole(['thelia:demo:import', '--skip-images']);
+}
+
+// ── Phase 9: Optional admin creation ─────────────────────────────────
+
+if (isset($options['with-admin'])) {
+    $adminArgs = [
+        'admin:create',
+        '--login_name='.($options['admin_login'] ?? 'thelia'),
+        '--first_name='.($options['admin_first_name'] ?? 'Admin'),
+        '--last_name='.($options['admin_last_name'] ?? 'Thelia'),
+        '--email='.($options['admin_email'] ?? 'admin@thelia.net'),
+        '--password='.($options['admin_password'] ?? 'thelia'),
+    ];
+
+    echo "Creating admin user...\n";
+    runConsole($adminArgs);
+}
+
+echo "\nThelia installed successfully.\n";
+
+// ─── Helpers ─────────────────────────────────────────────────────────
+
+function runConsole(array $args): int
+{
+    $cmd = array_merge([PHP_BINARY, THELIA_ROOT.'bin/console'], $args);
+    $process = new Symfony\Component\Process\Process($cmd);
+    $process->setTimeout(null);
+    $process->run(static function (string $type, string $buffer): void {
+        echo $buffer;
+    });
+
+    return $process->getExitCode() ?? 1;
+}
+
+function removeBundlesForNonSelectedThemes(array $selectedThemes): void
+{
+    $bundlesPath = THELIA_ROOT.'config'.DS.'bundles.php';
+    if (!file_exists($bundlesPath)) {
+        return;
+    }
+
+    $helper = new Thelia\Domain\Module\Composer\ComposerHelper();
+    $bundlesToRemove = [];
+
+    $templateTypes = ['frontOffice', 'backOffice', 'pdf', 'email'];
+
+    foreach ($templateTypes as $type) {
+        $selectedName = $selectedThemes[$type] ?? '';
+
+        // Scan all installed templates of this type and find bundles for non-selected ones
+        $templateBaseDir = THELIA_TEMPLATE_DIR.$type.DS;
+        if (!is_dir($templateBaseDir)) {
+            continue;
+        }
+
+        foreach (new DirectoryIterator($templateBaseDir) as $entry) {
+            if (!$entry->isDir() || $entry->isDot()) {
+                continue;
+            }
+
+            if ($entry->getFilename() === $selectedName) {
+                continue;
+            }
+
+            $bundleFqcn = $helper->findFirstClassBundle($entry->getPathname());
+            if (null !== $bundleFqcn) {
+                $bundlesToRemove[$bundleFqcn] = true;
+            }
+        }
+
+        // Also check vendor paths
+        $vendorPath = THELIA_VENDOR_ROOT.$selectedName;
+        // We don't remove selected — only non-selected
+    }
+
+    if ([] === $bundlesToRemove) {
+        return;
+    }
+
+    $bundles = require $bundlesPath;
+    $changed = false;
+
+    foreach (array_keys($bundlesToRemove) as $fqcn) {
+        if (isset($bundles[$fqcn])) {
+            unset($bundles[$fqcn]);
+            $changed = true;
+            echo "  Removed bundle {$fqcn} from bundles.php\n";
+        }
+    }
+
+    if ($changed) {
+        dumpBundlesPhp($bundles, $bundlesPath);
+    }
+}
+
+function dumpBundlesPhp(array $bundles, string $bundlesPath): void
+{
+    ksort($bundles);
+
+    $lines = ["<?php\n", "\nreturn [\n"];
+
+    foreach ($bundles as $fqcn => $envs) {
+        $envParts = [];
+        foreach ($envs as $env => $enabled) {
+            $envParts[] = sprintf("'%s' => %s", $env, $enabled ? 'true' : 'false');
+        }
+        $lines[] = sprintf("    %s::class => [%s],\n", $fqcn, implode(', ', $envParts));
+    }
+
+    $lines[] = "];\n";
+
+    file_put_contents($bundlesPath, implode('', $lines));
+}
