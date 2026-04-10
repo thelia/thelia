@@ -12,6 +12,6 @@
 
 $loader = require 'vendor/autoload.php';
 
-$loader->addPsr4('', THELIA_ROOT.'var/cache/test/propel/model');
-$loader->addPsr4('TheliaMain\\', THELIA_ROOT.'var/cache/test/propel/database/TheliaMain');
+$loader->addPsr4('', THELIA_ROOT.'var/propel/test/model');
+$loader->addPsr4('TheliaMain\\', THELIA_ROOT.'var/propel/test/database/TheliaMain');
 $loader->register();

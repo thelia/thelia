@@ -36,8 +36,10 @@ class Cache extends BaseAction implements EventSubscriberInterface
     /**
      * CacheListener constructor.
      */
-    public function __construct(protected AdapterInterface $adapter)
-    {
+    public function __construct(
+        protected AdapterInterface $adapter,
+        protected string $environment,
+    ) {
     }
 
     public function cacheClear(CacheEvent $event): void
@@ -77,6 +79,11 @@ class Cache extends BaseAction implements EventSubscriberInterface
 
         $fs = new Filesystem();
         $fs->remove($dir);
+
+        // Invalidate the Propel combined schema so it is recombined on next boot
+        // (picks up activated/deactivated modules). Models are only rebuilt if the
+        // recombined schema hash actually changes.
+        $fs->remove(THELIA_ROOT.'var'.DS.'propel'.DS.$this->environment.DS.'schema');
     }
 
     public static function getSubscribedEvents(): array

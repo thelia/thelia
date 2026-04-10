@@ -30,7 +30,7 @@ trait ImplementationClassTrait
     public function getClassFilePath(): string
     {
         return rtrim((new Filesystem())->makePathRelative(
-            THELIA_CACHE_DIR.$_SERVER['APP_ENV'].DS.'propel'.DS.'model'.DS
+            THELIA_ROOT.'var'.DS.'propel'.DS.$_SERVER['APP_ENV'].DS.'model'.DS
             .parent::getClassFilePath(),
             THELIA_ROOT,
         ), '/');
