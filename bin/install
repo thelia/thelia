@@ -87,7 +87,7 @@ try {
 
     echo "Applying core schema...\n";
     $setup->connect();
-    $setup->applyCoreSchemAndSeed();
+    $setup->applyCoreSchemaAndSeed();
     $setup->generateFormSecret();
 } catch (\PDOException $e) {
     fwrite(STDERR, "ERROR: Database operation failed — {$e->getMessage()}\n");

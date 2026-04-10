@@ -38,6 +38,9 @@ final class DatabaseSetup
         private readonly string $user,
         private readonly string $password,
     ) {
+        if (!preg_match('/^[a-zA-Z0-9_\-]+$/', $this->dbName)) {
+            throw new \InvalidArgumentException(\sprintf('Invalid database name: "%s"', $this->dbName));
+        }
     }
 
     public function createDatabase(): void
@@ -58,7 +61,7 @@ final class DatabaseSetup
         );
     }
 
-    public function applyCoreSchemAndSeed(): void
+    public function applyCoreSchemaAndSeed(): void
     {
         $database = new Database($this->pdo);
         $database->insertSql(null, [THELIA_SETUP_DIRECTORY.'thelia.sql']);

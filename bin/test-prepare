@@ -42,7 +42,7 @@ try {
 
     echo "Applying core schema...\n";
     $setup->connect();
-    $setup->applyCoreSchemAndSeed();
+    $setup->applyCoreSchemaAndSeed();
 
     echo "Registering modules...\n";
     $count = $setup->registerAndApplyModules();
