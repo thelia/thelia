@@ -62,6 +62,12 @@ if (!preg_match('/^[a-zA-Z0-9_\-]+$/', $dbName)) {
 
 // ── Phase 1: Check permissions ───────────────────────────────────────
 
+// Ensure required directories exist (may be missing after a fresh clone)
+$fs = new Symfony\Component\Filesystem\Filesystem();
+foreach (['var', 'public', 'local/media', 'local/config'] as $dir) {
+    $fs->mkdir(THELIA_ROOT.$dir);
+}
+
 echo "Checking permissions...\n";
 
 $check = new CheckPermission(verifyInstall: false);
@@ -147,6 +153,42 @@ foreach ($themes as $type => $name) {
 }
 
 removeBundlesForNonSelectedThemes($themes);
+
+// Pre-copy templates from vendor to templates/ so the kernel can boot.
+// template:set does this too, but the kernel crashes if the active
+// template directory doesn't exist yet when it scans for UiComponents.
+$composerHelper = new Thelia\Domain\Module\Composer\ComposerHelper();
+$templateTypeToComposerType = [
+    'frontOffice' => 'thelia-frontoffice-template',
+    'backOffice'  => 'thelia-backoffice-template',
+    'pdf'         => 'thelia-pdf-template',
+    'email'       => 'thelia-email-template',
+];
+
+foreach ($themes as $type => $name) {
+    $name = trim($name);
+    if ('' === $name) {
+        continue;
+    }
+
+    $targetDir = THELIA_TEMPLATE_DIR.$type.DS.$name;
+    if (is_dir($targetDir)) {
+        continue;
+    }
+
+    $packageType = $templateTypeToComposerType[$type] ?? null;
+    if (null === $packageType) {
+        continue;
+    }
+
+    $vendorPath = $composerHelper->findInstalledPackagePathByTypeAndInstallerName($packageType, $name);
+    if (null === $vendorPath || !is_dir($vendorPath)) {
+        continue;
+    }
+
+    echo "  Copying {$name} → templates/{$type}/{$name}\n";
+    (new Symfony\Component\Filesystem\Filesystem())->mirror($vendorPath, $targetDir);
+}
 
 echo "Applying templates...\n";
 
