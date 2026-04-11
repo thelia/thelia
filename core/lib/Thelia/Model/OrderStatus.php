@@ -14,7 +14,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\OrderStatus as BaseOrderStatus;
 use Thelia\Model\Tools\PositionManagementTrait;
-use Thelia\Model\OrderStatusQuery;
 
 class OrderStatus extends BaseOrderStatus
 {
@@ -60,11 +59,12 @@ class OrderStatus extends BaseOrderStatus
             ->filterByProtectedStatus(0)
             ->filterByPaidStatus(1)
             ->find();
-        if (null !== $paidStatusQuery){
+        if (null !== $paidStatusQuery) {
             foreach ($paidStatusQuery as $paidStatus) {
                 $paid_status[] = $paidStatus->getCode();
             }
         }
+
         return $this->hasStatusHelper(
             $exact ?
             self::CODE_PAID :
