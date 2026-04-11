@@ -43,8 +43,22 @@
         <testsuite name="unit">
             <directory>tests/Unit</directory>
         </testsuite>
+        <testsuite name="integration">
+            <directory>tests/Integration</directory>
+        </testsuite>
+        <testsuite name="api">
+            <directory>tests/Api</directory>
+        </testsuite>
+        <testsuite name="http-flexy">
+            <directory>tests/Http/Flexy</directory>
+        </testsuite>
+        <testsuite name="http-backoffice">
+            <directory>tests/Http/BackOffice</directory>
+        </testsuite>
         <testsuite name="functional">
-            <directory>tests/Functional</directory>
+            <directory>tests/Integration</directory>
+            <directory>tests/Api</directory>
+            <directory>tests/Http</directory>
         </testsuite>
     </testsuites>
 

@@ -12,7 +12,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Tests\Functional\Action;
+namespace Thelia\Tests\Integration\Action;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Currency\CurrencyCreateEvent;

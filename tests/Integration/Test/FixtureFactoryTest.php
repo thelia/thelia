@@ -12,7 +12,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Tests\Functional\Test;
+namespace Thelia\Tests\Integration\Test;
 
 use Thelia\Model\AdminQuery;
 use Thelia\Model\ProductSaleElementsQuery;

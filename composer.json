@@ -77,12 +77,24 @@
             "@phpc ./vendor/bin/phpunit --testsuite unit"
         ],
         "test:integration": [
-            "@phpc ./vendor/bin/phpunit --testsuite functional"
+            "@phpc ./vendor/bin/phpunit --testsuite integration"
+        ],
+        "test:api": [
+            "@phpc ./vendor/bin/phpunit --testsuite api"
+        ],
+        "test:http-flexy": [
+            "@phpc ./vendor/bin/phpunit --testsuite http-flexy"
+        ],
+        "test:http-backoffice": [
+            "@phpc ./vendor/bin/phpunit --testsuite http-backoffice"
         ],
         "test": [
             "@test:prepare",
             "@test:unit",
-            "@test:integration"
+            "@test:integration",
+            "@test:api",
+            "@test:http-flexy",
+            "@test:http-backoffice"
         ],
         "ci": [
             "@cs-diff",
@@ -126,7 +138,10 @@
     "autoload-dev": {
         "psr-4": {
             "Thelia\\Tests\\Unit\\": "tests/Unit",
-            "Thelia\\Tests\\Functional\\": "tests/Functional",
+            "Thelia\\Tests\\Integration\\": "tests/Integration",
+            "Thelia\\Tests\\Api\\": "tests/Api",
+            "Thelia\\Tests\\Http\\": "tests/Http",
+            "Thelia\\Tests\\Support\\": "tests/Support",
             "Thelia\\Tests\\": "tests/Legacy"
         }
     },
