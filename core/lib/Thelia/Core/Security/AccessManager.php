@@ -53,9 +53,14 @@ class AccessManager
         return $this->accessGranted[$type];
     }
 
-    public static function getMaxAccessValue(): int|float
+    public static function getMaxAccessValue(): int
     {
-        return 2 ** current(\array_slice(self::$accessPows, -1, 1, true)) - 1;
+        $max = 0;
+        foreach (self::$accessPows as $pow) {
+            $max += 2 ** $pow;
+        }
+
+        return $max;
     }
 
     public function build($accesses): void

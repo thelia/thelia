@@ -37,13 +37,18 @@ final class AccessManagerTest extends TestCase
 
     public function testFullAccessValueGrantsEverything(): void
     {
-        // View(8) + Create(4) + Update(2) + Delete(1) = 15
-        $manager = new AccessManager(15);
+        $manager = new AccessManager(AccessManager::getMaxAccessValue());
 
         self::assertTrue($manager->can(AccessManager::VIEW));
         self::assertTrue($manager->can(AccessManager::CREATE));
         self::assertTrue($manager->can(AccessManager::UPDATE));
         self::assertTrue($manager->can(AccessManager::DELETE));
+    }
+
+    public function testGetMaxAccessValueIsTheSumOfAllBits(): void
+    {
+        // View(8) + Create(4) + Update(2) + Delete(1) = 15
+        self::assertSame(15, AccessManager::getMaxAccessValue());
     }
 
     #[DataProvider('singleBitAccessValues')]
@@ -62,7 +67,7 @@ final class AccessManagerTest extends TestCase
 
     public function testUnknownPermissionAlwaysFails(): void
     {
-        $manager = new AccessManager(15);
+        $manager = new AccessManager(AccessManager::getMaxAccessValue());
 
         self::assertFalse($manager->can('IMAGINARY'));
     }
