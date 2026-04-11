@@ -15,18 +15,33 @@ declare(strict_types=1);
 namespace Thelia\Test;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use Thelia\Domain\Taxation\TaxEngine\TaxType\PricePercentTaxType;
+use Thelia\Model\Address;
 use Thelia\Model\Admin;
+use Thelia\Model\Attribute;
+use Thelia\Model\AttributeAv;
+use Thelia\Model\Brand;
 use Thelia\Model\Category;
+use Thelia\Model\Content;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
+use Thelia\Model\Coupon;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerTitle;
 use Thelia\Model\CustomerTitleQuery;
+use Thelia\Model\Feature;
+use Thelia\Model\FeatureAv;
+use Thelia\Model\Folder;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
+use Thelia\Model\OrderAddress;
+use Thelia\Model\OrderStatus;
 use Thelia\Model\Product;
+use Thelia\Model\ProductSaleElements;
+use Thelia\Model\Profile;
+use Thelia\Model\Tax;
 use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleQuery;
 
@@ -226,5 +241,233 @@ final class FixtureFactory
         $admin->save($this->connection);
 
         return $admin;
+    }
+
+    public function address(
+        Customer $customer,
+        ?Country $country = null,
+        ?CustomerTitle $title = null,
+        array $overrides = [],
+    ): Address {
+        $n = $this->next();
+
+        $address = new Address();
+        $address->setCustomerId($customer->getId());
+        $address->setTitleId(($title ?? $this->customerTitle())->getId());
+        $address->setLabel($overrides['label'] ?? 'Address '.$n);
+        $address->setFirstname($overrides['firstname'] ?? 'John');
+        $address->setLastname($overrides['lastname'] ?? 'Doe');
+        $address->setAddress1($overrides['address1'] ?? $n.' Main Street');
+        $address->setAddress2($overrides['address2'] ?? '');
+        $address->setAddress3($overrides['address3'] ?? '');
+        $address->setZipcode($overrides['zipcode'] ?? '75001');
+        $address->setCity($overrides['city'] ?? 'Paris');
+        $address->setCountryId(($country ?? $this->country())->getId());
+        $address->save($this->connection);
+
+        return $address;
+    }
+
+    public function brand(array $overrides = []): Brand
+    {
+        $n = $this->next();
+
+        $brand = new Brand();
+        $brand->setVisible($overrides['visible'] ?? 1);
+        // Position is auto-assigned in Brand::preInsert() via PositionManagementTrait.
+        $brand->setLocale($overrides['locale'] ?? 'en_US');
+        $brand->setTitle($overrides['title'] ?? 'Brand '.$n);
+        $brand->save($this->connection);
+
+        return $brand;
+    }
+
+    public function folder(int $parent = 0, array $overrides = []): Folder
+    {
+        $n = $this->next();
+
+        $folder = new Folder();
+        $folder->setParent($parent);
+        $folder->setVisible($overrides['visible'] ?? 1);
+        $folder->setLocale($overrides['locale'] ?? 'en_US');
+        $folder->setTitle($overrides['title'] ?? 'Folder '.$n);
+        $folder->save($this->connection);
+
+        return $folder;
+    }
+
+    public function content(Folder $folder, array $overrides = []): Content
+    {
+        $n = $this->next();
+
+        $content = new Content();
+        $content->setVisible($overrides['visible'] ?? 1);
+        $content->setLocale($overrides['locale'] ?? 'en_US');
+        $content->setTitle($overrides['title'] ?? 'Content '.$n);
+        $content->save($this->connection);
+
+        // Content requires a default folder link via ContentFolder.
+        // setDefaultFolder() persists the link itself.
+        $content->setDefaultFolder($folder->getId());
+
+        return $content;
+    }
+
+    public function attribute(array $overrides = []): Attribute
+    {
+        $n = $this->next();
+
+        $attribute = new Attribute();
+        $attribute->setLocale($overrides['locale'] ?? 'en_US');
+        $attribute->setTitle($overrides['title'] ?? 'Attribute '.$n);
+        $attribute->save($this->connection);
+
+        return $attribute;
+    }
+
+    public function attributeAv(Attribute $attribute, array $overrides = []): AttributeAv
+    {
+        $n = $this->next();
+
+        $attributeAv = new AttributeAv();
+        $attributeAv->setAttributeId($attribute->getId());
+        $attributeAv->setLocale($overrides['locale'] ?? 'en_US');
+        $attributeAv->setTitle($overrides['title'] ?? 'Value '.$n);
+        $attributeAv->save($this->connection);
+
+        return $attributeAv;
+    }
+
+    public function feature(array $overrides = []): Feature
+    {
+        $n = $this->next();
+
+        $feature = new Feature();
+        $feature->setVisible($overrides['visible'] ?? 1);
+        $feature->setLocale($overrides['locale'] ?? 'en_US');
+        $feature->setTitle($overrides['title'] ?? 'Feature '.$n);
+        $feature->save($this->connection);
+
+        return $feature;
+    }
+
+    public function featureAv(Feature $feature, array $overrides = []): FeatureAv
+    {
+        $n = $this->next();
+
+        $featureAv = new FeatureAv();
+        $featureAv->setFeatureId($feature->getId());
+        $featureAv->setLocale($overrides['locale'] ?? 'en_US');
+        $featureAv->setTitle($overrides['title'] ?? 'Value '.$n);
+        $featureAv->save($this->connection);
+
+        return $featureAv;
+    }
+
+    public function tax(array $overrides = []): Tax
+    {
+        $tax = new Tax();
+        $tax->setType($overrides['type'] ?? PricePercentTaxType::class);
+        $tax->setRequirements($overrides['requirements'] ?? ['percent' => '20']);
+        $tax->setLocale($overrides['locale'] ?? 'en_US');
+        $tax->setTitle($overrides['title'] ?? 'Test VAT');
+        $tax->save($this->connection);
+
+        return $tax;
+    }
+
+    public function orderStatus(array $overrides = []): OrderStatus
+    {
+        $n = $this->next();
+
+        $status = new OrderStatus();
+        $status->setCode($overrides['code'] ?? 'status-'.$n);
+        $status->setColor($overrides['color'] ?? '#cccccc');
+        $status->setLocale($overrides['locale'] ?? 'en_US');
+        $status->setTitle($overrides['title'] ?? 'Status '.$n);
+        $status->save($this->connection);
+
+        return $status;
+    }
+
+    public function orderAddress(
+        ?Country $country = null,
+        ?CustomerTitle $title = null,
+        array $overrides = [],
+    ): OrderAddress {
+        $n = $this->next();
+
+        $address = new OrderAddress();
+        $address->setCustomerTitleId(($title ?? $this->customerTitle())->getId());
+        $address->setFirstname($overrides['firstname'] ?? 'John');
+        $address->setLastname($overrides['lastname'] ?? 'Doe');
+        $address->setAddress1($overrides['address1'] ?? $n.' Main Street');
+        $address->setAddress2($overrides['address2'] ?? '');
+        $address->setAddress3($overrides['address3'] ?? '');
+        $address->setZipcode($overrides['zipcode'] ?? '75001');
+        $address->setCity($overrides['city'] ?? 'Paris');
+        $address->setCountryId(($country ?? $this->country())->getId());
+        $address->save($this->connection);
+
+        return $address;
+    }
+
+    public function coupon(array $overrides = []): Coupon
+    {
+        $n = $this->next();
+
+        $coupon = new Coupon();
+        $coupon->setCode($overrides['code'] ?? 'COUPON-'.$n);
+        $coupon->setType($overrides['type'] ?? 'thelia.coupon.type.remove_x_amount');
+        $coupon->setSerializedEffects(json_encode($overrides['effects'] ?? ['amount' => 5.0], \JSON_THROW_ON_ERROR));
+        $coupon->setIsEnabled($overrides['isEnabled'] ?? true);
+        $coupon->setExpirationDate($overrides['expirationDate'] ?? new \DateTime('+1 month'));
+        $coupon->setMaxUsage($overrides['maxUsage'] ?? Coupon::UNLIMITED_COUPON_USE);
+        $coupon->setIsCumulative($overrides['isCumulative'] ?? false);
+        $coupon->setIsRemovingPostage($overrides['isRemovingPostage'] ?? false);
+        $coupon->setIsAvailableOnSpecialOffers($overrides['isAvailableOnSpecialOffers'] ?? false);
+        $coupon->setIsUsed($overrides['isUsed'] ?? false);
+        $coupon->setPerCustomerUsageCount($overrides['perCustomerUsageCount'] ?? false);
+        $coupon->setSerializedConditions($overrides['conditions'] ?? '');
+        $coupon->setLocale($overrides['locale'] ?? 'en_US');
+        $coupon->setTitle($overrides['title'] ?? 'Coupon '.$n);
+        $coupon->setShortDescription('');
+        $coupon->setDescription('');
+        $coupon->save($this->connection);
+
+        return $coupon;
+    }
+
+    public function profile(array $overrides = []): Profile
+    {
+        $n = $this->next();
+
+        $profile = new Profile();
+        $profile->setCode($overrides['code'] ?? 'profile-'.$n);
+        $profile->setLocale($overrides['locale'] ?? 'en_US');
+        $profile->setTitle($overrides['title'] ?? 'Profile '.$n);
+        $profile->save($this->connection);
+
+        return $profile;
+    }
+
+    /**
+     * Creates an ADDITIONAL ProductSaleElements row. The default PSE is
+     * already created by Product::create() — never call this for the
+     * default one.
+     */
+    public function productSaleElement(Product $product, array $overrides = []): ProductSaleElements
+    {
+        $n = $this->next();
+
+        $pse = new ProductSaleElements();
+        $pse->setProductId($product->getId());
+        $pse->setRef($overrides['ref'] ?? $product->getRef().'-PSE-'.$n);
+        $pse->setQuantity($overrides['quantity'] ?? 10);
+        $pse->setWeight($overrides['weight'] ?? 0.0);
+        $pse->setIsDefault($overrides['isDefault'] ?? false);
+        $pse->save($this->connection);
+
+        return $pse;
     }
 }
