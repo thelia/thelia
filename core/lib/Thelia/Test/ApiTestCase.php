@@ -47,6 +47,14 @@ abstract class ApiTestCase extends WebIntegrationTestCase
     use LogsInAsCustomer;
 
     /**
+     * Map of short format keys to their Content-Type / Accept MIME type.
+     */
+    private const MIME_TYPES = [
+        'jsonld' => 'application/ld+json',
+        'json' => 'application/json',
+    ];
+
+    /**
      * Sends a JSON request and returns the underlying Response.
      *
      * @param array<string, mixed> $payload encoded as JSON body if non-empty
@@ -59,9 +67,12 @@ abstract class ApiTestCase extends WebIntegrationTestCase
         ?string $token = null,
         string $format = 'jsonld',
     ): Response {
+        $mimeType = self::MIME_TYPES[$format]
+            ?? throw new \InvalidArgumentException(\sprintf('Unsupported format "%s".', $format));
+
         $server = [
-            'CONTENT_TYPE' => 'application/'.$format,
-            'HTTP_ACCEPT' => 'application/'.$format,
+            'CONTENT_TYPE' => $mimeType,
+            'HTTP_ACCEPT' => $mimeType,
         ];
 
         if (null !== $token) {

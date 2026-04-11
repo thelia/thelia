@@ -18,6 +18,8 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\TheliaKernel;
 use Thelia\Core\Translation\Translator;
 
@@ -68,16 +70,28 @@ abstract class IntegrationTestCase extends KernelTestCase
         }
 
         // Push a minimal Request so that modules accessing the request stack
-        // (e.g. CustomerFamily, OpenApi) don't crash on null.
+        // (e.g. CustomerFamily, OpenApi) don't crash on null. The request
+        // also needs a session: several Action listeners (Coupon,
+        // CustomerFamily…) call $request->getSession() unconditionally,
+        // which throws a SessionNotFoundException on a bare Request.
         $requestStack = $container->get('request_stack');
         if (null === $requestStack->getCurrentRequest()) {
-            $requestStack->push(Request::create('http://localhost'));
+            $request = Request::create('http://localhost');
+            $request->setSession(new BaseSession(new MockArraySessionStorage()));
+            $requestStack->push($request);
         }
 
         if ($this->useTransaction) {
             $this->connection = Propel::getConnection('TheliaMain');
             $this->connection->beginTransaction();
         }
+
+        // Propel caches ActiveRecord instances in a per-class in-memory
+        // pool. Across tests this cache survives the transaction rollback
+        // and leaks "ghost" rows that no longer exist on disk, breaking
+        // isolation. Turning pooling off guarantees every read goes back
+        // to the DB, which is exactly what we want under test.
+        Propel::disableInstancePooling();
     }
 
     protected function tearDown(): void

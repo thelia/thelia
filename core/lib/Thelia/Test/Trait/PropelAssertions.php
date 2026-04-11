@@ -20,10 +20,12 @@ use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 /**
  * Assertions helpers for tests that hit the Propel layer.
  *
- * Every read goes through a fresh query — `clearInstancePool()` is called
- * before any lookup so that data modified by an HTTP request handler (which
- * may have mutated Propel's in-memory object pool) is re-read from the
- * database and not from the pool.
+ * Tests that share the same Propel connection (which is the case under
+ * {@see \Thelia\Test\IntegrationTestCase} and its descendants) see model
+ * updates immediately via the instance pool, so there is no need for
+ * manual pool clearing in this trait. If a test really needs a fresh
+ * read (e.g. cross-connection), it should call
+ * `\Thelia\Model\Map\FooTableMap::clearInstancePool()` explicitly.
  */
 trait PropelAssertions
 {
@@ -32,11 +34,8 @@ trait PropelAssertions
      */
     protected static function assertRowExists(string $queryClass, int $id, ?string $message = null): void
     {
-        $queryClass::create()->clearInstancePool();
-        $row = $queryClass::create()->findPk($id);
-
         Assert::assertNotNull(
-            $row,
+            $queryClass::create()->findPk($id),
             $message ?? \sprintf('%s row #%d is missing.', $queryClass, $id),
         );
     }
@@ -46,8 +45,6 @@ trait PropelAssertions
      */
     protected static function assertRowDeleted(string $queryClass, int $id, ?string $message = null): void
     {
-        $queryClass::create()->clearInstancePool();
-
         Assert::assertNull(
             $queryClass::create()->findPk($id),
             $message ?? \sprintf('%s row #%d still exists.', $queryClass, $id),
@@ -59,8 +56,6 @@ trait PropelAssertions
      */
     protected static function assertRowCount(int $expected, string $queryClass): void
     {
-        $queryClass::create()->clearInstancePool();
-
         Assert::assertSame($expected, $queryClass::create()->count());
     }
 
