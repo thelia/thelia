@@ -156,7 +156,7 @@ class Content extends BaseContent implements FileModelParentInterface
     /**
      * @deprecated since 2.3, and will be removed in 2.4, please use ContentFolder::setPosition
      */
-    public function setPosition($v)
+    public function setPosition(?int $v = null): static
     {
         return parent::setPosition($v);
     }
@@ -164,7 +164,7 @@ class Content extends BaseContent implements FileModelParentInterface
     /**
      * @deprecated since 2.3, and will be removed in 2.4, please use ContentFolder::getPosition
      */
-    public function getPosition()
+    public function getPosition(): ?int
     {
         return parent::getPosition();
     }

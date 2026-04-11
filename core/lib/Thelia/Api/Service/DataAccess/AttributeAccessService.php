@@ -278,10 +278,10 @@ class AttributeAccessService
                 $result = $cart->getTotalVAT($taxCountry, $taxState, false, false);
                 break;
             case 'taxed_discount':
-                $result = $cart->getDiscount(true, $taxCountry, $taxState);
+                $result = $cart->getCalculatedDiscount(true, $taxCountry, $taxState);
                 break;
             case 'discount':
-                $result = $cart->getDiscount(false, $taxCountry, $taxState);
+                $result = $cart->getCalculatedDiscount(false, $taxCountry, $taxState);
                 break;
             case 'discount_tax_amount':
                 $result = $cart->getDiscountVAT($taxCountry, $taxState);

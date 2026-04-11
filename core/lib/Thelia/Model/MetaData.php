@@ -37,18 +37,18 @@ class MetaData extends BaseMetaData
     public const COUNTRY_KEY = 'country';
     public const LANG_KEY = 'lang';
 
-    public function getValue()
+    public function getDeserializedValue(): mixed
     {
         $data = parent::getValue();
 
         if (parent::getIsSerialized()) {
-            $data = @unserialize($data);
+            $data = @unserialize((string) $data);
         }
 
         return $data;
     }
 
-    public function setValue($v)
+    public function setSerializableValue(mixed $v): static
     {
         $isSerialized = false;
         $data = $v;
@@ -60,6 +60,6 @@ class MetaData extends BaseMetaData
 
         parent::setIsSerialized($isSerialized);
 
-        return parent::setValue($data);
+        return parent::setValue((string) $data);
     }
 }

@@ -168,7 +168,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
         }
 
         if (null !== $event->getEmail()) {
-            $customer->setEmail($event->getEmail(), $event->getEmailUpdateAllowed());
+            $customer->updateEmail($event->getEmail(), $event->getEmailUpdateAllowed());
         }
 
         if (null !== $event->getPassword()) {

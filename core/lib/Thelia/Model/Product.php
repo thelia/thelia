@@ -219,10 +219,10 @@ class Product extends BaseProduct implements FileModelParentInterface
         $saleElements
             ->setProduct($this)
             ->setRef(false === $ref ? $this->getRef() : $ref)
-            ->setPromo($isPromo)
-            ->setNewness($isNew)
+            ->setPromo((int) $isPromo)
+            ->setNewness((int) $isNew)
             ->setWeight($weight)
-            ->setIsDefault($isDefault)
+            ->setIsDefault((int) $isDefault)
             ->setEanCode($eanCode)
             ->setQuantity($quantity)
             ->save($con);
@@ -232,10 +232,10 @@ class Product extends BaseProduct implements FileModelParentInterface
 
         $productPrice
             ->setProductSaleElements($saleElements)
-            ->setPromoPrice($salePrice)
-            ->setPrice($basePrice)
+            ->setPromoPrice((string) $salePrice)
+            ->setPrice((string) $basePrice)
             ->setCurrencyId($currencyId)
-            ->setFromDefaultCurrency(false)
+            ->setFromDefaultCurrency(0)
             ->save($con);
 
         return $saleElements;
@@ -292,7 +292,7 @@ class Product extends BaseProduct implements FileModelParentInterface
     /**
      * @deprecated since 2.3, and will be removed in 2.4, please use ProductCategory::setPosition
      */
-    public function setPosition($v)
+    public function setPosition(?int $v = null): static
     {
         return parent::setPosition($v);
     }
@@ -300,7 +300,7 @@ class Product extends BaseProduct implements FileModelParentInterface
     /**
      * @deprecated since 2.3, and will be removed in 2.4, please use ProductCategory::getPosition
      */
-    public function getPosition()
+    public function getPosition(): ?int
     {
         return parent::getPosition();
     }

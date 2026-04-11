@@ -44,7 +44,7 @@ class MetaDataQuery extends BaseMetaDataQuery
 
         if (null !== $data) {
             /** @var MetaData $data */
-            $out = $data->getValue();
+            $out = $data->getDeserializedValue();
         } else {
             $out = $default;
         }
@@ -71,7 +71,7 @@ class MetaDataQuery extends BaseMetaDataQuery
             if (null !== $datas) {
                 /** @var MetaData $data */
                 foreach ($datas as $data) {
-                    $out[$data->getMetaKey()] = $data->getValue();
+                    $out[$data->getMetaKey()] = $data->getDeserializedValue();
                 }
             }
         }
@@ -101,7 +101,7 @@ class MetaDataQuery extends BaseMetaDataQuery
             $data->setElementId($elementId);
         }
 
-        $data->setValue($value);
+        $data->setSerializableValue($value);
 
         $data->save();
     }

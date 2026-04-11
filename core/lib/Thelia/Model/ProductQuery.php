@@ -29,7 +29,7 @@ class ProductQuery extends BaseProductQuery
     /**
      * @deprecated since 2.3, and will be removed in 2.4, please use ProductCategoryQuery::filterByPosition
      */
-    public function filterByPosition($position = null, $comparison = null)
+    public function filterByPosition($position = null, ?string $comparison = null)
     {
         return parent::filterByPosition($position, $comparison);
     }

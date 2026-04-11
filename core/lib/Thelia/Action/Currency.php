@@ -43,7 +43,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
     {
         $currency = new CurrencyModel();
 
-        $isDefault = 0 === CurrencyQuery::create()->count();
+        $isDefault = 0 === CurrencyQuery::create()->count() ? 1 : 0;
 
         $currency
 

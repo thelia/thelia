@@ -31,7 +31,7 @@ class FeatureProductQuery extends BaseFeatureProductQuery
      * @deprecated since version 2.4.0, to be removed in 3.0.
      *                      Please use  filterByIsFreeText() instead
      */
-    public function filterByFreeTextValue($freeTextValue = null, $comparison = null)
+    public function filterByFreeTextValue($freeTextValue = null, ?string $comparison = null)
     {
         $bt = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 1);
         Tlog::getInstance()->warning(\sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));

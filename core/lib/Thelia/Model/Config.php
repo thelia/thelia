@@ -29,7 +29,7 @@ class Config extends BaseConfig
         );
     }
 
-    public function getValue()
+    public function getValue(): ?string
     {
         if ($this->isOverriddenInEnv()) {
             return $_ENV[$this->getEnvName()];

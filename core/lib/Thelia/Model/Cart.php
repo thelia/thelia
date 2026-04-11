@@ -169,7 +169,7 @@ class Cart extends BaseCart
         }
 
         if ($withDiscount) {
-            $total -= $this->getDiscount(false, $country, $state);
+            $total -= $this->getCalculatedDiscount(false, $country, $state);
 
             if ($total < 0) {
                 $total = 0;
@@ -198,7 +198,7 @@ class Cart extends BaseCart
      */
     public function getDiscountVAT($taxCountry, $taxState = null): float
     {
-        return $this->getDiscount(true, $taxCountry, $taxState) - $this->getDiscount(false, $taxCountry, $taxState);
+        return $this->getCalculatedDiscount(true, $taxCountry, $taxState) - $this->getCalculatedDiscount(false, $taxCountry, $taxState);
     }
 
     /**
@@ -243,18 +243,18 @@ class Cart extends BaseCart
         return $this->getCartItems()->count() > 0;
     }
 
-    public function setDiscount($discount): self
+    public function setDiscount(?string $discount = null): static
     {
-        return parent::setDiscount(round((float) $discount, 2));
+        return parent::setDiscount($discount !== null ? (string) round((float) $discount, 2) : null);
     }
 
     /**
      * @throws PropelException
      */
-    public function getDiscount(bool $withTaxes = true, ?Country $country = null, ?State $state = null): float
+    public function getCalculatedDiscount(bool $withTaxes = true, ?Country $country = null, ?State $state = null): float
     {
         if ($withTaxes || !$country instanceof Country) {
-            return (float) parent::getDiscount();
+            return (float) $this->getDiscount();
         }
 
         return round(Calculator::getUntaxedCartDiscount($this, $country, $state), 2);

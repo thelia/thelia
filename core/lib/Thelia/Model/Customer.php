@@ -76,11 +76,11 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
             ->setTitleId($titleId)
             ->setFirstname($firstname)
             ->setLastname($lastname)
-            ->setEmail($email, $forceEmailUpdate)
+            ->updateEmail($email, $forceEmailUpdate)
             ->setPassword($plainPassword)
-            ->setReseller($reseller)
+            ->setReseller((int) $reseller)
             ->setSponsor($sponsor)
-            ->setDiscount($discount ?? 0)
+            ->setDiscount((string) ($discount ?? 0))
             ->setRef($ref);
 
         if (null !== $lang) {
@@ -147,13 +147,13 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
             ->setTitleId($titleId)
             ->setFirstname($firstname)
             ->setLastname($lastname)
-            ->setEmail($email, $forceEmailUpdate)
+            ->updateEmail($email, $forceEmailUpdate)
             ->setPassword($plainPassword)
-            ->setReseller($reseller)
+            ->setReseller((int) $reseller)
             ->setSponsor($sponsor)
-            ->setDiscount($discount)
+            ->setDiscount($discount !== null ? (string) $discount : null)
             ->setRef($ref)
-            ->setEnable($enabled);
+            ->setEnable((int) $enabled);
 
         if (ConfigQuery::isCustomerEmailConfirmationEnable()) {
             $validationCode = $this->setConfirmationTokenWithExpiry();
@@ -238,7 +238,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
             ->findOne();
     }
 
-    public function setRef($v)
+    public function setRef(?string $v = null): static
     {
         if (null !== $v) {
             parent::setRef($v);
@@ -256,7 +256,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
      *
      * @throws Exception\InvalidArgumentException
      */
-    public function setPassword($password)
+    public function setPassword(?string $password = null): static
     {
         if ($this->isNew() && (null === $password || '' === trim($password))) {
             throw new InvalidArgumentException('customer password is mandatory on creation');
@@ -290,7 +290,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
             return $this;
         }*/
 
-    public function setEmail($email, $force = false)
+    public function updateEmail(?string $email, bool $force = false): static
     {
         $email = trim((string) $email);
 
@@ -302,7 +302,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
             return $this;
         }
 
-        return parent::setEmail($email);
+        return $this->setEmail($email);
     }
 
     public function getUsername(): string

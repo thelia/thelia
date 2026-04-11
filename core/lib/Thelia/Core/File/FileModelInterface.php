@@ -127,7 +127,7 @@ interface FileModelInterface
     /**
      * Set the current locale.
      *
-     * @param bool $visible true if the file is visible, false otherwise
+     * @param int|null $visible 1 if the file is visible, 0 otherwise
      */
-    public function setVisible(bool $visible);
+    public function setVisible(?int $visible = null): static;
 }

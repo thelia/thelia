@@ -113,7 +113,7 @@ trait UrlRewritingTrait
             $rewritingUrl = new RewritingUrl();
             $rewritingUrl->setUrl($urlFilePart)
                 ->setView($this->getRewrittenUrlViewName())
-                ->setViewId($this->getId())
+                ->setViewId((string) $this->getId())
                 ->setViewLocale($locale)
                 ->save();
         }
@@ -206,7 +206,7 @@ trait UrlRewritingTrait
             /* erase the old one */
             $rewritingUrl = RewritingUrlQuery::create()->findOneByUrl($url);
             $rewritingUrl->setView($this->getRewrittenUrlViewName())
-                ->setViewId($this->getId())
+                ->setViewId((string) $this->getId())
                 ->setViewLocale($locale)
                 ->setRedirected(null)
                 ->save();
@@ -218,7 +218,7 @@ trait UrlRewritingTrait
             $rewritingUrl = new RewritingUrl();
             $rewritingUrl->setUrl($url)
                 ->setView($this->getRewrittenUrlViewName())
-                ->setViewId($this->getId())
+                ->setViewId((string) $this->getId())
                 ->setViewLocale($locale)
                 ->save();
         }

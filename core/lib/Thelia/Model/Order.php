@@ -39,8 +39,6 @@ class Order extends BaseOrder
 
     protected ?Cart $cart = null;
 
-    protected $postage_tax = '0.00';
-
     /**
      * @return $this
      */
@@ -56,7 +54,7 @@ class Order extends BaseOrder
         return $this->disableVersioning;
     }
 
-    public function isVersioningNecessary($con = null): bool
+    public function isVersioningNecessary(?ConnectionInterface $con = null): bool
     {
         if ($this->isVersioningDisable()) {
             return false;
@@ -565,8 +563,8 @@ class Order extends BaseOrder
         return CartQuery::create()->filterById($cartId)->findOne();
     }
 
-    public function setPostageTax($v): static
+    public function setPostageTax(?string $v = null): static
     {
-        return parent::setPostageTax($v ?? 0);
+        return parent::setPostageTax($v ?? '0');
     }
 }

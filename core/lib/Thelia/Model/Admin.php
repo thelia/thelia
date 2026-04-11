@@ -42,7 +42,7 @@ class Admin extends BaseAdmin implements UserInterface, SecurityUserInterface, P
         return true;
     }
 
-    public function setPassword($password)
+    public function setPassword(?string $password = null): static
     {
         if ($this->isNew() && (null === $password || '' === trim($password))) {
             throw new \InvalidArgumentException('customer password is mandatory on creation');
