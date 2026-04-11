@@ -13,6 +13,14 @@
         <server name="SHELL_VERBOSITY" value="-1" />
         <server name="KERNEL_CLASS" value="App\Kernel" />
 
+        <!-- Tolerate indirect deprecations from third-party vendors
+             (api-platform 3.4, twig 3.x…). Upgrading API Platform to
+             4.x is phase 2 of the alpha release roadmap and will
+             lift most of them. Deprecations coming from our own code
+             are still surfaced in the final report (SymfonyTestsListener
+             default). -->
+        <server name="SYMFONY_DEPRECATIONS_HELPER" value="weak" />
+
         <!-- ###+ symfony/framework-bundle ### -->
         <server name="APP_ENV" value="test" force="true" />
         <server name="APP_DEBUG" value="0" force="true" />
