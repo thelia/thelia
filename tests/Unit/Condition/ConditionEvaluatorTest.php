@@ -34,20 +34,20 @@ final class ConditionEvaluatorTest extends TestCase
      */
     public static function comparisons(): iterable
     {
-        yield 'equal true'                 => [10, Operators::EQUAL, 10, true];
-        yield 'equal different types'      => [10, Operators::EQUAL, '10', false];
-        yield 'different true'             => [10, Operators::DIFFERENT, 11, true];
-        yield 'different same value type'  => [10, Operators::DIFFERENT, 10, false];
-        yield 'superior strict true'       => [11, Operators::SUPERIOR, 10, true];
-        yield 'superior strict false'      => [10, Operators::SUPERIOR, 10, false];
-        yield 'superior or equal true'     => [10, Operators::SUPERIOR_OR_EQUAL, 10, true];
-        yield 'inferior strict true'       => [9, Operators::INFERIOR, 10, true];
-        yield 'inferior strict false'      => [10, Operators::INFERIOR, 10, false];
-        yield 'inferior or equal true'     => [10, Operators::INFERIOR_OR_EQUAL, 10, true];
-        yield 'in true'                    => ['b', Operators::IN, ['a', 'b', 'c'], true];
-        yield 'in false'                   => ['z', Operators::IN, ['a', 'b', 'c'], false];
-        yield 'out true'                   => ['z', Operators::OUT, ['a', 'b'], true];
-        yield 'out false'                  => ['a', Operators::OUT, ['a', 'b'], false];
+        yield 'equal true' => [10, Operators::EQUAL, 10, true];
+        yield 'equal different types' => [10, Operators::EQUAL, '10', false];
+        yield 'different true' => [10, Operators::DIFFERENT, 11, true];
+        yield 'different same value type' => [10, Operators::DIFFERENT, 10, false];
+        yield 'superior strict true' => [11, Operators::SUPERIOR, 10, true];
+        yield 'superior strict false' => [10, Operators::SUPERIOR, 10, false];
+        yield 'superior or equal true' => [10, Operators::SUPERIOR_OR_EQUAL, 10, true];
+        yield 'inferior strict true' => [9, Operators::INFERIOR, 10, true];
+        yield 'inferior strict false' => [10, Operators::INFERIOR, 10, false];
+        yield 'inferior or equal true' => [10, Operators::INFERIOR_OR_EQUAL, 10, true];
+        yield 'in true' => ['b', Operators::IN, ['a', 'b', 'c'], true];
+        yield 'in false' => ['z', Operators::IN, ['a', 'b', 'c'], false];
+        yield 'out true' => ['z', Operators::OUT, ['a', 'b'], true];
+        yield 'out false' => ['a', Operators::OUT, ['a', 'b'], false];
     }
 
     public function testVariableOpComparisonThrowsOnUnknownOperator(): void

@@ -143,5 +143,4 @@ final class BrandFacadeTest extends TestCase
 
         $this->facade->updatePosition(3, 2);
     }
-
 }

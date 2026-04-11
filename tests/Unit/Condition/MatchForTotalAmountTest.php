@@ -26,7 +26,6 @@ use Thelia\Model\Currency;
  * into ConfigQuery (Propel). Those failure paths are exercised in the
  * integration layer where the database is available.
  */
-
 final class MatchForTotalAmountTest extends FacadeBackedTestCase
 {
     public function testServiceIdIsStable(): void

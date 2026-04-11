@@ -55,13 +55,13 @@ final class OperatorsTest extends TestCase
      */
     public static function knownOperators(): iterable
     {
-        yield 'inferior'          => [Operators::INFERIOR, 'Less than'];
+        yield 'inferior' => [Operators::INFERIOR, 'Less than'];
         yield 'inferior or equal' => [Operators::INFERIOR_OR_EQUAL, 'Less than or equals'];
-        yield 'equal'             => [Operators::EQUAL, 'Equal to'];
+        yield 'equal' => [Operators::EQUAL, 'Equal to'];
         yield 'superior or equal' => [Operators::SUPERIOR_OR_EQUAL, 'Greater than or equals'];
-        yield 'superior'          => [Operators::SUPERIOR, 'Greater than'];
-        yield 'different'         => [Operators::DIFFERENT, 'Not equal to'];
-        yield 'in'                => [Operators::IN, 'In'];
-        yield 'out'               => [Operators::OUT, 'Not in'];
+        yield 'superior' => [Operators::SUPERIOR, 'Greater than'];
+        yield 'different' => [Operators::DIFFERENT, 'Not equal to'];
+        yield 'in' => [Operators::IN, 'In'];
+        yield 'out' => [Operators::OUT, 'Not in'];
     }
 }

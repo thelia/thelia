@@ -37,15 +37,15 @@ final class VersionTest extends TestCase
      */
     public static function matchingConstraints(): iterable
     {
-        yield 'exact equal'               => ['2.4.0', '2.4.0'];
+        yield 'exact equal' => ['2.4.0', '2.4.0'];
         yield 'exact equal with operator' => ['2.4.0', '=2.4.0'];
-        yield 'greater or equal'          => ['2.4.0', '>=2.4.0'];
-        yield 'greater'                   => ['2.4.1', '>2.4.0'];
-        yield 'lower or equal'            => ['2.4.0', '<=2.4.0'];
-        yield 'lower'                     => ['2.3.9', '<2.4.0'];
-        yield 'tilde major minor'         => ['2.4.2', '~2.4'];
-        yield 'compound range'            => ['2.4.3', '>=2.4.0 <=2.4.5'];
-        yield 'compound tilde with cap'   => ['2.4.2', '~2.4 <=2.4.4'];
+        yield 'greater or equal' => ['2.4.0', '>=2.4.0'];
+        yield 'greater' => ['2.4.1', '>2.4.0'];
+        yield 'lower or equal' => ['2.4.0', '<=2.4.0'];
+        yield 'lower' => ['2.3.9', '<2.4.0'];
+        yield 'tilde major minor' => ['2.4.2', '~2.4'];
+        yield 'compound range' => ['2.4.3', '>=2.4.0 <=2.4.5'];
+        yield 'compound tilde with cap' => ['2.4.2', '~2.4 <=2.4.4'];
     }
 
     /**
@@ -53,11 +53,11 @@ final class VersionTest extends TestCase
      */
     public static function nonMatchingConstraints(): iterable
     {
-        yield 'not equal'            => ['2.4.0', '2.4.1'];
-        yield 'greater fails'        => ['2.4.0', '>2.4.0'];
-        yield 'lower fails'          => ['2.4.0', '<2.4.0'];
-        yield 'above upper bound'    => ['2.5.0', '>=2.4.0 <=2.4.9'];
-        yield 'below lower bound'    => ['2.3.0', '>=2.4.0 <=2.4.9'];
+        yield 'not equal' => ['2.4.0', '2.4.1'];
+        yield 'greater fails' => ['2.4.0', '>2.4.0'];
+        yield 'lower fails' => ['2.4.0', '<2.4.0'];
+        yield 'above upper bound' => ['2.5.0', '>=2.4.0 <=2.4.9'];
+        yield 'below lower bound' => ['2.3.0', '>=2.4.0 <=2.4.9'];
         yield 'tilde major mismatch' => ['3.0.0', '~2.4'];
     }
 

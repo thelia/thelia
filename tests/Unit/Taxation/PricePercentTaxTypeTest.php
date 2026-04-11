@@ -58,10 +58,10 @@ final class PricePercentTaxTypeTest extends TestCase
      */
     public static function percentAndExpectedTax(): iterable
     {
-        yield 'zero percent'   => [0.0, 100.0, 0.0];
-        yield '20 on 100'      => [20.0, 100.0, 20.0];
-        yield '5.5 on 100'     => [5.5, 100.0, 5.5];
-        yield '10 on 49.90'    => [10.0, 49.90, 4.99];
-        yield 'zero untaxed'   => [20.0, 0.0, 0.0];
+        yield 'zero percent' => [0.0, 100.0, 0.0];
+        yield '20 on 100' => [20.0, 100.0, 20.0];
+        yield '5.5 on 100' => [5.5, 100.0, 5.5];
+        yield '10 on 49.90' => [10.0, 49.90, 4.99];
+        yield 'zero untaxed' => [20.0, 0.0, 0.0];
     }
 }

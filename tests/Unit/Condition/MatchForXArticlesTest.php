@@ -23,7 +23,6 @@ use Thelia\Domain\Promotion\Coupon\FacadeInterface;
  * Tlog instance that hits ConfigQuery — see MatchForTotalAmountTest for
  * the full note. Only the happy `isMatching()` path is covered here.
  */
-
 final class MatchForXArticlesTest extends FacadeBackedTestCase
 {
     public function testServiceIdIsStable(): void
