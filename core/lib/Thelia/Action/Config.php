@@ -37,8 +37,8 @@ class Config extends BaseAction implements EventSubscriberInterface
             ->setValue($event->getValue())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
-            ->setHidden($event->getHidden())
-            ->setSecured($event->getSecured())
+            ->setHidden((int) $event->getHidden())
+            ->setSecured((int) $event->getSecured())
             ->save();
 
         $event->setConfig($config);
@@ -66,8 +66,8 @@ class Config extends BaseAction implements EventSubscriberInterface
         $config
             ->setName($event->getEventName())
             ->setValue($event->getValue())
-            ->setHidden($event->getHidden())
-            ->setSecured($event->getSecured())
+            ->setHidden((int) $event->getHidden())
+            ->setSecured((int) $event->getSecured())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
             ->setDescription($event->getDescription())

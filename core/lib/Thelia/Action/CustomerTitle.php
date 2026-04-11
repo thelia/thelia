@@ -19,6 +19,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\CustomerTitle\CustomerTitleEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\CustomerTitle as CustomerTitleModel;
+use Thelia\Model\CustomerTitleQuery;
 use Thelia\Model\Map\CustomerTitleTableMap;
 
 /**
@@ -30,7 +31,15 @@ class CustomerTitle extends BaseAction implements EventSubscriberInterface
 {
     public function create(CustomerTitleEvent $event): void
     {
-        $this->createOrUpdate($event, new CustomerTitleModel());
+        $nextPosition = 1 + (int) CustomerTitleQuery::create()
+            ->orderByPosition(\Propel\Runtime\ActiveQuery\Criteria::DESC)
+            ->select(['position'])
+            ->findOne();
+
+        $this->createOrUpdate(
+            $event,
+            (new CustomerTitleModel())->setPosition((string) $nextPosition),
+        );
     }
 
     public function update(CustomerTitleEvent $event): void

@@ -33,7 +33,7 @@ class AreaRemoveCountryEvent extends AreaAddCountryEvent
 
     public function getStateId(): ?int
     {
-        return (int) $this->stateId;
+        return null === $this->stateId ? null : (int) $this->stateId;
     }
 
     public function setStateId(?int $stateId)

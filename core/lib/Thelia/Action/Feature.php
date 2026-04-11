@@ -38,10 +38,9 @@ class Feature extends BaseAction implements EventSubscriberInterface
         $feature = new FeatureModel();
 
         $feature
-
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
-            ->setVisible(true)
+            ->setVisible(1)
             ->save();
 
         $event->setFeature($feature);

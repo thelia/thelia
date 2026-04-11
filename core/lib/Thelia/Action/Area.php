@@ -51,8 +51,8 @@ class Area extends BaseAction implements EventSubscriberInterface
 
             $countryArea
                 ->setAreaId($area->getId())
-                ->setCountryId($country[0])
-                ->setStateId($country[1])
+                ->setCountryId((int) $country[0])
+                ->setStateId(null !== $country[1] ? (int) $country[1] : null)
                 ->save();
         }
     }

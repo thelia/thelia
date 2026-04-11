@@ -33,12 +33,10 @@ class Message extends BaseAction implements EventSubscriberInterface
         $message = new MessageModel();
 
         $message
-
             ->setName($event->getMessageName())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
-            ->setSecured($event->getSecured())
-
+            ->setSecured((int) $event->getSecured())
             ->save();
 
         $event->setMessage($message);
@@ -54,8 +52,7 @@ class Message extends BaseAction implements EventSubscriberInterface
         }
         $message
             ->setName($event->getMessageName())
-            ->setSecured($event->getSecured())
-
+            ->setSecured((int) $event->getSecured())
             ->setLocale($event->getLocale())
 
             ->setTitle($event->getTitle())

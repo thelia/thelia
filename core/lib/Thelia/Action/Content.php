@@ -120,8 +120,7 @@ class Content extends BaseAction implements EventSubscriberInterface
         }
 
         $content
-
-            ->setVisible(!$content->getVisible())
+            ->setVisible($content->getVisible() ? 0 : 1)
             ->save();
 
         $event->setContent($content);
