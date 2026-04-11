@@ -341,8 +341,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
             $productPrice = $productSaleElements->getPricesByCurrency($currency, $discount);
 
             $cartItem
-                ->setPrice($productPrice->getPrice())
-                ->setPromoPrice($productPrice->getPromoPrice());
+                ->setPrice((string) $productPrice->getPrice())
+                ->setPromoPrice((string) $productPrice->getPromoPrice());
 
             $cartItem->save();
         }
@@ -386,8 +386,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->setProductId($productId)
             ->setProductSaleElementsId($productSaleElements->getId())
             ->setQuantity($quantity)
-            ->setPrice($productPrices->getPrice())
-            ->setPromoPrice($productPrices->getPromoPrice())
+            ->setPrice((string) $productPrices->getPrice())
+            ->setPromoPrice((string) $productPrices->getPromoPrice())
             ->setPromo($productSaleElements->getPromo())
             ->setPriceEndOfLife(time() + ConfigQuery::read('cart.priceEOF', 60 * 60 * 24 * 30))
             ->save();

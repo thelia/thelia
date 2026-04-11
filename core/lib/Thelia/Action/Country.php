@@ -37,11 +37,11 @@ class Country extends BaseAction implements EventSubscriberInterface
         $country = new CountryModel();
 
         $country
-            ->setVisible($event->isVisible())
+            ->setVisible((int) $event->isVisible())
             ->setIsocode($event->getIsocode())
             ->setIsoalpha2($event->getIsoAlpha2())
             ->setIsoalpha3($event->getIsoAlpha3())
-            ->setHasStates($event->isHasStates())
+            ->setHasStates((int) $event->isHasStates())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
             ->save();
@@ -55,12 +55,12 @@ class Country extends BaseAction implements EventSubscriberInterface
             return;
         }
         $country
-            ->setVisible($event->isVisible())
+            ->setVisible((int) $event->isVisible())
             ->setIsocode($event->getIsocode())
             ->setIsoalpha2($event->getIsoAlpha2())
             ->setIsoalpha3($event->getIsoAlpha3())
-            ->setHasStates($event->isHasStates())
-            ->setNeedZipCode($event->isNeedZipCode())
+            ->setHasStates((int) $event->isHasStates())
+            ->setNeedZipCode((int) $event->isNeedZipCode())
             ->setZipCodeFormat($event->getZipCodeFormat())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
@@ -102,7 +102,7 @@ class Country extends BaseAction implements EventSubscriberInterface
         }
 
         $country
-            ->setVisible(!$country->getVisible())
+            ->setVisible($country->getVisible() ? 0 : 1)
             ->save();
 
         $event->setCountry($country);

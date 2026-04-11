@@ -140,11 +140,11 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $totalDiscount = $this->couponManager->getDiscount();
 
             $this->getSession()?->getSessionCart($dispatcher)
-                ->setDiscount($totalDiscount)
+                ->setDiscount((string) $totalDiscount)
                 ->save();
 
             $this->getSession()?->getOrder()
-                ->setDiscount($totalDiscount);
+                ->setDiscount((string) $totalDiscount);
         }
 
         $event->setIsValid($isValid);
@@ -162,11 +162,11 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $discount = $this->couponManager->getDiscount();
 
         $this->getSession()?->getSessionCart($dispatcher)
-            ->setDiscount($discount)
+            ->setDiscount((string) $discount)
             ->save();
 
         $this->getSession()?->getOrder()
-            ->setDiscount($discount);
+            ->setDiscount((string) $discount);
     }
 
     /**

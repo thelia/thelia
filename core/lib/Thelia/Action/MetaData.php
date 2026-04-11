@@ -44,8 +44,10 @@ class MetaData extends BaseAction implements EventSubscriberInterface
                 ->setElementId($event->getElementId());
         }
 
-        $metaData->
-            setValue($event->getValue());
+        // setSerializableValue() normalizes the value (scalar or
+        // array/object) and flips the is_serialized flag accordingly,
+        // which the schema requires as NOT NULL with no default.
+        $metaData->setSerializableValue($event->getValue());
         $metaData->save();
 
         $event->setMetaData($metaData);
