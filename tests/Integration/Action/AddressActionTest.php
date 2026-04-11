@@ -83,7 +83,6 @@ final class AddressActionTest extends ActionIntegrationTestCase
 
         $this->dispatch($event, TheliaEvents::ADDRESS_UPDATE);
 
-        AddressQuery::create()->clearInstancePool();
         $reloaded = AddressQuery::create()->findPk($address->getId());
         self::assertSame('New street', $reloaded->getAddress1());
         self::assertSame('Lyon', $reloaded->getCity());
@@ -100,7 +99,6 @@ final class AddressActionTest extends ActionIntegrationTestCase
 
         $this->dispatch(new AddressEvent($second), TheliaEvents::ADDRESS_DEFAULT);
 
-        AddressQuery::create()->clearInstancePool();
         self::assertSame(1, (int) AddressQuery::create()->findPk($second->getId())->getIsDefault());
         self::assertSame(0, (int) AddressQuery::create()->findPk($first->getId())->getIsDefault());
     }

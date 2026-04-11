@@ -50,7 +50,6 @@ final class SaleActionTest extends ActionIntegrationTestCase
 
         $this->dispatch(new SaleToggleActivityEvent($sale), TheliaEvents::SALE_TOGGLE_ACTIVITY);
 
-        SaleQuery::create()->clearInstancePool();
         self::assertSame(1, (int) SaleQuery::create()->findPk($sale->getId())->getActive());
     }
 
@@ -64,7 +63,6 @@ final class SaleActionTest extends ActionIntegrationTestCase
 
         $this->dispatch(new SaleDeleteEvent($saleId), TheliaEvents::SALE_DELETE);
 
-        SaleQuery::create()->clearInstancePool();
         self::assertNull(SaleQuery::create()->findPk($saleId));
     }
 }

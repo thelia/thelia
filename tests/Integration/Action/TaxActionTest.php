@@ -56,7 +56,6 @@ final class TaxActionTest extends ActionIntegrationTestCase
 
         $this->dispatch($event, TheliaEvents::TAX_UPDATE);
 
-        TaxQuery::create()->clearInstancePool();
         $reloaded = TaxQuery::create()->findPk($tax->getId());
         self::assertSame(['percent' => '15'], $reloaded->getRequirements());
         self::assertSame('Updated', $reloaded->setLocale('en_US')->getTitle());
@@ -72,7 +71,6 @@ final class TaxActionTest extends ActionIntegrationTestCase
 
         $this->dispatch($event, TheliaEvents::TAX_DELETE);
 
-        TaxQuery::create()->clearInstancePool();
         self::assertNull(TaxQuery::create()->findPk($taxId));
     }
 }

@@ -49,7 +49,6 @@ final class TaxRuleActionTest extends ActionIntegrationTestCase
 
         $this->dispatch($event, TheliaEvents::TAX_RULE_UPDATE);
 
-        TaxRuleQuery::create()->clearInstancePool();
         self::assertSame(
             'Reduced',
             TaxRuleQuery::create()->findPk($existing->getId())->setLocale('en_US')->getTitle(),

@@ -51,7 +51,6 @@ final class AttributeActionTest extends ActionIntegrationTestCase
 
         $this->dispatch($event, TheliaEvents::ATTRIBUTE_UPDATE);
 
-        AttributeQuery::create()->clearInstancePool();
         $reloaded = AttributeQuery::create()->findPk($attribute->getId());
         self::assertSame('Updated', $reloaded->setLocale('en_US')->getTitle());
     }
@@ -63,7 +62,6 @@ final class AttributeActionTest extends ActionIntegrationTestCase
 
         $this->dispatch(new AttributeDeleteEvent($attributeId), TheliaEvents::ATTRIBUTE_DELETE);
 
-        AttributeQuery::create()->clearInstancePool();
         self::assertNull(AttributeQuery::create()->findPk($attributeId));
     }
 }

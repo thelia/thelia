@@ -67,7 +67,6 @@ final class MessageActionTest extends ActionIntegrationTestCase
 
         $this->dispatch($event, TheliaEvents::MESSAGE_UPDATE);
 
-        MessageQuery::create()->clearInstancePool();
         $reloaded = MessageQuery::create()->findPk($existing->getId());
         self::assertSame('text body', $reloaded->getTextMessage());
         self::assertStringContainsString('html body', $reloaded->getHtmlMessage());
@@ -87,7 +86,6 @@ final class MessageActionTest extends ActionIntegrationTestCase
 
         $this->dispatch(new MessageDeleteEvent($messageId), TheliaEvents::MESSAGE_DELETE);
 
-        MessageQuery::create()->clearInstancePool();
         self::assertNull(MessageQuery::create()->findPk($messageId));
     }
 }

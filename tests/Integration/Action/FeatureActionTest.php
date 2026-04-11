@@ -50,7 +50,6 @@ final class FeatureActionTest extends ActionIntegrationTestCase
 
         $this->dispatch($event, TheliaEvents::FEATURE_UPDATE);
 
-        FeatureQuery::create()->clearInstancePool();
         self::assertSame('Updated', FeatureQuery::create()->findPk($feature->getId())->setLocale('en_US')->getTitle());
     }
 
@@ -61,7 +60,6 @@ final class FeatureActionTest extends ActionIntegrationTestCase
 
         $this->dispatch(new FeatureDeleteEvent($featureId), TheliaEvents::FEATURE_DELETE);
 
-        FeatureQuery::create()->clearInstancePool();
         self::assertNull(FeatureQuery::create()->findPk($featureId));
     }
 }

@@ -68,7 +68,6 @@ final class TemplateActionTest extends ActionIntegrationTestCase
 
         $this->dispatch(new TemplateDeleteEvent($templateId), TheliaEvents::TEMPLATE_DELETE);
 
-        TemplateQuery::create()->clearInstancePool();
         self::assertNull(TemplateQuery::create()->findPk($templateId));
     }
 }

@@ -56,7 +56,6 @@ final class ProfileActionTest extends ActionIntegrationTestCase
 
         $this->dispatch($event, TheliaEvents::PROFILE_UPDATE);
 
-        ProfileQuery::create()->clearInstancePool();
         self::assertSame(
             'Updated',
             ProfileQuery::create()->findPk($profile->getId())->setLocale('en_US')->getTitle(),
@@ -73,7 +72,6 @@ final class ProfileActionTest extends ActionIntegrationTestCase
 
         $this->dispatch($event, TheliaEvents::PROFILE_DELETE);
 
-        ProfileQuery::create()->clearInstancePool();
         self::assertNull(ProfileQuery::create()->findPk($profileId));
     }
 }

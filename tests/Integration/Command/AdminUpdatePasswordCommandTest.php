@@ -38,7 +38,6 @@ final class AdminUpdatePasswordCommandTest extends IntegrationTestCase
         self::assertSame(0, $tester->getStatusCode());
         self::assertStringContainsString('password updated', $tester->getDisplay());
 
-        AdminQuery::create()->clearInstancePool();
         $reloaded = AdminQuery::create()->findOneByLogin($admin->getLogin());
         self::assertNotNull($reloaded);
         self::assertNotSame($previousHash, $reloaded->getPassword());

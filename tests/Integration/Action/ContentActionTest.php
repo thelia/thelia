@@ -67,7 +67,6 @@ final class ContentActionTest extends ActionIntegrationTestCase
 
         $this->dispatch($event, TheliaEvents::CONTENT_UPDATE);
 
-        ContentQuery::create()->clearInstancePool();
         $reloaded = ContentQuery::create()->findPk($content->getId());
         self::assertSame('New', $reloaded->setLocale('en_US')->getTitle());
         self::assertSame('body', $reloaded->getDescription());
@@ -79,7 +78,6 @@ final class ContentActionTest extends ActionIntegrationTestCase
 
         $this->dispatch(new ContentToggleVisibilityEvent($content), TheliaEvents::CONTENT_TOGGLE_VISIBILITY);
 
-        ContentQuery::create()->clearInstancePool();
         self::assertSame(0, (int) ContentQuery::create()->findPk($content->getId())->getVisible());
     }
 
@@ -91,8 +89,6 @@ final class ContentActionTest extends ActionIntegrationTestCase
 
         $this->dispatch(new ContentDeleteEvent($contentId), TheliaEvents::CONTENT_DELETE);
 
-        ContentQuery::create()->clearInstancePool();
-        ContentFolderQuery::create()->clearInstancePool();
         self::assertNull(ContentQuery::create()->findPk($contentId));
         self::assertSame(0, ContentFolderQuery::create()->filterByContentId($contentId)->count());
     }

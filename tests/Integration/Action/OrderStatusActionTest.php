@@ -55,7 +55,6 @@ final class OrderStatusActionTest extends ActionIntegrationTestCase
 
         $this->dispatch($event, TheliaEvents::ORDER_STATUS_UPDATE);
 
-        OrderStatusQuery::create()->clearInstancePool();
         $reloaded = OrderStatusQuery::create()->findPk($status->getId());
         self::assertSame('#ff0000', $reloaded->getColor());
         self::assertSame('Updated', $reloaded->setLocale('en_US')->getTitle());
@@ -68,7 +67,6 @@ final class OrderStatusActionTest extends ActionIntegrationTestCase
 
         $this->dispatch(new OrderStatusDeleteEvent($statusId), TheliaEvents::ORDER_STATUS_DELETE);
 
-        OrderStatusQuery::create()->clearInstancePool();
         self::assertNull(OrderStatusQuery::create()->findPk($statusId));
     }
 }

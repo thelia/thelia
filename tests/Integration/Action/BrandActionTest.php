@@ -67,7 +67,6 @@ final class BrandActionTest extends ActionIntegrationTestCase
 
         $this->dispatch(new BrandToggleVisibilityEvent($brand), TheliaEvents::BRAND_TOGGLE_VISIBILITY);
 
-        BrandQuery::create()->clearInstancePool();
         self::assertSame(0, (int) BrandQuery::create()->findPk($brand->getId())->getVisible());
     }
 
@@ -81,7 +80,6 @@ final class BrandActionTest extends ActionIntegrationTestCase
 
         $this->dispatch($event, TheliaEvents::BRAND_UPDATE_POSITION);
 
-        BrandQuery::create()->clearInstancePool();
         self::assertSame(3, BrandQuery::create()->findPk($first->getId())->getPosition());
     }
 
@@ -92,7 +90,6 @@ final class BrandActionTest extends ActionIntegrationTestCase
 
         $this->dispatch(new BrandDeleteEvent($brandId), TheliaEvents::BRAND_DELETE);
 
-        BrandQuery::create()->clearInstancePool();
         self::assertNull(BrandQuery::create()->findPk($brandId));
     }
 }

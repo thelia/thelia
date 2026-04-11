@@ -70,7 +70,6 @@ final class ConfigActionTest extends ActionIntegrationTestCase
 
         $this->dispatch($event, TheliaEvents::CONFIG_UPDATE);
 
-        ConfigQuery::create()->clearInstancePool();
         $reloaded = ConfigQuery::create()->findPk($existing->getId());
         self::assertSame('new', $reloaded->getValue());
         self::assertSame('New', $reloaded->setLocale('en_US')->getTitle());
@@ -92,7 +91,6 @@ final class ConfigActionTest extends ActionIntegrationTestCase
 
         $this->dispatch(new ConfigDeleteEvent($configId), TheliaEvents::CONFIG_DELETE);
 
-        ConfigQuery::create()->clearInstancePool();
         self::assertNull(ConfigQuery::create()->findPk($configId));
     }
 }

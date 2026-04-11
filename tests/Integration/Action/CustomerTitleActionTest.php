@@ -41,11 +41,16 @@ final class CustomerTitleActionTest extends ActionIntegrationTestCase
 
     public function testUpdateChangesLongAndShortLabels(): void
     {
-        $existing = (new CustomerTitle())->setLocale('en_US')->setLong('Old')->setShort('O');
+        $existing = (new CustomerTitle())
+            ->setPosition('99')
+            ->setLocale('en_US')
+            ->setLong('Old')
+            ->setShort('O');
         $existing->save();
 
-        $event = new CustomerTitleEvent($existing);
+        $event = new CustomerTitleEvent();
         $event
+            ->setCustomerTitle($existing)
             ->setLocale('en_US')
             ->setLong('Updated')
             ->setShort('U')
@@ -53,7 +58,6 @@ final class CustomerTitleActionTest extends ActionIntegrationTestCase
 
         $this->dispatch($event, TheliaEvents::CUSTOMER_TITLE_UPDATE);
 
-        CustomerTitleQuery::create()->clearInstancePool();
         $reloaded = CustomerTitleQuery::create()->findPk($existing->getId());
         self::assertSame('Updated', $reloaded->setLocale('en_US')->getLong());
         self::assertSame('U', $reloaded->setLocale('en_US')->getShort());

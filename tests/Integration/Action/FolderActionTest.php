@@ -65,7 +65,6 @@ final class FolderActionTest extends ActionIntegrationTestCase
 
         $this->dispatch($event, TheliaEvents::FOLDER_UPDATE);
 
-        FolderQuery::create()->clearInstancePool();
         $reloaded = FolderQuery::create()->findPk($folder->getId());
         self::assertSame('New', $reloaded->setLocale('en_US')->getTitle());
         self::assertSame('description', $reloaded->getDescription());
@@ -78,7 +77,6 @@ final class FolderActionTest extends ActionIntegrationTestCase
         $event = new FolderToggleVisibilityEvent($folder);
         $this->dispatch($event, TheliaEvents::FOLDER_TOGGLE_VISIBILITY);
 
-        FolderQuery::create()->clearInstancePool();
         self::assertSame(0, (int) FolderQuery::create()->findPk($folder->getId())->getVisible());
     }
 
@@ -89,7 +87,6 @@ final class FolderActionTest extends ActionIntegrationTestCase
 
         $this->dispatch(new FolderDeleteEvent($folderId), TheliaEvents::FOLDER_DELETE);
 
-        FolderQuery::create()->clearInstancePool();
         self::assertNull(FolderQuery::create()->findPk($folderId));
     }
 }

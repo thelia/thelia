@@ -31,7 +31,6 @@ final class AreaActionTest extends ActionIntegrationTestCase
 
         $this->dispatch(new AreaEvent($area), TheliaEvents::AREA_CREATE);
 
-        AreaQuery::create()->clearInstancePool();
         $reloaded = AreaQuery::create()->findPk($area->getId());
         self::assertNotNull($reloaded);
         self::assertSame('Test Area', $reloaded->getName());
@@ -83,7 +82,6 @@ final class AreaActionTest extends ActionIntegrationTestCase
 
         $this->dispatch(new AreaEvent($area), TheliaEvents::AREA_DELETE);
 
-        AreaQuery::create()->clearInstancePool();
         self::assertNull(AreaQuery::create()->findPk($areaId));
     }
 
