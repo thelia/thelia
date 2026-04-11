@@ -16,16 +16,49 @@ namespace Thelia\Tests\Integration\Command;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
+use Thelia\Model\ModuleQuery;
+use Thelia\Module\BaseModule;
 use Thelia\Test\IntegrationTestCase;
 
-/**
- * The success path of `module:activate` depends on the exact modules
- * registered in the test database, which varies across developer
- * setups. We keep the integration tests focused on the error contracts
- * (unknown module) so the suite stays deterministic.
- */
 final class ModuleActivateCommandTest extends IntegrationTestCase
 {
+    public function testActivatesAModuleThatIsCurrentlyDeactivated(): void
+    {
+        // Cheque ships with every Thelia install, has a trivial
+        // postActivation (insert one Message row) that the transaction
+        // rollback will undo, and is always present after
+        // `bin/test-prepare`. Deactivate it first so the command has
+        // something to toggle back to active.
+        $module = ModuleQuery::create()->findOneByCode('Cheque');
+        self::assertNotNull($module, 'Cheque module must be registered by bin/test-prepare');
+
+        $module->setActivate(BaseModule::IS_NOT_ACTIVATED)->save();
+
+        $tester = new CommandTester(
+            (new Application(self::$kernel))->find('module:activate'),
+        );
+        $tester->execute(['module' => 'Cheque']);
+
+        self::assertSame(0, $tester->getStatusCode());
+        self::assertSame(
+            BaseModule::IS_ACTIVATED,
+            ModuleQuery::create()->findOneByCode('Cheque')->getActivate(),
+        );
+    }
+
+    public function testCommandFailsGracefullyWhenModuleAlreadyActive(): void
+    {
+        $tester = new CommandTester(
+            (new Application(self::$kernel))->find('module:activate'),
+        );
+        $tester->execute(['module' => 'Cheque']);
+
+        // The command prints an error and returns FAILURE but does not
+        // throw — an already-active module is not a fatal error.
+        self::assertSame(1, $tester->getStatusCode());
+        self::assertStringContainsString('already activated', $tester->getDisplay());
+    }
+
     public function testCommandThrowsWhenModuleDoesNotExist(): void
     {
         $tester = new CommandTester(
