@@ -17,9 +17,9 @@ namespace Thelia\Test;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\TheliaKernel;
 use Thelia\Core\Translation\Translator;
 
@@ -77,7 +77,10 @@ abstract class IntegrationTestCase extends KernelTestCase
         $requestStack = $container->get('request_stack');
         if (null === $requestStack->getCurrentRequest()) {
             $request = Request::create('http://localhost');
-            $request->setSession(new BaseSession(new MockArraySessionStorage()));
+            // Thelia Action listeners type-hint the concrete
+            // `Thelia\Core\HttpFoundation\Session\Session` class, so
+            // the base Symfony Session is not enough.
+            $request->setSession(new Session(new MockArraySessionStorage()));
             $requestStack->push($request);
         }
 
