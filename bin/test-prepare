@@ -70,8 +70,46 @@ try {
         fwrite(STDERR, "  WARN {$warning}\n");
     }
 
+    ensureJwtKeyPair($projectRoot);
+
     echo "\nDone: database \"{$dbName}\" is ready.\n";
 } catch (\PDOException $e) {
     fwrite(STDERR, "ERROR: Database connection failed — {$e->getMessage()}\n");
     exit(1);
+}
+
+/**
+ * Generates a JWT key pair for the test environment if missing.
+ *
+ * The API Platform tests authenticate against /api/admin/login and
+ * /api/front/login, which rely on LexikJWTAuthenticationBundle. Without
+ * the keys the login endpoints return 500 and every API test fails in
+ * an obscure way. Running the generator here keeps `bin/test-prepare`
+ * the single entry point for a CI-ready environment.
+ */
+function ensureJwtKeyPair(string $projectRoot): void
+{
+    $privateKey = $projectRoot.'config'.DS.'jwt'.DS.'private.pem';
+    $publicKey  = $projectRoot.'config'.DS.'jwt'.DS.'public.pem';
+
+    if (is_file($privateKey) && is_file($publicKey)) {
+        return;
+    }
+
+    echo "Generating JWT key pair (test environment)...\n";
+    $console = $projectRoot.'bin'.DS.'console';
+    $command = \sprintf(
+        '%s %s lexik:jwt:generate-keypair --skip-if-exists --env=test 2>&1',
+        escapeshellarg(PHP_BINARY),
+        escapeshellarg($console),
+    );
+
+    exec($command, $output, $exitCode);
+
+    if (0 !== $exitCode) {
+        fwrite(STDERR, "  WARN JWT key pair generation failed:\n");
+        foreach ($output as $line) {
+            fwrite(STDERR, "    {$line}\n");
+        }
+    }
 }
