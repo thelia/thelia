@@ -22,10 +22,10 @@ use Thelia\Core\Event\Brand\BrandUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
-use Thelia\Domain\Brand\DTO\BrandCreateDTO;
-use Thelia\Domain\Brand\DTO\BrandSeoDTO;
-use Thelia\Domain\Brand\DTO\BrandUpdateDTO;
-use Thelia\Domain\Brand\Exception\BrandNotFoundException;
+use Thelia\Domain\Catalog\Brand\DTO\BrandCreateDTO;
+use Thelia\Domain\Catalog\Brand\DTO\BrandSeoDTO;
+use Thelia\Domain\Catalog\Brand\DTO\BrandUpdateDTO;
+use Thelia\Domain\Catalog\Brand\Exception\BrandNotFoundException;
 use Thelia\Model\Brand;
 use Thelia\Model\BrandQuery;
 
