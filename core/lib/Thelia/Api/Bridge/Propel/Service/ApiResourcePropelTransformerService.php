@@ -370,6 +370,16 @@ readonly class ApiResourcePropelTransformerService
                     }
                 }
 
+                // Skip null values when the Propel setter's parameter is
+                // non-nullable — prevents TypeError on PATCH operations
+                // that don't send all relation fields.
+                if (null === $value && null !== $firstParam) {
+                    $paramType = $firstParam->getType();
+                    if ($paramType instanceof \ReflectionNamedType && !$paramType->allowsNull()) {
+                        continue;
+                    }
+                }
+
                 if (\in_array('force', $paramNames, true)) {
                     $propelModel->{$propelSetter}($value, true);
                 }

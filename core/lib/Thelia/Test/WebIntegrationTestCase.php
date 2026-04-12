@@ -18,6 +18,8 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\TheliaKernel;
 use Thelia\Core\Translation\Translator;
 use Thelia\Tools\URL;
@@ -115,6 +117,27 @@ abstract class WebIntegrationTestCase extends WebTestCase
 
     protected function createFixtureFactory(): FixtureFactory
     {
+        // Ensure a Request exists in the RequestStack when creating
+        // fixtures. Vendor modules (e.g. CustomerFamily/OpenApiListener)
+        // may access $requestStack->getCurrentRequest()->getContent()
+        // during Propel model events. Without a request in the stack,
+        // this crashes with "Call to a member function getContent() on null".
+        $requestStack = static::getContainer()->get(RequestStack::class);
+        if (null === $requestStack->getCurrentRequest()) {
+            // Use a JSON body '{}' so that listeners parsing
+            // $request->getContent() (e.g. PropelPersistProcessor,
+            // CustomerFamily/OpenApiListener) don't crash on empty content.
+            $requestStack->push(TheliaRequest::create(
+                '/',
+                'GET',
+                [],
+                [],
+                [],
+                ['CONTENT_TYPE' => 'application/json'],
+                '{}',
+            ));
+        }
+
         return new FixtureFactory($this->getPropelConnection());
     }
 }

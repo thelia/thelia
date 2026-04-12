@@ -47,7 +47,7 @@ class ProductI18n extends I18n
         return $this;
     }
 
-    public function getChapo(): string
+    public function getChapo(): ?string
     {
         return $this->chapo;
     }
