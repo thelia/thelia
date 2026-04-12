@@ -53,7 +53,7 @@ class XmlFileLoader extends FileLoader
 {
     public const DEFAULT_HOOK_CLASS = 'Thelia\\Core\\Hook\\DefaultHook';
 
-    public function load(mixed $resource, ?string $type = null): void
+    public function load(mixed $resource, ?string $type = null): mixed
     {
         $path = $this->locator->locate($resource);
 
@@ -99,6 +99,8 @@ class XmlFileLoader extends FileLoader
             [$this, 'parseImports'],
             $xml,
         );
+
+        return null;
     }
 
     public function propelOnlyRun(callable $method, $arg): void

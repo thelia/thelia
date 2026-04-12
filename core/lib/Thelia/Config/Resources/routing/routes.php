@@ -25,6 +25,5 @@ return static function (RoutingConfigurator $routes): void {
 
     $routes->import('.', 'module_attribute');
     $routes->import('.', 'template_attribute');
-    $routes->import('.', 'module_annotation');
     $routes->import('.', 'module_xml');
 };

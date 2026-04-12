@@ -18,7 +18,6 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\Routing\Loader\XmlFileLoader;
 use Thelia\Controller\Admin\BaseAdminController;
-use Thelia\Core\Routing\ModuleAnnotationLoader;
 use Thelia\Core\Routing\ModuleAttributeLoader;
 use Thelia\Core\Routing\ModuleXmlLoader;
 use Thelia\Core\Routing\RewritingRouter;
@@ -91,10 +90,6 @@ return static function (ContainerConfigurator $container): void {
     // Module attribute loader
     $services->set('thelia.loader.module_attributes', ModuleAttributeLoader::class)->public()
         ->tag('routing.loader', ['priority' => 254]);
-
-    // Module annotation loader
-    $services->set('thelia.loader.module_annotations', ModuleAnnotationLoader::class)->public()
-        ->tag('routing.loader', ['priority' => 253]);
 
     // Module XML loader
     $services->set('thelia.loader.module_xml', ModuleXmlLoader::class)

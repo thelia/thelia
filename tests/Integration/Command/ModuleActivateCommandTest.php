@@ -73,14 +73,14 @@ final class ModuleActivateCommandTest extends IntegrationTestCase
         ]);
     }
 
-    public function testCommandSwallowsErrorWhenSilentFlagIsSet(): void
+    public function testCommandSwallowsErrorWhenNoThrowFlagIsSet(): void
     {
         $tester = new CommandTester(
             (new Application(self::$kernel))->find('module:activate'),
         );
         $tester->execute([
             'module' => 'ThisModuleDoesNotExist',
-            '--silent' => true,
+            '--no-throw' => true,
         ]);
 
         self::assertSame(0, $tester->getStatusCode());

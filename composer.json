@@ -42,10 +42,10 @@
         "phpstan/extension-installer": "1.*",
         "phpunit/phpunit": "11.5.*",
         "rector/rector": "^2.0",
-        "symfony/browser-kit": "6.4.*",
-        "symfony/phpunit-bridge": "6.4.*",
-        "symfony/css-selector": "6.4.*",
-        "symfony/debug-bundle": "6.4.*",
+        "symfony/browser-kit": "7.4.*",
+        "symfony/phpunit-bridge": "7.4.*",
+        "symfony/css-selector": "7.4.*",
+        "symfony/debug-bundle": "7.4.*",
         "thelia/web-profiler-module": "dev-twig"
     },
     "scripts": {
@@ -148,7 +148,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": true,
-            "require": "6.4.*",
+            "require": "7.4.*",
             "endpoint": [
                 "https://api.github.com/repos/thelia/thelia-recipes/contents/index.json?ref=main",
                 "flex://defaults"

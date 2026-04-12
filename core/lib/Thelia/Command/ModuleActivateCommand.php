@@ -55,8 +55,8 @@ class ModuleActivateCommand extends BaseModuleGenerate
                 'activate module recursively',
             )
             ->addOption(
-                'silent',
-                's',
+                'no-throw',
+                null,
                 InputOption::VALUE_NONE,
                 "Don't throw exception on error",
             )
@@ -116,7 +116,7 @@ class ModuleActivateCommand extends BaseModuleGenerate
                 ], 'bg=green;fg=black');
             }
         } catch (\Exception $exception) {
-            if (!$input->getOption('silent')) {
+            if (!$input->getOption('no-throw')) {
                 throw $exception;
             }
         }
