@@ -129,7 +129,7 @@ class SaleUpdateEvent extends SaleCreateEvent
         return $this;
     }
 
-    public function getEndDate(): ?DateTime
+    public function getEndDate(): ?\DateTime
     {
         return $this->endDate;
     }
@@ -161,7 +161,7 @@ class SaleUpdateEvent extends SaleCreateEvent
         return $this;
     }
 
-    public function getStartDate(): ?DateTime
+    public function getStartDate(): ?\DateTime
     {
         return $this->startDate;
     }

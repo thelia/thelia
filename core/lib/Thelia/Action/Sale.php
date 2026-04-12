@@ -246,7 +246,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     $saleOffset
                         ->setCurrencyId($currencyId)
                         ->setSaleId($sale->getId())
-                        ->setPriceOffsetValue($priceOffset)
+                        ->setPriceOffsetValue((float) $priceOffset)
                         ->save($con);
                 }
 
