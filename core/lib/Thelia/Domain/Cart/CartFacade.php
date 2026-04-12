@@ -121,7 +121,7 @@ final readonly class CartFacade
             ->setDeliveryModuleId(null)
             ->setPaymentModuleId(null)
             ->setPostage(null)
-            ->setPostageTax(0.0)
+            ->setPostageTax('0')
             ->setPostageTaxRuleTitle(null);
         if ($resetCartItems) {
             $cart->setCartItems(new Collection());
