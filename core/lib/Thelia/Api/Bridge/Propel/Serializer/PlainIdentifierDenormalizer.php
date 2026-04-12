@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel\Serializer;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;

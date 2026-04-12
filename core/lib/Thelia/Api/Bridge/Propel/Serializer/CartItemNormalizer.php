@@ -14,8 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel\Serializer;
 
-use ApiPlatform\Api\IriConverterInterface as LegacyIriConverterInterface;
-use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -40,8 +38,8 @@ class CartItemNormalizer extends AbstractItemNormalizer
         private readonly RequestStack $requestStack,
         PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
         PropertyMetadataFactoryInterface $propertyMetadataFactory,
-        LegacyIriConverterInterface|IriConverterInterface $iriConverter,
-        LegacyResourceClassResolverInterface|ResourceClassResolverInterface $resourceClassResolver,
+        IriConverterInterface $iriConverter,
+        ResourceClassResolverInterface $resourceClassResolver,
         ?PropertyAccessorInterface $propertyAccessor = null,
         ?NameConverterInterface $nameConverter = null,
         ?ClassMetadataFactoryInterface $classMetadataFactory = null,

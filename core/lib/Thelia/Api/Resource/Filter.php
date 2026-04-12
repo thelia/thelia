@@ -17,6 +17,8 @@ namespace Thelia\Api\Resource;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\OpenApi\Model\Operation;
+use ApiPlatform\OpenApi\Model\Parameter;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\State\Provider\TFiltersProvider;
 
@@ -27,16 +29,11 @@ use Thelia\Api\State\Provider\TFiltersProvider;
             uriVariables: [
                 'resource' => new Link(fromProperty: 'resource', identifiers: ['string']),
             ],
-            openapiContext: [
-                'parameters' => [
-                    [
-                        'name' => 'resource',
-                        'in' => 'path',
-                        'required' => true,
-                        'schema' => ['type' => 'string'],
-                    ],
+            openapi: new Operation(
+                parameters: [
+                    new Parameter(name: 'resource', in: 'path', required: true, schema: ['type' => 'string']),
                 ],
-            ],
+            ),
             provider: TFiltersProvider::class,
         ),
     ],

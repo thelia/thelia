@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel\State;
 
-use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;

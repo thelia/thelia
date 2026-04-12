@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\ProductFilter;
 
-use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
 use ApiPlatform\Metadata\Operation;
+use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Api\Bridge\Propel\Filter\AbstractFilter;
 
@@ -37,8 +37,8 @@ class ProductPriceOrderFilter extends AbstractFilter
                 'schema' => [
                     'type' => 'string',
                     'enum' => [
-                        strtolower(OrderFilterInterface::DIRECTION_ASC),
-                        strtolower(OrderFilterInterface::DIRECTION_DESC),
+                        strtolower(OrderFilter::DIRECTION_ASC),
+                        strtolower(OrderFilter::DIRECTION_DESC),
                     ],
                 ],
             ],

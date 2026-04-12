@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel\Filter;
 
-use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 
@@ -78,8 +77,8 @@ class OrderFilter extends AbstractFilter
                 'schema' => [
                     'type' => 'string',
                     'enum' => [
-                        strtolower(OrderFilterInterface::DIRECTION_ASC),
-                        strtolower(OrderFilterInterface::DIRECTION_DESC),
+                        strtolower(self::DIRECTION_ASC),
+                        strtolower(self::DIRECTION_DESC),
                     ],
                 ],
             ];

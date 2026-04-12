@@ -18,6 +18,8 @@ use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\OpenApi\Model\Operation;
+use ApiPlatform\OpenApi\Model\Parameter;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
@@ -28,26 +30,12 @@ use Thelia\Model\Map\ModuleTableMap;
     operations: [
         new GetCollection(
             uriTemplate: '/front/delivery_modules',
-            openapiContext: [
-                'parameters' => [
-                    [
-                        'name' => 'by_code',
-                        'in' => 'query',
-                        'required' => false,
-                        'schema' => [
-                            'type' => 'integer',
-                        ],
-                    ],
-                    [
-                        'name' => 'only_valid',
-                        'in' => 'query',
-                        'required' => false,
-                        'schema' => [
-                            'type' => 'boolean',
-                        ],
-                    ],
+            openapi: new Operation(
+                parameters: [
+                    new Parameter(name: 'by_code', in: 'query', required: false, schema: ['type' => 'integer']),
+                    new Parameter(name: 'only_valid', in: 'query', required: false, schema: ['type' => 'boolean']),
                 ],
-            ],
+            ),
             provider: DeliveryModuleProvider::class,
         ),
         new Get(

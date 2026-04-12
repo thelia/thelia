@@ -14,11 +14,10 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel\Routing;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\Routing\RouterInterface;
@@ -28,8 +27,6 @@ use Thelia\Log\Tlog;
 #[AsDecorator(decorates: 'api_platform.symfony.iri_converter')]
 class IriConverter implements IriConverterInterface
 {
-    use ClassInfoTrait;
-
     public function __construct(
         #[AutowireDecorated]
         private IriConverterInterface $decorated,

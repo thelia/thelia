@@ -16,6 +16,8 @@ namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\OpenApi\Model\Operation;
+use ApiPlatform\OpenApi\Model\Parameter;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Thelia\Api\State\Provider\DeliveryPickupLocationProvider;
 use Thelia\Core\Translation\Translator;
@@ -25,85 +27,19 @@ use Thelia\Core\Translation\Translator;
         new GetCollection(
             uriTemplate: '/front/delivery_pickup_locations/{city}/{zipcode}',
             uriVariables: ['city', 'zipcode'],
-            openapiContext: [
-                'parameters' => [
-                    [
-                        'name' => 'stateId',
-                        'in' => 'query',
-                        'required' => false,
-                        'schema' => [
-                            'type' => 'integer',
-                        ],
-                    ],
-                    [
-                        'name' => 'countryId',
-                        'in' => 'query',
-                        'required' => false,
-                        'schema' => [
-                            'type' => 'integer',
-                        ],
-                    ],
-                    [
-                        'name' => 'radius',
-                        'in' => 'query',
-                        'required' => false,
-                        'schema' => [
-                            'type' => 'integer',
-                        ],
-                    ],
-                    [
-                        'name' => 'maxRelays',
-                        'in' => 'query',
-                        'required' => false,
-                        'schema' => [
-                            'type' => 'integer',
-                        ],
-                    ],
-                    [
-                        'name' => 'address',
-                        'in' => 'query',
-                        'required' => false,
-                        'schema' => [
-                            'type' => 'string',
-                        ],
-                    ],
-                    [
-                        'name' => 'city',
-                        'in' => 'path',
-                        'required' => true,
-                        'schema' => [
-                            'type' => 'string',
-                        ],
-                    ],
-                    [
-                        'name' => 'zipCode',
-                        'in' => 'path',
-                        'required' => true,
-                        'schema' => [
-                            'type' => 'string',
-                        ],
-                    ],
-                    [
-                        'name' => 'orderWeight',
-                        'in' => 'query',
-                        'required' => false,
-                        'schema' => [
-                            'type' => 'integer',
-                        ],
-                    ],
-                    [
-                        'name' => 'moduleIds',
-                        'in' => 'query',
-                        'required' => false,
-                        'schema' => [
-                            'type' => 'array',
-                            'items' => [
-                                'type' => 'integer',
-                            ],
-                        ],
-                    ],
+            openapi: new Operation(
+                parameters: [
+                    new Parameter(name: 'stateId', in: 'query', required: false, schema: ['type' => 'integer']),
+                    new Parameter(name: 'countryId', in: 'query', required: false, schema: ['type' => 'integer']),
+                    new Parameter(name: 'radius', in: 'query', required: false, schema: ['type' => 'integer']),
+                    new Parameter(name: 'maxRelays', in: 'query', required: false, schema: ['type' => 'integer']),
+                    new Parameter(name: 'address', in: 'query', required: false, schema: ['type' => 'string']),
+                    new Parameter(name: 'city', in: 'path', required: true, schema: ['type' => 'string']),
+                    new Parameter(name: 'zipCode', in: 'path', required: true, schema: ['type' => 'string']),
+                    new Parameter(name: 'orderWeight', in: 'query', required: false, schema: ['type' => 'integer']),
+                    new Parameter(name: 'moduleIds', in: 'query', required: false, schema: ['type' => 'array', 'items' => ['type' => 'integer']]),
                 ],
-            ],
+            ),
             paginationEnabled: false,
             provider: DeliveryPickupLocationProvider::class,
         ),

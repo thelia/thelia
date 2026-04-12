@@ -16,6 +16,8 @@ namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\OpenApi\Model\Operation;
+use ApiPlatform\OpenApi\Model\Parameter;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\State\Provider\PaymentModuleProvider;
@@ -25,18 +27,11 @@ use Thelia\Model\Map\ModuleTableMap;
     operations: [
         new GetCollection(
             uriTemplate: '/front/payment/modules',
-            openapiContext: [
-                'parameters' => [
-                    [
-                        'name' => 'moduleId',
-                        'in' => 'query',
-                        'required' => false,
-                        'schema' => [
-                            'type' => 'string',
-                        ],
-                    ],
+            openapi: new Operation(
+                parameters: [
+                    new Parameter(name: 'moduleId', in: 'query', required: false, schema: ['type' => 'string']),
                 ],
-            ],
+            ),
             provider: PaymentModuleProvider::class,
         ),
     ],
