@@ -52,6 +52,7 @@ abstract class ApiTestCase extends WebIntegrationTestCase
     private const MIME_TYPES = [
         'jsonld' => 'application/ld+json',
         'json' => 'application/json',
+        'merge-patch+json' => 'application/merge-patch+json',
     ];
 
     /**
@@ -70,9 +71,15 @@ abstract class ApiTestCase extends WebIntegrationTestCase
         $mimeType = self::MIME_TYPES[$format]
             ?? throw new \InvalidArgumentException(\sprintf('Unsupported format "%s".', $format));
 
+        // For merge-patch+json, the Content-Type is the patch format but
+        // the Accept header must remain a standard format (jsonld).
+        $acceptType = 'application/merge-patch+json' === $mimeType
+            ? self::MIME_TYPES['jsonld']
+            : $mimeType;
+
         $server = [
             'CONTENT_TYPE' => $mimeType,
-            'HTTP_ACCEPT' => $mimeType,
+            'HTTP_ACCEPT' => $acceptType,
         ];
 
         if (null !== $token) {

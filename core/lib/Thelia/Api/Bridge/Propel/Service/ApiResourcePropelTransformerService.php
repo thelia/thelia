@@ -354,6 +354,22 @@ readonly class ApiResourcePropelTransformerService
                     $method->getParameters(),
                 );
 
+                // Propel models use strict types (int for booleans, string
+                // for decimals). API Resources use PHP-native types for a
+                // clean JSON contract. Bridge the gap automatically.
+                $firstParam = $method->getParameters()[0] ?? null;
+                if (null !== $firstParam) {
+                    $paramType = $firstParam->getType();
+                    if ($paramType instanceof \ReflectionNamedType) {
+                        $expectedType = $paramType->getName();
+                        if (\is_bool($value) && 'int' === $expectedType) {
+                            $value = (int) $value;
+                        } elseif ((\is_float($value) || \is_int($value)) && 'string' === $expectedType) {
+                            $value = (string) $value;
+                        }
+                    }
+                }
+
                 if (\in_array('force', $paramNames, true)) {
                     $propelModel->{$propelSetter}($value, true);
                 }
