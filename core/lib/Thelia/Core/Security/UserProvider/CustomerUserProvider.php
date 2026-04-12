@@ -49,7 +49,7 @@ class CustomerUserProvider implements PayloadAwareUserProviderInterface
         }
 
         $user = CustomerQuery::create()
-            ->filterByLogin($user->getUserIdentifier(), Criteria::EQUAL)
+            ->filterByEmail($user->getUserIdentifier(), Criteria::EQUAL)
             ->findOne();
 
         if (null === $user) {

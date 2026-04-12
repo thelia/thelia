@@ -185,13 +185,13 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             if (0 === $event->getFromDefaultCurrency()) {
                 // Store the price
                 $productPrice
-                    ->setPromoPrice($event->getSalePrice())
-                    ->setPrice($event->getPrice());
+                    ->setPromoPrice((string) $event->getSalePrice())
+                    ->setPrice((string) $event->getPrice());
             } else {
                 // Do not store the price.
                 $productPrice
-                    ->setPromoPrice(0)
-                    ->setPrice(0);
+                    ->setPromoPrice('0')
+                    ->setPrice('0');
             }
 
             $productPrice->save($con);
