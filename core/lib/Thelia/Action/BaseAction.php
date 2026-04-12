@@ -118,9 +118,8 @@ class BaseAction
             return null;
         }
 
-        $newVisibility = !$object->getVisible();
         $object
-            ->setVisible($newVisibility)
+            ->setVisible($object->getVisible() ? 0 : 1)
             ->save();
 
         $event->setObject($object);

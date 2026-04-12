@@ -15,14 +15,14 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Condition;
 
 use Thelia\Condition\ConditionEvaluator;
+use Thelia\Condition\Exception\InvalidConditionOperatorException;
+use Thelia\Condition\Exception\InvalidConditionValueException;
 use Thelia\Condition\Implementation\CartContainsProducts;
 use Thelia\Condition\Implementation\MatchForTotalAmount;
 use Thelia\Condition\Implementation\MatchForXArticles;
 use Thelia\Condition\Operators;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
-use Thelia\Condition\Exception\InvalidConditionOperatorException;
-use Thelia\Condition\Exception\InvalidConditionValueException;
 use Thelia\Model\Currency;
 use Thelia\Test\IntegrationTestCase;
 
