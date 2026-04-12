@@ -66,6 +66,7 @@ class ModulePositionCommand extends ContainerAwareCommand
         $argsList = $input->getArgument('modules');
         array_walk($argsList, [$this, 'checkModuleArgument']);
 
+        $isAbsolute = false;
         if (!$this->checkPositions($input, $output, $isAbsolute)) {
             return 1;
         }
@@ -100,7 +101,7 @@ class ModulePositionCommand extends ContainerAwareCommand
                     $position = $maxPosition;
                 }
 
-                $event = new UpdatePositionEvent($module->getId(), UpdatePositionEvent::POSITION_ABSOLUTE, $position);
+                $event = new UpdatePositionEvent($module->getId(), UpdatePositionEvent::POSITION_ABSOLUTE, (int) $position);
             }
 
             $this->getDispatcher()->dispatch($event, TheliaEvents::MODULE_UPDATE_POSITION);
@@ -179,7 +180,7 @@ class ModulePositionCommand extends ContainerAwareCommand
         $isRelative = false;
 
         foreach (array_count_values($this->positionsList) as $value => $count) {
-            if (\is_int($value) && '+' !== $value[0] && '-' !== $value[0]) {
+            if (\is_int($value) || (\is_string($value) && '+' !== $value[0] && '-' !== $value[0] && !ctype_alpha($value))) {
                 $isAbsolute = true;
 
                 if ($count > 1) {
