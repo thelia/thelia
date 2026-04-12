@@ -45,14 +45,18 @@ readonly class DeliveryPickupLocationProvider implements ProviderInterface
         $country = $countryId
             ? (CountryQuery::create())->filterById($countryId)->findOne()
             : null;
+        $radius = $this->request->get('radius');
+        $maxRelays = $this->request->get('maxRelays');
+        $orderWeight = $this->request->get('orderWeight');
+
         $pickupLocationEvent = new PickupLocationEvent(
             null,
-            $this->request->get('radius'),
-            $this->request->get('maxRelays'),
+            null !== $radius ? (int) $radius : null,
+            null !== $maxRelays ? (int) $maxRelays : null,
             $this->request->get('address'),
             $uriVariables['city'],
             $uriVariables['zipcode'],
-            $this->request->get('orderWeight'),
+            null !== $orderWeight ? (int) $orderWeight : null,
             $state,
             $country,
             $this->request->get('moduleIds'),
