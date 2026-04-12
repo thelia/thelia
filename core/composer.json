@@ -20,11 +20,10 @@
         "composer/installers": "~1.0",
 
         "api-platform/symfony": "^4.3",
-        "doctrine/annotations": "^2.0",
         "lexik/jwt-authentication-bundle": "^3.0",
         "nelmio/cors-bundle": "^2.2",
         "phpdocumentor/reflection-docblock": "^5.3",
-        "phpstan/phpdoc-parser": "^1.4",
+        "phpstan/phpdoc-parser": "^1.30",
 
         "psr/log": "^3.0",
         "ptachoire/cssembed": "1.0.*",
