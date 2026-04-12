@@ -42,7 +42,7 @@ class BrandI18n extends I18n
     ])]
     protected ?string $description = null;
 
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
@@ -54,7 +54,7 @@ class BrandI18n extends I18n
         return $this;
     }
 
-    public function getChapo(): string
+    public function getChapo(): ?string
     {
         return $this->chapo;
     }
