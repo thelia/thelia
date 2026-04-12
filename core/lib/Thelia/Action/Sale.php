@@ -67,11 +67,13 @@ class Sale extends BaseAction implements EventSubscriberInterface
         array $saleOffsetByCurrency,
         ConnectionInterface $con,
     ): void {
+        $promoInt = $promoStatus ? 1 : 0;
+
         /** @var ProductSaleElements $pse */
         foreach ($pseList as $pse) {
-            if ($pse->getPromo() !== $promoStatus) {
+            if ($pse->getPromo() !== $promoInt) {
                 $pse
-                    ->setPromo($promoStatus)
+                    ->setPromo($promoInt)
                     ->save($con);
             }
 

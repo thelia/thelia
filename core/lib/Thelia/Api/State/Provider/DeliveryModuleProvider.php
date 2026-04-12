@@ -47,10 +47,14 @@ readonly class DeliveryModuleProvider implements ProviderInterface
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $cart = $this->session->getSessionCart($this->dispatcher);
+        try {
+            $cart = $this->session->getSessionCart($this->dispatcher);
+        } catch (\Throwable) {
+            return [];
+        }
 
         if (!$cart instanceof Cart) {
-            return null;
+            return [];
         }
 
         $deliveryAddress = $this->addressService->getDeliveryAddress($this->request, $this->securityContext);
@@ -59,7 +63,7 @@ readonly class DeliveryModuleProvider implements ProviderInterface
             : CountryQuery::create()->filterByByDefault(1)->findOne();
 
         if (null === $country) {
-            throw new \RuntimeException(Translator::getInstance()->trans('You must either pass an address id or have a customer connected'));
+            return [];
         }
 
         $state = $deliveryAddress instanceof Address

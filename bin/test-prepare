@@ -70,6 +70,21 @@ try {
         fwrite(STDERR, "  WARN {$warning}\n");
     }
 
+    // Purge Propel test cache so it regenerates with the correct DSN.
+    // Without this, a stale cache pointing at a different database name
+    // (e.g. "db" instead of "test") causes tests to hit the wrong DB.
+    $propelTestCache = $projectRoot.'var'.DS.'propel'.DS.($_SERVER['APP_ENV'] ?? 'test');
+    if (is_dir($propelTestCache)) {
+        echo "Purging Propel test cache...\n";
+        (new \Symfony\Component\Filesystem\Filesystem())->remove($propelTestCache);
+    }
+
+    // Run postActivation() for all modules — some modules create their
+    // tables in postActivation() (e.g. CustomDelivery, ShortCode) rather
+    // than via TheliaMain.sql. Without this step, module-specific tables
+    // are missing in the test database.
+    runPostActivateAll($projectRoot);
+
     ensureJwtKeyPair($projectRoot);
 
     echo "\nDone: database \"{$dbName}\" is ready.\n";
@@ -87,6 +102,36 @@ try {
  * an obscure way. Running the generator here keeps `bin/test-prepare`
  * the single entry point for a CI-ready environment.
  */
+/**
+ * Runs module:post-activate-all so that modules can create their tables.
+ *
+ * Some modules (CustomDelivery, ShortCode, etc.) create their database
+ * tables in postActivation() rather than in a TheliaMain.sql file.
+ * Without this step those tables are missing in the test database and
+ * any query touching them triggers a 500.
+ */
+function runPostActivateAll(string $projectRoot): void
+{
+    echo "Running module post-activation hooks...\n";
+    $console = $projectRoot.'bin'.DS.'console';
+    $env = $_SERVER['APP_ENV'] ?? 'test';
+    $command = \sprintf(
+        '%s %s module:post-activate-all --env=%s 2>&1',
+        escapeshellarg(PHP_BINARY),
+        escapeshellarg($console),
+        escapeshellarg($env),
+    );
+
+    exec($command, $output, $exitCode);
+
+    if (0 !== $exitCode) {
+        fwrite(STDERR, "  WARN module:post-activate-all failed:\n");
+        foreach ($output as $line) {
+            fwrite(STDERR, "    {$line}\n");
+        }
+    }
+}
+
 function ensureJwtKeyPair(string $projectRoot): void
 {
     $privateKey = $projectRoot.'config'.DS.'jwt'.DS.'private.pem';

@@ -27,22 +27,15 @@ final class FrontProviderApiTest extends ApiTestCase
     {
         $response = $this->jsonRequest('GET', '/api/front/delivery_modules');
 
-        // DeliveryModuleProvider returns null when no cart exists,
-        // AP may render that as 200 with empty collection or 404.
-        $statusCode = $response->getStatusCode();
-        self::assertContains($statusCode, [200, 404], sprintf(
-            'Expected 200 or 404, got %d: %s',
-            $statusCode,
-            $response->getContent(),
-        ));
+        // Without an active cart/session the provider returns an empty array.
+        self::assertJsonResponseSuccessful($response);
     }
 
     public function testDeliveryModulesWithOnlyValidParam(): void
     {
         $response = $this->jsonRequest('GET', '/api/front/delivery_modules?only_valid=true');
 
-        $statusCode = $response->getStatusCode();
-        self::assertContains($statusCode, [200, 404]);
+        self::assertJsonResponseSuccessful($response);
     }
 
     public function testPaymentModulesCollectionReturns200(): void
