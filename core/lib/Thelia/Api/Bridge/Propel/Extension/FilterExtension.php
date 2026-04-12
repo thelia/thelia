@@ -16,7 +16,7 @@ namespace Thelia\Api\Bridge\Propel\Extension;
 
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Thelia\Api\Bridge\Propel\Filter\FilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
@@ -26,7 +26,7 @@ class FilterExtension implements QueryCollectionExtensionInterface
     private $filterLocator;
 
     public function __construct(
-        #[TaggedLocator('thelia.api.propel.filter')]
+        #[AutowireLocator('thelia.api.propel.filter')]
         ServiceLocator $filterLocator,
     ) {
         $this->filterLocator = $filterLocator;

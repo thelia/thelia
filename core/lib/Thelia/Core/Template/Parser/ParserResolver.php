@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Parser;
 
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
@@ -28,9 +28,9 @@ class ParserResolver
     private static ?ParserInterface $currentParser = null;
 
     public function __construct(
-        #[TaggedIterator('thelia.parser.template', exclude: [ParserFallback::class])]
+        #[AutowireIterator('thelia.parser.template', exclude: [ParserFallback::class])]
         private readonly iterable $parsers,
-        #[TaggedIterator('thelia.parser.asset', exclude: [ParserAssetResolverFallback::class])]
+        #[AutowireIterator('thelia.parser.asset', exclude: [ParserAssetResolverFallback::class])]
         private readonly iterable $assetResolvers,
         private readonly RequestStack $requestStack,
         private readonly TemplateHelperInterface $templateHelper,

@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Form;
 
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -35,7 +35,7 @@ class TaxCreationForm extends BaseForm
     use StandardDescriptionFieldsTrait;
 
     public function __construct(
-        #[TaggedIterator('thelia.taxType')]
+        #[AutowireIterator('thelia.taxType')]
         private iterable $taxTypeIterator,
     ) {
     }

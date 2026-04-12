@@ -18,7 +18,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\TypeInfo\Type;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\TranslatableResourceInterface;
 
@@ -56,8 +56,8 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
         $resourceAddonDefinitions = $this->apiResourcePropelTransformerService->getResourceAddonDefinitions($resourceClass);
 
         if ([] !== $resourceAddonDefinitions && isset($resourceAddonDefinitions[$property])) {
-            $propertyMetadata = $propertyMetadata->withBuiltinTypes(
-                [new Type(builtinType: 'object', class: $resourceAddonDefinitions[$property])],
+            $propertyMetadata = $propertyMetadata->withNativeType(
+                Type::object($resourceAddonDefinitions[$property]),
             );
             $propertyMetadata = $propertyMetadata->withReadable(true);
             $propertyMetadata = $propertyMetadata->withReadableLink(true);

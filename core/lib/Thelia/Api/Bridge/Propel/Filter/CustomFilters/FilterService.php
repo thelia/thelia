@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\CategoryFilter;
@@ -33,9 +33,9 @@ use Thelia\Model\ChoiceFilterQuery;
 readonly class FilterService
 {
     public function __construct(
-        #[TaggedIterator('api.thelia.filter')]
+        #[AutowireIterator('api.thelia.filter')]
         private readonly iterable $filters,
-        #[TaggedIterator('api.thelia.filter.type')]
+        #[AutowireIterator('api.thelia.filter.type')]
         private readonly iterable $filterTypes,
         private readonly LangService $langService,
         private readonly RequestStack $requestStack,

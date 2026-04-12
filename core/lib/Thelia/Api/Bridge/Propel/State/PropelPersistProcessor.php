@@ -41,7 +41,7 @@ readonly class PropelPersistProcessor implements ProcessorInterface
     ) {
     }
 
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         if (isset($uriVariables['id'])) {
             $data->setId($uriVariables['id']);

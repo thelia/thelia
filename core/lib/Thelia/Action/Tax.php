@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
-use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -28,7 +28,7 @@ class Tax extends BaseAction implements EventSubscriberInterface
     private readonly ServiceLocator $taxTypeLocator;
 
     public function __construct(
-        #[TaggedLocator('thelia.taxType')]
+        #[AutowireLocator('thelia.taxType')]
         ServiceLocator $taxTypeLocator,
     ) {
         $this->taxTypeLocator = $taxTypeLocator;

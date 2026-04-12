@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel\Loader;
 
-use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
@@ -25,8 +24,6 @@ use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 #[AsDecorator(decorates: 'api_platform.serializer.mapping.class_metadata_factory')]
 class ClassMetaDataFactory implements ClassMetadataFactoryInterface
 {
-    use ClassInfoTrait;
-
     public function __construct(
         #[AutowireDecorated]
         private ClassMetadataFactoryInterface $inner,
@@ -63,5 +60,34 @@ class ClassMetaDataFactory implements ClassMetadataFactoryInterface
     public function hasMetadataFor(mixed $value): bool
     {
         return $this->inner->hasMetadataFor(\is_object($value) ? $this->getObjectClass($value) : $this->getRealClassName($value));
+    }
+
+    private function getObjectClass(object $object): string
+    {
+        return $this->getRealClassName($object::class);
+    }
+
+    private function getRealClassName(string $className): string
+    {
+        // Strip Doctrine proxy prefixes (__CG__ for ORM < 3, __PM__ for Ocramius).
+        // Propel does not use proxies, but we keep this for robustness.
+        $positionCg = strrpos($className, '\\__CG__\\');
+        $positionPm = strrpos($className, '\\__PM__\\');
+
+        if (false === $positionCg && false === $positionPm) {
+            return $className;
+        }
+
+        if (false !== $positionCg) {
+            return substr($className, $positionCg + 8);
+        }
+
+        $className = ltrim($className, '\\');
+
+        return substr(
+            $className,
+            8 + $positionPm,
+            strrpos($className, '\\') - ($positionPm + 8),
+        );
     }
 }

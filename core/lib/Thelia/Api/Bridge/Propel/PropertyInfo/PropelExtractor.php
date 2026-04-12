@@ -18,7 +18,8 @@ use Propel\Runtime\Collection\Collection;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
 class PropelExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface
@@ -54,14 +55,14 @@ class PropelExtractor implements PropertyListExtractorInterface, PropertyTypeExt
 
             if ('array' === $reflectionProperty->getType()->getName() || \in_array(\Traversable::class, class_implements($reflectionProperty->getType()->getName()), true)) {
                 return [
-                    new Type(
-                        Type::BUILTIN_TYPE_OBJECT,
+                    new LegacyType(
+                        LegacyType::BUILTIN_TYPE_OBJECT,
                         false,
                         Collection::class,
                         true,
-                        new Type(Type::BUILTIN_TYPE_INT),
-                        new Type(
-                            Type::BUILTIN_TYPE_OBJECT,
+                        new LegacyType(LegacyType::BUILTIN_TYPE_INT),
+                        new LegacyType(
+                            LegacyType::BUILTIN_TYPE_OBJECT,
                             $reflectionProperty->getType()->allowsNull(),
                             $targetClass,
                         ),
@@ -70,12 +71,42 @@ class PropelExtractor implements PropertyListExtractorInterface, PropertyTypeExt
             }
 
             return [
-                new Type(
-                    Type::BUILTIN_TYPE_OBJECT,
+                new LegacyType(
+                    LegacyType::BUILTIN_TYPE_OBJECT,
                     $reflectionProperty->getType()->allowsNull(),
                     $targetClass,
                 ),
             ];
+        }
+
+        return null;
+    }
+
+    public function getType(string $class, string $property, array $context = []): ?Type
+    {
+        $reflector = new \ReflectionClass($class);
+
+        if (!$reflector->hasProperty($property)) {
+            return null;
+        }
+
+        $reflectionProperty = $reflector->getProperty($property);
+
+        foreach ($reflectionProperty->getAttributes(Relation::class) as $relationAttribute) {
+            $targetClass = $relationAttribute->getArguments()['targetResource'];
+            $nullable = $reflectionProperty->getType()?->allowsNull() ?? true;
+
+            if ('array' === $reflectionProperty->getType()->getName() || \in_array(\Traversable::class, class_implements($reflectionProperty->getType()->getName()), true)) {
+                return Type::collection(
+                    Type::object(Collection::class),
+                    Type::object($targetClass),
+                    Type::int(),
+                );
+            }
+
+            $type = Type::object($targetClass);
+
+            return $nullable ? Type::nullable($type) : $type;
         }
 
         return null;

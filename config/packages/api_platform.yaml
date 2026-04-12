@@ -14,4 +14,5 @@ api_platform:
         extra_properties:
             standard_put: true
             rfc_7807_compliant_errors: true
+            deduplicate_resource_short_names: true
     use_symfony_listeners: true
