@@ -16,6 +16,7 @@ namespace Thelia\Tests\Integration\Api;
 
 use Thelia\Api\Service\DataAccess\DataAccessService;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Test\Trait\LogsInAsAdmin;
 
 /**
  * Guard-rail for {@see DataAccessService::resources()}, which calls
@@ -29,6 +30,8 @@ use Thelia\Test\IntegrationTestCase;
  */
 final class DataAccessServiceTest extends IntegrationTestCase
 {
+    use LogsInAsAdmin;
+
     private DataAccessService $dataAccess;
 
     protected function setUp(): void
@@ -44,8 +47,17 @@ final class DataAccessServiceTest extends IntegrationTestCase
         self::assertIsArray($result);
     }
 
+    public function testFrontCategoriesCollectionResolvesWithoutError(): void
+    {
+        $result = $this->dataAccess->resources('/api/front/categories');
+
+        self::assertIsArray($result);
+    }
+
     public function testAdminCategoriesCollectionResolvesWithoutError(): void
     {
+        $this->loginAsAdminInSession();
+
         $result = $this->dataAccess->resources('/api/admin/categories');
 
         self::assertIsArray($result);
@@ -53,14 +65,9 @@ final class DataAccessServiceTest extends IntegrationTestCase
 
     public function testAdminProductsCollectionResolvesWithoutError(): void
     {
+        $this->loginAsAdminInSession();
+
         $result = $this->dataAccess->resources('/api/admin/products');
-
-        self::assertIsArray($result);
-    }
-
-    public function testFrontCategoriesCollectionResolvesWithoutError(): void
-    {
-        $result = $this->dataAccess->resources('/api/front/categories');
 
         self::assertIsArray($result);
     }
