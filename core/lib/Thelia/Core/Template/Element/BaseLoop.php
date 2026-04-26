@@ -51,7 +51,9 @@ use Thelia\Type\TypeCollection;
  * @method ModelCriteria buildModelCriteria()
  * @method array         buildArray()
  *
- * @deprecated prefer to use the the resources from API
+ * BaseLoop is the canonical extension point for `{loop type="..."}` in the
+ * Smarty back-office templates. Front-office (Twig/Flexy) code should
+ * prefer the API resources exposed by `DataAccessService::resources()`.
  */
 abstract class BaseLoop implements LoopInterface
 {
