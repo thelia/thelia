@@ -100,7 +100,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $visible = $this->getVisible();
 
-        if (BooleanOrBothType::ANY !== $visible) {
+        if (!$this->getBackendContext()) {
             $search->filterByVisible($visible);
         }
 
