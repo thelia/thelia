@@ -102,6 +102,11 @@ class BaseModule implements BaseModuleInterface
                 );
                 $this->getDispatcher()->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
 
+                // Rebuild Propel models now that the module is marked active in DB,
+                // so its Base classes are regenerated before postActivation() runs
+                // (postActivation typically uses module-specific Query classes).
+                $this->getContainer()->get('kernel')->initializePropelService(true);
+
                 $this->postActivation($con);
                 $con->commit();
             } catch (\Exception $e) {
