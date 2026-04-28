@@ -96,21 +96,27 @@ class BaseModule implements BaseModuleInterface
                 $moduleModel->setActivate(self::IS_ACTIVATED);
                 $moduleModel->save();
 
+                // Commit the activation flag now so that the upcoming Propel rebuild,
+                // which opens its own PDO connection in getActiveModuleCodes(), can
+                // see the module as active and include its schema. Without this,
+                // postActivation() crashes loading the module's Query classes.
+                $con->commit();
+                $con->beginTransaction();
+
                 $this->initializeCoreI18n();
                 $cacheEvent = new CacheEvent(
                     $this->getContainer()->getParameter('kernel.cache_dir'),
                 );
                 $this->getDispatcher()->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
 
-                // Rebuild Propel models now that the module is marked active in DB,
-                // so its Base classes are regenerated before postActivation() runs
-                // (postActivation typically uses module-specific Query classes).
                 $this->getContainer()->get('kernel')->initializePropelService(true);
 
                 $this->postActivation($con);
                 $con->commit();
             } catch (\Exception $e) {
-                $con->rollBack();
+                if ($con->inTransaction()) {
+                    $con->rollBack();
+                }
                 $moduleModel->setActivate(self::IS_NOT_ACTIVATED);
                 $moduleModel->save();
 
