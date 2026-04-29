@@ -44,8 +44,8 @@ class Folder extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $folder = FolderQuery::create()->findPk($event->getFolderId())) {
             $folder
-                ->setParent($event->getParent())
-                ->setVisible($event->getVisible())
+                ->setParent((int) $event->getParent())
+                ->setVisible((int) $event->getVisible())
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setDescription($event->getDescription())
@@ -111,8 +111,8 @@ class Folder extends BaseAction implements EventSubscriberInterface
         $folder = new FolderModel();
 
         $folder
-            ->setParent($event->getParent())
-            ->setVisible($event->getVisible())
+            ->setParent((int) $event->getParent())
+            ->setVisible((int) $event->getVisible())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
             ->save();

@@ -333,7 +333,7 @@ abstract class AbstractCrudController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $errorMessage = $this->createStandardFormValidationErrorMessage($ex);
-            $errorCode = 500;
+            $errorCode = 400;
         }
 
         // At this point, the form has errors, and should be redisplayed.

@@ -48,6 +48,14 @@ class TheliaFormValidator
         if (null === $expectedMethod || $aBaseForm->getRequest()->isMethod($expectedMethod)) {
             $form->handleRequest($aBaseForm->getRequest());
 
+            if (!$form->isSubmitted()) {
+                $aBaseForm->setError(true);
+
+                throw new FormValidationException(
+                    $this->translator->trans('The form has not been submitted, or its data could not be matched. Please try again.')
+                );
+            }
+
             if ($form->isValid()) {
                 if ($aBaseForm instanceof FirewallForm && !$aBaseForm->isFirewallOk($this->environment)) {
                     throw new FormValidationException($this->translator->trans("You've submitted this form too many times. ").$this->translator->trans('Further submissions will be ignored during %time', ['%time' => $aBaseForm->getWaitingTime()]));
