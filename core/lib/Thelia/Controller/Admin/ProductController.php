@@ -175,10 +175,10 @@ class ProductController extends AbstractSeoCrudController
             ->setVirtual($formData['virtual'])
             ->setBasePrice($formData['price'])
             ->setBaseWeight($formData['weight'])
-            ->setCurrencyId($formData['currency'])
-            ->setTaxRuleId($formData['tax_rule'])
+            ->setCurrencyId((int) $formData['currency'])
+            ->setTaxRuleId((int) $formData['tax_rule'])
             ->setBaseQuantity((int) $formData['quantity'])
-            ->setTemplateId($formData['template_id']);
+            ->setTemplateId((int) $formData['template_id']);
 
         return $createEvent;
     }
@@ -197,8 +197,8 @@ class ProductController extends AbstractSeoCrudController
             ->setVisible($formData['visible'] ?? false)
             ->setVirtual($formData['virtual'] ?? false)
             ->setDefaultCategory($formData['default_category'])
-            ->setBrandId($formData['brand_id'])
-            ->setVirtualDocumentId($formData['virtual_document_id']);
+            ->setBrandId((int) $formData['brand_id'])
+            ->setVirtualDocumentId((int) $formData['virtual_document_id']);
 
         // Create and dispatch the change event
         return $changeEvent;

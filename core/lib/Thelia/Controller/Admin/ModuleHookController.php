@@ -171,13 +171,13 @@ class ModuleHookController extends AbstractCrudController
     {
         if (!$update) {
             $event
-                ->setModuleId($formData['module_id'])
-                ->setHookId($formData['hook_id']);
+                ->setModuleId((int) $formData['module_id'])
+                ->setHookId((int) $formData['hook_id']);
         } else {
             $event
-                ->setModuleHookId($formData['id'])
-                ->setModuleId($formData['module_id'])
-                ->setHookId($formData['hook_id'])
+                ->setModuleHookId((int) $formData['id'])
+                ->setModuleId((int) $formData['module_id'])
+                ->setHookId((int) $formData['hook_id'])
                 ->setClassname($formData['classname'])
                 ->setMethod($formData['method'])
                 ->setActive($formData['active'])

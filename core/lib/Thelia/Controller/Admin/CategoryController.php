@@ -100,7 +100,7 @@ class CategoryController extends AbstractSeoCrudController
             ->setPostscriptum($formData['postscriptum'])
             ->setVisible($formData['visible'])
             ->setParent($formData['parent'])
-            ->setDefaultTemplateId($formData['default_template_id']);
+            ->setDefaultTemplateId((int) $formData['default_template_id']);
 
         return $changeEvent;
     }

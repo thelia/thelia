@@ -80,7 +80,7 @@ class ChoiceFilterController extends BaseAdminController
 
             if ('attribute' === $filter['type']) {
                 $choiceFilter
-                    ->setAttributeId($filter['id']);
+                    ->setAttributeId((int) $filter['id']);
             } elseif ('feature' === $filter['type']) {
                 $choiceFilter
                     ->setFeatureId((int) $filter['id']);
