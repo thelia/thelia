@@ -743,7 +743,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             }
         }
 
-        $featureProduct->setFeatureAvId($featureAvId);
+        $featureProduct->setFeatureAvId(null === $featureAvId || '' === $featureAvId ? null : (int) $featureAvId);
 
         $featureProduct->save();
 

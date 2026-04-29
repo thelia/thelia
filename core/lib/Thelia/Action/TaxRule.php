@@ -85,7 +85,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
                             $taxModel->setTaxRule($taxRule)
                                 ->setCountryId($countryId)
                                 ->setStateId($stateId ?: null)
-                                ->setTaxId($samePositionTax)
+                                ->setTaxId((int) $samePositionTax)
                                 ->setPosition($position);
                             $taxModel->save();
                         }
@@ -94,7 +94,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
                         $taxModel->setTaxRule($taxRule)
                             ->setCountryId($countryId)
                             ->setStateId($stateId ?: null)
-                            ->setTaxId($tax)
+                            ->setTaxId((int) $tax)
                             ->setPosition($position);
                         $taxModel->save();
                     }

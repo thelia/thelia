@@ -486,11 +486,11 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             switch ($type) {
                 case 'image':
                     $assoc = new ProductSaleElementsProductImage();
-                    $assoc->setProductImageId($clonedProductFileIdToLinkToPSE);
+                    $assoc->setProductImageId((int) $clonedProductFileIdToLinkToPSE);
                     break;
                 case 'document':
                     $assoc = new ProductSaleElementsProductDocument();
-                    $assoc->setProductDocumentId($clonedProductFileIdToLinkToPSE);
+                    $assoc->setProductDocumentId((int) $clonedProductFileIdToLinkToPSE);
                     break;
             }
 

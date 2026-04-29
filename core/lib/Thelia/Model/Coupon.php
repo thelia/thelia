@@ -109,6 +109,7 @@ class Coupon extends BaseCoupon
             CouponModuleQuery::create()->filterByCouponId($this->id)->delete();
 
             foreach ($freeShippingForCountries as $countryId) {
+                $countryId = (int) $countryId;
                 if ($countryId <= 0) {
                     continue;
                 }
@@ -122,6 +123,7 @@ class Coupon extends BaseCoupon
             }
 
             foreach ($freeShippingForMethods as $moduleId) {
+                $moduleId = (int) $moduleId;
                 if ($moduleId <= 0) {
                     continue;
                 }
