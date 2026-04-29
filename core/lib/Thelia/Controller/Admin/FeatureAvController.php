@@ -67,7 +67,7 @@ class FeatureAvController extends AbstractCrudController
         $createEvent = new FeatureAvCreateEvent();
 
         $createEvent
-            ->setFeatureId($formData['feature_id'])
+            ->setFeatureId((int) $formData['feature_id'])
             ->setTitle($formData['title'])
             ->setLocale($formData['locale']);
 

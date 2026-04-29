@@ -67,7 +67,7 @@ class AttributeAvController extends AbstractCrudController
         $createEvent = new AttributeAvCreateEvent();
 
         $createEvent
-            ->setAttributeId($formData['attribute_id'])
+            ->setAttributeId((int) $formData['attribute_id'])
             ->setTitle($formData['title'])
             ->setLocale($formData['locale']);
 
