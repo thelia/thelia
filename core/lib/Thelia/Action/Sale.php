@@ -264,8 +264,8 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
                             $saleProduct
                                 ->setSaleId($sale->getId())
-                                ->setProductId($productId)
-                                ->setAttributeAvId($attributeId)
+                                ->setProductId((int) $productId)
+                                ->setAttributeAvId((int) $attributeId)
                                 ->save($con);
                         }
                     } else {
@@ -273,7 +273,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
                         $saleProduct
                             ->setSaleId($sale->getId())
-                            ->setProductId($productId)
+                            ->setProductId((int) $productId)
                             ->setAttributeAvId(null)
                             ->save($con);
                     }

@@ -91,7 +91,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                         $attributeCombination = new AttributeCombination();
 
                         $attributeCombination
-                            ->setAttributeAvId($attributeAvId)
+                            ->setAttributeAvId((int) $attributeAvId)
                             ->setAttribute($attributeAv->getAttribute())
                             ->setProductSaleElements($salesElement)
                             ->save($con);
@@ -329,7 +329,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 $attributeCombination = new AttributeCombination();
 
                 $attributeCombination
-                    ->setAttributeAvId($attributeAvId)
+                    ->setAttributeAvId((int) $attributeAvId)
                     ->setAttribute($attributeAv->getAttribute())
                     ->setProductSaleElements($salesElement)
                     ->save($con);
