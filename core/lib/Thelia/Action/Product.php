@@ -98,7 +98,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->setTitle($event->getTitle())
             ->setVisible($event->getVisible() ? 1 : 0)
             ->setVirtual($event->getVirtual() ? 1 : 0)
-            ->setTemplateId($event->getTemplateId())
+            ->setTemplateId((int) $event->getTemplateId())
 
             ->create(
                 $event->getDefaultCategory(),
@@ -179,7 +179,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->setVisible(0)
             ->setQuantity(0)
             ->setVirtual((bool) $event->getOriginalProduct()->getVirtual())
-            ->setTaxRuleId($event->getOriginalProduct()->getTaxRuleId())
+            ->setTaxRuleId((int) $event->getOriginalProduct()->getTaxRuleId())
             ->setDefaultCategory($event->getOriginalProduct()->getDefaultCategoryId())
             ->setBasePrice((float) $originalProductDefaultPrice->getPrice())
             ->setCurrencyId($originalProductDefaultPrice->getCurrencyId())
@@ -213,8 +213,8 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->setBasePrice((float) $originalProductDefaultPrice->getPrice())
                 ->setCurrencyId($originalProductDefaultPrice->getCurrencyId())
                 ->setBaseWeight($event->getOriginalProduct()->getDefaultSaleElements()->getWeight())
-                ->setTaxRuleId($event->getOriginalProduct()->getTaxRuleId())
-                ->setBrandId($event->getOriginalProduct()->getBrandId())
+                ->setTaxRuleId((int) $event->getOriginalProduct()->getTaxRuleId())
+                ->setBrandId((int) $event->getOriginalProduct()->getBrandId())
                 ->setDefaultCategory($event->getOriginalProduct()->getDefaultCategoryId());
 
             $this->eventDispatcher->dispatch($clonedProductUpdateEvent, TheliaEvents::PRODUCT_UPDATE);
@@ -349,7 +349,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->setPostscriptum($event->getPostscriptum())
                 ->setVisible($event->getVisible() ? 1 : 0)
                 ->setVirtual($event->getVirtual() ? 1 : 0)
-                ->setBrandId($event->getBrandId() <= 0 ? null : $event->getBrandId())
+                ->setBrandId($event->getBrandId() > 0 ? (int) $event->getBrandId() : null)
 
                 ->save($con);
 
@@ -466,7 +466,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             $content
                 ->setProduct($event->getProduct())
-                ->setContentId($event->getContentId())
+                ->setContentId((int) $event->getContentId())
                 ->save();
         }
     }
@@ -491,7 +491,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->count() <= 0) {
             $productCategory = (new ProductCategory())
                 ->setProduct($event->getProduct())
-                ->setCategoryId($event->getCategoryId())
+                ->setCategoryId((int) $event->getCategoryId())
                 ->setDefaultCategory(false);
 
             $productCategory
@@ -520,7 +520,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             $accessory = new Accessory();
 
             $accessory
-                ->setProductId($event->getProduct()->getId())
+                ->setProductId((int) $event->getProduct()->getId())
                 ->setAccessory($event->getAccessoryId())
                 ->save();
         }

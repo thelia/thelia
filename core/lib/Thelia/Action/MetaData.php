@@ -41,7 +41,7 @@ class MetaData extends BaseAction implements EventSubscriberInterface
             $metaData
                 ->setMetaKey($event->getMetaKey())
                 ->setElementKey($event->getElementkey())
-                ->setElementId($event->getElementId());
+                ->setElementId((int) $event->getElementId());
         }
 
         // setSerializableValue() normalizes the value (scalar or

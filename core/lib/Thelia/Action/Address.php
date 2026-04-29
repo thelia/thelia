@@ -73,7 +73,7 @@ class Address extends BaseAction implements EventSubscriberInterface
         try {
             $addressModel
                 ->setLabel($event->getLabel())
-                ->setTitleId($event->getTitle() ?? $this->customerTitleService->getDefaultCustomerTitle()?->getId())
+                ->setTitleId(null !== $event->getTitle() ? (int) $event->getTitle() : $this->customerTitleService->getDefaultCustomerTitle()?->getId())
                 ->setFirstname($event->getFirstname())
                 ->setLastname($event->getLastname())
                 ->setAddress1($event->getAddress1())
@@ -81,7 +81,7 @@ class Address extends BaseAction implements EventSubscriberInterface
                 ->setAddress3($event->getAddress3() ?? '')
                 ->setZipcode($event->getZipcode())
                 ->setCity($event->getCity())
-                ->setCountryId($event->getCountry())
+                ->setCountryId((int) $event->getCountry())
                 ->setStateId($event->getState() ? (int) $event->getState() : null)
                 ->setCellphone((string) $event->getCellphone())
                 ->setPhone((string) $event->getPhone())

@@ -114,7 +114,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     {
         $order = $event->getOrder();
 
-        $order->setPaymentModuleId($event->getPaymentModule());
+        $order->setPaymentModuleId((int) $event->getPaymentModule());
 
         $event->setOrder($order);
     }

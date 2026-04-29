@@ -75,7 +75,7 @@ class Profile extends BaseAction implements EventSubscriberInterface
                 $manager->build($accesses);
 
                 $profileResource = new ProfileResource();
-                $profileResource->setProfileId($event->getId())
+                $profileResource->setProfileId((int) $event->getId())
                     ->setResource(ResourceQuery::create()->findOneByCode($resourceCode))
                     ->setAccess($manager->getAccessValue());
 
@@ -96,7 +96,7 @@ class Profile extends BaseAction implements EventSubscriberInterface
                 $manager->build($accesses);
 
                 $profileModule = new ProfileModule();
-                $profileModule->setProfileId($event->getId())
+                $profileModule->setProfileId((int) $event->getId())
                     ->setModule(ModuleQuery::create()->findOneByCode($moduleCode))
                     ->setAccess($manager->getAccessValue());
 

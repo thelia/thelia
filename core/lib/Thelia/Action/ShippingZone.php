@@ -33,8 +33,8 @@ class ShippingZone extends BaseAction implements EventSubscriberInterface
         $areaDelivery = new AreaDeliveryModule();
 
         $areaDelivery
-            ->setAreaId($event->getAreaId())
-            ->setDeliveryModuleId($event->getShippingZoneId())
+            ->setAreaId((int) $event->getAreaId())
+            ->setDeliveryModuleId((int) $event->getShippingZoneId())
             ->save();
     }
 

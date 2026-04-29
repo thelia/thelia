@@ -156,7 +156,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
         $customer = $event->getCustomer();
 
         if (null !== $event->getTitle()) {
-            $customer->setTitleId($event->getTitle());
+            $customer->setTitleId((int) $event->getTitle());
         }
 
         if (null !== $event->getFirstname()) {
@@ -188,7 +188,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
         }
 
         if (null !== $event->getLangId()) {
-            $customer->setLangId($event->getLangId());
+            $customer->setLangId((int) $event->getLangId());
         }
 
         $customer->save();

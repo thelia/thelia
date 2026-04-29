@@ -41,7 +41,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
             ->setEmail($event->getEmail())
             ->setLogin($event->getLogin())
             ->setPassword($event->getPassword())
-            ->setProfileId($event->getProfile())
+            ->setProfileId((int) $event->getProfile())
             ->setLocale($event->getLocale());
 
         $administrator->save();
@@ -59,7 +59,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
             ->setLastname($event->getLastname())
             ->setLogin($event->getLogin())
             ->setEmail($event->getEmail())
-            ->setProfileId($event->getProfile())
+            ->setProfileId((int) $event->getProfile())
             ->setLocale($event->getLocale());
 
         if ('' !== $event->getPassword()) {

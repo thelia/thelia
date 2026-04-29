@@ -172,7 +172,7 @@ class Category extends BaseAction implements EventSubscriberInterface
 
         $content
             ->setCategory($event->getCategory())
-            ->setContentId($event->getContentId())
+            ->setContentId((int) $event->getContentId())
             ->setPosition(1)
             ->save();
     }

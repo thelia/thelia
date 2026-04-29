@@ -125,7 +125,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
         try {
             // Update the product's tax rule
-            $event->getProduct()->setTaxRuleId($event->getTaxRuleId())->save($con);
+            $event->getProduct()->setTaxRuleId((int) $event->getTaxRuleId())->save($con);
 
             // If product sale element is not defined, create it.
             if (null === $salesElement) {
@@ -176,7 +176,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
                 $productPrice
                     ->setProductSaleElements($salesElement)
-                    ->setCurrencyId($event->getCurrencyId());
+                    ->setCurrencyId((int) $event->getCurrencyId());
             }
 
             // Check if we have to store the price

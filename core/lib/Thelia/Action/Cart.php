@@ -119,14 +119,14 @@ class Cart extends BaseAction implements EventSubscriberInterface
     public function setPaymentModule(CartCheckoutEvent $event): void
     {
         $cart = $event->getCart();
-        $cart->setPaymentModuleId($event->getPaymentModuleId());
+        $cart->setPaymentModuleId((int) $event->getPaymentModuleId());
         $cart->save();
     }
 
     public function setDeliveryModule(CartCheckoutEvent $event): void
     {
         $cart = $event->getCart();
-        $cart->setDeliveryModuleId($event->getDeliveryModuleId());
+        $cart->setDeliveryModuleId((int) $event->getDeliveryModuleId());
         $cart->save();
     }
 
