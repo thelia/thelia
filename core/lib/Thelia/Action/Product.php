@@ -675,8 +675,8 @@ class Product extends BaseAction implements EventSubscriberInterface
             $featureProduct = new FeatureProduct();
 
             $featureProduct
-                ->setProductId($event->getProductId())
-                ->setFeatureId($event->getFeatureId());
+                ->setProductId((int) $event->getProductId())
+                ->setFeatureId((int) $event->getFeatureId());
 
             // If it's a free text value, create a FeatureAv to handle i18n
             if ($event->getIsTextValue()) {
@@ -684,7 +684,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
                 $createFeatureAvEvent = new FeatureAvCreateEvent();
                 $createFeatureAvEvent
-                    ->setFeatureId($event->getFeatureId())
+                    ->setFeatureId((int) $event->getFeatureId())
                     ->setLocale($event->getLocale())
                     ->setTitle($event->getFeatureValue());
                 $this->eventDispatcher->dispatch($createFeatureAvEvent, TheliaEvents::FEATURE_AV_CREATE);

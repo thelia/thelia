@@ -34,7 +34,7 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
         $feature = new FeatureAvModel();
 
         $feature
-            ->setFeatureId($event->getFeatureId())
+            ->setFeatureId((int) $event->getFeatureId())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
 

@@ -168,7 +168,7 @@ class Template extends BaseAction implements EventSubscriberInterface
             $attributeTemplate = new AttributeTemplate();
 
             $attributeTemplate
-                ->setAttributeId($event->getAttributeId())
+                ->setAttributeId((int) $event->getAttributeId())
                 ->setTemplate($event->getTemplate())
                 ->save();
         }
@@ -216,7 +216,7 @@ class Template extends BaseAction implements EventSubscriberInterface
             $featureTemplate = new FeatureTemplate();
 
             $featureTemplate
-                ->setFeatureId($event->getFeatureId())
+                ->setFeatureId((int) $event->getFeatureId())
                 ->setTemplate($event->getTemplate())
                 ->save();
         }

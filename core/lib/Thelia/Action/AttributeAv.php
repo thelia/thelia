@@ -34,7 +34,7 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
         $attribute = new AttributeAvModel();
 
         $attribute
-            ->setAttributeId($event->getAttributeId())
+            ->setAttributeId((int) $event->getAttributeId())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
 
