@@ -49,7 +49,7 @@ class AttributeAvCreateEvent extends AttributeAvEvent
         return $this->attribute_id;
     }
 
-    public function setAttributeId($attribute_id): static
+    public function setAttributeId(?int $attribute_id): static
     {
         $this->attribute_id = $attribute_id;
 

@@ -49,7 +49,7 @@ class FeatureAvCreateEvent extends FeatureAvEvent
         return $this->feature_id;
     }
 
-    public function setFeatureId($feature_id): static
+    public function setFeatureId(?int $feature_id): static
     {
         $this->feature_id = $feature_id;
 
