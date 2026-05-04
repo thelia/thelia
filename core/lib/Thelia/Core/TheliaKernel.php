@@ -823,7 +823,7 @@ class TheliaKernel extends Kernel
                 $typeName = ucfirst((string) TemplateDefinition::$standardTemplatesSubdirs[$type]);
                 $moduleMethod = 'getAbsolute'.$typeName.'I18nTemplatePath';
 
-                if (!method_exists($moduleMethod, $module::class)) {
+                if (!method_exists($module, $moduleMethod)) {
                     continue;
                 }
 
