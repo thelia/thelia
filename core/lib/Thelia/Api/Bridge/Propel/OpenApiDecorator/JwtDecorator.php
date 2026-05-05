@@ -18,6 +18,7 @@ use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\PathItem;
 use ApiPlatform\OpenApi\Model\RequestBody;
+use ApiPlatform\OpenApi\Model\Response;
 use ApiPlatform\OpenApi\OpenApi;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
@@ -80,16 +81,16 @@ class JwtDecorator implements OpenApiFactoryInterface
                 operationId: 'postCredentialsItem'.$type,
                 tags: ['Token '.$type],
                 responses: [
-                    '200' => [
-                        'description' => 'Get JWT token for '.$type.' routes',
-                        'content' => [
+                    '200' => new Response(
+                        description: 'Get JWT token for '.$type.' routes',
+                        content: new \ArrayObject([
                             'application/json' => [
                                 'schema' => [
                                     '$ref' => '#/components/schemas/Token',
                                 ],
                             ],
-                        ],
-                    ],
+                        ]),
+                    ),
                 ],
                 summary: 'Get JWT token to login to '.$type,
                 requestBody: new RequestBody(

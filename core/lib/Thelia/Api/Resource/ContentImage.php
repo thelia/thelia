@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model\Operation;
+use ApiPlatform\OpenApi\Model\Response;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -58,9 +59,7 @@ use Thelia\Model\Map\ContentImageTableMap;
             controller: BinaryFileController::class,
             openapi: new Operation(
                 responses: [
-                    '200' => [
-                        'description' => 'The binary file',
-                    ],
+                    '200' => new Response(description: 'The binary file'),
                 ],
             ),
         ),
@@ -93,9 +92,7 @@ use Thelia\Model\Map\ContentImageTableMap;
             controller: BinaryFileController::class,
             openapi: new Operation(
                 responses: [
-                    '200' => [
-                        'description' => 'The binary file',
-                    ],
+                    '200' => new Response(description: 'The binary file'),
                 ],
             ),
         ),
