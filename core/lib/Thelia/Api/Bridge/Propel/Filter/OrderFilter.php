@@ -24,8 +24,6 @@ class OrderFilter extends AbstractFilter
     public function apply(ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
     {
         if (!isset($context['filters']['order']) || !\is_array($context['filters']['order'])) {
-            parent::apply($query, $resourceClass, $operation, $context);
-
             return;
         }
 
