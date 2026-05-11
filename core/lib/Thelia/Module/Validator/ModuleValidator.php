@@ -317,8 +317,14 @@ class ModuleValidator
             }
 
             if ($recursive) {
-                $recursiveModuleValidator = new self(THELIA_MODULE_DIR.'/'.$dependency);
-                array_merge(
+                $dependencyCode = (string) $dependency;
+                $vendorPath = THELIA_MODULE_DIR.$dependencyCode;
+                $modulePath = is_dir($vendorPath)
+                    ? $vendorPath
+                    : THELIA_LOCAL_MODULE_DIR.$dependencyCode;
+
+                $recursiveModuleValidator = new self($modulePath);
+                $dependencies = array_merge(
                     $dependencies,
                     $recursiveModuleValidator->getCurrentModuleDependencies(true),
                 );
