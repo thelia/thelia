@@ -169,7 +169,10 @@ class Module extends BaseAction implements EventSubscriberInterface
                 ->findOneByCode($defMod['code']);
 
             if (!$submodule) {
-                $absolutePathToSubModule = $module->getAbsoluteBaseDir().DS.'..'.DS.$defMod['code'];
+                $dependencyCode = $defMod['code'];
+                $absolutePathToSubModule = is_dir(THELIA_MODULE_DIR.$dependencyCode)
+                    ? THELIA_MODULE_DIR.$dependencyCode
+                    : THELIA_LOCAL_MODULE_DIR.$dependencyCode;
                 $moduleInstallEvent = (new ModuleInstallEvent())
                     ->setModulePath($absolutePathToSubModule)
                     ->setModuleDefinition((new ModuleValidator($absolutePathToSubModule))->getModuleDefinition());
