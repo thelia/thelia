@@ -149,15 +149,26 @@ class PropelInitService
     public function buildPropelGlobalSchema(): bool
     {
         $fs = new Filesystem();
+        $schemaDir = $this->getPropelSchemaDir();
 
-        // TODO: caching rules ?
-        if ($fs->exists($this->getPropelSchemaDir())) {
-            return false;
+        if ($fs->exists($schemaDir)) {
+            // A populated $schemaDir means a previous build completed (atomic
+            // rename below). An empty one is leftover from a build that crashed
+            // before writing any file — treat it as incomplete and rebuild.
+            if (glob($schemaDir.'*.schema.xml')) {
+                return false;
+            }
+            $fs->remove($schemaDir);
         }
 
-        $hash = '';
-
-        $fs->mkdir($this->getPropelSchemaDir());
+        // Build into a sibling .tmp dir then atomic-rename. If an exception fires
+        // mid-build the final $schemaDir never exists, so the next run rebuilds
+        // cleanly instead of being short-circuited by an empty leftover dir.
+        $tmpDir = rtrim($schemaDir, DS).'.tmp'.DS;
+        if ($fs->exists($tmpDir)) {
+            $fs->remove($tmpDir);
+        }
+        $fs->mkdir($tmpDir);
 
         $activeCodes = $this->getActiveModuleCodes();
         $schemas = $activeCodes === null
@@ -165,17 +176,20 @@ class PropelInitService
             : $this->schemaLocator->findForModules($activeCodes, true);
 
         $schemaCombiner = new SchemaCombiner($schemas);
+        $hash = '';
 
         foreach ($schemaCombiner->getDatabases() as $database) {
             $databaseSchemaCache = new ConfigCache(
-                \sprintf('%s%s.schema.xml', $this->getPropelSchemaDir(), $database),
+                \sprintf('%s%s.schema.xml', $tmpDir, $database),
                 $this->debug,
             );
 
             $databaseSchemaCache->write($schemaCombiner->getCombinedDocument($database)->saveXML());
 
-            $hash .= md5(file_get_contents($this->getPropelSchemaDir().$database.'.schema.xml'));
+            $hash .= md5(file_get_contents($tmpDir.$database.'.schema.xml'));
         }
+
+        $fs->rename($tmpDir, $schemaDir);
 
         $fs->dumpFile($this->getPropelCacheDir().'hash', $hash);
 
