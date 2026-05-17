@@ -19,4 +19,5 @@ return [
     Symfony\UX\LiveComponent\LiveComponentBundle::class => ['all' => true],
     Symfony\UX\Icons\UXIconsBundle::class => ['all' => true],
     FlexyBundle\FlexyBundle::class => ['all' => true],
+    BackOfficeDefaultBundle\BackOfficeDefaultBundle::class => ['all' => true],
 ];
