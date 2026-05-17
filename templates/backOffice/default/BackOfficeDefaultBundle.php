@@ -24,6 +24,17 @@ final class BackOfficeDefaultBundle extends AbstractBundle
         $services = $container->services();
 
         $services
+            ->defaults()
+            ->autowire()
+            ->autoconfigure();
+
+        $services
+            ->load('Thelia\\Controller\\Admin\\', __DIR__.'/Controller/Admin/');
+
+        $services
+            ->load('Thelia\\Form\\', __DIR__.'/Form/');
+
+        $services
             ->set('bo_default.routing.attribute_loader', BackOfficeDefaultAttributeLoader::class)
             ->public()
             ->tag('routing.loader', ['priority' => 254]);
@@ -52,7 +63,6 @@ final class BackOfficeDefaultBundle extends AbstractBundle
             ])
             ->tag('router.register', ['priority' => 0])
             ->public();
-
     }
 
     public function build(ContainerBuilder $container): void
