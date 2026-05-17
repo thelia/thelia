@@ -25,9 +25,10 @@
         }
     ],
     "require": {
-        "php": ">= 8.2",
+        "php": ">= 8.3",
         "thelia/core": "dev-twig",
         "thelia/backoffice-default-template": "dev-twig",
+        "thelia/backoffice-default-twig-template": "dev-main",
         "thelia/email-default-template": "dev-twig",
         "thelia/pdf-default-template": "dev-twig",
         "symfony/flex": "^2.4",
@@ -127,7 +128,6 @@
                 "vendor/thelia/modules"
             ],
             "App\\": "src/",
-            "FlexyBundle\\": "templates/frontOffice/flexy/src/",
             "Thelia\\": "core/lib/Thelia"
         },
         "files": [
@@ -156,6 +156,9 @@
         "installer-paths": {
             "vendor/{$vendor}/modules/{$name}": [
                 "type:thelia-module"
+            ],
+            "templates/backOffice/{$name}": [
+                "type:thelia-backoffice-template"
             ],
             "templates/email/{$name}": [
                 "type:thelia-email-template"

@@ -86,7 +86,7 @@ trait ParserTemplateTrait
         }
     }
 
-    public function getTemplateDefinition(string|bool $webAssetTemplateName = false): TemplateDefinition
+    public function getTemplateDefinition(string|bool $webAssetTemplateName = false): ?TemplateDefinition
     {
         return $this->templateDefinition;
     }

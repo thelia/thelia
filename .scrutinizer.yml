@@ -1,0 +1,25 @@
+build:
+    environment:
+        php:
+            version: '8.3.16'
+            ini:
+                date.timezone: 'UTC'
+                memory_limit: '-1'
+
+    nodes:
+        analysis:
+            tests:
+                override:
+                    - php-scrutinizer-run
+                    - command: composer phpstan
+                      use_website_config: false
+
+filter:
+    excluded_paths:
+        - 'core/CHANGELOG.md'
+        - 'tests/*'
+        - 'templates/*'
+        - 'vendor/*'
+        - 'var/*'
+        - 'public/*'
+        - 'local/*'
