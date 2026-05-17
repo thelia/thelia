@@ -37,19 +37,6 @@ return static function (ContainerConfigurator $container): void {
     $services->set('request.context', (string) param('router.request_context.class'))
         ->public();
 
-    // Router file locator
-    $services->set('router.fileLocator', FileLocator::class)
-        ->args([
-            param('thelia.core_dir').'/Config/Resources/routing',
-        ])
-        ->public();
-
-    // Router XML loader
-    $services->set('router.xmlLoader', XmlFileLoader::class)
-        ->args([
-            service('router.fileLocator'),
-        ]);
-
     // Module file locator
     $services->set('router.module.fileLocator', FileLocator::class)
         ->args([
@@ -61,20 +48,6 @@ return static function (ContainerConfigurator $container): void {
         ->args([
             service('router.module.fileLocator'),
         ]);
-
-    // Admin router
-    $services->set('router.admin', (string) param('router.class'))
-        ->args([
-            service('router.xmlLoader'),
-            'admin.xml',
-            [
-                'cache_dir' => param('kernel.cache_dir'),
-                'debug' => param('kernel.debug'),
-            ],
-            service('request.context'),
-        ])
-        ->tag('router.register', ['priority' => 0])
-        ->public();
 
     // Rewriting router
     $services->set('router.rewrite', RewritingRouter::class)->args(
