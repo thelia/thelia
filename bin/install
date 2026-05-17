@@ -11,11 +11,13 @@ declare(strict_types=1);
  * database is populated, modules are registered, and the kernel can boot.
  *
  * Usage:
- *   php bin/install                                       (reads env vars)
- *   php bin/install --with-demo --with-admin              (non-interactive)
- *   ddev exec php bin/install
+ *   php bin/install                                                                                 (reads env vars)
+ *   php bin/install --database_host=db --database_name=db --database_user=db --database_password=db (CLI flags)
+ *   php bin/install --with-demo --with-admin                                                        (non-interactive)
+ *   ddev exec php bin/install                                                                       (DDEV web_environment)
  *
- * Required env vars: DATABASE_HOST, DATABASE_PORT, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD
+ * Database credentials are resolved in this order: CLI flag > env var ($_SERVER) > default.
+ * DATABASE_HOST and DATABASE_NAME are required (no default).
  */
 
 // Define path constants before autoload. core/bootstrap.php derives
@@ -63,17 +65,22 @@ $options = getopt('', [
     'admin_first_name:',
     'admin_last_name:',
     'admin_email:',
+    'database_host:',
+    'database_port:',
+    'database_name:',
+    'database_user:',
+    'database_password:',
 ]);
 
-$host     = $_SERVER['DATABASE_HOST'] ?? '';
-$port     = $_SERVER['DATABASE_PORT'] ?? '3306';
-$user     = $_SERVER['DATABASE_USER'] ?? '';
-$password = $_SERVER['DATABASE_PASSWORD'] ?? '';
-$dbName   = $_SERVER['DATABASE_NAME'] ?? '';
+$host     = $options['database_host']     ?? $_SERVER['DATABASE_HOST']     ?? '';
+$port     = $options['database_port']     ?? $_SERVER['DATABASE_PORT']     ?? '3306';
+$user     = $options['database_user']     ?? $_SERVER['DATABASE_USER']     ?? '';
+$password = $options['database_password'] ?? $_SERVER['DATABASE_PASSWORD'] ?? '';
+$dbName   = $options['database_name']     ?? $_SERVER['DATABASE_NAME']     ?? '';
 $errors   = 0;
 
 if ('' === $host || '' === $dbName) {
-    fwrite(STDERR, "ERROR: DATABASE_HOST and DATABASE_NAME must be set.\n");
+    fwrite(STDERR, "ERROR: DATABASE_HOST and DATABASE_NAME must be set (via env var or --database_host/--database_name).\n");
     exit(1);
 }
 
