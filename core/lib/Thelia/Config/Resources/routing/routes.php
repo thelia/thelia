@@ -35,10 +35,4 @@ return static function (RoutingConfigurator $routes): void {
     $routes->import('.', 'module_attribute');
     $routes->import('.', 'template_attribute');
     $routes->import('.', 'module_xml');
-
-    $backOfficeDefaultControllerPath = THELIA_ROOT.'templates'.DS.'backOffice'.DS.'default'.DS.'Controller';
-
-    if (is_dir($backOfficeDefaultControllerPath)) {
-        $routes->import($backOfficeDefaultControllerPath, 'attribute');
-    }
 };

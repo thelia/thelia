@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackOfficeDefaultBundle;
 
+use BackOfficeDefaultBundle\Routing\BackOfficeDefaultAttributeLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
@@ -16,6 +17,11 @@ final class BackOfficeDefaultBundle extends AbstractBundle
 
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
+        $container->services()
+            ->set('bo_default.routing.attribute_loader', BackOfficeDefaultAttributeLoader::class)
+            ->public()
+            ->tag('routing.loader', ['priority' => 254]);
+
         if (!$this->isActive($builder)) {
             return;
         }
