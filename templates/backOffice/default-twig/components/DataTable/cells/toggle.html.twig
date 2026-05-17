@@ -1,0 +1,19 @@
+{%- set urlKey = column.options.url_key|default(null) -%}
+{%- set href = urlKey ? row[urlKey]|default(null) : null -%}
+{%- set state = value ? 'on' : 'off' -%}
+{%- set iconOn = column.options.icon_on|default('bi-check-circle-fill text-success') -%}
+{%- set iconOff = column.options.icon_off|default('bi-circle text-secondary') -%}
+{% if href %}
+    <a href="{{ href }}"
+       class="bo-toggle"
+       data-testid="datatable-{{ column.key }}-toggle"
+       data-state="{{ state }}"
+       aria-pressed="{{ value ? 'true' : 'false' }}"
+       aria-label="{{ column.label }}">
+        <i class="bi {{ value ? iconOn : iconOff }}" aria-hidden="true"></i>
+    </a>
+{% else %}
+    <span class="bo-toggle bo-toggle--readonly" data-state="{{ state }}" aria-label="{{ column.label }}">
+        <i class="bi {{ value ? iconOn : iconOff }}" aria-hidden="true"></i>
+    </span>
+{% endif %}

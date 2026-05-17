@@ -1,0 +1,70 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Edit content'|trans }} — {{ content.title }}{% endblock %}
+{% block body_testid %}folder-content-edit{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.folders.default') }}">{{ 'Library'|trans }}</a></li>
+            {% if content.defaultFolderId %}
+                <li class="breadcrumb-item"><a href="{{ path('admin.folders.default', { folder_id: content.defaultFolderId }) }}">{{ 'Parent folder'|trans }}</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active" aria-current="page">{{ content.title }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    {{ safe_hook('content.top', { content: content.id }) }}
+
+    <div class="container-fluid" data-testid="content-edit-page">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h3 mb-0">{{ 'Content'|trans }} <small class="text-muted">#{{ content.id }}</small></h1>
+            <a href="{{ path('admin.folders.default', { folder_id: content.defaultFolderId|default(0) }) }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i> {{ 'Back'|trans }}
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                {{ form_start(form, { action: path('admin.content.save'), method: 'post', attr: { 'data-testid': 'content-edit-form' } }) }}
+                    <input type="hidden" name="content_id" value="{{ content.id }}">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            {{ form_row(form.title) }}
+                            {{ form_row(form.chapo) }}
+                            {{ form_row(form.description) }}
+                            {{ form_row(form.postscriptum) }}
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check mb-3">
+                                {{ form_widget(form.visible, { attr: { class: 'form-check-input' } }) }}
+                                {{ form_label(form.visible, null, { label_attr: { class: 'form-check-label' } }) }}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="content_default_folder">{{ 'Default folder'|trans }}</label>
+                                <select name="thelia_content_modification[default_folder]" id="content_default_folder" class="form-select" data-testid="content-default-folder">
+                                    {% for folder in folders %}
+                                        <option value="{{ folder.id }}" {% if folder.id == content.defaultFolderId %}selected{% endif %}>{{ folder.title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    {{ form_widget(form.id) }}
+                    {{ form_widget(form.locale) }}
+                    {{ safe_hook('content.update-form', { content: content.id }) }}
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary" data-testid="content-edit-submit">
+                            <i class="bi bi-check2" aria-hidden="true"></i> {{ 'Save'|trans }}
+                        </button>
+                    </div>
+                {{ form_end(form, { render_rest: false }) }}
+            </div>
+        </div>
+    </div>
+
+    {{ safe_hook('content.bottom', { content: content.id }) }}
+{% endblock %}

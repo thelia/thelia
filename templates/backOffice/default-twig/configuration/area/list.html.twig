@@ -1,0 +1,96 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Thelia Shipping configuration'|trans }}{% endblock %}
+{% block body_testid %}shipping-configuration-list{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="/admin/configuration">{{ 'Configuration'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ 'Shipping zones management'|trans }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    {{ safe_hook('shipping-configuration.top', { location: 'shipping_configuration_top' }) }}
+
+    <div class="container-fluid" data-testid="shipping-configuration-page">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h3 mb-0">{{ 'Shipping zones management'|trans }}</h1>
+            {% if is_granted('CREATE', 'admin.configuration.shipping-configuration') %}
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shipping-configuration-create-modal" data-testid="shipping-configuration-create-btn">
+                    <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>{{ 'Add a new shipping zone'|trans }}
+                </button>
+            {% endif %}
+        </div>
+
+        {{ component('BoDataTable', {
+            id: 'shipping-configuration',
+            columns: [
+                column('id', 'ID'|trans),
+                column('name', 'Zone name'|trans),
+                column('countries', 'Included countries'|trans),
+                column('modules', 'Assigned modules'|trans),
+                column_actions('_actions', 'Actions'|trans),
+            ],
+            rows: rows,
+            emptyMessage: 'No shipping zone defined yet. Click the + button to create one.'|trans,
+        }) }}
+    </div>
+
+    {{ safe_hook('shipping-configuration.bottom', { location: 'shipping_configuration_bottom' }) }}
+
+    {# Create modal #}
+    <div class="modal fade" id="shipping-configuration-create-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                {{ form_start(create_form, { attr: { action: path('admin.configuration.shipping-configuration.create'), 'data-testid': 'shipping-configuration-create-form' } }) }}
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ 'Create a new shipping zone'|trans }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
+                    </div>
+                    <div class="modal-body">
+                        {{ form_row(create_form.name) }}
+                        {{ safe_hook('shipping-configuration.create-form', { location: 'shipping_configuration_create_form' }) }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                        <button type="submit" class="btn btn-primary">{{ 'Create this shipping zone'|trans }}</button>
+                    </div>
+                {{ form_end(create_form, { render_rest: false }) }}
+            </div>
+        </div>
+    </div>
+
+    {# Delete modal #}
+    <div class="modal fade" id="shipping-configuration-delete-modal" tabindex="-1" aria-hidden="true"
+         data-controller="bo-prefill-modal"
+         data-bo-prefill-modal-source-trigger-value="data-area-id"
+         data-bo-prefill-modal-target-input-value="area_id">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="{{ path('admin.configuration.shipping-configuration.delete') }}?_token={{ assignToken() }}" data-testid="shipping-configuration-delete-form">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ 'Delete shipping zone'|trans }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>{{ 'Do you really want to delete this shipping zone ?'|trans }}</p>
+                        <input type="hidden" name="area_id" data-bo-prefill-modal-target="input">
+                        {{ safe_hook('shipping-configuration.delete-form', { location: 'shipping_configuration_delete_form' }) }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                        <button type="submit" class="btn btn-danger">{{ 'Delete'|trans }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript_last_call %}
+    {{ safe_hook('shipping-configuration.js', { location: 'shipping-configuration-js' }) }}
+{% endblock %}

@@ -1,0 +1,32 @@
+{% set selected_operator = validators.setOperators[field_name] ?? 'in' %}
+<div class="mb-3" data-controller="bo-coupon-multiselect-search">
+    <label class="form-label">{{ country_label }}</label>
+    <div class="row g-2">
+        <div class="col-md-4">
+            <select class="form-select" name="{{ field_name }}[operator]">
+                {% for op in available_operators[field_name] ?? [] %}
+                    <option value="{{ op.value }}" {{ op.value == selected_operator ? 'selected' : '' }}>{{ op.label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-8">
+            <input type="search"
+                   class="form-control mb-2"
+                   placeholder="{{ 'Filter…'|trans }}"
+                   data-bo-coupon-multiselect-search-target="input"
+                   data-action="input->bo-coupon-multiselect-search#filter"
+                   data-testid="coupon-countries-filter">
+            <select required multiple
+                    size="8"
+                    class="form-select"
+                    name="{{ field_name }}[value][]"
+                    data-bo-coupon-multiselect-search-target="select"
+                    data-testid="coupon-countries-select">
+                {% for choice in countries_choices %}
+                    <option value="{{ choice.id }}" {{ choice.id in selected_values ? 'selected' : '' }}>{{ choice.label }}</option>
+                {% endfor %}
+            </select>
+            <span class="form-text small">{{ 'Use Ctrl+click to select (or deselect) more than one country.'|trans }}</span>
+        </div>
+    </div>
+</div>

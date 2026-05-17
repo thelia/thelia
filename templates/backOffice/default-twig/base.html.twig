@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale|default('en') }}" data-bs-theme="light">
+    {% block head %}
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta name="referrer" content="same-origin">
+
+            <title>{% block title %}{{ 'Back-office'|trans({}, 'bo.default-twig') }}{% endblock %} — Thelia</title>
+
+            {% block stylesheets %}
+                {{ encore_entry_link_tags('app', null, 'backoffice') }}
+            {% endblock %}
+
+            {% block head_extra %}{% endblock %}
+
+            {% block head_hook %}
+                {{ safe_hook('main.head-css') }}
+            {% endblock %}
+        </head>
+    {% endblock %}
+
+    <body class="bg-body-secondary" data-testid="{% block body_testid %}bo-page{% endblock %}">
+        {% block body %}
+            <div class="bo-layout">
+                {% block side_nav %}{% include '@BackOfficeDefaultTwig/_side_nav.html.twig' %}{% endblock %}
+
+                <div class="bo-main flex-grow-1 d-flex flex-column">
+                    {% block top_nav %}{% include '@BackOfficeDefaultTwig/_top_nav.html.twig' %}{% endblock %}
+
+                    <main class="p-4 flex-grow-1" data-testid="bo-main">
+                        {% block breadcrumb %}{% endblock %}
+                        {% block flash %}
+                            {% for type, messages in app.flashes %}
+                                {% for message in messages %}
+                                    <div class="alert alert-{{ type }} alert-dismissible fade show" role="alert" data-testid="bo-flash-{{ type }}">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                        {% endblock %}
+
+                        {% block content %}{% endblock %}
+                    </main>
+
+                    {% block footer %}{% include '@BackOfficeDefaultTwig/_footer.html.twig' %}{% endblock %}
+                </div>
+            </div>
+        {% endblock %}
+
+        {% block scripts %}
+            {{ encore_entry_script_tags('app', null, 'backoffice') }}
+        {% endblock %}
+
+        {% block scripts_extra %}{% endblock %}
+    </body>
+</html>

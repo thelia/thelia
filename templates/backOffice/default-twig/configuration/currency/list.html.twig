@@ -1,0 +1,83 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Currencies'|trans({}, 'bo.default-twig') }}{% endblock %}
+{% block body_testid %}configuration-currencies{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.configuration.index') }}">{{ 'Configuration'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ 'Currencies'|trans }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    {{ safe_hook('currencies.top') }}
+
+    <div class="container-fluid" data-testid="currencies-page">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h3 mb-0">{{ 'Currencies management'|trans }}</h1>
+            <div class="d-flex gap-2">
+                {% if is_granted('UPDATE', 'admin.configuration.currency') %}
+                    <form action="{{ path('admin.configuration.currencies.update-rates') }}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-outline-secondary" data-testid="currency-update-rates-button">
+                            <i class="bi bi-globe2" aria-hidden="true"></i>
+                            {{ 'Update rates'|trans }}
+                        </button>
+                    </form>
+                {% endif %}
+                {% if is_granted('CREATE', 'admin.configuration.currency') %}
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#currency-create-modal" data-testid="currency-create-button">
+                        <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                        {{ 'Add a new currency'|trans }}
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if undefined_rates is not empty %}
+            <div class="alert alert-warning" role="alert" data-testid="currency-undefined-rates">
+                <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                {{ 'No exchange rate could be fetched for: %list'|trans({'%list': undefined_rates|join(', ')}) }}
+            </div>
+        {% endif %}
+
+        {{ component('BoDataTable', {
+            id: 'currencies',
+            columns: [
+                column('id', 'ID'|trans),
+                column('name', 'Name'|trans),
+                column('code', 'ISO 4217'|trans),
+                column('symbol', 'Symbol'|trans, 'center'),
+                column('rate', 'Exchange rate'|trans, 'center'),
+                column_toggle('visible', 'Visible'|trans, 'toggle_visible_url'),
+                column_toggle('default', 'Default'|trans, 'toggle_default_url'),
+                column('position', 'Position'|trans, 'center'),
+                column_actions('_actions', 'Actions'|trans),
+            ],
+            rows: rows,
+            emptyMessage: 'No currency defined yet.'|trans,
+            tbodyAttributes: {
+                'data-controller': 'bo-sortable',
+                'data-bo-sortable-url-value': update_position_url,
+                'data-bo-sortable-token-value': update_position_token,
+                'data-bo-sortable-param-name-value': 'currency_id',
+            },
+        }) }}
+    </div>
+
+    {{ safe_hook('currencies.bottom') }}
+
+    {% include '@BackOfficeDefaultTwig/configuration/currency/_create_modal.html.twig' %}
+    {% include '@BackOfficeDefaultTwig/configuration/currency/_delete_modal.html.twig' %}
+
+    {% for currency_id, edit_form in edit_forms %}
+        {% include '@BackOfficeDefaultTwig/configuration/currency/_edit_modal.html.twig' with { currency_id: currency_id, form: edit_form } only %}
+    {% endfor %}
+{% endblock %}
+
+{% block scripts_extra %}
+    {{ safe_hook('currencies.js') }}
+{% endblock %}

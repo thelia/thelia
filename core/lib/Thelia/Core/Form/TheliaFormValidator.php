@@ -51,9 +51,7 @@ class TheliaFormValidator
             if (!$form->isSubmitted()) {
                 $aBaseForm->setError(true);
 
-                throw new FormValidationException(
-                    $this->translator->trans('The form has not been submitted, or its data could not be matched. Please try again.')
-                );
+                throw new FormValidationException($this->translator->trans('The form has not been submitted, or its data could not be matched. Please try again.'));
             }
 
             if ($form->isValid()) {

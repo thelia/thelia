@@ -1,0 +1,103 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Order statuses'|trans }}{% endblock %}
+{% block body_testid %}configuration-order-statuses{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.configuration.index') }}">{{ 'Configuration'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ 'Order statuses'|trans }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid" data-testid="order-statuses-page">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h3 mb-0">{{ 'Order statuses management'|trans }}</h1>
+            {% if is_granted('CREATE', 'admin.configuration.order-status') %}
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#order-status-create-modal" data-testid="order-status-create-button">
+                    <i class="bi bi-plus-lg" aria-hidden="true"></i> {{ 'Add a new order status'|trans }}
+                </button>
+            {% endif %}
+        </div>
+
+        {{ component('BoDataTable', {
+            id: 'order-statuses',
+            columns: [
+                column('id', 'ID'|trans),
+                column('title', 'Title'|trans),
+                column('code', 'Code'|trans),
+                column('color', 'Color'|trans, 'center'),
+                column('position', 'Position'|trans, 'center'),
+                column_actions('_actions', 'Actions'|trans),
+            ],
+            rows: rows,
+            emptyMessage: 'No order status yet.'|trans,
+            tbodyAttributes: {
+                'data-controller': 'bo-sortable',
+                'data-bo-sortable-url-value': update_position_url,
+                'data-bo-sortable-token-value': update_position_token,
+                'data-bo-sortable-param-name-value': 'order_status_id',
+            },
+        }) }}
+    </div>
+
+    <div class="modal fade" id="order-status-create-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                {{ form_start(create_form, { action: path('admin.order-status.create'), method: 'post', attr: { 'data-testid': 'order-status-create-form' } }) }}
+                    <div class="modal-header">
+                        <h2 class="modal-title h5">{{ 'Create a new order status'|trans }}</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            {{ form_label(create_form.title) }}
+                            {{ form_widget(create_form.title, { attr: { class: 'form-control' } }) }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form_label(create_form.code) }}
+                            {{ form_widget(create_form.code, { attr: { class: 'form-control' } }) }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form_label(create_form.color) }}
+                            {{ form_widget(create_form.color, { attr: { class: 'form-control', type: 'color' } }) }}
+                        </div>
+                        {{ form_widget(create_form.locale) }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                        <button type="submit" class="btn btn-primary" data-testid="order-status-create-submit">{{ 'Create'|trans }}</button>
+                    </div>
+                {{ form_end(create_form) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="order-status-delete-modal" tabindex="-1" aria-hidden="true"
+         data-controller="bo-prefill-modal"
+         data-bo-prefill-modal-source-trigger-value="data-order-status-id"
+         data-bo-prefill-modal-target-input-value="order_status_id">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ path('admin.order-status.delete') }}?_token={{ assignToken() }}" method="post" data-testid="order-status-delete-form">
+                    <div class="modal-header">
+                        <h2 class="modal-title h5">{{ 'Delete order status'|trans }}</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>{{ 'Do you really want to delete this order status?'|trans }}</p>
+                        <input type="hidden" name="order_status_id" value="" data-bo-prefill-modal-target="input">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                        <button type="submit" class="btn btn-danger" data-testid="order-status-delete-submit">{{ 'Delete'|trans }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

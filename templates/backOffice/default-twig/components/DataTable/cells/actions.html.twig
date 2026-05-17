@@ -1,0 +1,36 @@
+{%- set iconByKind = {
+    'edit': 'bi-pencil-square',
+    'delete': 'bi-trash',
+    'view': 'bi-eye',
+    'set-default': 'bi-star-fill',
+    'custom': 'bi-three-dots',
+} -%}
+{%- set buttonClassByKind = {
+    'edit': 'btn-outline-primary',
+    'delete': 'btn-outline-danger',
+    'view': 'btn-outline-secondary',
+    'set-default': 'btn-outline-warning',
+    'custom': 'btn-outline-secondary',
+} -%}
+{%- set actions = value|default([]) -%}
+<div class="btn-group btn-group-sm" role="group" aria-label="Row actions">
+    {% for action in actions %}
+        {% set granted = action.grantedAttribute is null or is_granted(action.grantedAttribute, action.grantedSubject) %}
+        {% if granted %}
+            {% set tag = action.href ? 'a' : 'button' %}
+            {% set icon = iconByKind[action.kind]|default(iconByKind['custom']) %}
+            {% set btnClass = buttonClassByKind[action.kind]|default(buttonClassByKind['custom']) %}
+            <{{ tag }}
+                {% if action.href %}href="{{ action.href }}"{% else %}type="button"{% endif %}
+                class="btn btn-sm {{ btnClass }} bo-action bo-action--{{ action.kind }}"
+                title="{{ action.label }}"
+                aria-label="{{ action.label }}"
+                data-testid="datatable-action-{{ action.kind }}"
+                {% if action.modalTarget %}data-bs-toggle="modal" data-bs-target="{{ action.modalTarget }}"{% endif %}
+                {% for dataKey, dataValue in action.dataAttributes %}data-{{ dataKey }}="{{ dataValue }}" {% endfor %}>
+                <i class="bi {{ icon }}" aria-hidden="true"></i>
+                <span class="visually-hidden">{{ action.label }}</span>
+            </{{ tag }}>
+        {% endif %}
+    {% endfor %}
+</div>

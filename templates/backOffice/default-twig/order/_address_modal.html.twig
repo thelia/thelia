@@ -1,0 +1,115 @@
+<div class="modal fade" id="order-address-modal" tabindex="-1" aria-labelledby="order-address-modal-label" aria-hidden="true"
+     data-controller="bo-order-address-modal"
+     data-bo-order-address-modal-states-value="{{ states|json_encode|e('html_attr') }}">
+    <div class="modal-dialog modal-lg">
+        <form method="post"
+              action="{{ path('admin.order.update.address', { order_id: order.id }) }}?_token={{ token }}"
+              data-testid="order-address-form">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="order-address-modal-label">{{ 'Edit order address'|trans }}</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="thelia_order_address[id]" data-bo-order-address-modal-target="id">
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="order-address-title" class="form-label">{{ 'Title'|trans }}</label>
+                            <select id="order-address-title" name="thelia_order_address[title]" class="form-select"
+                                    data-bo-order-address-modal-target="title">
+                                {% for t in customer_titles %}
+                                    <option value="{{ t.id }}">{{ t.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="order-address-company" class="form-label">{{ 'Company'|trans }}</label>
+                            <input type="text" id="order-address-company" name="thelia_order_address[company]" class="form-control"
+                                   data-bo-order-address-modal-target="company">
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="order-address-firstname" class="form-label">{{ 'First name'|trans }}</label>
+                            <input type="text" id="order-address-firstname" name="thelia_order_address[firstname]" class="form-control" required
+                                   data-bo-order-address-modal-target="firstname">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="order-address-lastname" class="form-label">{{ 'Last name'|trans }}</label>
+                            <input type="text" id="order-address-lastname" name="thelia_order_address[lastname]" class="form-control" required
+                                   data-bo-order-address-modal-target="lastname">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="order-address-address1" class="form-label">{{ 'Street address'|trans }}</label>
+                        <input type="text" id="order-address-address1" name="thelia_order_address[address1]" class="form-control" required
+                               data-bo-order-address-modal-target="address1">
+                    </div>
+                    <div class="mb-3">
+                        <label for="order-address-address2" class="form-label">{{ 'Address line 2'|trans }}</label>
+                        <input type="text" id="order-address-address2" name="thelia_order_address[address2]" class="form-control"
+                               data-bo-order-address-modal-target="address2">
+                    </div>
+                    <div class="mb-3">
+                        <label for="order-address-address3" class="form-label">{{ 'Address line 3'|trans }}</label>
+                        <input type="text" id="order-address-address3" name="thelia_order_address[address3]" class="form-control"
+                               data-bo-order-address-modal-target="address3">
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="order-address-zipcode" class="form-label">{{ 'Zip code'|trans }}</label>
+                            <input type="text" id="order-address-zipcode" name="thelia_order_address[zipcode]" class="form-control" required
+                                   data-bo-order-address-modal-target="zipcode">
+                        </div>
+                        <div class="col-md-8">
+                            <label for="order-address-city" class="form-label">{{ 'City'|trans }}</label>
+                            <input type="text" id="order-address-city" name="thelia_order_address[city]" class="form-control" required
+                                   data-bo-order-address-modal-target="city">
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="order-address-country" class="form-label">{{ 'Country'|trans }}</label>
+                            <select id="order-address-country" name="thelia_order_address[country]" class="form-select" required
+                                    data-bo-order-address-modal-target="country"
+                                    data-action="change->bo-order-address-modal#onCountryChange">
+                                {% for c in countries %}
+                                    <option value="{{ c.id }}">{{ c.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6" data-bo-order-address-modal-target="stateWrapper">
+                            <label for="order-address-state" class="form-label">{{ 'State'|trans }}</label>
+                            <select id="order-address-state" name="thelia_order_address[state]" class="form-select"
+                                    data-bo-order-address-modal-target="state">
+                                <option value="">—</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="order-address-phone" class="form-label">{{ 'Phone'|trans }}</label>
+                            <input type="text" id="order-address-phone" name="thelia_order_address[phone]" class="form-control"
+                                   data-bo-order-address-modal-target="phone">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="order-address-cellphone" class="form-label">{{ 'Cellphone'|trans }}</label>
+                            <input type="text" id="order-address-cellphone" name="thelia_order_address[cellphone]" class="form-control"
+                                   data-bo-order-address-modal-target="cellphone">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                    <button type="submit" class="btn btn-primary" data-testid="order-address-submit">{{ 'Confirm changes'|trans }}</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

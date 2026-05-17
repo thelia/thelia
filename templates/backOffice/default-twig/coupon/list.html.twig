@@ -1,0 +1,71 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Coupons'|trans }}{% endblock %}
+{% block body_testid %}coupons-list{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ 'Coupons'|trans }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    {{ safe_hook('coupon.top') }}
+
+    <div class="container-fluid" data-testid="coupons-page">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h3 mb-0">{{ 'Coupons'|trans }}</h1>
+            {% if is_granted('CREATE', 'admin.coupon') %}
+                <a href="{{ path('admin.coupon.create') }}" class="btn btn-primary" data-testid="coupon-create-button">
+                    <i class="bi bi-plus-circle"></i> {{ 'Create a new coupon'|trans }}
+                </a>
+            {% endif %}
+        </div>
+
+        {{ safe_hook('coupon.list-caption') }}
+
+        {{ component('BoDataTable', {
+            id: 'coupons',
+            columns: [
+                column('id', 'ID'|trans),
+                column('code', 'Code'|trans),
+                column('title', 'Title'|trans),
+                column('type', 'Type'|trans),
+                column_badge('enabled_label', 'Status'|trans, { Enabled: 'success', Disabled: 'secondary' }),
+                column_actions('_actions', 'Actions'|trans),
+            ],
+            rows: rows,
+            emptyMessage: 'No coupon is currently defined. Use the (+) button above to create your first coupon.'|trans,
+        }) }}
+    </div>
+
+    {{ safe_hook('coupon.bottom') }}
+
+    <div class="modal fade" id="coupon-delete-modal" tabindex="-1" aria-labelledby="coupon-delete-modal-label" aria-hidden="true"
+         data-controller="bo-prefill-modal"
+         data-bo-prefill-modal-source-trigger-value="data-coupon-id"
+         data-bo-prefill-modal-target-input-value="coupon_id">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ path('admin.coupon.delete') }}?_token={{ assignToken() }}" method="post" data-testid="coupon-delete-form">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="coupon-delete-modal-label">{{ 'Delete coupon'|trans }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>{{ 'Do you really want to delete this coupon ?'|trans }}</p>
+                        <input type="hidden" name="coupon_id" value="" data-bo-prefill-modal-target="input">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                        <button type="submit" class="btn btn-danger" data-testid="coupon-delete-submit">{{ 'Delete'|trans }}</button>
+                    </div>
+                    {{ safe_hook('coupon.delete-form') }}
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

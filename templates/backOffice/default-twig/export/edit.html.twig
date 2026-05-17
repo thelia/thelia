@@ -1,0 +1,141 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Export'|trans }} : {{ export.title }}{% endblock %}
+{% block body_testid %}export-edit{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="/admin/tools">{{ 'Tools'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('export.list') }}">{{ 'Exports'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ 'Export'|trans }} : {{ export.title }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid" data-testid="export-edit-page"
+         data-controller="bo-export-form"
+         data-bo-export-form-active-class="show">
+
+        <h1 class="h3 mb-3">{{ 'Export'|trans }} : {{ export.title }}</h1>
+
+        {% for type, messages in app.flashes(['error', 'success']) %}
+            {% for message in messages %}
+                <div class="alert alert-{{ type == 'success' ? 'success' : 'danger' }}">{{ message|raw }}</div>
+            {% endfor %}
+        {% endfor %}
+
+        <form method="post" action="{{ path('export.process', { id: export_id }) }}" enctype="multipart/form-data" data-testid="export-form">
+            <div class="card">
+                <div class="card-body">
+                    {% if export.description %}
+                        <div class="alert alert-info">{{ export.description|raw }}</div>
+                    {% endif %}
+
+                    {{ safe_hook('export.top', { id: export_id, type: 'page' }) }}
+
+                    {% if use_range %}
+                        <div class="row g-3 mb-3">
+                            {% for field, label in {'range_date_start': 'Range date Start'|trans, 'range_date_end': 'Range date End'|trans} %}
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ label }}</label>
+                                    <div class="d-flex gap-2">
+                                        <select class="form-select form-select-sm" name="{{ field }}[year]">
+                                            {% for year in years %}
+                                                <option value="{{ year }}"{% if year == "now"|date('Y') %} selected{% endif %}>{{ year }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <select class="form-select form-select-sm" name="{{ field }}[month]">
+                                            {% for month in months %}
+                                                <option value="{{ month }}"{% if month == "now"|date('n') %} selected{% endif %}>{{ '%02d'|format(month) }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% if serializers|length == 0 %}
+                        <div class="alert alert-warning">{{ "You can't do exports, you don't have any serializer that handles this."|trans }}</div>
+                    {% else %}
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="bo-export-serializer" class="form-label">{{ 'File format'|trans }}</label>
+                                <select id="bo-export-serializer" name="serializer" class="form-select" required>
+                                    {% for serializer in serializers %}
+                                        <option value="{{ serializer.id }}">{{ serializer.name }} (.{{ serializer.extension }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="bo-export-language" class="form-label">{{ 'Language'|trans }}</label>
+                                <select id="bo-export-language" name="language" class="form-select" required>
+                                    {% for lang in languages %}
+                                        <option value="{{ lang.id }}"{% if lang.is_default %} selected{% endif %}>{{ lang.title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            {% if archivers|length > 0 %}
+                                <div class="col-md-4">
+                                    <label class="form-label">{{ 'Do compress'|trans }}</label>
+                                    <div class="form-check form-switch">
+                                        <input id="bo-export-do-compress" type="checkbox" name="do_compress" value="1" class="form-check-input" data-action="change->bo-export-form#toggle" data-bo-export-form-target="toggle">
+                                        <label class="form-check-label" for="bo-export-do-compress">{{ 'Compress the output'|trans }}</label>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        {% if archivers|length > 0 %}
+                            <div class="row g-3 mt-2 d-none" data-bo-export-form-target="archiver">
+                                <div class="col-md-4">
+                                    <label for="bo-export-archiver" class="form-label">{{ 'Archive Format'|trans }}</label>
+                                    <select id="bo-export-archiver" name="archiver" class="form-select">
+                                        {% for archiver in archivers %}
+                                            <option value="{{ archiver.id }}">{{ archiver.name }} (.{{ archiver.extension }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                {% if has_images %}
+                                    <div class="col-md-4">
+                                        <label class="form-label">{{ 'Include images'|trans }}</label>
+                                        <div class="form-check form-switch">
+                                            <input id="bo-export-images" type="checkbox" name="images" value="1" class="form-check-input">
+                                            <label class="form-check-label" for="bo-export-images">{{ 'Add images to the archive'|trans }}</label>
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                                {% if has_documents %}
+                                    <div class="col-md-4">
+                                        <label class="form-label">{{ 'Include documents'|trans }}</label>
+                                        <div class="form-check form-switch">
+                                            <input id="bo-export-documents" type="checkbox" name="documents" value="1" class="form-check-input">
+                                            <label class="form-check-label" for="bo-export-documents">{{ 'Add documents to the archive'|trans }}</label>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                        {{ safe_hook('export.bottom', { id: export_id, type: 'page' }) }}
+
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-download me-1" aria-hidden="true"></i>{{ 'Do this export'|trans }}</button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block javascript_last_call %}
+    {{ safe_hook('export.js', { location: 'export-js' }) }}
+{% endblock %}

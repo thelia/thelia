@@ -1,0 +1,598 @@
+// Thelia back-office Twig — main stylesheet
+// Bootstrap 5.3 + bootstrap-icons (MIT)
+
+@import "variables";
+
+// Bootstrap 5
+@import "~bootstrap/scss/bootstrap";
+
+// Bootstrap Icons
+$bootstrap-icons-font-dir: "~bootstrap-icons/font/fonts";
+@import "~bootstrap-icons/font/bootstrap-icons.scss";
+
+// Back-office layout
+$bo-side-nav-width: 240px;
+$bo-side-nav-bg: #282828;
+$bo-side-nav-text: #cdd2d6;
+$bo-side-nav-text-active: #ffffff;
+$bo-side-nav-hover-bg: rgba(255, 255, 255, .07);
+
+.bo-layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: row;
+}
+
+.bo-main {
+    min-width: 0; // allow flex children to shrink below content size
+}
+
+.bo-top-nav {
+    min-height: 60px;
+
+    &__logo {
+        max-height: 32px;
+        width: auto;
+    }
+
+    &__flag {
+        object-fit: cover;
+        border-radius: 2px;
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, .08);
+    }
+}
+
+.thelia-logo {
+    display: inline-block;
+    vertical-align: middle;
+
+    &--dark .thelia-logo__base { fill: #4d4d4d; }
+    &--dark .thelia-logo__accent { fill: #ee8126; }
+    &--light .thelia-logo__base { fill: #ffffff; }
+    &--light .thelia-logo__accent { fill: #ffffff; }
+}
+
+.bo-side-nav {
+    width: $bo-side-nav-width;
+    background-color: $bo-side-nav-bg;
+    color: $bo-side-nav-text;
+    padding: 0;
+    flex-shrink: 0;
+    overflow-y: auto;
+
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 60px;
+        background-color: var(--bs-primary);
+        text-decoration: none;
+        flex-shrink: 0;
+
+        &:hover {
+            opacity: .92;
+        }
+
+        .thelia-logo {
+            height: 32px;
+            width: auto;
+        }
+    }
+
+    &__sections {
+        padding: 1rem .75rem 1.5rem;
+    }
+
+
+    .nav-link {
+        color: $bo-side-nav-text;
+        border-radius: 6px;
+        padding: .5rem .75rem;
+        margin-bottom: 2px;
+        font-size: .9rem;
+        display: flex;
+        align-items: center;
+
+        &:hover,
+        &:focus {
+            background-color: $bo-side-nav-hover-bg;
+            color: $bo-side-nav-text-active;
+        }
+
+        &.active {
+            background-color: var(--bs-primary);
+            color: $bo-side-nav-text-active;
+            box-shadow: 0 4px 14px rgba(242, 96, 65, .25);
+        }
+    }
+
+    &__toggle {
+        cursor: pointer;
+    }
+
+    &__chevron {
+        font-size: .75rem;
+        transition: transform .18s ease;
+    }
+
+    &__toggle[aria-expanded="true"] &__chevron,
+    .nav-link.bo-side-nav__toggle[aria-expanded="true"] .bo-side-nav__chevron {
+        transform: rotate(90deg);
+    }
+
+    .nav .nav-link {
+        font-size: .85rem;
+        padding-left: 2rem;
+        margin-bottom: 0;
+        background: transparent;
+        box-shadow: none;
+        color: rgba(255, 255, 255, .75);
+
+        &:hover {
+            background: $bo-side-nav-hover-bg;
+            color: #fff;
+        }
+    }
+}
+
+.bo-footer {
+    background-color: transparent;
+}
+
+// ---------- Polish global ----------
+
+body {
+    font-feature-settings: "kern" 1, "liga" 1;
+}
+
+main[data-testid="bo-main"] h1 {
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+// Inputs & selects
+.form-control,
+.form-select {
+    background-color: #fff;
+    border-color: #c6cbd1;
+    transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+    box-shadow: inset 0 1px 1px rgba(15, 23, 42, .025);
+
+    &:hover:not(:focus):not(:disabled):not([readonly]) {
+        border-color: #a9b0b8;
+    }
+
+    &::placeholder {
+        color: #b3b9c0;
+        opacity: 1;
+    }
+
+    &:disabled,
+    &[readonly] {
+        background-color: #f5f6f8;
+        color: #6c757d;
+        box-shadow: none;
+    }
+}
+
+textarea.form-control {
+    min-height: 6rem;
+    line-height: 1.5;
+}
+
+.input-group-text {
+    background-color: #fafbfc;
+    border-color: #c6cbd1;
+    color: #6c757d;
+}
+
+.form-check-input {
+    cursor: pointer;
+    border-color: #b3b9c0;
+
+    &:checked {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+    }
+
+    &:focus {
+        box-shadow: 0 0 0 .2rem rgba(242, 96, 65, .2);
+        border-color: var(--bs-primary);
+    }
+}
+
+// Form group spacing
+.mb-3 {
+    margin-bottom: 1.25rem !important;
+}
+
+// Form labels — display block; the helper rendered after the label gets pushed
+// onto its own line so "(optional)" no longer collides with the label.
+// Thelia legacy form theme emits `<label class="FieldInput-label">`, so we
+// style both the BS5 class and the legacy one.
+.form-label,
+label.FieldInput-label {
+    display: block;
+    margin-bottom: .5rem;
+    font-weight: 500;
+    color: #2c2c2c;
+    font-size: .9rem;
+    line-height: 1.3;
+
+    small,
+    .form-label__optional,
+    .form-label__help,
+    > .text-muted {
+        display: block;
+        margin: .15rem 0 0;
+        color: var(--bs-secondary);
+        font-weight: 400;
+        font-size: .78rem;
+        letter-spacing: .005em;
+    }
+}
+
+// Symfony auto-renders the help (label_attr.help) right after the label text
+// in the same node; we normalize the spacing via a leading space + small font.
+.form-label small {
+    margin-left: 0;
+}
+
+// Legacy "(optionnel)" text is concatenated directly into the label as plain
+// text — render it discreetly via `:has` and a CSS counter trick is not
+// possible, so use a softer color on the whole label except for the required
+// asterisk. We at least add some breathing room between the label and the
+// input below.
+label.FieldInput-label.required::after {
+    content: " *";
+    color: var(--bs-danger);
+    font-weight: 600;
+}
+
+// Flexy form theme wraps label + "(optional)" in a flex header; force the
+// optional span onto its own line for breathing room.
+.FieldInput-header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .15rem;
+    margin-bottom: .35rem;
+
+    > span.paragraph-5 {
+        margin: 0 !important;
+        font-size: .78rem;
+        font-weight: 400;
+        color: var(--bs-secondary);
+    }
+}
+
+// Inputs - taller, clearer borders, brand focus ring
+.form-control,
+.form-select {
+    border-color: #cbd0d6;
+    background-color: #ffffff;
+    box-shadow: inset 0 1px 0 rgba(15, 23, 42, .02);
+}
+
+// File inputs - blend in with the rest of the form
+input[type="file"].form-control,
+input[type="file"] {
+    padding: .35rem .9rem;
+
+    &::file-selector-button {
+        background-color: #f1f3f6;
+        border: 0;
+        padding: .35rem .9rem;
+        margin: -.35rem .9rem -.35rem -.9rem;
+        border-right: 1px solid #cbd0d6;
+        font-weight: 500;
+        color: #2c2c2c;
+        cursor: pointer;
+        transition: background-color .15s ease;
+    }
+
+    &::file-selector-button:hover {
+        background-color: #e6e9ee;
+    }
+}
+
+// Color inputs - rounded swatch
+input[type="color"].form-control {
+    height: 2.5rem;
+    padding: .2rem;
+}
+
+// Required marker on legacy theme label only when class.required is present
+.FieldInput-label.required::after {
+    content: " *";
+    color: var(--bs-danger);
+    font-weight: 600;
+    margin-left: .15rem;
+}
+
+// Cards — softer border, modern shadow, headers aligned with body padding
+.card {
+    border-color: $card-border-color;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+    overflow: hidden;
+}
+
+.card > .card-header {
+    background-color: #fafbfc;
+    border-bottom-color: $card-border-color;
+    font-weight: 600;
+    color: #3a3a3a;
+}
+
+// Buttons — refined idle/hover states
+.btn-primary {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #{$primary};
+    --bs-btn-border-color: #{$primary};
+    --bs-btn-hover-bg: #{$primary-dark};
+    --bs-btn-hover-border-color: #{$primary-dark};
+    --bs-btn-active-bg: #{$primary-dark};
+    --bs-btn-active-border-color: #{$primary-dark};
+}
+
+.btn-outline-primary {
+    --bs-btn-color: #{$primary};
+    --bs-btn-border-color: #{$primary};
+    --bs-btn-hover-bg: #{$primary};
+    --bs-btn-hover-border-color: #{$primary};
+}
+
+.btn {
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
+}
+
+// Tables — modern striping and hover
+.table {
+    --bs-table-hover-bg: rgba(242, 96, 65, .04);
+
+    > thead {
+        background-color: #fafbfc;
+        color: #3a3a3a;
+
+        > tr > th {
+            border-bottom: 1px solid #e6e8eb;
+            font-weight: 600;
+            font-size: .85rem;
+            text-transform: uppercase;
+            letter-spacing: .03em;
+            color: #6c757d;
+        }
+    }
+
+    > tbody > tr {
+        > td {
+            vertical-align: middle;
+        }
+    }
+}
+
+// Breadcrumbs — subtle separator and brand primary on links
+.breadcrumb {
+    font-size: .85rem;
+
+    a {
+        color: var(--bs-primary);
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+}
+
+// Tabs — extra breathing room
+.nav-tabs {
+    border-bottom-color: $card-border-color;
+    margin-bottom: 1.5rem;
+
+    .nav-link {
+        font-weight: 500;
+        padding: .65rem 1rem;
+
+        &.active {
+            border-bottom-color: var(--bs-primary);
+            box-shadow: inset 0 -3px 0 0 var(--bs-primary);
+        }
+    }
+}
+
+// Alerts — slightly bolder edge
+.alert {
+    border-radius: .5rem;
+}
+
+// Dropdowns — softer shadow
+.dropdown-menu {
+    box-shadow: 0 8px 24px rgba(15, 23, 42, .12);
+    border-color: $card-border-color;
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+    background-color: var(--bs-primary);
+    color: #fff;
+}
+
+// Code-style mono fields
+.form-control--mono {
+    font-family: var(--bs-font-monospace);
+}
+
+// Tooltips — softer, more readable
+.tooltip {
+    --bs-tooltip-bg: #1f2937;
+    --bs-tooltip-color: #ffffff;
+    --bs-tooltip-padding-y: .45rem;
+    --bs-tooltip-padding-x: .65rem;
+    --bs-tooltip-border-radius: .375rem;
+    --bs-tooltip-font-size: .8rem;
+    --bs-tooltip-opacity: 1;
+}
+
+.tooltip-inner {
+    box-shadow: 0 8px 18px rgba(15, 23, 42, .18);
+    font-weight: 500;
+}
+
+// Buttons with only an icon — tighter, square footprint with a clear hover state.
+.btn-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+// Row action buttons inside tables get the same treatment.
+.bo-action {
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+// Pagination
+.pagination {
+    .page-link {
+        color: var(--bs-secondary);
+        border-color: $card-border-color;
+
+        &:hover {
+            background-color: rgba(242, 96, 65, .08);
+            color: var(--bs-primary);
+        }
+    }
+
+    .page-item.active .page-link {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+    }
+}
+
+.bo-auth {
+    background-color: var(--bs-body-tertiary-bg, #f5f5f5);
+}
+
+.bo-auth-card {
+    border-radius: var(--bs-border-radius-lg);
+}
+
+// Sortable rows (drag-and-drop reorder)
+.bo-sortable-row {
+    cursor: grab;
+
+    &:active {
+        cursor: grabbing;
+    }
+}
+
+.bo-sortable-dragging {
+    opacity: 0.5;
+}
+
+.bo-sortable-target {
+    box-shadow: inset 0 2px 0 0 var(--bs-primary, #0d6efd);
+}
+
+// Tax rule matrix UI (drag&drop taxes between groups)
+.bo-tax-panel {
+    min-height: 220px;
+}
+
+.bo-tax-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-height: 120px;
+}
+
+.bo-tax-group {
+    border: 1px dashed var(--bs-border-color, #dee2e6);
+    border-radius: var(--bs-border-radius, 0.375rem);
+    padding: 0.5rem;
+    background-color: var(--bs-body-tertiary-bg, #f8f9fa);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    &:not(:has(.bo-tax-tile)) p {
+        margin: 0;
+    }
+}
+
+.bo-tax-available {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    min-height: 80px;
+}
+
+.bo-tax-tile {
+    display: inline-block;
+    padding: 0.3rem 0.65rem;
+    border-radius: var(--bs-border-radius-sm, 0.25rem);
+    cursor: grab;
+    user-select: none;
+    font-size: 0.875rem;
+    line-height: 1.25;
+
+    &:active {
+        cursor: grabbing;
+    }
+}
+
+.bo-tax-tile--available {
+    background-color: var(--bs-warning-bg-subtle, #fff3cd);
+    color: var(--bs-warning-text-emphasis, #664d03);
+    border: 1px solid var(--bs-warning-border-subtle, #ffe69c);
+}
+
+.bo-tax-tile--group {
+    background-color: var(--bs-info-bg-subtle, #cff4fc);
+    color: var(--bs-info-text-emphasis, #055160);
+    border: 1px solid var(--bs-info-border-subtle, #9eeaf9);
+}
+
+.bo-drop {
+    text-align: center;
+    background-color: var(--bs-body-tertiary-bg, #f8f9fa);
+}
+
+.bo-drop-create {
+    border-top: 2px dashed var(--bs-success, #198754);
+}
+
+.bo-drop-remove {
+    border-top: 2px dashed var(--bs-danger, #dc3545);
+}
+
+.bo-country-pill {
+    cursor: pointer;
+    user-select: none;
+}
+
+.bo-category-tree__item {
+    list-style: none;
+}
+
+.bo-category-tree__item > div {
+    transition: background-color 0.15s;
+}
+
+.bo-category-tree__drop-target > div {
+    background-color: var(--bs-primary-bg-subtle, #cfe2ff);
+    outline: 2px dashed var(--bs-primary, #0d6efd);
+    outline-offset: -2px;
+}
+
+.bo-category-tree__chevron {
+    transition: transform 0.15s;
+}

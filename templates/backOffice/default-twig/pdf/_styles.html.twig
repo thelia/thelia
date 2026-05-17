@@ -1,0 +1,31 @@
+{# Shared CSS for native Twig PDF templates rendered through Html2Pdf. #}
+<style>
+    h1, h2, h3, h4 { color:#f6993c; margin: .5em 0; }
+    h1 { font-size: 48px; }
+    h2 { font-size: 16px; }
+    h3 { font-size: 14px; }
+    h4 { color:#58585a; font-size: 12px; }
+    p, td { color:#58585a; font-size: 9px; }
+    p { margin: .5em 0; }
+    span { font-size: 9px; }
+    table { border-collapse: collapse; width: 100%; }
+    tr { width: 100%; }
+    td { vertical-align: top; }
+    .table-info { margin-bottom: 15px; }
+    .table-info h3 { font-size: 12px; color: #58585a; margin-top: 0; margin-bottom: 10px; }
+    .table-info h3 span { font-size: inherit; color: #f6993c; }
+    .table-1 td { background: #f1f3f4; border:solid 1px #bcbdc0; }
+    .table-2 td { border:solid 1px #bcbdc0; }
+    .table-3-1, .table-3-2 { border: solid 1px #bcbdc0; }
+    .table-3-1 span { font-size: 8px; color: #747475; }
+    .table-3-1 p { font-size: 10px; }
+    .table-3-2 { background: #f1f3f4; }
+    .table-3-module h3 { margin-top: 1.5em; }
+    .table-3-module span { font-size: 11px; }
+    .align-left { text-align: left; }
+    .align-center { text-align: center; }
+    .align-right { text-align: right; }
+    .clear { padding: 0.5%; border-bottom:solid 1px #dddddd; }
+    .clear-none { padding: 0.5%; }
+    {{ pdf_hook(kind ~ '.css', { 'order': order_id }) }}
+</style>

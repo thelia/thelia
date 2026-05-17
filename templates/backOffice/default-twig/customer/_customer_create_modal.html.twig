@@ -1,0 +1,22 @@
+<div class="modal fade" id="customer-create-modal" tabindex="-1" aria-labelledby="customer-create-modal-title" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            {{ form_start(create_form, { action: path('admin.customer.create'), method: 'post', attr: { 'data-testid': 'customer-create-form' } }) }}
+                <div class="modal-header">
+                    <h2 class="modal-title h5" id="customer-create-modal-title">{{ 'Create a new customer'|trans }}</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small">{{ 'A random password will be generated and sent to the customer.'|trans }}</p>
+                    {% include '@BackOfficeDefaultTwig/customer/_customer_form_fields.html.twig' with { form: create_form } only %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                    <button type="submit" class="btn btn-primary" data-testid="customer-create-submit">
+                        <i class="bi bi-check2" aria-hidden="true"></i> {{ 'Create this customer'|trans }}
+                    </button>
+                </div>
+            {{ form_end(create_form) }}
+        </div>
+    </div>
+</div>

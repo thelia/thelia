@@ -1,0 +1,144 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Edit profile'|trans({}, 'bo.default-twig') }}: {{ profile.title }}{% endblock %}
+{% block body_testid %}configuration-profile-edit{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.configuration.index') }}">{{ 'Configuration'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.configuration.profiles.list') }}">{{ 'Profiles'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ profile.title }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid" data-testid="profile-edit-page">
+        <h1 class="h3 mb-3">{{ 'Edit profile'|trans }}: <span class="text-muted">{{ profile.code }}</span></h1>
+
+        <ul class="nav nav-tabs mb-3" role="tablist" data-testid="profile-edit-tabs">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-general" type="button" role="tab" data-testid="profile-tab-general">{{ 'General'|trans }}</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-resources" type="button" role="tab" data-testid="profile-tab-resources">{{ 'Resources'|trans }}</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-modules" type="button" role="tab" data-testid="profile-tab-modules">{{ 'Modules'|trans }}</button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="tab-general" role="tabpanel">
+                <div class="card">
+                    <div class="card-body">
+                        {{ form_start(update_form, { action: path('admin.configuration.profiles.save'), method: 'post', attr: { 'data-testid': 'profile-update-form' } }) }}
+                            {{ form_widget(update_form.id) }}
+                            {{ form_widget(update_form.locale) }}
+                            <div class="row g-3">
+                                <div class="col-md-6">{{ form_row(update_form.code) }}</div>
+                                <div class="col-md-6">{{ form_row(update_form.title) }}</div>
+                                <div class="col-md-12">{{ form_row(update_form.chapo) }}</div>
+                                <div class="col-md-12">{{ form_row(update_form.description) }}</div>
+                                <div class="col-md-12">{{ form_row(update_form.postscriptum) }}</div>
+                            </div>
+                            <div class="text-end mt-3">
+                                <button type="submit" class="btn btn-primary" data-testid="profile-update-submit">
+                                    <i class="bi bi-check2" aria-hidden="true"></i> {{ 'Save'|trans }}
+                                </button>
+                            </div>
+                        {{ form_end(update_form) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-resources" role="tabpanel">
+                <form action="{{ path('admin.configuration.profiles.saveResourceAccess') }}" method="post" data-testid="profile-resource-access-form">
+                    <input type="hidden" name="profile_id" value="{{ profile.id }}">
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table table-striped align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>{{ 'Resource'|trans }}</th>
+                                        {% for value, label in access_codes %}
+                                            <th class="text-center">{{ label|trans }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for resource in resources %}
+                                        {% set granted = resource_access[resource.code]|default([]) %}
+                                        {% set field_key = resource.code|replace({'.': ':'}) %}
+                                        <tr>
+                                            <td><code>{{ resource.code }}</code></td>
+                                            {% for value, label in access_codes %}
+                                                <td class="text-center">
+                                                    <input type="checkbox"
+                                                           class="form-check-input"
+                                                           name="resource[{{ field_key }}][]"
+                                                           value="{{ value }}"
+                                                           {% if value in granted %}checked{% endif %}>
+                                                </td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card-footer text-end">
+                            <button type="submit" class="btn btn-primary" data-testid="profile-resource-access-submit">
+                                <i class="bi bi-check2" aria-hidden="true"></i> {{ 'Save resource access'|trans }}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="tab-pane fade" id="tab-modules" role="tabpanel">
+                <form action="{{ path('admin.configuration.profiles.saveModuleAccess') }}" method="post" data-testid="profile-module-access-form">
+                    <input type="hidden" name="profile_id" value="{{ profile.id }}">
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table table-striped align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>{{ 'Module'|trans }}</th>
+                                        {% for value, label in access_codes %}
+                                            <th class="text-center">{{ label|trans }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for module in modules %}
+                                        {% set granted = module_access[module.code]|default([]) %}
+                                        {% set field_key = module.code|replace({'.': ':'}) %}
+                                        <tr>
+                                            <td><code>{{ module.code }}</code></td>
+                                            {% for value, label in access_codes %}
+                                                <td class="text-center">
+                                                    <input type="checkbox"
+                                                           class="form-check-input"
+                                                           name="module[{{ field_key }}][]"
+                                                           value="{{ value }}"
+                                                           {% if value in granted %}checked{% endif %}>
+                                                </td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card-footer text-end">
+                            <button type="submit" class="btn btn-primary" data-testid="profile-module-access-submit">
+                                <i class="bi bi-check2" aria-hidden="true"></i> {{ 'Save module access'|trans }}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

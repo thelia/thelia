@@ -1,0 +1,27 @@
+<div class="modal fade" id="customer-delete-modal" tabindex="-1" aria-labelledby="customer-delete-modal-title" aria-hidden="true"
+     data-controller="bo-prefill-modal"
+     data-bo-prefill-modal-source-trigger-value="data-customer-id"
+     data-bo-prefill-modal-target-input-value="customer_id">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ path('admin.customer.delete') }}?_token={{ assignToken() }}"
+                  method="post"
+                  data-testid="customer-delete-form">
+                <div class="modal-header">
+                    <h2 class="modal-title h5" id="customer-delete-modal-title">{{ 'Delete customer'|trans }}</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
+                </div>
+                <div class="modal-body">
+                    <p>{{ 'Do you really want to delete this customer? This action cannot be undone.'|trans }}</p>
+                    <input type="hidden" name="customer_id" value="" data-bo-prefill-modal-target="input">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                    <button type="submit" class="btn btn-danger" data-testid="customer-delete-submit">
+                        <i class="bi bi-trash" aria-hidden="true"></i> {{ 'Delete'|trans }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

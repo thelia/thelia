@@ -1,0 +1,46 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Import'|trans }}{% endblock %}
+{% block body_testid %}import-list{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ 'Import'|trans }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid" data-testid="import-page">
+        <h1 class="h3 mb-3">{{ 'Available imports'|trans }}</h1>
+
+        {% if categories is empty %}
+            <p class="text-muted">{{ 'No import defined.'|trans }}</p>
+        {% else %}
+            <div class="row g-4">
+                {% for category in categories %}
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">{{ category.title }}</div>
+                            <ul class="list-group list-group-flush">
+                                {% for import in category.imports %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>{{ import.title }}</strong>
+                                            {% if import.description %}<div class="text-muted small">{{ import.description }}</div>{% endif %}
+                                        </div>
+                                        <a href="{{ path('import.view', { id: import.id }) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-upload" aria-hidden="true"></i> {{ 'Import'|trans }}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="list-group-item text-muted small">{{ 'No import in this category.'|trans }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

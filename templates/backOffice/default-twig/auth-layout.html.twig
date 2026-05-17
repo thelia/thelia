@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block body_testid %}bo-auth-page{% endblock %}
+
+{% block body %}
+    <main class="bo-auth d-flex align-items-center justify-content-center min-vh-100 bg-body-tertiary">
+        <div class="bo-auth-card card shadow-sm" style="max-width: 420px; width: 100%;">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <h1 class="h4 mb-1" data-testid="bo-auth-title">{% block auth_title %}{{ 'Thelia'|trans({}, 'bo.default-twig') }}{% endblock %}</h1>
+                    <p class="text-body-secondary small mb-0">{% block auth_subtitle %}{{ 'Back-office'|trans({}, 'bo.default-twig') }}{% endblock %}</p>
+                </div>
+
+                {% block flash %}{{ parent() }}{% endblock %}
+
+                {% block auth_content %}{% endblock %}
+            </div>
+        </div>
+    </main>
+{% endblock %}

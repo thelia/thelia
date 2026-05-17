@@ -1,0 +1,77 @@
+{% extends 'auth-layout.html.twig' %}
+
+{% block title %}{{ 'Welcome'|trans({}, 'bo.default-twig') }}{% endblock %}
+
+{% block auth_subtitle %}{{ 'Sign in to your back-office'|trans({}, 'bo.default-twig') }}{% endblock %}
+
+{% block flash %}
+    {{ parent() }}
+    {{ hook('index.top') }}
+{% endblock %}
+
+{% block auth_content %}
+    {% set login_form = getForm('thelia.admin.login') %}
+
+    <form action="{{ path('admin.checklogin') }}" method="post" data-testid="login-form" novalidate>
+        {{ form_widget(login_form._token) }}
+
+        <input type="hidden" name="{{ field_name(login_form.success_url) }}" value="{{ path('admin') }}">
+
+        <div class="mb-3">
+            {{ form_label(login_form.username, 'Username or e-mail address'|trans({}, 'bo.default-twig'), {'label_attr': {'class': 'form-label'}}) }}
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                {{ form_widget(login_form.username, {
+                    'attr': {
+                        'class': 'form-control form-control-lg',
+                        'placeholder': 'Username or e-mail address'|trans({}, 'bo.default-twig'),
+                        'autofocus': 'autofocus',
+                        'data-testid': 'login-username',
+                    },
+                }) }}
+            </div>
+            {{ form_errors(login_form.username) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(login_form.password, 'Password'|trans({}, 'bo.default-twig'), {'label_attr': {'class': 'form-label'}}) }}
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                {{ form_widget(login_form.password, {
+                    'attr': {
+                        'class': 'form-control form-control-lg',
+                        'placeholder': 'Password'|trans({}, 'bo.default-twig'),
+                        'data-testid': 'login-password',
+                    },
+                }) }}
+            </div>
+            {{ form_errors(login_form.password) }}
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="form-check">
+                {{ form_widget(login_form.remember_me, {'attr': {'class': 'form-check-input'}}) }}
+                {{ form_label(login_form.remember_me, null, {'label_attr': {'class': 'form-check-label'}}) }}
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg w-100" data-testid="login-submit">
+            <i class="bi bi-box-arrow-in-right me-2"></i>
+            {{ 'Login'|trans({}, 'bo.default-twig') }}
+        </button>
+    </form>
+
+    <div class="text-center mt-4">
+        <a class="text-decoration-none small" href="{{ path('index', {router: 'front'}) }}">
+            <i class="bi bi-arrow-left me-1"></i>
+            {{ 'Return to shop'|trans({}, 'bo.default-twig') }}
+        </a>
+    </div>
+
+    {{ hook('index.middle') }}
+{% endblock %}
+
+{% block body %}
+    {{ parent() }}
+    {{ hook('index.bottom') }}
+{% endblock %}

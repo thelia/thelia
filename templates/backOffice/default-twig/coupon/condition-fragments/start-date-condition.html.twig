@@ -1,0 +1,7 @@
+{% set field_name = condition.serviceId %}
+<input type="hidden" name="{{ field_name }}[operator]" value="==">
+<div class="mb-3">
+    <label class="form-label" for="{{ field_name }}-value">{{ 'Validity start date'|trans }}</label>
+    <input type="text" class="form-control" id="{{ field_name }}-value" name="{{ field_name }}[value]" value="{{ validators.value|default('') }}" placeholder="{{ 'Format: %fmt'|trans({'%fmt': date_format}) }}">
+    <small class="form-text text-muted">{{ 'Please enter the date using the %fmt format'|trans({'%fmt': date_format}) }}</small>
+</div>

@@ -1,0 +1,138 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Administrators'|trans({}, 'bo.default-twig') }}{% endblock %}
+{% block body_testid %}configuration-administrators{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.configuration.index') }}">{{ 'Configuration'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ 'Administrators'|trans }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    {{ safe_hook('administrators.top') }}
+
+    <div class="container-fluid" data-testid="administrators-page">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h3 mb-0">{{ 'Administrators management'|trans }}</h1>
+            {% if is_granted('CREATE', 'admin.configuration.administrator') %}
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#administrator-create-modal" data-testid="administrator-create-button">
+                    <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                    {{ 'Add a new administrator'|trans }}
+                </button>
+            {% endif %}
+        </div>
+
+        {{ component('BoDataTable', {
+            id: 'administrators',
+            columns: [
+                column('id', 'ID'|trans),
+                column('login', 'Login'|trans),
+                column('name', 'Name'|trans),
+                column('email', 'Email'|trans),
+                column('profile', 'Profile'|trans),
+                column_actions('_actions', 'Actions'|trans),
+            ],
+            rows: rows,
+            emptyMessage: 'No administrator yet.'|trans,
+        }) }}
+    </div>
+
+    {{ safe_hook('administrators.bottom') }}
+
+    <div class="modal fade" id="administrator-create-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                {{ form_start(create_form, { action: path('admin.configuration.administrators.add'), method: 'post', attr: { 'data-testid': 'administrator-create-form' } }) }}
+                    <div class="modal-header">
+                        <h2 class="modal-title h5">{{ 'Create a new administrator'|trans }}</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
+                    </div>
+                    <div class="modal-body">
+                        {{ form_widget(create_form.locale) }}
+                        <div class="row g-3">
+                            <div class="col-md-6">{{ form_row(create_form.login) }}</div>
+                            <div class="col-md-6">{{ form_row(create_form.email) }}</div>
+                            <div class="col-md-6">{{ form_row(create_form.firstname) }}</div>
+                            <div class="col-md-6">{{ form_row(create_form.lastname) }}</div>
+                            <div class="col-md-6">{{ form_row(create_form.password) }}</div>
+                            <div class="col-md-6">{{ form_row(create_form.profile) }}</div>
+                        </div>
+                        {{ safe_hook('administrator.create-form') }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                        <button type="submit" class="btn btn-primary" data-testid="administrator-create-submit">
+                            <i class="bi bi-check2" aria-hidden="true"></i> {{ 'Create this administrator'|trans }}
+                        </button>
+                    </div>
+                {{ form_end(create_form) }}
+            </div>
+        </div>
+    </div>
+
+    {% for admin_id, edit_form in edit_forms %}
+        <div class="modal fade" id="administrator-edit-modal-{{ admin_id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    {{ form_start(edit_form, { action: path('admin.configuration.administrators.save'), method: 'post', attr: { 'data-testid': 'administrator-edit-form-' ~ admin_id } }) }}
+                        <div class="modal-header">
+                            <h2 class="modal-title h5">{{ 'Edit administrator'|trans }}</h2>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
+                        </div>
+                        <div class="modal-body">
+                            {{ form_widget(edit_form.id) }}
+                            {{ form_widget(edit_form.locale) }}
+                            <div class="row g-3">
+                                <div class="col-md-6">{{ form_row(edit_form.login) }}</div>
+                                <div class="col-md-6">{{ form_row(edit_form.email) }}</div>
+                                <div class="col-md-6">{{ form_row(edit_form.firstname) }}</div>
+                                <div class="col-md-6">{{ form_row(edit_form.lastname) }}</div>
+                                <div class="col-md-6">{{ form_row(edit_form.password) }}</div>
+                                <div class="col-md-6">{{ form_row(edit_form.profile) }}</div>
+                            </div>
+                            {{ safe_hook('administrator.edit-form', { administrator_id: admin_id }) }}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                            <button type="submit" class="btn btn-primary" data-testid="administrator-edit-submit-{{ admin_id }}">
+                                <i class="bi bi-check2" aria-hidden="true"></i> {{ 'Save changes'|trans }}
+                            </button>
+                        </div>
+                    {{ form_end(edit_form) }}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="modal fade" id="administrator-delete-modal" tabindex="-1" aria-hidden="true"
+         data-controller="bo-prefill-modal"
+         data-bo-prefill-modal-source-trigger-value="data-administrator-id"
+         data-bo-prefill-modal-target-input-value="administrator_id">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ path('admin.configuration.administrators.delete') }}?_token={{ assignToken() }}" method="post" data-testid="administrator-delete-form">
+                    <div class="modal-header">
+                        <h2 class="modal-title h5">{{ 'Delete administrator'|trans }}</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>{{ 'Do you really want to delete this administrator?'|trans }}</p>
+                        <input type="hidden" name="administrator_id" value="" data-bo-prefill-modal-target="input">
+                        {{ safe_hook('administrator.delete-form') }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                        <button type="submit" class="btn btn-danger" data-testid="administrator-delete-submit">
+                            <i class="bi bi-trash" aria-hidden="true"></i> {{ 'Delete'|trans }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

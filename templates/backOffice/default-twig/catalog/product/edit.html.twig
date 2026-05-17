@@ -1,0 +1,158 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Edit product'|trans }} — {{ product.title }}{% endblock %}
+{% block body_testid %}catalog-product-edit{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.products.default') }}">{{ 'Products'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ product.title }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    {{ safe_hook('product.top', { product: product.id }) }}
+
+    <div class="container-fluid" data-testid="product-edit-page">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h3 mb-0">{{ product.title }} <small class="text-muted">#{{ product.id }}</small></h1>
+            <a href="{{ path('admin.products.default') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i> {{ 'Back to list'|trans }}
+            </a>
+        </div>
+
+        <ul class="nav nav-tabs mb-3" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link {% if current_tab == 'general' %}active{% endif %}" data-bs-toggle="tab" data-bs-target="#tab-general" type="button" data-testid="product-tab-general">{{ 'General'|trans }}</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link {% if current_tab == 'attributes' %}active{% endif %}" data-bs-toggle="tab" data-bs-target="#tab-attributes" type="button" data-testid="product-tab-attributes">{{ 'Attributes & Features'|trans }}</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link {% if current_tab == 'pse' %}active{% endif %}" data-bs-toggle="tab" data-bs-target="#tab-pse" type="button" data-testid="product-tab-pse">{{ 'Combinations'|trans }}</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link {% if current_tab == 'related' %}active{% endif %}" data-bs-toggle="tab" data-bs-target="#tab-related" type="button" data-testid="product-tab-related">{{ 'Related'|trans }}</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link {% if current_tab == 'seo' %}active{% endif %}" data-bs-toggle="tab" data-bs-target="#tab-seo" type="button" data-testid="product-tab-seo">{{ 'SEO'|trans }}</button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane fade {% if current_tab == 'general' %}show active{% endif %}" id="tab-general" role="tabpanel">
+                {{ form_start(form, { action: path('admin.products.save', { product_id: product.id }), method: 'post', attr: { 'data-testid': 'product-edit-form' } }) }}
+                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form_label(form.ref) }}
+                                    {{ form_widget(form.ref, { attr: { class: 'form-control' } }) }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form_label(form.title) }}
+                                    {{ form_widget(form.title, { attr: { class: 'form-control' } }) }}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                {{ form_label(form.chapo) }}
+                                {{ form_widget(form.chapo, { attr: { class: 'form-control', rows: 3 } }) }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form_label(form.description) }}
+                                {{ form_widget(form.description, { attr: { class: 'form-control', rows: 8 } }) }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form_label(form.postscriptum) }}
+                                {{ form_widget(form.postscriptum, { attr: { class: 'form-control', rows: 3 } }) }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check mb-3">
+                                {{ form_widget(form.visible, { attr: { class: 'form-check-input' } }) }}
+                                {{ form_label(form.visible, null, { label_attr: { class: 'form-check-label' } }) }}
+                            </div>
+                            <div class="form-check mb-3">
+                                {{ form_widget(form.virtual, { attr: { class: 'form-check-input' } }) }}
+                                {{ form_label(form.virtual, null, { label_attr: { class: 'form-check-label' } }) }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form_label(form.default_category) }}
+                                {{ form_widget(form.default_category, { attr: { class: 'form-control' } }) }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form_label(form.template_id) }}
+                                <select name="{{ form.template_id.vars.full_name }}" class="form-select" data-testid="product-edit-template">
+                                    {% for tpl in available_templates %}
+                                        <option value="{{ tpl.id }}" {% if tpl.id == product.templateId %}selected{% endif %}>{{ tpl.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                {{ form_label(form.brand_id) }}
+                                {{ form_widget(form.brand_id, { attr: { class: 'form-control' } }) }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form_label(form.virtual_document_id) }}
+                                {{ form_widget(form.virtual_document_id, { attr: { class: 'form-control' } }) }}
+                            </div>
+                        </div>
+                    </div>
+                    {{ form_widget(form.id) }}
+                    {{ form_widget(form.locale) }}
+                    {{ safe_hook('product.update-form', { product: product.id }) }}
+                    <button type="submit" class="btn btn-primary" data-testid="product-edit-submit">
+                        <i class="bi bi-check2" aria-hidden="true"></i> {{ 'Save'|trans }}
+                    </button>
+                {{ form_end(form, { render_rest: false }) }}
+            </div>
+
+            <div class="tab-pane fade {% if current_tab == 'attributes' %}show active{% endif %}" id="tab-attributes" role="tabpanel">
+                {{ render(controller('BackOfficeDefaultTwigBundle\\Controller\\Catalog\\ProductAdvancedController::attributesTab', { product_id: product.id })) }}
+            </div>
+
+            <div class="tab-pane fade {% if current_tab == 'pse' %}show active{% endif %}" id="tab-pse" role="tabpanel">
+                {{ render(controller('BackOfficeDefaultTwigBundle\\Controller\\Catalog\\ProductAdvancedController::combinationsTab', { product_id: product.id })) }}
+            </div>
+
+            <div class="tab-pane fade {% if current_tab == 'related' %}show active{% endif %}" id="tab-related" role="tabpanel">
+                {% include '@BackOfficeDefaultTwig/catalog/product/_related_tab.html.twig' %}
+            </div>
+
+            <div class="tab-pane fade {% if current_tab == 'seo' %}show active{% endif %}" id="tab-seo" role="tabpanel">
+                {{ form_start(seo_form, { action: path('admin.products.seo.save'), method: 'post', attr: { 'data-testid': 'product-seo-form' } }) }}
+                    <div class="mb-3">
+                        {{ form_label(seo_form.url) }}
+                        {{ form_widget(seo_form.url, { attr: { class: 'form-control' } }) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_label(seo_form.meta_title) }}
+                        {{ form_widget(seo_form.meta_title, { attr: { class: 'form-control' } }) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_label(seo_form.meta_description) }}
+                        {{ form_widget(seo_form.meta_description, { attr: { class: 'form-control', rows: 3 } }) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_label(seo_form.meta_keywords) }}
+                        {{ form_widget(seo_form.meta_keywords, { attr: { class: 'form-control', rows: 3 } }) }}
+                    </div>
+                    {{ form_widget(seo_form.id) }}
+                    {{ form_widget(seo_form.locale) }}
+                    {{ safe_hook('product.seo.update-form', { product: product.id }) }}
+                    <button type="submit" class="btn btn-primary" data-testid="product-seo-submit">
+                        <i class="bi bi-check2" aria-hidden="true"></i> {{ 'Save SEO'|trans }}
+                    </button>
+                {{ form_end(seo_form) }}
+            </div>
+        </div>
+    </div>
+
+    {% include '@BackOfficeDefaultTwig/catalog/product/_pse_assoc.html.twig' %}
+
+    {{ safe_hook('product.bottom', { product: product.id }) }}
+{% endblock %}

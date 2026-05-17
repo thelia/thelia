@@ -109,7 +109,8 @@ public/.htaccess
 ###< TEMP ###
 local/modules/
 templates/frontOffice/
-templates/backOffice/
+templates/backOffice/*
+!templates/backOffice/default-twig
 templates/email/
 templates/pdf/
 ###> liip/imagine-bundle ###

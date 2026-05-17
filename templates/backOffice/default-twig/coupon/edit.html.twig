@@ -1,0 +1,215 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% set is_update = mode == 'update' %}
+{% set form_action = is_update ? path('admin.coupon.update', { couponId: coupon_id }) : path('admin.coupon.create') %}
+{% set page_title = is_update ? ('Update coupon'|trans) : ('Create coupon'|trans) %}
+
+{% block title %}{{ page_title }}{% if is_update %} — {{ data.code }}{% endif %}{% endblock %}
+{% block body_testid %}coupon-edit{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.coupon.default') }}">{{ 'Coupons'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">
+                {% if is_update %}{{ 'Editing coupon "%title"'|trans({'%title': data.code}) }}{% else %}{{ 'Create'|trans }}{% endif %}
+            </li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    {% if error_message is defined %}
+        <div class="alert alert-danger" role="alert">{{ error_message }}</div>
+    {% endif %}
+
+    {{ safe_hook('coupon.edit-top', is_update ? { coupon_id: coupon_id } : {}) }}
+
+    <div class="container-fluid"
+         data-testid="coupon-edit-page"
+         data-controller="bo-coupon-form"
+         data-bo-coupon-form-draw-inputs-url-value="{{ path('admin.coupon.draw.inputs.ajax', { couponServiceId: '__SERVICE__' }) }}"
+         {% if is_update %}
+         data-bo-coupon-form-coupon-id-value="{{ coupon_id }}"
+         data-bo-coupon-form-save-condition-url-value="{{ path('admin.coupon.condition.save', { couponId: coupon_id }) }}"
+         data-bo-coupon-form-summaries-url-value="{{ path('admin.coupon.draw.condition.summaries.ajax', { couponId: coupon_id }) }}"
+         data-bo-coupon-form-read-inputs-url-value="{{ path('admin.coupon.draw.condition.read.inputs.ajax', { conditionId: '__CONDITION__' }) }}"
+         data-bo-coupon-form-update-inputs-url-value="{{ path('admin.coupon.draw.condition.update.inputs.ajax', { couponId: coupon_id, conditionIndex: 888888 }) }}"
+         data-bo-coupon-form-delete-condition-url-value="{{ path('admin.coupon.condition.delete', { couponId: coupon_id, conditionIndex: 888888 }) }}"
+         {% endif %}
+    >
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h3 mb-0">{{ page_title }} {% if is_update %}<small class="text-muted">#{{ coupon_id }}</small>{% endif %}</h1>
+            <a href="{{ path('admin.coupon.default') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i> {{ 'Back'|trans }}
+            </a>
+        </div>
+
+        <form action="{{ form_action }}" method="POST" data-testid="coupon-edit-form">
+            <input type="hidden" name="locale" value="{{ data.locale }}">
+
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label" for="coupon-code">{{ 'Coupon code'|trans }} *</label>
+                                <input id="coupon-code" required type="text" class="form-control" name="code" value="{{ data.code }}" placeholder="{{ 'code'|trans }}">
+                                <small class="form-text text-muted">{{ 'This is the code entered by your customers to use this coupon'|trans }}</small>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="mb-3">
+                                <label class="form-label" for="coupon-type">{{ 'Coupon type'|trans }} *</label>
+                                <select required id="coupon-type" name="type" class="form-select" data-bo-coupon-form-target="typeSelect">
+                                    <option value="" data-tooltip="">{{ 'Please select a coupon type'|trans }}</option>
+                                    {% for option in available_coupons %}
+                                        <option value="{{ option.serviceId }}" data-tooltip="{{ option.toolTip }}" {% if data.type == option.serviceId %}selected{% endif %}>
+                                            {{ option.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <small class="form-text text-muted" data-bo-coupon-form-target="typeTooltip">
+                                    {% for option in available_coupons %}{% if data.type == option.serviceId %}{{ option.toolTip }}{% endif %}{% endfor %}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="mb-3 form-check">
+                                <input id="is-enabled" type="checkbox" name="isEnabled" class="form-check-input" value="1" {% if data.isEnabled %}checked{% endif %}>
+                                <label class="form-check-label" for="is-enabled">{{ 'Enabled'|trans }}</label>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input id="is-available-on-special-offers" type="checkbox" name="isAvailableOnSpecialOffers" class="form-check-input" value="1" {% if data.isAvailableOnSpecialOffers %}checked{% endif %}>
+                                <label class="form-check-label" for="is-available-on-special-offers">{{ 'Valid on special offers'|trans }}</label>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input id="is-cumulative" type="checkbox" name="isCumulative" class="form-check-input" value="1" {% if data.isCumulative %}checked{% endif %}>
+                                <label class="form-check-label" for="is-cumulative">{{ 'Combinable with other promotions'|trans }}</label>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="start-date">{{ 'Start Date'|trans }}</label>
+                                <input id="start-date" type="text" name="startDate" class="form-control" value="{{ data.startDate }}" placeholder="{{ 'Format: %fmt'|trans({'%fmt': date_format}) }}">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="expiration-date">{{ 'Expiration date'|trans }} *</label>
+                                <input id="expiration-date" required type="text" name="expirationDate" class="form-control" value="{{ data.expirationDate }}" placeholder="{{ 'Format: %fmt'|trans({'%fmt': date_format}) }}">
+                            </div>
+
+                            <div class="mb-3 form-check">
+                                <input id="is-unlimited" type="checkbox" name="is-unlimited" class="form-check-input" value="1" {% if data.maxUsage == -1 %}checked{% endif %} data-bo-coupon-form-target="unlimitedCheck">
+                                <label class="form-check-label" for="is-unlimited">{{ 'Unlimited number of uses'|trans }}</label>
+                            </div>
+
+                            <div class="card card-body bg-body-tertiary mb-3" data-bo-coupon-form-target="maxUsageWrap" {% if data.maxUsage == -1 %}style="display: none;"{% endif %}>
+                                <div class="mb-3">
+                                    <label class="form-label" for="max-usage">{{ 'Maximum usage count'|trans }}</label>
+                                    <input id="max-usage" type="text" inputmode="numeric" class="form-control" name="maxUsage" value="{{ data.maxUsage == -1 ? '' : data.maxUsage }}" placeholder="{{ 'Usage count'|trans }}">
+                                </div>
+                                <div>
+                                    {% for choice in per_customer_choices %}
+                                        <div class="form-check form-check-inline">
+                                            <input id="perCustomerUsageCount-{{ choice.value }}" type="radio" class="form-check-input" name="perCustomerUsageCount" value="{{ choice.value }}" {% if data.perCustomerUsageCount == choice.value %}checked{% endif %}>
+                                            <label for="perCustomerUsageCount-{{ choice.value }}" class="form-check-label">{{ choice.label }}</label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="mb-3 form-check">
+                                <input id="is-removing-postage" type="checkbox" name="isRemovingPostage" class="form-check-input" value="1" {% if data.isRemovingPostage %}checked{% endif %} data-bo-coupon-form-target="postageCheck">
+                                <label class="form-check-label" for="is-removing-postage">{{ 'Provides free shipping'|trans }}</label>
+                            </div>
+
+                            <div class="card card-body bg-body-tertiary mb-3" data-bo-coupon-form-target="postageWrap" {% if not data.isRemovingPostage %}style="display: none;"{% endif %}>
+                                <div class="mb-3">
+                                    <label class="form-label" for="for-countries-only">{{ 'Free shipping to countries'|trans }}</label>
+                                    <select multiple size="5" class="form-select" id="for-countries-only" name="freeShippingForCountries[]">
+                                        {% for choice in countries %}
+                                            <option value="{{ choice.value }}" {% if choice.value in data.freeShippingForCountries %}selected{% endif %}>{{ choice.label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-0">
+                                    <label class="form-label" for="for-modules-only">{{ 'Free shipping for methods'|trans }}</label>
+                                    <select multiple size="5" class="form-select" id="for-modules-only" name="freeShippingForModules[]">
+                                        {% for choice in shipping_modules %}
+                                            <option value="{{ choice.value }}" {% if choice.value in data.freeShippingForModules %}selected{% endif %}>{{ choice.label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <h6 class="text-muted text-uppercase small mb-3">{{ 'Coupon parameters'|trans }}</h6>
+                            <div data-bo-coupon-form-target="inputsContainer">
+                                {{ coupon_inputs_html|raw }}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="coupon-title">{{ 'Title'|trans }} *</label>
+                                <input id="coupon-title" required type="text" class="form-control" name="title" value="{{ data.title }}" placeholder="{{ 'title'|trans }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="short-description">{{ 'Short description'|trans }}</label>
+                                <textarea id="short-description" name="shortDescription" class="form-control" rows="3" placeholder="{{ 'short description'|trans }}">{{ data.shortDescription }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="long-description">{{ 'Long description'|trans }}</label>
+                                <textarea id="long-description" name="description" class="form-control" rows="3" placeholder="{{ 'long description'|trans }}">{{ data.description }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex justify-content-end gap-2">
+                    <a href="{{ path('admin.coupon.default') }}" class="btn btn-outline-secondary">{{ 'Cancel'|trans }}</a>
+                    <button type="submit" name="save_mode" value="stay" class="btn btn-outline-primary" data-testid="coupon-save-stay">{{ 'Save'|trans }}</button>
+                    <button type="submit" name="save_mode" value="close" class="btn btn-primary" data-testid="coupon-save-close">{{ 'Save and close'|trans }}</button>
+                </div>
+            </div>
+        </form>
+
+        {% if is_update %}
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="mb-0">{{ 'Coupon conditions'|trans }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6" data-bo-coupon-form-target="conditionsList">
+                            {% include '@BackOfficeDefaultTwig/coupon/conditions.html.twig' with { conditions: conditions, coupon_id: coupon_id } only %}
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted text-uppercase small mb-3">{{ 'Add a condition'|trans }}</h6>
+                            <div class="mb-3">
+                                <label class="form-label" for="category-condition">{{ 'Condition category'|trans }}</label>
+                                <select id="category-condition" class="form-select" data-bo-coupon-form-target="conditionTypeSelect">
+                                    <option value="" data-tooltip="">{{ 'Please select a condition'|trans }}</option>
+                                    {% for cond in available_conditions %}
+                                        <option value="{{ cond.serviceId }}" data-tooltip="{{ cond.toolTip }}">{{ cond.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <small class="form-text text-muted" data-bo-coupon-form-target="conditionTooltip"></small>
+                            </div>
+                            <div data-bo-coupon-form-target="conditionInputs"></div>
+                            <button type="button" class="btn btn-primary mt-2 d-none" data-bo-coupon-form-target="conditionSaveBtn" data-action="bo-coupon-form#saveCondition">
+                                <i class="bi bi-plus-circle"></i> {{ 'Save this condition'|trans }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    {{ safe_hook('coupon.edit-bottom', is_update ? { coupon_id: coupon_id } : {}) }}
+{% endblock %}

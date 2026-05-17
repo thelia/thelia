@@ -1,0 +1,64 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Edit hook'|trans }} : {{ hook.title }}{% endblock %}
+{% block body_testid %}hook-edit{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="/admin/configuration">{{ 'Configuration'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.hook') }}">{{ 'Hooks'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ hook.title ?: hook.code }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid" data-testid="hook-edit-page">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h3 mb-0">{{ 'Edit hook'|trans }} : {{ hook.title ?: hook.code }}</h1>
+            <a href="{{ path('admin.hook') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-x-lg me-1" aria-hidden="true"></i>{{ 'Close'|trans }}
+            </a>
+        </div>
+
+        {{ form_start(form, { attr: { action: path('admin.hook.save', { hook_id: hook_id }), 'data-testid': 'hook-edit-form' } }) }}
+            <div class="card">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            {{ form_row(form.code) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(form.type) }}
+                        </div>
+                        <div class="col-md-12">
+                            {{ form_row(form.title) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(form.active) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(form.by_module) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(form.block) }}
+                        </div>
+                        <div class="col-md-12">
+                            {{ form_row(form.chapo) }}
+                        </div>
+                        <div class="col-md-12">
+                            {{ form_row(form.description) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <a href="{{ path('admin.hook') }}" class="btn btn-outline-secondary">{{ 'Cancel'|trans }}</a>
+                <button type="submit" class="btn btn-primary">{{ 'Save'|trans }}</button>
+            </div>
+        {{ form_end(form, { render_rest: false }) }}
+    </div>
+{% endblock %}

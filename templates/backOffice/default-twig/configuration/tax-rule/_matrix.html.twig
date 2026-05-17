@@ -1,0 +1,242 @@
+{# B.3 — tax rule matrix UI : drag&drop + configuration selector + country status #}
+<div
+    data-controller="bo-tax-rule-matrix"
+    data-bo-tax-rule-matrix-tax-rule-id-value="{{ tax_rule.id }}"
+    data-bo-tax-rule-matrix-default-country-id-value="{{ matrix_default_country_id }}"
+    data-bo-tax-rule-matrix-taxes-value="{{ matrix_taxes|json_encode|e('html_attr') }}"
+    data-bo-tax-rule-matrix-specification-value="{{ matrix_initial_specification|json_encode|e('html_attr') }}"
+    data-bo-tax-rule-matrix-save-url-value="{{ path('admin.configuration.taxes-rules.saveTaxes') }}"
+    data-bo-tax-rule-matrix-labels-value="{{ {
+        'all_states': 'all states/provinces'|trans,
+        'configuration_new': 'New configuration'|trans,
+        'configuration': 'Configuration'|trans,
+        'countries': 'Countries'|trans,
+        'no_countries': 'No country in this configuration yet.'|trans,
+        'save_error': 'Unable to save the configuration.'|trans,
+    }|json_encode|e('html_attr') }}"
+    data-testid="tax-rule-matrix"
+>
+    <div class="card mb-3">
+        <div class="card-header">{{ 'Select a configuration'|trans }}</div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="tax-rule-configuration-selector" class="form-label">{{ 'Choose a configuration'|trans }}</label>
+                    <select
+                        id="tax-rule-configuration-selector"
+                        class="form-select"
+                        data-bo-tax-rule-matrix-target="configurationSelector"
+                        data-action="change->bo-tax-rule-matrix#configurationChanged"
+                        data-testid="tax-rule-matrix-configuration"
+                    ></select>
+                </div>
+                <div class="col-md-6">
+                    <label for="tax-rule-country-selector" class="form-label">{{ 'Choose a country'|trans }}</label>
+                    <select
+                        id="tax-rule-country-selector"
+                        class="form-select"
+                        data-bo-tax-rule-matrix-target="countrySelector"
+                        data-action="change->bo-tax-rule-matrix#countryChanged"
+                        data-testid="tax-rule-matrix-country-selector"
+                    >
+                        {% for country in matrix_countries_simple %}
+                            <option value="{{ country.id }}-0">{{ country.title }}</option>
+                        {% endfor %}
+                        {% for country in matrix_countries_with_states %}
+                            <optgroup label="{{ country.title }}">
+                                <option value="{{ country.id }}-0">{{ 'all states'|trans }}</option>
+                                {% for state in country.states %}
+                                    <option value="{{ country.id }}-{{ state.id }}">{{ state.title }}</option>
+                                {% endfor %}
+                            </optgroup>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-muted small">
+            <i class="bi bi-info-circle" aria-hidden="true"></i>
+            {{ 'For a tax rule, you can have multiple configurations, as only one tax rule is affected to a product.'|trans }}
+            {{ '(according to a country the taxes applied could be different)'|trans }}<br>
+            {{ 'So, each configuration is a list of taxes applied to a list of countries/states.'|trans }}
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">{{ 'Countries/states configuration'|trans }}</div>
+        <div class="card-body">
+            <div class="row g-3 align-items-center mb-3">
+                <div class="col-md-7">
+                    <div class="btn-group" role="group" data-bo-tax-rule-matrix-target="filterButtons">
+                        <input type="radio" class="btn-check" name="tax-rule-country-filter" id="tax-rule-country-filter-all" value="all" autocomplete="off" checked data-action="change->bo-tax-rule-matrix#filterChanged">
+                        <label class="btn btn-outline-primary" for="tax-rule-country-filter-all">{{ 'No filters'|trans }}</label>
+
+                        <input type="radio" class="btn-check" name="tax-rule-country-filter" id="tax-rule-country-filter-selected" value="selected" autocomplete="off" data-action="change->bo-tax-rule-matrix#filterChanged">
+                        <label class="btn btn-outline-primary" for="tax-rule-country-filter-selected">{{ 'Use this config.'|trans }}</label>
+
+                        <input type="radio" class="btn-check" name="tax-rule-country-filter" id="tax-rule-country-filter-none" value="none" autocomplete="off" data-action="change->bo-tax-rule-matrix#filterChanged">
+                        <label class="btn btn-outline-primary" for="tax-rule-country-filter-none">{{ 'No config.'|trans }}</label>
+
+                        <input type="radio" class="btn-check" name="tax-rule-country-filter" id="tax-rule-country-filter-other" value="other" autocomplete="off" data-action="change->bo-tax-rule-matrix#filterChanged">
+                        <label class="btn btn-outline-primary" for="tax-rule-country-filter-other">{{ 'Use an other config.'|trans }}</label>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="{{ 'Filter'|trans }}"
+                        data-bo-tax-rule-matrix-target="filterText"
+                        data-action="input->bo-tax-rule-matrix#filterChanged"
+                        data-testid="tax-rule-matrix-filter-text"
+                    >
+                </div>
+            </div>
+
+            <div class="bo-country-list" data-bo-tax-rule-matrix-target="countryList" data-testid="tax-rule-matrix-country-list">
+                {% if matrix_countries_simple is not empty %}
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        {% for country in matrix_countries_simple %}
+                            <span class="badge text-bg-light border bo-country-pill" data-id="{{ country.id }}-0" data-action="click->bo-tax-rule-matrix#toggleCountry">{{ country.title }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% for country in matrix_countries_with_states %}
+                    <div class="card mb-3 bo-country-states">
+                        <div class="card-header py-2">{{ country.title }}</div>
+                        <div class="card-body py-2">
+                            <div class="d-flex flex-wrap gap-2">
+                                <span class="badge text-bg-light border bo-country-pill" data-id="{{ country.id }}-0" data-action="click->bo-tax-rule-matrix#toggleCountry">{{ 'all states/provinces'|trans }}</span>
+                                {% for state in country.states %}
+                                    <span class="badge text-bg-light border bo-country-pill" data-id="{{ country.id }}-{{ state.id }}" data-action="click->bo-tax-rule-matrix#toggleCountry">{{ state.title }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                <div>
+                    <button type="button" class="btn btn-sm btn-outline-danger" data-action="click->bo-tax-rule-matrix#resetCountryList" data-testid="tax-rule-matrix-reset">
+                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> {{ 'Reset'|trans }}
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-muted small">
+            <i class="bi bi-info-circle" aria-hidden="true"></i> {{ 'caption'|trans }}:
+            <span class="badge text-bg-light border ms-1">{{ 'country has no configuration'|trans }}</span>
+            <span class="badge text-bg-success ms-1">{{ 'country has the current configuration'|trans }}</span>
+            <span class="badge text-bg-danger ms-1">{{ 'country has an other configuration'|trans }}</span>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">{{ 'Taxes configuration'|trans }}</div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="card bo-tax-panel">
+                        <div class="card-header py-2"><strong>{{ 'Manage the tax rule taxes appliance order'|trans }}</strong></div>
+                        <div class="card-body bo-tax-groups" data-bo-tax-rule-matrix-target="taxGroups" data-testid="tax-rule-matrix-groups"></div>
+                        <div class="card-footer bo-drop bo-drop-create" data-bo-tax-rule-matrix-target="createGroup" data-action="dragover->bo-tax-rule-matrix#allowDrop drop->bo-tax-rule-matrix#dropCreateGroup">
+                            <p class="text-muted small mb-0"><i class="bi bi-plus-lg" aria-hidden="true"></i> {{ 'Drop tax here to create a tax group'|trans }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bo-tax-panel">
+                        <div class="card-header py-2"><strong>{{ 'Available taxes'|trans }}</strong></div>
+                        <div class="card-body bo-tax-available" data-bo-tax-rule-matrix-target="taxAvailable" data-action="dragover->bo-tax-rule-matrix#allowDrop drop->bo-tax-rule-matrix#dropAvailable" data-testid="tax-rule-matrix-available"></div>
+                        <div class="card-footer bo-drop bo-drop-remove" data-action="dragover->bo-tax-rule-matrix#allowDrop drop->bo-tax-rule-matrix#dropAvailable">
+                            <p class="text-muted small mb-0"><i class="bi bi-dash-lg" aria-hidden="true"></i> {{ 'Drop tax here to delete from group'|trans }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-muted small">
+            <i class="bi bi-info-circle" aria-hidden="true"></i>
+            {{ 'Here, just drag and drop the available taxes in groups.'|trans }}<br>
+            {{ 'Each group of taxes are applied from top to bottom.'|trans }}
+            {{ 'In a group, each taxes are applied independently on the incomming price (the price without tax for the first group).'|trans }}
+            {{ 'The outcomming price is the sum of the incomming one and the sum of taxes.'|trans }}
+            {{ 'This outcomming price is then passed to the next group as its incomming price, etc...'|trans }}
+        </div>
+    </div>
+
+    <div class="d-grid mb-4">
+        <button type="button" class="btn btn-primary" data-action="click->bo-tax-rule-matrix#openApply" data-bs-toggle="modal" data-bs-target="#tax-rule-apply-modal" data-testid="tax-rule-matrix-apply">
+            <i class="bi bi-check2-circle" aria-hidden="true"></i> {{ 'Apply'|trans }}
+        </button>
+    </div>
+
+    <div class="modal fade" id="tax-rule-apply-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form
+                    method="post"
+                    action="{{ path('admin.configuration.taxes-rules.saveTaxes') }}"
+                    data-bo-tax-rule-matrix-target="applyForm"
+                    data-action="submit->bo-tax-rule-matrix#submitApply"
+                    data-testid="tax-rule-matrix-apply-form"
+                >
+                    <input type="hidden" name="id" value="{{ tax_rule.id }}">
+                    <input type="hidden" name="tax_list" value="[]" data-bo-tax-rule-matrix-target="taxListInput">
+                    <input type="hidden" name="country_list" value="[]" data-bo-tax-rule-matrix-target="countryListInput">
+                    <input type="hidden" name="country_deleted_list" value="[]" data-bo-tax-rule-matrix-target="countryDeletedInput">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ 'Update tax rule taxes'|trans }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-danger d-none" data-bo-tax-rule-matrix-target="applyError"></div>
+
+                        <div class="card mb-3" data-bo-tax-rule-matrix-target="countriesAddedCard">
+                            <div class="card-header">{{ 'Countries/states that will use this configuration'|trans }}</div>
+                            <div class="card-body d-flex flex-wrap gap-2" data-bo-tax-rule-matrix-target="countriesAdded"></div>
+                        </div>
+
+                        <div class="card mb-3" data-bo-tax-rule-matrix-target="countriesDeletedCard">
+                            <div class="card-header">{{ 'Countries/states deleted of this configuration'|trans }}</div>
+                            <div class="card-body d-flex flex-wrap gap-2" data-bo-tax-rule-matrix-target="countriesDeleted"></div>
+                        </div>
+
+                        {{ safe_hook('taxes.update-form', { tax_rule_id: tax_rule.id, location: 'tax_list_update_form' }) }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                        <button type="submit" class="btn btn-primary" data-testid="tax-rule-matrix-apply-save">{{ 'Save tax rule taxes'|trans }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {% if specification_rows is not empty %}
+        <details class="card mt-3">
+            <summary class="card-header bg-light py-2"><i class="bi bi-table" aria-hidden="true"></i> {{ 'Detailed view of the saved bindings'|trans }}</summary>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0" data-testid="tax-rule-bindings-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th>{{ 'Country'|trans }}</th>
+                            <th>{{ 'State'|trans }}</th>
+                            <th>{{ 'Tax'|trans }}</th>
+                            <th class="text-end">{{ 'Position'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in specification_rows %}
+                            <tr>
+                                <td>{{ row.country }}</td>
+                                <td>{{ row.state }}</td>
+                                <td>{{ row.tax }}</td>
+                                <td class="text-end">{{ row.position }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </details>
+    {% endif %}
+</div>

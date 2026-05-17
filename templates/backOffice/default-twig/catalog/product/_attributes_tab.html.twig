@@ -1,0 +1,146 @@
+{# B.10 — product attributes & features tab (iso markup avec set-product-template + multi-select feature values + free-text) #}
+<div class="container-fluid" data-testid="product-attributes-tab">
+    <form method="post" action="{{ set_template_action }}?_token={{ assignToken() }}" class="mb-3" data-testid="product-template-form">
+        <input type="hidden" name="product_id" value="{{ product.id }}">
+        <input type="hidden" name="current_tab" value="attributes">
+
+        <div class="card">
+            <div class="card-body">
+                <p class="text-muted small mb-2">
+                    {{ 'To use features or attributes on this product, please select a product template.'|trans }}
+                    <a href="{{ path('admin.configuration.templates.default') }}" target="_blank">{{ 'Manage templates'|trans }}</a>
+                </p>
+                <label for="product_template_id" class="form-label">{{ 'Current product template'|trans }}</label>
+                <div class="input-group">
+                    <select name="template_id" id="product_template_id" class="form-select" required>
+                        <option value="0">{{ 'Do not use a product template'|trans }}</option>
+                        {% for template in product_templates %}
+                            <option value="{{ template.id }}" {{ product_template_id == template.id ? 'selected' : '' }}>{{ template.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn btn-primary" type="submit" data-testid="product-template-apply">{{ 'Apply'|trans }}</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    {% if product_template_id > 0 %}
+        <form method="post" action="{{ attributes_form_action }}" data-controller="bo-product-feature-batch" data-testid="product-feature-batch-form">
+            <input type="hidden" name="product_id" value="{{ product.id }}">
+            <input type="hidden" name="current_tab" value="attributes">
+
+            <div class="card mb-3" data-testid="product-attributes-section">
+                <div class="card-header"><strong>{{ 'Product attributes'|trans }}</strong></div>
+                <div class="card-body p-0">
+                    {% if product_attribute_rows is empty %}
+                        <div class="alert alert-info mb-0 rounded-0">{{ 'This product template does not contains any attributes'|trans }}</div>
+                    {% else %}
+                        <table class="table table-sm align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="col-1">{{ 'ID'|trans }}</th>
+                                    <th>{{ 'Attribute name'|trans }}</th>
+                                    {{ safe_hook('product.attributes-table-header', { location: 'product_attributes_table_header' }) }}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in product_attribute_rows %}
+                                    <tr data-testid="product-attribute-row-{{ row.id }}">
+                                        <td>{{ row.id }}</td>
+                                        <td>{{ row.title }}</td>
+                                        {{ safe_hook('product.attributes-table-row', { location: 'product_attributes_table_row', attribute_id: row.id }) }}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card mb-3" data-testid="product-features-section">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <strong>{{ 'Product features'|trans }}</strong>
+                    {% if product_feature_rows is not empty %}
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-success" data-action="bo-product-feature-batch#selectAll" data-testid="product-features-select-all">
+                                <i class="bi bi-check2-all" aria-hidden="true"></i> {{ 'Select all values'|trans }}
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" data-action="bo-product-feature-batch#deselectAll" data-testid="product-features-deselect-all">
+                                <i class="bi bi-eraser" aria-hidden="true"></i> {{ 'Clear all'|trans }}
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-body p-0">
+                    {% if product_feature_rows is empty %}
+                        <div class="alert alert-info mb-0 rounded-0">{{ 'This product template does not contains any features'|trans }}</div>
+                    {% else %}
+                        <table class="table table-sm align-middle mb-0" data-bo-product-feature-batch-target="table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="col-1">{{ 'ID'|trans }}</th>
+                                    <th class="col-3">{{ 'Feature name'|trans }}</th>
+                                    <th>{{ 'Feature value for this product'|trans }}</th>
+                                    {{ safe_hook('product.features-table-header', { location: 'product_features_table_header' }) }}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in product_feature_rows %}
+                                    <tr data-testid="product-feature-row-{{ row.id }}">
+                                        <td>{{ row.id }}</td>
+                                        <td>{{ row.title }}</td>
+                                        <td>
+                                            {% if row.options is not empty %}
+                                                <select
+                                                    multiple
+                                                    size="{{ min(row.options|length, 6) }}"
+                                                    name="feature_value[{{ row.id }}][]"
+                                                    id="feature_value_{{ row.id }}"
+                                                    class="form-select form-select-sm"
+                                                    data-bo-product-feature-batch-target="select"
+                                                    data-feature-id="{{ row.id }}"
+                                                >
+                                                    {% for option in row.options %}
+                                                        <option value="{{ option.id }}" {{ option.selected ? 'selected' : '' }}>{{ option.title }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                <div class="form-text d-flex justify-content-between">
+                                                    <span>{{ 'Use Ctrl+click to select more than one value.'|trans }}</span>
+                                                    <a href="#" class="text-decoration-none" data-action="click->bo-product-feature-batch#clearOne" data-target-select="#feature_value_{{ row.id }}">
+                                                        <i class="bi bi-eraser" aria-hidden="true"></i> {{ 'Clear selected values'|trans }}
+                                                    </a>
+                                                </div>
+                                            {% else %}
+                                                <input
+                                                    type="text"
+                                                    name="feature_text_value[{{ row.id }}]"
+                                                    id="feature_text_value_{{ row.id }}"
+                                                    class="form-control form-control-sm"
+                                                    value="{{ row.free_text_value }}"
+                                                    placeholder="{{ 'Feature value'|trans }}"
+                                                >
+                                            {% endif %}
+                                        </td>
+                                        {{ safe_hook('product.features-table-row', { location: 'product_features_table_row', feature_id: row.id }) }}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <a href="{{ path('admin.products.default') }}" class="btn btn-outline-secondary">{{ 'Cancel'|trans }}</a>
+                <button type="submit" name="save_mode" value="stay" class="btn btn-outline-primary" data-testid="product-feature-batch-save-stay">
+                    <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> {{ 'Save and stay'|trans }}
+                </button>
+                <button type="submit" class="btn btn-primary" data-testid="product-feature-batch-save">
+                    <i class="bi bi-check2" aria-hidden="true"></i> {{ 'Save'|trans }}
+                </button>
+            </div>
+        </form>
+    {% endif %}
+
+    {{ safe_hook('product-edit.attributes-tab', { product: product.id }) }}
+</div>

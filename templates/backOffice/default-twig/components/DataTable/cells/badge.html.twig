@@ -1,0 +1,3 @@
+{%- set variants = column.options.variants|default({}) -%}
+{%- set variant = variants[value]|default('secondary') -%}
+<span class="badge text-bg-{{ variant }}">{{ value }}</span>

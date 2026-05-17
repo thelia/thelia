@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'Dashboard'|trans({}, 'bo.default-twig') }}{% endblock %}
+
+{% block body_testid %}dashboard{% endblock %}
+
+{% block content %}
+    <div class="container-fluid" data-testid="dashboard">
+        {{ safe_hook('home.top') }}
+
+        <h1 class="h3 mb-3">{{ 'Dashboard'|trans }}</h1>
+
+        {{ component('BoDashboard') }}
+
+        <div class="row g-4 mt-1">
+            {% for block in hook_block('home.block') %}
+                <div class="{{ block.class|default('col-md-4') }}" data-testid="dashboard-home-block">
+                    <div class="card h-100 shadow-sm"{% if block.id %} id="{{ block.id }}"{% endif %}>
+                        {% if block.title %}
+                            <div class="card-header bg-body-tertiary">
+                                <h2 class="h5 mb-0">{{ block.title }}</h2>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            {{ block.content|raw }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {{ safe_hook('home.bottom') }}
+    </div>
+{% endblock %}

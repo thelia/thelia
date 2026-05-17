@@ -1,0 +1,21 @@
+<div class="modal fade" id="lang-edit-modal-{{ lang_id }}" tabindex="-1" aria-labelledby="lang-edit-modal-title-{{ lang_id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            {{ form_start(form, { action: path('admin.configuration.languages.update.process', { lang_id: lang_id }), method: 'post', attr: { 'data-testid': 'lang-edit-form-' ~ lang_id } }) }}
+                <div class="modal-header">
+                    <h2 class="modal-title h5" id="lang-edit-modal-title-{{ lang_id }}">{{ 'Edit language'|trans }}</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
+                </div>
+                <div class="modal-body">
+                    {% include '@BackOfficeDefaultTwig/configuration/lang/_form_fields.html.twig' with { form: form } only %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                    <button type="submit" class="btn btn-primary" data-testid="lang-edit-submit-{{ lang_id }}">
+                        <i class="bi bi-check2" aria-hidden="true"></i> {{ 'Save changes'|trans }}
+                    </button>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>

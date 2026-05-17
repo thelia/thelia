@@ -1,0 +1,53 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Edit state'|trans }} — {{ state.title }}{% endblock %}
+{% block body_testid %}state-edit{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="/admin/configuration">{{ 'Configuration'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.configuration.states.default') }}">{{ 'States'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ state.title }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid" data-testid="state-edit-page">
+        <h1 class="h3 mb-3">{{ 'State'|trans }} <small class="text-muted">{{ state.isocode }} — #{{ state.id }}</small></h1>
+
+        <div class="card">
+            <div class="card-body">
+                {{ form_start(form, { action: path('admin.configuration.states.save'), method: 'post' }) }}
+                    <input type="hidden" name="state_id" value="{{ state.id }}">
+                    <div class="row g-3">
+                        <div class="col-md-6">{{ form_row(form.title) }}</div>
+                        <div class="col-md-3">{{ form_row(form.isocode) }}</div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="state-country-select">{{ 'Country'|trans }}</label>
+                            <select name="thelia_state_update[country]" id="state-country-select" class="form-select">
+                                {% for country in countries %}
+                                    <option value="{{ country.id }}" {% if country.id == state.countryId %}selected{% endif %}>{{ country.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check mt-2">
+                                {{ form_widget(form.visible, { attr: { class: 'form-check-input' } }) }}
+                                {{ form_label(form.visible, null, { label_attr: { class: 'form-check-label' } }) }}
+                            </div>
+                        </div>
+                    </div>
+                    {{ form_widget(form.id) }}
+                    {{ form_widget(form.locale) }}
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                        <a href="{{ path('admin.configuration.states.default') }}" class="btn btn-outline-secondary">{{ 'Cancel'|trans }}</a>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check2"></i> {{ 'Save'|trans }}</button>
+                    </div>
+                {{ form_end(form, { render_rest: false }) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,157 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Order'|trans }} #{{ order.ref }}{% endblock %}
+{% block body_testid %}order-detail{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.order.list') }}">{{ 'Orders'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">#{{ order.ref }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    {{ safe_hook('order-edit.top', { order: order.id }) }}
+
+    <div class="container-fluid" data-testid="order-detail-page">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h3 mb-0">{{ 'Order'|trans }} <small class="text-muted">#{{ order.ref }}</small></h1>
+            <div class="d-flex gap-2">
+                <a href="{{ invoice_url }}" target="_blank" class="btn btn-outline-secondary" data-testid="order-invoice-link">
+                    <i class="bi bi-file-pdf" aria-hidden="true"></i> {{ 'Invoice'|trans }}
+                </a>
+                <a href="{{ delivery_url }}" target="_blank" class="btn btn-outline-secondary" data-testid="order-delivery-link">
+                    <i class="bi bi-file-pdf" aria-hidden="true"></i> {{ 'Delivery slip'|trans }}
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-3">
+                    <div class="card-header">{{ 'Order items'|trans }}</div>
+                    <table class="table mb-0" data-testid="order-items-table">
+                        <thead>
+                            <tr>
+                                <th>{{ 'Reference'|trans }}</th>
+                                <th>{{ 'Title'|trans }}</th>
+                                <th class="text-end">{{ 'Quantity'|trans }}</th>
+                                <th class="text-end">{{ 'Unit price'|trans }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order_items %}
+                                <tr>
+                                    <td>{{ item.ref }}</td>
+                                    <td>{{ item.title }}</td>
+                                    <td class="text-end">{{ item.quantity }}</td>
+                                    <td class="text-end">{{ item.price|number_format(2) }}</td>
+                                </tr>
+                            {% else %}
+                                <tr><td colspan="4" class="text-muted text-center">{{ 'No item.'|trans }}</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-header">{{ 'Update status'|trans }}</div>
+                    <div class="card-body">
+                        <form action="{{ path('admin.order.update.status', { order_id: order.id }) }}?_token={{ token }}" method="post" data-testid="order-status-form">
+                            <div class="row g-2">
+                                <div class="col-md-9">
+                                    <select name="status_id" class="form-select" data-testid="order-status-select">
+                                        {% for s in available_statuses %}
+                                            {% if s.id > 0 %}
+                                                <option value="{{ s.id }}" {% if s.id == order.statusId %}selected{% endif %}>{{ s.title }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="submit" class="btn btn-primary w-100" data-testid="order-status-submit">{{ 'Update'|trans }}</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-header">{{ 'Delivery reference'|trans }}</div>
+                    <div class="card-body">
+                        <form action="{{ path('admin.order.update.deliveryRef', { order_id: order.id }) }}?_token={{ token }}" method="post" class="d-flex gap-2" data-testid="order-delivery-ref-form">
+                            <input type="text" name="delivery_ref" value="{{ order.deliveryRef }}" class="form-control" data-testid="order-delivery-ref-input">
+                            <button type="submit" class="btn btn-primary" data-testid="order-delivery-ref-submit">{{ 'Update'|trans }}</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>{{ 'Invoice address'|trans }}</span>
+                        {% if order_addresses.invoice %}
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                    data-bs-toggle="modal" data-bs-target="#order-address-modal"
+                                    data-address-payload="{{ order_addresses.invoice|json_encode|e('html_attr') }}"
+                                    data-address-kind="invoice"
+                                    data-testid="order-invoice-address-edit">
+                                <i class="bi bi-pencil-square" aria-hidden="true"></i> {{ 'Edit'|trans }}
+                            </button>
+                        {% endif %}
+                    </div>
+                    <div class="card-body" data-testid="order-invoice-address">
+                        {% if order_addresses.invoice %}
+                            <p>{{ order_addresses.invoice.firstname }} {{ order_addresses.invoice.lastname }}</p>
+                            {% if order_addresses.invoice.company %}<p>{{ order_addresses.invoice.company }}</p>{% endif %}
+                            <p>{{ order_addresses.invoice.address1 }}<br>{{ order_addresses.invoice.zipcode }} {{ order_addresses.invoice.city }}</p>
+                            <p>{{ order_addresses.invoice.phone }}</p>
+                        {% else %}
+                            <p class="text-muted">{{ 'No invoice address.'|trans }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>{{ 'Delivery address'|trans }}</span>
+                        {% if order_addresses.delivery %}
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                    data-bs-toggle="modal" data-bs-target="#order-address-modal"
+                                    data-address-payload="{{ order_addresses.delivery|json_encode|e('html_attr') }}"
+                                    data-address-kind="delivery"
+                                    data-testid="order-delivery-address-edit">
+                                <i class="bi bi-pencil-square" aria-hidden="true"></i> {{ 'Edit'|trans }}
+                            </button>
+                        {% endif %}
+                    </div>
+                    <div class="card-body" data-testid="order-delivery-address">
+                        {% if order_addresses.delivery %}
+                            <p>{{ order_addresses.delivery.firstname }} {{ order_addresses.delivery.lastname }}</p>
+                            {% if order_addresses.delivery.company %}<p>{{ order_addresses.delivery.company }}</p>{% endif %}
+                            <p>{{ order_addresses.delivery.address1 }}<br>{{ order_addresses.delivery.zipcode }} {{ order_addresses.delivery.city }}</p>
+                            <p>{{ order_addresses.delivery.phone }}</p>
+                        {% else %}
+                            <p class="text-muted">{{ 'No delivery address.'|trans }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if order_addresses.invoice or order_addresses.delivery %}
+        {% include '@BackOfficeDefaultTwig/order/_address_modal.html.twig' with {
+            order: order,
+            customer_titles: customer_titles,
+            countries: countries,
+            states: states,
+            token: token,
+        } only %}
+    {% endif %}
+
+    {{ safe_hook('order-edit.bottom', { order: order.id }) }}
+{% endblock %}

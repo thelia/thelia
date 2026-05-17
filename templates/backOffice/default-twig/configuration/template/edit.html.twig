@@ -1,0 +1,91 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Edit template'|trans }} — {{ template.name }}{% endblock %}
+{% block body_testid %}configuration-template-edit{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.configuration.index') }}">{{ 'Configuration'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.configuration.templates.default') }}">{{ 'Templates'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ template.name }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    {{ safe_hook('template.top', { template: template.id }) }}
+
+    <div class="container-fluid" data-testid="template-edit-page">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h3 mb-0">{{ 'Template'|trans }} <small class="text-muted">#{{ template.id }}</small></h1>
+            <a href="{{ path('admin.configuration.templates.default') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i> {{ 'Back to list'|trans }}
+            </a>
+        </div>
+
+        <div class="row">
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-header">{{ 'General'|trans }}</div>
+                    <div class="card-body">
+                        {{ form_start(form, { action: path('admin.configuration.templates.save', { template_id: template.id }), method: 'post', attr: { 'data-testid': 'template-edit-form' } }) }}
+                            <input type="hidden" name="template_id" value="{{ template.id }}">
+                            <div class="mb-3">
+                                {{ form_label(form.name) }}
+                                {{ form_widget(form.name, { attr: { class: 'form-control' } }) }}
+                                {{ form_errors(form.name) }}
+                            </div>
+                            {{ form_widget(form.id) }}
+                            {{ form_widget(form.locale) }}
+                            <button type="submit" class="btn btn-primary" data-testid="template-edit-submit">
+                                <i class="bi bi-check2" aria-hidden="true"></i> {{ 'Save'|trans }}
+                            </button>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-7">
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>{{ 'Features'|trans }}</span>
+                        {% if available_features|length > 0 %}
+                            <form action="{{ path('admin.configuration.templates.features.add') }}?_token={{ assignToken() }}" method="post" class="d-flex gap-2" data-testid="template-add-feature-form">
+                                <input type="hidden" name="template_id" value="{{ template.id }}">
+                                <select name="feature_id" class="form-select form-select-sm" data-testid="template-add-feature-select">
+                                    {% for feature in available_features %}
+                                        <option value="{{ feature.id }}">{{ feature.title }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-primary" data-testid="template-add-feature-submit">{{ 'Add'|trans }}</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                    {% include '@BackOfficeDefaultTwig/configuration/template/_features_table.html.twig' %}
+                </div>
+
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>{{ 'Attributes'|trans }}</span>
+                        {% if available_attributes|length > 0 %}
+                            <form action="{{ path('admin.configuration.templates.attributes.add') }}?_token={{ assignToken() }}" method="post" class="d-flex gap-2" data-testid="template-add-attribute-form">
+                                <input type="hidden" name="template_id" value="{{ template.id }}">
+                                <select name="attribute_id" class="form-select form-select-sm" data-testid="template-add-attribute-select">
+                                    {% for attribute in available_attributes %}
+                                        <option value="{{ attribute.id }}">{{ attribute.title }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-primary" data-testid="template-add-attribute-submit">{{ 'Add'|trans }}</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                    {% include '@BackOfficeDefaultTwig/configuration/template/_attributes_table.html.twig' %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ safe_hook('template.bottom', { template: template.id }) }}
+{% endblock %}

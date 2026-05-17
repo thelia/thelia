@@ -1,0 +1,39 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Newsletter subscribers'|trans }}{% endblock %}
+{% block body_testid %}newsletter-list{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ 'Newsletter'|trans }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid" data-testid="newsletter-page">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h3 mb-0">{{ 'Newsletter subscribers'|trans }}</h1>
+            <a href="{{ export_url }}" class="btn btn-outline-primary" data-testid="newsletter-export-button">
+                <i class="bi bi-download" aria-hidden="true"></i> {{ 'Export CSV'|trans }}
+            </a>
+        </div>
+
+        {{ component('BoDataTable', {
+            id: 'newsletter',
+            columns: [
+                column('id', 'ID'|trans),
+                column('email', 'Email'|trans),
+                column('firstname', 'First name'|trans),
+                column('lastname', 'Last name'|trans),
+                column('locale', 'Locale'|trans, 'center'),
+                column('created_at', 'Subscribed on'|trans),
+                column_actions('_actions', 'Actions'|trans),
+            ],
+            rows: rows,
+            emptyMessage: 'No newsletter subscribers.'|trans,
+        }) }}
+    </div>
+{% endblock %}

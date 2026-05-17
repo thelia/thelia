@@ -1,0 +1,54 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Edit order status'|trans }} — {{ status.title }}{% endblock %}
+{% block body_testid %}configuration-order-status-edit{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.configuration.index') }}">{{ 'Configuration'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.order-status.default') }}">{{ 'Order statuses'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ status.title }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid" data-testid="order-status-edit-page">
+        <h1 class="h3 mb-3">{{ 'Order status'|trans }} <small class="text-muted">#{{ status.id }}</small></h1>
+
+        {{ form_start(form, { action: path('admin.order-status.save', { order_status_id: status.id }), method: 'post', attr: { 'data-testid': 'order-status-edit-form' } }) }}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form_label(form.title) }}
+                    {{ form_widget(form.title, { attr: { class: 'form-control' } }) }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    {{ form_label(form.code) }}
+                    {{ form_widget(form.code, { attr: { class: 'form-control' } }) }}
+                </div>
+                <div class="col-md-2 mb-3">
+                    {{ form_label(form.color) }}
+                    {{ form_widget(form.color, { attr: { class: 'form-control', type: 'color' } }) }}
+                </div>
+            </div>
+            <div class="mb-3">
+                {{ form_label(form.chapo) }}
+                {{ form_widget(form.chapo, { attr: { class: 'form-control', rows: 3 } }) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(form.description) }}
+                {{ form_widget(form.description, { attr: { class: 'form-control', rows: 6 } }) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(form.postscriptum) }}
+                {{ form_widget(form.postscriptum, { attr: { class: 'form-control', rows: 3 } }) }}
+            </div>
+            {{ form_widget(form.id) }}
+            {{ form_widget(form.locale) }}
+            <button type="submit" class="btn btn-primary" data-testid="order-status-edit-submit">{{ 'Save'|trans }}</button>
+            <a href="{{ path('admin.order-status.default') }}" class="btn btn-outline-secondary">{{ 'Back'|trans }}</a>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

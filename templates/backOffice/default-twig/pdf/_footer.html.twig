@@ -1,0 +1,30 @@
+{# Shared imprint footer rendered inside the Html2Pdf <page_footer>. #}
+{{ pdf_hook(kind ~ '.footer-top', { 'order': order_id }) }}
+<table>
+    <col style="width:100%">
+    <tbody>
+    <tr>
+        <td>
+            <div style="width:100%; text-align:center; position:relative;">
+                {% set imprint = pdf_hook('invoice.imprint', { 'order': order_id }) %}
+                {% if imprint|trim %}
+                    {{ imprint|raw }}
+                {% else %}
+                    {{ store.name }}
+                    {% set addresses = (store.address1 ~ ' ' ~ store.address2 ~ ' ' ~ store.address3)|trim %}
+                    {% set city = (store.zipcode ~ ' ' ~ store.city)|trim %}
+                    {% if addresses %} - {{ addresses }}{% endif %}
+                    {% if city %} - {{ city }}{% endif %}
+                    {% if store.country %} - {{ store.country }}{% endif %}
+                    {% if store.business_id %} - {{ store.business_id }}{% endif %}
+                    <br>
+                    {% if store.phone %}{{ 'Phone: '|trans({}, 'pdf.default') }}{{ store.phone }}{% endif %}
+                    {% if store.email %}{{ 'Email: '|trans({}, 'pdf.default') }}{{ store.email }}{% endif %}
+                {% endif %}
+                <div style="position:absolute;top:1mm;right:1mm;line-height:1">{{ 'page'|trans({}, 'pdf.default') }} [[page_cu]]/[[page_nb]]</div>
+            </div>
+        </td>
+    </tr>
+    </tbody>
+</table>
+{{ pdf_hook(kind ~ '.footer-bottom', { 'order': order_id }) }}

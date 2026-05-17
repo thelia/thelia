@@ -1,0 +1,7 @@
+<div class="mb-3" data-testid="coupon-amount-input">
+    <label for="coupon-amount" class="form-label">{{ 'Discount amount'|trans }}</label>
+    <div class="input-group">
+        <input id="coupon-amount" type="text" inputmode="decimal" class="form-control" name="coupon_specific[amount]" value="{{ amount_value|default('') }}" placeholder="14.50">
+        <span class="input-group-text">{{ currency_symbol|default('$') }}</span>
+    </div>
+</div>

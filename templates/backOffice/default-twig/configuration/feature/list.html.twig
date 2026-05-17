@@ -1,0 +1,108 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Features'|trans }}{% endblock %}
+{% block body_testid %}configuration-features{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.configuration.index') }}">{{ 'Configuration'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ 'Features'|trans }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    {{ safe_hook('features.top') }}
+
+    <div class="container-fluid" data-testid="features-page">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h3 mb-0">{{ 'Features management'|trans }}</h1>
+            {% if is_granted('CREATE', 'admin.configuration.feature') %}
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#feature-create-modal" data-testid="feature-create-button">
+                    <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                    {{ 'Add a new feature'|trans }}
+                </button>
+            {% endif %}
+        </div>
+
+        {{ component('BoDataTable', {
+            id: 'features',
+            columns: [
+                column('id', 'ID'|trans),
+                column('title', 'Title'|trans),
+                column('position', 'Position'|trans, 'center'),
+                column_actions('_actions', 'Actions'|trans),
+            ],
+            rows: rows,
+            emptyMessage: 'No feature defined yet.'|trans,
+            tbodyAttributes: {
+                'data-controller': 'bo-sortable',
+                'data-bo-sortable-url-value': update_position_url,
+                'data-bo-sortable-token-value': update_position_token,
+                'data-bo-sortable-param-name-value': 'feature_id',
+            },
+        }) }}
+    </div>
+
+    {{ safe_hook('features.bottom') }}
+
+    <div class="modal fade" id="feature-create-modal" tabindex="-1" aria-labelledby="feature-create-modal-title" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                {{ form_start(create_form, { action: path('admin.configuration.features.create'), method: 'post', attr: { 'data-testid': 'feature-create-form' } }) }}
+                    <div class="modal-header">
+                        <h2 class="modal-title h5" id="feature-create-modal-title">{{ 'Create a new feature'|trans }}</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            {{ form_label(create_form.title) }}
+                            {{ form_widget(create_form.title, { attr: { class: 'form-control' } }) }}
+                            {{ form_errors(create_form.title) }}
+                        </div>
+                        <div class="form-check mb-3">
+                            {{ form_widget(create_form.add_to_all, { attr: { class: 'form-check-input' } }) }}
+                            {{ form_label(create_form.add_to_all, null, { label_attr: { class: 'form-check-label' } }) }}
+                        </div>
+                        {{ form_widget(create_form.locale) }}
+                        {{ safe_hook('feature.create-form') }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                        <button type="submit" class="btn btn-primary" data-testid="feature-create-submit">
+                            <i class="bi bi-check2" aria-hidden="true"></i> {{ 'Create'|trans }}
+                        </button>
+                    </div>
+                {{ form_end(create_form) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="feature-delete-modal" tabindex="-1" aria-labelledby="feature-delete-modal-title" aria-hidden="true"
+         data-controller="bo-prefill-modal"
+         data-bo-prefill-modal-source-trigger-value="data-feature-id"
+         data-bo-prefill-modal-target-input-value="feature_id">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ path('admin.configuration.features.delete') }}?_token={{ assignToken() }}" method="post" data-testid="feature-delete-form">
+                    <div class="modal-header">
+                        <h2 class="modal-title h5" id="feature-delete-modal-title">{{ 'Delete feature'|trans }}</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>{{ 'Do you really want to delete this feature?'|trans }}</p>
+                        <input type="hidden" name="feature_id" value="" data-bo-prefill-modal-target="input">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                        <button type="submit" class="btn btn-danger" data-testid="feature-delete-submit">
+                            <i class="bi bi-trash" aria-hidden="true"></i> {{ 'Delete'|trans }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

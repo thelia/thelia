@@ -1,0 +1,61 @@
+<div class="modal fade" id="tax-create-modal" tabindex="-1" aria-labelledby="tax-create-modal-title" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            {{ form_start(create_tax_form, { action: path('admin.configuration.taxes.add'), method: 'post', attr: { 'data-testid': 'tax-create-form' } }) }}
+                <div class="modal-header">
+                    <h2 class="modal-title h5" id="tax-create-modal-title">{{ 'Create a new tax'|trans }}</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
+                </div>
+                <div class="modal-body">
+                    {{ form_widget(create_tax_form.locale) }}
+                    <div class="row g-3">
+                        <div class="col-md-12">{{ form_row(create_tax_form.title) }}</div>
+                        <div class="col-md-12">{{ form_row(create_tax_form.description) }}</div>
+                        <div class="col-md-6">{{ form_row(create_tax_form.type) }}</div>
+                    </div>
+                    <div class="row g-3 mt-2" data-testid="tax-create-requirements">
+                        {% for child in create_tax_form %}
+                            {% set field_name = child.vars.name %}
+                            {% if field_name not in ['locale', 'title', 'description', 'type'] %}
+                                {% set tax_type = child.vars.attr['data-tax-type'] ?? '' %}
+                                <div class="col-md-6 tax-requirement" data-tax-type="{{ tax_type }}">
+                                    {{ form_row(child) }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                    <button type="submit" class="btn btn-primary" data-testid="tax-create-submit">
+                        <i class="bi bi-check2" aria-hidden="true"></i> {{ 'Create this tax'|trans }}
+                    </button>
+                </div>
+            {{ form_end(create_tax_form) }}
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const form = document.querySelector('[data-testid="tax-create-form"]');
+        if (!form) return;
+        const select = form.querySelector('#thelia_tax_creation_type');
+        if (!select) return;
+        const groups = form.querySelectorAll('.tax-requirement');
+
+        function sync() {
+            const current = select.value;
+            groups.forEach(function (group) {
+                const matches = group.dataset.taxType === current;
+                group.style.display = matches ? '' : 'none';
+                group.querySelectorAll('input, select, textarea').forEach(function (input) {
+                    input.disabled = !matches;
+                });
+            });
+        }
+
+        select.addEventListener('change', sync);
+        sync();
+    })();
+</script>

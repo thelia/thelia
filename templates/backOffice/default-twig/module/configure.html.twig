@@ -1,0 +1,27 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Modules'|trans }}{% endblock %}
+{% block body_testid %}modules-configure{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="/admin/modules">{{ 'Modules'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ 'Configure'|trans }} : {{ module.code }} - {{ module.title }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid" data-testid="module-configure-page">
+        <h1 class="h3 mb-3">{{ 'Configure'|trans }} : {{ module.code }} - {{ module.title }}</h1>
+
+        {{ safe_hook('module.configuration', { location: 'module_configuration', modulecode: module_code }) }}
+    </div>
+{% endblock %}
+
+{% block javascript_last_call %}
+    {{ safe_hook('module.config-js', { location: 'module-config-js', modulecode: module_code }) }}
+    {{ safe_hook('wysiwyg.js', { location: 'wysiwyg-module-config-js' }) }}
+{% endblock %}

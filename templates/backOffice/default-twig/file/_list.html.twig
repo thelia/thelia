@@ -1,0 +1,70 @@
+<div class="bo-file-list" data-controller="bo-file-list"
+     data-bo-file-list-toggle-url-template-value="{{ path(urls.toggle, { parentType: parent_type, documentId: 0 }) }}"
+     data-bo-file-list-delete-url-template-value="{{ path(urls.delete, { parentType: parent_type, imageId: 0, documentId: 0 }) }}"
+     data-bo-file-list-position-url-value="{{ path(urls.position, { parentType: parent_type, parentId: parent_id }) }}">
+    {% if items|length == 0 %}
+        <div class="alert alert-info" data-testid="bo-file-list-empty">
+            {% if kind == 'image' %}
+                {{ 'No images yet. Upload some with the form above.'|trans }}
+            {% else %}
+                {{ 'No documents yet. Upload some with the form above.'|trans }}
+            {% endif %}
+        </div>
+    {% else %}
+        <ul class="list-unstyled row g-3" data-bo-file-list-target="grid" data-testid="bo-file-list-grid">
+            {% for item in items %}
+                <li class="col-12 col-md-6 col-xl-4" data-bo-file-list-target="item" data-file-id="{{ item.id }}">
+                    <div class="card h-100">
+                        {% if kind == 'image' %}
+                            <a href="{{ path(urls.update, { parentType: parent_type, imageId: item.id }) }}"
+                               class="d-block text-center bg-light py-3" data-testid="bo-file-thumb">
+                                <img src="{{ item.url }}" alt="{{ item.title }}" class="img-fluid" style="max-height: 120px;">
+                            </a>
+                        {% else %}
+                            <a href="{{ path(urls.update, { parentType: parent_type, documentId: item.id }) }}"
+                               class="d-block text-center bg-light py-4" data-testid="bo-file-thumb">
+                                <i class="bi bi-file-earmark fs-1" aria-hidden="true"></i>
+                                <div class="small text-truncate px-2">{{ item.file }}</div>
+                            </a>
+                        {% endif %}
+                        <div class="card-body p-2">
+                            {% if can_update %}
+                                <form method="post" action="{{ path(urls.update_title, kind == 'image' ? { parentType: parent_type, imageId: item.id } : { parentType: parent_type, documentId: item.id }) }}"
+                                      class="input-group input-group-sm mb-2" data-testid="bo-file-title-form-{{ item.id }}">
+                                    <input type="hidden" name="success_url" value="">
+                                    <input type="text" name="title" value="{{ item.title }}" class="form-control" placeholder="{{ 'Title'|trans }}">
+                                    <button type="submit" name="save_mode" value="stay" class="btn btn-outline-primary" title="{{ 'Save'|trans }}">
+                                        <i class="bi bi-check2" aria-hidden="true"></i>
+                                    </button>
+                                </form>
+                            {% else %}
+                                <div class="small fw-semibold text-truncate mb-2">{{ item.title }}</div>
+                            {% endif %}
+                            <div class="d-flex gap-2 justify-content-between align-items-center small text-muted">
+                                <span>#{{ item.position }}</span>
+                                <div class="btn-group btn-group-sm">
+                                    {% if can_update %}
+                                        <button type="button" class="btn btn-outline-secondary" data-action="bo-file-list#toggle"
+                                                data-bo-file-list-id-param="{{ item.id }}"
+                                                title="{{ item.visible ? 'Hide'|trans : 'Show'|trans }}"
+                                                data-testid="bo-file-toggle-{{ item.id }}">
+                                            <i class="bi bi-eye{% if not item.visible %}-slash{% endif %}" aria-hidden="true"></i>
+                                        </button>
+                                    {% endif %}
+                                    {% if can_delete %}
+                                        <button type="button" class="btn btn-outline-danger" data-action="bo-file-list#delete"
+                                                data-bo-file-list-id-param="{{ item.id }}"
+                                                title="{{ 'Delete'|trans }}"
+                                                data-testid="bo-file-delete-{{ item.id }}">
+                                            <i class="bi bi-trash" aria-hidden="true"></i>
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>

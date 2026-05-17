@@ -1,0 +1,49 @@
+{% set can_reorder = coupon_id is defined and coupon_id and conditions|length > 1 %}
+<table class="table table-striped table-hover align-middle bo-conditions-table" data-testid="coupon-conditions-table">
+    <thead>
+        <tr>
+            {% if can_reorder %}<th style="width: 2.5rem;" aria-label="{{ 'Move'|trans }}"></th>{% endif %}
+            <th>{{ 'Condition description'|trans }}</th>
+            <th class="text-end" style="width: 7rem;">{{ 'Actions'|trans }}</th>
+        </tr>
+    </thead>
+    <tbody {% if can_reorder %}data-controller="bo-sortable"
+           data-bo-sortable-url-value="{{ path('admin.coupon.condition.reorder', { 'couponId': coupon_id }) }}"
+           data-bo-sortable-token-value="{{ assignToken() }}"
+           data-bo-sortable-param-name-value="id"{% endif %}>
+        {% for entry in conditions %}
+            <tr {% if can_reorder %}data-row-id="{{ entry.index }}"{% endif %} data-testid="coupon-condition-row-{{ entry.index }}">
+                {% if can_reorder %}
+                    <td class="text-center text-body-secondary" style="cursor: grab;" title="{{ 'Drag to reorder'|trans }}">
+                        <i class="bi bi-grip-vertical"></i>
+                    </td>
+                {% endif %}
+                <td>
+                    {% if not loop.first %}<span class="badge bg-info-subtle text-info-emphasis me-2">{{ 'And'|trans }}</span>{% endif %}
+                    {{ entry.summary|raw }}
+                </td>
+                <td class="text-end">
+                    <button type="button"
+                            class="btn btn-sm btn-outline-secondary bo-coupon-condition-edit"
+                            data-condition-service-id="{{ entry.serviceId }}"
+                            data-condition-index="{{ entry.index }}"
+                            title="{{ 'Change this condition'|trans }}">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    {% if conditions|length > 1 %}
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger bo-coupon-condition-delete"
+                                data-condition-index="{{ entry.index }}"
+                                title="{{ 'Delete this condition'|trans }}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="{{ can_reorder ? 3 : 2 }}" class="text-center text-muted small">{{ 'No condition. The coupon will apply to every order.'|trans }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

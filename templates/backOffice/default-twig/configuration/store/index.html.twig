@@ -1,0 +1,101 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Store configuration'|trans({}, 'bo.default-twig') }}{% endblock %}
+{% block body_testid %}configuration-store{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.configuration.index') }}">{{ 'Configuration'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ 'Store'|trans }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    {{ safe_hook('configuration.store.top') }}
+
+    <div class="container-fluid" data-testid="config-store-page">
+        <h1 class="h3 mb-4">{{ 'Store configuration'|trans }}</h1>
+
+        {{ form_start(form, {
+            action: path('admin.configuration.store.save'),
+            method: 'post',
+            attr: { 'data-testid': 'config-store-form', enctype: 'multipart/form-data' },
+        }) }}
+
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="card mb-4">
+                        <div class="card-header">{{ 'General'|trans }}</div>
+                        <div class="card-body">
+                            {{ form_row(form.store_name) }}
+                            {{ form_row(form.store_description) }}
+                            {{ form_row(form.store_business_id) }}
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">{{ 'Email addresses'|trans }}</div>
+                        <div class="card-body">
+                            {{ form_row(form.store_email) }}
+                            {{ form_row(form.store_notification_emails) }}
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">{{ 'Media'|trans }}</div>
+                        <div class="card-body">
+                            {{ form_row(form.favicon_file) }}
+                            {{ form_row(form.logo_file) }}
+                            {{ form_row(form.banner_file) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="card mb-4">
+                        <div class="card-header">{{ 'Store address'|trans }}</div>
+                        <div class="card-body">
+                            {{ form_row(form.store_address1) }}
+                            {{ form_row(form.store_address2) }}
+                            {{ form_row(form.store_address3) }}
+
+                            <div class="row g-2">
+                                <div class="col-md-4">{{ form_row(form.store_zipcode) }}</div>
+                                <div class="col-md-8">{{ form_row(form.store_city) }}</div>
+                            </div>
+
+                            {{ form_row(form.store_country) }}
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">{{ 'Phone & Fax'|trans }}</div>
+                        <div class="card-body">
+                            <div class="row g-2">
+                                <div class="col-md-6">{{ form_row(form.store_phone) }}</div>
+                                <div class="col-md-6">{{ form_row(form.store_fax) }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <a href="{{ path('admin.configuration.index') }}" class="btn btn-outline-secondary" data-testid="config-store-cancel">
+                    {{ 'Cancel'|trans }}
+                </a>
+                <button type="submit" name="save_mode" value="stay" class="btn btn-outline-primary" data-testid="config-store-save-stay">
+                    <i class="bi bi-check2" aria-hidden="true"></i> {{ 'Save'|trans }}
+                </button>
+                <button type="submit" name="save_mode" value="close" class="btn btn-primary" data-testid="config-store-save-close">
+                    <i class="bi bi-check2-all" aria-hidden="true"></i> {{ 'Save and close'|trans }}
+                </button>
+            </div>
+        {{ form_end(form) }}
+    </div>
+
+    {{ safe_hook('configuration.store.bottom') }}
+{% endblock %}

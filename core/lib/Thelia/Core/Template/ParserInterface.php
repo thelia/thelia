@@ -97,7 +97,7 @@ interface ParserInterface
      * @param bool|string $webAssetTemplateName false to use the current template path, or a template name to
      *                                          load assets from this template instead of the current one
      */
-    public function getTemplateDefinition(bool|string $webAssetTemplateName = false): TemplateDefinition;
+    public function getTemplateDefinition(bool|string $webAssetTemplateName = false): ?TemplateDefinition;
 
     /**
      * Check if template definition is not null.

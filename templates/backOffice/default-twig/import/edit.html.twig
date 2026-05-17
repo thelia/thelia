@@ -1,0 +1,63 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Import'|trans }} : {{ import.title }}{% endblock %}
+{% block body_testid %}import-edit{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="/admin/tools">{{ 'Tools'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('import.list') }}">{{ 'Imports'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ 'Import'|trans }} : {{ import.title }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid" data-testid="import-edit-page">
+        <h1 class="h3 mb-3">{{ 'Import'|trans }} : {{ import.title }}</h1>
+
+        {% for type, messages in app.flashes(['thelia.import.error', 'thelia.import.success', 'error', 'success']) %}
+            {% for message in messages %}
+                {% set variant = type ends with 'success' ? 'success' : 'danger' %}
+                <div class="alert alert-{{ variant }}">{{ message|raw }}</div>
+            {% endfor %}
+        {% endfor %}
+
+        <form method="post" action="{{ path('import.process', { id: import_id }) }}" enctype="multipart/form-data" data-testid="import-form">
+            <div class="card">
+                <div class="card-body">
+                    {% if import.description %}
+                        <div class="alert alert-info">{{ import.description|raw }}</div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="bo-import-language" class="form-label">{{ 'Language'|trans }}</label>
+                            <select id="bo-import-language" name="language" class="form-select" required>
+                                {% for lang in languages %}
+                                    <option value="{{ lang.id }}"{% if lang.is_default %} selected{% endif %}>{{ lang.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="bo-import-file" class="form-label">{{ 'File'|trans }}</label>
+                            <input id="bo-import-file" type="file" name="file_upload" accept="{{ allowed_mime_types }}" class="form-control" required>
+                            <div class="form-text">{{ 'Accepted formats'|trans }} : {{ allowed_extensions }}</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-4">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-upload me-1" aria-hidden="true"></i>{{ 'Import this file'|trans }}</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block javascript_last_call %}
+    {{ safe_hook('import.js', { location: 'import-js' }) }}
+{% endblock %}

@@ -1,0 +1,93 @@
+<div data-testid="product-combinations-tab">
+    {{ safe_hook('product.combinations-tab.top', { product: product.id }) }}
+
+    {% if pse_rows is empty %}
+        <div class="alert alert-info" data-testid="combinations-empty">
+            {{ 'No combination yet. Use the combination builder below to generate combinations from attribute values.'|trans }}
+        </div>
+    {% else %}
+        <form method="post" action="{{ path('admin.product.combination.update') }}?_token={{ assignToken() }}" data-testid="combinations-form">
+            <input type="hidden" name="product_id" value="{{ product.id }}">
+            <input type="hidden" name="tax_rule" value="{{ tax_rule_id }}">
+            <input type="hidden" name="currency" value="{{ currency_id }}">
+            <input type="hidden" name="use_exchange_rate" value="0">
+
+            <div class="table-responsive">
+                <table class="table table-sm align-middle" data-testid="combinations-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th>{{ 'Default'|trans }}</th>
+                            <th>{{ 'Combination'|trans }}</th>
+                            <th>{{ 'Reference'|trans }}</th>
+                            <th class="text-end">{{ 'Quantity'|trans }}</th>
+                            <th class="text-end">{{ 'Price'|trans }}</th>
+                            <th class="text-end">{{ 'Sale price'|trans }}</th>
+                            <th class="text-end">{{ 'Weight'|trans }}</th>
+                            <th>{{ 'EAN'|trans }}</th>
+                            <th>{{ 'Promo'|trans }}</th>
+                            <th>{{ 'New'|trans }}</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in pse_rows %}
+                            <tr data-testid="combinations-row-{{ row.id }}">
+                                <td class="text-center">
+                                    <input type="radio" name="default_pse" value="{{ row.id }}" {% if row.isdefault %}checked{% endif %} aria-label="{{ 'Default combination'|trans }}">
+                                </td>
+                                <td><small>{{ row.label }}</small></td>
+                                <td><input type="hidden" name="product_sale_element_id[]" value="{{ row.id }}"><input type="text" name="reference[]" value="{{ row.ref }}" class="form-control form-control-sm"></td>
+                                <td><input type="number" step="0.01" name="quantity[]" value="{{ row.quantity }}" class="form-control form-control-sm text-end"></td>
+                                <td><input type="number" step="0.0001" name="price[]" value="{{ row.price }}" class="form-control form-control-sm text-end"></td>
+                                <td><input type="number" step="0.0001" name="sale_price[]" value="{{ row.sale_price }}" class="form-control form-control-sm text-end"></td>
+                                <td><input type="number" step="0.0001" name="weight[]" value="{{ row.weight }}" class="form-control form-control-sm text-end"></td>
+                                <td><input type="text" name="ean_code[]" value="{{ row.ean_code }}" class="form-control form-control-sm"></td>
+                                <td class="text-center"><input type="checkbox" name="onsale[{{ loop.index0 }}]" value="1" {% if row.onsale %}checked{% endif %}></td>
+                                <td class="text-center"><input type="checkbox" name="isnew[{{ loop.index0 }}]" value="1" {% if row.isnew %}checked{% endif %}></td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                            data-bs-toggle="modal" data-bs-target="#pse-delete-modal"
+                                            data-pse-id="{{ row.id }}"
+                                            data-testid="combinations-delete-{{ row.id }}">
+                                        <i class="bi bi-trash" aria-hidden="true"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <button type="submit" class="btn btn-primary" data-testid="combinations-submit">
+                <i class="bi bi-check2" aria-hidden="true"></i> {{ 'Save all combinations'|trans }}
+            </button>
+        </form>
+    {% endif %}
+
+    <div class="modal fade" id="pse-delete-modal" tabindex="-1" aria-hidden="true"
+         data-controller="bo-prefill-modal"
+         data-bo-prefill-modal-source-trigger-value="data-pse-id"
+         data-bo-prefill-modal-target-input-value="product_sale_element_id">
+        <div class="modal-dialog">
+            <form method="post" action="{{ path('admin.product.combination.delete') }}?_token={{ assignToken() }}">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5">{{ 'Delete combination'|trans }}</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="product_id" value="{{ product.id }}">
+                        <input type="hidden" name="product_sale_element_id" data-bo-prefill-modal-target="input">
+                        <p>{{ 'Are you sure you want to delete this combination?'|trans }}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                        <button type="submit" class="btn btn-danger">{{ 'Delete'|trans }}</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{ safe_hook('product.combinations-tab.bottom', { product: product.id }) }}
+</div>

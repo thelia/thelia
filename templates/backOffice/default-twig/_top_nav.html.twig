@@ -1,0 +1,72 @@
+{# Back-office top bar — mirrors the Smarty admin-layout.tpl navbar-top:
+   brand, search, locale switcher, admin profile shortcut, view-site, logout.
+   Hook names match the legacy template so third-party modules keep working. #}
+
+{# Back-office top bar — mirrors the Smarty admin-layout.tpl navbar-top:
+   brand logo, search, locale switcher, admin profile, view site, logout.
+   Hooks (main.before-topbar / main.topbar-top / main.after-topbar) keep
+   their legacy names so third-party modules keep working. #}
+
+{% set dist = '/templates-assets/backOffice/default-twig/dist' %}
+{% set current_lang = bo_current_language() %}
+
+{{ safe_hook('main.before-topbar', { location: 'before_topbar' }) }}
+
+<nav class="bo-top-nav navbar navbar-expand-md bg-body border-bottom shadow-sm" data-testid="bo-top-nav">
+    <div class="container-fluid">
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#bo-side-nav-offcanvas" aria-controls="bo-side-nav-offcanvas" aria-label="{{ 'Toggle navigation'|trans }}">
+            <i class="bi bi-list fs-3" aria-hidden="true"></i>
+        </button>
+
+        {% if is_granted('VIEW', 'admin.search') %}
+            <form class="d-none d-md-flex flex-grow-1 mx-3" role="search" action="/admin/search" method="get" data-testid="bo-search-form">
+                <div class="input-group">
+                    <span class="input-group-text bg-body-secondary border-end-0"><i class="bi bi-search" aria-hidden="true"></i></span>
+                    <input type="search" id="search_term" name="search_term" value="{{ app.request.query.get('search_term', '') }}" class="form-control border-start-0" placeholder="{{ 'Search...'|trans }}">
+                </div>
+            </form>
+        {% endif %}
+
+        <ul class="navbar-nav ms-auto align-items-md-center">
+            {{ safe_hook('main.topbar-top') }}
+
+            <li class="nav-item dropdown" data-testid="bo-top-nav-langs">
+                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="{{ 'Interface language'|trans }}">
+                    <img src="{{ dist }}/img/svgFlags/{{ current_lang.code }}.svg" alt="{{ current_lang.title }}" class="bo-top-nav__flag" width="22" height="14">
+                    <span class="d-none d-lg-inline ms-1">{{ current_lang.title }}</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                    {% for lang in bo_languages() %}
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center{{ lang.id == current_lang.id ? ' active' : '' }}" href="{{ app.request.pathInfo }}?{{ app.request.query.all|merge({lang: lang.code})|url_encode }}">
+                                <img src="{{ dist }}/img/svgFlags/{{ lang.code }}.svg" alt="" class="bo-top-nav__flag me-2" width="22" height="14">
+                                {{ lang.title }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="/" title="{{ 'View site'|trans }}" target="_blank" rel="noopener" data-testid="bo-top-nav-view-site">
+                    <i class="bi bi-eye" aria-hidden="true"></i>
+                    <span class="d-md-none ms-1">{{ 'View site'|trans }}</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('admin.configuration.administrators.view-profile') }}" title="{{ 'Edit profile'|trans }}" data-testid="bo-top-nav-profile">
+                    <i class="bi bi-person-circle" aria-hidden="true"></i>
+                    <span class="ms-1 d-none d-lg-inline">{{ app.user.firstname|default('Admin') }}</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="/admin/logout" title="{{ 'Logout'|trans }}" data-testid="bo-top-nav-logout">
+                    <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                    <span class="d-md-none ms-1">{{ 'Logout'|trans }}</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+{{ safe_hook('main.after-topbar', { location: 'after_topbar' }) }}

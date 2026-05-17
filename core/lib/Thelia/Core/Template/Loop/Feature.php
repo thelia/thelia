@@ -31,7 +31,6 @@ use Thelia\Model\Map\FeatureTemplateTableMap;
 use Thelia\Model\Product as ProductModel;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\TemplateQuery;
-use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
 

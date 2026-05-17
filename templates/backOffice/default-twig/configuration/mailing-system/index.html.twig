@@ -1,0 +1,92 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Thelia Mailing System'|trans }}{% endblock %}
+{% block body_testid %}mailing-system{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.configuration.index') }}">{{ 'Configuration'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ 'Mailing system'|trans }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    {{ safe_hook('mailing-system.top') }}
+
+    <div class="container-fluid"
+         data-testid="mailing-system-page"
+         data-controller="bo-mailing-system-test"
+         data-bo-mailing-system-test-url-value="{{ path('admin.mailingSystem.test') }}"
+    >
+        <h1 class="h3 mb-3">{{ 'Thelia Mailing System'|trans }}</h1>
+
+        <div class="card mb-3">
+            <div class="card-header">
+                <h2 class="h5 mb-0">{{ 'Configuration mailing system'|trans }}</h2>
+            </div>
+            <div class="card-body">
+                {% if edit_disabled %}
+                    <div class="alert alert-warning mb-3">
+                        {{ 'Your mailing system has been configured in .env file and cannot be changed here.'|trans }}
+                    </div>
+                {% endif %}
+
+                <div class="alert alert-warning mb-3">
+                    {{ "Be careful, we do not advise to use this interface. It's safer to put your smtp informations in your environement variables."|trans }}
+                </div>
+
+                {{ form_start(form, { action: path('admin.mailingSystem.save'), method: 'post', attr: { 'data-testid': 'mailing-system-form' } }) }}
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="form-check">
+                                {{ form_widget(form.enabled, { attr: { class: 'form-check-input', disabled: edit_disabled ? 'disabled' : null } }) }}
+                                {{ form_label(form.enabled, null, { label_attr: { class: 'form-check-label' } }) }}
+                            </div>
+                        </div>
+                        <div class="col-md-8">{{ form_row(form.host, { attr: { disabled: edit_disabled ? 'disabled' : null } }) }}</div>
+                        <div class="col-md-4">{{ form_row(form.port, { attr: { disabled: edit_disabled ? 'disabled' : null } }) }}</div>
+                        <div class="col-md-6">{{ form_row(form.username, { attr: { disabled: edit_disabled ? 'disabled' : null } }) }}</div>
+                        <div class="col-md-6">{{ form_row(form.password, { attr: { disabled: edit_disabled ? 'disabled' : null } }) }}</div>
+                        <div class="col-md-6">{{ form_row(form.encryption, { attr: { disabled: edit_disabled ? 'disabled' : null } }) }}</div>
+                        <div class="col-md-6">{{ form_row(form.auth_mode, { attr: { disabled: edit_disabled ? 'disabled' : null } }) }}</div>
+                        <div class="col-md-6">{{ form_row(form.timeout, { attr: { disabled: edit_disabled ? 'disabled' : null } }) }}</div>
+                        <div class="col-md-6">{{ form_row(form.source_ip, { attr: { disabled: edit_disabled ? 'disabled' : null } }) }}</div>
+                    </div>
+                    {% if not edit_disabled %}
+                        <div class="d-flex justify-content-end gap-2 mt-3">
+                            <a href="{{ path('admin.configuration.index') }}" class="btn btn-outline-secondary">{{ 'Cancel'|trans }}</a>
+                            <button type="submit" name="save_mode" value="stay" class="btn btn-primary" data-testid="mailing-system-save">
+                                <i class="bi bi-check2"></i> {{ 'Save'|trans }}
+                            </button>
+                        </div>
+                    {% endif %}
+                {{ form_end(form, { render_rest: false }) }}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="h5 mb-0">{{ 'Test your configuration'|trans }}</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-6">
+                        <label class="form-label" for="test-email">{{ 'Your email'|trans }}</label>
+                        <input type="email" id="test-email" class="form-control" value="{{ store_email }}" data-bo-mailing-system-test-target="email">
+                    </div>
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-primary" data-bo-mailing-system-test-target="button" data-action="bo-mailing-system-test#send" data-testid="mailing-system-test-send">
+                            <i class="bi bi-envelope-arrow-up"></i> {{ 'Send'|trans }}
+                        </button>
+                    </div>
+                    <div class="col-md-3 small" data-bo-mailing-system-test-target="result"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ safe_hook('mailing-system.bottom') }}
+{% endblock %}

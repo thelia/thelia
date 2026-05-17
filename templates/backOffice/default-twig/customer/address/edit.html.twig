@@ -1,0 +1,57 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Edit address'|trans({}, 'bo.default-twig') }}{% endblock %}
+{% block body_testid %}customer-address-edit{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.customers') }}">{{ 'Customers'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.customer.update.view', { customer_id: address.customerId }) }}">{{ 'Customer'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ address.label }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid" data-testid="address-edit-page">
+        <h1 class="h3 mb-3">{{ 'Edit address'|trans }}: <span class="text-muted">{{ address.label }}</span></h1>
+
+        <div class="card">
+            <div class="card-body">
+                {{ form_start(form, {
+                    action: path('admin.address.save'),
+                    method: 'post',
+                    attr: { 'data-testid': 'address-edit-form' },
+                }) }}
+                    {{ form_widget(form.id) }}
+                    {{ form_widget(form.customer_id) }}
+                    <div class="row g-3">
+                        <div class="col-md-12">{{ form_row(form.label) }}</div>
+                        <div class="col-md-3">{{ form_row(form.title) }}</div>
+                        <div class="col-md-4">{{ form_row(form.firstname) }}</div>
+                        <div class="col-md-5">{{ form_row(form.lastname) }}</div>
+                        <div class="col-md-12">{{ form_row(form.company) }}</div>
+                        <div class="col-md-12">{{ form_row(form.address1) }}</div>
+                        <div class="col-md-6">{{ form_row(form.address2) }}</div>
+                        <div class="col-md-6">{{ form_row(form.address3) }}</div>
+                        <div class="col-md-3">{{ form_row(form.zipcode) }}</div>
+                        <div class="col-md-5">{{ form_row(form.city) }}</div>
+                        <div class="col-md-4">{{ form_row(form.country) }}</div>
+                        <div class="col-md-6">{{ form_row(form.phone) }}</div>
+                        <div class="col-md-6">{{ form_row(form.cellphone) }}</div>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                        <a href="{{ path('admin.customer.update.view', { customer_id: address.customerId }) }}" class="btn btn-outline-secondary" data-testid="address-edit-cancel">
+                            {{ 'Cancel'|trans }}
+                        </a>
+                        <button type="submit" class="btn btn-primary" data-testid="address-edit-submit">
+                            <i class="bi bi-check2" aria-hidden="true"></i> {{ 'Save'|trans }}
+                        </button>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

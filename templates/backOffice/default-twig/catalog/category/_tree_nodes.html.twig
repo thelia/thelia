@@ -1,0 +1,26 @@
+{% for item in items %}
+    <li class="bo-category-tree__item" data-bo-category-tree-target="node" data-category-id="{{ item.id }}" data-parent-id="{{ items.parentId|default('') }}" draggable="true" data-testid="category-tree-node-{{ item.id }}">
+        <div class="d-flex align-items-center py-1 border-bottom" style="padding-left: {{ depth * 24 }}px;">
+            <button type="button" class="btn btn-sm btn-link p-0 me-2" data-action="bo-category-tree#toggle" aria-label="{{ 'Toggle children'|trans }}">
+                {% if item.children|length > 0 %}
+                    <i class="bi bi-chevron-down bo-category-tree__chevron" aria-hidden="true"></i>
+                {% else %}
+                    <i class="bi bi-dot text-muted" aria-hidden="true"></i>
+                {% endif %}
+            </button>
+            <i class="bi bi-grip-vertical text-muted me-2" aria-hidden="true" style="cursor: grab;"></i>
+            <a href="{{ path('admin.categories.update', { category_id: item.id }) }}" class="bo-category-tree__title flex-grow-1 text-decoration-none">
+                {{ item.title }}
+            </a>
+            <span class="badge bg-{{ item.visible ? 'success' : 'secondary' }} ms-2" data-testid="category-tree-status-{{ item.id }}">
+                {% if item.visible %}{{ 'Online'|trans }}{% else %}{{ 'Offline'|trans }}{% endif %}
+            </span>
+            <small class="text-muted ms-2">#{{ item.position }}</small>
+        </div>
+        {% if item.children|length > 0 %}
+            <ul class="list-unstyled bo-category-tree__children" data-bo-category-tree-target="children" data-parent-id="{{ item.id }}">
+                {% include '@BackOfficeDefaultTwig/catalog/category/_tree_nodes.html.twig' with { items: item.children, depth: depth + 1 } only %}
+            </ul>
+        {% endif %}
+    </li>
+{% endfor %}

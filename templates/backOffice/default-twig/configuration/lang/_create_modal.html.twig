@@ -1,0 +1,22 @@
+<div class="modal fade" id="lang-create-modal" tabindex="-1" aria-labelledby="lang-create-modal-title" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            {{ form_start(create_form, { action: path('admin.configuration.languages.add'), method: 'post', attr: { 'data-testid': 'lang-create-form' } }) }}
+                <div class="modal-header">
+                    <h2 class="modal-title h5" id="lang-create-modal-title">{{ 'Create a new language'|trans }}</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
+                </div>
+                <div class="modal-body">
+                    {% include '@BackOfficeDefaultTwig/configuration/lang/_form_fields.html.twig' with { form: create_form } only %}
+                    {{ safe_hook('language.create-form') }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                    <button type="submit" class="btn btn-primary" data-testid="lang-create-submit">
+                        <i class="bi bi-check2" aria-hidden="true"></i> {{ 'Create this language'|trans }}
+                    </button>
+                </div>
+            {{ form_end(create_form) }}
+        </div>
+    </div>
+</div>

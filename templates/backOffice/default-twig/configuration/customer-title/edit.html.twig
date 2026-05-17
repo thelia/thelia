@@ -1,0 +1,38 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Edit customer title'|trans }} — {{ title.long }}{% endblock %}
+{% block body_testid %}customer-title-edit{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="/admin/configuration">{{ 'Configuration'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.configuration.customer-titles.default') }}">{{ 'Customer titles'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ title.long }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid" data-testid="customer-title-edit-page">
+        <h1 class="h3 mb-3">{{ 'Customer title'|trans }} <small class="text-muted">#{{ title.id }}</small></h1>
+
+        <div class="card">
+            <div class="card-body">
+                {{ form_start(form, { action: path('admin.configuration.customer-titles.save'), method: 'post' }) }}
+                    <input type="hidden" name="customer_title_id" value="{{ title.id }}">
+                    {{ form_row(form.short) }}
+                    {{ form_row(form.long) }}
+                    {{ form_row(form.default) }}
+                    {{ form_widget(form.id) }}
+                    {{ form_widget(form.locale) }}
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                        <a href="{{ path('admin.configuration.customer-titles.default') }}" class="btn btn-outline-secondary">{{ 'Cancel'|trans }}</a>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check2"></i> {{ 'Save'|trans }}</button>
+                    </div>
+                {{ form_end(form, { render_rest: false }) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

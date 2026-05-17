@@ -1,0 +1,83 @@
+// Thelia back-office — Bootstrap 5 variable overrides
+// Mirrors the public-facing thelia.net design system (orange / soft slate)
+
+$primary: #f26041;        // Thelia orange (matches thelia.net .bg-primary)
+$primary-dark: #be5a1c;   // Hover / pressed state on primary surfaces
+$secondary: #4f4f4f;      // thelia.net body copy
+$dark: #282828;           // thelia.net deep text / sidebar accent
+
+$body-bg: #f4f7fa;        // thelia.net page background
+$body-color: #4f4f4f;
+$body-secondary-bg: #ffffff;
+$body-tertiary-bg: #ffffff;
+
+$border-color: #d9d9d9;
+
+// Bootstrap inherits nav-link colors from --bs-link-color which we override
+// to the brand orange. Neutralize tab colors so only the active tab pops.
+$nav-link-color: var(--bs-secondary);
+$nav-link-hover-color: var(--bs-body-color);
+$nav-tabs-link-active-color: var(--bs-body-color);
+$nav-tabs-link-hover-border-color: var(--bs-border-color) var(--bs-border-color) transparent;
+
+// Form polish — Thelia.net inspired (rounded, generous padding, brand focus ring)
+$input-border-radius: .5rem;
+$input-border-radius-sm: .375rem;
+$input-border-radius-lg: .625rem;
+$input-padding-y: .625rem;
+$input-padding-x: .9rem;
+$input-font-size: .925rem;
+$input-bg: #ffffff;
+$input-border-color: #c6cbd1;
+$input-border-width: 1px;
+$input-focus-border-color: #f26041;
+$input-focus-box-shadow: 0 0 0 .2rem rgba(242, 96, 65, .2);
+$input-placeholder-color: #b3b9c0;
+$form-label-margin-bottom: .5rem;
+$form-label-font-weight: 500;
+$form-label-color: #2c2c2c;
+$form-text-color: #6c757d;
+$form-text-margin-top: .4rem;
+$form-text-font-size: .8rem;
+
+// Tooltips — dark, generous padding, brand-tinted shadow
+$tooltip-bg: #1f2937;
+$tooltip-color: #ffffff;
+$tooltip-opacity: 1;
+$tooltip-border-radius: .375rem;
+$tooltip-padding-y: .45rem;
+$tooltip-padding-x: .65rem;
+$tooltip-font-size: .8rem;
+
+// Buttons — same border radius as inputs for consistency
+$btn-border-radius: .5rem;
+$btn-border-radius-sm: .375rem;
+$btn-border-radius-lg: .625rem;
+$btn-padding-y: .5rem;
+$btn-padding-x: 1rem;
+$btn-font-weight: 500;
+
+// Cards — softer borders + tinted header
+$card-border-radius: .75rem;
+$card-border-color: #e6e8eb;
+$card-cap-bg: #ffffff;
+$card-cap-padding-y: 1rem;
+$card-cap-padding-x: 1.25rem;
+$card-spacer-y: 1.25rem;
+$card-spacer-x: 1.25rem;
+
+// Breadcrumb — discrete
+$breadcrumb-padding-y: .25rem;
+$breadcrumb-padding-x: 0;
+$breadcrumb-margin-bottom: 1.25rem;
+$breadcrumb-font-size: .85rem;
+$breadcrumb-divider-color: #adb5bd;
+$breadcrumb-active-color: #6c757d;
+
+// Tables — zebra + hover + neutral header
+$table-bg: transparent;
+$table-cell-padding-y: .75rem;
+$table-cell-padding-x: 1rem;
+$table-th-font-weight: 600;
+$table-striped-bg: rgba(0, 0, 0, .015);
+$table-hover-bg: rgba(242, 96, 65, .04);

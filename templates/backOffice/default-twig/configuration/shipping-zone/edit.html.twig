@@ -1,0 +1,124 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Edit a shipping zone'|trans }}{% endblock %}
+{% block body_testid %}shipping-zones-edit{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="/admin/configuration">{{ 'Configuration'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.configuration.shipping-zones.default') }}">{{ 'Shipping configuration'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ 'Editing shipping configuration for module "%name"'|trans({ '%name': module.code ~ ' - ' ~ module.title }) }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    {{ safe_hook('shipping-zones-edit.top', { delivery_module_id: delivery_module_id }) }}
+
+    <div class="container-fluid" data-testid="shipping-zones-edit-page">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h3 mb-0">{{ 'Shipping configuration of delivery module "%title"'|trans({ '%title': module.title }) }}</h1>
+            <a href="{{ path('admin.configuration.shipping-zones.default') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-x-lg me-1" aria-hidden="true"></i>{{ 'Close'|trans }}
+            </a>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        {% if available_areas|length > 0 %}
+                            <form method="POST" action="{{ path('admin.configuration.shipping-zones.area.add') }}" data-testid="shipping-zones-add-area-form">
+                                <input type="hidden" name="shipping_zone_id" value="{{ delivery_module_id }}">
+
+                                <label for="bo-shipping-zones-area-id" class="form-label">{{ 'Available shipping zones'|trans }}</label>
+                                <div class="input-group">
+                                    <select id="bo-shipping-zones-area-id" name="area_id" class="form-select">
+                                        {% for area in available_areas %}
+                                            <option value="{{ area.id }}">{{ area.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>{{ 'Add'|trans }}
+                                    </button>
+                                </div>
+                            </form>
+                        {% else %}
+                            <div class="alert alert-info mb-0">{{ 'This delivery module handles all shipping zones.'|trans }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>{{ 'Shipping zone'|trans }}</th>
+                                        <th class="text-center">{{ 'Actions'|trans }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if associated_areas|length == 0 %}
+                                        <tr>
+                                            <td colspan="2"><div class="text-center text-muted">{{ 'There are no shipping zones attached to this module.'|trans }}</div></td>
+                                        </tr>
+                                    {% endif %}
+                                    {% for area in associated_areas %}
+                                        <tr data-testid="shipping-zones-area-{{ area.id }}">
+                                            <td>{{ area.name }}</td>
+                                            <td class="text-center">
+                                                {% if is_granted('UPDATE', 'admin.configuration.shipping-zone') %}
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#shipping-zones-remove-area-modal" data-area-id="{{ area.id }}" data-area-label="{{ area.name }}" title="{{ 'Delete this zone'|trans }}">
+                                                        <i class="bi bi-trash" aria-hidden="true"></i>
+                                                    </button>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ safe_hook('shipping-zones-edit.bottom', { delivery_module_id: delivery_module_id }) }}
+
+    <div class="modal fade" id="shipping-zones-remove-area-modal" tabindex="-1" aria-hidden="true"
+         data-controller="bo-prefill-modal"
+         data-bo-prefill-modal-source-trigger-value="data-area-id"
+         data-bo-prefill-modal-target-input-value="area_id">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="{{ path('admin.configuration.shipping-zones.area.remove') }}" data-testid="shipping-zones-remove-area-form">
+                    <input type="hidden" name="shipping_zone_id" value="{{ delivery_module_id }}">
+                    <input type="hidden" name="area_id" data-bo-prefill-modal-target="input">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ 'Remove zone'|trans }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>{{ 'Do you really want to remove this zone ?'|trans }}</p>
+                        {{ safe_hook('zone.delete-form', { module_id: delivery_module_id, location: 'zone_delete_form' }) }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                        <button type="submit" class="btn btn-danger">{{ 'Delete'|trans }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript_last_call %}
+    {{ safe_hook('shipping-zones.edit-js', { module_id: delivery_module_id, location: 'shipping-zones-edit-js' }) }}
+{% endblock %}

@@ -1,0 +1,157 @@
+{# Invoice PDF native Twig template — mirrors templates/pdf/default/invoice.html. #}
+{% trans_default_domain 'pdf.default' %}
+{% set money_format = '0.00' %}
+{% include '@BackOfficeDefaultTwig/pdf/_styles.html.twig' %}
+<page backtop="10mm" backleft="10mm" backright="10mm" backbottom="10mm">
+    <page_header>
+        {{ pdf_hook('invoice.header', { 'order': order_id }) }}
+    </page_header>
+
+    <page_footer>
+        {% include '@BackOfficeDefaultTwig/pdf/_footer.html.twig' %}
+    </page_footer>
+
+    <table class="table-info" style="margin-bottom: 15px;">
+        <tr>
+            <td>
+                <h1 style="text-transform: capitalize"><strong style="color: #58585a;">{{ 'INVOICE'|trans }}</strong> {{ store.name }}</h1>
+            </td>
+        </tr>
+    </table>
+    <table class="table-info">
+        <col style="width: 100%; padding: 0mm;" />
+        <tr>
+            <td><h3>{{ 'Invoice date'|trans }} : <span>{{ invoice_date ? invoice_date|date('Y-m-d') : '' }}</span></h3></td>
+        </tr>
+        <tr>
+            <td><h3>{{ 'Invoice REF'|trans }} : <span>{{ invoice_ref }}</span></h3></td>
+        </tr>
+        <tr>
+            <td><h3>{{ 'Customer Number'|trans }} : <span>{{ customer_ref }}</span></h3></td>
+        </tr>
+        {% for block in pdf_hook_block('invoice.information', { 'order': order_id }) %}
+            <tr>
+                <td><h3>{{ block.title }} : <span>{{ block.value }}</span></h3></td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    {{ pdf_hook('invoice.after-information', { 'order': order_id }) }}
+
+    <table class="table-address">
+        <col style="width: 50%; padding: 3mm;" />
+        <col style="padding: 3mm;" />
+        <tr>
+            <td style="border-left: solid 1mm #f6993c;">
+                <h3>{{ 'Delivery address'|trans }}</h3>
+                {% set delivery_hook = pdf_hook('invoice.delivery-address', { 'module': delivery_module_id, 'order': order_id }) %}
+                {% if delivery_hook|trim %}
+                    {{ delivery_hook|raw }}
+                {% else %}
+                    {{ delivery_address_html|raw }}
+                {% endif %}
+            </td>
+            <td style="border-left: solid 1mm #f6993c;">
+                <h3>{{ 'Invoice address'|trans }}</h3>
+                {{ invoice_address_html|raw }}
+            </td>
+        </tr>
+    </table>
+
+    {{ pdf_hook('invoice.after-addresses', { 'order': order_id }) }}
+
+    <table width="100%" cellspacing="0" cellpadding="0" style="padding-top: 5mm; padding-bottom: 8mm">
+        <col style="width: 40%; padding: 1mm;" />
+        <col style="width: 12%; padding: 1mm;" />
+        <col style="width: 12%; padding: 1mm;" />
+        <col style="width: 12%; padding: 1mm;" />
+        <col style="width: 12%; padding: 1mm;" />
+        <col style="width: 12%; padding: 1mm;" />
+        <tr class="table-1">
+            <td><h4>{{ 'Product'|trans }}</h4></td>
+            <td><h4 class="align-center">{{ 'Unit. price'|trans }}</h4></td>
+            <td><h4 class="align-center">{{ 'Tax'|trans }}</h4></td>
+            <td><h4 class="align-center">{{ 'Unit taxed price'|trans }}</h4></td>
+            <td><h4 class="align-center">{{ 'Quantity'|trans }}</h4></td>
+            <td style="background:#f6993c"><h4 style="color:white;" class="align-center">{{ 'Total without tax'|trans }}</h4></td>
+        </tr>
+        {% for item in items %}
+            <tr class="table-2">
+                <td>
+                    <p>
+                        {{ item.title }} <br>
+                        {{ 'Product ref : '|trans }}{{ item.ref }}<br>
+                        {{ 'Combination ref : '|trans }}{{ item.pse_ref }}
+                    </p>
+                    {{ pdf_hook('invoice.product-list', { 'order_product': item.id, 'order': order_id }) }}
+                </td>
+                <td><p class="align-right">{{ item.real_price|number_format(2, '.', ' ') }} {{ currency_symbol }}</p></td>
+                <td><p class="align-right">{{ item.real_price_tax|number_format(2, '.', ' ') }} {{ currency_symbol }}</p></td>
+                <td><p class="align-right">{{ item.real_taxed_price|number_format(2, '.', ' ') }} {{ currency_symbol }}</p></td>
+                <td><p class="align-center">{{ item.quantity }}</p></td>
+                <td><p class="align-right">{{ item.real_total_price|number_format(2, '.', ' ') }} {{ currency_symbol }}</p></td>
+            </tr>
+            {{ pdf_hook('invoice.order-product', { 'order': order_id, 'order_product': item.id }) }}
+        {% endfor %}
+    </table>
+
+    {{ pdf_hook('invoice.after-products', { 'order': order_id }) }}
+
+    <table cellspacing="0" cellpadding="0" style="padding-top: 5mm; padding-bottom: 8mm">
+        <col style="width: 60%; padding: 1mm;" />
+        <col style="width: 40%; padding: 1mm;" />
+        <tr>
+            <td class="table-3-module">
+                <h3>{{ 'Payment module'|trans }}</h3>
+                <p>
+                    <span>{{ payment_module_title }}</span>
+                </p>
+                {{ pdf_hook('invoice.after-payment-module', { 'order': order_id, 'module_id': payment_module_id }) }}
+
+                <h3>{{ 'Delivery module'|trans }}</h3>
+                <p>
+                    <span>{{ delivery_module_title }}</span>
+                </p>
+                {{ pdf_hook('invoice.after-delivery-module', { 'order': order_id, 'module_id': delivery_module_id }) }}
+            </td>
+            <td>
+                <table class="table-3">
+                    <col style="width: 50%; padding: 0 1mm 1mm;">
+                    <col style="width: 50%; padding: 0 1mm 1mm;">
+                    <tr>
+                        <td class="table-3-1"><p>{{ 'Total without tax'|trans }}</p></td>
+                        <td class="table-3-1 align-right"><p>{{ total_items_amount|number_format(2, '.', ' ') }} {{ currency_symbol }}</p></td>
+                    </tr>
+                    <tr>
+                        <td class="table-3-1"><p>{{ 'Postage without tax'|trans }}</p></td>
+                        <td class="table-3-1 align-right"><p>{{ postage_untaxed|number_format(2, '.', ' ') }} {{ currency_symbol }}</p></td>
+                    </tr>
+                    <tr>
+                        <td class="table-3-1"><p>{{ 'Total without tax'|trans }}</p></td>
+                        <td class="table-3-1 align-right"><p>{{ untaxed_total_with_untaxed_postage|number_format(2, '.', ' ') }} {{ currency_symbol }}</p></td>
+                    </tr>
+                    <tr>
+                        <td class="table-3-1"><p>{{ 'Total tax amount'|trans }}</p></td>
+                        <td class="table-3-1 align-right"><p>{{ (total_items_tax + postage_tax)|number_format(2, '.', ' ') }} {{ currency_symbol }}</p></td>
+                    </tr>
+                    <tr>
+                        <td class="table-3-1"><p>{{ 'Taxed total'|trans }}</p></td>
+                        <td class="table-3-1 align-right"><p>{{ (total_taxed_amount + discount)|number_format(2, '.', ' ') }} {{ currency_symbol }}</p></td>
+                    </tr>
+                    {% if discount > 0 %}
+                        <tr>
+                            <td class="table-3-1"><p>{{ 'Discount with tax'|trans }}</p></td>
+                            <td class="table-3-1 align-right"><p>{{ discount|number_format(2, '.', ' ') }} {{ currency_symbol }}</p></td>
+                        </tr>
+                    {% endif %}
+                    <tr>
+                        <td class="table-3-1" style="background:#f6993c;"><h3 style="color:white;">{{ 'Total'|trans }}</h3></td>
+                        <td class="table-3-1 align-right" style="background:#f6993c;"><h3 style="color:white;">{{ total_taxed_amount|number_format(2, '.', ' ') }} {{ currency_symbol }}</h3></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    {{ pdf_hook('invoice.after-summary', { 'order': order_id }) }}
+</page>

@@ -1,0 +1,13 @@
+<div class="mb-3" data-testid="coupon-percent-input">
+    <label for="coupon-percent" class="form-label">{{ 'Discount percentage'|trans }}</label>
+    <div class="input-group">
+        <input id="coupon-percent" type="number" step="any" min="0" class="form-control" name="coupon_specific[percentage]" value="{{ percentage_value|default('') }}" placeholder="5">
+        <span class="input-group-text">%</span>
+    </div>
+</div>
+
+{% include '@BackOfficeDefaultTwig/coupon/type-fragments/_products_picker.html.twig' with {
+    categories: categories|default([]),
+    products_by_category: products_by_category|default({}),
+    selected_products: selected_products|default([]),
+} only %}

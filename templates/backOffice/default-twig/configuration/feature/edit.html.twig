@@ -1,0 +1,142 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Edit feature'|trans }} — {{ feature.title }}{% endblock %}
+{% block body_testid %}configuration-feature-edit{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.configuration.index') }}">{{ 'Configuration'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.configuration.features.default') }}">{{ 'Features'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ feature.title }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    {{ safe_hook('feature.top', { feature: feature.id }) }}
+
+    <div class="container-fluid" data-testid="feature-edit-page">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h3 mb-0">{{ 'Feature'|trans }} <small class="text-muted">#{{ feature.id }}</small></h1>
+            <div class="btn-group" role="group" aria-label="{{ 'Feature actions'|trans }}">
+                <a href="{{ path('admin.configuration.features.add-to-all', { feature_id: feature.id }) }}?_token={{ assignToken() }}" class="btn btn-outline-secondary" data-testid="feature-add-to-all">
+                    <i class="bi bi-plus-square" aria-hidden="true"></i> {{ 'Add to all templates'|trans }}
+                </a>
+                <a href="{{ path('admin.configuration.features.rem-from-all', { feature_id: feature.id }) }}?_token={{ assignToken() }}" class="btn btn-outline-secondary" data-testid="feature-rem-from-all">
+                    <i class="bi bi-x-square" aria-hidden="true"></i> {{ 'Remove from all templates'|trans }}
+                </a>
+                <a href="{{ path('admin.configuration.features.default') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i> {{ 'Back to list'|trans }}
+                </a>
+            </div>
+        </div>
+
+        {{ form_start(form, { action: path('admin.configuration.features.save', { feature_id: feature.id }), method: 'post', attr: { 'data-testid': 'feature-edit-form' } }) }}
+        <input type="hidden" name="feature_id" value="{{ feature.id }}">
+        <div class="row">
+            <div class="col-md-7">
+                <div class="card">
+                    <div class="card-header">{{ 'General'|trans }}</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            {{ form_label(form.title) }}
+                            {{ form_widget(form.title, { attr: { class: 'form-control' } }) }}
+                            {{ form_errors(form.title) }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form_label(form.chapo) }}
+                            {{ form_widget(form.chapo, { attr: { class: 'form-control', rows: 3 } }) }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form_label(form.description) }}
+                            {{ form_widget(form.description, { attr: { class: 'form-control', rows: 6 } }) }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form_label(form.postscriptum) }}
+                            {{ form_widget(form.postscriptum, { attr: { class: 'form-control', rows: 3 } }) }}
+                        </div>
+                        {{ form_widget(form.id) }}
+                        {{ form_widget(form.locale) }}
+                        {{ safe_hook('feature.update-form', { feature: feature.id }) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>{{ 'Values'|trans }}</span>
+                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#feature-av-create-modal" data-testid="featureav-create-button">
+                            <i class="bi bi-plus" aria-hidden="true"></i> {{ 'Add'|trans }}
+                        </button>
+                    </div>
+                    <table class="table mb-0" data-testid="featureav-table">
+                        <thead>
+                            <tr>
+                                <th>{{ 'Title'|trans }}</th>
+                                <th class="text-center">{{ 'Position'|trans }}</th>
+                                <th class="text-end">{{ 'Actions'|trans }}</th>
+                            </tr>
+                        </thead>
+                        <tbody data-controller="bo-sortable"
+                               data-bo-sortable-url-value="{{ av_position_url }}"
+                               data-bo-sortable-token-value="{{ av_position_token }}"
+                               data-bo-sortable-param-name-value="featureav_id">
+                            {% for av in feature_avs %}
+                                <tr data-id="{{ av.id }}" data-testid="featureav-row-{{ av.id }}">
+                                    <td>
+                                        <input type="text" name="feature_values[{{ av.id }}]" value="{{ av.title }}" class="form-control form-control-sm" data-testid="featureav-input-{{ av.id }}">
+                                    </td>
+                                    <td class="text-center align-middle">{{ av.position }}</td>
+                                    <td class="text-end align-middle">
+                                        <a href="{{ av.delete_url }}" class="btn btn-sm btn-outline-danger" data-testid="featureav-delete-{{ av.id }}" onclick="return confirm('{{ 'Delete this value?'|trans }}')">
+                                            <i class="bi bi-trash" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr><td colspan="3" class="text-muted text-center">{{ 'No value yet.'|trans }}</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary" data-testid="feature-edit-submit">
+                <i class="bi bi-check2" aria-hidden="true"></i> {{ 'Save'|trans }}
+            </button>
+        </div>
+        {{ form_end(form, { render_rest: false }) }}
+    </div>
+
+    {{ safe_hook('feature.bottom', { feature: feature.id }) }}
+
+    <div class="modal fade" id="feature-av-create-modal" tabindex="-1" aria-labelledby="feature-av-create-modal-title" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                {{ form_start(av_create_form, { action: path('admin.configuration.features-av.create'), method: 'post', attr: { 'data-testid': 'featureav-create-form' } }) }}
+                    <div class="modal-header">
+                        <h2 class="modal-title h5" id="feature-av-create-modal-title">{{ 'Add a feature value'|trans }}</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            {{ form_label(av_create_form.title) }}
+                            {{ form_widget(av_create_form.title, { attr: { class: 'form-control' } }) }}
+                            {{ form_errors(av_create_form.title) }}
+                        </div>
+                        {{ form_widget(av_create_form.locale) }}
+                        {{ form_widget(av_create_form.feature_id) }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                        <button type="submit" class="btn btn-primary" data-testid="featureav-create-submit">{{ 'Add'|trans }}</button>
+                    </div>
+                {{ form_end(av_create_form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

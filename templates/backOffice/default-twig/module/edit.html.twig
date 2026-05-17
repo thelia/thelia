@@ -1,0 +1,43 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Edit module'|trans }} — {{ module.title }}{% endblock %}
+{% block body_testid %}module-edit{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin.module') }}">{{ 'Modules'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ module.title }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid" data-testid="module-edit-page">
+        <h1 class="h3 mb-3">{{ module.title }} <small class="text-muted">{{ module.code }}</small></h1>
+
+        <form action="{{ path('admin.module.save') }}" method="post" data-testid="module-edit-form">
+            <input type="hidden" name="module_id" value="{{ module.id }}">
+            <input type="hidden" name="locale" value="{{ locale }}">
+            <div class="mb-3">
+                <label class="form-label">{{ 'Title'|trans }}</label>
+                <input type="text" name="title" value="{{ module.title }}" class="form-control" data-testid="module-edit-title">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">{{ 'Summary'|trans }}</label>
+                <textarea name="chapo" class="form-control" rows="3">{{ module.chapo }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">{{ 'Description'|trans }}</label>
+                <textarea name="description" class="form-control" rows="6">{{ module.description }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">{{ 'Postscriptum'|trans }}</label>
+                <textarea name="postscriptum" class="form-control" rows="3">{{ module.postscriptum }}</textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" data-testid="module-edit-submit">{{ 'Save'|trans }}</button>
+            <a href="{{ path('admin.module') }}" class="btn btn-outline-secondary">{{ 'Back'|trans }}</a>
+        </form>
+    </div>
+{% endblock %}
