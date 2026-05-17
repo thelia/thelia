@@ -1,9 +1,6 @@
 <?php
 return [
     ApiPlatform\Symfony\Bundle\ApiPlatformBundle::class => ['all' => true],
-    BackOfficeDefaultBundle\BackOfficeDefaultBundle::class => ['all' => true],
-    BackOfficeDefaultTwigBundle\BackOfficeDefaultTwigBundle::class => ['all' => true],
-    FlexyBundle\FlexyBundle::class => ['all' => true],
     Lexik\Bundle\JWTAuthenticationBundle\LexikJWTAuthenticationBundle::class => ['all' => true],
     Liip\ImagineBundle\LiipImagineBundle::class => ['all' => true],
     Nelmio\CorsBundle\NelmioCorsBundle::class => ['all' => true],

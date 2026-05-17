@@ -22,10 +22,6 @@
                     "thelia/core": "dev-twig"
                 }
             }
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/thelia-templates/default-twig"
         }
     ],
     "require": {
