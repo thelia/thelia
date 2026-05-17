@@ -1,5 +1,0 @@
-twig:
-  paths:
-    "%kernel.project_dir%/templates/backOffice/default-twig/form": BackOfficeDefaultTwigForm
-  form_themes:
-    - "@BackOfficeDefaultTwigForm/bo_form_theme.html.twig"
