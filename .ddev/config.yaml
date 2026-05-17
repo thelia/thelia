@@ -1,0 +1,19 @@
+type: symfony
+docroot: public
+php_version: "8.3"
+webserver_type: nginx-fpm
+database:
+    type: mariadb
+    version: "10.11"
+composer_version: "2"
+nodejs_version: "20"
+# Database credentials exposed to the web container so that bin/install,
+# bin/test-prepare, and the Symfony kernel can read them at boot
+# without requiring a pre-existing .env.local file.
+# DDEV's default db service uses host=db, name/user/password=db, port=3306.
+web_environment:
+    - DATABASE_HOST=db
+    - DATABASE_PORT=3306
+    - DATABASE_NAME=db
+    - DATABASE_USER=db
+    - DATABASE_PASSWORD=db
