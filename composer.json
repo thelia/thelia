@@ -25,7 +25,7 @@
         }
     ],
     "require": {
-        "php": ">= 8.2",
+        "php": ">= 8.3",
         "thelia/core": "dev-twig",
         "thelia/backoffice-default-template": "dev-twig",
         "thelia/backoffice-default-twig-template": "dev-main",
@@ -128,17 +128,6 @@
                 "vendor/thelia/modules"
             ],
             "App\\": "src/",
-            "FlexyBundle\\": "templates/frontOffice/flexy/src/",
-            "BackOfficeDefaultTwigBundle\\": "templates/backOffice/default-twig/src/",
-            "BackOfficeDefaultBundle\\": "templates/backOffice/default/",
-            "Thelia\\Controller\\Admin\\": [
-                "core/lib/Thelia/Controller/Admin/",
-                "templates/backOffice/default/Controller/Admin/"
-            ],
-            "Thelia\\Form\\": [
-                "core/lib/Thelia/Form/",
-                "templates/backOffice/default/Form/"
-            ],
             "Thelia\\": "core/lib/Thelia"
         },
         "files": [
