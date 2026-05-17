@@ -1,7 +1,7 @@
 build:
     environment:
         php:
-            version: '8.3'
+            version: '8.3.16'
             ini:
                 date.timezone: 'UTC'
                 memory_limit: '-1'
