@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace BackOfficeDefaultBundle;
 
+use BackOfficeDefaultBundle\DependencyInjection\Compiler\RegisterAdminFormsPass;
 use BackOfficeDefaultBundle\Routing\BackOfficeDefaultAttributeLoader;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
@@ -16,8 +18,6 @@ use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 final class BackOfficeDefaultBundle extends AbstractBundle
 {
     public const ACTIVE_TEMPLATE_NAME = 'default';
-
-    private const ADMIN_TEMPLATE_PARAMETER = 'thelia_admin_template';
 
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
@@ -53,25 +53,13 @@ final class BackOfficeDefaultBundle extends AbstractBundle
             ->tag('router.register', ['priority' => 0])
             ->public();
 
-        if (!$this->isActive($builder)) {
-            return;
-        }
     }
 
-    public function prependExtension(ContainerConfigurator $container, ContainerBuilder $builder): void
+    public function build(ContainerBuilder $container): void
     {
-        if (!$this->isActive($builder)) {
-            return;
-        }
-    }
+        parent::build($container);
 
-    private function isActive(ContainerBuilder $builder): bool
-    {
-        if (!$builder->hasParameter(self::ADMIN_TEMPLATE_PARAMETER)) {
-            return false;
-        }
-
-        return self::ACTIVE_TEMPLATE_NAME === $builder->getParameter(self::ADMIN_TEMPLATE_PARAMETER);
+        $container->addCompilerPass(new RegisterAdminFormsPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
     }
 
     private function getRoutingPath(): string
