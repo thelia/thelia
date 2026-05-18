@@ -50,7 +50,7 @@ readonly class CartController
             throw new NotFoundHttpException('Cart not found.');
         }
 
-        $operation = $request->get('_api_operation');
+        $operation = $request->attributes->get('_api_operation');
 
         return $apiResourcePropelTransformerService->modelToResource(Cart::class, $cart, $operation->getNormalizationContext());
     }

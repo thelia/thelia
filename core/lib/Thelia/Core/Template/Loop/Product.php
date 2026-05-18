@@ -687,9 +687,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $current = $this->getCurrent();
 
         if (true === $current) {
-            $search->filterById($this->getMainRequest()->get('product_id'), Criteria::EQUAL);
+            $search->filterById(($this->getMainRequest()->attributes->get('product_id') ?? $this->getMainRequest()->query->get('product_id')), Criteria::EQUAL);
         } elseif (false === $current) {
-            $search->filterById($this->getMainRequest()->get('product_id'), Criteria::NOT_IN);
+            $search->filterById(($this->getMainRequest()->attributes->get('product_id') ?? $this->getMainRequest()->query->get('product_id')), Criteria::NOT_IN);
         }
 
         $brand_id = $this->getBrand();
@@ -720,7 +720,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         if (true === $current_category) {
             $search->filterByCategory(
                 CategoryQuery::create()->filterByProduct(
-                    ProductCategoryQuery::create()->findPk($this->getMainRequest()->get('product_id')),
+                    ProductCategoryQuery::create()->findPk(($this->getMainRequest()->attributes->get('product_id') ?? $this->getMainRequest()->query->get('product_id'))),
                     Criteria::IN,
                 )->find(),
                 Criteria::IN,
@@ -728,7 +728,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         } elseif (false === $current_category) {
             $search->filterByCategory(
                 CategoryQuery::create()->filterByProduct(
-                    ProductCategoryQuery::create()->findPk($this->getMainRequest()->get('product_id')),
+                    ProductCategoryQuery::create()->findPk(($this->getMainRequest()->attributes->get('product_id') ?? $this->getMainRequest()->query->get('product_id'))),
                     Criteria::IN,
                 )->find(),
                 Criteria::NOT_IN,

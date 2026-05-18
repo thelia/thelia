@@ -188,6 +188,6 @@ class ErrorListener
 
         return $event->isMainRequest()
             && !$request->attributes->get(TheliaHttpKernel::IGNORE_THELIA_VIEW, false)
-            && !$request->get('_api_operation_name', false);
+            && !$request->attributes->get('_api_operation_name', false);
     }
 }

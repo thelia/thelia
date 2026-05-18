@@ -243,8 +243,8 @@ readonly class ApiResourcePropelTransformerService
             $uriVariables = [];
             $id = null;
 
-            if (!$previousPropelModel && $request->get('id')) {
-                $id = $request->get('id');
+            if (!$previousPropelModel && $request->attributes->get('id')) {
+                $id = $request->attributes->get('id');
             }
 
             if (method_exists($data, 'getId') && $data->getId()) {

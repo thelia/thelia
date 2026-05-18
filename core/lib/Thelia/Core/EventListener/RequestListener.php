@@ -61,7 +61,7 @@ class RequestListener
         }
 
         $lang = Lang::getDefaultLanguage();
-        if (!$request->get('isApiRoute', false) && $request->hasSession(true)) {
+        if (!$request->request->get('isApiRoute', false) && $request->hasSession(true)) {
             $lang = $request->getSession()->getLang();
             if (null === $lang) {
                 $lang = Lang::getDefaultLanguage();

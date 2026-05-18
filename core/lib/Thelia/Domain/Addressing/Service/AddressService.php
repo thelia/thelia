@@ -160,7 +160,9 @@ readonly class AddressService
         if (null === $request) {
             return null;
         }
-        $addressId = $request->get('addressId');
+        $addressId = $request->attributes->get('addressId')
+            ?? $request->request->get('addressId')
+            ?? $request->query->get('addressId');
 
         if (null === $addressId) {
             $session = $request->getSession();

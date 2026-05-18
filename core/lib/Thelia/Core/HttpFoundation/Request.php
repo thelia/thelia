@@ -63,7 +63,7 @@ class Request extends BaseRequest
 
     public function getProductId(): mixed
     {
-        return $this->get('product_id');
+        return $this->attributes->get('product_id') ?? $this->query->get('product_id');
     }
 
     public function getUriAddingParameters(?array $parameters = null): string

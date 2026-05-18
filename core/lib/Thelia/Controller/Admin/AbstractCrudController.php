@@ -321,7 +321,7 @@ abstract class AbstractCrudController extends BaseAdminController
             if (!$response instanceof Response) {
                 // If we have to stay on the same page, do not redirect to the successUrl,
                 // just redirect to the edit page again.
-                if ('stay' === $request->get('save_mode')) {
+                if ('stay' === $request->request->get('save_mode')) {
                     return $this->redirectToEditionTemplate();
                 }
 
@@ -358,7 +358,7 @@ abstract class AbstractCrudController extends BaseAdminController
         }
 
         try {
-            $mode = $request->get('mode');
+            $mode = $request->request->get('mode') ?? $request->query->get('mode');
 
             if ('up' === $mode) {
                 $mode = UpdatePositionEvent::POSITION_UP;
@@ -368,7 +368,7 @@ abstract class AbstractCrudController extends BaseAdminController
                 $mode = UpdatePositionEvent::POSITION_ABSOLUTE;
             }
 
-            $position = (int) $request->get('position');
+            $position = (int) ($request->request->get('position') ?? $request->query->get('position'));
 
             $event = $this->createUpdatePositionEvent($mode, $position);
 
@@ -401,7 +401,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
         if (null !== $object) {
             try {
-                $mode = $request->get('mode');
+                $mode = $request->request->get('mode') ?? $request->query->get('mode');
 
                 if ('up' === $mode) {
                     $mode = UpdatePositionEvent::POSITION_UP;
@@ -411,7 +411,7 @@ abstract class AbstractCrudController extends BaseAdminController
                     $mode = UpdatePositionEvent::POSITION_ABSOLUTE;
                 }
 
-                $position = (int) $request->get('position');
+                $position = (int) ($request->request->get('position') ?? $request->query->get('position'));
 
                 $event = new UpdatePositionEvent((int) $object->getId(), $mode, $position);
 

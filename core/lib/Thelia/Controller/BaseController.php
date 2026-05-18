@@ -270,7 +270,8 @@ abstract class BaseController implements ControllerInterface
         if ($form instanceof BaseForm) {
             $url = $form->getFormDefinedUrl($parameterName);
         } else {
-            $url = $this->requestStack->getMainRequest()?->get($parameterName);
+            $mainRequest = $this->requestStack->getMainRequest();
+            $url = $mainRequest?->request->get($parameterName) ?? $mainRequest?->query->get($parameterName);
         }
 
         return $url;

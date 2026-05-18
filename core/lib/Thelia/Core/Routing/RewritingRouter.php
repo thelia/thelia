@@ -106,7 +106,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
 
     protected function maybeRedirectForRequestedLocale(Request $request, RewritingResolver $resolver): void
     {
-        $requestedLocale = $request->get('lang');
+        $requestedLocale = $request->query->get('lang');
 
         if (null === $requestedLocale) {
             return;

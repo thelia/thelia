@@ -37,33 +37,38 @@ readonly class DeliveryPickupLocationProvider implements ProviderInterface
             throw new \RuntimeException('City and zipcode are required');
         }
 
-        $stateId = $this->request->get('stateId');
+        $stateId = $this->requestParam('stateId');
         $state = $stateId
             ? (StateQuery::create())->filterById($stateId)->findOne()
             : null;
-        $countryId = $this->request->get('countryId');
+        $countryId = $this->requestParam('countryId');
         $country = $countryId
             ? (CountryQuery::create())->filterById($countryId)->findOne()
             : null;
-        $radius = $this->request->get('radius');
-        $maxRelays = $this->request->get('maxRelays');
-        $orderWeight = $this->request->get('orderWeight');
+        $radius = $this->requestParam('radius');
+        $maxRelays = $this->requestParam('maxRelays');
+        $orderWeight = $this->requestParam('orderWeight');
 
         $pickupLocationEvent = new PickupLocationEvent(
             null,
             null !== $radius ? (int) $radius : null,
             null !== $maxRelays ? (int) $maxRelays : null,
-            $this->request->get('address'),
+            $this->requestParam('address'),
             $uriVariables['city'],
             $uriVariables['zipcode'],
             null !== $orderWeight ? (int) $orderWeight : null,
             $state,
             $country,
-            $this->request->get('moduleIds'),
+            $this->requestParam('moduleIds'),
         );
 
         $this->dispatcher->dispatch($pickupLocationEvent, TheliaEvents::MODULE_DELIVERY_GET_PICKUP_LOCATIONS);
 
         return $pickupLocationEvent->getLocations();
+    }
+
+    private function requestParam(string $key): mixed
+    {
+        return $this->request->query->get($key) ?? $this->request->request->get($key);
     }
 }
