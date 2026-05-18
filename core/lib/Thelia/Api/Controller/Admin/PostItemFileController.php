@@ -34,7 +34,7 @@ class PostItemFileController
         ValidatorInterface $validator,
     ): PropelResourceInterface {
         /** @var ItemFileResourceInterface|PropelResourceInterface $resourceClass */
-        $resourceClass = $request->get('_api_resource_class');
+        $resourceClass = $request->attributes->get('_api_resource_class');
 
         if (!\in_array(ItemFileResourceInterface::class, class_implements($resourceClass), true)) {
             throw new \Exception('Resource must implements ItemFileResourceInterface to use the PostItemFileController');
@@ -58,7 +58,7 @@ class PostItemFileController
 
         $itemType = $resourceClass::getItemType();
         $fileType = $resourceClass::getFileType();
-        $itemId = $request->get($itemType);
+        $itemId = $request->attributes->get($itemType);
         $modelTableMap = $resourceClass::getPropelRelatedTableMap();
         $modelClassName = $modelTableMap->getClassName();
         $propelModel = new $modelClassName();
@@ -71,7 +71,7 @@ class PostItemFileController
         );
 
         /** @var Post $operation */
-        $operation = $request->get('_api_operation');
+        $operation = $request->attributes->get('_api_operation');
 
         return $apiResourceService->modelToResource(
             $resourceClass,

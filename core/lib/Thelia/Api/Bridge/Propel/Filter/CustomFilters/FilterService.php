@@ -79,8 +79,8 @@ readonly class FilterService
 
     public function filterTFilterWithRequest($request, ?ModelCriteria $query = null): iterable
     {
-        $tfilters = $request->get('tfilters', []);
-        $categoryDepth = (int) $request->get(CategoryFilter::CATEGORY_DEPTH_NAME, null);
+        $tfilters = $request->query->all('tfilters');
+        $categoryDepth = (int) $request->query->get(CategoryFilter::CATEGORY_DEPTH_NAME);
         $pathInfo = $request->getPathInfo();
         $segments = explode('/', (string) $pathInfo);
         $resource = end($segments);
@@ -151,10 +151,10 @@ readonly class FilterService
             throw new \InvalidArgumentException('The request is required.');
         }
 
-        $isApiRoute = $request->get('isApiRoute', false);
+        $isApiRoute = $request->request->get('isApiRoute', false);
 
         if ($isApiRoute) {
-            $tfilters = $request->get('tfilters', []);
+            $tfilters = $request->query->all('tfilters');
             $query = $this->filterTFilterWithRequest(request: $request);
         } else {
             $tfilters = $context['filters']['tfilters'] ?? [];
@@ -162,7 +162,7 @@ readonly class FilterService
         }
 
         $filterObjects = [];
-        $locale = $context['filters']['locale'] ?? $request->get('locale');
+        $locale = $context['filters']['locale'] ?? $request->query->get('locale');
         $locale ??= $this->langService->getLocale();
         $filters = $this->getAvailableFilters($resource);
 
@@ -468,6 +468,8 @@ readonly class FilterService
         foreach ($values as $value) {
             return $value->getMainId() && $value->getMainTitle();
         }
+
+        return false;
     }
 
     private function isMinOrMaxFilter(array $values): bool

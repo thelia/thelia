@@ -34,11 +34,11 @@ class TheliaFilter extends AbstractFilter
             $request = $this->requestStack->getMainRequest();
         }
 
-        if (!$request || (!isset($context['filters']['tfilters']) && \count($request->get('tfilters', [])) < 1)) {
+        if (!$request || (!isset($context['filters']['tfilters']) && \count($request->query->all('tfilters')) < 1)) {
             return;
         }
 
-        $isApiRoute = $request->get('isApiRoute', false);
+        $isApiRoute = $request->request->get('isApiRoute', false);
 
         if ($isApiRoute) {
             $this->filterService->filterTFilterWithRequest(request: $request, query: $query);

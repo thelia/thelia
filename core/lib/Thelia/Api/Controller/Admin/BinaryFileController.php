@@ -25,7 +25,7 @@ class BinaryFileController
     public function __invoke(
         Request $request,
     ): BinaryFileResponse {
-        $resource = $request->get('data');
+        $resource = $request->attributes->get('data');
 
         if (!$resource instanceof ItemFileResourceInterface) {
             throw new \Exception('Resource must implements ItemFileResourceInterface to use the BinaryFileController');

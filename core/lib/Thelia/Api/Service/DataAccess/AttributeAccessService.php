@@ -459,6 +459,10 @@ class AttributeAccessService
 
     public function getRequestParam(string $key): mixed
     {
-        return $this->getRequest()->get($key);
+        $request = $this->getRequest();
+
+        return $request->attributes->get($key)
+            ?? $request->request->get($key)
+            ?? $request->query->get($key);
     }
 }

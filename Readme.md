@@ -147,6 +147,36 @@ Please, follow the official documentation to install docker and docker-compose o
 https://doc.thelia.net/docs/getting_started/docker
 
 
+## Thelia 3 (twig branch) — Front-end assets build
+
+`bin/install` configures the database and activates the templates, but it does **not** compile front-end assets. After running it, you must build the Webpack assets for every active template that ships a `package.json`, otherwise the back-office and front-office return HTTP 500 with `Could not find the entrypoints file from Webpack`.
+
+Default install (back-office `default-twig` + front-office `flexy`):
+
+``` bash
+cd templates/backOffice/default-twig
+npm install
+npm run build
+cd -
+
+cd templates/frontOffice/flexy
+npm install
+npm run build
+cd -
+```
+
+With DDEV:
+
+``` bash
+ddev exec --dir /var/www/html/templates/backOffice/default-twig npm install
+ddev exec --dir /var/www/html/templates/backOffice/default-twig npm run build
+ddev exec --dir /var/www/html/templates/frontOffice/flexy npm install
+ddev exec --dir /var/www/html/templates/frontOffice/flexy npm run build
+```
+
+Repeat for any additional template (PDF, email, custom front/back) that contains a `package.json`. The legacy back-office `default` template ships its assets pre-built and does not require this step.
+
+
 Contribute
 ----------
 

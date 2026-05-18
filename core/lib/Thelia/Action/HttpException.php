@@ -48,7 +48,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
     public function checkHttpException(ExceptionEvent $event): void
     {
         $request = $event->getRequest();
-        if (!$request instanceof Request || $request->get('isApiRoute', false)) {
+        if (!$request instanceof Request || $request->request->get('isApiRoute', false)) {
             return;
         }
 

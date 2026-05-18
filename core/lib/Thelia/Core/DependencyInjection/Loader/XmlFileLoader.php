@@ -682,7 +682,7 @@ class XmlFileLoader extends FileLoader
      */
     public function supports(mixed $resource, ?string $type = null): bool
     {
-        // TODO: Implement supports() method.
+        return false;
     }
 
     /**

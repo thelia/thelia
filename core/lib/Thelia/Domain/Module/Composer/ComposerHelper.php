@@ -138,11 +138,12 @@ class ComposerHelper
                 continue;
             }
 
-            if ((($package['type'] ?? null) !== $packageType)
-                && isset($package['keywords'])
+            $hasTypeMatch = ($package['type'] ?? null) === $packageType;
+            $hasKeywordMatch = isset($package['keywords'])
                 && \is_array($package['keywords'])
-                && !\in_array($packageType, $package['keywords'], true)
-            ) {
+                && \in_array($packageType, $package['keywords'], true);
+
+            if (!$hasTypeMatch && !$hasKeywordMatch) {
                 continue;
             }
 

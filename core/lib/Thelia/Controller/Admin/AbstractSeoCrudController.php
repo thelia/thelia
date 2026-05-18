@@ -157,7 +157,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
         $updateSeoForm = $this->getUpdateSeoForm();
 
         // Pass the object id to the request
-        $request->attributes->set($this->objectName.'_id', $request->get('current_id'));
+        $request->attributes->set($this->objectName.'_id', $request->request->get('current_id'));
 
         try {
             // Check the form against constraints violations
@@ -178,7 +178,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             if (!$response instanceof Response) {
                 // If we have to stay on the same page, do not redirect to the successUrl,
                 // just redirect to the edit page again.
-                if ('stay' === $request->get('save_mode')) {
+                if ('stay' === $request->request->get('save_mode')) {
                     return $this->redirectToEditionTemplate();
                 }
 

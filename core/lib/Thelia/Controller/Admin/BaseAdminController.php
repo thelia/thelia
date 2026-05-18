@@ -48,7 +48,9 @@ class BaseAdminController extends BaseController
                 return $this->render($template);
             }
 
-            if (null !== $view = $this->requestStack->getMainRequest()?->get('view')) {
+            $mainRequest = $this->requestStack->getMainRequest();
+            $view = $mainRequest?->attributes->get('view') ?? $mainRequest?->query->get('view');
+            if (null !== $view) {
                 return $this->render($view);
             }
         } catch (\Exception $exception) {
@@ -188,8 +190,10 @@ class BaseAdminController extends BaseController
 
     protected function getCurrentEditionCurrency()
     {
-        // Return the new language if a change is required.
-        if (null !== ($edit_currency_id = $this->requestStack->getMainRequest()?->get('edit_currency_id')) && null !== $edit_currency = CurrencyQuery::create()->findOneById($edit_currency_id)) {
+        $mainRequest = $this->requestStack->getMainRequest();
+        $edit_currency_id = $mainRequest?->query->get('edit_currency_id') ?? $mainRequest?->request->get('edit_currency_id');
+
+        if (null !== $edit_currency_id && null !== $edit_currency = CurrencyQuery::create()->findOneById($edit_currency_id)) {
             return $edit_currency;
         }
 
@@ -200,8 +204,9 @@ class BaseAdminController extends BaseController
     protected function getCurrentEditionLang()
     {
         $mainRequest = $this->requestStack->getMainRequest();
-        // Return the new language if a change is required.
-        if (null !== ($edit_language_id = $mainRequest?->get('edit_language_id'))
+        $edit_language_id = $mainRequest?->query->get('edit_language_id') ?? $mainRequest?->request->get('edit_language_id');
+
+        if (null !== $edit_language_id
             && null !== $edit_language = LangQuery::create()->findOneById($edit_language_id)) {
             return $edit_language;
         }
@@ -244,10 +249,10 @@ class BaseAdminController extends BaseController
         }
 
         // Find the current order
-        $order = $this->requestStack->getMainRequest()?->get(
-            $requestParameterName,
-            $this->getSession()->get($orderSessionIdentifier, $defaultListOrder),
-        );
+        $mainRequest = $this->requestStack->getMainRequest();
+        $order = $mainRequest?->query->get($requestParameterName)
+            ?? $mainRequest?->request->get($requestParameterName)
+            ?? $this->getSession()->get($orderSessionIdentifier, $defaultListOrder);
 
         if ($updateSession) {
             $this->getSession()->set($orderSessionIdentifier, $order);

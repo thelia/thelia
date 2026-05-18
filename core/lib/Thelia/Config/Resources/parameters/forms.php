@@ -16,6 +16,9 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Thelia\Form\AddressCreateForm;
 use Thelia\Form\AddressUpdateForm;
+use Thelia\Form\AdminCreatePassword;
+use Thelia\Form\AdminLogin;
+use Thelia\Form\AdminLostPassword;
 use Thelia\Form\CartAdd;
 use Thelia\Form\ContactForm;
 use Thelia\Form\CouponCode;
@@ -40,6 +43,11 @@ return static function (ContainerConfigurator $configurator): void {
         'thelia.cart.add' => CartAdd::class,
         'thelia.order.coupon' => CouponCode::class,
         'thelia.empty' => EmptyForm::class,
+
+        // Admin authentication forms (used by SessionController, regardless of active back-office theme)
+        'thelia.admin.login' => AdminLogin::class,
+        'thelia.admin.lostpassword' => AdminLostPassword::class,
+        'thelia.admin.createpassword' => AdminCreatePassword::class,
 
         // Frontend forms
         'thelia.front.customer.login' => CustomerLogin::class,
