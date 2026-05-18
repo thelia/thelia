@@ -468,6 +468,8 @@ readonly class FilterService
         foreach ($values as $value) {
             return $value->getMainId() && $value->getMainTitle();
         }
+
+        return false;
     }
 
     private function isMinOrMaxFilter(array $values): bool

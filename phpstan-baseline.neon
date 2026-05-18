@@ -1,0 +1,325 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Variable \$height in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.variable
+			count: 1
+			path: core/lib/Thelia/Action/Image.php
+
+		-
+			message: '#^Variable \$width in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.variable
+			count: 1
+			path: core/lib/Thelia/Action/Image.php
+
+		-
+			message: '#^Caught class ApiPlatform\\Symfony\\Validator\\Exception\\ValidationException not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Bridge/Propel/Service/ApiResourcePropelTransformerService.php
+
+		-
+			message: '#^Instantiated class ApiPlatform\\Symfony\\Validator\\Exception\\ValidationException not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Bridge/Propel/Service/ApiResourcePropelTransformerService.php
+
+		-
+			message: '#^Variable \$resourceAddons might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: core/lib/Thelia/Api/Bridge/Propel/State/PropelPersistProcessor.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Brand\:\:getLocale\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Brand.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Brand\:\:getTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Brand.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Brand\:\:isNew\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Brand.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Brand\:\:setLocale\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Brand.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Category\:\:getLocale\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Category.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Category\:\:getTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Category.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Category\:\:isNew\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Category.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Category\:\:setLocale\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Category.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Content\:\:getLocale\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Content.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Content\:\:getTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Content.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Content\:\:isNew\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Content.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Content\:\:setLocale\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Content.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Folder\:\:getLocale\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Folder.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Folder\:\:getTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Folder.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Folder\:\:isNew\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Folder.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Folder\:\:setLocale\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Folder.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Product\:\:getLocale\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Product.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Product\:\:getTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Product.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Product\:\:isNew\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Product.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Product\:\:setLocale\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Product.php
+
+		-
+			message: '#^Call to static method createFromFormat\(\) on an unknown class Thelia\\Condition\\Implementation\\DateTime\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/lib/Thelia/Condition/Implementation/StartDate.php
+
+		-
+			message: '#^Class Thelia\\Core\\EventListener\\SessionListener not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/lib/Thelia/Config/Resources/services/core/event_listeners.php
+
+		-
+			message: '#^Call to method getPackage\(\) on an unknown class Thelia\\Core\\Propel\\Generator\\Builder\\Om\\Mixin\\AbstractOMBuilder\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/lib/Thelia/Core/Propel/Generator/Builder/Om/ExtensionObjectBuilder.php
+
+		-
+			message: '#^Call to method getPackage\(\) on an unknown class Thelia\\Core\\Propel\\Generator\\Builder\\Om\\Mixin\\AbstractOMBuilder\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/lib/Thelia/Core/Propel/Generator/Builder/Om/ExtensionQueryBuilder.php
+
+		-
+			message: '#^Call to method getPackage\(\) on an unknown class Thelia\\Core\\Propel\\Generator\\Builder\\Om\\Mixin\\AbstractOMBuilder\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/lib/Thelia/Core/Propel/Generator/Builder/Om/ExtensionQueryInheritanceBuilder.php
+
+		-
+			message: '#^Call to method getPackage\(\) on an unknown class Thelia\\Core\\Propel\\Generator\\Builder\\Om\\Mixin\\AbstractOMBuilder\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/lib/Thelia/Core/Propel/Generator/Builder/Om/InterfaceBuilder.php
+
+		-
+			message: '#^Call to method getPackage\(\) on an unknown class Thelia\\Core\\Propel\\Generator\\Builder\\Om\\Mixin\\AbstractOMBuilder\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/lib/Thelia/Core/Propel/Generator/Builder/Om/MultiExtendObjectBuilder.php
+
+		-
+			message: '#^Variable \$access on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: core/lib/Thelia/Core/Template/Loop/Auth.php
+
+		-
+			message: '#^Variable \$module on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: core/lib/Thelia/Core/Template/Loop/Auth.php
+
+		-
+			message: '#^Variable \$resource on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: core/lib/Thelia/Core/Template/Loop/Auth.php
+
+		-
+			message: '#^Class Thelia\\Model\\ExportQuery referenced with incorrect case\: Thelia\\Model\\ExportQUery\.$#'
+			identifier: class.nameCase
+			count: 1
+			path: core/lib/Thelia/Core/Template/Loop/ImportExportType.php
+
+		-
+			message: '#^Variable \$feature_availability on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: core/lib/Thelia/Core/Template/Loop/Product.php
+
+		-
+			message: '#^Variable \$feature_values on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: core/lib/Thelia/Core/Template/Loop/Product.php
+
+		-
+			message: '#^Class Symfony\\Component\\DependencyInjection\\ContainerAwareInterface not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/lib/Thelia/Core/TheliaKernel.php
+
+		-
+			message: '#^Class Thelia\\ImportExport\\Export\\DateTime not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/lib/Thelia/Domain/DataTransfer/Export/AbstractExport.php
+
+		-
+			message: '#^Method Thelia\\Domain\\Promotion\\Coupon\\Type\\CouponAbstract\:\:getExpirationDate\(\) has invalid return type Thelia\\Coupon\\Type\\DateTime\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/lib/Thelia/Domain/Promotion/Coupon/Type/CouponAbstract.php
+
+		-
+			message: '#^Variable \$description on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: core/lib/Thelia/Domain/Promotion/Coupon/Type/CouponAbstract.php
+
+		-
+			message: '#^Variable \$shortDescription on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: core/lib/Thelia/Domain/Promotion/Coupon/Type/CouponAbstract.php
+
+		-
+			message: '#^Variable \$title on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: core/lib/Thelia/Domain/Promotion/Coupon/Type/CouponAbstract.php
+
+		-
+			message: '#^Method Thelia\\Domain\\Promotion\\Coupon\\Type\\CouponInterface\:\:getExpirationDate\(\) has invalid return type Thelia\\Coupon\\Type\\DateTime\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/lib/Thelia/Domain/Promotion/Coupon/Type/CouponInterface.php
+
+		-
+			message: '#^Constructor of class Thelia\\Model\\OrderPostage has an unused parameter \$amount\.$#'
+			identifier: constructor.unusedParameter
+			count: 1
+			path: core/lib/Thelia/Model/OrderPostage.php
+
+		-
+			message: '#^Constructor of class Thelia\\Model\\OrderPostage has an unused parameter \$amountTax\.$#'
+			identifier: constructor.unusedParameter
+			count: 1
+			path: core/lib/Thelia/Model/OrderPostage.php
+
+		-
+			message: '#^Constructor of class Thelia\\Model\\OrderPostage has an unused parameter \$taxRuleTitle\.$#'
+			identifier: constructor.unusedParameter
+			count: 1
+			path: core/lib/Thelia/Model/OrderPostage.php
+
+		-
+			message: '#^Class Thelia\\Model\\DateTime not found\.$#'
+			identifier: class.notFound
+			count: 4
+			path: core/lib/Thelia/Model/OrderProductQuery.php
+
+		-
+			message: '#^Parameter \$endDate of method Thelia\\Model\\OrderProductQuery\:\:getSaleStats\(\) has invalid type Thelia\\Model\\DateTime\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/lib/Thelia/Model/OrderProductQuery.php
+
+		-
+			message: '#^Parameter \$startDate of method Thelia\\Model\\OrderProductQuery\:\:getSaleStats\(\) has invalid type Thelia\\Model\\DateTime\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/lib/Thelia/Model/OrderProductQuery.php
+
+		-
+			message: '#^Instantiated class CustomerFamily\\Model\\CustomerCustomerFamily not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/lib/Thelia/Test/FixtureFactory.php
+
+		-
+			message: '#^Call to static method createFromFormat\(\) on an unknown class Thelia\\Tools\\DateTime\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/lib/Thelia/Tools/I18n.php
+
+		-
+			message: '#^Method Thelia\\Tools\\I18n\:\:getDateTimeFromForm\(\) has invalid return type Thelia\\Tools\\DateTime\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/lib/Thelia/Tools/I18n.php
