@@ -334,6 +334,7 @@ function removeBundlesForNonSelectedThemes(array $selectedThemes): void
 
     $helper = new Thelia\Domain\Module\Composer\ComposerHelper();
     $bundlesToRemove = [];
+    $bundlePaths = [];
 
     foreach (['frontOffice', 'backOffice', 'pdf', 'email'] as $type) {
         $selectedName = $selectedThemes[$type] ?? '';
@@ -351,6 +352,7 @@ function removeBundlesForNonSelectedThemes(array $selectedThemes): void
             $bundleFqcn = $helper->findFirstClassBundle($entry->getPathname());
             if (null !== $bundleFqcn) {
                 $bundlesToRemove[$bundleFqcn] = true;
+                $bundlePaths[$bundleFqcn] = $entry->getPathname();
             }
         }
     }
@@ -362,21 +364,17 @@ function removeBundlesForNonSelectedThemes(array $selectedThemes): void
     $bundles = require $bundlesPath;
     $changed = false;
 
-    // Recipe-installed route files that depend on a bundle's loader.
-    // When the bundle is removed, the route file must go too — otherwise the
-    // kernel fails with "Cannot load resource. Make sure there is a loader supporting...".
-    $bundleRouteFiles = [
-        'BackOfficeDefaultBundle\\BackOfficeDefaultBundle' => THELIA_ROOT.'config'.DS.'routes'.DS.'bo_default.yaml',
-    ];
-
     foreach (array_keys($bundlesToRemove) as $fqcn) {
         if (isset($bundles[$fqcn])) {
             unset($bundles[$fqcn]);
             $changed = true;
         }
 
-        if (isset($bundleRouteFiles[$fqcn]) && file_exists($bundleRouteFiles[$fqcn])) {
-            unlink($bundleRouteFiles[$fqcn]);
+        // Recipe-installed route files reference custom route loaders provided by the bundle.
+        // When the bundle is removed, those YAML files must go too — otherwise the kernel
+        // fails with "Cannot load resource. Make sure there is a loader supporting...".
+        foreach (findRouteFilesUsingBundleLoaders($bundlePaths[$fqcn] ?? null) as $routeFile) {
+            unlink($routeFile);
         }
     }
 
@@ -397,4 +395,72 @@ function removeBundlesForNonSelectedThemes(array $selectedThemes): void
 
     $lines[] = "];\n";
     file_put_contents($bundlesPath, implode('', $lines));
+}
+
+/**
+ * Find config/routes/*.yaml files whose `type:` references a custom route loader
+ * shipped by the given bundle. Detection scans the bundle's PHP files for classes
+ * that extend Symfony's routing Loader and declare either a public `ROUTE_TYPE`
+ * constant or a `supports()` returning a literal string equality on `$type`.
+ *
+ * @return list<string> absolute paths to route YAML files to remove
+ */
+function findRouteFilesUsingBundleLoaders(?string $bundlePath): array
+{
+    if (null === $bundlePath || !is_dir($bundlePath)) {
+        return [];
+    }
+
+    $loaderTypes = [];
+    $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($bundlePath));
+
+    foreach ($files as $file) {
+        if (!$file->isFile() || 'php' !== $file->getExtension()) {
+            continue;
+        }
+
+        $contents = file_get_contents($file->getRealPath());
+        if (false === $contents || !preg_match('/extends\s+(?:\\\\?[A-Za-z_][A-Za-z0-9_\\\\]*\\\\)?(?:File)?Loader\b/', $contents)) {
+            continue;
+        }
+
+        if (preg_match("/public\s+const\s+ROUTE_TYPE\s*=\s*['\"]([^'\"]+)['\"]/", $contents, $m)) {
+            $loaderTypes[$m[1]] = true;
+        }
+
+        if (preg_match("/return\s+['\"]([^'\"]+)['\"]\s*===\s*\\\$type/", $contents, $m)) {
+            $loaderTypes[$m[1]] = true;
+        }
+    }
+
+    if ([] === $loaderTypes) {
+        return [];
+    }
+
+    $routesDir = THELIA_ROOT.'config'.DS.'routes';
+    if (!is_dir($routesDir)) {
+        return [];
+    }
+
+    $matchedFiles = [];
+
+    foreach (new DirectoryIterator($routesDir) as $entry) {
+        if (!$entry->isFile() || !\in_array($entry->getExtension(), ['yaml', 'yml'], true)) {
+            continue;
+        }
+
+        $contents = file_get_contents($entry->getRealPath());
+        if (false === $contents) {
+            continue;
+        }
+
+        foreach (array_keys($loaderTypes) as $type) {
+            if (preg_match("/^\s*type:\s*['\"]?".preg_quote($type, '/')."['\"]?\s*$/m", $contents)) {
+                $matchedFiles[] = $entry->getRealPath();
+                break;
+            }
+        }
+    }
+
+    return $matchedFiles;
 }
