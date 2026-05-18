@@ -362,10 +362,21 @@ function removeBundlesForNonSelectedThemes(array $selectedThemes): void
     $bundles = require $bundlesPath;
     $changed = false;
 
+    // Recipe-installed route files that depend on a bundle's loader.
+    // When the bundle is removed, the route file must go too — otherwise the
+    // kernel fails with "Cannot load resource. Make sure there is a loader supporting...".
+    $bundleRouteFiles = [
+        'BackOfficeDefaultBundle\\BackOfficeDefaultBundle' => THELIA_ROOT.'config'.DS.'routes'.DS.'bo_default.yaml',
+    ];
+
     foreach (array_keys($bundlesToRemove) as $fqcn) {
         if (isset($bundles[$fqcn])) {
             unset($bundles[$fqcn]);
             $changed = true;
+        }
+
+        if (isset($bundleRouteFiles[$fqcn]) && file_exists($bundleRouteFiles[$fqcn])) {
+            unlink($bundleRouteFiles[$fqcn]);
         }
     }
 
