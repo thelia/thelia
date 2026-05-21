@@ -260,7 +260,7 @@ class Session extends BaseSession
         $customer = $this->getCustomerUser();
 
         return (null !== $customer && $cart->getCustomerId() === $customer->getId())
-            || (null === $customer && null === $cart->getCustomerId());
+            || null === $cart->getCustomerId();
     }
 
     public function setOrder(Order $order): static
