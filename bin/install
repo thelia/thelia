@@ -149,6 +149,15 @@ if (file_exists($envFilePath)) {
     file_put_contents($envFilePath, $envContent);
 }
 
+// Publish the credentials in the current process so the kernel boot below
+// (Propel cache generation, template:set, admin:create) sees them without
+// needing a re-bootEnv of the dotenv loader.
+foreach (['DATABASE_HOST' => $host, 'DATABASE_PORT' => $port, 'DATABASE_NAME' => $dbName, 'DATABASE_USER' => $user, 'DATABASE_PASSWORD' => $password] as $name => $value) {
+    $_SERVER[$name] = (string) $value;
+    $_ENV[$name] = (string) $value;
+    putenv($name.'='.$value);
+}
+
 // ── Phase 6: Register modules ────────────────────────────────────────
 
 echo "Registering modules...\n";
