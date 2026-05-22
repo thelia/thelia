@@ -61,7 +61,7 @@ readonly class FileUpdateService
         $event = new FileCreateOrUpdateEvent(0);
 
         if (\array_key_exists('visible', $data)) {
-            $file->setVisible((bool) $data['visible']);
+            $file->setVisible($data['visible'] ? 1 : 0);
         }
         $file->setLocale($data['locale'] ?? $this->langService->getLocale());
 
