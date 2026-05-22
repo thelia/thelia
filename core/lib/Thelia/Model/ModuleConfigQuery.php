@@ -25,17 +25,7 @@ use Thelia\Model\Base\ModuleConfigQuery as BaseModuleConfigQuery;
  */
 class ModuleConfigQuery extends BaseModuleConfigQuery
 {
-    /**
-     * Get a module's configuration variable.
-     *
-     * @param int    $moduleId     the module id
-     * @param string $variableName the variable name
-     * @param string $defaultValue the default value, if variable is not defined
-     * @param null   $valueLocale  the required locale, or null to get default one
-     *
-     * @return string the variable value
-     */
-    public function getConfigValue(int $moduleId, string $variableName, bool|string|null $defaultValue = null, $valueLocale = null): ?string
+    public function getConfigValue(int $moduleId, string $variableName, int|bool|string|null $defaultValue = null, $valueLocale = null): ?string
     {
         $value = null;
 
@@ -52,7 +42,7 @@ class ModuleConfigQuery extends BaseModuleConfigQuery
             $value = $configValue->getValue();
         }
 
-        return $value ?? $defaultValue;
+        return $value ?? (null === $defaultValue ? null : (string) $defaultValue);
     }
 
     /**
