@@ -69,11 +69,10 @@ abstract class IntegrationTestCase extends KernelTestCase
             $container->get('thelia.url.manager');
         }
 
-        // Push a minimal Request so that modules accessing the request stack
-        // (e.g. CustomerFamily, OpenApi) don't crash on null. The request
-        // also needs a session: several Action listeners (Coupon,
-        // CustomerFamily…) call $request->getSession() unconditionally,
-        // which throws a SessionNotFoundException on a bare Request.
+        // Push a minimal Request so that listeners accessing the request stack
+        // don't crash on null. The request also needs a session: several Action
+        // listeners call $request->getSession() unconditionally, which throws a
+        // SessionNotFoundException on a bare Request.
         $requestStack = $container->get('request_stack');
         if (null === $requestStack->getCurrentRequest()) {
             $request = Request::create('http://localhost');

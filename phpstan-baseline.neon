@@ -307,12 +307,6 @@ parameters:
 			path: core/lib/Thelia/Model/OrderProductQuery.php
 
 		-
-			message: '#^Instantiated class CustomerFamily\\Model\\CustomerCustomerFamily not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/lib/Thelia/Test/FixtureFactory.php
-
-		-
 			message: '#^Call to static method createFromFormat\(\) on an unknown class Thelia\\Tools\\DateTime\.$#'
 			identifier: class.notFound
 			count: 1

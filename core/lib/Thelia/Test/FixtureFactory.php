@@ -498,19 +498,12 @@ final class FixtureFactory
      * and Cheque ship by default). The order goes straight into the
      * "not_paid" status unless `statusCode` is overridden.
      *
-     * If the CustomerFamily module is installed, the customer is
-     * attached to a family on the fly so the module's
-     * ORDER_AFTER_CREATE listener has something to link the fresh
-     * order to — without this, the listener dereferences null and
-     * crashes the save path.
-     *
      * The factory does NOT add products to the order — dedicated tests
      * that need real revenue should create their own OrderProduct rows.
      */
     public function order(?Customer $customer = null, array $overrides = []): Order
     {
         $customer ??= $this->customer($this->customerTitle());
-        $this->ensureCustomerFamilyLink($customer);
         $invoiceAddress = $this->orderAddress();
         $deliveryAddress = $this->orderAddress();
         $cart = $this->cart($customer);
@@ -545,46 +538,5 @@ final class FixtureFactory
         $order->save($this->connection);
 
         return $order;
-    }
-
-    /**
-     * Attaches the customer to a CustomerFamily row so that
-     * CustomerFamily's ORDER_AFTER_CREATE listener does not find null.
-     *
-     * The CustomerFamily module is optional — if it is not installed
-     * (e.g. the model/query classes are missing), this is a no-op.
-     */
-    private function ensureCustomerFamilyLink(Customer $customer): void
-    {
-        $familyClass = 'CustomerFamily\\Model\\CustomerFamily';
-        $familyQueryClass = 'CustomerFamily\\Model\\CustomerFamilyQuery';
-        $linkQueryClass = 'CustomerFamily\\Model\\CustomerCustomerFamilyQuery';
-        $linkClass = 'CustomerFamily\\Model\\CustomerCustomerFamily';
-
-        if (!class_exists($familyClass) || !class_exists($familyQueryClass)) {
-            return;
-        }
-
-        $existingLink = $linkQueryClass::create()
-            ->filterByCustomerId($customer->getId())
-            ->findOne($this->connection);
-        if (null !== $existingLink) {
-            return;
-        }
-
-        $family = $familyQueryClass::create()->findOne($this->connection);
-        if (null === $family) {
-            $family = new $familyClass();
-            $family->setCode('fixture-family-'.$this->next());
-            $family->setIsDefault(1);
-            $family->setLocale('en_US');
-            $family->setTitle('Fixture family');
-            $family->save($this->connection);
-        }
-
-        $link = new $linkClass();
-        $link->setCustomerId($customer->getId());
-        $link->setCustomerFamilyId($family->getId());
-        $link->save($this->connection);
     }
 }

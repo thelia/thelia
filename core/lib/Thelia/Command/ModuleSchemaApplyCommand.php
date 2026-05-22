@@ -50,7 +50,7 @@ final class ModuleSchemaApplyCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument('module', InputArgument::OPTIONAL, 'Module name (e.g. CustomerFamily)')
+            ->addArgument('module', InputArgument::OPTIONAL, 'Module name')
             ->addOption('all', null, InputOption::VALUE_NONE, 'Apply schemas for all modules that have a TheliaMain.sql')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'List SQL files that would be executed without executing them')
         ;
