@@ -98,7 +98,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->setTitle($event->getTitle())
             ->setVisible($event->getVisible() ? 1 : 0)
             ->setVirtual($event->getVirtual() ? 1 : 0)
-            ->setTemplateId((int) $event->getTemplateId())
+            ->setTemplateId(null !== $event->getTemplateId() ? (int) $event->getTemplateId() : null)
 
             ->create(
                 $event->getDefaultCategory(),
