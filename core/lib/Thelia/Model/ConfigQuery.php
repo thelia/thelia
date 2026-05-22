@@ -76,6 +76,8 @@ class ConfigQuery extends BaseConfigQuery
 
         $config->setValue($value !== null ? (string) $value : '');
         $config->save();
+
+        self::$cache[$configName] = $config->getValue();
     }
 
     public static function getConfiguredShopUrl()

@@ -30,6 +30,8 @@ class ConfigCacheService
     {
         if ($force) {
             $this->cache->delete(self::CACHE_KEY);
+
+            return;
         }
 
         $value = $this->cache->get(self::CACHE_KEY, static function (ItemInterface $item): array {
