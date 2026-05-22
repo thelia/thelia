@@ -6,7 +6,7 @@
          backupGlobals="false"
          colors="true"
          bootstrap="tests/bootstrap.php"
-        cacheResultFile="var/cache-ci/.phpunit.result.cache"
+         cacheDirectory="var/cache-ci/.phpunit.cache"
 >
     <php>
         <ini name="error_reporting" value="-1" />
@@ -66,10 +66,7 @@
         </testsuite>
     </testsuites>
 
-    <listeners>
-        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
-    </listeners>
-
     <extensions>
+        <bootstrap class="Symfony\Bridge\PhpUnit\SymfonyExtension" />
     </extensions>
 </phpunit>
