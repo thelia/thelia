@@ -99,7 +99,7 @@ interface BaseModuleInterface
      *
      * @return string the variable value
      */
-    public static function getConfigValue(string $variableName, ?string $defaultValue = null, $valueLocale = null): string;
+    public static function getConfigValue(string $variableName, bool|null|string $defaultValue = null, $valueLocale = null): ?string;
 
     /**
      * Set module configuration variable, creating it if required.

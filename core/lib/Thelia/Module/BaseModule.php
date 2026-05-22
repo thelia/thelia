@@ -244,10 +244,10 @@ class BaseModule implements BaseModuleInterface
         }
     }
 
-    public static function getConfigValue($variableName, $defaultValue = null, $valueLocale = null): string
+    public static function getConfigValue($variableName, $defaultValue = null, $valueLocale = null): ?string
     {
         return ModuleConfigQuery::create()
-            ->getConfigValue(self::getModuleId(), $variableName, (string) $defaultValue, $valueLocale);
+            ->getConfigValue(self::getModuleId(), $variableName, $defaultValue, $valueLocale);
     }
 
     public static function setConfigValue($variableName, $variableValue, $valueLocale = null, $createIfNotExists = true): void
