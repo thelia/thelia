@@ -230,8 +230,9 @@ class SessionController extends BaseAdminController
         // Clear the remember me cookie, if any
         $this->clearRememberMeCookie($this->getRememberMeCookieName());
 
-        // Go back to login page.
-        return $this->generateRedirectFromRoute('admin.login');
+        return new RedirectResponse(
+            URL::getInstance()->absoluteUrl($this->getRouteFromRouter('router', 'admin.login')),
+        );
     }
 
     public function checkLoginAction(EventDispatcherInterface $eventDispatcher): RedirectResponse|Response|null

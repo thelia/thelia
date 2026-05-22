@@ -21,7 +21,7 @@ return static function (ContainerConfigurator $configurator): void {
 
     // URL management
     $services->set(URL::class)
-        ->args([service('router.admin')]);
+        ->args([service('router')]);
 
     $services->alias('thelia.url.manager', URL::class)
         ->public();

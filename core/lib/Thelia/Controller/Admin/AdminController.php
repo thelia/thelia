@@ -27,7 +27,7 @@ class AdminController extends BaseAdminController
     public function indexAction(SecurityContext $securityContext): RedirectResponse|Response
     {
         if (!$securityContext->hasAdminUser()) {
-            return new RedirectResponse(URL::getInstance()->absoluteUrl($this->getRoute('admin.login')));
+            return new RedirectResponse(URL::getInstance()->absoluteUrl($this->getRouteFromRouter('router', 'admin.login')));
         }
 
         if (($response = $this->checkAuth(self::RESOURCE_CODE, [], AccessManager::VIEW)) instanceof Response) {
