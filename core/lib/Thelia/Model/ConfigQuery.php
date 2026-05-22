@@ -40,6 +40,15 @@ class ConfigQuery extends BaseConfigQuery
     }
 
     /**
+     * @internal
+     */
+    public static function resetCache(): void
+    {
+        self::$booted = false;
+        self::$cache = [];
+    }
+
+    /**
      * Find a config variable and return the value or default value if not founded.
      *
      * Use this method for better performance, a cache is created for each variable already searched

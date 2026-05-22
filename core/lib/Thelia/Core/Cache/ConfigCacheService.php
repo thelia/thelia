@@ -30,6 +30,7 @@ class ConfigCacheService
     {
         if ($force) {
             $this->cache->delete(self::CACHE_KEY);
+            ConfigQuery::resetCache();
 
             return;
         }
