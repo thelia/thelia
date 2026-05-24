@@ -67,6 +67,8 @@ abstract class BaseHook implements BaseHookInterface
 
     public ?EventDispatcherInterface $dispatcher = null;
     public ?ParserResolver $parserResolver = null;
+    public ?ParserInterface $parser = null;
+    public ?AssetResolverInterface $assetsResolver = null;
 
     public function __construct(
         ?EventDispatcherInterface $dispatcher = null,

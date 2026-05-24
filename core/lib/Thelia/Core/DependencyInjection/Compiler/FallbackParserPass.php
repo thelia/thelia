@@ -17,6 +17,7 @@ namespace Thelia\Core\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Thelia\Core\Template\Assets\AssetResolverFallback;
 use Thelia\Core\Template\Parser\ParserFallback;
 use Thelia\Core\Template\Parser\ParserHelperFallback;
 
@@ -40,7 +41,7 @@ class FallbackParserPass implements CompilerPassInterface
             [
                 'thelia.parser' => new Definition(ParserFallback::class),
                 'thelia.parser.helper' => new Definition(ParserHelperFallback::class),
-                'thelia.parser.asset.resolver' => new Definition(ParserHelperFallback::class),
+                'thelia.parser.asset.resolver' => new Definition(AssetResolverFallback::class),
             ],
         );
     }
