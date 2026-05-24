@@ -69,6 +69,10 @@
         "phpstan": [
             "@phpc ./vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=-1"
         ],
+        "phpstan-fresh": [
+            "@phpc ./vendor/bin/phpstan clear-result-cache -q",
+            "@phpc ./vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=-1"
+        ],
         "test:prepare": [
             "@phpc bin/test-prepare",
             "@phpc bin/console cache:warmup --env=test"
