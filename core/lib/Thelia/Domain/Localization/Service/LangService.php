@@ -38,7 +38,7 @@ readonly class LangService
     {
         $request = $this->requestStack->getMainRequest();
 
-        if (!$request instanceof Request) {
+        if (!$request instanceof Request || !$request->hasSession()) {
             return null;
         }
 
@@ -49,7 +49,7 @@ readonly class LangService
     {
         $request = $this->requestStack->getMainRequest();
 
-        if (!$request instanceof Request) {
+        if (!$request instanceof Request || !$request->hasSession()) {
             return;
         }
 
