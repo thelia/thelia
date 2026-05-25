@@ -36,8 +36,8 @@ final class ContentsImporter extends AbstractDemoImporter
         foreach ($this->readCsv($context->dataDir.'contents.csv') as $data) {
             $content = (new Content())
                 ->setVisible(1)
-                ->setLocale('fr_FR')->setTitle(trim($data[0]))->setChapo('Aut voluptas.')->setDescription('Et in ea corrupti sequi enim et. Et nobis similique velit occaecati.')
-                ->setLocale('en_US')->setTitle(trim($data[1]))->setChapo('Aut voluptas.')->setDescription('Et in ea corrupti sequi enim et. Et nobis similique velit occaecati.');
+                ->setLocale('fr_FR')->setTitle(trim($data[0]))->setChapo($data[2])->setDescription($data[4])
+                ->setLocale('en_US')->setTitle(trim($data[1]))->setChapo($data[3])->setDescription($data[5]);
 
             foreach (explode(';', $data[7]) as $folderTitle) {
                 $folderTitle = trim($folderTitle);

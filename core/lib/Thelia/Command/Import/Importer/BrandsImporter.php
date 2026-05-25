@@ -39,8 +39,8 @@ final class BrandsImporter extends AbstractDemoImporter
             $brand = (new Brand())
                 ->setVisible(1)
                 ->setPosition(++$position)
-                ->setLocale('fr_FR')->setTitle($brandTitle)->setChapo('Aut voluptas.')->setDescription('Et in ea corrupti sequi enim et. Et nobis similique velit occaecati.')
-                ->setLocale('en_US')->setTitle($brandTitle)->setChapo('Eos perspiciatis.')->setDescription('Eos velit enim autem eum nihil sunt ut. Porro ipsa deleniti dolore molestiae aut omnis autem.');
+                ->setLocale('fr_FR')->setTitle($brandTitle)->setChapo($data[2])->setDescription($data[4])
+                ->setLocale('en_US')->setTitle($brandTitle)->setChapo($data[3])->setDescription($data[5]);
             $brand->save($context->connection);
 
             $context->brandsByTitle[$brandTitle] = $brand;

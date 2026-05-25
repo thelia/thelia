@@ -38,8 +38,8 @@ final class FoldersImporter extends AbstractDemoImporter
             $folder = (new Folder())
                 ->setVisible(1)
                 ->setPosition(++$position)
-                ->setLocale('fr_FR')->setTitle(trim($data[0]))->setChapo('Aut voluptas.')->setDescription('Et in ea corrupti sequi enim et. Et nobis similique velit occaecati.')
-                ->setLocale('en_US')->setTitle(trim($data[1]))->setChapo('Aut voluptas.')->setDescription('Et in ea corrupti sequi enim et. Et nobis similique velit occaecati.');
+                ->setLocale('fr_FR')->setTitle(trim($data[0]))->setChapo($data[2])->setDescription($data[4])
+                ->setLocale('en_US')->setTitle(trim($data[1]))->setChapo($data[3])->setDescription($data[5]);
             $folder->save($context->connection);
 
             $context->foldersByTitle[trim($data[1])] = $folder;

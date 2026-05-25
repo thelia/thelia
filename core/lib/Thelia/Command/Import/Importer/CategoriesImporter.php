@@ -35,20 +35,25 @@ final class CategoriesImporter extends AbstractDemoImporter
     {
         $templateId = (int) $context->template()->getId();
 
-        $position = 0;
+        $positions = [];
         foreach ($this->readCsv($context->dataDir.'categories.csv') as $data) {
-            $title = trim($data[1]);
+            $titleUk = trim($data[1]);
+            $parentTitle = trim($data[7] ?? '');
+            $parentId = '' !== $parentTitle && isset($context->categoriesByTitle[$parentTitle])
+                ? (int) $context->categoriesByTitle[$parentTitle]->getId()
+                : 0;
+            $positions[$parentId] = ($positions[$parentId] ?? 0) + 1;
 
             $category = (new Category())
                 ->setDefaultTemplateId($templateId)
                 ->setVisible(1)
-                ->setPosition(++$position)
-                ->setParent(0)
-                ->setLocale('fr_FR')->setTitle($title)->setChapo('Aut voluptas.')->setDescription('Et in ea corrupti sequi enim et. Et nobis similique velit occaecati.')
-                ->setLocale('en_US')->setTitle($title)->setChapo('Eos perspiciatis.')->setDescription('Eos velit enim autem eum nihil sunt ut. Porro ipsa deleniti dolore molestiae aut omnis autem.');
+                ->setPosition($positions[$parentId])
+                ->setParent($parentId)
+                ->setLocale('fr_FR')->setTitle(trim($data[0]))->setChapo($data[2])->setDescription($data[4])
+                ->setLocale('en_US')->setTitle($titleUk)->setChapo($data[3])->setDescription($data[5]);
             $category->save($context->connection);
 
-            $context->categoriesByTitle[$title] = $category;
+            $context->categoriesByTitle[$titleUk] = $category;
 
             if ($context->withImages) {
                 foreach (explode(';', $data[6]) as $imageName) {
