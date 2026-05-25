@@ -128,7 +128,6 @@ class DemoImportCommand extends Command
                 connection: $connection,
                 output: $output,
                 withImages: !$input->getOption('skip-images'),
-                deterministic: true,
                 dataDir: self::DATA_DIR,
                 imagesDir: self::IMAGES_DIR,
             );

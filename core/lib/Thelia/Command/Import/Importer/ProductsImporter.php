@@ -104,19 +104,27 @@ final class ProductsImporter extends AbstractDemoImporter
      */
     private function importSaleElements(DemoImportContext $context, Product $product, array $data): void
     {
+        $variantIndex = 0;
         foreach (explode(';', $data[12]) as $colorValue) {
             if ('' === $colorValue) {
                 continue;
             }
 
+            // Deterministic values derived from the (stable) product ref and
+            // variant index, so a demo install is reproducible across runs
+            // (stable screenshots, tests) — unlike auto-increment ids.
+            $seed = crc32((string) $product->getRef()) + $variantIndex;
+
             $saleElements = new ProductSaleElements();
             $saleElements->setProduct($product);
-            $saleElements->setRef($product->getId().'_'.uniqid('', true));
-            $saleElements->setQuantity(random_int(1, 50));
+            $saleElements->setRef($product->getRef().'-'.$variantIndex);
+            $saleElements->setQuantity(5 + ($seed % 46));
             $saleElements->setPromo('' !== $data[9] ? 1 : 0);
-            $saleElements->setNewness(random_int(0, 1));
-            $saleElements->setWeight((float) random_int(100, 3000) / 100);
+            $saleElements->setNewness(0 === $seed % 4 ? 1 : 0);
+            $saleElements->setWeight(round(1.0 + ($seed % 250) / 10, 2));
             $saleElements->save($context->connection);
+
+            ++$variantIndex;
 
             (new ProductPrice())
                 ->setProductSaleElements($saleElements)

@@ -63,7 +63,6 @@ final class DemoImportContext
         public readonly ConnectionInterface $connection,
         public readonly OutputInterface $output,
         public readonly bool $withImages,
-        public readonly bool $deterministic,
         public readonly string $dataDir,
         public readonly string $imagesDir,
     ) {
