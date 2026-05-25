@@ -1848,11 +1848,11 @@ VALUES
 (2, 64, 2, 1, NOW(), NOW());
 
 INSERT INTO `order_status`(`id`, `code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
-(1, 'not_paid', '#f0ad4e', 1, 1, NOW(), NOW()),
+(1, 'not_paid', '#dc3545', 1, 1, NOW(), NOW()),
 (2, 'paid', '#5cb85c', 2, 1, NOW(), NOW()),
 (3, 'processing', '#f39922', 3, 1, NOW(), NOW()),
 (4, 'sent', '#5bc0de', 4, 1, NOW(), NOW()),
-(5, 'canceled', '#d9534f', 5, 1, NOW(), NOW()),
+(5, 'canceled', '#6c757d', 5, 1, NOW(), NOW()),
 (6, 'refunded', '#986dff', 6, 1, NOW(), NOW());
 
 /**

@@ -250,4 +250,9 @@ UPDATE `config` SET `value`='' WHERE `name`='thelia_extra_version';
 -- WebProfiler is not bundled in thelia-project on T3; disable it if it survived from T2.
 UPDATE `module` SET `activate` = 0 WHERE `code` = 'WebProfiler';
 
+-- Swap order status colours: not_paid deserves the danger red (needs follow-up),
+-- canceled is a terminal grey (no further action).
+UPDATE `order_status` SET `color` = '#dc3545' WHERE `code` = 'not_paid';
+UPDATE `order_status` SET `color` = '#6c757d' WHERE `code` = 'canceled';
+
 SET FOREIGN_KEY_CHECKS = 1;
