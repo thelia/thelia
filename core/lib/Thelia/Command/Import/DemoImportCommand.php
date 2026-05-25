@@ -38,6 +38,8 @@ use Thelia\Model\CategoryI18nQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ContentI18nQuery;
 use Thelia\Model\ContentQuery;
+use Thelia\Model\CouponI18nQuery;
+use Thelia\Model\CouponQuery;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\FeatureAvI18nQuery;
 use Thelia\Model\FeatureAvQuery;
@@ -199,6 +201,9 @@ class DemoImportCommand extends Command
         AddressQuery::create()->deleteAll($connection);
         CustomerQuery::create()->deleteAll($connection);
         NewsletterQuery::create()->deleteAll($connection);
+
+        CouponQuery::create()->deleteAll($connection);
+        CouponI18nQuery::create()->deleteAll($connection);
 
         SaleQuery::create()->deleteAll($connection);
         SaleProductQuery::create()->deleteAll($connection);
