@@ -50,7 +50,7 @@
     },
     "scripts": {
         "phpc": [
-            "APP_ENV=test php -d post_max_size=20M"
+            "env -u DATABASE_HOST -u DATABASE_PORT -u DATABASE_NAME -u DATABASE_USER -u DATABASE_PASSWORD APP_ENV=test php -d post_max_size=20M"
         ],
         "thelia-install": [
             "rm -f .env.test.local",

@@ -34,6 +34,21 @@ require $projectRoot.'vendor/autoload.php';
 use Symfony\Component\Dotenv\Dotenv;
 use Thelia\Install\Standalone\DatabaseSetup;
 
+// Pin the runtime to "test" before reading dotenv files so .env.test is
+// picked up by Dotenv::bootEnv() (it conditions .env.<APP_ENV>* loading on
+// the value present in $_SERVER/$_ENV at call time). Without this the
+// script silently falls back to .env.local and wipes the dev database.
+$_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = 'test';
+putenv('APP_ENV=test');
+
+// Shell-injected DATABASE_* (DDEV web_environment) would otherwise win over
+// .env.test because Dotenv::bootEnv() runs with overrideExistingVars=false.
+// Wipe them here so the test-env values from .env.test land in $_SERVER.
+foreach (['DATABASE_HOST', 'DATABASE_PORT', 'DATABASE_USER', 'DATABASE_PASSWORD', 'DATABASE_NAME'] as $envName) {
+    unset($_SERVER[$envName], $_ENV[$envName]);
+    putenv($envName);
+}
+
 (new Dotenv())->bootEnv(dirname(__DIR__).'/.env');
 
 $host     = $_SERVER['DATABASE_HOST'] ?? '';
@@ -41,6 +56,17 @@ $port     = $_SERVER['DATABASE_PORT'] ?? '3306';
 $user     = $_SERVER['DATABASE_USER'] ?? '';
 $password = $_SERVER['DATABASE_PASSWORD'] ?? '';
 $dbName   = $_SERVER['DATABASE_NAME'] ?? '';
+
+// Publish the resolved credentials so subprocesses (bin/console
+// module:post-activate-all, lexik:jwt:generate-keypair) see the right
+// DATABASE_* values when they boot the kernel — without this the Propel
+// runtime config gets re-cached with an empty DSN, mirroring the bug fixed
+// in bin/install (42e128c).
+foreach (['DATABASE_HOST', 'DATABASE_PORT', 'DATABASE_USER', 'DATABASE_PASSWORD', 'DATABASE_NAME'] as $envName) {
+    $value = (string) ($_SERVER[$envName] ?? '');
+    $_SERVER[$envName] = $_ENV[$envName] = $value;
+    putenv($envName.'='.$value);
+}
 
 if ('' === $host || '' === $dbName) {
     fwrite(STDERR, "ERROR: DATABASE_HOST and DATABASE_NAME must be set.\n");
