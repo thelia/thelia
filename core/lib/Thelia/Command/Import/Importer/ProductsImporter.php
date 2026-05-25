@@ -65,10 +65,11 @@ final class ProductsImporter extends AbstractDemoImporter
 
             $firstProductCategory = $product->getProductCategories()->getFirst();
             if (null !== $firstProductCategory) {
-                $firstProductCategory->setDefaultCategory(1)->save($context->connection);
+                $firstProductCategory
+                    ->setDefaultCategory(1)
+                    ->setPosition($product->getNextPosition())
+                    ->save($context->connection);
             }
-
-            $firstProductCategory->setPosition($product->getNextPosition())->save($context->connection);
 
             if ($context->withImages) {
                 $this->importImages($context, $product, $data[10]);

@@ -34,11 +34,10 @@ final class ConfigImporter extends AbstractDemoImporter
     {
         ConfigQuery::write('store_name', 'Thelia');
         ConfigQuery::write('store_description', 'E-commerce solution based on Symfony');
-        ConfigQuery::write('store_email', 'Thelia');
-        ConfigQuery::write('store_address1', '5 rue Rochon');
-        ConfigQuery::write('store_city', 'Clermont-Ferrrand');
-        ConfigQuery::write('store_phone', '+(33)444053102');
         ConfigQuery::write('store_email', 'contact@thelia.net');
+        ConfigQuery::write('store_address1', '5 rue Rochon');
+        ConfigQuery::write('store_city', 'Clermont-Ferrand');
+        ConfigQuery::write('store_phone', '+(33)444053102');
         ConfigQuery::write('information_folder_id', $context->foldersByTitle['Information']->getId());
         ConfigQuery::write('terms_conditions_content_id', $context->contentsByTitle['Terms and Conditions']->getId());
     }
