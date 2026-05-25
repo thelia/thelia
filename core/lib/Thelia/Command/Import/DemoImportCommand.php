@@ -24,6 +24,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Thelia\Model\AccessoryQuery;
+use Thelia\Model\AddressQuery;
 use Thelia\Model\AttributeAvI18nQuery;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\AttributeCombinationQuery;
@@ -46,6 +47,7 @@ use Thelia\Model\FeatureQuery;
 use Thelia\Model\FolderI18nQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Map\ProductTableMap;
+use Thelia\Model\NewsletterQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\ProductAssociatedContentQuery;
 use Thelia\Model\ProductI18nQuery;
@@ -158,49 +160,51 @@ class DemoImportCommand extends Command
     {
         $output->writeln('Cleaning tables');
 
-        ProductAssociatedContentQuery::create()->find($connection)->delete($connection);
-        CategoryAssociatedContentQuery::create()->find($connection)->delete($connection);
-        AttributeCombinationQuery::create()->find($connection)->delete($connection);
-        FeatureProductQuery::create()->find($connection)->delete($connection);
+        ProductAssociatedContentQuery::create()->deleteAll($connection);
+        CategoryAssociatedContentQuery::create()->deleteAll($connection);
+        AttributeCombinationQuery::create()->deleteAll($connection);
+        FeatureProductQuery::create()->deleteAll($connection);
 
-        FeatureQuery::create()->find($connection)->delete($connection);
-        FeatureI18nQuery::create()->find($connection)->delete($connection);
-        FeatureAvQuery::create()->find($connection)->delete($connection);
-        FeatureAvI18nQuery::create()->find($connection)->delete($connection);
+        FeatureQuery::create()->deleteAll($connection);
+        FeatureI18nQuery::create()->deleteAll($connection);
+        FeatureAvQuery::create()->deleteAll($connection);
+        FeatureAvI18nQuery::create()->deleteAll($connection);
 
-        AttributeQuery::create()->find($connection)->delete($connection);
-        AttributeI18nQuery::create()->find($connection)->delete($connection);
-        AttributeAvQuery::create()->find($connection)->delete($connection);
-        AttributeAvI18nQuery::create()->find($connection)->delete($connection);
+        AttributeQuery::create()->deleteAll($connection);
+        AttributeI18nQuery::create()->deleteAll($connection);
+        AttributeAvQuery::create()->deleteAll($connection);
+        AttributeAvI18nQuery::create()->deleteAll($connection);
 
-        BrandQuery::create()->find($connection)->delete($connection);
-        BrandI18nQuery::create()->find($connection)->delete($connection);
+        BrandQuery::create()->deleteAll($connection);
+        BrandI18nQuery::create()->deleteAll($connection);
 
-        CategoryQuery::create()->find($connection)->delete($connection);
-        CategoryI18nQuery::create()->find($connection)->delete($connection);
+        CategoryQuery::create()->deleteAll($connection);
+        CategoryI18nQuery::create()->deleteAll($connection);
 
-        ProductQuery::create()->find($connection)->delete($connection);
-        ProductI18nQuery::create()->find($connection)->delete($connection);
+        ProductQuery::create()->deleteAll($connection);
+        ProductI18nQuery::create()->deleteAll($connection);
 
-        FolderQuery::create()->find($connection)->delete($connection);
-        FolderI18nQuery::create()->find($connection)->delete($connection);
+        FolderQuery::create()->deleteAll($connection);
+        FolderI18nQuery::create()->deleteAll($connection);
 
-        ContentQuery::create()->find($connection)->delete($connection);
-        ContentI18nQuery::create()->find($connection)->delete($connection);
+        ContentQuery::create()->deleteAll($connection);
+        ContentI18nQuery::create()->deleteAll($connection);
 
-        AccessoryQuery::create()->find($connection)->delete($connection);
+        AccessoryQuery::create()->deleteAll($connection);
 
-        ProductSaleElementsQuery::create()->find($connection)->delete($connection);
-        ProductPriceQuery::create()->find($connection)->delete($connection);
-        ProductImageQuery::create()->find($connection)->delete($connection);
+        ProductSaleElementsQuery::create()->deleteAll($connection);
+        ProductPriceQuery::create()->deleteAll($connection);
+        ProductImageQuery::create()->deleteAll($connection);
 
-        CustomerQuery::create()->find($connection)->delete($connection);
+        AddressQuery::create()->deleteAll($connection);
+        CustomerQuery::create()->deleteAll($connection);
+        NewsletterQuery::create()->deleteAll($connection);
 
-        SaleQuery::create()->find($connection)->delete($connection);
-        SaleProductQuery::create()->find($connection)->delete($connection);
+        SaleQuery::create()->deleteAll($connection);
+        SaleProductQuery::create()->deleteAll($connection);
 
-        OrderQuery::create()->find($connection)->delete($connection);
-        CartQuery::create()->find($connection)->delete($connection);
+        OrderQuery::create()->deleteAll($connection);
+        CartQuery::create()->deleteAll($connection);
 
         $output->writeln('Tables cleaned');
     }
