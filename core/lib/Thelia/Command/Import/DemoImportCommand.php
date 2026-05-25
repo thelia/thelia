@@ -23,6 +23,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Component\Routing\RouterInterface;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AttributeAvI18nQuery;
@@ -83,6 +84,7 @@ class DemoImportCommand extends Command
     public function __construct(
         #[Autowire('%kernel.environment%')]
         private readonly string $env,
+        private readonly RouterInterface $router,
         #[AutowireIterator('thelia.demo_importer')]
         iterable $importers,
     ) {
@@ -110,7 +112,7 @@ class DemoImportCommand extends Command
             throw new \RuntimeException('This command is only available in dev environment');
         }
 
-        new URL();
+        new URL($this->router);
 
         $connection = Propel::getConnection(ProductTableMap::DATABASE_NAME);
         $connection->beginTransaction();
