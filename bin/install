@@ -60,6 +60,7 @@ $options = getopt('', [
     'with-demo',
     'skip-demo-images',
     'with-admin',
+    'strict-themes',
     'admin_login:',
     'admin_password:',
     'admin_first_name:',
@@ -190,7 +191,9 @@ foreach ($themes as $type => $name) {
     }
 }
 
-removeBundlesForNonSelectedThemes($themes);
+if (isset($options['strict-themes'])) {
+    removeBundlesForNonSelectedThemes($themes);
+}
 
 // Pre-copy templates from vendor to templates/ so the kernel can boot.
 // template:set does this too, but the kernel crashes if the active
@@ -334,6 +337,12 @@ echo "\nThelia installed successfully.\n";
 
 // ─── Helpers ─────────────────────────────────────────────────────────
 
+/**
+ * Drop bundles whose template is shipped with another package than the one selected.
+ *
+ * Off by default to preserve cohabitation setups (e.g. BO Twig sitting next to BO
+ * Smarty during the back-office migration) — opt-in with the --strict-themes flag.
+ */
 function removeBundlesForNonSelectedThemes(array $selectedThemes): void
 {
     $bundlesPath = THELIA_ROOT.'config'.DS.'bundles.php';
