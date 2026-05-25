@@ -33,6 +33,7 @@ use Thelia\Model\AttributeQuery;
 use Thelia\Model\Base\CartQuery;
 use Thelia\Model\BrandI18nQuery;
 use Thelia\Model\BrandQuery;
+use Thelia\Model\CartItemQuery;
 use Thelia\Model\CategoryAssociatedContentQuery;
 use Thelia\Model\CategoryI18nQuery;
 use Thelia\Model\CategoryQuery;
@@ -50,6 +51,9 @@ use Thelia\Model\FolderI18nQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\NewsletterQuery;
+use Thelia\Model\OrderAddressQuery;
+use Thelia\Model\OrderProductQuery;
+use Thelia\Model\OrderProductTaxQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\ProductAssociatedContentQuery;
 use Thelia\Model\ProductI18nQuery;
@@ -208,7 +212,12 @@ class DemoImportCommand extends Command
         SaleQuery::create()->deleteAll($connection);
         SaleProductQuery::create()->deleteAll($connection);
 
+        OrderProductTaxQuery::create()->deleteAll($connection);
+        OrderProductQuery::create()->deleteAll($connection);
+        OrderAddressQuery::create()->deleteAll($connection);
         OrderQuery::create()->deleteAll($connection);
+
+        CartItemQuery::create()->deleteAll($connection);
         CartQuery::create()->deleteAll($connection);
 
         $output->writeln('Tables cleaned');

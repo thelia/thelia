@@ -41,7 +41,7 @@ final class SalesImporter extends AbstractDemoImporter
 
         foreach ($this->readCsv($context->dataDir.'sales.csv') as $data) {
             $sale = (new Sale())
-                ->setActive(0)
+                ->setActive(1)
                 ->setStartDate((new \DateTime())->setTimestamp((int) strtotime('today - 1 month')))
                 ->setEndDate((new \DateTime())->setTimestamp((int) strtotime('today + 1 month')))
                 ->setPriceOffsetType((int) $data[2])
