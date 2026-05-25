@@ -88,14 +88,14 @@ class Content extends BaseContent implements FileModelParentInterface
 
         // checks if the content is already associated with the folder and but not default
         if (null !== $contentFolder = ContentFolderQuery::create()->filterByContent($this)->filterByFolderId($defaultFolderId)->findOne()) {
-            $contentFolder->setDefaultFolder(true)->save();
+            $contentFolder->setDefaultFolder(1)->save();
         } else {
             $position = (new ContentFolder())->setFolderId($defaultFolderId)->getNextPosition();
 
             (new ContentFolder())
                 ->setContent($this)
                 ->setFolderId($defaultFolderId)
-                ->setDefaultFolder(true)
+                ->setDefaultFolder(1)
                 ->setPosition($position)
                 ->save();
 

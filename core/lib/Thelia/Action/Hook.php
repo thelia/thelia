@@ -118,7 +118,7 @@ class Hook extends BaseAction implements EventSubscriberInterface
             return;
         }
         $hook
-            ->setActivate(false)
+            ->setActivate(0)
             ->save();
         $event->setHook($hook);
     }
@@ -129,7 +129,7 @@ class Hook extends BaseAction implements EventSubscriberInterface
             return;
         }
         $hook
-            ->setNative(!$hook->getNative())
+            ->setNative($hook->getNative() ? 0 : 1)
             ->save();
         $event->setHook($hook);
     }
@@ -140,7 +140,7 @@ class Hook extends BaseAction implements EventSubscriberInterface
             return;
         }
         $hook
-            ->setActivate(!$hook->getActivate())
+            ->setActivate($hook->getActivate() ? 0 : 1)
             ->save();
         $event->setHook($hook);
 

@@ -136,7 +136,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                 // Reset all sale status on product's PSE
                 ProductSaleElementsQuery::create()
                     ->filterByProductId($saleProduct->getProductId())
-                    ->update(['Promo' => false], $con);
+                    ->update(['Promo' => 0], $con);
 
                 $taxCalculator->load(
                     $saleProduct->getProduct($con),
@@ -216,7 +216,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
             try {
                 // Disable all promo flag on sale's currently selected products,
                 // to reset promo status of the products that may have been removed from the selection.
-                $sale->setActive(false);
+                $sale->setActive(0);
 
                 $dispatcher->dispatch(
                     new ProductSaleStatusUpdateEvent($sale),
@@ -224,7 +224,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                 );
 
                 $sale
-                    ->setActive($event->getActive())
+                    ->setActive($event->getActive() ? 1 : 0)
                     ->setStartDate($event->getStartDate())
                     ->setEndDate($event->getEndDate())
                     ->setPriceOffsetType($event->getPriceOffsetType())
@@ -312,7 +312,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
         try {
             $sale
-                ->setActive(!$sale->getActive())
+                ->setActive($sale->getActive() ? 0 : 1)
                 ->save($con);
 
             // Update related products sale status
@@ -346,7 +346,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
             try {
                 // Update related products sale status, if required
                 if ($sale->getActive()) {
-                    $sale->setActive(false);
+                    $sale->setActive(0);
 
                     // Update related products sale status
                     $dispatcher->dispatch(
@@ -382,12 +382,12 @@ class Sale extends BaseAction implements EventSubscriberInterface
             // Set the active status of all Sales to false
             SaleQuery::create()
                 ->filterByActive(true)
-                ->update(['Active' => false], $con);
+                ->update(['Active' => 0], $con);
 
             // Reset all sale status on PSE
             ProductSaleElementsQuery::create()
                 ->filterByPromo(true)
-                ->update(['Promo' => false], $con);
+                ->update(['Promo' => 0], $con);
 
             $con->commit();
         } catch (PropelException $propelException) {
@@ -418,7 +418,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                 ->find()) {
                 /** @var SaleModel $sale */
                 foreach ($salesToDisable as $sale) {
-                    $sale->setActive(false)->save();
+                    $sale->setActive(0)->save();
 
                     // Update related products sale status
                     $dispatcher->dispatch(
@@ -436,7 +436,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                 ->find()) {
                 /** @var SaleModel $sale */
                 foreach ($salesToEnable as $sale) {
-                    $sale->setActive(true)->save();
+                    $sale->setActive(1)->save();
 
                     // Update related products sale status
                     $dispatcher->dispatch(

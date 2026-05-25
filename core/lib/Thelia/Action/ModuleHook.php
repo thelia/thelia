@@ -103,7 +103,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
         $moduleHook
             ->setModuleId((int) $event->getModuleId())
             ->setHookId((int) $event->getHookId())
-            ->setActive(false)
+            ->setActive(0)
             ->setClassname($event->getClassname())
             ->setMethod($event->getMethod())
             ->setModuleActive($this->isModuleActive($event->getModuleId()))
@@ -168,7 +168,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
     {
         if (($moduleHook = $event->getModuleHook()) instanceof ModuleHookModel) {
             if ($moduleHook->getModuleActive()) {
-                $moduleHook->setActive(!$moduleHook->getActive());
+                $moduleHook->setActive($moduleHook->getActive() ? 0 : 1);
                 $moduleHook->save();
             } else {
                 throw new \LogicException(Translator::getInstance()->trans('The module has to be activated.'));

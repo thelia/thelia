@@ -258,7 +258,7 @@ class DemoImportCommand extends Command
 
             $firstProductCategory = $product->getProductCategories()->getFirst();
             if (null !== $firstProductCategory) {
-                $firstProductCategory->setDefaultCategory(true)->save($connection);
+                $firstProductCategory->setDefaultCategory(1)->save($connection);
             }
 
             $firstProductCategory->setPosition($product->getNextPosition())->save($connection);
@@ -777,7 +777,7 @@ class DemoImportCommand extends Command
                 }
             }
 
-            $content->getContentFolders()->getFirst()?->setDefaultFolder(true)->save($connection);
+            $content->getContentFolders()->getFirst()?->setDefaultFolder(1)->save($connection);
             $content->save($connection);
 
             if ($withImages) {

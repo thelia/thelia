@@ -367,7 +367,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                 }
 
                 // Mark coupon usage as canceled in the OrderCoupon table
-                $usedCoupon->setUsageCanceled(true)->save();
+                $usedCoupon->setUsageCanceled(1)->save();
             }
         } else {
             // Mark canceled coupons for this order as used again
@@ -385,7 +385,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                 }
 
                 // The coupon is no longer canceled
-                $usedCoupon->setUsageCanceled(false)->save();
+                $usedCoupon->setUsageCanceled(0)->save();
             }
         }
     }

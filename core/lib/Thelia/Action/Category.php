@@ -147,7 +147,7 @@ class Category extends BaseAction implements EventSubscriberInterface
         }
 
         $category
-            ->setVisible(!(bool) $category->getVisible())
+            ->setVisible($category->getVisible() ? 0 : 1)
             ->save();
 
         $event->setCategory($category);

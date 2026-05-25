@@ -186,7 +186,7 @@ class Content extends BaseAction implements EventSubscriberInterface
         $contentFolder = (new ContentFolder())
             ->setFolderId((int) $event->getFolderId())
             ->setContent($event->getContent())
-            ->setDefaultFolder(false);
+            ->setDefaultFolder(0);
 
         $contentFolder
             ->setPosition($contentFolder->getNextPosition())

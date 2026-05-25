@@ -77,7 +77,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 $salesElement = $event->getProduct()->createProductSaleElement($con, 0, 0, 0, $event->getCurrencyId(), false);
             } else {
                 // This (new) one is the default
-                $salesElement->setIsDefault(true)->save($con);
+                $salesElement->setIsDefault(1)->save($con);
             }
 
             // Attach combination, if defined.
@@ -225,7 +225,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 // prices, weight, stock and attributes will not be lost.
                 if (1 === $product->countSaleElements($con)) {
                     $pse
-                        ->setIsDefault(true)
+                        ->setIsDefault(1)
                         ->save($con);
                     // Delete the related attribute combination.
                     AttributeCombinationQuery::create()
@@ -244,7 +244,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                             ->findOne($con);
 
                         if (null !== $newDefaultPse) {
-                            $newDefaultPse->setIsDefault(true)->save($con);
+                            $newDefaultPse->setIsDefault(1)->save($con);
                         }
                     }
                 }
@@ -514,7 +514,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             throw new \Exception(Translator::getInstance()->trans('Product sale element not found'));
         }
 
-        $pse->setVisible(!$pse->getVisible())->save();
+        $pse->setVisible($pse->getVisible() ? 0 : 1)->save();
     }
 
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void

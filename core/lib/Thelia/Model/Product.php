@@ -122,14 +122,14 @@ class Product extends BaseProduct implements FileModelParentInterface
 
         // checks if the product is already associated with the category and but not default
         if (null !== $productCategory = ProductCategoryQuery::create()->filterByProduct($this)->filterByCategoryId($defaultCategoryId)->findOne()) {
-            $productCategory->setDefaultCategory(true)->save();
+            $productCategory->setDefaultCategory(1)->save();
         } else {
             $position = (new ProductCategory())->setCategoryId($defaultCategoryId)->getNextPosition();
 
             (new ProductCategory())
                 ->setProduct($this)
                 ->setCategoryId($defaultCategoryId)
-                ->setDefaultCategory(true)
+                ->setDefaultCategory(1)
                 ->setPosition($position)
                 ->save();
 

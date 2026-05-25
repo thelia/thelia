@@ -653,7 +653,7 @@ class BaseModule implements BaseModuleInterface
             ->setChapo($chapo)
             ->setType($hook['type'])
             ->setCode($hook['code'])
-            ->setNative(false)
+            ->setNative(0)
             ->setByModule(isset($hook['module']) && (int) $hook['module'])
             ->setActive(isset($hook['active']) && (bool) $hook['active']);
 

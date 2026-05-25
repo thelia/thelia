@@ -437,7 +437,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
 
         $product
-            ->setVisible(!(bool) $product->getVisible())
+            ->setVisible($product->getVisible() ? 0 : 1)
             ->save();
 
         $event->setProduct($product);
@@ -492,7 +492,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             $productCategory = (new ProductCategory())
                 ->setProduct($event->getProduct())
                 ->setCategoryId((int) $event->getCategoryId())
-                ->setDefaultCategory(false);
+                ->setDefaultCategory(0);
 
             $productCategory
                 ->setPosition($productCategory->getNextPosition())
@@ -680,7 +680,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             // If it's a free text value, create a FeatureAv to handle i18n
             if ($event->getIsTextValue()) {
-                $featureProduct->setIsFreeText(true);
+                $featureProduct->setIsFreeText(1);
 
                 $createFeatureAvEvent = new FeatureAvCreateEvent();
                 $createFeatureAvEvent
