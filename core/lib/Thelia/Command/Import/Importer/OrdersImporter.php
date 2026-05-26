@@ -119,10 +119,12 @@ final class OrdersImporter extends AbstractDemoImporter
         }
     }
 
-    private function resolveModule(DemoImportContext $context, int $type, string $fallbackCode): ?Module
+    private function resolveModule(DemoImportContext $context, int $type, string $preferredCode): ?Module
     {
-        return ModuleQuery::create()->filterByActivate(1)->filterByType($type)->orderByPosition()->findOne($context->connection)
-            ?? ModuleQuery::create()->filterByCode($fallbackCode)->findOne($context->connection);
+        // Prefer a realistic named module (e.g. Cheque over FreeOrder), then
+        // fall back to any active module of the right type.
+        return ModuleQuery::create()->filterByActivate(1)->filterByType($type)->filterByCode($preferredCode)->findOne($context->connection)
+            ?? ModuleQuery::create()->filterByActivate(1)->filterByType($type)->orderByPosition()->findOne($context->connection);
     }
 
     /**
