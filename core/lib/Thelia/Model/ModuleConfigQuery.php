@@ -25,7 +25,7 @@ use Thelia\Model\Base\ModuleConfigQuery as BaseModuleConfigQuery;
  */
 class ModuleConfigQuery extends BaseModuleConfigQuery
 {
-    public function getConfigValue(int $moduleId, string $variableName, int|bool|string|null $defaultValue = null, $valueLocale = null): ?string
+    public function getConfigValue(int $moduleId, string $variableName, mixed $defaultValue = null, $valueLocale = null): ?string
     {
         $value = null;
 
