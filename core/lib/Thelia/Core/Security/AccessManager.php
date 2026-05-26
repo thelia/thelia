@@ -63,6 +63,22 @@ class AccessManager
         return $max;
     }
 
+    /**
+     * @return list<string>
+     */
+    public static function getAccessNameByValue(int $accessValue): array
+    {
+        $granted = [];
+
+        foreach (self::$accessPows as $type => $pow) {
+            if (($accessValue & (1 << $pow)) !== 0) {
+                $granted[] = $type;
+            }
+        }
+
+        return $granted;
+    }
+
     public function build($accesses): void
     {
         $this->accessValue = 0;
