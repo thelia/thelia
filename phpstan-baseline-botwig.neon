@@ -1,0 +1,139 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Strict comparison using \!\=\= between Thelia\\Model\\Address and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 2
+			path: templates/backOffice/default-twig/src/Controller/Customer/AddressController.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 2
+			path: templates/backOffice/default-twig/src/Controller/Customer/CustomerController.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between Thelia\\Model\\Currency and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: templates/backOffice/default-twig/src/Controller/Customer/CustomerController.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between Thelia\\Model\\Customer and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: templates/backOffice/default-twig/src/Controller/Customer/CustomerController.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between Thelia\\Model\\OrderStatus and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 2
+			path: templates/backOffice/default-twig/src/Controller/Customer/CustomerController.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between Thelia\\Model\\Customer and null will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: templates/backOffice/default-twig/src/Controller/Customer/CustomerController.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type Thelia\\Model\\Customer\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: templates/backOffice/default-twig/src/Controller/Customer/CustomerController.php
+
+		-
+			message: '#^Cannot call method getFile\(\) on class\-string\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: templates/backOffice/default-twig/src/Controller/File/FileController.php
+
+		-
+			message: '#^Cannot call method getId\(\) on class\-string\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: templates/backOffice/default-twig/src/Controller/File/FileController.php
+
+		-
+			message: '#^Cannot call method getTitle\(\) on class\-string\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: templates/backOffice/default-twig/src/Controller/File/FileController.php
+
+		-
+			message: '#^Ternary operator condition is always true\.$#'
+			identifier: ternary.alwaysTrue
+			count: 2
+			path: templates/backOffice/default-twig/src/Controller/Order/OrderController.php
+
+		-
+			message: '#^Match arm comparison between ''year'' and ''year'' is always true\.$#'
+			identifier: match.alwaysTrue
+			count: 1
+			path: templates/backOffice/default-twig/src/DTO/Dashboard/DateRange.php
+
+		-
+			message: '#^Negated boolean expression is always false\.$#'
+			identifier: booleanNot.alwaysFalse
+			count: 1
+			path: templates/backOffice/default-twig/src/Service/Admin/AdminAccessChecker.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between Thelia\\Model\\Currency and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 3
+			path: templates/backOffice/default-twig/src/Service/Order/OrderDetailContextBuilder.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between Thelia\\Model\\Customer and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: templates/backOffice/default-twig/src/Service/Order/OrderDetailContextBuilder.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between Thelia\\Model\\Customer and null will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: templates/backOffice/default-twig/src/Service/Order/OrderListRowPresenter.php
+
+		-
+			message: '#^Ternary operator condition is always true\.$#'
+			identifier: ternary.alwaysTrue
+			count: 1
+			path: templates/backOffice/default-twig/src/Service/Order/OrderListRowPresenter.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type Thelia\\Model\\Country\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: templates/backOffice/default-twig/src/Service/Order/OrderListRowPresenter.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type Thelia\\Model\\Module\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 4
+			path: templates/backOffice/default-twig/src/Service/Order/OrderListRowPresenter.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type Thelia\\Model\\OrderAddress\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: templates/backOffice/default-twig/src/Service/Order/OrderListRowPresenter.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between Thelia\\Model\\Tools\\ProductPriceTools and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 2
+			path: templates/backOffice/default-twig/src/Service/Product/CombinationsTabContextBuilder.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between Thelia\\Model\\Product and null will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: templates/backOffice/default-twig/src/Service/Sale/SaleEditContextBuilder.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between Thelia\\Model\\Attribute and null will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: templates/backOffice/default-twig/src/Service/Sale/SaleProductAttributesProvider.php

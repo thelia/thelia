@@ -1,0 +1,41 @@
+name: phpstan-botwig
+
+# Level-5 static-analysis guard-rail for the Twig back-office bundle
+# (thelia/backoffice-default-twig-template). The bundle lives in its own repo
+# (thelia-templates/default-twig) and is NOT loaded in the test env, so neither
+# `composer phpstan` (core only) nor the PHPUnit suites cover it (debt B-052).
+# This job closes that blind spot.
+on:
+  push:
+    branches: [ twig, main, master ]
+  pull_request:
+    branches: [ twig, main, master ]
+
+jobs:
+  phpstan-botwig:
+    name: PHPStan level 5 (BO Twig bundle)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, gd, zip
+
+      - name: Install Composer dependencies
+        # Pulls the bundle (^0.1) and its deps (symfony/ux-*, twig-engine, core)
+        # into vendor/ so PHPStan can resolve the Thelia and Symfony types.
+        run: composer install --no-progress --prefer-dist
+
+      - name: Sync the bundle to its working branch
+        # composer installs the published tag; replace the source with the live
+        # branch so the analysed code matches phpstan-baseline-botwig.neon.
+        run: |
+          rm -rf templates/backOffice/default-twig
+          git clone --depth 1 --branch main https://github.com/thelia-templates/default-twig.git templates/backOffice/default-twig
+
+      - name: PHPStan (level 5 + dedicated baseline)
+        run: ./vendor/bin/phpstan analyse -c phpstan-botwig.neon --level=5 --no-progress --error-format=github templates/backOffice/default-twig/src

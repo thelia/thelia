@@ -1,0 +1,11 @@
+includes:
+    - phpstan.neon
+    - phpstan-baseline-botwig.neon
+parameters:
+    # Level-5 guard-rail for the BO Twig bundle (thelia/backoffice-default-twig-template).
+    # The baseline absorbs the defensive Propel/event narrowing false positives; tolerate
+    # unmatched baseline entries so a phpstan patch bump can't turn the gate red on
+    # already-known items — it still fails on NEW errors, which is the point.
+    reportUnmatchedIgnoredErrors: false
+    paths:
+        - templates/backOffice/default-twig/src
