@@ -19,15 +19,6 @@ jobs:
   phpstan-botwig:
     name: PHPStan level 5 (BO Twig bundle)
     runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mariadb:11.2
-        env:
-          MYSQL_ROOT_PASSWORD: thelia
-          MYSQL_DATABASE: thelia
-        ports:
-          - 3306/tcp
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,6 +27,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install sendmail
+
+      - name: Start MySQL
+        # The runner ships MySQL pre-installed (root/root on 127.0.0.1:3306); using
+        # it avoids the flaky service-container init on this runner image.
+        run: |
+          sudo systemctl start mysql.service
+          mysql -uroot -proot -e "CREATE DATABASE IF NOT EXISTS thelia;"
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -50,7 +48,7 @@ jobs:
           composer update --no-interaction --prefer-dist
 
       - name: Install Thelia (test env, builds the Propel models)
-        run: php Thelia thelia:install --env=test --database_host=127.0.0.1:${{ job.services.mysql.ports['3306'] }} --database_username=root --database_name=thelia --database_password=thelia
+        run: php Thelia thelia:install --env=test --database_host=127.0.0.1:3306 --database_username=root --database_name=thelia --database_password=root
 
       - name: Sync the bundle to its working branch
         # composer installs the published tag; replace the source with the live
