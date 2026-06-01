@@ -5,6 +5,10 @@ name: phpstan-botwig
 # (thelia-templates/default-twig) and is NOT loaded in the test env, so neither
 # `composer phpstan` (core only) nor the PHPUnit suites cover it (debt B-052).
 # This job closes that blind spot.
+#
+# PHPStan needs the Propel models generated (var/propel/test/model) to resolve the
+# i18n getters, so the setup mirrors the test job (MySQL + thelia:install --env=test)
+# before analysing the bundle.
 on:
   push:
     branches: [ twig, main, master ]
@@ -15,20 +19,38 @@ jobs:
   phpstan-botwig:
     name: PHPStan level 5 (BO Twig bundle)
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mariadb:11.2
+        env:
+          MYSQL_ROOT_PASSWORD: thelia
+          MYSQL_DATABASE: thelia
+        ports:
+          - 3306/tcp
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install sendmail
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
+          ini-values: post_max_size=20M
           extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, gd, zip
 
       - name: Install Composer dependencies
-        # Pulls the bundle (^0.1) and its deps (symfony/ux-*, twig-engine, core)
-        # into vendor/ so PHPStan can resolve the Thelia and Symfony types.
-        run: composer install --no-progress --prefer-dist
+        run: |
+          composer install --no-progress --prefer-dist --optimize-autoloader
+          composer update --no-interaction --prefer-dist
+
+      - name: Install Thelia (test env, builds the Propel models)
+        run: php Thelia thelia:install --env=test --database_host=127.0.0.1:${{ job.services.mysql.ports['3306'] }} --database_username=root --database_name=thelia --database_password=thelia
 
       - name: Sync the bundle to its working branch
         # composer installs the published tag; replace the source with the live
