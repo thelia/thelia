@@ -591,7 +591,10 @@ class TheliaKernel extends Kernel
                         ],
                     ]);
                 }
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
+                // \Throwable, not \Exception: a module whose class is missing from disk
+                // (removed from composer while still active in the database) makes
+                // call_user_func() throw a TypeError, which must not kill the boot.
                 if ($this->debug) {
                     throw $e;
                 }
@@ -622,7 +625,7 @@ class TheliaKernel extends Kernel
         foreach ($modules as $module) {
             try {
                 $this->loadModuleTranslationDirectories($module, $translationDirs, $templateHelper);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 if ($this->debug) {
                     throw $e;
                 }

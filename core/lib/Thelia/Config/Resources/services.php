@@ -124,7 +124,7 @@ return static function (ContainerConfigurator $configurator): void {
                 if (is_dir($apiModulePath)) {
                     $apiResourcePaths[] = $apiModulePath;
                 }
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 if ($_SERVER['APP_DEBUG']) {
                     throw $e;
                 }
