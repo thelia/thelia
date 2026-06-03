@@ -30,6 +30,7 @@ use Symfony\Component\Process\Process;
 use Thelia\Core\Install\CheckPermission;
 use Thelia\Core\Install\Database;
 use Thelia\Domain\Module\Composer\ComposerHelper;
+use Thelia\Install\Standalone\DatabaseSetup;
 use Thelia\Tools\TokenProvider;
 
 /**
@@ -186,14 +187,69 @@ class Install extends ContainerAwareCommand
             '',
         ]);
 
+        $this->registerModules($output, $connectionInfo);
+
         $this->handleThemesBundle($input, $output);
 
         $this->applyTemplatesInSameCommandProcess($output, $connectionInfo, $themes);
+
+        $this->runModulesPostActivation($output, $connectionInfo);
 
         $this->maybeImportDemoData($input, $output, $connectionInfo);
         $this->maybeCreateAdminUser($input, $output, $connectionInfo);
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * Register every module found on disk into the module table, active by default,
+     * and apply their SQL schemas. Without this step the module table stays empty
+     * after installation: PropelInitService would then fall back to a full
+     * filesystem scan on every boot, and the shop would run with no active module.
+     */
+    private function registerModules(OutputInterface $output, array $connectionInfo): void
+    {
+        $output->writeln('<info>Registering modules...</info>');
+
+        $setup = new DatabaseSetup(
+            (string) $connectionInfo['host'],
+            (string) $connectionInfo['port'],
+            (string) $connectionInfo['dbName'],
+            (string) $connectionInfo['username'],
+            (string) $connectionInfo['password'],
+        );
+        $setup->connect();
+
+        $count = $setup->registerAndApplyModules();
+
+        $output->writeln(\sprintf('<info>%d module(s) registered</info>', $count));
+
+        foreach ($setup->getWarnings() as $warning) {
+            $output->writeln(\sprintf('<comment>WARN %s</comment>', $warning));
+        }
+    }
+
+    /**
+     * Run postActivation() for all active modules in a separate process, once
+     * templates are applied and Propel models are generated. registerModules()
+     * inserts modules with activate=1 but never calls postActivation().
+     */
+    private function runModulesPostActivation(OutputInterface $output, array $connectionInfo): void
+    {
+        $output->writeln('<info>Running module post-activation hooks...</info>');
+
+        $process = $this->createTheliaCliProcess(
+            $connectionInfo,
+            [\PHP_BINARY, THELIA_ROOT.'Thelia', 'module:post-activate-all'],
+        );
+
+        $process->run(static function (string $type, string $buffer) use ($output): void {
+            $output->write($buffer);
+        });
+
+        if (!$process->isSuccessful()) {
+            throw new \RuntimeException('Module post-activation failed.');
+        }
     }
 
     protected function manageSecret(Database $database): void
@@ -536,46 +592,66 @@ class Install extends ContainerAwareCommand
         if (!class_exists(AppKernel::class)) {
             throw new \RuntimeException('App\\Kernel is missing. Post-install steps require the application kernel.');
         }
-        foreach ($themes as $type => $name) {
-            $name = trim((string) $name);
 
-            if ('' === $name) {
-                continue;
-            }
+        // template:set triggers cache:clear, which deletes container files
+        // mid-process. This causes harmless PHP warnings ("Failed to open
+        // stream") when the console.terminate event tries to load deleted
+        // services. We suppress them — same approach as bin/install.
+        set_error_handler(static fn (int $errno, string $errstr): bool => str_contains($errstr, 'Failed to open stream') || str_contains($errstr, 'Failed opening required'), \E_WARNING);
 
-            $output->writeln(\sprintf(
-                '<info>Applying template "%s" for type "%s"...</info>',
-                $name,
-                $type,
-            ));
+        try {
+            foreach ($themes as $type => $name) {
+                $name = trim((string) $name);
 
-            $kernel = new AppKernel($_SERVER['APP_ENV'], (bool) ($_SERVER['APP_DEBUG'] ?? false));
-            $kernel->boot();
-
-            try {
-                $application = new FrameworkConsoleApplication($kernel);
-                $application->setAutoExit(false);
-                $exitCode = $application->run(
-                    new ArrayInput([
-                        'command' => 'template:set',
-                        'type' => $type,
-                        'name' => $name,
-                    ]),
-                    $output,
-                );
-
-                if (Command::SUCCESS !== $exitCode) {
-                    $output->writeln(
-                        \sprintf(
-                            '<error>Post-install step failed while applying template "%s" for type "%s".</error>',
-                            $name,
-                            $type
-                        )
-                    );
+                if ('' === $name) {
+                    continue;
                 }
-            } finally {
-                $kernel->shutdown();
+
+                $output->writeln(\sprintf(
+                    '<info>Applying template "%s" for type "%s"...</info>',
+                    $name,
+                    $type,
+                ));
+
+                $kernel = new AppKernel($_SERVER['APP_ENV'], (bool) ($_SERVER['APP_DEBUG'] ?? false));
+                $kernel->boot();
+
+                try {
+                    $application = new FrameworkConsoleApplication($kernel);
+                    $application->setAutoExit(false);
+                    $exitCode = $application->run(
+                        new ArrayInput([
+                            'command' => 'template:set',
+                            'type' => $type,
+                            'name' => $name,
+                        ]),
+                        $output,
+                    );
+
+                    if (Command::SUCCESS !== $exitCode) {
+                        $output->writeln(
+                            \sprintf(
+                                '<error>Post-install step failed while applying template "%s" for type "%s".</error>',
+                                $name,
+                                $type
+                            )
+                        );
+                    }
+                } catch (\Error $error) {
+                    // Cache file deleted mid-process by cache:clear — the command
+                    // itself had already succeeded when console.terminate fired.
+                    if (!str_contains($error->getMessage(), 'Failed opening required')) {
+                        throw $error;
+                    }
+                } finally {
+                    try {
+                        $kernel->shutdown();
+                    } catch (\Throwable) {
+                    }
+                }
             }
+        } finally {
+            restore_error_handler();
         }
     }
 
