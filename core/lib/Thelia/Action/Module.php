@@ -56,6 +56,31 @@ class Module extends BaseAction implements EventSubscriberInterface
         if (null === $module = ModuleQuery::create()->findPk($event->getModuleId())) {
             return;
         }
+
+        if (!class_exists($module->getFullNamespace())) {
+            // The module code is missing from disk (e.g. removed from composer while
+            // still registered in the database). Allow deactivation so the database
+            // can be cleaned up; activation is impossible without the code.
+            if (BaseModule::IS_ACTIVATED !== $module->getActivate()) {
+                throw new ModuleException(\sprintf('Cannot activate module "%s": its class "%s" was not found on disk.', $module->getCode(), $module->getFullNamespace()));
+            }
+
+            $module->setActivate(BaseModule::IS_NOT_ACTIVATED);
+            $module->save();
+
+            Tlog::getInstance()->addWarning(\sprintf(
+                'Module "%s" was deactivated without running its lifecycle hooks: its class "%s" was not found on disk.',
+                $module->getCode(),
+                $module->getFullNamespace(),
+            ));
+
+            $event->setModule($module);
+
+            $this->cacheClear($dispatcher);
+
+            return;
+        }
+
         $moduleInstance = $module->createInstance();
 
         if (method_exists($moduleInstance, 'setContainer')) {
@@ -131,6 +156,12 @@ class Module extends BaseAction implements EventSubscriberInterface
      */
     private function checkDeactivation(\Thelia\Model\Module $module): bool
     {
+        // A module missing from disk declares no dependencies to other modules;
+        // it must remain deactivatable so the database can be cleaned up.
+        if (!is_dir($module->getAbsoluteBaseDir())) {
+            return true;
+        }
+
         $moduleValidator = new ModuleValidator($module->getAbsoluteBaseDir());
 
         $modules = $moduleValidator->getModulesDependOf();
