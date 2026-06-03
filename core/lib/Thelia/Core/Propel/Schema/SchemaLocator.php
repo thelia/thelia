@@ -88,6 +88,22 @@ class SchemaLocator
             if ('Thelia' === $moduleCode) {
                 $moduleSchemas = $this->getSchemaPathsForThelia();
             } else {
+                if (!$this->moduleDirectoryExists($moduleCode)) {
+                    // The module is active in the database but missing from disk (e.g.
+                    // removed from composer while a previously populated database is
+                    // reused). Crashing here would prevent the kernel from booting at
+                    // all, CLI included, making recovery (module:refresh, deactivation)
+                    // impossible. Tlog is not available yet: Propel models are not
+                    // generated at this point.
+                    error_log(\sprintf(
+                        '[thelia] Module "%s" is active in the database but its directory was not found on disk. Its Propel schema will be skipped; run "module:deactivate %s" to clean up.',
+                        $moduleCode,
+                        $moduleCode,
+                    ));
+
+                    continue;
+                }
+
                 $moduleSchemas = $this->getSchemaPathsForModule($moduleCode);
             }
 
@@ -134,12 +150,30 @@ class SchemaLocator
                 continue;
             }
 
+            // Missing from disk: findForModules() logs and skips it.
+            if (!$this->moduleDirectoryExists($module)) {
+                continue;
+            }
+
             $modulePath = is_dir(\sprintf('%s/%s', $this->theliaModuleDir, $module))
                 ? \sprintf('%s/%s', $this->theliaModuleDir, $module)
                 : \sprintf('%s/%s', $this->theliaLocalModuleDir, $module);
 
-            $moduleValidator = new ModuleValidator($modulePath);
-            $dependencies = $moduleValidator->getCurrentModuleDependencies(true);
+            try {
+                $moduleValidator = new ModuleValidator($modulePath);
+                $dependencies = $moduleValidator->getCurrentModuleDependencies(true);
+            } catch (\Exception $exception) {
+                // Broken module descriptor: do not let it crash the boot, the kernel
+                // could not be recovered from CLI otherwise. Tlog is not available
+                // yet: Propel models are not generated at this point.
+                error_log(\sprintf(
+                    '[thelia] Module "%s" could not be validated (%s). Its dependencies will be skipped.',
+                    $module,
+                    $exception->getMessage(),
+                ));
+
+                continue;
+            }
 
             foreach ($dependencies as $dependency) {
                 if (!\in_array($dependency['code'], $modules, true)) {
@@ -149,6 +183,12 @@ class SchemaLocator
         }
 
         return $modules;
+    }
+
+    private function moduleDirectoryExists(string $module): bool
+    {
+        return is_dir(\sprintf('%s/%s', $this->theliaModuleDir, $module))
+            || is_dir(\sprintf('%s/%s', $this->theliaLocalModuleDir, $module));
     }
 
     /**
