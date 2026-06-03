@@ -393,8 +393,12 @@ class PropelInitService
      * Read the active module codes from the database using a direct PDO connection.
      *
      * Returns null when the database is unreachable, the module table does not
-     * exist yet, or any other failure occurs — in that case the caller falls back
-     * to scanning the whole filesystem (install-time / recovery behaviour).
+     * exist yet, is empty, or any other failure occurs — in that case the caller
+     * falls back to scanning the whole filesystem (install-time / recovery
+     * behaviour). An empty module table means the installation is not finalized
+     * (thelia:install seeds no module rows): without the fallback no schema at
+     * all would be built, and the model build would crash with "No schema files
+     * were found".
      *
      * The Propel configuration file is the source of truth for the DSN so this
      * method is always consistent with the connection Propel will use at runtime.
@@ -430,7 +434,9 @@ class PropelInitService
                 return null;
             }
 
-            return $statement->fetchAll(\PDO::FETCH_COLUMN);
+            $codes = $statement->fetchAll(\PDO::FETCH_COLUMN);
+
+            return $codes === [] ? null : $codes;
         } catch (\Throwable) {
             return null;
         }
