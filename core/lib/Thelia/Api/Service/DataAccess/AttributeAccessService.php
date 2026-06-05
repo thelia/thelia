@@ -289,6 +289,12 @@ class AttributeAccessService
             case 'weight':
                 $result = $cart->getWeight();
                 break;
+            case 'delivery_module_id':
+                $result = $cart->getDeliveryModuleId();
+                break;
+            case 'payment_module_id':
+                $result = $cart->getPaymentModuleId();
+                break;
         }
 
         return $result;
