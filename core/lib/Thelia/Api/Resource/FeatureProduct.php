@@ -17,6 +17,7 @@ namespace Thelia\Api\Resource;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
@@ -39,6 +40,10 @@ use Thelia\Model\Map\FeatureProductTableMap;
 )]
 #[ApiResource(
     operations: [
+        new GetCollection(
+            uriTemplate: '/front/feature_products',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
+        ),
         new Get(
             uriTemplate: '/front/feature_products/{id}',
             normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
@@ -54,6 +59,9 @@ use Thelia\Model\Map\FeatureProductTableMap;
     filterClass: OrderFilter::class,
     properties: [
         'position',
+        'product.id',
+        'feature.id',
+        'featureAv.id',
     ],
 )]
 class FeatureProduct implements PropelResourceInterface
@@ -81,7 +89,7 @@ class FeatureProduct implements PropelResourceInterface
     #[Relation(targetResource: Feature::class)]
     #[Groups([
         self::GROUP_ADMIN_READ_SINGLE,
-        self::GROUP_FRONT_READ_SINGLE,
+        self::GROUP_FRONT_READ,
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
     ])]
@@ -90,7 +98,7 @@ class FeatureProduct implements PropelResourceInterface
     #[Relation(targetResource: FeatureAv::class)]
     #[Groups([
         self::GROUP_ADMIN_READ_SINGLE,
-        self::GROUP_FRONT_READ_SINGLE,
+        self::GROUP_FRONT_READ,
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
     ])]
