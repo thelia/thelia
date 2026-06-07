@@ -26,8 +26,11 @@ class OrderPostage
     protected ?float $untaxedAmount = null;
     protected ?string $taxRuleTitle = null;
 
-    public function __construct(?string $amount = null, ?string $amountTax = null, ?string $taxRuleTitle = null)
+    public function __construct(?float $amount = null, ?float $amountTax = null, ?string $taxRuleTitle = null)
     {
+        $this->amount = $amount;
+        $this->amountTax = $amountTax !== null ? round($amountTax, 2) : null;
+        $this->taxRuleTitle = $taxRuleTitle;
     }
 
     /**
@@ -56,7 +59,7 @@ class OrderPostage
     public function setAmountTax(?float $amountTax = null): void
     {
         // We have to round the postage tax to prevent small delta amounts in tax calculations.
-        $this->amountTax = round($amountTax, 2);
+        $this->amountTax = $amountTax !== null ? round($amountTax, 2) : null;
     }
 
     public function getTaxRuleTitle(): ?string

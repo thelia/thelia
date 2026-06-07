@@ -271,24 +271,6 @@ parameters:
 			path: core/lib/Thelia/Domain/Promotion/Coupon/Type/CouponInterface.php
 
 		-
-			message: '#^Constructor of class Thelia\\Model\\OrderPostage has an unused parameter \$amount\.$#'
-			identifier: constructor.unusedParameter
-			count: 1
-			path: core/lib/Thelia/Model/OrderPostage.php
-
-		-
-			message: '#^Constructor of class Thelia\\Model\\OrderPostage has an unused parameter \$amountTax\.$#'
-			identifier: constructor.unusedParameter
-			count: 1
-			path: core/lib/Thelia/Model/OrderPostage.php
-
-		-
-			message: '#^Constructor of class Thelia\\Model\\OrderPostage has an unused parameter \$taxRuleTitle\.$#'
-			identifier: constructor.unusedParameter
-			count: 1
-			path: core/lib/Thelia/Model/OrderPostage.php
-
-		-
 			message: '#^Class Thelia\\Model\\DateTime not found\.$#'
 			identifier: class.notFound
 			count: 4
