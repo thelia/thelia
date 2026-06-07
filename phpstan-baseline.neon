@@ -151,12 +151,6 @@ parameters:
 			path: core/lib/Thelia/Api/Resource/Product.php
 
 		-
-			message: '#^Call to static method createFromFormat\(\) on an unknown class Thelia\\Condition\\Implementation\\DateTime\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/lib/Thelia/Condition/Implementation/StartDate.php
-
-		-
 			message: '#^Class Thelia\\Core\\EventListener\\SessionListener not found\.$#'
 			identifier: class.notFound
 			count: 1

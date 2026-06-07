@@ -14,17 +14,20 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Condition;
 
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Exception\InvalidConditionOperatorException;
 use Thelia\Condition\Exception\InvalidConditionValueException;
 use Thelia\Condition\Implementation\CartContainsProducts;
 use Thelia\Condition\Implementation\MatchForTotalAmount;
 use Thelia\Condition\Implementation\MatchForXArticles;
+use Thelia\Condition\Implementation\StartDate;
 use Thelia\Condition\Operators;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Model\Currency;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Tools\DateTimeFormat;
 
 /**
  * Integration-level tests for condition failure paths that construct
@@ -134,6 +137,27 @@ final class ConditionFailurePathTest extends IntegrationTestCase
             [MatchForXArticles::CART_QUANTITY => 'INVALID'],
             [MatchForXArticles::CART_QUANTITY => 10],
         );
+    }
+
+    public function testStartDateParsesAFormattedDateFromTheForm(): void
+    {
+        $request = $this->getService(RequestStack::class)->getCurrentRequest();
+        self::assertNotNull($request);
+
+        $facade = $this->makeFacade();
+        $facade->method('getRequest')->willReturn($request);
+
+        $format = DateTimeFormat::getInstance($request)->getFormat('date');
+        self::assertNotNull($format);
+
+        $condition = new StartDate($facade);
+        $condition->setValidatorsFromForm(
+            [StartDate::START_DATE => Operators::SUPERIOR_OR_EQUAL],
+            [StartDate::START_DATE => (new \DateTime('2000-01-01'))->format($format)],
+        );
+
+        // A start date in the past means the coupon is already active.
+        self::assertTrue($condition->isMatching());
     }
 
     public function testCartContainsProductsThrowsOnEmptyProductList(): void
