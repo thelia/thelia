@@ -63,12 +63,13 @@ final class AdminPagesSmokeTest extends WebIntegrationTestCase
         self::assertNotSame(403, $statusCode, 'Admin firewall must not block authenticated request');
     }
 
-    public function testAdminHomeBlockedWhenNotLoggedIn(): void
+    public function testAdminHomeRedirectsToLoginWhenNotLoggedIn(): void
     {
         $this->client->request('GET', '/admin/home');
 
-        $statusCode = $this->client->getResponse()->getStatusCode();
-        self::assertContains($statusCode, [302, 403, 500]);
+        $response = $this->client->getResponse();
+        self::assertSame(302, $response->getStatusCode());
+        self::assertStringContainsString('/admin/login', (string) $response->headers->get('Location'));
     }
 
     public function testAdminCatalogBlockedWhenNotLoggedIn(): void

@@ -22,7 +22,8 @@ return static function (RoutingConfigurator $routes): void {
         ->defaults(['not-logged' => '1']);
 
     $routes->add('admin.home', '/admin/home')
-        ->controller([AdminController::class, 'indexAction']);
+        ->controller([AdminController::class, 'indexAction'])
+        ->defaults(['not-logged' => '1']);
 
     $routes->add('admin.login', '/admin/login')
         ->controller([SessionController::class, 'showLoginAction'])
