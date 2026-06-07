@@ -17,6 +17,8 @@ namespace Thelia\Tests\Integration\Action;
 use Propel\Runtime\Propel;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Serializer\SerializerManager;
+use Thelia\Domain\DataTransfer\ExportHandler;
 use Thelia\Model\Export;
 use Thelia\Model\ExportCategory;
 use Thelia\Model\ExportCategoryQuery;
@@ -155,5 +157,42 @@ final class ExportImportActionTest extends ActionIntegrationTestCase
             $cat2->getPosition(),
             ImportCategoryQuery::create()->findPk($cat1->getId())->getPosition(),
         );
+    }
+
+    public function testExportWithoutRangeDateProducesFile(): void
+    {
+        $export = $this->createExport($this->createExportCategory());
+        $export->setHandleClass(\Thelia\Domain\DataTransfer\Export\Type\MailingExport::class)->save();
+
+        // The mailing export needs at least one subscriber to produce a file.
+        (new \Thelia\Model\Newsletter())
+            ->setEmail('qa-export-'.uniqid().'@example.com')
+            ->setFirstname('QA')
+            ->setLastname('Export')
+            ->setLocale('en_US')
+            ->setUnsubscribed(0)
+            ->save();
+
+        $language = \Thelia\Model\LangQuery::create()->findOneByByDefault(true)
+            ?? \Thelia\Model\LangQuery::create()->findOne();
+
+        /** @var ExportHandler $handler */
+        $handler = $this->getService(ExportHandler::class);
+        $serializer = $this->getService(SerializerManager::class)->get('thelia.csv');
+
+        // The app promotes warnings to exceptions in debug, so an array access on a
+        // null range date would surface as a 500. Mirror that here to fail loudly.
+        set_error_handler(static function (int $severity, string $message): never {
+            throw new \ErrorException($message, 0, $severity);
+        }, \E_WARNING);
+
+        try {
+            $event = $handler->export($export, $serializer, null, $language);
+        } finally {
+            restore_error_handler();
+        }
+
+        self::assertNotSame('', $event->getFilePath());
+        self::assertFileExists($event->getFilePath());
     }
 }

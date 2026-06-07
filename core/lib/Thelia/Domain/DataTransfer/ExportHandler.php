@@ -99,31 +99,33 @@ class ExportHandler
             }
         }
 
-        if ($rangeDate['start'] && !($rangeDate['start'] instanceof \DateTime)) {
-            $startYear = '' !== $rangeDate['start']['year'] ? $rangeDate['start']['year'] : (new \DateTime())->format('Y');
-            $startMonth = '' !== $rangeDate['start']['month'] ? $rangeDate['start']['month'] : (new \DateTime())->format('m');
-            $rangeDate['start'] = \DateTime::createFromFormat(
-                'Y-m-d H:i:s',
-                $startYear.'-'.$startMonth.'-1 00:00:00',
-            );
-        }
-
-        if ($rangeDate['end'] && !($rangeDate['end'] instanceof \DateTime)) {
-            $endYear = '' !== $rangeDate['end']['year'] ? $rangeDate['end']['year'] : (new \DateTime())->format('Y');
-            $endMonth = '' !== $rangeDate['end']['month'] ? $rangeDate['end']['month'] : (new \DateTime())->format('m');
-            $rangeDate['end'] = \DateTime::createFromFormat(
-                'Y-m-d H:i:s',
-                $endYear.'-'.$endMonth.'-1 23:59:59',
-            );
-
-            if ($rangeDate['end'] instanceof \DateTime) {
-                $rangeDate['end']
-                    ->add(new \DateInterval('P1M'))
-                    ->sub(new \DateInterval('P1D'));
+        if (null !== $rangeDate) {
+            if ($rangeDate['start'] && !($rangeDate['start'] instanceof \DateTime)) {
+                $startYear = '' !== $rangeDate['start']['year'] ? $rangeDate['start']['year'] : (new \DateTime())->format('Y');
+                $startMonth = '' !== $rangeDate['start']['month'] ? $rangeDate['start']['month'] : (new \DateTime())->format('m');
+                $rangeDate['start'] = \DateTime::createFromFormat(
+                    'Y-m-d H:i:s',
+                    $startYear.'-'.$startMonth.'-1 00:00:00',
+                );
             }
-        }
 
-        $instance->setRangeDate($rangeDate);
+            if ($rangeDate['end'] && !($rangeDate['end'] instanceof \DateTime)) {
+                $endYear = '' !== $rangeDate['end']['year'] ? $rangeDate['end']['year'] : (new \DateTime())->format('Y');
+                $endMonth = '' !== $rangeDate['end']['month'] ? $rangeDate['end']['month'] : (new \DateTime())->format('m');
+                $rangeDate['end'] = \DateTime::createFromFormat(
+                    'Y-m-d H:i:s',
+                    $endYear.'-'.$endMonth.'-1 23:59:59',
+                );
+
+                if ($rangeDate['end'] instanceof \DateTime) {
+                    $rangeDate['end']
+                        ->add(new \DateInterval('P1M'))
+                        ->sub(new \DateInterval('P1D'));
+                }
+            }
+
+            $instance->setRangeDate($rangeDate);
+        }
 
         // Process export
         $event = new ExportEvent($instance, $serializer, $archiver);
