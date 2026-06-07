@@ -63,7 +63,7 @@ class MatchForTotalAmount extends ConditionAbstract
             ->checkComparisonOperatorValue($operators, self::CART_TOTAL)
             ->checkComparisonOperatorValue($operators, self::CART_CURRENCY);
 
-        $this->isPriceValid($values[self::CART_TOTAL]);
+        $this->isPriceValid((float) $values[self::CART_TOTAL]);
 
         $this->isCurrencyValid($values[self::CART_CURRENCY]);
 

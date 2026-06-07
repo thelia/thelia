@@ -68,6 +68,28 @@ final class MatchForTotalAmountTest extends FacadeBackedTestCase
         self::assertFalse($condition->isMatching());
     }
 
+    public function testAcceptsStringPriceComingFromTheForm(): void
+    {
+        $facade = $this->facadeWithEUR();
+        $facade->method('getCartTotalTaxPrice')->willReturn(120.0);
+        $facade->method('getCheckoutCurrency')->willReturn('EUR');
+
+        // Back-office form values reach the condition as strings.
+        $condition = new MatchForTotalAmount($facade);
+        $condition->setValidatorsFromForm(
+            [
+                MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR_OR_EQUAL,
+                MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
+            ],
+            [
+                MatchForTotalAmount::CART_TOTAL => '100',
+                MatchForTotalAmount::CART_CURRENCY => 'EUR',
+            ],
+        );
+
+        self::assertTrue($condition->isMatching());
+    }
+
     private function buildCondition(
         FacadeInterface $facade,
         string $priceOperator,
