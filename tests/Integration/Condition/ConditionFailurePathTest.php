@@ -160,6 +160,15 @@ final class ConditionFailurePathTest extends IntegrationTestCase
         self::assertTrue($condition->isMatching());
     }
 
+    public function testFacadeReturnsAvailableCurrenciesAsArray(): void
+    {
+        $facade = $this->getService('thelia.facade');
+
+        // The interface declares a return type of array; CurrencyQuery::find() yields an
+        // ObjectCollection, so the conversion must happen inside the facade.
+        self::assertIsArray($facade->getAvailableCurrencies());
+    }
+
     public function testCartContainsProductsThrowsOnEmptyProductList(): void
     {
         $condition = new CartContainsProducts($this->makeFacade());

@@ -244,9 +244,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getAvailableCurrencies(): array
     {
-        $currencies = CurrencyQuery::create();
-
-        return $currencies->find();
+        return CurrencyQuery::create()->find()->getData();
     }
 
     /**
