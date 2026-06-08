@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
 
 #[AsAlias(id: 'thelia.parser.resolver', public: true)]
@@ -87,12 +88,21 @@ class ParserResolver
     /**
      * @throws \Exception
      */
-    public function getAssetResolver(ParserInterface $parser): AssetResolverInterface
+    public function getCurrentTemplateDefinition(): ?TemplateDefinition
     {
-        if (!self::$currentParser instanceof ParserInterface) {
-            throw new \Exception('Parser not found');
+        $request = $this->requestStack->getMainRequest();
+
+        if (!$request instanceof Request) {
+            return null;
         }
 
+        return $this->templateHelper->isAdmin($request)
+            ? $this->templateHelper->getActiveAdminTemplate()
+            : $this->templateHelper->getActiveFrontTemplate();
+    }
+
+    public function getAssetResolver(ParserInterface $parser): AssetResolverInterface
+    {
         /* @var AssetResolverInterface $parserAsset */
         foreach ($this->assetResolvers as $assetResolvers) {
             if ($assetResolvers->supportParser($parser)) {

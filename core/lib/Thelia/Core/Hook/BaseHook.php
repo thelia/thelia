@@ -24,6 +24,7 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Cart;
 use Thelia\Model\Currency;
@@ -139,16 +140,65 @@ abstract class BaseHook implements BaseHookInterface
 
     public function render(string $templateName, array $parameters = []): string
     {
-        $templateDir = $this->getAssetsResolver()->resolveAssetSourcePath($this->module->getCode(), '', $templateName, $this->getParser());
+        // When a parser is already current (Smarty page, PDF or email pipeline), keep the
+        // existing behaviour untouched: render from the resolved absolute source path.
+        $currentParser = ParserResolver::getCurrentParser();
 
-        if (null !== $templateDir) {
-            // retrieve the template
-            $content = $this->getParser()->render($templateDir.DS.$templateName, $parameters);
-        } else {
-            $content = \sprintf('ERR: Unknown template %s for module %s', $templateName, $this->module->getCode());
+        if ($currentParser instanceof ParserInterface) {
+            $templateDir = $this->getParserResolver()->getAssetResolver($currentParser)
+                ->resolveAssetSourcePath($this->module->getCode(), '', $templateName, $currentParser);
+
+            return null !== $templateDir
+                ? $currentParser->render($templateDir.DS.$templateName, $parameters)
+                : \sprintf('ERR: Unknown template %s for module %s', $templateName, $this->module->getCode());
         }
 
-        return $content;
+        // Twig back-office: pages are rendered by Symfony controllers that bypass the Thelia
+        // parser pipeline, so no parser is current. Resolve it from the template; its loader
+        // already knows the module template directories, so render the relative name.
+        $parser = $this->resolveTemplateParser($templateName);
+
+        if (!$parser instanceof ParserInterface) {
+            return \sprintf('ERR: Unknown template %s for module %s', $templateName, $this->module->getCode());
+        }
+
+        return $parser->render($templateName, $parameters);
+    }
+
+    private function resolveTemplateParser(string $templateName): ?ParserInterface
+    {
+        $resolver = $this->getParserResolver();
+        $templateDefinition = $resolver->getCurrentTemplateDefinition();
+
+        // Parsers are iterated by descending priority (Twig before Smarty): the first one
+        // that owns the file within the active template wins, so a module shipping both a
+        // .html (Smarty) and a .html.twig picks the Twig one in the Twig back-office.
+        foreach ($resolver->getParsers() as $parser) {
+            // Only configure a parser that is idle; the one already rendering the current
+            // page keeps its template definition (re-setting it would re-init its Twig env).
+            if ($templateDefinition instanceof TemplateDefinition
+                && !$parser->getTemplateDefinition() instanceof TemplateDefinition) {
+                $parser->setTemplateDefinition($templateDefinition, true);
+            }
+
+            try {
+                $templateDir = $resolver->getAssetResolver($parser)
+                    ->resolveAssetSourcePath($this->module->getCode(), '', $templateName, $parser);
+            } catch (\Throwable) {
+                continue;
+            }
+
+            if (null !== $templateDir && is_file($templateDir.DS.$templateName)) {
+                return $parser;
+            }
+        }
+
+        return null;
+    }
+
+    private function getParserResolver(): ParserResolver
+    {
+        return $this->parserResolver ??= $this->container->get('thelia.parser.resolver');
     }
 
     public function dump(string $fileName): string
@@ -226,7 +276,7 @@ abstract class BaseHook implements BaseHookInterface
 
     public function getParser(): ParserInterface
     {
-        return ParserResolver::getCurrentParser();
+        return ParserResolver::getCurrentParser() ?? $this->getParserResolver()->getDefaultParser();
     }
 
     protected function trans(string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
