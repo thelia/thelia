@@ -19,6 +19,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\SecurityContext;
@@ -71,8 +72,16 @@ class ErrorListener
             return;
         }
 
-        $parser->assign('status_code', 500);
-        $parser->assign('exception_message', $event->getThrowable()->getMessage());
+        $throwable = $event->getThrowable();
+
+        // Preserve the intended HTTP status of HTTP exceptions (404, 403, 405, ...)
+        // instead of masking every error as a 500. Non-HTTP exceptions stay 500.
+        $statusCode = $throwable instanceof HttpExceptionInterface
+            ? $throwable->getStatusCode()
+            : Response::HTTP_INTERNAL_SERVER_ERROR;
+
+        $parser->assign('status_code', $statusCode);
+        $parser->assign('exception_message', $throwable->getMessage());
 
         if (!$parser->hasTemplateDefinition()) {
             $parser->setTemplateDefinition(
@@ -84,8 +93,12 @@ class ErrorListener
 
         $response = new Response(
             $parser->render(ConfigQuery::getErrorMessagePageName()),
-            Response::HTTP_INTERNAL_SERVER_ERROR,
+            $statusCode,
         );
+
+        if ($throwable instanceof HttpExceptionInterface) {
+            $response->headers->add($throwable->getHeaders());
+        }
 
         $event->setResponse($response);
     }

@@ -536,17 +536,19 @@ test.describe('catalog-taxonomy', () => {
       expect(getSave.status(), 'CAT-CF-01: GET on POST-only route currently 500s').toBe(500);
     });
 
-    // CAT-CF-01 (BUG, minor): a GET request to any POST-only BO route returns HTTP 500
-    // (generic BO error page) instead of 405 Method Not Allowed.
-    // Repro (authenticated): GET https://thelia-3.ddev.site/admin/choicefilter/save -> 500.
-    //   Same for GET /admin/categories/save and GET /admin/brand/seo/save.
-    //   `bin/console router:match /admin/choicefilter/save --method=GET` correctly reports
-    //   "method GET does not match (POST)", so routing raises MethodNotAllowedException;
-    //   the BO exception handler converts it to a 500 error page rather than a 405.
-    // Not reachable via the normal UI (forms always POST), so severity is minor; but a
-    // crawler/bookmark hitting these URLs receives a misleading 500.
-    // Fix: let the BO error handler pass through HttpException status codes (return 405 for
-    // MethodNotAllowedHttpException) instead of defaulting to 500.
+    // CAT-CF-01 (CORE FIX applied 2026-06-08, kept as fixme on this cohabitation install):
+    // a GET on a POST-only BO route should return 405, not a generic 500 error page.
+    // The core defect was real: ErrorListener::defaultErrorFallback() hard-coded HTTP 500 for
+    // EVERY exception, masking the status of genuine HttpExceptions. It now preserves the
+    // HTTP status (405 for MethodNotAllowedHttpException, 404, 403, ...) and is covered by a
+    // red→green unit test (Thelia\Tests\Integration\Core\EventListener\ErrorListenerTest).
+    // This assertion stays fixme because it CANNOT be observed on this dev box: the BO Smarty
+    // `default` template is enabled alongside BO Twig (local cohabitation only), and its admin
+    // catch-all route (templates/backOffice/default/.../admin.xml -> processTemplateAction)
+    // intercepts the GET, renders a missing Smarty template and returns 500 before
+    // ErrorListener ever sees the MethodNotAllowed. On a clean BO-Twig-only install that
+    // catch-all does not exist, the ChainRouter surfaces MethodNotAllowed and ErrorListener
+    // (prod) returns 405. Re-enable this test once the suite runs against a Twig-only install.
     test.fixme('CAT-CF-01: GET on a POST-only BO route should return 405, not 500', async ({ page }) => {
       const r = await page.request.get('/admin/choicefilter/save', { maxRedirects: 0 });
       expect(r.status()).toBe(405);
