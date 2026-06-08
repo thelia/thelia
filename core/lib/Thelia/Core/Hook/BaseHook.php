@@ -276,7 +276,24 @@ abstract class BaseHook implements BaseHookInterface
 
     public function getParser(): ParserInterface
     {
-        return ParserResolver::getCurrentParser() ?? $this->getParserResolver()->getDefaultParser();
+        $current = ParserResolver::getCurrentParser();
+
+        if ($current instanceof ParserInterface) {
+            return $current;
+        }
+
+        // Twig back-office (Symfony-rendered page): no parser is current. Use the highest-priority
+        // parser and give it the active template definition so asset resolution (addCSS/addJS/dump)
+        // has the template context it needs.
+        $resolver = $this->getParserResolver();
+        $parser = $resolver->getDefaultParser();
+        $definition = $resolver->getCurrentTemplateDefinition();
+
+        if ($definition instanceof TemplateDefinition && !$parser->getTemplateDefinition() instanceof TemplateDefinition) {
+            $parser->setTemplateDefinition($definition, true);
+        }
+
+        return $parser;
     }
 
     protected function trans(string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
