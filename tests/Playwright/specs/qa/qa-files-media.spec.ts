@@ -384,26 +384,18 @@ test.describe('files-media', () => {
   });
 
   test.describe('brand — document lifecycle', () => {
-    // FILESMEDIA-01 (BUG, major — confirmed 2026-06-07 via the real save-ajax POST):
-    // Uploading a DOCUMENT to a BRAND fails. POST
-    //   /admin/document/type/brand/{brandId}/save-ajax
-    // returns HTTP 422 with body:
-    //   {"error":"Thelia\\Model\\BrandDocument::getId(): Return value must be of
-    //    type int, null returned"}
-    // No row is persisted and no file is written to disk. Brand IMAGES upload fine,
-    // and DOCUMENTS upload fine for product / category / folder / content — the defect
-    // is specific to brand + document. Root cause is in core: the brand document save
-    // path reaches FileManager::copyUploadedFile() (core/lib/Thelia/Core/File/FileManager.php:80)
-    // which calls renameFile($model->getId(), ...) on a NOT-YET-PERSISTED BrandDocument,
-    // and BrandDocument::getId() has a strict `: int` return type so the null id throws
-    // a TypeError. For the other parents the IMAGE_SAVE listener (BaseCachedFile::saveFile)
-    // persists the model first, so getId() is non-null. Fix belongs in core (ensure the
-    // brand document model is saved before copyUploadedFile, like the other file models,
-    // or make renameFile tolerate a null id) — out of scope for this QA spec.
-    // Repro: open /admin/brand/update/165?current_tab=documents, pick any file, click
-    // "Upload documents" -> the upload silently fails (status banner shows the error);
-    // or POST the save-ajax endpoint with a valid _token -> 422 with the message above.
-    test.fixme('FILESMEDIA-01: brand document upload 422s (BrandDocument::getId null TypeError)', async ({ page }) => {
+    // FILESMEDIA-01 (FIXED 2026-06-08): uploading a DOCUMENT to a BRAND used to fail
+    // with HTTP 422 {"error":"Thelia\\Model\\BrandDocument::getId(): Return value must
+    // be of type int, null returned"}. Root cause was NOT in FileManager (the original
+    // analysis misattributed it to copyUploadedFile): BrandDocument carried three
+    // hand-written getter overrides — getId(): int, getTitle(): string and
+    // getFile(): string — that tightened the nullable base return type. During save the
+    // I18n cascade reads getId() to set the FK before the auto-increment is assigned, so
+    // the strict `: int` override threw a TypeError. No other *Document model overrides
+    // getId/getTitle (only getFile, which FileModelInterface requires non-null). Fix:
+    // drop the spurious getId()/getTitle() overrides from core BrandDocument so it
+    // inherits the nullable base getters like every other file model.
+    test('FILESMEDIA-01: brand document upload persists (regression guard)', async ({ page }) => {
       const collector = new IssueCollector(page);
       collector.attach();
       await runDocumentLifecycle(page, collector, 'brand', BRAND);

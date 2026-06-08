@@ -112,14 +112,4 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
     {
         return parent::getFile();
     }
-
-    public function getId(): int
-    {
-        return parent::getId();
-    }
-
-    public function getTitle(): string
-    {
-        return parent::getTitle();
-    }
 }
