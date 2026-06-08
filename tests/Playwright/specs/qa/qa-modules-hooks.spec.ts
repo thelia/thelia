@@ -581,18 +581,14 @@ test.describe('modules-hooks', () => {
       await expect(page.locator('tbody tr', { hasText: code })).toHaveCount(0);
     });
 
-    // FINDING MH-01 (major): the hook "Parse template" (discover) endpoint returns HTTP 500 for a
-    // recoverable parser-configuration error. In this install no parser is registered for ANY
-    // template type, so /admin/hooks/discover?template_type={1..4} responds
+    // MH-01 (FIXED 2026-06-08): the hook "Parse template" (discover) endpoint used to return
+    // HTTP 500 for a recoverable parser-configuration error. When no parser is registered for a
+    // template type, /admin/hooks/discover?template_type={1..4} responded
     //   500 {"success":false,"message":"if you want to use a parser, please register one"}.
-    // The Stimulus controller (bo-hooks_controller.js) does surface the message gracefully in the
-    // UI, but the HTTP status is a server error (500) rather than a 422/503, so QA sweeps flag it
-    // and the "Check the support of hooks" feature is unusable in BO Twig as installed.
-    // Root cause: HookController::discover() catches \Throwable and returns
-    // Response::HTTP_INTERNAL_SERVER_ERROR (line ~326). It should return 422/503 with the message.
-    // Repro: GET /admin/hooks/discover?template_type=2 (authenticated) -> 500 JSON.
-    // Verified out-of-band with curl (both type=1 and type=2 -> 500, same message).
-    test.fixme('MH-01: discover (Parse template) should not surface a parser misconfig as 500', async ({ page }) => {
+    // A missing/unconfigured parser is a configuration issue, not a server failure, so
+    // HookController::discover() now returns 422 (Unprocessable Entity) with the same message,
+    // letting crawlers and the UI tell it apart from a genuine 500.
+    test('MH-01: discover (Parse template) surfaces a parser misconfig as a non-5xx status', async ({ page }) => {
       await page.goto('/admin/hooks', { waitUntil: 'networkidle' });
       const resp = page
         .waitForResponse((r) => /\/admin\/hooks\/discover\b/.test(r.url()), { timeout: 10_000 })
@@ -601,8 +597,13 @@ test.describe('modules-hooks', () => {
       await page.locator('[data-action="bo-hooks#discover"]').click();
       const r = await resp;
       expect(r, 'discover fetch should fire').not.toBeNull();
-      // Expected: a non-5xx status for a recoverable config error. Actual: 500.
+      // A recoverable config error must not surface as a 5xx: discover() now returns 422.
       expect(r!.status(), 'discover must not return 5xx for a missing parser').toBeLessThan(500);
+      // The Stimulus consumer must surface the server message, not a bare "HTTP 422":
+      // when no parser is registered the panel shows the explanatory message inline.
+      const panel = page.locator('[data-bo-hooks-target="discoverContent"] .alert');
+      await expect(panel).toBeVisible();
+      await expect(panel).not.toContainText(/^HTTP \d+$/);
     });
   });
 });
