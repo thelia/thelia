@@ -140,29 +140,27 @@ abstract class BaseHook implements BaseHookInterface
 
     public function render(string $templateName, array $parameters = []): string
     {
-        // When a parser is already current (Smarty page, PDF or email pipeline), keep the
-        // existing behaviour untouched: render from the resolved absolute source path.
+        // Pick the parser by template extension and render by relative name: Twig loads relatively from
+        // its configured dirs, so the legacy absolute-path render below would fail when Twig is the
+        // current parser (Twig back-office). Smarty resolves the relative name through its own dirs too.
+        $parser = $this->resolveTemplateParser($templateName);
+
+        if ($parser instanceof ParserInterface) {
+            return $parser->render($templateName, $parameters);
+        }
+
         $currentParser = ParserResolver::getCurrentParser();
 
         if ($currentParser instanceof ParserInterface) {
             $templateDir = $this->getParserResolver()->getAssetResolver($currentParser)
                 ->resolveAssetSourcePath($this->module->getCode(), '', $templateName, $currentParser);
 
-            return null !== $templateDir
-                ? $currentParser->render($templateDir.DS.$templateName, $parameters)
-                : \sprintf('ERR: Unknown template %s for module %s', $templateName, $this->module->getCode());
+            if (null !== $templateDir) {
+                return $currentParser->render($templateDir.DS.$templateName, $parameters);
+            }
         }
 
-        // Twig back-office: pages are rendered by Symfony controllers that bypass the Thelia
-        // parser pipeline, so no parser is current. Resolve it from the template; its loader
-        // already knows the module template directories, so render the relative name.
-        $parser = $this->resolveTemplateParser($templateName);
-
-        if (!$parser instanceof ParserInterface) {
-            return \sprintf('ERR: Unknown template %s for module %s', $templateName, $this->module->getCode());
-        }
-
-        return $parser->render($templateName, $parameters);
+        return \sprintf('ERR: Unknown template %s for module %s', $templateName, $this->module->getCode());
     }
 
     private function resolveTemplateParser(string $templateName): ?ParserInterface
@@ -170,12 +168,13 @@ abstract class BaseHook implements BaseHookInterface
         $resolver = $this->getParserResolver();
         $templateDefinition = $resolver->getCurrentTemplateDefinition();
 
-        // Parsers are iterated by descending priority (Twig before Smarty): the first one
-        // that owns the file within the active template wins, so a module shipping both a
-        // .html (Smarty) and a .html.twig picks the Twig one in the Twig back-office.
         foreach ($resolver->getParsers() as $parser) {
-            // Only configure a parser that is idle; the one already rendering the current
-            // page keeps its template definition (re-setting it would re-init its Twig env).
+            // Each engine renders only its own extension, so cohabiting *.html and *.html.twig never cross.
+            if (!str_ends_with($templateName, '.'.$parser->getFileExtension())) {
+                continue;
+            }
+
+            // Don't re-set the definition of the parser already rendering the page (it would re-init Twig).
             if ($templateDefinition instanceof TemplateDefinition
                 && !$parser->getTemplateDefinition() instanceof TemplateDefinition) {
                 $parser->setTemplateDefinition($templateDefinition, true);
