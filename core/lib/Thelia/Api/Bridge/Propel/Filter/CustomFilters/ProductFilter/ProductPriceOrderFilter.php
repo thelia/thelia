@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\ProductFilter;
 
 use ApiPlatform\Metadata\Operation;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Api\Bridge\Propel\Filter\AbstractFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
@@ -25,6 +26,27 @@ class ProductPriceOrderFilter extends AbstractFilter
 
     protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
+        if (self::PRICE_ORDER_NAME !== $property) {
+            return;
+        }
+
+        $direction = strtolower($value);
+
+        if ($direction === strtolower(OrderFilter::DIRECTION_ASC)) {
+            $query
+                ->useProductSaleElementsQuery()
+                ->useProductPriceQuery()
+                ->orderByPrice(Criteria::ASC)
+                ->endUse()
+                ->endUse();
+        } elseif ($direction === strtolower(OrderFilter::DIRECTION_DESC)) {
+            $query
+                ->useProductSaleElementsQuery()
+                ->useProductPriceQuery()
+                ->orderByPrice(Criteria::DESC)
+                ->endUse()
+                ->endUse();
+        }
     }
 
     public function getDescription(string $resourceClass): array
