@@ -31,6 +31,7 @@ use Thelia\Model\AdminLog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\LangQuery;
+use Thelia\Model\ModuleQuery;
 use Thelia\Tools\URL;
 
 class BaseAdminController extends BaseController
@@ -164,6 +165,46 @@ class BaseAdminController extends BaseController
         $this->getParserContext()->setGeneralError($error_message);
     }
 
+    /**
+     * @return array{0: ParserInterface, 1: string}|null
+     */
+    private function resolveModuleTemplate(string $templateName): ?array
+    {
+        $moduleCode = strstr(static::class, '\\', true);
+
+        if (false === $moduleCode || 'Thelia' === $moduleCode) {
+            return null;
+        }
+
+        $module = ModuleQuery::create()->findOneByCode($moduleCode);
+
+        if (null === $module) {
+            return null;
+        }
+
+        $activeTemplate = $this->templateHelper->getActiveAdminTemplate();
+        $templatesDir = $module->getAbsoluteBaseDir().DS.'templates'.DS.TemplateDefinition::BACK_OFFICE_SUBDIR.DS.$activeTemplate->getName();
+
+        foreach ($this->parserResolver->getParsers() as $parser) {
+            foreach ([$templateName, $moduleCode.DS.$templateName] as $candidate) {
+                $candidateFile = $candidate.'.'.$parser->getFileExtension();
+
+                if (!is_file($templatesDir.DS.$candidateFile)) {
+                    continue;
+                }
+
+                // Setting the definition on the parser already rendering the page would re-init it.
+                if (!$parser->getTemplateDefinition() instanceof TemplateDefinition) {
+                    $parser->setTemplateDefinition($activeTemplate, $this->useFallbackTemplate);
+                }
+
+                return [$parser, $candidateFile];
+            }
+        }
+
+        return null;
+    }
+
     protected function getParser(?string $template = null, ?TemplateDefinition $templateDefinition = null): ParserInterface
     {
         $path = $this->templateHelper->getActiveAdminTemplate()->getAbsolutePath();
@@ -270,14 +311,17 @@ class BaseAdminController extends BaseController
 
     protected function renderRaw(string $templateName, array $args = [], string|TemplateDefinition|null $templateDir = null): string
     {
-        if ($templateDir instanceof TemplateDefinition) {
+        $moduleTemplate = null === $templateDir ? $this->resolveModuleTemplate($templateName) : null;
+
+        if (null !== $moduleTemplate) {
+            [$parser, $templateName] = $moduleTemplate;
+        } elseif ($templateDir instanceof TemplateDefinition) {
             $parser = $this->getParser($templateDir->getAbsolutePath().DS.$templateName, $templateDir);
+            $templateName .= '.'.$parser->getFileExtension();
         } else {
             $parser = $this->getParser($templateDir.DS.$templateName);
+            $templateName .= '.'.$parser->getFileExtension();
         }
-
-        // Add the template standard extension
-        $templateName .= '.'.$parser->getFileExtension();
 
         // Find the current edit language ID
         $editionLang = $this->getCurrentEditionLang();
