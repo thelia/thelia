@@ -15,7 +15,10 @@ declare(strict_types=1);
 namespace Thelia\Tests\Unit\BackOfficeDefaultTwig\Service\Admin;
 
 use BackOfficeDefaultTwigBundle\Service\Admin\AdminAccessChecker;
+use BackOfficeDefaultTwigBundle\Form\Legacy\LegacyFormEventBridge;
 use BackOfficeDefaultTwigBundle\Service\Admin\AdminFormAction;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use BackOfficeDefaultTwigBundle\Service\Admin\AdminFormErrorRenderer;
 use BackOfficeDefaultTwigBundle\Service\Admin\AdminFormValidator;
 use BackOfficeDefaultTwigBundle\Service\Admin\AdminLogger;
@@ -64,6 +67,7 @@ final class AdminFormActionTest extends TestCase
             $urls,
             $this->stubTranslator(),
             $this->createMock(TokenProvider::class),
+            new LegacyFormEventBridge(new EventDispatcher(), new RequestStack()),
         );
 
         $response = $action->submit(
@@ -113,6 +117,7 @@ final class AdminFormActionTest extends TestCase
             $this->createMock(UrlGeneratorInterface::class),
             $this->stubTranslator(),
             $this->createMock(TokenProvider::class),
+            new LegacyFormEventBridge(new EventDispatcher(), new RequestStack()),
         );
 
         $response = $action->submit(
@@ -156,6 +161,7 @@ final class AdminFormActionTest extends TestCase
             $urls,
             $this->stubTranslator(),
             $tokens,
+            new LegacyFormEventBridge(new EventDispatcher(), new RequestStack()),
         );
 
         $response = $action->tokenAction(
@@ -200,6 +206,7 @@ final class AdminFormActionTest extends TestCase
             $urls,
             $this->stubTranslator(),
             $tokens,
+            new LegacyFormEventBridge(new EventDispatcher(), new RequestStack()),
         );
 
         $response = $action->tokenAction(
@@ -235,6 +242,7 @@ final class AdminFormActionTest extends TestCase
             $this->createMock(UrlGeneratorInterface::class),
             $this->stubTranslator(),
             $this->createMock(TokenProvider::class),
+            new LegacyFormEventBridge(new EventDispatcher(), new RequestStack()),
         );
 
         $response = $action->submit(
