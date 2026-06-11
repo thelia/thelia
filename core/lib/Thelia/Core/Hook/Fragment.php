@@ -51,6 +51,13 @@ class Fragment
         return $this->get($key);
     }
 
+    // Twig probes attributes with isset() before falling back to __get(): without
+    // __isset() every {{ fragment.key }} silently renders null.
+    public function __isset($key): bool
+    {
+        return \array_key_exists($key, $this->data);
+    }
+
     public function getVarVal()
     {
         return $this->data;
