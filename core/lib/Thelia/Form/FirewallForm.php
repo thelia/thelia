@@ -79,9 +79,9 @@ abstract class FirewallForm extends BaseForm
      *
      * The time (in hours) to wait if the attempts have been exceeded
      */
-    public function getConfigTime()
+    public function getConfigTime(): int
     {
-        return ConfigQuery::read('form_firewall_time_to_wait', static::DEFAULT_TIME_TO_WAIT);
+        return (int) ConfigQuery::read('form_firewall_time_to_wait', static::DEFAULT_TIME_TO_WAIT);
     }
 
     /**
@@ -89,14 +89,14 @@ abstract class FirewallForm extends BaseForm
      *
      * The number of allowed attempts
      */
-    public function getConfigAttempts()
+    public function getConfigAttempts(): int
     {
-        return ConfigQuery::read('form_firewall_attempts', static::DEFAULT_ATTEMPTS);
+        return (int) ConfigQuery::read('form_firewall_attempts', static::DEFAULT_ATTEMPTS);
     }
 
-    public function isFirewallActive()
+    public function isFirewallActive(): bool
     {
-        return ConfigQuery::read('form_firewall_active', true);
+        return (bool) ConfigQuery::read('form_firewall_active', true);
     }
 
     public function getWaitingTime()
