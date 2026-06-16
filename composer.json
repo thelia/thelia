@@ -10,8 +10,11 @@
         "ecommerce cms"
     ],
     "support": {
-        "forum": "http://thelia.net/forum",
-        "wiki": "http://doc.thelia.net"
+        "issues": "https://github.com/thelia/thelia/issues",
+        "forum": "https://forum.thelia.net/",
+        "docs": "https://doc.thelia.net",
+        "source": "https://github.com/thelia/thelia",
+        "chat": "https://discord.gg/YgwpYEE3y3"
     },
     "repositories": [
         {
