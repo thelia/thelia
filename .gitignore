@@ -90,8 +90,6 @@ phpstan.neon
 
 
 
-/.env
-/.env.test
 /compose.override.yaml
 /phpstan.dist.neon
 
