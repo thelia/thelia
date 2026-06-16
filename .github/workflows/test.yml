@@ -1,62 +1,42 @@
 name: test
+
 on:
   push:
-    branches: [ master, main ]
+    branches: [ twig, main ]
   pull_request:
-    branches: [ master, main ]
+    branches: [ twig, main ]
+
 jobs:
-  phpunit:
-    name: PHP ${{ matrix.php-versions }}
+  ci:
+    name: CI (coding standard, static analysis, tests)
     runs-on: ubuntu-latest
     env:
       PHP_CS_FIXER_IGNORE_ENV: 1
-    services:
-      mysql:
-        image: mariadb:11.2
-        env:
-          MYSQL_ROOT_PASSWORD: thelia
-          MYSQL_DATABASE: thelia
-        ports:
-          - 3306/tcp
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-    strategy:
-      fail-fast: false
-      matrix:
-        php-versions: ['8.3']
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup Environment
-        run: |
-          sudo apt-get update
-          sudo apt-get install sendmail
-      - name: Setup PHP, with composer and extensions
-        uses: shivammathur/setup-php@v2 #https://github.com/shivammathur/setup-php
+        uses: actions/checkout@v4
+
+      - name: Start MySQL
+        # The runner ships MySQL pre-installed (root/root on 127.0.0.1:3306); using
+        # it avoids the flaky service-container init on this runner image.
+        run: sudo systemctl start mysql.service
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
+          php-version: '8.3'
           ini-values: post_max_size=20M
           extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, gd, zip
-      - name: Start mysql service
-        run: sudo /etc/init.d/mysql start
-      - name: Get composer cache directory
-        id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-      - name: Cache composer dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.composercache.outputs.dir }}
-          # Use composer.json for key, if composer.lock is not committed.
-          # key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-
+
       - name: Install Composer dependencies
         run: |
           composer install --no-progress --prefer-dist --optimize-autoloader
           composer update --no-interaction --prefer-dist
-      - name: Install Thelia
-        run: |
-          php Thelia thelia:install --env=test --database_host=127.0.0.1:${{ job.services.mysql.ports['3306'] }} --database_username=root --database_name=thelia --database_password=thelia
-          php Thelia module:refresh --env=test
-          php Thelia admin:create --env=test --login_name thelia2 --password thelia2 --last_name thelia2 --first_name thelia2 --email thelia2@example.com
-      - name: Run CI
+
+      - name: Prepare the test database credentials
+        # bin/test-prepare (run by `composer test`) reads these to create the test
+        # database, build the Propel models and generate the JWT keys.
+        run: printf 'DATABASE_HOST=127.0.0.1\nDATABASE_PORT=3306\nDATABASE_USER=root\nDATABASE_PASSWORD=root\nDATABASE_NAME=test\n' > .env.test.local
+
+      - name: Run CI (cs-diff, phpstan, the five PHPUnit suites)
         run: composer ci
