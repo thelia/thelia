@@ -1,196 +1,98 @@
-Readme
-======
+# Thelia
 
-## Warning
-### This is the development repository of Thelia. If you want to create a project, please take a look at [thelia/thelia-project](https://github.com/thelia/thelia-project)
+This is the development repository of Thelia, the open source e-commerce framework. Work on Thelia itself here.
 
-If you want to download a packaged, ready-to-use distribution of the most recent version of Thelia please download [thelia.zip](https://thelia.net/download/thelia.zip)
+To create a shop, use the project skeleton instead: [thelia/thelia-project](https://github.com/thelia/thelia-project).
 
-Thelia
-------
-[![Actions Status: test](https://github.com/thelia/thelia/workflows/test/badge.svg?branch=main)](https://github.com/thelia/thelia/actions?query=workflow%3A"test")
-[![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/thelia/thelia/badges/quality-score.png?s=61e3e04a69bffd71c29b08e5392080317a546716)](https://scrutinizer-ci.com/g/thelia/thelia/)
-![Discord Shield](https://discordapp.com/api/guilds/1067836968689487872/widget.png?style=shield)
+## About
 
-[Thelia](https://thelia.net/) is an open source tool for creating e-business websites and managing online content. This software is published under GNU General Public License v3.0.
+Thelia is an open source framework for building online stores and managing web content. Version 3 runs on:
 
-A repository containing all thelia modules is available at this address : https://github.com/thelia-modules
+- PHP 8.3
+- Symfony 7.4 LTS
+- API Platform 4.3 (standalone)
+- Propel ORM
+- A Twig front office (the Flexy theme) and a Twig back office (the default-twig theme)
+- Lexik JWT for API authentication
 
-Compatibility
-------------
+The back office and front office are built with Twig, Symfony UX (Stimulus, Twig Components and Live Components) and Bootstrap 5. The Smarty back office from Thelia 2 is still available for projects that need it while they migrate. See "Back-office templates" below.
 
-|         |   Thelia 2.3    |      Thelia 2.4 |  Thelia 2.5 |  Thelia 2.6 |
-|---------|:---------------:|----------------:|------------:|------------:|
-| PHP     | 5.5 5.6 7.0 7.1 | 7.0 7.1 7.2 7.3 |     8.2 8.3 |     8.2 8.3 |
-| MySQL   |     5.5 5.6     |     5.5 5.6 5.7 | 5.6 5.7 8.0 | 5.6 5.7 8.0 |
-| Symfony |       2.8       |             2.8 |         6.4 |         6.4 |
+Thelia is open source software. See the [LICENSE](LICENSE) file for details.
 
-Requirements
-------------
+## Requirements
 
-* PHP
-    * Required extensions :
-        * PDO_Mysql
-        * openssl
-        * intl
-        * gd
-        * curl
-        * dom
-    * safe_mode off
-    * memory_limit at least 128M, preferably 256.
-    * post\_max\_size 20M
-    * upload\_max\_filesize 2M
-    * date.timezone must be defined
-* Web Server Apache 2 or Nginx
+- PHP 8.3 with these extensions: pdo_mysql, openssl, intl, gd, curl, dom, mbstring, zip
+- MariaDB 10.11 or MySQL 8
+- Composer 2.7+
+- Node.js 20 and npm, to build the front-office and back-office assets
+- Nginx or Apache, with the document root set to `public/`
 
+## Setting up a development environment
 
-### MySQL 5.6
+The repository does not ship a Docker setup. The maintainers use [DDEV](https://ddev.com), which provides PHP 8.3, MariaDB 10.11 and Node.js 20 in one command. Any equivalent stack works: point your web server at `public/` and use the same PHP 8.3 binary for the command line and the web server.
 
-As of MySQL 5.6, default configuration sets the sql_mode value to
-
-```
-STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION
+```bash
+ddev config --project-type=php --php-version=8.3 --database=mariadb:10.11 --docroot=public --nodejs-version=20
+ddev start
+ddev exec composer install
 ```
 
-This 'STRICT_TRANS_TABLES' configuration results in SQL errors when no default value is defined on NOT NULL columns and the value is empty or invalid.
+### Install Thelia
 
-You can edit this default config in ` /etc/my.cnf ` and change the sql_mode to remove the STRICT_TRANS_TABLES part
+`bin/install` reads its database credentials from the `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_NAME`, `DATABASE_USER` and `DATABASE_PASSWORD` environment variables, or from command-line flags. With DDEV the database is reachable as `db:3306`, user `db`, password `db`:
 
-```
-[mysqld]
-sql_mode=NO_ENGINE_SUBSTITUTION
-```
-
-Assuming your sql_mode is the default one, you can change the value directly on the run by running the following SQL Command
-
-```sql
-SET @@GLOBAL.sql_mode='NO_ENGINE_SUBSTITUTION', @@SESSION.sql_mode='NO_ENGINE_SUBSTITUTION'
-```
-
-For more information on sql_mode you can consult the [MySQL doc](https://dev.mysql.com/doc/refman/5.0/fr/server-sql-mode.html "sql Mode")
-
-## Archive builders
-Thelia's archive builder's needs external libraries.
-For zip archives, you need PECL zip. See [PHP Doc](https://php.net/manual/en/zip.installation.php)
-
-For tar archives, you need PECL phar. Moreover, you need to deactivate php.ini option "phar.readonly":
-```ini
-phar.readonly = Off
+```bash
+ddev exec bin/install \
+  --frontoffice_theme=flexy --backoffice_theme=default-twig \
+  --pdf_theme=default --email_theme=default \
+  --with-demo --with-admin \
+  --admin_login=thelia --admin_password=thelia \
+  --admin_first_name=Admin --admin_last_name=User \
+  --admin_email=admin@example.com
 ```
 
-For tar.bz2 archives, you need tar's dependencies and the extension "bzip2". See [PHP Doc](https://php.net/manual/fr/book.bzip2.php)
+Without DDEV, export the database variables (or put them in `.env.local`) and run `php bin/install` with the same flags.
 
-For tar.gz archives, you need tar's dependencies and the extension "zlib". See [PHP Doc](https://fr2.php.net/manual/fr/book.zlib.php)
+### Build the assets
 
-## Download Thelia 2 and install its dependencies
+`bin/install` sets up the database and templates but does not compile front-end assets. Build them for each active template that has a `package.json`, otherwise the pages return HTTP 500 with a missing Webpack entrypoints file:
 
-You can get the sources from git and then let composer install dependencies, or use composer to install the whole thelia project into a specific directory
-
-### Using git for download and composer for dependencies
-
-``` bash
-$ git clone --recursive https://github.com/thelia/thelia path
-$ cd path
-$ git checkout 2.6.0
-$ curl -sS https://getcomposer.org/installer | php
-$ php composer.phar install
+```bash
+ddev exec bash -c "cd templates/frontOffice/flexy && npm install && npm run build"
+ddev exec bash -c "cd templates/backOffice/default-twig && npm install && npm run build"
 ```
 
-### Using composer for both download and dependencies
+The storefront is then at `https://<project>.ddev.site` and the admin at `https://<project>.ddev.site/admin`.
 
-``` bash
-$ curl -sS https://getcomposer.org/installer | php
-$ php composer.phar create-project thelia/thelia path/ 2.6.0
+## Back-office templates
+
+Thelia 3 installs the Twig back office (`default-twig`) by default. The Smarty back office (`templates/backOffice/default/`) stays available so projects migrating from Thelia 2 can keep modules that target it. You can install both at once and switch the active one:
+
+```bash
+ddev exec bin/console template:set backOffice default-twig   # or: default
 ```
 
-If something goes wrong during the install process, you can restart Thelia install wizard with
-the following command : `php composer.phar run-script post-create-project-cmd`
+If you maintain a module, the migration guide is in `BREAKING_CHANGES.md` inside the default-twig template.
 
-## Install it
+## Tests and quality
 
-You can install Thelia by different way
-
-### Using install wizard
-
-Installing thelia with the web install wizard allow to create an administrator, add some informations about your shop, etc
-
-First of all, you have to configure a vhost as describe in [configuration](https://doc.thelia.net/en/documentation/configuration.html) section.
-
-The install wizard in accessible with your favorite browser :
-
-``` bash
-https://yourdomain.tld/[/subdomain_if_needed]/install
+```bash
+ddev exec composer test       # PHPUnit test suites
+ddev exec composer cs-diff    # coding standard (php-cs-fixer)
+ddev exec composer phpstan    # static analysis
 ```
 
-For example, I have thelia downloaded at https://thelia.net and my vhost is correctly configured, I have to reach this address :
+## How the packages fit together
 
-``` bash
-https://thelia.net/install
-```
+Several packages are split out of this repository: `thelia/core`, `thelia/config` and `thelia/setup`. Modules live under [thelia-modules](https://github.com/thelia-modules), and the Flexy front-office theme is in [thelia/Flexy](https://github.com/thelia/Flexy).
 
-### Using cli tools
+## Contributing
 
-``` bash
-$ php Thelia thelia:install
-```
-
-You just have to follow all instructions.
-
-### Docker and docker compose
-
-This repo contains all the configuration needed to run Thelia with docker and docker-compose.
-Warning, this docker configuration is not ready for production.
-
-It requires obviously [docker](https://docker.com/) and [docker-compose](https://docs.docker.com/compose/)
-
-Please, follow the official documentation to install docker and docker-compose on your system :
-https://doc.thelia.net/docs/getting_started/docker
-
-
-## Thelia 3 (twig branch) — Front-end assets build
-
-`bin/install` configures the database and activates the templates, but it does **not** compile front-end assets. After running it, you must build the Webpack assets for every active template that ships a `package.json`, otherwise the back-office and front-office return HTTP 500 with `Could not find the entrypoints file from Webpack`.
-
-Default install (back-office `default-twig` + front-office `flexy`):
-
-``` bash
-cd templates/backOffice/default-twig
-npm install
-npm run build
-cd -
-
-cd templates/frontOffice/flexy
-npm install
-npm run build
-cd -
-```
-
-With DDEV:
-
-``` bash
-ddev exec --dir /var/www/html/templates/backOffice/default-twig npm install
-ddev exec --dir /var/www/html/templates/backOffice/default-twig npm run build
-ddev exec --dir /var/www/html/templates/frontOffice/flexy npm install
-ddev exec --dir /var/www/html/templates/frontOffice/flexy npm run build
-```
-
-Repeat for any additional template (PDF, email, custom front/back) that contains a `package.json`. The legacy back-office `default` template ships its assets pre-built and does not require this step.
-
-
-Contribute
-----------
-
-See the documentation : https://doc.thelia.net/docs/contribute
-
-
-If you submit modifications that adds new data or change the structure of the database, take a look to https://doc.thelia.net/docs/contribute#sql-scripts-modification
-
+Pull requests go to this repository. See [CONTRIBUTING.md](CONTRIBUTING.md) for the coding standard and the test workflow.
 
 ## Community
 
-Join the conversation and help the community :
-
-[Twitter](https://github.com/thelia/thelia)
-[Discord](https://discord.gg/YgwpYEE3y3)
-[StackOverflow](https://stackoverflow.com/questions/tagged/thelia)
-[Forum](https://forum.thelia.net/)
+- Documentation: <https://doc.thelia.net>
+- Website: <https://thelia.net>
+- Discord: <https://discord.gg/YgwpYEE3y3>
+- Forum: <https://forum.thelia.net/>
