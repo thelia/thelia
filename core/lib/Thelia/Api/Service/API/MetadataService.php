@@ -87,7 +87,7 @@ readonly class MetadataService
 
             return (bool) $this->expressionLanguage->evaluate($expression, $variables);
         }
-        $request = Request::create($path, $method);
+        $request = $context['request'] ?? Request::create($path, $method);
         [$roles, $channel] = $this->accessMap->getPatterns($request);
         if (null === $roles) {
             return true;

@@ -22,9 +22,17 @@ readonly class RouteMatcherService
     public function matchRoute(RouterInterface $router, Request $apiRequest): array
     {
         $context = $router->getContext();
+        $previousMethod = $context->getMethod();
+        $previousPathInfo = $context->getPathInfo();
+
         $context->setMethod(Request::METHOD_GET);
         $context->setPathInfo($apiRequest->getPathInfo());
 
-        return $router->matchRequest($apiRequest);
+        try {
+            return $router->matchRequest($apiRequest);
+        } finally {
+            $context->setMethod($previousMethod);
+            $context->setPathInfo($previousPathInfo);
+        }
     }
 }

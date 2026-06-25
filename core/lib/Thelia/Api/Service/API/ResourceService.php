@@ -34,14 +34,43 @@ readonly class ResourceService
         private MetadataService $metadataService,
         private RequestStack $requestStack,
         private LangService $localeService,
+        private ResourceMemoizer $memoizer,
     ) {
     }
 
     public function resources(string $path, array $parameters = [], ?string $format = null): object|array|null
     {
+        $currentLocale = $this->localeService->getLocale();
+        $cacheKey = $this->buildCacheKey($path, $parameters, $format, $currentLocale);
+
+        return $this->memoizer->remember(
+            $cacheKey,
+            fn (): object|array|null => $this->doResources($path, $parameters, $format, $currentLocale),
+        );
+    }
+
+    private function buildCacheKey(string $path, array $parameters, ?string $format, string $locale): string
+    {
+        $normalized = $parameters;
+        $this->ksortRecursive($normalized);
+
+        return md5($path.'|'.($format ?? '').'|'.$locale.'|'.serialize($normalized));
+    }
+
+    private function ksortRecursive(array &$array): void
+    {
+        ksort($array);
+        foreach ($array as &$value) {
+            if (\is_array($value)) {
+                $this->ksortRecursive($value);
+            }
+        }
+    }
+
+    private function doResources(string $path, array $parameters, ?string $format, string $currentLocale): object|array|null
+    {
         $apiRequest = $this->requestBuilder->createApiRequest($this->requestStack, $path);
         $route = $this->routeMatcher->matchRoute($this->router, $apiRequest);
-        $currentLocale = $this->localeService->getLocale();
         $operation = $this->operationProvider->getOperation($this->metadataService, $route);
         $resourceClass = $route['_api_resource_class'];
         $uriVariables = $this->operationProvider->getUriVariables($route, $operation, $resourceClass);
@@ -54,6 +83,7 @@ readonly class ResourceService
         }
         try {
             $context['extra_variables']['object'] = $result;
+            $context['request'] = $apiRequest;
             $this->accessChecker->checkUserAccess($resourceClass, $path, $operation, $context);
         } catch (\Exception $e) {
             Tlog::getInstance()->error(
@@ -94,17 +124,16 @@ readonly class ResourceService
 
     private function formatI18ns(array $datas, ?string $locale = null): array
     {
-        foreach ($datas as $key => $data) {
-            if ($key === 'i18ns' && isset($datas['i18ns'][$locale])) {
-                $datas['i18ns'] = $datas['i18ns'][$locale];
+        foreach ($datas as $key => &$value) {
+            if ($key === 'i18ns' && isset($value[$locale])) {
+                $value = $value[$locale];
                 continue;
             }
-            if (\is_array($data)) {
-                $datas[$key] = $this->formatI18ns($data, $locale);
-                continue;
+            if (\is_array($value)) {
+                $value = $this->formatI18ns($value, $locale);
             }
-            $datas[$key] = $data;
         }
+        unset($value);
 
         return $datas;
     }
