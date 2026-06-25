@@ -35,6 +35,7 @@ readonly class ResourceService
         private RequestStack $requestStack,
         private LangService $localeService,
         private ResourceMemoizer $memoizer,
+        private ResourceCache $resourceCache,
     ) {
     }
 
@@ -45,7 +46,11 @@ readonly class ResourceService
 
         return $this->memoizer->remember(
             $cacheKey,
-            fn (): object|array|null => $this->doResources($path, $parameters, $format, $currentLocale),
+            fn (): object|array|null => $this->resourceCache->remember(
+                $cacheKey,
+                $path,
+                fn (): object|array|null => $this->doResources($path, $parameters, $format, $currentLocale),
+            ),
         );
     }
 

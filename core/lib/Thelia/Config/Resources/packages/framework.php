@@ -19,5 +19,16 @@ return static function (ContainerConfigurator $container): void {
         'session' => [
             'save_path' => '%kernel.project_dir%/var/sessions/%kernel.environment%',
         ],
+        'cache' => [
+            'pools' => [
+                // Dedicated pool for the in-process data access layer
+                // (DataAccessService::resources). Disabled by default; enable
+                // per project with THELIA_DATA_ACCESS_CACHE=1. Clearing this
+                // pool never affects the rest of the application cache.
+                'thelia.cache.data_access' => [
+                    'adapter' => 'cache.app',
+                ],
+            ],
+        ],
     ]);
 };
