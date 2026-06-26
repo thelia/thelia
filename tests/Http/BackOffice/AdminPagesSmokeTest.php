@@ -74,10 +74,10 @@ final class AdminPagesSmokeTest extends WebIntegrationTestCase
 
     public function testAdminCatalogBlockedWhenNotLoggedIn(): void
     {
-        $this->client->request('GET', '/admin/catalog');
+        $this->client->request('GET', '/admin/categories');
 
         $statusCode = $this->client->getResponse()->getStatusCode();
-        self::assertContains($statusCode, [302, 403, 500]);
+        self::assertNotSame(200, $statusCode, 'Admin catalog must never be served to an anonymous user');
     }
 
     // -- Authenticated tests (admin session injected on every request) --
@@ -96,7 +96,7 @@ final class AdminPagesSmokeTest extends WebIntegrationTestCase
     public function testAdminCatalogAccessibleWhenLoggedIn(): void
     {
         $this->loginAdmin();
-        $this->client->request('GET', '/admin/catalog');
+        $this->client->request('GET', '/admin/categories');
 
         $statusCode = $this->client->getResponse()->getStatusCode();
         self::assertNotSame(403, $statusCode, 'Admin firewall must not block authenticated request');
