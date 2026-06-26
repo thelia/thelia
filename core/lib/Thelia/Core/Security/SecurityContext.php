@@ -31,9 +31,11 @@ class SecurityContext
     {
     }
 
-    private function getSession(): Session
+    private function getSession(): ?Session
     {
-        return $this->requestStack->getMainRequest()->getSession();
+        $request = $this->requestStack->getMainRequest();
+
+        return $request?->hasSession() ? $request->getSession() : null;
     }
 
     /**
@@ -43,7 +45,7 @@ class SecurityContext
      */
     public function getAdminUser(): mixed
     {
-        return $this->getSession()->getAdminUser();
+        return $this->getSession()?->getAdminUser();
     }
 
     /**
@@ -53,7 +55,7 @@ class SecurityContext
      */
     public function hasAdminUser(): bool
     {
-        return null !== $this->getSession()->getAdminUser();
+        return null !== $this->getSession()?->getAdminUser();
     }
 
     /**
@@ -63,7 +65,7 @@ class SecurityContext
      */
     public function getCustomerUser(): mixed
     {
-        return $this->getSession()->getCustomerUser();
+        return $this->getSession()?->getCustomerUser();
     }
 
     /**
@@ -73,7 +75,7 @@ class SecurityContext
      */
     public function hasCustomerUser(): bool
     {
-        return null !== $this->getSession()->getCustomerUser();
+        return null !== $this->getSession()?->getCustomerUser();
     }
 
     /**
@@ -214,7 +216,7 @@ class SecurityContext
     {
         $user->eraseCredentials();
 
-        $this->getSession()->setAdminUser($user);
+        $this->getSession()?->setAdminUser($user);
     }
 
     /**
@@ -226,7 +228,7 @@ class SecurityContext
     {
         $user->eraseCredentials();
 
-        $this->getSession()->setCustomerUser($user);
+        $this->getSession()?->setCustomerUser($user);
     }
 
     /**
@@ -234,7 +236,7 @@ class SecurityContext
      */
     public function clearCustomerUser(): void
     {
-        $this->getSession()->clearCustomerUser();
+        $this->getSession()?->clearCustomerUser();
     }
 
     /**
@@ -242,6 +244,6 @@ class SecurityContext
      */
     public function clearAdminUser(): void
     {
-        $this->getSession()->clearAdminUser();
+        $this->getSession()?->clearAdminUser();
     }
 }
