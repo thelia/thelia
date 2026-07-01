@@ -37,7 +37,8 @@
         "symfony/flex": "^2.4",
         "thelia/flexy": "dev-twig",
         "ext-simplexml": "*",
-        "ext-dom": "*"
+        "ext-dom": "*",
+        "symfony/asset-mapper": "7.4.*"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "3.*",
@@ -123,7 +124,8 @@
         ],
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+            "assets:install %PUBLIC_DIR%": "symfony-cmd",
+            "importmap:install": "symfony-cmd"
         }
     },
     "minimum-stability": "dev",
@@ -135,6 +137,8 @@
                 "vendor/thelia/modules"
             ],
             "App\\": "src/",
+            "BackOfficeDefaultTwigBundle\\": "templates/backOffice/default-twig/src/",
+            "FlexyBundle\\": "templates/frontOffice/flexy/src/",
             "Thelia\\": "core/lib/Thelia"
         },
         "files": [
@@ -187,7 +191,9 @@
             "phpstan/extension-installer": true,
             "symfony/flex": true,
             "symfony/runtime": true,
-            "composer/installers": true
+            "composer/installers": true,
+            "symfony/stimulus-bundle": false,
+            "symfony/asset-mapper": false
         }
     }
 }
