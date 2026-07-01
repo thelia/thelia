@@ -90,7 +90,10 @@ abstract class ContainerAwareCommand extends Command
             throw new \LogicException('Thelia URL manager is not available.');
         }
         $url->setRequestContext($requestContext);
-        $this->getContainer()->get('router.admin')?->setContext($requestContext);
+
+        if ($container->has('router.admin')) {
+            $container->get('router.admin')?->setContext($requestContext);
+        }
     }
 
     protected function getBaseUrl(?Lang $lang = null): string
