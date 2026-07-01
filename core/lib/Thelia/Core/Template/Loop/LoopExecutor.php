@@ -70,6 +70,34 @@ final readonly class LoopExecutor
      */
     public function execute(string $type, array $args = []): LoopResult
     {
+        // exec() returns a cached LoopResult; clone it to avoid side effects when the same
+        // argument set is executed again (mirrors TheliaLoop, see thelia/thelia#2213).
+        $pagination = null;
+
+        return $this->runExec($this->prepare($type, $args), $pagination);
+    }
+
+    /**
+     * Count the rows a loop would return, without materializing them.
+     *
+     * @param string               $type loop type, e.g. "order_product" or "order-product"
+     * @param array<string, mixed> $args loop arguments, e.g. ['order' => 123]
+     *
+     * @throws ElementNotFoundException  if the loop type is not registered
+     * @throws \InvalidArgumentException if a mandatory argument is missing or invalid
+     */
+    public function count(string $type, array $args = []): int
+    {
+        return (int) $this->prepare($type, $args)->count();
+    }
+
+    /**
+     * Resolve a loop type to its instance, initialized and ready to run.
+     *
+     * @param array<string, mixed> $args
+     */
+    private function prepare(string $type, array $args): LoopInterface
+    {
         $type = str_replace('_', '-', strtolower($type));
 
         if (!isset($this->loopDefinition[$type])) {
@@ -93,11 +121,7 @@ final readonly class LoopExecutor
 
         $loop->initializeArgs(array_merge($args, ['type' => $type]));
 
-        // exec() returns a cached LoopResult; clone it to avoid side effects when the same
-        // argument set is executed again (mirrors TheliaLoop, see thelia/thelia#2213).
-        $pagination = null;
-
-        return $this->runExec($loop, $pagination);
+        return $loop;
     }
 
     /**

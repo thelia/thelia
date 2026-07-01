@@ -67,6 +67,20 @@ final class LoopExecutorTest extends IntegrationTestCase
         $this->getLoopExecutor()->execute('this-loop-does-not-exist');
     }
 
+    public function testCountReturnsTheNumberOfRows(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $product = $factory->product($factory->category(), $factory->taxRule(), $factory->currency());
+
+        $lang = LangQuery::create()->filterByByDefault(1)->findOne() ?? LangQuery::create()->findOne();
+        $product->setLocale($lang->getLocale())->setTitle('LoopExecutor Count Product')->save();
+
+        self::assertSame(1, $this->getLoopExecutor()->count('product', [
+            'id' => $product->getId(),
+            'lang' => $lang->getId(),
+        ]));
+    }
+
     private function getLoopExecutor(): LoopExecutor
     {
         return $this->getService(LoopExecutor::class);
