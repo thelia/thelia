@@ -79,7 +79,14 @@ abstract class ContainerAwareCommand extends Command
         $container = $this->getContainer();
 
         $request = Request::create($this->getBaseUrl($lang));
-        $request->setSession(new Session(new MockArraySessionStorage()));
+        $session = new Session(new MockArraySessionStorage());
+        // Pin the requested language on the session: LangService (and therefore the "locale"
+        // template variable, the |trans locale and the formatters) reads it from there, so a
+        // command rendering in a given locale (mail:render, pdf:render) needs it set.
+        if ($lang instanceof Lang) {
+            $session->setLang($lang);
+        }
+        $request->setSession($session);
         $container->get('request_stack')?->push($request);
 
         $requestContext = new RequestContext();
