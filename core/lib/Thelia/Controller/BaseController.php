@@ -222,13 +222,15 @@ abstract class BaseController implements ControllerInterface
             throw new NotFoundHttpException();
         }
 
-        $html = $this->renderRaw(
-            $fileName,
-            [
-                'order_id' => $order_id,
-            ],
-            $this->getTemplateHelper()->getActivePdfTemplate(),
-        );
+        // Resolve the parser against the PDF template definition (not the active front/admin
+        // template): renderRaw() ignores its template-dir argument, so it would pick the front
+        // parser and miss a Twig PDF template. Selecting here lets the resolver choose the engine
+        // by the real file (invoice.html vs invoice.html.twig).
+        $pdfTemplate = $this->getTemplateHelper()->getActivePdfTemplate();
+        $parser = $this->parserResolver->getParser($pdfTemplate->getAbsolutePath(), $fileName);
+        $parser->setTemplateDefinition($pdfTemplate, true);
+
+        $html = $parser->render($fileName, ['order_id' => $order_id]);
 
         try {
             $pdfEvent = new PdfEvent($html);
