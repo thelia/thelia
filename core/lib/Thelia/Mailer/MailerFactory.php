@@ -164,7 +164,14 @@ class MailerFactory
         }
 
         $message->setLocale($locale);
-        $parser = $this->getParser($messageCode);
+        // Select the parser from the actual template file base name (e.g. "password"), not the
+        // message code (e.g. "lost_password"): the two frequently differ, and the parser is
+        // chosen by testing whether a matching template file exists. Using the code would make
+        // that existence test miss the real file and fall back to the wrong engine.
+        $templateFileName = (string) ($message->getHtmlTemplateFileName() ?: $message->getTextTemplateFileName());
+        $parser = $this->getParser(
+            '' !== $templateFileName ? pathinfo($templateFileName, \PATHINFO_FILENAME) : $messageCode
+        );
         // Assign parameters
         foreach ($messageParameters as $name => $value) {
             $parser->assign($name, $value);
