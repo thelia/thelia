@@ -84,7 +84,7 @@ final class TranslationActionTest extends ActionIntegrationTestCase
         self::assertContains('Cart total', $texts);
     }
 
-    public function testWriteTranslationFileCreatesPhpFile(): void
+    public function testWriteTranslationFileCreatesPhpFileInDeveloperMode(): void
     {
         $filePath = $this->tmpDir.'/translations.php';
 
@@ -99,6 +99,7 @@ final class TranslationActionTest extends ActionIntegrationTestCase
         $event->setDomain('core');
         $event->setCustomFallbackStrings([]);
         $event->setGlobalFallbackStrings([]);
+        $event->setDeveloperMode(true);
 
         $this->dispatch($event, TheliaEvents::TRANSLATION_WRITE_FILE);
 
@@ -107,6 +108,28 @@ final class TranslationActionTest extends ActionIntegrationTestCase
         $content = file_get_contents($filePath);
         self::assertStringContainsString("'Goodbye' => 'Au revoir'", $content);
         self::assertStringContainsString("'Hello' => 'Bonjour'", $content);
+    }
+
+    public function testWriteTranslationFileSkipsVersionedFileByDefault(): void
+    {
+        $filePath = $this->tmpDir.'/translations.php';
+
+        $event = TranslationEvent::createWriteFileEvent(
+            $filePath,
+            ['key1' => 'Hello'],
+            ['key1' => 'Bonjour'],
+            true,
+        );
+        $event->setLocale('fr_FR');
+        $event->setDomain('core');
+        $event->setCustomFallbackStrings([]);
+        $event->setGlobalFallbackStrings([]);
+
+        $this->dispatch($event, TheliaEvents::TRANSLATION_WRITE_FILE);
+
+        // Without developer mode, the versioned file must never be written: back-office edits
+        // only reach the local override layer, so they cannot conflict with a git push.
+        self::assertFileDoesNotExist($filePath);
     }
 
     public function testGetTranslatableStringsReturnsEmptyForNonExistentDirectory(): void

@@ -37,6 +37,7 @@ class TranslationEvent extends ActionEvent
     protected string $translationFilePath;
     protected array $translatedStrings;
     protected bool $createFileIfNotExists;
+    protected bool $developerMode = false;
 
     public static function createGetStringsEvent(string $directory, string $mode, string $locale, string $domain): self
     {
@@ -221,6 +222,23 @@ class TranslationEvent extends ActionEvent
     public function setGlobalFallbackStrings(array $globalFallbackStrings): static
     {
         $this->globalFallbackStrings = $globalFallbackStrings;
+
+        return $this;
+    }
+
+    /**
+     * Developer mode writes the versioned translation files (I18n/{locale}.php) shipped with
+     * the code. It is off by default so that back-office edits only ever touch the local,
+     * non-versioned override layer and never create a git conflict against pushed code.
+     */
+    public function isDeveloperMode(): bool
+    {
+        return $this->developerMode;
+    }
+
+    public function setDeveloperMode(bool $developerMode): static
+    {
+        $this->developerMode = $developerMode;
 
         return $this;
     }

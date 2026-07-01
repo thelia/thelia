@@ -194,6 +194,13 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
     public function writeTranslationFile(TranslationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
+        // Developer mode writes the versioned I18n/{locale}.php files shipped with the code.
+        // It is opt-in: without it, edits only reach the local override layer (writeFallbackFile),
+        // so a merchant edit never conflicts with a git push of the base translations.
+        if (!$event->isDeveloperMode()) {
+            return;
+        }
+
         $file = $event->getTranslationFilePath();
 
         $fs = new Filesystem();
