@@ -14,7 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
-use Spipu\Html2Pdf\Html2Pdf;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -28,22 +29,30 @@ class Pdf extends BaseAction implements EventSubscriberInterface
 {
     public function generatePdf(PdfEvent $event): void
     {
-        $html2pdf = new Html2Pdf(
-            $event->getOrientation(),
-            $event->getFormat(),
-            $event->getLang(),
-            $event->getUnicode(),
-            $event->getEncoding(),
-            $event->getMarges(),
-        );
+        // Page size and margins are driven by the template CSS (@page); the PdfEvent options
+        // (orientation, format, font) still steer the defaults so listeners keep control.
+        $orientation = strtoupper((string) $event->getOrientation()) === 'L' ? 'landscape' : 'portrait';
 
-        $html2pdf->setDefaultFont($event->getFontName());
+        $fontName = $event->getFontName();
+        if ('' === $fontName || 'freesans' === $fontName) {
+            // dompdf does not ship "freesans"; DejaVu Sans is its bundled Unicode sans-serif
+            // (renders € and accented characters), matching the previous html2pdf default.
+            $fontName = 'DejaVu Sans';
+        }
 
-        $html2pdf->pdf->SetDisplayMode('real');
+        $options = new Options();
+        $options->set('defaultFont', $fontName);
+        $options->set('isRemoteEnabled', true);
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('defaultPaperSize', $event->getFormat());
+        $options->set('defaultPaperOrientation', $orientation);
 
-        $html2pdf->writeHTML($event->getContent());
+        $dompdf = new Dompdf($options);
+        $dompdf->setPaper($event->getFormat(), $orientation);
+        $dompdf->loadHtml($event->getContent(), $event->getEncoding());
+        $dompdf->render();
 
-        $event->setPdf($html2pdf->output('output.pdf', 'S'));
+        $event->setPdf($dompdf->output());
     }
 
     public static function getSubscribedEvents(): array
