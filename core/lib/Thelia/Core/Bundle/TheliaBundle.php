@@ -33,6 +33,7 @@ use Thelia\Core\DependencyInjection\Compiler\RegisterFormPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterHookListenersPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterRouterPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
+use Thelia\Core\DependencyInjection\Compiler\RegisterTemplateTranslationsPass;
 use Thelia\Core\DependencyInjection\Compiler\TranslatorPass;
 
 /**
@@ -56,6 +57,7 @@ class TheliaBundle extends Bundle
         $container
             ->addCompilerPass(new FallbackParserPass())
             ->addCompilerPass(new TranslatorPass())
+            ->addCompilerPass(new RegisterTemplateTranslationsPass())
             ->addCompilerPass(new LoopCompilerPass())
             ->addCompilerPass(new ControllerArgumentValueResolverPass())
             ->addCompilerPass(new RegisterControllerArgumentLocatorsPass())
