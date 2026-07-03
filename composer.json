@@ -135,8 +135,6 @@
                 "vendor/thelia/modules"
             ],
             "App\\": "src/",
-            "BackOfficeDefaultTwigBundle\\": "templates/backOffice/default-twig/src/",
-            "FlexyBundle\\": "templates/frontOffice/flexy/src/",
             "Thelia\\": "core/lib/Thelia"
         },
         "files": [
