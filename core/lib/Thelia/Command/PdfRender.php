@@ -24,7 +24,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Parser\ParserResolver;
-use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Model\LangQuery;
 use Thelia\Model\OrderQuery;
@@ -114,7 +113,6 @@ class PdfRender extends ContainerAwareCommand
         $pdfTemplate = $this->templateHelper->getActivePdfTemplate();
 
         $parser = $this->parserResolver->getParser($pdfTemplate->getAbsolutePath(), $document);
-        \assert($parser instanceof ParserInterface);
         $parser->setTemplateDefinition($pdfTemplate, true);
 
         return $parser->render($document, ['order_id' => $orderId]);
