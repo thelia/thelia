@@ -41,6 +41,12 @@ final class RegisterTemplateTranslationsPass implements CompilerPassInterface
         $templatesDir = $container->getParameter('kernel.project_dir').'/templates';
 
         foreach (self::TYPES as $type) {
+            // GlobResource throws when its prefix does not exist, and this pass runs on every
+            // container build: an install without the email or PDF template package must still boot.
+            if (!is_dir($templatesDir.'/'.$type)) {
+                continue;
+            }
+
             $pattern = $templatesDir.'/'.$type.'/*/translations';
 
             // Track added or removed catalogs so the container is rebuilt when they change.
