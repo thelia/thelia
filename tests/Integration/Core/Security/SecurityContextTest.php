@@ -14,8 +14,12 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Core\Security;
 
+use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\Admin;
+use Thelia\Model\ProfileResource;
+use Thelia\Model\ResourceQuery;
 use Thelia\Test\IntegrationTestCase;
 
 final class SecurityContextTest extends IntegrationTestCase
@@ -85,5 +89,44 @@ final class SecurityContextTest extends IntegrationTestCase
         $this->securityContext->clearAdminUser();
         $notFound = $this->securityContext->checkRole(['ADMIN']);
         self::assertNull($notFound);
+    }
+
+    public function testGetPermissionsSkipsOrphanPermissionRows(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $profile = $factory->profile();
+        $admin = $factory->admin();
+        $admin->setProfileId($profile->getId());
+        $admin->save();
+
+        $resource = ResourceQuery::create()->findOneByCode(AdminResources::HOME);
+        $profileResource = new ProfileResource();
+        $profileResource
+            ->setProfileId($profile->getId())
+            ->setResourceId($resource->getId())
+            ->setAccess(8)
+            ->save();
+
+        // Databases migrated from Thelia 2 can hold permission rows whose
+        // module or resource no longer exists (no FK cascade back then).
+        $connection = $this->getPropelConnection();
+        $connection->exec('SET FOREIGN_KEY_CHECKS=0');
+        $connection->exec(\sprintf(
+            'INSERT INTO profile_module (profile_id, module_id, access) VALUES (%d, 999999, 0)',
+            $profile->getId(),
+        ));
+        $connection->exec(\sprintf(
+            'INSERT INTO profile_resource (profile_id, resource_id, access) VALUES (%d, 999999, 0)',
+            $profile->getId(),
+        ));
+        $connection->exec('SET FOREIGN_KEY_CHECKS=1');
+
+        $permissions = $admin->getPermissions();
+
+        self::assertIsArray($permissions);
+        self::assertArrayHasKey(AdminResources::HOME, $permissions);
+        self::assertTrue($permissions[AdminResources::HOME]->can(AccessManager::VIEW));
+        self::assertArrayNotHasKey('module', $permissions);
+        self::assertArrayNotHasKey('', $permissions);
     }
 }

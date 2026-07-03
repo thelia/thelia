@@ -46,12 +46,23 @@ trait UserPermissionsTrait
 
         $userPermissions = [];
 
+        // The LEFT JOINs return a null code for permission rows whose resource
+        // or module has been removed since the profile was configured; skip
+        // these orphans instead of failing on every request of the profile.
         foreach ($userResourcePermissionsQuery as $userResourcePermission) {
-            $userPermissions[$userResourcePermission->getVirtualColumn('code')] = new AccessManager($userResourcePermission->getAccess());
+            $code = $userResourcePermission->getVirtualColumn('code');
+            if (null === $code) {
+                continue;
+            }
+            $userPermissions[$code] = new AccessManager($userResourcePermission->getAccess());
         }
 
         foreach ($userModulePermissionsQuery as $userModulePermission) {
-            $userPermissions['module'][strtolower($userModulePermission->getVirtualColumn('code'))] = new AccessManager($userModulePermission->getAccess());
+            $code = $userModulePermission->getVirtualColumn('code');
+            if (null === $code) {
+                continue;
+            }
+            $userPermissions['module'][strtolower($code)] = new AccessManager($userModulePermission->getAccess());
         }
 
         return $userPermissions;
