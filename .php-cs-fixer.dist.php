@@ -34,6 +34,9 @@ $finder = PhpCsFixer\Finder::create()
         'local/modules/*/Model/Base/*',
         'local/modules/*/Model/Map/*',
         'local/modules/*/Model/om/*',
+        // Symfony code vendored as-is (routing XmlFileLoader kept beyond its 7.4 deprecation);
+        // keep the upstream style and license header untouched.
+        '#lib/Thelia/Core/Routing/Loader/#',
     ])
     ->name('*.php')
     ->notName('*.tpl')
