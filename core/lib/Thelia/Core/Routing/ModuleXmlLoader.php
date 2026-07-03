@@ -56,6 +56,8 @@ class ModuleXmlLoader extends Loader
                 continue;
             }
 
+            trigger_deprecation('thelia/core', '3.0', 'Loading module routes from %s/Config/routing.xml is deprecated, declare them with PHP #[Route] attributes on the controllers instead.', $module->getCode());
+
             $moduleRoutes = $loader->load($routingConfigFilePath);
             $moduleRoutePrefix = \call_user_func([$module->getFullNamespace(), 'getRoutePrefix']);
 
