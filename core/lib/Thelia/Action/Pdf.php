@@ -42,7 +42,10 @@ class Pdf extends BaseAction implements EventSubscriberInterface
 
         $options = new Options();
         $options->set('defaultFont', $fontName);
-        $options->set('isRemoteEnabled', true);
+        // Remote fetching stays disabled (dompdf default): the rendered HTML embeds order and
+        // customer data, so fetching remote resources from it would open an SSRF vector. Local
+        // assets (store images cache, template assets) remain reachable through the chroot.
+        $options->setChroot([THELIA_TEMPLATE_DIR.'pdf', THELIA_WEB_DIR]);
         $options->set('isHtml5ParserEnabled', true);
         $options->set('defaultPaperSize', $event->getFormat());
         $options->set('defaultPaperOrientation', $orientation);
