@@ -16,8 +16,8 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
-use Symfony\Component\Routing\Loader\XmlFileLoader;
 use Thelia\Controller\Admin\BaseAdminController;
+use Thelia\Core\Routing\Loader\XmlFileLoader;
 use Thelia\Core\Routing\ModuleAttributeLoader;
 use Thelia\Core\Routing\ModuleXmlLoader;
 use Thelia\Core\Routing\RewritingRouter;
