@@ -661,6 +661,9 @@
     <unique name="ref_UNIQUE">
       <unique-column name="ref" />
     </unique>
+    <unique name="invoice_ref_UNIQUE">
+      <unique-column name="invoice_ref" />
+    </unique>
     <index name="fk_order_payment_module_id_idx">
       <index-column name="payment_module_id" />
     </index>

@@ -80,7 +80,9 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (70, 'number_default_results_per_page.coupon_list', '20', 0, 0, NOW(), NOW()),
 (71, 'cdn.documents-base-url', '', 0, 0, NOW(), NOW()),
 (72, 'cdn.assets-base-url', '', 0, 0, NOW(), NOW()),
-(73, 'allow_module_zip_install', '1', 0, 0, NOW(), NOW());
+(73, 'allow_module_zip_install', '1', 0, 0, NOW(), NOW()),
+(74, 'invoice_ref_auto', '1', 0, 0, NOW(), NOW()),
+(75, 'invoice_ref_format', '%year%-%number%', 0, 0, NOW(), NOW());
 ;
 -- Insert front hooks
 INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES

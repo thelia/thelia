@@ -735,6 +735,7 @@ CREATE TABLE `order`
     `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`),
     UNIQUE INDEX `ref_UNIQUE` (`ref`),
+    UNIQUE INDEX `invoice_ref_UNIQUE` (`invoice_ref`),
     INDEX `idx_order_currency_id` (`currency_id`),
     INDEX `idx_order_customer_id` (`customer_id`),
     INDEX `idx_order_invoice_order_address_id` (`invoice_order_address_id`),

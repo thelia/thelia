@@ -281,4 +281,12 @@ SELECT 'order_ref', GREATEST(
 )
 FROM `order`;
 
+-- Automatic legal invoice numbering (order.invoice_ref, yearly gapless series).
+-- Opt-in on existing shops: a dedicated invoicing module may already own the
+-- invoice_ref column. Enable with config invoice_ref_auto = 1; when switching
+-- from a module mid-year, first run: php Thelia sequence:set invoice_ref_<year> <last number>.
+INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+('invoice_ref_auto', '0', 0, 0, NOW(), NOW()),
+('invoice_ref_format', '%year%-%number%', 0, 0, NOW(), NOW());
+
 SET FOREIGN_KEY_CHECKS = 1;
