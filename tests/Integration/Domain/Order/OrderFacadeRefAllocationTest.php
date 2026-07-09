@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Order;
 
 use Thelia\Domain\Order\OrderFacade;
+use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
 use Thelia\Model\Currency;
@@ -75,6 +76,16 @@ final class OrderFacadeRefAllocationTest extends ActionIntegrationTestCase
         );
     }
 
+    public function testCreateOrderRefusesACartExceedingAvailableStock(): void
+    {
+        [$customer, $currency, $lang, $product] = $this->createCatalogFixtures();
+
+        $this->expectException(TheliaProcessException::class);
+        $this->expectExceptionMessage('Not enough stock');
+
+        $this->createOrderThroughFacade($customer, $currency, $lang, $product, quantity: 500);
+    }
+
     /**
      * @return array{0: Customer, 1: Currency, 2: Lang, 3: Product}
      */
@@ -95,6 +106,7 @@ final class OrderFacadeRefAllocationTest extends ActionIntegrationTestCase
         Currency $currency,
         Lang $lang,
         Product $product,
+        float $quantity = 1.0,
     ): Order {
         $productSaleElements = ProductSaleElementsQuery::create()
             ->filterByProductId($product->getId())
@@ -112,7 +124,7 @@ final class OrderFacadeRefAllocationTest extends ActionIntegrationTestCase
             ->setCartId($cart->getId())
             ->setProductId($product->getId())
             ->setProductSaleElementsId($productSaleElements->getId())
-            ->setQuantity(1)
+            ->setQuantity($quantity)
             ->setPrice('10.00')
             ->setPromoPrice('10.00')
             ->setPromo(0)
