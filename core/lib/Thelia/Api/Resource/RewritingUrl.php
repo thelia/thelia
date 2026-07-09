@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Filter\NullableSearchFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\RewritingUrlTableMap;
 
@@ -45,6 +46,11 @@ use Thelia\Model\Map\RewritingUrlTableMap;
         'view',
         'viewId',
         'viewLocale',
+    ]
+)]
+#[ApiFilter(
+    filterClass: NullableSearchFilter::class,
+    properties: [
         'redirected',
     ]
 )]

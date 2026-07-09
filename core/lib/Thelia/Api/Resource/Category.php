@@ -22,7 +22,9 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Filter\DateFilter;
 use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
+use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Model\Map\CategoryTableMap;
 
 #[ApiResource(
@@ -66,6 +68,18 @@ use Thelia\Model\Map\CategoryTableMap;
     filterClass: NotInFilter::class,
     properties: [
         'id',
+    ]
+)]
+#[ApiFilter(
+    filterClass: DateFilter::class,
+    properties: [
+        'updatedAt' => 'include_null_before_and_after',
+    ]
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'updatedAt',
     ]
 )]
 class Category extends AbstractTranslatableResource

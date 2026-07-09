@@ -12,6 +12,7 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -22,6 +23,8 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Filter\DateFilter;
+use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Model\Map\BrandTableMap;
 
 #[ApiResource(
@@ -61,6 +64,18 @@ use Thelia\Model\Map\BrandTableMap;
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]]
 )]
+#[ApiFilter(
+    filterClass: DateFilter::class,
+    properties: [
+        'updatedAt' => 'include_null_before_and_after',
+    ]
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'updatedAt',
+    ]
+)]
 class Brand extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:brand:read';
@@ -92,6 +107,12 @@ class Brand extends AbstractTranslatableResource
         Product::GROUP_FRONT_READ_SINGLE,
     ])]
     public ?int $position = null;
+
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    public ?\DateTime $createdAt;
+
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    public ?\DateTime $updatedAt;
 
     #[ApiProperty(
         types: 'object'
@@ -135,6 +156,30 @@ class Brand extends AbstractTranslatableResource
     public function setPosition(?int $position): self
     {
         $this->position = $position;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTime $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTime $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }
