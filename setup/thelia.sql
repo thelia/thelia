@@ -914,6 +914,19 @@ CREATE TABLE `order_status`
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
+-- order_sequence
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_sequence`;
+
+CREATE TABLE `order_sequence`
+(
+    `name` VARCHAR(64) NOT NULL,
+    `current_value` BIGINT DEFAULT 0 NOT NULL,
+    PRIMARY KEY (`name`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
 -- order_product_attribute_combination
 -- ---------------------------------------------------------------------
 

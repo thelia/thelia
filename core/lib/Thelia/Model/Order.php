@@ -21,11 +21,14 @@ use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Order\Service\SequenceOrderRefGenerator;
+use Thelia\Domain\Sequence\GaplessSequenceGenerator;
 use Thelia\Domain\Taxation\TaxEngine\Calculator;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\Base\Order as BaseOrder;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderProductTaxTableMap;
+use Thelia\Model\Map\OrderTableMap;
 use Thelia\Module\BaseModuleInterface;
 use Thelia\Module\PaymentModuleInterface;
 
@@ -36,6 +39,8 @@ class Order extends BaseOrder
     protected ?int $choosenInvoiceAddress = null;
 
     protected bool $disableVersioning = false;
+
+    protected bool $refGenerationDeferred = false;
 
     protected ?Cart $cart = null;
 
@@ -129,18 +134,47 @@ class Order extends BaseOrder
     /**
      * @throws PropelException
      */
+    /**
+     * Defer reference generation to the caller (e.g. OrderFacade, which
+     * allocates the ref from the gapless sequence just before commit, keeping
+     * the sequence lock window as short as possible).
+     *
+     * @return $this
+     */
+    public function deferRefGeneration(bool $deferred = true): static
+    {
+        $this->refGenerationDeferred = $deferred;
+
+        return $this;
+    }
+
     public function postInsert(?ConnectionInterface $con = null): void
     {
         parent::postInsert($con);
 
-        $this->setRef($this->generateRef())
+        if ($this->refGenerationDeferred || null !== $this->getRef()) {
+            return;
+        }
+
+        $this->setRef($this->generateRef($con))
             ->setDisableVersioning(true)
             ->save($con);
     }
 
-    public function generateRef()
+    /**
+     * Allocates the next reference from the gapless order_ref sequence.
+     *
+     * Each call consumes a number: only call this to assign a reference that
+     * will be persisted. Since Thelia 3 the reference is no longer derived
+     * from the order id.
+     */
+    public function generateRef(?ConnectionInterface $con = null): string
     {
-        return \sprintf('ORD%s', str_pad((string) $this->getId(), 12, '0', \STR_PAD_LEFT));
+        $con ??= Propel::getConnection(OrderTableMap::DATABASE_NAME);
+
+        return SequenceOrderRefGenerator::format(
+            (new GaplessSequenceGenerator())->next(SequenceOrderRefGenerator::SEQUENCE_NAME, $con)
+        );
     }
 
     /**

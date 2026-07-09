@@ -783,6 +783,10 @@
       <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
     </behavior>
   </table>
+  <table name="order_sequence" namespace="Thelia\Model">
+    <column name="name" primaryKey="true" required="true" size="64" type="VARCHAR" />
+    <column defaultValue="0" name="current_value" required="true" type="BIGINT" />
+  </table>
   <table name="order_product_attribute_combination" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="order_product_id" required="true" type="INTEGER" />

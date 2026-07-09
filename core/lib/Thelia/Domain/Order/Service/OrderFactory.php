@@ -35,6 +35,7 @@ readonly class OrderFactory
         $order
             ->setId(null)
             ->setRef(null)
+            ->deferRefGeneration()
             ->setNew(true);
 
         $order->resetModified(OrderTableMap::COL_CREATED_AT);

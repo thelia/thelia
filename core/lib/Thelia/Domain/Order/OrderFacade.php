@@ -20,6 +20,7 @@ use Thelia\Core\Security\User\UserInterface;
 use Thelia\Domain\Order\Service\OrderAddressPersister;
 use Thelia\Domain\Order\Service\OrderFactory;
 use Thelia\Domain\Order\Service\OrderProductFactory;
+use Thelia\Domain\Order\Service\OrderRefGeneratorInterface;
 use Thelia\Domain\Order\Service\OrderTransactionManager;
 use Thelia\Domain\Order\Service\StockPolicy;
 use Thelia\Domain\Order\Service\TaxProvider;
@@ -45,6 +46,7 @@ readonly class OrderFacade
         private StockPolicy $stockPolicy,
         private TaxProvider $taxProvider,
         private OrderProductFactory $orderProductFactory,
+        private OrderRefGeneratorInterface $orderRefGenerator,
     ) {
     }
 
@@ -166,6 +168,14 @@ readonly class OrderFacade
                     $connection
                 );
             }
+
+            // Allocate the ref from the gapless sequence as the very last
+            // operation: the counter lock is only held for the commit window,
+            // and any earlier failure rolls the increment back with the order.
+            $placedOrder
+                ->setRef($this->orderRefGenerator->generate($connection))
+                ->setDisableVersioning(true)
+                ->save($connection);
 
             $this->orderTransactionManager->commit($connection);
 
