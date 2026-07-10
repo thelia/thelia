@@ -80,7 +80,7 @@ class RewritingUrl implements PropelResourceInterface
     public ?string $viewLocale;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
-    public ?string $redirected;
+    public ?int $redirected;
 
     public function getId(): ?int
     {
@@ -142,12 +142,12 @@ class RewritingUrl implements PropelResourceInterface
         return $this;
     }
 
-    public function getRedirected(): ?string
+    public function getRedirected(): ?int
     {
         return $this->redirected;
     }
 
-    public function setRedirected(?string $redirected): self
+    public function setRedirected(?int $redirected): self
     {
         $this->redirected = $redirected;
 
