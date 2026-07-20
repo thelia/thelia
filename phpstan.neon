@@ -1,6 +1,4 @@
 parameters:
-    parallel:
-        maximumNumberOfProcesses: 2
     level: 0
     tmpDir: var/cache-ci/phpstan
     paths:
