@@ -12,6 +12,7 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -22,6 +23,8 @@ use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Filter\DateFilter;
+use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Model\Map\ContentTableMap;
 
 #[ApiResource(
@@ -60,6 +63,18 @@ use Thelia\Model\Map\ContentTableMap;
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
+)]
+#[ApiFilter(
+    filterClass: DateFilter::class,
+    properties: [
+        'updatedAt' => 'include_null_before_and_after',
+    ]
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'updatedAt',
+    ]
 )]
 class Content extends AbstractTranslatableResource
 {

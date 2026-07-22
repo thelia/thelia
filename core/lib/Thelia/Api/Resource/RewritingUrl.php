@@ -19,13 +19,16 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Filter\NullableSearchFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Api\Bridge\Propel\State\RewritingUrlProcessor;
 use Thelia\Model\Map\RewritingUrlTableMap;
 
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/rewriting_url'
+            uriTemplate: '/admin/rewriting_url',
+            processor: RewritingUrlProcessor::class
         ),
         new GetCollection(
             uriTemplate: '/admin/rewriting_url'
@@ -45,6 +48,11 @@ use Thelia\Model\Map\RewritingUrlTableMap;
         'view',
         'viewId',
         'viewLocale',
+    ]
+)]
+#[ApiFilter(
+    filterClass: NullableSearchFilter::class,
+    properties: [
         'redirected',
     ]
 )]
@@ -72,7 +80,7 @@ class RewritingUrl implements PropelResourceInterface
     public ?string $viewLocale;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
-    public ?string $redirected;
+    public ?int $redirected;
 
     public function getId(): ?int
     {
@@ -134,12 +142,12 @@ class RewritingUrl implements PropelResourceInterface
         return $this;
     }
 
-    public function getRedirected(): ?string
+    public function getRedirected(): ?int
     {
         return $this->redirected;
     }
 
-    public function setRedirected(?string $redirected): self
+    public function setRedirected(?int $redirected): self
     {
         $this->redirected = $redirected;
 

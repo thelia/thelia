@@ -97,6 +97,7 @@ use Thelia\Model\ProductQuery;
     properties: [
         'ref',
         'productCategories.position',
+        'updatedAt',
     ]
 )]
 #[ApiFilter(
