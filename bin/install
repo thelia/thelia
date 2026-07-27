@@ -173,7 +173,7 @@ foreach ($setup->getWarnings() as $warning) {
 
 $themes = [
     'frontOffice' => $options['frontoffice_theme'] ?? $_SERVER['ACTIVE_FRONT_TEMPLATE'] ?? 'flexy',
-    'backOffice'  => $options['backoffice_theme'] ?? $_SERVER['ACTIVE_ADMIN_TEMPLATE'] ?? 'default',
+    'backOffice'  => $options['backoffice_theme'] ?? $_SERVER['ACTIVE_ADMIN_TEMPLATE'] ?? 'default-twig',
     'pdf'         => $options['pdf_theme'] ?? $_SERVER['ACTIVE_PDF_TEMPLATE'] ?? 'default',
     'email'       => $options['email_theme'] ?? $_SERVER['ACTIVE_EMAIL_TEMPLATE'] ?? 'default',
 ];
