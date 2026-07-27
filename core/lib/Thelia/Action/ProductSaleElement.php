@@ -417,12 +417,15 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
         $clonedProductUpdatePSEEvent = new ProductSaleElementUpdateEvent($event->getClonedProduct(), $clonedProductPSEId);
         $clonedProductUpdatePSEEvent
             ->setReference($event->getClonedProduct()->getRef().'-'.($key + 1))
-            ->setIsdefault($originalProductPSE->getIsDefault())
+            // promo, newness and is_default are nullable columns defaulting to 0, so rows
+            // written outside the back office (imports, migrations) can hold NULL where the
+            // event expects a scalar.
+            ->setIsdefault((bool) $originalProductPSE->getIsDefault())
             ->setFromDefaultCurrency(0)
             ->setWeight($originalProductPSE->getWeight() ?? 0.0)
-            ->setQuantity($originalProductPSE->getQuantity())
-            ->setOnsale($originalProductPSE->getPromo())
-            ->setIsnew($originalProductPSE->getNewness())
+            ->setQuantity($originalProductPSE->getQuantity() ?? 0.0)
+            ->setOnsale($originalProductPSE->getPromo() ?? 0)
+            ->setIsnew($originalProductPSE->getNewness() ?? 0)
             ->setEanCode($originalProductPSE->getEanCode())
             ->setTaxRuleId((int) $event->getOriginalProduct()->getTaxRuleId())
             ->setPrice((float) $originalProductPSEPrice->getPrice())

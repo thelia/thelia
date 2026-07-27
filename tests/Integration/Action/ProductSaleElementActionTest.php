@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Action;
 
+use Propel\Runtime\Propel;
+use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Core\Event\Product\ProductCombinationGenerationEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementDeleteEvent;
@@ -22,6 +24,7 @@ use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\AttributeCombinationQuery;
+use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Test\ActionIntegrationTestCase;
@@ -409,5 +412,42 @@ final class ProductSaleElementActionTest extends ActionIntegrationTestCase
             self::assertNotNull($price);
             self::assertEqualsWithDelta(25.0, (float) $price->getPrice(), 0.001);
         }
+    }
+
+    public function testClonePseKeepsGoingWhenNullableFlagsAreNull(): void
+    {
+        $currency = $this->factory->currency();
+        $product = $this->factory->product(
+            $this->factory->category(),
+            $this->factory->taxRule(),
+            $currency,
+        );
+
+        // cloneProduct() reads the source i18n row, which the fixture does not create.
+        $product->setLocale('en_US')->setTitle('Cloneable product')->save();
+
+        // Rows written outside the back office (imports, 2.x migrations) can leave
+        // promo/newness at NULL even though the column defaults to 0.
+        $pse = ProductSaleElementsQuery::create()
+            ->filterByProductId($product->getId())
+            ->findOne();
+        self::assertNotNull($pse);
+        $connection = Propel::getWriteConnection(ProductSaleElementsTableMap::DATABASE_NAME);
+        $connection->exec(
+            'UPDATE product_sale_elements SET promo = NULL, newness = NULL WHERE id = '.$pse->getId()
+        );
+
+        $event = new ProductCloneEvent($product->getRef().'-CLONE', 'en_US', $product);
+        $this->dispatch($event, TheliaEvents::PRODUCT_CLONE);
+
+        $clonedProduct = $event->getClonedProduct();
+        self::assertNotNull($clonedProduct);
+
+        $clonedPse = ProductSaleElementsQuery::create()
+            ->filterByProductId($clonedProduct->getId())
+            ->findOne();
+        self::assertNotNull($clonedPse);
+        self::assertSame(0, $clonedPse->getPromo());
+        self::assertSame(0, $clonedPse->getNewness());
     }
 }
