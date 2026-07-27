@@ -57,11 +57,11 @@
         ],
         "thelia-install": [
             "rm -f .env.test.local",
-            "@phpc bin/install --frontoffice_theme=flexy --backoffice_theme=default --pdf_theme=default --email_theme=default"
+            "@phpc bin/install --frontoffice_theme=flexy --backoffice_theme=default-twig --pdf_theme=default --email_theme=default"
         ],
         "demo-database": [
             "rm -f .env.test.local",
-            "@phpc bin/install --frontoffice_theme=flexy --backoffice_theme=default --pdf_theme=default --email_theme=default --with-demo --with-admin --admin_login=thelia --admin_password=thelia --admin_first_name=thelia --admin_last_name=thelia --admin_email=thelia@example.com"
+            "@phpc bin/install --frontoffice_theme=flexy --backoffice_theme=default-twig --pdf_theme=default --email_theme=default --with-demo --with-admin --admin_login=thelia --admin_password=thelia --admin_first_name=thelia --admin_last_name=thelia --admin_email=thelia@example.com"
         ],
         "cs-diff": [
             "@phpc ./vendor/bin/php-cs-fixer fix --dry-run --stop-on-violation --diff"
