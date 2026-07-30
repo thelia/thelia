@@ -82,7 +82,10 @@ readonly class MetadataService
         if ($expression !== null) {
             $variables = array_merge($context['extra_variables'] ?? [], [
                 'user' => $user,
-                'auth_checker' => $this->authorizationChecker, // needed for the is_granted expression function
+                // needed for the is_granted expression function; resolves ROLE_*
+                // against the Thelia session user because no firewall token exists
+                // on in-process evaluations (Twig resources() on front pages)
+                'auth_checker' => new SessionUserAuthorizationChecker($user, $this->authorizationChecker),
             ]);
 
             return (bool) $this->expressionLanguage->evaluate($expression, $variables);

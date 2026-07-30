@@ -17,6 +17,7 @@ namespace Thelia\Tests\Integration\Api;
 use Thelia\Api\Service\DataAccess\DataAccessService;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Test\Trait\LogsInAsAdmin;
+use Thelia\Test\Trait\LogsInAsCustomer;
 
 /**
  * Guard-rail for {@see DataAccessService::resources()}, which calls
@@ -31,6 +32,7 @@ use Thelia\Test\Trait\LogsInAsAdmin;
 final class DataAccessServiceTest extends IntegrationTestCase
 {
     use LogsInAsAdmin;
+    use LogsInAsCustomer;
 
     private DataAccessService $dataAccess;
 
@@ -70,5 +72,36 @@ final class DataAccessServiceTest extends IntegrationTestCase
         $result = $this->dataAccess->resources('/api/admin/products');
 
         self::assertIsArray($result);
+    }
+
+    public function testFrontAccountCustomerResolvesForLoggedInCustomer(): void
+    {
+        $customer = $this->loginAsCustomerInSession();
+
+        $result = $this->dataAccess->resources('/api/front/account/customers/'.$customer->getId());
+
+        self::assertIsArray($result);
+        self::assertSame($customer->getFirstname(), $result['firstname']);
+    }
+
+    public function testFrontAccountCustomerIsDeniedForAnonymousVisitor(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle());
+
+        $result = $this->dataAccess->resources('/api/front/account/customers/'.$customer->getId());
+
+        self::assertNull($result);
+    }
+
+    public function testFrontAccountCustomerIsDeniedForAnotherCustomer(): void
+    {
+        $this->loginAsCustomerInSession();
+        $factory = $this->createFixtureFactory();
+        $other = $factory->customer($factory->customerTitle());
+
+        $result = $this->dataAccess->resources('/api/front/account/customers/'.$other->getId());
+
+        self::assertNull($result);
     }
 }
