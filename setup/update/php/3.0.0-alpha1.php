@@ -21,8 +21,13 @@ $pdo = $database->getConnection();
 $hasIndex = 0 !== count($pdo->query("SHOW INDEX FROM `order` WHERE Key_name = 'invoice_ref_UNIQUE'")->fetchAll());
 
 if (!$hasIndex) {
+    // Unlike NULLs, several empty strings DO count as duplicates for a unique
+    // index: normalize them first, or the ALTER below would abort the update
+    // on any shop where a module left more than one empty invoice_ref.
+    $pdo->query('UPDATE `order` SET `invoice_ref` = NULL WHERE `invoice_ref` = ""');
+
     $duplicates = $pdo->query(
-        'SELECT `invoice_ref` FROM `order` WHERE `invoice_ref` IS NOT NULL AND `invoice_ref` != "" GROUP BY `invoice_ref` HAVING COUNT(*) > 1 LIMIT 1',
+        'SELECT `invoice_ref` FROM `order` WHERE `invoice_ref` IS NOT NULL GROUP BY `invoice_ref` HAVING COUNT(*) > 1 LIMIT 1',
     )->fetchAll();
 
     if (0 === count($duplicates)) {
