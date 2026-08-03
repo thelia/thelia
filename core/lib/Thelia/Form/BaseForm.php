@@ -243,7 +243,10 @@ abstract class BaseForm implements FormInterface
     {
         $formDefinedUrl = $this->form->get($parameterName)->getData();
 
-        if (empty($formDefinedUrl)) {
+        // success_url/error_url are user-controlled hidden fields. Only accept a relative
+        // path or an absolute URL pointing to the current host, so they cannot be abused
+        // for open redirects (CWE-601). Anything else falls back to the trusted default.
+        if (empty($formDefinedUrl) || !$this->isSafeRedirectUrl((string) $formDefinedUrl)) {
             if (null === $default) {
                 $default = ConfigQuery::read('base_url', '/');
             }
@@ -252,6 +255,35 @@ abstract class BaseForm implements FormInterface
         }
 
         return URL::getInstance()->absoluteUrl($formDefinedUrl);
+    }
+
+    /**
+     * A redirection URL is considered safe when it is a relative path, or an absolute
+     * http(s) URL whose host matches the current request host. Protocol-relative URLs,
+     * backslash tricks and non-http schemes (javascript:, data:, file:, ...) are rejected.
+     */
+    private function isSafeRedirectUrl(string $url): bool
+    {
+        $url = trim($url);
+
+        if ('' === $url || str_starts_with($url, '//') || str_contains($url, '\\')) {
+            return false;
+        }
+
+        if (preg_match('#^https?://#i', $url)) {
+            $host = parse_url($url, \PHP_URL_HOST);
+
+            return \is_string($host) && '' !== $host
+                && isset($this->request)
+                && 0 === strcasecmp($host, $this->request->getHost());
+        }
+
+        // Reject any other scheme (javascript:, data:, file:, https:evil.com, ...).
+        if (preg_match('#^[a-z][a-z0-9+.\-]*:#i', $url)) {
+            return false;
+        }
+
+        return true;
     }
 
     public function createView()
