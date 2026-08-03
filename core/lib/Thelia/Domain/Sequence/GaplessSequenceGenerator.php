@@ -20,7 +20,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
  * Allocates strictly consecutive numbers from a named counter stored in the
  * order_sequence table.
  *
- * The increment is a single atomic UPDATE executed on the caller's connection.
+ * The increment is a single atomic upsert executed on the caller's connection.
  * When the caller runs inside a transaction, the counter row stays locked until
  * commit and the increment is rolled back with everything else — numbers are
  * gapless by construction. Callers should therefore allocate as late as
@@ -30,19 +30,18 @@ final readonly class GaplessSequenceGenerator
 {
     public function next(string $sequenceName, ConnectionInterface $connection): int
     {
-        $insert = $connection->prepare(
-            'INSERT IGNORE INTO `order_sequence` (`name`, `current_value`) VALUES (:name, 0)'
+        // Counter creation and increment must be a single statement. A separate
+        // INSERT IGNORE hitting the existing row would take a shared lock
+        // (InnoDB duplicate-key check) that two concurrent allocations then
+        // both try to upgrade for the increment — a guaranteed deadlock; the
+        // upsert takes the exclusive lock directly. LAST_INSERT_ID(expr) makes
+        // the incremented value readable on this session without another read.
+        $statement = $connection->prepare(
+            'INSERT INTO `order_sequence` (`name`, `current_value`) VALUES (:name, LAST_INSERT_ID(1))
+             ON DUPLICATE KEY UPDATE `current_value` = LAST_INSERT_ID(`current_value` + 1)'
         );
-        $insert->bindValue(':name', $sequenceName, \PDO::PARAM_STR);
-        $insert->execute();
-
-        // LAST_INSERT_ID(expr) makes the increment and its read a single
-        // atomic statement, safe both inside and outside a transaction.
-        $update = $connection->prepare(
-            'UPDATE `order_sequence` SET `current_value` = LAST_INSERT_ID(`current_value` + 1) WHERE `name` = :name'
-        );
-        $update->bindValue(':name', $sequenceName, \PDO::PARAM_STR);
-        $update->execute();
+        $statement->bindValue(':name', $sequenceName, \PDO::PARAM_STR);
+        $statement->execute();
 
         return (int) $connection->lastInsertId();
     }
