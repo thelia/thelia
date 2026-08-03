@@ -42,7 +42,9 @@ class MetaData extends BaseMetaData
         $data = parent::getValue();
 
         if (parent::getIsSerialized()) {
-            $data = @unserialize((string) $data);
+            // Disallow object instantiation to prevent PHP object injection (CWE-502)
+            // from crafted meta_data rows; only scalars and arrays are ever stored.
+            $data = @unserialize((string) $data, ['allowed_classes' => false]);
         }
 
         return $data;
