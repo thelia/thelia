@@ -19,6 +19,11 @@ use Thelia\Test\IntegrationTestCase;
 
 final class DatabaseSetupTest extends IntegrationTestCase
 {
+    // This suite issues DDL (CREATE DATABASE), which would wait on the schema metadata
+    // lock held by the base class' per-test transaction until lock_wait_timeout (~1 year).
+    // DDL tests must opt out of the transactional isolation, per IntegrationTestCase.
+    protected bool $useTransaction = false;
+
     public function testConstructorRejectsInvalidDatabaseName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
