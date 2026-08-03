@@ -255,4 +255,38 @@ UPDATE `module` SET `activate` = 0 WHERE `code` = 'WebProfiler';
 UPDATE `order_status` SET `color` = '#dc3545' WHERE `code` = 'not_paid';
 UPDATE `order_status` SET `color` = '#6c757d' WHERE `code` = 'canceled';
 
+-- ---------------------------------------------------------------------
+-- order_sequence: gapless counters for order refs (and invoice refs).
+-- Order refs are no longer derived from the auto-increment id; they are
+-- allocated from this counter inside the order transaction, so a rollback
+-- can no longer leave a hole in the numbering.
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_sequence`;
+
+CREATE TABLE `order_sequence`
+(
+    `name` VARCHAR(64) NOT NULL,
+    `current_value` BIGINT DEFAULT 0 NOT NULL,
+    PRIMARY KEY (`name`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- Seed the counter after the highest existing reference so new refs continue
+-- the visible series seamlessly. Covers both id-derived refs (the historical
+-- default: ORD + zero-padded id) and any numerically higher legacy ORD ref.
+INSERT INTO `order_sequence` (`name`, `current_value`)
+SELECT 'order_ref', GREATEST(
+    COALESCE(MAX(`id`), 0),
+    COALESCE(MAX(CASE WHEN `ref` REGEXP '^ORD[0-9]+$' THEN CAST(SUBSTRING(`ref`, 4) AS UNSIGNED) ELSE 0 END), 0)
+)
+FROM `order`;
+
+-- Automatic legal invoice numbering (order.invoice_ref, yearly gapless series).
+-- Opt-in on existing shops: a dedicated invoicing module may already own the
+-- invoice_ref column. Enable with config invoice_ref_auto = 1; when switching
+-- from a module mid-year, first run: php Thelia sequence:set invoice_ref_<year> <last number>.
+INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+('invoice_ref_auto', '0', 0, 0, NOW(), NOW()),
+('invoice_ref_format', '%year%-%number%', 0, 0, NOW(), NOW());
+
 SET FOREIGN_KEY_CHECKS = 1;

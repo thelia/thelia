@@ -735,6 +735,7 @@ CREATE TABLE `order`
     `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`),
     UNIQUE INDEX `ref_UNIQUE` (`ref`),
+    UNIQUE INDEX `invoice_ref_UNIQUE` (`invoice_ref`),
     INDEX `idx_order_currency_id` (`currency_id`),
     INDEX `idx_order_customer_id` (`customer_id`),
     INDEX `idx_order_invoice_order_address_id` (`invoice_order_address_id`),
@@ -911,6 +912,19 @@ CREATE TABLE `order_status`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `code_UNIQUE` (`code`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- order_sequence
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_sequence`;
+
+CREATE TABLE `order_sequence`
+(
+    `name` VARCHAR(64) NOT NULL,
+    `current_value` BIGINT DEFAULT 0 NOT NULL,
+    PRIMARY KEY (`name`)
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------

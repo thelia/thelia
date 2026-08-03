@@ -35,6 +35,11 @@ readonly class StockPolicy
         return $useStock && $manageStockOnCreation;
     }
 
+    /**
+     * @deprecated since 3.0, use StockDecrementer::decrement() instead: computing the new
+     *             quantity in PHP from a previously read value is subject to concurrent
+     *             lost updates
+     */
     public function computeNewQuantity(float $currentQuantity, float $requestedQuantity, int $allowNegativeStock): float
     {
         $newQuantity = $currentQuantity - $requestedQuantity;

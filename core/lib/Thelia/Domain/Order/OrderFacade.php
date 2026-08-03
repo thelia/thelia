@@ -20,7 +20,9 @@ use Thelia\Core\Security\User\UserInterface;
 use Thelia\Domain\Order\Service\OrderAddressPersister;
 use Thelia\Domain\Order\Service\OrderFactory;
 use Thelia\Domain\Order\Service\OrderProductFactory;
+use Thelia\Domain\Order\Service\OrderRefGeneratorInterface;
 use Thelia\Domain\Order\Service\OrderTransactionManager;
+use Thelia\Domain\Order\Service\StockDecrementer;
 use Thelia\Domain\Order\Service\StockPolicy;
 use Thelia\Domain\Order\Service\TaxProvider;
 use Thelia\Domain\Order\Service\TranslationProvider;
@@ -45,6 +47,8 @@ readonly class OrderFacade
         private StockPolicy $stockPolicy,
         private TaxProvider $taxProvider,
         private OrderProductFactory $orderProductFactory,
+        private OrderRefGeneratorInterface $orderRefGenerator,
+        private StockDecrementer $stockDecrementer,
     ) {
     }
 
@@ -75,6 +79,11 @@ readonly class OrderFacade
         if (null === $cart->getId()) {
             throw new TheliaProcessException('Cart identifier is required');
         }
+
+        // Fail fast on predictable stock shortages before creating anything.
+        // The authoritative guard remains the conditional UPDATE performed by
+        // StockDecrementer inside the transaction.
+        $this->assertCartStockIsAvailable($cart);
 
         $connection = $this->orderTransactionManager->begin();
 
@@ -109,25 +118,26 @@ readonly class OrderFacade
                     $productSaleElements->getId()
                 );
 
-                // Stock check
-                if ($this->stockPolicy->shouldCheckAvailability(ConfigQuery::checkAvailableStock(), $virtualContext->useStock)) {
+                $checkStock = $this->stockPolicy->shouldCheckAvailability(ConfigQuery::checkAvailableStock(), $virtualContext->useStock);
+
+                if ($this->stockPolicy->shouldDecrementStock($manageStockOnCreation, $virtualContext->useStock)) {
+                    // Atomic conditional decrement: check and write are a single
+                    // statement, so concurrent checkouts cannot oversell.
+                    $this->stockDecrementer->decrement(
+                        $productSaleElements->getId(),
+                        (float) $cartItem->getQuantity(),
+                        guardAvailability: $checkStock,
+                        allowNegativeStock: (bool) (int) ConfigQuery::read('allow_negative_stock', 0),
+                        connection: $connection,
+                    );
+                } elseif ($checkStock) {
+                    // Stock is managed later (e.g. at payment): keep the
+                    // advisory availability check on order creation.
                     $this->stockPolicy->assertStockIsAvailable(
                         $cartItem->getQuantity(),
                         $productSaleElements->getQuantity(),
                         'Not enough stock'
                     );
-                }
-
-                // Decrement stock
-                if ($this->stockPolicy->shouldDecrementStock($manageStockOnCreation, $virtualContext->useStock)) {
-                    $newQuantity = $this->stockPolicy->computeNewQuantity(
-                        $productSaleElements->getQuantity(),
-                        $cartItem->getQuantity(),
-                        (int) ConfigQuery::read('allow_negative_stock', 0)
-                    );
-
-                    $productSaleElements->setQuantity($newQuantity);
-                    $productSaleElements->save($connection);
                 }
 
                 // Taxes
@@ -167,12 +177,47 @@ readonly class OrderFacade
                 );
             }
 
+            // Allocate the ref from the gapless sequence as the very last
+            // operation: the counter lock is only held for the commit window,
+            // and any earlier failure rolls the increment back with the order.
+            $placedOrder
+                ->setRef($this->orderRefGenerator->generate($connection))
+                ->setDisableVersioning(true)
+                ->save($connection);
+
             $this->orderTransactionManager->commit($connection);
 
             return $placedOrder;
         } catch (\Throwable $throwable) {
             $this->orderTransactionManager->rollback($connection);
             throw $throwable;
+        }
+    }
+
+    /**
+     * Read-only pre-check on the whole cart, before any row is written.
+     *
+     * Virtual products are skipped: their stock usage is decided by an event
+     * that requires the placed order, so they are handled in the main loop.
+     *
+     * @throws TheliaProcessException
+     */
+    private function assertCartStockIsAvailable(CartModel $cart): void
+    {
+        if (!ConfigQuery::checkAvailableStock()) {
+            return;
+        }
+
+        foreach ($cart->getCartItems() as $cartItem) {
+            if (1 === $cartItem->getProduct()->getVirtual()) {
+                continue;
+            }
+
+            $this->stockPolicy->assertStockIsAvailable(
+                $cartItem->getQuantity(),
+                $cartItem->getProductSaleElements()->getQuantity(),
+                'Not enough stock'
+            );
         }
     }
 }
