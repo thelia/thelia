@@ -199,10 +199,7 @@ readonly class FileProcessorService
         libxml_use_internal_errors($previousErrorState);
 
         if (!$loaded) {
-            throw new ProcessFileException(
-                $this->translator->trans('The uploaded SVG file is not a valid image.'),
-                415,
-            );
+            throw new ProcessFileException($this->translator->trans('The uploaded SVG file is not a valid image.'), 415);
         }
 
         $xpath = new \DOMXPath($document);
