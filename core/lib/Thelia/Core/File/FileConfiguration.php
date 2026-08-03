@@ -42,13 +42,13 @@ class FileConfiguration
             'objectType' => 'document',
             'validMimeTypes' => [],
             'extBlackList' => [
-                'php',
-                'php3',
-                'php4',
-                'php5',
-                'php6',
-                'asp',
-                'aspx',
+                'php', 'php3', 'php4', 'php5', 'php6', 'php7', 'php8',
+                'phtml', 'phtm', 'pht', 'phps', 'phpt', 'phar',
+                'shtml', 'shtm', 'stm',
+                'asp', 'aspx', 'jsp', 'jspx',
+                'cgi', 'pl', 'py', 'sh',
+                'htaccess', 'htpasswd',
+                'exe', 'bat', 'cmd', 'com',
             ],
         ];
     }
