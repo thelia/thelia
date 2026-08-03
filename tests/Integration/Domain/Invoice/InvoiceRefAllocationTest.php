@@ -105,6 +105,38 @@ final class InvoiceRefAllocationTest extends ActionIntegrationTestCase
         self::assertNull(OrderQuery::create()->findPk($order->getId())->getInvoiceRef());
     }
 
+    public function testDuplicatePaymentNotificationBurnsNoNumber(): void
+    {
+        $order = $this->payOrder($this->factory->order());
+        $allocatedRef = $order->getInvoiceRef();
+        self::assertNotNull($allocatedRef);
+
+        // Simulate the duplicate payment notification race: another process
+        // loaded the order before it was numbered, so its in-memory
+        // invoice_ref is still empty while the column is already set.
+        $stale = OrderQuery::create()->findPk($order->getId());
+        $stale->setInvoiceRef(null);
+
+        $this->getService(InvoiceRefAllocator::class)->allocate($stale);
+
+        $statement = $this->getPropelConnection()->prepare('SELECT `invoice_ref` FROM `order` WHERE `id` = ?');
+        $statement->execute([$order->getId()]);
+        self::assertSame($allocatedRef, $statement->fetchColumn(), 'The ref allocated first must never be overwritten.');
+
+        // The aborted reallocation must not have consumed a number: the next
+        // invoice of the series is strictly consecutive.
+        $nextInvoiceRef = $this->payOrder($this->factory->order())->getInvoiceRef();
+
+        [, $allocatedNumber] = explode('-', (string) $allocatedRef);
+        [, $nextNumber] = explode('-', (string) $nextInvoiceRef);
+
+        self::assertSame(
+            (int) $allocatedNumber + 1,
+            (int) $nextNumber,
+            'A refused duplicate allocation must leave no hole in the series.',
+        );
+    }
+
     public function testCustomFormatIsApplied(): void
     {
         ConfigQuery::write(InvoiceRefAllocator::CONFIG_FORMAT, 'FAC%year%/%number%');

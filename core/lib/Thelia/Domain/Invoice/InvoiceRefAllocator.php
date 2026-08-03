@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Invoice;
 
+use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Thelia\Domain\Sequence\GaplessSequenceGenerator;
 use Thelia\Model\ConfigQuery;
@@ -60,6 +61,17 @@ readonly class InvoiceRefAllocator
         $connection->beginTransaction();
 
         try {
+            // Concurrent allocations for the same order happen: payment
+            // gateways retry their notifications, sometimes in parallel. Lock
+            // the order row and re-check the ref under the lock, otherwise two
+            // processes would each consume a number and the overwritten one
+            // would leave a hole in the legal series.
+            if (null !== $this->readInvoiceRefLocked($order->getId(), $connection)) {
+                $connection->commit();
+
+                return;
+            }
+
             $year = ($order->getInvoiceDate() ?? new \DateTime())->format('Y');
             $number = $this->sequenceGenerator->next(self::SEQUENCE_PREFIX.$year, $connection);
 
@@ -73,6 +85,24 @@ readonly class InvoiceRefAllocator
             $connection->rollBack();
             throw $throwable;
         }
+    }
+
+    /**
+     * Reads order.invoice_ref under an exclusive row lock, normalizing the
+     * empty string to null. The lock is held until the surrounding
+     * transaction ends, serializing allocations for a given order.
+     */
+    private function readInvoiceRefLocked(int $orderId, ConnectionInterface $connection): ?string
+    {
+        $statement = $connection->prepare(
+            'SELECT `invoice_ref` FROM `order` WHERE `id` = :id FOR UPDATE'
+        );
+        $statement->bindValue(':id', $orderId, \PDO::PARAM_INT);
+        $statement->execute();
+
+        $invoiceRef = $statement->fetchColumn();
+
+        return \is_string($invoiceRef) && '' !== $invoiceRef ? $invoiceRef : null;
     }
 
     private function format(string $year, int $number): string
