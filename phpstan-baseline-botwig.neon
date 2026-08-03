@@ -9,7 +9,7 @@ parameters:
 		-
 			message: '#^Expression on left side of \?\? is not nullable\.$#'
 			identifier: nullCoalesce.expr
-			count: 2
+			count: 3
 			path: templates/backOffice/default-twig/src/Controller/Customer/CustomerController.php
 
 		-
@@ -39,7 +39,7 @@ parameters:
 		-
 			message: '#^Using nullsafe method call on non\-nullable type Thelia\\Model\\Customer\. Use \-\> instead\.$#'
 			identifier: nullsafe.neverNull
-			count: 1
+			count: 2
 			path: templates/backOffice/default-twig/src/Controller/Customer/CustomerController.php
 
 		-
@@ -141,8 +141,6 @@ parameters:
 		# Absorbs analysis noise that drifted in from default-twig `main` ahead of this
 		# baseline. reportUnmatchedIgnoredErrors is false, so these only ever soak up the
 		# listed known items; the gate still fails on any new error class.
-		- '#^Expression on left side of \?\? is not nullable\.$#'
-		- '#^Using nullsafe method call on non\-nullable type Thelia\\Model\\Customer\. Use \-\> instead\.$#'
 		- '#^Property .*ExportImportController.*events is never read, only written\.$#'
 		- '#^Parameter .*unsubscribed of method .*NewsletterQuery.*filterByUnsubscribed.* expects .*int given\.$#'
 		- '#^Cannot cast Thelia.*Product to int\.$#'
