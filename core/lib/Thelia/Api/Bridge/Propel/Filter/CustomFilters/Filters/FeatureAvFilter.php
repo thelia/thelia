@@ -87,17 +87,13 @@ class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterf
             if (null === $featureProduct->getFeatureAv()) {
                 continue;
             }
-            $filterValue = new FilterValue();
-
-            $filterValue->setMainTitle($featureProduct->getFeature()->setLocale($locale)->getTitle());
-            $filterValue->setMainId($featureProduct->getFeature()->getId());
-
-            if (null !== $featureProduct->getFeatureAv()) {
-                $filterValue->setId($featureProduct->getFeatureAv()->getId());
-                $filterValue->setTitle($featureProduct->getFeatureAv()->setLocale($locale)->getTitle());
-            }
-
-            $value[] = $filterValue;
+            
+            $value[] =
+                (new FilterValue())
+                ->setMainTitle($featureProduct->getFeature()->setLocale($locale)->getTitle())
+                ->setMainId($featureProduct->getFeature()->getId())
+                ->setId($featureProduct->getFeatureAv()->getId())
+                ->setTitle($featureProduct->getFeatureAv()->setLocale($locale)->getTitle());
         }
 
         return $value;
