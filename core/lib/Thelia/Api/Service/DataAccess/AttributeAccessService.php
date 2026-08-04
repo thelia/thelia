@@ -85,7 +85,9 @@ class AttributeAccessService
             if ($productId !== null) {
                 $product = ProductQuery::create()->findPk($productId);
                 if ($product !== null) {
-                    $categoryId = $product->getDefaultCategoryId();
+                    // getDefaultCategoryId() returns 0, not null, when the product has no default category.
+                    $defaultCategoryId = $product->getDefaultCategoryId();
+                    $categoryId = $defaultCategoryId === 0 ? null : $defaultCategoryId;
                 }
             }
         }
@@ -126,7 +128,9 @@ class AttributeAccessService
             if ($contentId !== null) {
                 $content = ContentQuery::create()->findPk($contentId);
                 if ($content !== null) {
-                    $folderId = $content->getDefaultFolderId();
+                    // getDefaultFolderId() returns 0, not null, when the content has no default folder.
+                    $defaultFolderId = $content->getDefaultFolderId();
+                    $folderId = $defaultFolderId === 0 ? null : $defaultFolderId;
                 }
             }
         }
