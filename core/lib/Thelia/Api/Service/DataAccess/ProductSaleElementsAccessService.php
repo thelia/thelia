@@ -17,6 +17,7 @@ namespace Thelia\Api\Service\DataAccess;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Attribute\AttributeAvProductEvent;
+use Thelia\Core\Event\ProductSaleElement\PseByProductEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
@@ -25,7 +26,6 @@ use Thelia\Model\AttributeQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElementsQuery;
-use TheliaSmarty\Events\PseByProductEvent;
 
 class ProductSaleElementsAccessService
 {
@@ -68,10 +68,7 @@ class ProductSaleElementsAccessService
                 $attributes[$attribute->getAttributeId()] = $attribute->getAttributeAvId();
             }
 
-            // TheliaSmarty is optional: without this guard, a Smarty-less install fatals here.
-            if (class_exists(PseByProductEvent::class)) {
-                $this->eventDispatcher->dispatch(new PseByProductEvent($pse));
-            }
+            $this->eventDispatcher->dispatch(new PseByProductEvent($pse));
 
             $result[] = [
                 'id' => $pse->getId(),
