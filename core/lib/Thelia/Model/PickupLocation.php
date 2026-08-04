@@ -22,14 +22,14 @@ use Thelia\Core\Translation\Translator;
 class PickupLocation
 {
     /** OPENING HOURS ARRAY KEYS */
-    public const MONDAY_OPENING_HOURS_KEY = '0';
+    public const MONDAY_OPENING_HOURS_KEY = 0;
 
-    public const TUESDAY_OPENING_HOURS_KEY = '1';
-    public const WEDNESDAY_OPENING_HOURS_KEY = '2';
-    public const THURSDAY_OPENING_HOURS_KEY = '3';
-    public const FRIDAY_OPENING_HOURS_KEY = '4';
-    public const SATURDAY_OPENING_HOURS_KEY = '5';
-    public const SUNDAY_OPENING_HOURS_KEY = '6';
+    public const TUESDAY_OPENING_HOURS_KEY = 1;
+    public const WEDNESDAY_OPENING_HOURS_KEY = 2;
+    public const THURSDAY_OPENING_HOURS_KEY = 3;
+    public const FRIDAY_OPENING_HOURS_KEY = 4;
+    public const SATURDAY_OPENING_HOURS_KEY = 5;
+    public const SUNDAY_OPENING_HOURS_KEY = 6;
 
     protected string $id;
 
