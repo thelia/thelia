@@ -65,11 +65,11 @@ class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterf
                 $query
                     ->useFeatureProductQuery()
                     ->filterByFeatureId($featureId)
-                        ->useFeatureAvQuery()
-                            ->useI18nQuery()
-                                ->where(\sprintf('CAST(feature_av_i18n.title AS UNSIGNED) %s ?', $operator), (int) $limit)
-                            ->endUse()
-                        ->endUse()
+                    ->useFeatureAvQuery()
+                    ->useI18nQuery()
+                    ->where(\sprintf('CAST(feature_av_i18n.title AS UNSIGNED) %s ?', $operator), (int) $limit)
+                    ->endUse()
+                    ->endUse()
                     ->endUse();
             }
         }
@@ -84,12 +84,16 @@ class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterf
         $value = [];
 
         foreach ($activeRecord->getFeatureProductsJoinFeatureAv() as $featureProduct) {
+            if (null === $featureProduct->getFeatureAv()) {
+                continue;
+            }
+
             $value[] =
                 (new FilterValue())
-                    ->setMainTitle($featureProduct->getFeature()->setLocale($locale)->getTitle())
-                    ->setMainId($featureProduct->getFeature()->getId())
-                    ->setId($featureProduct->getFeatureAv()->getId())
-                    ->setTitle($featureProduct->getFeatureAv()->setLocale($locale)->getTitle());
+                ->setMainTitle($featureProduct->getFeature()->setLocale($locale)->getTitle())
+                ->setMainId($featureProduct->getFeature()->getId())
+                ->setId($featureProduct->getFeatureAv()->getId())
+                ->setTitle($featureProduct->getFeatureAv()->setLocale($locale)->getTitle());
         }
 
         return $value;
