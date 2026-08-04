@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Test;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -99,7 +100,15 @@ abstract class IntegrationTestCase extends KernelTestCase
     protected function tearDown(): void
     {
         if ($this->useTransaction && $this->connection instanceof ConnectionInterface && $this->connection->inTransaction()) {
-            $this->connection->rollBack();
+            // A test that fails while application code is inside its own
+            // Propel "nested transaction" leaves the nesting counter above 1.
+            // A plain rollBack() would only decrement it, keeping the real
+            // transaction (and its metadata locks) open for the rest of the
+            // PHPUnit process — on MySQL the next DDL then waits on the
+            // schema lock until lock_wait_timeout (~1 year).
+            $this->connection instanceof ConnectionWrapper
+                ? $this->connection->forceRollBack()
+                : $this->connection->rollBack();
         }
 
         $this->connection = null;
