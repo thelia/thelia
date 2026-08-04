@@ -68,7 +68,10 @@ class ProductSaleElementsAccessService
                 $attributes[$attribute->getAttributeId()] = $attribute->getAttributeAvId();
             }
 
-            $this->eventDispatcher->dispatch(new PseByProductEvent($pse));
+            // TheliaSmarty is optional: without this guard, a Smarty-less install fatals here.
+            if (class_exists(PseByProductEvent::class)) {
+                $this->eventDispatcher->dispatch(new PseByProductEvent($pse));
+            }
 
             $result[] = [
                 'id' => $pse->getId(),
