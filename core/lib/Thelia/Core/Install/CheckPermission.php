@@ -73,6 +73,17 @@ class CheckPermission extends BaseInstall
      */
     public function __construct(bool $verifyInstall = true, protected ?Translator $translator = null)
     {
+        // The configuration package location depends on the install layout
+        // (local/config since thelia/installer 1.6, vendor/thelia/config before):
+        // trust the path resolved by bootstrap.php over the historical constant.
+        if (\defined('THELIA_CONF_DIR') && \defined('THELIA_ROOT') && str_starts_with(THELIA_CONF_DIR, THELIA_ROOT)) {
+            $confDirectory = rtrim(substr(THELIA_CONF_DIR, \strlen(THELIA_ROOT)), DS);
+            $this->directoriesToBeWritable = array_map(
+                static fn (string $directory): string => self::DIR_CONF === $directory ? $confDirectory : $directory,
+                $this->directoriesToBeWritable,
+            );
+        }
+
         $this->validationMessages['php_version'] = [
             'text' => $this->getI18nPhpVersionText(\PHP_VERSION, true),
             'hint' => $this->getI18nPhpVersionHint(),
