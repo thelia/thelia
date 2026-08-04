@@ -18,6 +18,7 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\BrandFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\CategoryFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoiceFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
@@ -400,6 +401,9 @@ readonly class FilterService
         }
         if ($filter instanceof CategoryFilter) {
             $mainTitle = $this->translator->trans(id: 'Category', locale: $locale);
+        }
+        if ($filter instanceof BrandFilter) {
+            $mainTitle = $this->translator->trans(id: 'Brand', locale: $locale);
         }
         $position = null;
         $isVisible = true;
