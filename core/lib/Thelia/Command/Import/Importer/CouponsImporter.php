@@ -16,12 +16,19 @@ namespace Thelia\Command\Import\Importer;
 
 use Thelia\Command\Import\AbstractDemoImporter;
 use Thelia\Command\Import\DemoImportContext;
+use Thelia\Condition\ConditionCollection;
+use Thelia\Condition\ConditionFactory;
 use Thelia\Model\Coupon;
 
 final class CouponsImporter extends AbstractDemoImporter
 {
     private const TYPE_PERCENT = 'thelia.coupon.type.remove_x_percent';
     private const TYPE_AMOUNT = 'thelia.coupon.type.remove_x_amount';
+
+    public function __construct(
+        private readonly ConditionFactory $conditionFactory,
+    ) {
+    }
 
     public function priority(): int
     {
@@ -70,7 +77,9 @@ final class CouponsImporter extends AbstractDemoImporter
         $coupon->setIsAvailableOnSpecialOffers(true);
         $coupon->setIsUsed(false);
         $coupon->setPerCustomerUsageCount(false);
-        $coupon->setSerializedConditions('');
+        // CouponFactory refuses a coupon without conditions: serializing an
+        // empty collection stores the default "match for everyone" rule.
+        $coupon->setSerializedConditions($this->conditionFactory->serializeConditionCollection(new ConditionCollection()));
         $coupon
             ->setLocale('fr_FR')->setTitle($titleFr)->setShortDescription('')->setDescription('')
             ->setLocale('en_US')->setTitle($titleEn)->setShortDescription('')->setDescription('');
