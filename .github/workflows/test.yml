@@ -10,6 +10,10 @@ jobs:
   ci:
     name: CI (coding standard, static analysis, tests)
     runs-on: ubuntu-latest
+    # A leaked DB transaction once kept a DDL test waiting on a metadata lock
+    # until the 6-hour runner limit. A green run takes ~15 minutes; anything
+    # beyond this is a hang, fail fast.
+    timeout-minutes: 30
     env:
       PHP_CS_FIXER_IGNORE_ENV: 1
     steps:
