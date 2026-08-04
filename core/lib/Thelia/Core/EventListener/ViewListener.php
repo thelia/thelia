@@ -37,6 +37,13 @@ class ViewListener
     #[AsEventListener(event: KernelEvents::VIEW, priority: 0)]
     public function onKernelView(ViewEvent $event): void
     {
+        // Sub-requests are never a front view to theme: LiveComponent batch
+        // actions, among others, run through kernel.view sub-requests whose
+        // attributes do not carry the route defaults.
+        if (!$event->isMainRequest()) {
+            return;
+        }
+
         $request = $event->getRequest();
 
         if (true === $request->attributes->get(TheliaHttpKernel::IGNORE_THELIA_VIEW, false)) {
