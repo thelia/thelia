@@ -60,4 +60,55 @@ test.describe('Account', () => {
     await login(authedPage, freshCustomer.email, newPassword);
     await expect(authedPage).toHaveURL(/\/account/);
   });
+
+  test('a rejected profile update keeps the email address and flags no error on it', async ({
+    authedPage,
+    freshCustomer,
+  }) => {
+    await authedPage.goto('/account');
+    const email = '#flexybundle_form_customer_update_form_email';
+    await expect(authedPage.locator(email)).toHaveValue(freshCustomer.email);
+
+    // An empty first name makes the profile form invalid, which sends it back
+    // through the parser context. The email is read-only: it must survive.
+    // The browser would refuse to submit a required field left empty, so the
+    // server-side validation is what we want to reach here.
+    await authedPage.fill('#flexybundle_form_customer_update_form_firstname', '');
+    await authedPage
+      .locator('form[name="flexybundle_form_customer_update_form"]')
+      .evaluate((form: HTMLFormElement) => {
+        form.noValidate = true;
+      });
+    await Promise.all([
+      authedPage.waitForResponse(
+        (response) => response.url().includes('/customer/update') && response.request().method() === 'POST',
+      ),
+      authedPage.locator('form[name="flexybundle_form_customer_update_form"] button[type="submit"]').click(),
+    ]);
+    await authedPage.waitForLoadState('load');
+
+    await expect(authedPage).toHaveURL(/\/account/);
+    await expect(authedPage.locator(email)).toHaveValue(freshCustomer.email);
+    const emailRow = authedPage.locator(`.FieldWrapper:has(${email})`);
+    await expect(emailRow.locator('.FieldInput-error')).toHaveCount(0);
+  });
+
+  test('an accepted profile update saves the new name and leaves the email untouched', async ({
+    authedPage,
+    freshCustomer,
+  }) => {
+    await authedPage.goto('/account');
+    await authedPage.fill('#flexybundle_form_customer_update_form_firstname', 'Renamed');
+    await Promise.all([
+      authedPage.waitForResponse(
+        (response) => response.url().includes('/customer/update') && response.request().method() === 'POST',
+      ),
+      authedPage.locator('form[name="flexybundle_form_customer_update_form"] button[type="submit"]').click(),
+    ]);
+    await authedPage.waitForLoadState('load');
+
+    await authedPage.goto('/account');
+    await expect(authedPage.locator('#flexybundle_form_customer_update_form_firstname')).toHaveValue('Renamed');
+    await expect(authedPage.locator('#flexybundle_form_customer_update_form_email')).toHaveValue(freshCustomer.email);
+  });
 });
