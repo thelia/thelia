@@ -104,7 +104,7 @@ readonly class MetadataService
         return false;
     }
 
-    private function isAdminRoute(string $path): bool
+    public function isAdminRoute(string $path): bool
     {
         return str_starts_with($path, '/api/admin/');
     }

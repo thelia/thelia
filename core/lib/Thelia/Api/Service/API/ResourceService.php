@@ -19,6 +19,8 @@ use Symfony\Component\Routing\RouterInterface;
 use Thelia\Api\Resource\TranslatableResourceInterface;
 use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Log\Tlog;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\Lang;
 
 readonly class ResourceService
 {
@@ -113,7 +115,30 @@ readonly class ResourceService
             }
         }
 
-        return $this->formatI18ns($normalizedData, $currentLocale);
+        return $this->formatI18ns($normalizedData, $currentLocale, $this->getFallbackLocale($path, $currentLocale));
+    }
+
+    /**
+     * Mirrors the front-only fallback that ModelCriteriaTools::getFrontEndI18n()
+     * already applies for the legacy loops and for attr()/theme_hook(): the BO's
+     * "If a translation is missing or incomplete" setting (Configuration >
+     * Languages) governs whether a missing translation falls back to the
+     * default language. The admin context is intentionally excluded so an
+     * admin editing a resource keeps seeing untranslated fields as empty.
+     */
+    private function getFallbackLocale(string $path, string $currentLocale): ?string
+    {
+        if ($this->metadataService->isAdminRoute($path)) {
+            return null;
+        }
+
+        if (Lang::REPLACE_BY_DEFAULT_LANGUAGE !== (int) ConfigQuery::getDefaultLangWhenNoTranslationAvailable()) {
+            return null;
+        }
+
+        $defaultLocale = Lang::getDefaultLanguage()->getLocale();
+
+        return $defaultLocale === $currentLocale ? null : $defaultLocale;
     }
 
     private function manageLocale(array $parameters): array
@@ -127,15 +152,19 @@ readonly class ResourceService
         return $parameters;
     }
 
-    private function formatI18ns(array $datas, ?string $locale = null): array
+    private function formatI18ns(array $datas, ?string $locale, ?string $fallbackLocale): array
     {
         foreach ($datas as $key => &$value) {
-            if ($key === 'i18ns' && isset($value[$locale])) {
-                $value = $value[$locale];
+            if ($key === 'i18ns' && \is_array($value)) {
+                if (isset($value[$locale])) {
+                    $value = $value[$locale];
+                } elseif (null !== $fallbackLocale && isset($value[$fallbackLocale])) {
+                    $value = $value[$fallbackLocale];
+                }
                 continue;
             }
             if (\is_array($value)) {
-                $value = $this->formatI18ns($value, $locale);
+                $value = $this->formatI18ns($value, $locale, $fallbackLocale);
             }
         }
         unset($value);
