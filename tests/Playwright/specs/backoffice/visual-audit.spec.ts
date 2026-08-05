@@ -2,11 +2,11 @@ import { test, expect } from '@playwright/test';
 import { loginAdmin } from '../../helpers/admin';
 import * as fs from 'fs';
 
-const SCREENS_DIR = 'test-results/visual-audit-s18';
+const SCREENS_DIR = 'test-results/visual-audit';
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('Visual audit S18 — BO Twig screens', () => {
+test.describe('Visual audit — BO Twig screens', () => {
   test.skip(
     (process.env.BO_TEMPLATE ?? 'default') !== 'default-twig',
     'BO Twig only.',
