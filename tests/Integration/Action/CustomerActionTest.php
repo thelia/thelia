@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Action;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateMinimalEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\CustomerQuery;
@@ -82,6 +83,37 @@ final class CustomerActionTest extends IntegrationTestCase
         self::assertNotNull($customer);
         self::assertEqualsWithDelta(15.5, (float) $customer->getDiscount(), 0.01);
         self::assertTrue((bool) $customer->getReseller());
+    }
+
+    public function testUpdateAccountOfCustomerWithoutAddressCreatesTheDefaultAddress(): void
+    {
+        $title = $this->factory->customerTitle();
+        $country = $this->factory->country();
+        $customer = $this->factory->customer($title);
+
+        self::assertNull($customer->getDefaultAddress());
+
+        $event = new CustomerCreateOrUpdateEvent(
+            title: $title->getId(),
+            firstname: 'Jean-Marie',
+            lastname: 'Rudler',
+            address1: '1 rue des Lilas',
+            zipcode: '24190',
+            city: 'Vallereuil',
+            country: (string) $country->getId(),
+            email: $customer->getEmail(),
+            reseller: false,
+        );
+        $event->setCustomer($customer);
+        $event->setNotifyCustomerOfAccountModification(false);
+
+        $this->dispatcher->dispatch($event, TheliaEvents::CUSTOMER_UPDATEACCOUNT);
+
+        $address = CustomerQuery::create()->findPk($customer->getId())->getDefaultAddress();
+        self::assertNotNull($address);
+        self::assertSame('1 rue des Lilas', $address->getAddress1());
+        self::assertSame('Vallereuil', $address->getCity());
+        self::assertSame($country->getId(), $address->getCountryId());
     }
 
     public function testTransactionRollbackIsolatesTests(): void

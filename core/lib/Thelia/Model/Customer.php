@@ -91,12 +91,13 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         $con->beginTransaction();
 
         try {
-            $address = $this->getDefaultAddress();
-            if ($this->isNew()) {
-                if (ConfigQuery::isCustomerEmailConfirmationEnable()) {
-                    $this->_validationCodeForEmail = $this->setConfirmationTokenWithExpiry();
-                }
+            if ($this->isNew() && ConfigQuery::isCustomerEmailConfirmationEnable()) {
+                $this->_validationCodeForEmail = $this->setConfirmationTokenWithExpiry();
+            }
 
+            // A customer registered through the minimal registration has no address yet.
+            $address = $this->getDefaultAddress();
+            if (null === $address) {
                 $address = (new Address())
                     ->setLabel(Translator::getInstance()->trans('Main address'))
                     ->setIsDefault(1);
