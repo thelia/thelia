@@ -37,11 +37,13 @@ final readonly class DeliverySetupService
             return;
         }
 
-        $defaultCartAddress = $this->cartAddressService->getOrCreateCartAddressFromAddress($customer->getDefaultAddress());
+        $defaultAddress = $customer->getDefaultAddress();
 
-        if (null === $defaultCartAddress) {
+        if (null === $defaultAddress) {
             throw new \RuntimeException(Translator::getInstance()->trans('Customer default address is null'));
         }
+
+        $defaultCartAddress = $this->cartAddressService->getOrCreateCartAddressFromAddress($defaultAddress);
 
         $cart->setAddressDeliveryId($defaultCartAddress->getId())->save();
     }
