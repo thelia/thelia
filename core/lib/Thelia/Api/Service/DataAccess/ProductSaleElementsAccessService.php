@@ -14,15 +14,18 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Service\DataAccess;
 
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Attribute\AttributeAvProductEvent;
 use Thelia\Core\Event\ProductSaleElement\PseByProductEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\AttributeQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElementsQuery;
@@ -36,6 +39,7 @@ class ProductSaleElementsAccessService
         private readonly TaxEngine $taxEngine,
         private readonly SecurityContext $securityContext,
         private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly LangService $langService,
     ) {
         $this->request = $requestStack->getMainRequest();
     }
@@ -92,7 +96,7 @@ class ProductSaleElementsAccessService
 
     public function attrAvByProduct($product_id)
     {
-        $locale = Lang::getDefaultLanguage()->getLocale();
+        $locale = $this->langService->getLocale() ?? Lang::getDefaultLanguage()->getLocale();
         $attributes = [];
         $attributesId = [];
         $attributeAvailabilitiesId = [];
@@ -105,24 +109,59 @@ class ProductSaleElementsAccessService
         }
 
         foreach (array_unique($attributesId) as $atributeId) {
-            $attribute = AttributeQuery::create()->joinWithI18n($locale)->findOneById($atributeId);
+            $attribute = AttributeQuery::create()->findOneById($atributeId);
 
             $attributes[$atributeId] = [
-                'label' => $attribute->getTitle(),
+                'label' => $this->localizedTitle($attribute, $locale),
                 'id' => $attribute->getId(),
             ];
         }
 
         foreach (array_unique($attributeAvailabilitiesId) as $attributeAvId) {
-            $attributeAv = AttributeAvQuery::create()->joinWithI18n($locale)->findOneById($attributeAvId);
+            $attributeAv = AttributeAvQuery::create()->findOneById($attributeAvId);
             $attributes[$attributeAv->getAttributeId()]['values'][] = [
                 'id' => $attributeAv->getId(),
-                'label' => $attributeAv->getTitle(),
+                'label' => $this->localizedTitle($attributeAv, $locale),
             ];
         }
 
         $event = $this->eventDispatcher->dispatch(new AttributeAvProductEvent($attributes));
 
         return $event->getAttributes();
+    }
+
+    /**
+     * Falling back to the default language mirrors ResourceService::formatI18ns(): the back office
+     * "If a translation is missing or incomplete" setting decides. This data access is exposed on
+     * the front only, so the admin exclusion that applies there has no equivalent here.
+     */
+    private function localizedTitle(ActiveRecordInterface $record, string $locale): string
+    {
+        $title = $record->setLocale($locale)->getTitle();
+
+        // Explicit emptiness test rather than ?: — "0" is a legitimate attribute value title
+        // (a size, for instance) and must not count as missing.
+        if (null !== $title && '' !== $title) {
+            return $title;
+        }
+
+        $fallbackLocale = $this->fallbackLocale($locale);
+
+        if (null !== $fallbackLocale) {
+            $title = $record->setLocale($fallbackLocale)->getTitle();
+        }
+
+        return $title ?? '';
+    }
+
+    private function fallbackLocale(string $currentLocale): ?string
+    {
+        if (Lang::REPLACE_BY_DEFAULT_LANGUAGE !== (int) ConfigQuery::getDefaultLangWhenNoTranslationAvailable()) {
+            return null;
+        }
+
+        $defaultLocale = Lang::getDefaultLanguage()->getLocale();
+
+        return $defaultLocale === $currentLocale ? null : $defaultLocale;
     }
 }
