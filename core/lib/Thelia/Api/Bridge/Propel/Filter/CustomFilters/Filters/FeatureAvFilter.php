@@ -26,6 +26,8 @@ use Thelia\Model\Map\FeatureProductTableMap;
 
 class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterface
 {
+    use LocalizedTitleTrait;
+
     public function getResourceType(): array
     {
         return ['products'];
@@ -90,10 +92,10 @@ class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterf
 
             $value[] =
                 (new FilterValue())
-                ->setMainTitle($featureProduct->getFeature()->setLocale($locale)->getTitle())
+                ->setMainTitle($this->localizedTitle($featureProduct->getFeature(), $locale))
                 ->setMainId($featureProduct->getFeature()->getId())
                 ->setId($featureProduct->getFeatureAv()->getId())
-                ->setTitle($featureProduct->getFeatureAv()->setLocale($locale)->getTitle());
+                ->setTitle($this->localizedTitle($featureProduct->getFeatureAv(), $locale));
         }
 
         return $value;
