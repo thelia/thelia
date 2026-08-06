@@ -22,6 +22,8 @@ use Thelia\Model\Brand;
 
 class BrandFilter implements TheliaFilterInterface
 {
+    use LocalizedTitleTrait;
+
     public function getResourceType(): array
     {
         return ['products'];
@@ -52,7 +54,7 @@ class BrandFilter implements TheliaFilterInterface
         return [
             (new FilterValue())
                 ->setId($brand->getId())
-                ->setTitle($brand->setLocale($locale)->getTitle()),
+                ->setTitle($this->localizedTitle($brand, $locale)),
         ];
     }
 }

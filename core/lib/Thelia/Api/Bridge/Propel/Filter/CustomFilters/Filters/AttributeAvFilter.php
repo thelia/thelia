@@ -24,6 +24,8 @@ use Thelia\Model\Attribute;
 
 class AttributeAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterface
 {
+    use LocalizedTitleTrait;
+
     public function getResourceType(): array
     {
         return ['products'];
@@ -88,10 +90,10 @@ class AttributeAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInte
             foreach ($productSaleElements->getAttributeCombinationsJoinAttributeAv() as $attributeAv) {
                 $value[] =
                     (new FilterValue())
-                        ->setMainTitle($attributeAv->getAttribute()->setLocale($locale)->getTitle())
+                        ->setMainTitle($this->localizedTitle($attributeAv->getAttribute(), $locale))
                         ->setMainId($attributeAv->getAttribute()->getId())
                         ->setId($attributeAv->getAttributeAvId())
-                        ->setTitle($attributeAv->getAttributeAv()->setLocale($locale)->getTitle());
+                        ->setTitle($this->localizedTitle($attributeAv->getAttributeAv(), $locale));
             }
         }
 

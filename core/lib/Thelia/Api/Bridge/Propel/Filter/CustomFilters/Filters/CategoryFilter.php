@@ -23,6 +23,8 @@ use Thelia\Model\CategoryQuery;
 
 class CategoryFilter implements TheliaFilterInterface
 {
+    use LocalizedTitleTrait;
+
     public const CATEGORY_DEPTH_NAME = 'category_depth';
 
     public function __construct(private readonly FilterService $filterService)
@@ -91,11 +93,11 @@ class CategoryFilter implements TheliaFilterInterface
                 foreach ($categories as $category) {
                     $value[] =
                         (new FilterValue())
-                            ->setMainTitle($mainCategory->setLocale($locale)->getTitle())
+                            ->setMainTitle($this->localizedTitle($mainCategory, $locale))
                             ->setMainId($mainCategory->getId())
                             ->setId($category->getId())
                             ->setDepth($depthIndex)
-                            ->setTitle($category->setLocale($locale)->getTitle());
+                            ->setTitle($this->localizedTitle($category, $locale));
                 }
             }
         }
