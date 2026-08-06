@@ -170,6 +170,16 @@ class URL
                 // Remove this parameter from base URL to prevent duplicate parameters
                 $base = preg_replace('`([?&])'.preg_quote($name, '`').'=(?:[^&]*)(?:&|$)`', '$1', (string) $base);
 
+                // An array value has to be expanded as name[key]=value: a plain string cast would
+                // raise "Array to string conversion" and yield name=Array.
+                if (\is_array($value)) {
+                    if ([] !== $value) {
+                        $queryString .= http_build_query([$name => $value]).'&';
+                    }
+
+                    continue;
+                }
+
                 $queryString .= \sprintf('%s=%s&', urlencode($name), urlencode((string) $value));
             }
         }
