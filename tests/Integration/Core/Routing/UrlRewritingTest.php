@@ -114,6 +114,57 @@ final class UrlRewritingTest extends IntegrationTestCase
         self::assertNotNull($retriever->url);
     }
 
+    /**
+     * Runs the callback with PHP warnings promoted to exceptions, the way the Symfony error
+     * handler does over HTTP. Without it, "Array to string conversion" stays a silent warning
+     * in the CLI test environment and the regression goes unnoticed.
+     */
+    private function withWarningsAsExceptions(callable $callback): mixed
+    {
+        set_error_handler(
+            static fn (int $severity, string $message, string $file, int $line) => throw new \ErrorException($message, 0, $severity, $file, $line),
+            \E_WARNING,
+        );
+
+        try {
+            return $callback();
+        } finally {
+            restore_error_handler();
+        }
+    }
+
+    public function testRewritingRetrieverIgnoresArrayValuedParameters(): void
+    {
+        $category = $this->createCategoryWithTitle('Filterable Category');
+
+        $con = Propel::getConnection('TheliaMain');
+        $category->generateRewrittenUrl('en_US', $con);
+
+        $retriever = new RewritingRetriever();
+        $this->withWarningsAsExceptions(static fn () => $retriever->loadSpecificUrl('category', 'en_US', $category->getId(), [
+            'tfilters' => ['attribute' => [1 => [0 => 2]]],
+        ]));
+
+        // A rewriting argument value is always scalar, so no rewritten URL can match an
+        // array-valued parameter: the plain URL is kept and no query is attempted with it.
+        self::assertNull($retriever->rewrittenUrl);
+        self::assertNotNull($retriever->url);
+    }
+
+    public function testGetSpecificUrlQueryReturnsNullForArrayValuedParameters(): void
+    {
+        $category = $this->createCategoryWithTitle('Queryable Category');
+
+        $result = $this->withWarningsAsExceptions(static fn () => RewritingUrlQuery::create()->getSpecificUrlQuery(
+            'category',
+            'en_US',
+            $category->getId(),
+            ['foo' => ['bar' => 1]],
+        ));
+
+        self::assertNull($result);
+    }
+
     public function testProductRewrittenUrlRoundTrip(): void
     {
         $factory = $this->createFixtureFactory();

@@ -68,6 +68,15 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
 
     public function getSpecificUrlQuery($view, $viewLocale, $viewId, $viewOtherParameters): ?RewritingUrl
     {
+        // A rewriting argument value is always scalar, so an array-valued parameter can never match
+        // a stored argument. Binding it as a string raises "Array to string conversion" and makes
+        // the query fail, so report no match and let the caller keep the non-rewritten URL.
+        foreach ($viewOtherParameters as $value) {
+            if (\is_array($value)) {
+                return null;
+            }
+        }
+
         $urlQuery = self::create()
             ->joinRewritingArgument('ra', Criteria::LEFT_JOIN)
             ->withColumn('`ra`.REWRITING_URL_ID', 'ra_REWRITING_URL_ID')
