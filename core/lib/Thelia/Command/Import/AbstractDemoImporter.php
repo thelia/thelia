@@ -37,7 +37,11 @@ abstract class AbstractDemoImporter implements DemoImporterInterface
 
         try {
             $rowNumber = 0;
-            while (false !== ($row = fgetcsv($handle, null, ';'))) {
+            // The escape character is passed explicitly: PHP 8.4 deprecates
+            // relying on the default, and '' is the RFC 4180 behaviour every
+            // spreadsheet tool implements (quotes are doubled, never escaped
+            // with a backslash).
+            while (false !== ($row = fgetcsv($handle, null, ';', '"', ''))) {
                 if ([null] === $row) {
                     continue;
                 }

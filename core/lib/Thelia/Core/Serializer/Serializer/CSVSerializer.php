@@ -25,6 +25,14 @@ class CSVSerializer extends AbstractSerializer
 {
     protected string $delimiter = ',';
     protected string $enclosure = '"';
+
+    /**
+     * RFC 4180 has no escape character: a quote inside a field is doubled.
+     * Spreadsheet software follows that rule, and PHP itself is moving to it
+     * (8.4 deprecates relying on the historical backslash default), so it is
+     * passed explicitly rather than inherited.
+     */
+    protected string $escape = '';
     private ?array $headers = null;
 
     public function getId(): string
@@ -93,7 +101,7 @@ class CSVSerializer extends AbstractSerializer
         }
 
         $fd = fopen('php://memory', 'w+');
-        fputcsv($fd, $data, $this->delimiter, $this->enclosure);
+        fputcsv($fd, $data, $this->delimiter, $this->enclosure, $this->escape);
         rewind($fd);
         $csvRow = stream_get_contents($fd);
         fclose($fd);
@@ -106,7 +114,7 @@ class CSVSerializer extends AbstractSerializer
         if (null !== $this->headers) {
             // Create tmp file with header
             $fd = fopen('php://temp', 'w+');
-            fputcsv($fd, $this->headers, $this->delimiter, $this->enclosure);
+            fputcsv($fd, $this->headers, $this->delimiter, $this->enclosure, $this->escape);
 
             // Copy file content into tmp file
             $fileObject->rewind();
@@ -136,7 +144,7 @@ class CSVSerializer extends AbstractSerializer
 
         $index = 0;
 
-        while (false !== $row = $fileObject->fgetcsv($this->delimiter, $this->enclosure)) {
+        while (false !== $row = $fileObject->fgetcsv($this->delimiter, $this->enclosure, $this->escape)) {
             ++$index;
 
             if (empty($row)) {
