@@ -32,7 +32,7 @@ class Cart extends BaseCart
      * @throws PropelException
      */
     public function duplicate(
-        string $token,
+        ?string $token,
         ?Customer $customer = null,
         ?Currency $currency = null,
         ?EventDispatcherInterface $dispatcher = null,
