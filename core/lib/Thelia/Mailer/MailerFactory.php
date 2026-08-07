@@ -188,15 +188,22 @@ class MailerFactory
             $session->setLang($requiredLang);
         }
 
-        $email = (new Email());
+        try {
+            $email = (new Email());
 
-        $this->setupMessageHeaders($email, $from, $to, $cc, $bcc, $replyTo);
+            $this->setupMessageHeaders($email, $from, $to, $cc, $bcc, $replyTo);
 
-        $message->buildMessage($parser, $email);
+            $message->buildMessage($parser, $email);
 
-        $session->setLang($currentLang);
-
-        return $email;
+            return $email;
+        } finally {
+            // Restore on every path: sendEmailMessage() deliberately swallows a rendering
+            // failure so the request survives it, which would otherwise leave the visitor's
+            // session in the language of an email they never received.
+            if (null !== $currentLang) {
+                $session->setLang($currentLang);
+            }
+        }
     }
 
     /**
