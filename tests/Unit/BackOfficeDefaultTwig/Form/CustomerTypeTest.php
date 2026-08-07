@@ -16,10 +16,13 @@ namespace Thelia\Tests\Unit\BackOfficeDefaultTwig\Form;
 
 use BackOfficeDefaultTwigBundle\Form\Customer\CustomerType;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Translation\IdentityTranslator;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Validation;
 
 final class CustomerTypeTest extends TestCase
@@ -75,6 +78,23 @@ final class CustomerTypeTest extends TestCase
         $this->assertTrue($form->isValid(), (string) $form->getErrors(true, false));
     }
 
+    public function testAddressFieldsReAddedByLegacyModuleListenersAreDropped(): void
+    {
+        // Reproduces ForcePhone: a FORM_AFTER_BUILD listener removes then re-adds
+        // cellphone as required, on the builder, after CustomerType::buildForm.
+        $builder = $this->formFactory()->createNamedBuilder('thelia_customer_update', CustomerType::class, null, [
+            'title_choices' => ['Mr' => 1],
+            'country_choices' => ['France' => 64],
+            'lang_choices' => ['Français' => 1],
+            'include_address' => false,
+        ]);
+        $builder->add('cellphone', TextType::class, ['constraints' => [new NotBlank()], 'required' => true]);
+
+        $form = $builder->getForm();
+
+        $this->assertFalse($form->has('cellphone'), 'a re-added address field would block the save with no address to store it on');
+    }
+
     public function testFormWithAddressStillRequiresTheAddressFields(): void
     {
         $form = $this->createForm([]);
@@ -88,17 +108,20 @@ final class CustomerTypeTest extends TestCase
         $this->assertFalse($form->isValid(), 'the default form must keep its address constraints');
     }
 
+    private function formFactory(): FormFactoryInterface
+    {
+        return Forms::createFormFactoryBuilder()
+            ->addExtension(new ValidatorExtension(Validation::createValidator()))
+            ->addType(new CustomerType(new IdentityTranslator()))
+            ->getFormFactory();
+    }
+
     /**
      * @param array<string, mixed> $options
      */
     private function createForm(array $options): FormInterface
     {
-        $factory = Forms::createFormFactoryBuilder()
-            ->addExtension(new ValidatorExtension(Validation::createValidator()))
-            ->addType(new CustomerType(new IdentityTranslator()))
-            ->getFormFactory();
-
-        return $factory->createNamed('thelia_customer_update', CustomerType::class, null, array_merge([
+        return $this->formFactory()->createNamed('thelia_customer_update', CustomerType::class, null, array_merge([
             'title_choices' => ['Mr' => 1],
             'country_choices' => ['France' => 64],
             'lang_choices' => ['Français' => 1],
