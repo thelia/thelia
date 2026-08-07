@@ -638,7 +638,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         $this->getSession()->setSessionCart($cart);
 
-        if (1 === ConfigQuery::read('cart.use_persistent_cookie', 1)) {
+        if (1 === (int) ConfigQuery::read('cart.use_persistent_cookie', 1)) {
             // set cart_use_cookie to "" to remove the cart cookie
             // see Thelia\Core\EventListener\ResponseListener
             $this->getSession()->set('cart_use_cookie', '');
@@ -673,7 +673,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         $id = null;
 
-        if (1 === ConfigQuery::read('cart.use_persistent_cookie', 1)) {
+        if (1 === (int) ConfigQuery::read('cart.use_persistent_cookie', 1)) {
             $id = $this->tokenProvider->getToken();
             $this->getSession()->set('cart_use_cookie', $id);
         }
