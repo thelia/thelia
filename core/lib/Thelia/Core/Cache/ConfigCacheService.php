@@ -30,22 +30,32 @@ class ConfigCacheService
     {
         if ($force) {
             $this->cache->delete(self::CACHE_KEY);
-            ConfigQuery::resetCache();
+
+            // Reload for the remainder of the request only: the shared entry is
+            // rebuilt by the next request, so an uncommitted value is never
+            // published to it. Without this, every ConfigQuery::read() left in
+            // the request would fall back to the default it was given.
+            ConfigQuery::initCache(self::loadConfigs());
 
             return;
         }
 
-        $value = $this->cache->get(self::CACHE_KEY, static function (ItemInterface $item): array {
-            $configs = ConfigQuery::create()->find();
-            $caches = [];
-
-            foreach ($configs as $config) {
-                $caches[$config->getName()] = $config->getValue();
-            }
-
-            return $caches;
-        });
+        $value = $this->cache->get(self::CACHE_KEY, static fn (ItemInterface $item): array => self::loadConfigs());
 
         ConfigQuery::initCache($value);
+    }
+
+    /**
+     * @return array<string, string|null>
+     */
+    private static function loadConfigs(): array
+    {
+        $configs = [];
+
+        foreach (ConfigQuery::create()->find() as $config) {
+            $configs[$config->getName()] = $config->getValue();
+        }
+
+        return $configs;
     }
 }

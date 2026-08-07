@@ -58,9 +58,9 @@ class ConfigQuery extends BaseConfigQuery
         if ($ignoreCache || !self::$booted || !\array_key_exists($search, self::$cache)) {
             $model = self::create()->filterByName($search)->findOneOrCreate();
 
-            $value = $model->getValue() ?: $default;
-
-            self::$cache[$search] = $value;
+            // The default only applies to a variable that does not exist yet: a stored
+            // '0' or '' is a value, and the cached path returns it as such.
+            self::$cache[$search] = $model->getValue() ?? $default;
         }
 
         return self::$cache[$search];
