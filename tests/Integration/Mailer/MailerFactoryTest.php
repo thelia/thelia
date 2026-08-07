@@ -14,10 +14,13 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Mailer;
 
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\MailerInterface;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Mailer\MailerFactory;
+use Thelia\Model\LangQuery;
+use Thelia\Model\Message;
 use Thelia\Test\IntegrationTestCase;
 
 final class MailerFactoryTest extends IntegrationTestCase
@@ -79,6 +82,38 @@ final class MailerFactoryTest extends IntegrationTestCase
 
         self::assertCount(1, $email->getReplyTo());
         self::assertSame('reply@test.com', $email->getReplyTo()[0]->getAddress());
+    }
+
+    public function testCreateEmailMessageRestoresTheSessionLangWhenRenderingFails(): void
+    {
+        $session = $this->getService(RequestStack::class)->getMainRequest()->getSession();
+
+        $french = LangQuery::create()->findOneByLocale('fr_FR');
+        self::assertNotNull($french);
+        $session->setLang($french);
+
+        // No body and no template file: buildMessage() throws once the required language has
+        // already been written into the session.
+        $message = new Message();
+        $message->setName('test_unrenderable_message');
+        $message->setLocale('en_US');
+        $message->setSubject('Subject');
+        $message->save();
+
+        try {
+            $this->mailerFactory->createEmailMessage(
+                'test_unrenderable_message',
+                ['sender@example.com' => 'Sender'],
+                ['recipient@example.com' => 'Recipient'],
+                [],
+                'en_US',
+            );
+            self::fail('Rendering was expected to fail.');
+        } catch (\Exception) {
+            // The failure is the point: sendEmailMessage() swallows it in production.
+        }
+
+        self::assertSame('fr_FR', $session->getLang()->getLocale());
     }
 
     public function testSendDoesNotThrowWithNullTransport(): void
