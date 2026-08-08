@@ -252,7 +252,7 @@ class Database
     {
         $this->execute(
             \sprintf(
-                'CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET utf8',
+                'CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci',
                 $dbName,
             ),
         );

@@ -83,10 +83,14 @@ if (!defined('THELIA_TEMPLATE_FRONTOFFICE_DIR')) {
 }
 
 if (!defined('THELIA_SETUP_DIRECTORY')) {
-    if (is_dir(THELIA_VENDOR.'thelia'.DS.'setup'.DS)) {
-        define('THELIA_SETUP_DIRECTORY', THELIA_VENDOR.'thelia'.DS.'setup'.DS);
-    } elseif (is_dir(THELIA_ROOT.'setup'.DS)) {
+    // A setup/ directory at the project root is the source the project itself
+    // ships, so it wins over the thelia/setup package, the same way local/config
+    // wins over thelia/config above. A project installed with Composer has no
+    // root setup/ and keeps using the package.
+    if (is_dir(THELIA_ROOT.'setup'.DS)) {
         define('THELIA_SETUP_DIRECTORY', THELIA_ROOT.'setup'.DS);
+    } elseif (is_dir(THELIA_VENDOR.'thelia'.DS.'setup'.DS)) {
+        define('THELIA_SETUP_DIRECTORY', THELIA_VENDOR.'thelia'.DS.'setup'.DS);
     } else {
         define('THELIA_SETUP_DIRECTORY', THELIA_LOCAL_DIR.'setup'.DS);
     }

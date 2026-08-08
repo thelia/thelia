@@ -139,7 +139,10 @@ class DatabaseConfigurationSource
                 'classname' => $connectionParameterBag->get('classname'),
                 'settings' => [
                     'queries' => [
-                        "SET NAMES 'UTF8'",
+                        // "utf8" is an alias for utf8mb3 in MySQL and MariaDB: it
+                        // stores three bytes per character and rejects everything
+                        // outside the Basic Multilingual Plane, emoji included.
+                        "SET NAMES 'utf8mb4'",
                     ],
                 ],
             ];
@@ -167,7 +170,7 @@ class DatabaseConfigurationSource
             $theliaConnectionParameterBag->get('user'),
             $theliaConnectionParameterBag->get('password'),
             [
-                \PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'UTF8'",
+                \PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8mb4'",
             ],
         );
     }
