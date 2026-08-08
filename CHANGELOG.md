@@ -1,3 +1,17 @@
+# 3.0.0-beta1
+
+Thelia 3 is a major version. Main changes:
+
+- PHP 8.3 minimum, Symfony 7.4 LTS
+- API Platform 4.3, installed standalone
+- New back office built with Twig (`thelia/backoffice-default-twig-template`), enabled by default
+- New front office template Flexy (`thelia/flexy`), built with Twig and Symfony UX
+- Email and PDF templates rendered with Twig (PDF generation through dompdf)
+- Smarty stays available through the TheliaSmarty module for existing templates
+- Propel models generated with native PHP types
+
+The 2.6.x line is maintained on the `2.6` branch.
+
 # 2.5.5
 - #3267 Fix wrong .env location in TinyMCE filemanager config
 - #3263 fix: better get current locale

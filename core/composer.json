@@ -91,6 +91,9 @@
         "thelia/web-profiler-module": "dev-twig"
     },
     "extra": {
+        "branch-alias": {
+            "dev-main": "3.0.x-dev"
+        },
         "symfony": {
             "allow-contrib": true,
             "require": "7.4.*",
