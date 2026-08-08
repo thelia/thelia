@@ -142,8 +142,14 @@ $envContent = sprintf(
     $host, $port, $dbName, $user, $password,
 );
 
-// A fresh install must not run on an empty or shared APP_SECRET.
-if ('' === (string) ($_SERVER['APP_SECRET'] ?? getenv('APP_SECRET') ?: '')) {
+// A fresh install must not run on an empty or shared APP_SECRET. The check reads
+// the base env files directly: the Flex recipe only seeds .env.dev, which the
+// prod environment never loads.
+$baseEnv = '';
+foreach (['.env', $envFile] as $f) {
+    $baseEnv .= is_file(THELIA_ROOT.$f) ? file_get_contents(THELIA_ROOT.$f)."\n" : '';
+}
+if (!preg_match('/^APP_SECRET=.+$/m', $baseEnv)) {
     $appSecret = bin2hex(random_bytes(16));
     $envContent .= sprintf("\n###> symfony/framework-bundle ###\nAPP_SECRET=%s\n###< symfony/framework-bundle ###\n", $appSecret);
     $_SERVER['APP_SECRET'] = $_ENV['APP_SECRET'] = $appSecret;
