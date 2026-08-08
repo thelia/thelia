@@ -9,7 +9,7 @@
         "wiki": "http://doc.thelia.net"
     },
     "require": {
-        "php": ">= 8.2",
+        "php": ">= 8.3",
 
         "ext-curl": "*",
         "ext-intl": "*",

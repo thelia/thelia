@@ -12,9 +12,9 @@ name: phpstan-botwig
 # were found"). A .env.test.local points it at the runner's MySQL.
 on:
   push:
-    branches: [ twig, main, master ]
+    branches: [ twig, main ]
   pull_request:
-    branches: [ twig, main, master ]
+    branches: [ twig, main ]
 
 jobs:
   phpstan-botwig:
