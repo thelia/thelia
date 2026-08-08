@@ -3,7 +3,14 @@
 <database defaultIdMethod="native" name="TheliaMain">
   <vendor type="mysql">
     <parameter name="Engine" value="InnoDB"/>
-    <parameter name="Charset" value="utf8"/>
+    <!-- utf8mb4 stores the whole Unicode range; "utf8" is capped at three bytes
+         per character and rejects anything outside the Basic Multilingual Plane.
+         general_ci keeps the comparison rules the tables already used, and the
+         DYNAMIC row format raises the index prefix limit to 3072 bytes, which a
+         four-byte VARCHAR(255) index needs. -->
+    <parameter name="Charset" value="utf8mb4"/>
+    <parameter name="Collate" value="utf8mb4_general_ci"/>
+    <parameter name="RowFormat" value="DYNAMIC"/>
   </vendor>
   <table name="category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />

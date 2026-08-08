@@ -24,7 +24,7 @@ CREATE TABLE `category`
     PRIMARY KEY (`id`),
     INDEX `idx_parent` (`parent`),
     INDEX `idx_parent_position` (`parent`, `position`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- product
@@ -66,7 +66,7 @@ CREATE TABLE `product`
         REFERENCES `brand` (`id`)
         ON UPDATE RESTRICT
         ON DELETE SET NULL
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- product_category
@@ -96,7 +96,7 @@ CREATE TABLE `product_category`
         REFERENCES `category` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- country
@@ -120,7 +120,7 @@ CREATE TABLE `country`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_country_by_default` (`by_default`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- tax
@@ -136,7 +136,7 @@ CREATE TABLE `tax`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- tax_rule
@@ -151,7 +151,7 @@ CREATE TABLE `tax_rule`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- tax_rule_country
@@ -195,7 +195,7 @@ CREATE TABLE `tax_rule_country`
         REFERENCES `state` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- feature
@@ -211,7 +211,7 @@ CREATE TABLE `feature`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- feature_av
@@ -233,7 +233,7 @@ CREATE TABLE `feature_av`
         REFERENCES `feature` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- feature_product
@@ -272,7 +272,7 @@ CREATE TABLE `feature_product`
         REFERENCES `feature_av` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 DROP TRIGGER IF EXISTS `remove_free_text_feature_av`;
 
@@ -312,7 +312,7 @@ CREATE TABLE `feature_template`
         REFERENCES `template` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- attribute
@@ -327,7 +327,7 @@ CREATE TABLE `attribute`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- attribute_av
@@ -349,7 +349,7 @@ CREATE TABLE `attribute_av`
         REFERENCES `attribute` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- attribute_combination
@@ -384,7 +384,7 @@ CREATE TABLE `attribute_combination`
         REFERENCES `product_sale_elements` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- product_sale_elements
@@ -416,7 +416,7 @@ CREATE TABLE `product_sale_elements`
         REFERENCES `product` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- attribute_template
@@ -445,7 +445,7 @@ CREATE TABLE `attribute_template`
         REFERENCES `template` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- config
@@ -464,7 +464,7 @@ CREATE TABLE `config`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `name_UNIQUE` (`name`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- customer
@@ -511,7 +511,7 @@ CREATE TABLE `customer`
         REFERENCES `lang` (`id`)
         ON UPDATE RESTRICT
         ON DELETE SET NULL
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- address
@@ -565,7 +565,7 @@ CREATE TABLE `address`
         REFERENCES `state` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- customer_title
@@ -581,7 +581,7 @@ CREATE TABLE `customer_title`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- lang
@@ -610,7 +610,7 @@ CREATE TABLE `lang`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_lang_by_default` (`by_default`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- folder
@@ -630,7 +630,7 @@ CREATE TABLE `folder`
     `version_created_at` DATETIME,
     `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- content
@@ -649,7 +649,7 @@ CREATE TABLE `content`
     `version_created_at` DATETIME,
     `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- product_image
@@ -674,7 +674,7 @@ CREATE TABLE `product_image`
         REFERENCES `product` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- product_document
@@ -698,7 +698,7 @@ CREATE TABLE `product_document`
         REFERENCES `product` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- order
@@ -785,7 +785,7 @@ CREATE TABLE `order`
         REFERENCES `lang` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- currency
@@ -808,7 +808,7 @@ CREATE TABLE `currency`
     PRIMARY KEY (`id`),
     INDEX `idx_currency_by_default` (`by_default`),
     INDEX `idx_currency_code` (`code`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- order_address
@@ -853,7 +853,7 @@ CREATE TABLE `order_address`
         REFERENCES `state` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- order_product
@@ -893,7 +893,7 @@ CREATE TABLE `order_product`
         REFERENCES `order` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- order_status
@@ -912,7 +912,7 @@ CREATE TABLE `order_status`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `code_UNIQUE` (`code`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- order_sequence
@@ -925,7 +925,7 @@ CREATE TABLE `order_sequence`
     `name` VARCHAR(64) NOT NULL,
     `current_value` BIGINT DEFAULT 0 NOT NULL,
     PRIMARY KEY (`name`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- order_product_attribute_combination
@@ -954,7 +954,7 @@ CREATE TABLE `order_product_attribute_combination`
         REFERENCES `order_product` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- module
@@ -979,7 +979,7 @@ CREATE TABLE `module`
     PRIMARY KEY (`id`),
     UNIQUE INDEX `code_UNIQUE` (`code`),
     INDEX `idx_module_activate` (`activate`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- accessory
@@ -1008,7 +1008,7 @@ CREATE TABLE `accessory`
         REFERENCES `product` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- area
@@ -1024,7 +1024,7 @@ CREATE TABLE `area`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- area_delivery_module
@@ -1053,7 +1053,7 @@ CREATE TABLE `area_delivery_module`
         REFERENCES `module` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- profile
@@ -1069,7 +1069,7 @@ CREATE TABLE `profile`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `code_UNIQUE` (`code`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- resource
@@ -1085,7 +1085,7 @@ CREATE TABLE `resource`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `code_UNIQUE` (`code`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- admin
@@ -1119,7 +1119,7 @@ CREATE TABLE `admin`
         REFERENCES `profile` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- profile_resource
@@ -1147,7 +1147,7 @@ CREATE TABLE `profile_resource`
         REFERENCES `resource` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- profile_module
@@ -1175,7 +1175,7 @@ CREATE TABLE `profile_module`
         REFERENCES `module` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- message
@@ -1199,7 +1199,7 @@ CREATE TABLE `message`
     `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`),
     UNIQUE INDEX `name_UNIQUE` (`name`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- coupon
@@ -1239,7 +1239,7 @@ CREATE TABLE `coupon`
     INDEX `idx_max_usage` (`max_usage`),
     INDEX `idx_is_available_on_special_offers` (`is_available_on_special_offers`),
     INDEX `idx_start_date` (`start_date`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- admin_log
@@ -1261,7 +1261,7 @@ CREATE TABLE `admin_log`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- content_folder
@@ -1291,7 +1291,7 @@ CREATE TABLE `content_folder`
         REFERENCES `folder` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- cart
@@ -1351,7 +1351,7 @@ CREATE TABLE `cart`
         REFERENCES `module` (`id`)
         ON DELETE SET NULL
         ON UPDATE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- cart_address
@@ -1403,7 +1403,7 @@ CREATE TABLE `cart_address`
     REFERENCES `address` (`id`)
     ON UPDATE RESTRICT
     ON DELETE SET NULL
-    ) ENGINE=InnoDB CHARACTER SET='utf8';
+    ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- cart_item
@@ -1443,7 +1443,7 @@ CREATE TABLE `cart_item`
         REFERENCES `product_sale_elements` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- product_price
@@ -1471,7 +1471,7 @@ CREATE TABLE `product_price`
         FOREIGN KEY (`currency_id`)
         REFERENCES `currency` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- category_image
@@ -1496,7 +1496,7 @@ CREATE TABLE `category_image`
         REFERENCES `category` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- folder_image
@@ -1521,7 +1521,7 @@ CREATE TABLE `folder_image`
         REFERENCES `folder` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- content_image
@@ -1546,7 +1546,7 @@ CREATE TABLE `content_image`
         REFERENCES `content` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- category_document
@@ -1570,7 +1570,7 @@ CREATE TABLE `category_document`
         REFERENCES `category` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- content_document
@@ -1594,7 +1594,7 @@ CREATE TABLE `content_document`
         REFERENCES `content` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- folder_document
@@ -1618,7 +1618,7 @@ CREATE TABLE `folder_document`
         REFERENCES `folder` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- product_associated_content
@@ -1647,7 +1647,7 @@ CREATE TABLE `product_associated_content`
         REFERENCES `content` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- category_associated_content
@@ -1676,7 +1676,7 @@ CREATE TABLE `category_associated_content`
         REFERENCES `content` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- rewriting_url
@@ -1703,7 +1703,7 @@ CREATE TABLE `rewriting_url`
         REFERENCES `rewriting_url` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- rewriting_argument
@@ -1725,7 +1725,7 @@ CREATE TABLE `rewriting_argument`
         REFERENCES `rewriting_url` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- template
@@ -1739,7 +1739,7 @@ CREATE TABLE `template`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- module_image
@@ -1764,7 +1764,7 @@ CREATE TABLE `module_image`
         REFERENCES `module` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- order_product_tax
@@ -1789,7 +1789,7 @@ CREATE TABLE `order_product_tax`
         REFERENCES `order_product` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- newsletter
@@ -1810,7 +1810,7 @@ CREATE TABLE `newsletter`
     PRIMARY KEY (`id`),
     UNIQUE INDEX `email_UNIQUE` (`email`),
     INDEX `idx_unsubscribed` (`unsubscribed`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- order_coupon
@@ -1845,7 +1845,7 @@ CREATE TABLE `order_coupon`
         REFERENCES `order` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- coupon_country
@@ -1867,7 +1867,7 @@ CREATE TABLE `coupon_country`
         FOREIGN KEY (`coupon_id`)
         REFERENCES `coupon` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- coupon_module
@@ -1889,7 +1889,7 @@ CREATE TABLE `coupon_module`
         FOREIGN KEY (`module_id`)
         REFERENCES `module` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- order_coupon_country
@@ -1910,7 +1910,7 @@ CREATE TABLE `order_coupon_country`
     CONSTRAINT `fk_order_coupon_country_coupon_id`
         FOREIGN KEY (`coupon_id`)
         REFERENCES `order_coupon` (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- order_coupon_module
@@ -1932,7 +1932,7 @@ CREATE TABLE `order_coupon_module`
         FOREIGN KEY (`module_id`)
         REFERENCES `module` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- coupon_customer_count
@@ -1958,7 +1958,7 @@ CREATE TABLE `coupon_customer_count`
         REFERENCES `coupon` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- brand
@@ -1981,7 +1981,7 @@ CREATE TABLE `brand`
         REFERENCES `brand_image` (`id`)
         ON UPDATE RESTRICT
         ON DELETE SET NULL
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- brand_document
@@ -2005,7 +2005,7 @@ CREATE TABLE `brand_document`
         REFERENCES `brand` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- brand_image
@@ -2029,7 +2029,7 @@ CREATE TABLE `brand_image`
         REFERENCES `brand` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- form_firewall
@@ -2048,7 +2048,7 @@ CREATE TABLE `form_firewall`
     PRIMARY KEY (`id`),
     INDEX `idx_form_firewall_form_name` (`form_name`),
     INDEX `idx_form_firewall_ip_address` (`ip_address`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- sale
@@ -2069,7 +2069,7 @@ CREATE TABLE `sale`
     PRIMARY KEY (`id`),
     INDEX `idx_sales_active_start_end_date` (`active`, `start_date`, `end_date`),
     INDEX `idx_sales_active` (`active`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- sale_offset_currency
@@ -2093,7 +2093,7 @@ CREATE TABLE `sale_offset_currency`
         REFERENCES `currency` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- sale_product
@@ -2126,7 +2126,7 @@ CREATE TABLE `sale_product`
         REFERENCES `attribute_av` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- export_category
@@ -2143,7 +2143,7 @@ CREATE TABLE `export_category`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `ref_UNIQUE` (`ref`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- export
@@ -2168,7 +2168,7 @@ CREATE TABLE `export`
         REFERENCES `export_category` (`id`)
         ON UPDATE CASCADE
         ON DELETE RESTRICT
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- import_category
@@ -2185,7 +2185,7 @@ CREATE TABLE `import_category`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `ref_UNIQUE` (`ref`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- import
@@ -2210,7 +2210,7 @@ CREATE TABLE `import`
         REFERENCES `import_category` (`id`)
         ON UPDATE CASCADE
         ON DELETE RESTRICT
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- product_sale_elements_product_image
@@ -2236,7 +2236,7 @@ CREATE TABLE `product_sale_elements_product_image`
         REFERENCES `product_image` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- product_sale_elements_product_document
@@ -2262,7 +2262,7 @@ CREATE TABLE `product_sale_elements_product_document`
         REFERENCES `product_document` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- hook
@@ -2285,7 +2285,7 @@ CREATE TABLE `hook`
     PRIMARY KEY (`id`),
     UNIQUE INDEX `code_UNIQUE` (`code`, `type`),
     INDEX `idx_module_activate` (`activate`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- module_hook
@@ -2319,7 +2319,7 @@ CREATE TABLE `module_hook`
         REFERENCES `hook` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- meta_data
@@ -2339,7 +2339,7 @@ CREATE TABLE `meta_data`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `meta_data_key_element_idx` (`meta_key`, `element_key`, `element_id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- module_config
@@ -2361,7 +2361,7 @@ CREATE TABLE `module_config`
         REFERENCES `module` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- api
@@ -2382,7 +2382,7 @@ CREATE TABLE `api`
     CONSTRAINT `fk_api_profile_id`
         FOREIGN KEY (`profile_id`)
         REFERENCES `profile` (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- country_area
@@ -2412,7 +2412,7 @@ CREATE TABLE `country_area`
         REFERENCES `country` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- ignored_module_hook
@@ -2441,7 +2441,7 @@ CREATE TABLE `ignored_module_hook`
         REFERENCES `hook` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- state
@@ -2464,7 +2464,7 @@ CREATE TABLE `state`
         REFERENCES `country` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- category_i18n
@@ -2488,7 +2488,7 @@ CREATE TABLE `category_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `category` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- product_i18n
@@ -2512,7 +2512,7 @@ CREATE TABLE `product_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `product` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- country_i18n
@@ -2533,7 +2533,7 @@ CREATE TABLE `country_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `country` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- tax_i18n
@@ -2552,7 +2552,7 @@ CREATE TABLE `tax_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `tax` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- tax_rule_i18n
@@ -2571,7 +2571,7 @@ CREATE TABLE `tax_rule_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `tax_rule` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- feature_i18n
@@ -2592,7 +2592,7 @@ CREATE TABLE `feature_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `feature` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- feature_av_i18n
@@ -2613,7 +2613,7 @@ CREATE TABLE `feature_av_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `feature_av` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- attribute_i18n
@@ -2634,7 +2634,7 @@ CREATE TABLE `attribute_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `attribute` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- attribute_av_i18n
@@ -2655,7 +2655,7 @@ CREATE TABLE `attribute_av_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `attribute_av` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- config_i18n
@@ -2676,7 +2676,7 @@ CREATE TABLE `config_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `config` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- customer_title_i18n
@@ -2695,7 +2695,7 @@ CREATE TABLE `customer_title_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `customer_title` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- folder_i18n
@@ -2719,7 +2719,7 @@ CREATE TABLE `folder_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `folder` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- content_i18n
@@ -2743,7 +2743,7 @@ CREATE TABLE `content_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `content` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- product_image_i18n
@@ -2764,7 +2764,7 @@ CREATE TABLE `product_image_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `product_image` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- product_document_i18n
@@ -2785,7 +2785,7 @@ CREATE TABLE `product_document_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `product_document` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- currency_i18n
@@ -2803,7 +2803,7 @@ CREATE TABLE `currency_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `currency` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- order_status_i18n
@@ -2824,7 +2824,7 @@ CREATE TABLE `order_status_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `order_status` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- module_i18n
@@ -2845,7 +2845,7 @@ CREATE TABLE `module_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `module` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- profile_i18n
@@ -2866,7 +2866,7 @@ CREATE TABLE `profile_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `profile` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- resource_i18n
@@ -2887,7 +2887,7 @@ CREATE TABLE `resource_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `resource` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- message_i18n
@@ -2908,7 +2908,7 @@ CREATE TABLE `message_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `message` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- coupon_i18n
@@ -2928,7 +2928,7 @@ CREATE TABLE `coupon_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `coupon` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- category_image_i18n
@@ -2949,7 +2949,7 @@ CREATE TABLE `category_image_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `category_image` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- folder_image_i18n
@@ -2970,7 +2970,7 @@ CREATE TABLE `folder_image_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `folder_image` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- content_image_i18n
@@ -2991,7 +2991,7 @@ CREATE TABLE `content_image_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `content_image` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- category_document_i18n
@@ -3012,7 +3012,7 @@ CREATE TABLE `category_document_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `category_document` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- content_document_i18n
@@ -3033,7 +3033,7 @@ CREATE TABLE `content_document_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `content_document` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- folder_document_i18n
@@ -3054,7 +3054,7 @@ CREATE TABLE `folder_document_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `folder_document` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- template_i18n
@@ -3072,7 +3072,7 @@ CREATE TABLE `template_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `template` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- module_image_i18n
@@ -3093,7 +3093,7 @@ CREATE TABLE `module_image_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `module_image` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- brand_i18n
@@ -3117,7 +3117,7 @@ CREATE TABLE `brand_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `brand` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- brand_document_i18n
@@ -3138,7 +3138,7 @@ CREATE TABLE `brand_document_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `brand_document` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- brand_image_i18n
@@ -3159,7 +3159,7 @@ CREATE TABLE `brand_image_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `brand_image` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- sale_i18n
@@ -3181,7 +3181,7 @@ CREATE TABLE `sale_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `sale` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- export_category_i18n
@@ -3199,7 +3199,7 @@ CREATE TABLE `export_category_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `export_category` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- export_i18n
@@ -3218,7 +3218,7 @@ CREATE TABLE `export_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `export` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- import_category_i18n
@@ -3236,7 +3236,7 @@ CREATE TABLE `import_category_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `import_category` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- import_i18n
@@ -3255,7 +3255,7 @@ CREATE TABLE `import_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `import` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- hook_i18n
@@ -3275,7 +3275,7 @@ CREATE TABLE `hook_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `hook` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- module_config_i18n
@@ -3293,7 +3293,7 @@ CREATE TABLE `module_config_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `module_config` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- state_i18n
@@ -3311,7 +3311,7 @@ CREATE TABLE `state_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `state` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- category_version
@@ -3336,7 +3336,7 @@ CREATE TABLE `category_version`
         FOREIGN KEY (`id`)
         REFERENCES `category` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- product_version
@@ -3364,7 +3364,7 @@ CREATE TABLE `product_version`
         FOREIGN KEY (`id`)
         REFERENCES `product` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- customer_version
@@ -3403,7 +3403,7 @@ CREATE TABLE `customer_version`
         FOREIGN KEY (`id`)
         REFERENCES `customer` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- folder_version
@@ -3427,7 +3427,7 @@ CREATE TABLE `folder_version`
         FOREIGN KEY (`id`)
         REFERENCES `folder` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- content_version
@@ -3450,7 +3450,7 @@ CREATE TABLE `content_version`
         FOREIGN KEY (`id`)
         REFERENCES `content` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- order_version
@@ -3491,7 +3491,7 @@ CREATE TABLE `order_version`
         FOREIGN KEY (`id`)
         REFERENCES `order` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- message_version
@@ -3518,7 +3518,7 @@ CREATE TABLE `message_version`
         FOREIGN KEY (`id`)
         REFERENCES `message` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- coupon_version
@@ -3552,7 +3552,7 @@ CREATE TABLE `coupon_version`
         FOREIGN KEY (`id`)
         REFERENCES `coupon` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 
 -- ---------------------------------------------------------------------
@@ -3567,7 +3567,7 @@ CREATE TABLE `choice_filter_other`
     `type` VARCHAR(55),
     `visible` TINYINT(1),
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- choice_filter
@@ -3619,7 +3619,7 @@ CREATE TABLE `choice_filter`
             REFERENCES `template` (`id`)
             ON UPDATE RESTRICT
             ON DELETE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
 -- choice_filter_other_i18n
@@ -3638,6 +3638,6 @@ CREATE TABLE `choice_filter_other_i18n`
         FOREIGN KEY (`id`)
             REFERENCES `choice_filter_other` (`id`)
             ON DELETE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

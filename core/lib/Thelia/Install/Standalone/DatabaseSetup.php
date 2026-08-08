@@ -48,7 +48,10 @@ final class DatabaseSetup
         $pdo = new \PDO("mysql:host={$this->host};port={$this->port}", $this->user, $this->password, [
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
         ]);
-        $pdo->exec("CREATE DATABASE IF NOT EXISTS `{$this->dbName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+        // The collation must match the one the core tables declare: comparing two
+        // columns that share a charset but not a collation raises "1267 Illegal mix
+        // of collations", and module tables inherit this database default.
+        $pdo->exec("CREATE DATABASE IF NOT EXISTS `{$this->dbName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci");
     }
 
     public function connect(): void
