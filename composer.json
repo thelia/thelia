@@ -22,20 +22,20 @@
             "url": "core/",
             "options": {
                 "versions": {
-                    "thelia/core": "dev-twig"
+                    "thelia/core": "3.0.0-beta1"
                 }
             }
         }
     ],
     "require": {
         "php": ">= 8.3",
-        "thelia/core": "dev-twig",
-        "thelia/backoffice-default-template": "^0.1",
-        "thelia/backoffice-default-twig-template": "^0.4",
-        "thelia/email-default-template": "dev-twig",
-        "thelia/pdf-default-template": "dev-twig",
+        "thelia/core": "^3.0.0-beta1",
+        "thelia/backoffice-default-template": "^1.0.0-beta1",
+        "thelia/backoffice-default-twig-template": "^1.0.0-beta1",
+        "thelia/email-default-template": "^1.0.0-beta1",
+        "thelia/pdf-default-template": "^1.0.0-beta1",
         "symfony/flex": "^2.4",
-        "thelia/flexy": "dev-twig",
+        "thelia/flexy": "^1.0.0-beta1",
         "ext-simplexml": "*",
         "ext-dom": "*"
     },
@@ -49,7 +49,7 @@
         "symfony/phpunit-bridge": "7.4.*",
         "symfony/css-selector": "7.4.*",
         "symfony/debug-bundle": "7.4.*",
-        "thelia/web-profiler-module": "dev-twig"
+        "thelia/web-profiler-module": "^3.0"
     },
     "scripts": {
         "phpc": [
@@ -126,7 +126,7 @@
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "beta",
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
