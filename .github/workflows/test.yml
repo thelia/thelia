@@ -1,9 +1,9 @@
 name: test
 on:
   push:
-    branches: [ master, main ]
+    branches: [ master, main, 2.6 ]
   pull_request:
-    branches: [ master, main ]
+    branches: [ master, main, 2.6 ]
 jobs:
   phpunit:
     name: PHP ${{ matrix.php-versions }}

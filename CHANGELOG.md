@@ -1,3 +1,32 @@
+# 2.6.1
+- #3446 fix: require lexik/jwt-authentication-bundle ^2.20 in thelia/core
+- #3435 Feat/api updated at rewriting filters
+- #3433 Fix #3432
+- #3430 fix bo template catalog-breadcrumb
+- #3421 fix: skip OrderFilter when no order param is provided
+- #3416 Main fix api
+- #3407 Thelia API
+- #3406 Remove symfony/polyfill-php73 dependency
+- #3399 Fix clone when file is empty
+- #3398 Fix clone product
+- #3394 Fix unknow resource type Url
+- #3392 expose template attributes and feature for products route API on Thelia Main
+- #3391 Fix incorrect log level
+- #3386 Fix feature multilanguage
+- #3385 fix mailer i18n
+- #3384 fix missing i18n rows in database
+- #3383 Feature Informations Boutique Multilanguage
+- #3381 chore(deps): bump lodash in /templates/frontOffice/modern
+- #3379 Feature Images by lang
+- #3377 Integrate native url sanitization
+- #3375 Update page_url for image upload form
+- #3370 Fixed the build of module list when editing module hook
+- #3325 Sum of rounds / round of sums selection from configuration
+- fix: bump phpunit to 9.6.* to resolve security advisory GHSA-vvj3-c3rp-c85p
+- feat: enhance PropelExtractor and PropelPersistProcessor for translatable resources
+- Backport Front 2.6.1: multi-domain language detection in sitemap generation
+- Backport Tinymce 2.6.1: handle null request in TinyMCELanguage constructor
+
 # 2.6.0
 - #3369 Feat: remove stack docker
 - #3368 chore: remove deprecated CI/CD workflow configuration
