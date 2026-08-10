@@ -73,7 +73,7 @@ use Thelia\Model\Map\AddressTableMap;
         new Get(
             uriTemplate: '/front/account/addresses/{id}',
             normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
-            // security: 'object.customer.getId() == user.getId()'
+            security: 'object.customer.getId() == user.getId()',
         ),
         new Put(
             uriTemplate: '/front/account/addresses/{id}',
