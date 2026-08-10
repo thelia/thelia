@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Core\Security;
 
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\SecurityContext;
@@ -89,6 +90,61 @@ final class SecurityContextTest extends IntegrationTestCase
         $this->securityContext->clearAdminUser();
         $notFound = $this->securityContext->checkRole(['ADMIN']);
         self::assertNull($notFound);
+    }
+
+    public function testDeletedAdminNoLongerHasAValidSession(): void
+    {
+        $admin = $this->createFixtureFactory()->admin();
+        $this->securityContext->setAdminUser($admin);
+
+        self::assertTrue($this->securityContext->hasAdminUser());
+
+        $admin->delete();
+
+        // Simulate the next request: the session admin is unserialized afresh,
+        // exactly as the session storage does between two requests.
+        $this->reloadSessionAdminUser();
+
+        self::assertNull($this->securityContext->getAdminUser());
+        self::assertFalse($this->securityContext->hasAdminUser());
+    }
+
+    public function testSessionAdminProfileIsRefreshedFromTheDatabase(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $profile = $factory->profile();
+        $admin = $factory->admin();
+        $this->securityContext->setAdminUser($admin);
+
+        // Demote the admin (superadministrator -> restricted profile) while
+        // the session still holds the old serialized object.
+        $staleSerializedAdmin = serialize($admin);
+        $admin->setProfileId($profile->getId());
+        $admin->save();
+
+        $this->getSession()->setAdminUser(unserialize($staleSerializedAdmin));
+
+        $freshAdmin = $this->securityContext->getAdminUser();
+
+        self::assertInstanceOf(Admin::class, $freshAdmin);
+        self::assertSame($profile->getId(), $freshAdmin->getProfileId());
+    }
+
+    private function getSession(): Session
+    {
+        $session = self::getContainer()->get('request_stack')->getMainRequest()->getSession();
+        self::assertInstanceOf(Session::class, $session);
+
+        return $session;
+    }
+
+    private function reloadSessionAdminUser(): void
+    {
+        $session = $this->getSession();
+        $staleAdmin = unserialize(serialize($session->getAdminUser()));
+        self::assertInstanceOf(Admin::class, $staleAdmin);
+
+        $session->setAdminUser($staleAdmin);
     }
 
     public function testGetPermissionsSkipsOrphanPermissionRows(): void
