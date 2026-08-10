@@ -1265,6 +1265,7 @@ return [
     'Tab image - bottom' => 'Вкладка изображений - внизу',
     'Tab image - top' => 'Вкладка изображений - вверху',
     'Tabasco' => 'Табаско',
+    'Taïwan' => 'Тайвань',
     'Tajikistan' => 'Таджикистан',
     'Tamaulipas' => 'Тамаулипас',
     'Tanzania' => 'Танзания',
