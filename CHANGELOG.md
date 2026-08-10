@@ -1,5 +1,6 @@
 # 2.6.1
 - #3446 fix: require lexik/jwt-authentication-bundle ^2.20 in thelia/core
+- fix: allow composer/composer ~2.10.0, all 2.9.x affected by security advisories
 - #3435 Feat/api updated at rewriting filters
 - #3433 Fix #3432
 - #3430 fix bo template catalog-breadcrumb
