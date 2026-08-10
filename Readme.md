@@ -136,15 +136,9 @@ $ php Thelia thelia:install
 
 You just have to follow all instructions.
 
-### Docker and docker compose
+### Local development environment
 
-This repo contains all the configuration needed to run Thelia with docker and docker-compose.
-Warning, this docker configuration is not ready for production.
-
-It requires obviously [docker](https://docker.com/) and [docker-compose](https://docs.docker.com/compose/)
-
-Please, follow the official documentation to install docker and docker-compose on your system :
-https://doc.thelia.net/docs/getting_started/docker
+This repository does not ship a Docker setup. The maintainers use [DDEV](https://ddev.com/) for local development ; see the official DDEV documentation to install it and set up a PHP/MySQL environment for your project.
 
 
 Contribute
