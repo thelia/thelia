@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\User\UserInterface;
+use Thelia\Model\Admin;
+use Thelia\Model\AdminQuery;
 use Thelia\Model\Customer;
 
 /**
@@ -27,6 +29,9 @@ class SecurityContext
 {
     /** @var RequestStack */
     private $requestStack;
+
+    /** @var \WeakReference<Admin>|null the session admin already checked against the database */
+    private ?\WeakReference $revalidatedAdminUser = null;
 
     public function __construct(RequestStack $requestStack)
     {
@@ -54,7 +59,38 @@ class SecurityContext
      */
     public function getAdminUser()
     {
-        return $this->getSession()->getAdminUser();
+        $user = $this->getSession()->getAdminUser();
+
+        if ($user instanceof Admin && $this->revalidatedAdminUser?->get() !== $user) {
+            return $this->revalidateAdminUser($user);
+        }
+
+        return $user;
+    }
+
+    /**
+     * Reload the session admin from the database, once per request, so that a
+     * deleted admin (or one whose profile was changed) does not keep a
+     * privileged session built from stale serialized data.
+     *
+     * @return Admin|null the freshly loaded admin, or null if it no longer exists
+     */
+    private function revalidateAdminUser(Admin $sessionAdminUser)
+    {
+        $freshAdminUser = AdminQuery::create()->findPk($sessionAdminUser->getId());
+
+        if (null === $freshAdminUser) {
+            $this->clearAdminUser();
+
+            return null;
+        }
+
+        $freshAdminUser->eraseCredentials();
+
+        $this->getSession()->setAdminUser($freshAdminUser);
+        $this->revalidatedAdminUser = \WeakReference::create($freshAdminUser);
+
+        return $freshAdminUser;
     }
 
     /**
@@ -64,7 +100,7 @@ class SecurityContext
      */
     public function hasAdminUser()
     {
-        return $this->getSession()->getAdminUser() !== null;
+        return $this->getAdminUser() !== null;
     }
 
     /**
@@ -257,6 +293,8 @@ class SecurityContext
      */
     public function clearAdminUser(): void
     {
+        $this->revalidatedAdminUser = null;
+
         $this->getSession()->clearAdminUser();
     }
 }
