@@ -47,7 +47,7 @@ class Content extends BaseAction implements EventSubscriberInterface
     {
         $content = (new ContentModel())
 
-            ->setVisible($event->getVisible())
+            ->setVisible($event->getVisible() ? 1 : 0)
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
             ->create($event->getDefaultFolder())
@@ -69,7 +69,7 @@ class Content extends BaseAction implements EventSubscriberInterface
             $con->beginTransaction();
             try {
                 $content
-                    ->setVisible($event->getVisible())
+                    ->setVisible($event->getVisible() ? 1 : 0)
                     ->setLocale($event->getLocale())
                     ->setTitle($event->getTitle())
                     ->setDescription($event->getDescription())

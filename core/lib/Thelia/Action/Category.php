@@ -47,7 +47,7 @@ class Category extends BaseAction implements EventSubscriberInterface
         $category
             ->setLocale($event->getLocale())
             ->setParent($event->getParent())
-            ->setVisible($event->getVisible())
+            ->setVisible($event->getVisible() ? 1 : 0)
             ->setTitle($event->getTitle())
 
             ->save()
@@ -71,7 +71,7 @@ class Category extends BaseAction implements EventSubscriberInterface
                 ->setPostscriptum($event->getPostscriptum())
 
                 ->setParent($event->getParent())
-                ->setVisible($event->getVisible())
+                ->setVisible($event->getVisible() ? 1 : 0)
 
                 ->save();
 

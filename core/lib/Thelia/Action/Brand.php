@@ -38,7 +38,7 @@ class Brand extends BaseAction implements EventSubscriberInterface
         $brand = new BrandModel();
 
         $brand
-            ->setVisible($event->getVisible())
+            ->setVisible($event->getVisible() ? 1 : 0)
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
             ->save()
@@ -54,7 +54,7 @@ class Brand extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $brand = BrandQuery::create()->findPk($event->getBrandId())) {
             $brand
-                ->setVisible($event->getVisible())
+                ->setVisible($event->getVisible() ? 1 : 0)
                 ->setLogoImageId((int) $event->getLogoImageId() == 0 ? null : $event->getLogoImageId())
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())

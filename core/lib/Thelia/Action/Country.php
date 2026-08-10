@@ -35,7 +35,7 @@ class Country extends BaseAction implements EventSubscriberInterface
         $country = new CountryModel();
 
         $country
-            ->setVisible($event->isVisible())
+            ->setVisible($event->isVisible() ? 1 : 0)
             ->setIsocode($event->getIsocode())
             ->setIsoalpha2($event->getIsoAlpha2())
             ->setIsoalpha3($event->getIsoAlpha3())
@@ -51,7 +51,7 @@ class Country extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
             $country
-                ->setVisible($event->isVisible())
+                ->setVisible($event->isVisible() ? 1 : 0)
                 ->setIsocode($event->getIsocode())
                 ->setIsoalpha2($event->getIsoAlpha2())
                 ->setIsoalpha3($event->getIsoAlpha3())

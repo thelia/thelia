@@ -34,7 +34,7 @@ class State extends BaseAction implements EventSubscriberInterface
         $state = new StateModel();
 
         $state
-            ->setVisible($event->isVisible())
+            ->setVisible($event->isVisible() ? 1 : 0)
             ->setCountryId($event->getCountry())
             ->setIsocode($event->getIsocode())
             ->setLocale($event->getLocale())
@@ -49,7 +49,7 @@ class State extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $state = StateQuery::create()->findPk($event->getStateId())) {
             $state
-                ->setVisible($event->isVisible())
+                ->setVisible($event->isVisible() ? 1 : 0)
                 ->setCountryId($event->getCountry())
                 ->setIsocode($event->getIsocode())
                 ->setLocale($event->getLocale())
