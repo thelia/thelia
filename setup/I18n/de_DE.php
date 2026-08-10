@@ -921,6 +921,7 @@ return [
     'Tab document - top' => 'Dokument Tab - oben',
     'Tab image - bottom' => 'Bild Tab - unten',
     'Tab image - top' => 'Bild Tab - oben',
+    'Taïwan' => 'Taiwan',
     'Tajikistan' => 'Tadschikistan',
     'Tanzania' => 'Tansania',
     'Tax - Edit JavaScript' => 'Taxe - JavaScript Änderung',

@@ -1270,6 +1270,7 @@ return [
     'Tab image - bottom' => 'Onglet image - en bas',
     'Tab image - top' => 'Onglet image - en haut',
     'Tabasco' => 'Tabasco',
+    'Taïwan' => 'Taïwan',
     'Tajikistan' => 'Tadjikistan',
     'Tamaulipas' => 'Tamaulipas',
     'Tanzania' => 'Tanzanie',
