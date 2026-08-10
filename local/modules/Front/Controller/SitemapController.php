@@ -15,7 +15,6 @@ namespace Front\Controller;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Thelia\Controller\Front\BaseFrontController;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
@@ -48,7 +47,6 @@ class SitemapController extends BaseFrontController
     public const SITEMAP_CACHE_KEY = 'sitemap';
 
     /**
-     * @return Response
      * @throws InvalidArgumentException
      * @throws \SmartyException
      */
