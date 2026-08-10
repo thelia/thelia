@@ -12,6 +12,7 @@
 
 namespace Front\Controller;
 
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\HttpFoundation\Request;
@@ -48,10 +49,11 @@ class SitemapController extends BaseFrontController
 
     /**
      * @return Response
+     * @throws InvalidArgumentException
+     * @throws \SmartyException
      */
-    public function generateAction()
+    public function generateAction(): Response
     {
-        /** @var Request $request */
         $request = $this->getRequest();
 
         // the locale : fr, en,
@@ -59,6 +61,16 @@ class SitemapController extends BaseFrontController
         if ('' !== $lang) {
             if (!$this->checkLang($lang)) {
                 $this->pageNotFound();
+            }
+        } elseif (ConfigQuery::isMultiDomainActivated()) {
+            $currentHost = rtrim($request->getSchemeAndHttpHost(), '/');
+            $langs = LangQuery::create()->filterByActive(true)->find();
+            foreach ($langs as $langModel) {
+                $langUrl = rtrim($langModel->getUrl(), '/');
+                if (!empty($langUrl) && $currentHost === $langUrl) {
+                    $lang = $langModel->getCode();
+                    break;
+                }
             }
         }
 
@@ -129,7 +141,7 @@ class SitemapController extends BaseFrontController
     /**
      * Check if a lang is used.
      *
-     * @param $lang The lang code. e.g.: fr
+     * @param string $lang The lang code. e.g.: fr
      *
      * @return bool true if the language is used, otherwise false
      */
