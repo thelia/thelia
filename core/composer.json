@@ -85,7 +85,7 @@
         "symfony/browser-kit": "6.4.*",
         "symfony/phpunit-bridge": "6.4.*",
         "phpstan/phpstan": "1.11.*",
-        "composer/composer": "~2.9.0",
+        "composer/composer": "~2.9.0 || ~2.10.0",
         "phpstan/extension-installer": "1.1.0",
         "symfony/css-selector": "6.4.*",
         "friendsofphp/php-cs-fixer": "3.41.*",

@@ -105,7 +105,7 @@
         "symfony/css-selector": "6.4.*",
         "friendsofphp/php-cs-fixer": "3.41.*",
         "symfony/debug-bundle": "6.4.*",
-        "composer/composer": "~2.9.0"
+        "composer/composer": "~2.9.0 || ~2.10.0"
     },
     "scripts": {
         "cs-diff": [
