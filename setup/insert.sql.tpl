@@ -1641,6 +1641,7 @@ INSERT INTO `country_area` (`country_id`, `area_id`, `created_at`, `updated_at`)
 (270, 5, NOW(), NOW()),
 (271, 5, NOW(), NOW()),
 (272, 6, NOW(), NOW()),
+(273, 4, NOW(), NOW()),
 (1, 9, NOW(), NOW()),
 (2, 10, NOW(), NOW()),
 (3, 13, NOW(), NOW()),

@@ -1290,6 +1290,7 @@ return [
     'Tab image - bottom' => 'Tab image - bottom',
     'Tab image - top' => 'Tab image - top',
     'Tabasco' => 'Tabasco',
+    'Taïwan' => 'Taiwan',
     'Tajikistan' => 'Tajikistan',
     'Tamaulipas' => 'Tamaulipas',
     'Tanzania' => 'Tanzania',

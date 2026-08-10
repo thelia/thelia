@@ -944,6 +944,7 @@ return [
     'Tab document - top' => 'Ficha de documento - arriba',
     'Tab image - bottom' => 'Pestaña de imagen - abajo',
     'Tab image - top' => 'Pestaña de imagen - arriba',
+    'Taïwan' => 'Taiwán',
     'Tajikistan' => 'Tayikistán',
     'Tanzania' => 'Tanzanía',
     'Tax - Edit JavaScript' => 'Editar JavaScript',

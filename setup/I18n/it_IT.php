@@ -326,6 +326,7 @@ return [
     'Sweden' => 'Svezia',
     'Switzerland' => 'Svizzera',
     'Syria' => 'Siria',
+    'Taïwan' => 'Taiwan',
     'Tajikistan' => 'Tagikistan',
     'Tanzania' => 'Tanzania',
     'Taranto' => 'Taranto',
