@@ -35,10 +35,10 @@ class AdminLogsController extends BaseAdminController
 
         /** @var AdminLog $entry */
         foreach (AdminLogQuery::getEntries(
-            $this->getRequest()->request->get('admins', []),
+            $this->getRequest()->request->all('admins'),
             $this->getRequest()->request->get('fromDate', null),
             $this->getRequest()->request->get('toDate', null),
-            array_merge($this->getRequest()->request->get('resources', []), $this->getRequest()->request->get('modules', [])),
+            array_merge($this->getRequest()->request->all('resources'), $this->getRequest()->request->all('modules')),
             null
         ) as $entry) {
             $entries[] = [
