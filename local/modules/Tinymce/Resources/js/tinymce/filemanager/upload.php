@@ -23,6 +23,7 @@ if ($_SESSION['RF']['verify'] != 'RESPONSIVEfilemanager') {
 }
 
 include 'include/mime_type_lib.php';
+include 'include/ssrf_guard.php';
 
 if (isset($_POST['path'])) {
     $storeFolder = $_POST['path'];
@@ -77,9 +78,14 @@ while ($cycle && $i < $max_cycles) {
 
 if (!empty($_FILES) || isset($_POST['url'])) {
     if (isset($_POST['url'])) {
+        $remoteContent = thelia_fetch_remote_file((string) $_POST['url']);
+        if ($remoteContent === false) {
+            response(trans('forbiden').AddErrorLocation(), 403)->send();
+            exit;
+        }
         $temp = tempnam('/tmp', 'RF');
         $handle = fopen($temp, 'w');
-        fwrite($handle, file_get_contents($_POST['url']));
+        fwrite($handle, $remoteContent);
         fclose($handle);
         $_FILES['file'] = [
             'name' => basename($_POST['url']),
