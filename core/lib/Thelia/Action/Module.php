@@ -262,7 +262,7 @@ class Module extends BaseAction implements EventSubscriberInterface
             if (OrderQuery::create()->filterByDeliveryModuleId($module->getId())->count() > 0
                 || OrderQuery::create()->filterByPaymentModuleId($module->getId())->count() > 0
             ) {
-                throw new \LogicException(Translator::getInstance()->trans('The module "%name%" is currently in use by at least one order, and can\'t be deleted.', ['%name%' => $module->getCode()]));
+                throw new \LogicException(Translator::getInstance()->trans('The module "%name%" is currently in use by at least one order, and can\'t be deleted.', ['%name%' => $module->getCode()]).' '.Translator::getInstance()->trans('To stop offering it to your customers, deactivate the module instead of deleting it.'));
             }
 
             try {
