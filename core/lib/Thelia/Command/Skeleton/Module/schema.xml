@@ -2,6 +2,12 @@
 <database defaultIdMethod="native" name="TheliaMain"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="%%XSD_LOCATION%%" >
+    <vendor type="mysql">
+        <parameter name="Engine" value="InnoDB"/>
+        <parameter name="Charset" value="utf8mb4"/>
+        <parameter name="Collate" value="utf8mb4_general_ci"/>
+        <parameter name="RowFormat" value="DYNAMIC"/>
+    </vendor>
     <!--
     See propel documentation on http://propelorm.org for all information about schema file
 
