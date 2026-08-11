@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Install;
 
 use Michelf\Markdown;
+use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Symfony\Component\Filesystem\Filesystem;
@@ -50,7 +51,7 @@ class Update
     protected array $postInstructions = [];
 
     protected array $updatedVersions = [];
-    protected \PDO $connection;
+    protected ConnectionInterface|\PDO $connection;
     protected ?string $backupFile = null;
     protected string $backupDir = 'local/backup/';
     protected array $messages = [];
@@ -69,14 +70,17 @@ class Update
         }
 
         try {
-            $this->connection = Propel::getConnection(
+            $connection = Propel::getConnection(
                 ProductTableMap::DATABASE_NAME,
             );
 
-            // Get the PDO connection from the WrappedConnection
-            if ($this->connection instanceof ConnectionWrapper) {
-                $this->connection = $this->connection->getWrappedConnection();
+            // Unwrap before assigning: the property is typed \PDO, so the wrapper
+            // cannot transit through it.
+            if ($connection instanceof ConnectionWrapper) {
+                $connection = $connection->getWrappedConnection();
             }
+
+            $this->connection = $connection;
         } catch (ParseException $ex) {
             throw new UpdateException('database.yml is not a valid file : '.$ex->getMessage());
         } catch (\PDOException $ex) {

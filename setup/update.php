@@ -239,7 +239,9 @@ cliOutput(sprintf('Try to delete cache in : %s', THELIA_CACHE_DIR), 'info');
 
 foreach ($finder as $file) {
     try {
-        $fs->remove($file);
+        // remove() takes a path, a Traversable or an array: a Finder entry is an
+        // SplFileInfo and would raise a TypeError.
+        $fs->remove($file->getPathname());
     } catch (Symfony\Component\Filesystem\Exception\IOException $ex) {
         $hasDeleteError = true;
     }
@@ -259,10 +261,18 @@ exit(0);
 
 function readStdin($normalize = false)
 {
-    $fr = fopen('php://stdin', 'r');
-    $input = fgets($fr, 128);
-    $input = rtrim($input);
-    fclose($fr);
+    // Kept open across calls: closing php://stdin makes every later read fail,
+    // and a piped input then dies on the second question.
+    static $stream = null;
+
+    if (null === $stream) {
+        $stream = fopen('php://stdin', 'r');
+    }
+
+    $input = fgets($stream, 128);
+
+    // End of input (a pipe that ran out, or no stdin at all): behave like an empty answer.
+    $input = false === $input ? '' : rtrim($input);
 
     if ($normalize) {
         $input = strtolower(trim($input));
