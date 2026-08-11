@@ -19,5 +19,6 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
         (@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL),
         (@max_id + 1, 'fr_FR', NULL, NULL, NULL, NULL),
         (@max_id + 1, 'it_IT', NULL, NULL, NULL, NULL),
-        (@max_id + 1, 'ru_RU', NULL, NULL, NULL, NULL)
+        (@max_id + 1, 'ru_RU', NULL, NULL, NULL, NULL);
+
 SET FOREIGN_KEY_CHECKS = 1;
