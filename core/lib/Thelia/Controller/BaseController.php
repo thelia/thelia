@@ -207,6 +207,32 @@ abstract class BaseController implements ControllerInterface
         return $this->theliaFormValidator;
     }
 
+    protected function setupFormErrorContext(string $action, string $error_message, ?BaseForm $form = null, ?\Exception $exception = null): void
+    {
+        // Log the error message
+        Tlog::getInstance()->error(
+            $this->translator->trans(
+                'Error during %action process : %error. Exception was %exc',
+                [
+                    '%action' => $action,
+                    '%error' => $error_message,
+                    '%exc' => $exception instanceof \Exception ? $exception->getMessage() : 'no exception',
+                ],
+            ),
+        );
+
+        if ($form instanceof BaseForm) {
+            // Mark the form as errored
+            $form->setErrorMessage($error_message);
+
+            // Pass it to the parser context
+            $this->getParserContext()->addForm($form);
+        }
+
+        // Pass the error message to the parser.
+        $this->getParserContext()->setGeneralError($error_message);
+    }
+
     protected function generateOrderPdf(
         EventDispatcherInterface $eventDispatcher,
         int $order_id,
