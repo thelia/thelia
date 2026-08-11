@@ -122,7 +122,7 @@
                                             {$TITLE}
                                           </a>
                                           ( {count type="product" visible="*" backend_context="1" visible="*" category={$ID} } {intl l="Products" d='hookadminhome.bo.default'} - 
-                                          {count type="category" visible="*" backend_context="1" visible="*" category={$ID} } {intl l="Categories" d='hookadminhome.bo.default'} )
+                                          {count type="category" visible="*" backend_context="1" visible="*" parent={$ID} } {intl l="Categories" d='hookadminhome.bo.default'} )
                                      </td>
 
                                      {hook name="categories.row" location="category_list_row" category_id={$ID} }
