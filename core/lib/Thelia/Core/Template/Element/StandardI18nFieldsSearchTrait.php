@@ -31,9 +31,10 @@ trait StandardI18nFieldsSearchTrait
     }
 
     /**
-     * @param string[] $searchIn
+     * @param string|array $searchTerm the searched term, or a list of terms when $searchCriteria is Criteria::IN
+     * @param string[]     $searchIn
      */
-    protected function addStandardI18nSearch(ModelCriteria $search, string $searchTerm, string $searchCriteria, array $searchIn = ['title', 'chapo', 'description', 'postscriptum']): void
+    protected function addStandardI18nSearch(ModelCriteria $search, string|array $searchTerm, string $searchCriteria, array $searchIn = ['title', 'chapo', 'description', 'postscriptum']): void
     {
         $firstSearch = true;
 

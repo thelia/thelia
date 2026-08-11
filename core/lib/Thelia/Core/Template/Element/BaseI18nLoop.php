@@ -75,29 +75,52 @@ abstract class BaseI18nLoop extends BaseLoop
     }
 
     /**
+     * Build the SQL placeholder(s) and PDO binding type for a search term. When $searchTerm is a list of values
+     * (search_mode=any_word uses Criteria::IN with several words), a single "?" cannot be bound to it: one
+     * placeholder per value is required instead, and Propel must be left to auto-detect the binding type.
+     *
+     * @return array{0: string|array, 1: string, 2: int|null} the (possibly normalized) search term, the SQL
+     *                                                        placeholder, and the PDO binding type to use
+     */
+    protected function buildSearchTermPlaceholder(string|array $searchTerm): array
+    {
+        if (\is_array($searchTerm) && 1 === \count($searchTerm)) {
+            $searchTerm = reset($searchTerm);
+        }
+
+        if (\is_array($searchTerm)) {
+            return [$searchTerm, '('.implode(', ', array_fill(0, \count($searchTerm), '?')).')', null];
+        }
+
+        return [$searchTerm, '?', \PDO::PARAM_STR];
+    }
+
+    /**
      * Add the search clause for an I18N column, taking care of the back/front context, as default_locale_i18n is
      * not defined in the backEnd I18N context.
      *
-     * @param string $columnName     the column to search into, such as TITLE
-     * @param string $searchCriteria the search criteria, such as Criterial::LIKE, Criteria::EQUAL, etc
-     * @param string $searchTerm     the searched term
+     * @param string       $columnName     the column to search into, such as TITLE
+     * @param string       $searchCriteria the search criteria, such as Criterial::LIKE, Criteria::EQUAL, etc
+     * @param string|array $searchTerm     the searched term, or a list of terms when $searchCriteria is Criteria::IN
      */
-    public function addSearchInI18nColumn(ModelCriteria $search, string $columnName, string $searchCriteria, string $searchTerm): void
+    public function addSearchInI18nColumn(ModelCriteria $search, string $columnName, string $searchCriteria, string|array $searchTerm): void
     {
+        [$searchTerm, $placeholder, $bindingType] = $this->buildSearchTermPlaceholder($searchTerm);
+
         if (!$this->getBackendContext()) {
             $search->where(
                 "CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID)
                         THEN `requested_locale_i18n`.`{$columnName}`
                         ELSE `default_locale_i18n`.`{$columnName}`
-                        END ".$searchCriteria.' ?',
+                        END ".$searchCriteria.' '.$placeholder,
                 $searchTerm,
-                \PDO::PARAM_STR,
+                $bindingType,
             );
         } else {
             $search->where(
-                \sprintf('`requested_locale_i18n`.`%s` %s ?', $columnName, $searchCriteria),
+                \sprintf('`requested_locale_i18n`.`%s` %s %s', $columnName, $searchCriteria, $placeholder),
                 $searchTerm,
-                \PDO::PARAM_STR,
+                $bindingType,
             );
         }
     }
