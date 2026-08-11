@@ -38,7 +38,7 @@ class ConfigCreationForm extends BaseForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                 ],
-                'label' => Translator::getInstance()->trans('Purpose *'),
+                'label' => Translator::getInstance()->trans('Title *'),
                 'label_attr' => [
                     'for' => 'purpose',
                 ],
