@@ -119,16 +119,21 @@ class Message extends BaseMessage
             $useFallbackTemplate
         );
 
-        $subject = $parser->renderString($this->getSubject());
-        $htmlMessage = $this->getHtmlMessageBody($parser);
-        $textMessage = $this->getTextMessageBody($parser);
+        try {
+            $subject = $parser->renderString($this->getSubject());
+            $htmlMessage = $this->getHtmlMessageBody($parser);
+            $textMessage = $this->getTextMessageBody($parser);
 
-        $messageInstance->subject($subject);
-        $messageInstance->text($textMessage);
-        $messageInstance->html($htmlMessage);
-
-        // Restore previous template
-        $parser->popTemplateDefinition();
+            $messageInstance->subject($subject);
+            $messageInstance->text($textMessage);
+            $messageInstance->html($htmlMessage);
+        } finally {
+            // Restore previous template, even if rendering failed: MailerFactory::sendEmailMessage()
+            // catches rendering exceptions so the request can go on, which would otherwise leave the
+            // parser stuck on the mail template definition for the rest of the request (e.g. a payment
+            // module rendering its own template right after order notification emails are sent).
+            $parser->popTemplateDefinition();
+        }
 
         return $messageInstance;
     }
