@@ -16,5 +16,5 @@ use Thelia\Core\Security\User\UserInterface;
 
 interface TokenUserProviderInterface
 {
-    public function getUser(array $key): UserInterface;
+    public function getUser(array $key): ?UserInterface;
 }

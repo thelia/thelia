@@ -18,7 +18,7 @@ use Thelia\Model\CustomerQuery;
 
 class CustomerTokenUserProvider extends TokenUserProvider
 {
-    public function getUser(array $dataArray): UserInterface
+    public function getUser(array $dataArray): ?UserInterface
     {
         return CustomerQuery::create()
             ->filterByEmail($dataArray['username'], Criteria::EQUAL)

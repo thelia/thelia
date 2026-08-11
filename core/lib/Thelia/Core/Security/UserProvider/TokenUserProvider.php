@@ -17,5 +17,5 @@ use Thelia\Core\Security\User\UserInterface;
 
 abstract class TokenUserProvider extends TokenProvider implements TokenUserProviderInterface
 {
-    abstract public function getUser(array $key): UserInterface;
+    abstract public function getUser(array $key): ?UserInterface;
 }
