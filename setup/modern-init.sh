@@ -20,6 +20,7 @@ then
     echo "${green}Node: OK${reset}"
 else
     echo "${red}Node is not installed nor in your PATH${reset}"
+    echo "${yellow}If you just installed Node.js, close and reopen your terminal so your PATH is refreshed.${reset}"
     exit 1
 fi
 
@@ -29,6 +30,7 @@ then
     echo "${green}Yarn: OK${reset}"
 else
     echo "${red}Yarn is not installed or nor in your PATH${reset}"
+    echo "${yellow}If you just installed Yarn, close and reopen your terminal so your PATH is refreshed.${reset}"
     exit 1
 fi
 
@@ -39,6 +41,7 @@ if command -v composer > /dev/null 2>&1
     echo "${green}Composer: OK${reset}"
   else
     echo "${red}Composer is not installed nor in your PATH${reset}"
+    echo "${yellow}If you just installed Composer, close and reopen your terminal so your PATH is refreshed.${reset}"
     exit 1
 fi
 
