@@ -18,6 +18,7 @@ return [
     '"%param" parameter cannot be empty in loop type: %type, name: %name' => 'Le paramètre "%param" ne peut être vide dans la boucle type: %type, nom: %name ',
     '"%param" parameter is missing in loop type: %type, name: %name' => 'Le paramètre "%param" est absent dans la boucle type: %type, nom: %name ',
     '#000000' => '#000000',
+    '%code is not a canonical order status code.' => '%code n\'est pas un code de statut de commande canonique.',
     '%module (version: %version)' => '%module (version: %version)',
     '%n for number, %c for the currency code, %s for the currency symbol' => '%n pour le nombre, %c pour le code de devise, %s pour le symbole monétaire',
     '%obj SEO modification' => 'Modification SEO de %obj',

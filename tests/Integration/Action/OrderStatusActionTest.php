@@ -18,6 +18,7 @@ use Thelia\Core\Event\OrderStatus\OrderStatusCreateEvent;
 use Thelia\Core\Event\OrderStatus\OrderStatusDeleteEvent;
 use Thelia\Core\Event\OrderStatus\OrderStatusUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 
@@ -58,6 +59,42 @@ final class OrderStatusActionTest extends ActionIntegrationTestCase
         $reloaded = OrderStatusQuery::create()->findPk($status->getId());
         self::assertSame('#ff0000', $reloaded->getColor());
         self::assertSame('Updated', $reloaded->setLocale('en_US')->getTitle());
+    }
+
+    public function testUpdatePersistsEquivalentCode(): void
+    {
+        $status = $this->factory->orderStatus(['code' => 'paid_on_delivery', 'title' => 'Paid on delivery']);
+
+        $event = new OrderStatusUpdateEvent($status->getId());
+        $event
+            ->setCode('paid_on_delivery')
+            ->setEquivalentCode(OrderStatus::CODE_PAID)
+            ->setColor('#00ff00')
+            ->setLocale('en_US')
+            ->setTitle('Paid on delivery');
+
+        $this->dispatch($event, TheliaEvents::ORDER_STATUS_UPDATE);
+
+        $reloaded = OrderStatusQuery::create()->findPk($status->getId());
+        self::assertSame(OrderStatus::CODE_PAID, $reloaded->getEquivalentCode());
+        self::assertTrue($reloaded->isPaid());
+    }
+
+    public function testUpdateRejectsNonCanonicalEquivalentCode(): void
+    {
+        $status = $this->factory->orderStatus(['code' => 'bad_equivalence']);
+
+        $event = new OrderStatusUpdateEvent($status->getId());
+        $event
+            ->setCode('bad_equivalence')
+            ->setEquivalentCode('not_a_canonical_code')
+            ->setColor('#00ff00')
+            ->setLocale('en_US')
+            ->setTitle('Bad equivalence');
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->dispatch($event, TheliaEvents::ORDER_STATUS_UPDATE);
     }
 
     public function testDeleteRemovesNonProtectedOrderStatus(): void

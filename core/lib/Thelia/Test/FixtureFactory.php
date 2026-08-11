@@ -386,6 +386,7 @@ final class FixtureFactory
 
         $status = new OrderStatus();
         $status->setCode($overrides['code'] ?? 'status-'.$n);
+        $status->setEquivalentCode($overrides['equivalentCode'] ?? null);
         $status->setColor($overrides['color'] ?? '#cccccc');
         $status->setLocale($overrides['locale'] ?? 'en_US');
         $status->setTitle($overrides['title'] ?? 'Status '.$n);

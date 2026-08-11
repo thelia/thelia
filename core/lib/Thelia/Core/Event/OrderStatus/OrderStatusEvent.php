@@ -25,6 +25,7 @@ use Thelia\Model\OrderStatus;
 class OrderStatusEvent extends ActionEvent
 {
     protected string $code;
+    protected ?string $equivalentCode = null;
     protected string $title;
     protected ?string $description = null;
     protected ?string $chapo = null;
@@ -83,6 +84,22 @@ class OrderStatusEvent extends ActionEvent
     public function setCode(string $code): static
     {
         $this->code = $code;
+
+        return $this;
+    }
+
+    /**
+     * The canonical status code this status stands for, one of OrderStatus::CANONICAL_CODES,
+     * or null when the status stands for itself.
+     */
+    public function getEquivalentCode(): ?string
+    {
+        return $this->equivalentCode;
+    }
+
+    public function setEquivalentCode(?string $equivalentCode): static
+    {
+        $this->equivalentCode = $equivalentCode;
 
         return $this;
     }
