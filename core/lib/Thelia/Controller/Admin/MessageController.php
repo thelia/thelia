@@ -262,18 +262,31 @@ class MessageController extends AbstractCrudController
             $parser->assign($key, $value);
         }
 
+        $editionLang = $this->getCurrentEditionLang();
+
+        // The parser derives the "locale" template variable and the translator locale from the
+        // admin language stored in session, not from the message's edition locale. Temporarily
+        // switch it so the preview (and any {intl} tag in the template) uses the expected locale.
+        $session = $this->getSession();
+        $previousAdminLang = $session->getAdminLang();
+        $session->setAdminLang($editionLang);
+
         try {
-            if ($html) {
-                $content = $message->setLocale($this->getCurrentEditionLocale())->getHtmlMessageBody($parser);
-            } else {
-                $content = $message->setLocale($this->getCurrentEditionLocale())->getTextMessageBody($parser);
+            try {
+                if ($html) {
+                    $content = $message->setLocale($editionLang->getLocale())->getHtmlMessageBody($parser);
+                } else {
+                    $content = $message->setLocale($editionLang->getLocale())->getTextMessageBody($parser);
+                }
+            } catch (\InvalidArgumentException|\ErrorException $exception) {
+                return new Response($this->getTranslator()->trans('You probably didn\'t inject the missing variable to preview the HTML. Error is : %err',
+                    ['%err' => $exception->getMessage()]), 200);
+            } catch (\Exception $exception) {
+                return new Response($this->getTranslator()->trans('Something goes wrong, error is : %err',
+                    ['%err' => $exception->getMessage()]), 200);
             }
-        } catch (\InvalidArgumentException|\ErrorException $exception) {
-            return new Response($this->getTranslator()->trans('You probably didn\'t inject the missing variable to preview the HTML. Error is : %err',
-                ['%err' => $exception->getMessage()]), 200);
-        } catch (\Exception $exception) {
-            return new Response($this->getTranslator()->trans('Something goes wrong, error is : %err',
-                ['%err' => $exception->getMessage()]), 200);
+        } finally {
+            $session->setAdminLang($previousAdminLang);
         }
 
         return new Response($content);
