@@ -119,7 +119,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
         $sale = $event->getSale();
 
         // Get all selected product sale elements for this sale
-        if (null === $sale || null === $saleProducts = SaleProductQuery::create()->filterBySale($sale)->orderByProductId()) {
+        if (null === $sale || null === $saleProducts = SaleProductQuery::create()->filterBySale($sale)->orderByProductId()->find()) {
             return;
         }
         $saleOffsetByCurrency = $sale->getPriceOffsets();
@@ -131,13 +131,25 @@ class Sale extends BaseAction implements EventSubscriberInterface
         $con->beginTransaction();
 
         try {
+            // A product is present once per selected attribute value, so the sale status of its PSE has to be
+            // reset once and for all before processing the selection. Doing it in the loop below would discard
+            // the promo status set by the previously processed attribute values of the same product.
+            $saleProductIds = [];
+
             /** @var SaleProduct $saleProduct */
             foreach ($saleProducts as $saleProduct) {
-                // Reset all sale status on product's PSE
-                ProductSaleElementsQuery::create()
-                    ->filterByProductId($saleProduct->getProductId())
-                    ->update(['Promo' => 0], $con);
+                $saleProductIds[$saleProduct->getProductId()] = $saleProduct->getProductId();
+            }
 
+            if ([] !== $saleProductIds) {
+                // Reset all sale status on the PSE of the sale's products
+                ProductSaleElementsQuery::create()
+                    ->filterByProductId($saleProductIds, Criteria::IN)
+                    ->update(['Promo' => 0], $con);
+            }
+
+            /** @var SaleProduct $saleProduct */
+            foreach ($saleProducts as $saleProduct) {
                 $taxCalculator->load(
                     $saleProduct->getProduct($con),
                     CountryModel::getShopLocation(),
