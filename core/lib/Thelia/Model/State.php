@@ -16,4 +16,21 @@ use Thelia\Model\Base\State as BaseState;
 
 class State extends BaseState
 {
+    /**
+     * Get the full ISO 3166-2 code of this state (e.g. "US-CA"), built from
+     * the country ISO alpha-2 code and the state ISO code.
+     *
+     * @return string|null the full ISO 3166-2 code, or null if the country or the state ISO code is not defined
+     */
+    public function getIsoCode3166_2(): ?string
+    {
+        $country = $this->getCountry();
+        $isocode = $this->getIsocode();
+
+        if (null === $country || null === $isocode) {
+            return null;
+        }
+
+        return $country->getIsoalpha2().'-'.$isocode;
+    }
 }

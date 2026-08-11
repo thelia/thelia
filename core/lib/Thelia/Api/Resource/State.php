@@ -89,6 +89,9 @@ class State extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, OrderAddress::GROUP_ADMIN_READ])]
     public ?string $isocode;
 
+    #[Groups([self::GROUP_ADMIN_READ])]
+    public ?string $isoCode3166_2 = null;
+
     #[Relation(targetResource: Country::class)]
     #[Groups(groups: [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE])]
     public Country $country;
@@ -134,6 +137,18 @@ class State extends AbstractTranslatableResource
     public function setIsocode(?string $isocode): self
     {
         $this->isocode = $isocode;
+
+        return $this;
+    }
+
+    public function getIsoCode3166_2(): ?string
+    {
+        return $this->isoCode3166_2;
+    }
+
+    public function setIsoCode3166_2(?string $isoCode3166_2): self
+    {
+        $this->isoCode3166_2 = $isoCode3166_2;
 
         return $this;
     }
