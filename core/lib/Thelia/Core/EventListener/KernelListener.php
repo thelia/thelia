@@ -25,10 +25,13 @@ use Thelia\Core\Event\SessionEvent;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\TheliaKernelEvents;
 use Thelia\Core\Translation\Translator;
+use Thelia\Exception\UrlRewritingException;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
+use Thelia\Model\RewritingUrlQuery;
+use Thelia\Rewriting\RewritingResolver;
 
 class KernelListener implements EventSubscriberInterface
 {
@@ -192,9 +195,10 @@ class KernelListener implements EventSubscriberInterface
                 $domainUrl = $lang->getUrl();
 
                 if (!empty($domainUrl)) {
-                    // if lang domain is different from current domain, redirect to the proper one
+                    // if lang domain is different from current domain, redirect to the proper one,
+                    // keeping the current page if a translation of it exists for the target language.
                     if (rtrim($domainUrl, '/') != $request->getSchemeAndHttpHost()) {
-                        return new RedirectResponse($domainUrl, 301);
+                        return new RedirectResponse($this->getTranslatedDomainUrl($request, $domainUrl, $lang), 301);
                     }
 
                     // the user is currently on the proper domain, nothing to change
@@ -225,6 +229,43 @@ class KernelListener implements EventSubscriberInterface
         }
 
         return null;
+    }
+
+    /**
+     * When redirecting to another language's domain (one_domain_foreach_lang), try to keep
+     * the current page by looking up its translation in the target language. Falls back to
+     * the bare domain URL if the current page has no rewritten URL or no translation.
+     */
+    protected function getTranslatedDomainUrl(TheliaRequest $request, string $domainUrl, Lang $lang): string
+    {
+        if (!ConfigQuery::isRewritingEnable()) {
+            return $domainUrl;
+        }
+
+        $currentPath = ltrim($request->getRealPathInfo(), '/');
+
+        if ('' === $currentPath) {
+            return $domainUrl;
+        }
+
+        try {
+            $rewrittenUrlData = new RewritingResolver($currentPath);
+        } catch (UrlRewritingException) {
+            return $domainUrl;
+        }
+
+        $translatedUrl = RewritingUrlQuery::create()
+            ->filterByView($rewrittenUrlData->view)
+            ->filterByViewId($rewrittenUrlData->viewId)
+            ->filterByViewLocale($lang->getLocale())
+            ->filterByRedirected(null, ModelCriteria::ISNULL)
+            ->findOne();
+
+        if (null === $translatedUrl) {
+            return $domainUrl;
+        }
+
+        return rtrim($domainUrl, '/').'/'.$translatedUrl->getUrl();
     }
 
     public function sessionInit(RequestEvent $event): void
