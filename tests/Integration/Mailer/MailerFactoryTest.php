@@ -16,7 +16,9 @@ namespace Thelia\Tests\Integration\Mailer;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\MailerInterface;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Parser\ParserResolver;
+use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\LangQuery;
@@ -162,6 +164,73 @@ final class MailerFactoryTest extends IntegrationTestCase
         self::assertSame($frontTemplate->getAbsolutePath(), $templateAfterFailure?->getAbsolutePath());
     }
 
+    public function testCreateEmailMessageRendersInTheRequestedLocaleInAdminEnvironment(): void
+    {
+        $session = $this->getService(RequestStack::class)->getMainRequest()->getSession();
+
+        $french = LangQuery::create()->findOneByLocale('fr_FR');
+        $english = LangQuery::create()->findOneByLocale('en_US');
+        self::assertNotNull($french);
+        self::assertNotNull($english);
+
+        // The administrator browses the back office in English, the customer is French.
+        $session->setAdminLang($english);
+        $session->setLang($french);
+
+        $message = new Message();
+        $message->setName('test_admin_triggered_customer_message');
+        $message->setLocale('fr_FR');
+        $message->setSubject('Sujet');
+        $message->setHtmlMessage('<p>Corps</p>');
+        $message->setTextMessage('Corps');
+        $message->save();
+
+        $renderedLocales = [];
+        $parser = $this->createMock(ParserInterface::class);
+        $parser->method('getRequest')->willReturn($this->getService(RequestStack::class)->getMainRequest());
+        $parser->method('getTemplateHelper')->willReturn($this->getService(TemplateHelperInterface::class));
+        $parser->method('renderString')->willReturnCallback(
+            static function (string $templateText) use (&$renderedLocales, $session): string {
+                // What the parsers and the translator actually read to localize a render.
+                $renderedLocales[] = $session->getLang()->getLocale();
+
+                return $templateText;
+            },
+        );
+
+        $mailerFactory = new MailerFactory(
+            $this->getService(TemplateHelperInterface::class),
+            $this->createParserResolverReturning($parser),
+            $this->getService(MailerInterface::class),
+        );
+
+        $wasAdminEnvironment = Request::$isAdminEnv;
+        Request::$isAdminEnv = true;
+
+        try {
+            // Guard: in an admin environment Session::getLang() reads the admin language, so
+            // the assertions below cannot be satisfied by the front office language slot.
+            self::assertSame('en_US', $session->getLang()->getLocale());
+
+            $mailerFactory->createEmailMessage(
+                'test_admin_triggered_customer_message',
+                ['sender@example.com' => 'Sender'],
+                ['customer@example.com' => 'Customer'],
+                [],
+                'fr_FR',
+            );
+
+            self::assertSame('en_US', $session->getAdminLang()->getLocale());
+        } finally {
+            Request::$isAdminEnv = $wasAdminEnvironment;
+        }
+
+        self::assertNotSame([], $renderedLocales);
+        self::assertSame(['fr_FR'], array_values(array_unique($renderedLocales)));
+        // The front office language of the session is left untouched by an admin-side send.
+        self::assertSame('fr_FR', $session->getLang()->getLocale());
+    }
+
     public function testSendDoesNotThrowWithNullTransport(): void
     {
         $email = $this->mailerFactory->createSimpleEmailMessage(
@@ -176,5 +245,23 @@ final class MailerFactoryTest extends IntegrationTestCase
         // should complete without error.
         $this->mailerFactory->send($email);
         self::assertTrue(true);
+    }
+
+    private function createParserResolverReturning(ParserInterface $parser): ParserResolver
+    {
+        return new class($this->getService(RequestStack::class), $this->getService(TemplateHelperInterface::class), $parser) extends ParserResolver {
+            public function __construct(
+                RequestStack $requestStack,
+                TemplateHelperInterface $templateHelper,
+                private readonly ParserInterface $parser,
+            ) {
+                parent::__construct([], [], $requestStack, $templateHelper);
+            }
+
+            public function getParser(string $pathTemplate, ?string $templateName): ParserInterface
+            {
+                return $this->parser;
+            }
+        };
     }
 }

@@ -17,6 +17,8 @@ namespace Thelia\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Thelia\Core\HttpFoundation\Request as TheliaRequest;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
@@ -180,12 +182,19 @@ class MailerFactory
         // As the parser uses the lang stored in the session, temporarly set the required language into the session.
         // This is required in the back office when sending emails to customers, that may use a different locale than
         // the current one.
-        $session = $parser->getRequest()->getSession();
+        // There is no session on the command line, where emails are sent from commands and
+        // scheduled tasks, so nothing to swap there: the requested locale is then only carried
+        // by the message itself.
+        $request = $parser->getRequest();
+        $session = $request?->hasSession() ? $request->getSession() : null;
+        $session = $session instanceof Session ? $session : null;
 
-        $currentLang = $session->getLang();
+        $currentLang = null !== $session
+            ? (TheliaRequest::$isAdminEnv ? $session->getAdminLang() : $session->getLang())
+            : null;
 
         if (null !== $requiredLang = LangQuery::create()->findOneByLocale($locale)) {
-            $session->setLang($requiredLang);
+            $this->setLanguageSession($session, $requiredLang);
         }
 
         try {
@@ -200,9 +209,27 @@ class MailerFactory
             // Restore on every path: sendEmailMessage() deliberately swallows a rendering
             // failure so the request survives it, which would otherwise leave the visitor's
             // session in the language of an email they never received.
-            if (null !== $currentLang) {
-                $session->setLang($currentLang);
-            }
+            $this->setLanguageSession($session, $currentLang);
+        }
+    }
+
+    /**
+     * Session::getLang(), which the parsers and the translator read to localize a render,
+     * returns the admin language as soon as the request runs in an admin environment. The
+     * language of an email therefore has to be written to that slot there: swapping the front
+     * office one would silently do nothing, and a customer email triggered by a back office
+     * action would render in the language of the administrator's interface.
+     */
+    protected function setLanguageSession(?Session $session, ?Lang $lang): void
+    {
+        if (null === $session || null === $lang) {
+            return;
+        }
+
+        if (TheliaRequest::$isAdminEnv) {
+            $session->setAdminLang($lang);
+        } else {
+            $session->setLang($lang);
         }
     }
 
