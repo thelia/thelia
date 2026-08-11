@@ -133,7 +133,39 @@ class Update
 
         $lastEntry = end($this->version);
 
-        return $lastEntry === $version;
+        return version_compare($lastEntry, $version, '<=');
+    }
+
+    /**
+     * Find the position of the current version in the update script list.
+     *
+     * Some releases ship without an update script, so the current version is not always part of
+     * that list. In that case, the update resumes from the closest known version below the
+     * current one instead of replaying every script from the beginning.
+     *
+     * @throws UpdateException when no known version precedes the current one
+     */
+    protected function getStartIndex(string $currentVersion): int
+    {
+        $index = array_search($currentVersion, $this->version, true);
+
+        if (false !== $index) {
+            return $index;
+        }
+
+        $closestIndex = null;
+
+        foreach ($this->version as $position => $knownVersion) {
+            if (version_compare($knownVersion, $currentVersion, '<=')) {
+                $closestIndex = $position;
+            }
+        }
+
+        if (null === $closestIndex) {
+            throw new UpdateException(\sprintf('Unknown installed version "%s", unable to find where to start the update.', $currentVersion));
+        }
+
+        return $closestIndex;
     }
 
     public function process(): array
@@ -149,7 +181,7 @@ class Update
             throw new UpToDateException('You already have the latest version. No update available');
         }
 
-        $index = array_search($currentVersion, $this->version, true);
+        $index = $this->getStartIndex($currentVersion);
 
         $this->connection->beginTransaction();
 
@@ -159,7 +191,7 @@ class Update
         try {
             $size = \count($this->version);
 
-            for ($i = ++$index; $i < $size; ++$i) {
+            for ($i = $index + 1; $i < $size; ++$i) {
                 $version = $this->version[$i];
                 $this->updateToVersion($version, $database);
                 $this->updatedVersions[] = $version;
