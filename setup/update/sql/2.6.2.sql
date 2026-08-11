@@ -24,4 +24,8 @@ WHERE `config`.`name` IN ('cdn.documents-base-url', 'cdn.assets-base-url')
 
 ;
 
+-- remove the use_tax_free_amounts variable : it was never implemented, and had no effect at all.
+DELETE FROM `config_i18n` WHERE `id` IN (SELECT `id` FROM `config` WHERE `name` = 'use_tax_free_amounts');
+DELETE FROM `config` WHERE `name` = 'use_tax_free_amounts';
+
 SET FOREIGN_KEY_CHECKS = 1;

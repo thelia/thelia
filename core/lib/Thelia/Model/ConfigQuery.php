@@ -105,6 +105,10 @@ class ConfigQuery extends BaseConfigQuery
         return self::read('obsolete_rewriten_url_view', 'obsolete-rewritten-url');
     }
 
+    /**
+     * @deprecated since 2.6.2, and will be removed in 3.0. The use_tax_free_amounts variable was never
+     *             implemented, and has been removed. Handle tax-free prices in your template instead.
+     */
     public static function useTaxFreeAmounts()
     {
         return self::read('use_tax_free_amounts', 'default') == 1;
