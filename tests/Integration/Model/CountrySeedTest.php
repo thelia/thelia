@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Model;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Thelia\Model\CountryQuery;
 use Thelia\Test\IntegrationTestCase;
 
@@ -57,5 +58,46 @@ final class CountrySeedTest extends IntegrationTestCase
         }
 
         self::assertSame([], $untranslated);
+    }
+
+    /**
+     * Belize used to be seeded with 'BL', the code of Saint-Barthelemy, see issue #3559.
+     */
+    public function testNoTwoCountriesShareTheSameAlpha2Code(): void
+    {
+        $countriesByAlpha2 = [];
+        foreach (CountryQuery::create()->find() as $country) {
+            $countriesByAlpha2[$country->getIsoalpha2()][] = $country->getIsoalpha3();
+        }
+
+        $duplicated = [];
+        foreach ($countriesByAlpha2 as $alpha2 => $alpha3Codes) {
+            if (\count($alpha3Codes) > 1) {
+                $duplicated[] = $alpha2.' ('.implode(', ', $alpha3Codes).')';
+            }
+        }
+
+        self::assertSame([], $duplicated, 'two countries claim the same ISO 3166-1 alpha-2 code');
+    }
+
+    /**
+     * @return iterable<string, array{string, string, string}>
+     */
+    public static function correctedCountryProvider(): iterable
+    {
+        // alpha-3 code, expected alpha-2 code, expected numeric code, see issue #3559
+        yield 'Belize' => ['BLZ', 'BZ', '84'];
+        yield 'Saint-Barthelemy' => ['BLM', 'BL', '652'];
+        yield 'Libya' => ['LBY', 'LY', '434'];
+    }
+
+    #[DataProvider('correctedCountryProvider')]
+    public function testTheSeedUsesTheOfficialCodes(string $alpha3, string $alpha2, string $numeric): void
+    {
+        $country = CountryQuery::create()->filterByIsoalpha3($alpha3)->findOne();
+
+        self::assertNotNull($country, \sprintf('country %s is missing from the seed', $alpha3));
+        self::assertSame($alpha2, $country->getIsoalpha2());
+        self::assertSame($numeric, $country->getIsocode());
     }
 }

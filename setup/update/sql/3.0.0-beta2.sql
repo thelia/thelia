@@ -443,4 +443,18 @@ END
 WHERE (`isocode_numeric` IS NULL OR `isocode_numeric` = '')
   AND `code` IN ('EUR', 'USD', 'GBP', 'CHF', 'MXN', 'PLN', 'CNY', 'NOK', 'MDL', 'PYG', 'ARS', 'BYR', 'FJD', 'RSD', 'SEK', 'HRK', 'DKK', 'NGN', 'HKD', 'CAD', 'SAR', 'CZK', 'CRC', 'AZN', 'IDR', 'PKR', 'BRL', 'VND', 'PHP', 'GTQ', 'TRY', 'JPY', 'RUB', 'PEN', 'EGP', 'GEL', 'BOB', 'AED', 'THB', 'ILS', 'MYR', 'VEF', 'HUF', 'KES', 'UAH', 'TND', 'BGN', 'INR');
 
+-- ---------------------------------------------------------------------
+-- Two wrong ISO 3166-1 codes in the country seed (#3559)
+--
+-- Belize was seeded with the alpha-2 code 'BL', which belongs to
+-- Saint-Barthelemy and is also seeded: two rows claimed the same code.
+-- Libya was seeded with the numeric code '343' instead of '434'.
+--
+-- Matched on the alpha-3 code, and only on rows still carrying the wrong
+-- value, so a shop that already corrected them by hand is left untouched.
+-- ---------------------------------------------------------------------
+
+UPDATE `country` SET `isoalpha2` = 'BZ' WHERE `isoalpha3` = 'BLZ' AND `isoalpha2` = 'BL';
+UPDATE `country` SET `isocode` = '434' WHERE `isoalpha3` = 'LBY' AND `isocode` = '343';
+
 SET FOREIGN_KEY_CHECKS = 1;
