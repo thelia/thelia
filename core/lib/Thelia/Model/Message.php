@@ -112,20 +112,25 @@ class Message extends BaseMessage
             $useFallbackTemplate,
         );
 
-        $subject = $parser->renderString($this->getSubject());
-        $htmlMessage = $this->getHtmlMessageBody($parser);
-        $textMessage = $this->getTextMessageBody($parser);
+        try {
+            $subject = $parser->renderString($this->getSubject());
+            $htmlMessage = $this->getHtmlMessageBody($parser);
+            $textMessage = $this->getTextMessageBody($parser);
 
-        if (empty($htmlMessage) && empty($textMessage)) {
-            throw new \RuntimeException('Message body is empty for message ID: '.$this->getId());
+            if (empty($htmlMessage) && empty($textMessage)) {
+                throw new \RuntimeException('Message body is empty for message ID: '.$this->getId());
+            }
+
+            $messageInstance->subject($subject);
+            $messageInstance->text($textMessage);
+            $messageInstance->html($htmlMessage);
+        } finally {
+            // Restore the previous template on every path: MailerFactory::sendEmailMessage()
+            // swallows rendering failures so the request survives them, which would otherwise
+            // leave the parser stuck on the mail template for the rest of the request (e.g. a
+            // payment module rendering its own template right after order notification emails).
+            $parser->popTemplateDefinition();
         }
-
-        $messageInstance->subject($subject);
-        $messageInstance->text($textMessage);
-        $messageInstance->html($htmlMessage);
-
-        // Restore previous template
-        $parser->popTemplateDefinition();
 
         return $messageInstance;
     }

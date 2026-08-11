@@ -116,6 +116,52 @@ final class MailerFactoryTest extends IntegrationTestCase
         self::assertSame('fr_FR', $session->getLang()->getLocale());
     }
 
+    public function testCreateEmailMessageRestoresTheParserTemplateWhenRenderingFails(): void
+    {
+        $templateHelper = $this->getService(TemplateHelperInterface::class);
+        $frontTemplate = $templateHelper->getActiveFrontTemplate();
+
+        // Parsers are shared services: the template definition MailerFactory leaves behind is
+        // the one every later render sees, hence resolving the very same instance here.
+        $parser = $this->getService(ParserResolver::class)->getParser(
+            $templateHelper->getActiveMailTemplate()->getAbsolutePath(),
+            'order_confirmation',
+        );
+
+        $initialTemplate = $parser->getTemplateDefinition();
+        $parser->setTemplateDefinition($frontTemplate);
+
+        // An existing template file so a parser is resolved, and a subject that cannot be
+        // compiled so rendering throws once the mail template has been pushed.
+        $message = new Message();
+        $message->setName('test_unrenderable_subject_message');
+        $message->setLocale('en_US');
+        $message->setSubject('{{ ');
+        $message->setHtmlTemplateFileName('order_confirmation.html');
+        $message->save();
+
+        try {
+            $this->mailerFactory->createEmailMessage(
+                'test_unrenderable_subject_message',
+                ['sender@example.com' => 'Sender'],
+                ['recipient@example.com' => 'Recipient'],
+                [],
+                'en_US',
+            );
+            self::fail('Rendering was expected to fail.');
+        } catch (\Exception) {
+            // The failure is the point: sendEmailMessage() swallows it in production.
+        }
+
+        $templateAfterFailure = $parser->getTemplateDefinition();
+
+        if (null !== $initialTemplate) {
+            $parser->setTemplateDefinition($initialTemplate);
+        }
+
+        self::assertSame($frontTemplate->getAbsolutePath(), $templateAfterFailure?->getAbsolutePath());
+    }
+
     public function testSendDoesNotThrowWithNullTransport(): void
     {
         $email = $this->mailerFactory->createSimpleEmailMessage(
