@@ -261,7 +261,7 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
-    public ?bool $virtualDocument;
+    public ?string $virtualDocument;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
     public ?\DateTime $createdAt;
@@ -530,12 +530,12 @@ class OrderProduct implements PropelResourceInterface
         return $this;
     }
 
-    public function getVirtualDocument(): ?bool
+    public function getVirtualDocument(): ?string
     {
         return $this->virtualDocument;
     }
 
-    public function setVirtualDocument(?bool $virtualDocument): self
+    public function setVirtualDocument(?string $virtualDocument): self
     {
         $this->virtualDocument = $virtualDocument;
 
