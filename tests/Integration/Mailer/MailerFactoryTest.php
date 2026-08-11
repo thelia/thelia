@@ -175,6 +175,7 @@ final class MailerFactoryTest extends IntegrationTestCase
 
         // The administrator browses the back office in English, the customer is French.
         $session->setAdminLang($english);
+        $session->setLang($french);
 
         $message = new Message();
         $message->setName('test_admin_triggered_customer_message');
@@ -207,6 +208,10 @@ final class MailerFactoryTest extends IntegrationTestCase
         Request::$isAdminEnv = true;
 
         try {
+            // Guard: in an admin environment Session::getLang() reads the admin language, so
+            // the assertions below cannot be satisfied by the front office language slot.
+            self::assertSame('en_US', $session->getLang()->getLocale());
+
             $mailerFactory->createEmailMessage(
                 'test_admin_triggered_customer_message',
                 ['sender@example.com' => 'Sender'],
@@ -214,13 +219,16 @@ final class MailerFactoryTest extends IntegrationTestCase
                 [],
                 'fr_FR',
             );
+
+            self::assertSame('en_US', $session->getAdminLang()->getLocale());
         } finally {
             Request::$isAdminEnv = $wasAdminEnvironment;
         }
 
         self::assertNotSame([], $renderedLocales);
         self::assertSame(['fr_FR'], array_values(array_unique($renderedLocales)));
-        self::assertSame('en_US', $session->getAdminLang()->getLocale());
+        // The front office language of the session is left untouched by an admin-side send.
+        self::assertSame('fr_FR', $session->getLang()->getLocale());
     }
 
     public function testSendDoesNotThrowWithNullTransport(): void
