@@ -223,7 +223,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $quantity = $event->getQuantity();
         $currency = $cart->getCurrency();
         $customer = $cart->getCustomer();
-        $discount = 0;
+        $discount = 0.0;
 
         if ($cart->isNew()) {
             $persistEvent = new CartPersistEvent($cart);
@@ -231,7 +231,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
         }
 
         if (null !== $customer && $customer->getDiscount() > 0) {
-            $discount = $customer->getDiscount();
+            // getDiscount() maps a DECIMAL column and returns a string.
+            $discount = (float) $customer->getDiscount();
         }
 
         $productSaleElementsId = $event->getProductSaleElementsId();
@@ -342,10 +343,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
     protected function refreshCartItemPrices(CartModel $cart, CurrencyModel $currency): void
     {
         $customer = $cart->getCustomer();
-        $discount = 0;
+        $discount = 0.0;
 
         if (null !== $customer && $customer->getDiscount() > 0) {
-            $discount = $customer->getDiscount();
+            // getDiscount() maps a DECIMAL column and returns a string.
+            $discount = (float) $customer->getDiscount();
         }
 
         // cart item
@@ -558,7 +560,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
             // A customer is logged in.
             // If the customer has a discount, whe have to duplicate the cart,
             // so that the discount will be applied to the products in cart.
-            if (null === $cart->getCustomerId() && (0 === $customer->getDiscount() || 0 === $cart->countCartItems())) {
+            // getDiscount() maps a DECIMAL column, so it returns a string such as '0.000000'.
+            if (null === $cart->getCustomerId() && (0.0 === (float) $customer->getDiscount() || 0 === $cart->countCartItems())) {
                 // If no discount, or an empty cart, there's no need to duplicate.
                 $duplicateCart = false;
             }

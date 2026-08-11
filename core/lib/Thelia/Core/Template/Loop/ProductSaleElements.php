@@ -254,10 +254,11 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         $taxCountry = $this->taxEngine->getDeliveryCountry();
         /** @var SecurityContext $securityContext */
         $securityContext = $this->container->get('thelia.securityContext');
-        $discount = 0;
+        $discount = 0.0;
 
         if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {
-            $discount = $securityContext->getCustomerUser()->getDiscount();
+            // getDiscount() maps a DECIMAL column and returns a string.
+            $discount = (float) $securityContext->getCustomerUser()->getDiscount();
         }
 
         /** @var \Thelia\Model\ProductSaleElements $PSEValue */

@@ -48,7 +48,7 @@ class Cart extends BaseCart
         $cart->setAddressInvoiceId($this->getAddressInvoiceId());
         $cart->setToken($token);
 
-        $discount = 0;
+        $discount = 0.0;
 
         if (!$currency instanceof Currency) {
             $currencyQuery = CurrencyQuery::create();
@@ -61,7 +61,8 @@ class Cart extends BaseCart
             $cart->setCustomer($customer);
 
             if ($customer->getDiscount() > 0) {
-                $discount = $customer->getDiscount();
+                // getDiscount() maps a DECIMAL column and returns a string.
+                $discount = (float) $customer->getDiscount();
             }
         }
 

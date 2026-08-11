@@ -28,7 +28,7 @@ class ProductSaleElements extends BaseProductSaleElements
     /**
      * @throws PropelException
      */
-    public function getPrice(string $virtualColumnName = 'price_PRICE', int $discount = 0): float
+    public function getPrice(string $virtualColumnName = 'price_PRICE', float $discount = 0.0): float
     {
         try {
             $amount = $this->getVirtualColumn($virtualColumnName);
@@ -46,7 +46,7 @@ class ProductSaleElements extends BaseProductSaleElements
     /**
      * @throws PropelException
      */
-    public function getPromoPrice(string $virtualColumnName = 'price_PROMO_PRICE', int $discount = 0): float
+    public function getPromoPrice(string $virtualColumnName = 'price_PROMO_PRICE', float $discount = 0.0): float
     {
         try {
             $amount = $this->getVirtualColumn($virtualColumnName);
@@ -64,7 +64,7 @@ class ProductSaleElements extends BaseProductSaleElements
     /**
      * @throws PropelException
      */
-    public function getTaxedPrice(Country $country, string $virtualColumnName = 'price_PRICE', int $discount = 0): float
+    public function getTaxedPrice(Country $country, string $virtualColumnName = 'price_PRICE', float $discount = 0.0): float
     {
         $taxCalculator = new Calculator();
 
@@ -74,7 +74,7 @@ class ProductSaleElements extends BaseProductSaleElements
     /**
      * @throws PropelException
      */
-    public function getTaxedPromoPrice(Country $country, string $virtualColumnName = 'price_PROMO_PRICE', int $discount = 0): float
+    public function getTaxedPromoPrice(Country $country, string $virtualColumnName = 'price_PROMO_PRICE', float $discount = 0.0): float
     {
         $taxCalculator = new Calculator();
 
@@ -92,7 +92,7 @@ class ProductSaleElements extends BaseProductSaleElements
      * @throws \RuntimeException
      * @throws PropelException
      */
-    public function getPricesByCurrency(Currency $currency, int $discount = 0): ProductPriceTools
+    public function getPricesByCurrency(Currency $currency, float $discount = 0.0): ProductPriceTools
     {
         $defaultCurrency = Currency::getDefaultCurrency();
 
