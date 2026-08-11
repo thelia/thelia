@@ -155,7 +155,7 @@ class CustomerController extends BaseFrontController
                 $form = $this->validateForm($customerCreation, 'post');
 
                 $customerCreateEvent = $this->createEventInstance($form->getData());
-                $customerCreateEvent->bindForm($form->getForm());
+                $customerCreateEvent->bindForm($form);
 
                 $eventDispatcher->dispatch($customerCreateEvent, TheliaEvents::CUSTOMER_CREATEACCOUNT);
 
@@ -273,7 +273,7 @@ class CustomerController extends BaseFrontController
                 $form = $this->validateForm($customerPasswordUpdateForm, 'post');
 
                 $customerChangeEvent = $this->createEventInstance($form->getData());
-                $customerChangeEvent->bindForm($form->getForm());
+                $customerChangeEvent->bindForm($form);
                 $customerChangeEvent->setCustomer($customer);
                 $eventDispatcher->dispatch($customerChangeEvent, TheliaEvents::CUSTOMER_UPDATEPROFILE);
 
@@ -330,7 +330,7 @@ class CustomerController extends BaseFrontController
                 $form = $this->validateForm($customerProfileUpdateForm, 'post');
 
                 $customerChangeEvent = $this->createEventInstance($form->getData());
-                $customerChangeEvent->bindForm($form->getForm());
+                $customerChangeEvent->bindForm($form);
                 $customerChangeEvent->setCustomer($customer);
 
                 $customerChangeEvent->setEmailUpdateAllowed(
