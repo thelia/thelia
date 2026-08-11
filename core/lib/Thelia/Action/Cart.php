@@ -407,7 +407,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 // If the customer has a discount, whe have to duplicate the cart,
                 // so that the discount will be applied to the products in cart.
 
-                if (0 === $customer->getDiscount() || 0 === $cart->countCartItems()) {
+                // getDiscount() maps a DECIMAL column, so it returns a string such as '0.000000'.
+                if (0.0 === (float) $customer->getDiscount() || 0 === $cart->countCartItems()) {
                     // If no discount, or an empty cart, there's no need to duplicate.
                     $duplicateCart = false;
                 }
