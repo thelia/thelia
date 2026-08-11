@@ -32,10 +32,13 @@ class Pdf extends BaseAction implements EventSubscriberInterface
             $event->getLang(),
             $event->getUnicode(),
             $event->getEncoding(),
-            $event->getMarges()
+            $event->getMarges(),
+            $event->getPdfa()
         );
 
         $html2pdf->setDefaultFont($event->getFontName());
+        $html2pdf->setTestTdInOnePage($event->getTestTdInOnePage());
+        $html2pdf->setTestIsImage($event->getTestIsImage());
 
         $html2pdf->pdf->SetDisplayMode('real');
 
