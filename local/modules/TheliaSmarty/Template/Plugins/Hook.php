@@ -42,6 +42,9 @@ class Hook extends AbstractSmartyPlugin
     /** @var Module */
     protected $smartyPluginModule;
 
+    /** @var Translation|null */
+    protected $smartyPluginTranslation;
+
     /** @var array */
     protected $hookResults = [];
 
@@ -55,12 +58,14 @@ class Hook extends AbstractSmartyPlugin
         $kernelDebug,
         EventDispatcherInterface $dispatcher,
         TranslatorInterface $translator,
-        Module $smartyPluginModule
+        Module $smartyPluginModule,
+        Translation $smartyPluginTranslation = null
     ) {
         $this->debug = $kernelDebug;
         $this->dispatcher = $dispatcher;
         $this->translator = $translator;
         $this->smartyPluginModule = $smartyPluginModule;
+        $this->smartyPluginTranslation = $smartyPluginTranslation;
         $this->hookResults = [];
     }
 
@@ -108,23 +113,31 @@ class Hook extends AbstractSmartyPlugin
             $eventName .= '.'.$module;
         }
 
-        $this->getDispatcher()->dispatch($event, $eventName);
+        // The templates rendered by the modules that listen to this hook may change the default
+        // translation domain and locale: this must not affect the template we are rendering.
+        $this->smartyPluginTranslation?->saveDefaults();
 
-        $content = trim($event->dump());
+        try {
+            $this->getDispatcher()->dispatch($event, $eventName);
 
-        if ($this->debug && $smarty->getRequest()->get('SHOW_HOOK')) {
-            $content = self::showHook(
-                $hookName,
-                $params,
-                $smarty->getTemplateVars()
-            ).$content;
-        }
+            $content = trim($event->dump());
 
-        $this->hookResults[$hookName] = $content;
+            if ($this->debug && $smarty->getRequest()->get('SHOW_HOOK')) {
+                $content = self::showHook(
+                    $hookName,
+                    $params,
+                    $smarty->getTemplateVars()
+                ).$content;
+            }
 
-        // support for compatibility with module_include
-        if ($type === TemplateDefinition::BACK_OFFICE) {
-            $content .= $this->moduleIncludeCompat($params, $smarty);
+            $this->hookResults[$hookName] = $content;
+
+            // support for compatibility with module_include
+            if ($type === TemplateDefinition::BACK_OFFICE) {
+                $content .= $this->moduleIncludeCompat($params, $smarty);
+            }
+        } finally {
+            $this->smartyPluginTranslation?->restoreDefaults();
         }
 
         return $content;
@@ -247,7 +260,14 @@ HTML;
             $eventName .= '.'.$module;
         }
 
-        $this->getDispatcher()->dispatch($event, $eventName);
+        // See processHookFunction() : the fragments are rendered by the modules during the dispatch.
+        $this->smartyPluginTranslation?->saveDefaults();
+
+        try {
+            $this->getDispatcher()->dispatch($event, $eventName);
+        } finally {
+            $this->smartyPluginTranslation?->restoreDefaults();
+        }
 
         // save results so we can use it in forHook block
         $this->hookResults[$hookName] = $event->get();
