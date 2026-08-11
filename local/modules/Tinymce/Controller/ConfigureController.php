@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Tools\URL;
 use Tinymce\Form\ConfigurationForm;
@@ -66,19 +65,10 @@ class ConfigureController extends BaseAdminController
             Tinymce::setConfigValue('show_menu_bar', $data['show_menu_bar']);
             Tinymce::setConfigValue('force_pasting_as_text', $data['force_pasting_as_text']);
             Tinymce::setConfigValue('editor_height', $data['editor_height']);
+            // The custom CSS is stored as module configuration only: it used to be written to a
+            // file inside the module's own template tree, which composer can wipe on update and
+            // which does not exist on a fresh install, flooding the logs with asset warnings.
             Tinymce::setConfigValue('custom_css', $data['custom_css']);
-
-            // Save Custom CSS in default assets
-            $customCss = __DIR__.DS.'..'.DS.'templates'.DS.'backOffice'.DS.'default'.DS.'assets'.DS.'css'.DS.'custom-css.less';
-
-            if (false === file_put_contents($customCss, $data['custom_css'])) {
-                throw new TheliaProcessException(
-                    $this->getTranslator()->trans(
-                        'Failed to update custom CSS file "%file". Please check this file or parent folder write permissions.',
-                        ['%file' => $customCss]
-                    )
-                );
-            }
 
             // Log configuration modification
             $this->adminLogAppend(

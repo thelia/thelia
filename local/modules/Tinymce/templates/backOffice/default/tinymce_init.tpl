@@ -100,16 +100,18 @@
         {$css = $asset_url}
         {/stylesheets}
 
-        {stylesheets file='assets/css/custom-css.less' failsafe=true filters='less' source='Tinymce' template='default'}
-            {if $asset_url != ''}
-                {$css = "`$css`,`$asset_url`"}
-            {/if}
-        {/stylesheets}
-
         {if $css != ''}
             content_css: "{$css}",
             importcss_append: true,
         {/if}
+
+        // Custom CSS is stored as module configuration, not as a file in the module directory
+        // (a file there would be lost on composer update and missing on a fresh install).
+        {loop type="module-config" name="dummy" module="tinymce" variable="custom_css" default_value=""}
+            {if $VALUE != ''}
+                content_style: `{$VALUE}`,
+            {/if}
+        {/loop}
 
         convert_urls: false,
         relative_urls : false,
