@@ -25,6 +25,7 @@ readonly class CurrencyCreateDTO implements DTOEventActionInterface
         public string $locale,
         public float $rate = 1.0,
         public ?string $format = null,
+        public ?string $isocodeNumeric = null,
     ) {
     }
 
@@ -37,6 +38,7 @@ readonly class CurrencyCreateDTO implements DTOEventActionInterface
             'locale' => $this->locale,
             'rate' => $this->rate,
             'format' => $this->format,
+            'isocode_numeric' => $this->isocodeNumeric,
         ];
     }
 }

@@ -42,7 +42,8 @@ final readonly class CurrencyFacade
             ->setSymbol($dto->symbol)
             ->setLocale($dto->locale)
             ->setRate($dto->rate)
-            ->setFormat($dto->format);
+            ->setFormat($dto->format)
+            ->setIsocodeNumeric($dto->isocodeNumeric);
 
         $this->dispatcher->dispatch($event, TheliaEvents::CURRENCY_CREATE);
 
@@ -59,6 +60,7 @@ final readonly class CurrencyFacade
             ->setLocale($dto->locale)
             ->setRate($dto->rate)
             ->setFormat($dto->format)
+            ->setIsocodeNumeric($dto->isocodeNumeric)
             ->setVisible($dto->visible ? 1 : 0)
             ->setIsDefault($dto->isDefault ? 1 : 0);
 

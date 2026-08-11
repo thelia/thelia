@@ -45,6 +45,7 @@ class CurrencyFacadeTest extends TestCase
             locale: 'en_US',
             rate: 1.1,
             format: '%n %s',
+            isocodeNumeric: '840',
         );
 
         $currency = $this->createCurrencyMock(10);
@@ -60,6 +61,7 @@ class CurrencyFacadeTest extends TestCase
                     self::assertSame('en_US', $event->getLocale());
                     self::assertSame(1.1, $event->getRate());
                     self::assertSame('%n %s', $event->getFormat());
+                    self::assertSame('840', $event->getIsocodeNumeric());
 
                     $event->setCurrency($currency);
 
@@ -95,6 +97,7 @@ class CurrencyFacadeTest extends TestCase
                     self::assertSame('fr_FR', $event->getLocale());
                     self::assertSame(1.0, $event->getRate());
                     self::assertNull($event->getFormat());
+                    self::assertNull($event->getIsocodeNumeric());
 
                     $event->setCurrency($currency);
 
@@ -119,6 +122,7 @@ class CurrencyFacadeTest extends TestCase
             format: '%s%n',
             visible: true,
             isDefault: false,
+            isocodeNumeric: '840',
         );
 
         $currency = $this->createCurrencyMock(10);
@@ -137,6 +141,7 @@ class CurrencyFacadeTest extends TestCase
                     self::assertSame('%s%n', $event->getFormat());
                     self::assertSame(1, $event->getVisible());
                     self::assertSame(0, $event->getIsDefault());
+                    self::assertSame('840', $event->getIsocodeNumeric());
 
                     $event->setCurrency($currency);
 
@@ -159,6 +164,7 @@ class CurrencyFacadeTest extends TestCase
             locale: 'en_US',
             rate: 1.1,
             format: '%n %s',
+            isocodeNumeric: '840',
         );
 
         $array = $dto->toArray();
@@ -169,6 +175,7 @@ class CurrencyFacadeTest extends TestCase
         $this->assertSame('en_US', $array['locale']);
         $this->assertSame(1.1, $array['rate']);
         $this->assertSame('%n %s', $array['format']);
+        $this->assertSame('840', $array['isocode_numeric']);
     }
 
     public function testCurrencyCreateDTODefaultValues(): void
@@ -182,6 +189,7 @@ class CurrencyFacadeTest extends TestCase
 
         $this->assertSame(1.0, $dto->rate);
         $this->assertNull($dto->format);
+        $this->assertNull($dto->isocodeNumeric);
     }
 
     public function testCurrencyUpdateDTOToArray(): void
@@ -195,6 +203,7 @@ class CurrencyFacadeTest extends TestCase
             format: '%s%n',
             visible: true,
             isDefault: true,
+            isocodeNumeric: '840',
         );
 
         $array = $dto->toArray();
@@ -205,6 +214,7 @@ class CurrencyFacadeTest extends TestCase
         $this->assertSame('en_US', $array['locale']);
         $this->assertSame(1.2, $array['rate']);
         $this->assertSame('%s%n', $array['format']);
+        $this->assertSame('840', $array['isocode_numeric']);
         $this->assertTrue($array['visible']);
         $this->assertTrue($array['is_default']);
     }
@@ -220,6 +230,7 @@ class CurrencyFacadeTest extends TestCase
 
         $this->assertSame(1.0, $dto->rate);
         $this->assertNull($dto->format);
+        $this->assertNull($dto->isocodeNumeric);
         $this->assertTrue($dto->visible);
         $this->assertFalse($dto->isDefault);
     }

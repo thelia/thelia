@@ -40,6 +40,7 @@ final class CurrencyActionTest extends IntegrationTestCase
             ->setSymbol('CHF')
             ->setFormat('#,###.##')
             ->setCode('chf')
+            ->setIsocodeNumeric('756')
             ->setRate(0.92);
 
         $this->dispatcher->dispatch($event, TheliaEvents::CURRENCY_CREATE);
@@ -47,6 +48,7 @@ final class CurrencyActionTest extends IntegrationTestCase
         $currency = $event->getCurrency();
         self::assertNotNull($currency);
         self::assertSame('CHF', $currency->getCode(), 'Code must be uppercased by the listener');
+        self::assertSame('756', $currency->getIsocodeNumeric());
         self::assertEqualsWithDelta(0.92, (float) $currency->getRate(), 0.001);
     }
 
@@ -69,12 +71,14 @@ final class CurrencyActionTest extends IntegrationTestCase
             ->setLocale('en_US')
             ->setSymbol('£')
             ->setCode('GBP')
+            ->setIsocodeNumeric('826')
             ->setRate(0.88);
         $this->dispatcher->dispatch($updateEvent, TheliaEvents::CURRENCY_UPDATE);
 
         $reloaded = CurrencyQuery::create()->findPk($currencyId);
         self::assertNotNull($reloaded);
         self::assertSame('British Pound Sterling', $reloaded->setLocale('en_US')->getName());
+        self::assertSame('826', $reloaded->getIsocodeNumeric());
         self::assertEqualsWithDelta(0.88, (float) $reloaded->getRate(), 0.001);
     }
 

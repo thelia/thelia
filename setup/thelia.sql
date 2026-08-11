@@ -798,6 +798,7 @@ CREATE TABLE `currency`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(45),
+    `isocode_numeric` VARCHAR(3) COMMENT 'the ISO 4217 numeric currency code',
     `symbol` VARCHAR(45),
     `format` CHAR(10),
     `rate` FLOAT,

@@ -128,6 +128,18 @@ class Currency extends AbstractTranslatableResource
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_READ_SINGLE,
+        ProductSaleElements::GROUP_ADMIN_READ_SINGLE,
+        Cart::GROUP_ADMIN_READ_SINGLE,
+        Cart::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+    ])]
+    public ?string $isocodeNumeric = null;
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        Order::GROUP_ADMIN_READ_SINGLE,
         Cart::GROUP_ADMIN_READ_SINGLE,
         Cart::GROUP_FRONT_READ_SINGLE,
         Product::GROUP_ADMIN_READ_SINGLE,
@@ -179,6 +191,18 @@ class Currency extends AbstractTranslatableResource
     public function setCode(?string $code): self
     {
         $this->code = $code;
+
+        return $this;
+    }
+
+    public function getIsocodeNumeric(): ?string
+    {
+        return $this->isocodeNumeric;
+    }
+
+    public function setIsocodeNumeric(?string $isocodeNumeric): self
+    {
+        $this->isocodeNumeric = $isocodeNumeric;
 
         return $this;
     }
