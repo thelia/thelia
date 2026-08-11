@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace Thelia\Install\Standalone;
 
 use Thelia\Core\Install\Database;
+use Thelia\Core\TheliaKernel;
+use Thelia\Tools\Version\Version;
 
 final class DatabaseSetup
 {
@@ -69,6 +71,27 @@ final class DatabaseSetup
         $database = new Database($this->pdo);
         $database->insertSql(null, [THELIA_SETUP_DIRECTORY.'thelia.sql']);
         $database->insertSql(null, [THELIA_SETUP_DIRECTORY.'insert.sql']);
+        $this->writeTheliaVersion();
+    }
+
+    /**
+     * Overwrites the version seeded by insert.sql with the version of the running code.
+     *
+     * insert.sql is generated from insert.sql.tpl by the generate:sql command, so its version
+     * number is a snapshot of the code version at generation time and drifts as soon as a
+     * release bumps TheliaKernel::THELIA_VERSION. A fresh install left with an older number
+     * announces the wrong version and makes setup/update.php replay every update script above
+     * it, on a database that already has the latest schema.
+     */
+    private function writeTheliaVersion(): void
+    {
+        $parsedVersion = Version::parse(TheliaKernel::THELIA_VERSION);
+
+        $this->setConfig('thelia_version', $parsedVersion['version']);
+        $this->setConfig('thelia_major_version', $parsedVersion['major']);
+        $this->setConfig('thelia_minus_version', $parsedVersion['minus']);
+        $this->setConfig('thelia_release_version', $parsedVersion['release']);
+        $this->setConfig('thelia_extra_version', $parsedVersion['extra']);
     }
 
     public function generateFormSecret(): void

@@ -14,8 +14,11 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Install;
 
+use Thelia\Core\TheliaKernel;
 use Thelia\Install\Standalone\DatabaseSetup;
+use Thelia\Model\ConfigQuery;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Tools\Version\Version;
 
 final class DatabaseSetupTest extends IntegrationTestCase
 {
@@ -60,6 +63,22 @@ final class DatabaseSetupTest extends IntegrationTestCase
 
         // If we get here, it didn't throw.
         self::assertTrue(true);
+    }
+
+    public function testSeededVersionIsTheVersionOfTheRunningCode(): void
+    {
+        // This database is built by bin/test-prepare through DatabaseSetup, exactly like a
+        // fresh install. The version it carries must be the code version: any older value
+        // makes setup/update.php replay the update scripts above it (#3571).
+        $parsedVersion = Version::parse(TheliaKernel::THELIA_VERSION);
+
+        // Reading past the config cache: that pool outlives a database rebuild, so the
+        // cached copy would answer for a row this test is precisely about.
+        self::assertSame($parsedVersion['version'], ConfigQuery::read('thelia_version', null, true));
+        self::assertSame($parsedVersion['major'], ConfigQuery::read('thelia_major_version', null, true));
+        self::assertSame($parsedVersion['minus'], ConfigQuery::read('thelia_minus_version', null, true));
+        self::assertSame($parsedVersion['release'], ConfigQuery::read('thelia_release_version', null, true));
+        self::assertSame($parsedVersion['extra'], ConfigQuery::read('thelia_extra_version', null, true));
     }
 
     /**
