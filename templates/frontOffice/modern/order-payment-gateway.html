@@ -22,6 +22,8 @@
     {include file="components/smarty/Title/Title.html" title={intl l="Secure payment"} }
 
     {loop type="order" name="placed-order" id=$order_id}
+    {* PAYMENT_MODULE is reset once this loop ends, but is still needed in the javascript-initialization block below *}
+    {assign var="orderPaymentModuleId" value=$PAYMENT_MODULE}
     {ifhook rel="order-payment-gateway.body"}
         {hook name="order-payment-gateway.body" module="$PAYMENT_MODULE"}
     {/ifhook}
@@ -60,7 +62,7 @@
 
 {block name="javascript-initialization"}
   {ifhook rel="order-payment-gateway.javascript"}
-    {hook name="order-payment-gateway.javascript" module="$PAYMENT_MODULE"}
+    {hook name="order-payment-gateway.javascript" module="$orderPaymentModuleId"}
   {/ifhook}
   {elsehook rel="order-payment-gateway.javascript"}
       {strip}
