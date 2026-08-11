@@ -86,26 +86,29 @@ $(function($){
         var $form = $("#condition-form");
         var data = $form.serialize();
         var url = $form.attr('action');
+        var $errors = $('#condition-form-errors');
         url = url.replace('8888888', $.couponManager.conditionToUpdateIndex);
-        $('#condition-add-operators-values').html('<div class="loading" ></div>');
+        $errors.hide().empty();
 
         $.post(
             url,
             data
         ).done(function() {
-            $.couponManager.displayConditionsSummary();
             $('#condition-add-operators-values').html('');
             $('#condition-add-type').find('.typeToolTip').html('');
             // Set the condition selector to default
             $("#category-condition option").filter(function() {
                 return $(this).val() == '';
             }).prop('selected', true);
-        }).fail(function() {
-            $('#condition-add-operators-values').html(
-                $.couponManager.intlPleaseRetry
-            );
-        }).always(function() {
             $('#condition-save-btn').hide();
+        }).fail(function(jqXHR) {
+            // Keep the submitted inputs untouched, so that the user can fix them and retry.
+            $errors.text(
+                jqXHR.status === 400 && jqXHR.responseText
+                    ? jqXHR.responseText
+                    : $.couponManager.intlPleaseRetry
+            ).show();
+        }).always(function() {
             // Reload condition summaries ajax
             $.couponManager.displayConditionsSummary();
         });

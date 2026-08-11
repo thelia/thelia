@@ -29,6 +29,8 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Coupon\CouponFactory;
 use Thelia\Coupon\CouponManager;
 use Thelia\Coupon\Type\CouponInterface;
+use Thelia\Exception\InvalidConditionOperatorException;
+use Thelia\Exception\InvalidConditionValueException;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
@@ -390,7 +392,21 @@ class CouponController extends BaseAdminController
             return $this->pageNotFound();
         }
 
-        $conditionToSave = $this->buildConditionFromRequest();
+        try {
+            $conditionToSave = $this->buildConditionFromRequest();
+        } catch (InvalidConditionOperatorException|InvalidConditionValueException) {
+            // The exception constructor already logged the detailed error.
+            return new Response(
+                $this->getTranslator()->trans(
+                    'Please check the parameters of this condition: some of them are missing or invalid.'
+                ),
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+
+        if (!$conditionToSave instanceof ConditionInterface) {
+            return $this->pageNotFound();
+        }
 
         /** @var CouponFactory $couponFactory */
         $couponFactory = $this->container->get('thelia.coupon.factory');
@@ -743,13 +759,16 @@ class CouponController extends BaseAdminController
     /**
      * Build ConditionInterface from request.
      *
-     * @return ConditionInterface
+     * @throws InvalidConditionOperatorException if an operator submitted for this condition is not allowed
+     * @throws InvalidConditionValueException    if a value submitted for this condition is missing or invalid
+     *
+     * @return ConditionInterface|false the condition, or false if the submitted condition service does not exist
      */
     protected function buildConditionFromRequest()
     {
         $request = $this->getRequest();
         $post = $request->request->getIterator();
-        $serviceId = $request->request->get('categoryCondition');
+        $serviceId = (string) $request->request->get('categoryCondition');
         $operators = [];
         $values = [];
         foreach ($post as $key => $input) {

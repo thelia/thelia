@@ -398,6 +398,7 @@ return [
     'Phone' => 'Phone',
     'Placed order' => 'Placed order',
     'Please accept the Terms and conditions in order to register.' => 'Please accept the Terms and conditions in order to register.',
+    'Please check the parameters of this condition: some of them are missing or invalid.' => 'Please check the parameters of this condition: some of them are missing or invalid.',
     'Please check your input: %error' => 'Please check your input: %error',
     'Please enter a valid email address' => 'Please enter a valid email address',
     'Please enter your email address' => 'Please enter your email address',
