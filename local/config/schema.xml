@@ -694,6 +694,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="name" size="45" type="VARCHAR" />
     <column name="code" size="45" type="VARCHAR" />
+    <column description="the ISO 4217 numeric currency code" name="isocode_numeric" size="3" type="VARCHAR" />
     <column name="symbol" size="45" type="VARCHAR" />
     <column name="format" size="10" type="CHAR" />
     <column name="rate" type="FLOAT" />

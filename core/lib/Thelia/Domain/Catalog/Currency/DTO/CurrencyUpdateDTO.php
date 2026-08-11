@@ -27,6 +27,7 @@ readonly class CurrencyUpdateDTO implements DTOEventActionInterface
         public ?string $format = null,
         public bool $visible = true,
         public bool $isDefault = false,
+        public ?string $isocodeNumeric = null,
     ) {
     }
 
@@ -39,6 +40,7 @@ readonly class CurrencyUpdateDTO implements DTOEventActionInterface
             'locale' => $this->locale,
             'rate' => $this->rate,
             'format' => $this->format,
+            'isocode_numeric' => $this->isocodeNumeric,
             'visible' => $this->visible,
             'is_default' => $this->isDefault,
         ];

@@ -21,6 +21,7 @@ class CurrencyCreateEvent extends CurrencyEvent
     protected ?string $symbol = null;
     protected ?string $format = null;
     protected ?string $code = null;
+    protected ?string $isocode_numeric = null;
     protected ?float $rate = null;
 
     // Use currency_name to prevent conflict with Event::name property.
@@ -80,6 +81,18 @@ class CurrencyCreateEvent extends CurrencyEvent
     public function setCode(?string $code): static
     {
         $this->code = $code;
+
+        return $this;
+    }
+
+    public function getIsocodeNumeric(): ?string
+    {
+        return $this->isocode_numeric;
+    }
+
+    public function setIsocodeNumeric(?string $isocode_numeric): static
+    {
+        $this->isocode_numeric = $isocode_numeric;
 
         return $this;
     }
