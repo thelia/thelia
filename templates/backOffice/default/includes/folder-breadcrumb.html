@@ -5,17 +5,21 @@
 	<li><a href="{url path='admin/folders'}">{intl l="Folders"}</a></li>
 
 	{ifloop rel="folder_path"}
-		{loop name="folder_path" type="folder-path" visible="*" folder=$folder_id}
+		{loop name="folder_path" type="folder-path" visible="*" backend_context="1" folder=$folder_id}
+			{assign var="folder_title" value=$TITLE}
+			{if $folder_title == ''}
+				{assign var="folder_title" value={intl l='Untitled folder'}}
+			{/if}
 			{if $ID == $parent|default:null}
 				<li class="active">
 				   {if $editing_folder|default:false == true}
-                       {intl l='Editing %fold' fold="{$TITLE}"}
+                       {intl l='Editing %fold' fold="{$folder_title}"}
 				   {else}
-                       {$TITLE} <a href="{url path="/admin/folders/update/%id" id=$ID}" title="{intl l='Edit this folder'}">{intl l="(edit)"}</a>
+                       {$folder_title} <a href="{url path="/admin/folders/update/%id" id=$ID}" title="{intl l='Edit this folder'}">{intl l="(edit)"}</a>
 			        {/if}
 				</li>
 			{else}
-			   <li><a href="{url path='/admin/folders' parent="$ID" }">{$TITLE}</a></li>
+			   <li><a href="{url path='/admin/folders' parent="$ID" }">{$folder_title}</a></li>
 			{/if}
 	   {/loop}
 	{/ifloop}
