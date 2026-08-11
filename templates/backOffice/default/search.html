@@ -6,7 +6,7 @@
 {block name="check-access"}view{/block}
 
 {block name="main-content"}
-{$searchTerm = {$smarty.get.search_term|trim}}
+{$searchTerm = {$smarty.get.search_term|default:''|trim}}
 {$page = $page|default:0}
 
 {capture name="more_results"}

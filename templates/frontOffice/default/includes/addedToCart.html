@@ -2,6 +2,7 @@
 {set_previous_url ignore_current="1"}
 
 {default_translation_domain domain='fo.default'}
+{$pse_id={$smarty.get.pse_id|default:''}}
 {loop type="product" name="add_product_to_cart" id={product attr="id"}}
 <div class="clearfix">
     <table>
@@ -13,7 +14,7 @@
         <tr>
             <td class="col-md-4">
                 {ifloop rel="pse-first-image"}
-                    {loop type="product-sale-elements-image" name="pse-first-image" product_sale_elements_id={$smarty.get.pse_id} limit="1"}
+                    {loop type="product-sale-elements-image" name="pse-first-image" product_sale_elements_id=$pse_id limit="1"}
                         {loop type="image" name="product-image" id=$PRODUCT_IMAGE_ID product=$ID limit="1" width="218" height="146" resize_mode="borders"}
                             <img itemprop="image" src="{$IMAGE_URL nofilter}" alt="Product #{$LOOP_COUNT}">
                         {/loop}
@@ -27,12 +28,12 @@
             </td>
             <td class="col-md-4">
                 <h2>{$TITLE}</h2>
-                {loop type="attribute_combination" name="product_options" product_sale_elements={$smarty.get.pse_id} order="manual"}
+                {loop type="attribute_combination" name="product_options" product_sale_elements=$pse_id order="manual"}
                     <p>{$ATTRIBUTE_TITLE} : {$ATTRIBUTE_AVAILABILITY_TITLE}</p>
                 {/loop}
             </td>
             <td class="col-md-4">
-                {loop type="product_sale_elements" name="product_price" id={$smarty.get.pse_id}}
+                {loop type="product_sale_elements" name="product_price" id=$pse_id}
                     {if $IS_PROMO == 1}
                         <div class="special-price"><span class="price">{format_money number=$TAXED_PROMO_PRICE}</span></div>
                         <small class="old-price"> <span class="price">{format_money number=$TAXED_PRICE}</span></small>
