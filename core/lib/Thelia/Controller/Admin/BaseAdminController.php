@@ -20,7 +20,6 @@ use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\AdminLog;
@@ -166,42 +165,6 @@ class BaseAdminController extends BaseController
                 '%error' => $exception->getMessage(),
             ]
         );
-    }
-
-    /**
-     * Setup the error context when an error occurs in a action method.
-     *
-     * @param string          $action        the action that caused the error (category modification, variable creation, currency update, etc.)
-     * @param BaseForm        $form          the form where the error occured, or null if no form was involved
-     * @param string          $error_message the error message
-     * @param \Exception|null $exception     the exception or null if no exception
-     */
-    protected function setupFormErrorContext(string $action, string $error_message, BaseForm $form = null, \Exception $exception = null): void
-    {
-        if ($error_message !== false) {
-            // Log the error message
-            Tlog::getInstance()->error(
-                $this->getTranslator()->trans(
-                    'Error during %action process : %error. Exception was %exc',
-                    [
-                        '%action' => $action,
-                        '%error' => $error_message,
-                        '%exc' => $exception != null ? $exception->getMessage() : 'no exception',
-                    ]
-                )
-            );
-
-            if ($form != null) {
-                // Mark the form as errored
-                $form->setErrorMessage($error_message);
-
-                // Pass it to the parser context
-                $this->getParserContext()->addForm($form);
-            }
-
-            // Pass the error message to the parser.
-            $this->getParserContext()->setGeneralError($error_message);
-        }
     }
 
     /**
