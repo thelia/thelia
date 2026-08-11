@@ -407,7 +407,46 @@ abstract class BaseController implements ControllerInterface
             $url = $this->container->get('request_stack')->getCurrentRequest()->get($parameterName);
         }
 
-        return $url;
+        return $this->keepInternalUrl($url);
+    }
+
+    /**
+     * Keep a form- or request-provided URL only when it targets the current
+     * site, and drop it (return null) otherwise.
+     */
+    private function keepInternalUrl($url): ?string
+    {
+        if (empty($url) || !\is_string($url)) {
+            return null;
+        }
+
+        // Browsers treat backslashes as slashes; normalize before parsing.
+        $candidate = str_replace('\\', '/', $url);
+
+        $scheme = parse_url($candidate, PHP_URL_SCHEME);
+        if (!empty($scheme) && !\in_array(strtolower($scheme), ['http', 'https'], true)) {
+            return null;
+        }
+
+        $host = parse_url($candidate, PHP_URL_HOST);
+        if (empty($host)) {
+            // No host: relative URL, always local.
+            return $url;
+        }
+
+        $allowedHosts = [];
+
+        $request = $this->container->get('request_stack')->getCurrentRequest();
+        if (null !== $request) {
+            $allowedHosts[] = strtolower($request->getHost());
+        }
+
+        $siteHost = parse_url(URL::getInstance()->absoluteUrl('/'), PHP_URL_HOST);
+        if (!empty($siteHost)) {
+            $allowedHosts[] = strtolower($siteHost);
+        }
+
+        return \in_array(strtolower($host), $allowedHosts, true) ? $url : null;
     }
 
     /**
