@@ -219,15 +219,27 @@ class Update
                 $this->updatedVersions[] = $version;
             }
 
-            $currentVersion = Version::parse();
-            $this->log('debug', sprintf('setting database configuration to %s', $currentVersion['version']));
-            $updateConfigVersion = [
-                'thelia_version' => $currentVersion['version'],
-                'thelia_major_version' => $currentVersion['major'],
-                'thelia_minus_version' => $currentVersion['minus'],
-                'thelia_release_version' => $currentVersion['release'],
-                'thelia_extra_version' => $currentVersion['extra'],
-            ];
+            // The version stored in the database is the last update script applied, not the version
+            // of the code : update scripts are often committed before the version number is bumped,
+            // and storing the code version here would make the last script run again on every update.
+            $appliedVersion = $version ?? $currentVersion;
+
+            $updateConfigVersion = ['thelia_version' => $appliedVersion];
+
+            try {
+                $parsedVersion = Version::parse($appliedVersion);
+
+                $updateConfigVersion += [
+                    'thelia_major_version' => $parsedVersion['major'],
+                    'thelia_minus_version' => $parsedVersion['minus'],
+                    'thelia_release_version' => $parsedVersion['release'],
+                    'thelia_extra_version' => $parsedVersion['extra'],
+                ];
+            } catch (\InvalidArgumentException) {
+                $this->log('error', sprintf('unable to parse version %s, detailed version variables were left unchanged', $appliedVersion));
+            }
+
+            $this->log('debug', sprintf('setting database configuration to %s', $appliedVersion));
 
             foreach ($updateConfigVersion as $name => $value) {
                 $stmt = $this->connection->prepare('SELECT * FROM `config` WHERE `name` = ?');
@@ -235,10 +247,10 @@ class Update
 
                 if ($stmt->rowCount()) {
                     $stmt = $this->connection->prepare('UPDATE `config` SET `value` = ? WHERE `name` = ?');
-                    $stmt->execute([$version, $value]);
+                    $stmt->execute([$value, $name]);
                 } else {
-                    $stmt = $this->connection->prepare('INSERT INTO `config` (?) VALUES (?)');
-                    $stmt->execute([$version, $value]);
+                    $stmt = $this->connection->prepare('INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES (?, ?, 1, 1, NOW(), NOW())');
+                    $stmt->execute([$name, $value]);
                 }
             }
 
