@@ -251,7 +251,9 @@ class RequestListener implements EventSubscriberInterface
                         ->filterByUrl(sprintf('%s://%s', $components['scheme'], $components['host']), ModelCriteria::LIKE)
                         ->findOne();
 
-                    if (null !== $lang) {
+                    // Fall back to a same-host comparison when no lang.url matches the referrer
+                    // (e.g. lang URLs left empty), instead of silently dropping the previous URL.
+                    if (null !== $lang || str_contains($referrer, $request->getSchemeAndHttpHost())) {
                         $session->setReturnToUrl($referrer);
 
                         if (\in_array($view, $catalogViews)) {
