@@ -69,6 +69,7 @@ class CurrencyController extends AbstractCrudController
         ->setSymbol($formData['symbol'])
         ->setFormat($formData['format'])
         ->setCode($formData['code'])
+        ->setIsocodeNumeric($formData['isocode_numeric'])
         ->setRate($formData['rate'])
         ;
 
@@ -85,6 +86,7 @@ class CurrencyController extends AbstractCrudController
         ->setSymbol($formData['symbol'])
         ->setFormat($formData['format'])
         ->setCode($formData['code'])
+        ->setIsocodeNumeric($formData['isocode_numeric'])
         ->setRate($formData['rate'])
         ;
 
@@ -118,6 +120,7 @@ class CurrencyController extends AbstractCrudController
                 'name' => $object->getName(),
                 'locale' => $object->getLocale(),
                 'code' => $object->getCode(),
+                'isocode_numeric' => $object->getIsocodeNumeric(),
                 'symbol' => $object->getSymbol(),
                 'format' => $object->getFormat(),
                 'rate' => $object->getRate(),

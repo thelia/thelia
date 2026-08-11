@@ -14,6 +14,7 @@ namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\CurrencyQuery;
@@ -105,6 +106,23 @@ class CurrencyCreationForm extends BaseForm
                 ],
                 'attr' => [
                     'placeholder' => $this->translator->trans('Code'),
+                ],
+            ])
+            ->add('isocode_numeric', TextType::class, [
+                'required' => false,
+                'constraints' => [
+                    new Regex([
+                        'pattern' => '/^\d{3}$/',
+                        'message' => 'The ISO 4217 numeric code must be exactly 3 digits.',
+                    ]),
+                ],
+                'label' => $this->translator->trans('ISO 4217 numeric code'),
+                'label_attr' => [
+                    'for' => 'iso_4217_numeric_code',
+                    'help' => $this->translator->trans('More information about ISO 4217'),
+                ],
+                'attr' => [
+                    'placeholder' => $this->translator->trans('Numeric code'),
                 ],
             ])
         ;

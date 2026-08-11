@@ -792,6 +792,7 @@ CREATE TABLE `currency`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(45),
+    `isocode_numeric` VARCHAR(3),
     `symbol` VARCHAR(45),
     `format` CHAR(10),
     `rate` FLOAT,

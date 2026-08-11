@@ -46,6 +46,7 @@ class CurrencyTest extends ContainerAwareTestCase
         $event
             ->setCurrencyName('test')
             ->setCode('AZE')
+            ->setIsocodeNumeric('944')
             ->setRate('1.35')
             ->setLocale('en_US')
             ->setSymbol('ù')
@@ -62,6 +63,7 @@ class CurrencyTest extends ContainerAwareTestCase
 
         $this->assertEquals('test', $createdCurrency->getName());
         $this->assertEquals('AZE', $createdCurrency->getCode());
+        $this->assertEquals('944', $createdCurrency->getIsocodeNumeric());
         $this->assertEquals('1.35', $createdCurrency->getRate());
         $this->assertEquals('en_US', $createdCurrency->getLocale());
         $this->assertEquals('ù', $createdCurrency->getSymbol());
@@ -82,6 +84,7 @@ class CurrencyTest extends ContainerAwareTestCase
         $event
             ->setCurrencyName('test update')
             ->setCode('AZER')
+            ->setIsocodeNumeric('943')
             ->setRate('2.35')
             ->setLocale('en_US')
             ->setSymbol('ù')
@@ -96,6 +99,7 @@ class CurrencyTest extends ContainerAwareTestCase
         $this->assertInstanceOf('Thelia\Model\Currency', $updatedCurrency);
         $this->assertEquals('test update', $updatedCurrency->getName());
         $this->assertEquals('AZER', $updatedCurrency->getCode());
+        $this->assertEquals('943', $updatedCurrency->getIsocodeNumeric());
         $this->assertEquals('2.35', $updatedCurrency->getRate());
         $this->assertEquals('en_US', $updatedCurrency->getLocale());
         $this->assertEquals('ù', $updatedCurrency->getSymbol());
