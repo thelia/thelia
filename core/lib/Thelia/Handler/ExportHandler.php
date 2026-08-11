@@ -14,6 +14,7 @@ namespace Thelia\Handler;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Event\ExportEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -32,6 +33,11 @@ use Thelia\Model\Lang;
  */
 class ExportHandler
 {
+    /**
+     * @var int Maximum age, in days, of generated export files kept in the export cache directory
+     */
+    private const EXPORT_CACHE_MAX_AGE_DAYS = 1;
+
     /**
      * @var EventDispatcherInterface An event dispatcher interface
      */
@@ -250,6 +256,8 @@ class ExportHandler
         $fileSystem = new Filesystem();
         $fileSystem->mkdir(\dirname($filePath));
 
+        $this->purgeOldExportFiles($fileSystem, \dirname($filePath));
+
         $file = new \SplFileObject($filePath, 'w+b');
 
         $serializer->prepareFile($file);
@@ -272,6 +280,22 @@ class ExportHandler
         unset($file);
 
         return $filePath;
+    }
+
+    /**
+     * Remove previously generated export files that are older than self::EXPORT_CACHE_MAX_AGE_DAYS,
+     * so the export cache directory does not grow indefinitely.
+     *
+     * @param string $directory The export cache directory
+     */
+    protected function purgeOldExportFiles(Filesystem $fileSystem, $directory): void
+    {
+        $finder = new Finder();
+        $finder->files()->in($directory)->date('before '.self::EXPORT_CACHE_MAX_AGE_DAYS.' days ago');
+
+        foreach ($finder as $oldExportFile) {
+            $fileSystem->remove($oldExportFile->getRealPath());
+        }
     }
 
     /**
