@@ -927,6 +927,10 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             try {
                 $this->dispatcher->dispatch($event, TheliaEvents::IMAGE_PROCESS);
                 $template->assign('MEDIA_URL', $event->getFileUrl());
+
+                if ($this->getParam($params, 'base64', false)) {
+                    $template->assign('MEDIA_BASE64', $this->toBase64($event->getCacheFilepath()));
+                }
             } catch (\Exception $ex) {
                 Tlog::getInstance()->error($ex->getMessage());
                 $template->assign('MEDIA_URL', '');
@@ -938,6 +942,20 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         }
 
         return null;
+    }
+
+    /**
+     * Convert a local file into a base64-encoded data URI.
+     *
+     * @param string $path the absolute path of the file to convert
+     *
+     * @return string the data URI (e.g. "data: image/png;base64,...")
+     */
+    private function toBase64($path)
+    {
+        $imgData = base64_encode(file_get_contents($path));
+
+        return 'data: '.mime_content_type($path).';base64,'.$imgData;
     }
 
     public function getPluginDescriptors()
