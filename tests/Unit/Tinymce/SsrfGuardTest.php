@@ -29,7 +29,7 @@ final class SsrfGuardTest extends TestCase
      */
     public function testInternalAddressesAreBlocked(string $ip): void
     {
-        self::assertTrue(\thelia_ip_is_blocked($ip));
+        self::assertTrue(thelia_ip_is_blocked($ip));
     }
 
     /**
@@ -50,7 +50,7 @@ final class SsrfGuardTest extends TestCase
 
     public function testPublicAddressIsAllowed(): void
     {
-        self::assertFalse(\thelia_ip_is_blocked('8.8.8.8'));
+        self::assertFalse(thelia_ip_is_blocked('8.8.8.8'));
     }
 
     /**
@@ -58,8 +58,8 @@ final class SsrfGuardTest extends TestCase
      */
     public function testDangerousUrlsAreRejected(string $url): void
     {
-        self::assertNull(\thelia_remote_url_target($url));
-        self::assertFalse(\thelia_fetch_remote_file($url));
+        self::assertNull(thelia_remote_url_target($url));
+        self::assertFalse(thelia_fetch_remote_file($url));
     }
 
     /**
@@ -78,7 +78,7 @@ final class SsrfGuardTest extends TestCase
 
     public function testPublicHttpUrlIsAccepted(): void
     {
-        $target = \thelia_remote_url_target('http://8.8.8.8/robots.txt');
+        $target = thelia_remote_url_target('http://8.8.8.8/robots.txt');
 
         self::assertIsArray($target);
         self::assertSame('8.8.8.8', $target['ip']);
