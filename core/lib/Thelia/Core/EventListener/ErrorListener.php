@@ -119,7 +119,11 @@ class ErrorListener
         }
     }
 
-    #[AsEventListener(event: KernelEvents::EXCEPTION, priority: 0)]
+    // Must run before handleException(): a successfully rendered error page
+    // sets a response, which stops event propagation and would skip logging.
+    // Must stay below authenticationException() (100) so login redirects are
+    // not logged as errors.
+    #[AsEventListener(event: KernelEvents::EXCEPTION, priority: 50)]
     public function logException(ExceptionEvent $event): void
     {
         if (!$this->isAuthorizedToSeeErrorDetails($event)) {

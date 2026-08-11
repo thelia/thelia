@@ -14,12 +14,17 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Core\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\EventListener\ErrorListener;
+use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
@@ -58,6 +63,96 @@ final class ErrorListenerTest extends IntegrationTestCase
         self::assertNotNull($event->getResponse());
         self::assertSame(500, $event->getResponse()->getStatusCode());
         self::assertSame(500, $assigned['status_code'] ?? null);
+    }
+
+    /**
+     * When the error page renders successfully, handleException() sets a
+     * response on the kernel.exception event, which stops propagation: any
+     * listener registered after it never runs. logException() must therefore
+     * run BEFORE handleException(), otherwise production errors whose error
+     * page renders fine are never logged anywhere.
+     */
+    public function testExceptionIsLoggedEvenWhenErrorPageIsRendered(): void
+    {
+        [$listener, $event] = $this->dispatchThroughRealPriorities(new \RuntimeException('boom'));
+
+        self::assertNotNull($event->getResponse(), 'the error page should have been rendered');
+        self::assertTrue($listener->logExceptionCalled, 'the original exception must be logged before the error page response stops event propagation');
+    }
+
+    /**
+     * Authentication redirects are normal flow: authenticationException() runs
+     * first (priority 100) and must keep short-circuiting logException() so
+     * every login redirect does not pollute the error log.
+     */
+    public function testAuthenticationRedirectIsNotLoggedAsAnError(): void
+    {
+        [$listener, $event] = $this->dispatchThroughRealPriorities(new AuthenticationException('login required'));
+
+        self::assertNotNull($event->getResponse());
+        self::assertTrue($event->getResponse()->isRedirect());
+        self::assertFalse($listener->logExceptionCalled, 'authentication redirects must not be logged as uncaught exceptions');
+    }
+
+    /**
+     * Dispatches a kernel.exception event through a real EventDispatcher with
+     * the listener methods registered at their attribute-declared priorities,
+     * in method-declaration order — the exact wiring production uses.
+     *
+     * @return array{0: ErrorListener&object{logExceptionCalled: bool}, 1: ExceptionEvent}
+     */
+    private function dispatchThroughRealPriorities(\Throwable $throwable): array
+    {
+        $parserResolver = $this->createMock(ParserResolver::class);
+        $parserResolver->method('getParserByCurrentRequest')
+            ->willThrowException(new \Exception('no parser in this test'));
+
+        // Simulates the prod wiring where THELIA_HANDLE_ERROR successfully
+        // renders the Thelia error page and puts it on the event.
+        $innerDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $innerDispatcher->method('dispatch')->willReturnCallback(
+            static function (object $event): object {
+                if ($event instanceof ExceptionEvent) {
+                    $event->setResponse(new Response('error page', 500));
+                }
+
+                return $event;
+            },
+        );
+
+        $listener = new class('prod', $parserResolver, $this->createMock(SecurityContext::class), $innerDispatcher) extends ErrorListener {
+            public bool $logExceptionCalled = false;
+
+            public function logException(ExceptionEvent $event): void
+            {
+                $this->logExceptionCalled = true;
+            }
+        };
+
+        $dispatcher = new EventDispatcher();
+        foreach ((new \ReflectionClass(ErrorListener::class))->getMethods() as $method) {
+            foreach ($method->getAttributes(AsEventListener::class) as $attribute) {
+                $arguments = $attribute->getArguments();
+                if (KernelEvents::EXCEPTION === ($arguments['event'] ?? null)) {
+                    $dispatcher->addListener(
+                        KernelEvents::EXCEPTION,
+                        [$listener, $method->getName()],
+                        $arguments['priority'] ?? 0,
+                    );
+                }
+            }
+        }
+
+        $event = new ExceptionEvent(
+            $this->createMock(HttpKernelInterface::class),
+            new Request(),
+            HttpKernelInterface::MAIN_REQUEST,
+            $throwable,
+        );
+
+        $dispatcher->dispatch($event, KernelEvents::EXCEPTION);
+
+        return [$listener, $event];
     }
 
     /**
