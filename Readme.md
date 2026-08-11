@@ -42,6 +42,7 @@ Requirements
     * upload\_max\_filesize 2M
     * date.timezone must be defined
 * Web Server Apache 2 or Nginx
+* [Node.js](https://nodejs.org/) and [Yarn](https://yarnpkg.com/), only if you build the `modern` front-office template assets (see `setup/modern-init.sh`)
 
 
 ### MySQL 5.6
