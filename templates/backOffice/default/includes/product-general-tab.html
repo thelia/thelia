@@ -94,6 +94,15 @@
                             {/loop}
                         </select>
                         {/custom_render_form_field}
+                        {ifloop rel="virtual-documents"}
+                            {form_field field='virtual_document_id'}
+                                {if empty($value)}
+                                    <div class="alert alert-warning">
+                                        <p>{intl l="No document is associated with this virtual product: your customers will not be able to download anything."}</p>
+                                    </div>
+                                {/if}
+                            {/form_field}
+                        {/ifloop}
                         <div id="virtual-product-message" class="{ifloop rel="virtual-documents"}hidden{/ifloop}">
                             <div class="alert alert-warning">
                                 <p>
@@ -109,6 +118,7 @@
                         <p>
                             <a href="#prices" data-toggle="tab">{intl l="Associate files to your combinations"}</a>
                         </p>
+                        <span class="help-block">{intl l="Each combination has its own file to download. Only the documents of this product which are not visible can be selected, so that they cannot be downloaded for free."}</span>
                     {/if}
                 </div>
 

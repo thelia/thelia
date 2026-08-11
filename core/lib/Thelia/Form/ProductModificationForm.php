@@ -49,7 +49,10 @@ class ProductModificationForm extends ProductCreationForm
             ])
             ->add('virtual_document_id', IntegerType::class, [
                 'label' => Translator::getInstance()->trans('Virtual document'),
-                'label_attr' => ['for' => 'virtual_document_id_field'],
+                'label_attr' => [
+                    'for' => 'virtual_document_id_field',
+                    'help' => Translator::getInstance()->trans('The file your customer will download once the order is paid. Only the documents of this product which are not visible can be selected, so that they cannot be downloaded for free. Leave empty if this virtual product has nothing to download.'),
+                ],
             ])
         ;
 
