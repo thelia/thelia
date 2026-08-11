@@ -1228,6 +1228,8 @@ return [
     'Unspecified' => 'Non mentionné',
     'Unsupported field type \'%type\' in form-field.html' => 'Le type de champ \'%type\' n\'est pas supporté par form-field.html ',
     'Untaxed total' => 'Total HT',
+    'Untitled category' => 'Catégorie sans titre',
+    'Untitled folder' => 'Dossier sans titre',
     'Update' => 'Mettre à jour',
     'Update URL' => 'URL de mise à jour',
     'Update an administrator' => 'Mettre à jour cet administrateur',

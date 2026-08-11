@@ -1220,6 +1220,8 @@ return [
     'Unspecified' => 'Unspecified',
     'Unsupported field type \'%type\' in form-field.html' => 'Unsupported field type \'%type\' in form-field.html',
     'Untaxed total' => 'Untaxed total',
+    'Untitled category' => 'Untitled category',
+    'Untitled folder' => 'Untitled folder',
     'Update' => 'Update',
     'Update URL' => 'Update URL',
     'Update an administrator' => 'Update an administrator',
