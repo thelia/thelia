@@ -18,6 +18,7 @@ use Thelia\Controller\BaseController;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
+use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Form\Exception\FormValidationException;
@@ -58,6 +59,9 @@ class BaseAdminController extends BaseController
             if (null != $view = $this->getRequest()->get('view')) {
                 return $this->render($view);
             }
+        } catch (ResourceNotFoundException) {
+            // The requested template does not exist: this is a 404, not a server error.
+            return $this->pageNotFound();
         } catch (\Exception $ex) {
             return $this->errorPage($ex->getMessage());
         }
