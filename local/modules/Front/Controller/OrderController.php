@@ -229,6 +229,8 @@ class OrderController extends BaseFrontController
                 ->setGeneralError($message)
             ;
         }
+
+        return $this->render('order-delivery');
     }
 
     /**
