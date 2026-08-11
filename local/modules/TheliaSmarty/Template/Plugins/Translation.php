@@ -25,6 +25,9 @@ class Translation extends AbstractSmartyPlugin
     protected $defaultTranslationDomain = '';
     protected $defaultLocale;
 
+    /** @var array saved default domain and locale, see saveDefaults() */
+    protected $savedDefaults = [];
+
     protected $protectedParams = [
         'l',
         'd',
@@ -53,6 +56,27 @@ class Translation extends AbstractSmartyPlugin
     public function setDefaultLocale(array $params): void
     {
         $this->defaultLocale = $this->getParam($params, 'locale');
+    }
+
+    /**
+     * Save the current default translation domain and locale, so that a template rendered
+     * in the meantime cannot change them for the rest of the current template.
+     */
+    public function saveDefaults(): void
+    {
+        $this->savedDefaults[] = [$this->defaultTranslationDomain, $this->defaultLocale];
+    }
+
+    /**
+     * Restore the default translation domain and locale saved by saveDefaults().
+     */
+    public function restoreDefaults(): void
+    {
+        if ([] === $this->savedDefaults) {
+            return;
+        }
+
+        [$this->defaultTranslationDomain, $this->defaultLocale] = array_pop($this->savedDefaults);
     }
 
     /**
