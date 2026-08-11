@@ -20,6 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Hook\ModuleHookConfigurationStore;
 use Thelia\Model\IgnoredModuleHookQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleHookQuery;
@@ -38,12 +39,25 @@ class HookCleanCommand extends ContainerAwareCommand
     {
         $this
             ->setName('hook:clean')
-            ->setDescription('Clean hooks. It will delete all hooks, then recreate it.')
+            ->setDescription('Clean hooks. It will delete all hooks, then recreate them from the module declarations.')
+            ->setHelp(
+                'Delete the module hooks, so that they are recreated from the module declarations on the next '
+                ."container build.\n"
+                .'The positions and the active states set in the back office are restored on the recreated hooks, '
+                .'and the hooks removed in the back office are not restored. Use --reset-positions to drop that '
+                .'configuration and start over.'
+            )
             ->addOption(
                 'assume-yes',
                 'y',
                 InputOption::VALUE_NONE,
                 'Assume to answer yes to all questions'
+            )
+            ->addOption(
+                'reset-positions',
+                null,
+                InputOption::VALUE_NONE,
+                'Do not keep the positions and the active states set in the back office, and restore the hooks removed in the back office'
             )
             ->addArgument(
                 'module',
@@ -61,7 +75,7 @@ class HookCleanCommand extends ContainerAwareCommand
                 return 1;
             }
 
-            $this->deleteHooks($module);
+            $this->deleteHooks($module, !$input->getOption('reset-positions'));
 
             $output->writeln('<info>Hooks have been successfully deleted</info>');
 
@@ -116,15 +130,28 @@ class HookCleanCommand extends ContainerAwareCommand
     }
 
     /**
-     * Delete module hooks.
+     * Delete module hooks. They are recreated by RegisterHookListenersPass on the next container build.
      *
-     * @param Module|null $module if specified it will only delete hooks related to this module
+     * @param Module|null $module                if specified it will only delete hooks related to this module
+     * @param bool        $preserveConfiguration keep the positions and the active states set in the back office,
+     *                                           and keep the hooks removed in the back office removed
      *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    protected function deleteHooks($module): void
+    protected function deleteHooks($module, $preserveConfiguration = true): void
     {
+        if ($preserveConfiguration) {
+            $savedHooks = ModuleHookQuery::create();
+            if (null !== $module) {
+                $savedHooks->filterByModule($module);
+            }
+
+            ModuleHookConfigurationStore::save($savedHooks->find());
+        } else {
+            ModuleHookConfigurationStore::discard();
+        }
+
         $query = ModuleHookQuery::create();
         if (null !== $module) {
             $query
@@ -132,6 +159,11 @@ class HookCleanCommand extends ContainerAwareCommand
                 ->delete();
         } else {
             $query->deleteAll();
+        }
+
+        if ($preserveConfiguration) {
+            // A hook removed in the back office must stay removed.
+            return;
         }
 
         $query = IgnoredModuleHookQuery::create();
