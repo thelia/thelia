@@ -214,10 +214,12 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     $search->filterByRef($searchTerm, $searchCriteria);
                     break;
                 case 'id':
+                    [$idSearchTerm, $placeholder, $bindingType] = $this->buildSearchTermPlaceholder($searchTerm);
+
                     $search->where(
-                        \sprintf('`product`.`id` %s ?', $searchCriteria),
-                        $searchTerm,
-                        \PDO::PARAM_STR,
+                        \sprintf('`product`.`id` %s %s', $searchCriteria, $placeholder),
+                        $idSearchTerm,
+                        $bindingType,
                     );
                     break;
             }
