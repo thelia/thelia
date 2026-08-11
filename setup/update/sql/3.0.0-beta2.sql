@@ -348,4 +348,99 @@ SET `country_i18n`.`title` = CASE `country`.`isoalpha3`
 END
 WHERE `country_i18n`.`locale` = 'ru_RU' AND `country_i18n`.`title` IS NULL AND `country`.`isoalpha3` IN ('AIA', 'ATA', 'ASM', 'ABW', 'ALA', 'BMU', 'BES', 'BVT', 'CCK', 'CUW', 'CXR', 'ESH', 'FLK', 'FRO', 'GGY', 'GIB', 'GRL', 'SGS', 'GUM', 'HMD', 'IMN', 'IOT', 'JEY', 'CYM', 'MNE', 'MAC', 'MNP', 'MSR', 'NFK', 'PCN', 'PRI', 'PSE', 'SRB', 'SHN', 'SJM', 'SSD', 'SXM', 'TCA', 'TKL', 'TLS', 'UMI', 'VGB', 'VIR');
 
+-- ---------------------------------------------------------------------
+-- Columns added to the schema after the 3.0.0-beta1 tag
+--
+-- order_status.equivalent_code (#3533), order.customer_discount_rate (#3532)
+-- and currency.isocode_numeric (#3549) reached setup/thelia.sql without an
+-- update script, so only fresh installs had them. The DDL below matches
+-- setup/thelia.sql exactly, column position included, so an updated shop and
+-- a fresh install end up with the same structure.
+--
+-- Each ALTER is guarded on information_schema, so a shop that already has the
+-- column - anyone who installed from a main snapshot - is left untouched
+-- instead of failing on a duplicate column.
+-- ---------------------------------------------------------------------
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_status' AND `COLUMN_NAME` = 'equivalent_code');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_status` ADD `equivalent_code` VARCHAR(45) AFTER `code`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `COLUMN_NAME` = 'customer_discount_rate');
+SET @statement := IF(@add_column, 'ALTER TABLE `order` ADD `customer_discount_rate` DECIMAL(16,6) DEFAULT 0.000000 COMMENT \'the customer discount rate, as a percentage, already included in the order products prices\' AFTER `discount`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+-- `order` is versionable: the version table mirrors its columns
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_version' AND `COLUMN_NAME` = 'customer_discount_rate');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_version` ADD `customer_discount_rate` DECIMAL(16,6) DEFAULT 0.000000 COMMENT \'the customer discount rate, as a percentage, already included in the order products prices\' AFTER `discount`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'currency' AND `COLUMN_NAME` = 'isocode_numeric');
+SET @statement := IF(@add_column, 'ALTER TABLE `currency` ADD `isocode_numeric` VARCHAR(3) COMMENT \'the ISO 4217 numeric currency code\' AFTER `code`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+-- ISO 4217 numeric codes for the currencies seeded by setup/insert.sql, matched
+-- on the alpha-3 code. Currencies added by the shop, and any numeric code
+-- already filled in, are left alone.
+UPDATE `currency` SET `isocode_numeric` = CASE `code`
+    WHEN 'EUR' THEN '978'
+    WHEN 'USD' THEN '840'
+    WHEN 'GBP' THEN '826'
+    WHEN 'CHF' THEN '756'
+    WHEN 'MXN' THEN '484'
+    WHEN 'PLN' THEN '985'
+    WHEN 'CNY' THEN '156'
+    WHEN 'NOK' THEN '578'
+    WHEN 'MDL' THEN '498'
+    WHEN 'PYG' THEN '600'
+    WHEN 'ARS' THEN '032'
+    WHEN 'BYR' THEN '974'
+    WHEN 'FJD' THEN '242'
+    WHEN 'RSD' THEN '941'
+    WHEN 'SEK' THEN '752'
+    WHEN 'HRK' THEN '191'
+    WHEN 'DKK' THEN '208'
+    WHEN 'NGN' THEN '566'
+    WHEN 'HKD' THEN '344'
+    WHEN 'CAD' THEN '124'
+    WHEN 'SAR' THEN '682'
+    WHEN 'CZK' THEN '203'
+    WHEN 'CRC' THEN '188'
+    WHEN 'AZN' THEN '944'
+    WHEN 'IDR' THEN '360'
+    WHEN 'PKR' THEN '586'
+    WHEN 'BRL' THEN '986'
+    WHEN 'VND' THEN '704'
+    WHEN 'PHP' THEN '608'
+    WHEN 'GTQ' THEN '320'
+    WHEN 'TRY' THEN '949'
+    WHEN 'JPY' THEN '392'
+    WHEN 'RUB' THEN '643'
+    WHEN 'PEN' THEN '604'
+    WHEN 'EGP' THEN '818'
+    WHEN 'GEL' THEN '981'
+    WHEN 'BOB' THEN '068'
+    WHEN 'AED' THEN '784'
+    WHEN 'THB' THEN '764'
+    WHEN 'ILS' THEN '376'
+    WHEN 'MYR' THEN '458'
+    WHEN 'VEF' THEN '937'
+    WHEN 'HUF' THEN '348'
+    WHEN 'KES' THEN '404'
+    WHEN 'UAH' THEN '980'
+    WHEN 'TND' THEN '788'
+    WHEN 'BGN' THEN '975'
+    WHEN 'INR' THEN '356'
+END
+WHERE (`isocode_numeric` IS NULL OR `isocode_numeric` = '')
+  AND `code` IN ('EUR', 'USD', 'GBP', 'CHF', 'MXN', 'PLN', 'CNY', 'NOK', 'MDL', 'PYG', 'ARS', 'BYR', 'FJD', 'RSD', 'SEK', 'HRK', 'DKK', 'NGN', 'HKD', 'CAD', 'SAR', 'CZK', 'CRC', 'AZN', 'IDR', 'PKR', 'BRL', 'VND', 'PHP', 'GTQ', 'TRY', 'JPY', 'RUB', 'PEN', 'EGP', 'GEL', 'BOB', 'AED', 'THB', 'ILS', 'MYR', 'VEF', 'HUF', 'KES', 'UAH', 'TND', 'BGN', 'INR');
+
 SET FOREIGN_KEY_CHECKS = 1;
