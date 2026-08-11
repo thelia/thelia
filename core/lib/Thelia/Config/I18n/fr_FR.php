@@ -663,6 +663,7 @@ return [
     'Title *' => 'Titre *',
     'Title ID not found' => 'ID de la civilité non trouvé',
     'To activate module %name, the following modules should be activated first: %modules' => 'Pour activer le module %name, les modules suivants doivent être tout d\'abord activés: %modules',
+    'To stop offering it to your customers, deactivate the module instead of deleting it.' => 'Pour ne plus le proposer à vos clients, désactivez le module au lieu de le supprimer.',
     'Tools' => 'Outils',
     'Translations' => 'Traductions',
     'Tried to download a file, but the URL was not valid: %url' => 'Le fichier n\'a pas été téléchargé, l\'url n\'est pas valide: %url',
