@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Thelia\Core\Hook\BaseHook;
 use Thelia\Core\Hook\HookDefinition;
+use Thelia\Core\Hook\ModuleHookConfigurationStore;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Log\Tlog;
 use Thelia\Model\Base\IgnoredModuleHookQuery;
@@ -126,6 +127,9 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
         // now we can add listeners for active hooks and active module
         $this->addHooksMethodCall($container, $definition);
+
+        // the hooks saved by hook:clean have been recreated, the saved configuration is not needed anymore
+        ModuleHookConfigurationStore::discard();
     }
 
     /**
@@ -189,6 +193,13 @@ class RegisterHookListenersPass implements CompilerPassInterface
                 ->count();
 
             if (0 === $ignoreCount) {
+                // restore the configuration saved by hook:clean, if this hook was one of the deleted ones
+                $savedConfiguration = ModuleHookConfigurationStore::find(
+                    $module->getId(),
+                    $hook->getId(),
+                    $attributes['method']
+                );
+
                 // hook for module doesn't exist, we add it with default registered values
                 $moduleHook = new ModuleHook();
 
@@ -196,10 +207,10 @@ class RegisterHookListenersPass implements CompilerPassInterface
                     ->setModuleId($module->getId())
                     ->setClassname($id)
                     ->setMethod($attributes['method'])
-                    ->setActive($active)
+                    ->setActive($savedConfiguration['active'] ?? $active)
                     ->setHookActive(true)
                     ->setModuleActive(true)
-                    ->setPosition(ModuleHook::MAX_POSITION);
+                    ->setPosition($savedConfiguration['position'] ?? ModuleHook::MAX_POSITION);
 
                 if (isset($attributes['templates'])) {
                     $moduleHook->setTemplates($attributes['templates']);
