@@ -17,9 +17,15 @@ namespace Thelia\Tests\Integration\Action;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Product\ProductCreateEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
+use Thelia\Core\Event\Product\ProductUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\MetaData;
+use Thelia\Model\MetaDataQuery;
+use Thelia\Model\Product;
+use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductQuery;
+use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
@@ -159,5 +165,112 @@ final class ProductActionTest extends IntegrationTestCase
             ->filterByProductId($productId)
             ->count();
         self::assertSame(0, $remainingPse);
+    }
+
+    public function testUpdateStoresVirtualDocumentOfTheDefaultSaleElement(): void
+    {
+        $product = $this->createVirtualProduct();
+        $document = $this->createDocument($product);
+
+        $this->dispatcher->dispatch(
+            $this->virtualDocumentUpdateEvent($product, $document->getId()),
+            TheliaEvents::PRODUCT_UPDATE,
+        );
+
+        self::assertSame(
+            $document->getId(),
+            (int) MetaDataQuery::getVal('virtual', MetaData::PSE_KEY, $this->defaultSaleElement($product)->getId()),
+        );
+    }
+
+    public function testUpdateRemovesVirtualDocumentWhenNoneIsSelected(): void
+    {
+        $product = $this->createVirtualProduct();
+        $document = $this->createDocument($product);
+        $defaultPse = $this->defaultSaleElement($product);
+
+        MetaDataQuery::setVal('virtual', MetaData::PSE_KEY, $defaultPse->getId(), $document->getId());
+
+        $this->dispatcher->dispatch(
+            $this->virtualDocumentUpdateEvent($product, 0),
+            TheliaEvents::PRODUCT_UPDATE,
+        );
+
+        self::assertNull(MetaDataQuery::getVal('virtual', MetaData::PSE_KEY, $defaultPse->getId()));
+    }
+
+    public function testUpdateKeepsTheAssociationsOfAProductWithSeveralCombinations(): void
+    {
+        $product = $this->createVirtualProduct();
+        $document = $this->createDocument($product);
+        $defaultPse = $this->defaultSaleElement($product);
+        $secondPse = $this->factory->productSaleElement($product);
+
+        MetaDataQuery::setVal('virtual', MetaData::PSE_KEY, $defaultPse->getId(), $document->getId());
+        MetaDataQuery::setVal('virtual', MetaData::PSE_KEY, $secondPse->getId(), $document->getId());
+
+        // -1 is what the back office sends when the association is managed per combination.
+        $this->dispatcher->dispatch(
+            $this->virtualDocumentUpdateEvent($product, -1),
+            TheliaEvents::PRODUCT_UPDATE,
+        );
+
+        self::assertSame(
+            $document->getId(),
+            (int) MetaDataQuery::getVal('virtual', MetaData::PSE_KEY, $defaultPse->getId()),
+        );
+        self::assertSame(
+            $document->getId(),
+            (int) MetaDataQuery::getVal('virtual', MetaData::PSE_KEY, $secondPse->getId()),
+        );
+    }
+
+    private function createVirtualProduct(): Product
+    {
+        return $this->factory->product(
+            $this->factory->category(),
+            $this->factory->taxRule(),
+            $this->factory->currency(),
+        );
+    }
+
+    private function createDocument(Product $product): ProductDocument
+    {
+        $document = new ProductDocument();
+        $document
+            ->setProductId($product->getId())
+            ->setFile('handbook.pdf')
+            ->setVisible(0)
+            ->setPosition(1)
+            ->save();
+
+        return $document;
+    }
+
+    private function defaultSaleElement(Product $product): ProductSaleElements
+    {
+        $defaultPse = ProductSaleElementsQuery::create()
+            ->filterByProductId($product->getId())
+            ->filterByIsDefault(true)
+            ->findOne();
+
+        self::assertNotNull($defaultPse);
+
+        return $defaultPse;
+    }
+
+    private function virtualDocumentUpdateEvent(Product $product, int $virtualDocumentId): ProductUpdateEvent
+    {
+        $event = new ProductUpdateEvent($product->getId());
+        $event
+            ->setLocale('en_US')
+            ->setRef($product->getRef())
+            ->setTitle('Digital handbook')
+            ->setDefaultCategory($product->getDefaultCategoryId())
+            ->setVisible(true)
+            ->setVirtual(true)
+            ->setVirtualDocumentId($virtualDocumentId);
+
+        return $event;
     }
 }
