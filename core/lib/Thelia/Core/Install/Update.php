@@ -162,9 +162,7 @@ class Update
         }
 
         if (null === $closestIndex) {
-            throw new UpdateException(
-                \sprintf('Unknown installed version "%s", unable to find where to start the update.', $currentVersion)
-            );
+            throw new UpdateException(\sprintf('Unknown installed version "%s", unable to find where to start the update.', $currentVersion));
         }
 
         return $closestIndex;
