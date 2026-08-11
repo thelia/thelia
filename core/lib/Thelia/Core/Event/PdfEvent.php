@@ -33,19 +33,25 @@ class PdfEvent extends ActionEvent
     protected $templateName;
     protected $fileName;
     protected $object;
+    protected $pdfa;
+    protected $testTdInOnePage;
+    protected $testIsImage;
 
     /**
-     * @param string $content      html content to transform into pdf
-     * @param string $orientation  page orientation, same as TCPDF
-     * @param string $format       The format used for pages, same as TCPDF
-     * @param string $lang         Lang : fr, en, it...
-     * @param bool   $unicode      TRUE means that the input text is unicode (default = true)
-     * @param string $encoding     charset encoding; default is UTF-8
-     * @param array  $marges       Default marges (left, top, right, bottom)
-     * @param string $fontName     Default font name
+     * @param string $content         html content to transform into pdf
+     * @param string $orientation     page orientation, same as TCPDF
+     * @param string $format          The format used for pages, same as TCPDF
+     * @param string $lang            Lang : fr, en, it...
+     * @param bool   $unicode         TRUE means that the input text is unicode (default = true)
+     * @param string $encoding        charset encoding; default is UTF-8
+     * @param array  $marges          Default marges (left, top, right, bottom)
+     * @param string $fontName        Default font name
      * @param string $templateName
      * @param string $fileName
      * @param string $object
+     * @param bool   $pdfa            TRUE sets the document to PDF/A mode (default = false)
+     * @param bool   $testTdInOnePage TRUE checks that a table cell content fits on one page (default = true)
+     * @param bool   $testIsImage     TRUE checks that images used in the content exist (default = true)
      */
     public function __construct(
         $content,
@@ -58,7 +64,10 @@ class PdfEvent extends ActionEvent
         $fontName = 'freesans',
         $templateName = null,
         $fileName = null,
-        $object = null
+        $object = null,
+        $pdfa = false,
+        $testTdInOnePage = true,
+        $testIsImage = true
     ) {
         $this->content = $content;
         $this->orientation = $orientation;
@@ -71,6 +80,9 @@ class PdfEvent extends ActionEvent
         $this->templateName = $templateName;
         $this->fileName = $fileName;
         $this->object = $object;
+        $this->pdfa = $pdfa;
+        $this->testTdInOnePage = $testTdInOnePage;
+        $this->testIsImage = $testIsImage;
     }
 
     /**
@@ -264,6 +276,66 @@ class PdfEvent extends ActionEvent
     public function setObject($object)
     {
         $this->object = $object;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getPdfa()
+    {
+        return $this->pdfa;
+    }
+
+    /**
+     * @param bool $pdfa TRUE sets the document to PDF/A mode
+     *
+     * @return $this
+     */
+    public function setPdfa($pdfa)
+    {
+        $this->pdfa = $pdfa;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getTestTdInOnePage()
+    {
+        return $this->testTdInOnePage;
+    }
+
+    /**
+     * @param bool $testTdInOnePage TRUE checks that a table cell content fits on one page
+     *
+     * @return $this
+     */
+    public function setTestTdInOnePage($testTdInOnePage)
+    {
+        $this->testTdInOnePage = $testTdInOnePage;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getTestIsImage()
+    {
+        return $this->testIsImage;
+    }
+
+    /**
+     * @param bool $testIsImage TRUE checks that images used in the content exist
+     *
+     * @return $this
+     */
+    public function setTestIsImage($testIsImage)
+    {
+        $this->testIsImage = $testIsImage;
 
         return $this;
     }
