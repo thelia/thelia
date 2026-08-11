@@ -147,7 +147,8 @@ class State extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('IS_TRANSLATED', $state->getVirtualColumn('IS_TRANSLATED'))
                 ->set('LOCALE', $this->locale)
                 ->set('TITLE', $state->getVirtualColumn('i18n_TITLE'))
-                ->set('ISOCODE', $state->getIsocode());
+                ->set('ISOCODE', $state->getIsocode())
+                ->set('ISOCODE_3166_2', $state->getIsoCode3166_2());
 
             $this->addOutputFields($loopResultRow, $state);
 
