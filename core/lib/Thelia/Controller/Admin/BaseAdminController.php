@@ -23,6 +23,7 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
+use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Log\Tlog;
@@ -53,6 +54,9 @@ class BaseAdminController extends BaseController
             if (null !== $view) {
                 return $this->render($view);
             }
+        } catch (ResourceNotFoundException) {
+            // The requested template does not exist: this is a 404, not a server error.
+            return $this->pageNotFound();
         } catch (\Exception $exception) {
             return $this->errorPage($exception->getMessage());
         }
