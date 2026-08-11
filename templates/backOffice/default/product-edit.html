@@ -839,7 +839,7 @@ $(function() {
                     action : 'visibilityToggle'
                 },
                 success: function() {
-                    $('#visible_field').prop('checked', $that.find('input').prop('checked'))
+                    $('#visible_field').prop('checked', data.value)
                 }
             });
         });
