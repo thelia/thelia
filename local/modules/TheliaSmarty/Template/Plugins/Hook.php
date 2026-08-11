@@ -118,7 +118,11 @@ class Hook extends AbstractSmartyPlugin
         $this->smartyPluginTranslation?->saveDefaults();
 
         try {
-            $this->getDispatcher()->dispatch($event, $eventName);
+            try {
+                $this->getDispatcher()->dispatch($event, $eventName);
+            } catch (\TypeError $exception) {
+                $this->logHookTypeMismatch($hookName, $eventName, $exception);
+            }
 
             $content = trim($event->dump());
 
@@ -264,13 +268,41 @@ HTML;
         $this->smartyPluginTranslation?->saveDefaults();
 
         try {
-            $this->getDispatcher()->dispatch($event, $eventName);
+            try {
+                $this->getDispatcher()->dispatch($event, $eventName);
+            } catch (\TypeError $exception) {
+                $this->logHookTypeMismatch($hookName, $eventName, $exception);
+            }
         } finally {
             $this->smartyPluginTranslation?->restoreDefaults();
         }
 
         // save results so we can use it in forHook block
         $this->hookResults[$hookName] = $event->get();
+    }
+
+    /**
+     * A module method can be attached to a hook of the wrong kind through the back-office
+     * hook management screens: a "simple" method (expecting a HookRenderEvent) attached to
+     * a "block" hook, or the reverse. Since HookRenderEvent and HookRenderBlockEvent are
+     * unrelated sibling classes, the dispatcher then calls the listener with the wrong event
+     * type, which PHP reports as a TypeError. Log it clearly and degrade instead of letting
+     * the whole page fail; in debug mode, re-throw so the misconfiguration stays visible.
+     *
+     * @throws \TypeError
+     */
+    protected function logHookTypeMismatch($hookName, $eventName, \TypeError $exception): void
+    {
+        Tlog::getInstance()->error(sprintf(
+            'Hook "%s" (event "%s") could not be rendered: a module method is attached to it with an incompatible event type (a "simple" method attached to a "block" hook, or vice-versa). %s',
+            $hookName,
+            $eventName,
+            $exception->getMessage()
+        ));
+
+        if ($this->debug) {
+            throw $exception;
+        }
     }
 
     /**
