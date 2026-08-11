@@ -434,8 +434,8 @@ final class TheliaEvents
     public const ATTRIBUTE_UPDATE = 'action.updateAttribute';
     public const ATTRIBUTE_DELETE = 'action.deleteAttribute';
     public const ATTRIBUTE_UPDATE_POSITION = 'action.updateAttributePosition';
-    public const ATTRIBUTE_REMOVE_FROM_ALL_TEMPLATES = 'action.addAttributeToAllTemplate';
-    public const ATTRIBUTE_ADD_TO_ALL_TEMPLATES = 'action.removeAttributeFromAllTemplate';
+    public const ATTRIBUTE_REMOVE_FROM_ALL_TEMPLATES = 'action.removeAttributeFromAllTemplate';
+    public const ATTRIBUTE_ADD_TO_ALL_TEMPLATES = 'action.addAttributeToAllTemplate';
 
     // -- Features management ---------------------------------------------
 
@@ -443,8 +443,8 @@ final class TheliaEvents
     public const FEATURE_UPDATE = 'action.updateFeature';
     public const FEATURE_DELETE = 'action.deleteFeature';
     public const FEATURE_UPDATE_POSITION = 'action.updateFeaturePosition';
-    public const FEATURE_REMOVE_FROM_ALL_TEMPLATES = 'action.addFeatureToAllTemplate';
-    public const FEATURE_ADD_TO_ALL_TEMPLATES = 'action.removeFeatureFromAllTemplate';
+    public const FEATURE_REMOVE_FROM_ALL_TEMPLATES = 'action.removeFeatureFromAllTemplate';
+    public const FEATURE_ADD_TO_ALL_TEMPLATES = 'action.addFeatureToAllTemplate';
 
     // -- Attributes values management ----------------------------------------
 
