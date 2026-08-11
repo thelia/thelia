@@ -423,12 +423,12 @@ abstract class BaseController implements ControllerInterface
         // Browsers treat backslashes as slashes; normalize before parsing.
         $candidate = str_replace('\\', '/', $url);
 
-        $scheme = parse_url($candidate, PHP_URL_SCHEME);
+        $scheme = parse_url($candidate, \PHP_URL_SCHEME);
         if (!empty($scheme) && !\in_array(strtolower($scheme), ['http', 'https'], true)) {
             return null;
         }
 
-        $host = parse_url($candidate, PHP_URL_HOST);
+        $host = parse_url($candidate, \PHP_URL_HOST);
         if (empty($host)) {
             // No host: relative URL, always local.
             return $url;
@@ -441,7 +441,7 @@ abstract class BaseController implements ControllerInterface
             $allowedHosts[] = strtolower($request->getHost());
         }
 
-        $siteHost = parse_url(URL::getInstance()->absoluteUrl('/'), PHP_URL_HOST);
+        $siteHost = parse_url(URL::getInstance()->absoluteUrl('/'), \PHP_URL_HOST);
         if (!empty($siteHost)) {
             $allowedHosts[] = strtolower($siteHost);
         }
