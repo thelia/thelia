@@ -17,5 +17,6 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (@max_id + 1, '{$locale}', {intl l='Rounding mode for calculating the order total (1: sums of roundings, 2: rounding of sums).' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},
     {/if}
 {/foreach}
+;
 
 SET FOREIGN_KEY_CHECKS = 1;
