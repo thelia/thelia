@@ -22,6 +22,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Export\AbstractExport;
+use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
 use Thelia\Model\Export;
 use Thelia\Model\ExportCategory;
 use Thelia\Model\ExportCategoryQuery;
@@ -35,8 +36,10 @@ use Thelia\Model\Lang;
  */
 class ExportHandler
 {
-    public function __construct(protected EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        protected EventDispatcherInterface $eventDispatcher,
+        protected ExportCachePurger $exportCachePurger,
+    ) {
     }
 
     public function getExport(int $exportId, bool $dispatchException = false): ?Export
@@ -178,6 +181,8 @@ class ExportHandler
 
         $fileSystem = new Filesystem();
         $fileSystem->mkdir(\dirname($filePath));
+
+        $this->exportCachePurger->purgeOldExportFiles(\dirname($filePath));
 
         $file = new \SplFileObject($filePath, 'w+b');
 
