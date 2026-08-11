@@ -154,6 +154,13 @@ class Order implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     public ?float $discount = null;
 
+    /**
+     * Customer discount rate, as a percentage, already included in the order products prices.
+     * Read only: it is a snapshot taken when the order was placed.
+     */
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $customerDiscountRate = null;
+
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
     public float $postage;
@@ -407,6 +414,18 @@ class Order implements PropelResourceInterface
     public function setDiscount(?float $discount): self
     {
         $this->discount = $discount;
+
+        return $this;
+    }
+
+    public function getCustomerDiscountRate(): ?float
+    {
+        return $this->customerDiscountRate;
+    }
+
+    public function setCustomerDiscountRate(?float $customerDiscountRate): self
+    {
+        $this->customerDiscountRate = $customerDiscountRate;
 
         return $this;
     }
