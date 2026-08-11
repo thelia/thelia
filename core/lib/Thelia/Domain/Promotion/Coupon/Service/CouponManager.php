@@ -17,6 +17,9 @@ namespace Thelia\Domain\Promotion\Coupon\Service;
 use Thelia\Condition\Exception\UnmatchableConditionException;
 use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Domain\Promotion\Coupon\CouponFactory;
+use Thelia\Domain\Promotion\Coupon\Exception\CouponExpiredException;
+use Thelia\Domain\Promotion\Coupon\Exception\CouponNoUsageLeftException;
+use Thelia\Domain\Promotion\Coupon\Exception\InactiveCouponException;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
 use Thelia\Log\Tlog;
@@ -81,13 +84,15 @@ class CouponManager
      */
     public function getCurrentCoupons(): array
     {
-        $couponCodes = $this->facade->getRequest()->getSession()->getConsumedCoupons();
+        $session = $this->facade->getRequest()->getSession();
+        $couponCodes = $session->getConsumedCoupons();
 
         if (null === $couponCodes) {
             return [];
         }
 
         $coupons = [];
+        $codesToRemove = [];
 
         foreach ($couponCodes as $couponCode) {
             // Only valid coupons are returned
@@ -95,12 +100,24 @@ class CouponManager
                 if (false !== $couponInterface = $this->couponFactory->buildCouponFromCode($couponCode)) {
                     $coupons[] = $couponInterface;
                 }
+            } catch (CouponExpiredException|InactiveCouponException|CouponNoUsageLeftException $ex) {
+                // The coupon can no longer become valid again in this session: remove it from the cart
+                // instead of leaving it there silently ignored on every calculation.
+                $codesToRemove[] = $couponCode;
+
+                Tlog::getInstance()->warning(
+                    \sprintf('Coupon %s removed from cart, exception occurred: %s', $couponCode, $ex->getMessage()),
+                );
             } catch (\Exception $ex) {
                 // Just ignore the coupon and log the problem, just in case someone realize it.
                 Tlog::getInstance()->warning(
                     \sprintf('Coupon %s ignored, exception occurred: %s', $couponCode, $ex->getMessage()),
                 );
             }
+        }
+
+        if ([] !== $codesToRemove) {
+            $session->setConsumedCoupons(array_values(array_diff($couponCodes, $codesToRemove)));
         }
 
         return $coupons;
