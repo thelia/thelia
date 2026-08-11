@@ -367,7 +367,7 @@ foreach ($commands as $cmd) {
 restore_error_handler();
 
 if (!is_file($jwtPrivateKeyPath) || !is_file($jwtPublicKeyPath)) {
-    fwrite(STDERR, "  ERROR: JWT key pair missing ({$jwtPrivateKeyPath}, {$jwtPublicKeyPath}) — the API login endpoints would return 500. Run \"php bin/console lexik:jwt:generate-keypair --overwrite\".\n");
+    fwrite(STDERR, "  ERROR: JWT key pair missing ({$jwtPrivateKeyPath}, {$jwtPublicKeyPath}): the API login endpoints would answer 500. Run \"php bin/console lexik:jwt:generate-keypair --overwrite\".\n");
     ++$errors;
 }
 
