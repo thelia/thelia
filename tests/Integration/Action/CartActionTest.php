@@ -189,6 +189,38 @@ final class CartActionTest extends ActionIntegrationTestCase
         self::assertNotSame($cart->getToken(), $restored->getToken());
     }
 
+    public function testRestoreCurrentCartRealignsItemPricesWithTheCatalog(): void
+    {
+        $cart = $this->factory->cart();
+        $product = $this->factory->product(
+            $this->factory->category(),
+            $this->factory->taxRule(),
+            $this->factory->currency(),
+            ['baseQuantity' => 100],
+        );
+        $pse = $this->defaultPseFor($product->getId());
+        $this->dispatchAddItem($cart, $product->getId(), $pse->getId(), 1);
+
+        // The item was added while the product was on a special offer, which has since ended.
+        $item = CartItemQuery::create()->filterByCartId($cart->getId())->findOne();
+        $item->setPromo(1)->setPromoPrice('4.44')->save();
+        self::assertSame(4.44, $item->getRealPrice());
+
+        $this->mainRequest()->cookies->set(
+            ConfigQuery::read('cart.cookie_name', 'thelia_cart'),
+            $cart->getToken(),
+        );
+
+        $this->dispatch(new CartRestoreEvent(), TheliaEvents::CART_RESTORE_CURRENT);
+
+        $catalogPrice = $pse->getPricesByCurrency($cart->getCurrency(), 0);
+        $item->reload();
+
+        self::assertSame(0, (int) $item->getPromo());
+        self::assertSame((float) $catalogPrice->getPromoPrice(), (float) $item->getPromoPrice());
+        self::assertSame((float) $catalogPrice->getPrice(), $item->getRealPrice());
+    }
+
     public function testDuplicateAcceptsANullTokenWhenTheCartCookieIsDisabled(): void
     {
         $cart = $this->newEmptyCart();

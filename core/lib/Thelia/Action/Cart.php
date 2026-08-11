@@ -328,6 +328,19 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     public function updateCartPrices(CartModel $cart, CurrencyModel $currency): void
     {
+        $this->refreshCartItemPrices($cart, $currency);
+
+        // update the currency cart
+        $cart->setCurrencyId($currency->getId());
+        $cart->save();
+    }
+
+    /**
+     * Update the price, the promo price and the special offer status of the items of a cart, so that
+     * they always reflect the current catalog prices, in the given currency.
+     */
+    protected function refreshCartItemPrices(CartModel $cart, CurrencyModel $currency): void
+    {
         $customer = $cart->getCustomer();
         $discount = 0;
 
@@ -339,18 +352,25 @@ class Cart extends BaseAction implements EventSubscriberInterface
         foreach ($cart->getCartItems() as $cartItem) {
             $productSaleElements = $cartItem->getProductSaleElements();
 
+            if (null === $productSaleElements) {
+                continue;
+            }
+
             $productPrice = $productSaleElements->getPricesByCurrency($currency, $discount);
+
+            // Nothing changed in the catalog, leave this item alone.
+            if ((float) $cartItem->getPrice() === (float) $productPrice->getPrice()
+                && (float) $cartItem->getPromoPrice() === (float) $productPrice->getPromoPrice()
+                && (int) $cartItem->getPromo() === (int) $productSaleElements->getPromo()) {
+                continue;
+            }
 
             $cartItem
                 ->setPrice((string) $productPrice->getPrice())
-                ->setPromoPrice((string) $productPrice->getPromoPrice());
-
-            $cartItem->save();
+                ->setPromoPrice((string) $productPrice->getPromoPrice())
+                ->setPromo($productSaleElements->getPromo())
+                ->save();
         }
-
-        // update the currency cart
-        $cart->setCurrencyId($currency->getId());
-        $cart->save();
     }
 
     /**
@@ -456,6 +476,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         if ($cart->getCurrency()) {
             $this->getSession()->setCurrency($cart->getCurrency());
+        }
+
+        // A restored cart may have been created a long time ago: bring the price and the special offer
+        // status of its items back in line with the current catalog.
+        if (!$cart->isNew()) {
+            $this->refreshCartItemPrices($cart, $cart->getCurrency() ?: $this->getSession()->getCurrency(true));
         }
 
         $cartRestoreEvent->setCart($cart);
