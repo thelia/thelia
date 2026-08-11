@@ -16,9 +16,15 @@ namespace Thelia\Tests\Integration\Action;
 
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\Coupon\CouponDeleteEvent;
+use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
+use Thelia\Model\Order;
+use Thelia\Model\OrderCoupon;
+use Thelia\Model\OrderCouponQuery;
+use Thelia\Model\OrderStatus;
+use Thelia\Model\OrderStatusQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 
 final class CouponActionTest extends ActionIntegrationTestCase
@@ -56,6 +62,83 @@ final class CouponActionTest extends ActionIntegrationTestCase
         $this->dispatch($event, TheliaEvents::COUPON_DELETE);
 
         self::assertNull(CouponQuery::create()->findPk($couponId));
+    }
+
+    public function testUsageIsCountedWhenTheOrderIsPaid(): void
+    {
+        $coupon = $this->factory->coupon(['code' => 'PAID-CPN', 'maxUsage' => 1]);
+        $order = $this->factory->order();
+        $orderCoupon = $this->rememberCouponOnOrder($order, $coupon);
+
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+
+        self::assertSame(0, CouponQuery::create()->findPk($coupon->getId())->getMaxUsage());
+        self::assertFalse((bool) OrderCouponQuery::create()->findPk($orderCoupon->getId())->getUsageCanceled());
+    }
+
+    public function testUsageIsNotCountedWhenThePaymentIsAbandoned(): void
+    {
+        $coupon = $this->factory->coupon(['code' => 'UNPAID-CPN', 'maxUsage' => 1]);
+        $order = $this->factory->order();
+        $orderCoupon = $this->rememberCouponOnOrder($order, $coupon);
+
+        // What BasePaymentModuleController::cancelPayment() does when the payment fails.
+        $this->moveOrderTo($order, OrderStatus::CODE_NOT_PAID);
+
+        self::assertSame(1, CouponQuery::create()->findPk($coupon->getId())->getMaxUsage());
+        self::assertTrue((bool) OrderCouponQuery::create()->findPk($orderCoupon->getId())->getUsageCanceled());
+    }
+
+    public function testUsageIsGivenBackWhenAPaidOrderIsCanceled(): void
+    {
+        $coupon = $this->factory->coupon(['code' => 'CANCEL-CPN', 'maxUsage' => 1]);
+        $order = $this->factory->order();
+        $orderCoupon = $this->rememberCouponOnOrder($order, $coupon);
+
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+        $this->moveOrderTo($order, OrderStatus::CODE_CANCELED);
+
+        self::assertSame(1, CouponQuery::create()->findPk($coupon->getId())->getMaxUsage());
+        self::assertTrue((bool) OrderCouponQuery::create()->findPk($orderCoupon->getId())->getUsageCanceled());
+    }
+
+    /**
+     * Records a coupon on an order the way Action\Coupon::afterOrder() does on ORDER_BEFORE_PAYMENT:
+     * the coupon is remembered, but its usage is not counted yet.
+     */
+    private function rememberCouponOnOrder(Order $order, Coupon $coupon): OrderCoupon
+    {
+        $orderCoupon = new OrderCoupon();
+        $orderCoupon
+            ->setOrder($order)
+            ->setUsageCanceled(1)
+            ->setCode($coupon->getCode())
+            ->setType($coupon->getType())
+            ->setAmount('5')
+            ->setTitle($coupon->getTitle())
+            ->setShortDescription($coupon->getShortDescription())
+            ->setDescription($coupon->getDescription())
+            ->setStartDate($coupon->getStartDate())
+            ->setExpirationDate($coupon->getExpirationDate())
+            ->setIsCumulative($coupon->getIsCumulative())
+            ->setIsRemovingPostage($coupon->getIsRemovingPostage())
+            ->setIsAvailableOnSpecialOffers($coupon->getIsAvailableOnSpecialOffers())
+            ->setSerializedConditions($coupon->getSerializedConditions())
+            ->setPerCustomerUsageCount($coupon->getPerCustomerUsageCount())
+            ->save();
+
+        return $orderCoupon;
+    }
+
+    private function moveOrderTo(Order $order, string $statusCode): void
+    {
+        $status = OrderStatusQuery::create()->findOneByCode($statusCode);
+        self::assertNotNull($status, "Seeded order status '$statusCode' is missing.");
+
+        $event = new OrderEvent($order);
+        $event->setStatus($status->getId());
+
+        $this->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
     }
 
     /**

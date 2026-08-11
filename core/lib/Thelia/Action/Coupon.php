@@ -283,12 +283,10 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                 $couponModel = $couponQuery->findOneByCode($couponCode->getCode());
                 $couponModel->setLocale($this->getSession()?->getLang()?->getLocale());
 
-                /* decrease coupon quantity */
-                $this->couponManager->decrementQuantity($couponModel, $event->getOrder()?->getCustomerId());
-
-                /* memorize coupon */
+                /* memorize coupon. Its usage is not counted yet: this is done when the order is paid. */
                 $orderCoupon = new OrderCoupon();
                 $orderCoupon->setOrder($event->getOrder())
+                    ->setUsageCanceled(1)
                     ->setCode($couponModel->getCode())
                     ->setType($couponModel->getType())
                     ->setAmount((string) $couponCode->exec())
@@ -342,22 +340,26 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Cancels order coupons usage when order is canceled or refunded,
-     * or use canceled coupons again if the order is no longer canceled or refunded.
+     * Counts the usage of the coupons of an order as soon as the order is paid, and gives it back to
+     * the coupons when the order is no longer paid: canceled, refunded, or back to the "not paid" status.
+     *
+     * Any other status, a custom one for example, leaves the coupon usage count unchanged.
      *
      * @throws \Exception
      * @throws PropelException
      */
     public function orderStatusChange(OrderEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {
-        // The order has been canceled or refunded ?
-        if ($event->getOrder()->isCancelled() || $event->getOrder()->isRefunded()) {
+        $order = $event->getOrder();
+
+        // The order is no longer paid ?
+        if ($order->isNotPaid() || $order->isCancelled() || $order->isRefunded()) {
             // Cancel usage of all coupons for this order
             $usedCoupons = OrderCouponQuery::create()
                 ->filterByUsageCanceled(false)
-                ->findByOrderId($event->getOrder()->getId());
+                ->findByOrderId($order->getId());
 
-            $customerId = $event->getOrder()->getCustomerId();
+            $customerId = $order->getCustomerId();
 
             /** @var OrderCoupon $usedCoupon */
             foreach ($usedCoupons as $usedCoupon) {
@@ -369,13 +371,13 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                 // Mark coupon usage as canceled in the OrderCoupon table
                 $usedCoupon->setUsageCanceled(1)->save();
             }
-        } else {
-            // Mark canceled coupons for this order as used again
+        } elseif ($order->isPaid(false)) {
+            // Count the usage of the coupons which are not counted yet
             $usedCoupons = OrderCouponQuery::create()
                 ->filterByUsageCanceled(true)
-                ->findByOrderId($event->getOrder()->getId());
+                ->findByOrderId($order->getId());
 
-            $customerId = $event->getOrder()->getCustomerId();
+            $customerId = $order->getCustomerId();
 
             /** @var OrderCoupon $usedCoupon */
             foreach ($usedCoupons as $usedCoupon) {
